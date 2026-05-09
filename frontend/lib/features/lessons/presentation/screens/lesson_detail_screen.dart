@@ -80,7 +80,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   Widget _buildNotFoundScaffold() {
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(title: ''),
+      appBar: const NotebookDetailAppBar(title: AppStrings.lessonRecordTitle),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -101,14 +101,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   Widget _buildLoadingScaffold() {
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(title: ''),
+      appBar: const NotebookDetailAppBar(title: AppStrings.lessonRecordTitle),
       body: const Center(child: CircularProgressIndicator()),
     );
   }
 
   Widget _buildErrorScaffold() {
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(title: ''),
+      appBar: const NotebookDetailAppBar(title: AppStrings.lessonRecordTitle),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

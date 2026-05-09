@@ -336,9 +336,9 @@ class _TutorialPage extends StatelessWidget {
               key: const ValueKey('tutorial_name'),
               controller: nameController,
               onChanged: (_) => onTextChanged(),
-              decoration: const InputDecoration(
-                labelText: '선생님 이름',
-                hintText: '예) 김선생',
+              decoration: InputDecoration(
+                labelText: AppStrings.tutorialTeacherNameLabel,
+                hintText: AppStrings.tutorialTeacherNameHint,
               ),
             ),
             const SizedBox(height: AppSpacing.space4),
@@ -392,9 +392,9 @@ class _TutorialPage extends StatelessWidget {
           onChanged: (_) => onTextChanged(),
           minLines: 4,
           maxLines: 6,
-          decoration: const InputDecoration(
-            labelText: '레슨 노트',
-            hintText: '예) 오늘 연습한 내용과 다음 과제를 적어주세요.',
+          decoration: InputDecoration(
+            labelText: AppStrings.lessonNotesTitle,
+            hintText: AppStrings.tutorialLessonNoteHint,
           ),
         );
       case TutorialStep.createLesson:

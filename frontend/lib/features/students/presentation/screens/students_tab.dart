@@ -637,9 +637,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return EmptyStateWidget(
       icon: Icons.people_outline,
-      title: query.isNotEmpty ? '검색 결과가 없습니다' : '아직 등록된 학생이 없습니다',
-      subtitle: query.isEmpty ? '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요' : null,
-      actionLabel: query.isEmpty ? '학생 추가' : null,
+      title: query.isNotEmpty ? AppStrings.studentsSearchEmptyTitle : AppStrings.studentsEmptyTitle,
+      subtitle: query.isEmpty ? AppStrings.studentsEmptySubtitle : null,
+      actionLabel: query.isEmpty ? AppStrings.studentAddLabel : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
       onAction:
           query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,

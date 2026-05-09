@@ -32,7 +32,7 @@ class FollowListScreen extends ConsumerWidget {
             labelColor: AppColors.paperAccent,
             unselectedLabelColor: AppColors.inkSecondary,
             indicatorColor: AppColors.paperAccent,
-            tabs: [Tab(text: '전체'), Tab(text: '선생님'), Tab(text: '학원')],
+            tabs: [Tab(text: AppStrings.followTabAll), Tab(text: AppStrings.teacher), Tab(text: AppStrings.followTabAcademy)],
           ),
         ),
         body: TabBarView(
@@ -71,11 +71,11 @@ class _FollowTab extends ConsumerWidget {
             icon: Icons.person_add_outlined,
             title:
                 filterType == null
-                    ? '팔로우한 계정이 없습니다'
+                    ? AppStrings.followEmptyAll
                     : filterType == FollowTargetType.teacher
-                    ? '팔로우한 선생님이 없습니다'
-                    : '팔로우한 학원이 없습니다',
-            subtitle: '선생님이나 학원을 팔로우하면\n소식을 받아볼 수 있습니다',
+                    ? AppStrings.followEmptyTeacher
+                    : AppStrings.followEmptyAcademy,
+            subtitle: AppStrings.followEmptySubtitle,
           );
         }
 
@@ -104,9 +104,9 @@ class _FollowTab extends ConsumerWidget {
   ) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: '팔로우 취소',
+      title: AppStrings.followCancelTitle,
       content: Text('${follow.followingId}의 팔로우를 취소하시겠습니까?'),
-      confirmLabel: '팔로우 취소',
+      confirmLabel: AppStrings.followCancelConfirmLabel,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
       onConfirm: () => Navigator.pop(context, true),

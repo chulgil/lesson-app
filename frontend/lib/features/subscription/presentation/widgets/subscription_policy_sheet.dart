@@ -539,7 +539,7 @@ class _AddRescheduleSheetState extends State<_AddRescheduleSheet> {
             controller: _reasonController,
             decoration: InputDecoration(
               labelText: AppStrings.addReason,
-              hintText: '예: 이사 관련 일정 변경',
+              hintText: AppStrings.scheduleChangeReasonHint,
               border: OutlineInputBorder(borderRadius: BorderRadius.zero),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.zero,

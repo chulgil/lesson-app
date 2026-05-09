@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -110,7 +111,7 @@ class FollowCard extends StatelessWidget {
                       : AppColors.inkTertiary,
               size: 20,
             ),
-            tooltip: follow.notificationEnabled ? '알림 끄기' : '알림 켜기',
+            tooltip: follow.notificationEnabled ? AppStrings.followNotificationOffTooltip : AppStrings.followNotificationOnTooltip,
           ),
 
           // Unfollow button
@@ -121,7 +122,7 @@ class FollowCard extends StatelessWidget {
               color: AppColors.inkTertiary,
               size: 20,
             ),
-            tooltip: '팔로우 취소',
+            tooltip: AppStrings.followUnfollowTooltip,
           ),
         ],
       ),

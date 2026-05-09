@@ -193,7 +193,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: Text(isEditing ? '수정' : '추가'),
+                        child: Text(isEditing ? AppStrings.edit : AppStrings.add),
                       ),
                     ),
                   ],

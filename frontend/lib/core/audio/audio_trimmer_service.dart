@@ -29,7 +29,9 @@ class AudioTrimmerService {
       }
 
       // Check if trimming is needed (including middle silence)
-      if (trimStart == Duration.zero && trimEnd == Duration.zero && silencePeriods.isEmpty) {
+      if (trimStart == Duration.zero &&
+          trimEnd == Duration.zero &&
+          silencePeriods.isEmpty) {
         return TrimResult.noTrim(inputPath);
       }
 
@@ -38,14 +40,17 @@ class AudioTrimmerService {
       Duration adjustedTrimStart = trimStart;
       Duration adjustedTrimEnd = trimEnd;
 
-      final contentDuration = totalDuration - adjustedTrimStart - adjustedTrimEnd;
+      final contentDuration =
+          totalDuration - adjustedTrimStart - adjustedTrimEnd;
       if (contentDuration < minContentDuration) {
         // Reduce trimEnd first to preserve minimum content
         final deficit = minContentDuration - contentDuration;
         adjustedTrimEnd = adjustedTrimEnd - deficit;
         if (adjustedTrimEnd < Duration.zero) {
           // If still not enough, also reduce trimStart
-          adjustedTrimStart = adjustedTrimStart + adjustedTrimEnd; // adjustedTrimEnd is negative
+          adjustedTrimStart =
+              adjustedTrimStart +
+              adjustedTrimEnd; // adjustedTrimEnd is negative
           adjustedTrimEnd = Duration.zero;
           if (adjustedTrimStart < Duration.zero) {
             adjustedTrimStart = Duration.zero;
@@ -54,7 +59,8 @@ class AudioTrimmerService {
       }
 
       // Final content duration check (minimum 1 second)
-      final finalContentDuration = totalDuration - adjustedTrimStart - adjustedTrimEnd;
+      final finalContentDuration =
+          totalDuration - adjustedTrimStart - adjustedTrimEnd;
       if (finalContentDuration.inSeconds < 1) {
         return TrimResult.failed(
           inputPath,
@@ -154,12 +160,14 @@ class AudioTrimmerService {
 
       // Extract filename and extension manually
       final lastSlash = inputPath.lastIndexOf('/');
-      final fullName = lastSlash >= 0 ? inputPath.substring(lastSlash + 1) : inputPath;
+      final fullName =
+          lastSlash >= 0 ? inputPath.substring(lastSlash + 1) : inputPath;
       final lastDot = fullName.lastIndexOf('.');
       final fileName = lastDot >= 0 ? fullName.substring(0, lastDot) : fullName;
       final extension = lastDot >= 0 ? fullName.substring(lastDot) : '';
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final backupPath = '${backupDir.path}/${fileName}_original_$timestamp$extension';
+      final backupPath =
+          '${backupDir.path}/${fileName}_original_$timestamp$extension';
 
       await inputFile.copy(backupPath);
       return backupPath;
@@ -207,7 +215,8 @@ class AudioTrimmerService {
         final validSilencePeriods = <SilencePeriod>[];
         for (final silence in silencePeriods) {
           // Skip silence periods that are completely outside content range
-          if (silence.endTime <= contentStart || silence.startTime >= contentEnd) {
+          if (silence.endTime <= contentStart ||
+              silence.startTime >= contentEnd) {
             continue;
           }
 
@@ -224,10 +233,9 @@ class AudioTrimmerService {
 
           // Only add if there's still a valid silence period after adjustment
           if (adjustedEnd > adjustedStart) {
-            validSilencePeriods.add(SilencePeriod(
-              startTime: adjustedStart,
-              endTime: adjustedEnd,
-            ));
+            validSilencePeriods.add(
+              SilencePeriod(startTime: adjustedStart, endTime: adjustedEnd),
+            );
           }
         }
 
@@ -288,15 +296,20 @@ class AudioTrimmerService {
       try {
         final json = jsonDecode(content) as Map<String, dynamic>;
         final segmentsJson = json['segments'] as List<dynamic>? ?? [];
-        final segments = segmentsJson
-            .map((s) => PlayableSegment.fromJson(s as Map<String, dynamic>))
-            .toList();
+        final segments =
+            segmentsJson
+                .map((s) => PlayableSegment.fromJson(s as Map<String, dynamic>))
+                .toList();
 
         return TrimMetadata(
           trimStart: Duration(milliseconds: json['trimStart'] as int? ?? 0),
           trimEnd: Duration(milliseconds: json['trimEnd'] as int? ?? 0),
-          totalDuration: Duration(milliseconds: json['totalDuration'] as int? ?? 0),
-          contentStart: Duration(milliseconds: json['contentStart'] as int? ?? 0),
+          totalDuration: Duration(
+            milliseconds: json['totalDuration'] as int? ?? 0,
+          ),
+          contentStart: Duration(
+            milliseconds: json['contentStart'] as int? ?? 0,
+          ),
           contentEnd: Duration(milliseconds: json['contentEnd'] as int? ?? 0),
           segments: segments,
         );
@@ -325,6 +338,45 @@ class AudioTrimmerService {
     }
   }
 
+  /// Calculate playback duration after trimming.
+  ///
+  /// Priority:
+  /// 1) Use companion trim metadata when present (authoritative for trimmed/segment playback).
+  /// 2) Fallback to arithmetic with provided trim inputs.
+  Future<Duration> calculatePlayableDuration({
+    required String filePath,
+    required Duration totalDuration,
+    required Duration trimmedStart,
+    required Duration trimmedEnd,
+    List<SilencePeriod> middleSilencePeriods = const [],
+  }) async {
+    final metadata = await readTrimMetadata(filePath);
+    if (metadata != null && metadata.totalDuration > Duration.zero) {
+      final contentDuration = metadata.effectivePlayDuration;
+      if (contentDuration > Duration.zero) {
+        return contentDuration;
+      }
+    }
+
+    var duration = totalDuration - trimmedStart - trimmedEnd;
+    if (duration < Duration.zero) {
+      return Duration.zero;
+    }
+
+    final middleSilenceMs = _sumPositiveDurationMs(
+      middleSilencePeriods,
+      fallbackTotalDuration: totalDuration,
+      effectiveRangeStart: trimmedStart,
+      effectiveRangeEnd: totalDuration - trimmedEnd,
+    );
+    final adjustedMs = duration.inMilliseconds - middleSilenceMs;
+    if (adjustedMs <= 0) {
+      return Duration.zero;
+    }
+
+    return Duration(milliseconds: adjustedMs);
+  }
+
   /// Delete trim metadata file.
   Future<void> deleteTrimMetadata(String audioPath) async {
     try {
@@ -335,6 +387,47 @@ class AudioTrimmerService {
     } catch (e) {
       // Error deleting trim metadata
     }
+  }
+
+  /// Sum middle-silence durations that fall inside the effective playback window.
+  int _sumPositiveDurationMs(
+    List<SilencePeriod> periods, {
+    required Duration fallbackTotalDuration,
+    required Duration effectiveRangeStart,
+    required Duration effectiveRangeEnd,
+  }) {
+    final maxDuration = fallbackTotalDuration;
+    var totalMs = 0;
+
+    for (final period in periods) {
+      final safeStart = _clampDuration(
+        period.startTime,
+        Duration.zero,
+        maxDuration,
+      );
+      final safeEnd = _clampDuration(
+        period.endTime,
+        Duration.zero,
+        maxDuration,
+      );
+      final clampedStart =
+          safeStart < effectiveRangeStart ? effectiveRangeStart : safeStart;
+      final clampedEnd =
+          safeEnd > effectiveRangeEnd ? effectiveRangeEnd : safeEnd;
+
+      final lengthMs = (clampedEnd - clampedStart).inMilliseconds;
+      if (lengthMs > 0) {
+        totalMs += lengthMs;
+      }
+    }
+
+    return totalMs;
+  }
+
+  Duration _clampDuration(Duration value, Duration min, Duration max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
   }
 }
 
@@ -382,19 +475,13 @@ class TrimMetadata {
     if (segments.isEmpty) {
       return contentDuration;
     }
-    return segments.fold(
-      Duration.zero,
-      (sum, seg) => sum + seg.duration,
-    );
+    return segments.fold(Duration.zero, (sum, seg) => sum + seg.duration);
   }
 }
 
 /// A playable segment within the audio file.
 class PlayableSegment {
-  const PlayableSegment({
-    required this.start,
-    required this.end,
-  });
+  const PlayableSegment({required this.start, required this.end});
 
   final Duration start;
   final Duration end;
@@ -402,11 +489,12 @@ class PlayableSegment {
   Duration get duration => end - start;
 
   Map<String, dynamic> toJson() => {
-        'start': start.inMilliseconds,
-        'end': end.inMilliseconds,
-      };
+    'start': start.inMilliseconds,
+    'end': end.inMilliseconds,
+  };
 
-  factory PlayableSegment.fromJson(Map<String, dynamic> json) => PlayableSegment(
+  factory PlayableSegment.fromJson(Map<String, dynamic> json) =>
+      PlayableSegment(
         start: Duration(milliseconds: json['start'] as int),
         end: Duration(milliseconds: json['end'] as int),
       );

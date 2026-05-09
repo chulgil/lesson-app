@@ -182,13 +182,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       loading:
           () => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(title: ''),
+            appBar: const NotebookDetailAppBar(title: AppStrings.requestDetailTitle),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(title: ''),
+            appBar: const NotebookDetailAppBar(title: AppStrings.requestDetailTitle),
             body: Center(
               child: Text(
                 AppStrings.requestLoadError,
@@ -202,7 +202,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         if (request == null) {
           return NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(title: ''),
+            appBar: const NotebookDetailAppBar(title: AppStrings.requestDetailTitle),
             body: Center(
               child: Text(
                 AppStrings.requestNotFound,

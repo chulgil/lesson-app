@@ -137,8 +137,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
   Future<Duration?> _getActualFileDuration(String filePath) async {
     try {
       final player = AudioPlayer();
-      await player.setFilePath(filePath);
-      final duration = player.duration;
+      final duration = await player.setFilePath(filePath);
       await player.dispose();
       return duration;
     } catch (e) {
@@ -222,23 +221,23 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       );
     }
 
-    // Calculate actual duration after trimming using milliseconds for accuracy
-    int actualDurationMs = totalDuration.inMilliseconds;
-    if (trimResult?.hasTrimming == true) {
-      actualDurationMs -= trimResult!.trimmedStart.inMilliseconds;
-      actualDurationMs -= trimResult.trimmedEnd.inMilliseconds;
-    }
-    // Also subtract middle silence periods
-    if (smartRecordingState.silencePeriods.isNotEmpty) {
-      final middleSilenceMs = smartRecordingState.silencePeriods.fold<int>(
-        0,
-        (sum, period) => sum + period.duration.inMilliseconds,
-      );
-      actualDurationMs -= middleSilenceMs;
-    }
-    // Convert to seconds with rounding, ensure at least 1 second
-    int actualDuration = (actualDurationMs / 1000).round();
-    if (actualDuration < 1) actualDuration = 1;
+    final trimStartForDuration =
+        trimResult?.trimmedStart ?? smartRecordingState.trimmedStart;
+    final trimEndForDuration =
+        trimResult?.trimmedEnd ?? smartRecordingState.trimmedEnd;
+    final durationForSave =
+        needsTrimming
+            ? await AudioTrimmerService.instance.calculatePlayableDuration(
+              filePath: filePath,
+              totalDuration: totalDuration,
+              trimmedStart: trimStartForDuration,
+              trimmedEnd: trimEndForDuration,
+              middleSilencePeriods: smartRecordingState.silencePeriods,
+            )
+            : totalDuration;
+
+    final actualDuration =
+        durationForSave.inSeconds < 1 ? 1 : durationForSave.inSeconds;
 
     try {
       await ref

@@ -276,7 +276,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
               TextFormField(
                 controller: _nicknameController,
                 decoration: _inputDecoration(
-                  hintText: '예) 영희쌤, 바이올린 선생님',
+                  hintText: AppStrings.teacherNicknameHint,
                 ),
                 textInputAction: TextInputAction.next,
               ),

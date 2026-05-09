@@ -5799,6 +5799,17 @@ class AppStrings {
   static const followTitle = '팔로우';
   static const followUnfollowed = '팔로우가 취소되었습니다';
   static const followFeedTitle = '소식';
+  static const followTabAll = '전체';
+  static const followTabAcademy = '학원';
+  static const followEmptyAll = '팔로우한 계정이 없습니다';
+  static const followEmptyTeacher = '팔로우한 선생님이 없습니다';
+  static const followEmptyAcademy = '팔로우한 학원이 없습니다';
+  static const followEmptySubtitle = '선생님이나 학원을 팔로우하면\n소식을 받아볼 수 있습니다';
+  static const followCancelTitle = '팔로우 취소';
+  static const followCancelConfirmLabel = '팔로우 취소';
+  static const followNotificationOnTooltip = '알림 켜기';
+  static const followNotificationOffTooltip = '알림 끄기';
+  static const followUnfollowTooltip = '팔로우 취소';
 
   // ─── Student Home ───
   static const studentHomePracticeReminder = '연습 리마인더';
@@ -6567,6 +6578,7 @@ class AppStrings {
   static const studentSharedRecordings = '공유 녹음';
   static const studentWeeklyPracticeStatus = '주간 연습 현황';
   static const studentSharedRecordingsSection = '공유된 녹음';
+  static const studentDetailTitle = '학생 상세';
   static const studentDetailStatsPreparing = '상세 통계 기능은 준비 중입니다';
   static const studentDetailStatsButton = '상세 통계 보기';
   static const studentStatTotalLessons = '총 레슨';
@@ -6837,4 +6849,42 @@ class AppStrings {
   static const ratingFeedbackBody = '소중한 의견을 개발팀에 직접 전달할게요.';
   static const ratingSendFeedback = '피드백 보내기';
   static const ratingLater = '나중에';
+
+  // ── Announcement edit/delete ──
+  static const announcementEditTitle = '공지 수정';
+  static const announcementEditHint = '공지 내용을 수정하세요';
+  static const announcementDeleteTitle = '공지 삭제';
+  static const announcementDeleteConfirm =
+      '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.';
+
+  // ── Add student method screen ──
+  static const studentAddMethodBadgeRecommended = '권장';
+  static const studentAddMethodInviteDescription =
+      '학생에게 초대 링크를 보내면\n학생 정보가 자동으로 등록됩니다.';
+  static const studentAddMethodDirectDescription =
+      '학생 정보를 직접 입력하여\n관리할 수 있습니다.';
+  static const studentAddMethodInviteButton = '초대하기';
+  static const studentAddMethodDirectButton = '작성하기';
+
+  // ── Students tab empty state ──
+  static const studentsEmptyTitle = '아직 등록된 학생이 없습니다';
+  static const studentsEmptySubtitle =
+      '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요';
+  static const studentsSearchEmptyTitle = '검색 결과가 없습니다';
+
+  // ── Parent profile menu ──
+  static const parentProfileLanguageLabel = '언어';
+  static const parentProfileRecordingBackupLabel = '녹음 백업';
+  static const parentProfileSectionSettings = '설정';
+  static const parentProfileSectionSupport = '지원';
+  static const parentProfileSectionAccount = '계정';
+
+  // ── Schedule change reason ──
+  static const scheduleChangeReasonHint = '예: 이사 관련 일정 변경';
+
+  // ── Onboarding / profile hints ──
+  static const teacherNicknameHint = '예) 영희쌤, 바이올린 선생님';
+  static const tutorialTeacherNameLabel = '선생님 이름';
+  static const tutorialTeacherNameHint = '예) 김선생';
+  static const tutorialLessonNoteHint = '예) 오늘 연습한 내용과 다음 과제를 적어주세요.';
 }

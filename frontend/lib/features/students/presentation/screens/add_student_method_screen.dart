@@ -38,9 +38,9 @@ class AddStudentMethodScreen extends StatelessWidget {
               _MethodCard(
                 icon: Icons.mail_outline,
                 title: AppStrings.studentInviteTitle,
-                badge: '권장',
-                description: '학생에게 초대 링크를 보내면\n학생 정보가 자동으로 등록됩니다.',
-                buttonText: '초대하기',
+                badge: AppStrings.studentAddMethodBadgeRecommended,
+                description: AppStrings.studentAddMethodInviteDescription,
+                buttonText: AppStrings.studentAddMethodInviteButton,
                 isPrimary: true,
                 onTap: () {
                   context.push(AppRoutes.invite);
@@ -53,8 +53,8 @@ class AddStudentMethodScreen extends StatelessWidget {
               _MethodCard(
                 icon: Icons.edit_note,
                 title: AppStrings.studentDirectRegister,
-                description: '학생 정보를 직접 입력하여\n관리할 수 있습니다.',
-                buttonText: '작성하기',
+                description: AppStrings.studentAddMethodDirectDescription,
+                buttonText: AppStrings.studentAddMethodDirectButton,
                 isPrimary: false,
                 onTap: () {
                   context.push(AppRoutes.addStudent);

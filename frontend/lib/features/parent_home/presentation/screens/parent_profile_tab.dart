@@ -62,13 +62,13 @@ class ParentProfileTab extends ConsumerWidget {
 
             // General settings
             ProfileMenuSection(
-              title: '설정',
+              title: AppStrings.parentProfileSectionSettings,
               items: [
                 ProfileMenuItem(
                   icon: Icons.language,
-                  label: '언어',
+                  label: AppStrings.parentProfileLanguageLabel,
                   trailing: Text(
-                    '한국어',
+                    AppStrings.studentHomeMenuLanguageValue,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -77,7 +77,7 @@ class ParentProfileTab extends ConsumerWidget {
                 ),
                 ProfileMenuItem(
                   icon: Icons.backup_outlined,
-                  label: '녹음 백업',
+                  label: AppStrings.parentProfileRecordingBackupLabel,
                   onTap: () => context.push(AppRoutes.backupSettings),
                 ),
               ],
@@ -87,16 +87,16 @@ class ParentProfileTab extends ConsumerWidget {
 
             // Support section
             ProfileMenuSection(
-              title: '지원',
+              title: AppStrings.parentProfileSectionSupport,
               items: [
                 ProfileMenuItem(
                   icon: Icons.help_outline,
-                  label: '도움말',
+                  label: AppStrings.profileHelpLabel,
                   onTap: () => context.push(AppRoutes.help),
                 ),
                 ProfileMenuItem(
                   icon: Icons.info_outline,
-                  label: '앱 정보',
+                  label: AppStrings.profileAppInfoLabel,
                   trailing: Text(
                     'v1.0.0',
                     style: AppTypography.bodyMedium.copyWith(
@@ -112,21 +112,21 @@ class ParentProfileTab extends ConsumerWidget {
 
             // Account section
             ProfileMenuSection(
-              title: '계정',
+              title: AppStrings.parentProfileSectionAccount,
               items: [
                 ProfileMenuItem(
                   icon: Icons.description_outlined,
-                  label: '이용약관',
+                  label: AppStrings.profileTermsLabel,
                   onTap: () => context.push(AppRoutes.termsOfService),
                 ),
                 ProfileMenuItem(
                   icon: Icons.privacy_tip_outlined,
-                  label: '개인정보처리방침',
+                  label: AppStrings.profilePrivacyPolicyLabel,
                   onTap: () => context.push(AppRoutes.privacyPolicy),
                 ),
                 ProfileMenuItem(
                   icon: Icons.logout,
-                  label: '로그아웃',
+                  label: AppStrings.profileLogoutLabel,
                   labelColor: AppColors.paperAccent,
                   onTap: () => _showLogoutDialog(context),
                 ),
@@ -143,9 +143,9 @@ class ParentProfileTab extends ConsumerWidget {
   void _showLogoutDialog(BuildContext context) {
     showNotebookDialog<void>(
       context: context,
-      title: '로그아웃',
+      title: AppStrings.parentHomeLogout,
       content: const Text(AppStrings.parentHomeLogoutConfirm),
-      confirmLabel: '로그아웃',
+      confirmLabel: AppStrings.parentHomeLogout,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
       onConfirm: () {

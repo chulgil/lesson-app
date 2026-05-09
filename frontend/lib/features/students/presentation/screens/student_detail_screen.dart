@@ -111,7 +111,7 @@ class StudentDetailScreen extends ConsumerWidget {
   Widget _buildShellScaffold(BuildContext context, {required Widget child}) {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: NotebookDetailAppBar(title: ''),
+      appBar: const NotebookDetailAppBar(title: AppStrings.studentDetailTitle),
       body: SafeArea(child: child),
     );
   }

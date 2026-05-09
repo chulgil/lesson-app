@@ -92,18 +92,18 @@ class _AnnouncementCard extends ConsumerWidget {
     final controller = TextEditingController(text: announcement.message);
     final result = await showNotebookDialog<String>(
       context: context,
-      title: '공지 수정',
+      title: AppStrings.announcementEditTitle,
       content: TextField(
         controller: controller,
         maxLines: 4,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: '공지 내용을 수정하세요',
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          hintText: AppStrings.announcementEditHint,
         ),
       ),
-      confirmLabel: '저장',
+      confirmLabel: AppStrings.save,
       onConfirm: () => Navigator.pop(context, controller.text.trim()),
-      cancelLabel: '취소',
+      cancelLabel: AppStrings.cancel,
       onCancel: () => Navigator.pop(context),
     );
     controller.dispose();
@@ -126,13 +126,11 @@ class _AnnouncementCard extends ConsumerWidget {
   void _deleteAnnouncement(BuildContext context, WidgetRef ref) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: '공지 삭제',
-      content: const Text(
-        '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.',
-      ),
-      confirmLabel: '삭제',
+      title: AppStrings.announcementDeleteTitle,
+      content: const Text(AppStrings.announcementDeleteConfirm),
+      confirmLabel: AppStrings.delete,
       onConfirm: () => Navigator.pop(context, true),
-      cancelLabel: '취소',
+      cancelLabel: AppStrings.cancel,
       onCancel: () => Navigator.pop(context, false),
       isDestructive: true,
     );
@@ -176,7 +174,7 @@ class _AnnouncementCard extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    isDayOff ? '휴강 · $dateText' : '일반 공지',
+                    isDayOff ? '${AppStrings.announcementTypeDayOff} · $dateText' : AppStrings.announcementTypeGeneral,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
