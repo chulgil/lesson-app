@@ -39,8 +39,11 @@ class SyncAdapterRegistry {
       'manual-teacher',
       'location',
     ];
-    if (kDebugMode && domains.length != 20) {
-      throw StateError('SyncAdapter domain count should be 20 in baseline');
+    const expectedDomainCount = 21;
+    if (kDebugMode && domains.length != expectedDomainCount) {
+      throw StateError(
+        'SyncAdapter domain count should be $expectedDomainCount in baseline',
+      );
     }
 
     return domains.map((domain) => RestSyncAdapter(domain: domain));

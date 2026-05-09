@@ -56,6 +56,7 @@ class SyncService {
   final _uuid = const Uuid();
   final _statsStream = StreamController<SyncServiceStats>.broadcast();
   StreamSubscription<SyncConnectivity>? _connectivitySubscription;
+  bool _isDisposed = false;
 
   bool _isInitialized = false;
   bool _isRunning = false;
@@ -76,6 +77,9 @@ class SyncService {
 
     _connectivitySubscription = _connectivityService.connectivityChanges.listen(
       (state) {
+        if (_isDisposed) {
+          return;
+        }
         if (state == SyncConnectivity.online) {
           unawaited(syncPending());
         }
@@ -89,12 +93,18 @@ class SyncService {
   }
 
   Future<void> dispose() async {
+    _isDisposed = true;
     await _connectivitySubscription?.cancel();
     _pollTimer?.cancel();
-    await _statsStream.close();
+    if (!_statsStream.isClosed) {
+      await _statsStream.close();
+    }
   }
 
   Future<void> syncPending() async {
+    if (_isDisposed) {
+      return;
+    }
     if (_isRunning) {
       return;
     }
@@ -238,6 +248,9 @@ class SyncService {
   }
 
   Future<void> _refreshStats({String nextAction = 'idle'}) async {
+    if (_statsStream.isClosed) {
+      return;
+    }
     final stats = await _readStats(nextAction: nextAction);
     _statsStream.add(stats);
   }

@@ -35,6 +35,8 @@
 - `flutter --no-version-check test frontend/test/architecture/notebook_design_contract_test.dart`
 - `flutter --no-version-check test frontend/test/architecture/ux_overlay_label_contract_test.dart`
 - `flutter --no-version-check test frontend/test/architecture/header_primary_action_contract_test.dart`
+- `flutter --no-version-check test frontend/test/core/sync/sync_queue_store_test.dart`
+- `flutter --no-version-check test frontend/test/core/sync/sync_service_test.dart`
 
 이 항목은 변경 전/후 `git status`에서 UI 라벨 문구가 변경되었는지 확인되면 반드시 재실행한다.
 

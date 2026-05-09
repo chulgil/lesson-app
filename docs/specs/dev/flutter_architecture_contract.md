@@ -153,6 +153,24 @@ Hive, SharedPreferences, SecureStorage 같은 로컬 저장소는 business entit
 - 같은 기기에서 역할/계정이 바뀌어도 flag가 섞이지 않는 테스트를 추가한다.
 - 저장소 provider를 다른 feature에서 써야 하면 feature facade에서 public API로 export한다.
 
+## 오프라인 모드 검증 (Offline Verification)
+
+오프라인/복구 흐름은 `SyncQueueStore` + `SyncService` 계약으로 고정한다.
+
+- `SyncQueueStore`는 앱 시작 시 마이그레이션으로 `items` 레거시 키와 잘못된 큐 엔트리를 정리해야 한다.
+- `queueMutation`은 오프라인 상태에서 `pending` 큐잉되고, 네트워크 회복 시 자동 재시도를 수행해야 한다.
+- 재시도 실패는 `retryCount`를 누적하고, `retryCount < maxRetryCount`이면 `pending` 유지, 초과 시 `failed` 처리해야 한다.
+- 미지원 도메인은 즉시 `NO_ADAPTER` 에러(`errorCode`)로 실패 처리하고 API 호출을 시도하지 않는다.
+- `currentStats()`는 `pending/syncing/synced/failed/queueBacklog`가 상태와 일치해야 한다.
+
+검증 명령:
+
+```bash
+cd frontend
+flutter test test/core/sync/sync_queue_store_test.dart
+flutter test test/core/sync/sync_service_test.dart
+```
+
 온보딩 예시:
 
 ```text
