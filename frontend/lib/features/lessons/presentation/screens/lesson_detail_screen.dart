@@ -386,8 +386,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   Widget _buildNotesTab(Lesson lesson) {
+    // Feedback prompt only for subscription lessons (student is connected).
+    // Manual lessons without student connection don't need feedback alerts.
     final needsFeedback =
         widget.isTeacher &&
+        lesson.subscriptionId != null &&
         lesson.displayStatus == LessonStatus.completed &&
         (lesson.feedback == null || lesson.feedback!.isEmpty);
 
