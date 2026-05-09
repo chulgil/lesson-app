@@ -58,6 +58,11 @@ enum DetailAppBarLeading {
 class NotebookDetailAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final String title;
+
+  /// Custom title widget (e.g., GestureDetector-wrapped text).
+  /// When provided, [title] is ignored.
+  final Widget? titleWidget;
+
   final DetailAppBarLeading leading;
   final VoidCallback? onLeadingTap;
   final List<DetailAppBarAction> actions;
@@ -73,7 +78,8 @@ class NotebookDetailAppBar extends StatelessWidget
 
   const NotebookDetailAppBar({
     super.key,
-    required this.title,
+    this.title = '',
+    this.titleWidget,
     this.leading = DetailAppBarLeading.back,
     this.onLeadingTap,
     this.actions = const [],
@@ -133,7 +139,7 @@ class NotebookDetailAppBar extends StatelessWidget
         icon: Icon(leadingIcon),
         onPressed: onLeadingTap ?? () => Navigator.of(context).maybePop(),
       ),
-      title: Text(
+      title: titleWidget ?? Text(
         title,
         style: NotebookTypography.appBarTitle,
       ),

@@ -11,6 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -181,13 +182,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       loading:
           () => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: AppBar(),
+            appBar: const NotebookDetailAppBar(title: ''),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: AppBar(),
+            appBar: const NotebookDetailAppBar(title: ''),
             body: Center(
               child: Text(
                 AppStrings.requestLoadError,
@@ -201,7 +202,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         if (request == null) {
           return NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: AppBar(),
+            appBar: const NotebookDetailAppBar(title: ''),
             body: Center(
               child: Text(
                 AppStrings.requestNotFound,
@@ -378,15 +379,18 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     );
   }
 
-  AppBar _buildChatAppBar(
+  PreferredSizeWidget _buildChatAppBar(
     BuildContext context,
     UnifiedLessonRequest request,
     String opponentName,
     String? academyName,
   ) {
-    return AppBar(
-      titleSpacing: 0,
-      title: GestureDetector(
+    final titleText = request.isAcademy && academyName != null
+        ? '$academyName $opponentName (${request.typeDisplayLabel})'
+        : '$opponentName (${request.typeDisplayLabel})';
+
+    return NotebookDetailAppBar(
+      titleWidget: GestureDetector(
         onTap:
             () => _showProfileBottomSheet(
               context,
@@ -394,15 +398,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
               opponentName,
               academyName,
             ),
-        // Notebook × Score: AppBar title 는 Playfair appBarTitle 로 통일
-        // (§7.27). academyName/opponentName/typeDisplayLabel 동적 조합이지만
-        // 구조적 역할은 동일.
-        child: Text(
-          request.isAcademy && academyName != null
-              ? '$academyName $opponentName (${request.typeDisplayLabel})'
-              : '$opponentName (${request.typeDisplayLabel})',
-          style: NotebookTypography.appBarTitle,
-        ),
+        child: Text(titleText, style: NotebookTypography.appBarTitle),
       ),
     );
   }
