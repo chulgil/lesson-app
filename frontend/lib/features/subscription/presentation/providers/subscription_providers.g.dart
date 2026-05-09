@@ -7,7 +7,7 @@ part of 'subscription_providers.dart';
 // **************************************************************************
 
 String _$subscriptionRepositoryHash() =>
-    r'9e1b631150bbeb10b52473dbe57c7705100da50f';
+    r'2ab1c730946e66dc5be16c8940cd79eb5def92b5';
 
 /// Repository provider for Subscription - switches between Mock and Remote.
 ///

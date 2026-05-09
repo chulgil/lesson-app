@@ -5,6 +5,7 @@ import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/remote_subscription_repository.dart';
+import '../../data/repositories/sync_aware_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
@@ -14,10 +15,13 @@ part 'subscription_providers.g.dart';
 /// Repository provider for Subscription - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
 SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
-  return createRepository<SubscriptionRepository>(
+  return createSyncAwareRepository<SubscriptionRepository>(
     ref: ref,
     mock: () => MockSubscriptionRepository(),
-    remote: (api) => RemoteSubscriptionRepository(api),
+    syncAware: (api, queue) => SyncAwareSubscriptionRepository(
+      remote: RemoteSubscriptionRepository(api),
+      queue: queue,
+    ),
   );
 }
 

@@ -3,6 +3,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../config/environment.dart';
 import '../network/api_client.dart';
+import '../sync/application/connectivity_service.dart';
+import '../sync/application/mutation_queue_helper.dart';
+import '../sync/application/sync_service.dart';
+import '../sync/presentation/providers/sync_provider.dart';
 
 part 'repository_provider.g.dart';
 
@@ -41,6 +45,40 @@ T createRepository<T>({
   }
   final apiClient = ref.read(apiClientProvider);
   return remote(apiClient);
+}
+
+/// Creates a repository with offline-queue support via [MutationQueueHelper].
+///
+/// In mock mode, bypasses sync entirely and returns the mock directly.
+/// In remote mode, injects both [ApiClient] and [MutationQueueHelper].
+///
+/// Usage:
+/// ```dart
+/// @Riverpod(keepAlive: true)
+/// LessonRepository lessonRepository(Ref ref) =>
+///     createSyncAwareRepository<LessonRepository>(
+///       ref: ref,
+///       mock: () => MockLessonRepository(),
+///       syncAware: (apiClient, queue) => SyncAwareLessonRepository(
+///         remote: RemoteLessonRepository(apiClient),
+///         queue: queue,
+///       ),
+///     );
+/// ```
+T createSyncAwareRepository<T>({
+  required Ref ref,
+  required T Function() mock,
+  required T Function(ApiClient apiClient, MutationQueueHelper queue) syncAware,
+}) {
+  if (EnvironmentConfig.useMockData) {
+    return mock();
+  }
+  final apiClient = ref.read(apiClientProvider);
+  final queue = MutationQueueHelper(
+    connectivity: ref.read(connectivityServiceProvider),
+    syncService: ref.read(syncServiceProvider),
+  );
+  return syncAware(apiClient, queue);
 }
 
 /// Creates a repository provider for features that do not have a remote API yet.

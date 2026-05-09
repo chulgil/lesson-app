@@ -7,9 +7,9 @@ part of 'practice_repository_provider.dart';
 // **************************************************************************
 
 String _$practiceRepositoryHash() =>
-    r'0ebfb45e8fc63bc2ba1e1d5bcd0b091a1b6ca3cf';
+    r'478dce0df953904285604ba2347133a1e814b601';
 
-/// Practice repository provider - switches between Mock and Remote.
+/// Practice repository provider - switches between Mock and SyncAware (Remote + Queue).
 ///
 /// Copied from [practiceRepository].
 @ProviderFor(practiceRepository)
