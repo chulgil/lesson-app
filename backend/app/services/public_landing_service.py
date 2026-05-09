@@ -12,9 +12,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.schemas.public_landing import (
     PublicInviteLandingResponse,
+    PublicLessonSummaryContent,
+    PublicLessonSummaryLesson,
+    PublicLessonSummaryTeacher,
     PublicShareMeta,
+    PublicStudentSummaryIdentity,
+    PublicStudentSummaryResponse,
     PublicTeacherSummary,
 )
+from app.services.lesson_summary_share_service import LessonSummaryShareService
 
 
 class PublicLandingService:
@@ -68,6 +74,72 @@ class PublicLandingService:
                 app_deep_link=app_deep_link,
             ),
             expires_at=expires_at,
+        )
+
+    async def get_student_summary(self, raw_token: str) -> PublicStudentSummaryResponse:
+        """Return read-only lesson summary data for a valid public token."""
+        from app.models.lesson import Lesson
+        from app.models.lesson_summary_share_token import LessonSummaryShareToken
+        from app.models.student import Student
+        from app.models.user import User
+
+        token_hash = LessonSummaryShareService.hash_token(raw_token)
+        share_token = await self.db.scalar(
+            select(LessonSummaryShareToken).where(LessonSummaryShareToken.token_hash == token_hash)
+        )
+        if share_token is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Summary token not found")
+
+        expires_at = self._ensure_aware(share_token.expires_at)
+        if share_token.revoked_at is not None or expires_at <= datetime.now(UTC):
+            raise HTTPException(status_code=status.HTTP_410_GONE, detail="Summary token is no longer available")
+
+        lesson = await self.db.get(Lesson, share_token.lesson_id)
+        if lesson is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found")
+
+        teacher_user = await self.db.get(User, share_token.teacher_id)
+        student = await self.db.get(Student, share_token.student_id) if share_token.student_id else None
+
+        share_token.access_count += 1
+        share_token.last_accessed_at = datetime.now(UTC)
+        await self.db.flush()
+
+        web_url = f"{settings.PUBLIC_WEB_BASE_URL.rstrip('/')}/student/{raw_token}/summary"
+        instrument = lesson.instrument or (student.instrument if student is not None else None)
+        title = lesson.feedback or lesson.practice_tips or "레슨 정리"
+        teacher_name = teacher_user.name if teacher_user is not None else lesson.teacher_name
+        teacher_profile_image = teacher_user.profile_image_url if teacher_user is not None else None
+
+        return PublicStudentSummaryResponse(
+            lesson=PublicLessonSummaryLesson(
+                id=lesson.id,
+                date=lesson.date,
+                start_time=lesson.start_time,
+                duration_minutes=lesson.duration,
+                session_number=lesson.session_number,
+                status=lesson.status.value if hasattr(lesson.status, "value") else str(lesson.status),
+            ),
+            teacher=PublicLessonSummaryTeacher(
+                name=teacher_name,
+                instrument=instrument,
+                profile_image_url=teacher_profile_image,
+            ),
+            student=PublicStudentSummaryIdentity(
+                name=student.name if student is not None else lesson.student_name,
+            ),
+            summary=PublicLessonSummaryContent(
+                title=title,
+                lesson_note=lesson.feedback,
+                homework=lesson.practice_tips,
+                next_lesson_at=None,
+            ),
+            share=PublicShareMeta(
+                title=f"오늘 {instrument or '레슨'} 레슨 정리",
+                description=f"{teacher_name or '선생님'} 선생님이 보낸 레슨 요약",
+                url=web_url,
+                app_deep_link=f"lessonapp://student/summary/{raw_token}",
+            ),
         )
 
     @staticmethod
