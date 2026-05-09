@@ -7003,4 +7003,8 @@ class AppStrings {
   static String billingPlanActivated(String plan) => '$plan 플랜이 활성화되었습니다';
   static const billingPurchasePending = '결제가 처리 중입니다';
   static const billingRestoreComplete = '구매 복원이 완료되었습니다';
+  static const billingLifetimeEarlyBirdSubtitle = '얼리어답터 한정 (90일)';
+  static const billingLifetimeFeature = '영구 이용';
+  static const billingCurrentPlan = '현재 플랜';
+  static const billingCurrentBadge = '현재';
 }

@@ -69,4 +69,34 @@ void main() {
           'Bottom navigation labels are high-traffic UI text and must not be hardcoded.',
     );
   });
+
+  test('high-traffic billing and account UI text uses AppStrings', () {
+    final prohibited = <String, List<String>>{
+      'lib/features/billing/presentation/screens/billing_plans_screen.dart': [
+        "'얼리어답터 한정 (90일)'",
+        "'영구 이용'",
+        "'현재 플랜'",
+        "'현재'",
+      ],
+      'lib/features/student_home/presentation/screens/student_profile_tab.dart':
+          ["'계정 삭제'"],
+    };
+
+    final violations = <String>[];
+    for (final entry in prohibited.entries) {
+      final content = File(entry.key).readAsStringSync();
+      for (final literal in entry.value) {
+        if (content.contains(literal)) {
+          violations.add('${entry.key}: $literal');
+        }
+      }
+    }
+
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'High-traffic billing/account labels must be centralized through AppStrings.',
+    );
+  });
 }

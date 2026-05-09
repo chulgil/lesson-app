@@ -26,23 +26,23 @@ class BillingPlansScreen extends ConsumerWidget {
     final storeProductsAsync = ref.watch(storeProductsProvider);
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.billingViewPlans,
-      ),
+      appBar: const NotebookDetailAppBar(title: AppStrings.billingViewPlans),
       body: billingAsync.when(
-        data: (status) => _BillingPlansBody(
-          currentStatus: status,
-          storeProducts: storeProductsAsync.valueOrNull ?? [],
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Text(
-            '$e',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
+        data:
+            (status) => _BillingPlansBody(
+              currentStatus: status,
+              storeProducts: storeProductsAsync.valueOrNull ?? [],
             ),
-          ),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error:
+            (e, _) => Center(
+              child: Text(
+                '$e',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ),
       ),
     );
   }
@@ -70,11 +70,7 @@ class _BillingPlansBody extends ConsumerWidget {
         _PlanCard(
           planName: 'Free',
           price: AppStrings.billingFreePrice,
-          features: const [
-            '학생 5명까지',
-            '기본 레슨 관리',
-            '스케줄 관리',
-          ],
+          features: const ['학생 5명까지', '기본 레슨 관리', '스케줄 관리'],
           isCurrent: currentStatus.isFree,
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -83,55 +79,48 @@ class _BillingPlansBody extends ConsumerWidget {
           planName: 'Pro',
           price: _getPrice(IapProductIds.proMonthly) ?? '₩9,900/월',
           yearlyPrice: _getPrice(IapProductIds.proYearly),
-          features: const [
-            '학생 수 무제한',
-            'AI 레슨 노트',
-            '녹음 기능',
-            '학부모 포털',
-            '연습 통계',
-          ],
+          features: const ['학생 수 무제한', 'AI 레슨 노트', '녹음 기능', '학부모 포털', '연습 통계'],
           isCurrent: currentStatus.planType == BillingPlanType.pro,
           isTrial: currentStatus.isTrial,
           isHighlighted: true,
-          onSubscribeMonthly: currentStatus.isPaid
-              ? null
-              : () => _purchase(context, ref, IapProductIds.proMonthly),
-          onSubscribeYearly: currentStatus.isPaid
-              ? null
-              : () => _purchase(context, ref, IapProductIds.proYearly),
+          onSubscribeMonthly:
+              currentStatus.isPaid
+                  ? null
+                  : () => _purchase(context, ref, IapProductIds.proMonthly),
+          onSubscribeYearly:
+              currentStatus.isPaid
+                  ? null
+                  : () => _purchase(context, ref, IapProductIds.proYearly),
         ),
         const SizedBox(height: AppSpacing.space3),
 
         _PlanCard(
           planName: 'Studio',
           price: _getPrice(IapProductIds.studioMonthly) ?? '₩29,900/월',
-          features: const [
-            'Pro의 모든 기능',
-            '다중 선생님 관리',
-            '커스텀 브랜딩',
-            '분석 리포트',
-          ],
+          features: const ['Pro의 모든 기능', '다중 선생님 관리', '커스텀 브랜딩', '분석 리포트'],
           isCurrent: currentStatus.planType == BillingPlanType.studio,
-          onSubscribeMonthly: currentStatus.isPaid &&
-                  currentStatus.planType != BillingPlanType.pro
-              ? null
-              : () => _purchase(context, ref, IapProductIds.studioMonthly),
+          onSubscribeMonthly:
+              currentStatus.isPaid &&
+                      currentStatus.planType != BillingPlanType.pro
+                  ? null
+                  : () => _purchase(context, ref, IapProductIds.studioMonthly),
         ),
         const SizedBox(height: AppSpacing.space3),
 
         _PlanCard(
           planName: 'Lifetime',
           price: _getPrice(IapProductIds.lifetime) ?? '₩199,000',
-          subtitle: '얼리어답터 한정 (90일)',
+          subtitle: AppStrings.billingLifetimeEarlyBirdSubtitle,
           features: const [
             'Pro의 모든 기능',
-            '영구 이용',
+            AppStrings.billingLifetimeFeature,
             '평생 업데이트',
           ],
           isCurrent: currentStatus.planType == BillingPlanType.lifetime,
-          onSubscribeMonthly: currentStatus.planType == BillingPlanType.lifetime
-              ? null
-              : () => _purchase(context, ref, IapProductIds.lifetime),
+          onSubscribeMonthly:
+              currentStatus.planType == BillingPlanType.lifetime
+                  ? null
+                  : () => _purchase(context, ref, IapProductIds.lifetime),
         ),
         const SizedBox(height: AppSpacing.space5),
 
@@ -153,9 +142,7 @@ class _BillingPlansBody extends ConsumerWidget {
   }
 
   String? _getPrice(String productId) {
-    final product = storeProducts
-        .where((p) => p.id == productId)
-        .firstOrNull;
+    final product = storeProducts.where((p) => p.id == productId).firstOrNull;
     return product?.price;
   }
 
@@ -294,9 +281,9 @@ class _CurrentPlanBanner extends StatelessWidget {
       return AppStrings.billingDaysLeft(status.daysRemaining!);
     }
     if (status.planType == BillingPlanType.lifetime) {
-      return '영구 이용';
+      return AppStrings.billingLifetimeFeature;
     }
-    return '현재 플랜';
+    return AppStrings.billingCurrentPlan;
   }
 }
 
@@ -345,9 +332,10 @@ class _PlanCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: isHighlighted
-                  ? AppColors.paperAccentSoft
-                  : AppColors.paperDark,
+              color:
+                  isHighlighted
+                      ? AppColors.paperAccentSoft
+                      : AppColors.paperDark,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,7 +359,9 @@ class _PlanCard extends StatelessWidget {
                           color: AppColors.paperAccent,
                         ),
                         child: Text(
-                          isTrial ? '체험 중' : '현재',
+                          isTrial
+                              ? AppStrings.billingTrialBadge
+                              : AppStrings.billingCurrentBadge,
                           style: AppTypography.captionSmall.copyWith(
                             color: AppColors.paper,
                             fontWeight: FontWeight.bold,
@@ -472,7 +462,9 @@ class _PlanCard extends StatelessWidget {
                         onPressed: onSubscribeYearly,
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.ink,
-                          side: const BorderSide(color: AppColors.inkQuaternary),
+                          side: const BorderSide(
+                            color: AppColors.inkQuaternary,
+                          ),
                           minimumSize: const Size(
                             double.infinity,
                             AppSpacing.buttonHeightSmall,

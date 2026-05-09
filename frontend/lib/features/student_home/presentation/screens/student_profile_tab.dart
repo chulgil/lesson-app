@@ -391,7 +391,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.delete_outline,
             iconColor: AppColors.profileRed,
-            title: '계정 삭제',
+            title: AppStrings.accountDeletionTitle,
             onTap: () => context.push(AppRoutes.accountDeletion),
           ),
         ],
@@ -457,7 +457,9 @@ class StudentProfileTab extends ConsumerWidget {
 
   Widget _buildMenuDivider() {
     return Padding(
-      padding: EdgeInsets.only(left: AppSpacing.space4 + 36 + AppSpacing.space3),
+      padding: EdgeInsets.only(
+        left: AppSpacing.space4 + 36 + AppSpacing.space3,
+      ),
       child: const ThinRule(),
     );
   }
@@ -566,9 +568,7 @@ class StudentProfileTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '* 코드는 24시간 동안 유효합니다',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),

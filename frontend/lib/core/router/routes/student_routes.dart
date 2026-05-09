@@ -12,6 +12,10 @@ import '../../../features/students/presentation/screens/announcement_history_scr
 import '../app_routes.dart';
 
 /// Student management routes
+///
+/// IMPORTANT: Literal paths (e.g. /students/announcement-history) must come
+/// BEFORE parameterized paths (e.g. /students/:id) to avoid GoRouter matching
+/// the literal segment as a path parameter.
 List<GoRoute> studentRoutes = [
   // Add Student Method Selection
   GoRoute(
@@ -27,7 +31,24 @@ List<GoRoute> studentRoutes = [
     builder: (context, state) => const AddStudentScreen(),
   ),
 
-  // Student Detail
+  // Announcement History — must precede /students/:id
+  GoRoute(
+    path: AppRoutes.announcementHistory,
+    name: 'announcementHistory',
+    builder: (context, state) => const AnnouncementHistoryScreen(),
+  ),
+
+  // Badge Collection
+  GoRoute(
+    path: AppRoutes.badgeCollection,
+    name: 'badgeCollection',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return BadgeCollectionScreen(studentId: studentId);
+    },
+  ),
+
+  // Student Detail — parameterized path, must come after literal paths
   GoRoute(
     path: AppRoutes.studentDetail,
     name: 'studentDetail',
@@ -57,22 +78,5 @@ List<GoRoute> studentRoutes = [
     builder:
         (context, state) =>
             EditStudentScreen(studentId: state.pathParameters['id'] ?? ''),
-  ),
-
-  // Badge Collection
-  GoRoute(
-    path: AppRoutes.badgeCollection,
-    name: 'badgeCollection',
-    builder: (context, state) {
-      final studentId = state.uri.queryParameters['studentId'] ?? '';
-      return BadgeCollectionScreen(studentId: studentId);
-    },
-  ),
-
-  // Announcement History
-  GoRoute(
-    path: AppRoutes.announcementHistory,
-    name: 'announcementHistory',
-    builder: (context, state) => const AnnouncementHistoryScreen(),
   ),
 ];
