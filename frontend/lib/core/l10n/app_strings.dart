@@ -2357,7 +2357,8 @@ class AppStrings {
   static const archiveLessonTitle = '레슨 보관';
 
   /// 레슨 보관 확인 다이얼로그 메시지
-  static const archiveLessonConfirm = '이 레슨을 보관하시겠습니까?\n보관된 레슨은 목록에서 숨겨지며 언제든지 복원할 수 있습니다.';
+  static const archiveLessonConfirm =
+      '이 레슨을 보관하시겠습니까?\n보관된 레슨은 목록에서 숨겨지며 언제든지 복원할 수 있습니다.';
 
   /// 레슨이 보관되었습니다 (archive success)
   static const lessonArchivedSnack = '레슨이 보관되었습니다';
@@ -5824,6 +5825,23 @@ class AppStrings {
   static const settingsRecordingFiles = '녹음 파일';
   static const settingsTotalSize = '전체 용량';
 
+  // ── Settings / Account deletion ──
+  static const accountDeletionTitle = '계정 삭제';
+  static const accountDeletionWarningTitle = '주의';
+  static const accountDeletionWarningIntro = '계정을 삭제하면 다음과 같은 일이 발생합니다:';
+  static const accountDeletionWarningPersonalData = '모든 개인 정보 및 데이터가 영구 삭제됩니다';
+  static const accountDeletionWarningLessonData = '레슨, 연습 기록, 녹음 파일이 모두 삭제됩니다';
+  static const accountDeletionWarningIrreversible = '삭제된 계정은 복구할 수 없습니다';
+  static const accountDeletionWarningRetention = '데이터는 삭제 신청 후 30일 내에 영구 삭제됩니다';
+  static const accountDeletionLegalNotice =
+      '법적 요구사항(GDPR, 개인정보보호법)에 따라, 계정 삭제 신청 후 30일 이내에 모든 데이터가 영구적으로 삭제됩니다. 이 기간 동안 계정에 로그인할 수 없습니다.';
+  static const accountDeletionConfirmTitle = '정말 삭제하시겠습니까?';
+  static const accountDeletionConfirmMessage =
+      '30일 후 모든 데이터가 영구 삭제됩니다.\n이 작업은 취소할 수 없습니다.';
+  static const accountDeletionSuccess = '계정이 삭제되었습니다. 30일 후 모든 데이터가 영구 삭제됩니다.';
+  static String accountDeletionFailed(String message) =>
+      '계정 삭제에 실패했습니다: $message';
+
   // ── Gamification ──
   static const gamificationContinue = '계속하기';
   static const gamificationChallenges = '도전 과제';
@@ -5908,8 +5926,7 @@ class AppStrings {
   static const forceUpdateTitle = '업데이트가 필요합니다';
   static String forceUpdateBody(String minVersion) =>
       '원활한 사용을 위해 v$minVersion 이상으로\n업데이트해 주세요.';
-  static String forceUpdateCurrentVersion(String version) =>
-      '현재 버전: v$version';
+  static String forceUpdateCurrentVersion(String version) => '현재 버전: v$version';
   static const forceUpdateAction = '업데이트하기';
   static const studentHomeTermsOfService = '이용약관';
   static const studentHomePrivacyPolicy = '개인정보처리방침';
@@ -6520,6 +6537,8 @@ class AppStrings {
   static const profileRepertoireAssignStudent = '학생에게 할당';
   static const profileRepertoirePieceEditTitle = '곡 수정';
   static const profileRepertoirePieceAddTitle = '곡 추가';
+  static const profileRepertoirePieceTitleLabel = '곡 제목 *';
+  static const profileRepertoirePieceTitleRequired = '곡 제목을 입력하세요';
   static const profileRepertoireHintTitle = '예: 봄의 소리 왈츠';
   static const profileRepertoireHintComposer = '예: J. Strauss II';
   static const profileRepertoireHintOpus = '예: Op. 410';
@@ -6931,8 +6950,7 @@ class AppStrings {
 
   // ── Students tab empty state ──
   static const studentsEmptyTitle = '아직 등록된 학생이 없습니다';
-  static const studentsEmptySubtitle =
-      '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요';
+  static const studentsEmptySubtitle = '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요';
   static const studentsSearchEmptyTitle = '검색 결과가 없습니다';
 
   // ── Parent profile menu ──

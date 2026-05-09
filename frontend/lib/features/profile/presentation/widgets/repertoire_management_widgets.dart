@@ -385,12 +385,12 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: '곡 제목 *',
+                  labelText: AppStrings.profileRepertoirePieceTitleLabel,
                   hintText: AppStrings.profileRepertoireHintTitle,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '곡 제목을 입력하세요';
+                    return AppStrings.profileRepertoirePieceTitleRequired;
                   }
                   return null;
                 },

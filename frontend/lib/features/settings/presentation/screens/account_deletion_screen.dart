@@ -29,7 +29,9 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: '계정 삭제'),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.accountDeletionTitle,
+      ),
       body: _buildContent(context),
     );
   }
@@ -58,7 +60,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '주의',
+                    AppStrings.accountDeletionWarningTitle,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.profileRed,
@@ -68,17 +70,17 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
               ),
               const SizedBox(height: AppSpacing.space3),
               Text(
-                '계정을 삭제하면 다음과 같은 일이 발생합니다:',
+                AppStrings.accountDeletionWarningIntro,
                 style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
               ),
               const SizedBox(height: AppSpacing.space2),
-              _buildWarningItem('모든 개인 정보 및 데이터가 영구 삭제됩니다'),
+              _buildWarningItem(AppStrings.accountDeletionWarningPersonalData),
               const SizedBox(height: AppSpacing.space1),
-              _buildWarningItem('레슨, 연습 기록, 녹음 파일이 모두 삭제됩니다'),
+              _buildWarningItem(AppStrings.accountDeletionWarningLessonData),
               const SizedBox(height: AppSpacing.space1),
-              _buildWarningItem('삭제된 계정은 복구할 수 없습니다'),
+              _buildWarningItem(AppStrings.accountDeletionWarningIrreversible),
               const SizedBox(height: AppSpacing.space1),
-              _buildWarningItem('데이터는 삭제 신청 후 30일 내에 영구 삭제됩니다'),
+              _buildWarningItem(AppStrings.accountDeletionWarningRetention),
             ],
           ),
         ),
@@ -93,9 +95,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Text(
-            '법적 요구사항(GDPR, 개인정보보호법)에 따라, '
-            '계정 삭제 신청 후 30일 이내에 모든 데이터가 영구적으로 삭제됩니다. '
-            '이 기간 동안 계정에 로그인할 수 없습니다.',
+            AppStrings.accountDeletionLegalNotice,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -127,7 +127,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
                         ),
                       ),
                     )
-                    : const Text('계정 삭제'),
+                    : const Text(AppStrings.accountDeletionTitle),
           ),
         ),
 
@@ -174,11 +174,8 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
   Future<void> _showConfirmDialog(BuildContext context) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      titleWidget: const Text('정말 삭제하시겠습니까?'),
-      content: const Text(
-        '30일 후 모든 데이터가 영구 삭제됩니다.\n'
-        '이 작업은 취소할 수 없습니다.',
-      ),
+      titleWidget: const Text(AppStrings.accountDeletionConfirmTitle),
+      content: const Text(AppStrings.accountDeletionConfirmMessage),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
@@ -225,7 +222,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('계정이 삭제되었습니다. 30일 후 모든 데이터가 영구 삭제됩니다.'),
+            content: Text(AppStrings.accountDeletionSuccess),
             duration: Duration(seconds: 3),
           ),
         );
@@ -237,7 +234,7 @@ class _AccountDeletionScreenState extends ConsumerState<AccountDeletionScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('계정 삭제에 실패했습니다: ${e.toString()}'),
+          content: Text(AppStrings.accountDeletionFailed(e.toString())),
           duration: const Duration(seconds: 4),
         ),
       );
