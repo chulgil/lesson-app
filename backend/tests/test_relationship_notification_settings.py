@@ -15,6 +15,18 @@ async def test_relationship_notification_settings_match_frontend_contract(
     """GET/PUT/DELETE /relationships/notification-settings follows frontend contract."""
     await create_test_user(user_id="student-user-id", role="student", name="Student", email="student@test.com")
     await create_test_user(user_id="teacher-user-id", role="teacher", name="Teacher", email="teacher@test.com")
+    from app.models.student import Student
+
+    db_session.add(
+        Student(
+            id="student-user-id",
+            user_id="student-user-id",
+            teacher_id="teacher-user-id-prof",
+            name="Student",
+            instrument="piano",
+        )
+    )
+    await db_session.flush()
 
     from app.models.relationship import TeacherStudentRelation
 

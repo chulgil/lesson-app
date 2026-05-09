@@ -69,6 +69,18 @@ async def _create_template(db: AsyncSession, *, sub_type: str = "monthly", lesso
 async def _create_relationship(db: AsyncSession) -> str:
     """Insert a TeacherStudentRelation in pending state."""
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
+
+    db.add(
+        Student(
+            id=STUDENT_ID,
+            teacher_id=TEACHER_PROF_ID,
+            name="Student",
+            instrument="violin",
+            user_id=STUDENT_ID,
+        )
+    )
+    await db.flush()
 
     rel = TeacherStudentRelation(
         teacher_id=TEACHER_PROF_ID,
@@ -84,13 +96,16 @@ async def _create_relationship(db: AsyncSession) -> str:
 # Service instantiation
 # ---------------------------------------------------------------------------
 
+
 def _sub_svc(db: AsyncSession):
     from app.services.subscription_service import SubscriptionService
+
     return SubscriptionService(db)
 
 
 def _card_svc(db: AsyncSession):
     from app.services.schedule_confirmation_service import ScheduleConfirmationService
+
     return ScheduleConfirmationService(db)
 
 
@@ -135,6 +150,7 @@ async def test_full_happy_path_regular(db_session: AsyncSession, create_test_use
     assert proposal.lesson_request_id == lr_id
 
     from app.models.schedule import LessonRequest
+
     lr = await db_session.get(LessonRequest, lr_id)
     assert lr.proposal_id == proposal.id
     assert lr.status == "proposalSent"  # GAP-6
@@ -158,23 +174,26 @@ async def test_full_happy_path_regular(db_session: AsyncSession, create_test_use
 
     # GAP-2: membership_id is real (not empty)
     from app.models.subscription import Subscription
+
     sub = await db_session.get(Subscription, result.subscription_id)
     assert sub.membership_id != ""
     assert sub.membership_id is not None
 
     # GAP-3: Relationship activated
     from app.models.relationship import TeacherStudentRelation
+
     rel = await db_session.get(TeacherStudentRelation, rel_id)
     assert rel.status == "active"
     assert rel.active_subscription_id == sub.id
 
     # GAP-4: Confirmation card created
     from app.models.policy import ScheduleConfirmationCard
-    cards = (await db_session.scalars(
-        select(ScheduleConfirmationCard).where(
-            ScheduleConfirmationCard.subscription_id == sub.id
+
+    cards = (
+        await db_session.scalars(
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == sub.id)
         )
-    )).all()
+    ).all()
     assert len(cards) == 1
     card = cards[0]
     assert card.proposed_day == "2"
@@ -197,27 +216,28 @@ async def test_full_happy_path_regular(db_session: AsyncSession, create_test_use
     from app.models.lesson import Lesson
     from app.models.schedule import LessonBooking
 
-    bookings = (await db_session.scalars(
-        select(LessonBooking).where(
-            LessonBooking.student_id == STUDENT_ID,
-            LessonBooking.teacher_id == TEACHER_PROF_ID,
+    bookings = (
+        await db_session.scalars(
+            select(LessonBooking).where(
+                LessonBooking.student_id == STUDENT_ID,
+                LessonBooking.teacher_id == TEACHER_PROF_ID,
+            )
         )
-    )).all()
+    ).all()
     assert len(bookings) == 4  # monthly, total_lessons=4
     assert all(booking.subscription_id == sub.id for booking in bookings)
 
-    lessons = (await db_session.scalars(
-        select(Lesson).where(
-            Lesson.student_id == STUDENT_ID,
-            Lesson.teacher_id == TEACHER_PROF_ID,
-            Lesson.subscription_id == sub.id,
+    lessons = (
+        await db_session.scalars(
+            select(Lesson).where(
+                Lesson.student_id == STUDENT_ID,
+                Lesson.teacher_id == TEACHER_PROF_ID,
+                Lesson.subscription_id == sub.id,
+            )
         )
-    )).all()
+    ).all()
     assert len(lessons) == 4
-    assert all(
-        lesson.lesson_source == "subscriptionGenerated"
-        for lesson in lessons
-    )
+    assert all(lesson.lesson_source == "subscriptionGenerated" for lesson in lessons)
 
 
 @pytest.mark.asyncio
@@ -241,17 +261,23 @@ async def test_trial_single_booking(db_session: AsyncSession, create_test_user):
         teacher,
     )
     await svc.respond_to_proposal(
-        proposal.id, ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id), student,
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
     )
     result = await svc.confirm_proposal(proposal.id, teacher)
 
     # Confirm card
     from app.models.policy import ScheduleConfirmationCard
-    card = (await db_session.scalars(
-        select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
-    )).first()
+
+    card = (
+        await db_session.scalars(
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
+        )
+    ).first()
 
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
+
     await _card_svc(db_session).confirm_card(card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student)
 
     from app.models.lesson import Lesson
@@ -288,16 +314,22 @@ async def test_package_first_booking_only(db_session: AsyncSession, create_test_
         teacher,
     )
     await svc.respond_to_proposal(
-        proposal.id, ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id), student,
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
     )
     result = await svc.confirm_proposal(proposal.id, teacher)
 
     from app.models.policy import ScheduleConfirmationCard
-    card = (await db_session.scalars(
-        select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
-    )).first()
+
+    card = (
+        await db_session.scalars(
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
+        )
+    ).first()
 
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
+
     await _card_svc(db_session).confirm_card(card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student)
 
     from app.models.lesson import Lesson
@@ -335,7 +367,9 @@ async def test_backward_compat_no_lesson_request(db_session: AsyncSession, creat
     assert proposal.lesson_request_id is None
 
     await svc.respond_to_proposal(
-        proposal.id, ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id), student,
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
     )
     result = await svc.confirm_proposal(proposal.id, teacher)
     assert result.status == "confirmed"
@@ -343,6 +377,7 @@ async def test_backward_compat_no_lesson_request(db_session: AsyncSession, creat
 
     # membership_id should still be real (not empty)
     from app.models.subscription import Subscription
+
     sub = await db_session.get(Subscription, result.subscription_id)
     assert sub.membership_id != ""
 
@@ -361,7 +396,10 @@ async def test_existing_membership_reused(db_session: AsyncSession, create_test_
     await db_session.flush()
 
     existing_membership = ClassMembership(
-        lesson_class_id=lc.id, student_id=STUDENT_ID, instrument="violin", status="active",
+        lesson_class_id=lc.id,
+        student_id=STUDENT_ID,
+        instrument="violin",
+        status="active",
     )
     db_session.add(existing_membership)
     await db_session.flush()
@@ -381,11 +419,14 @@ async def test_existing_membership_reused(db_session: AsyncSession, create_test_
         teacher,
     )
     await svc.respond_to_proposal(
-        proposal.id, ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id), student,
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
     )
     result = await svc.confirm_proposal(proposal.id, teacher)
 
     from app.models.subscription import Subscription
+
     sub = await db_session.get(Subscription, result.subscription_id)
     assert sub.membership_id == existing_id  # Reused, not new
 
@@ -411,21 +452,30 @@ async def test_card_rejected_no_bookings(db_session: AsyncSession, create_test_u
         teacher,
     )
     await svc.respond_to_proposal(
-        proposal.id, ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id), student,
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
     )
     result = await svc.confirm_proposal(proposal.id, teacher)
 
     from app.models.policy import ScheduleConfirmationCard
-    card = (await db_session.scalars(
-        select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
-    )).first()
+
+    card = (
+        await db_session.scalars(
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
+        )
+    ).first()
 
     # Reject the card
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
+
     await _card_svc(db_session).confirm_card(
-        card.id, ScheduleConfirmationCardConfirm(action="rejected"), student,
+        card.id,
+        ScheduleConfirmationCardConfirm(action="rejected"),
+        student,
     )
 
     from app.models.schedule import LessonBooking
+
     bookings = (await db_session.scalars(select(LessonBooking).where(LessonBooking.student_id == STUDENT_ID))).all()
     assert len(bookings) == 0

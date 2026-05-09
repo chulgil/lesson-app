@@ -49,6 +49,17 @@ async def _create_membership_and_relation(
 ):
     from app.models.lesson import ClassMembership, LessonClass
     from app.models.relationship import RelationStatus, TeacherStudentRelation
+    from app.models.student import Student
+
+    db_session.add(
+        Student(
+            id=student_id,
+            teacher_id=teacher_id,
+            name="Student",
+            instrument="violin",
+            user_id=None,
+        )
+    )
 
     lesson_class = LessonClass(teacher_id=teacher_id, name="만료 테스트 클래스", type="private")
     db_session.add(lesson_class)

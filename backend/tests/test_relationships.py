@@ -25,8 +25,49 @@ async def test_list_relationships_supports_repository_filters(
 ):
     """RemoteTeacherStudentRelationRepository should not need client-side filtering."""
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
+    from app.models.teacher import Teacher
 
     await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add_all(
+        [
+            Student(
+                id="student-001",
+                user_id=None,
+                teacher_id="test-user-id-prof",
+                name="student-001",
+                instrument="violin",
+            ),
+            Student(
+                id="student-002",
+                user_id=None,
+                teacher_id="test-user-id-prof",
+                name="student-002",
+                instrument="violin",
+            ),
+            Student(
+                id="student-003",
+                user_id=None,
+                teacher_id="test-user-id-prof",
+                name="student-003",
+                instrument="violin",
+            ),
+            Student(
+                id="test-user-id",
+                user_id="test-user-id",
+                teacher_id="test-user-id-prof",
+                name="student-as-user-id",
+                instrument="violin",
+            ),
+            Teacher(
+                id="other-teacher-prof",
+                user_id="other-teacher-user-id",
+                instruments=[],
+            ),
+        ]
+    )
+    await db_session.flush()
+
     db_session.add_all(
         [
             TeacherStudentRelation(

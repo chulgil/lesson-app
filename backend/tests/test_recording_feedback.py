@@ -25,6 +25,7 @@ async def test_teacher_creates_and_lists_feedback_for_shared_recording(
 
     from app.models.practice import PracticeRecording
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
 
     recording = PracticeRecording(
         id="feedback-recording-id",
@@ -41,7 +42,19 @@ async def test_teacher_creates_and_lists_feedback_for_shared_recording(
         status="active",
         is_app_connected=True,
     )
-    db_session.add_all([recording, relation])
+    db_session.add_all(
+        [
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+            recording,
+            relation,
+        ]
+    )
     await db_session.flush()
 
     create_response = await client.post(
@@ -128,6 +141,7 @@ async def test_teacher_updates_and_deletes_own_recording_feedback(
 
     from app.models.practice import PracticeRecording, RecordingFeedback
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
 
     recording = PracticeRecording(
         id="mutate-feedback-recording-id",
@@ -150,7 +164,20 @@ async def test_teacher_updates_and_deletes_own_recording_feedback(
         status="active",
         is_app_connected=True,
     )
-    db_session.add_all([recording, feedback, relation])
+    db_session.add_all(
+        [
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+            recording,
+            feedback,
+            relation,
+        ]
+    )
     await db_session.flush()
 
     update_response = await client.put(
@@ -167,9 +194,7 @@ async def test_teacher_updates_and_deletes_own_recording_feedback(
     )
     assert delete_response.status_code == 204
 
-    remaining = await db_session.scalar(
-        select(RecordingFeedback).where(RecordingFeedback.id == "mutate-feedback-id")
-    )
+    remaining = await db_session.scalar(select(RecordingFeedback).where(RecordingFeedback.id == "mutate-feedback-id"))
     assert remaining is None
 
 

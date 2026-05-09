@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import Boolean, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, UUIDMixin
@@ -27,8 +27,16 @@ class TeacherStudentRelation(UUIDMixin, Base):
 
     __tablename__ = "teacher_student_relations"
 
-    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    student_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    teacher_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("teachers.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    student_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("students.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     invite_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
     status: Mapped[RelationStatus] = mapped_column(
         Enum(RelationStatus, native_enum=True),

@@ -153,6 +153,7 @@ async def test_connected_teacher_can_access_student_recording(
 
     from app.models.practice import PracticeRecording
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
 
     recording = PracticeRecording(
         id="shared-recording-id",
@@ -169,7 +170,19 @@ async def test_connected_teacher_can_access_student_recording(
         status="active",
         is_app_connected=True,
     )
-    db_session.add_all([recording, relation])
+    db_session.add_all(
+        [
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+            recording,
+            relation,
+        ]
+    )
     await db_session.flush()
 
     list_response = await client.get("/api/v1/recordings", headers=auth_headers)
@@ -202,6 +215,7 @@ async def test_inactive_teacher_connection_cannot_access_student_recording(
 
     from app.models.practice import PracticeRecording
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
 
     recording = PracticeRecording(
         id="not-shared-recording-id",
@@ -218,7 +232,19 @@ async def test_inactive_teacher_connection_cannot_access_student_recording(
         status="inactive",
         is_app_connected=True,
     )
-    db_session.add_all([recording, relation])
+    db_session.add_all(
+        [
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+            recording,
+            relation,
+        ]
+    )
     await db_session.flush()
 
     list_response = await client.get("/api/v1/recordings", headers=auth_headers)
@@ -250,25 +276,35 @@ async def test_teacher_cannot_access_recording_when_relation_disallows_practice(
 
     from app.models.practice import PracticeRecording
     from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
 
-    db_session.add_all([
-        PracticeRecording(
-            id="permission-denied-recording-id",
-            section_id="section-005",
-            student_id="student-user-id",
-            file_path="recordings/permission-denied.m4a",
-            file_key="recordings/permission-denied.m4a",
-            file_url="https://storage.example/permission-denied.m4a",
-            duration_seconds=180,
-        ),
-        TeacherStudentRelation(
-            teacher_id="test-user-id-prof",
-            student_id="student-user-id",
-            status="active",
-            is_app_connected=True,
-            can_view_practice=False,
-        ),
-    ])
+    db_session.add_all(
+        [
+            PracticeRecording(
+                id="permission-denied-recording-id",
+                section_id="section-005",
+                student_id="student-user-id",
+                file_path="recordings/permission-denied.m4a",
+                file_key="recordings/permission-denied.m4a",
+                file_url="https://storage.example/permission-denied.m4a",
+                duration_seconds=180,
+            ),
+            TeacherStudentRelation(
+                teacher_id="test-user-id-prof",
+                student_id="student-user-id",
+                status="active",
+                is_app_connected=True,
+                can_view_practice=False,
+            ),
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+        ]
+    )
     await db_session.flush()
 
     response = await client.get(
@@ -298,29 +334,39 @@ async def test_teacher_cannot_access_recording_when_student_disabled_practice_sh
     from app.models.practice import PracticeRecording
     from app.models.relationship import TeacherStudentRelation
     from app.models.settings import NotificationSettings
+    from app.models.student import Student
 
-    db_session.add_all([
-        PracticeRecording(
-            id="share-disabled-recording-id",
-            section_id="section-006",
-            student_id="student-user-id",
-            file_path="recordings/share-disabled.m4a",
-            file_key="recordings/share-disabled.m4a",
-            file_url="https://storage.example/share-disabled.m4a",
-            duration_seconds=180,
-        ),
-        TeacherStudentRelation(
-            teacher_id="test-user-id-prof",
-            student_id="student-user-id",
-            status="active",
-            is_app_connected=True,
-        ),
-        NotificationSettings(
-            user_id="student-user-id",
-            target_user_id="test-user-id",
-            practice_share_enabled=False,
-        ),
-    ])
+    db_session.add_all(
+        [
+            PracticeRecording(
+                id="share-disabled-recording-id",
+                section_id="section-006",
+                student_id="student-user-id",
+                file_path="recordings/share-disabled.m4a",
+                file_key="recordings/share-disabled.m4a",
+                file_url="https://storage.example/share-disabled.m4a",
+                duration_seconds=180,
+            ),
+            TeacherStudentRelation(
+                teacher_id="test-user-id-prof",
+                student_id="student-user-id",
+                status="active",
+                is_app_connected=True,
+            ),
+            NotificationSettings(
+                user_id="student-user-id",
+                target_user_id="test-user-id",
+                practice_share_enabled=False,
+            ),
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+        ]
+    )
     await db_session.flush()
 
     response = await client.get(
@@ -350,24 +396,26 @@ async def test_parent_can_access_child_recording_when_visibility_allows(
     from app.models.practice import PracticeRecording
 
     parent = Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent", email="parent@test.com")
-    db_session.add_all([
-        parent,
-        ParentChildRelation(parent_id="parent-profile-id", student_id="student-user-id"),
-        ParentVisibilitySettings(
-            teacher_id="teacher-profile-id",
-            student_id="student-user-id",
-            can_view_recordings=True,
-        ),
-        PracticeRecording(
-            id="parent-visible-recording-id",
-            section_id="section-007",
-            student_id="student-user-id",
-            file_path="recordings/parent-visible.m4a",
-            file_key="recordings/parent-visible.m4a",
-            file_url="https://storage.example/parent-visible.m4a",
-            duration_seconds=180,
-        ),
-    ])
+    db_session.add_all(
+        [
+            parent,
+            ParentChildRelation(parent_id="parent-profile-id", student_id="student-user-id"),
+            ParentVisibilitySettings(
+                teacher_id="teacher-profile-id",
+                student_id="student-user-id",
+                can_view_recordings=True,
+            ),
+            PracticeRecording(
+                id="parent-visible-recording-id",
+                section_id="section-007",
+                student_id="student-user-id",
+                file_path="recordings/parent-visible.m4a",
+                file_key="recordings/parent-visible.m4a",
+                file_url="https://storage.example/parent-visible.m4a",
+                duration_seconds=180,
+            ),
+        ]
+    )
     await db_session.flush()
 
     parent_headers = {
@@ -400,24 +448,26 @@ async def test_parent_cannot_access_child_recording_when_visibility_denies(
     from app.models.parent import Parent, ParentChildRelation, ParentVisibilitySettings
     from app.models.practice import PracticeRecording
 
-    db_session.add_all([
-        Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent", email="parent@test.com"),
-        ParentChildRelation(parent_id="parent-profile-id", student_id="student-user-id"),
-        ParentVisibilitySettings(
-            teacher_id="teacher-profile-id",
-            student_id="student-user-id",
-            can_view_recordings=False,
-        ),
-        PracticeRecording(
-            id="parent-hidden-recording-id",
-            section_id="section-008",
-            student_id="student-user-id",
-            file_path="recordings/parent-hidden.m4a",
-            file_key="recordings/parent-hidden.m4a",
-            file_url="https://storage.example/parent-hidden.m4a",
-            duration_seconds=180,
-        ),
-    ])
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent", email="parent@test.com"),
+            ParentChildRelation(parent_id="parent-profile-id", student_id="student-user-id"),
+            ParentVisibilitySettings(
+                teacher_id="teacher-profile-id",
+                student_id="student-user-id",
+                can_view_recordings=False,
+            ),
+            PracticeRecording(
+                id="parent-hidden-recording-id",
+                section_id="section-008",
+                student_id="student-user-id",
+                file_path="recordings/parent-hidden.m4a",
+                file_key="recordings/parent-hidden.m4a",
+                file_url="https://storage.example/parent-hidden.m4a",
+                duration_seconds=180,
+            ),
+        ]
+    )
     await db_session.flush()
 
     parent_headers = {
@@ -466,9 +516,7 @@ async def test_upload_recording_saves_owner_and_storage_key(
 
     from app.models.practice import PracticeRecording
 
-    recording = await db_session.scalar(
-        select(PracticeRecording).where(PracticeRecording.section_id == "section-001")
-    )
+    recording = await db_session.scalar(select(PracticeRecording).where(PracticeRecording.section_id == "section-001"))
     assert recording is not None
     assert recording.student_id == "test-user-id"
     assert recording.file_key.startswith("recordings/")

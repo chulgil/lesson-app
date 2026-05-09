@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_reviewed": "2026-05-07",
+  "last_reviewed": "2026-05-09",
   "purpose": "Explicit inventory of known backend database integrity gaps. This file is a contract target for tests; remove entries only when a migration and model-level FK or constraint closes the gap.",
   "canonical_identifier_policy": {
     "users.id": "Authentication account identifier.",
@@ -42,7 +42,7 @@
       "table": "teacher_student_relations",
       "column": "teacher_id",
       "target": "teachers.id",
-      "status": "missing",
+      "status": "present",
       "priority": "P0",
       "reason": "Relation rows drive access decisions and must not outlive the teacher profile."
     },
@@ -51,7 +51,7 @@
       "table": "teacher_student_relations",
       "column": "student_id",
       "target": "students.id",
-      "status": "missing",
+      "status": "present",
       "priority": "P0",
       "reason": "Relation rows drive access decisions and must not outlive the student profile."
     },
