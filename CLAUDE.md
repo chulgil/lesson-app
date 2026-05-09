@@ -95,6 +95,16 @@ flutter analyze                                              # 분석
 | `lore-commit.md` | git trailer 의사결정 기록 (directive/constraint/rejected) |
 | `hash-anchored-edit.md` | xxhash 기반 정밀 편집 (긴 파일 안전 수정) |
 
+## Matt Pocock 기반 스킬
+
+`mattpocock/skills`의 engineering 패턴을 Lessonaza 경로에 맞춰 적용한다.
+
+| 스킬 | 사용 시점 |
+|------|----------|
+| `matt-grill-with-docs` | 기능 착수 전 요구사항·도메인 용어·결정사항 정리 |
+| `matt-zoom-out` | 특정 파일/기능의 전체 시스템 맥락이 필요할 때 |
+| `matt-to-issues` | spec/PRD를 독립 실행 가능한 vertical slice 이슈로 분해할 때 |
+
 ## 검증 에이전트 (`.claude/agents/`)
 
 Oracle Problem (같은 AI 가 코드+테스트 작성 시 정확도 ~6%) 완화를 위해 별개 컨텍스트로 격리 호출.
