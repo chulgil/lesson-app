@@ -36,6 +36,9 @@ PUBLIC_API_OPERATIONS = {
     ("POST", "/api/v1/auth/oauth/{provider}"),
     ("POST", "/api/v1/auth/dev-login"),
     ("POST", "/api/v1/auth/token/refresh"),
+    ("GET", "/api/v1/app/version"),
+    ("GET", "/api/v1/public/invites/{invite_code}/landing"),
+    ("GET", "/api/v1/public/student-summaries/{token}"),
     ("GET", "/api/v1/users/supported-locales"),
 }
 
