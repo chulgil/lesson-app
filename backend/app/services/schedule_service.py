@@ -186,6 +186,7 @@ class ScheduleService:
 
         from app.models.lesson import Lesson, LessonStatus
         from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
+        from app.models.schedule_ext import ScheduleException
 
         ws = date_type.fromisoformat(week_start) if week_start else date_type.today()
         # Align to Monday
@@ -198,13 +199,56 @@ class ScheduleService:
             select(TeacherAvailability).where(TeacherAvailability.teacher_id.in_(teacher_id_scope))
         )
         avail_by_day: dict[int, list[dict]] = {}
+        avail_ids: list[str] = []
         for avail in avail_rows.all():
+            avail_ids.append(avail.id)
             slots_rows = await self.db.scalars(
                 select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
             )
             avail_by_day[avail.day_of_week] = [
                 {"start_time": s.start_time, "end_time": s.end_time, "type": "available"} for s in slots_rows.all()
             ]
+
+        # Load schedule exceptions (holiday/vacation) for this week.
+        exception_scope = [
+            ScheduleException.teacher_id.in_(teacher_id_scope),
+        ]
+        if avail_ids:
+            exception_scope.append(
+                ScheduleException.teacher_availability_id.in_(avail_ids)
+            )
+
+        exceptions_by_date: dict[str, list[dict]] = {}
+        exception_rows = await self.db.scalars(
+            select(ScheduleException).where(
+                or_(*exception_scope),
+                ScheduleException.start_date <= week_end,
+                ScheduleException.end_date >= ws,
+                ScheduleException.type.in_(["holiday", "vacation"]),
+            )
+        )
+        for exc in exception_rows.all():
+            # For each affected date in the requested window, append exception block.
+            current_day = max(ws, exc.start_date)
+            end_day = min(week_end, exc.end_date)
+            if current_day > end_day:
+                continue
+            while current_day <= end_day:
+                date_str = current_day.isoformat()
+                start_time = exc.start_time or "00:00"
+                end_time = exc.end_time or "23:59"
+                exceptions_by_date.setdefault(date_str, []).append(
+                    {
+                        "type": "exception",
+                        "exception_type": str(exc.type.value),
+                        "status": "unavailable",
+                        "start_time": start_time,
+                        "end_time": end_time,
+                        "reason": exc.reason,
+                        "exception_id": exc.id,
+                    }
+                )
+                current_day += timedelta(days=1)
 
         # Load bookings for this week
         bookings = await self.db.scalars(
@@ -282,6 +326,8 @@ class ScheduleService:
                 events.extend(bookings_by_date[date_str])
             if date_str in lessons_by_date:
                 events.extend(lessons_by_date[date_str])
+            if date_str in exceptions_by_date:
+                events.extend(exceptions_by_date[date_str])
             if events:
                 days[date_str] = events
 

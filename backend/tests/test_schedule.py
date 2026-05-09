@@ -177,3 +177,108 @@ async def test_available_slots_blocks_manual_lesson(client: AsyncClient, auth_he
     blocked_14 = [slot for slot in slots if slot["start_time"] == "14:00"]
     assert blocked_14
     assert blocked_14[0]["status"] == "booked"
+
+
+@pytest.mark.asyncio
+async def test_weekly_schedule_includes_full_day_exception(client: AsyncClient, auth_headers, create_test_user):
+    """Weekly schedule should include teacher holiday/vacation as exceptions."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    # Set base availability so week has at least one visible slot.
+    await client.put(
+        "/api/v1/schedule/availability",
+        headers=auth_headers,
+        json={
+            "availabilities": [
+                {
+                    "day_of_week": 1,  # Tuesday
+                    "time_slots": [
+                        {
+                            "start_time": "10:00",
+                            "end_time": "18:00",
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+
+    exception_resp = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=auth_headers,
+        json={
+            "type": "holiday",
+            "start_date": "2026-03-10",
+            "end_date": "2026-03-11",
+            "reason": "긴급 휴무",
+        },
+    )
+    assert exception_resp.status_code == 201
+
+    response = await client.get(
+        "/api/v1/schedule/weekly",
+        headers=auth_headers,
+        params={"week_start": "2026-03-09"},
+    )
+    assert response.status_code == 200
+
+    days = response.json()["days"]
+    day_events = days.get("2026-03-10", [])
+    exceptions = [evt for evt in day_events if evt.get("type") == "exception"]
+    assert exceptions
+    assert exceptions[0]["exception_type"] == "holiday"
+
+
+@pytest.mark.asyncio
+async def test_weekly_schedule_includes_partial_day_exception(client: AsyncClient, auth_headers, create_test_user):
+    """Weekly schedule should include partial-day vacation blocks."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    await client.put(
+        "/api/v1/schedule/availability",
+        headers=auth_headers,
+        json={
+            "availabilities": [
+                {
+                    "day_of_week": 1,
+                    "time_slots": [
+                        {
+                            "start_time": "09:00",
+                            "end_time": "20:00",
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+
+    exception_resp = await client.post(
+        "/api/v1/schedule/exceptions",
+        headers=auth_headers,
+        json={
+            "type": "vacation",
+            "start_date": "2026-03-10",
+            "end_date": "2026-03-10",
+            "start_time": "13:00",
+            "end_time": "15:00",
+            "reason": "오후 오피스 미팅",
+        },
+    )
+    assert exception_resp.status_code == 201
+
+    response = await client.get(
+        "/api/v1/schedule/weekly",
+        headers=auth_headers,
+        params={"week_start": "2026-03-09"},
+    )
+    assert response.status_code == 200
+
+    day_events = response.json()["days"].get("2026-03-10", [])
+    exceptions = [
+        evt
+        for evt in day_events
+        if evt.get("type") == "exception" and evt.get("exception_type") == "vacation"
+    ]
+    assert exceptions
+    assert exceptions[0]["start_time"] == "13:00"
+    assert exceptions[0]["end_time"] == "15:00"
