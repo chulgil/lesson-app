@@ -11,6 +11,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../students/students_ui_facade.dart';
 import '../providers/student_home_profile_edit_provider.dart';
@@ -136,16 +137,18 @@ class _StudentProfileEditScreenState
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return NotebookScreenScaffold(
-        appBar: AppBar(title: const Text(AppStrings.studentHomeProfileEdit)),
-        body: const Center(child: CircularProgressIndicator()),
+      return const NotebookScreenScaffold(
+        appBar: NotebookDetailAppBar(
+          title: AppStrings.studentHomeProfileEdit,
+        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.studentHomeProfileEdit),
-        actions: [
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.studentHomeProfileEdit,
+        customActions: [
           TextButton(
             onPressed: _hasChanges && !_isSaving ? _onSave : null,
             child:

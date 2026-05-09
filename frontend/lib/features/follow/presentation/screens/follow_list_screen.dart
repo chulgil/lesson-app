@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/follow.dart';
 import '../../domain/entities/follow_target_type.dart';
@@ -25,13 +26,13 @@ class FollowListScreen extends ConsumerWidget {
     return DefaultTabController(
       length: 3,
       child: NotebookScreenScaffold(
-        appBar: AppBar(
-          title: const Text(AppStrings.followTitle),
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.followTitle,
           bottom: TabBar(
             labelColor: AppColors.paperAccent,
             unselectedLabelColor: AppColors.inkSecondary,
             indicatorColor: AppColors.paperAccent,
-            tabs: const [Tab(text: '전체'), Tab(text: '선생님'), Tab(text: '학원')],
+            tabs: [Tab(text: '전체'), Tab(text: '선생님'), Tab(text: '학원')],
           ),
         ),
         body: TabBarView(

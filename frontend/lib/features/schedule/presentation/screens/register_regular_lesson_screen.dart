@@ -9,6 +9,7 @@ import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
@@ -59,7 +60,9 @@ class _RegisterRegularLessonScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.regularLessonTitle)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.regularLessonTitle,
+      ),
       body: settingsAsync.when(
         data:
             (settings) => availabilityAsync.when(

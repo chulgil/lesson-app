@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../providers/subscription_issue_flow_provider.dart';
@@ -65,9 +66,8 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     );
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.proposalCreateAppBarTitle),
-        centerTitle: true,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.proposalCreateAppBarTitle,
       ),
       body: studentsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

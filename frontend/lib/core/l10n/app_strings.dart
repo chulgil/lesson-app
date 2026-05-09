@@ -6018,6 +6018,8 @@ class AppStrings {
   static const parentHomeParentLabel = '학부모';
   static const parentHomeTotal = '전체';
   static const parentHomeInProgress = '진행중';
+  static const parentHomeChildAddTitle = '자녀 추가';
+  static const parentHomeChildEditTitle = '자녀 정보 수정';
 
   // ── Schedule (추가) ───────────────────────────────────────
 

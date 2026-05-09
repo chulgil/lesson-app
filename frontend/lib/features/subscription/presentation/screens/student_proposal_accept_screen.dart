@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../search/search_facade.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../providers/subscription_proposal_providers.dart';
@@ -39,9 +40,8 @@ class _StudentProposalAcceptScreenState
     );
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.studentProposalAcceptAppBarTitle),
-        centerTitle: true,
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.studentProposalAcceptAppBarTitle,
       ),
       body:
           _isProcessing

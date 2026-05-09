@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../providers/assignment_summary_provider.dart';
 
@@ -22,12 +23,8 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     final summaryAsync = ref.watch(weeklyAssignmentSummaryProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text(AppStrings.weeklyAssignmentTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.weeklyAssignmentTitle,
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

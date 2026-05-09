@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../features/schedule/schedule_ui_facade.dart';
@@ -28,6 +29,11 @@ class TeacherDetailScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
+      appBar: NotebookDetailAppBar(
+        title: profileAsync.valueOrNull?.name != null
+            ? '${profileAsync.valueOrNull!.name} (선생님)'
+            : AppStrings.searchAnonymousTeacher,
+      ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -109,73 +115,47 @@ class _TeacherDetailContent extends ConsumerWidget {
         disconnectedConnectionsAsync.valueOrNull
             ?.where((c) => c.teacherId == profile.id)
             .firstOrNull;
-    return CustomScrollView(
-      slivers: [
-        // App bar with profile image
-        SliverAppBar(
-          expandedHeight: 200,
-          pinned: true,
-          titleSpacing: 0,
-          backgroundColor: AppColors.paperAccent,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.paper),
-            onPressed: () => context.pop(),
-          ),
-          title: Text(
-            '${profile.name ?? AppStrings.searchAnonymousTeacher} (선생님)',
-            style: NotebookTypography.appBarTitle.copyWith(
-              color: AppColors.paper,
-            ),
-          ),
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.paperAccent, AppColors.paperAccent],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile image header (previously in SliverAppBar flexibleSpace)
+          Container(
+            width: double.infinity,
+            color: AppColors.paperAccent,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space6),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: AppColors.paper.withValues(alpha: 0.2),
+                  backgroundImage:
+                      profile.profileImage != null
+                          ? NetworkImage(profile.profileImage!)
+                          : null,
+                  child:
+                      profile.profileImage == null
+                          ? const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: AppColors.paper,
+                          )
+                          : null,
                 ),
-              ),
-              child: SafeArea(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: AppSpacing.space4),
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.paper.withValues(alpha: 0.2),
-                        backgroundImage:
-                            profile.profileImage != null
-                                ? NetworkImage(profile.profileImage!)
-                                : null,
-                        child:
-                            profile.profileImage == null
-                                ? const Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: AppColors.paper,
-                                )
-                                : null,
-                      ),
-                      const SizedBox(height: AppSpacing.space3),
-                      Text(
-                        profile.name ?? AppStrings.searchAnonymousTeacher,
-                        style: AppTypography.headingMedium.copyWith(
-                          color: AppColors.paper,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  profile.name ?? AppStrings.searchAnonymousTeacher,
+                  style: AppTypography.headingMedium.copyWith(
+                    color: AppColors.paper,
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ),
 
-        // Content
-        SliverToBoxAdapter(
-          child: Padding(
+          // Content
+          Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -470,8 +450,8 @@ class _TeacherDetailContent extends ConsumerWidget {
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

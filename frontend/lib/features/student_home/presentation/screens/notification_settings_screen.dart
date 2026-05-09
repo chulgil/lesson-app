@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../notifications/notifications_facade.dart';
 import '../providers/notification_settings_provider.dart';
@@ -23,8 +24,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
     final isTeacher = role == UserRole.teacher;
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.notificationSettingsAppBarTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.notificationSettingsAppBarTitle,
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),

@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 
 const _supportEmail = 'support@lessonaza.com';
 
@@ -59,7 +60,9 @@ class HelpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.studentHomeHelpTitle)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.studentHomeHelpTitle,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [

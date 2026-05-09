@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
@@ -146,9 +147,10 @@ class _ChildProfileFormScreenState
     final maxYear = currentYear - 3; // Min 3 years old
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? '자녀 정보 수정' : '자녀 추가'),
-        centerTitle: true,
+      appBar: NotebookDetailAppBar(
+        title: isEditing
+            ? AppStrings.parentHomeChildEditTitle
+            : AppStrings.parentHomeChildAddTitle,
       ),
       body: Form(
         key: _formKey,

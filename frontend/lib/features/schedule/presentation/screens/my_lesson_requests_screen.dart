@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/request_list_item.dart';
 
@@ -26,7 +27,9 @@ class MyLessonRequestsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.lessonRequestTitle)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.lessonRequestTitle,
+      ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:

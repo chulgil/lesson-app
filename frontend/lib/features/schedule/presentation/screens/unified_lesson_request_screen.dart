@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/settings/settings_facade.dart';
@@ -94,7 +95,9 @@ class _UnifiedLessonRequestScreenState
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(title: Text(AppStrings.lessonRequestFormTitle)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.lessonRequestFormTitle,
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(

@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../providers/lesson_policy_providers.dart';
 import '../widgets/chip_input_field.dart';
@@ -105,13 +106,10 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.lessonClassId != null
-              ? AppStrings.policyClassAppBarTitle
-              : AppStrings.policyLessonAppBarTitle,
-        ),
-        centerTitle: true,
+      appBar: NotebookDetailAppBar(
+        title: widget.lessonClassId != null
+            ? AppStrings.policyClassAppBarTitle
+            : AppStrings.policyLessonAppBarTitle,
       ),
       body:
           _isLoading

@@ -6,6 +6,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 
 /// Reusable legal document viewer screen.
 class LegalDocumentScreen extends StatelessWidget {
@@ -21,7 +22,7 @@ class LegalDocumentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: NotebookDetailAppBar(title: title),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(

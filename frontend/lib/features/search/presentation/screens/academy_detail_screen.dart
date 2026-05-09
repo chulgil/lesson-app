@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../domain/repositories/teacher_search_repository.dart';
 import '../../../parent_home/parent_home_facade.dart';
@@ -27,6 +28,11 @@ class AcademyDetailScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
+      appBar: NotebookDetailAppBar(
+        title: academyAsync.valueOrNull != null
+            ? '${academyAsync.valueOrNull!.name} (학원)'
+            : AppStrings.searchTabAcademy,
+      ),
       body: academyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildErrorState(context, '학원 정보를 불러올 수 없습니다'),
@@ -34,55 +40,7 @@ class AcademyDetailScreen extends ConsumerWidget {
           if (academy == null) {
             return _buildErrorState(context, '학원 정보를 찾을 수 없습니다');
           }
-          return CustomScrollView(
-            slivers: [
-              _buildAppBar(context, academy),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.space4),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildAcademyInfoCard(academy),
-                      const SizedBox(height: AppSpacing.space6),
-                      _buildTeacherListHeader(academy),
-                      const SizedBox(height: AppSpacing.space3),
-                    ],
-                  ),
-                ),
-              ),
-              teachersAsync.when(
-                loading:
-                    () => const SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                error:
-                    (error, stack) => SliverToBoxAdapter(
-                      child: Center(
-                        child: Text(
-                          '선생님 목록을 불러올 수 없습니다',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                data: (teachers) => _buildTeacherList(context, ref, teachers),
-              ),
-              // Notebook × Score: "Fine." 종지부
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const SizedBox(height: AppSpacing.space6),
-                    Center(
-                      child: Text('Fine.', style: NotebookTypography.fine),
-                    ),
-                    const SizedBox(height: AppSpacing.space8),
-                  ],
-                ),
-              ),
-            ],
-          );
+          return _buildScrollBody(context, ref, academy, teachersAsync);
         },
       ),
     );
@@ -111,57 +69,78 @@ class AcademyDetailScreen extends ConsumerWidget {
     );
   }
 
-  SliverAppBar _buildAppBar(BuildContext context, AcademyInfo academy) {
-    return SliverAppBar(
-      expandedHeight: 160,
-      pinned: true,
-      titleSpacing: 0,
-      backgroundColor: AppColors.paperAccent,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.paper),
-        onPressed: () => context.pop(),
-      ),
-      title: Text(
-        '${academy.name} (학원)',
-        style: NotebookTypography.appBarTitle.copyWith(color: AppColors.paper),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.paperAccent, AppColors.paperAccent],
+  Widget _buildScrollBody(
+    BuildContext context,
+    WidgetRef ref,
+    AcademyInfo academy,
+    AsyncValue<List<TeacherPublicProfile>> teachersAsync,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Academy header (previously in SliverAppBar flexibleSpace)
+          Container(
+            width: double.infinity,
+            color: AppColors.paperAccent,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space6),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(color: AppColors.paper),
+                  child: Icon(
+                    Icons.school,
+                    size: 36,
+                    color: AppColors.paperAccent,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  academy.name,
+                  style: AppTypography.headingMedium.copyWith(
+                    color: AppColors.paper,
+                  ),
+                ),
+              ],
             ),
           ),
-          child: SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: AppSpacing.space4),
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: const BoxDecoration(color: AppColors.paper),
-                    child: const Icon(
-                      Icons.school,
-                      size: 36,
-                      color: AppColors.paper,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    academy.name,
-                    style: AppTypography.headingMedium.copyWith(
-                      color: AppColors.paper,
-                    ),
-                  ),
-                ],
+
+          // Academy info + teacher list
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAcademyInfoCard(academy),
+                const SizedBox(height: AppSpacing.space6),
+                _buildTeacherListHeader(academy),
+                const SizedBox(height: AppSpacing.space3),
+              ],
+            ),
+          ),
+
+          // Teachers
+          teachersAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Center(
+              child: Text(
+                '선생님 목록을 불러올 수 없습니다',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
               ),
             ),
+            data: (teachers) => _buildTeacherList(context, ref, teachers),
           ),
-        ),
+
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+          const SizedBox(height: AppSpacing.space8),
+        ],
       ),
     );
   }
@@ -271,32 +250,27 @@ class AcademyDetailScreen extends ConsumerWidget {
     );
   }
 
-  SliverList _buildTeacherList(
+  Widget _buildTeacherList(
     BuildContext context,
     WidgetRef ref,
     List<TeacherPublicProfile> teachers,
   ) {
     if (teachers.isEmpty) {
-      return SliverList(
-        delegate: SliverChildListDelegate([
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            child: Center(
-              child: Text(
-                '소속 선생님이 없습니다',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        child: Center(
+          child: Text(
+            '소속 선생님이 없습니다',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
             ),
           ),
-        ]),
+        ),
       );
     }
 
-    return SliverList(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        final teacher = teachers[index];
+    return Column(
+      children: teachers.map((teacher) {
         return _AcademyTeacherCard(
           teacher: teacher,
           onProfileTap: () {
@@ -322,7 +296,7 @@ class AcademyDetailScreen extends ConsumerWidget {
             );
           },
         );
-      }, childCount: teachers.length),
+      }).toList(),
     );
   }
 }

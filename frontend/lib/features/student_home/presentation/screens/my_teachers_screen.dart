@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
@@ -28,7 +29,9 @@ class MyTeachersScreen extends ConsumerWidget {
     final manualTeachersAsync = ref.watch(manualTeacherNotifierProvider);
 
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.studentHomeMyTeachers)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.studentHomeMyTeachers,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(

@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/gamification.dart';
 import '../providers/gamification_provider.dart';
 import '../widgets/challenges_card.dart';
@@ -24,12 +24,8 @@ class BadgeCollectionScreen extends ConsumerWidget {
     final gamificationAsync = ref.watch(studentGamificationProvider(studentId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: const Text(AppStrings.gamificationMyGrowth),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.gamificationMyGrowth,
       ),
       body: gamificationAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

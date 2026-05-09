@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
@@ -23,16 +24,10 @@ class ChildProfilesScreen extends ConsumerWidget {
     final profilesAsync = ref.watch(childProfilesProvider(parentId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.parentHomeChildManagement),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () => _navigateToAddChild(context),
-            icon: const Icon(Icons.add),
-            tooltip: '자녀 추가',
-          ),
-        ],
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.parentHomeChildManagement,
+        actions: const [DetailAppBarAction.add],
+        onAction: (_) => _navigateToAddChild(context),
       ),
       body: profilesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

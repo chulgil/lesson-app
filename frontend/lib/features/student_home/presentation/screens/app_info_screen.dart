@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 
 /// App information screen.
 class AppInfoScreen extends StatelessWidget {
@@ -18,7 +19,9 @@ class AppInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.studentHomeAppInfoTitle)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.studentHomeAppInfoTitle,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [

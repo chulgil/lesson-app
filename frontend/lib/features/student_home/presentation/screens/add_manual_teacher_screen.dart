@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../students/students_ui_facade.dart';
 import '../../domain/entities/manual_teacher.dart';
 import '../providers/manual_teacher_provider.dart';
@@ -63,17 +64,13 @@ class _AddManualTeacherScreenState
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: Text(
-          _isEditMode
-              ? AppStrings.studentHomeTeacherEditLabel
-              : AppStrings.studentHomeTeacherRegisterLabel,
-        ),
-        leading: IconButton(
-          onPressed: () => _confirmExit(),
-          icon: const Icon(Icons.close),
-        ),
-        actions: [
+      appBar: NotebookDetailAppBar(
+        title: _isEditMode
+            ? AppStrings.studentHomeTeacherEditLabel
+            : AppStrings.studentHomeTeacherRegisterLabel,
+        leading: DetailAppBarLeading.close,
+        onLeadingTap: _confirmExit,
+        customActions: [
           TextButton(
             onPressed: _isSaving ? null : _save,
             child: const Text(AppStrings.save),

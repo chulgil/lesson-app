@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../domain/entities/unified_lesson_request.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/request_list_item.dart';
 
@@ -26,32 +26,8 @@ class LessonRequestsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: requestsAsync.when(
-          loading: () => const Text(AppStrings.lessonRequestTitle),
-          error: (_, __) => const Text(AppStrings.lessonRequestTitle),
-          data: (requests) {
-            final pendingCount =
-                requests
-                    .where((r) => r.status == UnifiedRequestStatus.pending)
-                    .length;
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(AppStrings.lessonRequestTitle),
-                if (pendingCount > 0)
-                  Text(
-                    AppStrings.lessonRequestPending(pendingCount),
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.paperAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.lessonRequestTitle,
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

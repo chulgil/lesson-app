@@ -8,9 +8,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
-import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/notification.dart';
 import '../navigation/notification_navigation_target.dart';
 import '../providers/notification_providers.dart';
@@ -33,15 +33,9 @@ class NotificationListScreen extends ConsumerWidget {
     // §7.131: AppBar 는 전역 테마(Playfair appBarTitle)를 따르고,
     // 하단에 1px ThinRule 을 두어 매스트헤드 메타포 유지.
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.notifications),
-        backgroundColor: AppColors.paperDark,
-        elevation: 0,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: ThinRule(color: AppColors.ink),
-        ),
-        actions: [
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.notifications,
+        customActions: [
           TextButton(
             onPressed: () => _markAllAsRead(ref),
             // §7.131: 액션 라벨도 시스템 메타이므로 sectionLabel(uppercase) 톤.

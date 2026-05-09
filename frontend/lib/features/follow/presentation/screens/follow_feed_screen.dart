@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../auth/auth_facade.dart';
 import '../providers/post_providers.dart';
 import '../widgets/follow_feed_item.dart';
@@ -23,7 +24,9 @@ class FollowFeedScreen extends ConsumerWidget {
     final feedAsync = ref.watch(followFeedProvider(userId));
 
     return NotebookScreenScaffold(
-      appBar: AppBar(title: const Text(AppStrings.followFeedTitle)),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.followFeedTitle,
+      ),
       body: feedAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
