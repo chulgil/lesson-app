@@ -14,9 +14,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../../core/widgets/notebook/notebook_masthead.dart';
-import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/students_facade.dart'
     show
@@ -112,36 +111,8 @@ class StudentDetailScreen extends ConsumerWidget {
   Widget _buildShellScaffold(BuildContext context, {required Widget child}) {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: NotebookMasthead.mastheadTopPaddingScreen),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-              ),
-              child: NotebookMasthead(
-                eyebrow: 'STUDENT',
-                meta: '',
-                trailing: IconButton(
-                  onPressed: () => context.pop(),
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.ink,
-                    size: 22,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(child: child),
-          ],
-        ),
-      ),
+      appBar: NotebookDetailAppBar(title: ''),
+      body: SafeArea(child: child),
     );
   }
 
@@ -172,23 +143,68 @@ class _StudentDetailContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profileImagePath =
+        ref
+            .watch(studentProfileImageNotifierProvider(student.id))
+            .valueOrNull;
+
     return DefaultTabController(
       length: 3,
       child: NotebookScreenScaffold(
         backgroundColor: AppColors.paper,
+        appBar: NotebookDetailAppBar(
+          title: student.name,
+          onLeadingTap: () => context.pop(),
+          customActions: [
+            IconButton(
+              onPressed: () => _showMoreOptions(context, ref),
+              icon: const Icon(Icons.more_vert, color: AppColors.ink, size: 22),
+              tooltip: 'more',
+            ),
+          ],
+        ),
         body: SafeArea(
           bottom: false,
           child: Column(
             children: [
-              // ── Notebook 헤더: Masthead + 신원 스트립 + 로마숫자 탭 ──
-              _NotebookHeader(
-                student: student,
-                onBack: () => context.pop(),
-                onMore: () => _showMoreOptions(context, ref),
-                profileImagePath:
-                    ref
-                        .watch(studentProfileImageNotifierProvider(student.id))
-                        .valueOrNull,
+              // ── 신원 스트립: 모노그램 + 학생명 + 메타 라인 ──
+              ColoredBox(
+                color: AppColors.paper,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenPadding,
+                        AppSpacing.space5,
+                        AppSpacing.screenPadding,
+                        AppSpacing.space4,
+                      ),
+                      child: Column(
+                        children: [
+                          _StudentMonogram(
+                            student: student,
+                            profileImagePath: profileImagePath,
+                          ),
+                          const SizedBox(height: AppSpacing.space3),
+                          Text(
+                            student.name,
+                            style: NotebookTypography.masthead.copyWith(
+                              fontSize: 28,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 4),
+                          _StudentMetaLine(student: student),
+                        ],
+                      ),
+                    ),
+                    const ThinRule(),
+                    // ── 로마숫자 탭 ──
+                    const _RomanTabBar(),
+                    const ThinRule(),
+                  ],
+                ),
               ),
               // ── 본문: 3 탭 콘텐츠 ──
               Expanded(
@@ -569,108 +585,6 @@ class _StudentDetailContent extends ConsumerWidget {
               ),
             ],
           ),
-    );
-  }
-}
-
-/// Notebook 헤더 — Masthead(2px ink) + 신원 스트립 + 로마숫자 탭.
-class _NotebookHeader extends StatelessWidget {
-  final Student student;
-  final VoidCallback onBack;
-  final VoidCallback onMore;
-  final String? profileImagePath;
-
-  const _NotebookHeader({
-    required this.student,
-    required this.onBack,
-    required this.onMore,
-    this.profileImagePath,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.paper,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: NotebookMasthead.mastheadTopPaddingScreen),
-          // ── Masthead: 좌 STUDENT eyebrow + 우 back/more 아이콘 ──
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenPadding,
-            ),
-            child: NotebookMasthead(
-              eyebrow: 'STUDENT',
-              meta: '',
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: onBack,
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: AppColors.ink,
-                      size: 22,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    onPressed: onMore,
-                    icon: const Icon(
-                      Icons.more_vert,
-                      color: AppColors.ink,
-                      size: 22,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ── 신원 스트립: 모노그램 + 학생명 + 메타 라인 ──
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space5,
-              AppSpacing.screenPadding,
-              AppSpacing.space4,
-            ),
-            child: Column(
-              children: [
-                _StudentMonogram(
-                  student: student,
-                  profileImagePath: profileImagePath,
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                Text(
-                  student.name,
-                  style: NotebookTypography.masthead.copyWith(fontSize: 28),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                _StudentMetaLine(student: student),
-              ],
-            ),
-          ),
-
-          const ThinRule(),
-
-          // ── 로마숫자 탭 ──
-          const _RomanTabBar(),
-          const ThinRule(),
-        ],
-      ),
     );
   }
 }
