@@ -85,8 +85,8 @@ class NotebookDetailAppBar extends StatelessWidget
   @override
   Size get preferredSize {
     final bottomHeight = bottom?.preferredSize.height ?? 0;
-    // AppBar height (kToolbarHeight) + bottom widget + border (1px)
-    return Size.fromHeight(kToolbarHeight + bottomHeight + 1);
+    // AppBar height (kToolbarHeight) + bottom widget + border (2px)
+    return Size.fromHeight(kToolbarHeight + bottomHeight + 2);
   }
 
   @override
@@ -104,32 +104,46 @@ class NotebookDetailAppBar extends StatelessWidget
       if (customActions != null) ...customActions!,
     ];
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppBar(
-          leading: IconButton(
-            icon: Icon(leadingIcon),
-            onPressed: onLeadingTap ?? () => Navigator.of(context).maybePop(),
-          ),
-          title: Text(
-            title,
-            style: NotebookTypography.appBarTitle,
-          ),
-          centerTitle: false,
-          titleSpacing: 0,
-          actions: actionWidgets.isEmpty ? null : actionWidgets,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          bottom: bottom,
+    // Bottom border — same weight as main tab bar top border (ink, 2px)
+    final borderLine = PreferredSize(
+      preferredSize: const Size.fromHeight(2),
+      child: Container(
+        height: 2,
+        color: AppColors.ink,
+      ),
+    );
+
+    final PreferredSizeWidget effectiveBottom;
+    if (bottom != null) {
+      effectiveBottom = PreferredSize(
+        preferredSize: Size.fromHeight(
+          bottom!.preferredSize.height + 1,
         ),
-        // Bottom border — 진한 줄
-        Container(
-          height: 1,
-          color: AppColors.ink.withValues(alpha: 0.15),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [bottom!, borderLine],
         ),
-      ],
+      );
+    } else {
+      effectiveBottom = borderLine;
+    }
+
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(leadingIcon),
+        onPressed: onLeadingTap ?? () => Navigator.of(context).maybePop(),
+      ),
+      title: Text(
+        title,
+        style: NotebookTypography.appBarTitle,
+      ),
+      centerTitle: false,
+      titleSpacing: 0,
+      actions: actionWidgets.isEmpty ? null : actionWidgets,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      bottom: effectiveBottom,
     );
   }
 }
