@@ -44,7 +44,7 @@
 | 서비스 레이어 | ✅ | 19개 서비스 (라우터 1:1 매핑) |
 | API 라우터 | ✅ | 19개, 120+ 엔드포인트 |
 | 테스트 | ✅ | 21개 테스트 파일 + 시나리오 프레임워크 |
-| 환경 설정 | ⚠️ | `.env.example`에 MySQL URL 잔존 (실제는 PostgreSQL) |
+| 환경 설정 | ✅ | `.env.example`은 PostgreSQL 기준으로 정리됨 |
 
 **결론: 백엔드는 구조적으로 완성되어 있음. 실행 가능한 상태.**
 
@@ -215,7 +215,7 @@
 | 11 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
 | 12 | LocationRepository Remote 검증 | 레슨 장소 관리는 `/locations`로 지원. 프론트 synthetic location id(`student_home_*`, `academy_default` 등)는 실제 location lookup 또는 membership location 선택 UI로 정리 필요 |
 | 13 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | 백엔드 API와 remote class는 존재. Provider 미연결 상태 해소 |
-| 14 | `.env.example` MySQL→PostgreSQL 수정 | 혼동 방지 |
+| 14 | `.env.example` PostgreSQL 정합성 점검 | 완료 |
 
 ---
 
