@@ -4,17 +4,25 @@ class AppVersionSnapshot {
   final String currentVersion;
   final String? buildNumber;
   final String? latestVersion;
+  final String? minVersion;
   final DateTime checkedAt;
 
   const AppVersionSnapshot({
     required this.currentVersion,
     this.buildNumber,
     this.latestVersion,
+    this.minVersion,
     required this.checkedAt,
   });
 
   bool get hasUpdate =>
       latestVersion != null && latestVersion != currentVersion;
+
+  bool get requiresForceUpdate {
+    final min = minVersion;
+    if (min == null) return false;
+    return _compareVersions(currentVersion, min) < 0;
+  }
 
   String get displayVersion {
     final build = buildNumber;
@@ -22,6 +30,19 @@ class AppVersionSnapshot {
       return currentVersion;
     }
     return '$currentVersion ($build)';
+  }
+
+  /// Compare semver strings. Returns negative if a < b.
+  static int _compareVersions(String a, String b) {
+    final partsA = a.split('.').map(int.tryParse).toList();
+    final partsB = b.split('.').map(int.tryParse).toList();
+    final len = partsA.length > partsB.length ? partsA.length : partsB.length;
+    for (int i = 0; i < len; i++) {
+      final va = i < partsA.length ? (partsA[i] ?? 0) : 0;
+      final vb = i < partsB.length ? (partsB[i] ?? 0) : 0;
+      if (va != vb) return va - vb;
+    }
+    return 0;
   }
 }
 

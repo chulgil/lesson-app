@@ -46,6 +46,8 @@ class RemoteAppReleaseRepository implements AppReleaseRepository {
         buildNumber: _asString(raw, 'buildNumber') ?? _asString(raw, 'build_number'),
         latestVersion:
             _asString(raw, 'latestVersion') ?? _asString(raw, 'latest_version'),
+        minVersion:
+            _asString(raw, 'minVersion') ?? _asString(raw, 'min_version'),
         checkedAt: _parseDate(raw['checkedAt'] ?? raw['checked_at']) ??
             DateTime.now().toUtc(),
       );

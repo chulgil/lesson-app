@@ -5439,6 +5439,24 @@ class AppStrings {
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';
 
+  /// Student/parent bottom navigation home tab.
+  static const navHome = '홈';
+
+  /// Student/parent bottom navigation lessons tab.
+  static const navLessons = '레슨';
+
+  /// Student bottom navigation practice tab.
+  static const navPractice = '연습';
+
+  /// Student/parent bottom navigation profile tab.
+  static const navProfile = '프로필';
+
+  /// Parent bottom navigation assignments tab.
+  static const navAssignments = '과제';
+
+  /// Parent bottom navigation payments tab.
+  static const navPayments = '입금';
+
   /// 수강관리 (bottom nav label, 로마숫자 III)
   static const studentsTabLabel = '수강관리';
 
@@ -5885,6 +5903,14 @@ class AppStrings {
   static const newsRoadmapStatusPlanned = '준비 중';
   static const newsRoadmapStatusInProgress = '진행 중';
   static const newsRoadmapStatusShipped = '완료';
+
+  // Force update screen
+  static const forceUpdateTitle = '업데이트가 필요합니다';
+  static String forceUpdateBody(String minVersion) =>
+      '원활한 사용을 위해 v$minVersion 이상으로\n업데이트해 주세요.';
+  static String forceUpdateCurrentVersion(String version) =>
+      '현재 버전: v$version';
+  static const forceUpdateAction = '업데이트하기';
   static const studentHomeTermsOfService = '이용약관';
   static const studentHomePrivacyPolicy = '개인정보처리방침';
   static const studentHomeOpenSourceLicense = '오픈소스 라이선스';
