@@ -5,6 +5,8 @@ import datetime as _dt
 import pytest
 from httpx import AsyncClient
 
+from app.models.lesson import Lesson, LessonSource
+
 
 @pytest.mark.asyncio
 async def test_get_availability(client: AsyncClient, auth_headers, create_test_user):
@@ -134,6 +136,74 @@ async def test_weekly_schedule_includes_manual_lessons(client: AsyncClient, auth
     day_events = days[str(lesson_date)]
     lesson_events = [evt for evt in day_events if evt.get("type") == "lesson"]
     assert any(evt.get("lesson_source") == "manual" for evt in lesson_events)
+
+
+@pytest.mark.asyncio
+async def test_weekly_schedule_includes_subscription_generated_lessons(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """GET /api/v1/schedule/weekly should include subscription-generated lessons."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        name="수강생",
+        email="student-subscription@test.com",
+    )
+
+    student_response = await client.post(
+        "/api/v1/students",
+        headers=auth_headers,
+        json={"name": "수강생", "instrument": "piano"},
+    )
+    assert student_response.status_code == 201
+    student_id = student_response.json()["id"]
+
+    subscription_response = await client.post(
+        "/api/v1/subscriptions",
+        headers=auth_headers,
+        json={
+            "student_id": student_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 200000,
+        },
+    )
+    assert subscription_response.status_code == 201
+    subscription_id = subscription_response.json()["id"]
+
+    lesson_date = _dt.date(2026, 3, 10)  # Tuesday
+    db_session.add(
+        Lesson(
+            student_id=student_id,
+            teacher_id="test-user-id",
+            student_name="수강생",
+            instrument="piano",
+            date=lesson_date,
+            start_time="15:00",
+            duration=60,
+            status="scheduled",
+            lesson_source=LessonSource.subscription_generated,
+            subscription_id=subscription_id,
+        )
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/schedule/weekly",
+        headers=auth_headers,
+        params={"week_start": "2026-03-09"},
+    )
+    assert response.status_code == 200
+
+    days = response.json()["days"]
+    assert str(lesson_date) in days
+    day_events = days[str(lesson_date)]
+    lesson_events = [evt for evt in day_events if evt.get("type") == "lesson"]
+    assert any(evt.get("lesson_source") == "subscriptionGenerated" for evt in lesson_events)
 
 
 @pytest.mark.asyncio
