@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -448,10 +449,9 @@ class StudentProfileTab extends ConsumerWidget {
   }
 
   Widget _buildMenuDivider() {
-    return Divider(
-      height: 1,
-      indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-      color: AppColors.inkQuaternary,
+    return Padding(
+      padding: EdgeInsets.only(left: AppSpacing.space4 + 36 + AppSpacing.space3),
+      child: const ThinRule(),
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
@@ -166,17 +167,23 @@ class ProposalDetailsCard extends StatelessWidget {
             AppStrings.issueFormSummaryAmountLabel,
             template.formattedPrice,
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 12),
+          const ThinRule(),
+          const SizedBox(height: 12),
           _buildDetailRow(
             AppStrings.proposalDetailsLessonsLabel,
             AppStrings.proposalDetailsLessonsValue(template.totalLessons),
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 12),
+          const ThinRule(),
+          const SizedBox(height: 12),
           _buildDetailRow(
             AppStrings.proposalDetailsDurationLabel,
             AppStrings.durationMinutesValue(template.lessonDurationMinutes),
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 12),
+          const ThinRule(),
+          const SizedBox(height: 12),
           _buildDetailRow(
             AppStrings.issueFormValidityTitle,
             AppStrings.proposalDetailsValidityValue(template.formattedValidity),
@@ -364,7 +371,9 @@ class ProposalDiscountCard extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(height: 16),
+          const SizedBox(height: 8),
+          const ThinRule(),
+          const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

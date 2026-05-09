@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 
 /// Reminder settings section
@@ -76,7 +77,7 @@ class LessonReminderSection extends StatelessWidget {
 
           if (enableReminder) ...[
             const SizedBox(height: AppSpacing.space3),
-            const Divider(),
+            const ThinRule(),
             const SizedBox(height: AppSpacing.space3),
             Row(
               children: [

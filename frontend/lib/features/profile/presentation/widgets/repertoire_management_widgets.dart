@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -542,7 +543,7 @@ void showDifficultyFilter({
                   style: NotebookTypography.appBarTitle,
                 ),
               ),
-              const Divider(),
+              const ThinRule(),
               ...difficulties.map(
                 (difficulty) => ListTile(
                   leading: CircleAvatar(
@@ -593,7 +594,7 @@ void showComposerFilter({
                   style: NotebookTypography.appBarTitle,
                 ),
               ),
-              const Divider(),
+              const ThinRule(),
               if (composers.isEmpty)
                 const ListTile(
                   title: Text(AppStrings.profileRepertoireNoComposers),

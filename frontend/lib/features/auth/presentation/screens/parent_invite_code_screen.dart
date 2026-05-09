@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -192,7 +193,7 @@ class _ParentInviteCodeScreenState
                       Row(
                         children: [
                           Expanded(
-                            child: Divider(color: AppColors.inkQuaternary),
+                            child: ThinRule(),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -206,7 +207,7 @@ class _ParentInviteCodeScreenState
                             ),
                           ),
                           Expanded(
-                            child: Divider(color: AppColors.inkQuaternary),
+                            child: ThinRule(),
                           ),
                         ],
                       ),

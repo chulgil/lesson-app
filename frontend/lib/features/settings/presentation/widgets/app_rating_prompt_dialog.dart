@@ -55,7 +55,7 @@ class MilestoneRatingCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Text('🎉', style: TextStyle(fontSize: 20)),
+              Text('🎉', style: AppTypography.headingMedium),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(

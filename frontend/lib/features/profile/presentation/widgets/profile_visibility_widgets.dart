@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 
 /// Labels for visibility options
@@ -505,7 +506,7 @@ void showProfilePreviewSheet({
                         ],
                       ),
                     ),
-                    const Divider(),
+                    const ThinRule(),
                     Expanded(
                       child: ListView(
                         controller: scrollController,

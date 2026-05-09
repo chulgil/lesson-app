@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/student_lesson_progress_item.dart';
 import '../providers/student_lesson_progress_provider.dart';
 import 'student_lesson_progress_item_row.dart';
@@ -49,11 +50,7 @@ class StudentLessonProgressSection extends ConsumerWidget {
                 children: [
                   for (int i = 0; i < sortedItems.length; i++) ...[
                     if (i > 0)
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: AppColors.inkQuaternary,
-                      ),
+                      const ThinRule(),
                     StudentLessonProgressItemRow(
                       item: sortedItems[i],
                       onTap:

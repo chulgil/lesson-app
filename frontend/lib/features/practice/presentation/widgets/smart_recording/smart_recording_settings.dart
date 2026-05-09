@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -68,7 +69,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
             // Threshold slider (only when enabled)
             if (settings.smartRecordingEnabled) ...[
               const SizedBox(height: AppSpacing.space4),
-              const Divider(),
+              const ThinRule(),
               const SizedBox(height: AppSpacing.space3),
 
               Row(
@@ -170,7 +171,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
 
               // Middle silence skip section
               const SizedBox(height: AppSpacing.space4),
-              const Divider(),
+              const ThinRule(),
               const SizedBox(height: AppSpacing.space3),
 
               // Middle silence toggle

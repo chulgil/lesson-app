@@ -489,7 +489,7 @@ class _LocationTravelSelectorState
       ),
       child: Row(
         children: [
-          const Text('💡', style: TextStyle(fontSize: 14)),
+          const Text('💡', style: AppTypography.bodyMedium),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(

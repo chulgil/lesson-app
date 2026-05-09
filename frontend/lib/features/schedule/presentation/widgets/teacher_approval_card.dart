@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -72,7 +73,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             const SizedBox(height: AppSpacing.space4),
 
             // Divider
-            Divider(color: AppColors.inkQuaternary, height: 1),
+            const ThinRule(),
 
             const SizedBox(height: AppSpacing.space4),
 

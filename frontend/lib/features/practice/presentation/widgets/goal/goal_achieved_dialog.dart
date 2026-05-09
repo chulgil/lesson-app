@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../providers/practice_goal_provider.dart';
@@ -187,7 +188,9 @@ class GoalAchievedDialog extends StatelessWidget {
               target: goal.dailyTimeText,
             ),
           if (goal.dailyTimeMinutes != null && goal.dailySectionCount != null)
-            const Divider(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space2),
+            const ThinRule(),
+            const SizedBox(height: AppSpacing.space2),
           if (goal.dailySectionCount != null)
             _buildAchievementRow(
               icon: Icons.check_box,
@@ -216,7 +219,9 @@ class GoalAchievedDialog extends StatelessWidget {
               target: goal.weeklyTimeText,
             ),
           if (goal.weeklyTimeMinutes != null && goal.weeklyDayCount != null)
-            const Divider(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space2),
+            const ThinRule(),
+            const SizedBox(height: AppSpacing.space2),
           if (goal.weeklyDayCount != null)
             _buildAchievementRow(
               icon: Icons.calendar_today,

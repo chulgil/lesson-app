@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Data class for menu item configuration
@@ -66,10 +67,11 @@ class ProfileMenuSection extends StatelessWidget {
                       children: [
                         ProfileMenuItemTile(item: item),
                         if (!isLast)
-                          Divider(
-                            height: 1,
-                            indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                            color: AppColors.inkQuaternary,
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: AppSpacing.space4 + 24 + AppSpacing.space3,
+                            ),
+                            child: const ThinRule(),
                           ),
                       ],
                     );

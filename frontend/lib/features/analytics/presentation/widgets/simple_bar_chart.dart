@@ -103,8 +103,7 @@ class _BarChartPainter extends CustomPainter {
       final textPainter = TextPainter(
         text: TextSpan(
           text: _formatValue(value),
-          style: TextStyle(
-            fontSize: 10,
+          style: AppTypography.captionSmall.copyWith(
             fontWeight: FontWeight.w600,
             color: barColor,
           ),

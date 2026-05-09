@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/lesson_settings_bottom_sheet.dart';
@@ -343,7 +344,9 @@ class _TeacherAvailabilityScreenState
               value: AppStrings.durationMinutesValue(avail.slotDurationMinutes),
               help: AppStrings.lessonLengthHelp,
             ),
-            const Divider(height: 24),
+            const SizedBox(height: 12),
+            const ThinRule(),
+            const SizedBox(height: 12),
             _buildSettingRow(
               icon: Icons.coffee_outlined,
               label: AppStrings.breakTimeLabel,
@@ -352,7 +355,9 @@ class _TeacherAvailabilityScreenState
               ),
               help: AppStrings.breakTimeHelp,
             ),
-            const Divider(height: 24),
+            const SizedBox(height: 12),
+            const ThinRule(),
+            const SizedBox(height: 12),
             _buildSettingRow(
               icon: Icons.schedule,
               label: AppStrings.startIntervalLabel,

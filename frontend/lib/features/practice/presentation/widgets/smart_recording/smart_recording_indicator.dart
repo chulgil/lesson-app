@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/smart_recording.dart';
 import '../../../../../features/practice/practice_facade.dart';
@@ -132,7 +133,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
           ),
           if (hasAnyTrimming) ...[
             const SizedBox(height: AppSpacing.space3),
-            const Divider(),
+            const ThinRule(),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '스마트 녹음 적용:',

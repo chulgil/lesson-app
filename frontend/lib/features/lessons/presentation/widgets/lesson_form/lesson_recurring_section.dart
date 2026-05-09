@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 
 /// Recurring lesson section
@@ -61,7 +62,7 @@ class LessonRecurringSection extends StatelessWidget {
           // Recurring days selector
           if (isRecurring) ...[
             const SizedBox(height: AppSpacing.space4),
-            const Divider(),
+            const ThinRule(),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '반복 요일',

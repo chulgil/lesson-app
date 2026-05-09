@@ -12,6 +12,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../data/services/backup_service.dart';
 import '../../domain/entities/backup_state.dart';
 import '../providers/backup_provider.dart';
@@ -73,7 +74,7 @@ class StatusCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
-          const Divider(height: 1, color: AppColors.inkQuaternary),
+          const ThinRule(),
           const SizedBox(height: AppSpacing.space4),
           Row(
             children: [

@@ -11,6 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../profile/profile_facade.dart';
 
@@ -321,7 +322,7 @@ class MyConnectionsScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space6),
-                const Divider(),
+                const ThinRule(),
                 ListTile(
                   leading: Icon(
                     Icons.calendar_today,

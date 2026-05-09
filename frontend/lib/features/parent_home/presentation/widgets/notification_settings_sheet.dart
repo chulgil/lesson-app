@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
@@ -167,7 +168,10 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                     children: [
                       _buildSettingTile(item),
                       if (!isLast)
-                        const Divider(height: 1, indent: 16, endIndent: 16),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 16),
+                          child: ThinRule(),
+                        ),
                     ],
                   );
                 }).toList(),

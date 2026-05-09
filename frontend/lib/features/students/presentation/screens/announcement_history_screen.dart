@@ -11,6 +11,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/teacher_announcement.dart';
 import '../providers/teacher_announcement_providers.dart';
@@ -225,7 +226,7 @@ class _AnnouncementCard extends ConsumerWidget {
 
           // Affected students (dayOff only)
           if (isDayOff && announcement.affectedLessons.isNotEmpty) ...[
-            const Divider(height: 1, color: AppColors.inkQuaternary),
+            const ThinRule(),
             Padding(
               padding: const EdgeInsets.all(AppSpacing.space3),
               child: Column(

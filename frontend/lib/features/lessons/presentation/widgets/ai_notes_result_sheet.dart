@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -92,7 +93,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                 ),
               ),
 
-              const Divider(height: 1),
+              const ThinRule(),
 
               // Content
               Expanded(

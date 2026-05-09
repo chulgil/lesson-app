@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 import '../../../schedule/schedule_facade.dart';
@@ -62,11 +63,7 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                 children: [
                   for (int i = 0; i < displayRequests.length; i++) ...[
                     if (i > 0)
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: AppColors.inkQuaternary,
-                      ),
+                      const ThinRule(),
                     _ScheduleChangeListItem(
                       event: displayRequests[i],
                       studentName:

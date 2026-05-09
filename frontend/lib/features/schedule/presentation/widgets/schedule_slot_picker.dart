@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -96,7 +97,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildDayHeaders(),
-        const Divider(height: 1, color: AppColors.scheduleGridLine),
+        const ThinRule(color: AppColors.scheduleGridLine),
         ...hours.map((hour) => _buildHourRow(hour, slotMap, availability)),
       ],
     );

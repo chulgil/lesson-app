@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -71,10 +72,11 @@ class AppInfoScreen extends StatelessWidget {
                   title: AppStrings.studentHomeTermsOfService,
                   onTap: () => context.push(AppRoutes.termsOfService),
                 ),
-                Divider(
-                  height: 1,
-                  indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-                  color: AppColors.inkQuaternary,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: AppSpacing.space4 + 36 + AppSpacing.space3,
+                  ),
+                  child: const ThinRule(),
                 ),
                 _buildMenuItem(
                   context,
@@ -82,10 +84,11 @@ class AppInfoScreen extends StatelessWidget {
                   title: AppStrings.studentHomePrivacyPolicy,
                   onTap: () => context.push(AppRoutes.privacyPolicy),
                 ),
-                Divider(
-                  height: 1,
-                  indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-                  color: AppColors.inkQuaternary,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: AppSpacing.space4 + 36 + AppSpacing.space3,
+                  ),
+                  child: const ThinRule(),
                 ),
                 _buildMenuItem(
                   context,
@@ -110,10 +113,11 @@ class AppInfoScreen extends StatelessWidget {
                         ),
                       ),
                 ),
-                Divider(
-                  height: 1,
-                  indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-                  color: AppColors.inkQuaternary,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: AppSpacing.space4 + 36 + AppSpacing.space3,
+                  ),
+                  child: const ThinRule(),
                 ),
                 _buildMenuItem(
                   context,

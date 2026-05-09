@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../settings/settings_facade.dart';
@@ -191,7 +192,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                               (value) => _toggleDuration(ref, duration, value),
                         ),
                         if (index < allDurations.length - 1)
-                          const Divider(height: 1, indent: 16, endIndent: 16),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16, right: 16),
+                            child: const ThinRule(),
+                          ),
                       ],
                     );
                   }).toList(),
@@ -243,7 +247,10 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 subtitle: '${settings.breakTimeBetweenLessons}분',
                 onTap: () => _showBreakTimeDialog(context, ref),
               ),
-              const Divider(height: 1, indent: 56, endIndent: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 56, right: 16),
+                child: const ThinRule(),
+              ),
               // Minimum booking hours setting
               _BookingSettingItem(
                 icon: Icons.schedule_outlined,
@@ -624,7 +631,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.space2),
-              const Divider(height: 1),
+              const ThinRule(),
               ...instruments.map(
                 (instrument) => Padding(
                   padding: const EdgeInsets.only(top: AppSpacing.space2),

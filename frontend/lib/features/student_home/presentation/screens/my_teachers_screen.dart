@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -372,7 +373,7 @@ class _AppTeacherCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.space3),
-                Divider(height: 1, color: AppColors.inkQuaternary),
+                const ThinRule(),
                 const SizedBox(height: AppSpacing.space3),
                 Row(
                   children: [

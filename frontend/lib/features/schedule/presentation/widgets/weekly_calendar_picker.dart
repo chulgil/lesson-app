@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
@@ -248,7 +249,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         // Regular: no week navigation (weekday-only selection)
         if (!isRegular) _buildWeekNavigation(),
         _buildDayHeaders(showDate: !isRegular),
-        const Divider(height: 1, color: AppColors.scheduleGridLine),
+        const ThinRule(color: AppColors.scheduleGridLine),
         ..._buildHourRows(availability, dayOffSet: dayOffSet),
         const SizedBox(height: AppSpacing.space3),
         _buildSelectionList(),

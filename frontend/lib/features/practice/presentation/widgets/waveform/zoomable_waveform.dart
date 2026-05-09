@@ -482,9 +482,8 @@ class _ZoomableWaveformPainter extends CustomPainter {
     final textPainter = TextPainter(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: AppTypography.bodySmall.copyWith(
           color: Colors.white,
-          fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
       ),

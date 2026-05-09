@@ -9,6 +9,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/recording_feedback.dart';
 import '../../domain/entities/student_practice_overview.dart';
 import '../providers/recording_feedback_provider.dart';
@@ -113,7 +114,7 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
                   margin: EdgeInsets.symmetric(vertical: AppSpacing.space3),
                 ),
                 _Header(recording: widget.recording),
-                const Divider(height: 1, color: AppColors.inkQuaternary),
+                const ThinRule(),
                 Expanded(
                   child: _FeedbackList(
                     feedbacks: feedbacks,

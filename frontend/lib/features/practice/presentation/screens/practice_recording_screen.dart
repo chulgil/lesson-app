@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/l10n/app_strings.dart';
@@ -130,7 +131,7 @@ class _PracticeRecordingScreenState
                     onCancel: () => _cancelRecording(),
                   ),
 
-                  const Divider(),
+                  const ThinRule(),
 
                   // Recordings list
                   Expanded(

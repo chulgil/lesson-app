@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/tuner_types.dart';
 
 /// Normalized staff widget that displays notes within a single octave range.
@@ -114,8 +115,7 @@ class _StaffPainter extends CustomPainter {
     final textPainter = TextPainter(
       text: TextSpan(
         text: '𝄞',
-        style: TextStyle(
-          fontSize: 38,
+        style: AppTypography.displayMedium.copyWith(
           color: AppColors.inkSecondary,
           fontFamily: 'Noto Music',
         ),
@@ -265,8 +265,7 @@ class _StaffPainter extends CustomPainter {
     final textPainter = TextPainter(
       text: TextSpan(
         text: symbol,
-        style: TextStyle(
-          fontSize: 16,
+        style: AppTypography.bodyLarge.copyWith(
           color: color,
           fontWeight: FontWeight.bold,
         ),
@@ -281,8 +280,7 @@ class _StaffPainter extends CustomPainter {
     final textPainter = TextPainter(
       text: TextSpan(
         text: '$octave',
-        style: TextStyle(
-          fontSize: 14,
+        style: AppTypography.bodyMedium.copyWith(
           color: color,
           fontWeight: FontWeight.bold,
         ),

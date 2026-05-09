@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../providers/auth_provider.dart';
 
@@ -76,7 +77,9 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               // Select all
               _buildSelectAllItem(),
 
-              const Divider(height: 32),
+              const SizedBox(height: 16),
+              const ThinRule(),
+              const SizedBox(height: 16),
 
               // Individual items
               _buildTermItem(
@@ -261,7 +264,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
                   // Notebook × Score §7.27: 바텀시트 제목 Playfair.
                   child: Text(title, style: NotebookTypography.sectionTitle),
                 ),
-                const Divider(height: 1),
+                const ThinRule(),
                 // Content
                 Expanded(
                   child: SingleChildScrollView(

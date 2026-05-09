@@ -6,6 +6,7 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import 'lesson_student_info.dart';
 
 /// Student picker bottom sheet
@@ -44,7 +45,7 @@ void showLessonStudentPicker({
                         horizontal: AppSpacing.screenPadding,
                       ),
                       itemCount: students.length,
-                      separatorBuilder: (_, __) => const Divider(),
+                      separatorBuilder: (_, __) => const ThinRule(),
                       itemBuilder: (context, index) {
                         final student = students[index];
                         final isSelected = selectedStudent?.id == student.id;

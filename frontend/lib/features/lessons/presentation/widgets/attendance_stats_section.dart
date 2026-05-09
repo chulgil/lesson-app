@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/attendance_stats.dart';
 import '../providers/attendance_providers.dart';
@@ -53,7 +54,7 @@ class AttendanceStatsSection extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.space4),
 
-              Divider(height: 1, color: AppColors.inkQuaternary),
+              const ThinRule(),
 
               const SizedBox(height: AppSpacing.space4),
 
@@ -62,7 +63,7 @@ class AttendanceStatsSection extends ConsumerWidget {
 
               if (stats.monthlyBreakdown.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space4),
-                Divider(height: 1, color: AppColors.inkQuaternary),
+                const ThinRule(),
                 const SizedBox(height: AppSpacing.space4),
                 _buildMonthlyTable(stats),
               ],
@@ -229,7 +230,7 @@ class AttendanceStatsSection extends ConsumerWidget {
             _tableCell('출석률', isHeader: true),
           ],
         ),
-        Divider(height: 1, color: AppColors.inkQuaternary),
+        const ThinRule(),
 
         // Table rows (show last 6 months)
         ...stats.monthlyBreakdown.take(6).map((m) {
@@ -263,10 +264,7 @@ class AttendanceStatsSection extends ConsumerWidget {
                   ],
                 ),
               ),
-              Divider(
-                height: 1,
-                color: AppColors.inkQuaternary.withValues(alpha: 0.5),
-              ),
+              ThinRule(color: AppColors.inkQuaternary.withValues(alpha: 0.5)),
             ],
           );
         }),

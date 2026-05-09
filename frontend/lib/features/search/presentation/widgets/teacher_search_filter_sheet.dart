@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
@@ -76,7 +77,7 @@ class _TeacherSearchFilterSheetState
                   ),
                 ),
 
-                const Divider(),
+                const ThinRule(),
 
                 // Filter options
                 Expanded(

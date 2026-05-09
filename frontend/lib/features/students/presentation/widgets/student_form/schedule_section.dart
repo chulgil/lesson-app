@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import 'duration_selector.dart';
 import 'student_form_helpers.dart';
@@ -93,7 +94,7 @@ class ScheduleSection extends StatelessWidget {
           ),
 
           const SizedBox(height: AppSpacing.space4),
-          const Divider(),
+          const ThinRule(),
           const SizedBox(height: AppSpacing.space4),
 
           // Per-day time settings (if multiple days selected)
@@ -172,7 +173,7 @@ class ScheduleSection extends StatelessWidget {
           ],
 
           const SizedBox(height: AppSpacing.space4),
-          const Divider(),
+          const ThinRule(),
           const SizedBox(height: AppSpacing.space4),
 
           // Lesson duration

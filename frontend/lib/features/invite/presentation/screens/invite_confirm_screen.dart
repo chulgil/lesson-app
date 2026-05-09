@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -163,13 +164,17 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   label: AppStrings.inviteInviter,
                   value: creatorRoleLabel,
                 ),
-                const Divider(height: AppSpacing.space4),
+                const SizedBox(height: AppSpacing.space2),
+                const ThinRule(),
+                const SizedBox(height: AppSpacing.space2),
                 _buildInfoRow(
                   icon: Icons.confirmation_number,
                   label: AppStrings.inviteCode,
                   value: widget.invite.inviteCode,
                 ),
-                const Divider(height: AppSpacing.space4),
+                const SizedBox(height: AppSpacing.space2),
+                const ThinRule(),
+                const SizedBox(height: AppSpacing.space2),
                 _buildInfoRow(
                   icon: Icons.access_time,
                   label: AppStrings.inviteValidPeriod,

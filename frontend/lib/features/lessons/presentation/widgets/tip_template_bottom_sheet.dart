@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/tip_template.dart';
 import '../extensions/template_category_visuals.dart';
 import '../providers/tip_template_providers.dart';
@@ -223,7 +224,7 @@ class _TipTemplateBottomSheetState
               ),
             ),
             const SizedBox(height: AppSpacing.space4),
-            const Divider(height: 1),
+            const ThinRule(),
           ],
         );
       },

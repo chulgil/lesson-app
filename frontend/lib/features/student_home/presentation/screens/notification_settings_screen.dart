@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -198,11 +199,12 @@ class NotificationSettingsScreen extends ConsumerWidget {
             children: [
               for (var i = 0; i < children.length; i++) ...[
                 if (i > 0)
-                  Divider(
-                    height: 1,
-                    indent: AppSpacing.space4,
-                    endIndent: AppSpacing.space4,
-                    color: AppColors.inkQuaternary,
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: AppSpacing.space4,
+                      right: AppSpacing.space4,
+                    ),
+                    child: const ThinRule(),
                   ),
                 children[i],
               ],

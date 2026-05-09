@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../lessons/domain/entities/feedback_template.dart';
 import '../../../lessons/presentation/extensions/template_category_visuals.dart';
@@ -113,7 +114,7 @@ class _FeedbackTemplateFormSheetState
                   ],
                 ),
               ),
-              const Divider(height: 1),
+              const ThinRule(),
               // Form fields
               Expanded(
                 child: ListView(

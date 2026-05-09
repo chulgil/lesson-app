@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
@@ -51,7 +52,7 @@ class _UnifiedApprovalBottomSheetState
         children: [
           const Center(child: BottomSheetHandle()),
           _buildHeader(),
-          const Divider(height: 1, color: AppColors.inkQuaternary),
+          const ThinRule(),
           Expanded(
             child: ListView(
               controller: widget.scrollController,

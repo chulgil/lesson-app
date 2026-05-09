@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -238,7 +239,7 @@ class _StudentProposalAcceptScreenState
   Widget _buildSectionDivider(String label) {
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.inkQuaternary)),
+        const Expanded(child: ThinRule()),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
           child: Text(
@@ -246,7 +247,7 @@ class _StudentProposalAcceptScreenState
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.inkQuaternary)),
+        const Expanded(child: ThinRule()),
       ],
     );
   }

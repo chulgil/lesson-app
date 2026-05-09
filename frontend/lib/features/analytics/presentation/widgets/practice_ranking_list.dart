@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/teacher_stats.dart';
@@ -54,11 +55,12 @@ class PracticeRankingList extends StatelessWidget {
                             children: [
                               _buildRankingTile(index + 1, rank),
                               if (!isLast)
-                                Divider(
-                                  height: 1,
-                                  indent: AppSpacing.space4,
-                                  endIndent: AppSpacing.space4,
-                                  color: AppColors.inkQuaternary,
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: AppSpacing.space4,
+                                    right: AppSpacing.space4,
+                                  ),
+                                  child: const ThinRule(),
                                 ),
                             ],
                           );

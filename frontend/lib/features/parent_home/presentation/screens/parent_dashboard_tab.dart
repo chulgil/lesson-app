@@ -200,7 +200,7 @@ class ParentDashboardTab extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppSpacing.space3),
-          const ThinRule(),
+          ThinRule(),
         ],
       ),
     );
@@ -721,14 +721,14 @@ class ParentDashboardTab extends ConsumerWidget {
             isCompleted: false,
             priority: 'must',
           ),
-          Divider(height: 1),
+          ThinRule(),
           AssignmentItem(
             title: '비브라토 연습',
             dueDate: '완료됨',
             isCompleted: true,
             priority: 'should',
           ),
-          Divider(height: 1),
+          ThinRule(),
           AssignmentItem(
             title: '모차르트 소나타 1악장',
             dueDate: '2일 남음',

@@ -8,6 +8,7 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../extensions/practice_display_extensions.dart';
@@ -57,7 +58,7 @@ class TunerSettingsSheet extends ConsumerWidget {
               ),
             ),
 
-            const Divider(height: 1),
+            const ThinRule(),
 
             // Settings list
             Flexible(

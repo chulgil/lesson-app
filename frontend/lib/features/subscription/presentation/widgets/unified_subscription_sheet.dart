@@ -11,6 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_proposal_providers.dart';
@@ -160,7 +161,7 @@ class _UnifiedSubscriptionSheetState
             ],
           ),
         ),
-        const Divider(height: 1, color: AppColors.inkQuaternary),
+        const ThinRule(),
       ],
     );
   }

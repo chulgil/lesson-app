@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
@@ -281,7 +282,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
             color: AppColors.ink,
           ),
         ),
-        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        const ThinRule(),
         Text(
           AppStrings.chatLessonCancelledByTeacher,
           style: AppTypography.bodySmall.copyWith(
@@ -343,7 +344,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
             color: AppColors.ink,
           ),
         ),
-        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        const ThinRule(),
         Text(
           title,
           style: AppTypography.bodySmall.copyWith(

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
 import '../../../../features/parent_home/parent_home_facade.dart';
 import 'notification_settings_sheet.dart';
@@ -206,10 +207,9 @@ class ProfileNotificationSection extends ConsumerWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-      color: AppColors.inkQuaternary,
+    return Padding(
+      padding: EdgeInsets.only(left: AppSpacing.space4 + 24 + AppSpacing.space3),
+      child: const ThinRule(),
     );
   }
 

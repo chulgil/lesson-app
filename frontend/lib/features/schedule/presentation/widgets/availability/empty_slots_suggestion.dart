@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/availability_slot.dart';
 
@@ -44,7 +45,7 @@ class EmptySlotsSuggestion extends StatelessWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Divider
-          const Divider(),
+          const ThinRule(),
 
           const SizedBox(height: AppSpacing.space4),
 

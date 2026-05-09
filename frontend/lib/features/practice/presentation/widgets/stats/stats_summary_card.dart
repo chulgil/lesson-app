@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../domain/entities/entities.dart';
@@ -72,7 +73,7 @@ class StatsSummaryCard extends StatelessWidget {
           // Additional stats for monthly report
           if (report.type == ReportType.monthly) ...[
             const SizedBox(height: AppSpacing.space4),
-            const Divider(),
+            const ThinRule(),
             const SizedBox(height: AppSpacing.space3),
             Row(
               children: [

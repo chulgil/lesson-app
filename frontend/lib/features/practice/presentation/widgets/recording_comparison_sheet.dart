@@ -11,6 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../providers/recording_comparison_provider.dart';
 import 'waveform/zoomable_waveform.dart';
@@ -157,7 +158,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
         children: [
           _buildHandle(),
           _buildHeader(),
-          const Divider(height: 1),
+          const ThinRule(),
           Expanded(
             child: switch (_step) {
               0 => _buildSelectStep(

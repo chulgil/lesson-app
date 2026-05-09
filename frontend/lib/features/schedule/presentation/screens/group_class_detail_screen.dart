@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -215,13 +216,17 @@ class _GroupClassDetailScreenState
             label: AppStrings.infoLabelDate,
             value: widget.schedule.dateText,
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 12),
+          const ThinRule(),
+          const SizedBox(height: 12),
           _buildInfoRow(
             icon: Icons.access_time,
             label: AppStrings.infoLabelTime,
             value: widget.schedule.timeText,
           ),
-          const Divider(height: 24),
+          const SizedBox(height: 12),
+          const ThinRule(),
+          const SizedBox(height: 12),
           _buildInfoRow(
             icon: Icons.timer_outlined,
             label: AppStrings.infoLabelDuration,
@@ -230,7 +235,9 @@ class _GroupClassDetailScreenState
             ),
           ),
           if (widget.groupClass.pricePerSession != null) ...[
-            const Divider(height: 24),
+            const SizedBox(height: 12),
+          const ThinRule(),
+          const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.payments_outlined,
               label: AppStrings.infoLabelTuition,

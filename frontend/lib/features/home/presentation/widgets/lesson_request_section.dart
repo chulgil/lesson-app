@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
@@ -67,11 +68,7 @@ class LessonRequestSection extends ConsumerWidget {
                 children: [
                   for (int i = 0; i < displayRequests.length; i++) ...[
                     if (i > 0)
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: AppColors.inkQuaternary,
-                      ),
+                      const ThinRule(),
                     RequestListItem(
                       request: displayRequests[i],
                       studentName:

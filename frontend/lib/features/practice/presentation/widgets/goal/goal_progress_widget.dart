@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../providers/practice_goal_provider.dart';
@@ -149,7 +150,7 @@ class GoalProgressWidget extends ConsumerWidget {
 
           // Divider
           if (status.goal?.hasWeeklyGoal == true) ...[
-            const Divider(height: 1),
+            const ThinRule(),
             const SizedBox(height: AppSpacing.space3),
 
             // Weekly summary

@@ -4,6 +4,7 @@ import '../../../../../core/booking/presentation/extensions/lesson_booking_visua
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/booking/entities/lesson_booking.dart';
 
@@ -32,7 +33,7 @@ class TrialLessonInfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 1, color: AppColors.inkQuaternary),
+        const ThinRule(),
         const SizedBox(height: AppSpacing.space4),
 
         // Lesson goal

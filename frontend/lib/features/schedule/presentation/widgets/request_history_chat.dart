@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/chapter_guide_box.dart';
 import '../../../../core/utils/date_format_utils.dart';
@@ -511,7 +512,7 @@ class RequestHistoryChat extends StatelessWidget {
             color: AppColors.ink,
           ),
         ),
-        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        const ThinRule(),
         // Body
         Text(
           AppStrings.chatLessonCancelledByTeacher,
@@ -578,7 +579,7 @@ class RequestHistoryChat extends StatelessWidget {
             color: AppColors.ink,
           ),
         ),
-        const Divider(height: AppSpacing.space3, color: AppColors.inkQuaternary),
+        const ThinRule(),
         // Title
         Text(
           title,
@@ -626,7 +627,7 @@ class RequestHistoryChat extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
       child: Row(
         children: [
-          const Expanded(child: Divider(color: AppColors.inkQuaternary)),
+          const Expanded(child: ThinRule()),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
             child: Text(
@@ -636,7 +637,7 @@ class RequestHistoryChat extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(child: Divider(color: AppColors.inkQuaternary)),
+          const Expanded(child: ThinRule()),
         ],
       ),
     );

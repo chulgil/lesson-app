@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription.dart';
 import '../extensions/subscription_visuals.dart';
@@ -347,7 +348,7 @@ class SubscriptionCard extends StatelessWidget {
               ),
 
               const SizedBox(height: AppSpacing.space3),
-              const Divider(height: 1),
+              const ThinRule(),
               const SizedBox(height: AppSpacing.space3),
 
               // Subscription info with progress

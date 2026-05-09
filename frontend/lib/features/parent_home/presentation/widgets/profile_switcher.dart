@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
@@ -430,7 +431,9 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
 
             // Children
             if (userProfile.children.isNotEmpty) ...[
-              const Divider(height: AppSpacing.space6),
+              const SizedBox(height: AppSpacing.space3),
+              const ThinRule(),
+              const SizedBox(height: AppSpacing.space3),
               Text(
                 '자녀 프로필',
                 style: AppTypography.bodyMedium.copyWith(

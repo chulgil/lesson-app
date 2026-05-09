@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/parent_home/domain/entities/parent_child_relation.dart';
 import '../../../../features/students/students_facade.dart';
@@ -138,7 +139,7 @@ class ChildCard extends ConsumerWidget {
               ),
 
               const SizedBox(height: AppSpacing.space3),
-              const Divider(),
+              const ThinRule(),
               const SizedBox(height: AppSpacing.space3),
 
               // Stats row

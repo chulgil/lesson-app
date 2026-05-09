@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/utils/date_format_utils.dart';
 import 'lesson_form_helpers.dart';
@@ -86,7 +87,7 @@ class LessonDateTimeSection extends StatelessWidget {
               ),
 
               const SizedBox(height: AppSpacing.space3),
-              const Divider(),
+              const ThinRule(),
               const SizedBox(height: AppSpacing.space3),
 
               // Time picker

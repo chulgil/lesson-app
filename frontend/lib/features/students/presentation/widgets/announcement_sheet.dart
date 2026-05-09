@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../domain/entities/teacher_announcement.dart';
 import '../providers/teacher_announcement_providers.dart';
@@ -286,7 +287,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
               children: [
                 for (int i = 0; i < affected.length; i++) ...[
                   if (i > 0)
-                    const Divider(height: 1, color: AppColors.inkQuaternary),
+                    const ThinRule(),
                   _AffectedLessonItem(
                     lesson: affected[i],
                     onScheduleChange: () {

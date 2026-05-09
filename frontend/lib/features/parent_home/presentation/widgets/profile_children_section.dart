@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../screens/child_profile_form_screen.dart';
@@ -82,10 +83,11 @@ class ProfileChildrenSection extends ConsumerWidget {
                         (profile) => _buildChildItem(context, profile),
                       ),
                       if (profiles.isNotEmpty)
-                        Divider(
-                          height: 1,
-                          indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                          color: AppColors.inkQuaternary,
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: AppSpacing.space4 + 24 + AppSpacing.space3,
+                          ),
+                          child: const ThinRule(),
                         ),
                       ProfileMenuItemTile(
                         item: ProfileMenuItem(

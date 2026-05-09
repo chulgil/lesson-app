@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_utils.dart';
@@ -650,7 +651,9 @@ class RegularLessonSummary extends StatelessWidget {
           _buildRow('레슨 횟수', '주 $lessonsPerWeek회 (월 ${lessonsPerWeek * 4}회)'),
           const SizedBox(height: AppSpacing.space2),
           _buildRow('회당 수강료', formatFee(perLessonFee)),
-          const Divider(height: AppSpacing.space4),
+          const SizedBox(height: AppSpacing.space2),
+          const ThinRule(),
+          const SizedBox(height: AppSpacing.space2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

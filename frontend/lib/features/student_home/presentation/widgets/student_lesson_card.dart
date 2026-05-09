@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
@@ -212,7 +213,7 @@ class StudentLessonCard extends StatelessWidget {
 
             // Feedback preview (for past lessons)
             if (!isUpcoming && lesson.hasFeedback) ...[
-              Divider(height: 1, color: AppColors.inkQuaternary),
+              const ThinRule(),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 child: Row(

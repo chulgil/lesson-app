@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
+import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -432,7 +433,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                         style: NotebookTypography.sectionTitle,
                       ),
                     ),
-                    const Divider(height: 1),
+                    const ThinRule(),
                     Expanded(
                       child: SingleChildScrollView(
                         controller: scrollController,
