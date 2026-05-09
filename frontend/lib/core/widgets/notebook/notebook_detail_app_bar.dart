@@ -85,8 +85,8 @@ class NotebookDetailAppBar extends StatelessWidget
   @override
   Size get preferredSize {
     final bottomHeight = bottom?.preferredSize.height ?? 0;
-    // AppBar height (kToolbarHeight) + bottom widget + border (2px)
-    return Size.fromHeight(kToolbarHeight + bottomHeight + 2);
+    // AppBar height (kToolbarHeight) + bottom widget + border (1px)
+    return Size.fromHeight(kToolbarHeight + bottomHeight + 1);
   }
 
   @override
@@ -104,12 +104,12 @@ class NotebookDetailAppBar extends StatelessWidget
       if (customActions != null) ...customActions!,
     ];
 
-    // Bottom border — same weight as main tab bar top border (ink, 2px)
+    // Bottom border — matches ThinRule (1px inkQuaternary), same as home screen
     final borderLine = PreferredSize(
-      preferredSize: const Size.fromHeight(2),
+      preferredSize: const Size.fromHeight(1),
       child: Container(
-        height: 2,
-        color: AppColors.ink,
+        height: 1,
+        color: AppColors.inkQuaternary,
       ),
     );
 
