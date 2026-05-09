@@ -119,10 +119,13 @@ class AllRecordingsScreen extends ConsumerWidget {
 
     // Show loading indicator
     if (context.mounted) {
-      showDialog(
+      showNotebookDialog(
         context: context,
+        title: AppStrings.loadingText,
+        content: const Center(child: CircularProgressIndicator()),
+        cancelLabel: null,
+        actions: const <Widget>[],
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
     }
 

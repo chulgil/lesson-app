@@ -91,6 +91,17 @@ class StudentsNotifier extends _$StudentsNotifier {
     }
   }
 
+  Future<void> archiveStudent(String id) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.archiveStudent(id);
+      state = await AsyncValue.guard(() => _repository.getStudents());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _repository.getStudents());

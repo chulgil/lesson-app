@@ -139,6 +139,9 @@ class AppStrings {
   /// 삭제 버튼
   static const delete = '삭제';
 
+  /// 보관 버튼
+  static const archive = '보관';
+
   /// 저장 버튼
   static const save = '저장';
 
@@ -2343,6 +2346,18 @@ class AppStrings {
 
   /// 레슨 삭제 확인 다이얼로그 메시지 (녹음/노트 동반 삭제 경고 포함)
   static const deleteLessonConfirm = '이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.';
+
+  /// 레슨 보관 다이얼로그 제목
+  static const archiveLessonTitle = '레슨 보관';
+
+  /// 레슨 보관 확인 다이얼로그 메시지
+  static const archiveLessonConfirm = '이 레슨을 보관하시겠습니까?\n보관된 레슨은 목록에서 숨겨지며 언제든지 복원할 수 있습니다.';
+
+  /// 레슨이 보관되었습니다 (archive success)
+  static const lessonArchivedSnack = '레슨이 보관되었습니다';
+
+  /// 레슨 보관에 실패했습니다. (archive failure)
+  static const archiveLessonFailed = '레슨 보관에 실패했습니다. 다시 시도해주세요.';
 
   /// 연습 팁 수정 다이얼로그 제목
   static const editPracticeTipTitle = '연습 팁 수정';
@@ -6536,6 +6551,10 @@ class AppStrings {
   static const studentSelectInstrument = '악기를 선택해주세요';
   static const studentStatusChangeFailed = '상태 변경에 실패했습니다. 다시 시도해주세요.';
   static const studentDeleteTitle = '학생 삭제';
+  static const studentArchiveTitle = '학생 보관';
+  static const studentArchiveMessage = '보관된 학생은 목록에서 숨겨지며 언제든지 복원할 수 있습니다.';
+  static const studentArchiveFailed = '학생 보관에 실패했습니다. 다시 시도해주세요.';
+  static const studentArchivedSnack = '학생이 보관되었습니다';
   static const studentInviteTitle = '학생 초대';
   static const studentDirectRegister = '직접 등록';
   static const studentParentInviteCode = '학부모 초대 코드';

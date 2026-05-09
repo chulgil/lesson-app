@@ -160,6 +160,8 @@ class Lesson {
   final String?
   subscriptionId; // Linked subscription (null for trial-free lessons)
   final bool isPreview; // Preview lesson (beyond subscription range)
+  final bool isArchived; // Archived lesson (hidden from active views)
+  final DateTime? archivedAt; // When the lesson was archived
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -185,6 +187,8 @@ class Lesson {
     this.travelTimeMinutes = 0,
     this.subscriptionId,
     this.isPreview = false,
+    this.isArchived = false,
+    this.archivedAt,
     required this.createdAt,
     this.updatedAt,
   });
@@ -269,6 +273,8 @@ class Lesson {
     int? travelTimeMinutes,
     String? subscriptionId,
     bool? isPreview,
+    bool? isArchived,
+    DateTime? archivedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -294,6 +300,8 @@ class Lesson {
       travelTimeMinutes: travelTimeMinutes ?? this.travelTimeMinutes,
       subscriptionId: subscriptionId ?? this.subscriptionId,
       isPreview: isPreview ?? this.isPreview,
+      isArchived: isArchived ?? this.isArchived,
+      archivedAt: archivedAt ?? this.archivedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

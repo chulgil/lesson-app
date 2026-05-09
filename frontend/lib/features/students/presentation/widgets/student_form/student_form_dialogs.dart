@@ -198,7 +198,7 @@ void showExitConfirmation(
   );
 }
 
-/// Show delete confirmation dialog.
+/// Show archive confirmation dialog (replaces delete).
 void showDeleteStudentConfirmation(
   BuildContext context, {
   required String studentName,
@@ -206,11 +206,10 @@ void showDeleteStudentConfirmation(
 }) {
   showNotebookDialog(
     context: context,
-    titleWidget: const Text(AppStrings.studentDeleteTitle),
+    titleWidget: const Text(AppStrings.studentArchiveTitle),
     content: Text(
-      '$studentName 학생을 삭제하시겠습니까?\n\n'
-      '관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n'
-      '이 작업은 되돌릴 수 없습니다.',
+      '$studentName 학생을 보관하시겠습니까?\n\n'
+      '${AppStrings.studentArchiveMessage}',
     ),
     actions: [
       TextButton(
@@ -225,7 +224,7 @@ void showDeleteStudentConfirmation(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.paperAccent,
         ),
-        child: const Text(AppStrings.delete),
+        child: const Text(AppStrings.archive),
       ),
     ],
   );

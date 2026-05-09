@@ -175,8 +175,6 @@ class _RepertoireCard extends ConsumerWidget {
                       );
                     } else if (value == 'archive') {
                       _showArchiveConfirmation(context, ref);
-                    } else if (value == 'delete') {
-                      _showDeleteConfirmation(context, ref);
                     }
                   },
                   itemBuilder:
@@ -198,23 +196,6 @@ class _RepertoireCard extends ConsumerWidget {
                               Icon(Icons.inventory_2_outlined, size: 20),
                               SizedBox(width: AppSpacing.space2),
                               Text(AppStrings.practiceArchiveTitle),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.delete,
-                                size: 20,
-                                color: AppColors.paperAccent,
-                              ),
-                              SizedBox(width: AppSpacing.space2),
-                              Text(
-                                '삭제',
-                                style: TextStyle(color: AppColors.paperAccent),
-                              ),
                             ],
                           ),
                         ),
@@ -334,35 +315,6 @@ class _RepertoireCard extends ConsumerWidget {
             }
           },
           child: const Text(AppStrings.practiceArchiveTitle),
-        ),
-      ],
-    );
-  }
-
-  void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
-    showNotebookDialog(
-      context: context,
-      titleWidget: const Text(AppStrings.practiceRepertoireDeleteTitle),
-      content: Text(
-        '\'${repertoire.name}\'을(를) 삭제하시겠습니까?\n모든 섹션과 녹음이 함께 삭제됩니다.',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text(AppStrings.cancel),
-        ),
-        FilledButton(
-          onPressed: () async {
-            Navigator.of(context).pop();
-            await ref
-                .read(repertoireCrudProvider.notifier)
-                .deleteRepertoire(repertoire.id, studentId);
-            ref.invalidate(studentRepertoiresProvider(studentId));
-          },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-          ),
-          child: const Text(AppStrings.delete),
         ),
       ],
     );

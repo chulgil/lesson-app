@@ -676,12 +676,12 @@ Future<bool?> showCancelLessonConfirmation(BuildContext context) {
   );
 }
 
-/// Show delete lesson confirmation dialog
+/// Show archive lesson confirmation dialog (replaces delete)
 Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
   return showNotebookDialog<bool>(
     context: context,
-    title: AppStrings.deleteLessonTitle,
-    content: const Text(AppStrings.deleteLessonConfirm),
+    title: AppStrings.archiveLessonTitle,
+    content: const Text(AppStrings.archiveLessonConfirm),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context, false),
@@ -690,7 +690,7 @@ Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
       FilledButton(
         onPressed: () => Navigator.pop(context, true),
         style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
-        child: const Text(AppStrings.delete),
+        child: const Text(AppStrings.archive),
       ),
     ],
   );

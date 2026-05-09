@@ -40,7 +40,7 @@ final tunerInfoDisplayProvider = AutoDisposeProvider<String>.internal(
 );
 
 typedef TunerInfoDisplayRef = AutoDisposeProviderRef<String>;
-String _$tunerHash() => r'e1d1d9ae0e4fd9526a24de30f707bd60483e9450';
+String _$tunerHash() => r'5f383449a040cce925b70ad8ecfb5242d9fb0ce7';
 
 /// Tuner state management with Riverpod.
 ///

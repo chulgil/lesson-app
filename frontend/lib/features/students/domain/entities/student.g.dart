@@ -60,6 +60,10 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
       address: json['address'] as String?,
       addressDetail: json['address_detail'] as String?,
       district: json['district'] as String?,
+      isArchived: json['is_archived'] as bool? ?? false,
+      archivedAt: json['archived_at'] == null
+          ? null
+          : DateTime.parse(json['archived_at'] as String),
     );
 
 Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
@@ -98,6 +102,8 @@ Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
       'address': instance.address,
       'address_detail': instance.addressDetail,
       'district': instance.district,
+      'is_archived': instance.isArchived,
+      'archived_at': instance.archivedAt?.toIso8601String(),
     };
 
 const _$StudentLevelEnumMap = {

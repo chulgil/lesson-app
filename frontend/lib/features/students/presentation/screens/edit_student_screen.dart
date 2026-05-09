@@ -367,7 +367,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
                     const SizedBox(height: AppSpacing.space4),
 
-                    // Delete button
+                    // Archive button
                     SizedBox(
                       width: double.infinity,
                       height: AppSpacing.buttonHeight,
@@ -378,14 +378,14 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                                 : () => showDeleteStudentConfirmation(
                                   context,
                                   studentName: _nameController.text,
-                                  onDelete: () => _deleteStudent(student),
+                                  onDelete: () => _archiveStudent(student),
                                 ),
                         icon: Icon(
-                          Icons.delete_outline,
+                          Icons.archive_outlined,
                           color: AppColors.paperAccent,
                         ),
                         label: Text(
-                          '학생 삭제',
+                          AppStrings.studentArchiveTitle,
                           style: TextStyle(color: AppColors.paperAccent),
                         ),
                         style: OutlinedButton.styleFrom(
@@ -487,17 +487,17 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     if (success) _markChanged();
   }
 
-  Future<void> _deleteStudent(Student student) async {
+  Future<void> _archiveStudent(Student student) async {
     try {
       await ref
           .read(studentsNotifierProvider.notifier)
-          .deleteStudent(student.id);
+          .archiveStudent(student.id);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${student.name} 학생이 삭제되었습니다'),
+          content: Text('${student.name} ${AppStrings.studentArchivedSnack}'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -508,7 +508,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(AppStrings.studentDeleteFailed),
+          content: const Text(AppStrings.studentArchiveFailed),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperAccent,
         ),

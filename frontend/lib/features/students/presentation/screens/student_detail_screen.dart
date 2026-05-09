@@ -360,25 +360,30 @@ class _StudentDetailContent extends ConsumerWidget {
               ),
               const _MoreOptionDivider(),
               _MoreOptionTile(
-                icon: Icons.delete_outline,
-                title: AppStrings.studentDeleteTitle,
+                icon: Icons.archive_outlined,
+                title: AppStrings.studentArchiveTitle,
                 isDestructive: true,
                 onTap: () async {
                   Navigator.pop(context);
-                  final confirmed = await _showDeleteConfirmation(context);
+                  final confirmed = await _showArchiveConfirmation(context);
                   if (confirmed == true) {
                     try {
                       await ref
                           .read(studentsNotifierProvider.notifier)
-                          .deleteStudent(student.id);
+                          .archiveStudent(student.id);
                       if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(AppStrings.studentArchivedSnack),
+                          ),
+                        );
                         context.pop();
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text(AppStrings.studentDeleteFailed),
+                            content: const Text(AppStrings.studentArchiveFailed),
                             backgroundColor: AppColors.paperAccent,
                           ),
                         );
@@ -424,13 +429,13 @@ class _StudentDetailContent extends ConsumerWidget {
     }
   }
 
-  Future<bool?> _showDeleteConfirmation(BuildContext context) {
+  Future<bool?> _showArchiveConfirmation(BuildContext context) {
     return showNotebookDialog(
       context: context,
-      title: AppStrings.studentDeleteTitle,
+      title: AppStrings.studentArchiveTitle,
       message:
-          '${student.name} 학생을 삭제하시겠습니까?\n\n관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
-      confirmLabel: AppStrings.delete,
+          '${student.name} 학생을 보관하시겠습니까?\n\n${AppStrings.studentArchiveMessage}',
+      confirmLabel: AppStrings.archive,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
     );

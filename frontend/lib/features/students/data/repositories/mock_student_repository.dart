@@ -408,7 +408,9 @@ class MockStudentRepository implements StudentRepository {
   Future<List<Student>> getStudents() async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 300));
-    return List.unmodifiable(_students.where((s) => s.isActive));
+    return List.unmodifiable(
+      _students.where((s) => s.isActive && !s.isArchived),
+    );
   }
 
   @override
@@ -490,6 +492,67 @@ class MockStudentRepository implements StudentRepository {
   @override
   Future<List<Student>> getStudentsByStatus(StudentStatus status) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return _students.where((s) => s.status == status).toList();
+    return _students
+        .where((s) => s.status == status && !s.isArchived)
+        .toList();
+  }
+
+  @override
+  Future<void> archiveStudent(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _students.indexWhere((s) => s.id == id);
+    if (index == -1) throw Exception('Student not found');
+    _students[index] = _students[index].copyWith(
+      isArchived: true,
+      archivedAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  @override
+  Future<void> unarchiveStudent(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _students.indexWhere((s) => s.id == id);
+    if (index == -1) throw Exception('Student not found');
+    final student = _students[index];
+    _students[index] = Student(
+      id: student.id,
+      name: student.name,
+      instrument: student.instrument,
+      level: student.level,
+      status: student.status,
+      monthlyFee: student.monthlyFee,
+      lessonsPerWeek: student.lessonsPerWeek,
+      phone: student.phone,
+      parentName: student.parentName,
+      parentPhone: student.parentPhone,
+      email: student.email,
+      profileImageUrl: student.profileImageUrl,
+      backgroundImageUrl: student.backgroundImageUrl,
+      profileColorKey: student.profileColorKey,
+      lessonSlots: student.lessonSlots,
+      lessonDuration: student.lessonDuration,
+      totalLessons: student.totalLessons,
+      monthlyLessons: student.monthlyLessons,
+      practiceStatus: student.practiceStatus,
+      practiceRate: student.practiceRate,
+      notes: student.notes,
+      createdAt: student.createdAt,
+      updatedAt: DateTime.now(),
+      isActive: student.isActive,
+      birthDate: student.birthDate,
+      manualAgeGroup: student.manualAgeGroup,
+      connectionStatus: student.connectionStatus,
+      connectedAt: student.connectedAt,
+      breakReason: student.breakReason,
+      expectedReturnDate: student.expectedReturnDate,
+      practiceLevel: student.practiceLevel,
+      postalCode: student.postalCode,
+      address: student.address,
+      addressDetail: student.addressDetail,
+      district: student.district,
+      isArchived: false,
+      // archivedAt intentionally omitted to clear it (defaults to null)
+    );
   }
 }

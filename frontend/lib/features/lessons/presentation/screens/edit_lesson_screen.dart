@@ -126,7 +126,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 case 'cancel':
                   _showCancelDialog();
                   break;
-                case 'delete':
+                case 'archive':
                   _showDeleteDialog();
                   break;
               }
@@ -144,16 +144,16 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                     ),
                   ),
                   PopupMenuItem(
-                    value: 'delete',
+                    value: 'archive',
                     child: Row(
                       children: [
                         Icon(
-                          Icons.delete_outline,
+                          Icons.archive_outlined,
                           color: AppColors.paperAccent,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
-                          AppStrings.deleteLessonTitle,
+                          AppStrings.archiveLessonTitle,
                           style: TextStyle(color: AppColors.paperAccent),
                         ),
                       ],
@@ -456,12 +456,12 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
     try {
       await ref
           .read(lessonsNotifierProvider.notifier)
-          .deleteLesson(widget.lessonId);
+          .archiveLesson(widget.lessonId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(AppStrings.lessonDeletedMessage),
+            content: Text(AppStrings.lessonArchivedSnack),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -471,7 +471,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(AppStrings.deleteLessonFailedRetry),
+            content: const Text(AppStrings.archiveLessonFailed),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),

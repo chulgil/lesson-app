@@ -103,6 +103,17 @@ class LessonsNotifier extends _$LessonsNotifier {
     }
   }
 
+  Future<void> archiveLesson(String id) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.archiveLesson(id);
+      state = await AsyncValue.guard(() => _repository.getLessons());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   Future<void> cancelLesson(String id) async {
     state = const AsyncValue.loading();
     try {

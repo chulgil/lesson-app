@@ -135,4 +135,14 @@ class RemoteLessonRepository implements LessonRepository {
       data: {'status': 'cancelled'},
     );
   }
+
+  @override
+  Future<void> archiveLesson(String id) async {
+    await _apiClient.patch('/lessons/$id/archive');
+  }
+
+  @override
+  Future<void> unarchiveLesson(String id) async {
+    await _apiClient.patch('/lessons/$id/unarchive');
+  }
 }

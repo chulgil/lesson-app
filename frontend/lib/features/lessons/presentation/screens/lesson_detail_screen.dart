@@ -252,9 +252,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                     child: Text(AppStrings.announcementScheduleChange),
                   ),
                 PopupMenuItem(
-                  value: 'delete',
+                  value: 'archive',
                   child: Text(
-                    AppStrings.delete,
+                    AppStrings.archive,
                     style: TextStyle(color: AppColors.paperAccent),
                   ),
                 ),
@@ -325,24 +325,24 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           }
         }
       }
-    } else if (value == 'delete') {
+    } else if (value == 'archive') {
       final confirmed = await showDeleteLessonConfirmation(context);
       if (confirmed == true) {
         try {
           await ref
               .read(lessonsNotifierProvider.notifier)
-              .deleteLesson(lesson.id);
+              .archiveLesson(lesson.id);
           if (mounted) {
             context.pop();
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text(AppStrings.lessonDeleted)),
+              const SnackBar(content: Text(AppStrings.lessonArchivedSnack)),
             );
           }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text(AppStrings.lessonDeleteFailed),
+                content: const Text(AppStrings.archiveLessonFailed),
                 backgroundColor: AppColors.paperAccent,
               ),
             );

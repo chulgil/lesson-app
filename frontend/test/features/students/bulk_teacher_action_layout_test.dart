@@ -54,6 +54,12 @@ class _StubLessonRepository implements LessonRepository {
   Future<void> deleteLesson(String id) async {}
 
   @override
+  Future<void> archiveLesson(String id) async {}
+
+  @override
+  Future<void> unarchiveLesson(String id) async {}
+
+  @override
   Future<void> cancelLesson(String id) async {}
 }
 

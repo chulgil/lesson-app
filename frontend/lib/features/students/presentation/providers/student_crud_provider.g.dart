@@ -379,7 +379,7 @@ final studentSearchQueryProvider =
 );
 
 typedef _$StudentSearchQuery = Notifier<String>;
-String _$studentsNotifierHash() => r'd52a0f4f7082ff5efe596943c57b559a3bfda914';
+String _$studentsNotifierHash() => r'5e0303f18b30de07ff313cdf3e33f15c8a29cfac';
 
 /// Student list notifier for CRUD operations
 ///

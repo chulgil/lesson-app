@@ -82,4 +82,14 @@ class RemoteStudentRepository implements StudentRepository {
     );
     return paginated.items;
   }
+
+  @override
+  Future<void> archiveStudent(String id) async {
+    await _apiClient.patch('/students/$id/archive');
+  }
+
+  @override
+  Future<void> unarchiveStudent(String id) async {
+    await _apiClient.patch('/students/$id/unarchive');
+  }
 }

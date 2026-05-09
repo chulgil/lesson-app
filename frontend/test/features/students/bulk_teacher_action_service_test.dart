@@ -79,6 +79,12 @@ class _FakeLessonRepository implements LessonRepository {
   Future<void> deleteLesson(String id) async => _lessons.remove(id);
 
   @override
+  Future<void> archiveLesson(String id) async => _lessons.remove(id);
+
+  @override
+  Future<void> unarchiveLesson(String id) async {}
+
+  @override
   Future<void> cancelLesson(String id) async {
     cancelledIds.add(id);
     final existing = _lessons[id];

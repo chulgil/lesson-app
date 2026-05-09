@@ -92,6 +92,10 @@ Lesson _$LessonFromJson(Map<String, dynamic> json) => Lesson(
       travelTimeMinutes: (json['travel_time_minutes'] as num?)?.toInt() ?? 0,
       subscriptionId: json['subscription_id'] as String?,
       isPreview: json['is_preview'] as bool? ?? false,
+      isArchived: json['is_archived'] as bool? ?? false,
+      archivedAt: json['archived_at'] == null
+          ? null
+          : DateTime.parse(json['archived_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -120,6 +124,8 @@ Map<String, dynamic> _$LessonToJson(Lesson instance) => <String, dynamic>{
       'travel_time_minutes': instance.travelTimeMinutes,
       'subscription_id': instance.subscriptionId,
       'is_preview': instance.isPreview,
+      'is_archived': instance.isArchived,
+      'archived_at': instance.archivedAt?.toIso8601String(),
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

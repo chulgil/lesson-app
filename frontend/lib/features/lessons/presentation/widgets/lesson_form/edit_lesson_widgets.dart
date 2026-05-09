@@ -92,7 +92,7 @@ class EditLessonStudentCard extends StatelessWidget {
   }
 }
 
-/// Action buttons for edit lesson screen (cancel/delete)
+/// Action buttons for edit lesson screen (cancel/archive)
 class LessonActionButtons extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onDelete;
@@ -125,9 +125,9 @@ class LessonActionButtons extends StatelessWidget {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: onDelete,
-            icon: Icon(Icons.delete_outline, color: AppColors.paperAccent),
+            icon: Icon(Icons.archive_outlined, color: AppColors.paperAccent),
             label: Text(
-              AppStrings.deleteLessonTitle,
+              AppStrings.archiveLessonTitle,
               style: TextStyle(color: AppColors.paperAccent),
             ),
             style: OutlinedButton.styleFrom(
@@ -207,15 +207,15 @@ void showCancelLessonDialog({
   );
 }
 
-/// Delete lesson confirmation dialog
+/// Archive lesson confirmation dialog (replaces delete)
 void showDeleteLessonDialog({
   required BuildContext context,
   required VoidCallback onConfirm,
 }) {
   showNotebookDialog(
     context: context,
-    titleWidget: const Text(AppStrings.deleteLessonTitle),
-    content: const Text(AppStrings.deleteLessonNoRestoreConfirm),
+    titleWidget: const Text(AppStrings.archiveLessonTitle),
+    content: const Text(AppStrings.archiveLessonConfirm),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
@@ -229,7 +229,7 @@ void showDeleteLessonDialog({
         style: TextButton.styleFrom(
           foregroundColor: AppColors.paperAccent,
         ),
-        child: const Text(AppStrings.delete),
+        child: const Text(AppStrings.archive),
       ),
     ],
   );

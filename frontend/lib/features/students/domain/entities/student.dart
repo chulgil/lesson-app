@@ -119,6 +119,10 @@ class Student {
   final String? addressDetail; // 상세주소 (비공개, 연결된 선생님에게만)
   final String? district; // 구/동 이름 (검색용, 우편번호에서 자동추출)
 
+  // Archive fields
+  final bool isArchived; // Whether the student is archived
+  final DateTime? archivedAt; // When the student was archived
+
   Student({
     required this.id,
     required this.name,
@@ -155,6 +159,8 @@ class Student {
     this.address,
     this.addressDetail,
     this.district,
+    this.isArchived = false,
+    this.archivedAt,
   }) : profileColorKey = profileColorKey ?? _profileColorKeyFromName(name);
 
   /// Create from JSON (profileColor is auto-generated from name).
@@ -306,6 +312,8 @@ class Student {
     String? address,
     String? addressDetail,
     String? district,
+    bool? isArchived,
+    DateTime? archivedAt,
   }) {
     return Student(
       id: id ?? this.id,
@@ -343,6 +351,8 @@ class Student {
       address: address ?? this.address,
       addressDetail: addressDetail ?? this.addressDetail,
       district: district ?? this.district,
+      isArchived: isArchived ?? this.isArchived,
+      archivedAt: archivedAt ?? this.archivedAt,
     );
   }
 

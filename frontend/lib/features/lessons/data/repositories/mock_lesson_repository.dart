@@ -904,4 +904,60 @@ class MockLessonRepository implements LessonRepository {
       updatedAt: DateTime.now(),
     );
   }
+
+  @override
+  Future<void> archiveLesson(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _lessons.indexWhere((l) => l.id == id);
+    if (index == -1) {
+      throw Exception('Lesson not found');
+    }
+    final now = DateTime.now();
+    _lessons[index] = _lessons[index].copyWith(
+      isArchived: true,
+      archivedAt: now,
+      updatedAt: now,
+    );
+  }
+
+  @override
+  Future<void> unarchiveLesson(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _lessons.indexWhere((l) => l.id == id);
+    if (index == -1) {
+      throw Exception('Lesson not found');
+    }
+    _lessons[index] = _lessons[index].copyWith(
+      isArchived: false,
+      updatedAt: DateTime.now(),
+    );
+    // Clear archivedAt by rebuilding without it
+    _lessons[index] = Lesson(
+      id: _lessons[index].id,
+      studentId: _lessons[index].studentId,
+      studentName: _lessons[index].studentName,
+      teacherId: _lessons[index].teacherId,
+      teacherName: _lessons[index].teacherName,
+      instrument: _lessons[index].instrument,
+      date: _lessons[index].date,
+      startTime: _lessons[index].startTime,
+      duration: _lessons[index].duration,
+      status: _lessons[index].status,
+      pieces: _lessons[index].pieces,
+      feedback: _lessons[index].feedback,
+      keyPoints: _lessons[index].keyPoints,
+      practiceTips: _lessons[index].practiceTips,
+      recordings: _lessons[index].recordings,
+      assignments: _lessons[index].assignments,
+      location: _lessons[index].location,
+      studentNote: _lessons[index].studentNote,
+      travelTimeMinutes: _lessons[index].travelTimeMinutes,
+      subscriptionId: _lessons[index].subscriptionId,
+      isPreview: _lessons[index].isPreview,
+      isArchived: false,
+      archivedAt: null,
+      createdAt: _lessons[index].createdAt,
+      updatedAt: DateTime.now(),
+    );
+  }
 }

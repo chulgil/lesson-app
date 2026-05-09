@@ -13,4 +13,6 @@ abstract class LessonRepository {
   Future<Lesson> updateLesson(Lesson lesson);
   Future<void> deleteLesson(String id);
   Future<void> cancelLesson(String id);
+  Future<void> archiveLesson(String id);
+  Future<void> unarchiveLesson(String id);
 }

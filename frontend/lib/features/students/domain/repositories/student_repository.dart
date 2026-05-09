@@ -14,4 +14,10 @@ abstract class StudentRepository {
 
   /// Get students by status
   Future<List<Student>> getStudentsByStatus(StudentStatus status);
+
+  /// Archive a student (soft-delete)
+  Future<void> archiveStudent(String id);
+
+  /// Unarchive a previously archived student
+  Future<void> unarchiveStudent(String id);
 }
