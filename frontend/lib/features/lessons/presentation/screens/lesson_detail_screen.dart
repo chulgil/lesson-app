@@ -214,6 +214,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       },
       customActions: [
         PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
           onSelected: (value) => _handleAppBarAction(value, lesson),
           itemBuilder:
               (context) => [
