@@ -22,7 +22,7 @@ import '../providers/student_roster_summary_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../../billing/presentation/widgets/billing_guard.dart';
+import '../../../billing/billing_facade.dart';
 import '../widgets/bulk_message_sheet.dart';
 import '../widgets/roster_triage_banner.dart';
 import '../widgets/student_subscription_badge.dart';
