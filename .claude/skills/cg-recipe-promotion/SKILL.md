@@ -70,7 +70,7 @@ Phase 5 Execution Loop 의 journal 엔트리에서 **반복되는 명령 패턴*
 
 ```
 **요약**: Phase 5 journal {N}개 스캔, 임계 {T} 회 이상 패턴 {M}개 발견
-**작성 candidate**: run-pytest, cg-check (총 2건)
+**작성 candidate**: run-pytest, flutter-analyze (총 2건)
 **스킵 (existing)**: build-flutter (1건)
 **다음 단계**: .harness/recipes/{slug}.md 검토 후 cg recipe promote
 ```

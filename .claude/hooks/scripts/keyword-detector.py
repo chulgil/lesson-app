@@ -63,6 +63,61 @@ KEYWORD_MAP: list[tuple[tuple[str, ...], str]] = [
         ),
         "cg-status",
     ),
+    (
+        (
+            "subagent",
+            "서브에이전트",
+            "SDD",
+            "병렬 구현",
+            "태스크별 에이전트",
+        ),
+        "cg-subagent-dev",
+    ),
+    (
+        (
+            "parallel dispatch",
+            "병렬 파견",
+            "동시에 해결",
+            "independent tasks",
+        ),
+        "cg-parallel-dispatch",
+    ),
+    (
+        (
+            "worktree",
+            "격리 브랜치",
+            "isolated workspace",
+        ),
+        "cg-worktree",
+    ),
+    (
+        (
+            "finish branch",
+            "브랜치 완료",
+            "작업 마무리",
+            "PR 생성",
+        ),
+        "cg-finish-branch",
+    ),
+    (
+        (
+            "debug",
+            "디버그",
+            "왜 안 돼",
+            "root cause",
+            "근본 원인",
+        ),
+        "cg-debug",
+    ),
+    (
+        (
+            "review feedback",
+            "리뷰 피드백",
+            "리뷰 반영",
+            "코드 리뷰 결과",
+        ),
+        "cg-review-receive",
+    ),
 ]
 
 

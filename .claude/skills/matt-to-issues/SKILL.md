@@ -1,7 +1,7 @@
 ---
 name: matt-to-issues
 version: 1.0.0
-description: "Matt Pocock의 to-issues/to-prd 패턴을 Lessonaza spec과 로컬 이슈 파일로 변환하는 스킬"
+description: "Matt Pocock의 to-issues/to-prd 패턴을 cg-harness 산출물과 로컬 이슈 파일로 변환하는 스킬"
 last_updated: 2026-05-09
 source: "Adapted from mattpocock/skills (MIT): skills/engineering/to-issues and skills/engineering/to-prd"
 ---
@@ -16,15 +16,15 @@ Turn a clarified plan, PRD, or `.harness/spec` into small vertical slices that c
 
 Read:
 
-- `.harness/spec/{feature}.md` or current PRD
+- `.harness/spec/{feature}.md` or the current PRD
 - `.harness/interview/{feature}.md` when available
 - `.harness/knowledge/glossary.md`
-- `docs/specs/{domain}/**`
-- `docs/specs/glossary.md`
+- relevant `docs/specs/**`
+- relevant ADRs
 
 ## Output Location
 
-If the task is tracked in GitHub Issues, prepare issue bodies for `gh issue create`.
+If the project uses GitHub Issues, prepare issue bodies for `gh issue create`.
 
 If not, write local files:
 
@@ -57,13 +57,13 @@ Create `.harness/issues/` if it does not exist.
 ## Notes
 ```
 
-## Lessonaza Slicing Rules
+## Slicing Rules
 
-- Slice vertically through teacher/parent/student workflows, not horizontally by Flutter layer.
-- Keep backend contract changes separate from pure presentation changes when rollback risk differs.
-- Include empty, loading, error, and permission states when UI is touched.
-- Include spec sync work when code changes affect `docs/specs/**`.
-- Each issue should be independently testable with `flutter analyze`, targeted widget tests, architecture tests, or backend scenario tests.
+- Slice vertically through the user workflow, not horizontally by layer.
+- Prefer "one reviewed PR" size over "one giant milestone".
+- Each issue should be independently testable.
+- Avoid issues that are only "create model", "add repository", or "wire UI" unless they are genuinely standalone.
+- Put risky migrations, schema changes, and API contract changes into separate issues with explicit rollback notes.
 
 ## Exit Criteria
 
