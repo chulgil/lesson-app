@@ -9,7 +9,11 @@ from passlib.context import CryptContext
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import create_access_token, create_refresh_token
 from app.models.recovery import RecoveryCode
+from app.models.user import User
+from app.schemas.auth import TokenResponse
+from app.schemas.user import UserResponse
 
 # Password context for bcrypt hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -110,3 +114,38 @@ class RecoveryService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to verify recovery code: {str(e)}",
             )
+
+    async def verify_any_code(self, code: str) -> TokenResponse:
+        """Verify any unused recovery code and return JWT tokens for that user."""
+        result = await self.db.execute(
+            select(RecoveryCode).where(not RecoveryCode.is_used)
+        )
+        recovery_codes = result.scalars().all()
+
+        for recovery_code in recovery_codes:
+            if await self.verify_code(recovery_code.user_id, code):
+                user_result = await self.db.execute(
+                    select(User).where(User.id == recovery_code.user_id)
+                )
+                user = user_result.scalar_one_or_none()
+                if user is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail="User not found",
+                    )
+
+                access_token = create_access_token(
+                    data={"sub": user.id, "role": getattr(user.role, "value", None)}
+                )
+                refresh_token = create_refresh_token(data={"sub": user.id})
+                return TokenResponse(
+                    access_token=access_token,
+                    refresh_token=refresh_token,
+                    token_type="bearer",
+                    user=UserResponse.model_validate(user),
+                )
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid recovery code",
+        )

@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.audit_log import AuditAction
+from app.models.device_token import DeviceToken
+from app.models.user import OAuthAccount, TokenBlacklist
 from app.schemas.user import (
     LocaleUpdate,
     OnboardingProgressResponse,
@@ -20,6 +24,7 @@ from app.schemas.user import (
     SupportedLocalesResponse,
     UserUpdate,
 )
+from app.services.audit_log_service import AuditLogService
 
 
 @dataclass(frozen=True)
@@ -218,6 +223,43 @@ class UserService:
             await self.db.refresh(progress)
             response = await self._progress_response(current_user, progress)
         return response
+
+    async def delete_account(
+        self,
+        current_user: Any,
+        *,
+        ip_address: str | None,
+        user_agent: str | None,
+    ) -> None:
+        """Soft-delete the current account and remove linked auth/device records."""
+        audit_service = AuditLogService(self.db)
+        user_id = current_user.id
+        normalized_user_agent = user_agent[:500] if user_agent and len(user_agent) > 500 else user_agent
+
+        await audit_service.log_action(
+            user_id=user_id,
+            action=AuditAction.ACCOUNT_DELETE_REQUESTED,
+            details={"email": current_user.email},
+            ip_address=ip_address,
+            user_agent=normalized_user_agent,
+        )
+
+        current_user.is_active = False
+        hashed_email = hashlib.sha256(current_user.email.encode()).hexdigest()
+        current_user.email = f"deleted_{hashed_email}"
+
+        await self.db.execute(delete(OAuthAccount).where(OAuthAccount.user_id == user_id))
+        await self.db.execute(delete(DeviceToken).where(DeviceToken.user_id == user_id))
+        await self.db.execute(delete(TokenBlacklist).where(TokenBlacklist.user_id == user_id))
+        await self.db.flush()
+
+        await audit_service.log_action(
+            user_id=user_id,
+            action=AuditAction.ACCOUNT_DELETED,
+            details={"email_hash": hashed_email},
+            ip_address=ip_address,
+            user_agent=normalized_user_agent,
+        )
 
     async def _get_or_create_progress(self, user_id: str) -> Any:
         from app.models.onboarding import UserOnboardingProgress

@@ -102,6 +102,21 @@ class SessionService:
                 detail=f"Failed to revoke session: {str(e)}",
             )
 
+    async def revoke_user_session(self, user_id: str, session_id: str) -> bool:
+        """Revoke one session only when it belongs to the user."""
+        result = await self.db.execute(
+            select(UserSession).where(
+                (UserSession.id == session_id) & (UserSession.user_id == user_id)
+            )
+        )
+        session = result.scalar_one_or_none()
+        if session is None:
+            return False
+        session.is_active = False
+        self.db.add(session)
+        await self.db.commit()
+        return True
+
     async def revoke_all_except(self, user_id: str, current_session_id: str) -> int:
         """Revoke all sessions for a user except the current one.
 
@@ -126,6 +141,20 @@ class SessionService:
             await self.db.commit()
             return result.rowcount
 
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to revoke sessions: {str(e)}",
+            )
+
+    async def revoke_all(self, user_id: str) -> int:
+        """Revoke all sessions for a user."""
+        try:
+            stmt = update(UserSession).where(UserSession.user_id == user_id).values(is_active=False)
+            result = await self.db.execute(stmt)
+            await self.db.commit()
+            return result.rowcount
         except Exception as e:
             await self.db.rollback()
             raise HTTPException(

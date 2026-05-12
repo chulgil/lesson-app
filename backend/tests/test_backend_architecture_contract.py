@@ -33,9 +33,12 @@ SQLALCHEMY_QUERY_IMPORTS = {
 ROUTER_HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
 MUTATING_HTTP_METHODS = {"post", "put", "patch", "delete"}
 PUBLIC_API_OPERATIONS = {
+    ("GET", "/api/v1/app/billing/products"),
+    ("GET", "/api/v1/app/version"),
     ("POST", "/api/v1/auth/oauth/{provider}"),
     ("POST", "/api/v1/auth/dev-login"),
     ("POST", "/api/v1/auth/token/refresh"),
+    ("POST", "/api/v1/auth/recovery-codes/verify"),
     ("GET", "/api/v1/users/supported-locales"),
 }
 

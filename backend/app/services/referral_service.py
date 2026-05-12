@@ -92,6 +92,16 @@ class ReferralService:
 
         return "Referral code applied successfully"
 
+    async def apply_referral_code_and_reward(self, new_teacher_id: str, code: str) -> None:
+        """Apply a referral code and evaluate referrer reward."""
+        normalized_code = code.strip().upper()
+        await self.apply_referral_code(new_teacher_id, normalized_code)
+        referral = await self.db.scalar(
+            select(TeacherReferral).where(TeacherReferral.referral_code == normalized_code)
+        )
+        if referral is not None:
+            await self.check_and_reward(referral.referrer_id)
+
     async def check_and_reward(self, referrer_id: str) -> dict | None:
         """Check if referrer has reached reward threshold and apply reward.
 
@@ -196,6 +206,27 @@ class ReferralService:
             "completed_referrals": completed or 0,
             "rewarded_count": rewarded or 0,
         }
+
+    async def get_referral_history(self, teacher_id: str) -> dict:
+        """Get referral history for a teacher."""
+        referrals = await self.db.scalars(
+            select(TeacherReferral)
+            .where(TeacherReferral.referrer_id == teacher_id)
+            .order_by(TeacherReferral.created_at.desc())
+        )
+        history = [
+            {
+                "id": referral.id,
+                "code": referral.referral_code,
+                "referred_teacher_id": referral.referred_teacher_id,
+                "status": referral.status,
+                "reward_type": referral.reward_type,
+                "rewarded_at": referral.rewarded_at.isoformat() if referral.rewarded_at else None,
+                "created_at": referral.created_at.isoformat(),
+            }
+            for referral in referrals
+        ]
+        return {"history": history, "total": len(history)}
 
     # -----------------------------------------------------------------------
     # Helpers

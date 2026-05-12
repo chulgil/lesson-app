@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-import hashlib
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, status
-from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
-from app.models.device_token import DeviceToken
-from app.models.user import OAuthAccount, TokenBlacklist, User
+from app.models.user import User
 from app.schemas.user import (
     LocaleUpdate,
     OnboardingProgressResponse,
@@ -22,9 +19,7 @@ from app.schemas.user import (
     UserResponse,
     UserUpdate,
 )
-from app.services.audit_log_service import AuditLogService
 from app.services.user_service import UserService
-from app.models.audit_log import AuditAction
 
 router = APIRouter()
 
@@ -205,56 +200,13 @@ async def delete_account(
     The user data is soft-deleted and will be permanently removed after 30 days
     via a scheduled task (not implemented in this PR).
     """
-    audit_service = AuditLogService(db)
-    user_id = current_user.id
-
-    # Extract IP address and user agent
     ip_address = None
     if request.client:
         ip_address = request.client.host
     user_agent = request.headers.get("user-agent", None)
-    if user_agent and len(user_agent) > 500:
-        user_agent = user_agent[:500]
-
-    # Log the deletion request
-    await audit_service.log_action(
-        user_id=user_id,
-        action=AuditAction.ACCOUNT_DELETE_REQUESTED,
-        details={"email": current_user.email},
-        ip_address=ip_address,
-        user_agent=user_agent,
-    )
-
-    # Soft delete: mark user as inactive
-    current_user.is_active = False
-
-    # Hash email to make it unrecoverable
-    hashed_email = hashlib.sha256(current_user.email.encode()).hexdigest()
-    current_user.email = f"deleted_{hashed_email}"
-
-    # Delete OAuth accounts
-    await db.execute(
-        delete(OAuthAccount).where(OAuthAccount.user_id == user_id)
-    )
-
-    # Delete device tokens
-    await db.execute(
-        delete(DeviceToken).where(DeviceToken.user_id == user_id)
-    )
-
-    # Blacklist all refresh tokens for this user
-    # Get all non-expired tokens and add them to blacklist
-    # Note: In a real implementation, we'd track all issued JTIs, but for now
-    # we'll rely on the frontend to clear local tokens
-    await db.execute(
-        delete(TokenBlacklist).where(TokenBlacklist.user_id == user_id)
-    )
-
-    await db.flush()
-    await audit_service.log_action(
-        user_id=user_id,
-        action=AuditAction.ACCOUNT_DELETED,
-        details={"email_hash": hashed_email},
+    service = UserService(db)
+    await service.delete_account(
+        current_user,
         ip_address=ip_address,
         user_agent=user_agent,
     )

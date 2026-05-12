@@ -5,13 +5,10 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
-from app.models.recovery import RecoveryCode
 from app.models.user import User
-from app.models.user_session import UserSession
 from app.schemas.auth import (
     DevLoginRequest,
     LogoutRequest,
@@ -170,48 +167,8 @@ async def verify_recovery_code(
 
     Used when user has lost OAuth access but has a recovery code.
     """
-    from app.core.security import create_access_token, create_refresh_token
-
     recovery_service = RecoveryService(db)
-
-    # Find all unused recovery codes and check each one
-    result = await db.execute(
-        select(RecoveryCode).where(not RecoveryCode.is_used)
-    )
-    recovery_codes = result.scalars().all()
-
-    # Check all recovery codes to find matching user
-    for recovery_code in recovery_codes:
-        if await recovery_service.verify_code(recovery_code.user_id, body.code):
-            # Found valid code, get the user
-            user_result = await db.execute(
-                select(User).where(User.id == recovery_code.user_id)
-            )
-            user = user_result.scalar_one_or_none()
-
-            if user is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="User not found",
-                )
-
-            # Generate tokens
-            access_token = create_access_token(
-                data={"sub": user.id, "role": getattr(user.role, "value", None)}
-            )
-            refresh_token = create_refresh_token(data={"sub": user.id})
-
-            return TokenResponse(
-                access_token=access_token,
-                refresh_token=refresh_token,
-                token_type="bearer",
-                user=UserResponse.model_validate(user),
-            )
-
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid recovery code",
-    )
+    return await recovery_service.verify_any_code(body.code)
 
 
 @router.get(
@@ -248,22 +205,8 @@ async def revoke_session(
 
     The session must belong to the current user.
     """
-    # Verify the session belongs to the current user
-    result = await db.execute(
-        select(UserSession).where(
-            (UserSession.id == session_id) & (UserSession.user_id == current_user.id)
-        )
-    )
-    session = result.scalar_one_or_none()
-
-    if session is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Session not found",
-        )
-
     service = SessionService(db)
-    success = await service.revoke_session(session_id)
+    success = await service.revoke_user_session(current_user.id, session_id)
 
     if not success:
         raise HTTPException(
@@ -296,15 +239,7 @@ async def revoke_all_sessions(
         return SuccessResponse(
             message=f"Revoked {revoked_count} session(s). Current session remains active."
         )
-    else:
-        # Revoke all sessions
-        stmt = update(UserSession).where(
-            UserSession.user_id == current_user.id
-        ).values(is_active=False)
-
-        result = await db.execute(stmt)
-        await db.commit()
-
-        return SuccessResponse(
-            message=f"Revoked all {result.rowcount} session(s). You have been logged out from all devices."
-        )
+    revoked_count = await service.revoke_all(current_user.id)
+    return SuccessResponse(
+        message=f"Revoked all {revoked_count} session(s). You have been logged out from all devices."
+    )
