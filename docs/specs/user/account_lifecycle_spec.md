@@ -1,19 +1,55 @@
-# 계정 라이프사이클 스펙 — 삭제 / 부모 동의 / 감사 로그
+# 계정 라이프사이클 스펙 — 가입 / 삭제 / 부모 동의 / 감사 로그
 
 > 작성일: 2026-05-18
 > 상태: 활성 (마스터 SSOT)
 > 우선: 🔴 CRITICAL (출시 전 — PIPA/GDPR 준수)
-> 관련: [privacy_policy.md](../subscription/privacy_policy.md), [user_master.md](./user_master.md)
+> 관련: [privacy_policy.md](../subscription/privacy_policy.md), [user_master.md](./user_master.md), [signup_spec.md](../web/signup_spec.md), [slug_lifecycle_spec.md](./slug_lifecycle_spec.md)
 
 ---
 
 ## 0. 개요
 
-PIPA(개인정보보호법) / GDPR 준수를 위한 3대 인프라:
+PIPA(개인정보보호법) / GDPR 준수를 위한 4대 인프라:
 
-1. **계정 삭제 API** — 사용자 권리 (잊혀질 권리)
-2. **14세 미만 부모 동의 흐름** — 법정대리인 동의 (PIPA §22조의2)
-3. **감사 로그 (AuditLog)** — 침해 사고 대응 의무
+1. **역할 분리 + 가입** — 선생님/학생/학부모 별도 계정, signup_source 메타
+2. **계정 삭제 API** — 사용자 권리 (잊혀질 권리)
+3. **14세 미만 부모 동의 흐름** — 법정대리인 동의 (PIPA §22조의2)
+4. **감사 로그 (AuditLog)** — 침해 사고 대응 의무
+
+---
+
+## 0.5. 역할 분리
+
+### 0.5.1 역할 (`User.role`)
+
+| 역할 | 가입 진입 | 권한 |
+|---|---|---|
+| `teacher` | `lessonaza.app/signup?role=teacher` (웹) / 앱 가입 화면 | 본인 프로필 편집, 학생 관리, 휴강 공지 |
+| `student` | `lessonaza.app/signup?role=student` (웹) / 앱 가입 화면 | 선생님 검색, 본인 레슨/연습 기록 |
+| `parent` | `lessonaza.app/signup?role=parent` (Year 1: 학생 흐름과 동일) | 자녀 프로필 관리, 결제 |
+| `academy_owner` | 운영자 수동 발급 (Year 1) | 학원 단위 관리 |
+
+### 0.5.2 별도 계정 원칙 (SSO 3-tuple unique)
+
+- M4 가입은 **SSO 전용** (Google + Kakao. Apple 은 M5)
+- `auth_identities(provider, provider_user_id, role)` **3-tuple unique** 제약
+- 같은 IdP 계정으로 **다른 역할 별도 User 가능** (예: 같은 구글 계정 → 선생님 User + 학부모 User)
+- 같은 IdP 계정 + 같은 역할로 두 번 가입 시도 → 기존 계정 로그인으로 처리
+- 역할 전환은 별도 흐름 (Year 2 백로그)
+- 데이터 모델: `User.role` enum, 가입 후 변경 불가 (운영자 수동만)
+- 다른 IdP 자동 연동 없음 — 명시적 `/settings/linked-accounts` 메뉴로만 연동 (탈취 위험 차단)
+
+### 0.5.3 signup_source 메타
+
+```python
+class User(Base):
+    signup_source = Column(String(20), default="app")  # "app" | "web"
+```
+
+- `"app"`: lesson-app 모바일 가입 화면 (M5 SSO 전환 후)
+- `"web"`: lessonaza.app/signup 가입 폼 (M4 SSO)
+
+사용 목적: 분석/이벤트 트래킹만. 인증/권한에 영향 없음. 가입 채널 무관 동일 계정 사용.
 
 ---
 
@@ -28,6 +64,10 @@ PIPA(개인정보보호법) / GDPR 준수를 위한 3대 인프라:
 | 계정 삭제 API | ❌ 미구현 |
 | AuditLog 테이블 | ❌ 없음 |
 | 법률 검토 | ❌ 미진행 |
+| 웹 가입 흐름 (SSO + role + signup_source) | 🟡 M4 (signup_spec) |
+| SSO IdP 연동 (`auth_identities` 3-tuple unique) | 🟡 M4 (signup_spec §4.2, §9.3) |
+| 약관 버전 기록 (`terms_versions`) | 🟡 M4 (signup_spec §7) |
+| Slug 휴면/회수 정책 | 🟡 M4 (slug_lifecycle_spec) |
 
 ---
 
@@ -313,3 +353,5 @@ GET  /api/v1/users/me/data-export/{job_id}
 - [user_master.md](./user_master.md) — 14세 미만 자녀 프로필 정책
 - [account_recovery_spec.md](./account_recovery_spec.md) — 삭제와 구분되는 계정 복구
 - [event_tracking_spec.md](../analytics/event_tracking_spec.md) — `account_deleted` 이벤트
+- [signup_spec.md](../web/signup_spec.md) — 가입 흐름 (선생님/학생/학부모, 이메일 인증, 약관 버전)
+- [slug_lifecycle_spec.md](./slug_lifecycle_spec.md) — 선생님 slug 휴면/회수 정책 (12mo + 1mo + 3mo cooldown)
