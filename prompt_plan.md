@@ -1,246 +1,89 @@
-# 현재 계획: 선생님 공지 시스템 v3 (공지 중심 재설계)
+# 현재 계획: 기획 갭 10건 스펙 단순화 (UX/기획 재검증 반영)
 
-> 생성: 2026-05-07
-> 스펙: `docs/specs/student/bulk_teacher_actions_spec.md` (v3)
-
-## Phase A: 스펙 전면 재작성 ✅
-
-- [x] `bulk_teacher_actions_spec.md` v3 전면 재작성 — 공지 중심 (자동 취소 분리)
-- [x] `backend_spec.md` API 계약 v3 (announcements 엔드포인트)
-
-## Phase B: 엔티티 + Provider ✅
-
-- [x] `TeacherAnnouncement` 엔티티 + `AnnouncementType` enum + `AffectedLesson`
-- [x] `TeacherAnnouncementRepository` 인터페이스 (create/getByTeacherId/getDayOffs)
-- [x] `MockTeacherAnnouncementRepository` — 영향 레슨 조회 + 알림 발송
-- [x] `teacherAnnouncementRepositoryProvider` + `teacherDayOffsProvider` + `teacherAnnouncementsProvider`
-
-## Phase C: 공지 UI ✅
-
-- [x] Masthead 📢 공지 아이콘 추가 (students_tab.dart)
-- [x] `AnnouncementSheet` — 타입(휴강/일반) + 날짜 + 메시지 → 발송
-- [x] 결과 화면 — 영향 학생 목록 + [스케줄 변경 →] 딥링크
-- [x] 하단 액션바에서 [휴강 공지] 버튼 제거 (메시지 보내기만 유지)
-- [x] AppStrings 공지 관련 상수 14개 추가
-
-## Phase D: 휴강일 전역 표시 ✅
-
-- [x] 선생님 스케줄 탭 (주간 그리드) — 휴강일 셀 `paperDark` grey-out
-- [x] 수강권 상세 배너 — `TeacherAnnouncement` 기반으로 데이터 소스 변경
-- [x] 학생 레슨 카드 — `cancelledByTeacher` 상태 시 "휴강" 배지 표시
-- [x] 스케줄 재조절 시간 선택 (WeeklyCalendarPicker) — 휴강일 비활성화
-
-## Phase E: v2 정리 ✅
-
-- [x] 하단 액션바에서 [휴강 공지] 버튼 제거 (메시지 보내기만 유지)
-- [x] mock 데이터에서 `lessonCancelledByTeacher` 이벤트 제거
-- [x] `BulkCancelScreen` 파일 삭제 + import/테스트 정리
-
----
-
-## 이전 계획
-
-### 백엔드 갭 분석 + 결제 정책 명시 + Phase 0~1 (2026-05-01)
-
-> 작성일: 2026-05-01
-> 모드: `/plan` + adaptive-quality **balanced** (스펙 보강은 fast / 백엔드 코드 변경은 별도 ultra)
-> 사용자 결정 (2026-05-01):
-> - 결제 모듈 = 무통장입금 + 수동 2단계 확인 (PG 미채택)
-> - 향후 PG 도입 시 = 앱 관리자 ↔ 선생님 ↔ 학생 양방향 결제 신규 설계 필요
-> - 결제 아키텍처 = **옵시디언 vault + 프로젝트 docs 양쪽에 md 파일** 로 관리
+> 생성: 2026-05-18
+> 모드: **기본 확장** (방향 A·B·C·D 모두 채택)
+> 원본 갭 문서: `/Users/r00360/Dev/mybrain/10 Projects/레슨앱/15-기획방향-보완.md`
 
 ## 배경
 
-프론트엔드 features (20개 도메인) + docs/specs (13개 master) 와 백엔드 (26 라우터 / 64 테이블) 를 매트릭스로 비교한 결과, **9개 영역**이 갭으로 식별됨. 그중 P1-A로 잡았던 **PG 연동**은 사용자 정정으로 **삭제** — 현재 정책은 무통장입금 + 수동 확인이며, 이는 `subscription_master.md` §4.1 에 이미 명시되어 있음. 다만 다음 2가지가 누락:
+10개 갭 스펙(G1–G10)을 작성 완료했으나 UX/기획 관점 재검증에서 빨간불 5개 발견:
 
-1. **"PG 미채택"이 정책상 의도된 상태** 라는 점이 백엔드 작업자에게 전달되지 않음
-2. **"향후 PG 도입 시 양방향 결제 신규 설계 요건"** 이 정의되지 않음
+1. 🔴 G4 자격 조건 4단계 — "왜 보상 안 와요?" 컴플레인
+2. 🔴 G2 14세 미만 A/B/C 분기 — 가입 이탈
+3. 🔴 G9 강제 복구 이메일 + 백업코드 — 가입 직후 이탈
+4. 🟠 설정 화면 비대화 — 토글 13+개
+5. 🟠 1인 운영 부담 누적 — Year 1 실행 불가능성
 
-## 갭 분석 결과 (요약)
+## 단순화 PR — 4건
 
-```
-백엔드 라우터 26개:
-  완성     → 23 (lessons / students / schedule / subscriptions / practice 등)
-  스텁     → 2  (ai_notes, payments)
-  미존재   → 1  (analytics)
+### A. G4 추천 보상 단일화 ✅
 
-부분 구현:
-  - 그룹 레슨 출석/대기자 자동화
-  - 수강권 만료 dispatcher 연결 (테이블/모델 존재, 스케줄러 트리거 미연결)
-  - 온보딩 상태 추적
-  - 선생님 검색 필터/정렬
-  - 알림 환경설정 적용
-```
+**파일**: `docs/specs/lesson/invite/teacher_referral_spec.md`
 
-## 갭 우선순위 (정정 후)
+- [x] 3단계 보상(가입/자격/전환) → **단일 보상**(가입 즉시 Pro 1주 양쪽)
+- [x] 자격 판정 워커 §3.4 삭제
+- [x] 어뷰징 방지는 device_id + IP throttle + 월 한도(20명) + 7일 회수 유지
+- [x] §3.3 보상 단계 표 단순화
+- [x] 의사결정 로그에 단순화 근거 추가
 
-| # | 영역 | 가치 | 의존성 | 복잡도 | Phase |
-|---|------|:----:|:------:|:------:|:-----:|
-| 1 | **결제 정책 스펙 보강** (PG 미채택 + 미래 설계) | HIGH | 없음 | LOW | **P0** |
-| 2 | **payments.py 수동 워크플로우 점검** (6개 API 갭 식별) | HIGH | 1 | LOW-MED | **P1-A** |
-| 3 | **Analytics 라우터 신설** | HIGH | 없음 | MED | **P1-B** |
-| 4 | **Expiry Dispatcher 스케줄러 연결** | HIGH | Notification, FCM | MED | **P1-C** |
-| 5 | AI Notes (Whisper + 요약) | MED | OpenAI, Recording | HIGH | **P2** |
-| 6 | 그룹 레슨 자동화 | MED | GroupClass | MED | **P2** |
-| 7 | 선생님 검색 고도화 | MED | Teacher | LOW-MED | **P2** |
-| 8 | 온보딩 상태 관리 | LOW-MED | User | LOW | **P3** |
-| 9 | 알림 환경설정 적용 | LOW-MED | Notification | LOW | **P3** |
+### B. G2 14세 미만 단일 경로 ✅
 
-## Phase 0 — 결제 아키텍처 스펙 보강 (이번 PR)
+**파일**: `docs/specs/user/account_lifecycle_spec.md`
 
-### 산출물 (4개 파일)
+- [x] 경로 A/B/C → **A(자녀 프로필)만 유지**
+- [x] 경로 B(부모 동의 + 자녀 계정) → Year 2 백로그로 명시 이동
+- [x] 경로 C(가입 거절) 삭제 — A로 흡수
+- [x] ParentalConsent 테이블은 유지 (Year 2 대비) but 가입 흐름에서 분리
+- [x] §의사결정 로그 갱신
 
-| # | 파일 | 작업 |
-|---|------|------|
-| 1 | `docs/specs/subscription/payment_architecture.md` | **신규**. 현행 정책 + 미래 PG 설계 요건 단일 진원지 |
-| 2 | `docs/specs/subscription/subscription_master.md` | §4.1.1 (PG 미채택) + §4.1.2 (미래 설계 요건) 추가, 신규 파일 참조 |
-| 3 | `docs/specs/backend/backend_spec.md` | "다음 단계" 갱신 — payments 라우터 PG 미진행 정책 명시 |
-| 4 | `~/Dev/mybrain/10 Projects/레슨앱/결제-아키텍처.md` | **신규**. 옵시디언 vault 사본. 프로젝트 docs 와 동기화 |
+### C. G9 점진 보안 ✅
 
-### 결제 아키텍처 핵심 포인트
+**파일**: `docs/specs/user/account_recovery_spec.md`
 
-```
-┌─ 현행 (PG 미채택) ──────────────────────────────────────┐
-│                                                          │
-│  학생 ──외부 은행 앱── 송금 ──▶ 선생님 계좌              │
-│   │                                  │                   │
-│   └─ [입금완료] ──────────────────▶ Lessonaza            │
-│       (학생 자가 신고)               │                   │
-│                                      ▼                   │
-│                              [입금확인] ─▶ confirmed     │
-│                              (선생님 통장 대조 후)        │
-└──────────────────────────────────────────────────────────┘
+- [x] 복구 이메일 **선택**으로 변경 (skip 가능, 미설정 시 보안 뱃지 표시)
+- [x] 백업 코드 → **Pro 전용 기능**
+- [x] 첫 가입 가이드 §9.2 "skip 불가" 제거
+- [x] 일반 잠금 케이스는 "이메일 매직 링크"로 90% 해결 (§2.1 점진 도입 표)
+- [x] 의사결정 로그에 점진 도입 근거 추가
 
-┌─ 미래 (PG 도입 시 — Out of Scope) ──────────────────────┐
-│                                                          │
-│  학생 ──결제──▶ [앱 관리자 = 에스크로] ──정산──▶ 선생님 │
-│                       │                                   │
-│                       └── 플랫폼 수수료 N%               │
-│                                                          │
-│  미정 항목:                                              │
-│  - 정산 주기 (실시간 vs 월 1회)                          │
-│  - 수수료 모델 (선생님 부담 / 학생 부담 / 분담)          │
-│  - 사업자/개인 구분 (세금계산서, 원천징수)               │
-│  - 환불 흐름 (관리자 승인 필수 여부)                     │
-│  - 에스크로 보유 기간                                    │
-│  - PG 선택 (Toss / Portone / 카카오페이 / 이니시스)      │
-└──────────────────────────────────────────────────────────┘
-```
+### D. 설정 IA 통합 (신규 스펙) ✅
 
-### Lore Trailer (커밋 시 첨부)
+**파일**: `docs/specs/design/settings_information_architecture_spec.md` (신규 생성)
 
-```
-Lore-directive: 결제 모듈 PG 미채택 — 무통장입금 + 수동 2단계 확인만 유지
-Lore-constraint: 1:1 레슨 시장 수수료 회피 + 선생님 자율성 우선
-Lore-rejected: Toss/Portone PG 즉시 도입 — 양방향 정산 설계 미완 상태에서 도입 시 환불/세금/에스크로 정책 누수
-```
+- [x] "내 데이터 · 프라이버시" 단일 허브 정의
+- [x] G3·G7 옵트아웃 → 단일 "데이터 수집 끄기" 토글로 통합 (내부적으로 둘 다 OFF)
+- [x] G2 내보내기·삭제·동의 이력을 같은 허브에
+- [x] "로그인 보안" 별도 그룹 (복구 이메일 + 활성 세션 + 백업 코드 Pro)
+- [x] G3·G7 스펙은 본문 유지, "진입점은 IA 스펙 참조" 명시
 
-## Phase 1 — 백엔드 코드 작업 (다음 세션)
+### E. 부수 정리 ✅
 
-### P1-A — payments.py 수동 워크플로우 점검 (진단 → 코드)
+- [x] `event_tracking_spec.md` §2.3, §7 옵트아웃 위치 → IA 스펙 참조로 변경
+- [x] `crashlytics_spec.md` §7.1 옵트아웃 위치 → IA 스펙 참조로 변경
+- [x] `customer_support_spec.md` Phase 2 항목(인앱 트래커) → 백로그 명시 강화
+- [x] `last_active_at` 필드 SSOT 통일 (reengagement_spec이 정의, account_recovery Session.last_active_at은 별개임을 명시)
 
-| API | 필요 여부 | 현재 상태 | 비고 |
-|-----|:---------:|----------|------|
-| `POST /payments/{id}/student-confirm` | 필수 | 진단 필요 | 학생이 입금완료 표시 |
-| `POST /payments/{id}/teacher-confirm` | 필수 | 진단 필요 | 선생님이 통장 확인 → 수강권 활성화 |
-| `POST /payments/{id}/teacher-reject` | 필수 | 진단 필요 | 선생님이 반려 → pending 복귀 |
-| `POST /payments/{id}/refund` | 필수 | 진단 필요 | 환불 기록 (외부 송금은 별개) |
-| `GET /payments/overdue` | 필수 | 진단 필요 | 미수금 목록 |
-| `POST /payments/{id}/remind` | 필수 | 진단 필요 | 수동 입금 알림 발송 |
+## 검증
 
-→ 진단 결과로 **누락 API 정확히 N개** 확정 후 사용자 컨펌 → 구현.
-
-### P1-B — Analytics 라우터 신설
-
-```
-GET /analytics/teacher/monthly         (수익/레슨 수/출석률)
-GET /analytics/students/{id}/report    (월별 진도/연습률)
-GET /analytics/practice-ranking        (학생 랭킹)
-```
-
-- 신규 모델 없음, 기존 테이블 read-only 집계
-- ORM CTE / window function 사용
-- 인덱스 EXPLAIN 검증
-
-### P1-C — Expiry Dispatcher 스케줄러 연결
-
-- `subscription_expiry_dispatcher.py` + `dispatch_log` 마이그레이션 이미 존재
-- APScheduler / cron 진입점만 추가 (`scheduler.py` 라우터)
-- D-7/D-1 알림 → `notification_service` + `fcm_service`
-- 만료 30일 후 `expired` → `past` 자동 전환
-
-## ASCII 아키텍처 (P1 완성 시)
-
-```
-┌─ Frontend ──────────────────────────────────────────────────┐
-│  payment_card  미수금탭  analytics_screen  expiry_banner    │
-└──┬──────┬──────────┬──────────────────────┬─────────────────┘
-   │ POST │ POST     │ GET                  │ FCM subscribe
-   │ student│ teacher│ /analytics/...      │
-   │-confirm│-confirm│                      │
-   ▼       ▼          ▼                    ▼
-┌─ FastAPI app/api/v1/ ───────────────────────────────────────┐
-│  payments.py (수동 only)   analytics.py (NEW)               │
-│   ├── student-confirm       ├── /teacher/monthly             │
-│   ├── teacher-confirm       ├── /students/{id}/report        │
-│   ├── teacher-reject        └── /practice-ranking            │
-│   ├── refund (기록)                                           │
-│   ├── overdue list          subscriptions.py                 │
-│   └── remind                 └── expiry-dispatch (APScheduler)│
-│                                                              │
-│  ✗ NO PG SDK   ✗ NO webhook   ✗ NO 카드토큰                 │
-└──────────────────────────────────────────────────────────────┘
-```
-
-## 위험 / 결정사항
-
-| 항목 | 결정 |
+| 항목 | 방법 |
 |------|------|
-| PG 연동 | **하지 않음** (정책 명시) |
-| 결제 시크릿 | 없음 (시크릿 노출 위험 0) |
-| Analytics N+1 | EXPLAIN 측정 후 인덱스, balanced 모드 |
-| Dispatcher 중복 | `dispatch_log` UNIQUE 로 idempotent |
-| 옵시디언/프로젝트 동기화 | 양쪽 md 파일 동일 내용, 변경 시 양쪽 갱신 |
+| 설정 화면 깊이 | 1단계 감소 확인 (옵트아웃 13개 → 7개 가시) |
+| 가입 흐름 단계 | 14세 미만 분기 1개로 감소 |
+| 추천 룰 설명 | "추천 코드 공유 → 가입 즉시 Pro 1주" 한 문장 |
+| 1인 운영 부담 | Phase 1만 출시 시점, Phase 2 백로그 명시 |
 
-## 평가 기준 (rubric)
+## 진행 순서
 
-| 기준 | P0 합격선 | P1 합격선 |
-|---|:--:|:--:|
-| 완성도 | 9/10 (4파일 모두 산출) | 8/10 (P1-A/B/C 모두 PR) |
-| 견고성 | 7/10 (스펙 모순 0) | 7/10 (테스트 추가) |
-| 일관성 | 9/10 (Lore trailer + 양쪽 동기화) | 8/10 (도메인 린터 통과) |
-| 간결성 | 8/10 (마스터 본문 비대화 없음) | 7/10 |
+1. PR A·B·C 병렬 (스펙 본문 편집)
+2. PR D 신규 작성
+3. PR E 부수 정리 (A·B·C·D 머지 후)
 
-## 다음 행동
-
-1. **이번 세션**: Phase 0 4파일 작성 + payments.py 진단 (코드 변경 없음)
-2. **다음 세션**: P1-A 누락 API 구현 (사용자 컨펌 후) → P1-B → P1-C
+승인 시 PR A부터 작업 개시.
 
 ---
 
 ## 이전 계획
 
-### 선생님 피드백 템플릿 시스템 — Profile 등록 / Lesson 적용 (2026-05-01)
+### 선생님 공지 시스템 v3 (2026-05-07)
 
-> 모드: `/plan` + adaptive-quality **ultra** (~12 파일 / HiveType 신규 / Mock 데이터 변경 #1 위험)
-> 사용자 결정:
-> - Q1 = A — 신규 `FeedbackTemplate` 엔티티 (TipTemplate 분리 유지)
-> - Q2 = A — 칩 라인 완전 제거, "템플릿 선택" 버튼만 남김
-> - Q3 = A — 본문 전체 교체 (기존 입력 있으면 confirm dialog)
-> - Q4 = A — 태그는 메타데이터 only (검색/필터, 본문엔 미포함)
-
-#### 요약
-
-선생님이 학생 레슨 피드백을 작성할 때 **개인화된 긴 본문 템플릿** 을 프로필에서 미리 등록하고, 피드백 화면에서는 1탭으로 선택해 본문을 채우는 시스템.
-
-- Phase 1: `FeedbackTemplate` 엔티티 + Hive Box `feedback_templates` + Mock 시드 9개
-- Phase 2: `@riverpod` AsyncNotifier + 라우트 `/profile/feedback-templates`
-- Phase 3: 관리 화면 (TipTemplateManagementScreen 패턴 미러) + ProfileScreen 메뉴 1행
-- Phase 4: `quick_feedback_screen.dart` 칩 라인 제거 + 템플릿 선택 버튼 + ConfirmReplaceDialog
-- Phase 5: 정리 + 문서
-
-상세는 `.claude/archive/prompt_plan_20260501_feedback_template.md` 로 이동 (필요 시 재참조).
-
-### 스케줄 탭 UX 재설계 (Phase A 완료, 2026-04-30)
-
-`.claude/archive/prompt_plan_20260501_archive.md` 로 이동.
+> 공지 중심 재설계 — 모든 Phase A–E 완료. `docs/specs/student/bulk_teacher_actions_spec.md` v3 기준 머지.
