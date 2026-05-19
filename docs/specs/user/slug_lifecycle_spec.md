@@ -1,8 +1,8 @@
 # slug_lifecycle_spec — 선생님 프로필 slug 휴면/회수 정책
 
-> 기준일: 2026-05-18
+> 기준일: 2026-05-19 (Option D 정렬)
 > 우선: 🟡 HIGH (외부 공유 URL 보호 — Year 1 출시 전 정착 필요)
-> 선행: [signup_spec.md](../web/signup_spec.md), [profile_spec.md](../web/profile_spec.md), [account_lifecycle_spec.md](./account_lifecycle_spec.md)
+> 선행: [signup_spec.md](../web/signup_spec.md), [profile_spec.md](../web/profile_spec.md), [../profile/public_profile_content_spec.md](../profile/public_profile_content_spec.md), [account_lifecycle_spec.md](./account_lifecycle_spec.md)
 
 ## 1. 개요
 
@@ -22,7 +22,7 @@
 ### 1.2 비책임
 
 - 계정 삭제/복구 — `account_lifecycle_spec` 담당
-- Ghost Page 콘텐츠 관리 — `profile_spec` 담당
+- `TeacherProfile` 콘텐츠 관리 — `public_profile_content_spec` / `profile_spec` 담당
 - 가입 시점 slug 발급 — `signup_spec` 담당
 
 ## 2. 성공 기준
@@ -30,7 +30,7 @@
 - [SC-1] 활동 사용자(앱 로그인 OR 프로필 편집)는 무기한 slug 유지
 - [SC-2] 12개월 미활동 사용자에게 6/9/12개월에 알림 3회 발송
 - [SC-3] 13개월 도달 시 slug 풀 반환, 3개월 cooldown 후 재선점 가능
-- [SC-4] 옛 사용자의 콘텐츠가 새 사용자에게 절대 노출되지 않음 (Ghost Page 분리)
+- [SC-4] 옛 사용자의 콘텐츠가 새 사용자에게 절대 노출되지 않음 (`TeacherProfile` 분리)
 - [SC-5] 운영자는 침해/저작권 신고 시 slug 즉시 회수 가능
 - [SC-6] slug 변경은 Year 1 동안 가입 후 60일 내 1회만 허용
 
@@ -54,7 +54,7 @@ SLUG_MAX_LEN = 30
 
 | 카테고리 | 예시 |
 |---|---|
-| 시스템 경로 | `ghost`, `admin`, `api`, `www`, `terms`, `privacy`, `signup`, `login`, `verify-email`, `edit`, `static`, `well-known`, `assets`, `images` |
+| 시스템 경로 | `admin`, `api`, `www`, `terms`, `privacy`, `signup`, `login`, `verify-email`, `edit`, `static`, `well-known`, `assets`, `images` |
 | 브랜드 | `lessonaza`, `lessonaza-app`, `lessonaza-official` |
 | 욕설/비속어 | (별도 사전 — 운영자 관리) |
 | 유명인 | 동명이인 분쟁 방지 정책 (사후 신고 처리) — 사전 차단은 안 함 |
@@ -88,7 +88,7 @@ class SlugReservedWord(Base):
 ### 5.1 활동 기준 (둘 중 하나)
 
 - `last_app_login_at` — 앱에서 로그인 (모든 디바이스)
-- `last_profile_edit_at` — 웹에서 프로필 편집 (Custom Edit UI)
+- `last_profile_edit_at` — 인앱 편집 화면에서 프로필 수정 (`TeacherProfile` 변경)
 
 둘 중 최신값을 `User.last_activity_at` 으로 갱신. 단순 페이지 조회는 제외 (편집권자만 활동으로 카운트).
 
@@ -134,9 +134,9 @@ T+485일   slug 재선점 가능 (FCFS)
 ### 6.3 휴면 진입 (12개월, T+365)
 
 - `Teacher.dormant_entered_at = now()` 설정
-- `Teacher.profile_visibility = "dormant"` 전환
-- Ghost Page status → `members` (외부 접근 차단)
-- `profile.lessonaza.app/{slug}` 요청 시 **dormant guide page** 표시:
+- `Teacher.profile_visibility = "dormant"` + `TeacherProfile.status = "dormant"` 전환
+- 백엔드가 `POST /internal/cache/invalidate {slug}` 호출 → renderer 캐시 즉시 제거
+- `profile.lessonaza.app/{slug}` 요청 시 renderer 가 410 Gone 응답 + **dormant guide page** 표시:
 
 ```
 ┌──────────────────────────────────────┐
@@ -160,7 +160,7 @@ T+485일   slug 재선점 가능 (FCFS)
 
 - `Teacher.slug_released_at = now()` 설정
 - `Teacher.profile_slug = NULL` 처리
-- Ghost Page 는 **유지** (archive 상태). 다음 단계 (T+485) 까지 보존.
+- `TeacherProfile` 은 **유지** (status="archived", `slug` 컬럼은 `archived-{teacher_id}-{uuid}` 로 rename). 다음 단계 (T+485) 까지 보존.
 - `SlugHistory` 레코드 갱신: `released_at = now()`, `release_reason = "dormant"`, `cooldown_until = now() + 90d`
 
 ### 6.5 Cooldown (16개월, T+395 ~ T+485)
@@ -173,9 +173,9 @@ T+485일   slug 재선점 가능 (FCFS)
 
 - FCFS (선착순)
 - 새 사용자가 가입 시 해당 slug 선택 가능
-- 옛 Ghost Page 는 **새 사용자에게 절대 이관 안 됨**:
-  - 옛 Page는 `ghost-archive-{slug}-{teacher_id}` 같은 보관용 slug로 영구 이전
-  - 새 사용자는 빈 Page 신규 발급
+- 옛 `TeacherProfile` 은 **새 사용자에게 절대 이관 안 됨**:
+  - 옛 프로필은 `status="archived"` + `slug="archived-{teacher_id}-{uuid}"` 로 영구 보관
+  - 새 사용자는 신규 `TeacherProfile` 발급 (status=draft)
   - 외부에서 옛 URL 접근 시 새 사용자 프로필 표시 (콘텐츠는 새것)
 
 ## 7. 복구 흐름
@@ -189,7 +189,8 @@ T+485일   slug 재선점 가능 (FCFS)
 ### 7.2 휴면 ~ 회수 전 (T+365 ~ T+395, 30일 grace)
 
 - 로그인 시도 → "프로필이 휴면 상태예요. 복구하시겠어요?" 모달
-- 복구 동의 → `dormant_entered_at = NULL`, `profile_visibility = "public"`, Ghost Page status = "published"
+- 복구 동의 → `dormant_entered_at = NULL`, `Teacher.profile_visibility = "public"`, `TeacherProfile.status = "public"` (첫 승인 이력 있을 경우. 없으면 status=draft 로 되돌리고 재검토)
+- 백엔드가 renderer 캐시 무효화 webhook 호출
 - 백엔드 AuditLog: `profile_restored`
 
 ### 7.3 회수 후 (T+395 이후)
@@ -216,7 +217,8 @@ T+485일   slug 재선점 가능 (FCFS)
    - Teacher.profile_slug = NULL
    - SlugHistory.released_at = now, release_reason = "admin_revoked"
    - SlugHistory.cooldown_until = now + N days (기본 365일 — 분쟁 슬러그는 1년)
-   - Ghost Page → archive
+   - TeacherProfile.status = "archived" + slug rename
+   - renderer 캐시 무효화 webhook 호출
    - AuditLog: slug_revoked_by_admin
 3. 알림 메일: "[Lessonaza] 프로필 주소 회수 안내"
 ```
@@ -272,11 +274,11 @@ slug_released_at: DateTime | None
 
 3. SELECT * FROM users WHERE last_activity_at < now - 365d
    AND dormant_entered_at IS NULL
-   → 휴면 진입 (Teacher.profile_visibility="dormant", Ghost Page members, 알림 3)
+   → 휴면 진입 (Teacher.profile_visibility="dormant", TeacherProfile.status="dormant", renderer 캐시 무효화, 알림 3)
 
 4. SELECT * FROM users WHERE dormant_entered_at < now - 30d
    AND slug_released_at IS NULL
-   → slug 회수 (SlugHistory.released_at=now, cooldown_until=now+90d, Ghost archive)
+   → slug 회수 (SlugHistory.released_at=now, cooldown_until=now+90d, TeacherProfile.status="archived" + slug rename)
 ```
 
 배치 실패 시 재시도 (idempotent — 멱등성 보장).
@@ -308,9 +310,10 @@ slug_released_at: DateTime | None
 
 - [ ] 알림 채널 다원화 — SMS 추가 발송 (Year 2 SMS 인증 도입 시)
 - [ ] 휴면 임계값 12개월 — 시장 검증 후 9개월 vs 18개월 조정 가능성
-- [ ] 옛 Ghost Page 영구 보관 — 스토리지 비용 vs 보존 의무 균형. 5년 후 자동 삭제?
+- [ ] 옛 `TeacherProfile` (status="archived") 영구 보관 — DB row + Vultr Object Storage 이미지 비용 vs 보존 의무 균형. 5년 후 자동 hard delete?
 - [ ] dormant guide page 디자인 — Notebook × Score 시그니처 적용 범위
 
 ## 13. 변경 이력
 
 - 2026-05-18: 초안 — LOL 방식 휴면 정책 (12mo + 1mo grace + 3mo cooldown), Year 1 slug 변경 60일 내 1회, Option B 권한 격리 전제
+- 2026-05-19: Option D 정렬 — Ghost Page 폐기, `TeacherProfile` 상태 전환(`public`/`dormant`/`archived`)로 동등 동작 대체. 휴면/회수/관리자 회수 시 백엔드가 renderer 캐시 무효화 webhook 호출. 예약어 `ghost` 제거.

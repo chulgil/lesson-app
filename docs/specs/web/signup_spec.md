@@ -1,8 +1,8 @@
 # signup_spec — SSO 기반 가입 흐름 (선생님 / 학생)
 
-> 기준일: 2026-05-18 (v2 — SSO-only)
+> 기준일: 2026-05-19 (v3 — Option D 정렬)
 > 도메인: `lessonaza.app/signup` (www), `profile.lessonaza.app/{slug}` (profile)
-> 선행: [www_spec.md](www_spec.md), [profile_spec.md](profile_spec.md), [slug_lifecycle_spec.md](../user/slug_lifecycle_spec.md), [account_lifecycle_spec.md](../user/account_lifecycle_spec.md)
+> 선행: [www_spec.md](www_spec.md), [profile_spec.md](profile_spec.md), [../profile/public_profile_content_spec.md](../profile/public_profile_content_spec.md), [slug_lifecycle_spec.md](../user/slug_lifecycle_spec.md), [account_lifecycle_spec.md](../user/account_lifecycle_spec.md)
 
 ## 1. 개요
 
@@ -18,7 +18,7 @@
 
 - SSO 인증 흐름 (구글/카카오/Apple) + IdP 콜백 처리
 - 약관/개인정보 동의 + 버전 기록 (SSO 콜백 직후 1회)
-- 선생님: slug 선점 + Ghost Page 자동 발급
+- 선생님: slug 선점 + `TeacherProfile` 자동 초기화 (status=draft)
 - 학생: 별도 가입 흐름 (선생님과 분리)
 
 ### 1.3 비책임
@@ -32,7 +32,7 @@
 ## 2. 성공 기준
 
 - [SC-1] SSO 버튼 클릭 → IdP 동의 → 약관 동의 → 계정 활성화까지 1분 이내
-- [SC-2] 선생님 가입 시 slug 발급 + Ghost Page 자동 생성 + `profile.lessonaza.app/{slug}` 접근 가능
+- [SC-2] 선생님 가입 시 slug 발급 + `TeacherProfile` 자동 초기화 (status=draft) + 인앱 편집 화면 진입. 첫 운영자 검토 통과 후 `profile.lessonaza.app/{slug}` 공개
 - [SC-3] 가입자가 lesson-app 앱 로그인 시 동일 SSO 자격으로 정상 인증 (M5 이후 — M4 백엔드만 SSO)
 - [SC-4] 약관 미동의 상태로 IdP 콜백만 완료된 계정은 **활성화되지 않음** (`terms_version_agreed` 미기록 = 가입 미완료 상태)
 - [SC-5] slug 중복/예약어/형식 위반은 클라이언트 검증 + 서버 재검증
@@ -126,13 +126,13 @@
         ※ password_hash 없음 (M4 nullable, M5에 drop)
    d. auth_identities 레코드 생성 (provider, provider_user_id, role)
    e. SlugHistory 레코드 생성 (assigned_at=now)
-   f. Ghost Page 자동 발급 (Admin API, status="published" — IdP가 이메일 검증 완료)
-   g. Teacher 레코드 생성 (ghost_page_id, profile_slug 매핑)
+   f. Teacher 레코드 생성 (profile_slug 매핑, profile_visibility="draft")
+   g. TeacherProfile 레코드 생성 (teacher_id FK 1:1, status="draft", headline/bio_long 비어 있음) — public_profile_content_spec §8
    h. terms_versions 레코드 생성 (동의 증거 보존)
    i. AuditLog: signup_completed
    j. JWT 발급
-9. 응답: 201 Created + { access_token, profile_url }
-10. 프로필 편집 화면 (Custom Edit UI) 자동 이동
+9. 응답: 201 Created + { access_token, profile_edit_deeplink }
+10. lesson-app 인앱 편집 화면으로 안내 (앱 미설치 시 스토어 CTA)
 ```
 
 ### 5.2 학생 가입 (SSO)
@@ -152,7 +152,7 @@
 7. 가입 완료 → "선생님 찾기" 또는 "앱 다운로드" CTA
 ```
 
-학생 가입은 선생님과 흐름 골격은 동일하나 **slug/Ghost Page 발급 없음**.
+학생 가입은 선생님과 흐름 골격은 동일하나 **slug/TeacherProfile 발급 없음**.
 
 ### 5.3 미완료 가입 정리
 
@@ -217,12 +217,15 @@ SSO 인증은 완료했으나 약관 동의/slug 입력 단계에서 이탈한 �
 | GET | `/api/v1/auth/oauth/kakao/authorize?role=...` | 카카오 OAuth URL 생성 + state 발급 |
 | POST | `/api/v1/auth/oauth/google/callback` | 구글 콜백 처리 (code + state → signup_session_token 또는 JWT) |
 | POST | `/api/v1/auth/oauth/kakao/callback` | 카카오 콜백 처리 |
-| POST | `/api/v1/auth/signup/complete` | 약관 동의 + 역할별 추가 정보 → User/Teacher/Ghost Page 생성 |
+| POST | `/api/v1/auth/signup/complete` | 약관 동의 + 역할별 추가 정보 → User/Teacher 생성. 선생님이면 `TeacherProfile`(status=draft) 동시 초기화 |
 | POST | `/api/v1/auth/logout` | 세션 종료 |
-| GET | `/api/v1/teachers/me/profile` | 본인 프로필 조회 (Ghost Page 데이터 + 매핑) |
-| PUT | `/api/v1/teachers/me/profile` | 본인 프로필 수정 (Ghost Admin API 프록시) |
-| POST | `/api/v1/teachers/me/profile/publish` | 초안 → 게시 전환 |
-| POST | `/api/v1/teachers/me/profile/images` | 이미지 업로드 (Vultr Object Storage) |
+| GET | `/api/v1/teachers/me/profile` | 본인 `TeacherProfile` 조회 (편집용 원본) |
+| PUT | `/api/v1/teachers/me/profile` | 본인 `TeacherProfile` 수정 (`bio_long` markdown → `bio_long_html` sanitize) |
+| POST | `/api/v1/teachers/me/profile/submit-review` | draft → review 전환 (운영자 검토 큐 진입) |
+| POST | `/api/v1/teachers/me/profile/publish` | 첫 승인 이력 있는 선생님의 직접 public 전환 |
+| POST | `/api/v1/teachers/me/profile/unpublish` | public → draft 되돌리기 |
+| POST | `/api/v1/teachers/me/profile/images` | 이미지 업로드 (Vultr Object Storage presigned URL) |
+| DELETE | `/api/v1/teachers/me/profile/images/{image_id}` | 이미지 삭제 |
 | POST | `/api/v1/teachers/me/profile/preview` | 게시 전 미리보기 토큰 발급 |
 | GET | `/api/v1/teachers/me/profile/slug/check?slug=...` | slug 가용성 확인 |
 | PUT | `/api/v1/teachers/me/profile/slug` | slug 변경 (Year 1: 60일 내 1회만 — slug_lifecycle §4 참조) |
@@ -230,7 +233,9 @@ SSO 인증은 완료했으나 약관 동의/slug 입력 단계에서 이탈한 �
 | POST | `/api/v1/users/me/linked-accounts/{provider}` | 추가 IdP 연동 (본 계정 로그인 상태에서) |
 | DELETE | `/api/v1/users/me/linked-accounts/{provider}` | 연동 해제 (최소 1개 IdP 유지 강제) |
 
-### 8.1 권한 격리 (Option B)
+상세 endpoint 스펙 (운영자 검토 큐, 내부 by-slug API 포함) 은 [backend_architecture.md](../backend/backend_architecture.md) §API + [public_profile_content_spec.md](../profile/public_profile_content_spec.md) §7.
+
+### 8.1 권한 격리 (Option D)
 
 모든 `/teachers/me/profile/*` 엔드포인트는:
 ```python
@@ -238,12 +243,12 @@ async def get_my_profile(current_user: User = Depends(require_teacher)):
     if current_user.role != "teacher":
         raise HTTPException(403)
     teacher = await teacher_service.get_by_user_id(current_user.id)
-    return await ghost_admin_client.get_page(teacher.ghost_page_id)
+    return await teacher_profile_repo.get_by_teacher_id(teacher.id)
 ```
 
-- Custom Edit UI 는 Ghost 어드민을 노출하지 않는다
-- Ghost Admin API 키는 백엔드만 보관 (앱/웹 클라이언트에 노출 금지)
-- 다른 선생님 `ghost_page_id` 조작은 백엔드 권한 체크로 차단
+- 콘텐츠 SSOT 는 PostgreSQL `teacher_profiles` 테이블 — 외부 CMS 의존 없음
+- 다른 선생님 `teacher_id` 조작은 백엔드 권한 체크로 차단 (서버가 `current_user` 의 teacher_id 강제)
+- 공개 페이지는 web VPS 의 `profile-renderer` 가 내부 API (X-Internal-API-Token + IP whitelist) 로 읽기
 
 ### 8.2 앱 SSO (M5 별도 마일스톤)
 
@@ -275,14 +280,14 @@ class User(Base):
 class Teacher(Base):
     # 기존 필드 ...
     profile_slug = Column(String(30), unique=True, nullable=True)
-    ghost_page_id = Column(String(50), unique=True, nullable=True)
-    profile_url = Column(String(500), nullable=True)
-    profile_visibility = Column(String(20), default="draft")  # draft|public|members|dormant
+    profile_url = Column(String(500), nullable=True)  # https://profile.lessonaza.app/{slug}
+    profile_visibility = Column(String(20), default="draft")  # draft|public|dormant|archived
     # 휴면 트래킹 (slug_lifecycle_spec 참조)
     dormant_notice_6m_at = Column(DateTime, nullable=True)
     dormant_notice_9m_at = Column(DateTime, nullable=True)
     dormant_entered_at = Column(DateTime, nullable=True)
     slug_released_at = Column(DateTime, nullable=True)
+    # 공개 콘텐츠는 1:1 분리된 TeacherProfile 로 이전 (public_profile_content_spec)
 ```
 
 ### 9.3 신규 테이블 (SSO 전용)
@@ -367,14 +372,14 @@ class TermsVersion(Base):
 | M4.4 | `/auth/signup/complete` + 약관 동의 + terms_versions | 2일 |
 | M4.5 | 선생님 가입 폼 (lessonaza.app/signup?role=teacher) + 3 SSO 버튼 | 3일 |
 | M4.6 | 학생 가입 폼 + 14세 미만 분기 | 2일 |
-| M4.7 | Ghost Page 자동 발급 (Admin API 통합) | 2일 |
-| M4.8 | `/teachers/me/profile` CRUD (Custom Edit UI 백엔드) | 4일 |
-| M4.9 | Custom Edit UI 프론트 (lessonaza.app/edit) | 5일 |
+| M4.7 | `TeacherProfile` 자동 초기화 (status=draft) — `/auth/signup/complete` 통합 | 1일 |
+| M4.8 | `/teachers/me/profile` CRUD + sanitize 파이프라인 + 운영자 검토 큐 | 4일 |
+| M4.9 | 인앱 편집 화면 (`features/profile/teacher_profile_edit/`) — 별도 마일스톤 (`teacher_profile_edit_spec`) | — |
 | M4.10 | 계정 연동 메뉴 (`/settings/linked-accounts`) | 2일 |
 | M4.11 | 운영자 SSO 분리 (admin.lessonaza.app + Google Workspace 도메인 제한) | 2일 |
 | M4.12 | reCAPTCHA + Rate limit + AuditLog | 1일 |
-| M4.13 | E2E (SSO 가입 → 약관 → slug → 편집 → 게시 → 외부 공유) | 2일 |
-| **M4 종료** | **웹 SSO 가입 + 프로필 편집 운영** | **약 5주** |
+| M4.13 | E2E (SSO 가입 → 약관 → slug → 인앱 편집 → 검토 → 게시 → 외부 공유) | 2일 |
+| **M4 종료** | **웹 SSO 가입 + TeacherProfile 운영** | **약 4주** |
 
 별도 마일스톤:
 - **M5**: Flutter 앱 SSO 전환 + Apple SSO 추가 + dev-login 대체 + `User.password_hash` drop
@@ -390,3 +395,4 @@ class TermsVersion(Base):
 
 - 2026-05-18 v1: 초안 — 이메일+비번 가입 + 이메일 인증 토큰 + 9개 엔드포인트
 - 2026-05-18 v2: **SSO-only 전환** — 이메일+비번 폐기, `email_verification_tokens` 폐기, `auth_identities` 신설, OAuth callback 흐름 + 약관 동의 분리 페이지 + 3-tuple unique (provider, provider_user_id, role) + 운영자 SSO 분리 + Apple은 M5 일정으로 분리
+- 2026-05-19 v3: **Option D 전환** — Ghost Page 발급 폐기, `TeacherProfile` 1:1 분리 모델로 대체. `ghost_page_id` 컬럼 제거. 인앱 편집 화면으로 편집 채널 이전 (웹 Custom Edit UI 제거). 운영자 첫 게시 검토 큐 추가. 상세는 [public_profile_content_spec.md](../profile/public_profile_content_spec.md), [profile_spec.md](profile_spec.md) v3.

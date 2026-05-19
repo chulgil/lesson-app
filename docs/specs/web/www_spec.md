@@ -1,6 +1,6 @@
 # www_spec — 앱 소개 사이트
 
-> 기준일: 2026-05-18
+> 기준일: 2026-05-19 (v3 — Option D 정렬)
 > 도메인: `lessonaza.app` (apex) / `www.lessonaza.app` (apex 로 301)
 > 컨테이너: `ghost-www` (Ghost 5.x + MySQL 8)
 > 선행: [README.md](README.md), `mybrain/10 Projects/레슨앱/17-www-profile-시장조사.md`, `18-www-profile-요구사항.md`
@@ -104,11 +104,11 @@ services:
     volumes:
       - /var/lib/ghost-www/db:/var/lib/mysql
 
-  ghost-profile:
-    # (profile_spec.md 참조) — Traefik 라벨로 profile.lessonaza.app 라우팅
-
-  mysql-profile:
-    # (profile_spec.md 참조)
+  profile-renderer:
+    # (profile_renderer_spec.md 참조) — FastAPI + Jinja2 SSR
+    # Traefik 라벨로 profile.lessonaza.app 라우팅
+    # 백엔드 내부 API 호출 (X-Internal-API-Token + IP whitelist)
+    # 별도 DB 없음. 메모리 캐시(TTLCache 5분)만 보유
 
   backup-cron:
     image: offen/docker-volume-backup
@@ -121,15 +121,12 @@ services:
       AWS_SECRET_ACCESS_KEY: ${VULTR_OBJ_SECRET_KEY}
     volumes:
       - /var/lib/ghost-www:/backup/ghost-www:ro
-      - /var/lib/ghost-profile:/backup/ghost-profile:ro
 
 networks:
   traefiknet:
     external: true   # 호스트 단일 Traefik 인스턴스 공유 (backend 와 동일)
   www_internal:
     driver: bridge   # ghost-www ↔ mysql-www 격리
-  profile_internal:
-    driver: bridge   # ghost-profile ↔ mysql-profile 격리
 ```
 
 ### 3.4 Traefik 라우팅 (개요)
@@ -138,7 +135,7 @@ networks:
 |---|---|---|---|
 | `lessonaza.app` | `Host:lessonaza.app` | `ghost-www:2368` | Let's Encrypt 자동 (Traefik certResolver) |
 | `www.lessonaza.app` | `Host:www.lessonaza.app` + redirect middleware | (없음 — 301 to apex) | 자동 |
-| `profile.lessonaza.app` | `Host:profile.lessonaza.app` | `ghost-profile:2368` | 자동 |
+| `profile.lessonaza.app` | `Host:profile.lessonaza.app` | `profile-renderer:8000` | 자동 |
 | `api.lessonaza.app` | `Host:api.lessonaza.app` | (별도 API VPS — 같은 traefik.toml 에 정의) | 자동 |
 
 **보안 헤더 (HSTS/CSP/X-Frame-Options 등)** 는 호스트 Traefik 의 글로벌 `headers` middleware 에서 일괄 적용. 컨테이너 라벨로 override 가능.
@@ -218,8 +215,8 @@ lessonaza.app
 1. SSO 버튼 클릭 → IdP 동의 화면
 2. IdP 콜백 → 백엔드가 `signup_session_token` 발급 (이메일 검증은 IdP가 완료)
 3. `/signup/complete?role=teacher` 페이지: 표시 이름(prefilled) + slug 선점 + 분야 태그 + 약관 동의
-4. `POST /auth/signup/complete` → User + Teacher + Ghost Page 자동 생성 (status="published")
-5. Custom Edit UI 진입 → 프로필 편집 → 외부 공유 (카카오톡/SNS)
+4. `POST /auth/signup/complete` → User + Teacher + TeacherProfile 자동 초기화 (status="draft")
+5. lesson-app 인앱 편집 화면 진입 → 작성 → 운영자 첫 검토 통과 → 외부 공유 (카카오톡/SNS)
 
 **비채택**:
 - ~~운영자 검토 큐 (recruitment_applications 테이블)~~ — 모든 가입자는 즉시 활성화
@@ -350,7 +347,7 @@ lessonaza.app
 
 확정 (2026-05-18 v2):
 - [x] 선생님 모집 폼 — 폐기. `/teachers` 는 가입 1차 채널 ([signup_spec](signup_spec.md), [slug_lifecycle_spec](../user/slug_lifecycle_spec.md))
-- [x] 권한 격리 — Option B (Custom Edit UI + Ghost Admin API 백엔드 프록시) — [profile_spec §3.3](profile_spec.md)
+- [x] 권한 격리 — Option D (백엔드 직접 렌더링 + TeacherProfile SSOT + profile-renderer 컨테이너) — [profile_spec §3](profile_spec.md)
 
 미정:
 - [ ] 테마 저장소 — lesson-app monorepo vs 별도 리포지토리
@@ -361,3 +358,4 @@ lessonaza.app
 
 - 2026-05-18: 초안 (Ghost self-host Docker 분리 전략 확정)
 - 2026-05-18 (v2): 선생님 모집 폼 폐기 → `/teachers` 가입 1차 채널로 전환. [signup_spec.md](signup_spec.md) 신설.
+- 2026-05-19 (v3): Option D 채택 — `ghost-profile` / `mysql-profile` 컨테이너 제거, `profile-renderer` (FastAPI + Jinja2 SSR) 추가. TeacherProfile 1:1 분리 모델 적용 ([profile_spec.md](profile_spec.md)).

@@ -1,6 +1,6 @@
 # Backend Architecture Guardrails (Backend)
 
-> 기준일: 2026-05-18
+> 기준일: 2026-05-19
 
 ## 배포 토폴로지 / 도메인 매트릭스
 
@@ -10,11 +10,13 @@
 | `api-beta.lessonaza.app` | 백엔드 API (검증) | beta VPS | beta | prod 동일 토폴로지, 시드 데이터 포함 |
 | `lessonaza.app` | 앱 소개 사이트 (www) | web VPS | production | Ghost 5.x (Docker, `ghost-www` 컨테이너) |
 | `www.lessonaza.app` | apex 리다이렉트 | web VPS | production | Traefik redirect middleware → `lessonaza.app` 301 |
-| `profile.lessonaza.app` | 선생님 프로필 사이트 | web VPS | production | Ghost 5.x (Docker, `ghost-profile` 컨테이너) — `lessonaza.app` 와 별도 인스턴스 |
+| `profile.lessonaza.app` | 선생님 프로필 렌더러 | web VPS | production | **`profile-renderer`** 컨테이너 (FastAPI + Jinja2) — 백엔드 내부 API 를 호출해 SSR. Ghost 의존 없음 |
 
 **호스트 분리 원칙**: API 와 웹(www/profile) 은 **물리적으로 다른 VPS** 에 배포한다. 웹 사이트 트래픽/장애가 API 에 전파되지 않도록 격리한다.
 
-**Docker 컨테이너 분리**: web VPS 내부에서 `ghost-www` 와 `ghost-profile` 은 **별도 컨테이너 + 별도 MySQL 인스턴스** 로 분리한다. 사이트 한 쪽 장애가 다른 쪽에 영향을 주지 않도록 한다. **Traefik** (외부 `traefiknet` 네트워크, backend `api.lessonaza.app` 와 단일 인스턴스 공유) 이 도메인별 라우팅과 TLS 자동 갱신(Let's Encrypt) 을 담당한다.
+**Docker 컨테이너 분리**: web VPS 내부에서 `ghost-www` 와 `profile-renderer` 는 **별도 컨테이너** 로 분리한다. www 의 Ghost/MySQL 장애가 프로필 페이지에 전파되지 않도록 한다. **Traefik** (외부 `traefiknet` 네트워크, backend `api.lessonaza.app` 와 단일 인스턴스 공유) 이 도메인별 라우팅과 TLS 자동 갱신(Let's Encrypt) 을 담당한다.
+
+**Option D (2026-05-19 전환)**: 선생님 프로필은 별도 Ghost 인스턴스(`ghost-profile` + `mysql-profile`)를 운영하지 않고, 백엔드가 보유한 `TeacherProfile` 콘텐츠를 `profile-renderer` 가 SSR 한다. 상세: [profile_renderer_spec.md](../web/profile_renderer_spec.md), [public_profile_content_spec.md](../profile/public_profile_content_spec.md).
 
 상세 토폴로지·운영 정책: `docs/specs/web/README.md`, `docs/specs/web/www_spec.md`, `docs/specs/web/profile_spec.md`.
 
@@ -96,17 +98,35 @@
 
 운영자 SSO 는 **별도 IdP 키** + `admin.lessonaza.app` 서브도메인 + Google Workspace 도메인 제한 (`@lessonaza.app`) + 2FA. 일반 사용자 SSO 풀과 분리.
 
-### 선생님 본인 프로필 (Option B — Custom Edit UI + Ghost Admin API 백엔드 프록시)
+### 선생님 본인 프로필 (Option D — Custom Edit UI + TeacherProfile SSOT)
 
 | Method | Path | 책임 |
 |---|---|---|
-| GET | `/api/v1/teachers/me/profile` | 본인 Ghost Page 데이터 + Teacher 매핑 조회 |
-| PUT | `/api/v1/teachers/me/profile` | 본인 Ghost Page 수정 (백엔드가 ghost_page_id 강제 셋) |
-| POST | `/api/v1/teachers/me/profile/publish` | draft → published 전환 |
+| GET | `/api/v1/teachers/me/profile` | 본인 `TeacherProfile` 조회 (draft 포함) |
+| PUT | `/api/v1/teachers/me/profile` | 본인 `TeacherProfile` 부분 수정 (검증 화이트리스트) |
+| POST | `/api/v1/teachers/me/profile/publish` | `draft → review` (첫 게시 시 운영자 검토 큐) 또는 `draft → public` (재게시) |
+| POST | `/api/v1/teachers/me/profile/unpublish` | `public → draft` (본인 비공개) |
 | POST | `/api/v1/teachers/me/profile/images` | 이미지 업로드 (Vultr Object Storage, S3 호환) |
-| POST | `/api/v1/teachers/me/profile/preview` | 게시 전 미리보기 토큰 발급 |
+| DELETE | `/api/v1/teachers/me/profile/images/{image_id}` | 갤러리 이미지 삭제 |
+| POST | `/api/v1/teachers/me/profile/preview` | 게시 전 미리보기 토큰 (profile-renderer 가 검증) |
 | GET | `/api/v1/teachers/me/profile/slug/check?slug=...` | slug 가용성 확인 (형식/예약어/cooldown) |
 | PUT | `/api/v1/teachers/me/profile/slug` | slug 변경 (Year 1: 가입 후 60일 내 1회만) |
+
+### 운영자 프로필 검토 큐
+
+| Method | Path | 책임 |
+|---|---|---|
+| GET | `/api/v1/admin/profile-reviews?state=pending` | 검토 대기 목록 |
+| POST | `/api/v1/admin/profile-reviews/{teacher_id}/approve` | `status=public` 전환 + AuditLog |
+| POST | `/api/v1/admin/profile-reviews/{teacher_id}/reject` | `status=draft` 복귀 + `review_notes` + 이메일 |
+
+### 내부 (profile-renderer 전용)
+
+| Method | Path | 책임 |
+|---|---|---|
+| GET | `/api/v1/internal/teachers/by-slug/{slug}` | profile-renderer SSR 용 (X-Internal-API-Token + IP 화이트리스트 이중 보호) |
+
+상세: [public_profile_content_spec.md](../profile/public_profile_content_spec.md), [profile_renderer_spec.md](../web/profile_renderer_spec.md).
 
 ### 운영자 slug 관리
 
@@ -120,17 +140,18 @@
 
 ```python
 class Teacher(Base):
-    # 기존 ...
-    # 프로필 매핑 (Ghost SSOT)
+    # 기존 ... (인증/매칭 SSOT — display_name, instruments 등은 그대로)
+    # 프로필 매핑 (slug 정책 SSOT)
     profile_slug = Column(String(30), unique=True, nullable=True)
-    ghost_page_id = Column(String(50), unique=True, nullable=True)
     profile_url = Column(String(500), nullable=True)
-    profile_visibility = Column(String(20), default="draft")  # draft|public|members|dormant
+    profile_visibility = Column(String(20), default="draft")  # draft|public|dormant
     # 휴면 트래킹 (slug_lifecycle_spec)
     dormant_notice_6m_at = Column(DateTime, nullable=True)
     dormant_notice_9m_at = Column(DateTime, nullable=True)
     dormant_entered_at = Column(DateTime, nullable=True)
     slug_released_at = Column(DateTime, nullable=True)
+    # 공개 콘텐츠는 1:1 분리된 TeacherProfile 모델로 이전 (public_profile_content_spec)
+    # ghost_page_id 컬럼은 Option D 전환으로 제거됨
 ```
 
 ### User 모델 확장 필드 (M4)
@@ -155,15 +176,16 @@ class User(Base):
 - `terms_versions` — 약관/개인정보 동의 증거 (버전 + IP + UA)
 - `slug_history` — slug 선점/회수 이력 (cooldown 추적)
 - `slug_reserved_words` — 예약어 사전 (운영자 관리)
+- `teacher_profiles` — 공개 프로필 콘텐츠 (Teacher 와 1:1, `teacher_id UNIQUE`). 상세: [public_profile_content_spec.md](../profile/public_profile_content_spec.md)
 
 `email_verification_tokens` 는 **신설하지 않음** (SSO-only — IdP가 이메일 검증).
 
-### 권한 격리 원칙 (Option B)
+### 권한 격리 원칙 (Option D)
 
-- Ghost Admin API 키는 **백엔드만 보관** — 클라이언트 노출 금지
-- 모든 `/teachers/me/profile/*` 는 `Depends(require_teacher)` + `ghost_page_id = current_teacher.ghost_page_id` 강제
-- 다른 선생님 페이지 ID 조작 시도 → 403 + AuditLog 기록
-- Ghost 어드민 UI (`/ghost`) 는 운영자 전용 (선생님 노출 안 함)
+- 모든 `/teachers/me/profile/*` 는 `Depends(require_teacher)` + `teacher_id = current_user.teacher_id` 강제
+- 다른 선생님 `teacher_id` 조작 시도 → 403 + AuditLog
+- 내부 API (`/internal/teachers/by-slug/{slug}`) 는 X-Internal-API-Token + IP 화이트리스트 이중 보호 — profile-renderer 만 호출 가능
+- 운영자 검토 큐 (`/admin/profile-reviews`) 는 운영자 IdP 분리 + 2FA 필수
 
 ## 외부 저장소/캐시
 

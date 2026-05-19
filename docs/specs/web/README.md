@@ -1,6 +1,6 @@
 # Web Properties — www / profile
 
-> 기준일: 2026-05-18
+> 기준일: 2026-05-19 (v3 — Option D 정렬)
 > 옵시디언 선행 문서: `mybrain/10 Projects/레슨앱/17-www-profile-시장조사.md`, `18-www-profile-요구사항.md`
 
 Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
@@ -18,7 +18,7 @@ Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
 |---|---|---|---|
 | `lessonaza.app` (apex) | www | `ghost-www` | `lessonaza.app/ghost` |
 | `www.lessonaza.app` | → apex 리다이렉트 | (Traefik redirect middleware, 301) | - |
-| `profile.lessonaza.app` | profile | `ghost-profile` | `profile.lessonaza.app/ghost` |
+| `profile.lessonaza.app` | profile | `profile-renderer` | (어드민 없음 — lesson-app 인앱 편집) |
 | `api.lessonaza.app` | 백엔드 prod | (별도 VPS) | - |
 | `api-beta.lessonaza.app` | 백엔드 beta | (별도 VPS) | - |
 
@@ -30,27 +30,27 @@ Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
 ├─ host-level traefik (외부 traefiknet 네트워크, 단일 인스턴스)
 │  ├─ Host:lessonaza.app          → ghost-www:2368
 │  ├─ Host:www.lessonaza.app      → redirect 301 → lessonaza.app
-│  ├─ Host:profile.lessonaza.app  → ghost-profile:2368
+│  ├─ Host:profile.lessonaza.app  → profile-renderer:8000
 │  ├─ Host:api.lessonaza.app      → (별도 API VPS, 동일 Traefik 인스턴스 공유)
 │  └─ certResolver (Let's Encrypt 자동 발급/갱신)
 │
 ├─ docker compose (web 사이트 stack)
-│  ├─ ghost-www        (Ghost 5.x, traefik 라벨로 라우팅 선언)
-│  ├─ mysql-www        (MySQL 8, ghost-www 전용, 내부 네트워크)
-│  ├─ ghost-profile    (Ghost 5.x, traefik 라벨)
-│  ├─ mysql-profile    (MySQL 8, ghost-profile 전용)
-│  └─ backup-cron      (Vultr Object Storage, 매일 03:00 KST)
+│  ├─ ghost-www         (Ghost 5.x, 마케팅 사이트, traefik 라벨)
+│  ├─ mysql-www         (MySQL 8, ghost-www 전용, 내부 네트워크)
+│  ├─ profile-renderer  (FastAPI + Jinja2 SSR, 별도 DB 없음, 메모리 캐시 TTL 5분)
+│  └─ backup-cron       (Vultr Object Storage, 매일 03:00 KST)
 │
 └─ volumes
-   ├─ /var/lib/ghost-www/{content,db}
-   └─ /var/lib/ghost-profile/{content,db}
+   └─ /var/lib/ghost-www/{content,db}
+   (profile-renderer 는 stateless — 콘텐츠는 api.lessonaza.app PostgreSQL teacher_profiles)
 ```
 
-**핵심 격리 원칙**:
-- `ghost-www` 와 `ghost-profile` 은 컨테이너 + DB 인스턴스 분리
-- 어드민 계정/권한 모델 분리 (운영자 vs 선생님)
-- 백업 디렉토리 분리 (`/backup/www/`, `/backup/profile/`)
-- 한 쪽 장애가 다른 쪽 가용성에 영향 주지 않음
+**핵심 격리 원칙** (v3 — Option D):
+- `ghost-www` 는 마케팅 사이트 전용 (운영자만 어드민 접근)
+- `profile-renderer` 는 선생님 콘텐츠 렌더링 전용 — 어드민 노출 없음, lesson-app 인앱 편집만
+- 선생님 콘텐츠 SSOT 는 backend PostgreSQL `teacher_profiles` (api.lessonaza.app)
+- renderer ↔ backend 호출은 `X-Internal-API-Token` + IP whitelist 이중 인증
+- 한 쪽 장애가 다른 쪽 가용성에 영향 주지 않음 (renderer 가 죽어도 마케팅/앱은 정상)
 
 ## 디자인 시스템 적용
 
@@ -77,11 +77,13 @@ Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
 
 | 백엔드 변경 | 위치 | 마일스톤 |
 |---|---|---|
+| `TeacherProfile` 1:1 분리 테이블 + 9개 내부 API | `backend/app/models/teacher_profile.py`, `backend/app/api/internal/` | M4 |
 | `Teacher.profile_url` 컬럼 추가 (nullable, 절대 URL) | `backend/app/models/teacher.py` | M4 |
 | 약관/개인정보 화면 → WebView (`WWW_BASE_URL/terms`) | `frontend/lib/features/legal/` | M4 |
-| Universal Link / App Link — `profile.lessonaza.app/*` | iOS `apple-app-site-association`, Android `assetlinks.json` | M4 |
-| 선생님 모집 폼 수신 엔드포인트 (선택) | `POST /api/v1/recruitment/applications` | M2 (선택) |
+| Universal Link / App Link — `profile.lessonaza.app/*` (profile-renderer 가 `.well-known/*` 직접 서빙) | iOS `apple-app-site-association`, Android `assetlinks.json` | M4 |
+| 인앱 프로필 편집 화면 (Markdown bio + 갤러리 + 영상 embed) | `frontend/lib/features/profile/edit/` | M4.9 |
 
 ## 변경 이력
 
 - 2026-05-18: 초안 작성 (Ghost self-host Docker 분리 전략 확정)
+- 2026-05-19 (v3): Option D 채택 — `ghost-profile` / `mysql-profile` 제거, `profile-renderer` (FastAPI + Jinja2 SSR) 추가. 선생님 콘텐츠 SSOT 는 backend PostgreSQL `teacher_profiles` 로 1:1 분리.
