@@ -180,3 +180,29 @@ class LessonSlot {
 | `schedule/presentation/providers/week_lessons_provider.dart` | 미리보기 블록 생성 로직 추가 |
 | `schedule/presentation/widgets/schedule_weekly_grid_view.dart` | `isPreview` 렌더링 분기 |
 | `schedule/presentation/widgets/alternative_time_grid.dart` | 동일 미리보기 렌더링 |
+
+---
+
+## 부록. 키보드 위 고정 액션 바 패턴
+
+> `suggest_alternative_screen.dart` 의 하단 액션 바는 `bottomNavigationBar` 슬롯에 배치된다.
+> 메모 입력 키보드가 올라와도 액션 바가 키보드 위에 고정되어, "제안 보내기" 버튼이 항상 노출되도록 한다.
+
+### 적용 위치
+
+| 화면 | 구현 |
+|------|------|
+| `suggest_alternative_screen.dart` | `Scaffold.bottomNavigationBar: _buildBottomSection()` |
+
+### 사용 규칙
+
+- 일정 비교/대안 제안처럼 **사용자 입력 + 즉시 발송** 흐름에 사용
+- 일반 페이지 네비게이션과 혼동되지 않도록, 하단 바 내부는 **단일 액션 버튼 + 보조 정보** 구조만 허용
+- 화면 본문 스크롤과 분리되어, 본문이 길어도 액션 바는 항상 노출
+- 키보드와 충돌 없음 (Flutter `Scaffold` 가 자동 inset 처리)
+
+### 금지
+
+- `bottomNavigationBar` 슬롯에 탭바 형태의 다중 메뉴 배치 (사용자가 페이지 전환으로 오인)
+- 본문 `Stack` 으로 띄운 임시 액션 바 — 키보드 위로 안 올라감
+- 액션 바 안에 입력 필드 — 입력은 본문 영역, 액션은 바에 분리
