@@ -9,12 +9,12 @@
 | `api.lessonaza.app` | 백엔드 API (운영) | prod VPS | production | FastAPI, PostgreSQL 17 |
 | `api-beta.lessonaza.app` | 백엔드 API (검증) | beta VPS | beta | prod 동일 토폴로지, 시드 데이터 포함 |
 | `lessonaza.app` | 앱 소개 사이트 (www) | web VPS | production | Ghost 5.x (Docker, `ghost-www` 컨테이너) |
-| `www.lessonaza.app` | apex 리다이렉트 | web VPS | production | Caddy 가 `lessonaza.app` 로 301 |
+| `www.lessonaza.app` | apex 리다이렉트 | web VPS | production | Traefik redirect middleware → `lessonaza.app` 301 |
 | `profile.lessonaza.app` | 선생님 프로필 사이트 | web VPS | production | Ghost 5.x (Docker, `ghost-profile` 컨테이너) — `lessonaza.app` 와 별도 인스턴스 |
 
 **호스트 분리 원칙**: API 와 웹(www/profile) 은 **물리적으로 다른 VPS** 에 배포한다. 웹 사이트 트래픽/장애가 API 에 전파되지 않도록 격리한다.
 
-**Docker 컨테이너 분리**: web VPS 내부에서 `ghost-www` 와 `ghost-profile` 은 **별도 컨테이너 + 별도 MySQL 인스턴스** 로 분리한다. 사이트 한 쪽 장애가 다른 쪽에 영향을 주지 않도록 한다. Caddy 가 도메인별 라우팅과 TLS 자동 갱신을 담당한다.
+**Docker 컨테이너 분리**: web VPS 내부에서 `ghost-www` 와 `ghost-profile` 은 **별도 컨테이너 + 별도 MySQL 인스턴스** 로 분리한다. 사이트 한 쪽 장애가 다른 쪽에 영향을 주지 않도록 한다. **Traefik** (외부 `traefiknet` 네트워크, backend `api.lessonaza.app` 와 단일 인스턴스 공유) 이 도메인별 라우팅과 TLS 자동 갱신(Let's Encrypt) 을 담당한다.
 
 상세 토폴로지·운영 정책: `docs/specs/web/README.md`, `docs/specs/web/www_spec.md`, `docs/specs/web/profile_spec.md`.
 

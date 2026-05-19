@@ -17,7 +17,7 @@ Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
 | 도메인 | 사이트 | 컨테이너 | 어드민 경로 |
 |---|---|---|---|
 | `lessonaza.app` (apex) | www | `ghost-www` | `lessonaza.app/ghost` |
-| `www.lessonaza.app` | → apex 리다이렉트 | (Caddy 301) | - |
+| `www.lessonaza.app` | → apex 리다이렉트 | (Traefik redirect middleware, 301) | - |
 | `profile.lessonaza.app` | profile | `ghost-profile` | `profile.lessonaza.app/ghost` |
 | `api.lessonaza.app` | 백엔드 prod | (별도 VPS) | - |
 | `api-beta.lessonaza.app` | 백엔드 beta | (별도 VPS) | - |
@@ -27,16 +27,19 @@ Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
 ```
 신규 VPS (Ubuntu 22.04, 2vCPU/2GB, 40GB SSD)
 │
-├─ docker compose
-│  ├─ caddy            (reverse proxy, TLS 자동 갱신, 도메인 라우팅)
-│  │  ├─ lessonaza.app          → ghost-www:2368
-│  │  ├─ www.lessonaza.app      → 301 lessonaza.app
-│  │  └─ profile.lessonaza.app  → ghost-profile:2368
-│  ├─ ghost-www        (Ghost 5.x)
-│  ├─ mysql-www        (MySQL 8, ghost-www 전용)
-│  ├─ ghost-profile    (Ghost 5.x)
+├─ host-level traefik (외부 traefiknet 네트워크, 단일 인스턴스)
+│  ├─ Host:lessonaza.app          → ghost-www:2368
+│  ├─ Host:www.lessonaza.app      → redirect 301 → lessonaza.app
+│  ├─ Host:profile.lessonaza.app  → ghost-profile:2368
+│  ├─ Host:api.lessonaza.app      → (별도 API VPS, 동일 Traefik 인스턴스 공유)
+│  └─ certResolver (Let's Encrypt 자동 발급/갱신)
+│
+├─ docker compose (web 사이트 stack)
+│  ├─ ghost-www        (Ghost 5.x, traefik 라벨로 라우팅 선언)
+│  ├─ mysql-www        (MySQL 8, ghost-www 전용, 내부 네트워크)
+│  ├─ ghost-profile    (Ghost 5.x, traefik 라벨)
 │  ├─ mysql-profile    (MySQL 8, ghost-profile 전용)
-│  └─ backup-cron      (rclone → Backblaze B2, 매일 03:00 KST)
+│  └─ backup-cron      (Vultr Object Storage, 매일 03:00 KST)
 │
 └─ volumes
    ├─ /var/lib/ghost-www/{content,db}
@@ -61,14 +64,14 @@ Lessonaza 의 두 공개 웹 사이트 스펙을 모은 디렉토리.
 
 ## 보안 / 운영
 
-- TLS: Caddy 자동 발급/갱신 (Let's Encrypt)
+- TLS: Traefik certResolver 자동 발급/갱신 (Let's Encrypt, backend 와 동일 인스턴스 공유)
 - 어드민 2FA 필수
 - 백업: 매일 → Vultr Object Storage (S3 호환, 30일 보관), 주 1회 자동 복원 테스트
 - 메일: Gmail SMTP (`lessonaza@gmail.com` + App Password, 500/일 한도, 트랜잭션 메일 전용)
 - Analytics: GA4 (쿠키 동의 배너 필수)
 - 모니터링: Uptime Kuma (self-host) + Slack 알림
 - 보안 패치: Watchtower 또는 매주 수동 `docker compose pull && up -d`
-- 로그 보관: 90일 (Caddy access log + Ghost log)
+- 로그 보관: 90일 (Traefik access log + Ghost log)
 
 ## lesson-app 백엔드와의 계약
 

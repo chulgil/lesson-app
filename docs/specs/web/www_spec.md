@@ -50,17 +50,10 @@ CNAME api-beta.lessonaza.app  → (별도 API VPS DNS)
 
 ### 3.3 docker-compose.yml (개요)
 
+> Reverse proxy 는 **외부 Traefik** (`traefiknet` 외부 네트워크) 을 사용한다. backend (`api.lessonaza.app`) 와 동일한 Traefik 인스턴스를 공유하며, 컨테이너는 `traefik.*` 라벨로 라우팅을 선언한다.
+
 ```yaml
 services:
-  caddy:
-    image: caddy:2-alpine
-    ports: ["80:80", "443:443"]
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on: [ghost-www, ghost-profile]
-
   ghost-www:
     image: ghost:5-alpine
     environment:
@@ -79,7 +72,26 @@ services:
       mail__from: '"Lessonaza" <lessonaza@gmail.com>'
     volumes:
       - /var/lib/ghost-www/content:/var/lib/ghost/content
+    networks: [traefiknet, www_internal]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=ghost-www"
+      - "traefik.docker.network=traefiknet"
+      - "traefik.frontend.rule=Host:lessonaza.app"
+      - "traefik.port=2368"
     depends_on: [mysql-www]
+
+  www-apex-redirect:
+    image: traefik/whoami  # 빈 백엔드 — Traefik redirect middleware 만 사용
+    networks: [traefiknet]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=www-apex-redirect"
+      - "traefik.docker.network=traefiknet"
+      - "traefik.frontend.rule=Host:www.lessonaza.app"
+      - "traefik.frontend.redirect.regex=^https?://www\\.lessonaza\\.app/(.*)$$"
+      - "traefik.frontend.redirect.replacement=https://lessonaza.app/$$1"
+      - "traefik.frontend.redirect.permanent=true"
 
   mysql-www:
     image: mysql:8
@@ -88,11 +100,12 @@ services:
       MYSQL_DATABASE: ghost_www
       MYSQL_USER: ghost
       MYSQL_PASSWORD: ${WWW_DB_PASSWORD}
+    networks: [www_internal]
     volumes:
       - /var/lib/ghost-www/db:/var/lib/mysql
 
   ghost-profile:
-    # (profile_spec.md 참조)
+    # (profile_spec.md 참조) — Traefik 라벨로 profile.lessonaza.app 라우팅
 
   mysql-profile:
     # (profile_spec.md 참조)
@@ -110,31 +123,25 @@ services:
       - /var/lib/ghost-www:/backup/ghost-www:ro
       - /var/lib/ghost-profile:/backup/ghost-profile:ro
 
-volumes:
-  caddy-data:
-  caddy-config:
+networks:
+  traefiknet:
+    external: true   # 호스트 단일 Traefik 인스턴스 공유 (backend 와 동일)
+  www_internal:
+    driver: bridge   # ghost-www ↔ mysql-www 격리
+  profile_internal:
+    driver: bridge   # ghost-profile ↔ mysql-profile 격리
 ```
 
-### 3.4 Caddyfile (개요)
+### 3.4 Traefik 라우팅 (개요)
 
-```
-lessonaza.app {
-    reverse_proxy ghost-www:2368
-    encode gzip zstd
-    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
-    header X-Content-Type-Options "nosniff"
-    header Referrer-Policy "strict-origin-when-cross-origin"
-}
+| Host | 라벨 (frontend.rule) | 백엔드 | TLS |
+|---|---|---|---|
+| `lessonaza.app` | `Host:lessonaza.app` | `ghost-www:2368` | Let's Encrypt 자동 (Traefik certResolver) |
+| `www.lessonaza.app` | `Host:www.lessonaza.app` + redirect middleware | (없음 — 301 to apex) | 자동 |
+| `profile.lessonaza.app` | `Host:profile.lessonaza.app` | `ghost-profile:2368` | 자동 |
+| `api.lessonaza.app` | `Host:api.lessonaza.app` | (별도 API VPS — 같은 traefik.toml 에 정의) | 자동 |
 
-www.lessonaza.app {
-    redir https://lessonaza.app{uri} 301
-}
-
-profile.lessonaza.app {
-    reverse_proxy ghost-profile:2368
-    # (profile_spec.md 참조)
-}
-```
+**보안 헤더 (HSTS/CSP/X-Frame-Options 등)** 는 호스트 Traefik 의 글로벌 `headers` middleware 에서 일괄 적용. 컨테이너 라벨로 override 가능.
 
 ## 4. 정보 구조 (IA)
 
@@ -283,7 +290,7 @@ lessonaza.app
 
 - **저장소**: 별도 Git 리포지토리 (`lesson-app-web` 또는 lesson-app submodule). 결정은 운영자 합의.
 - **배포 흐름**:
-  1. 운영자가 Git push (테마/Caddyfile 변경 시) 또는 Ghost 어드민 직접 편집 (콘텐츠 변경 시)
+  1. 운영자가 Git push (테마/Traefik 라벨 변경 시) 또는 Ghost 어드민 직접 편집 (콘텐츠 변경 시)
   2. GitHub Actions: 테마 변경 시 web VPS 로 SCP + `docker compose restart ghost-www`
   3. 콘텐츠 변경은 Ghost 어드민에서 즉시 반영 (배포 불필요)
 - **마이그레이션**: Ghost 5.x → 6.x 업그레이드 시 스테이징 컨테이너 검증 후 본 컨테이너 교체
@@ -298,12 +305,12 @@ lessonaza.app
 | 복원 테스트 | 주 1회 자동 (스테이징 컨테이너 복원 → 헬스체크 → 알림) |
 | 보안 패치 | Watchtower 자동 또는 매주 수동 (`docker compose pull && up -d`) |
 | 모니터링 | Uptime Kuma (5분 간격, /health 페이지) → Slack 알림 |
-| 로그 | Caddy access log + Ghost log, 90일 보관 |
+| 로그 | Traefik access log + Ghost log, 90일 보관 |
 
 ## 11. 보안
 
-- HSTS, CSP, X-Frame-Options, X-Content-Type-Options 헤더 (Caddy 에서 설정)
-- TLS 1.3 (Caddy 자동)
+- HSTS, CSP, X-Frame-Options, X-Content-Type-Options 헤더 (Traefik 글로벌 headers middleware 에서 설정)
+- TLS 1.3 (Traefik certResolver, Let's Encrypt 자동 발급/갱신)
 - 어드민 경로(`/ghost`) IP 화이트리스트 (선택, 운영자 IP 고정 시)
 - Ghost 어드민 2FA 필수
 - 폼 입력값 → 백엔드 API 로 전송, www DB 에 저장 금지
@@ -313,7 +320,7 @@ lessonaza.app
 
 | 단계 | 작업 | 기간 |
 |---|---|---|
-| M1.1 | VPS 셋업, Docker, Caddy, 도메인 DNS 연결 | 2일 |
+| M1.1 | VPS 셋업, Docker, Traefik 라벨/네트워크 연결, 도메인 DNS | 2일 |
 | M1.2 | ghost-www 컨테이너 + MySQL + 초기 어드민 가입 + TLS | 1일 |
 | M1.3 | Lessonaza-notebook 테마 1차 (랜딩, 기본 페이지 레이아웃) | 3일 |
 | M1.4 | 약관/개인정보/FAQ 페이지 (기존 lesson-app 콘텐츠 이관) | 2일 |

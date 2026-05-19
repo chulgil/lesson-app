@@ -72,7 +72,7 @@ ghost-profile 컨테이너 (MySQL)
 ```
 
 **격리 보증**:
-- 선생님은 `/ghost` 어드민 URL 직접 접근 불가 (테마/Caddy 차단)
+- 선생님은 `/ghost` 어드민 URL 직접 접근 불가 (테마 또는 Traefik path-prefix middleware 차단)
 - Ghost Admin API Key 는 백엔드 환경변수만 보관
 - 백엔드는 `current_user` JWT 에서 `teacher_id` 추출 → 본인 `ghost_page_id` 만 조작
 - 다른 페이지 ID 조작 시도 → 403 + AuditLog 기록
@@ -245,7 +245,7 @@ async def update_my_profile(
 
 - iOS: `apple-app-site-association` 파일을 `profile.lessonaza.app/.well-known/apple-app-site-association` 에 호스팅
 - Android: `assetlinks.json` 을 `profile.lessonaza.app/.well-known/assetlinks.json` 에 호스팅
-- Caddy 설정: `.well-known/` 디렉토리를 정적 파일로 서빙 (Ghost 라우팅 우회)
+- Traefik 라우팅: `PathPrefix:/.well-known` 매처를 정적 파일 컨테이너 (예: `nginx:alpine` with `/.well-known` mount) 로 보내 Ghost 라우팅 우회. priority 를 높여 ghost 라우터보다 먼저 매치되도록 한다.
 - 앱 미설치 시: Ghost 페이지 노출 + 스토어 CTA
 - 앱 설치 시: 앱 열기 + slug 또는 teacher_code 로 자동 검색
 
@@ -329,7 +329,7 @@ class TeacherProfileContent(Base):
 1. Ghost Content API 로 모든 페이지 export → JSON
 2. 백엔드 `TeacherProfileContent` 로 매핑 import
 3. Astro 정적 사이트 빌드 + 배포
-4. DNS 전환 (Caddy → 새 호스트 또는 동일 호스트 Astro 컨테이너)
+4. 트래픽 전환 (Traefik 라벨 교체 → 새 호스트 또는 동일 호스트 Astro 컨테이너)
 5. ghost-profile 컨테이너 30일 보관 (롤백 대비) 후 폐기
 
 ## 11. 마일스톤 (M3 + M4 일부)
@@ -344,14 +344,14 @@ class TeacherProfileContent(Base):
 | **M3 종료** | **3명 선생님 페이지 운영** | **2주** |
 | M4.1 | 백엔드 `Teacher.profile_url` 컬럼 + Alembic 마이그레이션 | 1일 |
 | M4.2 | 앱 내 "공식 프로필" 버튼 + WebView | 2일 |
-| M4.3 | Deep Link (Universal Link / App Link) + `.well-known` Caddy 설정 | 3일 |
+| M4.3 | Deep Link (Universal Link / App Link) + `.well-known` Traefik path-prefix 라우팅 | 3일 |
 | M4.4 | 선생님 코드 클립보드 자동 입력 (앱 가입 화면) | 2일 |
 | M4.5 | E2E 검증 (외부 링크 클릭 → 앱 설치 → 매칭) | 2일 |
 | **M4 종료** | **lesson-app 통합 완료** | **+2주 = 누적 4주** |
 
 ## 12. 보안
 
-- TLS 1.3, HSTS, CSP (Caddy)
+- TLS 1.3, HSTS, CSP (Traefik 글로벌 headers middleware, Let's Encrypt 자동 갱신)
 - 어드민 2FA 필수
 - 어드민 경로 (`/ghost`) → 본문 페이지에서 노출 안 함 (테마에서 nav 제외)
 - 가입은 SSO 전용 (구글/카카오, M4) — 이메일 인증 토큰 미발급 (IdP가 검증). 상세: [signup_spec.md](signup_spec.md)
