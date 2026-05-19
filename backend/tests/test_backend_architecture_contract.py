@@ -229,3 +229,11 @@ def test_app_lifespan_runs_runtime_configuration_validation() -> None:
     source = inspect.getsource(app_main.lifespan)
 
     assert "validate_runtime_configuration()" in source
+
+
+def test_docker_runtime_uses_locked_uv_dependencies() -> None:
+    """Runtime image must not resync to newer dependency versions at container start."""
+    dockerfile = (BACKEND_ROOT / "Dockerfile").read_text()
+
+    assert "COPY --from=builder /app/uv.lock /app/uv.lock" in dockerfile
+    assert '"--locked"' in dockerfile
