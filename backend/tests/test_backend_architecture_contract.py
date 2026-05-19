@@ -237,3 +237,10 @@ def test_docker_runtime_uses_locked_uv_dependencies() -> None:
 
     assert "COPY --from=builder /app/uv.lock /app/uv.lock" in dockerfile
     assert '"--locked"' in dockerfile
+
+
+def test_student_create_routes_use_runtime_annotations_for_openapi() -> None:
+    """StudentCreate request bodies must be concrete types for Python 3.12 OpenAPI generation."""
+    for route_file in (API_V1_ROOT / "students.py", API_V1_ROOT / "teachers.py"):
+        source = route_file.read_text()
+        assert "from __future__ import annotations" not in source

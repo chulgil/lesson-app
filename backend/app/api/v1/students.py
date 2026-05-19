@@ -1,20 +1,22 @@
 """Student endpoints."""
 
-from __future__ import annotations
-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_student, get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
-from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentSummaryResponse, StudentUpdate
+from app.schemas.student import (
+    StudentCreate,
+    StudentResponse,
+    StudentStatsResponse,
+    StudentSummaryResponse,
+    StudentUpdate,
+)
 from app.services.student_service import StudentService
-
 
 # ---------------------------------------------------------------------------
 # Student self-profile schema
