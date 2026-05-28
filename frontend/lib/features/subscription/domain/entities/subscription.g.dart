@@ -56,6 +56,9 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
           (json['bonus_reschedule_count'] as num?)?.toInt() ?? 0,
       overrideCancelDeadlineHours:
           (json['override_cancel_deadline_hours'] as num?)?.toInt(),
+      ownership: $enumDecodeNullable(
+          _$SubscriptionOwnershipEnumMap, json['ownership']),
+      academyId: json['academy_id'] as String?,
     );
 
 Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
@@ -92,6 +95,8 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'reschedule_deadline_hours': instance.rescheduleDeadlineHours,
       'bonus_reschedule_count': instance.bonusRescheduleCount,
       'override_cancel_deadline_hours': instance.overrideCancelDeadlineHours,
+      'ownership': _$SubscriptionOwnershipEnumMap[instance.ownership],
+      'academy_id': instance.academyId,
     };
 
 const _$SubscriptionTypeEnumMap = {
@@ -124,4 +129,9 @@ const _$SubscriptionPaymentMethodEnumMap = {
   SubscriptionPaymentMethod.bankTransfer: 'bankTransfer',
   SubscriptionPaymentMethod.card: 'card',
   SubscriptionPaymentMethod.other: 'other',
+};
+
+const _$SubscriptionOwnershipEnumMap = {
+  SubscriptionOwnership.academy: 'academy',
+  SubscriptionOwnership.teacher: 'teacher',
 };

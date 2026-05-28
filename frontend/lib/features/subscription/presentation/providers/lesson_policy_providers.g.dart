@@ -486,5 +486,178 @@ class _EffectivePolicyProviderElement
   String? get lessonClassId =>
       (origin as EffectivePolicyProvider).lessonClassId;
 }
+
+String _$academySubscriptionPolicyPrefillHash() =>
+    r'c43eb191e7ba350a34d9f3569422818b1ad43faf';
+
+/// Provider for academy subscription policy prefill.
+/// Returns 5 policy variables for read-only display when ownership=academy.
+///
+/// Copied from [academySubscriptionPolicyPrefill].
+@ProviderFor(academySubscriptionPolicyPrefill)
+const academySubscriptionPolicyPrefillProvider =
+    AcademySubscriptionPolicyPrefillFamily();
+
+/// Provider for academy subscription policy prefill.
+/// Returns 5 policy variables for read-only display when ownership=academy.
+///
+/// Copied from [academySubscriptionPolicyPrefill].
+class AcademySubscriptionPolicyPrefillFamily
+    extends Family<AsyncValue<Map<String, dynamic>>> {
+  /// Provider for academy subscription policy prefill.
+  /// Returns 5 policy variables for read-only display when ownership=academy.
+  ///
+  /// Copied from [academySubscriptionPolicyPrefill].
+  const AcademySubscriptionPolicyPrefillFamily();
+
+  /// Provider for academy subscription policy prefill.
+  /// Returns 5 policy variables for read-only display when ownership=academy.
+  ///
+  /// Copied from [academySubscriptionPolicyPrefill].
+  AcademySubscriptionPolicyPrefillProvider call({
+    required String teacherId,
+    String? academyId,
+  }) {
+    return AcademySubscriptionPolicyPrefillProvider(
+      teacherId: teacherId,
+      academyId: academyId,
+    );
+  }
+
+  @override
+  AcademySubscriptionPolicyPrefillProvider getProviderOverride(
+    covariant AcademySubscriptionPolicyPrefillProvider provider,
+  ) {
+    return call(
+      teacherId: provider.teacherId,
+      academyId: provider.academyId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'academySubscriptionPolicyPrefillProvider';
+}
+
+/// Provider for academy subscription policy prefill.
+/// Returns 5 policy variables for read-only display when ownership=academy.
+///
+/// Copied from [academySubscriptionPolicyPrefill].
+class AcademySubscriptionPolicyPrefillProvider
+    extends AutoDisposeFutureProvider<Map<String, dynamic>> {
+  /// Provider for academy subscription policy prefill.
+  /// Returns 5 policy variables for read-only display when ownership=academy.
+  ///
+  /// Copied from [academySubscriptionPolicyPrefill].
+  AcademySubscriptionPolicyPrefillProvider({
+    required String teacherId,
+    String? academyId,
+  }) : this._internal(
+          (ref) => academySubscriptionPolicyPrefill(
+            ref as AcademySubscriptionPolicyPrefillRef,
+            teacherId: teacherId,
+            academyId: academyId,
+          ),
+          from: academySubscriptionPolicyPrefillProvider,
+          name: r'academySubscriptionPolicyPrefillProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$academySubscriptionPolicyPrefillHash,
+          dependencies: AcademySubscriptionPolicyPrefillFamily._dependencies,
+          allTransitiveDependencies:
+              AcademySubscriptionPolicyPrefillFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+          academyId: academyId,
+        );
+
+  AcademySubscriptionPolicyPrefillProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+    required this.academyId,
+  }) : super.internal();
+
+  final String teacherId;
+  final String? academyId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Map<String, dynamic>> Function(
+            AcademySubscriptionPolicyPrefillRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AcademySubscriptionPolicyPrefillProvider._internal(
+        (ref) => create(ref as AcademySubscriptionPolicyPrefillRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+        academyId: academyId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Map<String, dynamic>> createElement() {
+    return _AcademySubscriptionPolicyPrefillProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AcademySubscriptionPolicyPrefillProvider &&
+        other.teacherId == teacherId &&
+        other.academyId == academyId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+    hash = _SystemHash.combine(hash, academyId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin AcademySubscriptionPolicyPrefillRef
+    on AutoDisposeFutureProviderRef<Map<String, dynamic>> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+
+  /// The parameter `academyId` of this provider.
+  String? get academyId;
+}
+
+class _AcademySubscriptionPolicyPrefillProviderElement
+    extends AutoDisposeFutureProviderElement<Map<String, dynamic>>
+    with AcademySubscriptionPolicyPrefillRef {
+  _AcademySubscriptionPolicyPrefillProviderElement(super.provider);
+
+  @override
+  String get teacherId =>
+      (origin as AcademySubscriptionPolicyPrefillProvider).teacherId;
+  @override
+  String? get academyId =>
+      (origin as AcademySubscriptionPolicyPrefillProvider).academyId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

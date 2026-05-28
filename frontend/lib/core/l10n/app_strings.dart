@@ -29,6 +29,9 @@ class AppStrings {
   /// 수강권
   static const subscription = '수강권';
 
+  /// 학원 발행 수강권 배지
+  static const academyIssuedBadge = '학원 발행';
+
   // ── Schedule Domain Visuals ───────────────────────────────
 
   static const lessonRequestTypeTrial = '체험레슨';
@@ -6497,6 +6500,23 @@ class AppStrings {
   static const profilePriceTableSection = '레슨 가격표';
   static const profilePriceTableHint = '예: 50000';
 
+  // ── Cancellation Defaults Settings ──
+  static const profileCancellationDefaultsTitle = '취소 정책 디폴트';
+  static const profileCancellationDefaultsSection = '취소 정책 디폴트';
+  static const profileCancellationDeadlineHours = '취소 페널티 없는 시간';
+  static const profileCancellationDeadlineHoursHint = '시간';
+  static const profileCancellationDeadlineDescription =
+      '레슨 시작 몇 시간 전까지 취소하면 페널티를 받지 않는지 설정합니다';
+  static const profileStudentCompensation = '학생 취소 시 보상 제공';
+  static const profileStudentCompensationDescription =
+      '마감 후 학생 취소 시 추가 연습시간으로 보상합니다';
+  static const profileIncludeExtraMinutesText = '취소 알림에 보상 메시지 포함';
+  static const profileCompensationMessage = '보상 메시지';
+  static const profileCompensationMessageHint = '예: 10분 보너스 연습시간을 제공해드립니다';
+  static const profileCompensationMessageDescription = '학생에게 표시할 보상 메시지를 입력하세요';
+  static const profileNotifyOwnerOnLateCancel = '마감 후 취소 시 알림 (학원 강사만)';
+  static const profileNotifyOwnerDescription = '학생이 마감 후 취소하면 강사에게 알림을 보냅니다';
+
   // ── Lesson Time Settings Widgets ──
   static const profileTimeSlotAdd = '시간대 추가';
   static const profileTimeSlotEditTitle = '시간대 수정';
@@ -6998,4 +7018,87 @@ class AppStrings {
   static const inquiryFormMessageLabel = '문의 내용';
   static const inquiryFormMessageHint = '문의 내용을 입력해주세요';
   static const inquiryFormSubmit = '문의 보내기';
+
+  // ── Note Access Requests ───────────────────────────────────
+
+  /// 노트 일시 접근 요청 화면 제목
+  static const noteAccessRequestTitle = '노트 접근 동의';
+
+  /// 학원명 라벨
+  static const academyLabel = '학원';
+
+  /// 요청 사유 라벨
+  static const requestReasonLabel = '요청 사유';
+
+  /// 동의 버튼
+  static const consentButton = '동의';
+
+  /// 거절 버튼
+  static const rejectButton = '거절';
+
+  /// 회수 버튼
+  static const revokeButton = '회수';
+
+  /// 동의 성공 메시지
+  static const consentSuccess = '노트 접근을 동의했습니다';
+
+  /// 거절 성공 메시지
+  static const rejectSuccess = '노트 접근 요청을 거절했습니다';
+
+  /// 회수 성공 메시지
+  static const revokeSuccess = '노트 접근 권한을 회수했습니다';
+
+  /// 노트 접근 권한 배너 제목
+  static const noteAccessActiveBannerTitle = '노트 접근 권한';
+
+  /// 노트 접근 권한 배너 설명 (N일 남음)
+  static String noteAccessActiveBannerDays(int days) =>
+      '학원의 노트 접근 권한이 $days일 남았습니다';
+
+  /// 노트 접근 권한 배너 설명 (마지막 날)
+  static const noteAccessActiveBannerLastDay = '학원의 노트 접근 권한이 오늘 종료됩니다';
+
+  // ── Academy Activity Timeline ──────────────────────────────
+
+  /// 학원 활동 타임라인 화면 제목
+  static const academyActivityTimeline = '학원 활동 타임라인';
+
+  /// 활동 없음 메시지
+  static const noActivityFound = '활동 기록이 없습니다';
+
+  /// 활동 로드 실패 메시지
+  static const errorLoadingActivity = '활동 기록을 불러올 수 없습니다';
+
+  /// 최근 변경됨 배지
+  static const recentlyChanged = '12시간 이내';
+
+  /// 활동 타입: 레슨 생성
+  static const activityTypeLessonCreated = '레슨 생성';
+
+  /// 활동 타입: 수강권 발급
+  static const activityTypeSubscriptionIssued = '수강권 발급';
+
+  /// 활동 타입: 학생 등록
+  static const activityTypeStudentEnrolled = '학생 등록';
+
+  /// 활동 타입: 레슨 완료
+  static const activityTypeLessonCompleted = '레슨 완료';
+
+  /// 활동 타입: 입금 확인
+  static const activityTypePaymentConfirmed = '입금 확인';
+
+  /// 활동 타입: 일정 변경
+  static const activityTypeScheduleChanged = '일정 변경';
+
+  /// 활동 타입: 노트 추가
+  static const activityTypeNoteAdded = '노트 추가';
+
+  /// 활동 타입: 레슨 요청 수락
+  static const activityTypeLessonRequestAccepted = '요청 수락';
+
+  /// 활동 타입: 보강 기록
+  static const activityTypeMakeupRecorded = '보강 기록';
+
+  /// 활동 타입: 알 수 없음
+  static const activityTypeUnknown = '활동';
 }

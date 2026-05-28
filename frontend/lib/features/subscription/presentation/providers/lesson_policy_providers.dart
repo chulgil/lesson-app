@@ -45,3 +45,33 @@ Future<LessonPolicy?> effectivePolicy(
     lessonClassId: lessonClassId,
   );
 }
+
+/// Provider for academy subscription policy prefill.
+/// Returns 5 policy variables for read-only display when ownership=academy.
+@riverpod
+Future<Map<String, dynamic>> academySubscriptionPolicyPrefill(
+  Ref ref, {
+  required String teacherId,
+  String? academyId,
+}) async {
+  final repository = ref.watch(lessonPolicyRepositoryProvider);
+  final policy = await repository.getTeacherPolicy(teacherId);
+
+  if (policy == null) {
+    return {
+      'cancellation_deadline_hours': 12,
+      'student_compensation_extra_minutes_enabled': true,
+      'include_extra_minutes_text_on_late_cancel': true,
+      'student_compensation_extra_minutes_message': null,
+      'notify_owner_on_late_cancel': true,
+    };
+  }
+
+  return {
+    'cancellation_deadline_hours': policy.minCancelHours,
+    'student_compensation_extra_minutes_enabled': true,
+    'include_extra_minutes_text_on_late_cancel': true,
+    'student_compensation_extra_minutes_message': null,
+    'notify_owner_on_late_cancel': true,
+  };
+}
