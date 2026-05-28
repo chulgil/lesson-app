@@ -179,4 +179,7 @@ class AppRoutes {
   static const academyAnnouncements = '/academy/:academyId/announcements';
   static const academyAnnouncementDetail =
       '/academy/:academyId/announcements/:announcementId';
+  static const academyInquiries = '/academy/:academyId/inquiries';
+  static const academyInquiryDetail =
+      '/academy/:academyId/inquiries/:inquiryId';
 }

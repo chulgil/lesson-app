@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/academy/domain/entities/academy_announcement.dart';
+import '../../../features/academy/domain/entities/academy_inquiry.dart';
+import '../../../features/inbox/presentation/screens/academy_inquiry_detail_screen.dart';
+import '../../../features/inbox/presentation/screens/academy_inquiry_screen.dart';
 import '../../../features/notifications/presentation/screens/academy_announcement_detail_screen.dart';
 import '../../../features/notifications/presentation/screens/academy_announcements_screen.dart';
 import '../../../features/notifications/presentation/screens/notification_list_screen.dart';
@@ -37,6 +40,30 @@ List<GoRoute> notificationRoutes = [
         return const Scaffold(body: Center(child: Text('공지사항을 불러올 수 없습니다.')));
       }
       return AcademyAnnouncementDetailScreen(announcement: announcement);
+    },
+  ),
+
+  // Academy Inquiries List (G19/#400)
+  GoRoute(
+    path: AppRoutes.academyInquiries,
+    name: 'academyInquiries',
+    builder: (context, state) {
+      final academyId = state.pathParameters['academyId'] ?? '';
+      return AcademyInquiryScreen(academyId: academyId);
+    },
+  ),
+
+  // Academy Inquiry Detail (G19/#400)
+  GoRoute(
+    path: AppRoutes.academyInquiryDetail,
+    name: 'academyInquiryDetail',
+    builder: (context, state) {
+      final academyId = state.pathParameters['academyId'] ?? '';
+      final inquiry = state.extra;
+      if (inquiry is! AcademyInquiry) {
+        return const Scaffold(body: Center(child: Text('문의를 불러올 수 없습니다.')));
+      }
+      return AcademyInquiryDetailScreen(inquiry: inquiry, academyId: academyId);
     },
   ),
 ];
