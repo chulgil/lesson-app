@@ -713,3 +713,164 @@ class ProfilePreviewContent extends StatelessWidget {
     );
   }
 }
+
+/// Academy public page visibility toggles
+class AcademyVisibilitySection extends StatefulWidget {
+  final List<AcademyVisibilityItem> academies;
+  final Function(String academyId, bool consent) onToggle;
+  final bool isLoading;
+
+  const AcademyVisibilitySection({
+    super.key,
+    required this.academies,
+    required this.onToggle,
+    this.isLoading = false,
+  });
+
+  @override
+  State<AcademyVisibilitySection> createState() =>
+      _AcademyVisibilitySectionState();
+}
+
+class _AcademyVisibilitySectionState extends State<AcademyVisibilitySection> {
+  late Map<String, bool> _localState;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeLocalState();
+  }
+
+  void _initializeLocalState() {
+    _localState = {
+      for (final academy in widget.academies)
+        academy.academyId: academy.consent,
+    };
+  }
+
+  @override
+  void didUpdateWidget(AcademyVisibilitySection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.academies != widget.academies) {
+      _initializeLocalState();
+    }
+  }
+
+  void _handleToggle(String academyId, bool newValue) {
+    setState(() {
+      _localState[academyId] = newValue;
+    });
+    widget.onToggle(academyId, newValue);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.academies.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: AppSpacing.space4),
+        const VisibilitySectionTitle(title: '학원별 공개 페이지 노출'),
+        const SizedBox(height: AppSpacing.space3),
+        Container(
+          decoration: BoxDecoration(color: AppColors.paper),
+          child: Column(
+            children: [
+              for (int i = 0; i < widget.academies.length; i++) ...[
+                _buildAcademyToggleTile(
+                  widget.academies[i],
+                  _localState[widget.academies[i].academyId] ?? false,
+                ),
+                if (i < widget.academies.length - 1)
+                  const Divider(
+                    height: 0,
+                    thickness: 0.5,
+                    color: AppColors.inkQuaternary,
+                  ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAcademyToggleTile(AcademyVisibilityItem academy, bool value) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  academy.academyName,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space1),
+                Text(
+                  '학원 공개 페이지에서 강사 정보 노출',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Switch(
+            value: value,
+            onChanged:
+                widget.isLoading
+                    ? null
+                    : (newValue) => _handleToggle(academy.academyId, newValue),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Data class for academy visibility item
+class AcademyVisibilityItem {
+  final String academyId;
+  final String academyName;
+  final bool consent;
+
+  const AcademyVisibilityItem({
+    required this.academyId,
+    required this.academyName,
+    required this.consent,
+  });
+
+  AcademyVisibilityItem copyWith({
+    String? academyId,
+    String? academyName,
+    bool? consent,
+  }) {
+    return AcademyVisibilityItem(
+      academyId: academyId ?? this.academyId,
+      academyName: academyName ?? this.academyName,
+      consent: consent ?? this.consent,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AcademyVisibilityItem &&
+          runtimeType == other.runtimeType &&
+          academyId == other.academyId &&
+          academyName == other.academyName &&
+          consent == other.consent;
+
+  @override
+  int get hashCode =>
+      academyId.hashCode ^ academyName.hashCode ^ consent.hashCode;
+}

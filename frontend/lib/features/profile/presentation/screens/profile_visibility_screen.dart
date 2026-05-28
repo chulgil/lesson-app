@@ -8,6 +8,8 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/profile_facade.dart';
+import '../../../../features/academy/domain/repositories/academy_visibility_repository.dart';
+import '../../../../features/academy/presentation/providers/academy_visibility_provider.dart';
 import '../widgets/profile_visibility_widgets.dart';
 
 /// Screen for managing profile visibility settings
@@ -81,6 +83,11 @@ class _ProfileVisibilityScreenState
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
+    final academiesAsync = ref.watch(
+      teacherAcademiesProvider(
+        ref.watch(teacherExtendedProfileProvider).valueOrNull?.userId ?? '',
+      ),
+    );
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(
@@ -98,13 +105,17 @@ class _ProfileVisibilityScreenState
               child: Text(AppStrings.profileVisibilityNullState),
             );
           }
-          return _buildContent(context, profile);
+          return _buildContent(context, profile, academiesAsync);
         },
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, TeacherProfile profile) {
+  Widget _buildContent(
+    BuildContext context,
+    TeacherProfile profile,
+    AsyncValue<List<TeacherAcademyMembership>> academiesAsync,
+  ) {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       children: [
@@ -180,6 +191,48 @@ class _ProfileVisibilityScreenState
           onChanged:
               (v) =>
                   _updateSettings(_settings.copyWith(certificateVisibility: v)),
+        ),
+
+        const SizedBox(height: AppSpacing.space4),
+
+        // Academy visibility section (only if teacher has academy affiliations)
+        academiesAsync.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+          data: (academies) {
+            if (academies.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return AcademyVisibilitySection(
+              academies:
+                  academies
+                      .map(
+                        (a) => AcademyVisibilityItem(
+                          academyId: a.academyId,
+                          academyName: a.academyName,
+                          consent: a.publicPageConsent,
+                        ),
+                      )
+                      .toList(),
+              onToggle: (academyId, consent) async {
+                final notifierState = ref.read(
+                  academyVisibilityNotifierProvider,
+                );
+                if (notifierState is! AsyncValue) return;
+                // Call the update via the provider itself
+                // For this, we'll use a simpler approach: just call the repository
+                final repo = ref.read(academyVisibilityRepositoryProvider);
+                await repo.updateTeacherAcademyConsent(
+                  academyId,
+                  profile.userId,
+                  consent,
+                );
+                // Invalidate the academies list to refresh
+                ref.invalidate(teacherAcademiesProvider(profile.userId));
+              },
+              isLoading: false,
+            );
+          },
         ),
 
         const SizedBox(height: AppSpacing.space4),
