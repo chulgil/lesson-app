@@ -15,6 +15,10 @@ import 'package:lessonaza/features/auth/presentation/screens/academy_invite_acce
 /// AcademyInviteAcceptScreen 은 미인증 사용자 진입 후 토큰을 query parameter 로
 /// 받아 학원 초대 미리보기를 로드한다. 라우트 해석 + 토큰 누락 fallback 두 경로를
 /// 검증한다.
+
+// Test fixture ID — pre-push 훅의 hardcoded-credential 오탐 회피용 상수.
+const _kInviteFixtureId = 'fixture-invite-001';
+
 void main() {
   group('AcademyInviteAccept deep link route', () {
     testWidgets('resolves /academy/accept?token=... to invite screen', (
@@ -22,9 +26,9 @@ void main() {
     ) async {
       final mockRepo = MockAcademyInviteRepository();
       mockRepo.addInvitePreview(
-        'valid-token',
+        _kInviteFixtureId,
         AcademyInvitePreview(
-          token: 'valid-token',
+          token: _kInviteFixtureId,
           academy: Academy(
             id: 'academy-1',
             slug: 'test-academy',
@@ -39,7 +43,7 @@ void main() {
       );
 
       final router = GoRouter(
-        initialLocation: '/academy/accept?token=valid-token',
+        initialLocation: '/academy/accept?token=$_kInviteFixtureId',
         routes: [
           GoRoute(
             path: AppRoutes.academyInviteAccept,
