@@ -81,16 +81,16 @@ class TeacherSearchFilter {
   }
 
   TeacherSearchFilter clearKeyword() => TeacherSearchFilter(
-        instruments: instruments,
-        areas: areas,
-        lessonTypes: lessonTypes,
-        minFee: minFee,
-        maxFee: maxFee,
-        minExperience: minExperience,
-        hasVerifiedCertificate: hasVerifiedCertificate,
-        minCompletionLevel: minCompletionLevel,
-        teacherType: teacherType,
-      );
+    instruments: instruments,
+    areas: areas,
+    lessonTypes: lessonTypes,
+    minFee: minFee,
+    maxFee: maxFee,
+    minExperience: minExperience,
+    hasVerifiedCertificate: hasVerifiedCertificate,
+    minCompletionLevel: minCompletionLevel,
+    teacherType: teacherType,
+  );
 }
 
 /// Sort options for teacher search
@@ -148,6 +148,11 @@ class TeacherPublicProfile {
   final List<VerificationBadge> badges;
   final ProfileCompletionLevel completionLevel;
 
+  /// Academy public page consent (G5/W3).
+  /// 학원 공개 페이지에 노출 동의 여부. 개인 강사(isIndividual)는 무관.
+  /// AcademyMember.publicPageConsent 와 1:1 매핑.
+  final bool publicPageConsent;
+
   /// Check if this is an academy teacher
   bool get isAcademy => organizationId != null;
 
@@ -171,36 +176,45 @@ class TeacherPublicProfile {
     this.verifiedCertificates = const [],
     this.badges = const [],
     required this.completionLevel,
+    this.publicPageConsent = false,
   });
 
   /// Create from TeacherProfile applying visibility settings
-  factory TeacherPublicProfile.fromProfile(TeacherProfile profile) {
+  factory TeacherPublicProfile.fromProfile(
+    TeacherProfile profile, {
+    bool publicPageConsent = false,
+  }) {
     final settings = profile.visibilitySettings;
 
     return TeacherPublicProfile(
       id: profile.id,
-      name: settings.nameVisibility == ProfileVisibility.public
-          ? profile.name
-          : null,
-      profileImage: settings.photoVisibility == ProfileVisibility.public
-          ? profile.profileImage
-          : null,
+      name:
+          settings.nameVisibility == ProfileVisibility.public
+              ? profile.name
+              : null,
+      profileImage:
+          settings.photoVisibility == ProfileVisibility.public
+              ? profile.profileImage
+              : null,
       organizationId: profile.organizationId,
       organizationName: profile.organizationName,
       instruments: profile.instruments,
       introduction: profile.introduction,
       experienceYears: profile.experienceYears,
-      feeRange: settings.feeVisibility == ProfileVisibility.public
-          ? profile.feeRange
-          : null,
+      feeRange:
+          settings.feeVisibility == ProfileVisibility.public
+              ? profile.feeRange
+              : null,
       lessonAreas: profile.lessonAreas,
       lessonTypes: profile.lessonTypes,
-      education: settings.careerVisibility == ProfileVisibility.public
-          ? profile.education
-          : null,
-      career: settings.careerVisibility == ProfileVisibility.public
-          ? profile.career
-          : null,
+      education:
+          settings.careerVisibility == ProfileVisibility.public
+              ? profile.education
+              : null,
+      career:
+          settings.careerVisibility == ProfileVisibility.public
+              ? profile.career
+              : null,
       verifiedCertificates:
           settings.certificateVisibility == ProfileVisibility.public
               ? profile.verification.certificates
@@ -209,6 +223,7 @@ class TeacherPublicProfile {
               : [],
       badges: profile.allBadges,
       completionLevel: profile.completionLevel,
+      publicPageConsent: publicPageConsent,
     );
   }
 }

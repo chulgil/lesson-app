@@ -56,5 +56,24 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets(
+      'G5/W3: shows empty state when no teacher consents to public page',
+      (tester) async {
+        // academy_3 has teacher_4 with publicPageConsent=false → empty list.
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: AcademyDetailScreen(organizationId: 'academy_3'),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('공개된 강사 정보가 없습니다'), findsOneWidget);
+      },
+    );
   });
 }

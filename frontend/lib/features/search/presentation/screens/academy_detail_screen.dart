@@ -257,8 +257,8 @@ class AcademyDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     List<TeacherPublicProfile> teachers,
   ) {
-    // Filter teachers who have consented to public page visibility
-    final publicTeachers = teachers.isNotEmpty ? teachers : [];
+    // G5/W3: 학원 공개 페이지 노출 동의(publicPageConsent=true)한 강사만 표시.
+    final publicTeachers = teachers.where((t) => t.publicPageConsent).toList();
 
     if (publicTeachers.isEmpty) {
       return Padding(

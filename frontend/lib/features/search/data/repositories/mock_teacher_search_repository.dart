@@ -566,6 +566,15 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
     );
   }
 
+  /// Public-page consent per teacher (G5/W3).
+  /// Mirrors AcademyMember.publicPageConsent in MockAcademyRepository.
+  /// teacher_1: 동의, teacher_3: 동의, teacher_4: 미동의.
+  static const Map<String, bool> _publicPageConsentByTeacher = {
+    'teacher_1': true,
+    'teacher_3': true,
+    'teacher_4': false,
+  };
+
   @override
   Future<List<TeacherPublicProfile>> getTeachersByOrganization(
     String organizationId,
@@ -579,7 +588,12 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
               t.visibilitySettings.isSearchable &&
               t.canBeSearched,
         )
-        .map((t) => TeacherPublicProfile.fromProfile(t))
+        .map(
+          (t) => TeacherPublicProfile.fromProfile(
+            t,
+            publicPageConsent: _publicPageConsentByTeacher[t.id] ?? false,
+          ),
+        )
         .toList();
   }
 
