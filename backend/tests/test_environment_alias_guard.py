@@ -91,3 +91,84 @@ def test_alias_beta_uppercase_triggers_internal_key_guard(monkeypatch: pytest.Mo
     monkeypatch.setattr(config_module, "settings", test_settings)
     with pytest.raises(RuntimeError, match="INTERNAL_API_KEY"):
         validate_runtime_configuration()
+
+
+# --- Dead-zone tests: codex audit follow-up ---
+#
+# Threat model: values that *look* alias-like but aren't in the map must NOT
+# silently become "production". Without these guards, a typo on the operator's
+# part ("prdouction", "produc", " prod\n") could either:
+#   (a) match a guard accidentally (false-positive prod), or
+#   (b) be stored as-is and bypass all guards (false-negative prod).
+# The current normalizer strips + lowercases + alias-lookup. These tests pin
+# the boundary so future "helpful" fuzzy matching can't be added without
+# breaking the contract.
+
+
+@pytest.mark.parametrize(
+    "padded,canonical",
+    [
+        ("  prod  ", "production"),
+        ("\tprod\n", "production"),
+        ("  PRODUCTION  ", "production"),
+        ("\n\nbeta\t", "beta"),
+    ],
+)
+def test_whitespace_padded_aliases_normalize(padded: str, canonical: str) -> None:
+    """ENVIRONMENT values with leading/trailing whitespace are stripped before alias lookup."""
+    s = _make_settings(padded)
+    assert s.ENVIRONMENT == canonical
+
+
+@pytest.mark.parametrize(
+    "near_miss",
+    [
+        "prdouction",  # transposition typo
+        "produc",  # truncation
+        "production-like",  # punctuation suffix
+        "prod!",  # punctuation
+        "preprod",  # prefix
+        "prodtest",  # concat
+        "stagin",  # truncation
+        "betaa",  # double letter
+    ],
+)
+def test_near_miss_values_do_not_match_production(near_miss: str) -> None:
+    """Strings that resemble an alias but aren't exact matches must stay as-is and fail closed."""
+    s = _make_settings(near_miss)
+    assert s.ENVIRONMENT == near_miss.lower()
+    assert s.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS
+
+
+@pytest.mark.parametrize(
+    "empty_like",
+    ["", "   ", "\t\n", None],
+)
+def test_empty_and_whitespace_only_values_do_not_match_production(empty_like: object) -> None:
+    """Empty / whitespace-only / None values must NOT normalize to a production-like name."""
+    s = _make_settings(empty_like if isinstance(empty_like, str) else "")
+    assert s.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS
+
+
+def test_near_miss_prod_value_does_not_bypass_jwt_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A near-miss like 'prodtest' must NOT activate production guards.
+
+    But it also must NOT fail-OPEN — the JWT guard simply doesn't fire because
+    the environment is unrecognized. That's the contract: unknown values
+    behave like 'development' for guard *triggering*, never like production.
+    """
+    from app.core import config as config_module
+
+    test_settings = Settings(
+        ENVIRONMENT="prodtest",
+        JWT_SECRET_KEY="dev-only-insecure-jwt-secret-change-before-production",
+        INTERNAL_API_KEY="weak",
+    )
+    monkeypatch.setattr(config_module, "settings", test_settings)
+    # validate_runtime_configuration must not raise — environment is unknown,
+    # therefore not production-like, therefore weak secret is not checked.
+    validate_runtime_configuration()
+    assert test_settings.ENVIRONMENT == "prodtest"
+    assert test_settings.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS

@@ -8,6 +8,7 @@ Create Date: 2026-05-07 09:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision: str = "add_teacher_announcements"
@@ -33,7 +34,9 @@ def upgrade() -> None:
         ),
         sa.Column("message", sa.Text(), nullable=False),
         sa.Column("notified_count", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("(CURRENT_TIMESTAMP)")),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("(CURRENT_TIMESTAMP)")
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(timezone=True),
@@ -53,9 +56,13 @@ def upgrade() -> None:
         sa.Column("announcement_date", sa.Date(), nullable=False),
         sa.ForeignKeyConstraint(["teacher_announcement_id"], ["teacher_announcements.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("teacher_announcement_id", "announcement_date", name="uq_teacher_announcement_dates_per_announcement_date"),
+        sa.UniqueConstraint(
+            "teacher_announcement_id", "announcement_date", name="uq_teacher_announcement_dates_per_announcement_date"
+        ),
     )
-    op.create_index("idx_teacher_announcement_dates_announcement", "teacher_announcement_dates", ["teacher_announcement_id"])
+    op.create_index(
+        "idx_teacher_announcement_dates_announcement", "teacher_announcement_dates", ["teacher_announcement_id"]
+    )
     op.create_index("idx_teacher_announcement_dates_teacher", "teacher_announcement_dates", ["announcement_date"])
 
 
@@ -66,3 +73,8 @@ def downgrade() -> None:
     op.drop_index("idx_teacher_announcements_type", table_name="teacher_announcements")
     op.drop_index("idx_teacher_announcements_teacher_created", table_name="teacher_announcements")
     op.drop_table("teacher_announcements")
+
+    # PostgreSQL native enum type persists after drop_table; explicit drop required.
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        op.execute("DROP TYPE IF EXISTS teacherannouncementtype")

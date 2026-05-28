@@ -110,3 +110,12 @@ def downgrade() -> None:
     op.drop_index("idx_app_billing_status", table_name="app_billing_plans")
     op.drop_index("idx_app_billing_expires", table_name="app_billing_plans")
     op.drop_table("app_billing_plans")
+
+    # PostgreSQL native enum types persist after drop_table; explicit drop required.
+    # NO-OP on SQLite (test DB) and MySQL — types are inline there.
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        op.execute("DROP TYPE IF EXISTS iapreceiptstatus")
+        op.execute("DROP TYPE IF EXISTS iapplatform")
+        op.execute("DROP TYPE IF EXISTS billingplanstatus")
+        op.execute("DROP TYPE IF EXISTS billingtier")

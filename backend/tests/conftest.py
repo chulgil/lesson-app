@@ -10,6 +10,7 @@ os.environ.setdefault("TESTING", "1")
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.security import create_access_token
@@ -41,12 +42,33 @@ async def setup_db(db_engine) -> AsyncGenerator[None, None]:
 
 
 @pytest.fixture
-async def db_engine() -> AsyncGenerator:
-    """Create a per-test isolated SQLite database engine."""
+async def db_engine(request) -> AsyncGenerator:
+    """Create a per-test isolated SQLite database engine.
+
+    Opt-in FK enforcement via `@pytest.mark.sqlite_fk_on`:
+    SQLite defaults to foreign_keys=OFF, which silently no-ops ON DELETE CASCADE.
+    Production uses PostgreSQL where FKs are enforced by default; cascade tests
+    must opt in to FK enforcement or they would silently pass.
+
+    Default OFF (legacy) — many existing tests construct rows that violate FKs
+    (e.g. students.teacher_id holding a user_id). Flipping ON globally would
+    surface ~100 pre-existing data-construction bugs unrelated to this audit.
+    Tracked separately; cascade tests use the explicit marker below.
+    """
+    fk_enabled = request.node.get_closest_marker("sqlite_fk_on") is not None
     with tempfile.TemporaryDirectory() as tmp_dir:
         test_db_path = f"{tmp_dir}/test.db"
         database_url = f"sqlite+aiosqlite:///{test_db_path}"
         engine = create_async_engine(database_url, echo=False)
+
+        if fk_enabled:
+
+            @event.listens_for(engine.sync_engine, "connect")
+            def _enable_sqlite_fk(dbapi_connection, _connection_record):
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA foreign_keys=ON")
+                cursor.close()
+
         try:
             yield engine
         finally:
