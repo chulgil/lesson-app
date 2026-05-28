@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/auth/presentation/screens/academy_invite_accept_screen.dart';
+import '../../../features/auth/presentation/screens/academy_invite_expired_screen.dart';
 import '../../../features/auth/presentation/screens/login_screen.dart';
 import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
@@ -100,6 +101,18 @@ List<GoRoute> authRoutes = [
         );
       }
       return AcademyInviteAcceptScreen(token: token);
+    },
+  ),
+
+  // Academy Invite Expired/Invalid
+  GoRoute(
+    path: AppRoutes.academyInviteExpired,
+    name: 'academyInviteExpired',
+    builder: (context, state) {
+      return AcademyInviteExpiredScreen(
+        errorCode: state.uri.queryParameters['code'],
+        errorMessage: state.uri.queryParameters['message'],
+      );
     },
   ),
 ];

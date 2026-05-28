@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../providers/academy_invite_provider.dart';
+import 'academy_invite_expired_screen.dart';
 
 /// Academy invite accept screen — 학원 초대 수락 화면
 /// 학원 정보 표시 + 이중 권한 안내 + 공개 동의
@@ -20,6 +21,9 @@ class AcademyInviteAcceptScreen extends ConsumerStatefulWidget {
   ConsumerState<AcademyInviteAcceptScreen> createState() =>
       _AcademyInviteAcceptScreenState();
 }
+
+/// Predefined reject reasons (G9/W4 §3.7).
+const _kRejectReasons = <String>['관심 없음', '이미 다른 학원 소속', '기타'];
 
 class _AcademyInviteAcceptScreenState
     extends ConsumerState<AcademyInviteAcceptScreen> {
@@ -59,9 +63,13 @@ class _AcademyInviteAcceptScreenState
   }
 
   Future<void> _handleReject() async {
+    final reason = await _pickRejectReason();
+    if (reason == null) {
+      return;
+    }
     try {
       final repository = ref.read(academyInviteRepositoryProvider);
-      await repository.rejectInvite(widget.token);
+      await repository.rejectInvite(widget.token, reason: reason);
     } catch (_) {
       // Best-effort reject; navigate home regardless.
     }
@@ -70,18 +78,65 @@ class _AcademyInviteAcceptScreenState
     }
   }
 
+  Future<String?> _pickRejectReason() {
+    return showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(AppSpacing.space3),
+                child: Text('거절 사유를 선택해주세요', style: AppTypography.bodyLarge),
+              ),
+              for (final reason in _kRejectReasons)
+                ListTile(
+                  title: Text(reason),
+                  onTap: () => Navigator.of(sheetContext).pop(reason),
+                ),
+              const Divider(height: 1),
+              ListTile(
+                title: const Text('취소'),
+                onTap: () => Navigator.of(sheetContext).pop(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Classifies a preview load error code for the expired screen.
+  String _errorCodeFor(Object error) {
+    final text = error.toString();
+    if (text.contains('expired')) return 'expired';
+    if (text.contains('not found')) return 'not_found';
+    if (text.contains('invalid')) return 'already_used';
+    return 'unknown';
+  }
+
   @override
   Widget build(BuildContext context) {
     final previewAsync = ref.watch(academyInvitePreviewProvider(widget.token));
 
-    return NotebookScreenScaffold(
-      body: PaperScaffold(
-        child: previewAsync.when(
-          data: (preview) => _buildContent(preview),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => _buildErrorContent(error),
-        ),
-      ),
+    return previewAsync.when(
+      data:
+          (preview) => NotebookScreenScaffold(
+            body: PaperScaffold(child: _buildContent(preview)),
+          ),
+      loading:
+          () => const NotebookScreenScaffold(
+            body: PaperScaffold(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+      error:
+          (error, stack) => AcademyInviteExpiredScreen(
+            errorCode: _errorCodeFor(error),
+            errorMessage: error.toString(),
+          ),
     );
   }
 
@@ -174,24 +229,6 @@ class _AcademyInviteAcceptScreenState
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorContent(Object error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('초대 로드 실패'),
-          SizedBox(height: AppSpacing.space3),
-          Text(error.toString(), style: AppTypography.bodySmall),
-          SizedBox(height: AppSpacing.space4),
-          ElevatedButton(
-            onPressed: () => context.go(AppRoutes.home),
-            child: const Text('홈으로 이동'),
           ),
         ],
       ),

@@ -17,6 +17,7 @@ class _SpyInviteRepository implements AcademyInviteRepository {
   String? acceptedToken;
   bool? acceptedConsent;
   String? rejectedToken;
+  String? rejectedReason;
 
   @override
   Future<AcademyInvitePreview> getInvitePreview(String token) async => preview;
@@ -33,6 +34,7 @@ class _SpyInviteRepository implements AcademyInviteRepository {
   @override
   Future<void> rejectInvite(String token, {String? reason}) async {
     rejectedToken = token;
+    rejectedReason = reason;
   }
 }
 
@@ -122,16 +124,42 @@ void main() {
       expect(spy.acceptedConsent, isTrue);
     });
 
-    testWidgets('reject calls repository.rejectInvite', (tester) async {
+    testWidgets('reject opens reason sheet then calls rejectInvite', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildSubject());
       await tester.pump();
       await tester.pump();
 
       await tester.tap(find.text('거절'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('거절 사유를 선택해주세요'), findsOneWidget);
+      expect(find.text('관심 없음'), findsOneWidget);
+      expect(find.text('이미 다른 학원 소속'), findsOneWidget);
+
+      await tester.tap(find.text('관심 없음'));
       await tester.pump();
       await tester.pump();
 
       expect(spy.rejectedToken, equals(testToken));
+      expect(spy.rejectedReason, equals('관심 없음'));
+    });
+
+    testWidgets('reject sheet cancel does not call rejectInvite', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildSubject());
+      await tester.pump();
+      await tester.pump();
+
+      await tester.tap(find.text('거절'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('취소'));
+      await tester.pumpAndSettle();
+
+      expect(spy.rejectedToken, isNull);
     });
   });
 }
