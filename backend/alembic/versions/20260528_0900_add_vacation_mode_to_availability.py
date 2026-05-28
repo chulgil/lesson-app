@@ -44,30 +44,22 @@ def upgrade() -> None:
         sa.Column("vacation_reason", sa.String(length=100), nullable=True),
     )
 
-    # Add check constraints
-    op.create_check_constraint(
-        "ck_vacation_dates_required_when_active",
-        "teacher_availabilities",
-        "vacation_mode = false OR (vacation_start_date IS NOT NULL AND vacation_end_date IS NOT NULL)",
-    )
-    op.create_check_constraint(
-        "ck_vacation_end_after_start",
-        "teacher_availabilities",
-        "vacation_end_date IS NULL OR vacation_start_date IS NULL OR vacation_end_date >= vacation_start_date",
-    )
+    # Add check constraints (batch mode for SQLite ALTER compatibility — #310)
+    with op.batch_alter_table("teacher_availabilities") as batch_op:
+        batch_op.create_check_constraint(
+            "ck_vacation_dates_required_when_active",
+            "vacation_mode = false OR (vacation_start_date IS NOT NULL AND vacation_end_date IS NOT NULL)",
+        )
+        batch_op.create_check_constraint(
+            "ck_vacation_end_after_start",
+            "vacation_end_date IS NULL OR vacation_start_date IS NULL OR vacation_end_date >= vacation_start_date",
+        )
 
 
 def downgrade() -> None:
-    op.drop_constraint(
-        "ck_vacation_end_after_start",
-        "teacher_availabilities",
-        type_="check",
-    )
-    op.drop_constraint(
-        "ck_vacation_dates_required_when_active",
-        "teacher_availabilities",
-        type_="check",
-    )
+    with op.batch_alter_table("teacher_availabilities") as batch_op:
+        batch_op.drop_constraint("ck_vacation_end_after_start", type_="check")
+        batch_op.drop_constraint("ck_vacation_dates_required_when_active", type_="check")
     op.drop_column("teacher_availabilities", "vacation_reason")
     op.drop_column("teacher_availabilities", "vacation_end_date")
     op.drop_column("teacher_availabilities", "vacation_start_date")
