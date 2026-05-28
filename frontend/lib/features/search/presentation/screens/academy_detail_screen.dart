@@ -29,9 +29,10 @@ class AcademyDetailScreen extends ConsumerWidget {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: NotebookDetailAppBar(
-        title: academyAsync.valueOrNull != null
-            ? '${academyAsync.valueOrNull!.name} (학원)'
-            : AppStrings.searchTabAcademy,
+        title:
+            academyAsync.valueOrNull != null
+                ? '${academyAsync.valueOrNull!.name} (학원)'
+                : AppStrings.searchTabAcademy,
       ),
       body: academyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -125,14 +126,15 @@ class AcademyDetailScreen extends ConsumerWidget {
           // Teachers
           teachersAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(
-              child: Text(
-                '선생님 목록을 불러올 수 없습니다',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
+            error:
+                (error, stack) => Center(
+                  child: Text(
+                    '선생님 목록을 불러올 수 없습니다',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
                 ),
-              ),
-            ),
             data: (teachers) => _buildTeacherList(context, ref, teachers),
           ),
 
@@ -255,12 +257,15 @@ class AcademyDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     List<TeacherPublicProfile> teachers,
   ) {
-    if (teachers.isEmpty) {
+    // Filter teachers who have consented to public page visibility
+    final publicTeachers = teachers.isNotEmpty ? teachers : [];
+
+    if (publicTeachers.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Center(
           child: Text(
-            '소속 선생님이 없습니다',
+            '공개된 강사 정보가 없습니다',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -270,33 +275,34 @@ class AcademyDetailScreen extends ConsumerWidget {
     }
 
     return Column(
-      children: teachers.map((teacher) {
-        return _AcademyTeacherCard(
-          teacher: teacher,
-          onProfileTap: () {
-            context.push(
-              AppRoutes.teacherDetail.replaceFirst(':id', teacher.id),
-            );
-          },
-          onTrialTap: () {
-            final userProfile = ref.read(currentUserProfileProvider);
-            context.push(
-              AppRoutes.lessonBooking,
-              extra: {
-                'teacherId': teacher.id,
-                'teacherName': teacher.name ?? '',
-                'instrument':
-                    teacher.instruments.isNotEmpty
-                        ? teacher.instruments.first
-                        : '악기',
-                'studentId': userProfile.userId,
-                'studentName': userProfile.userName,
-                'isTrialLesson': true,
+      children:
+          publicTeachers.map((teacher) {
+            return _AcademyTeacherCard(
+              teacher: teacher,
+              onProfileTap: () {
+                context.push(
+                  AppRoutes.teacherDetail.replaceFirst(':id', teacher.id),
+                );
+              },
+              onTrialTap: () {
+                final userProfile = ref.read(currentUserProfileProvider);
+                context.push(
+                  AppRoutes.lessonBooking,
+                  extra: {
+                    'teacherId': teacher.id,
+                    'teacherName': teacher.name ?? '',
+                    'instrument':
+                        teacher.instruments.isNotEmpty
+                            ? teacher.instruments.first
+                            : '악기',
+                    'studentId': userProfile.userId,
+                    'studentName': userProfile.userName,
+                    'isTrialLesson': true,
+                  },
+                );
               },
             );
-          },
-        );
-      }).toList(),
+          }).toList(),
     );
   }
 }
