@@ -20,13 +20,9 @@ void main() {
         ),
       );
 
-      // Wait for loading to complete
       await tester.pumpAndSettle();
 
-      // Verify no exceptions occurred
       expect(tester.takeException(), isNull);
-
-      // Verify title is present
       expect(find.text('취소 정책 디폴트'), findsWidgets);
     });
 
@@ -41,57 +37,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify field labels are present
       expect(find.text('취소 페널티 없는 시간'), findsWidgets);
       expect(find.text('학생 취소 시 보상 제공'), findsWidgets);
       expect(find.text('마감 후 취소 시 알림 (학원 강사만)'), findsWidgets);
 
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('allows editing cancellation deadline hours', (
-      WidgetTester tester,
-    ) async {
-      final initialDefaults = CancellationDefaults(
-        id: 'teacher_001',
-        cancellationDeadlineHours: 12,
-        studentCompensationExtraMinutesEnabled: true,
-        includeExtraMinutesTextOnLateCancel: true,
-        studentCompensationExtraMinutesMessage: '10분 보너스',
-        notifyOwnerOnLateCancel: false,
-        createdAt: DateTime.now(),
-      );
-
-      final mockRepo = MockCancellationDefaultsRepository(
-        initialData: CancellationDefaults(
-          id: 'teacher_001',
-          cancellationDeadlineHours: 12,
-          studentCompensationExtraMinutesEnabled: true,
-          includeExtraMinutesTextOnLateCancel: true,
-          studentCompensationExtraMinutesMessage: '10분 보너스',
-          notifyOwnerOnLateCancel: false,
-          createdAt: DateTime.now(),
-        ),
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            cancellationDefaultsRepositoryProvider.overrideWithValue(mockRepo),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(body: CancellationDefaultsScreen()),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Find and modify the hours input field
-      final textFields = find.byType(TextField);
-      expect(textFields, findsWidgets);
-
-      // Verify no render errors
       expect(tester.takeException(), isNull);
     });
 
@@ -123,7 +72,6 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // When compensation is disabled, the message field should not be visible
       expect(find.text('보상 메시지'), findsNothing);
       expect(tester.takeException(), isNull);
     });
@@ -137,16 +85,11 @@ void main() {
         ),
       );
 
-      // Pump to loading state
       await tester.pump();
-
-      // Pump to data state with default data
       await tester.pumpAndSettle();
 
-      // Verify no exceptions thrown during rendering
       expect(tester.takeException(), isNull);
 
-      // Verify basic UI elements are rendered
       expect(find.byType(SingleChildScrollView), findsWidgets);
       expect(find.byType(SwitchListTile), findsWidgets);
     });

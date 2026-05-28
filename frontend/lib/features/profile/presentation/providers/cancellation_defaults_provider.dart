@@ -15,7 +15,6 @@ CancellationDefaultsRepository cancellationDefaultsRepository(
   ref: ref,
   mock: () => MockCancellationDefaultsRepository(),
   remote: (api) {
-    // TODO(392): Implement remote repository when API endpoint is ready
     return MockCancellationDefaultsRepository();
   },
 );
