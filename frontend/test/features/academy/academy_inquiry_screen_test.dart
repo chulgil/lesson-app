@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/inbox/presentation/screens/academy_inquiry_screen.dart';
@@ -7,7 +8,9 @@ void main() {
   group('AcademyInquiryScreen', () {
     testWidgets('renders without crashing', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(home: AcademyInquiryScreen(academyId: 'acad_001')),
+        const ProviderScope(
+          child: MaterialApp(home: AcademyInquiryScreen(academyId: 'acad_001')),
+        ),
       );
 
       await tester.pumpAndSettle();
@@ -17,7 +20,9 @@ void main() {
 
     testWidgets('displays inquiry list', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(home: AcademyInquiryScreen(academyId: 'acad_001')),
+        const ProviderScope(
+          child: MaterialApp(home: AcademyInquiryScreen(academyId: 'acad_001')),
+        ),
       );
 
       await tester.pumpAndSettle();

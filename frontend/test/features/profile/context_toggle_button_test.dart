@@ -8,27 +8,34 @@ void main() {
   group('ContextToggleButton', () {
     testWidgets('renders without crashing', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ProviderScope(child: ContextToggleButton())),
+        const ProviderScope(
+          child: MaterialApp(home: Scaffold(body: ContextToggleButton())),
         ),
       );
 
-      // Widget should render without exception
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('buildMenuItem returns null when user lacks both roles', (
       WidgetTester tester,
     ) async {
-      const mockContext = GlobalObjectKey<NavigatorState>('test');
-      final mockMembers = <AcademyMember>[]; // Empty — no roles
-
-      final result = await ContextToggleButton.buildMenuItem(
-        mockContext.currentContext ?? (throw StateError('No context')),
-        mockMembers,
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
       );
 
-      // Should return null when roles are missing
+      final result = await ContextToggleButton.buildMenuItem(
+        capturedContext,
+        <AcademyMember>[],
+      );
+
       expect(result, isNull);
     });
   });
