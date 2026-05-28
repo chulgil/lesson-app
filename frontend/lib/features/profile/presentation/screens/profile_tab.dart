@@ -193,6 +193,12 @@ class ProfileTab extends ConsumerWidget {
                     ),
               ),
               _MenuItem(
+                icon: Icons.event_busy_outlined,
+                label: AppStrings.profileCancellationDefaultsLabel,
+                subtitle: AppStrings.profileCancellationDefaultsSubtitle,
+                onTap: () => context.push(AppRoutes.cancellationDefaults),
+              ),
+              _MenuItem(
                 icon: Icons.library_music,
                 label: AppStrings.profileRepertoireLabel,
                 subtitle: AppStrings.profileRepertoireSubtitle,

@@ -77,6 +77,7 @@ class AppRoutes {
   static const profileVisibility = '/profile/visibility';
   static const profilePreview = '/profile/preview';
   static const outstandingPayments = '/profile/outstanding-payments';
+  static const cancellationDefaults = '/profile/cancellation-defaults';
 
   // Student routes
   static const myTeachers = '/student/my-teachers';

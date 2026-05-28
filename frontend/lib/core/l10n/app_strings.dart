@@ -6417,6 +6417,8 @@ class AppStrings {
   static const profileAvailabilitySubtitle = '주간 스케줄, 휴무, 예외 시간';
   static const profileCancelPolicyLabel = '취소/노쇼 정책';
   static const profileCancelPolicySubtitle = '변경 횟수, 취소 기한, 노쇼 처리';
+  static const profileCancellationDefaultsLabel = '취소 정책 디폴트';
+  static const profileCancellationDefaultsSubtitle = '마감 시간, 학생 보상, 학원 알림 기본값';
   static const profileRepertoireLabel = '레퍼토리 관리';
   static const profileRepertoireSubtitle = '교재 및 곡 목록';
   static const profileTipTemplateLabel = '연습 팁 템플릿';

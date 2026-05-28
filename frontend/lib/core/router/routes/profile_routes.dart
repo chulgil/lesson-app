@@ -13,6 +13,7 @@ import '../../../features/profile/presentation/screens/career_edit_screen.dart';
 import '../../../features/profile/presentation/screens/basic_info_edit_screen.dart';
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/profile/presentation/screens/bank_account_edit_screen.dart';
+import '../../../features/profile/presentation/screens/cancellation_defaults_screen.dart';
 import '../../../features/analytics/presentation/screens/analytics_dashboard_screen.dart';
 import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
@@ -143,5 +144,12 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.teacherAttendance,
     name: 'teacherAttendance',
     builder: (context, state) => const TeacherAttendanceScreen(),
+  ),
+
+  // Cancellation Policy Defaults (G11/#392)
+  GoRoute(
+    path: AppRoutes.cancellationDefaults,
+    name: 'cancellationDefaults',
+    builder: (context, state) => const CancellationDefaultsScreen(),
   ),
 ];
