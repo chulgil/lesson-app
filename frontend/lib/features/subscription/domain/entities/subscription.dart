@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../../../features/academy/domain/entities/academy_enums.dart';
+
 part 'subscription.g.dart';
 
 /// Subscription type.
@@ -135,6 +137,12 @@ class Subscription {
   /// Individual cancel deadline override in hours (null = use default policy).
   final int? overrideCancelDeadlineHours;
 
+  /// Subscription ownership — academy or teacher issued.
+  final SubscriptionOwnership? ownership;
+
+  /// Academy ID if ownership=academy. Null for teacher-issued subscriptions.
+  final String? academyId;
+
   Subscription({
     required this.id,
     required this.studentId,
@@ -167,6 +175,8 @@ class Subscription {
     this.rescheduleDeadlineHours = 12, // 기본값: 12시간
     this.bonusRescheduleCount = 0,
     this.overrideCancelDeadlineHours,
+    this.ownership,
+    this.academyId,
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) =>
@@ -208,7 +218,8 @@ class Subscription {
       totalRescheduleAllowance + bonusRescheduleCount;
 
   /// Remaining reschedule count (effective allowance minus used count).
-  int get remainingReschedule => effectiveRescheduleAllowance - usedRescheduleCount;
+  int get remainingReschedule =>
+      effectiveRescheduleAllowance - usedRescheduleCount;
 
   /// Check if student can reschedule (has remaining allowance).
   bool get canReschedule => remainingReschedule > 0;
@@ -312,6 +323,8 @@ class Subscription {
     int? bonusRescheduleCount,
     int? overrideCancelDeadlineHours,
     bool clearOverrideCancelDeadlineHours = false,
+    SubscriptionOwnership? ownership,
+    String? academyId,
   }) {
     return Subscription(
       id: id ?? this.id,
@@ -344,9 +357,12 @@ class Subscription {
       discountReason: discountReason ?? this.discountReason,
       originalAmount: originalAmount ?? this.originalAmount,
       bonusRescheduleCount: bonusRescheduleCount ?? this.bonusRescheduleCount,
-      overrideCancelDeadlineHours: clearOverrideCancelDeadlineHours
-          ? null
-          : overrideCancelDeadlineHours ?? this.overrideCancelDeadlineHours,
+      overrideCancelDeadlineHours:
+          clearOverrideCancelDeadlineHours
+              ? null
+              : overrideCancelDeadlineHours ?? this.overrideCancelDeadlineHours,
+      ownership: ownership ?? this.ownership,
+      academyId: academyId ?? this.academyId,
     );
   }
 
