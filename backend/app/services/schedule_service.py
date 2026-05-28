@@ -94,9 +94,7 @@ class ScheduleService:
         exception_filter = [ScheduleException.teacher_id.in_(teacher_id_scope)]
         if avail_ids:
             exception_filter.append(ScheduleException.teacher_availability_id.in_(avail_ids))
-        exception_rows = await self.db.scalars(
-            select(ScheduleException).where(or_(*exception_filter))
-        )
+        exception_rows = await self.db.scalars(select(ScheduleException).where(or_(*exception_filter)))
         exceptions = [
             {
                 "id": exc.id,
@@ -170,9 +168,7 @@ class ScheduleService:
         )
         for availability in existing.all():
             child_slots = await self.db.scalars(
-                select(AvailabilityTimeSlot).where(
-                    AvailabilityTimeSlot.availability_id == availability.id
-                )
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == availability.id)
             )
             for slot in child_slots.all():
                 await self.db.delete(slot)
@@ -214,9 +210,7 @@ class ScheduleService:
             ScheduleException.teacher_id.in_(teacher_id_scope),
         ]
         if avail_ids:
-            exception_scope.append(
-                ScheduleException.teacher_availability_id.in_(avail_ids)
-            )
+            exception_scope.append(ScheduleException.teacher_availability_id.in_(avail_ids))
 
         exceptions_by_date: dict[str, list[dict]] = {}
         exception_rows = await self.db.scalars(
@@ -293,8 +287,7 @@ class ScheduleService:
             date_str = lesson.date.isoformat()
             # Skip exact duplicates when booking already exists at same slot.
             if any(
-                existing.get("start_time") == lesson.start_time
-                and existing.get("duration") == lesson.duration
+                existing.get("start_time") == lesson.start_time and existing.get("duration") == lesson.duration
                 for existing in bookings_by_date.get(date_str, [])
             ):
                 continue
@@ -308,9 +301,7 @@ class ScheduleService:
                     "subscription_id": lesson.subscription_id,
                     "session_number": lesson.session_number,
                     "lesson_source": (
-                        lesson.lesson_source.value
-                        if hasattr(lesson.lesson_source, "value")
-                        else lesson.lesson_source
+                        lesson.lesson_source.value if hasattr(lesson.lesson_source, "value") else lesson.lesson_source
                     ),
                     "type": "lesson",
                 }
@@ -402,15 +393,20 @@ class ScheduleService:
                 TeacherAvailability.day_of_week == day_of_week,
             )
         )
-        availability_ids = [a.id for a in availability_rows.all()]
+        availability_list = availability_rows.all()
+        availability_ids = [a.id for a in availability_list]
         if not availability_ids:
             return SlotsResponse(date=d, slots=[])
 
+        # #380: TeacherAvailability.vacation_mode 가 활성이고 현재 날짜가 범위 내면
+        # 전체 슬롯 차단. ScheduleException(type=vacation)과 독립적으로 동작.
+        from app.services.availability_service import AvailabilityService
+
+        vacation_mode_blocked = any(AvailabilityService.is_slot_in_vacation(d, av) for av in availability_list)
+
         # Get time slots
         time_slots = await self.db.scalars(
-            select(AvailabilityTimeSlot).where(
-                AvailabilityTimeSlot.availability_id.in_(availability_ids)
-            )
+            select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id.in_(availability_ids))
         )
 
         # Get existing bookings for this date
@@ -483,7 +479,7 @@ class ScheduleService:
                 slot_end_minutes = current + duration
                 slot_end_time = f"{slot_end_minutes // 60:02d}:{slot_end_minutes % 60:02d}"
 
-                if whole_day_blocked:
+                if vacation_mode_blocked or whole_day_blocked:
                     slot_status = "unavailable"
                 elif _slot_overlaps_blocked(current, slot_end_minutes, blocked_ranges):
                     slot_status = "unavailable"
