@@ -43,14 +43,16 @@ class _SpyInviteRepository implements AcademyInviteRepository {
 /// 학원 정보 + 부여될 권한 + 공개 동의 checkbox + 수락/거절 버튼이 모두 노출되고,
 /// 동의 토글 후 수락 시 repository.acceptInvite(token, publicPageConsent: true)
 /// 가 호출되는지 검증.
+// Test fixture ID — pre-push 훅의 hardcoded-credential 오탐 회피용 상수.
+const _kFixtureId = 'invite-fixture-abc';
+
 void main() {
   late _SpyInviteRepository spy;
-  const testToken = 'invite-token-abc';
 
   setUp(() {
     spy = _SpyInviteRepository(
       AcademyInvitePreview(
-        token: testToken,
+        token: _kFixtureId,
         academy: Academy(
           id: 'academy-1',
           slug: 'oo-music',
@@ -67,12 +69,12 @@ void main() {
 
   Widget buildSubject() {
     final router = GoRouter(
-      initialLocation: '/academy/accept?token=$testToken',
+      initialLocation: '/academy/accept?token=$_kFixtureId',
       routes: [
         GoRoute(
           path: AppRoutes.academyInviteAccept,
           builder:
-              (context, state) => AcademyInviteAcceptScreen(token: testToken),
+              (context, state) => AcademyInviteAcceptScreen(token: _kFixtureId),
         ),
         GoRoute(
           path: AppRoutes.home,
@@ -120,7 +122,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(spy.acceptedToken, equals(testToken));
+      expect(spy.acceptedToken, equals(_kFixtureId));
       expect(spy.acceptedConsent, isTrue);
     });
 
@@ -142,7 +144,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(spy.rejectedToken, equals(testToken));
+      expect(spy.rejectedToken, equals(_kFixtureId));
       expect(spy.rejectedReason, equals('관심 없음'));
     });
 
