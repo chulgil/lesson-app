@@ -528,6 +528,9 @@ class RegularLessonRegistration {
   final int lessonsPerWeek;
   final int monthlyFee;
   final DateTime startDate;
+  final String?
+  academyId; // Optional: academy ID if lesson is linked to academy
+  final bool isAcademyPrivate; // If true, set visibility to academyBusyOnly
 
   const RegularLessonRegistration({
     required this.studentId,
@@ -536,6 +539,8 @@ class RegularLessonRegistration {
     this.lessonsPerWeek = 1,
     required this.monthlyFee,
     required this.startDate,
+    this.academyId,
+    this.isAcademyPrivate = false,
   });
 }
 

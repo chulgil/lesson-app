@@ -96,6 +96,10 @@ Lesson _$LessonFromJson(Map<String, dynamic> json) => Lesson(
       archivedAt: json['archived_at'] == null
           ? null
           : DateTime.parse(json['archived_at'] as String),
+      academyId: json['academy_id'] as String?,
+      visibility:
+          $enumDecodeNullable(_$LessonVisibilityEnumMap, json['visibility']) ??
+              LessonVisibility.academyFull,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -126,6 +130,8 @@ Map<String, dynamic> _$LessonToJson(Lesson instance) => <String, dynamic>{
       'is_preview': instance.isPreview,
       'is_archived': instance.isArchived,
       'archived_at': instance.archivedAt?.toIso8601String(),
+      'academy_id': instance.academyId,
+      'visibility': _$LessonVisibilityEnumMap[instance.visibility]!,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
@@ -141,4 +147,9 @@ const _$LessonStatusEnumMap = {
   LessonStatus.noShow: 'noShow',
   LessonStatus.studentAbsent: 'studentAbsent',
   LessonStatus.reschedulePending: 'reschedulePending',
+};
+
+const _$LessonVisibilityEnumMap = {
+  LessonVisibility.academyFull: 'academyFull',
+  LessonVisibility.academyBusyOnly: 'academyBusyOnly',
 };

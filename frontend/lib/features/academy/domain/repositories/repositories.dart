@@ -1,5 +1,6 @@
 // Barrel file for academy domain repositories
 
+export 'academy_activity_repository.dart';
 export 'academy_announcement_repository.dart';
 export 'academy_inquiry_repository.dart';
 export 'academy_invite_repository.dart';
