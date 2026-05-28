@@ -17,6 +17,7 @@ import '../../../features/practice/presentation/screens/practice_goal_setting_sc
 import '../../../features/practice/presentation/screens/practice_stats_screen.dart';
 import '../../../features/practice/presentation/screens/repertoire_history_screen.dart';
 import '../../../features/practice/presentation/screens/tuner_screen.dart';
+import '../../../features/practice/presentation/screens/note_access_request_screen.dart';
 import '../app_routes.dart';
 
 /// Practice routes
@@ -203,5 +204,15 @@ List<GoRoute> practiceRoutes = [
     path: AppRoutes.tuner,
     name: 'tuner',
     builder: (context, state) => const TunerScreen(),
+  ),
+
+  // Note Access Request (G21/#402)
+  GoRoute(
+    path: AppRoutes.noteAccessRequest,
+    name: 'noteAccessRequest',
+    builder: (context, state) {
+      final requestId = state.pathParameters['requestId'] ?? '';
+      return NoteAccessRequestScreen(requestId: requestId);
+    },
   ),
 ];

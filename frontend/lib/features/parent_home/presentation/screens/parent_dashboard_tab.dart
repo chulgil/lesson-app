@@ -13,6 +13,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../practice/presentation/widgets/note_access_active_banner.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
@@ -88,6 +89,9 @@ class ParentDashboardTab extends ConsumerWidget {
 
                     // ── 0순위: 자녀 정보 히어로 카드 ──────────────
                     _buildChildHeader(context, profile),
+
+                    // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
+                    const NoteAccessActiveBanner(),
 
                     const SizedBox(height: AppSpacing.space4),
 

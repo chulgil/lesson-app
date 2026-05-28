@@ -182,4 +182,5 @@ class AppRoutes {
   static const academyInquiries = '/academy/:academyId/inquiries';
   static const academyInquiryDetail =
       '/academy/:academyId/inquiries/:inquiryId';
+  static const noteAccessRequest = '/note-access/:requestId';
 }

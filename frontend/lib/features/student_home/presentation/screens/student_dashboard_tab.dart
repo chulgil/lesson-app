@@ -12,6 +12,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
+import '../../../practice/presentation/widgets/note_access_active_banner.dart';
 import '../../../gamification/gamification_ui_facade.dart';
 import '../providers/student_home_practice_provider.dart';
 import '../providers/student_home_session_provider.dart';
@@ -50,6 +51,9 @@ class StudentDashboardTab extends ConsumerWidget {
 
           // ── 0순위: 시간대 인식 배너 (student_home_master.md §2.2) ──
           _StudentTimeBanner(studentId: currentStudentId),
+
+          // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
+          const NoteAccessActiveBanner(),
 
           // Gamification header
           GamificationHeader(
