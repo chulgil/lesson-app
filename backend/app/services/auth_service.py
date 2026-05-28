@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Any
 
 import httpx
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -79,13 +82,12 @@ class AuthService:
         # Check if this email has a predefined seed ID
         try:
             from scripts.seeds.ids import SEED_ACCOUNTS
+
             seed_info = SEED_ACCOUNTS.get(request.email)
         except ImportError:
             seed_info = None
 
-        user = await self.db.scalar(
-            select(User).where(User.email == request.email)
-        )
+        user = await self.db.scalar(select(User).where(User.email == request.email))
 
         role_enum = UserRole(request.role) if request.role else None
 
@@ -140,9 +142,7 @@ class AuthService:
         from app.models.user import TokenBlacklist
 
         jti = payload.get("jti", "")
-        blacklisted = await self.db.scalar(
-            select(TokenBlacklist).where(TokenBlacklist.jti == jti)
-        ) if jti else None
+        blacklisted = await self.db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == jti)) if jti else None
         if blacklisted:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -241,9 +241,17 @@ class AuthService:
                 data=token_data,
             )
             if token_resp.status_code != 200:
+                # Log upstream detail server-side only; never echo Google's
+                # error body to the caller — it can contain trace IDs and
+                # echoed grant material.
+                logger.warning(
+                    "Google token exchange failed: status=%s body=%s",
+                    token_resp.status_code,
+                    token_resp.text,
+                )
                 raise HTTPException(
                     status_code=401,
-                    detail=f"Google token exchange failed: {token_resp.text}",
+                    detail="Google token exchange failed",
                 )
 
             tokens = token_resp.json()
@@ -353,9 +361,7 @@ class AuthService:
         if role_enum == UserRole.teacher:
             from app.models.teacher import Teacher
 
-            existing = await self.db.scalar(
-                select(Teacher).where(Teacher.user_id == user.id)
-            )
+            existing = await self.db.scalar(select(Teacher).where(Teacher.user_id == user.id))
             if not existing:
                 teacher = Teacher(user_id=user.id, instruments=[])
                 self.db.add(teacher)
@@ -364,9 +370,7 @@ class AuthService:
         elif role_enum == UserRole.parent:
             from app.models.parent import Parent
 
-            existing = await self.db.scalar(
-                select(Parent).where(Parent.user_id == user.id)
-            )
+            existing = await self.db.scalar(select(Parent).where(Parent.user_id == user.id))
             if not existing:
                 parent = Parent(
                     user_id=user.id,
@@ -406,9 +410,7 @@ class AuthService:
         # Check if a user with this email already exists
         user = None
         if provider_user.get("email"):
-            user = await self.db.scalar(
-                select(User).where(User.email == provider_user["email"])
-            )
+            user = await self.db.scalar(select(User).where(User.email == provider_user["email"]))
 
         if user is None:
             user = User(
