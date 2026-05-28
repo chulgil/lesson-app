@@ -56,6 +56,15 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
           (json['bonus_reschedule_count'] as num?)?.toInt() ?? 0,
       overrideCancelDeadlineHours:
           (json['override_cancel_deadline_hours'] as num?)?.toInt(),
+      overrideStudentCompensationExtraMinutesEnabled:
+          json['override_student_compensation_extra_minutes_enabled'] as bool?,
+      overrideIncludeExtraMinutesTextOnLateCancel:
+          json['override_include_extra_minutes_text_on_late_cancel'] as bool?,
+      overrideStudentCompensationExtraMinutesMessage:
+          json['override_student_compensation_extra_minutes_message']
+              as String?,
+      overrideNotifyOwnerOnLateCancel:
+          json['override_notify_owner_on_late_cancel'] as bool?,
       ownership: $enumDecodeNullable(
           _$SubscriptionOwnershipEnumMap, json['ownership']),
       academyId: json['academy_id'] as String?,
@@ -95,6 +104,14 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'reschedule_deadline_hours': instance.rescheduleDeadlineHours,
       'bonus_reschedule_count': instance.bonusRescheduleCount,
       'override_cancel_deadline_hours': instance.overrideCancelDeadlineHours,
+      'override_student_compensation_extra_minutes_enabled':
+          instance.overrideStudentCompensationExtraMinutesEnabled,
+      'override_include_extra_minutes_text_on_late_cancel':
+          instance.overrideIncludeExtraMinutesTextOnLateCancel,
+      'override_student_compensation_extra_minutes_message':
+          instance.overrideStudentCompensationExtraMinutesMessage,
+      'override_notify_owner_on_late_cancel':
+          instance.overrideNotifyOwnerOnLateCancel,
       'ownership': _$SubscriptionOwnershipEnumMap[instance.ownership],
       'academy_id': instance.academyId,
     };

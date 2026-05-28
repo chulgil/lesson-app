@@ -137,6 +137,22 @@ class Subscription {
   /// Individual cancel deadline override in hours (null = use default policy).
   final int? overrideCancelDeadlineHours;
 
+  /// Override: grant extra practice minutes as compensation for late student cancellation.
+  /// Null = inherit from policy default.
+  final bool? overrideStudentCompensationExtraMinutesEnabled;
+
+  /// Override: include compensation message in late cancellation notice to student.
+  /// Null = inherit from policy default.
+  final bool? overrideIncludeExtraMinutesTextOnLateCancel;
+
+  /// Override: custom compensation message shown to student on late cancellation.
+  /// Null = inherit from policy default.
+  final String? overrideStudentCompensationExtraMinutesMessage;
+
+  /// Override: notify teacher when student cancels after deadline.
+  /// Only applicable for academy teachers (ownership=academy). Null = inherit.
+  final bool? overrideNotifyOwnerOnLateCancel;
+
   /// Subscription ownership — academy or teacher issued.
   final SubscriptionOwnership? ownership;
 
@@ -175,6 +191,10 @@ class Subscription {
     this.rescheduleDeadlineHours = 12, // 기본값: 12시간
     this.bonusRescheduleCount = 0,
     this.overrideCancelDeadlineHours,
+    this.overrideStudentCompensationExtraMinutesEnabled,
+    this.overrideIncludeExtraMinutesTextOnLateCancel,
+    this.overrideStudentCompensationExtraMinutesMessage,
+    this.overrideNotifyOwnerOnLateCancel,
     this.ownership,
     this.academyId,
   });
@@ -323,6 +343,14 @@ class Subscription {
     int? bonusRescheduleCount,
     int? overrideCancelDeadlineHours,
     bool clearOverrideCancelDeadlineHours = false,
+    bool? overrideStudentCompensationExtraMinutesEnabled,
+    bool clearOverrideStudentCompensationExtraMinutesEnabled = false,
+    bool? overrideIncludeExtraMinutesTextOnLateCancel,
+    bool clearOverrideIncludeExtraMinutesTextOnLateCancel = false,
+    String? overrideStudentCompensationExtraMinutesMessage,
+    bool clearOverrideStudentCompensationExtraMinutesMessage = false,
+    bool? overrideNotifyOwnerOnLateCancel,
+    bool clearOverrideNotifyOwnerOnLateCancel = false,
     SubscriptionOwnership? ownership,
     String? academyId,
   }) {
@@ -361,6 +389,26 @@ class Subscription {
           clearOverrideCancelDeadlineHours
               ? null
               : overrideCancelDeadlineHours ?? this.overrideCancelDeadlineHours,
+      overrideStudentCompensationExtraMinutesEnabled:
+          clearOverrideStudentCompensationExtraMinutesEnabled
+              ? null
+              : overrideStudentCompensationExtraMinutesEnabled ??
+                  this.overrideStudentCompensationExtraMinutesEnabled,
+      overrideIncludeExtraMinutesTextOnLateCancel:
+          clearOverrideIncludeExtraMinutesTextOnLateCancel
+              ? null
+              : overrideIncludeExtraMinutesTextOnLateCancel ??
+                  this.overrideIncludeExtraMinutesTextOnLateCancel,
+      overrideStudentCompensationExtraMinutesMessage:
+          clearOverrideStudentCompensationExtraMinutesMessage
+              ? null
+              : overrideStudentCompensationExtraMinutesMessage ??
+                  this.overrideStudentCompensationExtraMinutesMessage,
+      overrideNotifyOwnerOnLateCancel:
+          clearOverrideNotifyOwnerOnLateCancel
+              ? null
+              : overrideNotifyOwnerOnLateCancel ??
+                  this.overrideNotifyOwnerOnLateCancel,
       ownership: ownership ?? this.ownership,
       academyId: academyId ?? this.academyId,
     );

@@ -14,6 +14,7 @@ import '../../domain/entities/subscription.dart';
 import '../extensions/lesson_policy_visuals.dart';
 import '../providers/lesson_policy_providers.dart';
 import '../providers/subscription_providers.dart';
+import '../screens/subscription_policy_override_screen.dart';
 import 'location_travel_selector.dart';
 
 /// Bottom sheet showing the applied policy for a subscription.
@@ -329,6 +330,15 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
           onTap: () => _showEditCancelDeadlineSheet(context, sub),
         ),
 
+        // ── 추가 정책 (보상·알림·문구) ──
+        _EditableRow(
+          label: AppStrings.subscriptionPolicyOverrideTitle,
+          value: _compensationSummary(sub),
+          buttonLabel: AppStrings.edit,
+          isSaving: _isSaving,
+          onTap: () => _openOverrideScreen(context, sub),
+        ),
+
         const SizedBox(height: AppSpacing.space4),
 
         // ── 수정 불가 섹션 구분선 ──
@@ -447,6 +457,26 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
               await _updateSubscription(updated);
             },
           ),
+    );
+  }
+
+  String _compensationSummary(Subscription sub) {
+    final hasOverrides =
+        sub.overrideStudentCompensationExtraMinutesEnabled != null ||
+        sub.overrideIncludeExtraMinutesTextOnLateCancel != null ||
+        sub.overrideStudentCompensationExtraMinutesMessage != null ||
+        sub.overrideNotifyOwnerOnLateCancel != null ||
+        sub.overrideCancelDeadlineHours != null;
+    return hasOverrides
+        ? AppStrings.subscriptionPolicyOverridden
+        : AppStrings.subscriptionPolicyUsingDefault;
+  }
+
+  void _openOverrideScreen(BuildContext context, Subscription sub) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SubscriptionPolicyOverrideScreen(subscription: sub),
+      ),
     );
   }
 
@@ -941,7 +971,9 @@ class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
                 ),
               ),
               ChoiceChip(
-                label: const Text(AppStrings.unifiedSubscriptionDirectInputToggle),
+                label: const Text(
+                  AppStrings.unifiedSubscriptionDirectInputToggle,
+                ),
                 selected: _isCustom,
                 onSelected: (_) => setState(() => _isCustom = true),
                 selectedColor: AppColors.paperAccent,

@@ -3206,6 +3206,63 @@ class AppStrings {
   static const policyAppliedFooter =
       '수강권 발급 시점의 정책이 적용됩니다. 선생님이 이후 정책을 변경해도 이 수강권에는 영향을 주지 않습니다.';
 
+  // -- Subscription Policy Override Screen (수강권 단위 override 화면) --
+
+  /// 수강권 취소 정책 (override 화면 제목)
+  static const subscriptionPolicyOverrideTitle = '수강권 취소 정책';
+
+  /// 학원 귀속 수강권 read-only 안내
+  static const subscriptionPolicyOverrideAcademyReadOnly =
+      '학원 귀속 수강권입니다. 정책은 학원 관리자만 변경할 수 있습니다.';
+
+  /// override 화면 푸터
+  static const subscriptionPolicyOverrideFooter =
+      'ⓘ 이 값들은 본 수강권에만 적용됩니다. 디폴트 자체를 바꾸려면 설정 화면에서 변경하세요.';
+
+  /// 시트 행 — override 미설정 (디폴트 사용)
+  static const subscriptionPolicyUsingDefault = '디폴트 사용';
+
+  /// 시트 행 — 1개 이상 override 적용 중
+  static const subscriptionPolicyOverridden = '개별 설정 적용';
+
+  /// 변경/취소 마감 시간 안내 (디폴트 값)
+  static String policyDeadlineHoursHelper(int defaultHours) =>
+      '디폴트: $defaultHours시간 전. 이 시간 안에 학생이 변경하면 변경권을 차감합니다.';
+
+  /// 학생 변경권 자동 적립 (라벨)
+  static const policyCompensationCreditLabel = '학생 변경권 자동 적립';
+
+  /// 학생 변경권 자동 적립 안내 (디폴트 ON/OFF)
+  static String policyCompensationCreditHelper(bool defaultEnabled) =>
+      '디폴트: ${defaultEnabled ? "켜짐" : "꺼짐"}. 강사 사유 12시간 이내 취소 시 학생에게 변경권 1회를 자동으로 적립합니다.';
+
+  /// 추가 시간 안내 문구 포함 (라벨)
+  static const policyIncludeExtraMinutesTextLabel = '"추가 시간 안내" 문구 포함';
+
+  /// 추가 시간 안내 문구 포함 안내
+  static String policyIncludeExtraMinutesTextHelper(bool defaultEnabled) =>
+      '디폴트: ${defaultEnabled ? "켜짐" : "꺼짐"}. 학생에게 보내는 카톡에 "다음 레슨 추가 시간 안내" 문구를 포함합니다.';
+
+  /// 안내 문구 (라벨)
+  static const policyCompensationMessageLabel = '안내 문구';
+
+  /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
+  static String policyCompensationMessageHelper(String? defaultMessage) =>
+      defaultMessage == null || defaultMessage.isEmpty
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+
+  /// 안내 문구 placeholder
+  static const policyCompensationMessageHint =
+      '예) 다음 레슨 시 10분 추가 시간을 안내드릴 예정입니다.';
+
+  /// 학원 관리자 알림 (라벨)
+  static const policyNotifyOwnerLabel = '학원 관리자에게 알림';
+
+  /// 학원 관리자 알림 안내
+  static String policyNotifyOwnerHelper(bool defaultEnabled) =>
+      '디폴트: ${defaultEnabled ? "켜짐" : "꺼짐"}. 강사 사유 12시간 이내 취소 시 학원 관리자에게 푸시 알림을 보냅니다.';
+
   // -- Issue Form Type Options (수강권 발급 폼 타입 옵션) --
 
   /// 회차 (패키지 회차 입력 라벨)
