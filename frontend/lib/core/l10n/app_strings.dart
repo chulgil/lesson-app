@@ -7195,4 +7195,68 @@ class AppStrings {
 
   /// 12시간 이내 취소 — 추가 시간 안내 기본 문구
   static const teacherCancelExtraMinutesDefault = '다음 레슨 시 추가 시간을 안내드릴 예정입니다.';
+
+  // ── Bulk Closure Makeup Input (G15) ───────────────────────
+
+  /// 보강 입력 화면 — 헤더
+  static String makeupInputTitle(String closureDateText) =>
+      '보강 일정 입력 — $closureDateText 휴원 영향';
+
+  /// 보강 입력 행 — 학생 이름 + 원래 시각
+  static String makeupInputLessonRow(String studentName, String originalText) =>
+      '$studentName ($originalText 휴강)';
+
+  /// 보강 입력 — picker 라벨
+  static const makeupInputPickerLabel = '보강 시각';
+
+  /// 보강 입력 — picker 미선택 placeholder
+  static const makeupInputPickerEmpty = '시각 선택';
+
+  /// 보강 입력 — 저장 버튼
+  static const makeupInputSaveAction = '저장';
+
+  /// 보강 입력 — 안내 1
+  static const makeupInputNoticeConfirm = '보강 시각은 강사가 직접 확정합니다.';
+
+  /// 보강 입력 — 안내 2
+  static const makeupInputNoticeNotify = '확정 즉시 학생/학부모에게 통보됩니다.';
+
+  /// 보강 입력 — 임시 저장 버튼
+  static const makeupInputDraftSave = '임시저장';
+
+  /// 보강 입력 — 전체 확정 버튼
+  static const makeupInputBulkConfirm = '전체 확정';
+
+  /// 보강 입력 — 진행률 표기
+  static String makeupInputProgress(int completed, int total) =>
+      '$total건 중 $completed건 입력 완료';
+
+  /// 보강 입력 — 빈 상태
+  static const makeupInputEmptyState = '영향 받은 레슨이 없습니다.';
+
+  /// 보강 입력 — 저장 성공 토스트
+  static const makeupInputSavedToast = '보강 일정이 저장되었습니다.';
+
+  // ── Closure Opinion Window (G15 §5.2) ─────────────────────
+
+  /// 의견 위젯 — 헤더
+  static const closureCommentTitle = '의견 입력 (학원 관리자에게 전달)';
+
+  /// 의견 위젯 — placeholder
+  static const closureCommentHint = '의견을 입력해주세요...';
+
+  /// 의견 위젯 — 보내기 버튼
+  static const closureCommentSend = '의견 보내기';
+
+  /// 의견 위젯 — 자동 적용 안내
+  static String closureCommentAutoApply(int minutes) => '$minutes분 후 자동 적용됩니다.';
+
+  /// 의견 위젯 — 즉시 적용 가능 안내
+  static const closureCommentImmediateApply = '학원 관리자가 즉시 적용할 수도 있습니다.';
+
+  /// 의견 위젯 — 윈도우 만료
+  static const closureCommentWindowClosed = '의견 윈도우가 종료되었습니다.';
+
+  /// 의견 위젯 — 의견 전송됨
+  static const closureCommentSubmitted = '의견이 전송되었습니다.';
 }
