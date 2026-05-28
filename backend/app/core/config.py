@@ -61,6 +61,12 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # In-App Purchase validation (#405). Default-deny: receipts are stored for audit
+    # but never upgrade plans unless a real validator is configured. The dev/test
+    # flag below is only consulted in non-production environments to keep mocking
+    # workflows convenient — production rejects it outright.
+    IAP_AUTO_GRANT_ON_PENDING_DEV_ONLY: bool = False
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 

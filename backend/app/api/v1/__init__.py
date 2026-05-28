@@ -6,6 +6,7 @@ from app.api.v1 import (
     ai_notes,
     analytics,
     announcements,
+    app_billing,
     app_version,
     auth,
     availability,
@@ -49,6 +50,7 @@ from app.api.v1 import (
 api_router = APIRouter()
 
 api_router.include_router(app_version.router, prefix="/app/version", tags=["app-version"])
+api_router.include_router(app_billing.router, prefix="/me/billing", tags=["billing"])
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
