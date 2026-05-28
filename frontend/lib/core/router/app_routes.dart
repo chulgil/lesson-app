@@ -176,4 +176,7 @@ class AppRoutes {
   // Academy routes
   static const academyInviteAccept = '/academy/accept';
   static const academyInviteExpired = '/academy/expired';
+  static const academyAnnouncements = '/academy/:academyId/announcements';
+  static const academyAnnouncementDetail =
+      '/academy/:academyId/announcements/:announcementId';
 }
