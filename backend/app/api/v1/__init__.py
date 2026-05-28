@@ -4,9 +4,9 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     ai_notes,
+    analytics,
     announcements,
     app_version,
-    analytics,
     auth,
     availability,
     bookings,
@@ -14,6 +14,7 @@ from app.api.v1 import (
     gamification,
     groups,
     help,
+    invite_landing,
     invites,
     lesson_policies,
     lesson_requests,
@@ -37,6 +38,7 @@ from app.api.v1 import (
     schedule_exceptions,
     scheduler,
     settings_api,
+    student_summary,
     students,
     subscription_settings,
     subscriptions,
@@ -69,6 +71,7 @@ api_router.include_router(parents.router, prefix="/parents", tags=["parents"])
 api_router.include_router(posts.router, prefix="/posts", tags=["posts"])
 api_router.include_router(relationships.router, tags=["relationships"])
 api_router.include_router(invites.router, prefix="/invites", tags=["invites"])
+api_router.include_router(invite_landing.router, tags=["invites-public"])
 api_router.include_router(gamification.router, prefix="/gamification", tags=["gamification"])
 api_router.include_router(settings_api.router, prefix="/settings", tags=["settings"])
 api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
@@ -104,4 +107,8 @@ api_router.include_router(
     availability.router,
     prefix="/availability",
     tags=["availability"],
+)
+api_router.include_router(
+    student_summary.router,
+    tags=["public-sharing"],
 )

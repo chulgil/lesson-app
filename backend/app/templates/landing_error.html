@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>초대 코드 오류 - Lessonaza</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .reason-box {
+            background: #fff5f5;
+            border: 2px solid #feb2b2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .reason-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #c53030;
+            margin-bottom: 8px;
+        }
+
+        .reason-text {
+            font-size: 14px;
+            color: #742a2a;
+        }
+
+        .solution-box {
+            background: #f0fff4;
+            border: 2px solid #9ae6b4;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .solution-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #22543d;
+            margin-bottom: 12px;
+        }
+
+        .solution-item {
+            font-size: 13px;
+            color: #22543d;
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .solution-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+        }
+
+        .contact-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .contact-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .error-icon {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">❌</div>
+
+        <div class="title">초대 코드가 유효하지 않습니다</div>
+
+        <div class="message">
+            죄송하지만 입력하신 초대 코드를 확인할 수 없습니다.
+        </div>
+
+        <div class="reason-box">
+            <div class="reason-title">🔍 가능한 원인:</div>
+            <div class="reason-text">
+                {% if error_reason == 'expired' %}
+                    초대 코드가 만료되었습니다. 선생님께 새로운 초대 링크를 요청해주세요.
+                {% elif error_reason == 'revoked' %}
+                    초대 코드가 취소되었습니다. 선생님께 문의해주세요.
+                {% else %}
+                    코드가 잘못되었거나 존재하지 않습니다. 초대 링크를 다시 확인해주세요.
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="solution-box">
+            <div class="solution-title">💡 해결 방법:</div>
+            <div class="solution-item">선생님께 새로운 초대 링크를 요청하세요</div>
+            <div class="solution-item">카톡이나 이메일로 받은 초대 링크를 다시 확인하세요</div>
+            <div class="solution-item">초대 코드를 정확하게 입력했는지 확인하세요</div>
+        </div>
+
+        <a href="mailto:support@lessonaza.app" class="contact-button">
+            📧 지원팀에 문의하기
+        </a>
+
+        <div class="footer">
+            © 2026 Lessonaza. 모든 권리 보유.
+        </div>
+    </div>
+</body>
+</html>

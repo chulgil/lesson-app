@@ -75,6 +75,7 @@ from app.models.settings import (  # noqa: F401
     TeachingResource,
     TeachingResourceTag,
 )
+from app.models.share_token import ShareToken  # noqa: F401
 from app.models.student import Student  # noqa: F401
 from app.models.subscription import (  # noqa: F401
     Subscription,
