@@ -37,7 +37,11 @@ class _AcademyInviteAcceptScreenState
   Future<void> _handleAccept() async {
     setState(() => _isAccepting = true);
     try {
-      await ref.read(academyInviteAcceptProvider(widget.token).future);
+      final repository = ref.read(academyInviteRepositoryProvider);
+      await repository.acceptInvite(
+        widget.token,
+        publicPageConsent: _publicPageConsent,
+      );
       if (mounted) {
         context.go(AppRoutes.home);
       }
@@ -55,7 +59,15 @@ class _AcademyInviteAcceptScreenState
   }
 
   Future<void> _handleReject() async {
-    context.go(AppRoutes.home);
+    try {
+      final repository = ref.read(academyInviteRepositoryProvider);
+      await repository.rejectInvite(widget.token);
+    } catch (_) {
+      // Best-effort reject; navigate home regardless.
+    }
+    if (mounted) {
+      context.go(AppRoutes.home);
+    }
   }
 
   @override
