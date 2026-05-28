@@ -407,22 +407,33 @@ class AuthService:
                 raise HTTPException(status_code=404, detail="User not found")
             return user
 
-        # Check if a user with this email already exists
-        user = None
+        # Refuse silent cross-provider link when the provider-returned email
+        # already belongs to another user. Providers do not uniformly prove
+        # email ownership at signup, so auto-linking by email allows takeover
+        # of the existing account by an attacker who registers the victim's
+        # email on a different provider. The caller must use an explicit
+        # account-linking flow instead. (#409)
         if provider_user.get("email"):
-            user = await self.db.scalar(select(User).where(User.email == provider_user["email"]))
+            existing_by_email = await self.db.scalar(select(User).where(User.email == provider_user["email"]))
+            if existing_by_email is not None:
+                raise HTTPException(
+                    status_code=409,
+                    detail=(
+                        "An account with this email already exists. "
+                        "Sign in with your original provider to link this account."
+                    ),
+                )
 
-        if user is None:
-            user = User(
-                email=provider_user.get("email"),
-                name=provider_user.get("name") or provider_user.get("email") or provider_user["provider_user_id"],
-                profile_image_url=provider_user.get("profile_image_url"),
-                locale=request.locale or "ko",
-                country=request.country or "KR",
-                timezone=request.timezone or "Asia/Seoul",
-            )
-            self.db.add(user)
-            await self.db.flush()
+        user = User(
+            email=provider_user.get("email"),
+            name=provider_user.get("name") or provider_user.get("email") or provider_user["provider_user_id"],
+            profile_image_url=provider_user.get("profile_image_url"),
+            locale=request.locale or "ko",
+            country=request.country or "KR",
+            timezone=request.timezone or "Asia/Seoul",
+        )
+        self.db.add(user)
+        await self.db.flush()
 
         new_oauth = OAuthAccount(
             user_id=user.id,
