@@ -2,6 +2,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../../features/auth/presentation/screens/academy_invite_accept_screen.dart';
 import '../../../features/auth/presentation/screens/login_screen.dart';
 import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
@@ -84,5 +85,20 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.studentTutorial,
     name: 'studentTutorial',
     builder: (context, state) => const StudentTutorialScreen(),
+  ),
+
+  // Academy Invite Accept
+  GoRoute(
+    path: AppRoutes.academyInviteAccept,
+    name: 'academyInviteAccept',
+    builder: (context, state) {
+      final token = state.uri.queryParameters['token'];
+      if (token == null) {
+        return const Scaffold(
+          body: Center(child: Text('Invalid invite token')),
+        );
+      }
+      return AcademyInviteAcceptScreen(token: token);
+    },
   ),
 ];

@@ -171,4 +171,7 @@ class AppRoutes {
 
   // Announcement routes
   static const announcementHistory = '/students/announcement-history';
+
+  // Academy routes
+  static const academyInviteAccept = '/academy/accept';
 }
