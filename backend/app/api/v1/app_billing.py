@@ -1,0 +1,124 @@
+"""App billing and IAP endpoints."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.deps import get_current_user, get_db
+from app.models.user import User
+from app.schemas.app_billing import (
+    BillingPlanResponse,
+    IapValidateRequest,
+    IapValidateResponse,
+    TrialStartResponse,
+)
+from app.services.app_billing_service import AppBillingService
+
+router = APIRouter()
+
+
+@router.get(
+    "/plan",
+    response_model=BillingPlanResponse,
+    summary="Get current user billing plan",
+)
+async def get_billing_plan(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> BillingPlanResponse:
+    """Retrieve the current user's app subscription tier and status."""
+    service = AppBillingService(db)
+    plan = await service.get_active_plan(current_user.id)
+
+    return BillingPlanResponse.model_validate(plan)
+
+
+@router.post(
+    "/trial/start",
+    response_model=TrialStartResponse,
+    summary="Start Pro trial",
+    status_code=status.HTTP_200_OK,
+)
+async def start_trial(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> TrialStartResponse:
+    """Activate 14-day Pro trial subscription.
+
+    Returns 409 if trial already used by this account.
+    """
+    service = AppBillingService(db)
+
+    try:
+        plan = await service.activate_trial(current_user.id)
+        await db.commit()
+
+        return TrialStartResponse(
+            success=True,
+            message="Pro trial activated for 14 days",
+            plan_id=plan.id,
+            expires_at=plan.expires_at,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        )
+
+
+@router.post(
+    "/iap/validate",
+    response_model=IapValidateResponse,
+    summary="Validate IAP receipt",
+)
+async def validate_iap_receipt(
+    request: IapValidateRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> IapValidateResponse:
+    """Validate in-app purchase receipt and activate subscription.
+
+    Accepts receipts from both Apple App Store and Google Play Store.
+    Stores receipt for audit trail and updates billing plan on success.
+    """
+    service = AppBillingService(db)
+
+    try:
+        granted, plan = await service.apply_iap_receipt(
+            user_id=current_user.id,
+            platform=request.platform,
+            raw_receipt=request.receipt,
+            transaction_id=request.product_id,  # Will be populated from validated receipt
+            product_id=request.product_id,
+        )
+        # Always commit so the audit-trail receipt is persisted, even when the
+        # plan was not upgraded (#405 default-deny).
+        await db.commit()
+
+        if granted:
+            return IapValidateResponse(
+                success=True,
+                message="Receipt validated and plan activated",
+                plan_id=plan.id,
+                tier=plan.tier,
+                expires_at=plan.expires_at,
+            )
+
+        return IapValidateResponse(
+            success=False,
+            message="Receipt stored for review — IAP validation not yet enabled",
+            plan_id=None,
+            tier=None,
+            expires_at=None,
+        )
+    except Exception as e:
+        await db.rollback()
+
+        return IapValidateResponse(
+            success=False,
+            message=f"Receipt validation failed: {str(e)}",
+            plan_id=None,
+            tier=None,
+            expires_at=None,
+        )
