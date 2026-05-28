@@ -59,6 +59,10 @@ class TimeSlotResponse(BaseModel):
 class TeacherAvailabilityCreate(BaseModel):
     day_of_week: int  # 0=Mon … 6=Sun
     time_slots: list[TimeSlotCreate] = []
+    vacation_mode: bool = False
+    vacation_start_date: _dt.date | None = None
+    vacation_end_date: _dt.date | None = None
+    vacation_reason: str | None = None
 
     @field_validator("day_of_week")
     @classmethod
@@ -66,6 +70,15 @@ class TeacherAvailabilityCreate(BaseModel):
         if value < 0 or value > 6:
             raise ValueError("day_of_week must be 0..6")
         return value
+
+    @model_validator(mode="after")
+    def validate_vacation_dates(self) -> "TeacherAvailabilityCreate":
+        if self.vacation_mode:
+            if self.vacation_start_date is None or self.vacation_end_date is None:
+                raise ValueError("vacation_start_date and vacation_end_date required when vacation_mode=true")
+            if self.vacation_end_date < self.vacation_start_date:
+                raise ValueError("vacation_end_date must be >= vacation_start_date")
+        return self
 
     @model_validator(mode="after")
     def validate_no_overlap(self) -> "TeacherAvailabilityCreate":
@@ -81,6 +94,10 @@ class TeacherAvailabilityCreate(BaseModel):
 class TeacherAvailabilityUpdate(BaseModel):
     day_of_week: int | None = None
     time_slots: list[TimeSlotCreate] | None = None
+    vacation_mode: bool | None = None
+    vacation_start_date: _dt.date | None = None
+    vacation_end_date: _dt.date | None = None
+    vacation_reason: str | None = None
 
     @field_validator("day_of_week")
     @classmethod
@@ -92,12 +109,20 @@ class TeacherAvailabilityUpdate(BaseModel):
         return value
 
     @model_validator(mode="after")
+    def validate_vacation_dates(self) -> "TeacherAvailabilityUpdate":
+        if self.vacation_mode is True:
+            if self.vacation_start_date is None or self.vacation_end_date is None:
+                raise ValueError("vacation_start_date and vacation_end_date required when vacation_mode=true")
+            if self.vacation_end_date < self.vacation_start_date:
+                raise ValueError("vacation_end_date must be >= vacation_start_date")
+        return self
+
+    @model_validator(mode="after")
     def validate_no_overlap(self) -> "TeacherAvailabilityUpdate":
         if self.time_slots is None or len(self.time_slots) <= 1:
             return self
         slots = sorted(
-            (_parse_slot_minute(slot.start_time), _parse_slot_minute(slot.end_time))
-            for slot in self.time_slots
+            (_parse_slot_minute(slot.start_time), _parse_slot_minute(slot.end_time)) for slot in self.time_slots
         )
         for previous, current in zip(slots, slots[1:]):
             if previous[1] > current[0]:
@@ -112,5 +137,9 @@ class TeacherAvailabilityResponse(BaseModel):
     teacher_id: str
     day_of_week: int
     time_slots: list[TimeSlotResponse] = []
+    vacation_mode: bool = False
+    vacation_start_date: _dt.date | None = None
+    vacation_end_date: _dt.date | None = None
+    vacation_reason: str | None = None
     created_at: _dt.datetime
     updated_at: _dt.datetime | None = None

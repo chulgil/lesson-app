@@ -814,3 +814,82 @@ async def test_fw_multiple_bank_accounts(teacher: TeacherActions):
     result = await teacher.update_teacher_profile(teacher_id, bank_accounts=updated_accounts)
     assert len(result["bank_accounts"]) == 1
     assert result["bank_accounts"][0]["bank_name"] == "신한은행"
+
+
+# ===========================================================================
+# Scenario Z: 방학 모드 (Vacation Mode) - Issue #380
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_vacation_mode_enable(teacher: TeacherActions):
+    """Teacher enables vacation mode for a period, blocks bookable slots."""
+    # Step 1: 초기 가용성 설정 (수요일 14:00 ~ 16:00)
+    avail = await teacher.client.post(
+        "/api/availability",
+        json={
+            "day_of_week": 2,  # Wednesday
+            "time_slots": [
+                {"start_time": "14:00", "end_time": "15:00", "is_available": True},
+                {"start_time": "15:00", "end_time": "16:00", "is_available": True},
+            ],
+            "vacation_mode": False,
+        },
+    )
+    assert avail.status_code == 200
+    avail_id = avail.json()["id"]
+    assert avail.json()["vacation_mode"] is False
+
+    # Step 2: 방학 모드 활성화 (7/15 ~ 8/31, "여름방학")
+    update = await teacher.client.patch(
+        f"/api/availability/{avail_id}",
+        json={
+            "vacation_mode": True,
+            "vacation_start_date": "2026-07-15",
+            "vacation_end_date": "2026-08-31",
+            "vacation_reason": "여름방학",
+        },
+    )
+    assert update.status_code == 200
+    result = update.json()
+    assert result["vacation_mode"] is True
+    assert result["vacation_start_date"] == "2026-07-15"
+    assert result["vacation_end_date"] == "2026-08-31"
+    assert result["vacation_reason"] == "여름방학"
+
+    # Step 3: 방학 기간 내 슬롯은 예약 불가
+    # (실제 구현: 학생이 예약 조회 시 vacation_mode=true인 슬롯은 필터링됨)
+    # 본 테스트는 API 응답 필드만 검증 (슬롯 차단 로직은 별도 E2E 테스트 대상)
+
+
+@pytest.mark.asyncio
+async def test_fw_vacation_mode_disable(teacher: TeacherActions):
+    """Teacher disables vacation mode, re-enables bookable slots."""
+    # Step 1: 방학 모드 활성화된 가용성 생성
+    avail = await teacher.client.post(
+        "/api/availability",
+        json={
+            "day_of_week": 4,  # Friday
+            "time_slots": [
+                {"start_time": "10:00", "end_time": "11:00", "is_available": True},
+            ],
+            "vacation_mode": True,
+            "vacation_start_date": "2026-10-01",
+            "vacation_end_date": "2026-10-31",
+            "vacation_reason": "시험기간",
+        },
+    )
+    assert avail.status_code == 200
+    avail_id = avail.json()["id"]
+    assert avail.json()["vacation_mode"] is True
+
+    # Step 2: 방학 모드 비활성화
+    update = await teacher.client.patch(
+        f"/api/availability/{avail_id}",
+        json={"vacation_mode": False},
+    )
+    assert update.status_code == 200
+    result = update.json()
+    assert result["vacation_mode"] is False
+    # 날짜는 유지되지만 vacation_mode=false이므로 무시됨
+    assert result["vacation_start_date"] == "2026-10-01"

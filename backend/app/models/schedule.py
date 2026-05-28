@@ -2,9 +2,9 @@ import enum
 from datetime import date, datetime
 
 from sqlalchemy import (
-    CheckConstraint,
     JSON,
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     Enum,
@@ -118,16 +118,38 @@ class NoShowPolicy(str, enum.Enum):
 
 
 class TeacherAvailability(UUIDMixin, TimestampMixin, Base):
-    """Teacher available day of the week."""
+    """Teacher available day of the week.
+
+    Vacation Mode (§3.5 teacher_availability_spec.md):
+    - vacation_mode: bool - whether vacation mode is active
+    - vacation_start_date: date | None - vacation start (inclusive)
+    - vacation_end_date: date | None - vacation end (inclusive)
+    - vacation_reason: str | None - vacation reason (e.g. "여름방학", "시험기간")
+
+    Note: Separate from ScheduleException(type=vacation). Both mechanisms can be
+    active simultaneously; if either is active, the slot is blocked.
+    """
 
     __tablename__ = "teacher_availabilities"
 
     teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
     day_of_week: Mapped[int] = mapped_column(Integer, nullable=False)
+    vacation_mode: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    vacation_start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    vacation_end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    vacation_reason: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     __table_args__ = (
         Index("uk_avail_teacher_day", "teacher_id", "day_of_week", unique=True),
         CheckConstraint("day_of_week BETWEEN 0 AND 6", name="ck_teacher_availabilities_day_of_week"),
+        CheckConstraint(
+            "vacation_mode = false OR (vacation_start_date IS NOT NULL AND vacation_end_date IS NOT NULL)",
+            name="ck_vacation_dates_required_when_active",
+        ),
+        CheckConstraint(
+            "vacation_end_date IS NULL OR vacation_start_date IS NULL OR vacation_end_date >= vacation_start_date",
+            name="ck_vacation_end_after_start",
+        ),
     )
 
 

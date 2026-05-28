@@ -50,28 +50,26 @@ class AvailabilityService:
         results: list[TeacherAvailabilityResponse] = []
         for avail in avail_rows.all():
             slot_rows = await self.db.scalars(
-                select(AvailabilityTimeSlot).where(
-                    AvailabilityTimeSlot.availability_id == avail.id
-                )
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
             )
-            slots = [
-                TimeSlotResponse.model_validate(s) for s in slot_rows.all()
-            ]
+            slots = [TimeSlotResponse.model_validate(s) for s in slot_rows.all()]
             results.append(
                 TeacherAvailabilityResponse(
                     id=avail.id,
                     teacher_id=avail.teacher_id,
                     day_of_week=avail.day_of_week,
                     time_slots=slots,
+                    vacation_mode=avail.vacation_mode,
+                    vacation_start_date=avail.vacation_start_date,
+                    vacation_end_date=avail.vacation_end_date,
+                    vacation_reason=avail.vacation_reason,
                     created_at=avail.created_at,
                     updated_at=avail.updated_at,
                 )
             )
         return results
 
-    async def create_or_update(
-        self, teacher_id: str, data: TeacherAvailabilityCreate
-    ) -> TeacherAvailabilityResponse:
+    async def create_or_update(self, teacher_id: str, data: TeacherAvailabilityCreate) -> TeacherAvailabilityResponse:
         """Create availability for a day, or update if it already exists."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
 
@@ -86,9 +84,7 @@ class AvailabilityService:
         if existing:
             # Replace time slots
             old_slots = await self.db.scalars(
-                select(AvailabilityTimeSlot).where(
-                    AvailabilityTimeSlot.availability_id == existing.id
-                )
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == existing.id)
             )
             for old_slot in old_slots.all():
                 await self.db.delete(old_slot)
@@ -98,6 +94,10 @@ class AvailabilityService:
             avail = TeacherAvailability(
                 teacher_id=teacher_id,
                 day_of_week=data.day_of_week,
+                vacation_mode=data.vacation_mode,
+                vacation_start_date=data.vacation_start_date,
+                vacation_end_date=data.vacation_end_date,
+                vacation_reason=data.vacation_reason,
             )
             self.db.add(avail)
             await self.db.flush()
@@ -122,6 +122,10 @@ class AvailabilityService:
             teacher_id=avail.teacher_id,
             day_of_week=avail.day_of_week,
             time_slots=new_slots,
+            vacation_mode=avail.vacation_mode,
+            vacation_start_date=avail.vacation_start_date,
+            vacation_end_date=avail.vacation_end_date,
+            vacation_reason=avail.vacation_reason,
             created_at=avail.created_at,
             updated_at=avail.updated_at,
         )
@@ -146,13 +150,21 @@ class AvailabilityService:
         if data.day_of_week is not None:
             avail.day_of_week = data.day_of_week
 
+        # Update vacation mode fields if provided
+        if data.vacation_mode is not None:
+            avail.vacation_mode = data.vacation_mode
+        if data.vacation_start_date is not None:
+            avail.vacation_start_date = data.vacation_start_date
+        if data.vacation_end_date is not None:
+            avail.vacation_end_date = data.vacation_end_date
+        if data.vacation_reason is not None:
+            avail.vacation_reason = data.vacation_reason
+
         # Replace time slots if provided
         if data.time_slots is not None:
             self._assert_non_overlapping_slots(data.time_slots)
             old_slots = await self.db.scalars(
-                select(AvailabilityTimeSlot).where(
-                    AvailabilityTimeSlot.availability_id == availability_id
-                )
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == availability_id)
             )
             for old_slot in old_slots.all():
                 await self.db.delete(old_slot)
@@ -171,9 +183,7 @@ class AvailabilityService:
                 new_slots.append(TimeSlotResponse.model_validate(slot))
         else:
             slot_rows = await self.db.scalars(
-                select(AvailabilityTimeSlot).where(
-                    AvailabilityTimeSlot.availability_id == availability_id
-                )
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == availability_id)
             )
             new_slots = [TimeSlotResponse.model_validate(s) for s in slot_rows.all()]
 
@@ -184,6 +194,10 @@ class AvailabilityService:
             teacher_id=avail.teacher_id,
             day_of_week=avail.day_of_week,
             time_slots=new_slots,
+            vacation_mode=avail.vacation_mode,
+            vacation_start_date=avail.vacation_start_date,
+            vacation_end_date=avail.vacation_end_date,
+            vacation_reason=avail.vacation_reason,
             created_at=avail.created_at,
             updated_at=avail.updated_at,
         )
@@ -202,9 +216,7 @@ class AvailabilityService:
 
         # Delete associated time slots
         old_slots = await self.db.scalars(
-            select(AvailabilityTimeSlot).where(
-                AvailabilityTimeSlot.availability_id == availability_id
-            )
+            select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == availability_id)
         )
         for slot in old_slots.all():
             await self.db.delete(slot)
@@ -296,9 +308,7 @@ class AvailabilityService:
             )
 
         existing = await self.db.scalars(
-            select(AvailabilityTimeSlot).where(
-                AvailabilityTimeSlot.availability_id == availability_id
-            )
+            select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == availability_id)
         )
         for slot in existing:
             if _slots_overlap(
@@ -315,13 +325,27 @@ class AvailabilityService:
     @staticmethod
     def _assert_non_overlapping_slots(time_slots: list[TimeSlotCreate]) -> None:
         """Validate a replacement slot list does not contain overlaps."""
-        normalized = sorted(
-            (_slot_minutes(slot.start_time), _slot_minutes(slot.end_time))
-            for slot in time_slots
-        )
+        normalized = sorted((_slot_minutes(slot.start_time), _slot_minutes(slot.end_time)) for slot in time_slots)
         for previous, current in zip(normalized, normalized[1:]):
             if previous[1] > current[0]:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail="time_slots for a day must not overlap",
                 )
+
+    @staticmethod
+    def is_slot_in_vacation(slot_date: date, availability: Any) -> bool:
+        """Check if a slot date falls within vacation period.
+
+        Args:
+            slot_date: The date of the slot (inclusive comparison)
+            availability: TeacherAvailability model instance
+
+        Returns:
+            True if vacation_mode is active and slot_date is within [start, end] (inclusive)
+        """
+        if not availability.vacation_mode:
+            return False
+        if availability.vacation_start_date is None or availability.vacation_end_date is None:
+            return False
+        return availability.vacation_start_date <= slot_date <= availability.vacation_end_date
