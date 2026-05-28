@@ -7172,4 +7172,27 @@ class AppStrings {
 
   /// 변경권 위젯 — 0회일 때 표시
   static const cancellationCreditNone = '변경권 없음';
+
+  // ── Teacher Cancel Policy Banner (G16) ────────────────────
+
+  /// 12시간 이내 취소 배너 — 제목
+  static const teacherCancelWithin12hTitle = '12시간 이내 취소입니다';
+
+  /// 12시간 이내 취소 안내 — 학생 변경권 자동 적립
+  static const teacherCancelGrantsCredit = '학생 변경권 +1 자동 적립';
+
+  /// 12시간 이내 취소 안내 — 사과 카톡 자동 발송
+  static const teacherCancelSendsApology = '학생에게 사과 카톡 자동 발송';
+
+  /// 12시간 이내 취소 안내 — 학원 관리자 알림 발송 (ownership=academy)
+  static const teacherCancelNotifyAcademy = '학원 관리자에게 알림 발송';
+
+  /// 12시간 이내 취소 안내 — 보강은 강사가 직접 안내
+  static const teacherCancelTeacherReschedule = '보강 일정은 강사님이 직접 안내·재입력';
+
+  /// 12시간 이내 취소 — 추가 시간 안내 라벨
+  static const teacherCancelExtraMinutesLabel = '다음 레슨 추가 시간 안내';
+
+  /// 12시간 이내 취소 — 추가 시간 안내 기본 문구
+  static const teacherCancelExtraMinutesDefault = '다음 레슨 시 추가 시간을 안내드릴 예정입니다.';
 }

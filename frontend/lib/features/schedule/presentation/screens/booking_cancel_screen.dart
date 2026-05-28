@@ -14,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../providers/teacher_availability_providers.dart';
+import '../widgets/teacher_cancel_policy_banner.dart';
 
 /// Booking cancellation screen
 ///
@@ -88,6 +89,14 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
               // Teacher cancel info
               if (widget.isTeacherCancel) _buildTeacherCancelInfo(),
+
+              // 12h policy banner (G16) — only on teacher cancel within 12h
+              if (widget.isTeacherCancel) ...[
+                const SizedBox(height: AppSpacing.space3),
+                TeacherCancelPolicyBanner(
+                  hoursUntilLesson: _hoursUntilLesson(),
+                ),
+              ],
 
               const SizedBox(height: AppSpacing.space4),
 
@@ -450,6 +459,19 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         ],
       ],
     );
+  }
+
+  /// Hours from now until lesson start. Negative when past.
+  double _hoursUntilLesson() {
+    final lessonStart = DateTime(
+      widget.bookingDate.year,
+      widget.bookingDate.month,
+      widget.bookingDate.day,
+      widget.startTime.hour,
+      widget.startTime.minute,
+    );
+    final diff = lessonStart.difference(DateTime.now());
+    return diff.inMinutes / 60.0;
   }
 
   Future<void> _handleCancel(bool isLastChance) async {
