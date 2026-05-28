@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ teacher_name }} 선생님과 함께 음악을 배워요 - Lessonaza</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        .teacher-info {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .teacher-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .teacher-instrument {
+            font-size: 14px;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .instrument-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .welcome-message {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .cta-section {
+            margin-bottom: 25px;
+        }
+
+        .cta-text {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .app-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .app-button {
+            flex: 1;
+            min-width: 160px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .app-button-ios {
+            background: #000;
+            color: white;
+        }
+
+        .app-button-ios:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .app-button-android {
+            background: #3ddc84;
+            color: #000;
+        }
+
+        .app-button-android:hover {
+            background: #2cc770;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(61, 220, 132, 0.3);
+        }
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .deep-link-button {
+            display: inline-block;
+            width: 100%;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .deep-link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .features {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .features-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .feature-item {
+            font-size: 13px;
+            color: #4a5568;
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            color: #667eea;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .code-display {
+            background: #edf2f7;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            color: #2d3748;
+            font-weight: 500;
+            letter-spacing: 2px;
+            word-break: break-all;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .teacher-name {
+                font-size: 20px;
+            }
+
+            .app-button {
+                min-width: 140px;
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎵</div>
+            <div class="title">레슨아자</div>
+            <div class="subtitle">음악 레슨 관리 앱</div>
+        </div>
+
+        <div class="teacher-info">
+            <div class="teacher-name">{{ teacher_name }}</div>
+            <div class="teacher-instrument">
+                악기:
+                <span class="instrument-badge">
+                    {% if instrument %}{{ instrument }}{% else %}음악{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="welcome-message">
+            🎉 {{ teacher_name }} 선생님께서 당신을 초대했습니다!<br><br>
+            레슨아자 앱을 설치하고 음악 레슨을 효율적으로 관리해보세요. 실시간 레슨 일정 확인, 연습 기록 관리, 녹음 저장 등 다양한 기능을 이용할 수 있습니다.
+        </div>
+
+        <div class="features">
+            <div class="features-title">✨ 주요 기능</div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>실시간 레슨 일정 및 수강권 관리</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>연습 기록 및 피드백 기능</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>음성 녹음 및 비교 분석</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>선생님과의 실시간 채팅</span>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <div class="cta-text">앱 설치하기</div>
+
+            <div class="app-buttons">
+                <a href="" class="app-button app-button-ios" id="iosLink">
+                    <span class="icon">🍎</span>
+                    <span>iOS</span>
+                </a>
+                <a href="" class="app-button app-button-android" id="androidLink">
+                    <span class="icon">🤖</span>
+                    <span>Android</span>
+                </a>
+            </div>
+
+            <button class="deep-link-button" id="openAppBtn">
+                📱 이미 앱이 설치되어 있나요?
+            </button>
+
+            <div class="code-display">코드: {{ code }}</div>
+        </div>
+
+        <div class="footer">
+            © 2026 Lessonaza. 모든 권리 보유.
+        </div>
+    </div>
+
+    <script>
+        // TODO: 실제 App Store / Google Play 링크 추가
+        const IOS_APP_STORE_URL = "https://apps.apple.com/app/lessonaza/id1234567890";
+        const ANDROID_PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=app.lessonaza";
+        const DEEPLINK_URL = "lessonaza://invite?code={{ code }}";
+
+        // Set app store links
+        document.getElementById('iosLink').href = IOS_APP_STORE_URL;
+        document.getElementById('androidLink').href = ANDROID_PLAY_STORE_URL;
+
+        // Deep link handler
+        document.getElementById('openAppBtn').addEventListener('click', function() {
+            // Try to open the app via deep link
+            window.location.href = DEEPLINK_URL;
+
+            // Fallback to iOS App Store after 2 seconds if app doesn't open
+            setTimeout(function() {
+                window.location.href = IOS_APP_STORE_URL;
+            }, 2000);
+        });
+
+        // Alternative: Use meta tag for iOS smart banner (optional)
+        // iOS will try to open the deep link first, then fall back to App Store
+    </script>
+</body>
+</html>
