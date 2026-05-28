@@ -3,7 +3,17 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, Index, String, Text, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -51,7 +61,11 @@ class AppBillingPlan(UUIDMixin, TimestampMixin, Base):
 
     __tablename__ = "app_billing_plans"
 
-    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     tier: Mapped[BillingTier] = mapped_column(
         Enum(BillingTier, native_enum=True),
         nullable=False,
@@ -86,8 +100,10 @@ class AppBillingPlan(UUIDMixin, TimestampMixin, Base):
         default=False,
     )
 
+    # One plan per user — enforced as a real UNIQUE constraint, not just a unique
+    # index, so the invariant is visible in the schema and FK-equivalent checks.
     __table_args__ = (
-        Index("uk_app_billing_user", "user_id", unique=True),
+        UniqueConstraint("user_id", name="uq_app_billing_plans_user_id"),
         Index("idx_app_billing_expires", "expires_at"),
         Index("idx_app_billing_status", "status"),
     )
@@ -102,7 +118,11 @@ class IapReceipt(UUIDMixin, TimestampMixin, Base):
 
     __tablename__ = "iap_receipts"
 
-    user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     platform: Mapped[IapPlatform] = mapped_column(
         Enum(IapPlatform, native_enum=True),
         nullable=False,
@@ -120,7 +140,15 @@ class IapReceipt(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
 
+    # (platform, transaction_id) is globally unique per Apple/Google contract —
+    # enforce at the DB level to make replayed receipts impossible to insert
+    # twice even if application-level dedup is bypassed.
     __table_args__ = (
+        UniqueConstraint(
+            "platform",
+            "transaction_id",
+            name="uq_iap_receipts_platform_transaction",
+        ),
         Index("idx_iap_receipt_user", "user_id"),
         Index("idx_iap_receipt_platform", "platform"),
         Index("idx_iap_receipt_transaction", "transaction_id"),
