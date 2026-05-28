@@ -15,6 +15,8 @@ import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../features/lessons/lessons_facade.dart';
 import '../../../../features/settings/settings_facade.dart';
+import '../../../../features/academy/presentation/providers/academy_visibility_provider.dart';
+import '../../../../features/academy/domain/repositories/academy_visibility_repository.dart';
 import '../widgets/regular_lesson_widgets.dart';
 import '../widgets/schedule_type_selector.dart';
 
@@ -48,6 +50,8 @@ class _RegisterRegularLessonScreenState
   int _monthlyFee = 200000;
   DateTime _startDate = getNextMonday();
   bool _isSubmitting = false;
+  bool _isAcademyPrivate = false;
+  String? _selectedAcademyId;
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +61,25 @@ class _RegisterRegularLessonScreenState
     final settingsAsync = ref.watch(
       teacherSettingsByIdProvider(widget.teacherId),
     );
+    final academiesAsync = ref.watch(
+      teacherAcademiesProvider(widget.teacherId),
+    );
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.regularLessonTitle,
-      ),
+      appBar: const NotebookDetailAppBar(title: AppStrings.regularLessonTitle),
       body: settingsAsync.when(
         data:
             (settings) => availabilityAsync.when(
-              data: (slots) => _buildContent(settings, slots),
+              data:
+                  (slots) => academiesAsync.when(
+                    data:
+                        (academies) =>
+                            _buildContent(settings, slots, academies),
+                    loading:
+                        () => const Center(child: CircularProgressIndicator()),
+                    error: (_, __) => _buildContent(settings, slots, []),
+                  ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error:
                   (_, __) =>
@@ -80,7 +93,11 @@ class _RegisterRegularLessonScreenState
     );
   }
 
-  Widget _buildContent(TeacherSettings settings, List<TimeSlot> slots) {
+  Widget _buildContent(
+    TeacherSettings settings,
+    List<TimeSlot> slots,
+    List<TeacherAcademyMembership> academies,
+  ) {
     // Initialize lesson duration from teacher's default if not set
     if (_selectedLessonDuration == 60 && settings.defaultLessonDuration != 60) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -278,6 +295,73 @@ class _RegisterRegularLessonScreenState
 
           const SizedBox(height: AppSpacing.space8),
 
+          // Academy privacy toggle (only show if teacher belongs to academy)
+          if (academies.isNotEmpty) ...[
+            const RegularLessonSectionTitle(
+              AppStrings.academyPrivacyLabel,
+              romanIndex: 7,
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            if (academies.length == 1)
+              SwitchListTile(
+                title: Text(
+                  AppStrings.academyPrivacyLabel,
+                  style: AppTypography.bodyMedium,
+                ),
+                subtitle: Text(
+                  AppStrings.academyPrivacyHint,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+                value: _isAcademyPrivate,
+                onChanged: (value) {
+                  setState(() {
+                    _isAcademyPrivate = value;
+                    if (value && _selectedAcademyId == null) {
+                      _selectedAcademyId = academies.first.academyId;
+                    }
+                  });
+                },
+              )
+            else ...[
+              // Multiple academies: show dropdown to select academy
+              DropdownButton<String>(
+                value: _selectedAcademyId,
+                hint: const Text(AppStrings.academy),
+                items:
+                    academies.map((academy) {
+                      return DropdownMenuItem(
+                        value: academy.academyId,
+                        child: Text(academy.academyName),
+                      );
+                    }).toList(),
+                onChanged: (value) {
+                  setState(() => _selectedAcademyId = value);
+                },
+              ),
+              const SizedBox(height: AppSpacing.space3),
+              if (_selectedAcademyId != null)
+                SwitchListTile(
+                  title: Text(
+                    AppStrings.academyPrivacyLabel,
+                    style: AppTypography.bodyMedium,
+                  ),
+                  subtitle: Text(
+                    AppStrings.academyPrivacyHint,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  value: _isAcademyPrivate,
+                  onChanged: (value) {
+                    setState(() => _isAcademyPrivate = value);
+                  },
+                ),
+            ],
+            const SizedBox(height: AppSpacing.space6),
+          ],
+
           // Summary
           RegularLessonSummary(
             scheduleTypeLabel: _scheduleType.label,
@@ -355,6 +439,8 @@ class _RegisterRegularLessonScreenState
         lessonsPerWeek: _lessonsPerWeek,
         monthlyFee: _monthlyFee,
         startDate: _startDate,
+        academyId: _selectedAcademyId,
+        isAcademyPrivate: _isAcademyPrivate,
       );
 
       await ref

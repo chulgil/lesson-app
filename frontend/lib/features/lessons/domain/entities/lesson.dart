@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../../academy/domain/entities/academy_enums.dart';
 
 part 'lesson.g.dart';
 
@@ -162,6 +163,8 @@ class Lesson {
   final bool isPreview; // Preview lesson (beyond subscription range)
   final bool isArchived; // Archived lesson (hidden from active views)
   final DateTime? archivedAt; // When the lesson was archived
+  final String? academyId; // Academy ID if lesson is linked to academy
+  final LessonVisibility visibility; // Academy visibility setting
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -189,6 +192,8 @@ class Lesson {
     this.isPreview = false,
     this.isArchived = false,
     this.archivedAt,
+    this.academyId,
+    this.visibility = LessonVisibility.academyFull,
     required this.createdAt,
     this.updatedAt,
   });
@@ -275,6 +280,8 @@ class Lesson {
     bool? isPreview,
     bool? isArchived,
     DateTime? archivedAt,
+    String? academyId,
+    LessonVisibility? visibility,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -302,6 +309,8 @@ class Lesson {
       isPreview: isPreview ?? this.isPreview,
       isArchived: isArchived ?? this.isArchived,
       archivedAt: archivedAt ?? this.archivedAt,
+      academyId: academyId ?? this.academyId,
+      visibility: visibility ?? this.visibility,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
