@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -19,15 +21,26 @@ class ContextSwitchToast extends StatefulWidget {
 }
 
 class _ContextSwitchToastState extends State<ContextSwitchToast> {
+  Timer? _dismissTimer;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), _dismissDialog);
+    _dismissTimer = Timer(const Duration(seconds: 3), _dismissDialog);
+  }
+
+  @override
+  void dispose() {
+    _dismissTimer?.cancel();
+    _dismissTimer = null;
+    super.dispose();
   }
 
   void _dismissDialog() {
-    if (mounted) {
-      Navigator.of(context).pop();
+    if (!mounted) return;
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
     }
   }
 
