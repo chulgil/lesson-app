@@ -2357,7 +2357,8 @@ class AppStrings {
   static const archiveLessonTitle = '레슨 보관';
 
   /// 레슨 보관 확인 다이얼로그 메시지
-  static const archiveLessonConfirm = '이 레슨을 보관하시겠습니까?\n보관된 레슨은 목록에서 숨겨지며 언제든지 복원할 수 있습니다.';
+  static const archiveLessonConfirm =
+      '이 레슨을 보관하시겠습니까?\n보관된 레슨은 목록에서 숨겨지며 언제든지 복원할 수 있습니다.';
 
   /// 레슨이 보관되었습니다 (archive success)
   static const lessonArchivedSnack = '레슨이 보관되었습니다';
@@ -5908,8 +5909,7 @@ class AppStrings {
   static const forceUpdateTitle = '업데이트가 필요합니다';
   static String forceUpdateBody(String minVersion) =>
       '원활한 사용을 위해 v$minVersion 이상으로\n업데이트해 주세요.';
-  static String forceUpdateCurrentVersion(String version) =>
-      '현재 버전: v$version';
+  static String forceUpdateCurrentVersion(String version) => '현재 버전: v$version';
   static const forceUpdateAction = '업데이트하기';
   static const studentHomeTermsOfService = '이용약관';
   static const studentHomePrivacyPolicy = '개인정보처리방침';
@@ -6407,6 +6407,18 @@ class AppStrings {
   static const profileEducationAdd = '학력 추가';
   static const profileCareerEmpty = '경력 정보가 없습니다';
   static const profileCareerAdd = '경력 추가';
+
+  // ── Context Toggle ──
+  static const contextToggleButtonLabel = '계정 전환';
+  static const contextToggleButtonSubtitle = '학원과 개인 계정';
+  static const contextToggleDialogTitle = '계정 전환';
+  static const contextToggleCurrentContext = '현재 계정';
+  static const contextToggleSwitchTo = '다음 계정으로 전환';
+  static const contextToggleCancel = '취소';
+  static const contextToggleConfirm = '전환하기';
+  static const contextToggleLoadingMessage = '계정을 전환 중입니다...';
+  static const contextToggleSwitchedToTeacher = '개인 강사 계정으로 전환되었습니다';
+  static const contextToggleSwitchedToOwner = '학원장 계정으로 전환되었습니다';
   static const profileCertificateEmpty = '등록된 자격증이 없습니다';
   static const profileCertificateAdd = '자격증 추가';
 
@@ -6931,8 +6943,7 @@ class AppStrings {
 
   // ── Students tab empty state ──
   static const studentsEmptyTitle = '아직 등록된 학생이 없습니다';
-  static const studentsEmptySubtitle =
-      '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요';
+  static const studentsEmptySubtitle = '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요';
   static const studentsSearchEmptyTitle = '검색 결과가 없습니다';
 
   // ── Parent profile menu ──
@@ -6962,4 +6973,29 @@ class AppStrings {
   // ── Sync failures ──
   static String syncFailedBanner(int count) => '$count건의 동기화가 실패했습니다';
   static const syncRetryAction = '재시도';
+
+  // ── Academy announcements ──
+  static const announcementsTitle = '공지사항';
+  static const announcementMarkAsRead = '읽음 처리';
+  static const announcementNoContent = '공지사항이 없습니다';
+
+  // ── Academy inquiry ──
+  static const inquiryTitle = '1:1 문의';
+  static const inquiryTabMyInquiries = '내 문의';
+  static const inquiryTabAsk = '문의하기';
+  static const inquirySenderRoleStudent = '학생';
+  static const inquirySenderRoleParent = '학부모';
+  static const inquiryAskButton = '문의 보내기';
+  static const inquiryReplyPlaceholder = '답글을 입력하세요';
+  static const inquiryReplySend = '답글 전송';
+  static const inquirySLALabel = '48시간 이내 답변';
+  static const inquiryNoInquiries = '문의 내역이 없습니다';
+  static const inquiryCreated = '문의가 접수되었습니다';
+  static const inquiryFormNameLabel = '이름';
+  static const inquiryFormNameHint = '예) 김철수';
+  static const inquiryFormPhoneLabel = '연락처';
+  static const inquiryFormPhoneHint = '예) 010-1234-5678';
+  static const inquiryFormMessageLabel = '문의 내용';
+  static const inquiryFormMessageHint = '문의 내용을 입력해주세요';
+  static const inquiryFormSubmit = '문의 보내기';
 }

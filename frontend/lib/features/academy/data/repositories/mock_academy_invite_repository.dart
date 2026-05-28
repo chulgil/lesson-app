@@ -1,4 +1,3 @@
-import '../../domain/entities/academy.dart';
 import '../../domain/repositories/academy_invite_repository.dart';
 
 /// Mock implementation of AcademyInviteRepository

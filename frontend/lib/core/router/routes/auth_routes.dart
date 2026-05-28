@@ -1,5 +1,6 @@
 // Auth and onboarding route definitions
 
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/auth/presentation/screens/academy_invite_accept_screen.dart';
