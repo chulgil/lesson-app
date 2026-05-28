@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription.dart';
 import '../extensions/subscription_visuals.dart';
 import '../utils/subscription_status_colors.dart';
+import 'subscription_credit_widget.dart';
 
 /// Card widget displaying subscription information.
 ///
@@ -210,6 +211,10 @@ class SubscriptionCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              if (subscription.hasCancellationCredits) ...[
+                SubscriptionCreditWidget(subscription: subscription),
+                const SizedBox(width: AppSpacing.space2),
+              ],
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space2,

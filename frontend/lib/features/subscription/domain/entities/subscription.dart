@@ -134,6 +134,11 @@ class Subscription {
   /// Bonus reschedule credits added post-issuance by the teacher (default 0).
   final int bonusRescheduleCount;
 
+  /// Student cancellation credits accumulated per subscription.
+  /// Earned when teacher cancels within 12h (deadline violation) or via manual grant.
+  /// Consumed when student reschedules/cancels (-1 per use).
+  final int cancellationCredits;
+
   /// Individual cancel deadline override in hours (null = use default policy).
   final int? overrideCancelDeadlineHours;
 
@@ -190,6 +195,7 @@ class Subscription {
     this.originalAmount,
     this.rescheduleDeadlineHours = 12, // 기본값: 12시간
     this.bonusRescheduleCount = 0,
+    this.cancellationCredits = 0,
     this.overrideCancelDeadlineHours,
     this.overrideStudentCompensationExtraMinutesEnabled,
     this.overrideIncludeExtraMinutesTextOnLateCancel,
@@ -243,6 +249,9 @@ class Subscription {
 
   /// Check if student can reschedule (has remaining allowance).
   bool get canReschedule => remainingReschedule > 0;
+
+  /// Check if subscription has at least one cancellation credit available.
+  bool get hasCancellationCredits => cancellationCredits > 0;
 
   /// Effective cancel deadline hours (override if set, otherwise base policy).
   int get effectiveCancelDeadlineHours =>
@@ -341,6 +350,7 @@ class Subscription {
     String? discountReason,
     int? originalAmount,
     int? bonusRescheduleCount,
+    int? cancellationCredits,
     int? overrideCancelDeadlineHours,
     bool clearOverrideCancelDeadlineHours = false,
     bool? overrideStudentCompensationExtraMinutesEnabled,
@@ -385,6 +395,7 @@ class Subscription {
       discountReason: discountReason ?? this.discountReason,
       originalAmount: originalAmount ?? this.originalAmount,
       bonusRescheduleCount: bonusRescheduleCount ?? this.bonusRescheduleCount,
+      cancellationCredits: cancellationCredits ?? this.cancellationCredits,
       overrideCancelDeadlineHours:
           clearOverrideCancelDeadlineHours
               ? null

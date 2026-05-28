@@ -7164,4 +7164,12 @@ class AppStrings {
 
   /// 활동 타입: 알 수 없음
   static const activityTypeUnknown = '활동';
+
+  // ── Cancellation Credit (G17) ─────────────────────────────
+
+  /// 변경권 위젯 — 잔여 개수 표시 ("변경권 잔여: 2회")
+  static String cancellationCreditRemaining(int count) => '변경권 잔여: $count회';
+
+  /// 변경권 위젯 — 0회일 때 표시
+  static const cancellationCreditNone = '변경권 없음';
 }

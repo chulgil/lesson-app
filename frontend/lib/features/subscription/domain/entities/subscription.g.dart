@@ -54,6 +54,7 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
           (json['reschedule_deadline_hours'] as num?)?.toInt() ?? 12,
       bonusRescheduleCount:
           (json['bonus_reschedule_count'] as num?)?.toInt() ?? 0,
+      cancellationCredits: (json['cancellation_credits'] as num?)?.toInt() ?? 0,
       overrideCancelDeadlineHours:
           (json['override_cancel_deadline_hours'] as num?)?.toInt(),
       overrideStudentCompensationExtraMinutesEnabled:
@@ -103,6 +104,7 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'original_amount': instance.originalAmount,
       'reschedule_deadline_hours': instance.rescheduleDeadlineHours,
       'bonus_reschedule_count': instance.bonusRescheduleCount,
+      'cancellation_credits': instance.cancellationCredits,
       'override_cancel_deadline_hours': instance.overrideCancelDeadlineHours,
       'override_student_compensation_extra_minutes_enabled':
           instance.overrideStudentCompensationExtraMinutesEnabled,
