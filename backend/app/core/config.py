@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 PRODUCTION_LIKE_ENVIRONMENTS = {"production", "beta"}
@@ -5,6 +6,35 @@ INSECURE_JWT_SECRETS = {
     "change-me-in-production",
     "dev-only-insecure-jwt-secret-change-before-production",
 }
+
+# Issue #410 — ENVIRONMENT alias map. Without normalization, a typo such as
+# `prod` or `Production` silently bypasses PRODUCTION_LIKE_ENVIRONMENTS guards
+# (strong-secret check, IAP default-deny, dev-only endpoints). Aliases are
+# folded to canonical names at settings-load time so every downstream check
+# sees the same vocabulary.
+_ENVIRONMENT_ALIASES = {
+    "prod": "production",
+    "production": "production",
+    "beta": "beta",
+    "stg": "staging",
+    "stage": "staging",
+    "staging": "staging",
+    "dev": "development",
+    "development": "development",
+    "local": "development",
+    "test": "test",
+    "testing": "test",
+}
+
+
+def normalize_environment(value: str) -> str:
+    """Fold an ENVIRONMENT string to its canonical lowercase name.
+
+    Unknown values are lower-cased but otherwise returned as-is so that
+    whitelist guards (e.g. PRODUCTION_LIKE_ENVIRONMENTS) fail closed.
+    """
+    folded = (value or "").strip().lower()
+    return _ENVIRONMENT_ALIASES.get(folded, folded)
 
 
 class Settings(BaseSettings):
@@ -51,6 +81,12 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     INTERNAL_API_KEY: str = ""
+
+    @field_validator("ENVIRONMENT", mode="before")
+    @classmethod
+    def _normalize_environment_field(cls, value: object) -> str:
+        return normalize_environment(value if isinstance(value, str) else str(value or ""))
+
     # Plan C Phase 6a — disable APScheduler in pytest (env: TESTING=1) to keep
     # ASGI lifespan deterministic and avoid leaking background event loops.
     TESTING: bool = False
