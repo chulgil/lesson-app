@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../features/inbox/presentation/widgets/academy_inquiry_form_widget.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../domain/repositories/teacher_search_repository.dart';
 import '../../../parent_home/parent_home_facade.dart';
@@ -136,6 +137,17 @@ class AcademyDetailScreen extends ConsumerWidget {
                   ),
                 ),
             data: (teachers) => _buildTeacherList(context, ref, teachers),
+          ),
+
+          // G20/#401 — 문의하기 폼
+          const SizedBox(height: AppSpacing.space6),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              decoration: BoxDecoration(color: AppColors.paper),
+              child: AcademyInquiryFormWidget(academyId: organizationId),
+            ),
           ),
 
           // Notebook × Score: "Fine." 종지부
