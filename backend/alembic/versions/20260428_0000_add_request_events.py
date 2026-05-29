@@ -11,6 +11,7 @@ Mirrors frontend Hive RequestEvent (typeId 131) — 27 event_type + 2 schedule_c
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 from alembic import op
 
@@ -70,7 +71,11 @@ def upgrade() -> None:
         sa.Column("message", sa.Text(), nullable=True),
         sa.Column(
             "schedule_change_type",
-            sa.Enum(*SCHEDULE_CHANGE_TYPE_VALUES, name="schedulechangetype"),
+            postgresql.ENUM(
+                *SCHEDULE_CHANGE_TYPE_VALUES,
+                name="schedulechangetype",
+                create_type=False,
+            ),
             nullable=True,
         ),
         sa.Column("proposed_day_of_week", sa.Integer(), nullable=True),
