@@ -14,6 +14,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../billing/billing_facade.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -93,6 +94,11 @@ class ProfileTab extends ConsumerWidget {
 
           // Stats section (팔로워 → 입금대기(후불))
           _buildStatsSection(ref, teacherId),
+
+          const SizedBox(height: AppSpacing.space5),
+
+          // 💳 구독 상태 카드 (paywall_spec.md §6.2 — #415 R4 Phase C2)
+          _buildSubscriptionStatusCard(context, ref),
 
           const SizedBox(height: AppSpacing.space5),
 
@@ -579,6 +585,34 @@ class ProfileTab extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSubscriptionStatusCard(BuildContext context, WidgetRef ref) {
+    final snapshotAsync = ref.watch(appBillingSnapshotProvider);
+    final teacherId = ref.watch(currentUserIdProvider);
+    final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
+
+    final snapshot = snapshotAsync.valueOrNull;
+    final groups = groupsAsync.valueOrNull;
+    if (snapshot == null || groups == null) {
+      return const SizedBox.shrink();
+    }
+
+    final studentCount = groups.fold(0, (sum, g) => sum + g.students.length);
+
+    return SubscriptionStatusCard(
+      snapshot: snapshot,
+      studentCount: studentCount,
+      onUpgrade: () => handleBuyPro(context: context, ref: ref),
+      onManage: () => _showBillingComingSoon(context),
+      onReceipts: () => _showBillingComingSoon(context),
+    );
+  }
+
+  void _showBillingComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppStrings.paywallComingSoonHint)),
     );
   }
 

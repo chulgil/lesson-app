@@ -7355,4 +7355,80 @@ class AppStrings {
 
   /// Trial 시작 실패 — 네트워크/서버 에러.
   static const paywallTrialFailed = '체험을 시작하지 못했어요. 잠시 후 다시 시도해주세요.';
+
+  // ── SubscriptionStatusCard Phase C2 (#415) ───────────────
+  // spec/paywall_spec.md §6.2 — 프로필 구독 배지.
+
+  /// Free 배지 라벨.
+  static const billingBadgeFree = 'FREE';
+
+  /// Pro 배지 라벨.
+  static const billingBadgePro = 'PRO';
+
+  /// Trial 배지 라벨.
+  static const billingBadgeTrial = 'TRIAL';
+
+  /// Studio 배지 라벨.
+  static const billingBadgeStudio = 'STUDIO';
+
+  /// Lifetime 배지 라벨.
+  static const billingBadgeLifetime = 'LIFETIME';
+
+  /// Pro 갱신까지 남은 일수 (D-N).
+  static const billingStatusProRenew = 'D-{days} 갱신';
+
+  /// Trial 종료까지 남은 일수.
+  static const billingStatusTrialEnds = 'D-{days} 종료';
+
+  /// Free 상태 — 학생 수 표시 ({used}/{limit}명).
+  static const billingStatusFreeStudents = '학생 {used}/{limit}명 사용 중';
+
+  /// Pro 상태 — 가격/혜택.
+  static const billingStatusProDetail = '₩9,900 / 월 · 학생 무제한';
+
+  /// Studio 상태 — 가격/혜택.
+  static const billingStatusStudioDetail = '₩29,900 / 월 · 학원 다중 강사';
+
+  /// Lifetime 상태 — 영구.
+  static const billingStatusLifetimeDetail = '영구 사용 · 학생 무제한';
+
+  /// Trial 상태 — 혜택.
+  static const billingStatusTrialDetail = '체험 중 · 학생 무제한';
+
+  /// Free 사용자용 업그레이드 CTA.
+  static const billingFreeUpgradeCta = 'Pro 업그레이드 → ₩9,900/월';
+
+  /// Pro 사용자용 — 플랜 관리 CTA.
+  static const billingManagePlanCta = '플랜 관리';
+
+  /// Pro 사용자용 — 영수증 CTA.
+  static const billingReceiptsCta = '영수증';
+
+  /// Trial 사용자용 — Pro 전환 CTA.
+  static const billingTrialConvertCta = 'Pro 전환';
+
+  /// Expired 상태 라벨.
+  static const billingBadgeExpired = 'EXPIRED';
+
+  /// Expired 안내.
+  static const billingStatusExpiredDetail =
+      '플랜이 만료되었어요. 7일 이내 재결제하지 않으면 Free 로 전환됩니다.';
+
+  // ── FeatureLockedSheet Phase C2 (#415) ───────────────────
+  // spec/paywall_spec.md §3.1, §7 — Pro/Studio 전용 기능 차단.
+
+  /// Pro 전용 기능 차단 sheet 제목.
+  static const featureLockedProTitle = 'Pro 전용 기능이에요';
+
+  /// Pro 전용 기능 차단 sheet 본문.
+  static const featureLockedProSubtitle = 'Pro 로 업그레이드하면 모든 기능을 사용할 수 있어요.';
+
+  /// Studio 전용 기능 차단 sheet 제목.
+  static const featureLockedStudioTitle = 'Studio 전용 기능이에요';
+
+  /// Studio 전용 기능 차단 sheet 본문.
+  static const featureLockedStudioSubtitle = '학원 다중 강사 기능은 Studio 플랜에서 제공돼요.';
+
+  /// Studio 업그레이드 CTA.
+  static const billingStudioUpgradeCta = 'Studio 업그레이드';
 }

@@ -24,6 +24,10 @@ export 'presentation/providers/app_billing_provider.dart'
         appBillingSnapshotProvider,
         iapServiceProvider;
 export 'presentation/utils/billing_guard_actions.dart'
-    show guardAddStudentNavigation;
+    show guardAddStudentNavigation, handleBuyPro, handleStartTrial;
+export 'presentation/widgets/feature_locked_sheet.dart'
+    show FeatureLockedSheet, LockedFeatureTier, showFeatureLockedSheet;
 export 'presentation/widgets/free_limit_sheet.dart'
     show FreeLimitSheet, showFreeLimitSheet;
+export 'presentation/widgets/subscription_status_card.dart'
+    show SubscriptionStatusCard;
