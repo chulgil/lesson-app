@@ -38,6 +38,7 @@ def upgrade() -> None:
     bind = op.get_bind()
     is_postgres = bind.dialect.name == "postgresql"
     has_attendances = _table_exists("group_class_attendances")
+    has_no_show_records = _table_exists("no_show_records")
 
     if is_postgres:
         # group_classes.no_show_policy 만 레거시 2값 → 새 4값 정렬
@@ -57,10 +58,20 @@ def upgrade() -> None:
                 "ALTER TABLE group_class_attendances "
                 "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
             )
+        if has_no_show_records:
+            op.execute(
+                "ALTER TABLE no_show_records "
+                "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
+            )
         op.execute("DROP TYPE IF EXISTS individualnoshowpolicy")
         if has_attendances:
             op.execute(
                 "ALTER TABLE group_class_attendances "
+                "ALTER COLUMN applied_policy TYPE noshowpolicy USING applied_policy::noshowpolicy"
+            )
+        if has_no_show_records:
+            op.execute(
+                "ALTER TABLE no_show_records "
                 "ALTER COLUMN applied_policy TYPE noshowpolicy USING applied_policy::noshowpolicy"
             )
     else:
@@ -73,6 +84,7 @@ def downgrade() -> None:
     bind = op.get_bind()
     is_postgres = bind.dialect.name == "postgresql"
     has_attendances = _table_exists("group_class_attendances")
+    has_no_show_records = _table_exists("no_show_records")
 
     if is_postgres:
         # halfCredit, reschedule 데이터 손실 경고: downgrade 는 정보 보존 불가
@@ -88,6 +100,11 @@ def downgrade() -> None:
                 "ALTER TABLE group_class_attendances "
                 "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
             )
+        if has_no_show_records:
+            op.execute(
+                "ALTER TABLE no_show_records "
+                "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
+            )
         op.execute("DROP TYPE IF EXISTS noshowpolicy")
         legacy_enum = sa.Enum(*LEGACY_VALUES, name="noshowpolicy")
         legacy_enum.create(bind, checkfirst=False)
@@ -100,6 +117,12 @@ def downgrade() -> None:
         if has_attendances:
             op.execute(
                 "ALTER TABLE group_class_attendances "
+                "ALTER COLUMN applied_policy TYPE individualnoshowpolicy "
+                "USING applied_policy::individualnoshowpolicy"
+            )
+        if has_no_show_records:
+            op.execute(
+                "ALTER TABLE no_show_records "
                 "ALTER COLUMN applied_policy TYPE individualnoshowpolicy "
                 "USING applied_policy::individualnoshowpolicy"
             )
