@@ -16,8 +16,8 @@ codenavi 서버(108.61.162.25)에 lesson-app 백엔드를 배포합니다.
 | 프로젝트 경로 | `~/apps/lesson-app-backend/backend` |
 | 컴포즈 파일 | `docker-compose.beta.yml` |
 | 컨테이너명 | `lessonaza-beta-api` |
-| 도메인 | `https://beta.lessonaza.app` |
-| API 문서 | `https://beta.lessonaza.app/docs` |
+| 도메인 | `https://api-beta.lessonaza.app` |
+| API 문서 | `https://api-beta.lessonaza.app/docs` |
 
 ## 실행 절차
 
@@ -60,7 +60,7 @@ $SSH_CMD "cd ~/apps/lesson-app-backend/backend && docker-compose -f docker-compo
 ### 5단계: 헬스체크
 
 ```bash
-curl -s https://beta.lessonaza.app/health
+curl -s https://api-beta.lessonaza.app/health
 # 기대 응답: {"status":"healthy"}
 ```
 
@@ -68,10 +68,10 @@ curl -s https://beta.lessonaza.app/health
 
 ```
 [Beta 배포 완료]
-  서버: beta.lessonaza.app
+  서버: api-beta.lessonaza.app
   상태: healthy
   마이그레이션: (적용된 내용 또는 "변경 없음")
-  API 문서: https://beta.lessonaza.app/docs
+  API 문서: https://api-beta.lessonaza.app/docs
 ```
 
 ## 에러 처리

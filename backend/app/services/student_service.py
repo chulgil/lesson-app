@@ -119,6 +119,26 @@ class StudentService:
         student.status = StudentStatus.inactive
         await self.db.flush()
 
+    async def archive(self, student_id: str, current_user: Any) -> StudentResponse:
+        """Archive a student for frontend repository compatibility."""
+        from app.models.student import StudentStatus
+
+        student = await self._get_accessible_student(student_id, current_user, require_teacher=True)
+        student.status = StudentStatus.inactive
+        await self.db.flush()
+        await self.db.refresh(student)
+        return StudentResponse.model_validate(student)
+
+    async def unarchive(self, student_id: str, current_user: Any) -> StudentResponse:
+        """Restore an archived student to active status."""
+        from app.models.student import StudentStatus
+
+        student = await self._get_accessible_student(student_id, current_user, require_teacher=True)
+        student.status = StudentStatus.active
+        await self.db.flush()
+        await self.db.refresh(student)
+        return StudentResponse.model_validate(student)
+
     async def get_stats(self, student_id: str, current_user: Any) -> StudentStatsResponse:
         """Return aggregated statistics for a student."""
         from app.models.lesson import Lesson

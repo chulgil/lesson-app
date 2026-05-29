@@ -127,6 +127,35 @@ async def test_get_invite_by_id_and_code_for_frontend_confirm_screen(
     assert by_code.json()["id"] == invite["id"]
 
 
+@pytest.mark.asyncio
+async def test_public_invite_landing_returns_json_contract(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Ghost consumes JSON data from the public invite landing API."""
+    await create_test_user(user_id="test-user-id", role="teacher", name="홍길동")
+
+    create_resp = await client.post("/api/v1/invites/", headers=auth_headers, json={})
+    invite = create_resp.json()
+
+    response = await client.get(f"/api/v1/public/invites/{invite['invite_code']}/landing")
+
+    assert response.status_code == 200, response.text
+    assert response.headers["content-type"].startswith("application/json")
+    data = response.json()
+    assert data["code"] == invite["invite_code"]
+    assert data["status"] == "active"
+    assert data["teacher"]["name"] == "홍길동"
+    assert data["share"]["url"].endswith(f"/invite/{invite['invite_code']}")
+    assert data["share"]["app_deep_link"] == f"lessonapp://invite/{invite['invite_code']}"
+
+
+@pytest.mark.asyncio
+async def test_public_invite_landing_returns_404_for_unknown_code(client: AsyncClient):
+    response = await client.get("/api/v1/public/invites/UNKNOWN/landing")
+
+    assert response.status_code == 404
+
+
 # ---------------------------------------------------------------------------
 # Connection Requests
 # ---------------------------------------------------------------------------

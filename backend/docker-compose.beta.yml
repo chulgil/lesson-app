@@ -5,7 +5,7 @@
 # - Uses existing PostgreSQL container on data_internal network
 # - Uses Traefik reverse proxy on traefiknet for HTTPS
 # - Separate DB (lessonaza_beta) from production
-# - Host: beta.lessonaza.app
+# - Host: api-beta.lessonaza.app
 #
 # Usage:
 #   docker-compose -f docker-compose.beta.yml up -d --build
@@ -36,7 +36,7 @@ services:
       - "traefik.enable=true"
       - "traefik.backend=lessonaza-beta-api"
       - "traefik.docker.network=traefiknet"
-      - "traefik.frontend.rule=Host:beta.lessonaza.app"
+      - "traefik.frontend.rule=Host:api-beta.lessonaza.app"
       - "traefik.port=8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

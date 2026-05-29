@@ -5,11 +5,13 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BillingPlanResponse(BaseModel):
     """Current user app billing plan."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: str
     user_id: str
@@ -20,9 +22,6 @@ class BillingPlanResponse(BaseModel):
     source: str
     original_transaction_id: str | None
     trial_used: bool
-
-    class Config:
-        from_attributes = True
 
 
 class IapValidateRequest(BaseModel):
@@ -45,23 +44,41 @@ class IapValidateRequest(BaseModel):
 class IapValidateResponse(BaseModel):
     """IAP receipt validation response."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     success: bool
     message: str
     plan_id: str | None = None
     tier: str | None = None
     expires_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
-
 
 class TrialStartResponse(BaseModel):
     """Pro trial activation response."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     success: bool
     message: str
     plan_id: str | None = None
     expires_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
+
+class BillingCancelResponse(BaseModel):
+    """Cancellation response."""
+
+    success: bool
+    message: str
+
+
+class IapReceiptResponse(BaseModel):
+    """IAP receipt audit row."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    platform: str
+    product_id: str
+    status: str
+    validated_at: datetime | None = None
+    created_at: datetime

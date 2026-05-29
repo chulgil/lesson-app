@@ -16,6 +16,7 @@ from app.models.app_billing import (
     IapReceipt,
     IapReceiptStatus,
 )
+from app.schemas.app_billing import IapReceiptResponse
 
 
 class IapValidationPendingError(Exception):
@@ -181,3 +182,21 @@ class AppBillingService:
 
         # At limit, suggest trial
         return (False, "start_trial")
+
+    async def cancel_plan(self, user_id: str) -> None:
+        """Mark the current app billing plan as cancelled."""
+        plan = await self.get_active_plan(user_id)
+        plan.status = BillingPlanStatus.cancelled
+        self.db.add(plan)
+        await self.db.flush()
+
+    async def list_receipts(self, user_id: str) -> list[IapReceiptResponse]:
+        """List IAP receipt audit rows for the user."""
+        rows = (
+            await self.db.scalars(
+                select(IapReceipt)
+                .where(IapReceipt.user_id == user_id)
+                .order_by(IapReceipt.created_at.desc(), IapReceipt.id.desc())
+            )
+        ).all()
+        return [IapReceiptResponse.model_validate(row) for row in rows]

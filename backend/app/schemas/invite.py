@@ -4,10 +4,10 @@ import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict
 
-
 # ---------------------------------------------------------------------------
 # Invite
 # ---------------------------------------------------------------------------
+
 
 class InviteCreate(BaseModel):
     """Create a new invite."""
@@ -37,6 +37,34 @@ class InviteResponse(BaseModel):
     note: str | None = None
     expires_at: _dt.datetime
     created_at: _dt.datetime
+
+
+class PublicInviteLandingTeacher(BaseModel):
+    """Public teacher data for invite landing pages."""
+
+    id: str | None = None
+    name: str
+    instrument: str
+    profile_image_url: str | None = None
+
+
+class PublicInviteLandingShare(BaseModel):
+    """Share metadata for invite landing pages."""
+
+    title: str
+    description: str
+    url: str
+    app_deep_link: str
+
+
+class PublicInviteLandingResponse(BaseModel):
+    """Public JSON consumed by Ghost invite landing pages."""
+
+    code: str
+    status: str
+    teacher: PublicInviteLandingTeacher
+    share: PublicInviteLandingShare
+    expires_at: _dt.datetime
 
 
 # ---------------------------------------------------------------------------

@@ -826,7 +826,8 @@ async def test_fw_vacation_mode_enable(teacher: TeacherActions):
     """Teacher enables vacation mode for a period, blocks bookable slots."""
     # Step 1: 초기 가용성 설정 (수요일 14:00 ~ 16:00)
     avail = await teacher.client.post(
-        "/api/availability",
+        "/api/v1/availability/",
+        headers=teacher.headers,
         json={
             "day_of_week": 2,  # Wednesday
             "time_slots": [
@@ -836,13 +837,14 @@ async def test_fw_vacation_mode_enable(teacher: TeacherActions):
             "vacation_mode": False,
         },
     )
-    assert avail.status_code == 200
+    assert avail.status_code == 201
     avail_id = avail.json()["id"]
     assert avail.json()["vacation_mode"] is False
 
     # Step 2: 방학 모드 활성화 (7/15 ~ 8/31, "여름방학")
-    update = await teacher.client.patch(
-        f"/api/availability/{avail_id}",
+    update = await teacher.client.put(
+        f"/api/v1/availability/{avail_id}",
+        headers=teacher.headers,
         json={
             "vacation_mode": True,
             "vacation_start_date": "2026-07-15",
@@ -867,7 +869,8 @@ async def test_fw_vacation_mode_disable(teacher: TeacherActions):
     """Teacher disables vacation mode, re-enables bookable slots."""
     # Step 1: 방학 모드 활성화된 가용성 생성
     avail = await teacher.client.post(
-        "/api/availability",
+        "/api/v1/availability/",
+        headers=teacher.headers,
         json={
             "day_of_week": 4,  # Friday
             "time_slots": [
@@ -879,13 +882,14 @@ async def test_fw_vacation_mode_disable(teacher: TeacherActions):
             "vacation_reason": "시험기간",
         },
     )
-    assert avail.status_code == 200
+    assert avail.status_code == 201
     avail_id = avail.json()["id"]
     assert avail.json()["vacation_mode"] is True
 
     # Step 2: 방학 모드 비활성화
-    update = await teacher.client.patch(
-        f"/api/availability/{avail_id}",
+    update = await teacher.client.put(
+        f"/api/v1/availability/{avail_id}",
+        headers=teacher.headers,
         json={"vacation_mode": False},
     )
     assert update.status_code == 200

@@ -18,6 +18,7 @@ from app.schemas.schedule import (
     BookingResponse,
     BookingUpdate,
     MakeupBookingCreate,
+    SlotStatus,
 )
 from app.services.schedule_service import ScheduleService
 
@@ -57,7 +58,7 @@ async def list_bookings(
 
 @router.post(
     "",
-    response_model=BookingResponse,
+    response_model=BookingResponse | SlotStatus,
     status_code=status.HTTP_201_CREATED,
     summary="Request a booking",
 )
@@ -65,9 +66,11 @@ async def create_booking(
     body: BookingCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-) -> BookingResponse:
+) -> BookingResponse | SlotStatus:
     """Create a new booking request."""
     service = ScheduleService(db)
+    if body.slot_id:
+        return await service.create_slot_booking(body, current_user)
     return await service.create_booking(body, current_user)
 
 

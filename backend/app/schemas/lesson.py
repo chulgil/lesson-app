@@ -167,6 +167,8 @@ class LessonResponse(BaseModel):
     session_number: int | None = Field(default=None, ge=1)
     location_name: str | None = None
     location_address: str | None = None
+    is_archived: bool = False
+    archived_at: _dt.datetime | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 

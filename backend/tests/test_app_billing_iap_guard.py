@@ -178,3 +178,25 @@ async def test_iap_validate_endpoint_defaults_to_failure(
     )
     assert plan is not None
     assert plan.tier == BillingTier.free
+
+
+@pytest.mark.asyncio
+async def test_paywall_spec_verify_purchase_alias_defaults_to_failure(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+    create_test_user,
+) -> None:
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/app/billing/verify-purchase",
+        headers=auth_headers,
+        json={
+            "platform": "apple",
+            "receipt": "forged-receipt-bytes",
+            "product_id": "pro_monthly",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["success"] is False

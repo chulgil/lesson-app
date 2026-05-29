@@ -11,6 +11,11 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
+from app.schemas.invite import (
+    PublicInviteLandingResponse,
+    PublicInviteLandingShare,
+    PublicInviteLandingTeacher,
+)
 
 
 class InviteService:
@@ -91,6 +96,56 @@ class InviteService:
         if invite is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
         return invite
+
+    async def get_public_invite_landing(self, invite_code: str) -> PublicInviteLandingResponse:
+        """Return minimal public landing data for Ghost-rendered invite pages."""
+        from app.core.config import settings
+        from app.models.invite import Invite, InviteStatus
+        from app.models.teacher import Teacher
+
+        invite = await self.db.scalar(
+            select(Invite).where(Invite.invite_code == invite_code.upper())
+        )
+        if invite is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
+
+        expires_at = invite.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=UTC)
+        if expires_at <= datetime.now(UTC) or invite.status in {
+            InviteStatus.expired,
+            InviteStatus.revoked,
+            InviteStatus.used,
+        }:
+            raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invite expired or unavailable")
+
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == invite.creator_id))
+        instrument = "음악"
+        if teacher and teacher.instruments:
+            if isinstance(teacher.instruments, list) and teacher.instruments:
+                instrument = str(teacher.instruments[0])
+            elif isinstance(teacher.instruments, dict) and teacher.instruments:
+                instrument = str(next(iter(teacher.instruments.values())))
+
+        teacher_name = invite.creator_name or "선생님"
+        public_url = f"{settings.WWW_BASE_URL.rstrip('/')}/invite/{invite.invite_code}"
+        return PublicInviteLandingResponse(
+            code=invite.invite_code,
+            status=invite.status.value,
+            teacher=PublicInviteLandingTeacher(
+                id=teacher.id if teacher else None,
+                name=teacher_name,
+                instrument=instrument,
+                profile_image_url=None,
+            ),
+            share=PublicInviteLandingShare(
+                title=f"{teacher_name} 선생님의 레슨앱 초대",
+                description=f"{instrument} 레슨 기록과 숙제를 함께 확인해요",
+                url=public_url,
+                app_deep_link=f"lessonapp://invite/{invite.invite_code}",
+            ),
+            expires_at=invite.expires_at,
+        )
 
     async def revoke_invite(self, invite_id: str, current_user: Any) -> Any:
         """Revoke an invite."""

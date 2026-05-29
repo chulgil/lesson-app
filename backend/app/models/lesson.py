@@ -187,12 +187,15 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
     )
     location_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     location_address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("idx_lesson_student", "student_id"),
         Index("idx_lesson_teacher", "teacher_id"),
         Index("idx_lesson_date", "date"),
         Index("idx_lesson_status", "status"),
+        Index("idx_lesson_archived", "is_archived"),
         Index("idx_lesson_source", "lesson_source"),
         Index("idx_lesson_subscription", "subscription_id"),
         Index("idx_lesson_subscription_session", "subscription_id", "session_number"),

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -53,7 +53,7 @@ class LessonService:
         from app.models.lesson import Lesson
 
         tid = await resolve_teacher_id(self.db, user.id)
-        query = select(Lesson).where(Lesson.teacher_id == tid)
+        query = select(Lesson).where(Lesson.teacher_id == tid, Lesson.is_archived == False)  # noqa: E712
         if student_id:
             query = query.where(Lesson.student_id == student_id)
         if date:
@@ -208,6 +208,24 @@ class LessonService:
                 )
             )
 
+        await self.db.flush()
+        await self.db.refresh(lesson)
+        return LessonResponse.model_validate(lesson)
+
+    async def archive(self, lesson_id: str, current_user: Any) -> LessonResponse:
+        """Archive a lesson from active lesson lists."""
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        lesson.is_archived = True
+        lesson.archived_at = datetime.now(UTC)
+        await self.db.flush()
+        await self.db.refresh(lesson)
+        return LessonResponse.model_validate(lesson)
+
+    async def unarchive(self, lesson_id: str, current_user: Any) -> LessonResponse:
+        """Restore an archived lesson."""
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        lesson.is_archived = False
+        lesson.archived_at = None
         await self.db.flush()
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)

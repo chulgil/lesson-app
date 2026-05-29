@@ -1,7 +1,7 @@
 # 선생님 가용 스케줄 시스템 설계서
 
 > 작성일: 2026-01-26
-> 최종 수정: 2026-02-01
+> 최종 수정: 2026-05-29
 > 상태: ✅ 구현 완료 (Phase 1~4)
 > 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_master.md](../subscription/subscription_master.md)
 > UX 가이드: [ux_guidelines.md](../design/ux_guidelines.md) - 섹션 11~12 참고
@@ -271,6 +271,37 @@ class TeacherAvailability {
 ---
 
 ## 4. 예약 플로우
+
+### 4.0 백엔드 슬롯 예약 API 계약 (2026-05-29)
+
+Flutter `RemoteTeacherAvailabilityRepository.bookSlot()`은 계산된 슬롯 ID만으로 예약을 생성할 수 있다.
+
+요청:
+
+```http
+POST /api/v1/bookings
+Content-Type: application/json
+
+{
+  "slot_id": "{teacher_id}-{yyyy-mm-dd}-{HH:mm}",
+  "student_id": "student-id",
+  "student_name": "학생 이름"
+}
+```
+
+서버는 `slot_id`를 `teacher_id`, `scheduled_date`, `scheduled_time`으로 해석하고 기본 `duration=60`분 예약을 생성한다. 응답은 기존 `AvailabilitySlot` 파서가 바로 읽을 수 있도록 다음 필드를 포함한다.
+
+| 필드 | 설명 |
+|------|------|
+| `id` | 생성된 booking id |
+| `teacher_id` | 슬롯 소유 선생님 id |
+| `date` | 예약 날짜 |
+| `start_time` / `end_time` | 예약 시작/종료 시간 |
+| `duration_minutes` | 예약 길이 |
+| `status` | 슬롯 예약 성공 시 `booked` |
+| `booked_by_student_id` / `booked_by_student_name` | 예약 학생 정보 |
+
+일반 `RemoteBookingRepository`가 보내는 `teacher_id`, `lesson_date`, `start_time` 기반 요청은 기존 `BookingResponse` 계약을 유지한다.
 
 ### 4.1 학생 예약 플로우
 

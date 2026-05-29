@@ -50,6 +50,18 @@ class StudentResponse(BaseModel):
 
     @computed_field
     @property
+    def is_archived(self) -> bool:
+        """Frontend archive flag backed by inactive enrollment status."""
+        return self.status == "inactive"
+
+    @computed_field
+    @property
+    def archived_at(self) -> _dt.datetime | None:
+        """Archive timestamp fallback for frontend compatibility."""
+        return self.updated_at if self.is_archived else None
+
+    @computed_field
+    @property
     def manual_age_group(self) -> str | None:
         """Frontend field name for manually selected age group."""
         return self.age_group

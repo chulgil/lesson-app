@@ -227,6 +227,38 @@ async def update_lesson_status(
     return await service.update_status(lesson_id, body.status, current_user)
 
 
+@router.patch(
+    "/{lesson_id}/archive",
+    response_model=LessonResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Archive lesson",
+)
+async def archive_lesson(
+    lesson_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> LessonResponse:
+    """Archive a lesson from active lesson lists."""
+    service = LessonService(db)
+    return await service.archive(lesson_id, current_user)
+
+
+@router.patch(
+    "/{lesson_id}/unarchive",
+    response_model=LessonResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Unarchive lesson",
+)
+async def unarchive_lesson(
+    lesson_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> LessonResponse:
+    """Restore a previously archived lesson."""
+    service = LessonService(db)
+    return await service.unarchive(lesson_id, current_user)
+
+
 @router.put(
     "/{lesson_id}/feedback",
     response_model=LessonResponse,

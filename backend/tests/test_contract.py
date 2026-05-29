@@ -164,6 +164,37 @@ async def test_contract_student_status_update(client, auth_headers, create_test_
 
 
 @pytest.mark.asyncio
+async def test_contract_student_archive_routes_match_remote_repository(client, auth_headers, create_test_user):
+    """RemoteStudentRepository calls PATCH /students/{id}/archive and /unarchive."""
+    await create_test_user()
+    create_resp = await client.post(
+        "/api/v1/students",
+        json={"name": "보관학생", "instrument": "piano"},
+        headers=auth_headers,
+    )
+    assert create_resp.status_code == 201
+    student_id = create_resp.json()["id"]
+
+    archive_resp = await client.patch(
+        f"/api/v1/students/{student_id}/archive",
+        headers=auth_headers,
+    )
+    assert archive_resp.status_code == 200
+    archived = archive_resp.json()
+    assert archived["status"] == "inactive"
+    assert archived["is_archived"] is True
+
+    unarchive_resp = await client.patch(
+        f"/api/v1/students/{student_id}/unarchive",
+        headers=auth_headers,
+    )
+    assert unarchive_resp.status_code == 200
+    restored = unarchive_resp.json()
+    assert restored["status"] == "active"
+    assert restored["is_archived"] is False
+
+
+@pytest.mark.asyncio
 async def test_contract_student_create_all_fields(client, auth_headers, create_test_user):
     """Frontend sends many fields that backend should accept."""
     await create_test_user()
@@ -1147,6 +1178,35 @@ async def test_contract_booking_create_preserves_frontend_student_and_date_alias
 
 
 @pytest.mark.asyncio
+async def test_contract_slot_booking_accepts_availability_slot_payload(
+    client, auth_headers, create_test_user
+):
+    """RemoteTeacherAvailabilityRepository books a computed slot with slot_id only."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    resp = await client.post(
+        "/api/v1/bookings",
+        json={
+            "slot_id": "test-user-id-2026-05-22-14:00",
+            "student_id": "student-slot-001",
+            "student_name": "Slot Student",
+        },
+        headers=auth_headers,
+    )
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["id"]
+    assert data["teacher_id"] == "test-user-id"
+    assert data["date"] == "2026-05-22"
+    assert data["start_time"] == "14:00"
+    assert data["end_time"] == "15:00"
+    assert data["duration_minutes"] == 60
+    assert data["status"] == "booked"
+    assert data["booked_by_student_id"] == "student-slot-001"
+    assert data["booked_by_student_name"] == "Slot Student"
+
+
+@pytest.mark.asyncio
 async def test_contract_lesson_delete(client, auth_headers, create_test_user):
     """Frontend lesson repository calls DELETE /lessons/{id}."""
     await create_test_user(user_id="test-user-id", role="teacher")
@@ -1173,6 +1233,44 @@ async def test_contract_lesson_delete(client, auth_headers, create_test_user):
 
     get_resp = await client.get(f"/api/v1/lessons/{lesson_id}", headers=auth_headers)
     assert get_resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_contract_lesson_archive_routes_match_remote_repository(client, auth_headers, create_test_user):
+    """RemoteLessonRepository calls PATCH /lessons/{id}/archive and /unarchive."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    create_resp = await client.post(
+        "/api/v1/lessons",
+        json={
+            "student_id": "student-archive-001",
+            "instrument": "piano",
+            "date": "2026-05-23",
+            "start_time": "14:00",
+            "duration": 60,
+        },
+        headers=auth_headers,
+    )
+    assert create_resp.status_code == 201
+    lesson_id = create_resp.json()["id"]
+
+    archive_resp = await client.patch(
+        f"/api/v1/lessons/{lesson_id}/archive",
+        headers=auth_headers,
+    )
+    assert archive_resp.status_code == 200
+    archived = archive_resp.json()
+    assert archived["is_archived"] is True
+    assert archived["archived_at"] is not None
+
+    unarchive_resp = await client.patch(
+        f"/api/v1/lessons/{lesson_id}/unarchive",
+        headers=auth_headers,
+    )
+    assert unarchive_resp.status_code == 200
+    restored = unarchive_resp.json()
+    assert restored["is_archived"] is False
+    assert restored["archived_at"] is None
 
 
 @pytest.mark.asyncio

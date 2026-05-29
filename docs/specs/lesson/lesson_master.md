@@ -1654,6 +1654,15 @@ void showLessonActionSheet({
 
 **엔티티 필드**: `isArchived: bool`, `archivedAt: DateTime?`
 
+**백엔드 API**:
+
+| Method | Path | 동작 |
+|--------|------|------|
+| PATCH | `/api/v1/lessons/{lesson_id}/archive` | `is_archived=true`, `archived_at=now`로 보관 |
+| PATCH | `/api/v1/lessons/{lesson_id}/unarchive` | `is_archived=false`, `archived_at=null`로 복원 |
+
+기본 `GET /api/v1/lessons` 목록은 보관된 레슨을 제외한다.
+
 **UI**:
 - 레슨 상세 PopupMenu: "삭제" → "보관"
 - 확인 다이얼로그: "이 레슨을 보관하시겠습니까? 보관된 레슨은 목록에서 숨겨지지만 데이터는 유지됩니다."
@@ -1667,6 +1676,15 @@ void showLessonActionSheet({
 | 막 추가한 학생 (이력 없음) | 하드 삭제 허용 (선택) |
 
 **엔티티 필드**: `isArchived: bool`, `archivedAt: DateTime?`
+
+**백엔드 API**:
+
+| Method | Path | 동작 |
+|--------|------|------|
+| PATCH | `/api/v1/students/{student_id}/archive` | 학생 상태를 `inactive`로 전환하고 `is_archived=true`로 응답 |
+| PATCH | `/api/v1/students/{student_id}/unarchive` | 학생 상태를 `active`로 복원하고 `is_archived=false`로 응답 |
+
+학생 보관은 별도 DB 컬럼을 추가하지 않고 기존 수강 상태 `inactive`를 보관 상태로 사용한다.
 
 **UI**:
 - 학생 상세 더보기 메뉴: "삭제" → "보관"

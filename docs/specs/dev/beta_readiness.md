@@ -1,6 +1,7 @@
 # 베타 서버 연동 현황
 
 > 작성일: 2026-03-03
+> 최종 수정: 2026-05-29
 > 상태: 진행 중
 
 ---
@@ -57,6 +58,17 @@
 
 ---
 
+## 베타 접속 빌드 조건 (2026-05-29)
+
+베타 서버를 기존 프론트 앱에서 검증할 때는 mock repository 기본값을 끄고 베타 API base URL을 명시한다.
+
+```bash
+--dart-define=USE_MOCK=false
+--dart-define=API_BASE_URL=https://api-beta.lessonaza.app/api/v1
+```
+
+`USE_MOCK` 기본값은 `true`이고 `API_BASE_URL` 기본값은 local 서버이므로, 위 값이 없으면 베타 백엔드를 테스트하지 않는다.
+
 ## 백엔드 API Gap (미구현 엔드포인트)
 
 | 프론트엔드 호출 경로 | 백엔드 상태 | 심각도 |
@@ -67,6 +79,19 @@
 | URL 패턴: `/subscriptions-templates` vs `/subscriptions/-templates` | 불일치 | HIGH |
 | URL 패턴: `/subscriptions-proposals` vs `/subscriptions/-proposals` | 불일치 | HIGH |
 | `POST /auth/logout` body 형식 | 불일치 가능 | MEDIUM |
+
+## 베타 계약 보완 완료 (2026-05-29)
+
+| 프론트엔드 호출 경로 | 백엔드 계약 | 상태 |
+|--------------------|------------|------|
+| `PATCH /lessons/{id}/archive` | 레슨을 `is_archived=true`, `archived_at=now`로 보관하고 기본 레슨 목록에서 숨김 | 완료 |
+| `PATCH /lessons/{id}/unarchive` | 레슨 보관을 해제하고 `archived_at=null`로 복원 | 완료 |
+| `PATCH /students/{id}/archive` | 기존 `inactive` 상태를 학생 보관 상태로 사용, `is_archived=true` 응답 | 완료 |
+| `PATCH /students/{id}/unarchive` | 학생 상태를 `active`로 복원, `is_archived=false` 응답 | 완료 |
+| `POST /bookings` with `slot_id` | `{teacher_id}-{yyyy-mm-dd}-{HH:mm}` 슬롯 ID를 예약 요청으로 변환하고 `AvailabilitySlot` 호환 응답 반환 | 완료 |
+| `share_tokens` hash-only 스키마 | 기존 `add_share_token` revision을 보존하고 새 forward migration으로 베타 DB를 `token_hash` 기반 스키마로 전환 | 완료 |
+
+베타 배포 전 서버에서 Alembic head까지 적용되어야 한다. 특히 `share_tokens`는 이미 적용된 베타 DB가 이전 컬럼(`token`, `scope`, `target_id`)을 가질 수 있으므로 새 migration 적용 여부를 확인한다.
 
 ---
 

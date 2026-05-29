@@ -42,7 +42,7 @@ API를 호출하여 핵심 데이터가 정상인지 확인:
 
 ```bash
 # 1. 선생님/학생 로그인
-curl -s -X POST https://beta.lessonaza.app/api/v1/auth/dev-login ...
+curl -s -X POST https://api-beta.lessonaza.app/api/v1/auth/dev-login ...
 
 # 2. 핵심 API 검증
 GET /teachers                    # 선생님 검색 가능?

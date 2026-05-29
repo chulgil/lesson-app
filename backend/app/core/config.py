@@ -81,6 +81,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     INTERNAL_API_KEY: str = ""
+    WWW_BASE_URL: str = "https://lessonaza.com"
 
     @field_validator("ENVIRONMENT", mode="before")
     @classmethod
@@ -113,7 +114,7 @@ def validate_runtime_configuration() -> None:
     """Validate secrets that must be strong before serving production-like traffic."""
     if settings.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS:
         return
-    if settings.JWT_SECRET_KEY in INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
-        raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
     if len(settings.INTERNAL_API_KEY) < 32:
         raise RuntimeError("INTERNAL_API_KEY must be set to a strong secret in production-like environments")
+    if settings.JWT_SECRET_KEY in INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
+        raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")

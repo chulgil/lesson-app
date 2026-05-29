@@ -161,6 +161,38 @@ async def update_student_status(
     return await service.update_status(student_id, body.status, current_user)
 
 
+@router.patch(
+    "/{student_id}/archive",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Archive student (teacher only)",
+)
+async def archive_student(
+    student_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> StudentResponse:
+    """Archive a student from active roster views."""
+    service = StudentService(db)
+    return await service.archive(student_id, current_user)
+
+
+@router.patch(
+    "/{student_id}/unarchive",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Unarchive student (teacher only)",
+)
+async def unarchive_student(
+    student_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> StudentResponse:
+    """Restore a previously archived student."""
+    service = StudentService(db)
+    return await service.unarchive(student_id, current_user)
+
+
 @router.delete(
     "/{student_id}",
     status_code=status.HTTP_204_NO_CONTENT,

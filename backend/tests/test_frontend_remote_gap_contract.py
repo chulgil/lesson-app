@@ -22,6 +22,10 @@ async def test_openapi_exposes_frontend_remote_contract_routes(client) -> None:
     expected_routes = {
         "/api/v1/lessons/bulk-cancel": {"post"},
         "/api/v1/lessons/bulk-cancel/preview": {"post"},
+        "/api/v1/lessons/{lesson_id}/archive": {"patch"},
+        "/api/v1/lessons/{lesson_id}/unarchive": {"patch"},
+        "/api/v1/students/{student_id}/archive": {"patch"},
+        "/api/v1/students/{student_id}/unarchive": {"patch"},
         "/api/v1/notifications/broadcast": {"post"},
         "/api/v1/announcements": {"post", "get"},
         "/api/v1/announcements/day-offs": {"get"},

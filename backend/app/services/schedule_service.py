@@ -740,6 +740,7 @@ class ScheduleService:
         """Create a new booking request."""
         from app.models.schedule import LessonBooking
 
+        assert data.teacher_id is not None  # normalized by BookingCreate
         await self._check_booking_overlap(
             teacher_id=data.teacher_id,
             scheduled_date=data.scheduled_date,
@@ -763,6 +764,23 @@ class ScheduleService:
         await self.db.flush()
         await self.db.refresh(booking)
         return BookingResponse.model_validate(booking)
+
+    async def create_slot_booking(self, data: BookingCreate, current_user: Any) -> dict[str, Any]:
+        """Create a booking from a frontend availability slot payload."""
+        booking = await self.create_booking(data, current_user)
+        return {
+            "id": booking.id,
+            "teacher_id": booking.teacher_id,
+            "date": booking.scheduled_date,
+            "start_time": booking.scheduled_time,
+            "end_time": booking.end_time,
+            "duration_minutes": booking.duration,
+            "status": "booked",
+            "booked_by_student_id": booking.student_id,
+            "booked_by_student_name": data.student_name,
+            "lesson_id": None,
+            "is_recommended": False,
+        }
 
     async def get_booking_by_id(self, booking_id: str, current_user: Any) -> BookingResponse:
         """Return a single booking."""

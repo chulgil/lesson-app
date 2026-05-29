@@ -323,9 +323,10 @@ class BookingCreate(BaseModel):
     frontend (lesson_date/start_time) field names.
     """
 
-    teacher_id: str
+    teacher_id: str | None = None
     student_id: str | None = None
     lesson_type: str | None = None
+    slot_id: str | None = None
 
     # Accept both naming conventions
     scheduled_date: _dt.date | None = None
@@ -355,6 +356,14 @@ class BookingCreate(BaseModel):
     @model_validator(mode="after")
     def normalize_fields(self) -> "BookingCreate":
         """Accept both frontend and backend field names."""
+        if self.slot_id:
+            teacher_id, slot_date, slot_time = _parse_frontend_slot_id(self.slot_id)
+            if not self.teacher_id:
+                self.teacher_id = teacher_id
+            if not self.scheduled_date:
+                self.scheduled_date = slot_date
+            if not self.scheduled_time:
+                self.scheduled_time = slot_time
         if self.lesson_date and not self.scheduled_date:
             self.scheduled_date = self.lesson_date
         if not self.scheduled_date:
@@ -371,7 +380,22 @@ class BookingCreate(BaseModel):
             self.scheduled_time = "00:00"
         if self.message and not self.notes:
             self.notes = self.message
+        if not self.teacher_id:
+            raise ValueError("teacher_id is required")
         return self
+
+
+def _parse_frontend_slot_id(slot_id: str) -> tuple[str, _dt.date, str]:
+    """Parse RemoteTeacherAvailabilityRepository slot ids.
+
+    The frontend receives ids as ``{teacher_id}-{yyyy-mm-dd}-{HH:mm}``.
+    Teacher ids may also contain hyphens, so parse from the right.
+    """
+    parts = slot_id.rsplit("-", 4)
+    if len(parts) != 5:
+        raise ValueError("slot_id must use {teacher_id}-{yyyy-mm-dd}-{HH:mm}")
+    teacher_id, year, month, day, start_time = parts
+    return teacher_id, _dt.date(int(year), int(month), int(day)), start_time
 
 
 class BookingUpdate(BaseModel):

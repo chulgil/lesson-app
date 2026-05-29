@@ -8,7 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.app_billing import (
+    BillingCancelResponse,
     BillingPlanResponse,
+    IapReceiptResponse,
     IapValidateRequest,
     IapValidateResponse,
     TrialStartResponse,
@@ -22,6 +24,7 @@ router = APIRouter()
     "/plan",
     response_model=BillingPlanResponse,
     summary="Get current user billing plan",
+    status_code=status.HTTP_200_OK,
 )
 async def get_billing_plan(
     current_user: User = Depends(get_current_user),
@@ -32,6 +35,20 @@ async def get_billing_plan(
     plan = await service.get_active_plan(current_user.id)
 
     return BillingPlanResponse.model_validate(plan)
+
+
+@router.get(
+    "/me",
+    response_model=BillingPlanResponse,
+    summary="Get current user billing plan",
+    status_code=status.HTTP_200_OK,
+)
+async def get_billing_plan_me(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> BillingPlanResponse:
+    """Paywall spec alias for retrieving the current billing plan."""
+    return await get_billing_plan(current_user=current_user, db=db)
 
 
 @router.post(
@@ -71,6 +88,7 @@ async def start_trial(
     "/iap/validate",
     response_model=IapValidateResponse,
     summary="Validate IAP receipt",
+    status_code=status.HTTP_200_OK,
 )
 async def validate_iap_receipt(
     request: IapValidateRequest,
@@ -122,3 +140,50 @@ async def validate_iap_receipt(
             tier=None,
             expires_at=None,
         )
+
+
+@router.post(
+    "/verify-purchase",
+    response_model=IapValidateResponse,
+    summary="Validate IAP receipt",
+    status_code=status.HTTP_200_OK,
+)
+async def verify_purchase(
+    request: IapValidateRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> IapValidateResponse:
+    """Paywall spec alias for IAP receipt validation."""
+    return await validate_iap_receipt(request=request, current_user=current_user, db=db)
+
+
+@router.post(
+    "/cancel",
+    response_model=BillingCancelResponse,
+    summary="Cancel current app billing plan",
+    status_code=status.HTTP_200_OK,
+)
+async def cancel_billing_plan(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> BillingCancelResponse:
+    """Cancel future app billing renewals for the current user."""
+    service = AppBillingService(db)
+    await service.cancel_plan(current_user.id)
+    await db.commit()
+    return BillingCancelResponse(success=True, message="Billing plan cancelled")
+
+
+@router.get(
+    "/receipts",
+    response_model=list[IapReceiptResponse],
+    summary="List IAP receipts",
+    status_code=status.HTTP_200_OK,
+)
+async def list_iap_receipts(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[IapReceiptResponse]:
+    """Return the current user's IAP receipt audit history."""
+    service = AppBillingService(db)
+    return await service.list_receipts(current_user.id)
