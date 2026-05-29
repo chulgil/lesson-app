@@ -5665,16 +5665,30 @@ class AppStrings {
   /// 초대 링크가 복사되었습니다 — 링크 복사 SnackBar.
   static const inviteLinkCopiedSnack = '초대 링크가 복사되었습니다';
 
-  /// 레슨앱 초대 공유 메시지 ($code, $url, $role) — multi-line share text.
+  /// 레슨앱 초대 공유 메시지 — multi-line share text.
+  ///
+  /// 선생님 케이스에서 [senderName] 과 [instruments] 가 비어있지 않으면
+  /// "악기 선생님 OOO" 형태의 헤더를 추가해 카톡 미리보기에서 신뢰도를 높인다.
   static String inviteShareMessageFormat(
     String code,
     String url,
-    String role,
-  ) =>
-      '레슨앱에서 저와 함께해요!\n\n'
-      '초대 코드: $code\n'
-      '또는 링크: $url\n\n'
-      '- $role 드림';
+    String role, {
+    String? senderName,
+    List<String> instruments = const [],
+  }) {
+    final hasIdentity = senderName != null && senderName.isNotEmpty;
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
+    final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
+    return '$header\n\n'
+        '초대 코드: $code\n'
+        '또는 링크: $url\n\n'
+        '$signature';
+  }
 
   /// 레슨앱 초대 — share subject.
   static const inviteShareSubject = '레슨앱 초대';

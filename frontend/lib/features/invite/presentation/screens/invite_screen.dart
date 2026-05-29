@@ -49,9 +49,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: userRole == InviteUserRole.teacher
-            ? AppStrings.inviteScreenTitleTeacher
-            : AppStrings.inviteScreenTitleStudent,
+        title:
+            userRole == InviteUserRole.teacher
+                ? AppStrings.inviteScreenTitleTeacher
+                : AppStrings.inviteScreenTitleStudent,
         leading: DetailAppBarLeading.close,
         actions: const [DetailAppBarAction.history],
         onAction: (action) {
@@ -428,12 +429,24 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ? AppStrings.teacher
             : AppStrings.student;
 
+    String? senderName;
+    List<String> instruments = const [];
+    if (userRole == InviteUserRole.teacher) {
+      final profile = ref.read(teacherExtendedProfileProvider).valueOrNull;
+      if (profile != null) {
+        senderName = profile.displayName;
+        instruments = profile.instruments;
+      }
+    }
+
     SharePlus.instance.share(
       ShareParams(
         text: AppStrings.inviteShareMessageFormat(
           invite.inviteCode,
           invite.inviteUrl,
           roleText,
+          senderName: senderName,
+          instruments: instruments,
         ),
         subject: AppStrings.inviteShareSubject,
       ),
