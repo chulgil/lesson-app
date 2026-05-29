@@ -27,6 +27,9 @@ class AppBillingDto {
           _asString(json, 'originalTransactionId'),
       trialUsed:
           _asBool(json['trial_used']) ?? _asBool(json['trialUsed']) ?? false,
+      lifetimeOfferEndsAt: _parseDate(
+        json['lifetime_offer_ends_at'] ?? json['lifetimeOfferEndsAt'],
+      ),
     );
   }
 

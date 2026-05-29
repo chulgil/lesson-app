@@ -129,6 +129,61 @@ Future<void> handleBuyPro({
   }
 }
 
+/// Lifetime 1회 결제 흐름 — M5 출시 후 90일 한정 얼리어답터.
+///
+/// handleBuyPro 와 동일한 구조: store 가용성 → 상품 조회 → 구매 → 백엔드 검증 →
+/// completePurchase → snapshot invalidate. productId 와 안내 문구만 다르다.
+Future<void> handleBuyLifetime({
+  required BuildContext context,
+  required WidgetRef ref,
+}) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final iap = ref.read(iapServiceProvider);
+  final repo = ref.read(appBillingRepositoryProvider);
+
+  final available = await iap.isAvailable();
+  if (!available) {
+    _showSnack(messenger, AppStrings.paywallLifetimeStoreUnavailable);
+    return;
+  }
+
+  final products = await iap.queryProducts({lifetimeProductId});
+  final product = products
+      .where((p) => p.id == lifetimeProductId)
+      .toList(growable: false);
+  if (product.isEmpty) {
+    _showSnack(messenger, AppStrings.paywallLifetimeProductNotFound);
+    return;
+  }
+
+  final outcome = await iap.purchase(product.first);
+
+  switch (outcome) {
+    case IapPurchaseCancelled():
+      _showSnack(messenger, AppStrings.paywallLifetimePurchaseCancelled);
+    case IapPurchaseFailure():
+      _showSnack(messenger, AppStrings.paywallLifetimePurchaseFailed);
+    case IapPurchaseSuccess(:final purchase):
+      try {
+        final result = await repo.validatePurchase(
+          platform: iap.platform,
+          receipt: purchase.verificationData.serverVerificationData,
+          productId: lifetimeProductId,
+        );
+        await iap.completePurchase(purchase);
+        ref.invalidate(appBillingSnapshotProvider);
+        _showSnack(
+          messenger,
+          result.granted
+              ? AppStrings.paywallLifetimePurchaseSuccess
+              : AppStrings.paywallLifetimePurchasePending,
+        );
+      } catch (_) {
+        _showSnack(messenger, AppStrings.paywallLifetimePurchaseFailed);
+      }
+  }
+}
+
 /// 14일 Pro 체험 시작 흐름.
 ///
 /// 백엔드가 409 를 돌려주면 (이미 사용) result.message 를 살펴 안내한다.

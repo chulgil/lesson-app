@@ -2,7 +2,7 @@
 //
 // 다른 feature 는 본 facade 만 import 한다 (presentation/data 직접 import 금지).
 
-export 'billing_constants.dart' show proMonthlyProductId;
+export 'billing_constants.dart' show lifetimeProductId, proMonthlyProductId;
 export 'data/services/iap_service.dart'
     show
         IapPurchaseCancelled,
@@ -24,10 +24,16 @@ export 'presentation/providers/app_billing_provider.dart'
         appBillingSnapshotProvider,
         iapServiceProvider;
 export 'presentation/utils/billing_guard_actions.dart'
-    show guardAddStudentNavigation, handleBuyPro, handleStartTrial;
+    show
+        guardAddStudentNavigation,
+        handleBuyLifetime,
+        handleBuyPro,
+        handleStartTrial;
 export 'presentation/widgets/feature_locked_sheet.dart'
     show FeatureLockedSheet, LockedFeatureTier, showFeatureLockedSheet;
 export 'presentation/widgets/free_limit_sheet.dart'
     show FreeLimitSheet, showFreeLimitSheet;
+export 'presentation/widgets/lifetime_promo_banner.dart'
+    show LifetimePromoBanner;
 export 'presentation/widgets/subscription_status_card.dart'
     show SubscriptionStatusCard;

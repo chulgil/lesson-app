@@ -97,6 +97,11 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space5),
 
+          // ⏳ Lifetime 얼리어답터 프로모 배너 (paywall_spec.md §1, §6.2)
+          //    snapshot.lifetimeOfferActive 일 때만 노출. 백엔드가 종료시각을
+          //    채우기 전까지는 SizedBox.shrink (자동 graceful degradation).
+          _buildLifetimePromoBanner(context, ref),
+
           // 💳 구독 상태 카드 (paywall_spec.md §6.2 — #415 R4 Phase C2)
           _buildSubscriptionStatusCard(context, ref),
 
@@ -584,6 +589,20 @@ class ProfileTab extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLifetimePromoBanner(BuildContext context, WidgetRef ref) {
+    final snapshot = ref.watch(appBillingSnapshotProvider).valueOrNull;
+    if (snapshot == null || !snapshot.lifetimeOfferActive) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+      child: LifetimePromoBanner(
+        endsAt: snapshot.lifetimeOfferEndsAt!,
+        onBuy: () => handleBuyLifetime(context: context, ref: ref),
       ),
     );
   }

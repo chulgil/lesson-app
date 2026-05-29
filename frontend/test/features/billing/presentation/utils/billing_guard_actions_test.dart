@@ -687,4 +687,172 @@ void main() {
       expect(find.text(AppStrings.paywallTrialFailed), findsOneWidget);
     });
   });
+
+  group('handleBuyLifetime (Phase C2)', () {
+    testWidgets('store unavailable → lifetime unavailable SnackBar', (
+      tester,
+    ) async {
+      await _useTallSurface(tester);
+      final repo = _FakeBillingRepository(
+        _snapshot(plan: BillingPlan.free, status: BillingStatus.active),
+      );
+      final iap = FakeIapService(available: false);
+
+      await tester.pumpWidget(
+        _harness(
+          snapshot: _snapshot(
+            plan: BillingPlan.free,
+            status: BillingStatus.active,
+          ),
+          studentCount: 0,
+          repository: repo,
+          iapService: iap,
+          onTap: (ctx, ref) async {
+            await handleBuyLifetime(context: ctx, ref: ref);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.paywallLifetimeStoreUnavailable),
+        findsOneWidget,
+      );
+      expect(repo.validatePurchaseCalls, 0);
+    });
+
+    testWidgets('구매 취소 → lifetime cancelled SnackBar', (tester) async {
+      await _useTallSurface(tester);
+      final repo = _FakeBillingRepository(
+        _snapshot(plan: BillingPlan.free, status: BillingStatus.active),
+      );
+      final iap = FakeIapService(
+        products: [_productDetails(lifetimeProductId)],
+        outcome: const IapPurchaseCancelled(),
+      );
+
+      await tester.pumpWidget(
+        _harness(
+          snapshot: _snapshot(
+            plan: BillingPlan.free,
+            status: BillingStatus.active,
+          ),
+          studentCount: 0,
+          repository: repo,
+          iapService: iap,
+          onTap: (ctx, ref) async {
+            await handleBuyLifetime(context: ctx, ref: ref);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.paywallLifetimePurchaseCancelled),
+        findsOneWidget,
+      );
+      expect(repo.validatePurchaseCalls, 0);
+      expect(iap.completePurchaseCalls, 0);
+    });
+
+    testWidgets(
+      '구매 성공 + 검증 granted → lifetime success SnackBar + complete + receipt 전송',
+      (tester) async {
+        await _useTallSurface(tester);
+        final repo = _FakeBillingRepository(
+          _snapshot(plan: BillingPlan.free, status: BillingStatus.active),
+          validatePurchaseResult: const IapValidationResult(
+            granted: true,
+            message: 'ok',
+            planId: 'plan-lifetime',
+            tier: 'lifetime',
+          ),
+        );
+        final iap = FakeIapService(
+          products: [_productDetails(lifetimeProductId)],
+          outcome: IapPurchaseSuccess(
+            _purchaseDetails(
+              productId: lifetimeProductId,
+              receipt: 'apple-receipt-lifetime',
+            ),
+          ),
+          platformName: 'apple',
+        );
+
+        await tester.pumpWidget(
+          _harness(
+            snapshot: _snapshot(
+              plan: BillingPlan.free,
+              status: BillingStatus.active,
+            ),
+            studentCount: 0,
+            repository: repo,
+            iapService: iap,
+            onTap: (ctx, ref) async {
+              await handleBuyLifetime(context: ctx, ref: ref);
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('go'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(AppStrings.paywallLifetimePurchaseSuccess),
+          findsOneWidget,
+        );
+        expect(repo.validatePurchaseCalls, 1);
+        expect(repo.lastPlatform, 'apple');
+        expect(repo.lastReceipt, 'apple-receipt-lifetime');
+        expect(iap.completePurchaseCalls, 1);
+      },
+    );
+
+    testWidgets('구매 성공 + 백엔드 검증 예외 → lifetime failed SnackBar + complete 미호출', (
+      tester,
+    ) async {
+      await _useTallSurface(tester);
+      final repo = _FakeBillingRepository(
+        _snapshot(plan: BillingPlan.free, status: BillingStatus.active),
+        validatePurchaseError: Exception('network'),
+      );
+      final iap = FakeIapService(
+        products: [_productDetails(lifetimeProductId)],
+        outcome: IapPurchaseSuccess(
+          _purchaseDetails(
+            productId: lifetimeProductId,
+            receipt: 'apple-receipt-lifetime-fail',
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(
+        _harness(
+          snapshot: _snapshot(
+            plan: BillingPlan.free,
+            status: BillingStatus.active,
+          ),
+          studentCount: 0,
+          repository: repo,
+          iapService: iap,
+          onTap: (ctx, ref) async {
+            await handleBuyLifetime(context: ctx, ref: ref);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.paywallLifetimePurchaseFailed),
+        findsOneWidget,
+      );
+      expect(iap.completePurchaseCalls, 0);
+    });
+  });
 }

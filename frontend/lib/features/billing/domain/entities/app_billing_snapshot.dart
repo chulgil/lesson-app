@@ -18,6 +18,7 @@ class AppBillingSnapshot {
     required this.source,
     required this.originalTransactionId,
     required this.trialUsed,
+    this.lifetimeOfferEndsAt,
   });
 
   /// 백엔드 plan row id.
@@ -46,6 +47,23 @@ class AppBillingSnapshot {
 
   /// 14일 무료 체험 사용 이력 — 중복 트라이얼 차단용.
   final bool trialUsed;
+
+  /// Lifetime 얼리어답터 오퍼 종료 시각. null = 오퍼 미활성 (배너 숨김).
+  ///
+  /// 백엔드가 M5 출시일 기준 90일 윈도우를 계산해 채운다. spec §1.
+  /// 이미 lifetime 보유자는 백엔드에서 null 로 응답해 노출이 자동 종료된다.
+  final DateTime? lifetimeOfferEndsAt;
+
+  /// Lifetime 얼리어답터 오퍼가 현재 활성인지.
+  ///
+  /// - 종료 시각이 미래
+  /// - free 또는 trial 상태 (이미 유료 결제 사용자는 노출 대상 아님)
+  bool get lifetimeOfferActive {
+    final endsAt = lifetimeOfferEndsAt;
+    if (endsAt == null) return false;
+    if (!endsAt.isAfter(DateTime.now())) return false;
+    return plan == BillingPlan.free || status == BillingStatus.trial;
+  }
 
   /// 무료 가입 직후 (가입 = free + active) 기본 스냅샷.
   ///
@@ -87,6 +105,7 @@ class AppBillingSnapshot {
     String? source,
     String? originalTransactionId,
     bool? trialUsed,
+    DateTime? lifetimeOfferEndsAt,
   }) {
     return AppBillingSnapshot(
       id: id ?? this.id,
@@ -99,6 +118,7 @@ class AppBillingSnapshot {
       originalTransactionId:
           originalTransactionId ?? this.originalTransactionId,
       trialUsed: trialUsed ?? this.trialUsed,
+      lifetimeOfferEndsAt: lifetimeOfferEndsAt ?? this.lifetimeOfferEndsAt,
     );
   }
 }

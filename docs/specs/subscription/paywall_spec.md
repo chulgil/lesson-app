@@ -37,6 +37,21 @@
 
 플랜 ID는 백엔드 enum `BillingPlan`: `free`, `trial_pro`, `pro`, `studio`, `lifetime`.
 
+### 1.1 Lifetime 얼리어답터 오퍼 가용성
+
+`AppBillingSnapshot.lifetimeOfferEndsAt: DateTime?` (백엔드가 채움) 로 노출 윈도우를 관리한다.
+
+| 백엔드 응답 | 클라이언트 효과 |
+|------------|---------------|
+| `null` (M5 미출시 / 윈도우 종료 / 이미 lifetime 보유) | 프로모 배너 숨김 |
+| 미래 datetime (윈도우 내, free/trial 사용자) | 프로모 배너 노출 + D-N 카운트다운 |
+
+배너 노출 조건은 `AppBillingSnapshot.lifetimeOfferActive` getter 가 캡슐화:
+- `lifetimeOfferEndsAt` 가 현재보다 미래
+- `plan == free` 또는 `status == trial` (이미 결제한 pro/studio/lifetime 사용자는 비노출)
+
+**Graceful degradation**: 백엔드가 필드를 채우기 전까지(M5 출시 전, M5+90일 이후) 클라이언트 코드 변경 없이 자동 숨김.
+
 ---
 
 ## 2. 상태 전이
@@ -222,7 +237,39 @@ Trial:  ⏰ TRIAL  D-9 종료   체험 중 · 학생 무제한
 
 위치: `features/profile/presentation/widgets/subscription_status_card.dart` (신규).
 
-### 6.3 문구 — AppStrings 키
+### 6.3 LifetimePromoBanner (얼리어답터 한정)
+
+`AppBillingSnapshot.lifetimeOfferActive == true` 일 때 SubscriptionStatusCard **위 인라인** 으로 표시.
+
+```
+┌─────────────────────────────────────┐
+│ [얼리어답터 한정] D-69 종료          │   ← eyebrow chip + 카운트다운
+│                                     │
+│ 평생 무제한 — 1회 결제               │   ← 타이틀 (18px, w700)
+│ ₩199,000 한 번 결제로 모든 Pro 기능   │   ← 서브타이틀 (13px, height 1.45)
+│ 영구 사용.                          │
+│                                     │
+│ ┌─ [Lifetime 구매하기] ─────────┐   │   ← FilledButton (full-width, paper bg)
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+**디자인 토큰**:
+- 배경: `AppColors.paperAccent` (#9B1B12 — 노트북 시그니처 적색, 프로모 강조)
+- 전경: `AppColors.paper` (#F2ECDD — 크림)
+- 패딩: `AppSpacing.space4`, 라운드: `radiusMedium`
+- CTA: `buttonHeightSmall`, paper 바탕 + paperAccent 텍스트
+
+**상태 분기**:
+- Free / Trial 사용자: 배너 노출 (활성)
+- Pro / Studio / Lifetime 사용자: 자동 숨김 (`lifetimeOfferActive == false`)
+- `lifetimeOfferEndsAt == null`: 자동 숨김 (backend 미응답 / 윈도우 종료)
+
+**위치**: `features/billing/presentation/widgets/lifetime_promo_banner.dart` (신규).
+**진입점**: `features/profile/presentation/screens/profile_tab.dart` — SubscriptionStatusCard 직전 inline.
+**구매 흐름**: `handleBuyLifetime` (storeKit 가용성 → 상품 조회 → 구매 → `/me/billing/iap/validate` → completePurchase). `handleBuyPro` 와 동일 구조, `productId=lifetime` 만 다름.
+
+### 6.4 문구 — AppStrings 키
 
 | 키 | 한국어 |
 |----|--------|
@@ -233,6 +280,13 @@ Trial:  ⏰ TRIAL  D-9 종료   체험 중 · 학생 무제한
 | `billingStatusFree` | FREE — 학생 {used}/{limit}명 사용 중 |
 | `billingStatusPro` | PRO — D-{days} 갱신 |
 | `billingStatusTrial` | TRIAL — D-{days} 종료 |
+| `paywallLifetimePromoEyebrow` | 얼리어답터 한정 |
+| `paywallLifetimePromoTitle` | 평생 무제한 — 1회 결제 |
+| `paywallLifetimePromoSubtitle` | ₩199,000 한 번 결제로 모든 Pro 기능 영구 사용. |
+| `paywallLifetimePromoCountdown` | D-{days} 종료 |
+| `paywallLifetimeBuyCta` | Lifetime 구매하기 |
+| `paywallLifetimePurchaseSuccess` | Lifetime 플랜이 활성화되었어요. |
+| `paywallLifetimePurchaseCancelled` | Lifetime 구매를 취소했어요. |
 
 **i18n 위반 금지**: 모든 paywall 문구는 코드에 직접 한글 박지 않는다. [i18n_migration_spec.md](../architecture/i18n_migration_spec.md) 참조.
 
@@ -261,12 +315,19 @@ Trial:  ⏰ TRIAL  D-9 종료   체험 중 · 학생 무제한
 - `backend/app/api/v1/app_billing.py`
 - `backend/app/services/app_billing_service.py`
 - `frontend/lib/features/billing/` 전체
+- `frontend/lib/features/billing/presentation/widgets/lifetime_promo_banner.dart` — Phase C2 얼리어답터 프로모 배너
 - `frontend/pubspec.yaml` — `in_app_purchase: ^3.2.0` 추가
 
 ### 변경
 - `features/students/presentation/screens/add_student_screen.dart` — BillingGuard 호출
 - `features/profile/presentation/screens/profile_screen.dart` — SubscriptionStatusCard 삽입
+- `features/profile/presentation/screens/profile_tab.dart` — Phase C2 LifetimePromoBanner inline 노출
 - `features/students/presentation/providers/students_provider.dart` — `studentCountProvider`와 BillingGuard 연결
+- `features/billing/domain/entities/app_billing_snapshot.dart` — Phase C2 `lifetimeOfferEndsAt` 필드 + `lifetimeOfferActive` getter 추가
+- `features/billing/data/repositories/app_billing_dto.dart` — Phase C2 `lifetime_offer_ends_at` 파싱
+- `features/billing/presentation/utils/billing_guard_actions.dart` — Phase C2 `handleBuyLifetime` 추가
+- `features/billing/billing_constants.dart` — `lifetimeProductId = 'lifetime'` 상수
+- `features/billing/billing_facade.dart` — Phase C2 export 확장
 
 ---
 
@@ -290,6 +351,9 @@ IAP 수수료(Apple 15% 소기업 / 30% 일반)는 실수령에서 차감.
 | 2026-05-18 | TrialPro 14일, 자동 갱신 없음, 만료 시 Free 복귀 | 카드 미등록 진입 장벽 제거 |
 | 2026-05-18 | 흐름 B 모델은 흐름 A와 물리적 분리 (`AppBillingPlan` 신규 테이블) | payment_architecture.md §3.3 미래 구현 경계 준수 |
 | 2026-05-18 | M5 동시 출시 플랜: Free/TrialPro/Pro 월간. Pro 연간/Studio/Lifetime은 M5 후속 | 초기 SKU 최소화로 검증 |
+| 2026-05-29 | Lifetime UI는 `AppBillingSnapshot.lifetimeOfferEndsAt` 단일 nullable 필드로 graceful degradation | 백엔드 미응답/윈도우 종료/이미 lifetime 보유 케이스를 한 곳에서 처리. 클라이언트는 시점/할당 로직 무지. |
+| 2026-05-29 | Lifetime 진입점은 프로필 탭 인라인 promo banner (별도 paywall sheet 아님) | 얼리어답터 한정 = 능동 어필 필요. 학생 한도 sheet 와 분리해 일상 결제 흐름 오염 방지. |
+| 2026-05-29 | `productId = 'lifetime'` 으로 StoreKit/Play 상품 ID 고정 | `handleBuyPro` 와 동일 흐름 재사용. spec/IAP/백엔드 검증 키를 단일 문자열로 정렬. |
 
 ---
 

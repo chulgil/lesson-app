@@ -7431,4 +7431,45 @@ class AppStrings {
 
   /// Studio 업그레이드 CTA.
   static const billingStudioUpgradeCta = 'Studio 업그레이드';
+
+  // ── LifetimePromoBanner Phase C2 (#415) ──────────────────
+  // spec/paywall_spec.md §1, §6.2 — M5 출시 후 90일 한정 얼리어답터.
+
+  /// Lifetime 프로모 배너 eyebrow.
+  static const paywallLifetimePromoEyebrow = '얼리어답터 한정';
+
+  /// Lifetime 프로모 배너 제목.
+  static const paywallLifetimePromoTitle = '평생 무제한 — 1회 결제';
+
+  /// Lifetime 프로모 배너 본문.
+  static const paywallLifetimePromoSubtitle =
+      '₩199,000 한 번 결제로 모든 Pro 기능 영구 사용.';
+
+  /// Lifetime 종료까지 남은 일수 (D-N 카운트다운).
+  static const paywallLifetimePromoCountdown = 'D-{days} 종료';
+
+  /// Lifetime 구매 CTA.
+  static const paywallLifetimeBuyCta = 'Lifetime 구매하기';
+
+  /// Lifetime 구매 — store 가용성 실패.
+  static const paywallLifetimeStoreUnavailable =
+      'Lifetime 결제 스토어에 연결할 수 없어요. 잠시 후 다시 시도해주세요.';
+
+  /// Lifetime 상품 정보 조회 실패.
+  static const paywallLifetimeProductNotFound =
+      'Lifetime 구매 정보를 찾을 수 없어요. 잠시 후 다시 시도해주세요.';
+
+  /// Lifetime 구매 성공 — 영수증 검증까지 완료.
+  static const paywallLifetimePurchaseSuccess = 'Lifetime 플랜이 활성화되었어요.';
+
+  /// Lifetime 구매 — 영수증 검증 보류.
+  static const paywallLifetimePurchasePending =
+      '구매가 접수되었어요. 검증이 완료되면 자동으로 Lifetime 으로 전환됩니다.';
+
+  /// Lifetime 구매 — 사용자가 store sheet 취소.
+  static const paywallLifetimePurchaseCancelled = 'Lifetime 구매를 취소했어요.';
+
+  /// Lifetime 구매 실패 — store/network/검증 에러.
+  static const paywallLifetimePurchaseFailed =
+      'Lifetime 구매를 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
 }
