@@ -14,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
+import '../../../billing/billing_facade.dart' show guardAddStudentNavigation;
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../extensions/student_domain_visuals.dart';
@@ -250,9 +251,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             TextButton(
               onPressed: _selectAllStudents,
               child: Text(
-                _isAllSelected
-                    ? AppStrings.deselectAll
-                    : AppStrings.selectAll,
+                _isAllSelected ? AppStrings.deselectAll : AppStrings.selectAll,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.ink,
                   fontWeight: FontWeight.w600,
@@ -327,7 +326,12 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 const SizedBox(width: AppSpacing.space1),
                 // + 학생 추가
                 IconButton(
-                  onPressed: () => context.push(AppRoutes.addStudentMethod),
+                  onPressed:
+                      () => guardAddStudentNavigation(
+                        context: context,
+                        ref: ref,
+                        onPass: () => context.push(AppRoutes.addStudentMethod),
+                      ),
                   icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
                   tooltip: AppStrings.studentAddLabel,
                   padding: EdgeInsets.zero,
@@ -636,7 +640,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return EmptyStateWidget(
       icon: Icons.people_outline,
-      title: query.isNotEmpty ? AppStrings.studentsSearchEmptyTitle : AppStrings.studentsEmptyTitle,
+      title:
+          query.isNotEmpty
+              ? AppStrings.studentsSearchEmptyTitle
+              : AppStrings.studentsEmptyTitle,
       subtitle: query.isEmpty ? AppStrings.studentsEmptySubtitle : null,
       actionLabel: query.isEmpty ? AppStrings.studentAddLabel : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
@@ -1100,16 +1107,26 @@ class _EnrollmentExtras extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.space2),
-        child: Row(
-          children: [
-            Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
-            const SizedBox(width: AppSpacing.space2),
-            Text(AppStrings.loadDataFailed, style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary)),
-          ],
-        ),
-      ),
+      error:
+          (_, __) => Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space2),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
     );
   }
 

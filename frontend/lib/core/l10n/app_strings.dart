@@ -7286,4 +7286,43 @@ class AppStrings {
 
   /// 공개 학생 요약 — 토큰 정보 부가 설명
   static const studentSummaryTokenLabel = '공유 링크';
+
+  // ── Paywall (R4 #415) ────────────────────────────────────
+  // spec/paywall_spec.md §6.3.
+
+  /// FreeLimitSheet 제목 — 학생 5명 한도 도달.
+  static const paywallFreeLimitTitle = '학생 5명 한도에 도달했어요';
+
+  /// FreeLimitSheet 본문 — Pro 업그레이드 안내.
+  static const paywallFreeLimitSubtitle = '더 많은 학생을 관리하려면 Pro 로 업그레이드하세요.';
+
+  /// PlanExpired 진입 차단 제목.
+  static const paywallPlanExpiredTitle = '플랜이 만료되었어요';
+
+  /// PlanExpired 본문 — 7일 유예 종료 후 Free 강등.
+  static const paywallPlanExpiredSubtitle = '재결제하거나 Free 플랜으로 돌아가야 합니다.';
+
+  /// Pro 월간 카드 제목.
+  static const paywallProMonthlyTitle = 'Pro 월간';
+
+  /// Pro 월간 카드 본문 (가격 + 혜택).
+  static const paywallProMonthlyDescription = '₩9,900 / 월 · 학생 무제한';
+
+  /// Pro 구매 CTA.
+  static const paywallProBuyCta = '구매하기';
+
+  /// Trial 카드 제목.
+  static const paywallTrialTitle = '14일 무료 체험';
+
+  /// Trial 본문 — 자동 결제 없음.
+  static const paywallTrialNote = '자동 결제 없음. 만료 시 Free 복귀.';
+
+  /// Trial 시작 CTA.
+  static const paywallTrialStartCta = '체험 시작';
+
+  /// Paywall 닫기.
+  static const paywallLaterCta = '나중에';
+
+  /// IAP 미연결 안내 (Phase B 임시) — Phase C 에서 제거.
+  static const paywallComingSoonHint = '구매 기능은 곧 제공됩니다.';
 }

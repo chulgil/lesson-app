@@ -9,3 +9,7 @@ export 'domain/repositories/app_billing_repository.dart';
 export 'domain/services/billing_guard.dart';
 export 'presentation/providers/app_billing_provider.dart'
     show appBillingRepositoryProvider, appBillingSnapshotProvider;
+export 'presentation/utils/billing_guard_actions.dart'
+    show guardAddStudentNavigation;
+export 'presentation/widgets/free_limit_sheet.dart'
+    show FreeLimitSheet, showFreeLimitSheet;
