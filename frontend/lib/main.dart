@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/deep_link/deep_link_handler.dart';
 import 'core/l10n/generated/app_localizations.dart';
 import 'core/providers/repository_provider.dart';
 import 'core/router/app_router.dart';
@@ -43,6 +44,8 @@ class LessonazaApp extends ConsumerStatefulWidget {
 
 class _LessonazaAppState extends ConsumerState<LessonazaApp>
     with WidgetsBindingObserver {
+  DeepLinkHandler? _deepLinkHandler;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +62,7 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    unawaited(_deepLinkHandler?.dispose());
     unawaited(ref.read(syncServiceProvider).dispose());
     super.dispose();
   }
@@ -100,6 +104,12 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
         useMockData
             ? AppRouter.router
             : AppRouter.createRouter(ref, useMockData: useMockData);
+
+    // R2 #318 — lessonapp:// 딥링크 → GoRouter 연결 (1회만 시작).
+    if (_deepLinkHandler == null) {
+      _deepLinkHandler = DeepLinkHandler(navigate: routerConfig.go);
+      unawaited(_deepLinkHandler!.start());
+    }
 
     // Global keyboard dismiss: tap outside any text field to close keyboard
     return GestureDetector(

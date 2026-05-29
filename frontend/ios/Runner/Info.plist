@@ -35,6 +35,17 @@
 				<string>com.googleusercontent.apps.312292843644-4i6n21tp6vagfltl2p1i7jlvk1avh0n7</string>
 			</array>
 		</dict>
+		<dict>
+			<!-- R2 #318 — Lessonaza 딥링크 (lessonapp://invite/{code}, lessonapp://student/summary/{token}) -->
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.lessonaza.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lessonapp</string>
+			</array>
+		</dict>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

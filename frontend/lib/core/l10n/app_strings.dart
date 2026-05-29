@@ -7261,4 +7261,15 @@ class AppStrings {
 
   /// 의견 위젯 — 의견 전송됨
   static const closureCommentSubmitted = '의견이 전송되었습니다.';
+
+  // ── Public Student Summary (R2 #318) ──────────────────────
+
+  /// 공개 학생 요약 — 화면 제목
+  static const studentSummaryAppBarTitle = '레슨 요약';
+
+  /// 공개 학생 요약 — 백엔드 미연결 placeholder (Flutter-only scope)
+  static const studentSummaryComingSoon = '곧 만나요!\n레슨 요약이 준비 중입니다.';
+
+  /// 공개 학생 요약 — 토큰 정보 부가 설명
+  static const studentSummaryTokenLabel = '공유 링크';
 }

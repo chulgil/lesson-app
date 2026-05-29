@@ -183,4 +183,7 @@ class AppRoutes {
   static const academyInquiryDetail =
       '/academy/:academyId/inquiries/:inquiryId';
   static const noteAccessRequest = '/note-access/:requestId';
+
+  // Public sharing routes (R2 #318 — 토큰 기반 읽기 전용 요약)
+  static const studentSummary = '/student/summary/:token';
 }

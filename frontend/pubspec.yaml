@@ -29,6 +29,9 @@ dependencies:
   # Network
   dio: ^5.4.3+1
 
+  # Deep links (R2 — lessonapp:// 스킴 처리)
+  app_links: ^6.3.2
+
   # Local Storage
   hive: ^2.2.3
   hive_flutter: ^1.1.0

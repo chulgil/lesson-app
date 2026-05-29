@@ -25,6 +25,7 @@ import 'routes/search_routes.dart';
 import 'routes/invite_routes.dart';
 import 'routes/notification_routes.dart';
 import 'routes/settings_routes.dart';
+import 'routes/share_routes.dart';
 import 'routes/subscription_routes.dart';
 
 // Re-export AppRoutes for convenient imports
@@ -32,6 +33,10 @@ export 'app_routes.dart';
 
 /// Auth-aware redirect paths.
 const _publicPaths = [AppRoutes.login, '/login'];
+
+/// Public path prefixes (token-based shares, no auth required) — R2 #318.
+const _publicPathPrefixes = ['/student/summary/'];
+
 const _roleSelectPath = AppRoutes.roleSelect;
 const _termsAgreementPath = AppRoutes.termsAgreement;
 
@@ -56,7 +61,9 @@ class AppRouter {
               : (context, state) {
                 final authState = ref.read(authNotifierProvider);
                 final currentPath = state.matchedLocation;
-                final isPublic = _publicPaths.contains(currentPath);
+                final isPublic =
+                    _publicPaths.contains(currentPath) ||
+                    _publicPathPrefixes.any(currentPath.startsWith);
                 final isRoleSelect = currentPath == _roleSelectPath;
                 final isTermsAgreement = currentPath == _termsAgreementPath;
 
@@ -109,6 +116,7 @@ class AppRouter {
         ...inviteRoutes,
         ...notificationRoutes,
         ...settingsRoutes,
+        ...shareRoutes,
         ...subscriptionRoutes,
       ],
       errorBuilder:
@@ -136,6 +144,7 @@ class AppRouter {
       ...inviteRoutes,
       ...notificationRoutes,
       ...settingsRoutes,
+      ...shareRoutes,
       ...subscriptionRoutes,
     ],
     errorBuilder:
