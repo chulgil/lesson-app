@@ -52,12 +52,13 @@ def test_subscription_fk_migration_is_chained_and_declares_constraints() -> None
         "fk_subscription_proposals_teacher_id_teachers",
         "fk_subscription_proposals_student_id_students",
         "fk_subscription_proposals_template_id_subscription_templates",
-        "fk_subscription_proposals_recommended_template_id_subscription_templates",
-        "fk_subscription_proposals_selected_template_id_subscription_templates",
+        "fk_sub_proposals_recommended_template_id_templates",
+        "fk_sub_proposals_selected_template_id_templates",
         "fk_subscription_proposals_subscription_id_subscriptions",
-        "fk_subscription_proposals_previous_subscription_id_subscriptions",
+        "fk_sub_proposals_previous_subscription_id_subscriptions",
         "fk_request_events_subscription_id_subscriptions",
     ]:
+        assert len(name) <= 63
         assert name in source
 
 

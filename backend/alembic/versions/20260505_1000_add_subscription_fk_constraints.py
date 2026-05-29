@@ -66,13 +66,13 @@ def upgrade() -> None:
             ["id"],
         )
         batch_op.create_foreign_key(
-            "fk_subscription_proposals_recommended_template_id_subscription_templates",
+            "fk_sub_proposals_recommended_template_id_templates",
             "subscription_templates",
             ["recommended_template_id"],
             ["id"],
         )
         batch_op.create_foreign_key(
-            "fk_subscription_proposals_selected_template_id_subscription_templates",
+            "fk_sub_proposals_selected_template_id_templates",
             "subscription_templates",
             ["selected_template_id"],
             ["id"],
@@ -84,7 +84,7 @@ def upgrade() -> None:
             ["id"],
         )
         batch_op.create_foreign_key(
-            "fk_subscription_proposals_previous_subscription_id_subscriptions",
+            "fk_sub_proposals_previous_subscription_id_subscriptions",
             "subscriptions",
             ["previous_subscription_id"],
             ["id"],
@@ -104,14 +104,14 @@ def downgrade() -> None:
         batch_op.drop_constraint("fk_request_events_subscription_id_subscriptions", type_="foreignkey")
 
     with op.batch_alter_table("subscription_proposals") as batch_op:
-        batch_op.drop_constraint("fk_subscription_proposals_previous_subscription_id_subscriptions", type_="foreignkey")
+        batch_op.drop_constraint("fk_sub_proposals_previous_subscription_id_subscriptions", type_="foreignkey")
         batch_op.drop_constraint("fk_subscription_proposals_subscription_id_subscriptions", type_="foreignkey")
         batch_op.drop_constraint(
-            "fk_subscription_proposals_selected_template_id_subscription_templates",
+            "fk_sub_proposals_selected_template_id_templates",
             type_="foreignkey",
         )
         batch_op.drop_constraint(
-            "fk_subscription_proposals_recommended_template_id_subscription_templates",
+            "fk_sub_proposals_recommended_template_id_templates",
             type_="foreignkey",
         )
         batch_op.drop_constraint("fk_subscription_proposals_template_id_subscription_templates", type_="foreignkey")
