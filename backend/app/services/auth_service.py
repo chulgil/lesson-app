@@ -61,17 +61,40 @@ class AuthService:
             user=UserResponse.model_validate(user),
         )
 
-    async def dev_login(self, request: DevLoginRequest) -> TokenResponse:
-        """Authenticate without OAuth — development environment only.
+    async def dev_login(
+        self,
+        request: DevLoginRequest,
+        *,
+        internal_api_key: str | None = None,
+    ) -> TokenResponse:
+        """Authenticate without OAuth — development env, or beta with internal key.
+
+        Environment gate:
+          - development: always allowed (key ignored)
+          - beta: allowed only if X-Internal-API-Key matches settings.INTERNAL_API_KEY
+                  (used by the beta integration-test harness)
+          - all other (production, staging, unknown): always 403
 
         Flow:
         1. Find existing user by email, or create a new one.
         2. Set role and auto-create role-specific profile (Teacher / Parent).
         3. Generate access + refresh tokens.
         """
+        import secrets as _secrets
+
         from app.core.config import settings
 
-        if settings.ENVIRONMENT != "development":
+        env = settings.ENVIRONMENT
+        if env == "development":
+            pass
+        elif env == "beta":
+            configured = settings.INTERNAL_API_KEY
+            if not configured or internal_api_key is None or not _secrets.compare_digest(internal_api_key, configured):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Dev login on beta requires a valid X-Internal-API-Key header",
+                )
+        else:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Dev login is only available in development environment",

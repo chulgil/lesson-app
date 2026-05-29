@@ -135,12 +135,77 @@ async def test_dev_login_blocked_in_production(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_dev_login_blocked_in_beta(client: AsyncClient):
-    """POST /api/v1/auth/dev-login returns 403 in beta-like environments."""
+async def test_dev_login_blocked_in_beta_without_internal_key(client: AsyncClient):
+    """beta + no X-Internal-API-Key header → 403 (default-closed)."""
     with patch("app.core.config.settings.ENVIRONMENT", "beta"):
         response = await client.post(
             "/api/v1/auth/dev-login",
             json={"email": "hacker@evil.com", "role": "teacher"},
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dev_login_blocked_in_beta_with_wrong_internal_key(client: AsyncClient):
+    """beta + incorrect X-Internal-API-Key → 403."""
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "beta"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", "correct-secret-" + "x" * 32),
+    ):
+        response = await client.post(
+            "/api/v1/auth/dev-login",
+            json={"email": "hacker@evil.com", "role": "teacher"},
+            headers={"X-Internal-API-Key": "wrong-secret"},
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dev_login_allowed_in_beta_with_correct_internal_key(client: AsyncClient):
+    """beta + correct X-Internal-API-Key → 200 (integration-test gateway)."""
+    secret = "beta-integration-test-key-" + "x" * 32
+    strong_jwt = "beta-strong-jwt-secret-" + "y" * 48
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "beta"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", secret),
+        patch("app.core.config.settings.JWT_SECRET_KEY", strong_jwt),
+    ):
+        response = await client.post(
+            "/api/v1/auth/dev-login",
+            json={"email": "qa-teacher@lessonaza.test", "role": "teacher"},
+            headers={"X-Internal-API-Key": secret},
+        )
+    assert response.status_code == 200, response.text
+    assert "access_token" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_dev_login_blocked_in_beta_when_internal_key_unset(client: AsyncClient):
+    """beta + INTERNAL_API_KEY unset (empty) → 403 even with any header value."""
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "beta"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", ""),
+    ):
+        response = await client.post(
+            "/api/v1/auth/dev-login",
+            json={"email": "hacker@evil.com", "role": "teacher"},
+            headers={"X-Internal-API-Key": "anything"},
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dev_login_blocked_in_production_even_with_correct_internal_key(client: AsyncClient):
+    """production never allows dev-login, regardless of header (defense in depth)."""
+    secret = "real-prod-key-" + "x" * 32
+    with (
+        patch("app.core.config.settings.ENVIRONMENT", "production"),
+        patch("app.core.config.settings.INTERNAL_API_KEY", secret),
+    ):
+        response = await client.post(
+            "/api/v1/auth/dev-login",
+            json={"email": "hacker@evil.com", "role": "teacher"},
+            headers={"X-Internal-API-Key": secret},
         )
     assert response.status_code == 403
 

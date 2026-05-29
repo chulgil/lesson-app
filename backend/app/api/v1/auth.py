@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Header, status  # noqa: F401  (Header used in string Annotated below)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
@@ -44,15 +44,21 @@ async def oauth_login(
     "/dev-login",
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
-    summary="Dev login (development environment only)",
+    summary="Dev login (development env, or beta with X-Internal-API-Key)",
 )
 async def dev_login(
     body: DevLoginRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
+    internal_api_key: Annotated[str | None, Header(alias="X-Internal-API-Key")] = None,
 ) -> TokenResponse:
-    """Bypass OAuth and log in directly — only works when ENVIRONMENT=development."""
+    """Bypass OAuth and log in directly.
+
+    Allowed in `development` unconditionally, and in `beta` if the request carries
+    a valid `X-Internal-API-Key` header matching `settings.INTERNAL_API_KEY`.
+    Production always rejects.
+    """
     service = AuthService(db)
-    return await service.dev_login(body)
+    return await service.dev_login(body, internal_api_key=internal_api_key)
 
 
 @router.post(
