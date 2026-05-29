@@ -6,10 +6,11 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../academy/domain/entities/academy_enums.dart';
 import '../../../profile/domain/entities/cancellation_defaults.dart';
-import '../../../profile/presentation/providers/cancellation_defaults_provider.dart';
+import '../../../profile/profile_facade.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 
@@ -116,16 +117,10 @@ class _SubscriptionPolicyOverrideScreenState
   Widget build(BuildContext context) {
     final defaultsAsync = ref.watch(cancellationDefaultsNotifierProvider);
 
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        backgroundColor: AppColors.paper,
-        elevation: 0,
-        title: Text(
-          AppStrings.subscriptionPolicyOverrideTitle,
-          style: NotebookTypography.sectionTitle.copyWith(color: AppColors.ink),
-        ),
-        iconTheme: IconThemeData(color: AppColors.ink),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.subscriptionPolicyOverrideTitle,
       ),
       body: defaultsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

@@ -8,8 +8,7 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/profile_facade.dart';
-import '../../../../features/academy/domain/repositories/academy_visibility_repository.dart';
-import '../../../../features/academy/presentation/providers/academy_visibility_provider.dart';
+import '../../../../features/academy/academy_facade.dart';
 import '../widgets/profile_visibility_widgets.dart';
 
 /// Screen for managing profile visibility settings

@@ -15,8 +15,7 @@ import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../features/lessons/lessons_facade.dart';
 import '../../../../features/settings/settings_facade.dart';
-import '../../../../features/academy/presentation/providers/academy_visibility_provider.dart';
-import '../../../../features/academy/domain/repositories/academy_visibility_repository.dart';
+import '../../../../features/academy/academy_facade.dart';
 import '../widgets/regular_lesson_widgets.dart';
 import '../widgets/schedule_type_selector.dart';
 

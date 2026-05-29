@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widgets/notebook/notebook_surfaces.dart';
 import '../../../features/academy/domain/entities/academy_announcement.dart';
 import '../../../features/academy/domain/entities/academy_inquiry.dart';
 import '../../../features/inbox/presentation/screens/academy_inquiry_detail_screen.dart';
@@ -37,7 +38,9 @@ List<GoRoute> notificationRoutes = [
     builder: (context, state) {
       final announcement = state.extra;
       if (announcement is! AcademyAnnouncement) {
-        return const Scaffold(body: Center(child: Text('공지사항을 불러올 수 없습니다.')));
+        return const NotebookScreenScaffold(
+          body: Center(child: Text('공지사항을 불러올 수 없습니다.')),
+        );
       }
       return AcademyAnnouncementDetailScreen(announcement: announcement);
     },
@@ -61,7 +64,9 @@ List<GoRoute> notificationRoutes = [
       final academyId = state.pathParameters['academyId'] ?? '';
       final inquiry = state.extra;
       if (inquiry is! AcademyInquiry) {
-        return const Scaffold(body: Center(child: Text('문의를 불러올 수 없습니다.')));
+        return const NotebookScreenScaffold(
+          body: Center(child: Text('문의를 불러올 수 없습니다.')),
+        );
       }
       return AcademyInquiryDetailScreen(inquiry: inquiry, academyId: academyId);
     },

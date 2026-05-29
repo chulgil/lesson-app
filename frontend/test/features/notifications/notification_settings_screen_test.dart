@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,19 +9,26 @@ import 'package:lessonaza/features/notifications/presentation/providers/notifica
 import 'package:lessonaza/features/notifications/presentation/screens/notification_settings_screen.dart';
 
 void main() {
+  late Directory hiveDir;
+
   setUp(() async {
-    await Hive.initFlutter('test_hive_notification');
+    hiveDir = await Directory.systemTemp.createTemp('test_hive_notification_');
+    Hive.init(hiveDir.path);
     if (!Hive.isBoxOpen('notification_settings')) {
       await Hive.openBox('notification_settings');
     }
   });
 
   tearDown(() async {
-    await Hive.deleteFromDisk();
+    await Hive.close();
+    if (await hiveDir.exists()) {
+      await hiveDir.delete(recursive: true);
+    }
   });
 
-  testWidgets('NotificationSettingsScreen renders without exception',
-      (tester) async {
+  testWidgets('NotificationSettingsScreen renders without exception', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -27,17 +36,14 @@ void main() {
             () => _FakeNotificationPreferencesNotifier(),
           ),
         ],
-        child: const MaterialApp(
-          home: NotificationSettingsScreen(),
-        ),
+        child: const MaterialApp(home: NotificationSettingsScreen()),
       ),
     );
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('NotificationSettingsScreen shows master toggle',
-      (tester) async {
+  testWidgets('NotificationSettingsScreen shows master toggle', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -45,9 +51,7 @@ void main() {
             () => _FakeNotificationPreferencesNotifier(),
           ),
         ],
-        child: const MaterialApp(
-          home: NotificationSettingsScreen(),
-        ),
+        child: const MaterialApp(home: NotificationSettingsScreen()),
       ),
     );
     await tester.pumpAndSettle();

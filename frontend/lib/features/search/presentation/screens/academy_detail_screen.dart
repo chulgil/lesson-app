@@ -10,7 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
-import '../../../../features/inbox/presentation/widgets/academy_inquiry_form_widget.dart';
+import '../../../../features/inbox/inbox_ui_facade.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../domain/repositories/teacher_search_repository.dart';
 import '../../../parent_home/parent_home_facade.dart';

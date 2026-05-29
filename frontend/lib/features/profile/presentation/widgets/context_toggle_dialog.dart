@@ -8,7 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../auth/data/repositories/mock_context_switch_repository.dart';
-import '../../../notifications/presentation/widgets/context_switch_toast.dart';
+import '../../../notifications/notifications_facade.dart';
 
 /// Dialog to confirm context switch between teacher and academy owner roles.
 ///
@@ -30,7 +30,9 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
     final authState = ref.watch(authNotifierProvider);
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: AppColors.paper,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: SingleChildScrollView(

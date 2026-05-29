@@ -5,6 +5,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/note_access_request.dart';
 import '../providers/note_access_provider.dart';
 
@@ -31,16 +33,16 @@ class _NoteAccessRequestScreenState
         .when(
           data: (request) => _buildContent(context, request),
           loading:
-              () => Scaffold(
-                appBar: AppBar(
-                  title: const Text(AppStrings.noteAccessRequestTitle),
+              () => const NotebookScreenScaffold(
+                appBar: NotebookDetailAppBar(
+                  title: AppStrings.noteAccessRequestTitle,
                 ),
-                body: const Center(child: CircularProgressIndicator()),
+                body: Center(child: CircularProgressIndicator()),
               ),
           error:
-              (error, stackTrace) => Scaffold(
-                appBar: AppBar(
-                  title: const Text(AppStrings.noteAccessRequestTitle),
+              (error, stackTrace) => NotebookScreenScaffold(
+                appBar: const NotebookDetailAppBar(
+                  title: AppStrings.noteAccessRequestTitle,
                 ),
                 body: Center(child: Text('Error: $error')),
               ),
@@ -49,8 +51,10 @@ class _NoteAccessRequestScreenState
 
   Widget _buildContent(BuildContext context, NoteAccessRequest? request) {
     if (request == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text(AppStrings.noteAccessRequestTitle)),
+      return NotebookScreenScaffold(
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.noteAccessRequestTitle,
+        ),
         body: Center(child: Text(AppStrings.requestNotFound)),
       );
     }
@@ -58,11 +62,9 @@ class _NoteAccessRequestScreenState
     // Don't allow action if already processed
     final canTakeAction = request.status == NoteAccessStatus.requested;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.noteAccessRequestTitle),
-        centerTitle: false,
-        elevation: 0,
+    return NotebookScreenScaffold(
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.noteAccessRequestTitle,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -71,12 +73,8 @@ class _NoteAccessRequestScreenState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Academy card
-              Card(
-                elevation: 0,
-                color: Colors.grey[50],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+              NotebookCard(
+                color: AppColors.paper,
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.cardPadding),
                   child: Column(
@@ -85,7 +83,7 @@ class _NoteAccessRequestScreenState
                       Text(
                         AppStrings.academyLabel,
                         style: AppTypography.caption.copyWith(
-                          color: Colors.grey[600],
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space2),
@@ -100,12 +98,8 @@ class _NoteAccessRequestScreenState
               const SizedBox(height: AppSpacing.sectionSpacing),
 
               // Reason card
-              Card(
-                elevation: 0,
-                color: Colors.grey[50],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+              NotebookCard(
+                color: AppColors.paper,
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.cardPadding),
                   child: Column(
@@ -114,7 +108,7 @@ class _NoteAccessRequestScreenState
                       Text(
                         AppStrings.requestReasonLabel,
                         style: AppTypography.caption.copyWith(
-                          color: Colors.grey[600],
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space2),
@@ -126,12 +120,8 @@ class _NoteAccessRequestScreenState
               const SizedBox(height: AppSpacing.sectionSpacing),
 
               // Validity card
-              Card(
-                elevation: 0,
-                color: Colors.grey[50],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+              NotebookCard(
+                color: AppColors.paper,
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.cardPadding),
                   child: Column(
@@ -140,7 +130,7 @@ class _NoteAccessRequestScreenState
                       Text(
                         AppStrings.validityLabel,
                         style: AppTypography.caption.copyWith(
-                          color: Colors.grey[600],
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space2),
@@ -165,9 +155,11 @@ class _NoteAccessRequestScreenState
                     AppStrings.consentButton,
                     style:
                         _isProcessing
-                            ? AppTypography.button.copyWith(color: Colors.grey)
+                            ? AppTypography.button.copyWith(
+                              color: AppColors.inkTertiary,
+                            )
                             : AppTypography.button.copyWith(
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                   ),
                 ),
@@ -178,7 +170,9 @@ class _NoteAccessRequestScreenState
                     AppStrings.rejectButton,
                     style:
                         _isProcessing
-                            ? AppTypography.button.copyWith(color: Colors.grey)
+                            ? AppTypography.button.copyWith(
+                              color: AppColors.inkTertiary,
+                            )
                             : AppTypography.button,
                   ),
                 ),
@@ -201,14 +195,14 @@ class _NoteAccessRequestScreenState
     final badgeColor = switch (request.status) {
       NoteAccessStatus.consented => AppColors.bubbleSuccessBackground,
       NoteAccessStatus.rejected => Colors.red[50],
-      NoteAccessStatus.revoked => Colors.grey[200],
+      NoteAccessStatus.revoked => AppColors.paperDark,
       NoteAccessStatus.requested => AppColors.bubbleIdleBackground,
     };
 
     final textColor = switch (request.status) {
       NoteAccessStatus.consented => AppColors.bubbleSuccessText,
       NoteAccessStatus.rejected => Colors.red[700],
-      NoteAccessStatus.revoked => Colors.grey[700],
+      NoteAccessStatus.revoked => AppColors.inkSecondary,
       NoteAccessStatus.requested => AppColors.bubbleIdleText,
     };
 
@@ -239,6 +233,8 @@ class _NoteAccessRequestScreenState
     if (_isProcessing) return;
 
     setState(() => _isProcessing = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
 
     try {
       await ref
@@ -246,16 +242,14 @@ class _NoteAccessRequestScreenState
           .consentAccess(widget.requestId);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           const SnackBar(content: Text(AppStrings.consentSuccess)),
         );
-        Navigator.of(context).pop(true);
+        navigator.pop(true);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) {
@@ -268,6 +262,8 @@ class _NoteAccessRequestScreenState
     if (_isProcessing) return;
 
     setState(() => _isProcessing = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
 
     try {
       await ref
@@ -275,16 +271,14 @@ class _NoteAccessRequestScreenState
           .rejectAccess(widget.requestId);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text(AppStrings.rejectSuccess)));
-        Navigator.of(context).pop(false);
+        messenger.showSnackBar(
+          const SnackBar(content: Text(AppStrings.rejectSuccess)),
+        );
+        navigator.pop(false);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) {

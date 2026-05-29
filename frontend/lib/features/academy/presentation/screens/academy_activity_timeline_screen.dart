@@ -6,6 +6,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/academy_activity_log.dart';
 import '../providers/academy_activity_provider.dart';
 
@@ -27,8 +29,10 @@ class AcademyActivityTimelineScreen extends ConsumerWidget {
       academyActivityLogsProvider(academyId, actorMemberId),
     );
 
-    return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.academyActivityTimeline)),
+    return NotebookScreenScaffold(
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.academyActivityTimeline,
+      ),
       body: logsAsync.when(
         data: (logs) {
           if (logs.isEmpty) {
@@ -165,7 +169,7 @@ class AcademyActivityTimelineItem extends StatelessWidget {
                     color:
                         _isRecentlyChanged
                             ? AppColors.amberLight
-                            : Colors.white,
+                            : AppColors.paper,
                     border: Border.all(
                       color:
                           _isRecentlyChanged

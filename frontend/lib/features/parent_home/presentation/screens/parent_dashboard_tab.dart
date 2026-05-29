@@ -13,7 +13,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
-import '../../../practice/presentation/widgets/note_access_active_banner.dart';
+import '../../../practice/practice_ui_facade.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';

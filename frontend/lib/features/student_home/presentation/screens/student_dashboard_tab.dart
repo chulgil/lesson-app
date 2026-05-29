@@ -12,7 +12,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
-import '../../../practice/presentation/widgets/note_access_active_banner.dart';
+import '../../../practice/practice_ui_facade.dart';
 import '../../../gamification/gamification_ui_facade.dart';
 import '../providers/student_home_practice_provider.dart';
 import '../providers/student_home_session_provider.dart';

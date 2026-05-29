@@ -12,13 +12,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../../../lessons/lessons_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
-import '../../../students/presentation/widgets/student_profile_bottom_sheet.dart';
+import '../../../students/students_ui_facade.dart';
 import '../extensions/subscription_visuals.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
@@ -200,9 +200,7 @@ class _SubscriptionDetailBodyState
 
     // Filter lessons belonging to this subscription, sorted by date
     final subLessons =
-        lessons
-            .where((l) => l.subscriptionId == subscription.id)
-            .toList()
+        lessons.where((l) => l.subscriptionId == subscription.id).toList()
           ..sort((a, b) => a.date.compareTo(b.date));
 
     final idx = subLessons.indexWhere((l) => l.id == widget.focusLessonId);
@@ -245,8 +243,9 @@ class _SubscriptionDetailBodyState
   /// Resolve teacherId from membership.
   /// Called in handlers that cannot access local build() variables.
   String? _getTeacherId() {
-    final membershipAsync =
-        ref.read(membershipProvider(subscription.membershipId));
+    final membershipAsync = ref.read(
+      membershipProvider(subscription.membershipId),
+    );
     final membership = membershipAsync.valueOrNull;
     if (membership == null) return null;
 
@@ -363,8 +362,12 @@ class _SubscriptionDetailBodyState
                     studentId: subscription.studentId,
                     studentName: studentName,
                     instrument: instrument,
-                    student: ref.read(studentProvider(subscription.studentId)).valueOrNull,
-                    subscriptionSummary: '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
+                    student:
+                        ref
+                            .read(studentProvider(subscription.studentId))
+                            .valueOrNull,
+                    subscriptionSummary:
+                        '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
                   ),
               child: Text(
                 appBarTitle,
@@ -423,8 +426,12 @@ class _SubscriptionDetailBodyState
                         studentId: subscription.studentId,
                         studentName: studentName,
                         instrument: instrument,
-                        student: ref.read(studentProvider(subscription.studentId)).valueOrNull,
-                        subscriptionSummary: '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
+                        student:
+                            ref
+                                .read(studentProvider(subscription.studentId))
+                                .valueOrNull,
+                        subscriptionSummary:
+                            '${subscription.typeLabel} · ${subscription.remainingLessons ?? 0}/${subscription.totalLessonsForDisplay ?? 0}${AppStrings.remainingCountSuffix}',
                       ),
                 ),
               ),

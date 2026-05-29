@@ -13,7 +13,7 @@ import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
-import '../../../students/presentation/widgets/student_profile_bottom_sheet.dart';
+import '../../../students/students_ui_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
 import '../../domain/entities/request_event.dart';
@@ -181,13 +181,17 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       loading:
           () => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(title: AppStrings.requestDetailTitle),
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.requestDetailTitle,
+            ),
             body: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(title: AppStrings.requestDetailTitle),
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.requestDetailTitle,
+            ),
             body: Center(
               child: Text(
                 AppStrings.requestLoadError,
@@ -201,7 +205,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         if (request == null) {
           return NotebookScreenScaffold(
             backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(title: AppStrings.requestDetailTitle),
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.requestDetailTitle,
+            ),
             body: Center(
               child: Text(
                 AppStrings.requestNotFound,
@@ -265,9 +271,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                             studentId: request.studentId,
                             studentName: opponentName,
                             instrument: request.instrument,
-                            student: ref.read(studentProvider(request.studentId)).valueOrNull,
+                            student:
+                                ref
+                                    .read(studentProvider(request.studentId))
+                                    .valueOrNull,
                             message: request.message,
-                            isTrialRequest: request.type == LessonRequestType.trial,
+                            isTrialRequest:
+                                request.type == LessonRequestType.trial,
                           ),
                     ),
                   ],
@@ -387,9 +397,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     String opponentName,
     String? academyName,
   ) {
-    final titleText = request.isAcademy && academyName != null
-        ? '$academyName $opponentName (${request.typeDisplayLabel})'
-        : '$opponentName (${request.typeDisplayLabel})';
+    final titleText =
+        request.isAcademy && academyName != null
+            ? '$academyName $opponentName (${request.typeDisplayLabel})'
+            : '$opponentName (${request.typeDisplayLabel})';
 
     return NotebookDetailAppBar(
       titleWidget: GestureDetector(
@@ -418,59 +429,77 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final isTerminal = request.currentPhase == RequestPhase.terminal;
     final items = <(IconData, String, VoidCallback)>[
       if (!isTerminal)
-        (Icons.edit_outlined, AppStrings.modifyRequest, () {
-          Navigator.pop(context);
-          _handleModify(context, request);
-        }),
+        (
+          Icons.edit_outlined,
+          AppStrings.modifyRequest,
+          () {
+            Navigator.pop(context);
+            _handleModify(context, request);
+          },
+        ),
       if (request.hasProposal)
-        (Icons.receipt_long_outlined, AppStrings.viewSubscription, () {
-          Navigator.pop(context);
-          _handleViewSubscription(context, request);
-        }),
+        (
+          Icons.receipt_long_outlined,
+          AppStrings.viewSubscription,
+          () {
+            Navigator.pop(context);
+            _handleViewSubscription(context, request);
+          },
+        ),
       if (!isTerminal)
-        (Icons.cancel_outlined, AppStrings.cancelRequestAction, () {
-          Navigator.pop(context);
-          _handleCancel(context, ref, request);
-        }),
+        (
+          Icons.cancel_outlined,
+          AppStrings.cancelRequestAction,
+          () {
+            Navigator.pop(context);
+            _handleCancel(context, ref, request);
+          },
+        ),
     ];
 
     if (items.isEmpty) return;
 
-    showModalBottomSheet(
+    showNotebookBottomSheet(
       context: context,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLarge)),
-      ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: AppSpacing.space2),
-            Container(
-              width: 32,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.inkQuaternary,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            for (final (icon, label, onTap) in items)
-              ListTile(
-                leading: Icon(icon, color: label == AppStrings.cancelRequestAction ? AppColors.paperAccent : AppColors.ink),
-                title: Text(
-                  label,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: label == AppStrings.cancelRequestAction ? AppColors.paperAccent : AppColors.ink,
+      builder:
+          (_) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: AppSpacing.space2),
+                Container(
+                  width: 32,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.inkQuaternary,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                onTap: onTap,
-              ),
-            const SizedBox(height: AppSpacing.space2),
-          ],
-        ),
-      ),
+                const SizedBox(height: AppSpacing.space3),
+                for (final (icon, label, onTap) in items)
+                  ListTile(
+                    leading: Icon(
+                      icon,
+                      color:
+                          label == AppStrings.cancelRequestAction
+                              ? AppColors.paperAccent
+                              : AppColors.ink,
+                    ),
+                    title: Text(
+                      label,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color:
+                            label == AppStrings.cancelRequestAction
+                                ? AppColors.paperAccent
+                                : AppColors.ink,
+                      ),
+                    ),
+                    onTap: onTap,
+                  ),
+                const SizedBox(height: AppSpacing.space2),
+              ],
+            ),
+          ),
     );
   }
 
@@ -1366,9 +1395,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         actions.cancelRequest(
           request.id,
           viewerRole == 'teacher' ? request.teacherId : request.studentId,
-          viewerRole == 'teacher'
-              ? ProposerRole.teacher
-              : ProposerRole.student,
+          viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student,
           request.teacherId,
           request.studentId,
         );

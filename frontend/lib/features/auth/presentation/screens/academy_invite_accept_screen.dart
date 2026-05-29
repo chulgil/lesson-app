@@ -79,30 +79,28 @@ class _AcademyInviteAcceptScreenState
   }
 
   Future<String?> _pickRejectReason() {
-    return showModalBottomSheet<String>(
+    return showNotebookBottomSheet<String>(
       context: context,
       builder: (sheetContext) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(AppSpacing.space3),
-                child: Text('거절 사유를 선택해주세요', style: AppTypography.bodyLarge),
-              ),
-              for (final reason in _kRejectReasons)
-                ListTile(
-                  title: Text(reason),
-                  onTap: () => Navigator.of(sheetContext).pop(reason),
-                ),
-              const Divider(height: 1),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(AppSpacing.space3),
+              child: Text('거절 사유를 선택해주세요', style: AppTypography.bodyLarge),
+            ),
+            for (final reason in _kRejectReasons)
               ListTile(
-                title: const Text('취소'),
-                onTap: () => Navigator.of(sheetContext).pop(),
+                title: Text(reason),
+                onTap: () => Navigator.of(sheetContext).pop(reason),
               ),
-            ],
-          ),
+            const Divider(height: 1),
+            ListTile(
+              title: const Text('취소'),
+              onTap: () => Navigator.of(sheetContext).pop(),
+            ),
+          ],
         );
       },
     );

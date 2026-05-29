@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
 /// Full-screen blocker shown when app version < server min_version.
 ///
@@ -22,7 +23,7 @@ class ForceUpdateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       body: SafeArea(
         child: Padding(
@@ -31,10 +32,7 @@ class ForceUpdateScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              const NotebookGlyph(
-                NotebookGlyph.arrowUp,
-                size: 48,
-              ),
+              const NotebookGlyph(NotebookGlyph.arrowUp, size: 48),
               const SizedBox(height: AppSpacing.space6),
               Text(
                 AppStrings.forceUpdateTitle,
@@ -74,9 +72,7 @@ class ForceUpdateScreen extends StatelessWidget {
 
   Future<void> _openStore() async {
     // iOS App Store URL — update with actual app ID when available
-    final uri = Uri.parse(
-      'https://apps.apple.com/app/lessonaza/id0000000000',
-    );
+    final uri = Uri.parse('https://apps.apple.com/app/lessonaza/id0000000000');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

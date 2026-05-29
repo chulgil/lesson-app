@@ -165,7 +165,7 @@ RequestEvent _event(
         actorId ??
         (actorType == ProposerRole.teacher ? 'teacher_1' : 'student_1'),
     eventType: eventType,
-    createdAt: DateTime(2026, 5, 4, 10),
+    createdAt: DateTime.now().subtract(const Duration(days: 1)),
     subscriptionId: subscriptionId ?? 'sub_1',
     sessionNumber: 4,
   );

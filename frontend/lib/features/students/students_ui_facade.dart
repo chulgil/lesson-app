@@ -6,3 +6,5 @@ export 'presentation/widgets/student_form/instrument_selector.dart'
     show InstrumentSelector;
 export 'presentation/widgets/student_form/student_form_dialogs.dart'
     show ImagePickerAction, showImagePickerBottomSheet, showImagePickerFlow;
+export 'presentation/widgets/student_profile_bottom_sheet.dart'
+    show showStudentProfileBottomSheet;

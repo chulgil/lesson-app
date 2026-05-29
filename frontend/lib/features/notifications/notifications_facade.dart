@@ -11,3 +11,4 @@ export 'domain/services/connection_notification_service.dart'
     show ConnectionInfo;
 export 'presentation/providers/subscription_expiry_providers.dart'
     show subscriptionExpiryReminderSettingsNotifierProvider;
+export 'presentation/widgets/context_switch_toast.dart' show ContextSwitchToast;

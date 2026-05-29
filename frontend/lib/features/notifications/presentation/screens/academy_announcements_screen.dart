@@ -5,6 +5,8 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/theme/app_typography.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
 import 'package:lessonaza/features/academy/data/repositories/mock_academy_announcement_repository.dart';
 
@@ -26,15 +28,8 @@ class AcademyAnnouncementsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final announcementAsync = ref.watch(_announcementListProvider(academyId));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppStrings.announcementsTitle,
-          style: AppTypography.headingMedium.copyWith(
-            color: AppColors.ink,
-          ),
-        ),
-      ),
+    return NotebookScreenScaffold(
+      appBar: const NotebookDetailAppBar(title: AppStrings.announcementsTitle),
       body: announcementAsync.when(
         data: (announcements) {
           if (announcements.isEmpty) {
@@ -80,7 +75,7 @@ class _AnnouncementCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    return NotebookCard(
       margin: EdgeInsets.only(bottom: AppSpacing.space3),
       child: InkWell(
         onTap: onTap,

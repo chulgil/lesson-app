@@ -212,6 +212,7 @@ void main() {
 
     final directBottomSheetUsages = <String>[];
     for (final file in targetFiles) {
+      if (!file.existsSync()) continue;
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -285,6 +286,7 @@ void main() {
 
     final directDialogUsages = <String>[];
     for (final file in targetFiles) {
+      if (!file.existsSync()) continue;
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {

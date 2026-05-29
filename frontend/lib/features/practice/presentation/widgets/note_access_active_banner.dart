@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/note_access_request.dart';
 import '../providers/note_access_provider.dart';
 
@@ -119,24 +120,14 @@ class _NoteAccessActiveBannerState
 
   Future<void> _revoke(BuildContext context, NoteAccessRequest access) async {
     if (_isRevoking) return;
+    final messenger = ScaffoldMessenger.of(context);
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('노트 접근 권한 회수'),
-            content: const Text('학원의 노트 접근 권한을 회수하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('취소'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('회수'),
-              ),
-            ],
-          ),
+      title: '노트 접근 권한 회수',
+      message: '학원의 노트 접근 권한을 회수하시겠습니까?',
+      confirmLabel: '회수',
+      cancelLabel: '취소',
     );
 
     if (confirmed != true) return;
@@ -149,15 +140,13 @@ class _NoteAccessActiveBannerState
           .revokeAccess(access.id);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text(AppStrings.revokeSuccess)));
+        messenger.showSnackBar(
+          const SnackBar(content: Text(AppStrings.revokeSuccess)),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) {

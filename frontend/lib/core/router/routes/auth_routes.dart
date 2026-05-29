@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widgets/notebook/notebook_surfaces.dart';
 import '../../../features/auth/presentation/screens/academy_invite_accept_screen.dart';
 import '../../../features/auth/presentation/screens/academy_invite_expired_screen.dart';
 import '../../../features/auth/presentation/screens/login_screen.dart';
@@ -96,7 +97,7 @@ List<GoRoute> authRoutes = [
     builder: (context, state) {
       final token = state.uri.queryParameters['token'];
       if (token == null) {
-        return const Scaffold(
+        return const NotebookScreenScaffold(
           body: Center(child: Text('Invalid invite token')),
         );
       }

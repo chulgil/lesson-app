@@ -4,6 +4,8 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/theme/app_typography.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
 import 'package:lessonaza/features/academy/data/repositories/mock_academy_inquiry_repository.dart';
 
@@ -82,15 +84,8 @@ class _AcademyInquiryDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppStrings.inquiryTitle,
-          style: AppTypography.headingMedium.copyWith(
-            color: AppColors.ink,
-          ),
-        ),
-      ),
+    return NotebookScreenScaffold(
+      appBar: const NotebookDetailAppBar(title: AppStrings.inquiryTitle),
       body: Column(
         children: [
           Expanded(
@@ -162,7 +157,7 @@ class _AcademyInquiryDetailScreenState
   }
 
   Widget _buildInquiryCard(AcademyInquiry inquiry) {
-    return Card(
+    return NotebookCard(
       child: Padding(
         padding: EdgeInsets.all(AppSpacing.space4),
         child: Column(
@@ -183,7 +178,7 @@ class _AcademyInquiryDetailScreenState
                     vertical: AppSpacing.space1,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withOpacity(0.1),
+                    color: AppColors.paperAccent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -224,7 +219,9 @@ class _AcademyInquiryDetailScreenState
       padding: EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border(left: BorderSide(color: AppColors.paperAccent, width: 4)),
+        border: Border(
+          left: BorderSide(color: AppColors.paperAccent, width: 4),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

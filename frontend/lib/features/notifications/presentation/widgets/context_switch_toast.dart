@@ -47,7 +47,9 @@ class _ContextSwitchToastState extends State<ContextSwitchToast> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.paper,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(),
       elevation: 0,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),

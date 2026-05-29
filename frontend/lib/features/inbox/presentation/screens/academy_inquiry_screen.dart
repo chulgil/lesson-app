@@ -5,6 +5,8 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/theme/app_typography.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
 import 'package:lessonaza/features/academy/data/repositories/mock_academy_inquiry_repository.dart';
 
@@ -23,15 +25,8 @@ class AcademyInquiryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final inquiryAsync = ref.watch(_inquiryListProvider(academyId));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppStrings.inquiryTitle,
-          style: AppTypography.headingMedium.copyWith(
-            color: AppColors.ink,
-          ),
-        ),
-      ),
+    return NotebookScreenScaffold(
+      appBar: const NotebookDetailAppBar(title: AppStrings.inquiryTitle),
       body: inquiryAsync.when(
         data: (inquiries) {
           if (inquiries.isEmpty) {
@@ -86,7 +81,7 @@ class _InquiryCard extends StatelessWidget {
     final hasReply = inquiry.replies.isNotEmpty;
     final statusColor = hasReply ? AppColors.paperOk : AppColors.paperTrial;
 
-    return Card(
+    return NotebookCard(
       margin: EdgeInsets.only(bottom: AppSpacing.space3),
       child: InkWell(
         onTap: onTap,
@@ -104,7 +99,7 @@ class _InquiryCard extends StatelessWidget {
                       vertical: AppSpacing.space1,
                     ),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -131,7 +126,7 @@ class _InquiryCard extends StatelessWidget {
                       vertical: AppSpacing.space1,
                     ),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
