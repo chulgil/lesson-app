@@ -28,9 +28,16 @@ NEW_VALUES = ("deductCredit", "halfCredit", "noDeduction", "reschedule")
 LEGACY_VALUES = ("deduct", "noDeduct")
 
 
+def _table_exists(table_name: str) -> bool:
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    return table_name in inspector.get_table_names()
+
+
 def upgrade() -> None:
     bind = op.get_bind()
     is_postgres = bind.dialect.name == "postgresql"
+    has_attendances = _table_exists("group_class_attendances")
 
     if is_postgres:
         # group_classes.no_show_policy 만 레거시 2값 → 새 4값 정렬
@@ -45,15 +52,17 @@ def upgrade() -> None:
         )
         op.execute("ALTER TABLE group_classes ALTER COLUMN no_show_policy SET DEFAULT 'deductCredit'")
         # individualnoshowpolicy → noshowpolicy 통합
-        op.execute(
-            "ALTER TABLE group_class_attendances "
-            "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
-        )
+        if has_attendances:
+            op.execute(
+                "ALTER TABLE group_class_attendances "
+                "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
+            )
         op.execute("DROP TYPE IF EXISTS individualnoshowpolicy")
-        op.execute(
-            "ALTER TABLE group_class_attendances "
-            "ALTER COLUMN applied_policy TYPE noshowpolicy USING applied_policy::noshowpolicy"
-        )
+        if has_attendances:
+            op.execute(
+                "ALTER TABLE group_class_attendances "
+                "ALTER COLUMN applied_policy TYPE noshowpolicy USING applied_policy::noshowpolicy"
+            )
     else:
         # sqlite: VARCHAR — 데이터 변환만
         op.execute("UPDATE group_classes SET no_show_policy = 'deductCredit' WHERE no_show_policy = 'deduct'")
@@ -63,6 +72,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     bind = op.get_bind()
     is_postgres = bind.dialect.name == "postgresql"
+    has_attendances = _table_exists("group_class_attendances")
 
     if is_postgres:
         # halfCredit, reschedule 데이터 손실 경고: downgrade 는 정보 보존 불가
@@ -73,10 +83,11 @@ def downgrade() -> None:
         op.execute(
             "UPDATE group_classes SET no_show_policy = 'noDeduct' WHERE no_show_policy IN ('noDeduction', 'reschedule')"
         )
-        op.execute(
-            "ALTER TABLE group_class_attendances "
-            "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
-        )
+        if has_attendances:
+            op.execute(
+                "ALTER TABLE group_class_attendances "
+                "ALTER COLUMN applied_policy TYPE VARCHAR(30) USING applied_policy::text"
+            )
         op.execute("DROP TYPE IF EXISTS noshowpolicy")
         legacy_enum = sa.Enum(*LEGACY_VALUES, name="noshowpolicy")
         legacy_enum.create(bind, checkfirst=False)
@@ -86,11 +97,12 @@ def downgrade() -> None:
         op.execute("ALTER TABLE group_classes ALTER COLUMN no_show_policy SET DEFAULT 'deduct'")
         individual_enum = sa.Enum(*NEW_VALUES, name="individualnoshowpolicy")
         individual_enum.create(bind, checkfirst=False)
-        op.execute(
-            "ALTER TABLE group_class_attendances "
-            "ALTER COLUMN applied_policy TYPE individualnoshowpolicy "
-            "USING applied_policy::individualnoshowpolicy"
-        )
+        if has_attendances:
+            op.execute(
+                "ALTER TABLE group_class_attendances "
+                "ALTER COLUMN applied_policy TYPE individualnoshowpolicy "
+                "USING applied_policy::individualnoshowpolicy"
+            )
     else:
         op.execute(
             "UPDATE group_classes SET no_show_policy = 'deduct' WHERE no_show_policy IN ('deductCredit', 'halfCredit')"
