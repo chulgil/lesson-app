@@ -73,6 +73,7 @@ dependencies:
   json_annotation: ^4.9.0
   package_info_plus: ^8.0.0
   in_app_review: ^2.0.9
+  in_app_purchase: ^3.2.0      # #415 R4 Phase C — StoreKit2 / PlayBilling IAP
   youtube_player_iframe: ^5.2.2
 
 dev_dependencies:

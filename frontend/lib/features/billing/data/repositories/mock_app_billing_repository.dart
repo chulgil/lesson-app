@@ -6,6 +6,8 @@
 import '../../domain/entities/app_billing_snapshot.dart';
 import '../../domain/entities/billing_plan.dart';
 import '../../domain/entities/billing_status.dart';
+import '../../domain/entities/iap_validation_result.dart';
+import '../../domain/entities/trial_activation_result.dart';
 import '../../domain/repositories/app_billing_repository.dart';
 
 class MockAppBillingRepository implements AppBillingRepository {
@@ -28,4 +30,29 @@ class MockAppBillingRepository implements AppBillingRepository {
 
   @override
   Future<AppBillingSnapshot> fetchSnapshot() async => _snapshot;
+
+  @override
+  Future<TrialActivationResult> startTrial() async {
+    return TrialActivationResult(
+      success: true,
+      message: 'mock_trial_started',
+      planId: _snapshot.id,
+      expiresAt: DateTime.now().toUtc().add(const Duration(days: 14)),
+    );
+  }
+
+  @override
+  Future<IapValidationResult> validatePurchase({
+    required String platform,
+    required String receipt,
+    required String productId,
+  }) async {
+    return IapValidationResult(
+      granted: true,
+      message: 'mock_iap_granted',
+      planId: _snapshot.id,
+      tier: 'pro',
+      expiresAt: DateTime.now().toUtc().add(const Duration(days: 30)),
+    );
+  }
 }

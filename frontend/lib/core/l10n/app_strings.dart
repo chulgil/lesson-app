@@ -7325,4 +7325,34 @@ class AppStrings {
 
   /// IAP 미연결 안내 (Phase B 임시) — Phase C 에서 제거.
   static const paywallComingSoonHint = '구매 기능은 곧 제공됩니다.';
+
+  // ── Paywall Phase C (#415) ───────────────────────────────
+  // IAP/Trial 처리 결과 안내.
+
+  /// Pro 구매 시작 직전 — store 사용 불가 (디바이스 미지원/네트워크 차단).
+  static const paywallStoreUnavailable = '결제 스토어에 연결할 수 없어요. 잠시 후 다시 시도해주세요.';
+
+  /// Pro 상품 정보 조회 실패.
+  static const paywallProductNotFound = '구매 정보를 찾을 수 없어요. 잠시 후 다시 시도해주세요.';
+
+  /// Pro 구매 성공 — 영수증 검증까지 완료.
+  static const paywallPurchaseSuccess = 'Pro 플랜이 활성화되었어요.';
+
+  /// Pro 구매 — 영수증은 받았지만 검증 보류 (백엔드가 비동기 처리 중).
+  static const paywallPurchasePending = '구매가 접수되었어요. 검증이 완료되면 자동으로 활성화됩니다.';
+
+  /// Pro 구매 — 사용자가 store sheet 취소.
+  static const paywallPurchaseCancelled = '구매를 취소했어요.';
+
+  /// Pro 구매 실패 — store/network/검증 에러.
+  static const paywallPurchaseFailed = '구매를 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
+
+  /// Trial 시작 성공.
+  static const paywallTrialStarted = '14일 무료 체험이 시작되었어요.';
+
+  /// Trial 시작 실패 — 이미 사용했거나 백엔드 거절.
+  static const paywallTrialAlreadyUsed = '체험은 1회만 사용할 수 있어요.';
+
+  /// Trial 시작 실패 — 네트워크/서버 에러.
+  static const paywallTrialFailed = '체험을 시작하지 못했어요. 잠시 후 다시 시도해주세요.';
 }
