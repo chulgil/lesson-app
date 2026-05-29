@@ -51,6 +51,7 @@ def test_feedback_template_migration_is_chained_and_normalized() -> None:
     assert "feedback_template_tags" in source
     assert "fk_feedback_template_tags_template_id_feedback_templates" in source
     assert "uk_feedback_template_tag" in source
+    assert "create_type=False" in source
 
 
 def test_teaching_resource_tags_are_normalized_in_metadata() -> None:

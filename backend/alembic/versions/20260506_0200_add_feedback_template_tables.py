@@ -7,8 +7,10 @@ Create Date: 2026-05-06 02:00:00.000000
 
 from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 revision: str = "add_feedback_template_tables"
 down_revision: str | None = "align_schedule_confirmation_status_enum"
@@ -16,27 +18,43 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
-feedback_category_enum = sa.Enum(
+FEEDBACK_CATEGORY_VALUES = (
     "technique",
     "musicality",
     "practice",
     "attitude",
     "general",
+)
+
+feedback_category_enum = sa.Enum(
+    *FEEDBACK_CATEGORY_VALUES,
     name="feedbackcategory",
 )
 
 
 def upgrade() -> None:
     bind = op.get_bind()
-    if bind.dialect.name == "postgresql":
+    is_pg = bind.dialect.name == "postgresql"
+    if is_pg:
         feedback_category_enum.create(bind, checkfirst=True)
+        feedback_category_column = postgresql.ENUM(
+            *FEEDBACK_CATEGORY_VALUES,
+            name="feedbackcategory",
+            create_type=False,
+        )
+    else:
+        feedback_category_column = sa.Enum(
+            *FEEDBACK_CATEGORY_VALUES,
+            name="feedbackcategory",
+            create_constraint=False,
+        )
 
     op.create_table(
         "feedback_templates",
         sa.Column("teacher_id", sa.String(length=36), nullable=False),
         sa.Column("title", sa.String(length=200), nullable=False),
         sa.Column("body", sa.Text(), nullable=False),
-        sa.Column("category", feedback_category_enum, nullable=False),
+        sa.Column("category", feedback_category_column, nullable=False),
         sa.Column("usage_count", sa.Integer(), nullable=False),
         sa.Column("last_used_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("id", sa.String(length=36), nullable=False),
