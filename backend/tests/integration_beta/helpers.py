@@ -74,6 +74,33 @@ class BetaClient:
         assert response.status_code == 200, _response_error(response, "students")
         return response.json()
 
+    async def create_lesson_class(self, access_token: str, **payload: Any) -> dict:
+        response = await self._client.post(
+            "/api/v1/lessons-classes",
+            headers=self._auth_headers(access_token),
+            json=payload,
+        )
+        assert response.status_code == 201, _response_error(response, "create lesson class")
+        return response.json()
+
+    async def create_membership(self, access_token: str, class_id: str, **payload: Any) -> dict:
+        response = await self._client.post(
+            f"/api/v1/lessons-classes/{class_id}/memberships",
+            headers=self._auth_headers(access_token),
+            json=payload,
+        )
+        assert response.status_code == 201, _response_error(response, "create membership")
+        return response.json()
+
+    async def get_memberships(self, access_token: str, *, student_id: str) -> list[dict]:
+        response = await self._client.get(
+            "/api/v1/memberships",
+            headers=self._auth_headers(access_token),
+            params={"student_id": student_id},
+        )
+        assert response.status_code == 200, _response_error(response, "memberships")
+        return response.json()
+
     async def create_invite(self, access_token: str, **payload: Any) -> dict:
         response = await self._client.post(
             "/api/v1/invites/",

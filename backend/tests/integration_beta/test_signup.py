@@ -57,6 +57,31 @@ async def test_teacher_signup_can_register_student_and_list_roster(
     students = await beta_client.get_students(teacher_tokens.access_token)
     assert any(item["id"] == created["id"] for item in students["items"])
 
+    lesson_class = await beta_client.create_lesson_class(
+        teacher_tokens.access_token,
+        name=f"Beta Roster Class {suffix}",
+        type="private",
+    )
+    membership = await beta_client.create_membership(
+        teacher_tokens.access_token,
+        lesson_class["id"],
+        student_id=created["id"],
+        instrument="piano",
+        status="active",
+        lesson_duration=60,
+        travel_time_minutes=20,
+    )
+    assert membership["travel_time_minutes"] == 20
+
+    memberships = await beta_client.get_memberships(
+        teacher_tokens.access_token,
+        student_id=created["id"],
+    )
+    assert any(
+        item["id"] == membership["id"] and item["travel_time_minutes"] == 20
+        for item in memberships
+    )
+
 
 @pytest.mark.asyncio
 async def test_student_invite_code_signup_reaches_pending_then_connection(
