@@ -204,6 +204,75 @@ async def test_list_pending_requests(client: AsyncClient, auth_headers, student_
 
 
 @pytest.mark.asyncio
+async def test_duplicate_pending_connection_request_keeps_latest_only(
+    client: AsyncClient,
+    auth_headers,
+    student_auth_headers,
+    create_test_user,
+):
+    """Repeated student requests to the same teacher should refresh one pending request."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    first = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={
+            "target_id": "test-user-id",
+            "method": "inAppSearch",
+            "message": "first",
+        },
+    )
+    assert first.status_code == 201
+
+    second = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={
+            "target_id": "test-user-id",
+            "method": "inAppSearch",
+            "message": "second",
+        },
+    )
+    assert second.status_code == 201
+    assert second.json()["id"] == first.json()["id"]
+    assert second.json()["message"] == "second"
+
+    pending = await client.get(
+        "/api/v1/invites/connection-requests/pending",
+        headers=auth_headers,
+    )
+    assert pending.status_code == 200
+    assert pending.json()["total"] == 1
+    assert pending.json()["items"][0]["message"] == "second"
+
+    sent = await client.get(
+        "/api/v1/invites/connection-requests/sent",
+        headers=student_auth_headers,
+    )
+    assert sent.status_code == 200
+    assert sent.json()["total"] == 1
+    assert sent.json()["items"][0]["message"] == "second"
+
+    notifications = await client.get("/api/v1/notifications", headers=auth_headers)
+    assert notifications.status_code == 200
+    notification_items = notifications.json()["items"]
+    connection_notifications = [
+        item
+        for item in notification_items
+        if item["type"] == "connectionRequestReceived"
+    ]
+    assert len(connection_notifications) == 1
+    assert connection_notifications[0]["action_url"] == "/invite/requests"
+    assert connection_notifications[0]["data"]["connectionRequestId"] == first.json()["id"]
+
+
+@pytest.mark.asyncio
 async def test_accept_connection_request(client: AsyncClient, auth_headers, student_auth_headers, create_test_user):
     """PATCH respond with 'accept' should create a Connection."""
     await create_test_user(user_id="test-user-id", role="teacher")

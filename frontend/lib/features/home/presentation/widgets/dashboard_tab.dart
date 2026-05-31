@@ -82,6 +82,11 @@ class DashboardTab extends ConsumerWidget {
               // ── Sync failure banner ────
               _buildSyncFailureBanner(ref),
 
+              // ── 0순위: 선생님이 즉시 처리해야 하는 학생 연결 요청 ────
+              _buildPendingConnectionRequests(context, ref),
+
+              const SizedBox(height: AppSpacing.space4),
+
               // ── 0순위: 시간대 인식 컨텍스트 배너 (다음 레슨) ────
               // (home_master.md §3.5)
               todayLessons.maybeWhen(
@@ -291,8 +296,6 @@ class DashboardTab extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildPendingConnectionRequests(context, ref),
-        const SizedBox(height: AppSpacing.space4),
         LessonRequestSection(userId: teacherId),
         const SizedBox(height: AppSpacing.space4),
         ScheduleChangeRequestSection(teacherId: teacherId),

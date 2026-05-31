@@ -49,5 +49,9 @@ void main() {
     expect(source, contains('pendingRequestCountProvider'));
     expect(source, contains('AppRoutes.pendingRequests'));
     expect(source, contains('teacherHomeConnectionRequestsTitle'));
+    expect(
+      source.indexOf('_buildPendingConnectionRequests(context, ref)'),
+      lessThan(source.indexOf('_buildTodayLessonsHeader')),
+    );
   });
 }

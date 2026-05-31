@@ -176,7 +176,7 @@ class InviteService:
         current_user: Any,
     ) -> Any:
         """Create a connection request."""
-        from app.models.invite import ConnectionRequest, Invite, InviteStatus
+        from app.models.invite import ConnectionRequest, ConnectionRequestStatus, Invite, InviteStatus
         from app.models.user import User
 
         invite: Invite | None = None
@@ -204,10 +204,6 @@ class InviteService:
             invite_id = invite.id
             target_id = invite.creator_id
 
-            invite.use_count += 1
-            if invite.is_single_use or (invite.max_uses is not None and invite.use_count >= invite.max_uses):
-                invite.status = InviteStatus.used
-
         target_user = await self.db.get(User, target_id) if target_id else None
 
         target_role = (
@@ -225,6 +221,42 @@ class InviteService:
             else None
         )
 
+        existing_pending = await self.db.scalar(
+            select(ConnectionRequest)
+            .where(
+                ConnectionRequest.requester_id == current_user.id,
+                ConnectionRequest.target_id == target_id,
+                ConnectionRequest.status == ConnectionRequestStatus.pending,
+            )
+            .order_by(ConnectionRequest.created_at.desc())
+        )
+        now = datetime.now(UTC)
+        if existing_pending is not None:
+            existing_pending.requester_role = current_user.role
+            existing_pending.requester_name = current_user.name
+            existing_pending.target_role = target_role
+            existing_pending.target_name = target_name
+            existing_pending.method = method
+            existing_pending.invite_id = invite_id
+            existing_pending.message = message
+            existing_pending.expires_at = now + timedelta(days=7)
+            existing_pending.created_at = now
+            await self._cancel_older_pending_requests(
+                requester_id=current_user.id,
+                target_id=target_id,
+                keep_request_id=existing_pending.id,
+                now=now,
+            )
+            await self._upsert_connection_request_notification(existing_pending)
+            await self.db.flush()
+            await self.db.refresh(existing_pending)
+            return existing_pending
+
+        if invite is not None:
+            invite.use_count += 1
+            if invite.is_single_use or (invite.max_uses is not None and invite.use_count >= invite.max_uses):
+                invite.status = InviteStatus.used
+
         conn_req = ConnectionRequest(
             requester_id=current_user.id,
             requester_role=current_user.role,
@@ -235,12 +267,100 @@ class InviteService:
             method=method,
             invite_id=invite_id,
             message=message,
-            expires_at=datetime.now(UTC) + timedelta(days=7),
+            expires_at=now + timedelta(days=7),
         )
         self.db.add(conn_req)
         await self.db.flush()
+        await self._upsert_connection_request_notification(conn_req)
+        await self.db.flush()
         await self.db.refresh(conn_req)
         return conn_req
+
+    async def _cancel_older_pending_requests(
+        self,
+        *,
+        requester_id: str,
+        target_id: str,
+        keep_request_id: str,
+        now: datetime,
+    ) -> None:
+        """Keep only the latest pending request for a requester/target pair."""
+        from app.models.invite import ConnectionRequest, ConnectionRequestStatus
+
+        older_requests = await self.db.scalars(
+            select(ConnectionRequest).where(
+                ConnectionRequest.requester_id == requester_id,
+                ConnectionRequest.target_id == target_id,
+                ConnectionRequest.status == ConnectionRequestStatus.pending,
+                ConnectionRequest.id != keep_request_id,
+            )
+        )
+        for request in older_requests.all():
+            request.status = ConnectionRequestStatus.cancelled
+            request.responded_at = now
+
+    async def _upsert_connection_request_notification(self, conn_req: Any) -> None:
+        """Create or refresh the in-app notification for a pending connection request."""
+        from app.models.notification import Notification, NotificationPriority
+
+        now = datetime.now(UTC)
+        action_url = "/invite/requests"
+        data = {
+            "connectionRequestId": conn_req.id,
+            "requesterId": conn_req.requester_id,
+            "targetId": conn_req.target_id,
+            "requesterRole": getattr(conn_req.requester_role, "value", conn_req.requester_role),
+        }
+        title = "연결 요청"
+        requester_name = conn_req.requester_name or "학생"
+        body = f"{requester_name}님이 연결을 요청했습니다"
+
+        notifications = await self.db.scalars(
+            select(Notification)
+            .where(
+                Notification.user_id == conn_req.target_id,
+                Notification.type == "connectionRequestReceived",
+                Notification.action_url == action_url,
+            )
+            .order_by(Notification.created_at.desc())
+        )
+        existing = next(
+            (
+                notification
+                for notification in notifications.all()
+                if (notification.data or {}).get("requesterId") == conn_req.requester_id
+                and (notification.data or {}).get("targetId") == conn_req.target_id
+            ),
+            None,
+        )
+        if existing is not None:
+            existing.title = title
+            existing.body = body
+            existing.data = data
+            existing.priority = NotificationPriority.high
+            existing.is_in_app = True
+            existing.is_push = True
+            existing.action_label = "요청 확인"
+            existing.read_at = None
+            existing.sent_at = now
+            existing.created_at = now
+            return
+
+        self.db.add(
+            Notification(
+                user_id=conn_req.target_id,
+                type="connectionRequestReceived",
+                priority=NotificationPriority.high,
+                title=title,
+                body=body,
+                data=data,
+                is_push=True,
+                is_in_app=True,
+                action_url=action_url,
+                action_label="요청 확인",
+                sent_at=now,
+            )
+        )
 
     def _validate_invite_can_be_used(self, invite: Any) -> None:
         """Validate active/unexpired usage limits before creating a request."""
@@ -281,14 +401,16 @@ class InviteService:
             ConnectionRequest.target_id == user_id,
             ConnectionRequest.status == "pending",
         )
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
-
         result = await self.db.scalars(
-            query.order_by(ConnectionRequest.created_at.desc()).offset(offset).limit(size)
+            query.order_by(ConnectionRequest.created_at.desc())
         )
-        return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
+        unique_items = self._latest_pending_request_per_pair(result.all())
+        return PaginatedResponse.create(
+            items=unique_items[offset : offset + size],
+            total=len(unique_items),
+            page=page,
+            size=size,
+        )
 
     async def get_sent_requests(
         self, *, user_id: str, page: int, size: int, offset: int
@@ -297,14 +419,30 @@ class InviteService:
         from app.models.invite import ConnectionRequest
 
         query = select(ConnectionRequest).where(ConnectionRequest.requester_id == user_id)
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
-
         result = await self.db.scalars(
-            query.order_by(ConnectionRequest.created_at.desc()).offset(offset).limit(size)
+            query.order_by(ConnectionRequest.created_at.desc())
         )
-        return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
+        unique_items = self._latest_pending_request_per_pair(result.all())
+        return PaginatedResponse.create(
+            items=unique_items[offset : offset + size],
+            total=len(unique_items),
+            page=page,
+            size=size,
+        )
+
+    def _latest_pending_request_per_pair(self, requests: list[Any]) -> list[Any]:
+        """Collapse duplicated pending requests while preserving other history."""
+        unique_requests = []
+        seen_pending_pairs: set[tuple[str, str]] = set()
+        for request in requests:
+            request_status = getattr(request.status, "value", request.status)
+            if request_status == "pending":
+                key = (request.requester_id, request.target_id)
+                if key in seen_pending_pairs:
+                    continue
+                seen_pending_pairs.add(key)
+            unique_requests.append(request)
+        return unique_requests
 
     async def respond_to_request(
         self,

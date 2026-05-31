@@ -205,7 +205,7 @@
 | `trialBookingRequest` | 학생 체험 요청 시 | 레슨 요청 | "새 체험 요청이 있습니다" | person_add | `/schedule/lesson-requests` |
 | `noshowWarning` | 레슨 시작 10분 경과, 미도착 | 노쇼 경고 | "김민수 레슨에 출석하지 않았습니다" | warning | `/lessons/{id}` |
 | `noshowConfirmed` | 노쇼 확정 시 | 노쇼 확정 | "김민수 레슨이 노쇼 처리되었습니다" | error | `/lessons/{id}` |
-| `connectionRequestReceived` | 연결 요청 수신 시 | 연결 요청 | "김민수님이 연결을 요청했습니다" | person | `/profile/connections` |
+| `connectionRequestReceived` | 연결 요청 수신 시 | 연결 요청 | "김민수님이 연결을 요청했습니다" | person | `/invite/requests` |
 | `connectionEstablished` | 연결 수락 시 | 연결 완료 | "김선생님과 연결되었습니다" | check | `/profile/connections` |
 | `proposalReceived` | 수강권 제안 수신 시 | 수강권 제안 | "김선생님이 수강권을 제안했습니다" | ticket | `/subscriptions/{id}` |
 | `proposalExpired` | 수강권 제안 72시간 경과 | 제안 만료 | "수강권 제안이 만료되었습니다" | timer_off | `/subscriptions` |
