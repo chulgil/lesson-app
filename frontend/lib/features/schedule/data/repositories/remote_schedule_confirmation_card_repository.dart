@@ -4,7 +4,7 @@ import '../../domain/repositories/schedule_confirmation_card_repository.dart';
 
 /// Remote implementation of [ScheduleConfirmationCardRepository].
 ///
-/// Maps to /api/v1/schedule/confirmations endpoints.
+/// Maps to /api/v1/schedule/confirmation-cards endpoints.
 /// Backend uses snake_case; Flutter entity uses snake_case JSON keys
 /// (via @JsonSerializable). Field name differences are mapped here.
 class RemoteScheduleConfirmationCardRepository
@@ -18,11 +18,8 @@ class RemoteScheduleConfirmationCardRepository
     String studentId,
   ) async {
     final response = await _apiClient.get(
-      '/schedule/confirmations',
-      queryParameters: {
-        'student_id': studentId,
-        'status': 'pending',
-      },
+      '/schedule/confirmation-cards',
+      queryParameters: {'student_id': studentId, 'status': 'pending'},
     );
     final items = response.data as List<dynamic>;
     return items
@@ -33,7 +30,7 @@ class RemoteScheduleConfirmationCardRepository
   @override
   Future<ScheduleConfirmationCard?> getCardById(String cardId) async {
     final response = await _apiClient.get(
-      '/schedule/confirmations/$cardId',
+      '/schedule/confirmation-cards/$cardId',
     );
     return _fromBackendJson(response.data as Map<String, dynamic>);
   }
@@ -43,7 +40,7 @@ class RemoteScheduleConfirmationCardRepository
     String subscriptionId,
   ) async {
     final response = await _apiClient.get(
-      '/schedule/confirmations/by-subscription/$subscriptionId',
+      '/schedule/confirmation-cards/by-subscription/$subscriptionId',
     );
     return _fromBackendJson(response.data as Map<String, dynamic>);
   }
@@ -53,21 +50,22 @@ class RemoteScheduleConfirmationCardRepository
     ScheduleConfirmationCard card,
   ) async {
     final response = await _apiClient.post(
-      '/schedule/confirmations',
+      '/schedule/confirmation-cards',
       data: {
         'student_id': card.studentId,
-        'teacher_id': card.teacherId,
-        'teacher_name': card.teacherName,
         'subscription_id': card.subscriptionId,
+        if (card.lessonRequestId != null)
+          'lesson_request_id': card.lessonRequestId,
         'card_type': card.cardType.name,
+        'title': _titleFor(card),
         if (card.instrument != null) 'instrument': card.instrument,
         if (card.suggestedDay != null) 'proposed_day': card.suggestedDay,
         if (card.suggestedTime != null) 'proposed_time': card.suggestedTime,
         if (card.lessonDuration != null)
           'proposed_duration': card.lessonDuration,
+        if (_proposedSlotsFor(card).isNotEmpty)
+          'proposed_slots': _proposedSlotsFor(card),
         if (card.totalLessons != null) 'total_lessons': card.totalLessons,
-        if (card.lessonRequestId != null)
-          'lesson_request_id': card.lessonRequestId,
       },
     );
     return _fromBackendJson(response.data as Map<String, dynamic>);
@@ -80,11 +78,10 @@ class RemoteScheduleConfirmationCardRepository
     DateTime? respondedAt,
   }) async {
     final response = await _apiClient.patch(
-      '/schedule/confirmations/$cardId/status',
+      '/schedule/confirmation-cards/$cardId/status',
       data: {
         'status': status.name,
-        if (respondedAt != null)
-          'responded_at': respondedAt.toIso8601String(),
+        if (respondedAt != null) 'responded_at': respondedAt.toIso8601String(),
       },
     );
     return _fromBackendJson(response.data as Map<String, dynamic>);
@@ -93,7 +90,7 @@ class RemoteScheduleConfirmationCardRepository
   @override
   Future<void> dismissAllPendingCards(String studentId) async {
     await _apiClient.post(
-      '/schedule/confirmations/dismiss-all',
+      '/schedule/confirmation-cards/dismiss-all',
       data: {'student_id': studentId},
     );
   }
@@ -111,17 +108,24 @@ class RemoteScheduleConfirmationCardRepository
       'teacher_name': json['teacher_name'] ?? '',
       'instrument': json['instrument'],
       'subscription_id': json['subscription_id'] ?? '',
-      'suggested_day': json['proposed_day'] != null
-          ? int.tryParse(json['proposed_day'].toString())
-          : null,
-      'suggested_time': json['proposed_time'],
-      'lesson_duration': json['proposed_duration'],
+      'suggested_day':
+          json['proposed_day'] != null
+              ? int.tryParse(json['proposed_day'].toString())
+              : json['suggested_day'] != null
+              ? int.tryParse(json['suggested_day'].toString())
+              : null,
+      'suggested_time': json['proposed_time'] ?? json['suggested_time'],
+      'lesson_duration': json['proposed_duration'] ?? json['lesson_duration'],
       'card_type': json['card_type'] ?? 'afterTrial',
       'status': json['status'] ?? 'pending',
       'created_at': json['created_at'],
       'responded_at': json['responded_at'],
       'total_lessons': json['total_lessons'],
       'lesson_request_id': json['lesson_request_id'],
+      'suggested_day2': json['suggested_day2'],
+      'suggested_time2': json['suggested_time2'],
+      'suggested_day3': json['suggested_day3'],
+      'suggested_time3': json['suggested_time3'],
     };
 
     // Map proposed_slots array to suggestedDay2/3 if present
@@ -138,5 +142,27 @@ class RemoteScheduleConfirmationCardRepository
     }
 
     return ScheduleConfirmationCard.fromJson(mapped);
+  }
+
+  List<Map<String, dynamic>> _proposedSlotsFor(ScheduleConfirmationCard card) {
+    final slots = <Map<String, dynamic>>[];
+    void addSlot(int? day, String? time) {
+      if (day != null && time != null) {
+        slots.add({'day': day, 'time': time});
+      }
+    }
+
+    addSlot(card.suggestedDay, card.suggestedTime);
+    addSlot(card.suggestedDay2, card.suggestedTime2);
+    addSlot(card.suggestedDay3, card.suggestedTime3);
+    return slots;
+  }
+
+  String _titleFor(ScheduleConfirmationCard card) {
+    final instrument = card.instrument;
+    if (instrument == null || instrument.isEmpty) {
+      return '스케줄 확인';
+    }
+    return '$instrument 스케줄 확인';
   }
 }

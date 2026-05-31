@@ -549,7 +549,7 @@ final connectionRequesterProvider = AutoDisposeNotifierProvider<
 typedef _$ConnectionRequester
     = AutoDisposeNotifier<AsyncValue<ConnectionRequest?>>;
 String _$connectionRequestResponderHash() =>
-    r'6d9963280f4d32775013747bea37a0b28312c6af';
+    r'1aafc2940c65416435865a2caabdc704a0f592b9';
 
 /// Accept/Reject connection request
 ///

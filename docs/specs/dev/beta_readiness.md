@@ -15,7 +15,7 @@
 
 ## Repository 연동 현황
 
-### Remote Repository 구현 완료 (14개)
+### Remote Repository 구현 완료 (16개)
 
 | 도메인 | Repository | Provider 파일 |
 |--------|-----------|--------------|
@@ -29,16 +29,17 @@
 | 가용시간 | `RemoteTeacherAvailabilityRepository` | `teacher_availability_providers.dart` |
 | 예약 | `RemoteBookingRepository` | `booking_providers.dart` |
 | 그룹클래스 예약 | `RemoteGroupClassBookingRepository` | `group_class_booking_providers.dart` |
+| 스케줄 확인 카드 | `RemoteScheduleConfirmationCardRepository` | `schedule_confirmation_card_providers.dart` |
 | 연습 | `RemotePracticeRepository` | `practice_repository_provider.dart` |
 | 알림 | `RemoteNotificationRepository` | `notification_providers.dart` |
 | 관계 | `RemoteTeacherStudentRelationRepository` | `relation_providers.dart` |
 | 학부모 | `RemoteParentRepository` | `parent_providers.dart` |
+| 녹음 피드백 | `RemoteRecordingFeedbackRepository` | `recording_feedback_provider.dart` |
 
 ### Mock-only (Remote 미구현, 7개)
 
 | 도메인 | Provider 파일 | 비고 |
 |--------|--------------|------|
-| 스케줄 확인 카드 | `schedule_confirmation_card_providers.dart` | 백엔드 API 필요 |
 | 레슨 정책 | `lesson_policy_providers.dart` | 백엔드 API 필요 |
 | 제안 설정 | `proposal_settings_providers.dart` | 백엔드 API 필요 |
 | 레슨 클래스 | `lesson_class_providers.dart` | 백엔드 API 필요 |

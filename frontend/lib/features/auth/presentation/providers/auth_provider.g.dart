@@ -23,7 +23,7 @@ final authRepositoryProvider = Provider<AuthRepository>.internal(
 );
 
 typedef AuthRepositoryRef = ProviderRef<AuthRepository>;
-String _$authNotifierHash() => r'f563fac4c30bdf5ca0a04533e5b3b2541e57361f';
+String _$authNotifierHash() => r'e77ed2bf8f3587b621e6febd2b5014561ad86ba8';
 
 /// Auth state notifier that manages authentication lifecycle.
 ///

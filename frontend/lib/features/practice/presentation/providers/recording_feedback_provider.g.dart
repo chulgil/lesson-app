@@ -171,7 +171,7 @@ class _RecordingFeedbackCountProviderElement
 }
 
 String _$recordingFeedbackListHash() =>
-    r'8a07e06b3616a5c83bd5afacbb5964d7968902e9';
+    r'd531727dbdf6f6b1edc24fa9aafa791edbf6e38f';
 
 abstract class _$RecordingFeedbackList
     extends BuildlessNotifier<List<RecordingFeedback>> {
@@ -182,26 +182,22 @@ abstract class _$RecordingFeedbackList
   );
 }
 
-/// In-memory store of teacher feedbacks keyed by recordingId.
-/// Mock-only — persistence/backend wired when API is available.
+/// Feedbacks keyed by recordingId.
 ///
 /// Copied from [RecordingFeedbackList].
 @ProviderFor(RecordingFeedbackList)
 const recordingFeedbackListProvider = RecordingFeedbackListFamily();
 
-/// In-memory store of teacher feedbacks keyed by recordingId.
-/// Mock-only — persistence/backend wired when API is available.
+/// Feedbacks keyed by recordingId.
 ///
 /// Copied from [RecordingFeedbackList].
 class RecordingFeedbackListFamily extends Family<List<RecordingFeedback>> {
-  /// In-memory store of teacher feedbacks keyed by recordingId.
-  /// Mock-only — persistence/backend wired when API is available.
+  /// Feedbacks keyed by recordingId.
   ///
   /// Copied from [RecordingFeedbackList].
   const RecordingFeedbackListFamily();
 
-  /// In-memory store of teacher feedbacks keyed by recordingId.
-  /// Mock-only — persistence/backend wired when API is available.
+  /// Feedbacks keyed by recordingId.
   ///
   /// Copied from [RecordingFeedbackList].
   RecordingFeedbackListProvider call(
@@ -236,14 +232,12 @@ class RecordingFeedbackListFamily extends Family<List<RecordingFeedback>> {
   String? get name => r'recordingFeedbackListProvider';
 }
 
-/// In-memory store of teacher feedbacks keyed by recordingId.
-/// Mock-only — persistence/backend wired when API is available.
+/// Feedbacks keyed by recordingId.
 ///
 /// Copied from [RecordingFeedbackList].
 class RecordingFeedbackListProvider extends NotifierProviderImpl<
     RecordingFeedbackList, List<RecordingFeedback>> {
-  /// In-memory store of teacher feedbacks keyed by recordingId.
-  /// Mock-only — persistence/backend wired when API is available.
+  /// Feedbacks keyed by recordingId.
   ///
   /// Copied from [RecordingFeedbackList].
   RecordingFeedbackListProvider(

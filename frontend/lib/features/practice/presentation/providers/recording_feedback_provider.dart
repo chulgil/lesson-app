@@ -1,19 +1,34 @@
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/providers/repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../notifications/domain/entities/notification.dart';
 import '../../../notifications/notifications_facade.dart';
+import '../../data/repositories/mock_recording_feedback_repository.dart';
+import '../../data/repositories/remote_recording_feedback_repository.dart';
 import '../../domain/entities/recording_feedback.dart';
+import '../../domain/repositories/recording_feedback_repository.dart';
 
 part 'recording_feedback_provider.g.dart';
 
-/// In-memory store of teacher feedbacks keyed by recordingId.
-/// Mock-only — persistence/backend wired when API is available.
+final recordingFeedbackRepositoryProvider =
+    Provider<RecordingFeedbackRepository>(
+      (ref) => createRepository<RecordingFeedbackRepository>(
+        ref: ref,
+        mock: MockRecordingFeedbackRepository.new,
+        remote: RemoteRecordingFeedbackRepository.new,
+      ),
+    );
+
+/// Feedbacks keyed by recordingId.
 @Riverpod(keepAlive: true)
 class RecordingFeedbackList extends _$RecordingFeedbackList {
   @override
-  List<RecordingFeedback> build(String recordingId) => const [];
+  List<RecordingFeedback> build(String recordingId) {
+    Future.microtask(_load);
+    return const [];
+  }
 
   Future<void> add({
     required String teacherId,
@@ -21,14 +36,21 @@ class RecordingFeedbackList extends _$RecordingFeedbackList {
     String? studentId,
     String? repertoireName,
   }) async {
-    final feedback = RecordingFeedback(
-      id: 'fb_${DateTime.now().microsecondsSinceEpoch}',
+    final trimmedContent = content.trim();
+    if (trimmedContent.isEmpty) {
+      return;
+    }
+
+    final repository = ref.read(recordingFeedbackRepositoryProvider);
+    final feedback = await repository.create(
       recordingId: recordingId,
       teacherId: teacherId,
-      content: content.trim(),
-      createdAt: DateTime.now(),
+      content: trimmedContent,
     );
-    state = [...state, feedback];
+    state = [
+      ...state.where((existing) => existing.id != feedback.id),
+      feedback,
+    ];
 
     if (studentId != null) {
       await _notifyStudent(
@@ -60,6 +82,11 @@ class RecordingFeedbackList extends _$RecordingFeedbackList {
         actionLabel: '피드백 보기',
       ),
     );
+  }
+
+  Future<void> _load() async {
+    final repository = ref.read(recordingFeedbackRepositoryProvider);
+    state = await repository.list(recordingId);
   }
 }
 

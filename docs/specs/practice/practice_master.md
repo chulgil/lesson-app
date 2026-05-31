@@ -953,7 +953,7 @@ iOS 앱 재배포 시 컨테이너 UUID 변경 -> Hive DB 녹음 경로 무효�
 | 1 (MVP) | 학생 녹음, 재생/삭제, 대표 녹음, 스마트 녹음, A-B 루프, 속도 조절, 파형 | 구현 완료 |
 | 1.5 | iOS 경로 복구, 완전 삭제, 진단 화면 | 구현 완료 |
 | 1.5 (진행중) | 트림 후 실제 재생 시간 표시 (Issue #7), 연습완료 날짜별 동기화 (Issue #8) | 트림 후 재생 시간 표시 완료, 연습완료 동기화 완료 |
-| 2 | 대표 녹음 서버 업로드, 선생님 주차 요약, 텍스트 피드백 | 예정 |
+| 2 | 대표 녹음 서버 업로드, 선생님 주차 요약, 텍스트 피드백 | 텍스트 피드백 원격 CRUD 완료, 업로드/주차 요약 예정 |
 | 3 | 레슨 피드백 AI 음성->텍스트, 선생님 참고 음원 | 예정 |
 | 4 | 선생님 음성 피드백, 선생님 직접 참고 녹음 | 예정 |
 | 5 | iCloud/ZIP 백업 | 예정 |
@@ -1265,7 +1265,7 @@ class RecordingComparison {
 - 이번 주 요약 (연습 일수, 총 시간, 공유 녹음 수)
 - 주간 연습 캘린더 (월~일 연습 여부 + 시간)
 - 공유된 녹음 목록 (탭하여 `TeacherFeedbackSheet` 오픈)
-- 피드백 입력 시 학생에게 `NotificationType.recordingFeedbackReceived` 로컬 알림 디스패치
+- 피드백 입력 시 `/recordings/{recording_id}/feedback`에 저장하고 학생에게 `NotificationType.recordingFeedbackReceived` 로컬 알림 디스패치
 
 재생 UI는 `SharedRecording` 전용 inline player가 필요 (별도 이슈).
 
