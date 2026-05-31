@@ -106,6 +106,16 @@
 | 4-5 | **결제 시스템 (Toss PG)** | payment_gateway_service.py | ⚠️ 인프라 완료, PG 키 설정 대기 |
 | 4-6 | **출석 Phase 3 (알림 + 자동화)** | [attendance_spec.md](../_archive/old/attendance_spec.md) Phase 3 | ✅ done |
 
+### 아키텍처 결정 (2026-05-31)
+
+| 결정 | 내용 | 스펙 |
+|------|------|------|
+| **수강권 필수화 (Plan B)** | 모든 레슨은 수강권에 연결. 없으면 1회 체험 수강권 자동 생성 | [subscription_required_spec.md](../subscription/subscription_required_spec.md) |
+| **취소 분기 로직** | 수강권 연결 레슨은 수강권 상세에서 취소 (크레딧 정상 처리), 수기 레슨은 직접 취소 | 위 스펙 §3 |
+| **보너스 레슨** | 남은 횟수 0인 수강권에 레슨 추가 시 total_lessons/bonus_count 자동 증가 | 위 스펙 §2.3 |
+| **학생 알림 4종 추가** | lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired | [notification_master.md](../notification/notification_master.md) |
+| **Mock → Remote 전환 4건** | 초대코드/ChildProfile/ScheduleConfirmationCard/알림탭 payload | 각 도메인 스펙 참조 |
+
 ---
 
 ## 3. Phase별 우선순위 판단 기준

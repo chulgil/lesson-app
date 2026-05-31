@@ -300,7 +300,39 @@ RequestEvent(
 - "무료 처리"와 "확인"은 선생님의 편의를 위한 것.
 - 하단 바는 취소 확정 상태를 유지하다가, 다른 세션 선택 시 해당 세션의 상태로 전환.
 
-## 9. 일정 변경 스펙과의 관계
+## 9. 수강권 필수화에 따른 취소 분기 (2026-05-31)
+
+> 참조: [subscription_required_spec.md](../subscription/subscription_required_spec.md)
+
+### 9.1 결정사항
+
+모든 레슨은 수강권에 연결된다 (Plan B). 따라서 취소는 **항상** 수강권 이벤트 시스템을 경유한다.
+
+### 9.2 선생님이 레슨 상세에서 "취소" 탭 시
+
+```
+lesson.subscriptionId != null (정상 — 모든 신규 레슨)
+  → 수강권 상세 화면으로 이동
+  → 수강권 이벤트 시스템에서 lessonCancelled 이벤트 생성
+  → 크레딧 차감 + 학생 알림 + 채팅 말풍선
+
+lesson.subscriptionId == null (레거시 데이터)
+  → 기존 직접 취소 (PATCH /status) 유지
+  → 마이그레이션 완료 후 이 분기 제거
+```
+
+### 9.3 구현 상태
+
+| 항목 | 상태 |
+|------|:----:|
+| 프론트 취소 분기 (`lesson_detail_screen.dart`) | ✅ 구현 |
+| 백엔드 자동 수강권 생성 (`lesson_service.create()`) | ✅ 구현 |
+| 보너스 레슨 (남은 횟수 0 → total_lessons/bonus_count 증가) | ✅ 구현 |
+| `cancel_lesson_bottom_sheet.dart` (취소 사유 UI) | ❌ 미구현 |
+| `update_status()` 가드 (수강권 레슨 직접 취소 차단) | ❌ 미구현 (2단계) |
+| 레거시 데이터 마이그레이션 | ❌ 미구현 (4단계) |
+
+## 10. 일정 변경 스펙과의 관계
 
 이 스펙은 `subscription_schedule_change_spec.md`와 함께 수강권 상세화면의
 하단 바 상태를 정의한다.
@@ -312,7 +344,7 @@ RequestEvent(
 | CanRespond | 상대방 일정 변경 수신 | `subscription_schedule_change_spec.md` §4.3 |
 | **CancellationConfirmed** | **학생 취소 자동 확정** | **이 문서 §5** |
 
-## 10. 관련 파일
+## 11. 관련 파일
 
 | 파일 | 역할 |
 |------|------|
