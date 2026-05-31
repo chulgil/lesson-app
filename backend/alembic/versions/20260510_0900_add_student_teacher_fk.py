@@ -24,6 +24,9 @@ def _has_constraint(bind: sa.Engine, table_name: str, constraint_name: str) -> b
 def upgrade() -> None:
     bind = op.get_bind()
 
+    with op.batch_alter_table("students") as batch_op:
+        batch_op.alter_column("teacher_id", existing_type=sa.String(length=36), nullable=True)
+
     op.execute("UPDATE students SET teacher_id = NULL WHERE teacher_id = ''")
     op.execute(
         """
@@ -39,7 +42,6 @@ def upgrade() -> None:
     )
 
     with op.batch_alter_table("students") as batch_op:
-        batch_op.alter_column("teacher_id", existing_type=sa.String(length=36), nullable=True)
         if not _has_constraint(bind, "students", "fk_students_teacher_id_teachers"):
             batch_op.create_foreign_key(
                 "fk_students_teacher_id_teachers",
