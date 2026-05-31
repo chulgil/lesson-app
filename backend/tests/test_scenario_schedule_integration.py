@@ -593,3 +593,227 @@ async def test_full_e2e_request_to_lesson(
     # ── Phase 7: 최종 확인 ────────────────────────────────────
     req = await student.get_lesson_request(request_id)
     assert_status(req, "completed")
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 9. Teacher vacation setting blocks student-visible slots
+# ─────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_teacher_vacation_setting_blocks_student_slot_search(
+    teacher: TeacherActions, student: StudentActions
+):
+    """
+    Teacher sets weekly availability with vacation mode →
+    student searches slots inside/outside vacation period.
+    """
+    availability = await teacher.client.post(
+        "/api/v1/availability/",
+        headers=teacher.headers,
+        json={
+            "day_of_week": 0,
+            "time_slots": [
+                {"start_time": "09:00", "end_time": "10:00", "is_available": True},
+                {"start_time": "10:00", "end_time": "11:00", "is_available": True},
+            ],
+            "vacation_mode": True,
+            "vacation_start_date": "2026-07-01",
+            "vacation_end_date": "2026-08-31",
+            "vacation_reason": "여름방학",
+        },
+    )
+    assert availability.status_code == 201
+
+    blocked = await student.client.get(
+        "/api/v1/schedule/slots",
+        headers=student.headers,
+        params={"teacher_id": "test-user-id", "date": "2026-07-06"},
+    )
+    assert blocked.status_code == 200
+    blocked_slots = blocked.json()["slots"]
+    assert blocked_slots
+    assert {slot["status"] for slot in blocked_slots} == {"unavailable"}
+
+    outside = await student.client.get(
+        "/api/v1/schedule/slots",
+        headers=student.headers,
+        params={"teacher_id": "test-user-id", "date": "2026-06-29"},
+    )
+    assert outside.status_code == 200
+    outside_slots = outside.json()["slots"]
+    assert outside_slots
+    assert {slot["status"] for slot in outside_slots} == {"available"}
+
+
+@pytest.mark.asyncio
+async def test_teacher_vacation_disable_reopens_student_slot_search(
+    teacher: TeacherActions, student: StudentActions
+):
+    """
+    Teacher disables vacation mode →
+    student can book slots in the previously blocked period again.
+    """
+    availability = await teacher.client.post(
+        "/api/v1/availability/",
+        headers=teacher.headers,
+        json={
+            "day_of_week": 0,
+            "time_slots": [
+                {"start_time": "13:00", "end_time": "14:00", "is_available": True},
+            ],
+            "vacation_mode": True,
+            "vacation_start_date": "2026-07-01",
+            "vacation_end_date": "2026-08-31",
+            "vacation_reason": "여름방학",
+        },
+    )
+    assert availability.status_code == 201
+    availability_id = availability.json()["id"]
+
+    blocked = await student.client.get(
+        "/api/v1/schedule/slots",
+        headers=student.headers,
+        params={"teacher_id": "test-user-id", "date": "2026-07-06"},
+    )
+    assert blocked.status_code == 200
+    assert {slot["status"] for slot in blocked.json()["slots"]} == {"unavailable"}
+
+    disabled = await teacher.client.put(
+        f"/api/v1/availability/{availability_id}",
+        headers=teacher.headers,
+        json={"vacation_mode": False},
+    )
+    assert disabled.status_code == 200
+    assert disabled.json()["vacation_mode"] is False
+
+    reopened = await student.client.get(
+        "/api/v1/schedule/slots",
+        headers=student.headers,
+        params={"teacher_id": "test-user-id", "date": "2026-07-06"},
+    )
+    assert reopened.status_code == 200
+    reopened_slots = reopened.json()["slots"]
+    assert reopened_slots
+    assert {slot["status"] for slot in reopened_slots} == {"available"}
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 10. Subscription preserves travel context from class membership
+# ─────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_subscription_creation_preserves_membership_location_and_travel_time(
+    teacher: TeacherActions,
+):
+    """
+    Teacher creates a location-aware membership →
+    creates subscription → subscription keeps location/travel context.
+    """
+    student_id = await teacher.create_student("방문레슨학생", instrument="violin")
+
+    class_response = await teacher.client.post(
+        "/api/v1/lessons-classes",
+        headers=teacher.headers,
+        json={"name": "방문 레슨반", "type": "private"},
+    )
+    assert class_response.status_code == 201
+    class_id = class_response.json()["id"]
+
+    location_response = await teacher.client.post(
+        "/api/v1/locations",
+        headers=teacher.headers,
+        json={
+            "lesson_class_id": class_id,
+            "name": "학생 자택",
+            "type": "studentHome",
+            "address": "서울시 강남구 테헤란로",
+            "is_default": True,
+        },
+    )
+    assert location_response.status_code == 201
+    location_id = location_response.json()["id"]
+
+    membership_response = await teacher.client.post(
+        f"/api/v1/lessons-classes/{class_id}/memberships",
+        headers=teacher.headers,
+        json={
+            "student_id": student_id,
+            "instrument": "violin",
+            "lesson_day": "monday",
+            "lesson_time": "15:00",
+            "lesson_duration": 60,
+            "lesson_location_id": location_id,
+            "travel_time_minutes": 25,
+        },
+    )
+    assert membership_response.status_code == 201
+    membership_id = membership_response.json()["id"]
+
+    subscription_response = await teacher.client.post(
+        "/api/v1/subscriptions",
+        headers=teacher.headers,
+        json={
+            "student_id": student_id,
+            "membership_id": membership_id,
+            "type": "package",
+            "total_lessons": 4,
+            "amount": 200000,
+            "payment_confirmed": False,
+        },
+    )
+    assert subscription_response.status_code == 201
+    created = subscription_response.json()
+    assert created["membership_id"] == membership_id
+    assert created["lesson_location_id"] == location_id
+    assert created["travel_time_minutes"] == 25
+
+    detail_response = await teacher.client.get(
+        f"/api/v1/subscriptions/{created['id']}",
+        headers=teacher.headers,
+    )
+    assert detail_response.status_code == 200
+    detail = detail_response.json()
+    assert detail["lesson_location_id"] == location_id
+    assert detail["travel_time_minutes"] == 25
+
+    list_response = await teacher.client.get(
+        "/api/v1/subscriptions",
+        headers=teacher.headers,
+        params={"student_id": student_id},
+    )
+    assert list_response.status_code == 200
+    listed = list_response.json()["items"][0]
+    assert listed["lesson_location_id"] == location_id
+    assert listed["travel_time_minutes"] == 25
+
+    confirm_response = await teacher.client.patch(
+        f"/api/v1/subscriptions/{created['id']}/confirm-payment",
+        headers=teacher.headers,
+        json={"payment_method": "bankTransfer"},
+    )
+    assert confirm_response.status_code == 200
+    confirmed = confirm_response.json()
+    assert confirmed["payment_confirmed"] is True
+    assert confirmed["lesson_location_id"] == location_id
+    assert confirmed["travel_time_minutes"] == 25
+
+    lesson_id = await teacher.create_lesson(
+        student_id,
+        date="2026-05-04",
+        start_time="15:00",
+        duration=60,
+        instrument="violin",
+    )
+    await teacher.complete_lesson(lesson_id)
+    used_response = await teacher.client.patch(
+        f"/api/v1/subscriptions/{created['id']}/use-lesson",
+        headers=teacher.headers,
+        json={"lesson_id": lesson_id},
+    )
+    assert used_response.status_code == 200
+    used = used_response.json()
+    assert used["used_lessons"] == 1
+    assert used["lesson_location_id"] == location_id
+    assert used["travel_time_minutes"] == 25

@@ -100,6 +100,8 @@ tests/
 | SI-06 | 승인 철회 후 재결정 | 요청 → 승인 → 철회(pending 복귀, confirmed_at=null) → 대안 제안 → 학생 수락 | approved→pending→negotiating→timeConfirmed, confirmed_at 리셋 확인 |
 | SI-07 | 스케줄 비교에서 선호 슬롯 바로 수락 | 학생 선호 3개 요청 → 선생님이 스케줄 확인 후 바로 승인 | pending→approved, confirmed_at 설정 |
 | SI-08 | 전체 E2E (요청→레슨 완료) | 요청 → 대안 제시 → 학생 수락 → 학생 등록 → 수강권 → 제안 → 수락 → 입금확인 → 레슨 생성/완료 → 차감 | 모든 상태 전이 검증, remaining=3 |
+| SI-09 | 휴가 설정 기반 학생 슬롯 조회 | 선생님 가용성+휴가 기간 설정 → 학생 슬롯 조회(기간 내/밖) → 휴가 해제 후 재조회 | 휴가 기간 내 슬롯은 unavailable, 기간 밖/해제 후 슬롯은 available |
+| SI-10 | 장소/이동시간 포함 수강권 생성 | 장소 생성 → 멤버십에 lesson_location_id/travel_time_minutes 저장 → 수강권 생성/목록/상세/결제확인/차감 | 수강권 응답이 모든 주요 상태 전이에서 장소와 이동시간 컨텍스트 보존 |
 
 ### 학생 시나리오 (StudentActions 사용)
 

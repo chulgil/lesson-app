@@ -118,7 +118,7 @@ class SubscriptionService:
         total = await self.db.scalar(count_query) or 0
 
         result = await self.db.scalars(query.offset(offset).limit(size))
-        items = [SubscriptionResponse.model_validate(s) for s in result.all()]
+        items = [await self._subscription_response(s) for s in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
     async def get_deposit_summary(
@@ -239,12 +239,12 @@ class SubscriptionService:
         self.db.add(sub)
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def get_by_id(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Return a subscription by ID."""
         sub = await self._get_subscription_for_user(subscription_id, current_user)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def update(self, subscription_id: str, data: SubscriptionUpdate, current_user: Any) -> SubscriptionResponse:
         """Update a subscription."""
@@ -261,7 +261,7 @@ class SubscriptionService:
             setattr(sub, key, value)
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def deduct_lesson(
         self, subscription_id: str, data: UseLessonRequest, current_user: Any
@@ -295,7 +295,7 @@ class SubscriptionService:
 
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def use_reschedule(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Use a reschedule credit from a subscription."""
@@ -318,7 +318,7 @@ class SubscriptionService:
         sub.used_reschedule_count = (sub.used_reschedule_count or 0) + 1
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status."""
@@ -329,7 +329,7 @@ class SubscriptionService:
         sub.status = SubscriptionStatus(new_status)
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def get_usage_history(self, subscription_id: str, current_user: Any) -> list:
         """Get usage history for a subscription."""
@@ -707,6 +707,22 @@ class SubscriptionService:
         result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc()))
         return result.first()
 
+    async def _subscription_response(self, sub: Any) -> SubscriptionResponse:
+        """Build a subscription response enriched with membership schedule context."""
+        from app.models.lesson import ClassMembership
+
+        response = SubscriptionResponse.model_validate(sub)
+        if sub.membership_id is None:
+            return response
+
+        membership = await self.db.get(ClassMembership, sub.membership_id)
+        if membership is None:
+            return response
+
+        response.lesson_location_id = membership.lesson_location_id
+        response.travel_time_minutes = membership.travel_time_minutes
+        return response
+
     async def _get_subscription_for_user(self, subscription_id: str, current_user: Any) -> Any:
         """Return subscription if the current user can access it."""
         from app.models.lesson import ClassMembership, LessonClass
@@ -849,7 +865,7 @@ class SubscriptionService:
         await self._notify_deposit_confirmed(sub, NotificationService(self.db))
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     async def notify_payment(
         self,
@@ -878,7 +894,7 @@ class SubscriptionService:
         await self._notify_deposit_received(sub, NotificationService(self.db))
         await self.db.flush()
         await self.db.refresh(sub)
-        return SubscriptionResponse.model_validate(sub)
+        return await self._subscription_response(sub)
 
     def _reject_deposit_state_update(self, subscription: Any, update_data: dict[str, Any]) -> None:
         """Keep manual deposit state transitions on dedicated endpoints."""

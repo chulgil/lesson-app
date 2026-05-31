@@ -17,6 +17,8 @@ class SubscriptionResponse(BaseModel):
     id: str
     student_id: str
     membership_id: str | None = None
+    lesson_location_id: str | None = None
+    travel_time_minutes: int | None = None
     type: str | None = None
     status: str | None = None
     total_lessons: int | None = None
