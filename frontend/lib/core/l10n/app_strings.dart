@@ -879,6 +879,10 @@ class AppStrings {
 
   /// 예약 승인 대기
   static String pendingBookings(int count) => '예약 승인 대기 $count건';
+  static String teacherHomeConnectionRequestsTitle(int count) =>
+      '학생 연결 요청 $count건';
+  static const teacherHomeConnectionRequestsSubtitle =
+      '초대코드로 가입한 학생을 승인하면 학생 목록에 추가됩니다';
 
   // ── Subscription Card ─────────────────────────────────────
 

@@ -231,6 +231,55 @@ async def test_accept_connection_request(client: AsyncClient, auth_headers, stud
 
 
 @pytest.mark.asyncio
+async def test_accept_invite_code_request_adds_student_to_teacher_roster(
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+):
+    """Accepting a student's invite-code request should attach their profile to the teacher roster."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    profile = await client.post(
+        "/api/v1/students/me/profile",
+        headers=student_auth_headers,
+        json={"name": "Student", "instrument": "피아노", "level": "beginner"},
+    )
+    assert profile.status_code == 201, profile.text
+    student_id = profile.json()["id"]
+
+    invite_resp = await client.post("/api/v1/invites/", headers=auth_headers, json={})
+    invite = invite_resp.json()
+
+    request_resp = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={
+            "target_id": "",
+            "method": "inviteCode",
+            "invite_code": invite["invite_code"],
+        },
+    )
+    assert request_resp.status_code == 201, request_resp.text
+
+    accept = await client.patch(
+        f"/api/v1/invites/connection-requests/{request_resp.json()['id']}/respond",
+        headers=auth_headers,
+        json={"action": "accept"},
+    )
+    assert accept.status_code == 200, accept.text
+
+    roster = await client.get("/api/v1/students", headers=auth_headers)
+    assert roster.status_code == 200, roster.text
+    assert roster.json()["total"] == 1
+    assert roster.json()["items"][0]["id"] == student_id
+    assert roster.json()["items"][0]["teacher_id"] == "test-user-id-prof"
+
+
+@pytest.mark.asyncio
 async def test_reject_connection_request(client: AsyncClient, auth_headers, student_auth_headers, create_test_user):
     """PATCH respond with 'reject' should set status rejected with reason."""
     await create_test_user(user_id="test-user-id", role="teacher")

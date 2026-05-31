@@ -39,4 +39,15 @@ void main() {
       expect(source, isNot(contains('authTeacherConnected')));
     },
   );
+
+  test('teacher dashboard surfaces pending connection requests', () {
+    final source =
+        File(
+          'lib/features/home/presentation/widgets/dashboard_tab.dart',
+        ).readAsStringSync();
+
+    expect(source, contains('pendingRequestCountProvider'));
+    expect(source, contains('AppRoutes.pendingRequests'));
+    expect(source, contains('teacherHomeConnectionRequestsTitle'));
+  });
 }

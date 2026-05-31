@@ -15,6 +15,7 @@ import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
 import 'demo_dashboard_overlay.dart';
@@ -126,7 +127,7 @@ class DashboardTab extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space6),
 
               // ── 이벤트: 대응 필요 ──────────────────────────
-              _buildEventsGroup(context, dashboard.teacherId),
+              _buildEventsGroup(context, ref, dashboard.teacherId),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -282,14 +283,72 @@ class DashboardTab extends ConsumerWidget {
 
   /// 이벤트 그룹: 레슨 요청 + 스케줄 변경을 시각적으로 묶음.
   /// 두 섹션 모두 빈 경우 자식이 SizedBox.shrink → 그룹 헤더도 자연 숨김.
-  Widget _buildEventsGroup(BuildContext context, String teacherId) {
+  Widget _buildEventsGroup(
+    BuildContext context,
+    WidgetRef ref,
+    String teacherId,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildPendingConnectionRequests(context, ref),
+        const SizedBox(height: AppSpacing.space4),
         LessonRequestSection(userId: teacherId),
         const SizedBox(height: AppSpacing.space4),
         ScheduleChangeRequestSection(teacherId: teacherId),
       ],
+    );
+  }
+
+  Widget _buildPendingConnectionRequests(BuildContext context, WidgetRef ref) {
+    final countAsync = ref.watch(pendingRequestCountProvider);
+
+    return countAsync.maybeWhen(
+      data: (count) {
+        if (count <= 0) return const SizedBox.shrink();
+
+        return InkWell(
+          onTap: () => context.push(AppRoutes.pendingRequests),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: AppColors.paperAccentSoft,
+              border: Border.all(color: AppColors.paperAccent),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.person_add_alt_1_outlined,
+                  color: AppColors.paperAccent,
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.teacherHomeConnectionRequestsTitle(count),
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        AppStrings.teacherHomeConnectionRequestsSubtitle,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.inkSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppColors.paperAccent),
+              ],
+            ),
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 

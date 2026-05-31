@@ -348,6 +348,12 @@ class InviteService:
                 connection_request_id=request_id,
             )
             self.db.add(connection)
+            await self._attach_student_to_teacher(
+                teacher_user_id=teacher_id,
+                student_user_id=student_id,
+                student_name=student_name,
+                connected_at=now,
+            )
         else:
             conn_req.status = ConnectionRequestStatus.rejected
             conn_req.rejection_reason = rejection_reason
@@ -355,6 +361,56 @@ class InviteService:
         await self.db.flush()
         await self.db.refresh(conn_req)
         return conn_req
+
+    async def _attach_student_to_teacher(
+        self,
+        *,
+        teacher_user_id: str,
+        student_user_id: str,
+        student_name: str | None,
+        connected_at: datetime,
+    ) -> None:
+        """Attach an accepted app connection to the teacher-owned student roster."""
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+        from app.models.student import ConnectionStatus, Student
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        teacher_id = await resolve_teacher_id(self.db, teacher_user_id)
+        student = await self.db.scalar(select(Student).where(Student.user_id == student_user_id))
+        if student is None:
+            student = Student(
+                user_id=student_user_id,
+                teacher_id=teacher_id,
+                name=student_name or "Student",
+                instrument="",
+            )
+            self.db.add(student)
+            await self.db.flush()
+        else:
+            student.teacher_id = teacher_id
+            student.is_active = True
+
+        student.connection_status = ConnectionStatus.connected
+        student.connected_at = connected_at
+
+        relation = await self.db.scalar(
+            select(TeacherStudentRelation).where(
+                TeacherStudentRelation.teacher_id == teacher_id,
+                TeacherStudentRelation.student_id == student.id,
+            )
+        )
+        if relation is None:
+            relation = TeacherStudentRelation(
+                teacher_id=teacher_id,
+                student_id=student.id,
+            )
+            self.db.add(relation)
+
+        relation.status = RelationStatus.active
+        relation.connected_at = connected_at
+        relation.disconnected_at = None
+        relation.is_app_connected = True
+        relation.app_connected_at = relation.app_connected_at or connected_at
 
     async def cancel_request(self, request_id: str, current_user: Any) -> Any:
         """Cancel a pending request by its requester."""
