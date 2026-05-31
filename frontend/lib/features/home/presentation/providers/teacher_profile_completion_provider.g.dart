@@ -110,22 +110,60 @@ final hasIssuedSubscriptionProvider = Provider<bool>.internal(
 );
 
 typedef HasIssuedSubscriptionRef = ProviderRef<bool>;
+String _$hasWrittenLessonNoteHash() =>
+    r'9991dbe87cd44e25b0ba760e938e4f424196a054';
+
+/// Whether the teacher has written at least one lesson note (feedback).
+///
+/// Copied from [hasWrittenLessonNote].
+@ProviderFor(hasWrittenLessonNote)
+final hasWrittenLessonNoteProvider = Provider<bool>.internal(
+  hasWrittenLessonNote,
+  name: r'hasWrittenLessonNoteProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$hasWrittenLessonNoteHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HasWrittenLessonNoteRef = ProviderRef<bool>;
+String _$hasAssignedPracticeHash() =>
+    r'6a2b976093b59a0f16fda2dc4bf469ec19137639';
+
+/// Whether the teacher has assigned at least one practice item.
+///
+/// Copied from [hasAssignedPractice].
+@ProviderFor(hasAssignedPractice)
+final hasAssignedPracticeProvider = Provider<bool>.internal(
+  hasAssignedPractice,
+  name: r'hasAssignedPracticeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$hasAssignedPracticeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HasAssignedPracticeRef = ProviderRef<bool>;
 String _$profileCompletionPercentHash() =>
-    r'9bb1cade6332c5a2df2e88c46dfa2d9c37288d09';
+    r'ee330208f625ea8bcb670aabe3e33be15deb7392';
 
 /// Quest board completion percentage (0–100).
 ///
-/// 8 quests total (phone verification is mandatory at signup):
-///   === Setup Phase (50%) ===
-///   I.   Available slots          : 12
-///   II.  Profile image            : 10
-///   III. Introduction             : 10
-///   IV.  Lesson price table       : 8
-///   V.   Bank account             : 10
-///   === Action Phase (50%) ===
-///   VI.  First student invite     : 15
-///   VII. First subscription       : 20
-///   VIII.First lesson completed   : 15
+/// 10 quests total (phone verification is mandatory at signup):
+///   === Setup Phase (40%) ===
+///   I.   Available slots          : 10
+///   II.  Profile image            : 8
+///   III. Introduction             : 8
+///   IV.  Lesson price table       : 7
+///   V.   Bank account             : 7
+///   === Action Phase (60%) ===
+///   VI.  First student invite     : 12
+///   VII. First subscription       : 15
+///   VIII.First lesson completed   : 13
+///   IX.  First lesson note        : 10
+///   X.   First practice assigned  : 10
 ///
 /// Copied from [profileCompletionPercent].
 @ProviderFor(profileCompletionPercent)

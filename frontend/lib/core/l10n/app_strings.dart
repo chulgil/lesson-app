@@ -5574,6 +5574,10 @@ class AppStrings {
   static const questRewardSubscription = '레슨 관리 시작';
   static const questTitleFirstLesson = '첫 레슨 완료';
   static const questRewardFirstLesson = '레슨 워크플로우 완성';
+  static const questTitleLessonNote = '레슨 메모 작성';
+  static const questRewardLessonNote = '학생에게 피드백 전달';
+  static const questTitlePracticeAssign = '연습 과제 등록';
+  static const questRewardPracticeAssign = '학생 연습 관리 시작';
 
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)

@@ -35,6 +35,8 @@ class QuestBoardCard extends ConsumerWidget {
     final hasBankAcc = ref.watch(hasBankAccountProvider);
     final hasSubscription = ref.watch(hasIssuedSubscriptionProvider);
     final hasCompletedLesson = ref.watch(homeHasCompletedLessonProvider);
+    final hasLessonNote = ref.watch(hasWrittenLessonNoteProvider);
+    final hasPracticeAssigned = ref.watch(hasAssignedPracticeProvider);
 
     final allDone =
         hasSlots &&
@@ -44,7 +46,9 @@ class QuestBoardCard extends ConsumerWidget {
         hasBankAcc &&
         hasStudents &&
         hasSubscription &&
-        hasCompletedLesson;
+        hasCompletedLesson &&
+        hasLessonNote &&
+        hasPracticeAssigned;
 
     if (allDone) return const SizedBox.shrink();
 
@@ -58,6 +62,8 @@ class QuestBoardCard extends ConsumerWidget {
       hasBankAcc: hasBankAcc,
       hasSubscription: hasSubscription,
       hasCompletedLesson: hasCompletedLesson,
+      hasLessonNote: hasLessonNote,
+      hasPracticeAssigned: hasPracticeAssigned,
     );
 
     return Padding(
@@ -107,6 +113,8 @@ class QuestBoardCard extends ConsumerWidget {
     required bool hasBankAcc,
     required bool hasSubscription,
     required bool hasCompletedLesson,
+    required bool hasLessonNote,
+    required bool hasPracticeAssigned,
   }) {
     // Quest order designed by teacher workflow:
     //
@@ -121,6 +129,8 @@ class QuestBoardCard extends ConsumerWidget {
     // 6. First student invite — connect with a student
     // 7. First subscription — issue subscription to start managing
     // 8. First lesson completed — complete the full workflow
+    // 9. First lesson note — provide feedback to student
+    // 10. First practice assigned — assign homework
     return [
       // ── Setup Phase ──
       _Quest(
@@ -181,6 +191,20 @@ class QuestBoardCard extends ConsumerWidget {
         title: AppStrings.questTitleFirstLesson,
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
+        onTap: null,
+      ),
+      _Quest(
+        step: 9,
+        title: AppStrings.questTitleLessonNote,
+        reward: AppStrings.questRewardLessonNote,
+        isCompleted: hasLessonNote,
+        onTap: null,
+      ),
+      _Quest(
+        step: 10,
+        title: AppStrings.questTitlePracticeAssign,
+        reward: AppStrings.questRewardPracticeAssign,
+        isCompleted: hasPracticeAssigned,
         onTap: null,
       ),
     ];
