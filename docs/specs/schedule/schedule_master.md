@@ -1410,7 +1410,7 @@ enum ScheduleCardStatus {
 | ScheduleConfirmationCard 엔티티 | 완료 | `domain/entities/schedule_confirmation_card.dart` |
 | ScheduleConfirmationCardWidget | 완료 | `presentation/widgets/schedule_confirmation_card_widget.dart` |
 | Provider | 완료 | `presentation/providers/schedule_confirmation_card_providers.dart` |
-| Repository (Mock/Remote) | 완료 | `data/repositories/mock_schedule_confirmation_card_repository.dart` |
+| Repository (Mock/local fallback) | 부분 구현 | `data/repositories/mock_schedule_confirmation_card_repository.dart` |
 | 카드 타입 분기 로직 | 완료 | `subscription/.../issue_subscription_screen.dart` (`_detectScheduleCardType`) |
 | 대시보드 표시 | **비활성** | 설계 재검토 필요 시 재활성화 |
 

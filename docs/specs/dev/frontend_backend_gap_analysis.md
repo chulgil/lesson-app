@@ -97,7 +97,7 @@
 | 33 | Lesson | LessonPolicyRepository | ✅ 있음 | LOW | `/lesson-policies/teacher/{id}`, `/lesson-policies/class/{id}`, `/lesson-policies/effective` 지원. class policy 우선, teacher default fallback |
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
 | 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
-| 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | LOW | `/schedule/confirmation-cards` 응답을 Flutter snake_case 계약과 기존 camelCase alias 모두에 맞춤. teacher profile id 접근과 중복 booking guard 포함 |
+| 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | LOW | 백엔드 API는 있으나 Flutter provider는 아직 mock/local fallback. remote adapter 연결 필요 |
 | 38 | Parent | ChildProfileRepository | ✅ 있음 | LOW | 백엔드 `GET /parents/{parent_id}/child-profiles`, `POST /parents/child-profiles`, `GET/PUT/DELETE /parents/child-profiles/{child_id}`, teacher connect/disconnect 지원. 프론트 remote adapter 연결 필요 |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
 | 41 | Lesson | FeedbackTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/feedback-templates`, usage increment 추가. tags는 `feedback_template_tags`로 정규화 |

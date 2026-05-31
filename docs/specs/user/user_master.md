@@ -100,8 +100,8 @@ Flutter 앱 (google_sign_in SDK)
 | 항목 | 상태 |
 |------|:----:|
 | Google SSO | ✅ 구현 완료 |
-| Kakao SSO | ✅ 구현 완료 |
-| Apple SSO | ✅ 구현 완료 |
+| Kakao SSO | ⚠️ Flutter SDK 미연결 — 준비 중 안내 |
+| Apple SSO | ⚠️ Flutter SDK 미연결 — 준비 중 안내 |
 | 소셜 로그인 미설정 시 크래시 방지 | ✅ 구현 완료 |
 
 #### 관련 파일
@@ -1592,7 +1592,7 @@ features/schedule/presentation/widgets/booking_card.dart
 
 | 기능 | 상태 |
 |------|:----:|
-| 소셜 로그인 (Google/Kakao/Apple) | ✅ |
+| 소셜 로그인 (Google/Kakao/Apple) | ⚠️ Google 구현, Kakao/Apple 준비 중 |
 | 역할 선택 (선생님/학생/학부모) | ✅ |
 | 학부모 로그인 플로우 | ✅ |
 | 학생/학부모 초대 코드 화면 | ✅ |
@@ -1601,7 +1601,7 @@ features/schedule/presentation/widgets/booking_card.dart
 | 선생님 검색 화면 (학원/개인 탭) | ✅ |
 | 학생 관리 (클래스별 그룹화) | ✅ |
 | LessonClass / ClassMembership 엔티티 | ✅ |
-| 학부모 대시보드 4탭 (Mock) | ✅ |
+| 학부모 대시보드 4탭 (Mock) | ✅ UI 완료, 실데이터 부분 연동 |
 | ProfileSwitcher (역할 전환) | ✅ |
 | 자녀 프로필 CRUD | ✅ |
 | 체험 레슨 신청/승인 화면 | ✅ |
