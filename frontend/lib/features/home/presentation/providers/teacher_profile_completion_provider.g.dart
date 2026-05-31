@@ -23,9 +23,10 @@ final hasAvailableSlotsProvider = Provider<bool>.internal(
 );
 
 typedef HasAvailableSlotsRef = ProviderRef<bool>;
-String _$hasProfileImageHash() => r'6a2beb236b3f0008feb3509dfef079e4e3b33702';
+String _$hasProfileImageHash() => r'5634b3e3850d6ef0a353e63a2179d9d445db6d3e';
 
-/// Whether the teacher has a profile image set.
+/// Whether the teacher has a real profile image set.
+/// Filters out mock placeholder URLs (example.com).
 ///
 /// Copied from [hasProfileImage].
 @ProviderFor(hasProfileImage)
@@ -75,19 +76,17 @@ final hasPriceTableProvider = Provider<bool>.internal(
 
 typedef HasPriceTableRef = ProviderRef<bool>;
 String _$profileCompletionPercentHash() =>
-    r'd1a928049f53999ecab763c649185174b4154d87';
+    r'd04c0c0e52fe34dab91b1bbe3cc8678b2d1dea48';
 
 /// Profile completion percentage (0–100).
 ///
-/// Weights:
-///   I.   Name + Instrument (always done post-onboarding) : 15
-///   II.  Available slots                                  : 15
-///   III. First student                                    : 15
-///   IV.  Profile image                                    : 15
-///   V.   Introduction (20+ chars)                        : 15
-///   VI.  Lesson price table                               : 10
-///   VII. Phone verification                               : 10
-///   (remaining 5% reserved for future video feature)
+/// Weights (6 quests, "name+instrument" removed since it's always done):
+///   I.   Available slots                                  : 20
+///   II.  Profile image                                    : 15
+///   III. Introduction (20+ chars)                         : 15
+///   IV.  Phone verification                               : 15
+///   V.   Lesson price table                               : 15
+///   VI.  First student (last — requires setup complete)   : 20
 ///
 /// Copied from [profileCompletionPercent].
 @ProviderFor(profileCompletionPercent)

@@ -100,57 +100,58 @@ class QuestBoardCard extends ConsumerWidget {
     required bool hasPrice,
     required bool isPhoneVerified,
   }) {
+    // Quest order designed by UX priority:
+    // 1. Lesson time settings — students can't book without this
+    // 2. Profile photo — builds trust, enables search visibility
+    // 3. Introduction — unlocks web profile sharing
+    // 4. Phone verification — earns "verified" badge
+    // 5. Lesson price — shows pricing to students
+    // 6. First student invite — LAST, requires all setup complete first
     return [
-      // Quest I: always completed after onboarding
       _Quest(
         step: 1,
-        title: AppStrings.questTitleNameInstrument,
-        reward: null,
-        isCompleted: true,
-        onTap: null,
-      ),
-      _Quest(
-        step: 2,
         title: AppStrings.questTitleSlots,
         reward: AppStrings.questRewardSlots,
         isCompleted: hasSlots,
         onTap: () => context.push(AppRoutes.lessonTimeSettings),
       ),
       _Quest(
-        step: 3,
-        title: AppStrings.questTitleStudent,
-        reward: AppStrings.questRewardConnection,
-        isCompleted: hasStudents,
-        onTap: () => context.push(AppRoutes.invite),
-      ),
-      _Quest(
-        step: 4,
+        step: 2,
         title: AppStrings.questTitlePhoto,
         reward: AppStrings.questRewardSearch,
         isCompleted: hasPhoto,
         onTap: () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
-        step: 5,
+        step: 3,
         title: AppStrings.questTitleIntro,
         reward: AppStrings.questRewardWebProfile,
         isCompleted: hasIntro,
         onTap: () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
-        step: 6,
+        step: 4,
+        title: AppStrings.questTitlePhone,
+        reward: AppStrings.questRewardVerified,
+        isCompleted: isPhoneVerified,
+        onTap:
+            isPhoneVerified
+                ? null
+                : () => context.push(AppRoutes.teacherPhoneVerification),
+      ),
+      _Quest(
+        step: 5,
         title: AppStrings.questTitlePrice,
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
         onTap: null,
       ),
       _Quest(
-        step: 7,
-        title: AppStrings.questTitlePhone,
-        reward: AppStrings.questRewardVerified,
-        isCompleted: isPhoneVerified,
-        onTap:
-            isPhoneVerified ? null : () => context.push(AppRoutes.teacherPhoneVerification),
+        step: 6,
+        title: AppStrings.questTitleStudent,
+        reward: AppStrings.questRewardConnection,
+        isCompleted: hasStudents,
+        onTap: () => context.push(AppRoutes.invite),
       ),
     ];
   }

@@ -15,11 +15,16 @@ bool hasAvailableSlots(HasAvailableSlotsRef ref) {
       false;
 }
 
-/// Whether the teacher has a profile image set.
+/// Whether the teacher has a real profile image set.
+/// Filters out mock placeholder URLs (example.com).
 @Riverpod(keepAlive: true)
 bool hasProfileImage(HasProfileImageRef ref) {
   final profile = ref.watch(currentTeacherProfileProvider).valueOrNull;
-  return profile?.profileImage != null && profile!.profileImage!.isNotEmpty;
+  final image = profile?.profileImage;
+  if (image == null || image.isEmpty) return false;
+  // Filter mock placeholder images
+  if (image.contains('example.com')) return false;
+  return true;
 }
 
 /// Whether the teacher has an introduction of at least 20 characters.
@@ -39,30 +44,25 @@ bool hasPriceTable(HasPriceTableRef ref) {
 
 /// Profile completion percentage (0–100).
 ///
-/// Weights:
-///   I.   Name + Instrument (always done post-onboarding) : 15
-///   II.  Available slots                                  : 15
-///   III. First student                                    : 15
-///   IV.  Profile image                                    : 15
-///   V.   Introduction (20+ chars)                        : 15
-///   VI.  Lesson price table                               : 10
-///   VII. Phone verification                               : 10
-///   (remaining 5% reserved for future video feature)
+/// Weights (6 quests, "name+instrument" removed since it's always done):
+///   I.   Available slots                                  : 20
+///   II.  Profile image                                    : 15
+///   III. Introduction (20+ chars)                         : 15
+///   IV.  Phone verification                               : 15
+///   V.   Lesson price table                               : 15
+///   VI.  First student (last — requires setup complete)   : 20
 @Riverpod(keepAlive: true)
 int profileCompletionPercent(ProfileCompletionPercentRef ref) {
   var total = 0;
 
-  // Quest I — always completed after onboarding
-  total += 15;
-
-  if (ref.watch(hasAvailableSlotsProvider)) total += 15;
-  if (ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true) {
-    total += 15;
-  }
+  if (ref.watch(hasAvailableSlotsProvider)) total += 20;
   if (ref.watch(hasProfileImageProvider)) total += 15;
   if (ref.watch(hasIntroductionProvider)) total += 15;
-  if (ref.watch(hasPriceTableProvider)) total += 10;
-  if (ref.watch(homeTeacherPhoneVerifiedProvider)) total += 10;
+  if (ref.watch(homeTeacherPhoneVerifiedProvider)) total += 15;
+  if (ref.watch(hasPriceTableProvider)) total += 15;
+  if (ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true) {
+    total += 20;
+  }
 
   return total.clamp(0, 100);
 }
