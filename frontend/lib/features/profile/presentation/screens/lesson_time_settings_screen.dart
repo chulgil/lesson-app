@@ -423,39 +423,25 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // Time slots by day
-        if (settings.availableSlots.isEmpty)
-          const TimeSlotsEmptyState()
-        else
-          ...List.generate(7, (index) {
-            final dayOfWeek = index + 1;
-            final slots = slotsByDay[dayOfWeek] ?? [];
-            return DaySectionCard(
-              dayOfWeek: dayOfWeek,
-              slots: slots,
-              onToggleSlot:
-                  (slot) => _toggleTimeSlot(ref, slot.id, !slot.isActive),
-              onEditSlot:
-                  (slot) => showEditTimeSlotDialog(
-                    context: context,
-                    slot: slot,
-                    onSave: (updatedSlot) {
-                      ref
-                          .read(teacherSettingsNotifierProvider.notifier)
-                          .updateTimeSlot(updatedSlot);
-                    },
-                  ),
-              onAddSlot:
-                  () => showAddTimeSlotDialog(
-                    context: context,
-                    preselectedDay: dayOfWeek,
-                    onSave: (slot) {
-                      ref
-                          .read(teacherSettingsNotifierProvider.notifier)
-                          .updateTimeSlot(slot);
-                    },
-                  ),
-            );
-          }),
+        ...List.generate(7, (index) {
+          final dayOfWeek = index + 1;
+          final slots = slotsByDay[dayOfWeek] ?? [];
+          return DaySectionCard(
+            dayOfWeek: dayOfWeek,
+            slots: slots,
+            onEditSlot:
+                (slot) => showEditTimeSlotDialog(
+                  context: context,
+                  slot: slot,
+                  onSave: (updatedSlot) {
+                    ref
+                        .read(teacherSettingsNotifierProvider.notifier)
+                        .updateTimeSlot(updatedSlot);
+                  },
+                ),
+            onDeleteSlot: (slot) => _deleteTimeSlot(ref, slot.id),
+          );
+        }),
       ],
     );
   }
@@ -466,10 +452,8 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         .updateDefaultDuration(duration);
   }
 
-  void _toggleTimeSlot(WidgetRef ref, String slotId, bool isActive) {
-    ref
-        .read(teacherSettingsNotifierProvider.notifier)
-        .toggleTimeSlot(slotId, isActive);
+  void _deleteTimeSlot(WidgetRef ref, String slotId) {
+    ref.read(teacherSettingsNotifierProvider.notifier).removeTimeSlot(slotId);
   }
 
   Widget _buildGuidanceMessageSection(BuildContext context, WidgetRef ref) {

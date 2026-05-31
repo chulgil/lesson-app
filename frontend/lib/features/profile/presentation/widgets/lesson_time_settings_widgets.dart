@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 
@@ -153,17 +154,15 @@ class TimeSlotsEmptyState extends StatelessWidget {
 class DaySectionCard extends StatelessWidget {
   final int dayOfWeek;
   final List<TimeSlot> slots;
-  final void Function(TimeSlot) onToggleSlot;
   final void Function(TimeSlot) onEditSlot;
-  final VoidCallback onAddSlot;
+  final void Function(TimeSlot) onDeleteSlot;
 
   const DaySectionCard({
     super.key,
     required this.dayOfWeek,
     required this.slots,
-    required this.onToggleSlot,
     required this.onEditSlot,
-    required this.onAddSlot,
+    required this.onDeleteSlot,
   });
 
   static const _dayNames = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
@@ -196,8 +195,8 @@ class DaySectionCard extends StatelessWidget {
             ...slots.map(
               (slot) => TimeSlotTile(
                 slot: slot,
-                onToggle: (value) => onToggleSlot(slot),
                 onEdit: () => onEditSlot(slot),
+                onDelete: () => onDeleteSlot(slot),
               ),
             )
           else
@@ -210,14 +209,6 @@ class DaySectionCard extends StatelessWidget {
                 ),
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            child: TextButton.icon(
-              onPressed: onAddSlot,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text(AppStrings.profileTimeSlotAdd),
-            ),
-          ),
         ],
       ),
     );
@@ -227,43 +218,43 @@ class DaySectionCard extends StatelessWidget {
 /// Time slot tile widget
 class TimeSlotTile extends StatelessWidget {
   final TimeSlot slot;
-  final ValueChanged<bool> onToggle;
   final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   const TimeSlotTile({
     super.key,
     required this.slot,
-    required this.onToggle,
     required this.onEdit,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        Icons.access_time,
-        color: slot.isActive ? AppColors.paperAccent : AppColors.inkTertiary,
-      ),
-      title: Text(
-        slot.timeRange,
-        style: AppTypography.bodyMedium.copyWith(
-          color: slot.isActive ? AppColors.ink : AppColors.inkTertiary,
-          decoration: slot.isActive ? null : TextDecoration.lineThrough,
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionEdit,
+          icon: Icons.edit_outlined,
+          onPressed: onEdit,
         ),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Switch(
-            value: slot.isActive,
-            onChanged: onToggle,
-            activeThumbColor: AppColors.paperAccent,
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: onDelete,
+        ),
+      ],
+      child: ListTile(
+        leading: Icon(
+          Icons.access_time,
+          color: slot.isActive ? AppColors.paperAccent : AppColors.inkTertiary,
+        ),
+        title: Text(
+          slot.timeRange,
+          style: AppTypography.bodyMedium.copyWith(
+            color: slot.isActive ? AppColors.ink : AppColors.inkTertiary,
           ),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, size: 20),
-            onPressed: onEdit,
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -185,6 +185,23 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     }
   }
 
+  /// Remove a time slot from operating hours.
+  Future<void> removeTimeSlot(String slotId) async {
+    final current = state.value;
+    if (current == null) return;
+
+    final slots =
+        current.availableSlots.where((slot) => slot.id != slotId).toList();
+    state = AsyncValue.data(current.copyWith(availableSlots: slots));
+    try {
+      final updated = await _repository.updateAvailableSlots(slots);
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.data(current);
+      Error.throwWithStackTrace(e, st);
+    }
+  }
+
   /// Refresh settings
   Future<void> refresh() async {
     state = const AsyncValue.loading();

@@ -142,6 +142,12 @@ class AppStrings {
   /// 삭제 버튼
   static const delete = '삭제';
 
+  /// 스와이프 편집 액션
+  static const swipeActionEdit = '편집';
+
+  /// 스와이프 액션 접근성 힌트
+  static const swipeActionHint = '스와이프 액션';
+
   /// 보관 버튼
   static const archive = '보관';
 

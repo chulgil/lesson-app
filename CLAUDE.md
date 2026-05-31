@@ -51,6 +51,7 @@ flutter analyze                                              # 분석
 | Provider | `@riverpod` 어노테이션, `features/[domain]/` 아래만 |
 | 위젯 크기 | 500줄 이상 → 별도 파일 분리 |
 | UI 텍스트 | `AppStrings` 상수 사용 (하드코딩 금지, 다국어 대비) |
+| 스와이프 액션 | 반복 리스트의 편집/삭제/보관은 `SwipeActionTile` 우선 검토 |
 
 **Ask First**: 아키텍처 변경, 새 패키지 추가, 데이터 스키마 변경
 **Never**: `Color(0x...)`, 레거시 위치에 새 코드, 사용자 확인 전 이슈 닫기
@@ -78,6 +79,12 @@ flutter analyze                                              # 분석
 | **UI/UX** | |
 | `ux-rules.md` | UX 위반 방지 + HARD-GATE + grep 패턴 |
 | `frontend-verify.md` | Playwright 스크린샷 기반 회귀 검증 |
+
+### 공통 UI 패턴
+
+- 행 단위 관리 액션은 `docs/_components/swipe_action.md`와 `frontend/lib/core/widgets/swipe_action_tile.dart`를 우선 사용한다.
+- 스와이프 액션을 도입한 행에는 동일 기능의 trailing 아이콘 버튼을 중복 배치하지 않는다.
+- 삭제 후에도 요일/카테고리 같은 그룹 맥락은 유지하고 비어 있는 상태 라벨로 표시한다.
 | **기술 가이드** | |
 | `tech-patterns.md` | 기술 에러 패턴 (Provider/Mock/iOS/CRUD/레이아웃) |
 | `metronome-guide.md` | 메트로놈 커스텀 플러그인 개발 지침 |

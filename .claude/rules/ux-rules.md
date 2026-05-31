@@ -38,6 +38,7 @@
 
 - **얕은 뎁스** — 모든 기능 2탭 이내 도달
 - **원클릭** — 핵심 작업은 한 번 탭으로 완료
+- **스와이프 액션 우선** — 반복 리스트의 행 단위 편집/삭제/보관은 `SwipeActionTile`을 우선 검토. trailing 아이콘 버튼과 중복 배치 금지. 스펙: `docs/_components/swipe_action.md`
 - **Hick's Law** — 하루 10회+ 반복 인터랙션은 선택지 1개. 뉘앙스 필요 시 텍스트 입력 (#22)
 - **플레이스홀더 UI 금지** — 미구현 기능의 UI 요소는 코드에서 제거. "Phase N에서 구현 예정"은 스펙에만 명시 (#15)
 - **NO-OP 버튼 금지** — 탭해도 아무 일도 안 일어나는 버튼은 앱 신뢰 하락 (#4, #15)
@@ -70,6 +71,9 @@ grep -rn "label: '[가-힣]\|hint.*'[가-힣]" --include="*.dart" features/
 # NO-OP 콜백
 grep -rn "onTap: () {}" --include="*.dart" features/
 grep -rn "onPressed: null" --include="*.dart" features/
+
+# 반복 리스트의 trailing 편집/삭제 버튼 후보. SwipeActionTile 적용 검토
+grep -rn "Icons\\.edit\\|Icons\\.delete" --include="*.dart" features/ | grep -E "Tile|Card|List"
 
 # 액션 박스 하드코딩 메시지 (AppStrings 미사용)
 grep -rn "message: '[가-힣]" --include="*.dart" features/

@@ -47,6 +47,8 @@ Codex 및 기타 코딩 에이전트가 이 저장소에서 작업할 때 따르
 - 상태 관리는 Riverpod을 사용하고, 신규 provider는 가능한 `riverpod_annotation` codegen 패턴을 따른다.
 - UI 문구는 `AppStrings`를 우선 사용한다.
 - 색상은 `AppColors`를 사용하고 raw `Color(0x...)`를 추가하지 않는다.
+- 반복 리스트의 행 단위 편집/삭제/보관은 `SwipeActionTile`과 `docs/_components/swipe_action.md`를 우선 검토한다.
+- 스와이프 액션을 적용한 행에는 동일 기능의 trailing 아이콘 버튼을 중복 배치하지 않는다.
 - 화면 간 역할 차이는 `viewerRole` 같은 명시적 컨텍스트로 전달하고, 기본값 추론에 의존하지 않는다.
 - feature presentation provider를 다른 feature에서 직접 import하는 경우는 legacy debt로만 허용한다. 새 코드는 facade 또는 feature-local application provider를 사용한다.
 
