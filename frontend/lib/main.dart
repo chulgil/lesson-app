@@ -13,6 +13,7 @@ import 'core/startup/startup_provider_observer.dart';
 import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
+import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
 import 'features/practice/presentation/providers/recording_provider.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
@@ -100,6 +101,7 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
   Widget build(BuildContext context) {
     // Use auth-aware router in remote mode, static router in mock mode
     final useMockData = ref.watch(mockDataModeProvider);
+    ref.watch(authNotifierProvider);
     final routerConfig =
         useMockData
             ? AppRouter.router
