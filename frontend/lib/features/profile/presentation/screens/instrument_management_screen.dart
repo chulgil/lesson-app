@@ -97,14 +97,20 @@ class _InstrumentManagementScreenState
       isScrollControlled: true,
       useSafeArea: true,
       builder:
-          (sheetContext) => Padding(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.space4,
-              AppSpacing.space4,
-              AppSpacing.space4,
-              AppSpacing.space4 + MediaQuery.of(sheetContext).viewInsets.bottom,
+          (sheetContext) => ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.82,
             ),
-            child: _buildAddInstrumentSection(currentInstruments),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.space4,
+                AppSpacing.space4,
+                AppSpacing.space4,
+                AppSpacing.space4 +
+                    MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: _buildAddInstrumentSection(currentInstruments),
+            ),
           ),
     );
   }

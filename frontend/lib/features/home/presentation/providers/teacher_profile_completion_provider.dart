@@ -16,15 +16,27 @@ bool hasAvailableSlots(HasAvailableSlotsRef ref) {
 }
 
 /// Whether the teacher has a real profile image set.
-/// Filters out mock placeholder URLs (example.com).
+/// Filters out mock placeholder URLs and OAuth account avatars.
+bool isTeacherProfileImageQuestEligible(String? image) {
+  final value = image?.trim();
+  if (value == null || value.isEmpty) return false;
+
+  final uri = Uri.tryParse(value);
+  final host = uri?.host.toLowerCase() ?? '';
+  if (host == 'example.com' || host.endsWith('.example.com')) return false;
+  if (host == 'googleusercontent.com' ||
+      host.endsWith('.googleusercontent.com')) {
+    return false;
+  }
+
+  return true;
+}
+
+/// Whether the teacher has a real profile image set.
 @Riverpod(keepAlive: true)
 bool hasProfileImage(HasProfileImageRef ref) {
   final profile = ref.watch(currentTeacherProfileProvider).valueOrNull;
-  final image = profile?.profileImage;
-  if (image == null || image.isEmpty) return false;
-  // Filter mock placeholder images
-  if (image.contains('example.com')) return false;
-  return true;
+  return isTeacherProfileImageQuestEligible(profile?.profileImage);
 }
 
 /// Whether the teacher has an introduction of at least 20 characters.

@@ -371,7 +371,118 @@ async def complete_signup(session, payload):
 
 베타 단계 진입 전이면 마이그레이션 불필요 — 모델 생성만.
 
-## 11. 마일스톤
+## 11. API 구현 현황 (2026-05-31)
+
+> 본 섹션은 `TeacherProfile` 전체 플로우 중 현재 완료된 백엔드 엔드포인트와 미구현 항목을 추적한다.
+
+### 11.1 백엔드 구현 현황
+
+| 항목 | 상태 | 비고 |
+|------|:----:|------|
+| `GET /api/v1/teachers/public/{id}` | ✅ 완료 | 인증 불필요, 민감정보 제외 — `backend/app/api/v1/teachers.py` |
+| `TeacherPublicProfileResponse` 스키마 | ✅ 완료 | `name`, `instruments`, `introduction`, `education`, `career` 등 — `backend/app/schemas/teacher.py` |
+| `GET /api/v1/internal/teachers/by-slug/{slug}` | ❌ 미구현 | profile-renderer 전용 내부 API — M4.A8 |
+| slug 기반 공개 조회 | ❌ 미구현 | `Teacher.profile_slug` 필드 마이그레이션 + `by-slug` 라우트 필요 |
+| `TeacherProfile` 테이블 (`teacher_profiles`) | ❌ 미구현 | Alembic 마이그레이션 — M4.A1 |
+| 상태 머신 (publish/unpublish/preview) | ❌ 미구현 | M4.A6 |
+| 캐시 무효화 webhook (`POST /internal/cache/invalidate`) | ❌ 미구현 | publish/unpublish 시점 — M4.A8 이후 |
+
+> **참고**: 현재 구현된 `GET /api/v1/teachers/public/{id}` 는 `Teacher` 테이블을 직접 조회한다. 향후 `TeacherProfile` 테이블이 생성되면 이 엔드포인트의 응답 소스를 `TeacherProfile` 로 전환하거나, §7.3의 내부 API(`by-slug`)와 역할을 분리한다.
+
+### 11.2 프론트엔드 / 웹 구현 현황
+
+| 항목 | 상태 | 비고 |
+|------|:----:|------|
+| 웹 프로필 페이지 (`profile.lessonaza.app/{slug}`) | ❌ 미구현 | profile-renderer (FastAPI + Jinja2 SSR) — M4.R3 |
+| Open Graph 메타 태그 | ❌ 미구현 | M4.R5 |
+| 체험 레슨 CTA + 딥링크 | ❌ 미구현 | M4.8 |
+| 인앱 "프로필 링크 복사" 버튼 | ❌ 미구현 | QuestBoard 완료 보상 연동 |
+| slug 기반 짧은 URL | ❌ 미구현 | `Teacher.slug` 마이그레이션 선행 필요 |
+
+## 12. 웹 페이지 구현 사양 (프론트엔드)
+
+> 렌더링 상세(HTML/CSS/Jinja2)는 [profile_renderer_spec.md](../web/teacher/profile_renderer_spec.md), 페이지 디자인은 [profile_spec.md](../web/teacher/profile_spec.md) 참조. 본 섹션은 콘텐츠 모델 관점의 **프론트엔드 구현 계약**을 정의한다.
+
+### 12.1 Open Graph / SNS 공유
+
+선생님이 카카오톡·인스타그램·페이스북에 프로필 링크를 공유할 때 미리보기가 표시되어야 한다.
+
+```html
+<meta property="og:title" content="{display_name} — {instrument} 선생님" />
+<meta property="og:description" content="{headline}" />
+<meta property="og:image" content="{og_image_url 또는 profile_image_url}" />
+<meta property="og:url" content="https://profile.lessonaza.app/{slug}" />
+<meta property="og:type" content="profile" />
+<meta name="twitter:card" content="summary_large_image" />
+```
+
+**카카오톡 특화 요건**:
+- `og:image` 크기: 최소 200×200px, 권장 600×314px (1.91:1 비율)
+- 카카오 스크래퍼가 이미지를 캐시하므로, 선생님이 프로필 이미지를 변경할 때 카카오 공유 디버거(https://developers.kakao.com/tool/clear/og) 캐시 초기화 안내 필요
+- `og:description` 이 없으면 카카오 미리보기에 빈 영역이 표시됨 — `headline` 이 없으면 `bio_long` 앞 80자로 fallback
+
+**폴백 우선순위**:
+1. `seo_title` / `seo_description` (선생님이 별도 입력한 경우)
+2. `display_name + instrument + headline`
+3. `bio_long` 앞 155자 (meta description), 앞 80자 (OG description)
+
+> 상세 메타태그 구현은 [profile_renderer_spec.md §9.3](../web/teacher/profile_renderer_spec.md) 참조.
+
+### 12.2 체험 레슨 CTA
+
+공개 프로필 페이지 하단에 "체험 레슨 신청" / "레슨 문의" CTA 버튼을 배치한다.
+
+**앱 설치 여부에 따른 분기**:
+
+| 상황 | 동작 |
+|------|------|
+| 앱 설치됨 (Universal Link / App Link 처리) | 딥링크 `lessonaza://teacher/{slug}` → 앱 내 해당 선생님 상세 화면 |
+| 앱 미설치 | 프로필 페이지 노출 + 1.5초 후 스토어 CTA (App Store / Play Store) |
+| 대안 (웹 직접 예약, Year 2 후보) | 이름 + 전화번호 입력 폼 → 선생님에게 앱 알림 전송 |
+
+**선생님 코드 자동 입력 흐름** (Year 1):
+1. 페이지 내 QR 코드 또는 "코드 복사" 버튼 — `T-XXXX` 형식 클립보드 복사
+2. 앱 가입 화면에서 클립보드의 `T-XXXX` 감지 시 자동 입력 제안
+3. 경로: `frontend/lib/features/auth/onboarding/`
+
+CTA 위치: 페이지 내 sticky 헤더 ("앱 받기") + 하단 CTA 카드 두 곳 모두 배치.
+
+> Deep Link 구현 상세: [profile_spec.md §6.3](../web/teacher/profile_spec.md) 및 [profile_renderer_spec.md §10](../web/teacher/profile_renderer_spec.md).
+
+### 12.3 퀘스트 보드 연동
+
+인앱 QuestBoardCard 와 공개 프로필의 활성화를 다음과 같이 연결한다.
+
+| 조건 | 상태 | 인앱 UI |
+|------|------|---------|
+| 소개글(`bio_long`) 미작성 | 웹 프로필 비활성 | QuestBoard — "소개글 작성" 퀘스트 표시 |
+| 소개글 50자+ 작성 완료 + 운영자 검토 통과 (`status=public`) | 웹 프로필 활성 | 프로필 상세 화면에 "웹 프로필 링크 복사" 버튼 노출 |
+
+**URL 형식 (slug 구현 전까지)**:
+- `https://profile.lessonaza.app/{teacher_slug}` — Teacher.profile_slug 기준
+- slug 미발급 선생님: `https://profile.lessonaza.app/t/{teacher_id}` (임시, slug 전환 전)
+
+**인앱 구현 위치**:
+- QuestBoardCard: `frontend/lib/features/gamification/` (또는 `features/profile/`)
+- "웹 프로필 링크 복사" 버튼: `frontend/lib/features/profile/presentation/screens/` 내 선생님 프로필 상세 화면
+- 링크 복사 시 클립보드 + 토스트 "카카오톡·인스타그램에 공유해 학생을 모집하세요"
+
+## 13. 마일스톤
+
+| 단계 | 범위 | 상태 |
+|------|------|:----:|
+| 1 — M4.A1~A3 | `TeacherProfile` 모델 + Alembic 마이그레이션 + `/teachers/me/profile` CRUD | ❌ 미구현 |
+| 2 — M4.A4~A9 | 이미지/영상 업로드, 상태 머신, 운영자 검토 큐, 내부 API | ❌ 미구현 |
+| 3 — M4.R1~R5 | profile-renderer 컨테이너 + SSR + OG 메타 태그 | ❌ 미구현 |
+| 4 — M4.R6~R12 | `/.well-known/*`, CSP, 캐시 무효화, sitemap, Lighthouse | ❌ 미구현 |
+| 5 — M4.8 | 인앱 "공식 프로필 보기" 버튼 + WebView + teacher_code 클립보드 자동 입력 | ❌ 미구현 |
+| 6 — M4.7 | Deep Link (Universal Link / App Link) | ❌ 미구현 |
+| 7 — 백로그 | slug 기반 짧은 URL (`Teacher.slug` 마이그레이션) | ❌ 미구현 |
+| 0 — 선행 완료 | `GET /api/v1/teachers/public/{id}` + `TeacherPublicProfileResponse` | ✅ 완료 |
+
+> 기존 M4.A1~A9 세부 작업은 단계 1·2에 포함됨. 백엔드 마일스톤 상세는 §§M4.A1~A9 (하단 참조).
+
+### 백엔드 마일스톤 세부
 
 | 단계 | 작업 |
 |---|---|
@@ -385,13 +496,17 @@ async def complete_signup(session, payload):
 | M4.A8 | `/internal/teachers/by-slug/{slug}` (profile-renderer 용) |
 | M4.A9 | Option B → Option D 마이그레이션 (베타 데이터 있을 경우만) |
 
-## 12. 미해결 질문
+## 14. 미해결 질문
 
 - [ ] `contact_methods.on_request` 의 익명 메시징 채널 — Year 1 SMS 미도입 환경에서 운영 가능성
 - [ ] 운영자 검토 큐의 우선순위 SLA — 24h 일괄 vs 신규/문제 콘텐츠 분리
 - [ ] 영상 임베드 화이트리스트 확장 — Naver TV, SoundCloud (Year 2)
 - [ ] 콘텐츠 변경 시 재검토 트리거 — 본문 80% 이상 교체 시 재검토 큐 진입 여부
+- [ ] `GET /api/v1/teachers/public/{id}` 응답 소스 전환 — `Teacher` 테이블 직접 조회 → `TeacherProfile` 전환 시점 (M4.A1 완료 후)
+- [ ] 체험 레슨 웹 직접 예약 — Year 2 범위 확정 필요 (이름+전화번호 입력 → 선생님 앱 알림)
+- [ ] 카카오 OG 캐시 초기화 — 자동화 가능 여부 (카카오 API 활용 vs 선생님 수동 안내)
 
-## 13. 변경 이력
+## 15. 변경 이력
 
 - 2026-05-19 v1: 초안 — Option D 전환에 따라 Ghost Page 의존 제거, `TeacherProfile` 1:1 분리, 첫 게시 운영자 검토 큐, YouTube/Vimeo 화이트리스트 + 정규화 저장 채택
+- 2026-05-31 v2: 프론트엔드 구현 사양 보완 — §11 API 구현 현황 추가 (`GET /api/v1/teachers/public/{id}` 완료 확인), §12 웹 페이지 구현 사양 (OG 메타 태그·체험 레슨 CTA·퀘스트 보드 연동), §13 구현 단계 통합 업데이트
