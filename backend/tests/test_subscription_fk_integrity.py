@@ -76,3 +76,15 @@ def test_subscription_counter_check_migration_is_chained_and_declares_constraint
         "ck_subscriptions_reschedule_counter_capacity",
     ]:
         assert name in source
+
+
+def test_membership_travel_time_migration_is_chained_and_declares_column() -> None:
+    """Upgraded databases need the ClassMembership travel-time column used by schedule reads."""
+    script = _script()
+    rev = script.get_revision("add_membership_travel_time")
+    assert rev is not None
+    assert rev.down_revision == "beta_backend_contract_fixes"
+
+    source = Path(rev.module.__file__).read_text()
+    assert "class_memberships" in source
+    assert "travel_time_minutes" in source
