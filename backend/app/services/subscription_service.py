@@ -239,6 +239,24 @@ class SubscriptionService:
         self.db.add(sub)
         await self.db.flush()
         await self.db.refresh(sub)
+
+        # Notify student about new subscription
+        from app.models.student import Student
+        _student = await self.db.get(Student, data.student_id)
+        if _student and _student.user_id:
+            from app.models.notification import NotificationPriority
+            from app.services.notification_service import NotificationService
+            notification_service = NotificationService(self.db)
+            await notification_service.create_and_send(
+                user_id=_student.user_id,
+                notification_type="subscriptionIssued",
+                title="수강권이 발급되었습니다",
+                body=f"{data.total_lessons}회 수강권이 발급되었습니다",
+                priority=NotificationPriority.high,
+                action_url=f"/subscriptions/{sub.id}",
+                action_label="수강권 확인",
+            )
+
         return await self._subscription_response(sub)
 
     async def get_by_id(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:

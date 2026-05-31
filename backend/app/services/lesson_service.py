@@ -118,6 +118,21 @@ class LessonService:
         await self.db.flush()
         await self.db.refresh(lesson)
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstLesson")
+
+        # Notify student about new lesson
+        if student and student.user_id:
+            from app.services.notification_service import NotificationService, NotificationPriority
+            notification_service = NotificationService(self.db)
+            await notification_service.create_and_send(
+                user_id=student.user_id,
+                notification_type="lessonBooked",
+                title="새 레슨이 등록되었습니다",
+                body=f"{data.date} 레슨이 등록되었습니다",
+                priority=NotificationPriority.normal,
+                action_url=f"/lessons/{lesson.id}",
+                action_label="레슨 확인",
+            )
+
         return LessonResponse.model_validate(lesson)
 
     async def _assert_subscription_matches_lesson(self, *, subscription_id: str, student_id: str) -> None:
@@ -259,6 +274,24 @@ class LessonService:
 
         await self.db.flush()
         await self.db.refresh(lesson)
+
+        # Notify student about new feedback
+        if lesson.student_id:
+            from app.models.student import Student
+            from app.services.notification_service import NotificationService, NotificationPriority
+            student = await self.db.get(Student, lesson.student_id)
+            if student and student.user_id:
+                notification_service = NotificationService(self.db)
+                await notification_service.create_and_send(
+                    user_id=student.user_id,
+                    notification_type="lessonNoteShared",
+                    title="레슨 피드백이 도착했습니다",
+                    body=f"{lesson.date} 레슨의 피드백을 확인하세요",
+                    priority=NotificationPriority.normal,
+                    action_url=f"/lessons/{lesson.id}",
+                    action_label="피드백 확인",
+                )
+
         return LessonResponse.model_validate(lesson)
 
     async def _get_accessible_lesson(self, lesson_id: str, current_user: Any) -> Any:

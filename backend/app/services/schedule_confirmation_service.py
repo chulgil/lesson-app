@@ -76,6 +76,26 @@ class ScheduleConfirmationService:
         self.db.add(card)
         await self.db.flush()
         await self.db.refresh(card)
+
+        # Notify student about new schedule confirmation card
+        from app.models.student import Student
+        _student = await self.db.get(Student, card.student_id)
+        if _student and _student.user_id:
+            from app.models.notification import NotificationPriority
+            from app.services.notification_service import NotificationService
+            _notification_service = NotificationService(self.db)
+            _response = await self._response_for_card(card)
+            _teacher_name = _response.teacher_name or "선생님"
+            await _notification_service.create_and_send(
+                user_id=_student.user_id,
+                notification_type="scheduleConfirmationRequired",
+                title="레슨 일정을 확인해주세요",
+                body=f"{_teacher_name}이 레슨 일정을 제안했습니다",
+                priority=NotificationPriority.high,
+                action_url=f"/schedule/confirmation-cards/{card.id}",
+                action_label="일정 확인",
+            )
+
         return await self._response_for_card(card)
 
     async def get_cards(
