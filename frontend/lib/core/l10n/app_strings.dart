@@ -5888,7 +5888,7 @@ class AppStrings {
   static const authKakaoContinue = '카카오로 계속하기';
   static const authStudentRegister = '학생 등록';
   static const authParentRegister = '학부모 등록';
-  static const authTeacherConnected = '선생님과 성공적으로 연결되었습니다!';
+  static const authTeacherConnectionRequested = '선생님에게 연결 요청을 보냈습니다!';
   static const authChildConnected = '자녀가 성공적으로 연결되었습니다!';
   static const authInviteCodeHint = '초대 코드 입력';
   static const authInviteCodeInvalid = '올바르지 않은 초대 코드입니다';

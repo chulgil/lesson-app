@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/auth_facade.dart';
+import '../../../../features/profile/profile_facade.dart';
 
 /// Student invite code input screen
 /// Students enter an invite code from the teacher to connect with their teacher
@@ -293,11 +294,13 @@ class _StudentInviteCodeScreenState
       }
 
       ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+      ref.invalidate(mySentRequestsProvider);
+      ref.invalidate(myConnectionsProvider);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(AppStrings.authTeacherConnected),
+            content: const Text(AppStrings.authTeacherConnectionRequested),
             backgroundColor: AppColors.paperOk,
             behavior: SnackBarBehavior.floating,
           ),

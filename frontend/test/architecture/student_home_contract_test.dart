@@ -24,4 +24,19 @@ void main() {
     expect(source, contains('hasPendingConnectionRequest'));
     expect(source, contains('studentHomeTeacherConnectionPending'));
   });
+
+  test(
+    'student invite code submits a pending request, not a completed connection',
+    () {
+      final source =
+          File(
+            'lib/features/auth/presentation/screens/student_invite_code_screen.dart',
+          ).readAsStringSync();
+
+      expect(source, contains('authTeacherConnectionRequested'));
+      expect(source, contains('ref.invalidate(mySentRequestsProvider)'));
+      expect(source, contains('ref.invalidate(myConnectionsProvider)'));
+      expect(source, isNot(contains('authTeacherConnected')));
+    },
+  );
 }
