@@ -103,7 +103,7 @@
 | 4-2 | **녹음 비교 재생** | recording_comparison_spec.md | ✅ Phase 1+2 done |
 | 4-3 | **게이미피케이션 Phase 3 (도전 과제)** | gamification_master.md | ✅ done |
 | 4-4 | **AI 연습 분석 (피치)** | pitch_analysis.dart | ⚠️ 엔티티+UI 완료, 실시간 연동 대기 |
-| 4-5 | **결제 시스템 (Toss PG)** | payment_gateway_service.py | ⚠️ 인프라 완료, PG 키 설정 대기 |
+| 4-5 | **앱 사용료 과금 (B2B)** | 별도 스펙 필요 | ❌ 미착수 — 수강료 PG는 정책상 제외 |
 | 4-6 | **출석 Phase 3 (알림 + 자동화)** | [attendance_spec.md](../_archive/old/attendance_spec.md) Phase 3 | ✅ done |
 
 ### 아키텍처 결정 (2026-05-31)

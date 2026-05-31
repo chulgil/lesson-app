@@ -250,47 +250,18 @@ def generate_receipt_number(teacher_id: str, year: int, seq: int) -> str:
 
 취소된 영수증은 논리 삭제(cancelled 상태), 실제 레코드는 보존한다.
 
-### 4.4 PG 결제(Toss Payments) 연계 시 자동 영수증
+### 4.4 결제 방식별 영수증 생성
 
-> Toss PG 연동이 활성화되면 아래 흐름으로 영수증이 자동 생성된다.
-> 무통장입금 흐름(§4.1)과 최종 영수증 생성 단계는 동일하다.
+> **정책**: 선생님-학생 수강료는 앱 밖(무통장입금/현금)에서 처리.
+> 앱은 수강권 상태만 기록하고, 입금 확인 시 영수증을 자동 생성한다.
+> PG 결제는 선생님-학생 수강료에 사용하지 않는다.
 
-```
-[Toss Payments 결제 완료]
-    │
-    ▼
-POST /api/v1/webhooks/toss  (Toss 웹훅 수신)
-    │
-    ├── 결제 검증 (idempotency_key 중복 방지)
-    ├── 수강권 자동 발급 (subscription.status → active)
-    ├── subscription.payment_confirmed = True
-    ├── subscription.payment_method = "pg_toss"
-    ├── subscription.pg_payment_key = toss_payment_key
-    │
-    ▼
-receipt_service.auto_generate(subscription_id)
-    │  (§4.1 자동 생성 흐름과 동일)
-    │
-    ▼ (백그라운드)
-pdf_service.generate_receipt_pdf(receipt_id)
-    │
-    ▼
-notification_service.send_receipt_ready(receipt_id)
-    │
-    ├── 앱 푸시: "영수증이 발행되었습니다" + 다운로드 링크
-    └── 카카오 알림톡: PDF 다운로드 링크 포함 (앱 미설치자 대응) — §5.3 참조
-```
+| 결제 방식 | 입금 확인 주체 | 영수증 생성 |
+|-----------|-------------|-----------|
+| 무통장입금 (기본) | 선생님 수동 확인 | §4.1 자동 생성 흐름 |
+| 현금 | 선생님 수동 확인 | §4.1 자동 생성 흐름 |
 
-**무통장입금과 비교:**
-
-| 항목 | 무통장입금 | PG 결제 |
-|------|-----------|---------|
-| 입금 확인 주체 | 선생님 수동 확인 | Toss 웹훅 자동 |
-| 수강권 발급 | 선생님 확인 후 | 결제 완료 즉시 |
-| 영수증 생성 | 동일 | 동일 |
-| payment_method | `bank_transfer` | `pg_toss` |
-
-> **참조**: Toss 웹훅 상세 처리 흐름은 [payment_architecture.md](./payment_architecture.md) 참조.
+> **향후**: 앱 사용료(B2B SaaS) 결제에 PG가 필요하면 별도 스펙으로 분리한다.
 
 ---
 
