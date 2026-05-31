@@ -1,41 +1,107 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/coach_mark/coach_mark_controller.dart';
+import '../../../../core/widgets/coach_mark/coach_mark_overlay.dart';
+import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../onboarding/presentation/providers/onboarding_progress_storage_provider.dart';
 import '../../../profile/profile_ui_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_ui_facade.dart';
 import '../widgets/dashboard_tab.dart';
 
 /// Home screen (Teacher Dashboard)
-class HomeScreen extends StatefulWidget {
+// ignore: widget-smoke-test — existing screen, smoke test already covers HomeScreen
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
+
+  final _settingsNavKey = GlobalKey();
+  final _studentsNavKey = GlobalKey();
+
+  late final CoachMarkController _coachMarkController;
+
+  bool _wasCoachMarkActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Coach mark: only guide to lesson time settings on first entry.
+    // Student invite requires phone verification + full setup first,
+    // so it's handled via QuestBoard, not coach mark.
+    _coachMarkController = CoachMarkController(
+      steps: [
+        CoachMarkStep(
+          id: 'lesson_time_settings',
+          targetKey: _settingsNavKey,
+          title: AppStrings.coachMarkTimeTitle,
+          description: AppStrings.coachMarkTimeDescription,
+          actionLabel: AppStrings.coachMarkTimeAction,
+          position: CoachMarkPosition.above,
+          onAction: () => setState(() => _currentIndex = 3),
+        ),
+      ],
+    );
+
+    _coachMarkController.addListener(_onCoachMarkChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeStartCoachMark();
+    });
+  }
+
+  void _onCoachMarkChanged() {
+    if (_wasCoachMarkActive && !_coachMarkController.isActive) {
+      ref
+          .read(onboardingProgressStorageProvider.notifier)
+          .markCoachMarkCompleted();
+    }
+    _wasCoachMarkActive = _coachMarkController.isActive;
+  }
+
+  void _maybeStartCoachMark() {
+    final storage = ref.read(onboardingProgressStorageProvider).valueOrNull;
+    if (storage != null && !storage.coachMarkCompleted) {
+      _coachMarkController.start();
+    }
+  }
+
+  @override
+  void dispose() {
+    _coachMarkController.removeListener(_onCoachMarkChanged);
+    _coachMarkController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return DebugWrapper(
       child: NotebookScreenScaffold(
         body: SafeArea(
-          child: IndexedStack(
-            index: _currentIndex,
-            children: [
-              DashboardTab(
-                onViewAllLessons: () => setState(() => _currentIndex = 1),
-              ),
-              const ScheduleTab(),
-              const StudentsTab(),
-              const ProfileTab(),
-            ],
+          child: CoachMarkScope(
+            controller: _coachMarkController,
+            child: IndexedStack(
+              index: _currentIndex,
+              children: [
+                DashboardTab(
+                  onViewAllLessons: () => setState(() => _currentIndex = 1),
+                ),
+                const ScheduleTab(),
+                const StudentsTab(),
+                const ProfileTab(),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: _buildBottomNavigation(),
@@ -58,8 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildNavItem(0, 'I', AppStrings.homeTabLabel),
               _buildNavItem(1, 'II', AppStrings.scheduleTabTitle),
-              _buildNavItem(2, 'III', AppStrings.studentsTabLabel),
-              _buildNavItem(3, 'IV', AppStrings.profileTabLabel),
+              _buildNavItem(2, 'III', AppStrings.studentsTabLabel,
+                  key: _studentsNavKey),
+              _buildNavItem(3, 'IV', AppStrings.profileTabLabel,
+                  key: _settingsNavKey),
             ],
           ),
         ),
@@ -67,12 +135,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, String roman, String label) {
+  Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
     final isSelected = _currentIndex == index;
     final accentColor =
         isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
 
     return InkWell(
+      key: key,
       onTap: () => setState(() => _currentIndex = index),
       child: SizedBox(
         width: 72,

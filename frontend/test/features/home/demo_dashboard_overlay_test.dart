@@ -156,6 +156,7 @@ class CompletedOnboardingProgressStorageFake extends OnboardingProgressStorage {
     return const OnboardingProgressStorageState(
       teacherOnboardingCompleted: true,
       demoOverlayDismissed: false,
+      coachMarkCompleted: true,
     );
   }
 
@@ -165,6 +166,7 @@ class CompletedOnboardingProgressStorageFake extends OnboardingProgressStorage {
       OnboardingProgressStorageState(
         teacherOnboardingCompleted: true,
         demoOverlayDismissed: true,
+        coachMarkCompleted: true,
       ),
     );
   }
@@ -176,6 +178,7 @@ class DismissedOnboardingProgressStorageFake extends OnboardingProgressStorage {
     return const OnboardingProgressStorageState(
       teacherOnboardingCompleted: true,
       demoOverlayDismissed: true,
+      coachMarkCompleted: true,
     );
   }
 }

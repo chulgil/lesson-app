@@ -9,7 +9,7 @@ from app.core.deps import get_current_teacher, get_current_user, get_db, get_pag
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.student import StudentCreate, StudentResponse
-from app.schemas.teacher import TeacherDashboardResponse, TeacherResponse, TeacherUpdate
+from app.schemas.teacher import TeacherDashboardResponse, TeacherPublicProfileResponse, TeacherResponse, TeacherUpdate
 from app.services.teacher_service import TeacherService
 
 router = APIRouter()
@@ -139,6 +139,25 @@ async def update_my_profile(
     """Update the authenticated teacher's profile."""
     service = TeacherService(db)
     return await service.upsert_for_user(current_user.id, body, current_user)
+
+
+@router.get(
+    "/public/{teacher_id}",
+    response_model=TeacherPublicProfileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get public teacher profile (no auth required)",
+)
+async def get_public_teacher_profile(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> TeacherPublicProfileResponse:
+    """Return public-facing teacher profile for web sharing.
+
+    No authentication required. Only returns profile data safe for public viewing.
+    Sensitive fields (phone, banking info, email) are excluded.
+    """
+    service = TeacherService(db)
+    return await service.get_public_profile(teacher_id)
 
 
 @router.get(

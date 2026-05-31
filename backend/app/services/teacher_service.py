@@ -15,6 +15,7 @@ from app.schemas.teacher import (
     TeacherCertificateResponse,
     TeacherDashboardResponse,
     TeacherEducationResponse,
+    TeacherPublicProfileResponse,
     TeacherResponse,
     TeacherUpdate,
 )
@@ -133,6 +134,49 @@ class TeacherService:
         if teacher is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
         return await self._enrich_response(teacher)
+
+    async def get_public_profile(self, teacher_id: str) -> TeacherPublicProfileResponse:
+        """Return public-facing teacher profile by teacher ID. No auth required."""
+        from app.models.teacher import Teacher, TeacherCareer, TeacherEducation
+        from app.models.user import User
+
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+
+        user = await self.db.get(User, teacher.user_id)
+
+        education_rows = await self.db.scalars(
+            select(TeacherEducation)
+            .where(TeacherEducation.teacher_id == teacher.id)
+            .order_by(TeacherEducation.sort_order)
+        )
+        career_rows = await self.db.scalars(
+            select(TeacherCareer)
+            .where(TeacherCareer.teacher_id == teacher.id)
+            .order_by(TeacherCareer.sort_order)
+        )
+
+        return TeacherPublicProfileResponse(
+            id=teacher.id,
+            name=user.name if user else "",
+            profile_image_url=user.profile_image_url if user else None,
+            instruments=teacher.instruments or [],
+            introduction=teacher.introduction,
+            experience_years=teacher.experience_years,
+            lesson_areas=teacher.lesson_areas or [],
+            lesson_types=teacher.lesson_types or [],
+            fee_min=teacher.fee_min,
+            fee_max=teacher.fee_max,
+            fee_duration=teacher.fee_duration,
+            teaching_style=teacher.teaching_style,
+            specialties=teacher.specialties or [],
+            portfolio_video_urls=teacher.portfolio_video_urls or [],
+            is_phone_verified=teacher.is_phone_verified,
+            background_image=teacher.background_image,
+            education=[TeacherEducationResponse.model_validate(e) for e in education_rows.all()],
+            career=[TeacherCareerResponse.model_validate(c) for c in career_rows.all()],
+        )
 
     async def update(self, teacher_id: str, data: TeacherUpdate, current_user: Any) -> TeacherResponse:
         """Update teacher profile (owner only)."""

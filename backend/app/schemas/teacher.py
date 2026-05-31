@@ -139,6 +139,34 @@ class TeacherUpdate(BaseModel):
     visibility_settings: dict | None = None
 
 
+class TeacherPublicProfileResponse(BaseModel):
+    """Public-facing teacher profile for web sharing.
+
+    Excludes all sensitive / private fields (banking, phone, email).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    name: str
+    profile_image_url: str | None = None
+    instruments: list[str] = []
+    introduction: str | None = None
+    experience_years: int | None = None
+    lesson_areas: list[str] = []
+    lesson_types: list[str] = []
+    fee_min: int | None = None
+    fee_max: int | None = None
+    fee_duration: int | None = 60
+    teaching_style: str | None = None
+    specialties: list[str] = []
+    portfolio_video_urls: list[str] = []
+    is_phone_verified: bool = False
+    background_image: str | None = None
+    education: list[TeacherEducationResponse] = []
+    career: list[TeacherCareerResponse] = []
+
+
 class TeacherDashboardResponse(BaseModel):
     """Aggregated dashboard data for a teacher."""
 

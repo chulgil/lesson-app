@@ -6746,6 +6746,14 @@ class AppStrings {
   static const onboardingWriteFeedbackTitle = '레슨 노트 작성';
   static const onboardingCompletedTitle = '준비 완료!';
 
+  // ── Coach Mark ──
+  static const coachMarkTimeTitle = '레슨 시간을 설정하세요';
+  static const coachMarkTimeDescription = '학생이 이 시간에 레슨을 예약할 수 있어요';
+  static const coachMarkTimeAction = '설정하러 가기';
+  static const coachMarkStudentTitle = '첫 학생을 초대하세요';
+  static const coachMarkStudentDescription = '초대 코드를 공유하여 학생과 연결하세요';
+  static const coachMarkStudentAction = '학생 추가하기';
+
   // ── Students Feature (학생 관리) ──────────────────────────────────
   static const studentFormTitle = '학생 작성';
   static const studentAddLabel = '학생 추가';

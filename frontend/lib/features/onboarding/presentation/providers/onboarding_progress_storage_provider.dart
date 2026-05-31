@@ -10,24 +10,29 @@ const _boxName = 'onboarding_progress';
 class OnboardingProgressStorageState {
   final bool teacherOnboardingCompleted;
   final bool demoOverlayDismissed;
+  final bool coachMarkCompleted;
 
   const OnboardingProgressStorageState({
     required this.teacherOnboardingCompleted,
     required this.demoOverlayDismissed,
+    required this.coachMarkCompleted,
   });
 
   const OnboardingProgressStorageState.defaults()
     : teacherOnboardingCompleted = false,
-      demoOverlayDismissed = false;
+      demoOverlayDismissed = false,
+      coachMarkCompleted = false;
 
   OnboardingProgressStorageState copyWith({
     bool? teacherOnboardingCompleted,
     bool? demoOverlayDismissed,
+    bool? coachMarkCompleted,
   }) {
     return OnboardingProgressStorageState(
       teacherOnboardingCompleted:
           teacherOnboardingCompleted ?? this.teacherOnboardingCompleted,
       demoOverlayDismissed: demoOverlayDismissed ?? this.demoOverlayDismissed,
+      coachMarkCompleted: coachMarkCompleted ?? this.coachMarkCompleted,
     );
   }
 }
@@ -49,6 +54,9 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
       demoOverlayDismissed:
           box.get(_demoOverlayDismissedKey(teacherId), defaultValue: false) ??
           false,
+      coachMarkCompleted:
+          box.get(_coachMarkCompletedKey(teacherId), defaultValue: false) ??
+          false,
     );
   }
 
@@ -65,6 +73,10 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
       _demoOverlayDismissedKey(teacherId),
       newState.demoOverlayDismissed,
     );
+    await box.put(
+      _coachMarkCompletedKey(teacherId),
+      newState.coachMarkCompleted,
+    );
   }
 
   String _teacherPrefix(String teacherId) => 'teacher:$teacherId';
@@ -74,6 +86,9 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
 
   String _demoOverlayDismissedKey(String teacherId) =>
       '${_teacherPrefix(teacherId)}:demoOverlayDismissed';
+
+  String _coachMarkCompletedKey(String teacherId) =>
+      '${_teacherPrefix(teacherId)}:coachMarkCompleted';
 
   Future<void> setTeacherOnboardingCompleted(bool value) async {
     final teacherId = ref.read(currentUserIdProvider);
@@ -95,4 +110,14 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
   }
 
   Future<void> dismissDemoOverlay() => setDemoOverlayDismissed(true);
+
+  Future<void> setCoachMarkCompleted(bool value) async {
+    final teacherId = ref.read(currentUserIdProvider);
+    final current = state.valueOrNull ?? await _loadState(teacherId);
+    final updated = current.copyWith(coachMarkCompleted: value);
+    await _persist(teacherId, updated);
+    state = AsyncData(updated);
+  }
+
+  Future<void> markCoachMarkCompleted() => setCoachMarkCompleted(true);
 }
