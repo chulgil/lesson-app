@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_child_profile_repository.dart';
+import '../../data/repositories/remote_child_profile_repository.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../domain/repositories/child_profile_repository.dart';
 import '../extensions/parent_home_domain_visuals.dart';
@@ -11,13 +12,12 @@ import '../extensions/parent_home_domain_visuals.dart';
 part 'child_profile_provider.g.dart';
 
 /// Provider for the child profile repository - switches between Mock and Remote.
-@riverpod
+@Riverpod(keepAlive: true)
 ChildProfileRepository childProfileRepository(Ref ref) =>
-    createLocalFallbackRepository<ChildProfileRepository>(
+    createRepository<ChildProfileRepository>(
       ref: ref,
       mock: MockChildProfileRepository.new,
-      // No remote API yet — use empty mock to avoid dummy data
-      fallback: () => MockChildProfileRepository(empty: true),
+      remote: (apiClient) => RemoteChildProfileRepository(apiClient),
     );
 
 /// Provider for child profiles of a specific parent

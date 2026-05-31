@@ -5891,6 +5891,9 @@ class AppStrings {
   static const authTeacherConnected = '선생님과 성공적으로 연결되었습니다!';
   static const authChildConnected = '자녀가 성공적으로 연결되었습니다!';
   static const authInviteCodeHint = '초대 코드 입력';
+  static const authInviteCodeInvalid = '올바르지 않은 초대 코드입니다';
+  static const authInviteCodeExpired = '만료되었거나 사용할 수 없는 초대 코드입니다';
+  static const authInviteCodeError = '코드 확인 중 오류가 발생했습니다';
   static const authDevTeacher = '선생님';
   static const authDevStudent = '학생';
   static const authDevParent = '학부모';

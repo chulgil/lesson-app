@@ -59,9 +59,30 @@ class LocalNotificationService implements NotificationService {
   }
 
   void _onNotificationTapped(NotificationResponse response) {
-    if (response.payload != null) {
-      // TODO: Parse payload to AppNotification and emit.
-    }
+    if (response.payload == null) return;
+
+    final parsed = parsePayload(response.payload!);
+    final typeStr = parsed['type'];
+    if (typeStr == null) return;
+
+    final type = NotificationType.values.firstWhere(
+      (t) => t.name == typeStr,
+      orElse: () => NotificationType.lessonReminder,
+    );
+
+    final notification = AppNotification(
+      id: parsed['id'] ?? '',
+      userId: '',
+      type: type,
+      priority: type.defaultPriority,
+      title: '',
+      body: '',
+      createdAt: DateTime.now(),
+      actionUrl: parsed['actionUrl'],
+      actionLabel: parsed['actionLabel'],
+    );
+
+    _notificationTapController.add(notification);
   }
 
   @override

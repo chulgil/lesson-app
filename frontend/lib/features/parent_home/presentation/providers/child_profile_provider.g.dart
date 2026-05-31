@@ -7,14 +7,14 @@ part of 'child_profile_provider.dart';
 // **************************************************************************
 
 String _$childProfileRepositoryHash() =>
-    r'8669274f97792ed022fd38f19e381f2777125e6e';
+    r'ed23dd9006042b11dc8424cc85b5dd4d22ecd563';
 
 /// Provider for the child profile repository - switches between Mock and Remote.
 ///
 /// Copied from [childProfileRepository].
 @ProviderFor(childProfileRepository)
 final childProfileRepositoryProvider =
-    AutoDisposeProvider<ChildProfileRepository>.internal(
+    Provider<ChildProfileRepository>.internal(
   childProfileRepository,
   name: r'childProfileRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -24,8 +24,7 @@ final childProfileRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-typedef ChildProfileRepositoryRef
-    = AutoDisposeProviderRef<ChildProfileRepository>;
+typedef ChildProfileRepositoryRef = ProviderRef<ChildProfileRepository>;
 String _$childProfilesHash() => r'0d9d83d12b08cb7d023f8a7375ca9595e466a58d';
 
 /// Copied from Dart SDK

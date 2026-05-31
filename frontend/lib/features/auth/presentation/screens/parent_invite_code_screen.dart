@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/auth_facade.dart';
+import '../../../profile/presentation/providers/invite_provider.dart';
 
 /// Parent invite code input screen
 /// Parents enter an invite code from the teacher to connect with their child
@@ -256,37 +257,43 @@ class _ParentInviteCodeScreenState
     });
 
     try {
-      // TODO: Verify invite code with backend
       final code = _codeController.text.trim().toUpperCase();
+      final repo = ref.read(inviteRepositoryProvider);
+      final invite = await repo.getInviteByCode(code);
 
-      // Mock verification - simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
 
-      // For demo, accept any 6-character code
-      if (code.length >= 6) {
-        // Set role to parent
-        ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
-
-        if (mounted) {
-          // Show success and navigate to parent home
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(AppStrings.authChildConnected),
-              backgroundColor: AppColors.paperOk,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-          context.go(AppRoutes.parentHome);
-        }
-      } else {
+      if (invite == null) {
         setState(() {
-          _errorMessage = '올바르지 않은 초대 코드입니다';
+          _errorMessage = AppStrings.authInviteCodeInvalid;
+        });
+        return;
+      }
+
+      if (!invite.isValid) {
+        setState(() {
+          _errorMessage = AppStrings.authInviteCodeExpired;
+        });
+        return;
+      }
+
+      // Set role to parent
+      ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(AppStrings.authChildConnected),
+          backgroundColor: AppColors.paperOk,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      context.go(AppRoutes.parentHome);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = AppStrings.authInviteCodeError;
         });
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage = '코드 확인 중 오류가 발생했습니다';
-      });
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
