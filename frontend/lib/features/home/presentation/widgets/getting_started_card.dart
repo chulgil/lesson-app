@@ -98,6 +98,7 @@ class GettingStartedCard extends ConsumerWidget {
         ];
         final completedCount = steps.where((step) => step.isCompleted).length;
         if (completedCount == steps.length) return const SizedBox.shrink();
+        final visibleSteps = steps.where((step) => !step.isCompleted).toList();
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -126,7 +127,7 @@ class GettingStartedCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),
-              for (final step in steps) ...[
+              for (final step in visibleSteps) ...[
                 _StepItem(
                   step: step.step,
                   title: step.title,
@@ -134,7 +135,7 @@ class GettingStartedCard extends ConsumerWidget {
                   isCompleted: step.isCompleted,
                   onTap: step.onTap,
                 ),
-                if (step != steps.last)
+                if (step != visibleSteps.last)
                   const SizedBox(height: AppSpacing.space2),
               ],
             ],

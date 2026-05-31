@@ -30,6 +30,35 @@ async def test_seed_teacher_dev_login_round_trips_to_me(
 
 
 @pytest.mark.asyncio
+async def test_teacher_signup_can_register_student_and_list_roster(
+    beta_client: BetaClient,
+) -> None:
+    """Beta deploy must support signup-to-student-registration used by home onboarding."""
+    suffix = uuid4().hex[:10]
+    teacher = BetaAccount(
+        email=f"beta-roster-teacher-{suffix}@example.com",
+        role="teacher",
+        expected_user_id="",
+    )
+
+    teacher_tokens = await beta_client.dev_login(teacher, name=f"Beta Roster Teacher {suffix}")
+    created = await beta_client.create_student(
+        teacher_tokens.access_token,
+        name=f"Beta Roster Student {suffix}",
+        instrument="piano",
+        level="beginner",
+        status="active",
+        lesson_duration=60,
+    )
+
+    assert created["name"] == f"Beta Roster Student {suffix}"
+    assert created["teacher_id"]
+
+    students = await beta_client.get_students(teacher_tokens.access_token)
+    assert any(item["id"] == created["id"] for item in students["items"])
+
+
+@pytest.mark.asyncio
 async def test_student_invite_code_signup_reaches_pending_then_connection(
     beta_client: BetaClient,
 ) -> None:

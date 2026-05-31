@@ -57,6 +57,23 @@ class BetaClient:
         assert response.status_code == 200, _response_error(response, "auth/me")
         return response.json()
 
+    async def create_student(self, access_token: str, **payload: Any) -> dict:
+        response = await self._client.post(
+            "/api/v1/students",
+            headers=self._auth_headers(access_token),
+            json=payload,
+        )
+        assert response.status_code == 201, _response_error(response, "create student")
+        return response.json()
+
+    async def get_students(self, access_token: str) -> dict:
+        response = await self._client.get(
+            "/api/v1/students",
+            headers=self._auth_headers(access_token),
+        )
+        assert response.status_code == 200, _response_error(response, "students")
+        return response.json()
+
     async def create_invite(self, access_token: str, **payload: Any) -> dict:
         response = await self._client.post(
             "/api/v1/invites/",

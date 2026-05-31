@@ -61,6 +61,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       final newStudent = await _repository.createStudent(student);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
       return newStudent;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
