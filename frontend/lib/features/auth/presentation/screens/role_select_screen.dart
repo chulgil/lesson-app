@@ -30,17 +30,21 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final currentState = ref.read(authNotifierProvider);
+      if (currentState is AuthNeedsOnboarding && currentState.role == role) {
+        if (!mounted) return;
+        _goToOnboarding(role);
+        return;
+      }
+
       await ref.read(authNotifierProvider.notifier).setRole(role);
 
       if (!mounted) return;
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
-        // Students go through onboarding first (invite code → profile → tutorial)
-        if (role == UserRole.student) {
-          context.go(AppRoutes.studentInviteCode);
-        } else {
-          context.go(authState.role.homeRoute);
-        }
+        context.go(authState.role.homeRoute);
+      } else if (authState is AuthNeedsOnboarding) {
+        _goToOnboarding(authState.role);
       }
     } catch (e) {
       if (mounted) {
@@ -57,10 +61,26 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
     }
   }
 
+  void _goToOnboarding(UserRole role) {
+    switch (role) {
+      case UserRole.teacher:
+        context.go(AppRoutes.teacherProfileSetup);
+      case UserRole.student:
+        context.go(AppRoutes.studentInviteCode);
+      case UserRole.parent:
+        context.go(AppRoutes.parentInviteCode);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
-    final userName = authState is AuthNeedsRole ? authState.name : '';
+    final userName =
+        authState is AuthNeedsRole
+            ? authState.name
+            : authState is AuthNeedsOnboarding
+            ? authState.name
+            : '';
 
     return NotebookScreenScaffold(
       body: SafeArea(

@@ -227,10 +227,13 @@ class StudentService:
             select(Student).where(Student.user_id == current_user.id)
         )
         if existing:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Student profile already exists",
-            )
+            existing.name = data.name
+            existing.instrument = data.instrument
+            existing.level = data.level
+            existing.phone = getattr(data, "phone", None)
+            await self.db.flush()
+            await self.db.refresh(existing)
+            return StudentResponse.model_validate(existing)
 
         student = Student(
             user_id=current_user.id,

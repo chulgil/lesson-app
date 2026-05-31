@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/providers/repository_provider.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
@@ -39,6 +40,22 @@ void main() {
         events.map((event) => event.eventType),
         isNot(contains(RequestEventType.teacherAnnouncement)),
       );
+    },
+  );
+
+  test(
+    'remote mode does not leak seeded mock schedule-change requests',
+    () async {
+      final container = ProviderContainer(
+        overrides: [mockDataModeProvider.overrideWithValue(false)],
+      );
+      addTearDown(container.dispose);
+
+      final events = await container.read(
+        pendingScheduleChangeRequestsProvider('student_new').future,
+      );
+
+      expect(events, isEmpty);
     },
   );
 

@@ -161,3 +161,78 @@ async def test_create_student_unauthorized(client: AsyncClient, student_auth_hea
         json={"name": "Unauthorized Student"},
     )
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_student_can_setup_own_profile_without_teacher(
+    client: AsyncClient,
+    student_auth_headers,
+    create_test_user,
+):
+    """Student onboarding creates a self-profile before teacher connection."""
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student-onboarding@test.com",
+        name="Student",
+    )
+
+    response = await client.post(
+        "/api/v1/students/me/profile",
+        headers=student_auth_headers,
+        json={
+            "name": "Student",
+            "instrument": "피아노",
+            "level": "beginner",
+        },
+    )
+
+    assert response.status_code == 201, response.text
+    data = response.json()
+    assert data["name"] == "Student"
+    assert data["instrument"] == "피아노"
+    assert data["teacher_id"] is None
+    assert data["user_id"] == "test-student-id"
+
+
+@pytest.mark.asyncio
+async def test_student_profile_setup_is_idempotent_for_existing_self_profile(
+    client: AsyncClient,
+    student_auth_headers,
+    create_test_user,
+):
+    """Retrying onboarding profile setup updates the existing self-profile."""
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student-onboarding-retry@test.com",
+        name="Student",
+    )
+
+    first = await client.post(
+        "/api/v1/students/me/profile",
+        headers=student_auth_headers,
+        json={
+            "name": "Student",
+            "instrument": "피아노",
+            "level": "beginner",
+        },
+    )
+    assert first.status_code == 201, first.text
+
+    retry = await client.post(
+        "/api/v1/students/me/profile",
+        headers=student_auth_headers,
+        json={
+            "name": "Updated Student",
+            "instrument": "바이올린",
+            "level": "elementary",
+        },
+    )
+
+    assert retry.status_code == 201, retry.text
+    data = retry.json()
+    assert data["id"] == first.json()["id"]
+    assert data["name"] == "Updated Student"
+    assert data["instrument"] == "바이올린"
+    assert data["level"] == "elementary"

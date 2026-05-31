@@ -77,6 +77,53 @@ async def test_get_me_unauthenticated(client: AsyncClient):
     assert response.status_code == 401
 
 
+@pytest.mark.asyncio
+async def test_update_role_allows_unfinished_onboarding_user_to_reselect_role(
+    client: AsyncClient,
+    create_test_user,
+):
+    """Onboarding-incomplete users can reselect role before their profile is finalized."""
+    await create_test_user(
+        user_id="unfinished-role-user",
+        role="student",
+        email="unfinished-role@example.com",
+    )
+    token = create_access_token(data={"sub": "unfinished-role-user", "role": "student"})
+
+    response = await client.patch(
+        "/api/v1/auth/me",
+        json={"role": "teacher"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["role"] == "teacher"
+    assert response.json()["onboarding_completed"] is False
+
+
+@pytest.mark.asyncio
+async def test_update_role_rejects_completed_onboarding_user(
+    client: AsyncClient,
+    create_test_user,
+):
+    """Completed users cannot silently change role through onboarding endpoint."""
+    user = await create_test_user(
+        user_id="completed-role-user",
+        role="student",
+        email="completed-role@example.com",
+    )
+    user.onboarding_completed = True
+    token = create_access_token(data={"sub": "completed-role-user", "role": "student"})
+
+    response = await client.patch(
+        "/api/v1/auth/me",
+        json={"role": "teacher"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 400
+
+
 # ------------------------------------------------------------------
 # Dev Login
 # ------------------------------------------------------------------

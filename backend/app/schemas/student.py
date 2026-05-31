@@ -1,6 +1,5 @@
 """Student-related schemas."""
 
-
 import datetime as _dt
 from typing import Any
 
@@ -13,7 +12,7 @@ class StudentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    teacher_id: str
+    teacher_id: str | None = None
     user_id: str | None = None
     name: str
     instrument: str | None = None

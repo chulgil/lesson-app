@@ -18,10 +18,11 @@ SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
   return createSyncAwareRepository<SubscriptionRepository>(
     ref: ref,
     mock: () => MockSubscriptionRepository(),
-    syncAware: (api, queue) => SyncAwareSubscriptionRepository(
-      remote: RemoteSubscriptionRepository(api),
-      queue: queue,
-    ),
+    syncAware:
+        (api, queue) => SyncAwareSubscriptionRepository(
+          remote: RemoteSubscriptionRepository(api),
+          queue: queue,
+        ),
   );
 }
 
@@ -604,6 +605,10 @@ Future<List<RequestEvent>> pendingScheduleChangeRequests(
   PendingScheduleChangeRequestsRef ref,
   String teacherId,
 ) async {
+  if (!ref.watch(mockDataModeProvider)) {
+    return const [];
+  }
+
   final storedEvents = _subscriptionSessionEventStore.values.expand(
     (events) => events,
   );

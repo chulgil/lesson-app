@@ -367,6 +367,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         context.go(authState.role.homeRoute);
       } else if (authState is AuthNeedsRole) {
         context.go(AppRoutes.termsAgreement);
+      } else if (authState is AuthNeedsOnboarding) {
+        context.go(AppRoutes.roleSelect);
       }
     } catch (e) {
       if (context.mounted) {
@@ -402,7 +404,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-
 }
 
 // ─────────────────────────────────────────────────────────────────

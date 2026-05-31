@@ -202,7 +202,7 @@ class AuthService:
         """Set role for a newly registered user and create the matching profile."""
         from app.models.user import UserRole
 
-        if user.role is not None:
+        if user.role is not None and user.onboarding_completed:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Role is already set. Contact support to change it.",

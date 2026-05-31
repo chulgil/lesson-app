@@ -163,7 +163,7 @@ class AuthNotifier extends _$AuthNotifier {
   /// Set role for a newly registered OAuth user.
   Future<void> setRole(UserRole role) async {
     final current = state;
-    if (current is! AuthNeedsRole) return;
+    if (current is! AuthNeedsRole && current is! AuthNeedsOnboarding) return;
 
     state = const AuthLoading();
     try {

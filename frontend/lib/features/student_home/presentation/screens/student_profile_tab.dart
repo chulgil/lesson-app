@@ -13,6 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/practice_reminder_provider.dart';
 import '../providers/student_home_profile_provider.dart';
 import '../widgets/language_select_sheet.dart';
@@ -110,7 +111,7 @@ class StudentProfileTab extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: _buildLogoutButton(context),
+            child: _buildLogoutButton(context, ref),
           ),
 
           const SizedBox(height: AppSpacing.space8),
@@ -450,16 +451,18 @@ class StudentProfileTab extends ConsumerWidget {
 
   Widget _buildMenuDivider() {
     return Padding(
-      padding: EdgeInsets.only(left: AppSpacing.space4 + 36 + AppSpacing.space3),
+      padding: EdgeInsets.only(
+        left: AppSpacing.space4 + 36 + AppSpacing.space3,
+      ),
       child: const ThinRule(),
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () => _showLogoutDialog(context),
+        onPressed: () => _showLogoutDialog(context, ref),
         icon: Icon(Icons.logout, color: AppColors.paperAccent),
         label: Text(
           AppStrings.studentHomeLogout,
@@ -474,7 +477,7 @@ class StudentProfileTab extends ConsumerWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showNotebookDialog(
       context: context,
       titleWidget: const Text(AppStrings.studentHomeLogout),
@@ -485,9 +488,9 @@ class StudentProfileTab extends ConsumerWidget {
           child: const Text(AppStrings.cancel),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             Navigator.pop(context);
-            context.go(AppRoutes.login);
+            await ref.read(authNotifierProvider.notifier).logout();
           },
           child: Text(
             AppStrings.studentHomeLogout,
@@ -559,9 +562,7 @@ class StudentProfileTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             '* 코드는 24시간 동안 유효합니다',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
