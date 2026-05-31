@@ -462,6 +462,12 @@ class InviteService:
 
         now = datetime.now(UTC)
         conn_req.responded_at = now
+        await self._cancel_older_pending_requests(
+            requester_id=conn_req.requester_id,
+            target_id=conn_req.target_id,
+            keep_request_id=conn_req.id,
+            now=now,
+        )
 
         if action == "accept":
             conn_req.status = ConnectionRequestStatus.accepted

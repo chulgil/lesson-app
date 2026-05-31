@@ -1,5 +1,7 @@
 """Tests for invite, connection request, and connection endpoints."""
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 from httpx import AsyncClient
 
@@ -270,6 +272,75 @@ async def test_duplicate_pending_connection_request_keeps_latest_only(
     assert len(connection_notifications) == 1
     assert connection_notifications[0]["action_url"] == "/invite/requests"
     assert connection_notifications[0]["data"]["connectionRequestId"] == first.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_accept_latest_pending_request_cancels_legacy_duplicates(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Accepting the latest visible request should not reveal older duplicate pending rows."""
+    from app.models.invite import ConnectionRequest, InviteMethod, InviteUserRole
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id",
+        role="student",
+        email="student@test.com",
+        name="Student",
+    )
+
+    now = datetime.now(UTC)
+    old_request = ConnectionRequest(
+        requester_id="test-student-id",
+        requester_role=InviteUserRole.student,
+        requester_name="Student",
+        target_id="test-user-id",
+        target_role=InviteUserRole.teacher,
+        target_name="Teacher",
+        method=InviteMethod.inAppSearch,
+        message="old",
+        expires_at=now + timedelta(days=7),
+        created_at=now - timedelta(minutes=5),
+    )
+    latest_request = ConnectionRequest(
+        requester_id="test-student-id",
+        requester_role=InviteUserRole.student,
+        requester_name="Student",
+        target_id="test-user-id",
+        target_role=InviteUserRole.teacher,
+        target_name="Teacher",
+        method=InviteMethod.inAppSearch,
+        message="latest",
+        expires_at=now + timedelta(days=7),
+        created_at=now,
+    )
+    db_session.add_all([old_request, latest_request])
+    await db_session.flush()
+
+    before = await client.get(
+        "/api/v1/invites/connection-requests/pending",
+        headers=auth_headers,
+    )
+    assert before.status_code == 200
+    assert before.json()["total"] == 1
+    assert before.json()["items"][0]["id"] == latest_request.id
+
+    response = await client.patch(
+        f"/api/v1/invites/connection-requests/{latest_request.id}/respond",
+        headers=auth_headers,
+        json={"action": "accept"},
+    )
+    assert response.status_code == 200
+
+    after = await client.get(
+        "/api/v1/invites/connection-requests/pending",
+        headers=auth_headers,
+    )
+    assert after.status_code == 200
+    assert after.json()["total"] == 0
 
 
 @pytest.mark.asyncio
