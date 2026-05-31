@@ -8,6 +8,7 @@ import '../../domain/entities/invite.dart';
 import '../../domain/repositories/invite_repository.dart';
 import '../../../invite/data/repositories/remote_invite_repository.dart';
 import '../../../notifications/notifications_facade.dart';
+import '../../../students/students_facade.dart';
 
 part 'invite_provider.g.dart';
 
@@ -237,6 +238,8 @@ class ConnectionRequestResponder extends _$ConnectionRequestResponder {
       // Refresh relevant providers
       ref.invalidate(pendingRequestsProvider);
       ref.invalidate(myConnectionsProvider);
+      ref.invalidate(studentsProvider);
+      ref.invalidate(studentsNotifierProvider);
 
       // Send notification using the connection notification service
       await _sendConnectionAcceptedNotification(connection);

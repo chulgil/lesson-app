@@ -54,4 +54,17 @@ void main() {
       lessThan(source.indexOf('_buildTodayLessonsHeader')),
     );
   });
+
+  test('accepting a connection request refreshes teacher roster state', () {
+    final source =
+        File(
+          'lib/features/profile/presentation/providers/invite_provider.dart',
+        ).readAsStringSync();
+    final acceptBody = source.substring(
+      source.indexOf('Future<Connection?> acceptRequest'),
+    );
+
+    expect(acceptBody, contains('ref.invalidate(studentsProvider)'));
+    expect(acceptBody, contains('ref.invalidate(studentsNotifierProvider)'));
+  });
 }
