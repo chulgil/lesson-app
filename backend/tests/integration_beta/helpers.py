@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import httpx
 
@@ -31,11 +32,14 @@ class BetaClient:
     async def health(self) -> httpx.Response:
         return await self._client.get("/health")
 
-    async def dev_login(self, account: BetaAccount) -> BetaTokens:
+    async def dev_login(self, account: BetaAccount, *, name: str | None = None) -> BetaTokens:
+        payload: dict[str, str] = {"email": account.email, "role": account.role}
+        if name is not None:
+            payload["name"] = name
         response = await self._client.post(
             "/api/v1/auth/dev-login",
             headers={"X-Internal-API-Key": self._internal_api_key},
-            json={"email": account.email, "role": account.role},
+            json=payload,
         )
         assert response.status_code == 200, _response_error(response, "dev-login")
         data = response.json()
@@ -52,6 +56,67 @@ class BetaClient:
         )
         assert response.status_code == 200, _response_error(response, "auth/me")
         return response.json()
+
+    async def create_invite(self, access_token: str, **payload: Any) -> dict:
+        response = await self._client.post(
+            "/api/v1/invites/",
+            headers=self._auth_headers(access_token),
+            json=payload,
+        )
+        assert response.status_code == 201, _response_error(response, "create invite")
+        return response.json()
+
+    async def create_connection_request(self, access_token: str, **payload: Any) -> dict:
+        response = await self._client.post(
+            "/api/v1/invites/connection-requests",
+            headers=self._auth_headers(access_token),
+            json=payload,
+        )
+        assert response.status_code == 201, _response_error(response, "create connection request")
+        return response.json()
+
+    async def get_sent_connection_requests(self, access_token: str) -> dict:
+        response = await self._client.get(
+            "/api/v1/invites/connection-requests/sent",
+            headers=self._auth_headers(access_token),
+        )
+        assert response.status_code == 200, _response_error(response, "sent connection requests")
+        return response.json()
+
+    async def get_pending_connection_requests(self, access_token: str) -> dict:
+        response = await self._client.get(
+            "/api/v1/invites/connection-requests/pending",
+            headers=self._auth_headers(access_token),
+        )
+        assert response.status_code == 200, _response_error(response, "pending connection requests")
+        return response.json()
+
+    async def respond_to_connection_request(
+        self,
+        access_token: str,
+        request_id: str,
+        *,
+        action: str,
+    ) -> dict:
+        response = await self._client.patch(
+            f"/api/v1/invites/connection-requests/{request_id}/respond",
+            headers=self._auth_headers(access_token),
+            json={"action": action},
+        )
+        assert response.status_code == 200, _response_error(response, "respond connection request")
+        return response.json()
+
+    async def get_connections(self, access_token: str) -> dict:
+        response = await self._client.get(
+            "/api/v1/invites/connections",
+            headers=self._auth_headers(access_token),
+        )
+        assert response.status_code == 200, _response_error(response, "connections")
+        return response.json()
+
+    @staticmethod
+    def _auth_headers(access_token: str) -> dict[str, str]:
+        return {"Authorization": f"Bearer {access_token}"}
 
 
 def _response_error(response: httpx.Response, label: str) -> str:

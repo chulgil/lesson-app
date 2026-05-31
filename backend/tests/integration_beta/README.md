@@ -22,5 +22,6 @@ BETA_BASE_URL=https://api-beta.lessonaza.app INTERNAL_API_KEY=... uv run pytest 
 - `GET /health`로 beta 서버 가용성을 확인합니다.
 - `POST /api/v1/auth/dev-login`에 `X-Internal-API-Key`를 붙여 시드 선생님 로그인을 검증합니다.
 - 발급된 access token으로 `GET /api/v1/auth/me`를 호출해 인증 왕복을 검증합니다.
+- 선생님 초대코드 생성 → 학생 초대코드 연결 요청 → 학생 sent 목록 → 선생님 pending 목록 → 선생님 수락 → 양쪽 connections 목록 반영을 검증합니다.
 
 이후 #418의 Phase 2에 따라 레슨 신청, 일정 변경, 레슨 종료, 권한/토큰/KST 경계 시나리오를 같은 디렉터리에 추가합니다.

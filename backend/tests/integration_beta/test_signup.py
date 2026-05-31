@@ -1,5 +1,7 @@
 """Remote beta signup/authentication smoke scenario."""
 
+from uuid import uuid4
+
 import pytest
 
 from tests.integration_beta.helpers import BetaAccount, BetaClient
@@ -25,3 +27,70 @@ async def test_seed_teacher_dev_login_round_trips_to_me(
     assert me["id"] == beta_teacher_account.expected_user_id
     assert me["email"] == beta_teacher_account.email
     assert me["role"] == beta_teacher_account.role
+
+
+@pytest.mark.asyncio
+async def test_student_invite_code_signup_reaches_pending_then_connection(
+    beta_client: BetaClient,
+) -> None:
+    """Beta deploy must support the frontend invite-code onboarding contract."""
+    suffix = uuid4().hex[:10]
+    teacher = BetaAccount(
+        email=f"beta-teacher-{suffix}@example.com",
+        role="teacher",
+        expected_user_id="",
+    )
+    student = BetaAccount(
+        email=f"beta-student-{suffix}@example.com",
+        role="student",
+        expected_user_id="",
+    )
+
+    teacher_tokens = await beta_client.dev_login(teacher, name=f"Beta Teacher {suffix}")
+    student_tokens = await beta_client.dev_login(student, name=f"Beta Student {suffix}")
+    teacher_id = teacher_tokens.user["id"]
+    student_id = student_tokens.user["id"]
+
+    invite = await beta_client.create_invite(
+        teacher_tokens.access_token,
+        is_single_use=True,
+        note=f"beta-smoke-{suffix}",
+    )
+    assert invite["creator_id"] == teacher_id
+    assert invite["invite_code"]
+
+    request = await beta_client.create_connection_request(
+        student_tokens.access_token,
+        target_id="",
+        method="inviteCode",
+        invite_code=invite["invite_code"],
+        message="beta smoke invite-code onboarding",
+    )
+    assert request["status"] == "pending"
+    assert request["requester_id"] == student_id
+    assert request["target_id"] == teacher_id
+
+    sent = await beta_client.get_sent_connection_requests(student_tokens.access_token)
+    assert any(item["id"] == request["id"] for item in sent["items"])
+
+    pending = await beta_client.get_pending_connection_requests(teacher_tokens.access_token)
+    assert any(item["id"] == request["id"] for item in pending["items"])
+
+    accepted = await beta_client.respond_to_connection_request(
+        teacher_tokens.access_token,
+        request["id"],
+        action="accept",
+    )
+    assert accepted["status"] == "accepted"
+
+    teacher_connections = await beta_client.get_connections(teacher_tokens.access_token)
+    assert any(
+        item["teacher_id"] == teacher_id and item["student_id"] == student_id and item["is_active"]
+        for item in teacher_connections["items"]
+    )
+
+    student_connections = await beta_client.get_connections(student_tokens.access_token)
+    assert any(
+        item["teacher_id"] == teacher_id and item["student_id"] == student_id and item["is_active"]
+        for item in student_connections["items"]
+    )
