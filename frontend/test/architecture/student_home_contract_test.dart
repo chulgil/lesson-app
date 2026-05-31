@@ -1,0 +1,27 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('remote note access does not show seeded mock active access', () {
+    final source =
+        File(
+          'lib/features/practice/presentation/providers/note_access_provider.dart',
+        ).readAsStringSync();
+
+    expect(source, contains('createLocalFallbackRepository'));
+    expect(source, contains('_EmptyNoteAccessRepository'));
+    expect(source, isNot(contains('remote:')));
+  });
+
+  test('student getting started distinguishes pending teacher connection', () {
+    final source =
+        File(
+          'lib/features/student_home/presentation/widgets/student_getting_started_card.dart',
+        ).readAsStringSync();
+
+    expect(source, contains('mySentRequestsProvider'));
+    expect(source, contains('hasPendingConnectionRequest'));
+    expect(source, contains('studentHomeTeacherConnectionPending'));
+  });
+}

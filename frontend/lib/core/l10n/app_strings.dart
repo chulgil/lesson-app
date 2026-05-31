@@ -6030,6 +6030,8 @@ class AppStrings {
   static const studentHomePracticeTeacherHint = '선생님이 과제를 등록하면 여기에 표시됩니다';
   static const studentHomeConnectTeacher = '선생님 연결하기';
   static const studentHomeConnectTeacherHint = '선생님을 검색하거나 초대 코드를 입력하세요';
+  static const studentHomeTeacherConnectionPending = '선생님 승인 대기';
+  static const studentHomeTeacherConnectionPendingHint = '초대 코드 연결 요청을 보냈습니다';
   static const studentHomeCompleteProfile = '프로필 완성하기';
   static const studentHomeCompleteProfileHint = '온보딩에서 프로필이 설정되었습니다';
   static const studentHomeCheckFirstLesson = '첫 레슨 확인하기';

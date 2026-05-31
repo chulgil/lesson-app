@@ -10,13 +10,37 @@ part 'note_access_provider.g.dart';
 /// Note access repository provider - switches between Mock and Remote
 @Riverpod(keepAlive: true)
 NoteAccessRepository noteAccessRepository(NoteAccessRepositoryRef ref) {
-  return createRepository<NoteAccessRepository>(
+  return createLocalFallbackRepository<NoteAccessRepository>(
     ref: ref,
     mock: () => MockNoteAccessRepository(),
-    remote:
-        (_) =>
-            MockNoteAccessRepository(), // TODO: Implement RemoteNoteAccessRepository
+    fallback: () => _EmptyNoteAccessRepository(),
   );
+}
+
+class _EmptyNoteAccessRepository implements NoteAccessRepository {
+  @override
+  Future<NoteAccessRequest?> getActiveAccess() async => null;
+
+  @override
+  Future<List<NoteAccessRequest>> getAllRequests() async => const [];
+
+  @override
+  Future<NoteAccessRequest?> getRequest(String requestId) async => null;
+
+  @override
+  Future<NoteAccessRequest> consentAccess(String requestId) async {
+    throw UnsupportedError('Note access API is not available in remote mode.');
+  }
+
+  @override
+  Future<NoteAccessRequest> rejectAccess(String requestId) async {
+    throw UnsupportedError('Note access API is not available in remote mode.');
+  }
+
+  @override
+  Future<NoteAccessRequest> revokeAccess(String requestId) async {
+    throw UnsupportedError('Note access API is not available in remote mode.');
+  }
 }
 
 /// Get the current active note access (banner display)

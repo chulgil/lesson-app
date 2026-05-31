@@ -21,16 +21,22 @@ class StudentGettingStartedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final connectionsAsync = ref.watch(myConnectionsProvider);
+    final sentRequestsAsync = ref.watch(mySentRequestsProvider);
     final hasAnyBookingAsync = ref.watch(
       studentHomeHasAnyBookingProvider(studentId),
     );
 
     // 로딩 중이면 숨김 (깜빡임 방지)
-    if (connectionsAsync.isLoading || hasAnyBookingAsync.isLoading) {
+    if (connectionsAsync.isLoading ||
+        sentRequestsAsync.isLoading ||
+        hasAnyBookingAsync.isLoading) {
       return const SizedBox.shrink();
     }
 
     final hasConnections = connectionsAsync.valueOrNull?.isNotEmpty ?? false;
+    final hasPendingConnectionRequest =
+        sentRequestsAsync.valueOrNull?.any((request) => request.isActionable) ??
+        false;
     final hasLessons = hasAnyBookingAsync.valueOrNull ?? false;
     const hasProfile = true; // Already set during onboarding
 
@@ -73,11 +79,17 @@ class StudentGettingStartedCard extends ConsumerWidget {
           // Step 1: Connect with teacher
           _StepItem(
             step: 1,
-            title: AppStrings.studentHomeConnectTeacher,
-            subtitle: AppStrings.studentHomeConnectTeacherHint,
+            title:
+                hasPendingConnectionRequest
+                    ? AppStrings.studentHomeTeacherConnectionPending
+                    : AppStrings.studentHomeConnectTeacher,
+            subtitle:
+                hasPendingConnectionRequest
+                    ? AppStrings.studentHomeTeacherConnectionPendingHint
+                    : AppStrings.studentHomeConnectTeacherHint,
             isCompleted: hasConnections,
             onTap:
-                hasConnections
+                hasConnections || hasPendingConnectionRequest
                     ? null
                     : () => context.push(AppRoutes.selectTeacher),
           ),
@@ -133,84 +145,83 @@ class _StepItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          color:
-              isCompleted
-                  ? AppColors.paperOk.withValues(alpha: 0.08)
-                  : AppColors.paper,
-          border: Border.all(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space3,
+            vertical: AppSpacing.space3,
+          ),
+          decoration: BoxDecoration(
             color:
                 isCompleted
-                    ? AppColors.paperOk.withValues(alpha: 0.3)
-                    : AppColors.inkQuaternary,
+                    ? AppColors.paperOk.withValues(alpha: 0.08)
+                    : AppColors.paper,
+            border: Border.all(
+              color:
+                  isCompleted
+                      ? AppColors.paperOk.withValues(alpha: 0.3)
+                      : AppColors.inkQuaternary,
+            ),
+          ),
+          child: Row(
+            children: [
+              // Step number or check
+              // §7.132: round → 사각 step 인디케이터 (Notebook 번호 메타포).
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color:
+                      isCompleted
+                          ? AppColors.paperOk
+                          : isEnabled
+                          ? AppColors.ink
+                          : AppColors.inkTertiary,
+                ),
+                child: Center(
+                  child:
+                      isCompleted
+                          ? const Icon(
+                            Icons.check,
+                            size: 16,
+                            color: AppColors.paper,
+                          )
+                          : Text(
+                            '$step',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.paper,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                        decoration:
+                            isCompleted ? TextDecoration.lineThrough : null,
+                        color: isCompleted ? AppColors.inkTertiary : null,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.inkTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isEnabled && !isCompleted)
+                Icon(Icons.chevron_right, color: AppColors.ink, size: 20),
+            ],
           ),
         ),
-        child: Row(
-          children: [
-            // Step number or check
-            // §7.132: round → 사각 step 인디케이터 (Notebook 번호 메타포).
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color:
-                    isCompleted
-                        ? AppColors.paperOk
-                        : isEnabled
-                        ? AppColors.ink
-                        : AppColors.inkTertiary,
-              ),
-              child: Center(
-                child:
-                    isCompleted
-                        ? const Icon(
-                          Icons.check,
-                          size: 16,
-                          color: AppColors.paper,
-                        )
-                        : Text(
-                          '$step',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.paper,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                      decoration:
-                          isCompleted ? TextDecoration.lineThrough : null,
-                      color: isCompleted ? AppColors.inkTertiary : null,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkTertiary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isEnabled && !isCompleted)
-              Icon(Icons.chevron_right, color: AppColors.ink, size: 20),
-          ],
-        ),
       ),
-    ),
     );
   }
 }
-
