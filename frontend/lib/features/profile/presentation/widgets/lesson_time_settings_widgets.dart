@@ -172,7 +172,7 @@ class DaySectionCard extends StatelessWidget {
     final dayName = _dayNames[dayOfWeek - 1];
     final hasSlots = slots.isNotEmpty;
 
-    return NotebookCard(
+    final card = NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ExpansionTile(
         leading: Icon(
@@ -211,6 +211,29 @@ class DaySectionCard extends StatelessWidget {
             ),
         ],
       ),
+    );
+
+    if (!hasSlots) return card;
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionEdit,
+          icon: Icons.edit_outlined,
+          onPressed: () => onEditSlot(slots.first),
+        ),
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () {
+            for (final slot in slots) {
+              onDeleteSlot(slot);
+            }
+          },
+        ),
+      ],
+      child: card,
     );
   }
 }

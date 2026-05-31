@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
@@ -25,6 +27,57 @@ void main() {
     expect(find.text('월요일'), findsOneWidget);
     expect(find.text('휴무'), findsOneWidget);
     expect(find.text(AppStrings.profileTimeSlotAdd), findsNothing);
+  });
+
+  testWidgets('DaySectionCard reveals edit and delete actions on right swipe', (
+    tester,
+  ) async {
+    var edited = false;
+    var deleted = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: DaySectionCard(
+            dayOfWeek: 1,
+            slots: const [
+              TimeSlot(
+                id: 'slot-1',
+                dayOfWeek: 1,
+                startTime: ClockTime(hour: 9, minute: 0),
+                endTime: ClockTime(hour: 18, minute: 0),
+              ),
+            ],
+            onEditSlot: (_) => edited = true,
+            onDeleteSlot: (_) => deleted = true,
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.down(tester.getCenter(find.text('월요일')));
+    await tester.pump();
+    await gesture.moveBy(const Offset(160, 0));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.swipeActionEdit), findsOneWidget);
+    expect(find.text(AppStrings.delete), findsOneWidget);
+
+    await tester.tap(find.text(AppStrings.swipeActionEdit));
+    expect(edited, isTrue);
+
+    final deleteGesture = await tester.createGesture(
+      kind: PointerDeviceKind.mouse,
+    );
+    await deleteGesture.down(tester.getCenter(find.text('월요일')));
+    await tester.pump();
+    await deleteGesture.moveBy(const Offset(160, 0));
+    await deleteGesture.up();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.delete));
+    expect(deleted, isTrue);
   });
 
   testWidgets('TimeSlotTile reveals edit and delete actions on right swipe', (

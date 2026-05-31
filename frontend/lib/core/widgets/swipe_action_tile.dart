@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
@@ -43,6 +46,20 @@ class _SwipeActionTileState extends State<SwipeActionTile> {
 
   double get _revealWidth => widget.actionWidth * widget.actions.length;
 
+  void _settleDrag(double velocity) {
+    if (velocity > 0 || _dragDelta > 48) {
+      setState(() => _revealed = true);
+    } else if (velocity < 0 || _dragDelta < -48) {
+      setState(() => _revealed = false);
+    }
+    _dragDelta = 0;
+  }
+
+  bool _isPrimaryMouseDrag(PointerEvent event) {
+    return event.kind == PointerDeviceKind.mouse &&
+        (event.buttons & kPrimaryMouseButton) != 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRect(
@@ -78,21 +95,28 @@ class _SwipeActionTileState extends State<SwipeActionTile> {
               0,
               0,
             ),
-            child: GestureDetector(
+            child: Listener(
               behavior: HitTestBehavior.opaque,
-              onHorizontalDragEnd: (details) {
-                final velocity = details.primaryVelocity ?? 0;
-                if (velocity > 0 || _dragDelta > 48) {
-                  setState(() => _revealed = true);
-                } else if (velocity < 0 || _dragDelta < -48) {
-                  setState(() => _revealed = false);
+              onPointerMove: (event) {
+                if (_isPrimaryMouseDrag(event)) {
+                  _dragDelta += event.delta.dx;
                 }
-                _dragDelta = 0;
               },
-              onHorizontalDragUpdate: (details) {
-                _dragDelta += details.primaryDelta ?? 0;
+              onPointerUp: (event) {
+                if (event.kind == PointerDeviceKind.mouse) {
+                  _settleDrag(0);
+                }
               },
-              child: widget.child,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onHorizontalDragEnd: (details) {
+                  _settleDrag(details.primaryVelocity ?? 0);
+                },
+                onHorizontalDragUpdate: (details) {
+                  _dragDelta += details.primaryDelta ?? 0;
+                },
+                child: widget.child,
+              ),
             ),
           ),
         ],
