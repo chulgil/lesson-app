@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -94,6 +96,15 @@ const _completedPhaseEventTypes = {
   RequestEventType.subscriptionCompleted,
   RequestEventType.completed,
 };
+
+String? requestDetailSubscriptionRoute(List<RequestEvent> events) {
+  final subscriptionEvents =
+      events.where((event) => event.subscriptionId != null).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  if (subscriptionEvents.isEmpty) return null;
+  final subscriptionId = subscriptionEvents.first.subscriptionId!;
+  return AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId);
+}
 
 /// Detail screen for a single lesson request — chat-style layout.
 ///
@@ -341,7 +352,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 onAddNote: () => _handleAddNote(context, ref, request),
                 // Phase 3/4
                 onViewSubscription:
-                    () => _handleViewSubscription(context, request),
+                    () => _handleViewSubscription(context, events),
                 onProposeRenewal: () => _handleRenewal(context, ref, request),
                 onRequestRenewal: () => _handleRenewal(context, ref, request),
               ),
@@ -443,7 +454,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           AppStrings.viewSubscription,
           () {
             Navigator.pop(context);
-            _handleViewSubscription(context, request);
+            final events =
+                ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
+            _handleViewSubscription(context, events);
           },
         ),
       if (!isTerminal)
@@ -1170,10 +1183,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   void _handleViewSubscription(
     BuildContext context,
-    UnifiedLessonRequest request,
+    List<RequestEvent> events,
   ) {
-    // TODO: Navigate to subscription detail screen
-    _showInfo(AppStrings.subscriptionDetailComingSoon);
+    final route = requestDetailSubscriptionRoute(events);
+    if (route == null) {
+      _showInfo(AppStrings.subscriptionDetailComingSoon);
+      return;
+    }
+    context.push(route, extra: {'viewerRole': viewerRole});
   }
 
   Future<void> _handleRenewal(
