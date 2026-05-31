@@ -92,14 +92,24 @@ class LessonService:
                     )
                 student_name = student.name
 
-        session_number = data.session_number
-        if data.subscription_id:
+        subscription_id = data.subscription_id
+        if subscription_id:
             await self._assert_subscription_matches_lesson(
-                subscription_id=data.subscription_id,
+                subscription_id=subscription_id,
                 student_id=data.student_id,
             )
+        else:
+            # Auto-find or create subscription
+            subscription_id = await self._find_or_create_subscription(
+                teacher_id=tid,
+                student_id=data.student_id,
+                lesson_date=data.date,
+            )
+
+        session_number = data.session_number
+        if subscription_id:
             if session_number is None:
-                session_number = await self._next_subscription_session_number(data.subscription_id)
+                session_number = await self._next_subscription_session_number(subscription_id)
 
         lesson = Lesson(
             teacher_id=tid,
@@ -109,7 +119,7 @@ class LessonService:
             date=data.date,
             start_time=data.start_time or "00:00",
             duration=data.duration,
-            subscription_id=data.subscription_id,
+            subscription_id=subscription_id,
             session_number=session_number,
             location_name=data.location_name,
             lesson_source=LessonSource.manual,
@@ -147,6 +157,117 @@ class LessonService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="subscription_id does not belong to student_id",
             )
+
+    async def _find_or_create_subscription(
+        self, *, teacher_id: str, student_id: str, lesson_date: date | None
+    ) -> str:
+        """Find active subscription for the student or create a trial one.
+
+        If the active subscription has no remaining lessons (used >= total),
+        auto-expand it as a bonus lesson (total_lessons += 1, bonus_count += 1).
+        """
+        from app.models.subscription import Subscription, SubscriptionStatus
+
+        active_sub = (
+            await self.db.execute(
+                select(Subscription)
+                .where(
+                    Subscription.student_id == student_id,
+                    Subscription.status == SubscriptionStatus.active,
+                )
+                .order_by(Subscription.created_at.desc())
+                .limit(1)
+            )
+        ).scalar_one_or_none()
+
+        if active_sub:
+            remaining = (active_sub.total_lessons or 0) - (active_sub.used_lessons or 0)
+            if remaining <= 0:
+                # Bonus lesson: expand subscription
+                active_sub.total_lessons = (active_sub.total_lessons or 0) + 1
+                active_sub.bonus_count = (active_sub.bonus_count or 0) + 1
+                if not active_sub.bonus_reason:
+                    active_sub.bonus_reason = "teacher_goodwill"
+                await self.db.flush()
+            return active_sub.id
+
+        return await self._create_trial_subscription(
+            teacher_id=teacher_id,
+            student_id=student_id,
+            lesson_date=lesson_date,
+        )
+
+    async def _create_trial_subscription(
+        self, *, teacher_id: str, student_id: str, lesson_date: date | None
+    ) -> str:
+        """Create a 1-lesson trial subscription for auto-assignment."""
+        from app.models.subscription import Subscription, SubscriptionType, SubscriptionStatus
+
+        membership_id = await self._find_or_create_class_membership(teacher_id, student_id)
+
+        end_date = (lesson_date + timedelta(days=30)) if lesson_date else None
+
+        sub = Subscription(
+            student_id=student_id,
+            membership_id=membership_id,
+            type=SubscriptionType.trial,
+            total_lessons=1,
+            used_lessons=0,
+            amount=0,
+            start_date=lesson_date,
+            end_date=end_date,
+            status=SubscriptionStatus.active,
+            payment_confirmed=True,
+            total_reschedule_allowance=0,
+        )
+        self.db.add(sub)
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return sub.id
+
+    async def _find_or_create_class_membership(self, teacher_id: str, student_id: str) -> str:
+        """Find existing ClassMembership or create one via a default private class."""
+        from app.models.lesson import ClassMembership, LessonClass
+
+        existing = await self.db.scalar(
+            select(ClassMembership.id)
+            .join(LessonClass, LessonClass.id == ClassMembership.lesson_class_id)
+            .where(
+                LessonClass.teacher_id == teacher_id,
+                ClassMembership.student_id == student_id,
+                ClassMembership.status.in_(["active", "trial"]),
+            )
+        )
+        if existing:
+            return existing
+
+        default_class = await self.db.scalar(
+            select(LessonClass).where(
+                LessonClass.teacher_id == teacher_id,
+                LessonClass.type == "private",
+                LessonClass.is_archived == False,  # noqa: E712
+            )
+        )
+        if default_class is None:
+            default_class = LessonClass(
+                teacher_id=teacher_id,
+                name="개인 레슨",
+                type="private",
+            )
+            self.db.add(default_class)
+            await self.db.flush()
+            await self.db.refresh(default_class)
+
+        membership = ClassMembership(
+            lesson_class_id=default_class.id,
+            student_id=student_id,
+            instrument="",
+            status="active",
+        )
+        self.db.add(membership)
+        await self.db.flush()
+        await self.db.refresh(membership)
+        return membership.id
 
     async def _next_subscription_session_number(self, subscription_id: str) -> int:
         """Return the next stable session number for a subscription-linked lesson."""

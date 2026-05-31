@@ -2693,6 +2693,9 @@ class AppStrings {
   /// 레슨 취소에 실패했습니다. 다시 시도해주세요. (lesson cancel failed)
   static const lessonCancelFailed = '레슨 취소에 실패했습니다. 다시 시도해주세요.';
 
+  /// 수강권에서 취소 (cancel via subscription menu item)
+  static const cancelViaSubscription = '수강권에서 취소';
+
   /// 레슨 완료 (lesson complete dialog title)
   static const lessonCompleteTitle = '레슨 완료';
 

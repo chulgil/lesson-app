@@ -232,9 +232,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                     child: Text(AppStrings.markComplete),
                   ),
                 if (lesson.displayStatus == LessonStatus.scheduled)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'cancel',
-                    child: Text(AppStrings.cancel),
+                    child: Text(
+                      lesson.subscriptionId != null
+                          ? AppStrings.cancelViaSubscription
+                          : AppStrings.cancel,
+                    ),
                   ),
                 // Show for subscription lessons OR manual lessons with an active subscription
                 if (lesson.subscriptionId != null ||
@@ -268,25 +272,34 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     if (value == 'edit') {
       context.push(AppRoutes.editLesson.replaceFirst(':id', widget.lessonId));
     } else if (value == 'cancel') {
-      final confirmed = await showCancelLessonConfirmation(context);
-      if (confirmed == true) {
-        try {
-          await ref
-              .read(lessonsNotifierProvider.notifier)
-              .cancelLesson(lesson.id);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text(AppStrings.lessonCancelled)),
-            );
-          }
-        } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text(AppStrings.lessonCancelFailed),
-                backgroundColor: AppColors.paperAccent,
-              ),
-            );
+      if (lesson.subscriptionId != null) {
+        // Connected lesson → navigate to subscription detail for proper cancel flow
+        context.push(
+          AppRoutes.subscriptionDetail.replaceFirst(':id', lesson.subscriptionId!),
+          extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
+        );
+      } else {
+        // Manual/legacy lesson without subscription → direct cancel
+        final confirmed = await showCancelLessonConfirmation(context);
+        if (confirmed == true) {
+          try {
+            await ref
+                .read(lessonsNotifierProvider.notifier)
+                .cancelLesson(lesson.id);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text(AppStrings.lessonCancelled)),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text(AppStrings.lessonCancelFailed),
+                  backgroundColor: AppColors.paperAccent,
+                ),
+              );
+            }
           }
         }
       }
