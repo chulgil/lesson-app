@@ -123,3 +123,9 @@ async def test_student_invite_code_signup_reaches_pending_then_connection(
         item["teacher_id"] == teacher_id and item["student_id"] == student_id and item["is_active"]
         for item in student_connections["items"]
     )
+
+    teacher_roster = await beta_client.get_students(teacher_tokens.access_token)
+    assert any(
+        item["user_id"] == student_id and item["connection_status"] == "connected"
+        for item in teacher_roster["items"]
+    )
