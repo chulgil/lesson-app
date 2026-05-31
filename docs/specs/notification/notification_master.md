@@ -189,6 +189,16 @@
 | `inactivityReminder14d` | high | 마지막 활동 14일 경과 | 양쪽 | "놓치고 있는 연습이 있어요" |
 | `winBackOffer30d` | high | 마지막 활동 30일 경과 | 양쪽 | "다시 시작해볼까요? 특별 혜택" |
 
+#### 프로필 완성 리마인더 (2026-05-31 추가)
+
+> 신규 가입 선생님의 프로필 완성을 유도하는 자동 알림. 백엔드 `ProfileReminderService.dispatch_reminders()` 구현 완료.
+
+| 타입 | 우선순위 | DND 우회 | 푸시 |
+|------|---------|---------|------|
+| `profileReminder24h` | normal | X | O |
+| `profileReminder3d` | normal | X | O |
+| `profileReminder7d` | normal | X | O |
+
 ### 2.2 알림 유형 상세 (Claude 구현 가이드)
 
 아래 표는 주요 알림 유형별 트리거 조건, 제목, 본문 예시, 아이콘, 딥링크를 정리한 것이다. Claude가 알림 생성 로직을 구현할 때 이 표를 참조한다.
@@ -221,6 +231,9 @@
 | `subscriptionIssued` | 수강권 발급 시 | 수강권 발급 | "4회 수강권이 발급되었습니다" | ticket | `/subscriptions/{id}` |
 | `scheduleConfirmationRequired` | 스케줄 카드 생성 시 | 일정 확인 요청 | "선생님이 레슨 일정을 제안했습니다" | schedule | `/schedule/confirmation-cards/{id}` |
 | `scheduleChangeRequested` | 스케줄 변경 요청 시 | 스케줄 변경 | "김민수 3/10 레슨 변경 요청" | schedule | `/schedule/{id}` |
+| `profileReminder24h` | 가입 후 24시간, 완성도 <50% | 프로필 완성 안내 | "프로필을 완성하면 학생에게 노출돼요!" | profile | `/profile` |
+| `profileReminder3d` | 가입 후 3일, 프로필 사진 없음 | 사진 추가 안내 | "프로필 사진만 추가하면 검색에 노출됩니다" | camera | `/profile` |
+| `profileReminder7d` | 가입 후 7일, 소개글 없음 | 소개글 작성 안내 | "웹 프로필 링크를 만들어 카톡에 공유해보세요" | edit | `/profile` |
 | `reviewReceived` | 학생 리뷰 작성 시 | 리뷰 알림 | "김민수님이 리뷰를 남겼습니다" | star | `/profile/reviews` |
 
 > **참고**: `{id}` 부분은 `AppNotification.data` 맵에서 해당 리소스 ID를 추출하여 동적으로 치환한다.
@@ -652,6 +665,7 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 서비스 | 역할 |
 |--------|------|
 | `LocalNotificationService` | 인앱 알림 표시/관리 (core service) |
+| `LocalNotificationService._onNotificationTapped` | 알림 탭 시 payload 파싱 → AppNotification stream emit |
 | `ConnectionNotificationService` | 연결 요청/수락/완료 알림 생성 |
 | `ProposalNotificationService` | 수강권 제안/수락/리마인더/만료 알림 생성 |
 | `NotificationSchedulerService` | 미래 시점 알림 예약/취소 (인메모리 큐) |
@@ -676,6 +690,9 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | `lessonReminder` | 서버 스케줄러 | ❌ 미구현 |
 | `lessonStarting` | 서버 스케줄러 | ❌ 미구현 |
 | `practiceReminder` | 로컬 스케줄러 (프론트) | ✅ 프론트 구현 |
+| `profileReminder24h` | `profile_reminder_service.dispatch_reminders()` | ✅ 구현 (2026-05-31) |
+| `profileReminder3d` | `profile_reminder_service.dispatch_reminders()` | ✅ 구현 (2026-05-31) |
+| `profileReminder7d` | `profile_reminder_service.dispatch_reminders()` | ✅ 구현 (2026-05-31) |
 | `lessonCancelled` (단일) | `lesson_service` | ❌ 미구현 |
 | `lessonRescheduled` | `lesson_service` | ❌ 미구현 |
 
@@ -713,4 +730,4 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 2026-03-06 | 구현 코드 기반 Master Spec 작성 (기존 스펙 + 구현 현실 통합) |
 | 2026-03-07 | 알림 유형 상세 테이블(트리거/제목/본문/아이콘/딥링크), Provider 코드 설계, 구현 파일 위치 섹션 추가 |
 | 2026-03-30 | FCM 푸시 알림 인프라 구현 (FcmService, DeviceToken 모델/API, Firebase 설정 가이드) |
-| 2026-05-31 | 백엔드 알림 발송 구현: lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired. 백엔드 발송 구현 상태 테이블 추가 |
+| 2026-05-31 | 백엔드 알림 발송 구현: lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired. 백엔드 발송 구현 상태 테이블 추가. 프로필 리마인더 3종(profileReminder24h/3d/7d) 추가. LocalNotificationService.\_onNotificationTapped payload 파싱 역할 명시 |

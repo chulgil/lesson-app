@@ -16,8 +16,8 @@
 | 분석 대상 | lesson-app 프론트엔드-백엔드 구현 상태 |
 | 분석일 | 2026-05-09 |
 | 전체 Repository 수 | 40개 |
-| Remote 구현 완료 | 27개 (67.5%) |
-| Mock-only (Remote 미구현) | 13개 (32.5%) |
+| Remote 구현 완료 | 30개 (75.0%) |
+| Mock-only (Remote 미구현) | 10개 (25.0%) |
 | 백엔드 API 라우터 | 19개, 120+ 엔드포인트 |
 | API 경로 불일치 | 0건 |
 
@@ -83,6 +83,7 @@
 | 25 | Search | TeacherSearchRepository | ✅ | ✅ | |
 | 26 | Settings | SettingsRepository | ✅ | ✅ | |
 | 27 | Student | LocationRepository | ✅ | ✅ | `/locations` CRUD/list/default/deactivate/reactivate 지원. class-scoped location은 `LessonClass.teacher_id` 소유권을 검증 |
+| 28 | Practice | RecordingFeedbackRepository | ✅ | ✅ | `/recordings/{recording_id}/feedback` CRUD. `RecordingFeedbackList` provider가 repository를 통해 원격 조회/작성 |
 
 ### 2-2. Mock-only — Remote 미구현 (13개)
 
@@ -93,12 +94,12 @@
 | 29 | Practice | PracticeRepertoireRepository | ✅ 있음 | **HIGH** | Hive 로컬 → 서버 동기화 설계 필요 |
 | 30 | Practice | PracticeNoteRepository | ❌ | MEDIUM | 섹션 노트 — practice/sections에 포함 가능 |
 | 31 | Practice | PracticeItemRepository | ✅ 있음 | LOW | 백엔드 `/practice/items` CRUD/filter/action API 추가. resourceIds는 `practice_item_resources`로 정규화 |
-| 32 | Invite | InviteRepository | ✅ 있음 | **HIGH** | 백엔드에 `/invites` 라우터 존재 |
+| 32 | Invite | InviteRepository | ✅ 있음 | **HIGH** | 백엔드에 `/invites` 라우터 존재. 학부모 초대코드 화면에서 InviteRepository 연결 완료 (2026-05-31) |
 | 33 | Lesson | LessonPolicyRepository | ✅ 있음 | LOW | `/lesson-policies/teacher/{id}`, `/lesson-policies/class/{id}`, `/lesson-policies/effective` 지원. class policy 우선, teacher default fallback |
 | 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
 | 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
-| 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | LOW | 백엔드 API는 있으나 Flutter provider는 아직 mock/local fallback. remote adapter 연결 필요 |
-| 38 | Parent | ChildProfileRepository | ✅ 있음 | LOW | 백엔드 `GET /parents/{parent_id}/child-profiles`, `POST /parents/child-profiles`, `GET/PUT/DELETE /parents/child-profiles/{child_id}`, teacher connect/disconnect 지원. 프론트 remote adapter 연결 필요 |
+| 37 | Schedule | ScheduleConfirmationCardRepository | ✅ 있음 | ~~LOW~~ | ✅ Remote 구현 완료 (2026-05-31). `RemoteScheduleConfirmationCardRepository` 신규 생성, provider 전환 완료 |
+| 38 | Parent | ChildProfileRepository | ✅ 있음 | ~~LOW~~ | ✅ Remote 구현 완료 (2026-05-31). `RemoteChildProfileRepository` 신규 생성, provider 전환 완료 |
 | 39 | Tip | TipTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/tip-templates`, usage increment 추가. 프론트 remote repository 연결 필요 |
 | 41 | Lesson | FeedbackTemplateRepository | ✅ 있음 | LOW | 백엔드 `GET/POST/PUT/DELETE /settings/feedback-templates`, usage increment 추가. tags는 `feedback_template_tags`로 정규화 |
 | 40 | Subscription | SubscriptionSettingsRepository | ✅ 있음 | LOW | 백엔드 `/subscription-settings` flat CRUD와 frontend remote class 존재. Provider 미연결 상태이며, write는 현재 teacher profile 소유권으로 제한 |
@@ -122,7 +123,7 @@
 | FeedbackTemplateRepository | `GET /settings/feedback-templates`, `POST /settings/feedback-templates`, `GET /settings/feedback-templates/{id}`, `PUT /settings/feedback-templates/{id}`, `PATCH /settings/feedback-templates/{id}/usage`, `DELETE /settings/feedback-templates/{id}` | 프론트 `RemoteFeedbackTemplateRepository` 추가 및 provider mock-only 제거 |
 | TeachingResourceRepository | `GET /settings/teaching-resources?tag=&query=`, `POST /settings/teaching-resources`, `GET /settings/teaching-resources/{id}`, `PUT /settings/teaching-resources/{id}`, `DELETE /settings/teaching-resources/{id}` | 프론트 remote repository의 `getByIds`는 아직 전체 목록 조회 후 client-side filter. 필요 시 batch endpoint 추가 |
 | PracticeItemRepository | `GET /practice/items?lesson_id=&student_id=&date_from=&date_to=`, `GET /practice/items/incomplete`, `GET /practice/items/awaiting-feedback`, `POST /practice/items`, `GET /practice/items/{id}`, `PUT /practice/items/{id}`, `DELETE /practice/items/{id}`, `PATCH /practice/items/{id}/complete`, `PATCH /practice/items/{id}/like`, `PATCH /practice/items/{id}/practice-count/increment`, `PATCH /practice/items/{id}/practice-count/decrement` | 프론트 `RemotePracticeItemRepository` 추가 및 provider mock-only 제거 |
-| RecordingFeedback provider | `GET /recordings/{recording_id}/feedback`, `POST /recordings/{recording_id}/feedback`, `PUT /recordings/{recording_id}/feedback/{feedback_id}`, `DELETE /recordings/{recording_id}/feedback/{feedback_id}` | 프론트 `RecordingFeedbackList` mock-only provider를 remote repository/provider로 전환. 응답 필드는 `id`, `recordingId`, `teacherId`, `content`, `createdAt` |
+| RecordingFeedback provider | `GET /recordings/{recording_id}/feedback`, `POST /recordings/{recording_id}/feedback`, `PUT /recordings/{recording_id}/feedback/{feedback_id}`, `DELETE /recordings/{recording_id}/feedback/{feedback_id}` | 완료. 프론트 `RecordingFeedbackList`가 `RecordingFeedbackRepository`를 통해 remote/mock 모드를 전환한다. 응답 필드는 `id`, `recordingId`, `teacherId`, `content`, `createdAt` |
 | Parent membership/class reads | `GET /memberships?student_id={linkedChildId}`, `GET /lessons-classes/{classId}` | 학부모 결제/수강권 화면이 자녀 subscription API와 같은 권한 모델로 membership/class read를 재사용 가능. mutation은 teacher-only 유지 |
 | FollowRepository filtered lookup | `GET /follows?follower_id=&following_id=&target_type=&direction=following|followers` | 프론트 `RemoteFollowRepository`가 전체 목록 조회 후 client-side filter/count 하던 흐름을 서버 필터로 대체 가능 |
 | TeacherStudentRelationRepository filtered lookup | `GET /relationships?teacher_id=&student_id=&status=&is_manually_registered=` | 프론트 `RemoteTeacherStudentRelationRepository`와 mock repository의 teacher/student/status/manual 필터 및 teacher-student pair lookup을 서버 필터로 대체 가능 |
@@ -172,7 +173,7 @@
 | 백엔드 라우터 | 엔드포인트 | 프론트엔드 Remote |
 |-------------|-----------|:---------------:|
 | users.py | `/users/me`, `/users/me/role`, `/users/me/locale`, `/users/me/onboarding-complete` | ❌ |
-| teachers.py | `/teachers/{id}/students`, `/teachers/{id}/dashboard`, `/teachers/me/dashboard` | ❌ |
+| teachers.py | `/teachers/{id}/students`, `/teachers/{id}/dashboard`, `/teachers/me/dashboard`, `GET /teachers/public/{id}` | ❌ (공개 프로필 API — 인증 불필요, 민감정보 제외) |
 | students.py | `/students/{id}/stats`, `/students/me/profile` | ❌ |
 | lessons.py | `/lessons/upcoming`, `/lessons/recent`, `/lessons/{id}/feedback` | ❌ |
 | practice.py | `/practice/repertoires/*`, `/practice/sections/*` | ❌ (Mock-only) |
@@ -211,7 +212,7 @@
 | # | 작업 | 비고 |
 |---|------|------|
 | 9 | PaymentRepository Remote 구현 | 앱 결제 표면이 아니라 선생님 수동 입금 상태 관리로 유지. 별도 PG API는 보류 |
-| 10 | ScheduleConfirmationCardRepository Remote 구현 | 백엔드 엔드포인트 추가 필요 |
+| 10 | ScheduleConfirmationCardRepository Remote 구현 | 완료 |
 | 11 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
 | 12 | LocationRepository Remote 검증 | 레슨 장소 관리는 `/locations`로 지원. 프론트 synthetic location id(`student_home_*`, `academy_default` 등)는 실제 location lookup 또는 membership location 선택 UI로 정리 필요 |
 | 13 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | 백엔드 API와 remote class는 존재. Provider 미연결 상태 해소 |
@@ -223,8 +224,8 @@
 
 ```
 총 Repository:            40개
-Remote 구현 완료:          27개 (67.5%)
-Mock-only:                13개 (32.5%)
+Remote 구현 완료:          30개 (75.0%)
+Mock-only:                10개 (25.0%)
 API 경로 일치:             27/27 Remote (100%)
 API 경로 불일치:            0건
 백엔드 전용 엔드포인트:     ~30개 (프론트 미사용)

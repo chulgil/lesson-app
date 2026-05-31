@@ -565,10 +565,24 @@ features/analytics/
 
 ---
 
+## 9. Phase G 메서드 임시 처리 (2026-05-31)
+
+백엔드 엔드포인트 미확정으로 임시 빈 데이터를 반환하는 메서드 목록.
+
+| 메서드 | 상태 | 비고 |
+|--------|:----:|------|
+| `getStudentProgress` | ⚠️ 임시 | 빈 데이터 반환 (백엔드 엔드포인트 추가 전) |
+| `getRevenueAnalytics` | ⚠️ 임시 | 월간 stats 기반 파생 데이터 |
+| `getRetentionAnalytics` | ⚠️ 임시 | 빈 데이터 반환 |
+| `getStudentSummaryList` | ⚠️ 임시 | 빈 리스트 반환 |
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-05-31 | Phase G 메서드 임시 처리 목록 추가 (getStudentProgress, getRevenueAnalytics, getRetentionAnalytics, getStudentSummaryList) |
 | 2026-03-11 | Phase 1+2 구현 완료 반영 (#97). fl_chart → CustomPaint 변경, 구현 파일 위치 업데이트 |
 | 2026-03-07 | 위젯 구조, 화면 플로우, 경쟁사 상세 분석, Mock 데이터 설계, 구현 파일 위치 섹션 추가 |
 | 2026-03-07 | 초안 작성 (이슈 #72) |

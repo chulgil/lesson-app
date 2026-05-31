@@ -115,6 +115,9 @@
 | **보너스 레슨** | 남은 횟수 0인 수강권에 레슨 추가 시 total_lessons/bonus_count 자동 증가 | 위 스펙 §2.3 |
 | **학생 알림 4종 추가** | lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired | [notification_master.md](../notification/notification_master.md) |
 | **Mock → Remote 전환 4건** | 초대코드/ChildProfile/ScheduleConfirmationCard/알림탭 payload | 각 도메인 스펙 참조 |
+| **온보딩 v3** | 간소화(이름+악기만) + 코치마크 + 퀘스트 보드 | [teacher_onboarding_v3_spec.md](../onboarding/teacher_onboarding_v3_spec.md) |
+| **웹 프로필 API** | GET /teachers/public/{id} 인증 불필요 공개 프로필 | [user_master.md](../user/user_master.md) |
+| **프로필 리마인더** | 24시간/3일/7일 자동 알림 (ProfileReminderService) | [notification_master.md](../notification/notification_master.md) |
 
 ---
 

@@ -1187,6 +1187,7 @@ class UserProfile {
 | ChildProfileManager (CRUD) | ✅ 구현 완료 |
 | ChildProfileFormScreen (자녀 등록/수정) | ✅ 구현 완료 |
 | RemoteParentRepository | ✅ 구현 완료 |
+| RemoteChildProfileRepository | ✅ Remote 구현 완료 (2026-05-31) |
 | 실데이터 연동 (퀵스탯, 과제, 입금 상태 등) | ❌ 미구현 |
 
 #### 관련 파일
@@ -1274,6 +1275,7 @@ features/parent_home/
 | 공개 범위 설정 | ✅ 구현 완료 |
 | 입금 상태 관리 | ✅ 구현 완료 |
 | 레퍼토리 관리 | ✅ 구현 완료 |
+| 공개 프로필 API | ✅ 구현 완료 (2026-05-31) — `GET /teachers/public/{id}` 인증 불필요, 민감정보 제외 |
 
 #### 관련 파일
 
