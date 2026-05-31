@@ -74,17 +74,58 @@ final hasPriceTableProvider = Provider<bool>.internal(
 );
 
 typedef HasPriceTableRef = ProviderRef<bool>;
-String _$profileCompletionPercentHash() =>
-    r'f01c55116d10e8aedc1987a3019cb0cd42cfdc50';
+String _$hasBankAccountHash() => r'24b8179f8863b39cd5ecf6b0b4ad1c39d46244cd';
 
-/// Profile completion percentage (0–100).
+/// Whether the teacher has registered a bank account.
 ///
-/// Weights (5 quests — phone verification is mandatory at signup, not a quest):
-///   I.   Available slots                                  : 25
-///   II.  Profile image                                    : 20
-///   III. Introduction (20+ chars)                         : 20
-///   IV.  Lesson price table                               : 15
-///   V.   First student (last — requires setup complete)   : 20
+/// Copied from [hasBankAccount].
+@ProviderFor(hasBankAccount)
+final hasBankAccountProvider = Provider<bool>.internal(
+  hasBankAccount,
+  name: r'hasBankAccountProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$hasBankAccountHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HasBankAccountRef = ProviderRef<bool>;
+String _$hasIssuedSubscriptionHash() =>
+    r'31d4bd5f238eac272337fa9d1e80a533807a45a9';
+
+/// Whether the teacher has issued at least one subscription.
+/// With auto-subscription (Plan B), having a lesson implies a subscription exists.
+///
+/// Copied from [hasIssuedSubscription].
+@ProviderFor(hasIssuedSubscription)
+final hasIssuedSubscriptionProvider = Provider<bool>.internal(
+  hasIssuedSubscription,
+  name: r'hasIssuedSubscriptionProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$hasIssuedSubscriptionHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HasIssuedSubscriptionRef = ProviderRef<bool>;
+String _$profileCompletionPercentHash() =>
+    r'9bb1cade6332c5a2df2e88c46dfa2d9c37288d09';
+
+/// Quest board completion percentage (0–100).
+///
+/// 8 quests total (phone verification is mandatory at signup):
+///   === Setup Phase (50%) ===
+///   I.   Available slots          : 12
+///   II.  Profile image            : 10
+///   III. Introduction             : 10
+///   IV.  Lesson price table       : 8
+///   V.   Bank account             : 10
+///   === Action Phase (50%) ===
+///   VI.  First student invite     : 15
+///   VII. First subscription       : 20
+///   VIII.First lesson completed   : 15
 ///
 /// Copied from [profileCompletionPercent].
 @ProviderFor(profileCompletionPercent)

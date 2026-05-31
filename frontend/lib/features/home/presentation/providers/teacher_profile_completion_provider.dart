@@ -55,25 +55,52 @@ bool hasPriceTable(HasPriceTableRef ref) {
   return table != null && table.isNotEmpty;
 }
 
-/// Profile completion percentage (0–100).
+/// Whether the teacher has registered a bank account.
+@Riverpod(keepAlive: true)
+bool hasBankAccount(HasBankAccountRef ref) {
+  final profile = ref.watch(currentTeacherProfileProvider).valueOrNull;
+  if (profile == null) return false;
+  final defaultAccount = profile.defaultBankAccount;
+  return defaultAccount != null;
+}
+
+/// Whether the teacher has issued at least one subscription.
+/// With auto-subscription (Plan B), having a lesson implies a subscription exists.
+@Riverpod(keepAlive: true)
+bool hasIssuedSubscription(HasIssuedSubscriptionRef ref) {
+  return ref.watch(homeHasLessonsProvider);
+}
+
+/// Quest board completion percentage (0–100).
 ///
-/// Weights (5 quests — phone verification is mandatory at signup, not a quest):
-///   I.   Available slots                                  : 25
-///   II.  Profile image                                    : 20
-///   III. Introduction (20+ chars)                         : 20
-///   IV.  Lesson price table                               : 15
-///   V.   First student (last — requires setup complete)   : 20
+/// 8 quests total (phone verification is mandatory at signup):
+///   === Setup Phase (50%) ===
+///   I.   Available slots          : 12
+///   II.  Profile image            : 10
+///   III. Introduction             : 10
+///   IV.  Lesson price table       : 8
+///   V.   Bank account             : 10
+///   === Action Phase (50%) ===
+///   VI.  First student invite     : 15
+///   VII. First subscription       : 20
+///   VIII.First lesson completed   : 15
 @Riverpod(keepAlive: true)
 int profileCompletionPercent(ProfileCompletionPercentRef ref) {
   var total = 0;
 
-  if (ref.watch(hasAvailableSlotsProvider)) total += 25;
-  if (ref.watch(hasProfileImageProvider)) total += 20;
-  if (ref.watch(hasIntroductionProvider)) total += 20;
-  if (ref.watch(hasPriceTableProvider)) total += 15;
+  // Setup Phase
+  if (ref.watch(hasAvailableSlotsProvider)) total += 12;
+  if (ref.watch(hasProfileImageProvider)) total += 10;
+  if (ref.watch(hasIntroductionProvider)) total += 10;
+  if (ref.watch(hasPriceTableProvider)) total += 8;
+  if (ref.watch(hasBankAccountProvider)) total += 10;
+
+  // Action Phase
   if (ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true) {
-    total += 20;
+    total += 15;
   }
+  if (ref.watch(hasIssuedSubscriptionProvider)) total += 20;
+  if (ref.watch(homeHasCompletedLessonProvider)) total += 15;
 
   return total.clamp(0, 100);
 }

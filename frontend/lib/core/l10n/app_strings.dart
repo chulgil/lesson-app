@@ -5567,6 +5567,14 @@ class AppStrings {
   /// Quest 보상 — 인증 선생님 배지.
   static const questRewardVerified = '인증 선생님 배지';
 
+  // Quest Board — Action Phase (실제 레슨 운영)
+  static const questTitleBankAccount = '입금 계좌 등록';
+  static const questRewardBankAccount = '학생에게 입금 안내 가능';
+  static const questTitleSubscription = '첫 수강권 발급';
+  static const questRewardSubscription = '레슨 관리 시작';
+  static const questTitleFirstLesson = '첫 레슨 완료';
+  static const questRewardFirstLesson = '레슨 워크플로우 완성';
+
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';

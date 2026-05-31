@@ -32,14 +32,19 @@ class QuestBoardCard extends ConsumerWidget {
     final hasPhoto = ref.watch(hasProfileImageProvider);
     final hasIntro = ref.watch(hasIntroductionProvider);
     final hasPrice = ref.watch(hasPriceTableProvider);
-    // Phone verification is now mandatory during signup — not a quest.
+    final hasBankAcc = ref.watch(hasBankAccountProvider);
+    final hasSubscription = ref.watch(hasIssuedSubscriptionProvider);
+    final hasCompletedLesson = ref.watch(homeHasCompletedLessonProvider);
 
     final allDone =
         hasSlots &&
-        hasStudents &&
         hasPhoto &&
         hasIntro &&
-        hasPrice;
+        hasPrice &&
+        hasBankAcc &&
+        hasStudents &&
+        hasSubscription &&
+        hasCompletedLesson;
 
     if (allDone) return const SizedBox.shrink();
 
@@ -50,6 +55,9 @@ class QuestBoardCard extends ConsumerWidget {
       hasPhoto: hasPhoto,
       hasIntro: hasIntro,
       hasPrice: hasPrice,
+      hasBankAcc: hasBankAcc,
+      hasSubscription: hasSubscription,
+      hasCompletedLesson: hasCompletedLesson,
     );
 
     return Padding(
@@ -96,16 +104,25 @@ class QuestBoardCard extends ConsumerWidget {
     required bool hasPhoto,
     required bool hasIntro,
     required bool hasPrice,
+    required bool hasBankAcc,
+    required bool hasSubscription,
+    required bool hasCompletedLesson,
   }) {
-    // Quest order designed by UX priority:
+    // Quest order designed by teacher workflow:
+    //
+    // === Setup Phase (프로필 & 설정) ===
     // 1. Lesson time settings — students can't book without this
     // 2. Profile photo — builds trust, enables search visibility
     // 3. Introduction — unlocks web profile sharing
     // 4. Lesson price — shows pricing to students
-    // 5. First student invite — LAST, requires all setup complete first
+    // 5. Bank account — students need to know where to pay
     //
-    // Phone verification is mandatory during signup, not a quest.
+    // === Action Phase (실제 레슨 운영) ===
+    // 6. First student invite — connect with a student
+    // 7. First subscription — issue subscription to start managing
+    // 8. First lesson completed — complete the full workflow
     return [
+      // ── Setup Phase ──
       _Quest(
         step: 1,
         title: AppStrings.questTitleSlots,
@@ -136,10 +153,35 @@ class QuestBoardCard extends ConsumerWidget {
       ),
       _Quest(
         step: 5,
+        title: AppStrings.questTitleBankAccount,
+        reward: AppStrings.questRewardBankAccount,
+        isCompleted: hasBankAcc,
+        onTap: () => context.push(AppRoutes.bankAccountEdit),
+      ),
+      // ── Action Phase ──
+      _Quest(
+        step: 6,
         title: AppStrings.questTitleStudent,
         reward: AppStrings.questRewardConnection,
         isCompleted: hasStudents,
         onTap: () => context.push(AppRoutes.invite),
+      ),
+      _Quest(
+        step: 7,
+        title: AppStrings.questTitleSubscription,
+        reward: AppStrings.questRewardSubscription,
+        isCompleted: hasSubscription,
+        onTap:
+            hasStudents
+                ? () => context.push(AppRoutes.issueSubscription)
+                : null,
+      ),
+      _Quest(
+        step: 8,
+        title: AppStrings.questTitleFirstLesson,
+        reward: AppStrings.questRewardFirstLesson,
+        isCompleted: hasCompletedLesson,
+        onTap: null,
       ),
     ];
   }
