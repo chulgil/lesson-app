@@ -404,7 +404,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         LessonTimeSettingsSectionTitle(
           title: AppStrings.profileOperatingHoursSection,
           onAddPressed:
-              () => showAddTimeSlotDialog(
+              () => showTimeSlotDialog(
                 context: context,
                 onSave: (slot) {
                   ref
@@ -430,9 +430,9 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
             dayOfWeek: dayOfWeek,
             slots: slots,
             onEditSlot:
-                (slot) => showEditTimeSlotDialog(
+                (slot) => showTimeSlotDialog(
                   context: context,
-                  slot: slot,
+                  existingSlot: slot,
                   onSave: (updatedSlot) {
                     ref
                         .read(teacherSettingsNotifierProvider.notifier)

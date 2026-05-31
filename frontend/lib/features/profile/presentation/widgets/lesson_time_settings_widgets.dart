@@ -782,11 +782,28 @@ void showAddTimeSlotDialog({
   required void Function(TimeSlot) onSave,
   int? preselectedDay,
 }) {
+  showTimeSlotDialog(
+    context: context,
+    onSave: onSave,
+    preselectedDay: preselectedDay,
+  );
+}
+
+/// Show the shared add/edit time slot dialog.
+void showTimeSlotDialog({
+  required BuildContext context,
+  required void Function(TimeSlot) onSave,
+  int? preselectedDay,
+  TimeSlot? existingSlot,
+}) {
   showDialog(
     context: context,
     builder:
-        (context) =>
-            TimeSlotDialog(preselectedDay: preselectedDay, onSave: onSave),
+        (context) => TimeSlotDialog(
+          preselectedDay: preselectedDay,
+          existingSlot: existingSlot,
+          onSave: onSave,
+        ),
   );
 }
 
@@ -796,8 +813,5 @@ void showEditTimeSlotDialog({
   required TimeSlot slot,
   required void Function(TimeSlot) onSave,
 }) {
-  showDialog(
-    context: context,
-    builder: (context) => TimeSlotDialog(existingSlot: slot, onSave: onSave),
-  );
+  showTimeSlotDialog(context: context, existingSlot: slot, onSave: onSave);
 }

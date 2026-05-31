@@ -64,4 +64,57 @@ void main() {
     await tester.tap(find.text(AppStrings.delete));
     expect(deleted, isTrue);
   });
+
+  testWidgets('time slot editor reuses add dialog with editable day selector', (
+    tester,
+  ) async {
+    TimeSlot? savedSlot;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder:
+                (context) => FilledButton(
+                  onPressed:
+                      () => showTimeSlotDialog(
+                        context: context,
+                        existingSlot: const TimeSlot(
+                          id: 'slot-2',
+                          dayOfWeek: 2,
+                          startTime: ClockTime(hour: 10, minute: 30),
+                          endTime: ClockTime(hour: 12, minute: 0),
+                        ),
+                        onSave: (slot) => savedSlot = slot,
+                      ),
+                  child: const Text('open'),
+                ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.profileTimeSlotEditTitle), findsOneWidget);
+    expect(find.text('요일'), findsOneWidget);
+    expect(find.text('시작 시간'), findsOneWidget);
+    expect(find.text('종료 시간'), findsOneWidget);
+    expect(find.text('화요일'), findsOneWidget);
+    expect(find.text('10:30'), findsOneWidget);
+    expect(find.text('12:00'), findsOneWidget);
+
+    await tester.tap(find.text('화요일'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('금요일').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.save));
+    await tester.pumpAndSettle();
+
+    expect(savedSlot?.id, 'slot-2');
+    expect(savedSlot?.dayOfWeek, 5);
+    expect(savedSlot?.startTime, const ClockTime(hour: 10, minute: 30));
+    expect(savedSlot?.endTime, const ClockTime(hour: 12, minute: 0));
+  });
 }
