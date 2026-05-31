@@ -1,6 +1,6 @@
 """Parent child profile API contract tests."""
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from httpx import AsyncClient
@@ -11,6 +11,43 @@ from app.core.security import create_access_token
 def _headers(user_id: str, role: str) -> dict[str, str]:
     token = create_access_token(data={"sub": user_id, "role": role})
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.mark.asyncio
+async def test_parent_profile_setup_is_idempotent_for_existing_self_profile(
+    client: AsyncClient,
+    create_test_user,
+):
+    """Retrying parent profile setup updates the current user's parent profile."""
+    await create_test_user(user_id="parent-user-id", role="parent", name="Parent", email="parent@test.com")
+
+    first = await client.post(
+        "/api/v1/parents",
+        headers=_headers("parent-user-id", "parent"),
+        json={
+            "name": "Parent",
+            "phone": "01011112222",
+            "email": "parent@test.com",
+        },
+    )
+    assert first.status_code == 201, first.text
+
+    retry = await client.post(
+        "/api/v1/parents",
+        headers=_headers("parent-user-id", "parent"),
+        json={
+            "name": "Updated Parent",
+            "phone": "01033334444",
+            "email": "updated-parent@test.com",
+        },
+    )
+
+    assert retry.status_code == 201, retry.text
+    data = retry.json()
+    assert data["id"] == first.json()["id"]
+    assert data["name"] == "Updated Parent"
+    assert data["phone"] == "01033334444"
+    assert data["email"] == "updated-parent@test.com"
 
 
 @pytest.mark.asyncio
@@ -194,3 +231,50 @@ async def test_parent_connects_and_disconnects_teacher_for_child_profile(
     assert disconnect_response.status_code == 200
     assert disconnect_response.json()["teacherId"] is None
     assert disconnect_response.json()["connectionStatus"] == "unconnected"
+
+
+@pytest.mark.asyncio
+async def test_parent_invite_link_is_idempotent_for_existing_child_relation(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """Retrying invite-code child linking returns the existing relation."""
+    from app.models.parent import Parent, ParentInvitation
+    from app.models.student import Student
+
+    await create_test_user(user_id="parent-user-id", role="parent", name="Parent", email="parent@test.com")
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent"),
+            Student(id="child-001", teacher_id=None, name="Child", instrument="violin"),
+            ParentInvitation(
+                id="parent-invite-id",
+                student_id="child-001",
+                teacher_id=None,
+                source="student",
+                parent_phone="01011112222",
+                invitation_code="PARENT-CODE",
+                expires_at=datetime.now(UTC) + timedelta(days=7),
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    first = await client.post(
+        "/api/v1/parents/me/children",
+        headers=_headers("parent-user-id", "parent"),
+        json={"invite_code": "PARENT-CODE"},
+    )
+    assert first.status_code == 201, first.text
+
+    retry = await client.post(
+        "/api/v1/parents/me/children",
+        headers=_headers("parent-user-id", "parent"),
+        json={"invite_code": "PARENT-CODE"},
+    )
+
+    assert retry.status_code == 201, retry.text
+    assert retry.json()["id"] == first.json()["id"]
+    assert retry.json()["parent_id"] == "parent-profile-id"
+    assert retry.json()["student_id"] == "child-001"

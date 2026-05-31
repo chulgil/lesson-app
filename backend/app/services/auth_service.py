@@ -8,13 +8,13 @@ from typing import Any
 
 import httpx
 from fastapi import HTTPException, status
-
-logger = logging.getLogger(__name__)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.auth import DevLoginRequest, OAuthRequest, RefreshTokenResponse, TokenResponse
 from app.schemas.user import UserResponse
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:

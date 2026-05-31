@@ -69,6 +69,15 @@ class ParentService:
 
         existing = await self.db.scalar(select(Parent).where(Parent.user_id == user_id))
         if existing is not None:
+            if role == "parent" and existing.user_id == current_user.id:
+                existing.name = data.name
+                existing.phone = data.phone
+                existing.email = data.email
+                existing.profile_image_url = data.profile_image_url
+                existing.profile_color = data.profile_color
+                await self.db.flush()
+                await self.db.refresh(existing)
+                return ParentResponse.model_validate(existing)
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Parent profile already exists")
 
         parent = Parent(
@@ -159,7 +168,6 @@ class ParentService:
         invitation = await self.db.scalar(
             select(ParentInvitation).where(
                 ParentInvitation.invitation_code == invite_code,
-                ParentInvitation.is_used == False,  # noqa: E712
                 ParentInvitation.expires_at > datetime.now(UTC),
             )
         )
@@ -183,7 +191,10 @@ class ParentService:
             )
         )
         if existing:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Already linked to this child")
+            return self._relation_response(existing)
+
+        if invitation is not None and invitation.is_used:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Invitation already used")
 
         link = ParentChildRelation(
             parent_id=parent.id,
