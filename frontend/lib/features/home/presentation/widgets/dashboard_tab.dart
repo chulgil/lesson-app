@@ -19,7 +19,7 @@ import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
 import 'demo_dashboard_overlay.dart';
-import 'getting_started_card.dart';
+import 'quest_board_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
 import 'schedule_change_request_section.dart';
@@ -114,8 +114,8 @@ class DashboardTab extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Getting Started Guide (shown when 0 students)
-              const GettingStartedCard(),
+              // Quest Board — profile completion gamification
+              const QuestBoardCard(),
 
               // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
               _buildStatsRow(context, todayLessons, dashboard.lessonStats),

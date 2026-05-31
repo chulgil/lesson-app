@@ -5509,6 +5509,58 @@ class AppStrings {
   /// Step 5 — 전화번호 인증 서브타이틀.
   static const gettingStartedStep5Subtitle = '안전한 수업 관리를 위해 연락처를 확인하세요';
 
+  // ── Quest Board (프로필 완성도 퀘스트 보드) ───────────────────────────────
+
+  // ── Onboarding v3 ──
+  static const onboardingFieldName = '이름';
+  static const onboardingFieldInstrument = '악기';
+  static const onboardingIntroOptionalHint = '나중에 작성해도 돼요';
+
+  /// Quest Board 섹션 헤더 라벨.
+  static const questBoardTitle = 'QUEST BOARD';
+
+  /// Quest Board 인트로 안내 — 프로필 완성 유도.
+  static const questBoardIntro = '프로필을 완성하면 학생에게 더 많이 노출돼요!';
+
+  /// Quest I — 이름 + 악기 설정 타이틀.
+  static const questTitleNameInstrument = '이름 + 악기 설정';
+
+  /// Quest II — 레슨 시간 설정 타이틀.
+  static const questTitleSlots = '레슨 시간 설정';
+
+  /// Quest III — 첫 학생 초대 타이틀.
+  static const questTitleStudent = '첫 학생 초대';
+
+  /// Quest IV — 프로필 사진 추가 타이틀.
+  static const questTitlePhoto = '프로필 사진 추가';
+
+  /// Quest V — 소개글 작성 타이틀.
+  static const questTitleIntro = '소개글 작성';
+
+  /// Quest VI — 레슨비 설정 타이틀.
+  static const questTitlePrice = '레슨비 설정';
+
+  /// Quest VII — 전화번호 인증 타이틀.
+  static const questTitlePhone = '전화번호 인증';
+
+  /// Quest 보상 — 학생 예약 가능.
+  static const questRewardSlots = '학생 예약 가능';
+
+  /// Quest 보상 — 연결 시스템 활성화.
+  static const questRewardConnection = '연결 시스템 활성화';
+
+  /// Quest 보상 — 학생 검색 노출.
+  static const questRewardSearch = '학생 검색 노출';
+
+  /// Quest 보상 — 웹 프로필 공유 가능.
+  static const questRewardWebProfile = '웹 프로필 공유 가능';
+
+  /// Quest 보상 — 학생에게 가격 표시.
+  static const questRewardPrice = '학생에게 가격 표시';
+
+  /// Quest 보상 — 인증 선생님 배지.
+  static const questRewardVerified = '인증 선생님 배지';
+
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';

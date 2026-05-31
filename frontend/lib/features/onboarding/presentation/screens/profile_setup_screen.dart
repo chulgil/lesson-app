@@ -66,16 +66,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   bool get _isFormValid {
-    return _nameController.text.isNotEmpty &&
-        _selectedInstruments.isNotEmpty &&
-        _introController.text.length >= 20;
+    return _nameController.text.isNotEmpty && _selectedInstruments.isNotEmpty;
   }
 
   List<String> get _missingFields {
     final fields = <String>[];
-    if (_nameController.text.isEmpty) fields.add('이름');
-    if (_selectedInstruments.isEmpty) fields.add('악기');
-    if (_introController.text.length < 20) fields.add('소개글 (20자 이상)');
+    if (_nameController.text.isEmpty) fields.add(AppStrings.onboardingFieldName);
+    if (_selectedInstruments.isEmpty) fields.add(AppStrings.onboardingFieldInstrument);
     return fields;
   }
 
@@ -209,7 +206,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         title: const Text(AppStrings.onboardingProfileSetup),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.teacherPhoneVerification),
+          onPressed: () => context.go(AppRoutes.roleSelect),
         ),
       ),
       body: SafeArea(
@@ -338,19 +335,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       children: [
         _ProgressStep(
           step: 1,
-          label: AppStrings.onboardingPhoneVerification,
-          isActive: false,
-          isCompleted: true,
-        ),
-        _ProgressDivider(isActive: true),
-        _ProgressStep(
-          step: 2,
           label: AppStrings.onboardingProfileSetup,
           isActive: true,
         ),
         _ProgressDivider(isActive: false),
         _ProgressStep(
-          step: 3,
+          step: 2,
           label: AppStrings.onboardingTutorial,
           isActive: false,
         ),
@@ -553,7 +543,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   Widget _buildIntroductionInput() {
     final charCount = _introController.text.length;
-    final isValid = charCount >= 20;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,22 +550,16 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Text(
-                  '소개',
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space1),
-                Text('*', style: TextStyle(color: AppColors.paperAccent)),
-              ],
+            Text(
+              '소개 (선택)',
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text(
-              '$charCount / 20자 이상',
+              '$charCount / 500자',
               style: AppTypography.caption.copyWith(
-                color: isValid ? AppColors.paperOk : AppColors.inkTertiary,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -589,7 +572,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           maxLength: 500,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
-            hintText: AppStrings.onboardingIntroHint,
+            hintText: AppStrings.onboardingIntroOptionalHint,
             counterText: '',
             border: OutlineInputBorder(borderRadius: BorderRadius.zero),
             enabledBorder: OutlineInputBorder(
