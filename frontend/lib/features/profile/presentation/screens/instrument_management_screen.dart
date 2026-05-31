@@ -152,22 +152,17 @@ class _InstrumentManagementScreenState
             ),
           )
         else
-          ReorderableListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: instruments.length,
-            onReorder:
-                (oldIndex, newIndex) =>
-                    _reorderInstrument(instruments, oldIndex, newIndex),
-            itemBuilder: (context, index) {
-              final instrument = instruments[index];
-              return _buildInstrumentTile(
+          ...List.generate(instruments.length, (index) {
+            final instrument = instruments[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: _buildInstrumentTile(
                 key: ValueKey(instrument),
                 instrument: instrument,
                 index: index,
-              );
-            },
-          ),
+              ),
+            );
+          }),
       ],
     );
   }
@@ -175,11 +170,10 @@ class _InstrumentManagementScreenState
   Widget _buildInstrumentTile({
     required Key key,
     required String instrument,
-    required int index,
+    int index = 0,
   }) {
     return NotebookCard(
       key: key,
-      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppColors.paperAccentSoft,
@@ -189,21 +183,12 @@ class _InstrumentManagementScreenState
           ),
         ),
         title: Text(instrument, style: AppTypography.bodyLarge),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline,
-                color: AppColors.paperAccent,
-              ),
-              onPressed: () => _showDeleteConfirmation(instrument),
-            ),
-            ReorderableDragStartListener(
-              index: index,
-              child: const Icon(Icons.drag_handle),
-            ),
-          ],
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.delete_outline,
+            color: AppColors.paperAccent,
+          ),
+          onPressed: () => _showDeleteConfirmation(instrument),
         ),
       ),
     );
@@ -387,17 +372,4 @@ class _InstrumentManagementScreenState
     }
   }
 
-  void _reorderInstrument(
-    List<String> instruments,
-    int oldIndex,
-    int newIndex,
-  ) async {
-    if (newIndex > oldIndex) newIndex -= 1;
-    final reordered = List<String>.from(instruments);
-    final item = reordered.removeAt(oldIndex);
-    reordered.insert(newIndex, item);
-    await ref
-        .read(teacherSettingsNotifierProvider.notifier)
-        .reorderInstruments(reordered);
-  }
 }
