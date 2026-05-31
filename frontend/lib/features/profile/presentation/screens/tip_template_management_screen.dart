@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../../features/lessons/domain/entities/tip_template.dart';
 import '../../../lessons/presentation/extensions/template_category_visuals.dart';
@@ -158,40 +159,20 @@ class _TipTemplateManagementScreenState
   }
 
   Widget _buildTemplateCard(TipTemplate template) {
-    return Dismissible(
-      key: Key(template.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: AppSpacing.space4),
-        decoration: BoxDecoration(color: AppColors.paperAccent),
-        child: const Icon(Icons.delete, color: AppColors.paper),
-      ),
-      confirmDismiss: (direction) async {
-        return await _showDeleteConfirmation(template);
-      },
-      onDismissed: (direction) {
-        ref
-            .read(tipTemplatesNotifierProvider.notifier)
-            .deleteTemplate(template.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(AppStrings.profileTipTemplateDeleted),
-            action: SnackBarAction(
-              label: AppStrings.profileTipTemplateUndo,
-              onPressed: () {
-                ref
-                    .read(tipTemplatesNotifierProvider.notifier)
-                    .addTemplate(
-                      content: template.content,
-                      category: template.category,
-                      instrument: template.instrument,
-                    );
-              },
-            ),
-          ),
-        );
-      },
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionEdit,
+          icon: Icons.edit_outlined,
+          onPressed: () => _showEditTemplateDialog(template),
+        ),
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _deleteTemplate(template),
+        ),
+      ],
       child: NotebookCard(
         margin: EdgeInsets.zero,
         child: InkWell(
@@ -277,6 +258,34 @@ class _TipTemplateManagementScreenState
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteTemplate(TipTemplate template) async {
+    final confirmed = await _showDeleteConfirmation(template);
+    if (confirmed != true) return;
+
+    await ref
+        .read(tipTemplatesNotifierProvider.notifier)
+        .deleteTemplate(template.id);
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(AppStrings.profileTipTemplateDeleted),
+        action: SnackBarAction(
+          label: AppStrings.profileTipTemplateUndo,
+          onPressed: () {
+            ref
+                .read(tipTemplatesNotifierProvider.notifier)
+                .addTemplate(
+                  content: template.content,
+                  category: template.category,
+                  instrument: template.instrument,
+                );
+          },
         ),
       ),
     );

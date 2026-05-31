@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../lessons/domain/entities/feedback_template.dart';
 import '../../../lessons/presentation/extensions/template_category_visuals.dart';
@@ -144,26 +145,21 @@ class _FeedbackTemplateManagementScreenState
   }
 
   Widget _buildCard(FeedbackTemplate template) {
-    return Dismissible(
-      key: Key(template.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: AppSpacing.space4),
-        decoration: BoxDecoration(color: AppColors.paperAccent),
-        child: const Icon(Icons.delete, color: AppColors.paper),
-      ),
-      confirmDismiss: (_) => _confirmDelete(),
-      onDismissed: (_) {
-        ref
-            .read(feedbackTemplatesNotifierProvider.notifier)
-            .deleteTemplate(template.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.feedbackTemplateDeletedSnack),
-          ),
-        );
-      },
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionEdit,
+          icon: Icons.edit_outlined,
+          onPressed:
+              () => FeedbackTemplateFormSheet.show(context, existing: template),
+        ),
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _deleteTemplate(template),
+        ),
+      ],
       child: NotebookCard(
         margin: EdgeInsets.zero,
         child: InkWell(
@@ -241,6 +237,20 @@ class _FeedbackTemplateManagementScreenState
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _deleteTemplate(FeedbackTemplate template) async {
+    final confirmed = await _confirmDelete();
+    if (confirmed != true) return;
+
+    await ref
+        .read(feedbackTemplatesNotifierProvider.notifier)
+        .deleteTemplate(template.id);
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppStrings.feedbackTemplateDeletedSnack)),
     );
   }
 
