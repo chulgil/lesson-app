@@ -57,21 +57,19 @@ bool hasPriceTable(HasPriceTableRef ref) {
 
 /// Profile completion percentage (0–100).
 ///
-/// Weights (6 quests, "name+instrument" removed since it's always done):
-///   I.   Available slots                                  : 20
-///   II.  Profile image                                    : 15
-///   III. Introduction (20+ chars)                         : 15
-///   IV.  Phone verification                               : 15
-///   V.   Lesson price table                               : 15
-///   VI.  First student (last — requires setup complete)   : 20
+/// Weights (5 quests — phone verification is mandatory at signup, not a quest):
+///   I.   Available slots                                  : 25
+///   II.  Profile image                                    : 20
+///   III. Introduction (20+ chars)                         : 20
+///   IV.  Lesson price table                               : 15
+///   V.   First student (last — requires setup complete)   : 20
 @Riverpod(keepAlive: true)
 int profileCompletionPercent(ProfileCompletionPercentRef ref) {
   var total = 0;
 
-  if (ref.watch(hasAvailableSlotsProvider)) total += 20;
-  if (ref.watch(hasProfileImageProvider)) total += 15;
-  if (ref.watch(hasIntroductionProvider)) total += 15;
-  if (ref.watch(homeTeacherPhoneVerifiedProvider)) total += 15;
+  if (ref.watch(hasAvailableSlotsProvider)) total += 25;
+  if (ref.watch(hasProfileImageProvider)) total += 20;
+  if (ref.watch(hasIntroductionProvider)) total += 20;
   if (ref.watch(hasPriceTableProvider)) total += 15;
   if (ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true) {
     total += 20;

@@ -23,10 +23,9 @@ final hasAvailableSlotsProvider = Provider<bool>.internal(
 );
 
 typedef HasAvailableSlotsRef = ProviderRef<bool>;
-String _$hasProfileImageHash() => r'5634b3e3850d6ef0a353e63a2179d9d445db6d3e';
+String _$hasProfileImageHash() => r'a9a5175cd8ef534a6f99da6ece956869cdfb2ca7';
 
 /// Whether the teacher has a real profile image set.
-/// Filters out mock placeholder URLs (example.com).
 ///
 /// Copied from [hasProfileImage].
 @ProviderFor(hasProfileImage)
@@ -76,17 +75,16 @@ final hasPriceTableProvider = Provider<bool>.internal(
 
 typedef HasPriceTableRef = ProviderRef<bool>;
 String _$profileCompletionPercentHash() =>
-    r'd04c0c0e52fe34dab91b1bbe3cc8678b2d1dea48';
+    r'f01c55116d10e8aedc1987a3019cb0cd42cfdc50';
 
 /// Profile completion percentage (0–100).
 ///
-/// Weights (6 quests, "name+instrument" removed since it's always done):
-///   I.   Available slots                                  : 20
-///   II.  Profile image                                    : 15
-///   III. Introduction (20+ chars)                         : 15
-///   IV.  Phone verification                               : 15
-///   V.   Lesson price table                               : 15
-///   VI.  First student (last — requires setup complete)   : 20
+/// Weights (5 quests — phone verification is mandatory at signup, not a quest):
+///   I.   Available slots                                  : 25
+///   II.  Profile image                                    : 20
+///   III. Introduction (20+ chars)                         : 20
+///   IV.  Lesson price table                               : 15
+///   V.   First student (last — requires setup complete)   : 20
 ///
 /// Copied from [profileCompletionPercent].
 @ProviderFor(profileCompletionPercent)

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -148,7 +149,10 @@ class _PhoneVerificationScreenState
 
     if (success) {
       if (mounted) {
-        context.go(AppRoutes.teacherProfileSetup);
+        // Phone verified → complete onboarding → home
+        ref.read(teacherOnboardingNotifierProvider.notifier).completeOnboarding();
+        await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        context.go(AppRoutes.home);
       }
     } else {
       final onboarding = ref.read(teacherOnboardingNotifierProvider);
@@ -161,8 +165,8 @@ class _PhoneVerificationScreenState
   }
 
   void _handleBack() {
-    // Navigate back to login screen
-    GoRouter.of(context).go(AppRoutes.login);
+    // Navigate back to profile setup
+    GoRouter.of(context).go(AppRoutes.teacherProfileSetup);
   }
 
   @override

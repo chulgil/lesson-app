@@ -97,7 +97,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
-        context.go(AppRoutes.teacherTutorial);
+        // Profile → Phone verification (mandatory) → Home
+        context.go(AppRoutes.teacherPhoneVerification);
       }
     } catch (e) {
       if (mounted) {
@@ -341,7 +342,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         _ProgressDivider(isActive: false),
         _ProgressStep(
           step: 2,
-          label: AppStrings.onboardingTutorial,
+          label: AppStrings.onboardingPhoneVerification,
           isActive: false,
         ),
       ],

@@ -32,15 +32,14 @@ class QuestBoardCard extends ConsumerWidget {
     final hasPhoto = ref.watch(hasProfileImageProvider);
     final hasIntro = ref.watch(hasIntroductionProvider);
     final hasPrice = ref.watch(hasPriceTableProvider);
-    final isPhoneVerified = ref.watch(homeTeacherPhoneVerifiedProvider);
+    // Phone verification is now mandatory during signup — not a quest.
 
     final allDone =
         hasSlots &&
         hasStudents &&
         hasPhoto &&
         hasIntro &&
-        hasPrice &&
-        isPhoneVerified;
+        hasPrice;
 
     if (allDone) return const SizedBox.shrink();
 
@@ -51,7 +50,6 @@ class QuestBoardCard extends ConsumerWidget {
       hasPhoto: hasPhoto,
       hasIntro: hasIntro,
       hasPrice: hasPrice,
-      isPhoneVerified: isPhoneVerified,
     );
 
     return Padding(
@@ -98,15 +96,15 @@ class QuestBoardCard extends ConsumerWidget {
     required bool hasPhoto,
     required bool hasIntro,
     required bool hasPrice,
-    required bool isPhoneVerified,
   }) {
     // Quest order designed by UX priority:
     // 1. Lesson time settings — students can't book without this
     // 2. Profile photo — builds trust, enables search visibility
     // 3. Introduction — unlocks web profile sharing
-    // 4. Phone verification — earns "verified" badge
-    // 5. Lesson price — shows pricing to students
-    // 6. First student invite — LAST, requires all setup complete first
+    // 4. Lesson price — shows pricing to students
+    // 5. First student invite — LAST, requires all setup complete first
+    //
+    // Phone verification is mandatory during signup, not a quest.
     return [
       _Quest(
         step: 1,
@@ -131,23 +129,13 @@ class QuestBoardCard extends ConsumerWidget {
       ),
       _Quest(
         step: 4,
-        title: AppStrings.questTitlePhone,
-        reward: AppStrings.questRewardVerified,
-        isCompleted: isPhoneVerified,
-        onTap:
-            isPhoneVerified
-                ? null
-                : () => context.push(AppRoutes.teacherPhoneVerification),
-      ),
-      _Quest(
-        step: 5,
         title: AppStrings.questTitlePrice,
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
         onTap: null,
       ),
       _Quest(
-        step: 6,
+        step: 5,
         title: AppStrings.questTitleStudent,
         reward: AppStrings.questRewardConnection,
         isCompleted: hasStudents,
