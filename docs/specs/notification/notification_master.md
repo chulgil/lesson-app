@@ -1,7 +1,7 @@
 # 알림 시스템 Master Spec
 
-> 구현 상태: ⚠️ 부분 구현 (90%) — FCM 인프라 구현, Firebase 설정 대기
-> Last updated: 2026-03-07
+> 구현 상태: ⚠️ 부분 구현 (95%) — FCM 인프라 구현, Firebase 설정 대기, 핵심 비즈니스 알림 4종 백엔드 발송 완료
+> Last updated: 2026-05-31
 > 기존 스펙: [notification_system.md](notification_system.md)
 
 ## 1. 개요
@@ -143,6 +143,12 @@
 | `scheduleChangeRejected` | normal | X | O |
 | `scheduleChangeAlternative` | normal | X | O |
 
+#### 스케줄 확인 알림
+
+| 타입 | 우선순위 | DND 우회 | 푸시 |
+|------|---------|---------|------|
+| `scheduleConfirmationRequired` | high | X | O |
+
 #### 수강권 제안 알림
 
 | 타입 | 우선순위 | DND 우회 | 푸시 |
@@ -189,6 +195,7 @@
 
 | 유형 | 트리거 | 제목 | 본문 예시 | 아이콘 | 딥링크 |
 |------|--------|------|----------|--------|--------|
+| `lessonBooked` | 선생님 레슨 등록 시 | 새 레슨 등록 | "2026-04-01 레슨이 등록되었습니다" | event | `/lessons/{id}` |
 | `lessonReminder` | 레슨 30분 전 | 레슨 알림 | "김민수 바이올린 14:00" | calendar | `/lessons/{id}` |
 | `lessonStarting` | 레슨 시작 시점 | 레슨 시작 | "김민수 바이올린 레슨이 시작됩니다" | alarm | `/lessons/{id}` |
 | `lessonCancelled` | 레슨 취소 시 | 레슨 취소 | "김민수 3/7 14:00 레슨이 취소되었습니다" | cancel | `/lessons/{id}` |
@@ -211,6 +218,8 @@
 | `proposalExpired` | 수강권 제안 72시간 경과 | 제안 만료 | "수강권 제안이 만료되었습니다" | timer_off | `/subscriptions` |
 | `makeupLessonCreated` | 보강 레슨 생성 시 | 보강 레슨 | "보강 레슨이 등록되었습니다" | event | `/lessons/{id}` |
 | `makeupLessonExpiring` | 보강 유효기간 D-3 | 보강 임박 | "보강 레슨 유효기간이 3일 남았습니다" | warning | `/lessons/{id}` |
+| `subscriptionIssued` | 수강권 발급 시 | 수강권 발급 | "4회 수강권이 발급되었습니다" | ticket | `/subscriptions/{id}` |
+| `scheduleConfirmationRequired` | 스케줄 카드 생성 시 | 일정 확인 요청 | "선생님이 레슨 일정을 제안했습니다" | schedule | `/schedule/confirmation-cards/{id}` |
 | `scheduleChangeRequested` | 스케줄 변경 요청 시 | 스케줄 변경 | "김민수 3/10 레슨 변경 요청" | schedule | `/schedule/{id}` |
 | `reviewReceived` | 학생 리뷰 작성 시 | 리뷰 알림 | "김민수님이 리뷰를 남겼습니다" | star | `/profile/reviews` |
 
@@ -648,6 +657,28 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | `NotificationSchedulerService` | 미래 시점 알림 예약/취소 (인메모리 큐) |
 | `PracticeReminderScheduler` | 연습 리마인더 스케줄링 |
 
+### 백엔드 발송 구현 상태
+
+| 알림 타입 | 트리거 위치 | 구현 상태 |
+|-----------|-----------|----------|
+| `lessonBooked` | `lesson_service.create()` | ✅ 구현 (2026-05-31) |
+| `lessonNoteShared` | `lesson_service.update_feedback()` | ✅ 구현 (2026-05-31) |
+| `subscriptionIssued` | `subscription_service.create()` | ✅ 구현 (2026-05-31) |
+| `scheduleConfirmationRequired` | `schedule_confirmation_service.create_card()` | ✅ 구현 (2026-05-31) |
+| `lessonCancelled` | `bulk_teacher_action_service` | ✅ 구현 |
+| `paymentReceived` | `subscription_service.confirm_payment_by_teacher()` | ✅ 구현 |
+| `paymentConfirmed` | `subscription_service.confirm_payment_by_teacher()` | ✅ 구현 |
+| `subscriptionExpiringSoon` | `subscription_expiry_dispatcher` | ✅ 구현 |
+| `connectionRequestReceived` | `invite_service` | ✅ 구현 |
+| `connectionRequestAccepted` | `ConnectionNotificationService` (프론트) | ✅ 구현 |
+| `generalAnnouncement` | `bulk_teacher_action_service`, `announcement_service` | ✅ 구현 |
+| `attendanceUnconfirmed` | `attendance_scheduler_service` | ✅ 구현 |
+| `lessonReminder` | 서버 스케줄러 | ❌ 미구현 |
+| `lessonStarting` | 서버 스케줄러 | ❌ 미구현 |
+| `practiceReminder` | 로컬 스케줄러 (프론트) | ✅ 프론트 구현 |
+| `lessonCancelled` (단일) | `lesson_service` | ❌ 미구현 |
+| `lessonRescheduled` | `lesson_service` | ❌ 미구현 |
+
 ### 미구현 (예정)
 
 | 항목 | 우선순위 |
@@ -682,3 +713,4 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 2026-03-06 | 구현 코드 기반 Master Spec 작성 (기존 스펙 + 구현 현실 통합) |
 | 2026-03-07 | 알림 유형 상세 테이블(트리거/제목/본문/아이콘/딥링크), Provider 코드 설계, 구현 파일 위치 섹션 추가 |
 | 2026-03-30 | FCM 푸시 알림 인프라 구현 (FcmService, DeviceToken 모델/API, Firebase 설정 가이드) |
+| 2026-05-31 | 백엔드 알림 발송 구현: lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired. 백엔드 발송 구현 상태 테이블 추가 |
