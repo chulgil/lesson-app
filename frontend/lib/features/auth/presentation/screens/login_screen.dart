@@ -74,7 +74,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const AppUpdateBanner(),
                     const SizedBox(height: AppSpacing.space4),
                     _buildSocialButtons(context),
-                    if (EnvironmentConfig.isDebug) ...[
+                    // DEV accounts only in mock mode (hidden in beta/production)
+                    if (EnvironmentConfig.useMockData) ...[
                       const SizedBox(height: AppSpacing.space6),
                       _buildDevAccountsSection(),
                     ],
