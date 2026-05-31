@@ -150,10 +150,25 @@ class UserService:
     async def complete_onboarding(self, user_id: str) -> Any:
         """Mark onboarding as completed."""
         user = await self.get_by_id(user_id)
+        await self._assert_onboarding_requirements_met(user)
         user.onboarding_completed = True
         await self.db.flush()
         await self.db.refresh(user)
         return user
+
+    async def _assert_onboarding_requirements_met(self, user: Any) -> None:
+        role = user.role.value if hasattr(user.role, "value") else user.role
+        if role != "student":
+            return
+
+        from app.models.student import Student
+
+        student = await self.db.scalar(select(Student).where(Student.user_id == user.id))
+        if student is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Student profile is required before completing onboarding",
+            )
 
     async def get_onboarding_progress(self, current_user: Any) -> OnboardingProgressResponse:
         """Return onboarding progress, creating a progress row on first access."""

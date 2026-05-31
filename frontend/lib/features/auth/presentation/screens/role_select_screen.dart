@@ -66,7 +66,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
       case UserRole.teacher:
         context.go(AppRoutes.teacherProfileSetup);
       case UserRole.student:
-        context.go(AppRoutes.studentInviteCode);
+        context.go(AppRoutes.studentProfileSetup);
       case UserRole.parent:
         context.go(AppRoutes.parentInviteCode);
     }

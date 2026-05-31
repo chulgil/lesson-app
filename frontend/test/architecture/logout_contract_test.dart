@@ -17,4 +17,18 @@ void main() {
 
     expect(source, contains('authNotifierProvider.notifier).logout()'));
   });
+
+  test('student role selection requires profile setup before invite flow', () {
+    final source =
+        File(
+          'lib/features/auth/presentation/screens/role_select_screen.dart',
+        ).readAsStringSync();
+
+    final studentCase = RegExp(
+      r'case UserRole\.student:\s*context\.go\(AppRoutes\.studentProfileSetup\);',
+      multiLine: true,
+    );
+
+    expect(source, matches(studentCase));
+  });
 }
