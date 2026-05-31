@@ -74,15 +74,14 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
 
     if (current.instruments.contains(instrument)) return;
 
-    state = const AsyncValue.loading();
+    final instruments = [...current.instruments, instrument];
+    state = AsyncValue.data(current.copyWith(instruments: instruments));
     try {
-      final updated = await _repository.updateInstruments([
-        ...current.instruments,
-        instrument,
-      ]);
+      final updated = await _repository.updateInstruments(instruments);
       state = AsyncValue.data(updated);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.data(current);
+      Error.throwWithStackTrace(e, st);
     }
   }
 
@@ -91,25 +90,32 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    state = const AsyncValue.loading();
+    final instruments =
+        current.instruments.where((i) => i != instrument).toList();
+    state = AsyncValue.data(current.copyWith(instruments: instruments));
     try {
-      final updated = await _repository.updateInstruments(
-        current.instruments.where((i) => i != instrument).toList(),
-      );
+      final updated = await _repository.updateInstruments(instruments);
       state = AsyncValue.data(updated);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncValue.data(current);
+      Error.throwWithStackTrace(e, st);
     }
   }
 
   /// Reorder instruments
   Future<void> reorderInstruments(List<String> instruments) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
+    if (current != null) {
+      state = AsyncValue.data(current.copyWith(instruments: instruments));
+    }
     try {
       final updated = await _repository.updateInstruments(instruments);
       state = AsyncValue.data(updated);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      if (current != null) {
+        state = AsyncValue.data(current);
+      }
+      Error.throwWithStackTrace(e, st);
     }
   }
 

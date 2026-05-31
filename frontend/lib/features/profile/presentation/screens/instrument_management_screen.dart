@@ -322,13 +322,20 @@ class _InstrumentManagementScreenState
   }
 
   void _addInstrument(String instrument) async {
-    await ref
-        .read(teacherSettingsNotifierProvider.notifier)
-        .addInstrument(instrument);
-    if (mounted) {
+    try {
+      await ref
+          .read(teacherSettingsNotifierProvider.notifier)
+          .addInstrument(instrument);
+      if (!mounted) return;
+      Navigator.pop(context);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('$instrument이(가) 추가되었습니다')));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('악기 추가에 실패했습니다')));
     }
   }
 
@@ -336,14 +343,21 @@ class _InstrumentManagementScreenState
     final instrument = _customInstrumentController.text.trim();
     if (instrument.isEmpty) return;
 
-    await ref
-        .read(teacherSettingsNotifierProvider.notifier)
-        .addInstrument(instrument);
-    _customInstrumentController.clear();
-    if (mounted) {
+    try {
+      await ref
+          .read(teacherSettingsNotifierProvider.notifier)
+          .addInstrument(instrument);
+      _customInstrumentController.clear();
+      if (!mounted) return;
+      Navigator.pop(context);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('$instrument이(가) 추가되었습니다')));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('악기 추가에 실패했습니다')));
     }
   }
 

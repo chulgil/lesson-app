@@ -1,4 +1,5 @@
 import '../../../../core/network/api_client.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../domain/repositories/settings_repository.dart';
@@ -17,8 +18,7 @@ class RemoteSettingsRepository implements SettingsRepository {
     final response = await _apiClient.get('/settings/teacher');
     final data = response.data as Map<String, dynamic>;
     final settings = TeacherSettings.fromJson(data);
-    // Available slots are managed by the schedule system, not settings API
-    return settings.copyWith(availableSlots: []);
+    return settings.copyWith(availableSlots: await _getAvailabilitySlots());
   }
 
   @override
@@ -27,13 +27,17 @@ class RemoteSettingsRepository implements SettingsRepository {
       '/settings/teacher/${Uri.encodeComponent(teacherId)}',
     );
     final data = response.data as Map<String, dynamic>;
-    return TeacherSettings.fromJson(data).copyWith(availableSlots: []);
+    final settings = TeacherSettings.fromJson(data);
+    return settings.copyWith(
+      availableSlots: await _getAvailabilitySlots(teacherId: teacherId),
+    );
   }
 
   Future<TeacherSettings> _updateSettings(Map<String, dynamic> updates) async {
     final response = await _apiClient.put('/settings/teacher', data: updates);
     final data = response.data as Map<String, dynamic>;
-    return TeacherSettings.fromJson(data).copyWith(availableSlots: []);
+    final settings = TeacherSettings.fromJson(data);
+    return settings.copyWith(availableSlots: await _getAvailabilitySlots());
   }
 
   @override
@@ -81,21 +85,50 @@ class RemoteSettingsRepository implements SettingsRepository {
 
   @override
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots) async {
-    // Available slots are managed by TeacherAvailabilityRepository
-    // This is a no-op for remote - return current settings
-    return getTeacherSettings();
+    final current = await getTeacherSettings();
+    return _saveAvailableSlots(current, slots);
+  }
+
+  Future<TeacherSettings> _saveAvailableSlots(
+    TeacherSettings current,
+    List<TimeSlot> slots,
+  ) async {
+    await _apiClient.put(
+      '/schedule/availability',
+      data: {
+        'availabilities': _availabilityPayloadFromSlots(slots),
+        'slot_duration_minutes': current.defaultLessonDuration,
+        'break_time_between_lessons': current.breakTimeBetweenLessons,
+        'min_booking_hours': current.minBookingHours,
+      },
+    );
+    return current.copyWith(availableSlots: slots);
   }
 
   @override
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot) async {
-    // Managed by TeacherAvailabilityRepository
-    return getTeacherSettings();
+    final current = await getTeacherSettings();
+    final slots = [...current.availableSlots];
+    final index = slots.indexWhere((existing) => existing.id == slot.id);
+    if (index == -1) {
+      slots.add(slot);
+    } else {
+      slots[index] = slot;
+    }
+    return _saveAvailableSlots(current, slots);
   }
 
   @override
   Future<TeacherSettings> toggleTimeSlot(String slotId, bool isActive) async {
-    // Managed by TeacherAvailabilityRepository
-    return getTeacherSettings();
+    final current = await getTeacherSettings();
+    final slots =
+        current.availableSlots
+            .map(
+              (slot) =>
+                  slot.id == slotId ? slot.copyWith(isActive: isActive) : slot,
+            )
+            .toList();
+    return _saveAvailableSlots(current, slots);
   }
 
   @override
@@ -123,5 +156,94 @@ class RemoteSettingsRepository implements SettingsRepository {
     Map<String, Map<String, int>> priceTable,
   ) async {
     await _updateSettings({'lesson_price_table': priceTable});
+  }
+
+  Future<List<TimeSlot>> _getAvailabilitySlots({String? teacherId}) async {
+    try {
+      final response = await _apiClient.get(
+        teacherId == null
+            ? '/schedule/availability'
+            : '/schedule/availability/${Uri.encodeComponent(teacherId)}',
+      );
+      final data = response.data as Map<String, dynamic>;
+      return _slotsFromAvailabilityJson(data);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  List<Map<String, dynamic>> _availabilityPayloadFromSlots(
+    List<TimeSlot> slots,
+  ) {
+    final grouped = <int, List<TimeSlot>>{};
+    for (final slot in slots.where((slot) => slot.isActive)) {
+      grouped.putIfAbsent(slot.dayOfWeek - 1, () => []).add(slot);
+    }
+
+    return grouped.entries.map((entry) {
+      final daySlots = [...entry.value]
+        ..sort((a, b) => a.startTime.inMinutes - b.startTime.inMinutes);
+      return {
+        'day_of_week': entry.key,
+        'time_slots':
+            daySlots
+                .map(
+                  (slot) => {
+                    'start_time': _clockTimeToJson(slot.startTime),
+                    'end_time': _clockTimeToJson(slot.endTime),
+                  },
+                )
+                .toList(),
+      };
+    }).toList();
+  }
+
+  List<TimeSlot> _slotsFromAvailabilityJson(Map<String, dynamic> json) {
+    final slots = <TimeSlot>[];
+    final availabilities = json['availabilities'] as List<dynamic>?;
+    if (availabilities != null) {
+      for (final dayAvailability in availabilities) {
+        final day = dayAvailability as Map<String, dynamic>;
+        final dayOfWeek = (day['day_of_week'] as num).toInt() + 1;
+        final timeSlots = day['time_slots'] as List<dynamic>? ?? [];
+        for (var index = 0; index < timeSlots.length; index++) {
+          final slot = timeSlots[index] as Map<String, dynamic>;
+          slots.add(
+            TimeSlot(
+              id: '${json['teacher_id'] ?? 'teacher'}_${dayOfWeek}_$index',
+              dayOfWeek: dayOfWeek,
+              startTime: _clockTimeFromJson(slot['start_time'] as String),
+              endTime: _clockTimeFromJson(slot['end_time'] as String),
+            ),
+          );
+        }
+      }
+      return slots;
+    }
+
+    final weeklySchedules = json['weekly_schedules'] as List<dynamic>? ?? [];
+    for (var index = 0; index < weeklySchedules.length; index++) {
+      final schedule = weeklySchedules[index] as Map<String, dynamic>;
+      final dayOfWeek = (schedule['day_of_week'] as num).toInt() + 1;
+      slots.add(
+        TimeSlot(
+          id: schedule['id'] as String? ?? '${json['teacher_id']}_$index',
+          dayOfWeek: dayOfWeek,
+          startTime: _clockTimeFromJson(schedule['start_time'] as String),
+          endTime: _clockTimeFromJson(schedule['end_time'] as String),
+        ),
+      );
+    }
+    return slots;
+  }
+
+  ClockTime _clockTimeFromJson(String value) {
+    final parts = value.split(':');
+    return ClockTime(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  String _clockTimeToJson(ClockTime value) {
+    return '${value.hour.toString().padLeft(2, '0')}:'
+        '${value.minute.toString().padLeft(2, '0')}';
   }
 }

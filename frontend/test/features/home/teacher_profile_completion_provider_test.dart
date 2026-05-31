@@ -3,14 +3,17 @@ import 'package:lessonaza/features/home/presentation/providers/teacher_profile_c
 
 void main() {
   group('isTeacherProfileImageQuestEligible', () {
-    test('does not complete the photo quest with an OAuth Google account image', () {
-      expect(
-        isTeacherProfileImageQuestEligible(
-          'https://lh3.googleusercontent.com/a/ACg8ocK-example=s96-c',
-        ),
-        isFalse,
-      );
-    });
+    test(
+      'does not complete the photo quest with an OAuth Google account image',
+      () {
+        expect(
+          isTeacherProfileImageQuestEligible(
+            'https://lh3.googleusercontent.com/a/ACg8ocK-example=s96-c',
+          ),
+          isFalse,
+        );
+      },
+    );
 
     test('completes the photo quest with an app-uploaded image', () {
       expect(

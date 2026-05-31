@@ -10,8 +10,9 @@ part 'teacher_profile_completion_provider.g.dart';
 @Riverpod(keepAlive: true)
 bool hasAvailableSlots(HasAvailableSlotsRef ref) {
   final settingsAsync = ref.watch(teacherSettingsProvider);
-  return settingsAsync.valueOrNull?.availableSlots
-          .any((slot) => slot.isActive) ??
+  return settingsAsync.valueOrNull?.availableSlots.any(
+        (slot) => slot.isActive,
+      ) ??
       false;
 }
 
