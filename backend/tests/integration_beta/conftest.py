@@ -33,7 +33,7 @@ def beta_teacher_account() -> BetaAccount:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def beta_client() -> AsyncIterator[BetaClient]:
     if INTERNAL_API_KEY is None:
         pytest.skip("INTERNAL_API_KEY is required for beta integration tests")
