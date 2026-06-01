@@ -18,11 +18,10 @@ SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
   return createSyncAwareRepository<SubscriptionRepository>(
     ref: ref,
     mock: () => MockSubscriptionRepository(),
-    syncAware:
-        (api, queue) => SyncAwareSubscriptionRepository(
-          remote: RemoteSubscriptionRepository(api),
-          queue: queue,
-        ),
+    syncAware: (api, queue) => SyncAwareSubscriptionRepository(
+      remote: RemoteSubscriptionRepository(api),
+      queue: queue,
+    ),
   );
 }
 
@@ -161,6 +160,14 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     return updated;
   }
 
+  /// Undo a manual deposit confirmation within 24h — #426.
+  Future<Subscription> undoConfirmPayment(String id) async {
+    final repository = ref.read(subscriptionRepositoryProvider);
+    final updated = await repository.undoConfirmPayment(id);
+    ref.invalidateSelf();
+    return updated;
+  }
+
   Future<void> updateStatus(String id, SubscriptionStatus status) async {
     final repository = ref.read(subscriptionRepositoryProvider);
     await repository.updateStatus(id, status);
@@ -278,16 +285,15 @@ Future<Subscription?> activeSubscriptionBetween(
   final teacherSubscriptions = await repository.getByTeacherId(teacherId);
 
   // Find active subscription for this student
-  final studentSubscriptions =
-      teacherSubscriptions
-          .where(
-            (s) =>
-                s.studentId == studentId &&
-                (s.status == SubscriptionStatus.active ||
-                    s.status == SubscriptionStatus.expiringSoon) &&
-                (s.remainingLessons ?? 0) > 0,
-          )
-          .toList();
+  final studentSubscriptions = teacherSubscriptions
+      .where(
+        (s) =>
+            s.studentId == studentId &&
+            (s.status == SubscriptionStatus.active ||
+                s.status == SubscriptionStatus.expiringSoon) &&
+            (s.remainingLessons ?? 0) > 0,
+      )
+      .toList();
 
   if (studentSubscriptions.isEmpty) {
     return null;

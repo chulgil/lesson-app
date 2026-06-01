@@ -44,6 +44,11 @@ class TeacherStudentRelation(UUIDMixin, Base):
         nullable=False,
         default=RelationStatus.pending,
     )
+    # 입금 확인 직전 status 백업 — Undo 시 복원용 (#426). Undo 후엔 None 으로 클리어.
+    previous_status: Mapped[RelationStatus | None] = mapped_column(
+        Enum(RelationStatus, native_enum=True),
+        nullable=True,
+    )
     connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     disconnected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 

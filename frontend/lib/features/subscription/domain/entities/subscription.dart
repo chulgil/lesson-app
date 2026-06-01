@@ -346,6 +346,7 @@ class Subscription {
     SubscriptionPaymentMethod? paymentMethod,
     DateTime? paidAt,
     DateTime? paymentConfirmedAt,
+    bool clearPaymentConfirmedAt = false,
     int? discountAmount,
     String? discountReason,
     int? originalAmount,
@@ -390,7 +391,10 @@ class Subscription {
       paymentConfirmed: paymentConfirmed ?? this.paymentConfirmed,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       paidAt: paidAt ?? this.paidAt,
-      paymentConfirmedAt: paymentConfirmedAt ?? this.paymentConfirmedAt,
+      paymentConfirmedAt:
+          clearPaymentConfirmedAt
+              ? null
+              : (paymentConfirmedAt ?? this.paymentConfirmedAt),
       discountAmount: discountAmount ?? this.discountAmount,
       discountReason: discountReason ?? this.discountReason,
       originalAmount: originalAmount ?? this.originalAmount,

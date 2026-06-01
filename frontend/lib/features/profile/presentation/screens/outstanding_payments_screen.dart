@@ -35,9 +35,8 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           return _buildContent(context, ref, unpaidList, teacherId);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) =>
-                const Center(child: Text(AppStrings.profileOutstandingError)),
+        error: (_, __) =>
+            const Center(child: Text(AppStrings.profileOutstandingError)),
       ),
     );
   }
@@ -169,10 +168,9 @@ class _UnpaidCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(
-            color:
-                daysOverdue > 0
-                    ? AppColors.paperAccent
-                    : AppColors.inkQuaternary,
+            color: daysOverdue > 0
+                ? AppColors.paperAccent
+                : AppColors.inkQuaternary,
           ),
         ),
         child: Padding(
@@ -312,8 +310,7 @@ class _UnpaidCard extends ConsumerWidget {
   Future<void> _sendReminder(BuildContext context, WidgetRef ref) async {
     final notificationService = ref.read(notificationServiceProvider);
     final notification = AppNotification(
-      id:
-          'payment_reminder_${subscription.id}_${DateTime.now().millisecondsSinceEpoch}',
+      id: 'payment_reminder_${subscription.id}_${DateTime.now().millisecondsSinceEpoch}',
       userId: subscription.studentId,
       type: NotificationType.paymentReminder,
       priority: NotificationPriority.high,
@@ -368,13 +365,49 @@ class _UnpaidCard extends ConsumerWidget {
         ref.invalidate(unpaidSummaryProvider(teacherId));
 
         if (context.mounted) {
+          // #426 — 8s Undo window in the SnackBar.
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(AppStrings.profileOutstandingPaymentConfirmed),
+            SnackBar(
+              content: const Text(AppStrings.paymentConfirmedUndoSnackbar),
+              duration: const Duration(seconds: 8),
+              action: SnackBarAction(
+                label: AppStrings.paymentUndoLabel,
+                onPressed: () => _undoConfirmPayment(context, ref),
+              ),
             ),
           );
         }
       },
     );
+  }
+
+  Future<void> _undoConfirmPayment(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref
+          .read(subscriptionNotifierProvider(subscription.studentId).notifier)
+          .undoConfirmPayment(subscription.id);
+
+      final teacherId = ref.read(currentUserIdProvider);
+      ref.invalidate(unpaidSubscriptionsProvider(teacherId));
+      ref.invalidate(unpaidSummaryProvider(teacherId));
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.paymentUndoSuccessSnackbar)),
+        );
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      // Server returns 409 for window-expired / first-lesson-consumed; map to friendly text.
+      final message = e.toString();
+      final friendly = message.contains('24')
+          ? AppStrings.paymentUndoWindowExpired
+          : message.contains('lesson') || message.contains('차감')
+          ? AppStrings.paymentUndoBlockedByLesson
+          : AppStrings.paymentUndoFailedSnackbar;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(friendly)));
+    }
   }
 }

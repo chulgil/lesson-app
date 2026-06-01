@@ -17,8 +17,8 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   SyncAwareSubscriptionRepository({
     required RemoteSubscriptionRepository remote,
     required MutationQueueHelper queue,
-  })  : _remote = remote,
-        _queue = queue;
+  }) : _remote = remote,
+       _queue = queue;
 
   // ═══════════════════════════════════════════════════════════════════
   // Read methods — direct delegation
@@ -75,9 +75,8 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
           path: '/subscriptions',
           payload: subscription.toJson(),
         ),
-        optimisticResult: () => subscription.copyWith(
-          id: 'tmp_${const Uuid().v4()}',
-        ),
+        optimisticResult: () =>
+            subscription.copyWith(id: 'tmp_${const Uuid().v4()}'),
       );
 
   @override
@@ -132,6 +131,11 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   }) =>
       // Online-only: payment operations require immediate server confirmation
       _remote.confirmPayment(id, paymentMethod: paymentMethod);
+
+  @override
+  Future<Subscription> undoConfirmPayment(String id) =>
+      // Online-only: payment operations require immediate server confirmation
+      _remote.undoConfirmPayment(id);
 
   @override
   Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) =>
