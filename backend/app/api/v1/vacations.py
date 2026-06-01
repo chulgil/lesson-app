@@ -2,8 +2,13 @@
 
 Spec: docs/specs/schedule/teacher_vacation_mode.md §9.
 
-본 모듈은 1차 BE 작업 범위만 포함 (등록 + 영향 미리보기).
-후속 PR: GET 목록 / DELETE 24h 일괄 취소 / 알림톡 발송.
+본 모듈 범위:
+- POST           — 휴가 등록 + 영향 미리보기
+- GET   /        — 목록 (active 기본, include_cancelled=true 옵션)
+- GET   /impact  — 기간 입력 시 영향 미리보기
+- DELETE /{id}   — 24h 내 일괄 취소 (auto_extended_days revert)
+
+후속 PR: 알림톡 발송 (LNZ_TEACHER_VACATION) · makeupCredit/freeCancel 실 처리.
 """
 
 from __future__ import annotations
@@ -18,6 +23,7 @@ from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.vacation import (
     VacationImpactPreview,
+    VacationListResponse,
     VacationPeriodCreate,
     VacationPeriodResponse,
 )
@@ -68,3 +74,40 @@ async def preview_vacation_impact(
         return await service.preview_impact(teacher_id, start, end)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get(
+    "",
+    response_model=VacationListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List teacher's vacation periods",
+)
+async def list_vacations(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    include_cancelled: Annotated[
+        bool,
+        Query(description="Include cancelled vacations in the response"),
+    ] = False,
+) -> VacationListResponse:
+    """선생님의 휴가 목록. 기본은 active 만, include_cancelled=true 면 취소된 것도 포함."""
+    teacher_id = await resolve_teacher_id(db, current_user.id)
+    service = VacationService(db)
+    return await service.list_vacations(teacher_id, include_cancelled=include_cancelled)
+
+
+@router.delete(
+    "/{period_id}",
+    response_model=VacationPeriodResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Cancel a vacation within 24h (Recovery, spec §7)",
+)
+async def cancel_vacation(
+    period_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> VacationPeriodResponse:
+    """24h 내 일괄 취소: cancelled_at 설정 + auto_extended_days revert."""
+    teacher_id = await resolve_teacher_id(db, current_user.id)
+    service = VacationService(db)
+    return await service.cancel_vacation(period_id, teacher_id)

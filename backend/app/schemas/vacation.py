@@ -53,6 +53,13 @@ class VacationPeriodResponse(BaseModel):
     updated_at: _dt.datetime | None = None
 
 
+class VacationListResponse(BaseModel):
+    """Response body for GET /api/teacher/vacation — list of periods."""
+
+    vacations: list[VacationPeriodResponse] = []
+    total_count: int
+
+
 class VacationImpactedStudent(BaseModel):
     """Per-student impact summary (spec §4.1 step 2)."""
 
