@@ -15,6 +15,8 @@ from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.schemas.subscription import (
     ConfirmPaymentRequest,
     NotifyPaymentRequest,
+    PendingPaymentCountResponse,
+    PendingPaymentResponse,
     ProposalConfirmRequest,
     ProposalRespondRequest,
     SubscriptionCreate,
@@ -31,6 +33,7 @@ from app.schemas.subscription import (
     UpdateStatusRequest,
     UseLessonRequest,
 )
+from app.services.payment_tracking_service import PaymentTrackingService
 from app.services.subscription_service import SubscriptionService
 
 router = APIRouter()
@@ -126,6 +129,40 @@ async def get_pending_subscription_schedule_change_events(
     """Return latest visible subscription session events that need the user's response."""
     service = SubscriptionService(db)
     return await service.get_pending_schedule_change_events(current_user)
+
+
+# ---------------------------------------------------------------------------
+# Payment-pending dashboard (#424) — must precede `/{subscription_id}` to avoid
+# the dynamic route swallowing the static "payment-pending" segment.
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/payment-pending/count",
+    response_model=PendingPaymentCountResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Teacher pending-payment count (home card) — #424",
+)
+async def count_pending_payments(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> PendingPaymentCountResponse:
+    service = PaymentTrackingService(db)
+    return await service.count_pending(current_user)
+
+
+@router.get(
+    "/payment-pending",
+    response_model=PendingPaymentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Teacher pending-payment list — #424",
+)
+async def list_pending_payments(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> PendingPaymentResponse:
+    service = PaymentTrackingService(db)
+    return await service.list_pending(current_user)
 
 
 @router.get(
@@ -547,6 +584,35 @@ async def expire_old_proposals(
     service = SubscriptionService(db)
     count = await service.expire_old_proposals()
     return SuccessResponse(message=f"Processed {count} expired proposals")
+
+
+@router.post(
+    "-proposals/{proposal_id}/resend",
+    status_code=status.HTTP_200_OK,
+    summary="Resend payment reminder to student (teacher only, 30-min cooldown) — #424",
+)
+async def resend_proposal_reminder(
+    proposal_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> dict:
+    service = PaymentTrackingService(db)
+    return await service.resend(proposal_id, current_user)
+
+
+@router.post(
+    "-proposals/{proposal_id}/revoke",
+    response_model=SubscriptionProposalResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Revoke a pending proposal (teacher only) — #424",
+)
+async def revoke_proposal(
+    proposal_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionProposalResponse:
+    service = PaymentTrackingService(db)
+    return await service.revoke(proposal_id, current_user)
 
 
 @router.patch(

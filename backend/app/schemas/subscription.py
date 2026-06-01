@@ -1,6 +1,5 @@
 """Subscription, template, and proposal schemas."""
 
-
 import datetime as _dt
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
@@ -8,6 +7,7 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field, computed_field,
 # ---------------------------------------------------------------------------
 # Subscription
 # ---------------------------------------------------------------------------
+
 
 class SubscriptionResponse(BaseModel):
     """Subscription representation."""
@@ -344,6 +344,7 @@ class NotifyPaymentRequest(BaseModel):
 # Subscription template
 # ---------------------------------------------------------------------------
 
+
 class SubscriptionTemplateResponse(BaseModel):
     """Subscription template (reusable preset)."""
 
@@ -436,6 +437,37 @@ class SubscriptionTemplateUpdate(BaseModel):
 # ---------------------------------------------------------------------------
 # Subscription proposal
 # ---------------------------------------------------------------------------
+
+
+class PendingPaymentRow(BaseModel):
+    """One row of the teacher's pending-payment dashboard — #424."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    proposal_id: str
+    student_id: str
+    student_name: str
+    amount: int
+    lesson_count: int | None = None
+    days_since_sent: int
+    expires_at: _dt.datetime
+    last_reminder_sent_at: _dt.datetime | None = None
+    can_resend: bool
+    status: str  # pending | paymentNotified
+
+
+class PendingPaymentResponse(BaseModel):
+    """Teacher's pending-payment list — #424."""
+
+    pending: list[PendingPaymentRow]
+    total_count: int
+
+
+class PendingPaymentCountResponse(BaseModel):
+    """Lightweight count for the home card — #424."""
+
+    count: int
+
 
 class SubscriptionProposalResponse(BaseModel):
     """Proposal sent from teacher to student."""
