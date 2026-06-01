@@ -2006,6 +2006,35 @@ class AppStrings {
   /// 특별 일정 관리 (버튼)
   static const manageSpecialSchedules = '특별 일정 관리';
 
+  // ── Split 레이아웃 (G5 #433) ──────────────────────────────────
+
+  /// Split 레이아웃 좌측 설정 패널 헤더
+  static const availabilitySettingsPanel = '레슨 시간 설정';
+
+  /// Split 레이아웃 우측 미리보기 헤더
+  static const availabilityPreviewPanel = '학생이 보게 될 예약 화면';
+
+  /// Split 레이아웃 미리보기 부제
+  static const availabilityPreviewHint = '좌측 설정이 실시간으로 반영됩니다';
+
+  /// 미리보기 — 예약 가능 시간 라벨
+  static const previewAvailableSlot = '예약 가능';
+
+  /// 미리보기 — 빈 상태 (요일 OFF)
+  static const previewDayOff = '쉼';
+
+  /// 미리보기 — 설정된 시간 없음 (모든 요일 OFF)
+  static const previewEmptyHint = '주간 레슨 시간을 설정하면 미리보기가 표시됩니다';
+
+  /// 레슨 1회 시간 옵션 단위 라벨
+  static String lessonDurationOptionLabel(int minutes) => '$minutes분';
+
+  /// 쉬는 시간 옵션 — 0분일 때 표시
+  static const breakTimeNoneOption = '없음';
+
+  /// 모바일 fallback 안내 (현재 미사용, 향후 sticky 미리보기 토글 시 활용)
+  static const previewToggleLabel = '미리보기';
+
   // ── Register Regular Lesson (정규레슨 등록) ──────────────────────
 
   /// 정규레슨 등록 (AppBar)

@@ -15,7 +15,7 @@ import '../../../features/schedule/presentation/screens/request_detail_screen.da
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
-import '../../../features/schedule/presentation/screens/teacher_availability_screen.dart';
+import '../../../features/schedule/presentation/screens/teacher_availability_split_page.dart';
 import '../app_routes.dart';
 
 /// Schedule and booking routes
@@ -169,7 +169,7 @@ List<GoRoute> scheduleRoutes = [
     name: 'teacherAvailability',
     builder: (context, state) {
       final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
-      return TeacherAvailabilityScreen(teacherId: teacherId);
+      return TeacherAvailabilitySplitPage(teacherId: teacherId);
     },
   ),
 

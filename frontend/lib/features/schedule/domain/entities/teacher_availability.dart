@@ -59,14 +59,16 @@ class TeacherAvailability {
   TeacherAvailability({
     required this.id,
     required this.teacherId,
-    this.slotDurationMinutes = 60,
+    // Defaults unified per spec: schedule_master.md §2.1 (50/10/60).
+    // Korean music lesson standard: 50 min lesson + 10 min break = 60 min interval.
+    this.slotDurationMinutes = 50,
     this.weeklySchedules = const [],
     this.exceptions = const [],
     this.autoGenerateWeeks = 4,
     required this.createdAt,
     this.updatedAt,
-    this.slotStartInterval = 30,
-    this.breakTimeBetweenLessons = 0,
+    this.slotStartInterval = 60,
+    this.breakTimeBetweenLessons = 10,
     this.minBookingHours = 24,
   });
 
