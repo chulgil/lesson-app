@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../auth/auth_facade.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../auth/auth_facade.dart';
+import '../models/student_tutorial_step.dart';
+import '../widgets/student_tutorial/feedback_step.dart';
+import '../widgets/student_tutorial/metronome_step.dart';
+import '../widgets/student_tutorial/recording_step.dart';
+import '../widgets/student_tutorial/tuner_step.dart';
 
-/// Tutorial screen for student onboarding
+/// Tutorial screen for student onboarding with interactive steps.
 class StudentTutorialScreen extends ConsumerStatefulWidget {
   const StudentTutorialScreen({super.key});
 
@@ -23,29 +28,10 @@ class StudentTutorialScreen extends ConsumerStatefulWidget {
 class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-
-  static const _pages = [
-    _StudentTutorialPageData(
-      icon: Icons.waving_hand_rounded,
-      title: '환영합니다!',
-      description: '레슨 앱에서 선생님과 함께\n음악 여정을 시작해보세요',
-    ),
-    _StudentTutorialPageData(
-      icon: Icons.calendar_month_rounded,
-      title: '레슨 확인',
-      description: '선생님과의 레슨 일정을\n한눈에 확인하고 관리할 수 있어요',
-    ),
-    _StudentTutorialPageData(
-      icon: Icons.fitness_center_outlined,
-      title: '연습 기록',
-      description: '매일 연습을 기록하고\n나의 성장을 확인해보세요',
-    ),
-    _StudentTutorialPageData(
-      icon: Icons.people_rounded,
-      title: '선생님과 소통',
-      description: '선생님의 피드백을 확인하고\n더 나은 연습을 해보세요',
-    ),
-  ];
+  bool _metronomeDone = false;
+  bool _tunerDone = false;
+  bool _recordingDone = false;
+  bool _feedbackDone = false;
 
   @override
   void dispose() {
@@ -57,8 +43,24 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
     setState(() => _currentPage = page);
   }
 
+  bool get _canContinue {
+    switch (_currentPage) {
+      case 0:
+        return _metronomeDone;
+      case 1:
+        return _tunerDone;
+      case 2:
+        return _recordingDone;
+      case 3:
+        return _feedbackDone;
+      default:
+        return false;
+    }
+  }
+
   void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+    if (!_canContinue) return;
+    if (_currentPage < StudentTutorialStepContent.all.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -90,26 +92,37 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
     if (!ref.read(mockDataModeProvider)) {
       ref.read(authNotifierProvider.notifier).completeOnboarding();
     }
+    if (!mounted) return;
     context.go(AppRoutes.studentHome);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLastPage = _currentPage == _pages.length - 1;
+    final isLastPage =
+        _currentPage == StudentTutorialStepContent.all.length - 1;
 
     return NotebookScreenScaffold(
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
+            // Progress indicator and skip button
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding,
                 vertical: AppSpacing.space2,
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Progress text
+                  Text(
+                    '${_currentPage + 1} / ${StudentTutorialStepContent.all.length}',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+
+                  // Skip button
                   TextButton(
                     onPressed: _skipTutorial,
                     child: Text(
@@ -123,15 +136,48 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
               ),
             ),
 
-            // Page content
+            // Progress bar with dashed line
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+                vertical: AppSpacing.space2,
+              ),
+              child: SizedBox(
+                height: 2,
+                child: LinearProgressIndicator(
+                  value:
+                      (_currentPage + 1) /
+                      StudentTutorialStepContent.all.length,
+                  backgroundColor: AppColors.inkQuaternary,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.paperAccent,
+                  ),
+                ),
+              ),
+            ),
+
+            // Page content with mission card
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: _onPageChanged,
-                itemCount: _pages.length,
+                itemCount: StudentTutorialStepContent.all.length,
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
-                  return _StudentTutorialPage(data: page);
+                  final content = StudentTutorialStepContent.all[index];
+                  return _StudentTutorialPage(
+                    content: content,
+                    metronomeDone: _metronomeDone,
+                    tunerDone: _tunerDone,
+                    recordingDone: _recordingDone,
+                    feedbackDone: _feedbackDone,
+                    onMetronomeDone: () =>
+                        setState(() => _metronomeDone = true),
+                    onTunerDone: () => setState(() => _tunerDone = true),
+                    onRecordingDone: () =>
+                        setState(() => _recordingDone = true),
+                    onFeedbackDone: () => setState(() => _feedbackDone = true),
+                  );
                 },
               ),
             ),
@@ -142,7 +188,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
-                  _pages.length,
+                  StudentTutorialStepContent.all.length,
                   (index) => _PageIndicator(isActive: index == _currentPage),
                 ),
               ),
@@ -160,7 +206,9 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                         onPressed: _previousPage,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: AppColors.inkQuaternary),
-                          shape: RoundedRectangleBorder(),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
                           minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
                         child: Text(
@@ -179,13 +227,15 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                   Expanded(
                     flex: _currentPage > 0 ? 1 : 2,
                     child: ElevatedButton(
-                      onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.paperAccent,
                         foregroundColor: AppColors.paper,
-                        shape: RoundedRectangleBorder(),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
                         minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
+                      onPressed: _canContinue ? _nextPage : null,
                       child: Text(
                         isLastPage ? '시작하기' : '다음',
                         style: AppTypography.button,
@@ -202,64 +252,96 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
   }
 }
 
-class _StudentTutorialPageData {
-  final IconData icon;
-  final String title;
-  final String description;
-
-  const _StudentTutorialPageData({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
-}
-
 class _StudentTutorialPage extends StatelessWidget {
-  final _StudentTutorialPageData data;
+  final StudentTutorialStepContent content;
+  final bool metronomeDone;
+  final bool tunerDone;
+  final bool recordingDone;
+  final bool feedbackDone;
+  final VoidCallback onMetronomeDone;
+  final VoidCallback onTunerDone;
+  final VoidCallback onRecordingDone;
+  final VoidCallback onFeedbackDone;
 
-  const _StudentTutorialPage({required this.data});
+  const _StudentTutorialPage({
+    required this.content,
+    required this.metronomeDone,
+    required this.tunerDone,
+    required this.recordingDone,
+    required this.feedbackDone,
+    required this.onMetronomeDone,
+    required this.onTunerDone,
+    required this.onRecordingDone,
+    required this.onFeedbackDone,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Illustration
+          const SizedBox(height: AppSpacing.space6),
+          // Mission card with border
           Container(
-            width: 200,
-            height: 200,
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.space5),
             decoration: BoxDecoration(
-              color: AppColors.paperAccentSoft,
-              borderRadius: BorderRadius.zero,
+              color: AppColors.paper,
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
-            child: Icon(data.icon, size: 80, color: AppColors.paperAccent),
-          ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icon
+                Icon(content.icon, size: 42, color: AppColors.paperAccent),
+                const SizedBox(height: AppSpacing.space4),
 
-          const SizedBox(height: AppSpacing.space8),
+                // Title
+                Text(content.title, style: NotebookTypography.sectionTitle),
+                const SizedBox(height: AppSpacing.space2),
 
-          // Notebook × Score: 튜토리얼 슬라이드 헤드라인 Playfair sectionTitle (§7.87-h).
-          Text(
-            data.title,
-            style: NotebookTypography.sectionTitle,
-            textAlign: TextAlign.center,
-          ),
+                // Description
+                Text(
+                  content.description,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space5),
 
-          const SizedBox(height: AppSpacing.space3),
-
-          // Description
-          Text(
-            data.description,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-              height: 1.5,
+                // Step widget body
+                _buildStepWidget(),
+              ],
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildStepWidget() {
+    switch (content.step) {
+      case StudentTutorialStep.metronome:
+        return MetronomeStep(
+          completed: metronomeDone,
+          onComplete: onMetronomeDone,
+        );
+      case StudentTutorialStep.tuner:
+        return TunerStep(completed: tunerDone, onComplete: onTunerDone);
+      case StudentTutorialStep.recording:
+        return RecordingStep(
+          completed: recordingDone,
+          onComplete: onRecordingDone,
+        );
+      case StudentTutorialStep.feedback:
+        return FeedbackStep(
+          completed: feedbackDone,
+          onComplete: onFeedbackDone,
+        );
+    }
   }
 }
 
@@ -276,6 +358,7 @@ class _PageIndicator extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
         color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
+        borderRadius: BorderRadius.zero,
       ),
     );
   }
