@@ -133,6 +133,8 @@
 
 ## #4 H-001 — 휴가/장기휴강 모드 부재
 
+> **상태: [스펙 완료] 2026-06-01** — `schedule/teacher_vacation_mode.md` (신규) + `subscription_master.md §2.2.3` `autoExtendedDays` 필드 + `teacher_availability_spec.md §3.5` 통합 안내. 코드 작업 대기.
+
 | 항목 | 값 |
 |---|---|
 | 단계 | H 일정 조절·갱신 (C 가용시간과 같은 뿌리) |
@@ -235,6 +237,8 @@
 
 ## #7 H-002 — 정규권 일괄변경 후 5주차/보강 재계산 미정의
 
+> **상태: [스펙 완료] 2026-06-01** — `subscription/makeup_credit_spec.md` (신규) + `subscription_master.md §2.2.3` `scheduledLessons` 필드 + `subscription_schedule_change_spec.md` Make-up Bank 참조. 코드 작업 대기.
+
 | 항목 | 값 |
 |---|---|
 | 단계 | H 일정 조절·갱신 |
@@ -306,6 +310,8 @@
 ---
 
 ## #9 C-G2 — 가용시간 UX redesign 미반영
+
+> **상태: [스펙 완료] 2026-06-01** — `schedule/availability_settings_ux_redesign_spec.md` Split 레이아웃 + 사용자 친숙 용어 매핑 표 + 기본값 50/10/60 통일 (3개 파일). 코드 작업 대기.
 
 | 항목 | 값 |
 |---|---|
