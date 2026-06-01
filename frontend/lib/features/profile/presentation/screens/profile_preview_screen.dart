@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
+import '../../../../features/profile/presentation/widgets/verification_badge_chip.dart';
 import '../../../../features/profile/profile_facade.dart';
 
 /// Preview screen showing the teacher's public profile as students would see it
@@ -243,6 +244,12 @@ class ProfilePreviewScreen extends ConsumerWidget {
                   color: AppColors.paper,
                 ),
               ),
+              if (profile.verification.isPhoneVerified) ...[
+                const SizedBox(height: AppSpacing.space2),
+                const VerificationBadgeChip(
+                  badge: VerificationBadge.phoneVerified,
+                ),
+              ],
               if (profile.instruments.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space2),
                 Text(

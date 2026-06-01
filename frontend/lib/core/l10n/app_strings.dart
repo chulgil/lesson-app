@@ -5596,6 +5596,16 @@ class AppStrings {
   /// Quest 보상 — 인증 선생님 배지.
   static const questRewardVerified = '인증 선생님 배지';
 
+  // Verification Badge — 프로필/카드에 표시되는 인증 칩
+  /// 인증 배지 라벨 — 전화인증 완료한 선생님.
+  static const verificationBadgePhoneLabel = '인증 선생님';
+
+  /// 인증 배지 라벨 — 자격증 승인된 선생님.
+  static const verificationBadgeCertifiedLabel = '자격증 인증';
+
+  /// 인증 배지 라벨 — 프리미엄 프로필 (100% 완성).
+  static const verificationBadgePremiumLabel = '프리미엄';
+
   // Quest Board — Action Phase (실제 레슨 운영)
   static const questTitleBankAccount = '입금 계좌 등록';
   static const questRewardBankAccount = '학생에게 입금 안내 가능';
