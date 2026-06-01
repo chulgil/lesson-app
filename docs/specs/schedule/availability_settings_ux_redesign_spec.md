@@ -67,6 +67,24 @@ After:  홈 → "레슨 시간 설정" 직접 진입 (1단계) + 온보딩 첫 �
 
 > 온보딩 중 첫 가용시간 등록은 [teacher_first_availability_setup.md](../onboarding/teacher_first_availability_setup.md) 의 간소 화면 사용. 본 스펙의 풀 화면은 이후 변경·추가 용도.
 
+### 사용자 친숙 용어 매핑 (2026-06-01 — E2E 감사 #9 C-G2)
+
+내부 기술 용어는 UI 에 노출하지 않는다. 화면·도움말·에러 메시지 모두 표시 용어 사용.
+
+| 내부 용어 (코드/스펙) | 표시 용어 (UI) | 비고 |
+|---|---|---|
+| `TeacherAvailability` | "레슨 운영 시간" | 화면 제목 |
+| `WeeklySchedule` | "주간 레슨 시간" | 섹션 1 헤더 |
+| `TimeException` | "임시 휴무/추가 오픈" | 섹션 4 헤더 |
+| `slotDurationMinutes` | "레슨 1회 시간" | 섹션 2 |
+| `breakTimeBetweenLessons` | "쉬는 시간" | 섹션 2 |
+| `slotStartInterval` | (UI 미노출) | 내부 자동 계산 |
+| "가용시간" (이전) | "레슨 시간" / "레슨 운영 시간" | 기술 용어 → 일상 용어 |
+| "슬롯" (이전) | "예약 가능 시간" / "레슨" | 시스템 용어 → 사용자 표현 |
+| "시간 예외" (이전) | "임시 휴무" / "추가 오픈" | 추상 용어 → 구체 행위 |
+
+> SSOT: 글로서리 (`.harness/knowledge/glossary.md` §3, `docs/specs/glossary.md`). 새 UI 텍스트는 `AppStrings` 키로 등록 (`lessonDurationLabel`, `breakTimeLabel`, etc.). 다국어 대비.
+
 ### 화면 제목 변경
 
 ```
@@ -183,3 +201,4 @@ After:  레슨 운영 시간 설정
 | 날짜 | 내용 |
 |------|------|
 | 2026-03-12 | 초안 작성 — 현재 UX 문제점 분석 + 재설계안 |
+| 2026-06-01 | E2E 감사 #9 C-G2 보강 — Split 레이아웃 추가, 첫 슬롯 ≤ 3탭 목표 명시, 사용자 친숙 용어 매핑 표 추가, 기본값 50/10/60 통일 (schedule_master·teacher_availability 와 동기화) |
