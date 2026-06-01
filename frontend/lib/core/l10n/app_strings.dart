@@ -1861,8 +1861,8 @@ class AppStrings {
   /// 레슨 시간 설정 (카드 헤더)
   static const lessonTimeSettings = '레슨 시간 설정';
 
-  /// 레슨 시간 (라벨)
-  static const lessonDurationLabel = '레슨 시간';
+  /// 레슨 1회 시간 (라벨) — G5 #9 spec §70 친숙 용어
+  static const lessonDurationLabel = '레슨 1회 시간';
 
   /// 시작 간격 (라벨)
   static const startIntervalLabel = '시작 간격';
@@ -6565,7 +6565,8 @@ class AppStrings {
   static const profileLogoutLabel = '로그아웃';
   static const profileLogoutConfirm = '정말 로그아웃 하시겠습니까?';
   static const profilePreviewCta = '내 프로필 미리보기';
-  static const profileShortcutAvailability = '가용시간';
+  // G5 #9 C-G2 — 친숙 용어 매핑 (availability_settings_ux_redesign_spec.md §70)
+  static const profileShortcutAvailability = '레슨 운영 시간';
   static const profileShortcutOutstandingPayment = '입금대기(후불)';
   static const profileShortcutSubscription = '수강권';
 

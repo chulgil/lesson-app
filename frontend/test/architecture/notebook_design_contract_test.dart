@@ -9,11 +9,12 @@ void main() {
 
     final directCardUsages = <String>[];
 
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (allowedFiles.contains(normalizedPath)) continue;
 
@@ -42,11 +43,12 @@ void main() {
 
     final directScaffoldUsages = <String>[];
 
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (allowedFiles.contains(normalizedPath)) continue;
 
@@ -80,11 +82,12 @@ void main() {
       r'Colors\.(white|yellow|black|black54|black87)\b',
     );
 
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (allowedPrefixes.any(normalizedPath.startsWith)) continue;
 
@@ -137,11 +140,12 @@ void main() {
       'lib/features/subscription/',
     ];
 
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (!targetPrefixes.any(normalizedPath.startsWith)) continue;
       if (allowedFiles.contains(normalizedPath)) continue;
@@ -174,11 +178,12 @@ void main() {
         'lib/features/subscription/presentation/widgets/',
       ];
 
-      for (final file in libDirectory
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => file.path.endsWith('.dart'))
-          .where((file) => !file.path.endsWith('.g.dart'))) {
+      for (final file
+          in libDirectory
+              .listSync(recursive: true)
+              .whereType<File>()
+              .where((file) => file.path.endsWith('.dart'))
+              .where((file) => !file.path.endsWith('.g.dart'))) {
         final normalizedPath = file.path.replaceAll('\\', '/');
         if (!targetPrefixes.any(normalizedPath.startsWith)) continue;
         if (allowedFiles.contains(normalizedPath)) continue;
@@ -205,9 +210,7 @@ void main() {
       File(
         'lib/features/schedule/presentation/screens/weekly_schedule_screen.dart',
       ),
-      File(
-        'lib/features/schedule/presentation/screens/teacher_availability_screen.dart',
-      ),
+      // teacher_availability_screen.dart removed in G5 #9 cleanup — split page is the live screen.
     ];
 
     final directBottomSheetUsages = <String>[];
@@ -369,11 +372,12 @@ void main() {
 
     final directBottomSheetUsages = <String>[];
     final libDirectory = Directory('lib/features/lessons/presentation');
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (!targetPrefixes.any(normalizedPath.startsWith)) continue;
 
@@ -397,11 +401,12 @@ void main() {
     final libDirectory = Directory('lib/features/practice/presentation');
     final directBottomSheetUsages = <String>[];
 
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -423,11 +428,12 @@ void main() {
     final libDirectory = Directory('lib/features/profile/presentation');
     final directBottomSheetUsages = <String>[];
 
-    for (final file in libDirectory
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in libDirectory
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -451,11 +457,12 @@ void main() {
     };
     final directBottomSheetUsages = <String>[];
 
-    for (final file in Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (allowedFiles.contains(normalizedPath)) continue;
 
@@ -483,11 +490,12 @@ void main() {
       };
       final directAlertDialogUsages = <String>[];
 
-      for (final file in Directory('lib')
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => file.path.endsWith('.dart'))
-          .where((file) => !file.path.endsWith('.g.dart'))) {
+      for (final file
+          in Directory('lib')
+              .listSync(recursive: true)
+              .whereType<File>()
+              .where((file) => file.path.endsWith('.dart'))
+              .where((file) => !file.path.endsWith('.g.dart'))) {
         final normalizedPath = file.path.replaceAll('\\', '/');
         if (allowedFiles.contains(normalizedPath)) continue;
 
@@ -511,11 +519,12 @@ void main() {
   test('custom Dialog surfaces explicitly use Notebook paper', () {
     final violations = <String>[];
 
-    for (final file in Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (normalizedPath ==
           'lib/core/widgets/notebook/notebook_alert_dialog.dart') {
@@ -554,11 +563,12 @@ void main() {
   test('showDialog builders do not create transparent loading overlays', () {
     final violations = <String>[];
 
-    for (final file in Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       if (normalizedPath ==
           'lib/core/widgets/notebook/notebook_alert_dialog.dart') {
@@ -603,11 +613,12 @@ void main() {
     final directScaffoldUsages = <String>[];
 
     for (final directory in targetDirectories) {
-      for (final file in directory
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => file.path.endsWith('.dart'))
-          .where((file) => !file.path.endsWith('.g.dart'))) {
+      for (final file
+          in directory
+              .listSync(recursive: true)
+              .whereType<File>()
+              .where((file) => file.path.endsWith('.dart'))
+              .where((file) => !file.path.endsWith('.g.dart'))) {
         final normalizedPath = file.path.replaceAll('\\', '/');
         if (allowedFiles.contains(normalizedPath)) continue;
 
@@ -631,13 +642,12 @@ void main() {
   test('student home screens use Notebook scaffold wrappers', () {
     final directScaffoldUsages = <String>[];
 
-    for (final file in Directory(
-          'lib/features/student_home/presentation/screens',
-        )
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib/features/student_home/presentation/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -658,11 +668,12 @@ void main() {
   test('profile setting screens use Notebook scaffold wrappers', () {
     final directScaffoldUsages = <String>[];
 
-    for (final file in Directory('lib/features/profile/presentation/screens')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib/features/profile/presentation/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -683,11 +694,12 @@ void main() {
   test('lesson screens use Notebook scaffold wrappers', () {
     final directScaffoldUsages = <String>[];
 
-    for (final file in Directory('lib/features/lessons/presentation/screens')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib/features/lessons/presentation/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -715,11 +727,12 @@ void main() {
     final directScaffoldUsages = <String>[];
 
     for (final directory in targetDirectories) {
-      for (final file in directory
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => file.path.endsWith('.dart'))
-          .where((file) => !file.path.endsWith('.g.dart'))) {
+      for (final file
+          in directory
+              .listSync(recursive: true)
+              .whereType<File>()
+              .where((file) => file.path.endsWith('.dart'))
+              .where((file) => !file.path.endsWith('.g.dart'))) {
         final normalizedPath = file.path.replaceAll('\\', '/');
         final lines = file.readAsLinesSync();
         for (var i = 0; i < lines.length; i++) {
@@ -741,11 +754,12 @@ void main() {
   test('student management screens use Notebook scaffold wrappers', () {
     final directScaffoldUsages = <String>[];
 
-    for (final file in Directory('lib/features/students/presentation/screens')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib/features/students/presentation/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -766,11 +780,12 @@ void main() {
   test('practice screens use Notebook scaffold wrappers', () {
     final directScaffoldUsages = <String>[];
 
-    for (final file in Directory('lib/features/practice/presentation/screens')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib/features/practice/presentation/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
@@ -802,11 +817,12 @@ void main() {
       final directScaffoldUsages = <String>[];
 
       for (final directory in targetDirectories) {
-        for (final file in directory
-            .listSync(recursive: true)
-            .whereType<File>()
-            .where((file) => file.path.endsWith('.dart'))
-            .where((file) => !file.path.endsWith('.g.dart'))) {
+        for (final file
+            in directory
+                .listSync(recursive: true)
+                .whereType<File>()
+                .where((file) => file.path.endsWith('.dart'))
+                .where((file) => !file.path.endsWith('.g.dart'))) {
           final normalizedPath = file.path.replaceAll('\\', '/');
           final lines = file.readAsLinesSync();
           for (var i = 0; i < lines.length; i++) {
@@ -829,13 +845,12 @@ void main() {
   test('parent home screens use Notebook scaffold wrappers', () {
     final directScaffoldUsages = <String>[];
 
-    for (final file in Directory(
-          'lib/features/parent_home/presentation/screens',
-        )
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where((file) => !file.path.endsWith('.g.dart'))) {
+    for (final file
+        in Directory('lib/features/parent_home/presentation/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
       final normalizedPath = file.path.replaceAll('\\', '/');
       final lines = file.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
