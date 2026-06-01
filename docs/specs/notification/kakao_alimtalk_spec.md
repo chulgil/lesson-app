@@ -1,8 +1,10 @@
 # 카카오 알림톡 연동 스펙
 
-> 작성일: 2026-05-31
+> 작성일: 2026-05-31 (2026-06-01 — E2E 감사 #2 E2-C2 보강)
 > 상태: 초안 (구현 대기)
+> 관련 이슈: #423
 > 관련 스펙: [notification_master.md](./notification_master.md), [payment_architecture.md](../subscription/payment_architecture.md)
+> **5종 템플릿 본문 + 정책**: [alimtalk_templates.md](alimtalk_templates.md) (LNZ_INVOICE / LNZ_PAYMENT_REMINDER_D1/D3/D7 / LNZ_PAYMENT_CONFIRM / LNZ_TEACHER_VACATION)
 
 ---
 

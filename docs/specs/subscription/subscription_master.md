@@ -369,6 +369,15 @@ else → 이용중 (보라)
 
 ## 3. Subscription Proposal Flow
 
+> **2026-06-01 E2E 감사 보강** (#2·#3·#6·#4·#7):
+> - **알림톡 자동 발송 (§3.6, §4.X)** — 제안 송신 시 LNZ_INVOICE, 입금 확인 시 LNZ_PAYMENT_CONFIRM. 템플릿 상세: [alimtalk_templates.md](../notification/alimtalk_templates.md)
+> - **선생님 측 입금 대시보드 (신규 §4.X)** — 입금 미확인 N건 집계 + D+1/3/7 자동 리마인드. 상세: [payment_tracking_dashboard.md](payment_tracking_dashboard.md)
+> - **입금 확인 Undo (신규 §4.X)** — 24시간 윈도우 내 되돌리기. 첫 레슨 차감 발생 시 불가
+> - **수강권 자동 연장 (§2.X)** — 선생님 휴가 모드 시 휴가 일수만큼 만료일 연장. 상세: [../schedule/teacher_vacation_mode.md](../schedule/teacher_vacation_mode.md)
+> - **`scheduledLessons` 별도 트랙 + Make-up Bank (§2.X)** — 일괄변경 후 회차 정합성. 상세: [makeup_credit_spec.md](makeup_credit_spec.md)
+>
+> **범위 명시**: 본 보강은 송금 자동화 아님. 외부 무통장입금 모델 유지 (§1.2 "돈은 앱 밖에서").
+
 ### 3.1 통합 수강권 플로우 — Template-First (v7)
 
 > **v7 핵심 변경**: 기존 "수강권 제안"과 "수강권 발급(직접)" 두 개의 분리된 경로를

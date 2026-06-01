@@ -1,8 +1,16 @@
 # 알림 시스템 Master Spec
 
 > 구현 상태: ⚠️ 부분 구현 (95%) — FCM 인프라 구현, Firebase 설정 대기, 핵심 비즈니스 알림 4종 백엔드 발송 완료
-> Last updated: 2026-05-31
-> 기존 스펙: [notification_system.md](notification_system.md)
+> Last updated: 2026-06-01 (E2E 감사 #3 E2-C1 보강 — 선생님 측 입금 미확인 푸시 3종 추가)
+> 기존 스펙: [notification_system.md](notification_system.md), [kakao_alimtalk_spec.md](kakao_alimtalk_spec.md)
+> 관련 이슈: #424
+
+> **선생님 측 입금 미확인 푸시 3종 (2026-06-01 신규)**:
+> - `payment.pending_d1` — D+1 첫 리마인드
+> - `payment.pending_d3` — D+3 두번째 리마인드
+> - `payment.pending_d7_final` — D+7 만료 직전 (선생님 액션 마지막 기회)
+>
+> 상세: [../subscription/payment_tracking_dashboard.md](../subscription/payment_tracking_dashboard.md). 학생 측 동등 알림톡은 [kakao_alimtalk_spec.md](kakao_alimtalk_spec.md) 참조.
 
 ## 1. 개요
 

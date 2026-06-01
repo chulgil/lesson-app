@@ -76,16 +76,20 @@
 
 **TeacherAvailability 핵심 속성:**
 
-| 속성 | 타입 | 설명 | 기본값 |
-|------|------|------|--------|
-| `slotDurationMinutes` | int | 레슨 시간 (30/45/50/60분) | 60 |
-| `slotStartInterval` | int | 슬롯 시작 간격 (30/60분) | 30 |
-| `breakTimeBetweenLessons` | int | 레슨 사이 쉬는 시간 (0/5/10/15분) | 0 |
-| `minBookingHours` | int | 최소 예약 사전 시간 | 24 |
-| `autoGenerateWeeks` | int | 자동 슬롯 생성 주 수 | 4 |
+| 속성 | 사용자 표시명 | 타입 | 설명 | 기본값 |
+|------|-------------|------|------|--------|
+| `slotDurationMinutes` | 레슨 1회 시간 | int | 레슨 시간 (30/45/50/60분) | **50** |
+| `slotStartInterval` | (내부) | int | 슬롯 시작 간격 (30/60분) | **60** (= 레슨+쉬는시간) |
+| `breakTimeBetweenLessons` | 쉬는 시간 | int | 레슨 사이 쉬는 시간 (0/5/10/15분) | **10** |
+| `minBookingHours` | 최소 예약 사전 시간 | int | 최소 예약 사전 시간 | 24 |
+| `autoGenerateWeeks` | (내부) | int | 자동 슬롯 생성 주 수 | 4 |
 
 **effectiveSlotDuration** = `slotDurationMinutes` + `breakTimeBetweenLessons`
 (다음 슬롯 시작 시간 계산에 사용)
+
+> **기본값 통일 (2026-06-01 — E2E 감사 #9 C-G2)**: 레슨 50분 + 쉬는 시간 10분 = 슬롯 간격 60분. 한국 음악 레슨 표준 (50분 1교시). 이전 60/30/0 조합은 effectiveSlotDuration 60분으로 같지만 쉬는 시간이 없어 연속 레슨 시 부담. 통일된 50/10/60 로 변경하면서 기존 데이터는 사용자 설정 우선(BE 기본값만 수정).
+
+> **사용자 표시명 (i18n)**: `slotDurationMinutes` → "레슨 1회 시간", `breakTimeBetweenLessons` → "쉬는 시간". UI 에는 표시명을 사용하고 내부 코드/스펙에는 영문 키 사용. AppStrings 키: `lessonDurationLabel`, `breakTimeLabel`.
 
 ### 2.2 주간 스케줄 (WeeklySchedule)
 

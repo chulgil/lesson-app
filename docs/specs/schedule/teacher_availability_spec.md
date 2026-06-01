@@ -1,10 +1,18 @@
 # 선생님 가용 스케줄 시스템 설계서
 
 > 작성일: 2026-01-26
-> 최종 수정: 2026-05-29
-> 상태: ✅ 구현 완료 (Phase 1~4)
+> 최종 수정: 2026-06-01 (E2E 감사 #1·#4·#9 보강)
+> 상태: ✅ 구현 완료 (Phase 1~4) — 신규 보강 작업 진행 중
 > 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_master.md](../subscription/subscription_master.md)
 > UX 가이드: [ux_guidelines.md](../design/ux_guidelines.md) - 섹션 11~12 참고
+> 관련 신규 스펙 (2026-06-01):
+> - [teacher_first_availability_setup.md](../onboarding/teacher_first_availability_setup.md) — 온보딩 간소 진입 (#1 AB-C1)
+> - [teacher_vacation_mode.md](teacher_vacation_mode.md) — 휴가 모드 (#4 H-001)
+> - [availability_settings_ux_redesign_spec.md](availability_settings_ux_redesign_spec.md) — Split 레이아웃·기본값 통일 (#9 C-G2)
+
+> **기본값 통일 (2026-06-01 — schedule_master §2 와 동기화)**:
+> `slotDurationMinutes` 기본값 = **50분**, `breakTimeBetweenLessons` = **10분**, `slotStartInterval` = **60분** (= 레슨+쉬는시간).
+> 본 문서 내 코드 예시·UI 설명에 60분 기본값이 박힌 곳이 있으면 신규 작성·수정 시 50분으로 통일.
 
 > ⚠️ **중요**: 레슨 예약은 **유효한 수강권이 있어야만** 가능합니다.
 > 수강권이 없는 학생의 경우 먼저 [수강권 제안 플로우](../subscription/subscription_master.md)를 통해 수강권을 발급받아야 합니다.

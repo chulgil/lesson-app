@@ -1,8 +1,11 @@
 # 선생님 홈 마스터 스펙
 
-> 마지막 업데이트: 2026-04-16
+> 마지막 업데이트: 2026-06-01 (E2E 감사 #3 E2-C1 보강)
 > 구현 상태: ✅ 구현 완료 (UX 개선 진행 중)
 > 관련 코드: `features/home/`
+> 관련 이슈: #424
+
+> **신규 카드 (2026-06-01)**: 상단 영역에 "입금 대기 N건" 카드 추가 — `paymentRequested` / `paymentNotified` 상태 집계. 1탭 진입 시 학생별 D+N 표시 + 1탭 재발송. 상세: [../subscription/payment_tracking_dashboard.md](../subscription/payment_tracking_dashboard.md)
 
 ---
 

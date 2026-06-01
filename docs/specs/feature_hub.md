@@ -21,8 +21,7 @@
 | 7 | 알림 | [notification_master.md](notification/notification_master.md) | 1개 보강 | 기존 스펙 + 구현 코드 통합 |
 | 8 | 디자인 | [notebook/README.md](design/notebook/README.md) | — | Notebook × Score 디자인 시스템 (**SSOT**) |
 | 9 | 캘린더 | [calendar_master.md](calendar/calendar_master.md) | 신규 | 코드 역공학 |
-| 10 | 온보딩 | [onboarding_master.md](onboarding/onboarding_master.md) | 신규 | 코드 역공학 |
-| 10-b | 온보딩 v3 | [teacher_onboarding_v3_spec.md](onboarding/teacher_onboarding_v3_spec.md) | 신규 | 간소화+코치마크+퀘스트 (구현 완료) |
+| 10 | 온보딩 (선생님 v3) | [teacher_onboarding_v3_spec.md](onboarding/teacher_onboarding_v3_spec.md) | 신규 | **공식 SSOT** — 간소화+코치마크+퀘스트. v1/v2는 `_archive/onboarding/` 이동 (2026-06-01) |
 | 11 | 학생홈 | [student_home_master.md](student_home/student_home_master.md) | 신규 | 코드 역공학 |
 | 12 | 팔로우 | [follow_master.md](follow/follow_master.md) | 신규 | Phase 1,3 완료 / Phase 2 미구현 |
 | 13 | 설정 | [settings_master.md](settings/settings_master.md) | 신규 | 코드 역공학 |
@@ -154,15 +153,15 @@
 |------|-----------|:----:|
 | 알림 시스템 | [notification_master.md](notification/notification_master.md) | 기본 구현 |
 | 캘린더 탭 | [calendar_master.md](calendar/calendar_master.md) | 완료 |
-| 온보딩 플로우 | [onboarding_master.md](onboarding/onboarding_master.md) | v3 구현 완료 (간소화 + 코치마크 + 퀘스트) |
+| 온보딩 플로우 | [teacher_onboarding_v3_spec.md](onboarding/teacher_onboarding_v3_spec.md) | v3 구현 완료 (간소화 + 코치마크 + 퀘스트) |
 | 학생홈 대시보드 | [student_home_master.md](student_home/student_home_master.md) | 완료 |
 | 팔로우 시스템 | [follow_master.md](follow/follow_master.md) | 데이터만 |
 | 설정/백업/녹음관리 | [settings_master.md](settings/settings_master.md) | 완료 |
 | 게이미피케이션 (포인트/레벨/뱃지) | (practice_master #6 참조) | 완료 |
 | 분석 대시보드 (월별 통계/차트) | (lesson_master 참조) | 완료 |
 | 과제 대시보드 (전체 학생 현황) | (lesson_master 참조) | 완료 |
-| 코치마크 튜토리얼 시스템 | [onboarding_master.md](onboarding/onboarding_master.md) | 구현 완료 |
-| 퀘스트 보드 (프로필 완성도) | [onboarding_master.md](onboarding/onboarding_master.md) | 구현 완료 |
+| 코치마크 튜토리얼 시스템 | [teacher_onboarding_v3_spec.md](onboarding/teacher_onboarding_v3_spec.md) | 구현 완료 |
+| 퀘스트 보드 (프로필 완성도) | [teacher_onboarding_v3_spec.md](onboarding/teacher_onboarding_v3_spec.md) | 구현 완료 |
 | 웹 프로필 공유 (공개 API) | [user_master.md](user/user_master.md) | 백엔드 완료, 프론트 미구현 |
 | 프로필 완성 리마인더 알림 | [notification_master.md](notification/notification_master.md) | 백엔드 완료 |
 | 수강권 필수화 (자동 생성) | [subscription_master.md](subscription/subscription_master.md) | 구현 완료 |

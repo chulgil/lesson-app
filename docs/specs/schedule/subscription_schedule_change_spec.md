@@ -1,6 +1,8 @@
 # 수강권 일정 변경 — 턴 기반 잠금 흐름 스펙
 
-> 최종 업데이트: 2026-05-05
+> 최종 업데이트: 2026-06-01 (E2E 감사 #7 H-002 보강)
+> 관련 이슈: #427
+> **일괄변경 후 5주차·보강 재계산 로직 + Make-up Bank**: [../subscription/makeup_credit_spec.md](../subscription/makeup_credit_spec.md) (`Subscription.scheduledLessons` 별도 트랙, MakeupCredit 적립 트리거)
 
 ## 1. 개요
 
