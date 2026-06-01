@@ -104,6 +104,14 @@ class Settings(BaseSettings):
     # workflows convenient — production rejects it outright.
     IAP_AUTO_GRANT_ON_PENDING_DEV_ONLY: bool = False
 
+    # Alimtalk (#423). Default mock=True so dev + CI never accidentally hit the
+    # vendor API. Production must set ALIMTALK_USE_MOCK=false AND populate the
+    # vendor credentials below; otherwise sends silently no-op via the mock.
+    ALIMTALK_USE_MOCK: bool = True
+    ALIMTALK_API_BASE_URL: str = ""
+    ALIMTALK_API_KEY: str = ""
+    ALIMTALK_SENDER_PROFILE: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 

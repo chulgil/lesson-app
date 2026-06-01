@@ -32,6 +32,30 @@ JOB_ID_D7 = "payment_reminder_d7_final"
 _ACTIVE = (ProposalStatus.pending, ProposalStatus.paymentNotified)
 
 
+async def _send_student_alimtalk(session: AsyncSession, proposal: SubscriptionProposal, d_day: int) -> None:
+    """#423 — D+1/D+3/D+7 학생/학부모 측 알림톡 발송 (멱등성은 service 안에서)."""
+    from app.models.student import Student
+    from app.services.alimtalk_service import build_alimtalk_service
+
+    student = await session.get(Student, proposal.student_id)
+    if student is None:
+        return
+    phone = student.parent_phone or student.phone or ""
+    if not phone:
+        return
+    service = build_alimtalk_service(session)
+    await service.send_payment_reminder(
+        proposal_id=proposal.id,
+        d_day=d_day,
+        recipient_phone=phone,
+        variables={
+            "student_name": student.name or "",
+            "proposal_id": proposal.id,
+            "d_day": str(d_day),
+        },
+    )
+
+
 async def _send_teacher_push(session: AsyncSession, proposal: SubscriptionProposal, notification_type: str) -> bool:
     """Best-effort push + in-app notif to the teacher. Silent on failure so cron stays green."""
     try:
@@ -87,6 +111,15 @@ async def _run_payment_reminder(
         sent = 0
         for proposal in candidates:
             ok = await _send_teacher_push(s, proposal, notification_type)
+            # #423 — alimtalk to student/parent in parallel with the teacher push.
+            try:
+                await _send_student_alimtalk(s, proposal, n_days)
+            except Exception:  # noqa: BLE001
+                logger.exception(
+                    "alimtalk LNZ_PAYMENT_REMINDER_D%d trigger failed proposal=%s",
+                    n_days,
+                    proposal.id,
+                )
             setattr(proposal, reminder_field, now)
             proposal.last_reminder_sent_at = now
             if ok:

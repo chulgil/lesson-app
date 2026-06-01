@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -747,9 +750,36 @@ class SubscriptionService:
         await self._link_subscription_to_relation(sub)
 
         await self._notify_deposit_confirmed(sub, NotificationService(self.db))
+
+        # #423 — fire-and-forget LNZ_PAYMENT_CONFIRM. Failure must not break the confirm flow.
+        try:
+            await self._send_alimtalk_payment_confirm(sub)
+        except Exception:  # noqa: BLE001
+            logger.exception("alimtalk LNZ_PAYMENT_CONFIRM trigger failed sub=%s", sub.id)
+
         await self.db.flush()
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
+
+    async def _send_alimtalk_payment_confirm(self, sub: Any) -> None:
+        """#423 — push LNZ_PAYMENT_CONFIRM alimtalk to the student/parent after E3."""
+        from app.models.student import Student
+        from app.services.alimtalk_service import build_alimtalk_service
+
+        student = await self.db.get(Student, sub.student_id)
+        if student is None:
+            return
+        phone = student.parent_phone or student.phone or ""
+        service = build_alimtalk_service(self.db)
+        await service.send_payment_confirm(
+            subscription_id=sub.id,
+            recipient_phone=phone,
+            variables={
+                "student_name": student.name or "",
+                "subscription_id": sub.id,
+                "amount": str(sub.amount or 0),
+            },
+        )
 
     async def undo_confirm_payment(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Undo a manual tuition deposit confirmation (#426).
@@ -1305,7 +1335,33 @@ class SubscriptionService:
                 event_type="proposalSent",
             )
 
+        # #423 — fire-and-forget alimtalk LNZ_INVOICE. Failure must not break proposal creation.
+        try:
+            await self._send_alimtalk_invoice(proposal)
+        except Exception:  # noqa: BLE001
+            logger.exception("alimtalk LNZ_INVOICE trigger failed proposal=%s", proposal.id)
+
         return SubscriptionProposalResponse.model_validate(proposal)
+
+    async def _send_alimtalk_invoice(self, proposal: Any) -> None:
+        """#423 — push LNZ_INVOICE alimtalk to the student/parent right after E1."""
+        from app.models.student import Student
+        from app.services.alimtalk_service import build_alimtalk_service
+
+        student = await self.db.get(Student, proposal.student_id)
+        if student is None:
+            return
+        phone = student.parent_phone or student.phone or ""
+        service = build_alimtalk_service(self.db)
+        await service.send_invoice(
+            proposal_id=proposal.id,
+            recipient_phone=phone,
+            variables={
+                "student_name": student.name or "",
+                "proposal_id": proposal.id,
+                "expires_at": proposal.expires_at.isoformat() if proposal.expires_at else "",
+            },
+        )
 
     async def _assert_proposal_create_resources(self, data: SubscriptionProposalCreate, teacher_ids: list[str]) -> None:
         await self._assert_proposal_student_owner(data.student_id, teacher_ids)
