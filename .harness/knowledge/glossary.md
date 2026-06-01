@@ -49,6 +49,9 @@
 | 스케줄 예외 | Schedule Exception | `TimeException` | `ScheduleException` | ⚠️ FE-BE 불일치. 휴무/휴가/추가 슬롯 |
 | 스케줄 변경 | Schedule Change | `ScheduleChange` | `LessonScheduleChange` | 레슨 일정 변경 요청 |
 | 스케줄 확정 카드 | Confirmation Card | `ScheduleConfirmationCard` | `ScheduleConfirmationCard` | 수강권 발급 후 스케줄 확정 UI |
+| 휴가 모드 | Vacation Mode | `TeacherAvailability.vacationPeriods` | `vacation_periods` | 선생님 휴가 기간 일괄 등록 → 영향 레슨 일괄 처리 (취소·보강·이월) |
+| 레슨 1회 시간 | Lesson Duration | `slotDurationMinutes` | `slot_duration_minutes` | 사용자 표시명. 한국 음악 레슨 표준 50분 |
+| 쉬는 시간 | Break Time | `breakTimeBetweenLessons` | `break_time_between_lessons` | 사용자 표시명. 표준 10분 |
 
 ---
 
@@ -61,6 +64,12 @@
 | 수강권 템플릿 | Template | `SubscriptionTemplate` | `SubscriptionTemplate` | 미리 설정한 수강권 상품 |
 | 수강권 상태 | Subscription Status | `SubscriptionStatus` | `SubscriptionStatus` | active/expiringSoon/expired/paused |
 | 입금 상태 | Payment Status | `paymentConfirmed` | `payment_confirmed` | 외부 입금 확인 여부 (앱 내 결제 아님) |
+| 입금 대기 | Payment Pending | `PaymentPendingCard` | (집계) | 입금 확인 전 수강권 제안 상태 (`paymentRequested`) 집계. 선생님 홈 상단 카드로 노출 |
+| 입금 추적 | Payment Tracking | `PaymentTrackingService` | `PaymentTrackingService` | D+1/3/7 자동 리마인드 시스템. 학생·선생님 양측 발송 |
+| 입금 확인 되돌리기 | Confirm Payment Undo | `undoConfirmPayment` | `undo_confirm_payment` | 입금 확인 후 24시간 내 취소 가능. 첫 레슨 차감 발생 시 불가 |
+| 수강권 자동 연장 | Auto-Extension | `Subscription.autoExtendedDays` | `auto_extended_days` | 선생님 휴가 모드 등록 시 휴가 일수만큼 만료일 자동 연장 |
+| 스케줄된 회차 | Scheduled Lessons | `Subscription.scheduledLessons` | `scheduled_lessons` | 실제 잡힌 레슨 수. `remainingLessons` 와 별개 트랙 |
+| 보강 크레딧 | Makeup Credit | `MakeupCredit` | `MakeupCredit` | 별도 엔티티. 휴가·노쇼 면제·일괄변경 손실 회차 적립. 30일 만료 |
 
 ---
 
@@ -79,7 +88,9 @@
 | 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
 |------|------|-----------|-----------|------|
 | 연결 | Connection | `Relationship` | `Relationship` | 선생님-학생 관계 |
-| 관계 상태 | Relationship Status | `RelationshipStatus` | `RelationStatus` | ⚠️ FE-BE 불일치 |
+| 관계 상태 | Relationship Status | `RelationshipStatus` | `RelationStatus` | ⚠️ FE-BE 불일치. **레슨 관계 SSOT**. ConnectionStatus는 deprecate 예정 |
+| 초대 코드 | Invite Code | `InviteCode` | `InviteCode` | 학생 초대용 6자리 코드 + QR + URL. 만료 7일 |
+| 초대 대기 | Invite Pending | `RelationshipStatus.invitePending` | `invite_pending` | 초대 전송 후 학생 미진입 상태. 학생 리스트에서 별도 그룹 표시 |
 | 팔로우 | Follow | `Follow` | `Follow` | 소식 구독 (레슨 무관) |
 | 학급 | Class | `LessonClass` | `LessonClass` | 선생님의 레슨 그룹 |
 | 소속 | Membership | `ClassMembership` | `ClassMembership` | 학생의 학급 소속 |
@@ -91,6 +102,8 @@
 | 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
 |------|------|-----------|-----------|------|
 | 알림 | Notification | `AppNotification` | `Notification` | ⚠️ FE-BE 불일치. 인앱/푸시 알림 |
+| 알림톡 | AlimTalk | `AlimTalkService` | `AlimTalkService` | 카카오톡 비즈 알림 메시지. LNZ_INVOICE / LNZ_PAYMENT_REMINDER_D1/D3/D7 / LNZ_PAYMENT_CONFIRM / LNZ_TEACHER_VACATION |
+| 발신 프로필 | Sender Profile | `AlimTalkSenderProfile` | `sender_profile` | 카카오 알림톡 발신 식별자. 본 앱 단일 프로필 사용 |
 | 만료 알림 설정 | Expiry Reminder Settings | `SubscriptionExpiryReminderSettings` | `SubscriptionSettings.renewal_alert_days_set` | D-14/D-7/D-1/D-0 토글 |
 | 선생님 휴강 이벤트 | Lesson Cancelled By Teacher | `RequestEventType.lessonCancelledByTeacher` | `lessonCancelledByTeacher` | 선생님 사유 휴강 → 수강권 챗에 이벤트 기록 (변경권 미차감) |
 | 선생님 공지 이벤트 | Teacher Announcement | `RequestEventType.teacherAnnouncement` | `teacherAnnouncement` | 선생님 일괄 메시지 → 수강권 챗에 공지 기록 |
@@ -113,7 +126,9 @@
 | 코치마크 | Coach Mark | 화면 오버레이로 특정 UI 요소를 하이라이트하며 안내하는 UI 패턴 |
 | 워크스루 | Walkthrough | 인터랙티브 온보딩 — 실제 화면에서 직접 탭하며 배우는 체험 |
 | 셀레브레이션 | Celebration | 퀘스트 완료 시 축하 피드백 (애니메이션 + 메시지) |
-| 프로필 완성도 | Profile Completeness | 프로필 입력 항목 기반 0-100% 게이지 |
+| 프로필 완성도 | Profile Completeness | 프로필 입력 항목 기반 0-100% 게이지. `canBeSearched` 60% 임계값 게이지에 표시 |
+| 첫 가용시간 | Initial Availability | 온보딩 중 강제 설정하는 최소 가용시간 (요일 다중선택 + 시작/종료시각 1쌍, 50분 기본). 풀 설정은 나중에 |
+| 인증 선생님 배지 | Verified Teacher Badge | 전화번호 인증 완료 시 부여. 학부모 측 신뢰 표시. 첫 수강권 발급 전 인증 필요 |
 
 ---
 
@@ -125,7 +140,8 @@
 |------|----------|---------|----------|
 | 사용자 | `AuthUser` | `User` | FE 사정 (Flutter Auth 충돌 회피) — 유지 |
 | 알림 | `AppNotification` | `Notification` | FE 사정 (dart:html 충돌 회피) — 유지 |
-| 관계 상태 | `RelationshipStatus` | `RelationStatus` | BE rename 권장 → `RelationshipStatus` |
+| 관계 상태 | `RelationshipStatus` | `RelationStatus` | BE rename 권장 → `RelationshipStatus`. 본 SSOT는 FE `RelationshipStatus` |
+| ConnectionStatus | (deprecate 예정) | (deprecate 예정) | 초대·연결 상태는 `RelationshipStatus.invitePending` 으로 통합. 점진적 제거 |
 | 레슨 요청 | `UnifiedLessonRequest` | `LessonRequest` | FE가 여러 소스 통합 — 유지 |
 | 요청 상태 | `UnifiedRequestStatus` | `RequestStatus` | 동일 사유 — 유지 |
 | 스케줄 예외 | `TimeException` | `ScheduleException` | BE 이름이 정확 — FE rename 권장 |
@@ -149,6 +165,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-01 | E2E 감사 Top 10 반영 — 15용어 추가: 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드/대기, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간, 발신 프로필. ConnectionStatus deprecate 명시 |
 | 2026-05-10 | §10 앱 릴리즈/신뢰 구축: AppVersionSnapshot, AppNewsItem, AppRoadmapItem, AppReleaseSnapshot, AppReviewState 추가 (R6) |
 | 2026-05-07 | §7 알림: lessonCancelledByTeacher, teacherAnnouncement 이벤트 타입 추가 (일괄 작업 v2) |
 | 2026-05-07 | §2 체험레슨: 수강권 필수 명시 (유료 기본, 무료 선택), 변경/취소 정책 동일 적용 |

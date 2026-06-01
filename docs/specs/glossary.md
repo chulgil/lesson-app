@@ -145,6 +145,30 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | **사용 상황** | QR/URL이 어려운 경우 |
 | **연결 방식** | 코드 입력 → 자동 연결 |
 
+### 2.4 초대 코드 라이프사이클 (Invite Code Lifecycle)
+
+> **정의**: 초대 코드의 발급·전송·만료·재발송 흐름. SSOT: `docs/specs/user/invite_lifecycle_spec.md`
+
+| 상태 | 의미 |
+|------|------|
+| created | 코드 생성됨, 미전송 |
+| sent | 학생에게 전송됨 |
+| opened | 학생이 링크/QR 접근함 |
+| joined | 학생 가입·연결 완료 (`RelationshipStatus.trialBooked` 또는 `active`) |
+| expired | 7일 경과로 자동 만료 |
+| revoked | 선생님이 명시적으로 회수 |
+
+#### 재발송 정책
+
+- 만료 임박(D-1, D-3) 시 선생님에게 알림 + 1탭 재발송 버튼
+- 재발송 = 같은 코드 만료 갱신 (새 코드 생성 X)
+- 회수(revoked) 후에는 새 코드 발급 필요
+
+#### 초대 대기 (Invite Pending)
+
+- `RelationshipStatus.invitePending`: 학생 리스트에서 별도 그룹으로 표시
+- 기존 `ConnectionStatus.inviteSent` 와 통합 (ConnectionStatus deprecate 예정)
+
 ---
 
 ## 3. 레슨 관련 용어
@@ -196,6 +220,10 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 레슨 기록 | 레슨 노트, 과제 배정 |
 | 가용시간 설정 | 예약 가능 시간 관리 |
 
+#### 인증 선생님 배지 (Verified Teacher Badge)
+
+> 전화번호 인증 완료 시 부여. 학부모 측 신뢰 표시. **첫 수강권 발급 전 인증 필요** (가입~D 단계는 미인증으로 자유 진행)
+
 ### 4.2 학생 (Student)
 
 레슨을 받는 사용자
@@ -220,23 +248,24 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 ## 5. 네트워크/연결 상태 용어
 
-### 5.1 ConnectionStatus (네트워크 상태)
+### 5.1 ConnectionStatus (네트워크 상태) — **Deprecate 예정**
 
-> **주의**: `ConnectionStatus`는 **네트워크/팔로우 연결 상태**를 의미합니다. 레슨 관계 상태와 혼동하지 마세요.
+> ⚠️ **2026-06-01 결정**: ConnectionStatus는 점진적으로 deprecate. 초대·연결 상태는 `RelationshipStatus.invitePending` 으로 통합. 신규 코드는 RelationshipStatus 사용.
 
-| 상태 | 코드 | 설명 |
+| 기존 상태 | 코드 | 통합 후 |
 |------|------|------|
-| 오프라인 | `offline` | 연결 없음 |
-| 초대 발송 | `inviteSent` | 초대 코드/링크 발송됨 |
-| 초대 수락 | `inviteAccepted` | 초대 수락 완료 |
-| 연결됨 | `connected` | 팔로우/연결 활성 |
+| 오프라인 | `offline` | (네트워크 영역으로 분리, 레슨 관계와 무관) |
+| 초대 발송 | `inviteSent` | → `RelationshipStatus.invitePending` |
+| 초대 수락 | `inviteAccepted` | → `RelationshipStatus.trialBooked` (체험 예약) |
+| 연결됨 | `connected` | → `RelationshipStatus.active` 또는 팔로우 영역 |
 
-### 5.2 RelationshipStatus (레슨 관계 상태)
+### 5.2 RelationshipStatus (레슨 관계 상태) — **공식 SSOT**
 
-> **수강권 기반 자동 전환**되는 레슨 관계 상태입니다. 위 ConnectionStatus와 별개입니다.
+> 레슨 관계의 단일 SSOT. 초대~수강 완료까지 모든 상태를 포괄.
 
 | 상태 | 코드 | 조건 |
 |------|------|------|
+| 초대 대기 | `invitePending` | 학생에게 초대 코드 전송됨, 미진입 (신규 — 2026-06-01) |
 | 체험 예정 | `trialBooked` | 체험 예약 완료 |
 | 수강 중 | `active` | 유효 수강권 존재 |
 | 수강권 만료 | `expired` | 만료 후 30일 이내 |
@@ -289,6 +318,12 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 수강권 제안 | Proposal | 선생님→학생 수강권 제안 |
 | 수강권 템플릿 | Template | 미리 설정한 수강권 상품 |
 | 입금 상태 | Payment Status | 외부 입금 확인 여부 (앱 내 결제 아님) |
+| 입금 대기 | Payment Pending | 입금 확인 전 수강권 제안 상태 집계. 선생님 홈 상단 카드로 노출 |
+| 입금 추적 | Payment Tracking | D+1/3/7 자동 리마인드 시스템 (학생·선생님 양측) |
+| 입금 확인 되돌리기 | Confirm Payment Undo | 입금 확인 후 24시간 내 취소 가능. 첫 레슨 차감 발생 시 불가 |
+| 수강권 자동 연장 | Auto-Extension | 선생님 휴가 일수만큼 만료일 자동 연장 |
+| 스케줄된 회차 | Scheduled Lessons | 실제 잡힌 레슨 수. 잔여 회차와 별개 트랙 (5주차·일괄변경 후 재계산용) |
+| 보강 크레딧 | Makeup Credit | 별도 엔티티로 적립된 보강 회차. 30일 만료 |
 
 ## 8. 스케줄 (Schedule)
 
@@ -297,7 +332,11 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 레슨 요청 | Lesson Request | 학생→선생님 레슨 신청 |
 | 예약 | Booking | 확정된 레슨 일정 |
 | 가용시간 | Availability | 선생님 예약 가능 시간대 |
+| 첫 가용시간 | Initial Availability | 온보딩 중 강제 설정하는 최소 가용시간 (요일 + 시작/종료 시각, 50분 기본) |
+| 휴가 모드 | Vacation Mode | 선생님 휴가 기간 일괄 등록 → 영향 레슨 일괄 처리 (취소·보강·이월) + 수강권 자동 연장 |
 | 스케줄 예외 | Schedule Exception | 휴무/휴가/추가 슬롯 |
+| 레슨 1회 시간 | Lesson Duration | 슬롯 길이 사용자 표시명. 한국 음악 레슨 표준 50분 |
+| 쉬는 시간 | Break Time | 레슨 간 쉬는 시간 사용자 표시명. 표준 10분 |
 
 ## 9. 연습 (Practice)
 
@@ -312,6 +351,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 한글 | 영문 | 설명 |
 |------|------|------|
 | 알림 | Notification | 인앱/푸시 알림 |
+| 알림톡 | AlimTalk | 카카오톡 비즈 알림 메시지. LNZ_INVOICE / LNZ_PAYMENT_REMINDER_D1/D3/D7 / LNZ_PAYMENT_CONFIRM / LNZ_TEACHER_VACATION |
 | 만료 알림 설정 | Expiry Reminder Settings | D-14/D-7/D-1/D-0 토글 |
 
 ---
@@ -320,6 +360,8 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-01 | ConnectionStatus | RelationshipStatus.invitePending 통합 | E2E 감사: 초대·관계 이중 상태 충돌 해소 (D-G3) |
+| 2026-06-01 | — | 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간 | E2E 감사 Top 10 반영 (.harness/knowledge/glossary.md SSOT 동기화) |
 | 2026-05-07 | 체험레슨 수강권 "불필요" | 체험레슨 수강권 **"필수"** (유료 기본, 무료 선택) | 실제 운영: 체험도 유료가 대부분이므로 수강권+변경권 정책 동일 적용 |
 | 2026-05-07 | — | 온보딩 퀘스트 v2 용어 6개 추가 | .harness glossary 동기화 |
 | 2026-05-04 | — | 수강권/스케줄/연습/알림 도메인 추가 | .harness glossary 동기화 |

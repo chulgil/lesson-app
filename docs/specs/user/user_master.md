@@ -483,6 +483,9 @@ features/profile/domain/entities/teacher_student_relation.dart
 
 ### 3.2 초대 시스템 (Invitation System v2)
 
+> **초대 코드 라이프사이클 (재발송·만료·회수) 상세**: [invite_lifecycle_spec.md](invite_lifecycle_spec.md) 참조
+> (E2E 감사 #5 D-G3 대응 — 2026-06-01 신규)
+
 #### 핵심 변경 (v1 -> v2)
 
 | 항목 | v1 | v2 |
@@ -491,6 +494,7 @@ features/profile/domain/entities/teacher_student_relation.dart
 | 학생 등록 | 앱 연결 필수 | 수기 등록 지원 |
 | 검색 방식 | 코드 입력 | 연락처 동기화 + 코드 |
 | 학원 지원 | 없음 | 학원-선생님 소속 관계 |
+| 초대 라이프사이클 | 단순 만료 | 재발송·회수·만료 임박 알림 (2026-06-01) |
 
 #### 초대 방식
 
