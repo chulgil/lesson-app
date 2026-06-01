@@ -14,6 +14,7 @@ from app.models.lesson import (  # noqa: F401
     LessonPiece,
     LessonRecording,
 )
+from app.models.makeup_credit import MakeupCredit, MakeupCreditReason  # noqa: F401
 from app.models.manual_teacher import ManualTeacher  # noqa: F401
 from app.models.notification import Notification, UserNotificationPreference  # noqa: F401
 from app.models.onboarding import UserOnboardingProgress, UserOnboardingQuestProgress  # noqa: F401

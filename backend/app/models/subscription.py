@@ -90,6 +90,10 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     )
     total_lessons: Mapped[int | None] = mapped_column(Integer, nullable=True)
     used_lessons: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # #432 G3 — scheduled lessons track (separate from used/remaining). Counts active
+    # LessonBookings (pending/confirmed/changeRequested/completed). Recalculated on
+    # bulkChange. Spec: docs/specs/subscription/makeup_credit_spec.md §3.2.
+    scheduled_lessons: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -144,7 +148,8 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
 
     __table_args__ = (
         CheckConstraint(
-            "used_lessons >= 0 AND bonus_count >= 0 AND total_reschedule_allowance >= 0 AND used_reschedule_count >= 0",
+            "used_lessons >= 0 AND bonus_count >= 0 AND total_reschedule_allowance >= 0 "
+            "AND used_reschedule_count >= 0 AND scheduled_lessons >= 0",
             name="ck_subscriptions_non_negative_counters",
         ),
         CheckConstraint(
