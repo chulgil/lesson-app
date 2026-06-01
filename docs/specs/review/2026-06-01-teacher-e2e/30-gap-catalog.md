@@ -382,7 +382,7 @@ v3 spec 자체에서 "전화인증이 첫 단계 → 진입 마찰 큼" 으로 �
 | 그룹 | 항목 | 도메인 | 예상 노력 |
 |---|---|---|---|
 | G1: 온보딩 정렬 | #1, #8, #10 | onboarding | 2-3주 |
-| G2: 입금 자동화 | #2, #3, #6 | subscription + notification | 2-3주 |
+| G2: 입금 추적·알림 자동화 | #2, #3, #6 | subscription + notification | 2-3주 |
 | G3: 휴가·일정 | #4, #7 | schedule | 3-4주 |
 | G4: 학생 연결 | #5 | user (invite) | 1주 |
 | G5: 가용시간 UX | #9 | schedule (UX) | 1-2주 |
