@@ -82,6 +82,8 @@ class AppRoutes {
   static const outstandingPayments = '/profile/outstanding-payments';
   // #424 — Teacher payment-pending dashboard list
   static const paymentPending = '/payments/pending';
+  // #5 D-G3 Phase 2 — Teacher invite-pending dashboard list
+  static const invitePending = '/invites/pending';
   static const cancellationDefaults = '/profile/cancellation-defaults';
 
   // Student routes

@@ -3291,8 +3291,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5643,10 +5643,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5783,12 +5782,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6791,6 +6789,19 @@ class AppStrings {
   static const paymentPendingRevokeConfirmTitle = '제안을 회수하시겠습니까?';
   static const paymentPendingRevokeConfirmBody =
       '학생에게 보낸 입금 안내가 사라집니다. 같은 학생에게 다시 보내려면 새로 제안을 만들어야 합니다.';
+
+  // #5 D-G3 Phase 2 — 초대 대기 대시보드
+  static const invitePendingCardTitle = '초대 대기';
+  static const invitePendingListTitle = '초대 대기';
+  static const invitePendingEmpty = '대기 중인 초대가 없습니다.';
+  static const invitePendingSectionImminent = '만료 임박 (D+5~)';
+  static const invitePendingSectionUrgent = 'D+3 이상';
+  static const invitePendingSectionRecent = 'D+0 ~ D+2';
+  static const invitePendingResendLabel = '재발송';
+  static const invitePendingResendSuccess = '초대를 다시 보냈습니다.';
+  static const invitePendingResendCooldown = '10분 후 다시 시도해주세요.';
+  static const invitePendingResendFailed = '재발송에 실패했습니다.';
+  static const invitePendingCodeLabel = '코드';
 
   // ── Tip Template Management ──
   static const profileTipTemplateTitle = '템플릿 관리';

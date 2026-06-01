@@ -1,4 +1,5 @@
 import '../entities/invite.dart';
+import '../entities/pending_invite.dart';
 
 /// Repository interface for invite and connection management
 abstract class InviteRepository {
@@ -28,6 +29,15 @@ abstract class InviteRepository {
 
   /// Use an invite (increment use count)
   Future<Invite> useInvite(String inviteId);
+
+  // ===== G3 Phase 2 — Pending invite dashboard (#5 D-G3) =====
+
+  /// 현재 사용자의 active + 만료 전 초대 목록 (D+N 큰 순).
+  Future<List<PendingInvite>> getPendingInvites();
+
+  /// 초대 재발송: expires_at 갱신 + resent_count++.
+  /// 서버 정책: 10분 쿨다운, 만료된 초대도 부활, used/revoked 는 400.
+  Future<void> resendInvite(String inviteId);
 
   // ===== Connection Request Management =====
 
