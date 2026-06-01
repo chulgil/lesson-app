@@ -3291,8 +3291,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5643,9 +5643,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5782,11 +5783,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -7752,4 +7754,25 @@ class AppStrings {
   static const firstAvailabilityDayFri = '금';
   static const firstAvailabilityDaySat = '토';
   static const firstAvailabilityDaySun = '일';
+
+  // -------------------------------------------------------------------------
+  // 전화인증 게이트 (#430)
+  // -------------------------------------------------------------------------
+
+  /// 수강권 발급 직전 전화인증 게이트 다이얼로그 제목.
+  static const phoneVerificationGateTitle = '전화인증이 필요해요';
+
+  /// 게이트 본문 — 학부모 신뢰 보호 사유 설명.
+  static const phoneVerificationGateBody =
+      '첫 수강권을 발급하려면 전화인증이 필요해요. 학부모님께 안전한 선생님임을 알리기 위해 전화번호를 한 번만 확인할게요.';
+
+  /// 보상 안내 — 인증 완료 시 인증 선생님 배지 부여.
+  static const phoneVerificationGateRewardLine =
+      '인증 완료 시 "인증 선생님 배지"가 프로필에 표시돼요.';
+
+  /// 게이트 CTA — 즉시 인증.
+  static const phoneVerificationGateCtaVerifyNow = '지금 인증하기';
+
+  /// 게이트 CTA — 나중에 (다이얼로그만 닫기).
+  static const phoneVerificationGateCtaLater = '나중에 하기';
 }

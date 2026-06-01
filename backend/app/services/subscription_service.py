@@ -9,6 +9,8 @@ from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import PhoneVerificationRequiredException
+from app.models.teacher import Teacher
 from app.schemas.common import PaginatedResponse
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
 from app.schemas.subscription import (
@@ -152,6 +154,12 @@ class SubscriptionService:
     async def create(self, data: SubscriptionCreate, current_user: Any) -> SubscriptionResponse:
         """Create a new subscription."""
         from app.models.subscription import Subscription
+
+        # #430: E3 hard gate — first subscription issuance requires phone
+        # verification per docs/specs/user/phone_verification_policy.md §4.
+        # Frontend intercepts the 409 + ``phone_verification_required`` code
+        # and routes to the verification flow.
+        await self._require_phone_verification(current_user)
 
         membership_id = data.membership_id
         if membership_id:
@@ -955,7 +963,6 @@ class SubscriptionService:
         from app.models.lesson import ClassMembership, LessonClass
         from app.models.notification import NotificationPriority
         from app.models.student import Student
-        from app.models.teacher import Teacher
 
         row = (
             await self.db.execute(
@@ -1601,6 +1608,19 @@ class SubscriptionService:
         request.status = new_status
         request.status_updated_at = datetime.now(UTC)
         await self.db.flush()
+
+    async def _require_phone_verification(self, current_user: Any) -> None:
+        """E3 hard gate: raise if the acting teacher has not verified their phone.
+
+        Non-teacher users are not gated here — role-level access is enforced
+        upstream by ``get_current_teacher`` on the API route.
+        """
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == current_user.id))
+        if teacher is None:
+            # No teacher profile yet — let downstream membership lookup raise.
+            return
+        if not teacher.is_phone_verified:
+            raise PhoneVerificationRequiredException("수강권 발급에는 전화인증이 필요해요")
 
     async def _find_or_create_membership(self, teacher_id: str, student_id: str, instrument: str | None = None) -> str:
         """GAP-2: Find existing ClassMembership or create one via a default private class."""

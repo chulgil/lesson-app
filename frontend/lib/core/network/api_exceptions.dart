@@ -46,3 +46,14 @@ class ServerException extends ApiException {
   const ServerException({super.message = '서버 오류가 발생했습니다.'})
     : super(statusCode: 500);
 }
+
+/// Phone verification required (409 with code ``phone_verification_required``).
+///
+/// Raised when the backend rejects an action — currently first subscription
+/// issuance — because the acting teacher has not verified their phone number.
+/// Spec: docs/specs/user/phone_verification_policy.md §4.2 (issue #430).
+class PhoneVerificationRequiredException extends ApiException {
+  const PhoneVerificationRequiredException({
+    super.message = '수강권 발급에는 전화인증이 필요해요',
+  }) : super(statusCode: 409);
+}

@@ -4,6 +4,7 @@ import asyncio
 import os
 import tempfile
 from collections.abc import AsyncGenerator
+from datetime import UTC, datetime
 
 # Plan C Phase 6a — must run before app.main import so APScheduler stays off.
 os.environ.setdefault("TESTING", "1")
@@ -140,7 +141,16 @@ async def create_test_user(db_session: AsyncSession):
         await db_session.flush()
 
         if role == "teacher":
-            teacher = Teacher(id=f"{user_id}-prof", user_id=user_id, instruments=[])
+            # #430: Default fixture teachers are phone-verified to preserve
+            # existing scenario tests. Tests that need to assert the E3 gate
+            # behaviour must explicitly flip ``is_phone_verified`` to False.
+            teacher = Teacher(
+                id=f"{user_id}-prof",
+                user_id=user_id,
+                instruments=[],
+                is_phone_verified=True,
+                phone_verified_at=datetime.now(UTC),
+            )
             db_session.add(teacher)
             await db_session.flush()
 
