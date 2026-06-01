@@ -16,6 +16,9 @@ class AppRoutes {
   static const teacherPhoneVerification = '/onboarding/phone-verification';
   static const teacherProfileSetup = '/onboarding/profile-setup';
   static const teacherTutorial = '/onboarding/tutorial';
+  // #422 — first availability quest (simple setup) per
+  // docs/specs/onboarding/teacher_first_availability_setup.md
+  static const teacherFirstAvailability = '/onboarding/first-availability';
 
   // Student onboarding routes
   static const studentProfileSetup = '/student/onboarding/profile-setup';

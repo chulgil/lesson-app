@@ -90,8 +90,9 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final instruments =
-        current.instruments.where((i) => i != instrument).toList();
+    final instruments = current.instruments
+        .where((i) => i != instrument)
+        .toList();
     state = AsyncValue.data(current.copyWith(instruments: instruments));
     try {
       final updated = await _repository.updateInstruments(instruments);
@@ -190,8 +191,27 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final slots =
-        current.availableSlots.where((slot) => slot.id != slotId).toList();
+    final slots = current.availableSlots
+        .where((slot) => slot.id != slotId)
+        .toList();
+    state = AsyncValue.data(current.copyWith(availableSlots: slots));
+    try {
+      final updated = await _repository.updateAvailableSlots(slots);
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.data(current);
+      Error.throwWithStackTrace(e, st);
+    }
+  }
+
+  /// Replace the entire available slots list at once.
+  ///
+  /// Used by the first-availability onboarding quest (#422) to commit
+  /// multiple new slots derived from the simple multi-day chip UI.
+  Future<void> replaceAvailableSlots(List<TimeSlot> slots) async {
+    final current = state.value;
+    if (current == null) return;
+
     state = AsyncValue.data(current.copyWith(availableSlots: slots));
     try {
       final updated = await _repository.updateAvailableSlots(slots);
@@ -235,8 +255,9 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final effectiveMessage =
-        (message != null && message.isEmpty) ? null : message;
+    final effectiveMessage = (message != null && message.isEmpty)
+        ? null
+        : message;
     state = AsyncValue.data(
       current.copyWith(bookingGuidanceMessage: effectiveMessage),
     );
