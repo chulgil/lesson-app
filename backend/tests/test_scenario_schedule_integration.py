@@ -16,9 +16,344 @@ Usage:
 from __future__ import annotations
 
 import pytest
+from httpx import AsyncClient
 
 from tests.scenarios.assertions import assert_status, assert_total
 from tests.scenarios.helpers import StudentActions, TeacherActions
+
+
+async def _dev_login_headers(
+    client: AsyncClient,
+    *,
+    email: str,
+    role: str,
+    name: str,
+) -> tuple[dict[str, str], dict]:
+    response = await client.post(
+        "/api/v1/auth/dev-login",
+        json={"email": email, "role": role, "name": name},
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    return {"Authorization": f"Bearer {body['access_token']}"}, body["user"]
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 0. Signup → settings → schedule negotiation
+# ─────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_signup_settings_connection_to_schedule_confirmation_card(
+    client: AsyncClient,
+):
+    """
+    Real user journey from API signup to schedule adjustment:
+    선생님 가입/프로필/설정/가용시간 → 학생 가입/자기 프로필 →
+    초대 연결 → 요청/협상/확정 → 수강권 제안/입금확인 →
+    학생이 스케줄 확인 카드를 조회하고 확정한다.
+    """
+    teacher_headers, teacher_user = await _dev_login_headers(
+        client,
+        email="scenario-teacher@test.com",
+        role="teacher",
+        name="시나리오 선생님",
+    )
+    teacher_user_id = teacher_user["id"]
+    assert teacher_user["role"] == "teacher"
+
+    locale = await client.put(
+        "/api/v1/users/me/locale",
+        headers=teacher_headers,
+        json={"locale": "ko", "country": "KR", "timezone": "Asia/Seoul", "currency": "KRW"},
+    )
+    assert locale.status_code == 200, locale.text
+
+    teacher_profile = await client.put(
+        "/api/v1/teachers/me/profile",
+        headers=teacher_headers,
+        json={
+            "instruments": ["violin", "piano"],
+            "introduction": "입문부터 입시까지 레슨합니다.",
+            "experience_years": 8,
+            "fee_min": 50000,
+            "fee_max": 80000,
+        },
+    )
+    assert teacher_profile.status_code == 200, teacher_profile.text
+    teacher_profile_id = teacher_profile.json()["id"]
+
+    settings = await client.put(
+        "/api/v1/settings/teacher",
+        headers=teacher_headers,
+        json={
+            "lesson_price_table": {
+                "violin": {"beginner": 50000, "intermediate": 65000},
+            },
+            "auto_proposal_enabled": False,
+        },
+    )
+    assert settings.status_code == 200, settings.text
+
+    availability = await client.put(
+        "/api/v1/schedule/availability",
+        headers=teacher_headers,
+        json={
+            "weekly_schedules": [
+                {
+                    "day_of_week": 0,
+                    "start_time": "15:00",
+                    "end_time": "18:00",
+                    "is_active": True,
+                }
+            ],
+            "slot_duration_minutes": 60,
+        },
+    )
+    assert availability.status_code == 200, availability.text
+
+    student_headers, _ = await _dev_login_headers(
+        client,
+        email="scenario-student@test.com",
+        role="student",
+        name="시나리오 학생",
+    )
+
+    student_profile = await client.post(
+        "/api/v1/students/me/profile",
+        headers=student_headers,
+        json={"name": "시나리오 학생", "instrument": "violin", "level": "beginner"},
+    )
+    assert student_profile.status_code == 201, student_profile.text
+
+    public_availability = await client.get(
+        f"/api/v1/schedule/availability/{teacher_user_id}",
+        headers=student_headers,
+    )
+    assert public_availability.status_code == 200, public_availability.text
+    assert public_availability.json()["weekly_schedules"][0]["start_time"] == "15:00"
+
+    invite = await client.post(
+        "/api/v1/invites/",
+        headers=teacher_headers,
+        json={"is_single_use": True},
+    )
+    assert invite.status_code == 201, invite.text
+
+    connection_request = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_headers,
+        json={
+            "target_id": teacher_user_id,
+            "method": "inviteCode",
+            "invite_code": invite.json()["invite_code"],
+        },
+    )
+    assert connection_request.status_code == 201, connection_request.text
+
+    accepted_connection = await client.patch(
+        f"/api/v1/invites/connection-requests/{connection_request.json()['id']}/respond",
+        headers=teacher_headers,
+        json={"action": "accept"},
+    )
+    assert accepted_connection.status_code == 200, accepted_connection.text
+
+    linked_student = await client.get("/api/v1/students/me/profile", headers=student_headers)
+    assert linked_student.status_code == 200, linked_student.text
+    student_profile_id = linked_student.json()["id"]
+    assert linked_student.json()["teacher_id"] == teacher_profile_id
+
+    request = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=student_headers,
+        json={
+            "teacher_id": teacher_user_id,
+            "request_type": "regular",
+            "instrument": "violin",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_day": 0,
+            "preferred_time": "15:00",
+            "preferred_duration": 60,
+            "message": "월요일 3시에 정규 레슨을 받고 싶어요.",
+        },
+    )
+    assert request.status_code == 201, request.text
+    request_body = request.json()
+    assert request_body["suggested_price"] == 50000
+
+    proposal = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_body['id']}/propose-alternatives",
+        headers=teacher_headers,
+        json={
+            "slots": [{"day_of_week": 0, "start_time": "16:00", "end_time": "17:00"}],
+            "message": "같은 요일 4시는 어떨까요?",
+        },
+    )
+    assert proposal.status_code == 200, proposal.text
+    assert_status(proposal.json(), "negotiating")
+
+    confirmed_time = await client.post(
+        f"/api/v1/schedule/lesson-requests/{request_body['id']}/accept-alternative",
+        headers=student_headers,
+        json={"selected_slot_index": 0, "message": "네, 4시로 할게요."},
+    )
+    assert confirmed_time.status_code == 200, confirmed_time.text
+    assert_status(confirmed_time.json(), "timeConfirmed")
+
+    template = await client.post(
+        "/api/v1/subscriptions-templates",
+        headers=teacher_headers,
+        json={"name": "바이올린 4회권", "type": "package", "lessons_count": 4, "amount": 200000},
+    )
+    assert template.status_code == 201, template.text
+    template_id = template.json()["id"]
+
+    subscription_proposal = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=teacher_headers,
+        json={
+            "student_id": student_profile_id,
+            "template_id": template_id,
+            "template_ids": [template_id],
+            "recommended_template_id": template_id,
+            "lesson_request_id": request_body["id"],
+            "message": "확정한 시간으로 4회권을 제안합니다.",
+        },
+    )
+    assert subscription_proposal.status_code == 201, subscription_proposal.text
+    subscription_proposal_id = subscription_proposal.json()["id"]
+
+    accepted_proposal = await client.patch(
+        f"/api/v1/subscriptions-proposals/{subscription_proposal_id}/respond",
+        headers=student_headers,
+        json={"action": "accept", "selected_template_id": template_id},
+    )
+    assert accepted_proposal.status_code == 200, accepted_proposal.text
+    assert accepted_proposal.json()["status"] == "paymentNotified"
+
+    confirmed_proposal = await client.patch(
+        f"/api/v1/subscriptions-proposals/{subscription_proposal_id}/confirm",
+        headers=teacher_headers,
+        json={},
+    )
+    assert confirmed_proposal.status_code == 200, confirmed_proposal.text
+    subscription_id = confirmed_proposal.json()["subscription_id"]
+    assert subscription_id is not None
+
+    confirmation_cards = await client.get(
+        "/api/v1/schedule/confirmation-cards",
+        headers=student_headers,
+        params={"student_id": student_profile_id, "status": "pending"},
+    )
+    assert confirmation_cards.status_code == 200, confirmation_cards.text
+    assert len(confirmation_cards.json()) == 1
+    card = confirmation_cards.json()[0]
+    assert card["subscription_id"] == subscription_id
+    assert card["suggested_time"] == "16:00"
+
+    confirmed_card = await client.patch(
+        f"/api/v1/schedule/confirmation-cards/{card['id']}/confirm",
+        headers=student_headers,
+        json={"action": "confirmed", "response_message": "이 시간으로 진행할게요."},
+    )
+    assert confirmed_card.status_code == 200, confirmed_card.text
+    assert confirmed_card.json()["status"] == "confirmed"
+
+    schedule_change_request_id = f"{subscription_id}-session-1"
+    student_change_request = await client.post(
+        f"/api/v1/subscriptions/{subscription_id}/events",
+        headers=student_headers,
+        json={
+            "request_id": schedule_change_request_id,
+            "actor_type": "student",
+            "actor_id": student_profile_id,
+            "event_type": "scheduleChanged",
+            "subscription_id": subscription_id,
+            "session_number": 1,
+            "schedule_change_type": "singleLesson",
+            "suggested_slots": [
+                {
+                    "id": "student-alt-1",
+                    "dayOfWeek": 2,
+                    "startTime": "17:00",
+                    "endTime": "18:00",
+                }
+            ],
+            "message": "1회차만 수요일 5시로 조정하고 싶어요.",
+        },
+    )
+    assert student_change_request.status_code == 201, student_change_request.text
+
+    teacher_pending_changes = await client.get(
+        "/api/v1/subscriptions/schedule-change-events/pending",
+        headers=teacher_headers,
+    )
+    assert teacher_pending_changes.status_code == 200, teacher_pending_changes.text
+    assert [event["id"] for event in teacher_pending_changes.json()] == [
+        student_change_request.json()["id"]
+    ]
+
+    teacher_accepts_change = await client.post(
+        f"/api/v1/subscriptions/{subscription_id}/events",
+        headers=teacher_headers,
+        json={
+            "request_id": schedule_change_request_id,
+            "actor_type": "teacher",
+            "actor_id": teacher_profile_id,
+            "event_type": "scheduleChangeAccepted",
+            "subscription_id": subscription_id,
+            "session_number": 1,
+            "selected_slot_index": 0,
+        },
+    )
+    assert teacher_accepts_change.status_code == 201, teacher_accepts_change.text
+    assert teacher_accepts_change.json()["suggested_slots"][0]["start_time"] == "17:00"
+
+    reschedule_credit = await client.patch(
+        f"/api/v1/subscriptions/{subscription_id}/use-reschedule",
+        headers=teacher_headers,
+    )
+    assert reschedule_credit.status_code == 200, reschedule_credit.text
+    assert reschedule_credit.json()["used_reschedule_count"] == 1
+    assert reschedule_credit.json()["total_reschedule_allowance"] >= 1
+
+    student_change_history = await client.get(
+        f"/api/v1/subscriptions/{subscription_id}/events",
+        headers=student_headers,
+        params={"session_number": 1},
+    )
+    assert student_change_history.status_code == 200, student_change_history.text
+    assert [event["event_type"] for event in student_change_history.json()] == [
+        "scheduleChanged",
+        "scheduleChangeAccepted",
+    ]
+
+    final_request = await client.get(
+        f"/api/v1/schedule/lesson-requests/{request_body['id']}",
+        headers=student_headers,
+    )
+    assert final_request.status_code == 200, final_request.text
+    assert_status(final_request.json(), "subscriptionIssued")
+
+    event_history = await client.get(
+        f"/api/v1/schedule/lesson-requests/{request_body['id']}/events",
+        headers=student_headers,
+    )
+    assert event_history.status_code == 200, event_history.text
+    event_types = [event["event_type"] for event in event_history.json()]
+    assert event_types == [
+        "initialRequest",
+        "proposeAlternative",
+        "acceptAlternative",
+        "proposalSent",
+        "paymentNotified",
+        "subscriptionIssued",
+    ]
+
+    me_after_setup = await client.get("/api/v1/users/me", headers=teacher_headers)
+    assert me_after_setup.status_code == 200, me_after_setup.text
+    assert me_after_setup.json()["role"] == "teacher"
 
 # ─────────────────────────────────────────────────────────────────────────
 # 1. Trial lesson full lifecycle
