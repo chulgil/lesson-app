@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_feedback_template_repository.dart';
+import '../../data/repositories/remote_feedback_template_repository.dart';
 import '../../domain/entities/feedback_template.dart';
 import '../../domain/repositories/feedback_template_repository.dart';
 
@@ -13,10 +14,10 @@ part 'feedback_template_providers.g.dart';
 FeedbackTemplateRepository feedbackTemplateRepository(
   FeedbackTemplateRepositoryRef ref,
 ) {
-  return createLocalFallbackRepository<FeedbackTemplateRepository>(
+  return createRepository<FeedbackTemplateRepository>(
     ref: ref,
     mock: () => MockFeedbackTemplateRepository(),
-    fallback: () => MockFeedbackTemplateRepository(),
+    remote: (api) => RemoteFeedbackTemplateRepository(api),
   );
 }
 

@@ -100,7 +100,6 @@ class RemoteScheduleConfirmationCardRepository
   /// Backend uses `proposed_day`/`proposed_time`/`proposed_duration`,
   /// Flutter entity expects `suggested_day`/`suggested_time`/`lesson_duration`.
   ScheduleConfirmationCard _fromBackendJson(Map<String, dynamic> json) {
-    // Map backend field names to Flutter entity field names
     final mapped = <String, dynamic>{
       'id': json['id'],
       'student_id': json['student_id'],
@@ -128,7 +127,6 @@ class RemoteScheduleConfirmationCardRepository
       'suggested_time3': json['suggested_time3'],
     };
 
-    // Map proposed_slots array to suggestedDay2/3 if present
     final slots = json['proposed_slots'] as List<dynamic>?;
     if (slots != null && slots.length >= 2) {
       final slot2 = slots[1] as Map<String, dynamic>;

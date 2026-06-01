@@ -1,7 +1,7 @@
 # 베타 서버 연동 현황
 
 > 작성일: 2026-03-03
-> 최종 수정: 2026-05-29
+> 최종 수정: 2026-06-01
 > 상태: 진행 중
 
 ---
@@ -15,7 +15,7 @@
 
 ## Repository 연동 현황
 
-### Remote Repository 구현 완료 (16개)
+### Remote Repository 구현 완료
 
 | 도메인 | Repository | Provider 파일 |
 |--------|-----------|--------------|
@@ -31,12 +31,18 @@
 | 그룹클래스 예약 | `RemoteGroupClassBookingRepository` | `group_class_booking_providers.dart` |
 | 스케줄 확인 카드 | `RemoteScheduleConfirmationCardRepository` | `schedule_confirmation_card_providers.dart` |
 | 연습 | `RemotePracticeRepository` | `practice_repository_provider.dart` |
+| 연습 항목 | `RemotePracticeItemRepository` | `practice_item_providers.dart` |
+| 연습 노트 | `RemotePracticeNoteRepository` | `practice_note_provider.dart` |
 | 알림 | `RemoteNotificationRepository` | `notification_providers.dart` |
 | 관계 | `RemoteTeacherStudentRelationRepository` | `relation_providers.dart` |
 | 학부모 | `RemoteParentRepository` | `parent_providers.dart` |
 | 녹음 피드백 | `RemoteRecordingFeedbackRepository` | `recording_feedback_provider.dart` |
+| 자녀 프로필 | `RemoteChildProfileRepository` | `child_profile_provider.dart` |
+| 선생님 공지 | `RemoteTeacherAnnouncementRepository` | `teacher_announcement_providers.dart` |
+| 팁 템플릿 | `RemoteTipTemplateRepository` | `tip_template_providers.dart` |
+| 피드백 템플릿 | `RemoteFeedbackTemplateRepository` | `feedback_template_providers.dart` |
 
-### Mock-only (Remote 미구현, 7개)
+### Mock-only 또는 정책상 Remote 보류
 
 | 도메인 | Provider 파일 | 비고 |
 |--------|--------------|------|
@@ -46,16 +52,10 @@
 | 멤버십 | `membership_providers.dart` | 백엔드 API 필요 |
 | 장소 | `location_providers.dart` | 백엔드 API 필요 |
 | 선생님 검색 | `teacher_providers.dart` | 백엔드 API 필요 |
-
-### Mock + Empty (Remote API 미구현, 5개)
-
-| 도메인 | Provider 파일 | remote mode 동작 |
-|--------|--------------|-----------------|
 | 결제 | `payment_repository_provider.dart` | 빈 Mock (empty: true) |
 | 악보 | `piece_repository_provider.dart` | 빈 Mock (empty: true) |
 | 연습 레퍼토리 | `practice_repertoire_repository_provider.dart` | Mock 반환 |
 | 선생님 프로필 | `teacher_profile_repository_provider.dart` | 빈 Mock (empty: true) |
-| 설정 | `settings_repository_provider.dart` | Mock 반환 |
 
 ---
 
@@ -70,16 +70,19 @@
 
 `USE_MOCK` 기본값은 `true`이고 `API_BASE_URL` 기본값은 local 서버이므로, 위 값이 없으면 베타 백엔드를 테스트하지 않는다.
 
-## 백엔드 API Gap (미구현 엔드포인트)
+## 백엔드 API Gap 검증 결과 (2026-06-01)
 
-| 프론트엔드 호출 경로 | 백엔드 상태 | 심각도 |
-|--------------------|-----------|--------|
-| `/practice-logs/*` (CRUD, 토글, 주간, 스트릭) | 미구현 | CRITICAL |
-| `/schedule/lesson-requests/*` (CRUD, 상태변경) | 미구현 | HIGH |
-| `/subscriptions/{id}/usage` | 미구현 | HIGH |
-| URL 패턴: `/subscriptions-templates` vs `/subscriptions/-templates` | 불일치 | HIGH |
-| URL 패턴: `/subscriptions-proposals` vs `/subscriptions/-proposals` | 불일치 | HIGH |
-| `POST /auth/logout` body 형식 | 불일치 가능 | MEDIUM |
+2026-06-01 기준 프론트 Remote Repository의 literal API 호출 275개와 FastAPI OpenAPI operation 400개를 대조했으며, 즉시 404/405로 이어지는 경로 불일치는 발견되지 않았다.
+
+기존에 미구현으로 기록되어 있던 `/practice-logs/*`, `/schedule/lesson-requests/*`, `/subscriptions/{id}/usage`, 수강권 템플릿/제안 URL 패턴, `POST /auth/logout` 계약은 현재 백엔드 계약 테스트에서 통과한다.
+
+남은 항목은 백엔드 미구현이 아니라 제품 정책 또는 프론트 연결 범위 문제다.
+
+| 영역 | 현재 판단 |
+|------|-----------|
+| 결제 | 앱 내 PG가 아니라 선생님 수동 입금 상태 관리로 유지한다. 별도 payment API는 만들지 않고 `/subscriptions` 입금 상태와 사용 이력을 재사용한다. |
+| 악보/곡 라이브러리 | `/practice/pieces` API는 있으나 기존 `PieceRepository`의 화면 계약과 전체 전환 범위가 다르다. 별도 전환 작업으로 다룬다. |
+| 연습 레퍼토리 | `/practice/repertoires`, `/practice/sections`, `/practice/notes` API는 있으나 기존 Hive 녹음/섹션 동기화 경계가 남아 있다. |
 
 ## 베타 계약 보완 완료 (2026-05-29)
 

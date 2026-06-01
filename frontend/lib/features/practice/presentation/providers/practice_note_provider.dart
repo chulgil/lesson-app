@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_practice_note_repository.dart';
+import '../../data/repositories/remote_practice_note_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_note_repository.dart';
 
@@ -10,11 +11,10 @@ part 'practice_note_provider.g.dart';
 /// Practice note repository provider - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
 PracticeNoteRepository practiceNoteRepository(PracticeNoteRepositoryRef ref) {
-  return createLocalFallbackRepository<PracticeNoteRepository>(
+  return createRepository<PracticeNoteRepository>(
     ref: ref,
     mock: MockPracticeNoteRepository.new,
-    // Mock already starts empty — safe to use in remote mode
-    fallback: MockPracticeNoteRepository.new,
+    remote: (api) => RemotePracticeNoteRepository(api),
   );
 }
 

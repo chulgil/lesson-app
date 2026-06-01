@@ -8,6 +8,7 @@ import '../../../gamification/gamification_facade.dart'
 import '../../../lessons/lessons_facade.dart'
     show TeachingResourceType, currentTeacherIdProvider, resourcesByIdsProvider;
 import '../../data/repositories/mock_practice_item_repository.dart';
+import '../../data/repositories/remote_practice_item_repository.dart';
 import '../../domain/repositories/practice_item_repository.dart';
 import 'practice_repertoire_repository_provider.dart';
 import 'practice_repertoire_crud_provider.dart';
@@ -17,10 +18,10 @@ part 'practice_item_providers.g.dart';
 /// Repository provider
 @Riverpod(keepAlive: true)
 PracticeItemRepository practiceItemRepository(PracticeItemRepositoryRef ref) {
-  return createLocalFallbackRepository<PracticeItemRepository>(
+  return createRepository<PracticeItemRepository>(
     ref: ref,
     mock: () => MockPracticeItemRepository(),
-    fallback: () => MockPracticeItemRepository(),
+    remote: (api) => RemotePracticeItemRepository(api),
   );
 }
 

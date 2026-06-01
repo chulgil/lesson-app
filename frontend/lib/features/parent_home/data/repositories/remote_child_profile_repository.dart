@@ -13,20 +13,14 @@ class RemoteChildProfileRepository implements ChildProfileRepository {
 
   @override
   Future<List<ChildProfile>> getChildProfilesByParent(String parentId) async {
-    final response = await _apiClient.get(
-      '/parents/$parentId/child-profiles',
-    );
+    final response = await _apiClient.get('/parents/$parentId/child-profiles');
     final items = response.data as List<dynamic>;
-    return items
-        .map((e) => _fromJson(e as Map<String, dynamic>))
-        .toList();
+    return items.map((e) => _fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
   Future<ChildProfile?> getChildProfile(String childId) async {
-    final response = await _apiClient.get(
-      '/parents/child-profiles/$childId',
-    );
+    final response = await _apiClient.get('/parents/child-profiles/$childId');
     return _fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -75,10 +69,7 @@ class RemoteChildProfileRepository implements ChildProfileRepository {
   ) async {
     final response = await _apiClient.post(
       '/parents/child-profiles/$childId/teacher',
-      data: {
-        'teacherId': teacherId,
-        'teacherName': teacherName,
-      },
+      data: {'teacherId': teacherId, 'teacherName': teacherName},
     );
     return _fromJson(response.data as Map<String, dynamic>);
   }
@@ -105,19 +96,20 @@ class RemoteChildProfileRepository implements ChildProfileRepository {
           (json['linkedStudentId'] ?? json['linked_student_id']) as String?,
       profileColorKey:
           (json['profileColor'] ?? json['profile_color'] ?? 'blue') as String,
-      status: _parseStatus(
-        (json['status'] ?? 'active') as String,
-      ),
+      status: _parseStatus((json['status'] ?? 'active') as String),
       connectionStatus: _parseConnectionStatus(
         (json['connectionStatus'] ?? json['connection_status'] ?? 'unconnected')
             as String,
       ),
-      createdAt: DateTime.parse(json['createdAt'] as String? ??
-          json['created_at'] as String? ??
-          DateTime.now().toIso8601String()),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
-          : json['updated_at'] != null
+      createdAt: DateTime.parse(
+        json['createdAt'] as String? ??
+            json['created_at'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
+      updatedAt:
+          json['updatedAt'] != null
+              ? DateTime.parse(json['updatedAt'] as String)
+              : json['updated_at'] != null
               ? DateTime.parse(json['updated_at'] as String)
               : null,
     );

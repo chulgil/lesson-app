@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_tip_template_repository.dart';
+import '../../data/repositories/remote_tip_template_repository.dart';
 import '../../domain/entities/tip_template.dart';
 import '../../domain/repositories/tip_template_repository.dart';
 
@@ -11,10 +12,10 @@ part 'tip_template_providers.g.dart';
 /// Repository provider
 @Riverpod(keepAlive: true)
 TipTemplateRepository tipTemplateRepository(TipTemplateRepositoryRef ref) {
-  return createLocalFallbackRepository<TipTemplateRepository>(
+  return createRepository<TipTemplateRepository>(
     ref: ref,
     mock: () => MockTipTemplateRepository(),
-    fallback: () => MockTipTemplateRepository(),
+    remote: (api) => RemoteTipTemplateRepository(api),
   );
 }
 
