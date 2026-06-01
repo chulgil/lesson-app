@@ -3291,8 +3291,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5643,10 +5643,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5783,12 +5782,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -7673,4 +7671,85 @@ class AppStrings {
 
   /// 학생별 미리보기 항목 카운트 ("3건").
   static String vacationImpactStudentCount(int count) => '$count건';
+
+  // ── First Availability Quest (#422) ─────────────────────────────────
+  // Spec: docs/specs/onboarding/teacher_first_availability_setup.md
+
+  /// 인터스티셜 모달 제목 — 가용시간 0개 상태로 홈 진입 시 강제 노출.
+  static const firstAvailabilityInterstitialTitle = '레슨 가능 시간을 먼저 설정해주세요';
+
+  /// 인터스티셜 모달 본문.
+  static const firstAvailabilityInterstitialDescription =
+      '학생이 예약할 수 있는 시간이 필요해요.';
+
+  /// 인터스티셜 CTA — 스킵 불가.
+  static const firstAvailabilityInterstitialAction = '지금 설정하기';
+
+  /// 간소 가용시간 화면 제목.
+  static const firstAvailabilitySetupTitle = '첫 가용시간 설정';
+
+  /// 요일 선택 섹션 헤더.
+  static const firstAvailabilityDaysLabel = '레슨 가능한 요일';
+
+  /// 시간 선택 섹션 헤더.
+  static const firstAvailabilityHoursLabel = '레슨 가능한 시간';
+
+  /// 시작 시각 라벨.
+  static const firstAvailabilityStartTimeLabel = '시작';
+
+  /// 종료 시각 라벨.
+  static const firstAvailabilityEndTimeLabel = '종료';
+
+  /// 기본값 안내 헤더.
+  static const firstAvailabilityDefaultsHeader = '기본값 (나중에 변경 가능)';
+
+  /// 레슨 1회 시간 기본값 — 50분 (스펙 §2 통일).
+  static const firstAvailabilityLessonDurationDefault = '레슨 1회 시간: 50분';
+
+  /// 쉬는 시간 기본값.
+  static const firstAvailabilityBreakTimeDefault = '쉬는 시간: 10분';
+
+  /// 시작 간격 기본값.
+  static const firstAvailabilityStartIntervalDefault = '시작 간격: 60분';
+
+  /// 적용 버튼.
+  static const firstAvailabilityApplyAction = '적용하기';
+
+  /// 풀 설정 이관 버튼.
+  static const firstAvailabilityAdvancedAction = '더 자세히 설정';
+
+  /// 요일 미선택 검증 메시지.
+  static const firstAvailabilityValidationDayMissing = '요일을 1개 이상 선택해주세요.';
+
+  /// 시작/종료 시각 검증 메시지.
+  static const firstAvailabilityValidationTimeInvalid =
+      '종료 시각은 시작 시각보다 최소 1시간 이후여야 해요.';
+
+  /// 저장 실패 메시지.
+  static const firstAvailabilitySaveFailed = '가용시간을 저장하지 못했어요. 잠시 후 다시 시도해주세요.';
+
+  /// 셀레브레이션 시트 제목.
+  static const firstAvailabilityCelebrationTitle = '첫 가용시간 등록 완료!';
+
+  /// 셀레브레이션 본문.
+  static const firstAvailabilityCelebrationDescription =
+      '이제 학생이 이 시간에 레슨을 예약할 수 있어요.';
+
+  /// 셀레브레이션 다음 단계 안내.
+  static const firstAvailabilityCelebrationNext = '다음 단계: 첫 학생 초대하기';
+
+  /// 셀레브레이션 닫기 버튼.
+  static const firstAvailabilityCelebrationAction = '다음 퀘스트으로';
+
+  /// 잠금 안내 — quest_board 에서 가용시간 0개일 때 다른 퀘스트 비활성 상태.
+  static const firstAvailabilityLockedHint = '가용시간 설정 후 진행 가능';
+
+  // 요일 라벨 (월~일) — 간소 화면 chip 표시용.
+  static const firstAvailabilityDayMon = '월';
+  static const firstAvailabilityDayTue = '화';
+  static const firstAvailabilityDayWed = '수';
+  static const firstAvailabilityDayThu = '목';
+  static const firstAvailabilityDayFri = '금';
+  static const firstAvailabilityDaySat = '토';
+  static const firstAvailabilityDaySun = '일';
 }

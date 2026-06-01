@@ -10,9 +10,11 @@ import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/presentation/providers/onboarding_progress_storage_provider.dart';
+import '../../../onboarding/presentation/widgets/first_availability_interstitial.dart';
 import '../../../profile/profile_ui_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_ui_facade.dart';
+import '../providers/teacher_profile_completion_provider.dart';
 import '../widgets/dashboard_tab.dart';
 
 /// Home screen (Teacher Dashboard)
@@ -57,8 +59,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _coachMarkController.addListener(_onCoachMarkChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeShowFirstAvailabilityInterstitial();
       _maybeStartCoachMark();
     });
+  }
+
+  bool _interstitialShown = false;
+
+  /// Show the first-availability interstitial when the teacher lands on
+  /// the home screen without any active availability slot (#422).
+  /// The dialog itself blocks back-navigation and dismiss, so we only
+  /// trigger it once per session — the slot count flips immediately
+  /// after the teacher saves a slot, so it will not reopen.
+  void _maybeShowFirstAvailabilityInterstitial() {
+    if (_interstitialShown) return;
+    final hasSlots = ref.read(hasAvailableSlotsProvider);
+    if (hasSlots) return;
+    _interstitialShown = true;
+    showFirstAvailabilityInterstitial(context);
   }
 
   void _onCoachMarkChanged() {
@@ -124,10 +142,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               _buildNavItem(0, 'I', AppStrings.homeTabLabel),
               _buildNavItem(1, 'II', AppStrings.scheduleTabTitle),
-              _buildNavItem(2, 'III', AppStrings.studentsTabLabel,
-                  key: _studentsNavKey),
-              _buildNavItem(3, 'IV', AppStrings.profileTabLabel,
-                  key: _settingsNavKey),
+              _buildNavItem(
+                2,
+                'III',
+                AppStrings.studentsTabLabel,
+                key: _studentsNavKey,
+              ),
+              _buildNavItem(
+                3,
+                'IV',
+                AppStrings.profileTabLabel,
+                key: _settingsNavKey,
+              ),
             ],
           ),
         ),
@@ -137,8 +163,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
     final isSelected = _currentIndex == index;
-    final accentColor =
-        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
+    final accentColor = isSelected
+        ? AppColors.paperAccent
+        : AppColors.inkTertiary;
 
     return InkWell(
       key: key,

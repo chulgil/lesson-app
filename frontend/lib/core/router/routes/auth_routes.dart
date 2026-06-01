@@ -11,6 +11,7 @@ import '../../../features/auth/presentation/screens/parent_invite_code_screen.da
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
 import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
 import '../../../features/auth/presentation/screens/terms_agreement_screen.dart';
+import '../../../features/onboarding/presentation/screens/first_availability_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
 import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/student_profile_setup_screen.dart';
@@ -74,6 +75,13 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.teacherTutorial,
     name: 'teacherTutorial',
     builder: (context, state) => const TutorialScreen(),
+  ),
+
+  // Teacher Onboarding - First Availability Quest (#422)
+  GoRoute(
+    path: AppRoutes.teacherFirstAvailability,
+    name: 'teacherFirstAvailability',
+    builder: (context, state) => const FirstAvailabilitySetupScreen(),
   ),
 
   // Student Onboarding - Profile Setup

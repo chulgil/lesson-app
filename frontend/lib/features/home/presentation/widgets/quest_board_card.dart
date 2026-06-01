@@ -76,9 +76,7 @@ class QuestBoardCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Expanded(
-                child: NotebookSectionHeader(
-                  label: AppStrings.questBoardTitle,
-                ),
+                child: NotebookSectionHeader(label: AppStrings.questBoardTitle),
               ),
               const SizedBox(width: AppSpacing.space3),
               _ProgressGauge(percent: percent),
@@ -120,6 +118,7 @@ class QuestBoardCard extends ConsumerWidget {
     //
     // === Setup Phase (프로필 & 설정) ===
     // 1. Lesson time settings — students can't book without this
+    //    (blocker quest #422 — locks all other quests until done)
     // 2. Profile photo — builds trust, enables search visibility
     // 3. Introduction — unlocks web profile sharing
     // 4. Lesson price — shows pricing to students
@@ -131,6 +130,12 @@ class QuestBoardCard extends ConsumerWidget {
     // 8. First lesson completed — complete the full workflow
     // 9. First lesson note — provide feedback to student
     // 10. First practice assigned — assign homework
+    //
+    // #422: When `hasSlots == false`, quests 2..10 are locked — onTap is
+    // forced to null so users see the disabled affordance with the
+    // "가용시간 설정 후 진행 가능" hint until they complete quest 1.
+    // The blocker quest itself uses the simple setup screen.
+    final bool slotsBlocker = !hasSlots;
     return [
       // ── Setup Phase ──
       _Quest(
@@ -138,27 +143,36 @@ class QuestBoardCard extends ConsumerWidget {
         title: AppStrings.questTitleSlots,
         reward: AppStrings.questRewardSlots,
         isCompleted: hasSlots,
-        onTap: () => context.push(AppRoutes.lessonTimeSettings),
+        // Blocker quest — first availability simple UI per spec
+        // docs/specs/onboarding/teacher_first_availability_setup.md.
+        onTap: () => context.push(AppRoutes.teacherFirstAvailability),
       ),
       _Quest(
         step: 2,
         title: AppStrings.questTitlePhoto,
         reward: AppStrings.questRewardSearch,
         isCompleted: hasPhoto,
-        onTap: () => context.push(AppRoutes.basicInfoEdit),
+        isLocked: slotsBlocker,
+        onTap: slotsBlocker
+            ? null
+            : () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
         step: 3,
         title: AppStrings.questTitleIntro,
         reward: AppStrings.questRewardWebProfile,
         isCompleted: hasIntro,
-        onTap: () => context.push(AppRoutes.basicInfoEdit),
+        isLocked: slotsBlocker,
+        onTap: slotsBlocker
+            ? null
+            : () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
         step: 4,
         title: AppStrings.questTitlePrice,
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
+        isLocked: slotsBlocker,
         onTap: null,
       ),
       _Quest(
@@ -166,7 +180,10 @@ class QuestBoardCard extends ConsumerWidget {
         title: AppStrings.questTitleBankAccount,
         reward: AppStrings.questRewardBankAccount,
         isCompleted: hasBankAcc,
-        onTap: () => context.push(AppRoutes.bankAccountEdit),
+        isLocked: slotsBlocker,
+        onTap: slotsBlocker
+            ? null
+            : () => context.push(AppRoutes.bankAccountEdit),
       ),
       // ── Action Phase ──
       _Quest(
@@ -174,23 +191,27 @@ class QuestBoardCard extends ConsumerWidget {
         title: AppStrings.questTitleStudent,
         reward: AppStrings.questRewardConnection,
         isCompleted: hasStudents,
-        onTap: () => context.push(AppRoutes.invite),
+        isLocked: slotsBlocker,
+        onTap: slotsBlocker ? null : () => context.push(AppRoutes.invite),
       ),
       _Quest(
         step: 7,
         title: AppStrings.questTitleSubscription,
         reward: AppStrings.questRewardSubscription,
         isCompleted: hasSubscription,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.issueSubscription)
-                : null,
+        isLocked: slotsBlocker,
+        onTap: slotsBlocker
+            ? null
+            : (hasStudents
+                  ? () => context.push(AppRoutes.issueSubscription)
+                  : null),
       ),
       _Quest(
         step: 8,
         title: AppStrings.questTitleFirstLesson,
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
+        isLocked: slotsBlocker,
         onTap: null,
       ),
       _Quest(
@@ -198,6 +219,7 @@ class QuestBoardCard extends ConsumerWidget {
         title: AppStrings.questTitleLessonNote,
         reward: AppStrings.questRewardLessonNote,
         isCompleted: hasLessonNote,
+        isLocked: slotsBlocker,
         onTap: null,
       ),
       _Quest(
@@ -205,6 +227,7 @@ class QuestBoardCard extends ConsumerWidget {
         title: AppStrings.questTitlePracticeAssign,
         reward: AppStrings.questRewardPracticeAssign,
         isCompleted: hasPracticeAssigned,
+        isLocked: slotsBlocker,
         onTap: null,
       ),
     ];
@@ -219,6 +242,10 @@ class _Quest {
   final String? reward;
   final bool isCompleted;
   final VoidCallback? onTap;
+  // #422 — locked by the first-availability blocker quest. When true,
+  // the quest item shows the "가용시간 설정 후 진행 가능" hint instead
+  // of the original reward copy.
+  final bool isLocked;
 
   const _Quest({
     required this.step,
@@ -226,6 +253,7 @@ class _Quest {
     required this.reward,
     required this.isCompleted,
     required this.onTap,
+    this.isLocked = false,
   });
 }
 
@@ -280,12 +308,11 @@ class _QuestItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = quest.onTap != null;
-    final accentColor =
-        quest.isCompleted
-            ? AppColors.paperOk
-            : isEnabled
-            ? AppColors.ink
-            : AppColors.inkTertiary;
+    final accentColor = quest.isCompleted
+        ? AppColors.paperOk
+        : isEnabled
+        ? AppColors.ink
+        : AppColors.inkTertiary;
 
     return Opacity(
       opacity: !quest.isCompleted && !isEnabled ? 0.5 : 1.0,
@@ -299,23 +326,22 @@ class _QuestItem extends StatelessWidget {
               // Roman numeral or check glyph
               SizedBox(
                 width: 28,
-                child:
-                    quest.isCompleted
-                        ? const Padding(
-                          padding: EdgeInsets.only(top: 2),
-                          child: NotebookGlyph(
-                            NotebookGlyph.check,
-                            size: 16,
-                            color: AppColors.paperOk,
-                          ),
-                        )
-                        : Text(
-                          romanOf(quest.step - 1),
-                          style: NotebookTypography.roman.copyWith(
-                            color: accentColor,
-                          ),
-                          textAlign: TextAlign.center,
+                child: quest.isCompleted
+                    ? const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: NotebookGlyph(
+                          NotebookGlyph.check,
+                          size: 16,
+                          color: AppColors.paperOk,
                         ),
+                      )
+                    : Text(
+                        romanOf(quest.step - 1),
+                        style: NotebookTypography.roman.copyWith(
+                          color: accentColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -326,14 +352,12 @@ class _QuestItem extends StatelessWidget {
                       quest.title,
                       style: NotebookTypography.pieceTitle.copyWith(
                         fontSize: 15,
-                        color:
-                            quest.isCompleted
-                                ? AppColors.inkTertiary
-                                : AppColors.ink,
-                        decoration:
-                            quest.isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
+                        color: quest.isCompleted
+                            ? AppColors.inkTertiary
+                            : AppColors.ink,
+                        decoration: quest.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     if (quest.reward != null && !quest.isCompleted) ...[
@@ -348,7 +372,9 @@ class _QuestItem extends StatelessWidget {
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
-                              quest.reward!,
+                              quest.isLocked
+                                  ? AppStrings.firstAvailabilityLockedHint
+                                  : quest.reward!,
                               style: NotebookTypography.roman.copyWith(
                                 fontSize: 12,
                                 color: AppColors.inkTertiary,
@@ -362,11 +388,7 @@ class _QuestItem extends StatelessWidget {
                 ),
               ),
               if (isEnabled && !quest.isCompleted)
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.ink,
-                  size: 18,
-                ),
+                const Icon(Icons.chevron_right, color: AppColors.ink, size: 18),
             ],
           ),
         ),
