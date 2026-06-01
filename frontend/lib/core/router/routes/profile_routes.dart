@@ -16,6 +16,7 @@ import '../../../features/profile/presentation/screens/bank_account_edit_screen.
 import '../../../features/profile/presentation/screens/cancellation_defaults_screen.dart';
 import '../../../features/analytics/presentation/screens/analytics_dashboard_screen.dart';
 import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
+import '../../../features/profile/presentation/screens/invite_pending_list_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
 import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
 import '../../../features/profile/presentation/screens/profile_visibility_screen.dart';
@@ -138,6 +139,13 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.paymentPending,
     name: 'paymentPending',
     builder: (context, state) => const PaymentPendingListScreen(),
+  ),
+
+  // Invite-pending dashboard list — #5 D-G3 Phase 2
+  GoRoute(
+    path: AppRoutes.invitePending,
+    name: 'invitePending',
+    builder: (context, state) => const InvitePendingListScreen(),
   ),
 
   // Analytics Dashboard (Refs #354 — 3-tab: 월간요약/학생성장/수입분석)

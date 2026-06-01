@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../../domain/entities/invite.dart';
+import '../../domain/entities/pending_invite.dart';
 import '../../domain/repositories/invite_repository.dart';
 
 /// Mock implementation of InviteRepository
@@ -487,5 +488,46 @@ class MockInviteRepository implements InviteRepository {
           a.deactivatedAt ?? a.connectedAt,
         ),
       );
+  }
+
+  // ===== G3 Phase 2 — Pending invite dashboard (#5 D-G3) =====
+
+  @override
+  Future<List<PendingInvite>> getPendingInvites() async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    final now = DateTime.now();
+    return _invites.values
+        .where(
+          (inv) =>
+              inv.status == InviteStatus.active && inv.expiresAt.isAfter(now),
+        )
+        .map(
+          (inv) => PendingInvite(
+            inviteId: inv.id,
+            inviteCode: inv.inviteCode,
+            daysSinceSent: now.difference(inv.createdAt).inDays,
+            expiresAt: inv.expiresAt,
+            resentCount: 0,
+            canResend: true,
+            note: inv.note,
+          ),
+        )
+        .toList()
+      ..sort((a, b) => b.daysSinceSent.compareTo(a.daysSinceSent));
+  }
+
+  @override
+  Future<void> resendInvite(String inviteId) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    final invite = _invites[inviteId];
+    if (invite == null) throw Exception('Invite not found: $inviteId');
+    if (invite.status == InviteStatus.used ||
+        invite.status == InviteStatus.revoked) {
+      throw Exception('Invite cannot be resent: ${invite.status.name}');
+    }
+    _invites[inviteId] = invite.copyWith(
+      status: InviteStatus.active,
+      expiresAt: DateTime.now().add(const Duration(days: 7)),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
+import '../../../profile/domain/entities/pending_invite.dart';
 import '../../../profile/domain/repositories/invite_repository.dart';
 
 /// Remote implementation of [InviteRepository] using FastAPI backend.
@@ -220,11 +221,26 @@ class RemoteInviteRepository implements InviteRepository {
     );
     final data = response.data as Map<String, dynamic>;
     final items = data['items'] as List<dynamic>;
-    final connections =
-        items
-            .map((e) => _connectionFromJson(e as Map<String, dynamic>))
-            .toList();
+    final connections = items
+        .map((e) => _connectionFromJson(e as Map<String, dynamic>))
+        .toList();
     return connections.where((c) => !c.isActive).toList();
+  }
+
+  // ===== G3 Phase 2 — Pending invite dashboard (#5 D-G3) =====
+
+  @override
+  Future<List<PendingInvite>> getPendingInvites() async {
+    final response = await _apiClient.get('/invites/pending');
+    final items = response.data['pending'] as List<dynamic>;
+    return items
+        .map((e) => PendingInvite.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<void> resendInvite(String inviteId) async {
+    await _apiClient.post('/invites/$inviteId/resend');
   }
 
   // ===== JSON Helpers =====
@@ -281,10 +297,9 @@ class RemoteInviteRepository implements InviteRepository {
         (e) => e.name == json['status'],
         orElse: () => ConnectionRequestStatus.pending,
       ),
-      respondedAt:
-          json['responded_at'] != null
-              ? DateTime.parse(json['responded_at'] as String)
-              : null,
+      respondedAt: json['responded_at'] != null
+          ? DateTime.parse(json['responded_at'] as String)
+          : null,
       rejectionReason: json['rejection_reason'] as String?,
       expiresAt: DateTime.parse(json['expires_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -303,10 +318,9 @@ class RemoteInviteRepository implements InviteRepository {
       connectionRequestId: json['connection_request_id'] as String?,
       connectedAt: DateTime.parse(json['connected_at'] as String),
       isActive: json['is_active'] as bool? ?? true,
-      deactivatedAt:
-          json['deactivated_at'] != null
-              ? DateTime.parse(json['deactivated_at'] as String)
-              : null,
+      deactivatedAt: json['deactivated_at'] != null
+          ? DateTime.parse(json['deactivated_at'] as String)
+          : null,
     );
   }
 }
