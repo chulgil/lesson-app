@@ -47,6 +47,7 @@ from app.api.v1 import (
     subscriptions,
     teachers,
     users,
+    vacations,
 )
 
 api_router = APIRouter()
@@ -114,6 +115,11 @@ api_router.include_router(
     availability.router,
     prefix="/availability",
     tags=["availability"],
+)
+api_router.include_router(
+    vacations.router,
+    prefix="/teacher/vacation",
+    tags=["vacation"],
 )
 api_router.include_router(
     student_summary.router,

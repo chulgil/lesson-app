@@ -7567,4 +7567,60 @@ class AppStrings {
   /// Lifetime 구매 실패 — store/network/검증 에러.
   static const paywallLifetimePurchaseFailed =
       'Lifetime 구매를 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
+
+  // ── 휴가 모드 / Vacation Mode (#431) ─────────────────────────
+
+  /// 휴가 모드 진입 화면 제목 — 선생님이 다중 기간 휴가를 등록.
+  static const vacationModeTitle = '휴가 모드';
+
+  /// 휴가 기간 섹션 제목.
+  static const vacationPeriodSection = '휴가 기간';
+
+  /// 시작일 라벨.
+  static const vacationStartDateLabel = '시작일';
+
+  /// 종료일 라벨.
+  static const vacationEndDateLabel = '종료일';
+
+  /// 휴가 사유 (선택) 라벨.
+  static const vacationReasonLabel = '사유 (선택)';
+
+  /// 휴가 사유 입력 힌트 — 예시.
+  static const vacationReasonHint = '예: 여름방학';
+
+  /// 영향 받는 레슨 미리보기 섹션 제목.
+  static const vacationImpactSection = '영향 받는 레슨';
+
+  /// 영향 미리보기 로딩 메시지.
+  static const vacationImpactLoading = '영향 받는 레슨을 확인하는 중...';
+
+  /// 영향 미리보기 빈 상태.
+  static const vacationImpactEmpty = '해당 기간에 영향 받는 레슨이 없어요.';
+
+  /// 휴가 등록 액션 버튼.
+  static const vacationRegisterButton = '휴가 등록';
+
+  /// 휴가 등록 성공 스낵바.
+  static const vacationRegisterSuccess = '휴가가 등록되었어요.';
+
+  /// 휴가 등록 실패 스낵바.
+  static const vacationRegisterFailed = '휴가 등록을 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
+
+  /// 종료일 < 시작일 검증 에러.
+  static const vacationDateRangeInvalid = '종료일은 시작일 이후여야 해요.';
+
+  /// 영향 미리보기 카운트 포맷 — "레슨 14건 · 학생 7명".
+  static String vacationImpactSummary({
+    required int lessonCount,
+    required int studentCount,
+  }) => '레슨 $lessonCount건 · 학생 $studentCount명';
+
+  /// 영향 미리보기 새로고침 버튼.
+  static const vacationImpactRefresh = '확인';
+
+  /// 기간 미선택 안내.
+  static const vacationRangeNeeded = '기간을 선택하면 영향 받는 레슨을 확인할 수 있어요.';
+
+  /// 학생별 미리보기 항목 카운트 ("3건").
+  static String vacationImpactStudentCount(int count) => '$count건';
 }

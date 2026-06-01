@@ -131,6 +131,10 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
         DateTime(timezone=True),
         nullable=True,
     )
+    # 휴가 모드 자동 연장 누적 일수 (#431). 만료일 계산 시 end_date + auto_extended_days.
+    # Spec: docs/specs/subscription/subscription_master.md §2.2.3,
+    #       docs/specs/schedule/teacher_vacation_mode.md §5.3.
+    auto_extended_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     @property
     def payment_status(self) -> str:
@@ -140,6 +144,21 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
         if self.paid_at is not None:
             return "needsConfirmation"
         return "pending"
+
+    @property
+    def effective_end_date(self) -> date | None:
+        """End date including vacation auto-extension days (#431).
+
+        Spec: docs/specs/schedule/teacher_vacation_mode.md §5.3.
+        Returns None if end_date is None (open-ended subscription).
+        """
+        from datetime import timedelta
+
+        if self.end_date is None:
+            return None
+        if self.auto_extended_days <= 0:
+            return self.end_date
+        return self.end_date + timedelta(days=self.auto_extended_days)
 
     # Discount
     discount_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
