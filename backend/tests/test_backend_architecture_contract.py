@@ -249,3 +249,20 @@ def test_student_create_routes_use_runtime_annotations_for_openapi() -> None:
     for route_file in (API_V1_ROOT / "students.py", API_V1_ROOT / "teachers.py"):
         source = route_file.read_text()
         assert "from __future__ import annotations" not in source
+
+
+def test_subscription_access_policy_lives_in_dedicated_service() -> None:
+    """Subscription visibility and teacher ownership checks should stay reusable."""
+    subscription_service = (APP_ROOT / "services" / "subscription_service.py").read_text()
+    access_service = APP_ROOT / "services" / "subscription_access_service.py"
+
+    assert access_service.exists()
+    source = access_service.read_text()
+    assert "class SubscriptionAccessService" in source
+    assert "async def get_subscription_for_user" in source
+    assert "async def require_teacher_subscription" in source
+    assert "async def get_membership_for_teacher" in source
+    assert "async def visible_subscription_query" in source
+    assert "async def visible_student_ids" in source
+    assert "_get_subscription_for_user" not in subscription_service
+    assert "_get_subscription_for_teacher" not in subscription_service

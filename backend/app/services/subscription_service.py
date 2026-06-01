@@ -26,7 +26,8 @@ from app.schemas.subscription import (
     SubscriptionUpdate,
     UseLessonRequest,
 )
-from app.services.teacher_id_resolver import resolve_teacher_id, try_resolve_teacher_id
+from app.services.subscription_access_service import SubscriptionAccessService
+from app.services.teacher_id_resolver import resolve_teacher_id
 
 
 class SubscriptionService:
@@ -34,6 +35,7 @@ class SubscriptionService:
 
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+        self.access = SubscriptionAccessService(db)
 
     # ------------------------------------------------------------------
     # Subscriptions
@@ -54,30 +56,9 @@ class SubscriptionService:
         status: str | None = None,
     ) -> PaginatedResponse[SubscriptionResponse]:
         """List subscriptions with filters."""
-        from app.models.lesson import ClassMembership, LessonClass
         from app.models.subscription import Subscription
 
-        query = select(Subscription)
-        role = self._actor_type(user)
-        if role == "student":
-            query = query.where(Subscription.student_id.in_(await self._student_identifiers(user)))
-        elif role == "parent":
-            query = query.where(Subscription.student_id.in_(await self._parent_child_student_ids(user)))
-        elif role == "teacher":
-            identifiers = await self._teacher_identifiers(user)
-            query = (
-                query.join(
-                    ClassMembership,
-                    Subscription.membership_id == ClassMembership.id,
-                )
-                .join(
-                    LessonClass,
-                    ClassMembership.lesson_class_id == LessonClass.id,
-                )
-                .where(LessonClass.teacher_id.in_(identifiers))
-            )
-        else:
-            query = query.where(False)
+        query = await self.access.visible_subscription_query(select(Subscription), user)
 
         if student_id:
             query = query.where(Subscription.student_id == student_id)
@@ -109,7 +90,9 @@ class SubscriptionService:
                     detail="Invalid deposit_status",
                 )
         if teacher_id:
-            if role == "teacher":
+            if self.access.actor_type(user) == "teacher":
+                from app.models.lesson import LessonClass
+
                 query = query.where(LessonClass.teacher_id == teacher_id)
             else:
                 query = query.where(False)
@@ -129,30 +112,12 @@ class SubscriptionService:
         month: int | None = None,
     ) -> SubscriptionDepositSummaryResponse:
         """Summarize visible manual tuition deposit states."""
-        from app.models.lesson import ClassMembership, LessonClass
         from app.models.subscription import Subscription
 
-        query = select(Subscription).where(Subscription.status == "active")
-        role = self._actor_type(user)
-        if role == "student":
-            query = query.where(Subscription.student_id.in_(await self._student_identifiers(user)))
-        elif role == "parent":
-            query = query.where(Subscription.student_id.in_(await self._parent_child_student_ids(user)))
-        elif role == "teacher":
-            identifiers = await self._teacher_identifiers(user)
-            query = (
-                query.join(
-                    ClassMembership,
-                    Subscription.membership_id == ClassMembership.id,
-                )
-                .join(
-                    LessonClass,
-                    ClassMembership.lesson_class_id == LessonClass.id,
-                )
-                .where(LessonClass.teacher_id.in_(identifiers))
-            )
-        else:
-            query = query.where(False)
+        query = await self.access.visible_subscription_query(
+            select(Subscription).where(Subscription.status == "active"),
+            user,
+        )
 
         if year is not None and month is not None:
             start = date(year, month, 1)
@@ -190,7 +155,7 @@ class SubscriptionService:
 
         membership_id = data.membership_id
         if membership_id:
-            await self._get_subscription_membership_for_teacher(
+            await self.access.get_membership_for_teacher(
                 membership_id,
                 current_user,
                 student_id=data.student_id,
@@ -261,12 +226,12 @@ class SubscriptionService:
 
     async def get_by_id(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Return a subscription by ID."""
-        sub = await self._get_subscription_for_user(subscription_id, current_user)
+        sub = await self.access.get_subscription_for_user(subscription_id, current_user)
         return await self._subscription_response(sub)
 
     async def update(self, subscription_id: str, data: SubscriptionUpdate, current_user: Any) -> SubscriptionResponse:
         """Update a subscription."""
-        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         self._reject_deposit_state_update(sub, update_data)
@@ -287,7 +252,7 @@ class SubscriptionService:
         """Deduct a lesson usage from a subscription."""
         from app.models.subscription import SubscriptionUsage
 
-        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
         remaining = self._remaining_lessons(sub)
         if remaining is not None and remaining <= 0:
@@ -319,7 +284,7 @@ class SubscriptionService:
         """Use a reschedule credit from a subscription."""
         from app.models.subscription import SubscriptionUsage
 
-        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
         remaining = (sub.total_reschedule_allowance or 0) - (sub.used_reschedule_count or 0)
         if remaining <= 0:
@@ -342,7 +307,7 @@ class SubscriptionService:
         """Update subscription status."""
         from app.models.subscription import SubscriptionStatus
 
-        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
         sub.status = SubscriptionStatus(new_status)
         await self.db.flush()
@@ -353,7 +318,7 @@ class SubscriptionService:
         """Get usage history for a subscription."""
         from app.models.subscription import SubscriptionUsage
 
-        await self._get_subscription_for_user(subscription_id, current_user)
+        await self.access.get_subscription_for_user(subscription_id, current_user)
         result = await self.db.scalars(
             select(SubscriptionUsage)
             .where(SubscriptionUsage.subscription_id == subscription_id)
@@ -365,7 +330,7 @@ class SubscriptionService:
         """Add a usage record to a subscription."""
         from app.models.subscription import SubscriptionUsage
 
-        await self._get_subscription_for_teacher(subscription_id, current_user)
+        await self.access.require_teacher_subscription(subscription_id, current_user)
 
         usage = SubscriptionUsage(
             subscription_id=subscription_id,
@@ -391,7 +356,7 @@ class SubscriptionService:
         """Get subscription chat events, optionally scoped to one session."""
         from app.models.request_event import RequestEvent
 
-        await self._get_subscription_for_user(subscription_id, current_user)
+        await self.access.get_subscription_for_user(subscription_id, current_user)
 
         query = (
             select(RequestEvent)
@@ -410,7 +375,7 @@ class SubscriptionService:
         from app.models.request_event import RequestEvent, RequestEventType
         from app.models.subscription import Subscription
 
-        role = self._actor_type(current_user)
+        role = self.access.actor_type(current_user)
         source_types = {
             RequestEventType.lessonCancelled,
             RequestEventType.scheduleChanged,
@@ -433,7 +398,7 @@ class SubscriptionService:
         )
 
         if role == "teacher":
-            identifiers = await self._teacher_identifiers(current_user)
+            identifiers = await self.access.teacher_identifiers(current_user)
             query = (
                 query.join(
                     ClassMembership,
@@ -446,9 +411,9 @@ class SubscriptionService:
                 .where(LessonClass.teacher_id.in_(identifiers))
             )
         elif role == "student":
-            query = query.where(Subscription.student_id.in_(await self._student_identifiers(current_user)))
+            query = query.where(Subscription.student_id.in_(await self.access.student_identifiers(current_user)))
         elif role == "parent":
-            query = query.where(Subscription.student_id.in_(await self._parent_child_student_ids(current_user)))
+            query = query.where(Subscription.student_id.in_(await self.access.parent_child_student_ids(current_user)))
         else:
             query = query.where(False)
 
@@ -483,7 +448,7 @@ class SubscriptionService:
         """Persist a subscription chat event."""
         from app.models.request_event import RequestEvent, RequestEventType, ScheduleChangeType
 
-        sub = await self._get_subscription_for_user(subscription_id, current_user)
+        sub = await self.access.get_subscription_for_user(subscription_id, current_user)
         self._validate_subscription_event_session_number(sub, data.session_number)
         await self._validate_subscription_event_turn(subscription_id, data, current_user)
         if data.subscription_id is not None and data.subscription_id != subscription_id:
@@ -554,7 +519,7 @@ class SubscriptionService:
         """Validate schedule-change event ordering for subscription sessions."""
         from app.models.request_event import RequestEvent, RequestEventType
 
-        role = self._actor_type(current_user)
+        role = self.access.actor_type(current_user)
         if role == "parent":
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
@@ -741,82 +706,6 @@ class SubscriptionService:
         response.travel_time_minutes = membership.travel_time_minutes
         return response
 
-    async def _get_subscription_for_user(self, subscription_id: str, current_user: Any) -> Any:
-        """Return subscription if the current user can access it."""
-        from app.models.lesson import ClassMembership, LessonClass
-        from app.models.subscription import Subscription
-
-        sub = await self.db.get(Subscription, subscription_id)
-        if sub is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Subscription not found",
-            )
-
-        role = self._actor_type(current_user)
-        if role == "student":
-            student_ids = await self._student_identifiers(current_user)
-            if sub.student_id in student_ids:
-                return sub
-        elif role == "parent":
-            student_ids = await self._parent_child_student_ids(current_user)
-            if sub.student_id in student_ids:
-                return sub
-
-        if role == "teacher":
-            identifiers = [current_user.id]
-            teacher_profile_id = await try_resolve_teacher_id(self.db, current_user.id)
-            if teacher_profile_id and teacher_profile_id not in identifiers:
-                identifiers.append(teacher_profile_id)
-
-            teacher_id = await self.db.scalar(
-                select(LessonClass.teacher_id)
-                .join(ClassMembership, ClassMembership.lesson_class_id == LessonClass.id)
-                .where(ClassMembership.id == sub.membership_id)
-            )
-            if teacher_id in identifiers:
-                return sub
-
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-
-    def _actor_type(self, user: Any) -> str:
-        role = getattr(user, "role", None)
-        return getattr(role, "value", role) or ""
-
-    async def _teacher_identifiers(self, user: Any) -> list[str]:
-        identifiers = [user.id]
-        teacher_profile_id = await try_resolve_teacher_id(self.db, user.id)
-        if teacher_profile_id and teacher_profile_id not in identifiers:
-            identifiers.append(teacher_profile_id)
-        return identifiers
-
-    async def _student_identifiers(self, user: Any) -> list[str]:
-        """Return user id plus linked Student profile ids for student actors."""
-        from app.models.student import Student
-
-        identifiers = [user.id]
-        result = await self.db.scalars(select(Student.id).where(Student.user_id == user.id))
-        for student_id in result.all():
-            if student_id not in identifiers:
-                identifiers.append(student_id)
-        return identifiers
-
-    async def _parent_child_student_ids(self, user: Any) -> list[str]:
-        """Return active child Student ids for a parent user."""
-        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
-
-        parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == user.id))
-        if parent_id is None:
-            return []
-
-        result = await self.db.scalars(
-            select(ParentChildRelation.student_id).where(
-                ParentChildRelation.parent_id == parent_id,
-                ParentChildRelation.status == ParentChildRelationStatus.active,
-            )
-        )
-        return list(result.all())
-
     def _remaining_lessons(self, sub: Any) -> int | None:
         type_value = getattr(sub.type, "value", sub.type)
         if type_value == "trial":
@@ -828,39 +717,6 @@ class SubscriptionService:
             return None
         return base + (sub.bonus_count or 0) - (sub.used_lessons or 0)
 
-    async def _get_subscription_for_teacher(self, subscription_id: str, current_user: Any) -> Any:
-        sub = await self._get_subscription_for_user(subscription_id, current_user)
-        if self._actor_type(current_user) != "teacher":
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-        return sub
-
-    async def _get_subscription_membership_for_teacher(
-        self,
-        membership_id: str,
-        current_user: Any,
-        *,
-        student_id: str | None = None,
-    ) -> Any:
-        from app.models.lesson import ClassMembership, LessonClass
-
-        identifiers = await self._teacher_identifiers(current_user)
-        membership = await self.db.scalar(
-            select(ClassMembership)
-            .join(LessonClass, ClassMembership.lesson_class_id == LessonClass.id)
-            .where(
-                ClassMembership.id == membership_id,
-                LessonClass.teacher_id.in_(identifiers),
-            )
-        )
-        if membership is None:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-        if student_id is not None and membership.student_id != student_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="membership_id does not belong to student_id",
-            )
-        return membership
-
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any
     ) -> SubscriptionResponse:
@@ -868,7 +724,7 @@ class SubscriptionService:
         from app.models.subscription import PaymentMethod
         from app.services.notification_service import NotificationService
 
-        sub = await self._get_subscription_for_teacher(subscription_id, current_user)
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
         if sub.payment_confirmed:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -895,8 +751,8 @@ class SubscriptionService:
         from app.models.subscription import PaymentMethod
         from app.services.notification_service import NotificationService
 
-        sub = await self._get_subscription_for_user(subscription_id, current_user)
-        if self._actor_type(current_user) == "teacher":
+        sub = await self.access.get_subscription_for_user(subscription_id, current_user)
+        if self.access.actor_type(current_user) == "teacher":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Teachers must use confirm-payment for manual tuition deposits",
@@ -1093,7 +949,7 @@ class SubscriptionService:
         """Persist template display order for the current teacher."""
         from app.models.subscription import SubscriptionTemplate
 
-        identifiers = await self._teacher_identifiers(current_user)
+        identifiers = await self.access.teacher_identifiers(current_user)
         for index, template_id in enumerate(ordered_ids):
             template = await self.db.get(SubscriptionTemplate, template_id)
             if template is not None:
@@ -1110,7 +966,7 @@ class SubscriptionService:
         if template is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
 
-        identifiers = await self._teacher_identifiers(current_user)
+        identifiers = await self.access.teacher_identifiers(current_user)
         if template.teacher_id not in identifiers:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
         return template
@@ -1131,7 +987,7 @@ class SubscriptionService:
 
         from app.models.subscription import SubscriptionProposal, SubscriptionTemplate
 
-        sub = await self._get_subscription_for_teacher(previous_subscription_id, current_user)
+        sub = await self.access.require_teacher_subscription(previous_subscription_id, current_user)
         tid = await resolve_teacher_id(self.db, current_user.id)
 
         # Find a matching active template by teacher + subscription type
@@ -1174,11 +1030,11 @@ class SubscriptionService:
         from app.models.subscription import SubscriptionProposal
 
         query = select(SubscriptionProposal)
-        role = self._actor_type(user)
+        role = self.access.actor_type(user)
         if role == "teacher":
-            query = query.where(SubscriptionProposal.teacher_id.in_(await self._teacher_identifiers(user)))
+            query = query.where(SubscriptionProposal.teacher_id.in_(await self.access.teacher_identifiers(user)))
         elif role == "student":
-            query = query.where(SubscriptionProposal.student_id.in_(await self._student_identifiers(user)))
+            query = query.where(SubscriptionProposal.student_id.in_(await self.access.student_identifiers(user)))
         else:
             query = query.where(False)
         if student_id:
@@ -1206,13 +1062,13 @@ class SubscriptionService:
         if proposal is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
 
-        role = self._actor_type(current_user)
+        role = self.access.actor_type(current_user)
         if role == "teacher":
-            identifiers = await self._teacher_identifiers(current_user)
+            identifiers = await self.access.teacher_identifiers(current_user)
             if proposal.teacher_id in identifiers:
                 return proposal
         elif role == "student":
-            identifiers = await self._student_identifiers(current_user)
+            identifiers = await self.access.student_identifiers(current_user)
             if proposal.student_id in identifiers:
                 return proposal
             if await self._is_unlinked_student_profile(proposal.student_id):
@@ -1230,7 +1086,7 @@ class SubscriptionService:
     async def _get_proposal_for_teacher(self, proposal_id: str, current_user: Any) -> Any:
         """Return a proposal only if the current teacher owns it."""
         proposal = await self._get_proposal_for_user(proposal_id, current_user)
-        if self._actor_type(current_user) != "teacher":
+        if self.access.actor_type(current_user) != "teacher":
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
         return proposal
 
@@ -1243,7 +1099,7 @@ class SubscriptionService:
         from app.models.subscription import SubscriptionProposal
 
         tid = await resolve_teacher_id(self.db, current_user.id)
-        teacher_ids = await self._teacher_identifiers(current_user)
+        teacher_ids = await self.access.teacher_identifiers(current_user)
         await self._assert_proposal_create_resources(data, teacher_ids)
         proposal = SubscriptionProposal(
             teacher_id=tid,
