@@ -1,6 +1,6 @@
 # 학생 인터랙티브 튜토리얼 v2 — 실행 스펙
 
-> 상태: 📋 구현 진행 중
+> 상태: 구현 완료 (2026-06-01)
 > 작성: 2026-06-01
 > 마스터: [onboarding_quest_v2.md §1.2, §3.2, §5.2.1](onboarding_quest_v2.md)
 
@@ -10,16 +10,16 @@
 
 ## 2. 성공 기준
 
-- [ ] `student_tutorial_screen.dart` 4단계 인터랙티브 페이지 구조 (PageView + NeverScrollable)
-- [ ] 각 단계 인터랙션 미완료 시 "다음" 버튼 비활성화 (_canContinue == false)
-- [ ] 4개 step widget 파일 (`metronome_step.dart`, `tuner_step.dart`, `recording_step.dart`, `feedback_step.dart`) 신규
-- [ ] `student_tutorial_step.dart` enum + 진행 모델
-- [ ] 진행률 표시 (선생님 튜토리얼과 동일 패턴: 1/4 → 4/4)
-- [ ] "건너뛰기"/"이전"/"다음"/"시작하기" 네비게이션 동일 패턴
-- [ ] 라우터 진입 후 마지막 단계에서 `AppRoutes.studentHome` 으로 이동
-- [ ] Smoke test: 4단계 모두 통과 + `tester.takeException() == null`
-- [ ] `flutter analyze` 위반 0건
-- [ ] AppColors/AppSpacing/AppTypography/AppStrings 사용 (하드코딩 금지)
+- [x] `student_tutorial_screen.dart` 4단계 인터랙티브 페이지 구조 (PageView + NeverScrollable)
+- [x] 각 단계 인터랙션 미완료 시 "다음" 버튼 비활성화 (_canContinue == false)
+- [x] 4개 step widget 파일 (`metronome_step.dart`, `tuner_step.dart`, `recording_step.dart`, `feedback_step.dart`) 신규
+- [x] `student_tutorial_step.dart` enum + 진행 모델
+- [x] 진행률 표시 (선생님 튜토리얼과 동일 `_ProgressStep` 3단 패턴: 휴대폰 / 프로필 / 튜토리얼)
+- [x] "건너뛰기"/"이전"/"다음"/"시작하기" 네비게이션 동일 패턴
+- [x] 라우터 진입 후 마지막 단계에서 `AppRoutes.studentHome` 으로 이동
+- [x] Smoke test: 4단계 모두 통과 + `tester.takeException() == null`
+- [x] `flutter analyze` 위반 0건
+- [x] AppColors/AppSpacing/AppTypography/AppStrings 사용 (진행 표시 라벨 상수화)
 
 ## 3. 비목표 (이번 범위 제외)
 
@@ -41,9 +41,10 @@ class StudentTutorialStepContent {
   final int index;          // 1..4
   final String title;       // 미션 제목
   final String description; // 미션 설명
-  final IconData icon;
 }
 ```
+
+> 아이콘은 모델 필드가 아닌 `_getIconForStep(step)` switch 로 매핑 (선생님 튜토리얼과 동일 패턴).
 
 ### 4.2 Step Widget 인터페이스 (모든 step widget 공통)
 
@@ -123,3 +124,4 @@ class XxxStep extends StatelessWidget {
 | 날짜 | 내용 |
 |------|------|
 | 2026-06-01 | 본 실행 스펙 작성 (마스터 v2 §3.2 구현 1차) |
+| 2026-06-01 | 병렬 worktree 5개 통합 완료 + 일관성 보정 (선생님 패턴 정렬: `_ProgressStep` 3단, `_getIconForStep` switch, `IconData` 필드 제거) |
