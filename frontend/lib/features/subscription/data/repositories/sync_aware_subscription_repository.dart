@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/sync/application/mutation_queue_helper.dart';
+import '../../domain/entities/pending_payment.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
@@ -136,6 +137,25 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<Subscription> undoConfirmPayment(String id) =>
       // Online-only: payment operations require immediate server confirmation
       _remote.undoConfirmPayment(id);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Payment-pending dashboard — #424 (online-only, no offline queue)
+  // ═══════════════════════════════════════════════════════════════════
+
+  @override
+  Future<List<PendingPayment>> getPendingPayments() =>
+      _remote.getPendingPayments();
+
+  @override
+  Future<int> getPendingPaymentCount() => _remote.getPendingPaymentCount();
+
+  @override
+  Future<void> resendProposalReminder(String proposalId) =>
+      _remote.resendProposalReminder(proposalId);
+
+  @override
+  Future<void> revokeProposal(String proposalId) =>
+      _remote.revokeProposal(proposalId);
 
   @override
   Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) =>

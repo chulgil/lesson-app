@@ -8,6 +8,7 @@ import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_reque
 import 'package:lessonaza/features/schedule/domain/repositories/unified_lesson_request_repository.dart';
 import 'package:lessonaza/features/students/domain/entities/bulk_cancel_result.dart';
 import 'package:lessonaza/features/students/domain/services/bulk_teacher_action_service.dart';
+import 'package:lessonaza/features/subscription/domain/entities/pending_payment.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription_usage.dart';
 import 'package:lessonaza/features/subscription/domain/repositories/subscription_repository.dart';
@@ -281,6 +282,18 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
   @override
   Future<Subscription> undoConfirmPayment(String id) =>
       throw UnimplementedError();
+
+  @override
+  Future<List<PendingPayment>> getPendingPayments() async => [];
+
+  @override
+  Future<int> getPendingPaymentCount() async => 0;
+
+  @override
+  Future<void> resendProposalReminder(String proposalId) async {}
+
+  @override
+  Future<void> revokeProposal(String proposalId) async {}
 
   @override
   Future<List<SubscriptionUsage>> getUsageHistory(

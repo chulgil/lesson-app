@@ -1,3 +1,4 @@
+import '../entities/pending_payment.dart';
 import '../entities/subscription.dart';
 import '../entities/subscription_usage.dart';
 
@@ -70,6 +71,22 @@ abstract class SubscriptionRepository {
   /// - first lesson has already been consumed (`firstLessonConsumedAt` set)
   /// - 24h window since `paymentConfirmedAt` has elapsed
   Future<Subscription> undoConfirmPayment(String id);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Payment-pending dashboard — #424
+  // ═══════════════════════════════════════════════════════════════════
+
+  /// List of subscription-proposals awaiting payment confirmation.
+  Future<List<PendingPayment>> getPendingPayments();
+
+  /// Lightweight count for the home card.
+  Future<int> getPendingPaymentCount();
+
+  /// Resend the payment reminder to the student (30-minute cooldown server-side).
+  Future<void> resendProposalReminder(String proposalId);
+
+  /// Revoke a proposal (teacher-side correction).
+  Future<void> revokeProposal(String proposalId);
 
   // ═══════════════════════════════════════════════════════════════════
   // Usage History

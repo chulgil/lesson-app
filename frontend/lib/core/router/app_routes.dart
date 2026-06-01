@@ -77,6 +77,8 @@ class AppRoutes {
   static const profileVisibility = '/profile/visibility';
   static const profilePreview = '/profile/preview';
   static const outstandingPayments = '/profile/outstanding-payments';
+  // #424 — Teacher payment-pending dashboard list
+  static const paymentPending = '/payments/pending';
   static const cancellationDefaults = '/profile/cancellation-defaults';
 
   // Student routes
