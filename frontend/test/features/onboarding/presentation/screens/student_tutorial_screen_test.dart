@@ -22,7 +22,6 @@ void main() {
     );
 
     expect(find.text('1. 메트로놈 켜보기'), findsOneWidget);
-    expect(find.text('1 / 4'), findsOneWidget);
     expect(find.text('건너뛰기'), findsOneWidget);
 
     final nextButton = find.widgetWithText(ElevatedButton, '다음');

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -114,13 +115,8 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Progress text
-                  Text(
-                    '${_currentPage + 1} / ${StudentTutorialStepContent.all.length}',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
+                  // Progress indicator
+                  _buildProgressIndicator(),
 
                   // Skip button
                   TextButton(
@@ -133,26 +129,6 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            // Progress bar with dashed line
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space2,
-              ),
-              child: SizedBox(
-                height: 2,
-                child: LinearProgressIndicator(
-                  value:
-                      (_currentPage + 1) /
-                      StudentTutorialStepContent.all.length,
-                  backgroundColor: AppColors.inkQuaternary,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.paperAccent,
-                  ),
-                ),
               ),
             ),
 
@@ -171,11 +147,11 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                     tunerDone: _tunerDone,
                     recordingDone: _recordingDone,
                     feedbackDone: _feedbackDone,
-                    onMetronomeDone: () =>
-                        setState(() => _metronomeDone = true),
+                    onMetronomeDone:
+                        () => setState(() => _metronomeDone = true),
                     onTunerDone: () => setState(() => _tunerDone = true),
-                    onRecordingDone: () =>
-                        setState(() => _recordingDone = true),
+                    onRecordingDone:
+                        () => setState(() => _recordingDone = true),
                     onFeedbackDone: () => setState(() => _feedbackDone = true),
                   );
                 },
@@ -250,6 +226,33 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
       ),
     );
   }
+
+  Widget _buildProgressIndicator() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ProgressStep(
+          step: 1,
+          label: AppStrings.onboardingPhone,
+          isActive: false,
+          isCompleted: true,
+        ),
+        const SizedBox(width: AppSpacing.space1),
+        _ProgressStep(
+          step: 2,
+          label: AppStrings.onboardingProfile,
+          isActive: false,
+          isCompleted: true,
+        ),
+        const SizedBox(width: AppSpacing.space1),
+        _ProgressStep(
+          step: 3,
+          label: AppStrings.onboardingTutorial,
+          isActive: true,
+        ),
+      ],
+    );
+  }
 }
 
 class _StudentTutorialPage extends StatelessWidget {
@@ -295,7 +298,11 @@ class _StudentTutorialPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Icon
-                Icon(content.icon, size: 42, color: AppColors.paperAccent),
+                Icon(
+                  _getIconForStep(content.step),
+                  size: 42,
+                  color: AppColors.paperAccent,
+                ),
                 const SizedBox(height: AppSpacing.space4),
 
                 // Title
@@ -343,6 +350,19 @@ class _StudentTutorialPage extends StatelessWidget {
         );
     }
   }
+
+  IconData _getIconForStep(StudentTutorialStep step) {
+    switch (step) {
+      case StudentTutorialStep.metronome:
+        return Icons.av_timer_rounded;
+      case StudentTutorialStep.tuner:
+        return Icons.graphic_eq_rounded;
+      case StudentTutorialStep.recording:
+        return Icons.fiber_manual_record_rounded;
+      case StudentTutorialStep.feedback:
+        return Icons.edit_note_rounded;
+    }
+  }
 }
 
 class _PageIndicator extends StatelessWidget {
@@ -360,6 +380,53 @@ class _PageIndicator extends StatelessWidget {
         color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
         borderRadius: BorderRadius.zero,
       ),
+    );
+  }
+}
+
+class _ProgressStep extends StatelessWidget {
+  final int step;
+  final String label;
+  final bool isActive;
+  final bool isCompleted;
+
+  const _ProgressStep({
+    required this.step,
+    required this.label,
+    required this.isActive,
+    this.isCompleted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color:
+                isActive || isCompleted
+                    ? AppColors.paperAccent
+                    : AppColors.inkQuaternary,
+            borderRadius: BorderRadius.zero,
+          ),
+          child: Center(
+            child:
+                isCompleted
+                    ? const Icon(Icons.check, size: 12, color: AppColors.paper)
+                    : Text(
+                      '$step',
+                      style: AppTypography.caption.copyWith(
+                        color:
+                            isActive ? AppColors.paper : AppColors.inkTertiary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+          ),
+        ),
+      ],
     );
   }
 }
