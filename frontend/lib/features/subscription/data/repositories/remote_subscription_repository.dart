@@ -1,5 +1,6 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/paginated_response.dart';
+import '../../domain/entities/pending_payment.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
@@ -178,6 +179,37 @@ class RemoteSubscriptionRepository implements SubscriptionRepository {
   Future<Subscription> undoConfirmPayment(String id) async {
     final response = await _apiClient.post('/subscriptions/$id/undo-confirm');
     return Subscription.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Payment-pending dashboard — #424
+  // ═══════════════════════════════════════════════════════════════════
+
+  @override
+  Future<List<PendingPayment>> getPendingPayments() async {
+    final response = await _apiClient.get('/subscriptions/payment-pending');
+    final items = response.data['pending'] as List<dynamic>;
+    return items
+        .map((e) => PendingPayment.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<int> getPendingPaymentCount() async {
+    final response = await _apiClient.get(
+      '/subscriptions/payment-pending/count',
+    );
+    return (response.data['count'] as num?)?.toInt() ?? 0;
+  }
+
+  @override
+  Future<void> resendProposalReminder(String proposalId) async {
+    await _apiClient.post('/subscriptions-proposals/$proposalId/resend');
+  }
+
+  @override
+  Future<void> revokeProposal(String proposalId) async {
+    await _apiClient.post('/subscriptions-proposals/$proposalId/revoke');
   }
 
   // ═══════════════════════════════════════════════════════════════════

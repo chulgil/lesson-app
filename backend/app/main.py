@@ -29,6 +29,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if scheduler_enabled:
         # KST 00:05 daily — subscription expiry status transition + notification dispatch
         register_daily_kst_job(run_subscription_expiry_job, job_id=JOB_ID, hour=0, minute=5)
+
+        # KST 09:00 daily — payment reminder jobs (#424). One registered job per D+N
+        # so scheduler logs surface a clear entry for each cycle.
+        from app.jobs.payment_reminder_jobs import (
+            JOB_ID_D1,
+            JOB_ID_D3,
+            JOB_ID_D7,
+            run_payment_reminder_d1,
+            run_payment_reminder_d3,
+            run_payment_reminder_d7_final,
+        )
+
+        register_daily_kst_job(run_payment_reminder_d1, job_id=JOB_ID_D1, hour=9, minute=0)
+        register_daily_kst_job(run_payment_reminder_d3, job_id=JOB_ID_D3, hour=9, minute=1)
+        register_daily_kst_job(run_payment_reminder_d7_final, job_id=JOB_ID_D7, hour=9, minute=2)
         start_scheduler()
 
     yield

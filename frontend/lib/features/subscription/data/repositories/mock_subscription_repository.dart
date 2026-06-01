@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:uuid/uuid.dart';
 
+import '../../domain/entities/pending_payment.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
@@ -1017,6 +1018,56 @@ class MockSubscriptionRepository implements SubscriptionRepository {
     final newUsage = usage.copyWith(id: _uuid.v4(), createdAt: DateTime.now());
     _usages.add(newUsage);
     return newUsage;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Payment-pending dashboard — #424
+  // ═══════════════════════════════════════════════════════════════════
+
+  @override
+  Future<List<PendingPayment>> getPendingPayments() async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    final now = DateTime.now();
+    return _subscriptions
+        .where((s) => !s.paymentConfirmed)
+        .map(
+          (s) => PendingPayment(
+            proposalId: s.id,
+            studentId: s.studentId,
+            studentName: '학생 ${s.studentId}',
+            amount: s.amount,
+            lessonCount: s.totalLessons,
+            daysSinceSent: now.difference(s.createdAt).inDays,
+            expiresAt: now.add(const Duration(days: 7)),
+            lastReminderSentAt: null,
+            canResend: true,
+            status: 'pending',
+          ),
+        )
+        .toList()
+      ..sort((a, b) => b.daysSinceSent.compareTo(a.daysSinceSent));
+  }
+
+  @override
+  Future<int> getPendingPaymentCount() async {
+    final list = await getPendingPayments();
+    return list.length;
+  }
+
+  @override
+  Future<void> resendProposalReminder(String proposalId) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    // Mock: no-op; real cooldown enforced on server.
+  }
+
+  @override
+  Future<void> revokeProposal(String proposalId) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    final index = _subscriptions.indexWhere((s) => s.id == proposalId);
+    if (index != -1) {
+      _subscriptions.removeAt(index);
+      _notifyListeners();
+    }
   }
 
   void dispose() {

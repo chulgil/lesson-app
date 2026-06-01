@@ -19,6 +19,7 @@ import '../../../features/lessons/presentation/screens/teacher_attendance_screen
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
 import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
 import '../../../features/profile/presentation/screens/profile_visibility_screen.dart';
+import '../../../features/subscription/presentation/screens/payment_pending_list_screen.dart';
 import '../app_routes.dart';
 
 /// Profile and settings routes
@@ -130,6 +131,13 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.outstandingPayments,
     name: 'outstandingPayments',
     builder: (context, state) => const OutstandingPaymentsScreen(),
+  ),
+
+  // Payment-pending dashboard list — #424
+  GoRoute(
+    path: AppRoutes.paymentPending,
+    name: 'paymentPending',
+    builder: (context, state) => const PaymentPendingListScreen(),
   ),
 
   // Analytics Dashboard (Refs #354 — 3-tab: 월간요약/학생성장/수입분석)

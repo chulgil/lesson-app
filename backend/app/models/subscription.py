@@ -267,6 +267,12 @@ class SubscriptionProposal(UUIDMixin, Base):
     payment_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     rejected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # #424 입금 추적 — D+N 자동 리마인드 멱등성 (cron 두 번 돌아도 1회만 발송)
+    reminder_d1_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reminder_d3_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reminder_d7_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # 수동 [재발송] 쿨다운 30분 기준 — 자동/수동 모두 갱신
+    last_reminder_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     subscription_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("subscriptions.id"), nullable=True)
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     academy_id: Mapped[str | None] = mapped_column(String(36), nullable=True)

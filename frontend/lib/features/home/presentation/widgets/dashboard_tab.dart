@@ -19,6 +19,7 @@ import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
 import 'demo_dashboard_overlay.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 import 'quest_board_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
@@ -113,6 +114,10 @@ class DashboardTab extends ConsumerWidget {
               ),
 
               const SizedBox(height: AppSpacing.space6),
+
+              // Payment-pending dashboard card — #424. Hides itself when count=0.
+              const PaymentPendingCard(),
+              const SizedBox(height: AppSpacing.space3),
 
               // Quest Board — profile completion gamification
               const QuestBoardCard(),

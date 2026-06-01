@@ -1,6 +1,7 @@
 // Subscription feature public UI boundary.
 library;
 
+export 'presentation/widgets/payment_pending_card.dart' show PaymentPendingCard;
 export 'presentation/widgets/selectable_template_card.dart'
     show SelectableTemplateCard, kMaxTemplateSelections;
 export 'presentation/widgets/subscription_badge.dart' show SubscriptionBadge;
