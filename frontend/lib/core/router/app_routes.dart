@@ -111,6 +111,7 @@ class AppRoutes {
   static const lessonRequests = '/schedule/lesson-requests';
   static const myBookings = '/schedule/my-bookings';
   static const teacherAvailability = '/schedule/availability';
+  static const teacherVacationMode = '/schedule/vacation';
   static const groupClassDetail = '/schedule/group-class/:id';
   static const groupClassAttendance = '/schedule/group-class/:id/attendance';
   static const requestCompletion = '/schedule/request-completion';

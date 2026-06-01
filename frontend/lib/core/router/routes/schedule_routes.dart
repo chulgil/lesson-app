@@ -16,6 +16,7 @@ import '../../../features/schedule/presentation/screens/my_bookings_screen.dart'
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
 import '../../../features/schedule/presentation/screens/teacher_availability_screen.dart';
+import '../../../features/schedule/presentation/screens/teacher_vacation_mode_screen.dart';
 import '../app_routes.dart';
 
 /// Schedule and booking routes
@@ -171,6 +172,13 @@ List<GoRoute> scheduleRoutes = [
       final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
       return TeacherAvailabilityScreen(teacherId: teacherId);
     },
+  ),
+
+  // Teacher Vacation Mode (#431) — 다중 기간 휴가 등록 진입 화면 (skeleton)
+  GoRoute(
+    path: AppRoutes.teacherVacationMode,
+    name: 'teacherVacationMode',
+    builder: (context, state) => const TeacherVacationModeScreen(),
   ),
 
   // Pending Bookings (teacher approval queue)

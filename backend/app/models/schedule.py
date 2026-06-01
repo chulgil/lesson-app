@@ -100,6 +100,20 @@ class GroupClassType(str, enum.Enum):
     dropIn = "dropIn"
 
 
+class VacationDisposition(str, enum.Enum):
+    """How impacted lessons are processed when a vacation period is registered.
+
+    Spec: docs/specs/schedule/teacher_vacation_mode.md §3.2 / §5.
+    - makeupCredit: 영향 받는 각 레슨당 MakeupCredit 1건 적립
+    - freeCancel: 수강권 차감 없이 취소
+    - rollForward: 다음 회차로 이월 (수강권 자동 연장, Subscription.autoExtendedDays 증가)
+    """
+
+    makeupCredit = "makeupCredit"
+    freeCancel = "freeCancel"
+    rollForward = "rollForward"
+
+
 class NoShowPolicy(str, enum.Enum):
     """spec 4값 SSOT (#239, 결정 2026-04-29 4값 단일 enum 채택).
 
@@ -150,6 +164,38 @@ class TeacherAvailability(UUIDMixin, TimestampMixin, Base):
             "vacation_end_date IS NULL OR vacation_start_date IS NULL OR vacation_end_date >= vacation_start_date",
             name="ck_vacation_end_after_start",
         ),
+    )
+
+
+class VacationPeriod(UUIDMixin, TimestampMixin, Base):
+    """Teacher vacation period — multi-day absence with bulk lesson disposition.
+
+    Spec: docs/specs/schedule/teacher_vacation_mode.md §3.2.
+
+    Unlike per-day-of-week vacation flags on TeacherAvailability (§3.5 legacy
+    fields), this entity supports multiple concurrent vacation periods per
+    teacher and tracks how impacted lessons are processed.
+
+    Issue: #431 (G3 휴가 모드).
+    """
+
+    __tablename__ = "vacation_periods"
+
+    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)  # inclusive
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)  # inclusive
+    reason: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    default_disposition: Mapped[VacationDisposition] = mapped_column(
+        Enum(VacationDisposition, native_enum=True),
+        nullable=False,
+        default=VacationDisposition.rollForward,
+    )
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        Index("idx_vacation_teacher", "teacher_id"),
+        Index("idx_vacation_dates", "start_date", "end_date"),
+        CheckConstraint("end_date >= start_date", name="ck_vacation_period_end_after_start"),
     )
 
 

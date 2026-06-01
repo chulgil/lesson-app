@@ -55,6 +55,7 @@ from app.models.schedule import (  # noqa: F401
     LessonBooking,
     LessonRequest,
     TeacherAvailability,
+    VacationPeriod,
 )
 from app.models.schedule_ext import (  # noqa: F401
     GroupClassBooking,
