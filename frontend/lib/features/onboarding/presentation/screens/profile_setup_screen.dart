@@ -14,6 +14,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/image_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';
@@ -71,8 +72,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   List<String> get _missingFields {
     final fields = <String>[];
-    if (_nameController.text.isEmpty) fields.add(AppStrings.onboardingFieldName);
-    if (_selectedInstruments.isEmpty) fields.add(AppStrings.onboardingFieldInstrument);
+    if (_nameController.text.isEmpty) {
+      fields.add(AppStrings.onboardingFieldName);
+    }
+    if (_selectedInstruments.isEmpty) {
+      fields.add(AppStrings.onboardingFieldInstrument);
+    }
     return fields;
   }
 
@@ -96,9 +101,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
       await Future.delayed(const Duration(milliseconds: 500));
 
+      // #430: Phone verification moved to optional quest + E3 (subscription
+      // issuance) hard gate. SSO → terms → role → profile (B) → home direct.
+      ref.read(teacherOnboardingNotifierProvider.notifier).completeOnboarding();
+      await ref.read(authNotifierProvider.notifier).completeOnboarding();
+
       if (mounted) {
-        // Profile → Phone verification (mandatory) → Home
-        context.go(AppRoutes.teacherPhoneVerification);
+        context.go(AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {

@@ -7673,4 +7673,25 @@ class AppStrings {
 
   /// 학생별 미리보기 항목 카운트 ("3건").
   static String vacationImpactStudentCount(int count) => '$count건';
+
+  // -------------------------------------------------------------------------
+  // 전화인증 게이트 (#430)
+  // -------------------------------------------------------------------------
+
+  /// 수강권 발급 직전 전화인증 게이트 다이얼로그 제목.
+  static const phoneVerificationGateTitle = '전화인증이 필요해요';
+
+  /// 게이트 본문 — 학부모 신뢰 보호 사유 설명.
+  static const phoneVerificationGateBody =
+      '첫 수강권을 발급하려면 전화인증이 필요해요. 학부모님께 안전한 선생님임을 알리기 위해 전화번호를 한 번만 확인할게요.';
+
+  /// 보상 안내 — 인증 완료 시 인증 선생님 배지 부여.
+  static const phoneVerificationGateRewardLine =
+      '인증 완료 시 "인증 선생님 배지"가 프로필에 표시돼요.';
+
+  /// 게이트 CTA — 즉시 인증.
+  static const phoneVerificationGateCtaVerifyNow = '지금 인증하기';
+
+  /// 게이트 CTA — 나중에 (다이얼로그만 닫기).
+  static const phoneVerificationGateCtaLater = '나중에 하기';
 }

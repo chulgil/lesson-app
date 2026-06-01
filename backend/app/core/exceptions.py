@@ -42,6 +42,19 @@ class ValidationException(AppException):
         super().__init__(422, message, "validation_error")
 
 
+class PhoneVerificationRequiredException(AppException):
+    """Phone verification required for the requested action.
+
+    Used as the E3 (subscription issuance) hard gate per
+    docs/specs/user/phone_verification_policy.md §4.2. Frontend should
+    intercept the 409 + ``phone_verification_required`` code and redirect to
+    the verification flow.
+    """
+
+    def __init__(self, message: str = "Phone verification required"):
+        super().__init__(409, message, "phone_verification_required")
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """Register custom exception handlers on the FastAPI app."""
 
