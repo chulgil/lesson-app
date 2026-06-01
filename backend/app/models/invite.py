@@ -58,6 +58,9 @@ class Invite(UUIDMixin, Base):
     use_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    # #5 D-G3 — 재발송 추적: count + 마지막 발송 시각 (10분 쿨다운 + 운영 메트릭)
+    resent_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_resent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

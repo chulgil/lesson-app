@@ -61,20 +61,14 @@ class InviteService:
         await self.db.refresh(invite)
         return invite
 
-    async def get_invites(
-        self, *, user_id: str, page: int, size: int, offset: int
-    ) -> PaginatedResponse:
+    async def get_invites(self, *, user_id: str, page: int, size: int, offset: int) -> PaginatedResponse:
         """List invites created by the user."""
         from app.models.invite import Invite
 
         query = select(Invite).where(Invite.creator_id == user_id)
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
+        total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
 
-        result = await self.db.scalars(
-            query.order_by(Invite.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(Invite.created_at.desc()).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
     async def get_invite(self, invite_id: str) -> Any:
@@ -90,9 +84,7 @@ class InviteService:
         """Get an invite by its short code."""
         from app.models.invite import Invite
 
-        invite = await self.db.scalar(
-            select(Invite).where(Invite.invite_code == invite_code.upper())
-        )
+        invite = await self.db.scalar(select(Invite).where(Invite.invite_code == invite_code.upper()))
         if invite is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
         return invite
@@ -103,9 +95,7 @@ class InviteService:
         from app.models.invite import Invite, InviteStatus
         from app.models.teacher import Teacher
 
-        invite = await self.db.scalar(
-            select(Invite).where(Invite.invite_code == invite_code.upper())
-        )
+        invite = await self.db.scalar(select(Invite).where(Invite.invite_code == invite_code.upper()))
         if invite is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
 
@@ -162,6 +152,88 @@ class InviteService:
         return invite
 
     # -----------------------------------------------------------------------
+    # G3 — Resend / Pending list (#5 D-G3)
+    # -----------------------------------------------------------------------
+
+    RESEND_COOLDOWN_MINUTES = 10
+    RESEND_EXTEND_DAYS = 7
+
+    async def resend_invite(self, invite_id: str, current_user: Any) -> Any:
+        """Resend an invite: extend expiry, bump resent_count, resurrect if expired."""
+        from app.models.invite import Invite, InviteStatus
+
+        invite = await self.db.get(Invite, invite_id)
+        if invite is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
+        if invite.creator_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your invite")
+        if invite.status in (InviteStatus.used, InviteStatus.revoked):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invite is {invite.status.value}; cannot resend",
+            )
+
+        now = datetime.now(UTC)
+        last = invite.last_resent_at
+        if last is not None:
+            last_aware = last if last.tzinfo else last.replace(tzinfo=UTC)
+            if (now - last_aware) < timedelta(minutes=self.RESEND_COOLDOWN_MINUTES):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"재발송은 {self.RESEND_COOLDOWN_MINUTES}분에 한 번만 가능합니다. cooldown",
+                )
+
+        invite.expires_at = now + timedelta(days=self.RESEND_EXTEND_DAYS)
+        invite.resent_count = (invite.resent_count or 0) + 1
+        invite.last_resent_at = now
+        # Resurrect expired invites — the resend itself is what re-activates them.
+        if invite.status == InviteStatus.expired:
+            invite.status = InviteStatus.active
+
+        await self.db.flush()
+        await self.db.refresh(invite)
+        return invite
+
+    async def list_pending_invites(self, current_user: Any) -> dict[str, Any]:
+        """Return the creator's active, non-expired, non-used invites with D+N + can_resend."""
+        from app.models.invite import Invite, InviteStatus
+
+        now = datetime.now(UTC)
+        result = await self.db.scalars(
+            select(Invite).where(
+                Invite.creator_id == current_user.id,
+                Invite.status == InviteStatus.active,
+                Invite.expires_at > now,
+            )
+        )
+        invites = list(result.all())
+
+        cooldown = timedelta(minutes=self.RESEND_COOLDOWN_MINUTES)
+        rows: list[dict[str, Any]] = []
+        for inv in invites:
+            created = inv.created_at if inv.created_at.tzinfo else inv.created_at.replace(tzinfo=UTC)
+            last = inv.last_resent_at
+            if last is not None:
+                last_aware = last if last.tzinfo else last.replace(tzinfo=UTC)
+                can_resend = (now - last_aware) >= cooldown
+            else:
+                can_resend = True
+            rows.append(
+                {
+                    "invite_id": inv.id,
+                    "invite_code": inv.invite_code,
+                    "days_since_sent": max(0, (now - created).days),
+                    "expires_at": inv.expires_at.isoformat() if inv.expires_at else None,
+                    "resent_count": inv.resent_count or 0,
+                    "last_resent_at": inv.last_resent_at.isoformat() if inv.last_resent_at else None,
+                    "can_resend": can_resend,
+                    "note": inv.note,
+                }
+            )
+        rows.sort(key=lambda r: r["days_since_sent"], reverse=True)
+        return {"pending": rows, "total_count": len(rows)}
+
+    # -----------------------------------------------------------------------
     # Connection Requests
     # -----------------------------------------------------------------------
 
@@ -183,9 +255,7 @@ class InviteService:
 
         # Validate invite code if provided
         if invite_code:
-            invite = await self.db.scalar(
-                select(Invite).where(Invite.invite_code == invite_code.upper())
-            )
+            invite = await self.db.scalar(select(Invite).where(Invite.invite_code == invite_code.upper()))
             if invite is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -207,18 +277,10 @@ class InviteService:
         target_user = await self.db.get(User, target_id) if target_id else None
 
         target_role = (
-            target_user.role
-            if target_user is not None
-            else "teacher"
-            if current_user.role == "student"
-            else "student"
+            target_user.role if target_user is not None else "teacher" if current_user.role == "student" else "student"
         )
         target_name = (
-            target_user.name
-            if target_user is not None
-            else invite.creator_name
-            if invite is not None
-            else None
+            target_user.name if target_user is not None else invite.creator_name if invite is not None else None
         )
 
         existing_pending = await self.db.scalar(
@@ -391,9 +453,7 @@ class InviteService:
                 detail="Invite usage limit reached",
             )
 
-    async def get_pending_requests(
-        self, *, user_id: str, page: int, size: int, offset: int
-    ) -> PaginatedResponse:
+    async def get_pending_requests(self, *, user_id: str, page: int, size: int, offset: int) -> PaginatedResponse:
         """List pending connection requests for the user."""
         from app.models.invite import ConnectionRequest
 
@@ -401,9 +461,7 @@ class InviteService:
             ConnectionRequest.target_id == user_id,
             ConnectionRequest.status == "pending",
         )
-        result = await self.db.scalars(
-            query.order_by(ConnectionRequest.created_at.desc())
-        )
+        result = await self.db.scalars(query.order_by(ConnectionRequest.created_at.desc()))
         unique_items = self._latest_pending_request_per_pair(result.all())
         return PaginatedResponse.create(
             items=unique_items[offset : offset + size],
@@ -412,16 +470,12 @@ class InviteService:
             size=size,
         )
 
-    async def get_sent_requests(
-        self, *, user_id: str, page: int, size: int, offset: int
-    ) -> PaginatedResponse:
+    async def get_sent_requests(self, *, user_id: str, page: int, size: int, offset: int) -> PaginatedResponse:
         """List connection requests sent by the user."""
         from app.models.invite import ConnectionRequest
 
         query = select(ConnectionRequest).where(ConnectionRequest.requester_id == user_id)
-        result = await self.db.scalars(
-            query.order_by(ConnectionRequest.created_at.desc())
-        )
+        result = await self.db.scalars(query.order_by(ConnectionRequest.created_at.desc()))
         unique_items = self._latest_pending_request_per_pair(result.all())
         return PaginatedResponse.create(
             items=unique_items[offset : offset + size],
@@ -474,16 +528,8 @@ class InviteService:
             # Create connection
             teacher_id = conn_req.requester_id if conn_req.requester_role.value == "teacher" else conn_req.target_id
             student_id = conn_req.target_id if conn_req.requester_role.value == "teacher" else conn_req.requester_id
-            teacher_name = (
-                conn_req.requester_name
-                if conn_req.requester_role.value == "teacher"
-                else current_user.name
-            )
-            student_name = (
-                current_user.name
-                if conn_req.requester_role.value == "teacher"
-                else conn_req.requester_name
-            )
+            teacher_name = conn_req.requester_name if conn_req.requester_role.value == "teacher" else current_user.name
+            student_name = current_user.name if conn_req.requester_role.value == "teacher" else conn_req.requester_name
             connection = Connection(
                 teacher_id=teacher_id,
                 teacher_name=teacher_name,
@@ -592,13 +638,9 @@ class InviteService:
         )
         if not include_inactive:
             query = query.where(Connection.is_active.is_(True))
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
+        total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
 
-        result = await self.db.scalars(
-            query.order_by(Connection.connected_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(Connection.connected_at.desc()).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
     async def reactivate_connection(self, connection_id: str, current_user: Any) -> Any:

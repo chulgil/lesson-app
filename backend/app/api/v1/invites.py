@@ -103,6 +103,42 @@ async def revoke_invite(
 
 
 # ---------------------------------------------------------------------------
+# G3 (#5 D-G3) — Resend invite + pending list
+# `/pending` must precede the dynamic `/{invite_id}` GET further down the file
+# to avoid it being swallowed as an invite_id.
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/pending",
+    status_code=status.HTTP_200_OK,
+    summary="List the current creator's outstanding invites — #5 D-G3",
+)
+async def list_pending_invites(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> dict:
+    service = InviteService(db)
+    return await service.list_pending_invites(current_user)
+
+
+@router.post(
+    "/{invite_id}/resend",
+    response_model=InviteResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Resend invite — extend expiry, resurrect if expired — #5 D-G3",
+)
+async def resend_invite(
+    invite_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> InviteResponse:
+    service = InviteService(db)
+    result: InviteResponse = await service.resend_invite(invite_id, current_user)
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Connection Requests
 # ---------------------------------------------------------------------------
 
