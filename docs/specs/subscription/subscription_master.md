@@ -203,6 +203,8 @@ enum SubscriptionPaymentMethod {
 | `endDate` | - | O | O | 만료일 |
 | `carryOver` | - | false | true | 이월 가능 여부 |
 | `paymentConfirmed` | - | O | O | 입금 확인 여부 |
+| `scheduledLessons` | - | O | O | 실제 잡힌 레슨 수 (활성 `LessonBooking` 카운트). `remainingLessons` 와 별개 트랙. 상세: [makeup_credit_spec.md §3.2](makeup_credit_spec.md) |
+| `autoExtendedDays` | - | O | O | 휴가 모드로 자동 연장된 누적 일수. `expiresAt` 추적용. 상세: [../schedule/teacher_vacation_mode.md §5.3](../schedule/teacher_vacation_mode.md) |
 
 **잔여 횟수 계산:**
 

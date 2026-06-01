@@ -172,6 +172,8 @@
 
 ### 3.5 방학/시즌 모드
 
+> **⚠️ 2026-06-01 보강 — 휴가 모드(Vacation Mode)로 통합**: 본 §3.5 의 단일 기간(`vacationMode`/`vacationStartDate`/`vacationEndDate`) 모델은 **다중 기간(`vacationPeriods: List<VacationPeriod>`) + 3옵션 처리(보강 크레딧·무료·이월) + Recovery** 로 확장된다. 신규 SSOT: [teacher_vacation_mode.md](teacher_vacation_mode.md) (E2E 감사 #4 H-001). 본 절의 기존 단일 필드는 마이그레이션 후 deprecate 예정 — 신규 코드/스펙은 신규 스펙을 따른다.
+
 > 일반 휴무(3.4)와 구별: 휴무는 며칠~주 단위 부재. 방학 모드는 **수~달 단위 전체 운영 정지** + 수강권 자동 연장.
 
 #### 3.5.1 사용 시나리오
