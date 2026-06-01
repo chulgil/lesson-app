@@ -99,12 +99,13 @@ class _FeedbackStepState extends State<FeedbackStep> {
                                     ? '오늘 G major 스케일 연습이 많이 좋아졌어요. 손목 힘이 안정적이고 음정도 정확합니다.'
                                     : '스케일 연습이 많이 좋아졌어요…',
                                 style: AppTypography.bodyLarge.copyWith(
-                                  color: AppColors.inkPrimary,
+                                  color: AppColors.ink,
                                 ),
                                 maxLines: _isExpanded ? null : 1,
-                                overflow: _isExpanded
-                                    ? TextOverflow.visible
-                                    : TextOverflow.ellipsis,
+                                overflow:
+                                    _isExpanded
+                                        ? TextOverflow.visible
+                                        : TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -143,7 +144,7 @@ class _FeedbackStepState extends State<FeedbackStep> {
                             child: Text(
                               'D major 스케일 연습',
                               style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.inkPrimary,
+                                color: AppColors.ink,
                               ),
                             ),
                           ),

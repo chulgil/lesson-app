@@ -107,7 +107,7 @@ class _TunerStepState extends State<TunerStep> {
                     Text(
                       '${_selectedNote!} (${_getNoteName(_selectedNote!)})',
                       style: AppTypography.bodyLarge.copyWith(
-                        color: AppColors.inkPrimary,
+                        color: AppColors.ink,
                       ),
                     ),
                     SizedBox(height: AppSpacing.space2),
@@ -149,9 +149,10 @@ class _TunerStepState extends State<TunerStep> {
       selectedColor: AppColors.paperAccentSoft,
       onSelected: (_) => _onSelect(note),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      side: isSelected
-          ? BorderSide(color: AppColors.paperAccent, width: 1)
-          : BorderSide.none,
+      side:
+          isSelected
+              ? BorderSide(color: AppColors.paperAccent, width: 1)
+              : BorderSide.none,
     );
   }
 }

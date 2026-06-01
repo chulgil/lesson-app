@@ -113,11 +113,12 @@ class _MetronomeStepState extends State<MetronomeStep> {
               min: 60,
               max: 180,
               divisions: 24,
-              onChanged: widget.completed
-                  ? null
-                  : (value) {
-                      setState(() => _bpm = value.toInt());
-                    },
+              onChanged:
+                  widget.completed
+                      ? null
+                      : (value) {
+                        setState(() => _bpm = value.toInt());
+                      },
               activeColor: AppColors.paperAccent,
               inactiveColor: AppColors.inkQuaternary,
             ),
@@ -137,9 +138,10 @@ class _MetronomeStepState extends State<MetronomeStep> {
                     horizontal: AppSpacing.space2,
                   ),
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? AppColors.paperAccent
-                        : AppColors.inkQuaternary,
+                    color:
+                        isActive
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                     borderRadius: BorderRadius.zero,
                   ),
                 );
@@ -174,14 +176,14 @@ class _MetronomeStepState extends State<MetronomeStep> {
               child: ElevatedButton(
                 onPressed: null, // Disabled during playback
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent.withOpacity(0.5),
+                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.5),
                   foregroundColor: AppColors.paper,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero,
                   ),
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
-                  disabledBackgroundColor: AppColors.paperAccent.withOpacity(
-                    0.5,
+                  disabledBackgroundColor: AppColors.paperAccent.withValues(
+                    alpha: 0.5,
                   ),
                 ),
                 child: Text(
