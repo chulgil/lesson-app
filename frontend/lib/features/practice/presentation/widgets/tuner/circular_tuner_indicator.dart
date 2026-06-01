@@ -308,23 +308,15 @@ class _CentGaugePainter extends CustomPainter {
   }
 }
 
-/// Tuner info bar showing reference frequency and cent deviation.
-/// Line 1: "A4=442Hz" (fixed reference)
-/// Line 2: "+5¢" (cent deviation)
+/// Tuner info bar showing the current display note, frequency, and cents.
 class TunerInfoBar extends ConsumerWidget {
   const TunerInfoBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tunerState = ref.watch(tunerProvider);
-    final settings = tunerState.settings;
+    final infoText = ref.watch(tunerInfoDisplayProvider);
     final note = tunerState.currentNote;
-
-    // Line 1: Reference frequency (always shown)
-    final freqText = 'A4=${settings.referenceFrequency.toStringAsFixed(0)}Hz';
-
-    // Line 2: Cent deviation (shown when note detected)
-    final centText = note != null ? '${note.centDisplayString}¢' : '--';
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -335,33 +327,21 @@ class TunerInfoBar extends ConsumerWidget {
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            freqText,
-            style: AppTypography.bodyMedium.copyWith(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            centText,
-            style: AppTypography.headingSmall.copyWith(
-              fontWeight: FontWeight.bold,
-              color:
-                  note != null
-                      ? (tunerState.isPerfect
-                          ? AppColors.paperOk
-                          : (note.centDeviation < 0
-                              ? AppColors.tunerCentFlat
-                              : AppColors.tunerCentSharp))
-                      : AppColors.inkTertiary,
-            ),
-          ),
-        ],
+      child: Text(
+        infoText,
+        style: AppTypography.bodyMedium.copyWith(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+          color:
+              note != null
+                  ? (tunerState.isPerfect
+                      ? AppColors.paperOk
+                      : (note.centDeviation < 0
+                          ? AppColors.tunerCentFlat
+                          : AppColors.tunerCentSharp))
+                  : AppColors.inkTertiary,
+        ),
       ),
     );
   }

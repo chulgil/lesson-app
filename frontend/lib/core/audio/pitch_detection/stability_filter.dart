@@ -1,7 +1,7 @@
 // Stability filter for pitch detection
 // Filters out noise and stabilizes detected notes
 
-import 'dart:collection';
+import 'dart:math' as math;
 
 /// Configuration for stability filtering.
 class StabilityConfig {
@@ -52,13 +52,10 @@ class StabilityResult {
 
 /// Stability filter that requires consistent pitch over multiple frames.
 class StabilityFilter {
-  StabilityFilter({
-    this.config = const StabilityConfig(),
-  });
+  StabilityFilter({this.config = const StabilityConfig()});
 
   final StabilityConfig config;
 
-  final Queue<double> _frequencyBuffer = Queue<double>();
   double _smoothedFrequency = 0;
   int _stableCount = 0;
   double _lastStableFrequency = 0;
@@ -96,7 +93,8 @@ class StabilityFilter {
     if (_smoothedFrequency == 0) {
       _smoothedFrequency = correctedFrequency;
     } else {
-      _smoothedFrequency = config.smoothingFactor * correctedFrequency +
+      _smoothedFrequency =
+          config.smoothingFactor * correctedFrequency +
           (1 - config.smoothingFactor) * _smoothedFrequency;
     }
 
@@ -105,15 +103,10 @@ class StabilityFilter {
 
     if (isConsistent) {
       _stableCount++;
+      _lastStableFrequency = correctedFrequency;
     } else {
       _stableCount = 1;
       _lastStableFrequency = correctedFrequency;
-    }
-
-    // Update buffer
-    _frequencyBuffer.addLast(correctedFrequency);
-    if (_frequencyBuffer.length > config.stabilityFrames * 2) {
-      _frequencyBuffer.removeFirst();
     }
 
     final isStable = _stableCount >= config.stabilityFrames;
@@ -165,29 +158,14 @@ class StabilityFilter {
   bool _isConsistent(double frequency) {
     if (_lastStableFrequency == 0) return true;
 
-    // Check if within tolerance (in cents for better accuracy)
+    final hzDiff = (frequency - _lastStableFrequency).abs();
     final centsDiff = _frequencyToCents(frequency, _lastStableFrequency).abs();
-    return centsDiff < 50; // Within 50 cents = same note
+    return hzDiff <= config.frequencyTolerance && centsDiff < 50;
   }
 
   double _frequencyToCents(double freq1, double freq2) {
     if (freq1 <= 0 || freq2 <= 0) return 0;
-    return 1200 * _log2(freq1 / freq2);
-  }
-
-  double _log2(double x) => x > 0 ? _ln(x) / _ln(2) : 0;
-  double _ln(double x) {
-    // Natural log approximation
-    if (x <= 0) return 0;
-    double result = 0;
-    double term = (x - 1) / (x + 1);
-    double termSquared = term * term;
-    double currentTerm = term;
-    for (int i = 1; i <= 50; i += 2) {
-      result += currentTerm / i;
-      currentTerm *= termSquared;
-    }
-    return 2 * result;
+    return 1200 * (math.log(freq1 / freq2) / math.ln2);
   }
 
   void _reset() {
@@ -199,7 +177,6 @@ class StabilityFilter {
 
   /// Reset the filter state.
   void reset() {
-    _frequencyBuffer.clear();
     _reset();
   }
 }

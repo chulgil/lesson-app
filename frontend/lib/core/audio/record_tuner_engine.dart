@@ -39,8 +39,8 @@ class RecordTunerEngine implements TunerEngine {
   RecordTunerEngine({
     RecordTunerConfig? config,
     double referenceFrequency = 440.0,
-  })  : _config = config ?? const RecordTunerConfig(),
-        _referenceFrequency = referenceFrequency;
+  }) : _config = config ?? const RecordTunerConfig(),
+       _referenceFrequency = referenceFrequency;
 
   final RecordTunerConfig _config;
   final AudioRecorder _recorder = AudioRecorder();
@@ -71,7 +71,6 @@ class RecordTunerEngine implements TunerEngine {
   // Buffer for accumulating audio samples
   final List<double> _sampleBuffer = [];
 
-
   @override
   Stream<TunerNote?> get noteStream => _streamController.stream;
 
@@ -99,6 +98,18 @@ class RecordTunerEngine implements TunerEngine {
       threshold: 0.01 + (1 - _sensitivity) * 0.19, // 0.01 ~ 0.2
     );
   }
+
+  static RecordConfig recordConfigFor(RecordTunerConfig config) => RecordConfig(
+    encoder: AudioEncoder.pcm16bits,
+    sampleRate: config.sampleRate,
+    numChannels: 1,
+    // Prevent record package from overriding our audio session config
+    autoGain: false,
+    echoCancel: false,
+    noiseSuppress: false,
+  );
+
+  RecordConfig get _recordConfig => recordConfigFor(_config);
 
   @override
   OnPitchDetected? onPitchDetected;
@@ -132,9 +143,7 @@ class RecordTunerEngine implements TunerEngine {
         ),
       );
 
-      _amplitudeGate = AmplitudeGate(
-        threshold: _config.amplitudeThreshold,
-      );
+      _amplitudeGate = AmplitudeGate(threshold: _config.amplitudeThreshold);
 
       _isInitialized = true;
       return true;
@@ -174,23 +183,10 @@ class RecordTunerEngine implements TunerEngine {
   Future<void> _startStream() async {
     if (_isStreamActive) return;
 
-    final stream = await _recorder.startStream(
-      const RecordConfig(
-        encoder: AudioEncoder.pcm16bits,
-        sampleRate: 44100,
-        numChannels: 1,
-        // Prevent record package from overriding our audio session config
-        autoGain: false,
-        echoCancel: false,
-        noiseSuppress: false,
-      ),
-    );
+    final stream = await _recorder.startStream(_recordConfig);
 
     _lastDataTime = DateTime.now();
-    _audioSubscription = stream.listen(
-      _onAudioData,
-      onError: _onAudioError,
-    );
+    _audioSubscription = stream.listen(_onAudioData, onError: _onAudioError);
 
     _isStreamActive = true;
   }
