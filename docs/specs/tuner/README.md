@@ -14,7 +14,7 @@ Tonal Energy 스타일의 전문가급 원형 튜너 + 고양이 캐릭터 피�
 - 원형 12음계 인디케이터 (자연음/반음 색상 구분)
 - 고양이 캐릭터 + 말풍선 피드백
 - Perfect/Good/Miss 판정 + 콤보 시스템
-- 음악 전공생 기능: 기준주파수(430-450Hz), 조옮김, 이명동음
+- 음악 전공생 기능: 기준주파수(430-450Hz), 조옮김, 이명동음, 오선 표기
 
 ---
 
@@ -36,8 +36,9 @@ lib/
     └── practice/
         ├── domain/
         │   └── entities/
-        │       ├── tuner_types.dart       # TunerNote, TuningStatus, etc.
-        │       └── tuner_settings.dart    # TunerSettings model
+        │       ├── tuner_types.dart        # TunerNote, TuningStatus, etc.
+        │       ├── tuner_settings.dart     # TunerSettings model
+        │       └── tuner_display_note.dart # Display note model
         │
         └── presentation/
             ├── providers/
@@ -47,9 +48,8 @@ lib/
             └── widgets/
                 ├── practice_tools_modal.dart     # Metronome/Tuner tabs
                 └── tuner/
-                    ├── circular_tuner_indicator.dart  # 12-note circle
+                    ├── circular_tuner_indicator.dart  # 12-note circle + TunerInfoBar
                     ├── tuner_cat_indicator.dart       # Cat + animations
-                    ├── tuner_info_bar.dart            # A4·442Hz·+5¢
                     └── tuner_settings_sheet.dart      # Settings bottom sheet
 ```
 
@@ -114,27 +114,53 @@ lib/
 ```dart
 class TunerSettings {
   double referenceFrequency;     // 430-450Hz (기본: 440Hz)
-  Transposition transposition;   // C, Bb, F, Eb, A
+  Transposition transposition;   // C, Bb, Eb, F, A
   EnharmonicMode enharmonicMode; // sharp, flat, both
   TunerDifficulty difficulty;    // beginner, intermediate, advanced
-  ClefType clefType;             // treble, bass
+  ClefType clefType;             // treble, bass, alto
   bool autoSwitchClef;           // 자동 음자리표 전환
   bool showCombo;                // 콤보 표시 여부
   bool vibrationFeedback;        // 진동 피드백
 }
 ```
 
-### 4.3 Hive 저장
+### 4.2 Hive 저장
 - 모든 설정값은 `TunerStorageService`를 통해 Hive에 저장됨
 - 앱 재시작 후에도 설정 유지
 
-### 4.2 난이도별 허용 오차
+### 4.3 난이도별 허용 오차
 
 | 난이도 | Perfect | Good |
 |--------|---------|------|
-| Beginner | ±15 cent | ±30 cent |
-| Intermediate | ±10 cent | ±20 cent |
+| Beginner | ±20 cent | ±40 cent |
+| Intermediate | ±15 cent | ±30 cent |
 | Advanced | ±5 cent | ±10 cent |
+
+### 4.4 조옮김과 표시 음표
+
+피치 감지는 항상 콘서트 피치 기준으로 유지한다. 화면에 표시하는 음표는 `TunerDisplayNote`에서 설정값을 적용해 별도로 계산한다.
+
+| 설정 | 의미 | 콘서트 C4 표시 |
+|------|------|----------------|
+| C | 실음 악기 | C4 |
+| Bb | Bb관 기보음 | D4 |
+| Eb | Eb관 기보음 | A4 |
+| F | F관 기보음 | G4 |
+| A | A관 기보음 | D#/Eb4 |
+
+- 조옮김은 음 이름뿐 아니라 옥타브 경계도 함께 보정한다.
+- 예: 콘서트 B4를 Bb관으로 표시하면 C#5가 된다.
+- 큰 음표, 정보바, 원형 인디케이터, 물고기 위치, 오선은 같은 표시 음표를 사용한다.
+
+### 4.5 이명동음과 오선 표기
+
+`EnharmonicMode.flatOnly`에서는 C# 계열 음을 Db처럼 표시하고, 오선 위치도 D 자리에 flat accidental을 그린다.
+
+| 모드 | 화면 표시 | 오선 accidental |
+|------|-----------|-----------------|
+| sharpOnly | C# | sharp |
+| flatOnly | Db | flat |
+| both | C#/Db | sharp 기준 |
 
 ---
 

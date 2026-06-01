@@ -10,6 +10,7 @@ import '../../../../core/audio/record_tuner_engine.dart';
 import '../../../../core/audio/tuner_engine.dart';
 import '../../../../core/audio/tuner_storage_service.dart';
 import '../../domain/entities/tuner_settings.dart';
+import '../../domain/entities/tuner_display_note.dart';
 import '../../domain/entities/tuner_types.dart';
 import 'recording_provider.dart';
 
@@ -562,31 +563,18 @@ class Tuner extends _$Tuner {
 
 /// Provider for current note display name.
 @riverpod
-String? currentNoteName(Ref ref) {
+TunerDisplayNote? currentDisplayNote(Ref ref) {
   final tunerState = ref.watch(tunerProvider);
   final note = tunerState.currentNote;
   if (note == null) return null;
 
-  final settings = tunerState.settings;
+  return TunerDisplayNote.from(note, tunerState.settings);
+}
 
-  // Get display name based on enharmonic mode
-  final displayName = switch (settings.enharmonicMode) {
-    EnharmonicMode.sharpOnly => note.name.sharpName,
-    EnharmonicMode.flatOnly => note.name.flatName,
-    EnharmonicMode.both => note.name.enharmonicName,
-  };
-
-  // Apply transposition display if not concert pitch
-  if (settings.transposition != Transposition.c) {
-    final transposed = settings.transposition.transpose(note.name);
-    final transposedName =
-        settings.enharmonicMode == EnharmonicMode.flatOnly
-            ? transposed.flatName
-            : transposed.sharpName;
-    return '$displayName ($transposedName${note.octave})';
-  }
-
-  return '$displayName${note.octave}';
+/// Provider for current note display name.
+@riverpod
+String? currentNoteName(Ref ref) {
+  return ref.watch(currentDisplayNoteProvider)?.fullName;
 }
 
 /// Provider for tuner info display string (e.g., "A4 · 442Hz · +5¢").

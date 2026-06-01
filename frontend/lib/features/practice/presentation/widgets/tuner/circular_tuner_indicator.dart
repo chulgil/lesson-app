@@ -127,8 +127,9 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
   Widget build(BuildContext context) {
     // Watch tuner state for perfect highlight
     final tunerState = ref.watch(tunerProvider);
+    final displayNote = ref.watch(currentDisplayNoteProvider);
     final isPerfectMatch =
-        tunerState.isPerfect && tunerState.currentNote?.name == widget.note;
+        tunerState.isPerfect && displayNote?.name == widget.note;
     // Calculate position on circle
     // Start from top (12 o'clock = C) and go clockwise
     final angle =

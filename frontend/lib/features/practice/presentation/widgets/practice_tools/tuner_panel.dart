@@ -109,7 +109,7 @@ class CurrentNoteDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tunerState = ref.watch(tunerProvider);
-    final currentNote = tunerState.currentNote;
+    final displayNote = ref.watch(currentDisplayNoteProvider);
     final isPerfect = tunerState.isPerfect;
 
     // Apply 1.1x size reduction and scale
@@ -119,7 +119,7 @@ class CurrentNoteDisplay extends ConsumerWidget {
     final noteFontSize = 72 * adjustedScale;
     final octaveFontSize = 42 * adjustedScale;
 
-    if (currentNote == null) {
+    if (displayNote == null) {
       // No note detected - show nothing (removed arrows)
       return const SizedBox.shrink();
     }
@@ -137,7 +137,7 @@ class CurrentNoteDisplay extends ConsumerWidget {
       children: [
         // Note name
         Text(
-          currentNote.name.sharpName,
+          displayNote.displayName,
           style: TextStyle(
             fontSize: noteFontSize,
             fontWeight: FontWeight.bold,
@@ -146,7 +146,7 @@ class CurrentNoteDisplay extends ConsumerWidget {
         ),
         // Octave
         Text(
-          '${currentNote.octave}',
+          '${displayNote.octave}',
           style: TextStyle(
             fontSize: octaveFontSize,
             fontWeight: FontWeight.w600,

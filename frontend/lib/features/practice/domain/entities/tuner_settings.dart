@@ -153,6 +153,7 @@ class TunerSettings {
         other.enharmonicMode == enharmonicMode &&
         other.difficulty == difficulty &&
         other.clefType == clefType &&
+        other.autoSwitchClef == autoSwitchClef &&
         other.showCombo == showCombo &&
         other.vibrationFeedback == vibrationFeedback;
   }
@@ -165,6 +166,7 @@ class TunerSettings {
       enharmonicMode,
       difficulty,
       clefType,
+      autoSwitchClef,
       showCombo,
       vibrationFeedback,
     );

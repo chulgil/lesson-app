@@ -150,6 +150,7 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
   Widget build(BuildContext context) {
     final tunerState = ref.watch(tunerProvider);
     final currentNote = tunerState.currentNote;
+    final displayNote = ref.watch(currentDisplayNoteProvider);
     final isListening = tunerState.isListening;
     final isPerfect = tunerState.isPerfect;
 
@@ -157,13 +158,13 @@ class _TunerFishIndicatorState extends ConsumerState<TunerFishIndicator>
     _updateAnimationSpeed(isPerfect);
 
     // Update angle animation
-    if (currentNote != null) {
+    if (currentNote != null && displayNote != null) {
       // If perfect, snap to note center (centDeviation = 0)
       // Otherwise, use actual centDeviation for smooth movement
       final effectiveCentDeviation =
           isPerfect ? 0.0 : currentNote.centDeviation;
       final newTarget = _calculateAngle(
-        currentNote.name,
+        displayNote.name,
         effectiveCentDeviation,
       );
       _updateAngle(newTarget);

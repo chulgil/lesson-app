@@ -6,7 +6,26 @@ part of 'tuner_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentNoteNameHash() => r'acda1400fbf92b98314684f5ba96d5e4d67c1e7a';
+String _$currentDisplayNoteHash() =>
+    r'd9f03f6366a8d41c36391d1ae0e25dda6aadb785';
+
+/// Provider for current note display name.
+///
+/// Copied from [currentDisplayNote].
+@ProviderFor(currentDisplayNote)
+final currentDisplayNoteProvider =
+    AutoDisposeProvider<TunerDisplayNote?>.internal(
+  currentDisplayNote,
+  name: r'currentDisplayNoteProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentDisplayNoteHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentDisplayNoteRef = AutoDisposeProviderRef<TunerDisplayNote?>;
+String _$currentNoteNameHash() => r'21e776737dc0fab6ad171ed128f59f4da87f15dd';
 
 /// Provider for current note display name.
 ///

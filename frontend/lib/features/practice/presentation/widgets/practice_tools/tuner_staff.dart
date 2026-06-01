@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../domain/entities/tuner_display_note.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
@@ -21,19 +22,22 @@ class TunerStaff extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tunerState = ref.watch(tunerProvider);
     final currentNote = tunerState.currentNote;
+    final currentDisplayNote = ref.watch(currentDisplayNoteProvider);
     final clefType = tunerState.settings.clefType;
     final autoSwitchClef = tunerState.settings.autoSwitchClef;
 
     // Use beginner-level threshold (±20 cents) for staff display
-    final isWithinBeginnerThreshold = currentNote != null &&
+    final isWithinBeginnerThreshold =
+        currentNote != null &&
         currentNote.centDeviation.abs() <= TunerDifficulty.beginner.perfectCent;
 
-    final displayNote = isWithinBeginnerThreshold ? currentNote : null;
+    final displayNote = isWithinBeginnerThreshold ? currentDisplayNote : null;
 
     // Determine effective clef (auto-switch only if enabled in settings)
-    final effectiveClef = displayNote != null
-        ? _getEffectiveClef(displayNote, clefType, autoSwitchClef)
-        : clefType;
+    final effectiveClef =
+        displayNote != null
+            ? _getEffectiveClef(displayNote, clefType, autoSwitchClef)
+            : clefType;
 
     // Get SVG for the clef
     final clefSvg = switch (effectiveClef) {
@@ -66,10 +70,7 @@ class TunerStaff extends ConsumerWidget {
         clipBehavior: Clip.none,
         children: [
           // Layer 1: Staff lines
-          CustomPaint(
-            size: Size(width, height),
-            painter: StaffLinesPainter(),
-          ),
+          CustomPaint(size: Size(width, height), painter: StaffLinesPainter()),
 
           // Layer 2: Clef SVG (only set height, let width auto-calculate to preserve aspect ratio)
           Positioned(
@@ -104,8 +105,11 @@ class TunerStaff extends ConsumerWidget {
   /// Automatically switches to bass clef for low notes (C3 and below in treble)
   /// to avoid notes going too far below the staff.
   ClefType _getEffectiveClef(
-      TunerNote note, ClefType preferredClef, bool autoSwitch) {
-    final naturalName = note.name.sharpName.replaceAll('#', '');
+    TunerDisplayNote note,
+    ClefType preferredClef,
+    bool autoSwitch,
+  ) {
+    final naturalName = note.staffNaturalName;
 
     // Always auto-switch for very low/high notes to keep them on staff
     // For treble clef: switch to bass for notes below E3
@@ -249,10 +253,11 @@ Map<String, double> getPositionsForClef(ClefType clef) {
 class StaffLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.inkTertiary
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = AppColors.inkTertiary
+          ..strokeWidth = 1.0
+          ..style = PaintingStyle.stroke;
 
     final lineSpacing = size.height / 6;
     final startX = 0.0;
@@ -276,7 +281,7 @@ class NotePainter extends CustomPainter {
     required this.lineSpacing,
   });
 
-  final TunerNote note;
+  final TunerDisplayNote note;
   final ClefType effectiveClef;
   final double lineSpacing;
 
@@ -306,7 +311,7 @@ class NotePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final naturalName = note.name.sharpName.replaceAll('#', '');
+    final naturalName = note.staffNaturalName;
     final position = _getPositionForNote(naturalName, note.octave);
 
     final y = position * lineSpacing;
@@ -314,9 +319,10 @@ class NotePainter extends CustomPainter {
     final noteRadius = lineSpacing * 0.55;
 
     // Draw note head
-    final notePaint = Paint()
-      ..color = AppColors.paperAccent
-      ..style = PaintingStyle.fill;
+    final notePaint =
+        Paint()
+          ..color = AppColors.paperAccent
+          ..style = PaintingStyle.fill;
 
     canvas.save();
     canvas.translate(x, y);
@@ -332,11 +338,12 @@ class NotePainter extends CustomPainter {
     canvas.restore();
 
     // Draw stem
-    final stemPaint = Paint()
-      ..color = AppColors.paperAccent
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    final stemPaint =
+        Paint()
+          ..color = AppColors.paperAccent
+          ..strokeWidth = 1.5
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
 
     final stemUp = position >= 3.0;
     final stemLength = lineSpacing * 3.5;
@@ -358,10 +365,11 @@ class NotePainter extends CustomPainter {
     }
 
     // Draw ledger lines if needed
-    final ledgerPaint = Paint()
-      ..color = AppColors.inkTertiary
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
+    final ledgerPaint =
+        Paint()
+          ..color = AppColors.inkTertiary
+          ..strokeWidth = 1.0
+          ..style = PaintingStyle.stroke;
 
     final ledgerWidth = noteRadius * 2.5;
 
@@ -387,42 +395,57 @@ class NotePainter extends CustomPainter {
       }
     }
 
-    // Draw sharp symbol if accidental
-    if (note.name.isAccidental) {
-      final accidentalPaint = Paint()
-        ..color = AppColors.paperAccent
-        ..strokeWidth = 1.5
-        ..style = PaintingStyle.stroke;
+    // Draw accidental symbol if needed
+    if (note.staffAccidental != TunerAccidental.natural) {
+      final accidentalPaint =
+          Paint()
+            ..color = AppColors.paperAccent
+            ..strokeWidth = 1.5
+            ..style = PaintingStyle.stroke;
 
       final accidentalX = x - noteRadius * 2.5;
       final accidentalSize = lineSpacing * 0.5;
 
-      // Sharp symbol (#)
-      canvas.drawLine(
-        Offset(accidentalX - accidentalSize * 0.3, y - accidentalSize),
-        Offset(accidentalX - accidentalSize * 0.3, y + accidentalSize),
-        accidentalPaint,
-      );
-      canvas.drawLine(
-        Offset(accidentalX + accidentalSize * 0.3, y - accidentalSize),
-        Offset(accidentalX + accidentalSize * 0.3, y + accidentalSize),
-        accidentalPaint,
-      );
-      canvas.drawLine(
-        Offset(accidentalX - accidentalSize * 0.6, y - accidentalSize * 0.3),
-        Offset(accidentalX + accidentalSize * 0.6, y - accidentalSize * 0.5),
-        accidentalPaint,
-      );
-      canvas.drawLine(
-        Offset(accidentalX - accidentalSize * 0.6, y + accidentalSize * 0.3),
-        Offset(accidentalX + accidentalSize * 0.6, y + accidentalSize * 0.1),
-        accidentalPaint,
-      );
+      if (note.staffAccidental == TunerAccidental.sharp) {
+        canvas.drawLine(
+          Offset(accidentalX - accidentalSize * 0.3, y - accidentalSize),
+          Offset(accidentalX - accidentalSize * 0.3, y + accidentalSize),
+          accidentalPaint,
+        );
+        canvas.drawLine(
+          Offset(accidentalX + accidentalSize * 0.3, y - accidentalSize),
+          Offset(accidentalX + accidentalSize * 0.3, y + accidentalSize),
+          accidentalPaint,
+        );
+        canvas.drawLine(
+          Offset(accidentalX - accidentalSize * 0.6, y - accidentalSize * 0.3),
+          Offset(accidentalX + accidentalSize * 0.6, y - accidentalSize * 0.5),
+          accidentalPaint,
+        );
+        canvas.drawLine(
+          Offset(accidentalX - accidentalSize * 0.6, y + accidentalSize * 0.3),
+          Offset(accidentalX + accidentalSize * 0.6, y + accidentalSize * 0.1),
+          accidentalPaint,
+        );
+      } else {
+        final path =
+            Path()
+              ..moveTo(accidentalX - accidentalSize * 0.15, y - accidentalSize)
+              ..lineTo(accidentalX - accidentalSize * 0.15, y + accidentalSize)
+              ..quadraticBezierTo(
+                accidentalX + accidentalSize * 0.6,
+                y + accidentalSize * 0.15,
+                accidentalX - accidentalSize * 0.15,
+                y,
+              );
+        canvas.drawPath(path, accidentalPaint);
+      }
     }
   }
 
   @override
   bool shouldRepaint(covariant NotePainter oldDelegate) {
-    return oldDelegate.note != note || oldDelegate.effectiveClef != effectiveClef;
+    return oldDelegate.note != note ||
+        oldDelegate.effectiveClef != effectiveClef;
   }
 }

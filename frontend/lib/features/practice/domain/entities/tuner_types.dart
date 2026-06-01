@@ -161,16 +161,16 @@ enum Transposition {
   c(0),
 
   /// Bb instruments (clarinet, trumpet, soprano sax)
-  bb(-2),
+  bb(2),
 
   /// Eb instruments (alto sax, baritone sax)
-  eb(-9),
+  eb(9),
 
   /// F instruments (horn)
-  f(-7),
+  f(7),
 
   /// A instruments (clarinet in A)
-  a(-3);
+  a(3);
 
   const Transposition(this.semitoneOffset);
 
