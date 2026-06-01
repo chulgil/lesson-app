@@ -65,12 +65,16 @@ class _ZoomableWaveformProgressBarState
   // For distinguishing tap from pan
   bool _isPanning = false;
   bool _isZooming = false;
+  bool _isScrubbing = false;
+  int _activePointerCount = 0;
+  Offset? _pointerStartPosition;
 
   // For reliable tap detection on iOS
   bool _isInScaleGesture = false;
   double _maxMoveDistance = 0.0;
-  static const double _tapThreshold =
-      15.0; // Max movement to be considered a tap
+  static const double _tapThreshold = 15.0;
+  static const double _scrubStartThreshold = 3.0;
+  static const double _markerTouchRadius = 24.0;
 
   /// Convert local x position to progress value considering zoom
   double _localXToProgress(double localX, double width) {
@@ -90,7 +94,7 @@ class _ZoomableWaveformProgressBarState
   /// Check if a marker is near the touch point
   bool _isNearMarker(double touchX, double markerProgress, double width) {
     final markerX = _progressToLocalX(markerProgress, width);
-    return (touchX - markerX).abs() < 20; // 20px touch target
+    return (touchX - markerX).abs() <= _markerTouchRadius;
   }
 
   void _handleScaleStart(ScaleStartDetails details, double width) {
@@ -99,8 +103,10 @@ class _ZoomableWaveformProgressBarState
     _scaleStartPoint = details.localFocalPoint;
     _isPanning = false;
     _isZooming = false;
+    _isScrubbing = false;
     _isInScaleGesture = true;
     _maxMoveDistance = 0.0;
+    _pointerStartPosition = details.localFocalPoint;
 
     // Check if starting on a marker
     final localX = details.localFocalPoint.dx;
@@ -140,6 +146,16 @@ class _ZoomableWaveformProgressBarState
       } else if (_isDraggingMarkerB && widget.onABMarkerDrag != null) {
         widget.onABMarkerDrag!(false, newProgress);
       }
+      return;
+    }
+
+    if (_scale <= widget.minScale &&
+        details.scale == 1.0 &&
+        details.pointerCount == 1 &&
+        _maxMoveDistance > _scrubStartThreshold) {
+      _isScrubbing = true;
+      widget.onSeek(_localXToProgress(details.localFocalPoint.dx, width));
+      _lastFocalPoint = details.localFocalPoint;
       return;
     }
 
@@ -194,6 +210,7 @@ class _ZoomableWaveformProgressBarState
     final isTap =
         _maxMoveDistance < _tapThreshold &&
         !_isZooming &&
+        !_isScrubbing &&
         !_isDraggingMarkerA &&
         !_isDraggingMarkerB;
 
@@ -207,9 +224,42 @@ class _ZoomableWaveformProgressBarState
     _isDraggingMarkerB = false;
     _isPanning = false;
     _isZooming = false;
+    _isScrubbing = false;
     _isInScaleGesture = false;
     _maxMoveDistance = 0.0;
     _scaleStartPoint = null;
+    _pointerStartPosition = null;
+  }
+
+  void _handlePointerDown(PointerDownEvent details) {
+    _activePointerCount += 1;
+    _pointerStartPosition = details.localPosition;
+  }
+
+  void _handlePointerMove(PointerMoveEvent details, double width) {
+    if (_activePointerCount != 1 ||
+        _scale > widget.minScale ||
+        _isZooming ||
+        _isDraggingMarkerA ||
+        _isDraggingMarkerB) {
+      return;
+    }
+
+    final start = _pointerStartPosition;
+    if (start == null ||
+        (details.localPosition - start).distance <= _scrubStartThreshold) {
+      return;
+    }
+
+    _isScrubbing = true;
+    widget.onSeek(_localXToProgress(details.localPosition.dx, width));
+  }
+
+  void _handlePointerEnd() {
+    _activePointerCount = (_activePointerCount - 1).clamp(0, 1000);
+    if (_activePointerCount == 0) {
+      _pointerStartPosition = null;
+    }
   }
 
   /// Handle tap gesture for reliable seek on iOS
@@ -274,32 +324,38 @@ class _ZoomableWaveformProgressBarState
               ),
 
             // Waveform
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              // Use onTapDown for desktop (macOS) for immediate click response
-              onTapDown:
-                  (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-                      ? (details) => _handleTap(details, width)
-                      : null,
-              onTapUp: (details) => _handleTapUp(details, width),
-              onScaleStart: (details) => _handleScaleStart(details, width),
-              onScaleUpdate: (details) => _handleScaleUpdate(details, width),
-              onScaleEnd: (details) => _handleScaleEnd(details, width),
-              child: ClipRRect(
-                child: Container(
-                  height: widget.height,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSecondaryDark,
+            Listener(
+              onPointerDown: _handlePointerDown,
+              onPointerMove: (details) => _handlePointerMove(details, width),
+              onPointerUp: (_) => _handlePointerEnd(),
+              onPointerCancel: (_) => _handlePointerEnd(),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                // Use onTapDown for desktop (macOS) for immediate click response
+                onTapDown:
+                    (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                        ? (details) => _handleTap(details, width)
+                        : null,
+                onTapUp: (details) => _handleTapUp(details, width),
+                onScaleStart: (details) => _handleScaleStart(details, width),
+                onScaleUpdate: (details) => _handleScaleUpdate(details, width),
+                onScaleEnd: (details) => _handleScaleEnd(details, width),
+                child: ClipRRect(
+                  child: Container(
+                    height: widget.height,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceSecondaryDark,
                     ),
-                  child: CustomPaint(
-                    painter: _ZoomableWaveformPainter(
-                      progress: widget.progress.clamp(0.0, 1.0),
-                      abLoop: widget.abLoop,
-                      duration: widget.duration,
-                      scale: _scale,
-                      offset: _offset,
+                    child: CustomPaint(
+                      painter: _ZoomableWaveformPainter(
+                        progress: widget.progress.clamp(0.0, 1.0),
+                        abLoop: widget.abLoop,
+                        duration: widget.duration,
+                        scale: _scale,
+                        offset: _offset,
+                      ),
+                      size: Size(width, widget.height),
                     ),
-                    size: Size(width, widget.height),
                   ),
                 ),
               ),
@@ -573,9 +629,7 @@ class _MiniMapState extends State<_MiniMap> {
               (details) => _handleDragUpdate(details, width),
           child: Container(
             height: 20,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceDark,
-              ),
+            decoration: BoxDecoration(color: AppColors.surfaceDark),
             child: CustomPaint(
               painter: _MiniMapPainter(
                 progress: widget.progress,
