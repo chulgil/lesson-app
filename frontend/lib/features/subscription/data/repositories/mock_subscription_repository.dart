@@ -713,6 +713,28 @@ class MockSubscriptionRepository implements SubscriptionRepository {
     return updated;
   }
 
+  @override
+  Future<Subscription> undoConfirmPayment(String id) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    final index = _subscriptions.indexWhere((s) => s.id == id);
+    if (index == -1) {
+      throw Exception('Subscription not found: $id');
+    }
+    final current = _subscriptions[index];
+    if (!current.paymentConfirmed) {
+      throw Exception('Payment is not confirmed; nothing to undo');
+    }
+    final now = DateTime.now();
+    final updated = current.copyWith(
+      paymentConfirmed: false,
+      clearPaymentConfirmedAt: true,
+      updatedAt: now,
+    );
+    _subscriptions[index] = updated;
+    _notifyListeners();
+    return updated;
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // Usage History Implementation
   // ═══════════════════════════════════════════════════════════════════

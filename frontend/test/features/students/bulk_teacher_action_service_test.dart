@@ -279,6 +279,10 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
   }) => throw UnimplementedError();
 
   @override
+  Future<Subscription> undoConfirmPayment(String id) =>
+      throw UnimplementedError();
+
+  @override
   Future<List<SubscriptionUsage>> getUsageHistory(
     String subscriptionId,
   ) async => [];

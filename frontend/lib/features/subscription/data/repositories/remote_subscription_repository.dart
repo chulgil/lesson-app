@@ -174,6 +174,12 @@ class RemoteSubscriptionRepository implements SubscriptionRepository {
     return Subscription.fromJson(response.data as Map<String, dynamic>);
   }
 
+  @override
+  Future<Subscription> undoConfirmPayment(String id) async {
+    final response = await _apiClient.post('/subscriptions/$id/undo-confirm');
+    return Subscription.fromJson(response.data as Map<String, dynamic>);
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // Usage History
   // ═══════════════════════════════════════════════════════════════════

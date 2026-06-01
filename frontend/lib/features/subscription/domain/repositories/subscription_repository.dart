@@ -63,6 +63,14 @@ abstract class SubscriptionRepository {
     SubscriptionPaymentMethod? paymentMethod,
   });
 
+  /// Undo a payment confirmation within the 24h window — #426.
+  ///
+  /// Server rejects with 400/409 if:
+  /// - payment is not yet confirmed
+  /// - first lesson has already been consumed (`firstLessonConsumedAt` set)
+  /// - 24h window since `paymentConfirmedAt` has elapsed
+  Future<Subscription> undoConfirmPayment(String id);
+
   // ═══════════════════════════════════════════════════════════════════
   // Usage History
   // ═══════════════════════════════════════════════════════════════════
