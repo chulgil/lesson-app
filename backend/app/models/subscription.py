@@ -122,6 +122,11 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     )
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     payment_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # 첫 레슨 차감 시각. Undo 차단 기준 — None 일 때만 입금 확인 되돌리기 가능 (#426)
+    first_lesson_consumed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     @property
     def payment_status(self) -> str:
@@ -139,10 +144,7 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
 
     __table_args__ = (
         CheckConstraint(
-            "used_lessons >= 0 "
-            "AND bonus_count >= 0 "
-            "AND total_reschedule_allowance >= 0 "
-            "AND used_reschedule_count >= 0",
+            "used_lessons >= 0 AND bonus_count >= 0 AND total_reschedule_allowance >= 0 AND used_reschedule_count >= 0",
             name="ck_subscriptions_non_negative_counters",
         ),
         CheckConstraint(
@@ -215,9 +217,7 @@ class SubscriptionTemplate(UUIDMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     is_auto_proposal_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
-    __table_args__ = (
-        Index("idx_template_teacher", "teacher_id"),
-    )
+    __table_args__ = (Index("idx_template_teacher", "teacher_id"),)
 
 
 class SubscriptionProposal(UUIDMixin, Base):

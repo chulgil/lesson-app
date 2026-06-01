@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -207,10 +207,12 @@ class SubscriptionService:
 
         # Notify student about new subscription
         from app.models.student import Student
+
         _student = await self.db.get(Student, data.student_id)
         if _student and _student.user_id:
             from app.models.notification import NotificationPriority
             from app.services.notification_service import NotificationService
+
             notification_service = NotificationService(self.db)
             await notification_service.create_and_send(
                 user_id=_student.user_id,
@@ -275,6 +277,10 @@ class SubscriptionService:
 
         # Update counters
         sub.used_lessons = (sub.used_lessons or 0) + 1
+
+        # #426: stamp first lesson consumption — blocks Undo of payment confirmation.
+        if sub.first_lesson_consumed_at is None:
+            sub.first_lesson_consumed_at = datetime.now(UTC)
 
         await self.db.flush()
         await self.db.refresh(sub)
@@ -417,9 +423,7 @@ class SubscriptionService:
         else:
             query = query.where(False)
 
-        result = await self.db.scalars(
-            query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc())
-        )
+        result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc()))
 
         latest_by_session: dict[tuple[str, int | None], Any] = {}
         for event in result.all():
@@ -460,9 +464,7 @@ class SubscriptionService:
         suggested_slots = [slot.model_dump(mode="json") for slot in data.suggested_slots]
         event_type = RequestEventType(data.event_type)
         schedule_change_type = (
-            ScheduleChangeType(data.schedule_change_type)
-            if data.schedule_change_type is not None
-            else None
+            ScheduleChangeType(data.schedule_change_type) if data.schedule_change_type is not None else None
         )
         proposed_day_of_week = data.proposed_day_of_week
         proposed_time = data.proposed_time
@@ -546,11 +548,7 @@ class SubscriptionService:
         if data.session_number is not None:
             query = query.where(RequestEvent.session_number == data.session_number)
 
-        latest = (
-            await self.db.scalars(
-                query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc())
-            )
-        ).first()
+        latest = (await self.db.scalars(query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc()))).first()
         if latest is None or latest.event_type not in pending_source_types:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -736,10 +734,170 @@ class SubscriptionService:
         sub.payment_confirmed_at = datetime.now(UTC)
         if data.payment_method:
             sub.payment_method = PaymentMethod(data.payment_method)
+
+        # #426: stash relation status so Undo can restore it.
+        await self._link_subscription_to_relation(sub)
+
         await self._notify_deposit_confirmed(sub, NotificationService(self.db))
         await self.db.flush()
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
+
+    async def undo_confirm_payment(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
+        """Undo a manual tuition deposit confirmation (#426).
+
+        Allowed when:
+          - payment was confirmed (payment_confirmed=True)
+          - first lesson has not yet been consumed (first_lesson_consumed_at is None)
+          - within 24h of payment_confirmed_at
+        """
+        from app.services.notification_service import NotificationService
+
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
+
+        if not sub.payment_confirmed:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment is not confirmed; nothing to undo",
+            )
+        if sub.first_lesson_consumed_at is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="첫 레슨 차감 후에는 입금 확인을 되돌릴 수 없습니다.",
+            )
+
+        confirmed_at = sub.payment_confirmed_at
+        now = datetime.now(UTC)
+        if confirmed_at is not None:
+            confirmed_at_aware = confirmed_at if confirmed_at.tzinfo else confirmed_at.replace(tzinfo=UTC)
+            if (now - confirmed_at_aware) > timedelta(hours=24):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="입금 확인 24h window 가 만료되었습니다.",
+                )
+
+        # 1) Roll back subscription deposit state.
+        sub.payment_confirmed = False
+        sub.payment_confirmed_at = None
+
+        # 2) Restore relation from previous_status stash.
+        await self._unlink_subscription_from_relation(sub)
+
+        # 3) Cancel auto-generated future lessons tied to this subscription.
+        await self._cancel_auto_generated_lessons(sub)
+
+        # 4) Notify student/parent that the deposit confirmation was undone.
+        await self._notify_deposit_undone(sub, NotificationService(self.db))
+
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return await self._subscription_response(sub)
+
+    async def _link_subscription_to_relation(self, subscription: Any) -> None:
+        """Stash relation status and mark this subscription as the active one (#426)."""
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+
+        teacher_ids = await self._teacher_ids_for_subscription(subscription)
+        if not teacher_ids:
+            return
+        relation = await self.db.scalar(
+            select(TeacherStudentRelation).where(
+                TeacherStudentRelation.teacher_id.in_(teacher_ids),
+                TeacherStudentRelation.student_id == subscription.student_id,
+            )
+        )
+        if relation is None:
+            return
+        if relation.status != RelationStatus.active:
+            relation.previous_status = relation.status
+            relation.status = RelationStatus.active
+        relation.active_subscription_id = subscription.id
+
+    async def _unlink_subscription_from_relation(self, subscription: Any) -> None:
+        """Restore previous_status and clear active_subscription_id on Undo (#426)."""
+        from app.models.relationship import TeacherStudentRelation
+
+        teacher_ids = await self._teacher_ids_for_subscription(subscription)
+        if not teacher_ids:
+            return
+        relation = await self.db.scalar(
+            select(TeacherStudentRelation).where(
+                TeacherStudentRelation.teacher_id.in_(teacher_ids),
+                TeacherStudentRelation.student_id == subscription.student_id,
+            )
+        )
+        if relation is None:
+            return
+        if relation.previous_status is not None:
+            relation.status = relation.previous_status
+            relation.previous_status = None
+        if relation.active_subscription_id == subscription.id:
+            relation.active_subscription_id = None
+
+    async def _teacher_ids_for_subscription(self, subscription: Any) -> list[str]:
+        """Return teacher_id(s) that own the subscription via its membership."""
+        from app.models.lesson import ClassMembership, LessonClass
+
+        teacher_id = await self.db.scalar(
+            select(LessonClass.teacher_id)
+            .join(ClassMembership, ClassMembership.lesson_class_id == LessonClass.id)
+            .where(ClassMembership.id == subscription.membership_id)
+        )
+        return [teacher_id] if teacher_id else []
+
+    async def _cancel_auto_generated_lessons(self, subscription: Any) -> None:
+        """Cancel future subscription-generated lessons attached to this sub (#426)."""
+        from app.models.lesson import Lesson, LessonSource, LessonStatus
+
+        result = await self.db.scalars(
+            select(Lesson).where(
+                Lesson.subscription_id == subscription.id,
+                Lesson.lesson_source == LessonSource.subscription_generated,
+                Lesson.status == LessonStatus.scheduled,
+            )
+        )
+        for lesson in result.all():
+            lesson.status = LessonStatus.cancelled
+
+    async def _notify_deposit_undone(self, subscription: Any, notification_service: Any) -> None:
+        """Notify student/parent that the teacher reverted the deposit confirmation (#426)."""
+        from app.models.notification import NotificationPriority
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+        from app.models.student import Student
+
+        student = await self.db.get(Student, subscription.student_id)
+        if student is None:
+            return
+
+        recipient_user_ids: set[str] = set()
+        if student.user_id:
+            recipient_user_ids.add(student.user_id)
+
+        parent_user_ids = await self.db.scalars(
+            select(Parent.user_id)
+            .join(ParentChildRelation, ParentChildRelation.parent_id == Parent.id)
+            .where(
+                ParentChildRelation.student_id == subscription.student_id,
+                ParentChildRelation.status == ParentChildRelationStatus.active,
+            )
+        )
+        recipient_user_ids.update(user_id for user_id in parent_user_ids.all() if user_id)
+
+        for user_id in sorted(recipient_user_ids):
+            await notification_service.create_and_send(
+                user_id=user_id,
+                notification_type="paymentUndone",
+                title="입금 확인이 취소되었습니다",
+                body=f"{student.name} 수강권의 입금 확인을 선생님이 되돌렸습니다.",
+                priority=NotificationPriority.normal,
+                data={
+                    "subscriptionId": subscription.id,
+                    "studentId": subscription.student_id,
+                    "source": "subscription_deposit",
+                },
+                action_url=f"/subscriptions/{subscription.id}",
+                action_label="수강권 보기",
+            )
 
     async def notify_payment(
         self,
@@ -992,11 +1150,13 @@ class SubscriptionService:
 
         # Find a matching active template by teacher + subscription type
         template = await self.db.scalar(
-            select(SubscriptionTemplate).where(
+            select(SubscriptionTemplate)
+            .where(
                 SubscriptionTemplate.teacher_id == tid,
                 SubscriptionTemplate.type == sub.type,
                 SubscriptionTemplate.is_active == True,  # noqa: E712
-            ).limit(1)
+            )
+            .limit(1)
         )
 
         proposal = SubscriptionProposal(
@@ -1333,7 +1493,8 @@ class SubscriptionService:
             # Resolve discount amount (golden-time or pre-set)
             original_amount = template.amount if template else 0
             discount_amount = await self._resolve_discount_amount(
-                proposal, original_amount,
+                proposal,
+                original_amount,
             )
             discount_reason = proposal.discount_reason if discount_amount > 0 else None
 
@@ -1441,9 +1602,7 @@ class SubscriptionService:
         request.status_updated_at = datetime.now(UTC)
         await self.db.flush()
 
-    async def _find_or_create_membership(
-        self, teacher_id: str, student_id: str, instrument: str | None = None
-    ) -> str:
+    async def _find_or_create_membership(self, teacher_id: str, student_id: str, instrument: str | None = None) -> str:
         """GAP-2: Find existing ClassMembership or create one via a default private class."""
         from app.models.lesson import ClassMembership, LessonClass
 
@@ -1486,9 +1645,7 @@ class SubscriptionService:
         await self.db.flush()
         return membership.id
 
-    async def _activate_relationship(
-        self, teacher_id: str, student_id: str, subscription_id: str
-    ) -> None:
+    async def _activate_relationship(self, teacher_id: str, student_id: str, subscription_id: str) -> None:
         """GAP-3: Find TeacherStudentRelation and set to active with subscription link."""
         from app.models.relationship import RelationStatus, TeacherStudentRelation
 
@@ -1504,9 +1661,7 @@ class SubscriptionService:
         relation.active_subscription_id = subscription_id
         await self.db.flush()
 
-    async def _apply_golden_time_discount(
-        self, proposal: Any, teacher_id: str
-    ) -> None:
+    async def _apply_golden_time_discount(self, proposal: Any, teacher_id: str) -> None:
         """Tag auto-proposals with golden-time discount metadata.
 
         The actual discount amount is calculated at confirmation time
@@ -1519,23 +1674,18 @@ class SubscriptionService:
         if not proposal.is_auto_proposal:
             return
 
-        settings = await self.db.scalar(
-            select(ProposalSettings).where(ProposalSettings.teacher_id == teacher_id)
-        )
+        settings = await self.db.scalar(select(ProposalSettings).where(ProposalSettings.teacher_id == teacher_id))
         if settings is None:
             return
 
         if settings.golden_time_discount_percent > 0:
             proposal.discount_amount = None  # Resolved at confirmation
             proposal.discount_reason = (
-                f"golden_time_{settings.golden_time_hours}h"
-                f"_{settings.golden_time_discount_percent}%"
+                f"golden_time_{settings.golden_time_hours}h_{settings.golden_time_discount_percent}%"
             )
             await self.db.flush()
 
-    async def _resolve_discount_amount(
-        self, proposal: Any, original_amount: int
-    ) -> int:
+    async def _resolve_discount_amount(self, proposal: Any, original_amount: int) -> int:
         """Calculate the final discount amount for a proposal.
 
         For golden-time discounts the student must have responded

@@ -323,6 +323,22 @@ async def confirm_payment(
     return await service.confirm_payment(subscription_id, body, current_user)
 
 
+@router.post(
+    "/{subscription_id}/undo-confirm",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Undo a payment confirmation (teacher only, 24h window) — #426",
+)
+async def undo_confirm_payment(
+    subscription_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """Roll back a manual deposit confirmation within 24h, before first lesson is consumed."""
+    service = SubscriptionService(db)
+    return await service.undo_confirm_payment(subscription_id, current_user)
+
+
 @router.patch(
     "/{subscription_id}/notify-payment",
     response_model=SubscriptionResponse,
