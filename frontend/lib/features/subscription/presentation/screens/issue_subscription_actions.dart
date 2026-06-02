@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/widgets/phone_verification_gate_modal.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../domain/entities/subscription.dart';
@@ -100,12 +102,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       paymentMethod: isPaymentConfirmed ? selectedPaymentMethod : null,
       paymentConfirmedAt: isPaymentConfirmed ? now : null,
       originalAmount: discountPercent > 0 ? originalAmount : null,
-      discountAmount:
-          discountPercent > 0 ? (originalAmount - finalAmount) : null,
-      discountReason:
-          discountPercent > 0
-              ? AppStrings.discountPercentReason(discountPercent)
-              : null,
+      discountAmount: discountPercent > 0
+          ? (originalAmount - finalAmount)
+          : null,
+      discountReason: discountPercent > 0
+          ? AppStrings.discountPercentReason(discountPercent)
+          : null,
       totalRescheduleAllowance: rescheduleAllowance,
       rescheduleDeadlineHours: rescheduleDeadlineHours,
     );
@@ -177,6 +179,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           context.pop();
         }
       }
+    } on PhoneVerificationRequiredException catch (_) {
+      // #430 G1 §4.3 — E3 게이트. 백엔드가 미인증 선생님에게 발급 차단 시
+      // 안내 다이얼로그 + 인증 화면 진입 옵션을 제공한다.
+      if (mounted) {
+        await PhoneVerificationGate.show(context);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -239,10 +247,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     final cardType = await _detectScheduleCardType(subscription, membership);
 
-    final suggestedDay =
-        membership.primarySlot != null
-            ? membership.primarySlot!.dayOfWeek + 1
-            : null;
+    final suggestedDay = membership.primarySlot != null
+        ? membership.primarySlot!.dayOfWeek + 1
+        : null;
     final suggestedTime = membership.primarySlot?.startTime;
     final lessonDuration = membership.lessonDuration;
 
@@ -284,22 +291,19 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           .read(subscriptionIssueFlowControllerProvider)
           .studentSubscriptions(primaryStudentId);
 
-      final sameMembershipSubs =
-          allSubscriptions
-              .where(
-                (s) =>
-                    s.membershipId == membership.id && s.id != subscription.id,
-              )
-              .toList();
+      final sameMembershipSubs = allSubscriptions
+          .where(
+            (s) => s.membershipId == membership.id && s.id != subscription.id,
+          )
+          .toList();
 
       if (sameMembershipSubs.isNotEmpty) {
         return ScheduleCardType.reEnrollment;
       }
 
-      final otherMembershipSubs =
-          allSubscriptions
-              .where((s) => s.membershipId != membership.id)
-              .toList();
+      final otherMembershipSubs = allSubscriptions
+          .where((s) => s.membershipId != membership.id)
+          .toList();
 
       if (otherMembershipSubs.isNotEmpty) {
         return ScheduleCardType.additionalInstrument;
@@ -393,12 +397,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             paymentMethod: isPaymentConfirmed ? selectedPaymentMethod : null,
             paymentConfirmedAt: isPaymentConfirmed ? now : null,
             originalAmount: discountPercent > 0 ? originalAmount : null,
-            discountAmount:
-                discountPercent > 0 ? (originalAmount - finalAmount) : null,
-            discountReason:
-                discountPercent > 0
-                    ? AppStrings.discountPercentReason(discountPercent)
-                    : null,
+            discountAmount: discountPercent > 0
+                ? (originalAmount - finalAmount)
+                : null,
+            discountReason: discountPercent > 0
+                ? AppStrings.discountPercentReason(discountPercent)
+                : null,
             totalRescheduleAllowance: rescheduleAllowance,
             rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
@@ -415,6 +419,11 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           }
 
           successCount++;
+        } on PhoneVerificationRequiredException {
+          // #430 G1 §4.3 — batch 중 게이트 발생 시 전체 흐름 중단하고
+          // outer catch 로 위임. 가입자 본인 인증이 완료되어야 batch 의
+          // 다른 학생도 의미가 있으므로 한 번 노출 후 종료.
+          rethrow;
         } catch (e) {
           failCount++;
           debugPrint('Failed to issue subscription for student $studentId: $e');
@@ -440,14 +449,17 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
                   failCount,
                 ),
               ),
-              backgroundColor:
-                  failCount == allStudentIds.length
-                      ? AppColors.paperAccent
-                      : AppColors.paperAccent,
+              backgroundColor: failCount == allStudentIds.length
+                  ? AppColors.paperAccent
+                  : AppColors.paperAccent,
             ),
           );
         }
         context.pop();
+      }
+    } on PhoneVerificationRequiredException catch (_) {
+      if (mounted) {
+        await PhoneVerificationGate.show(context);
       }
     } catch (e) {
       if (mounted) {
