@@ -68,6 +68,37 @@ void main() {
       expect(find.text('유효하지 않은 초대'), findsOneWidget);
       expect(find.text('유효하지 않은 초대 링크입니다.'), findsOneWidget);
     });
+
+    testWidgets('already_used code shows "이미 사용된" subtitle', (tester) async {
+      // G9 DoD §3: 거절/만료/잘못된 토큰 — 3rd case (already-used).
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AcademyInviteExpiredScreen(errorCode: 'already_used'),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('유효하지 않은 초대'), findsOneWidget);
+      expect(find.text('이미 사용된 초대 링크입니다.'), findsOneWidget);
+    });
+
+    testWidgets('errorMessage when provided renders inside the error panel', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: AcademyInviteExpiredScreen(
+            errorCode: 'expired',
+            errorMessage: 'Token expired at 2026-06-01',
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Token expired at 2026-06-01'), findsOneWidget);
+    });
   });
 
   group('AcademyInviteAcceptScreen error branch', () {
