@@ -26,6 +26,9 @@ class AlimTalkTemplate(str, Enum):
     reminder_d3 = "LNZ_PAYMENT_REMINDER_D3"
     reminder_d7 = "LNZ_PAYMENT_REMINDER_D7"
     payment_confirm = "LNZ_PAYMENT_CONFIRM"
+    # spec: docs/specs/schedule/teacher_vacation_mode.md §6.1 — sent right after
+    # a teacher registers a vacation period that impacts the student.
+    teacher_vacation = "LNZ_TEACHER_VACATION"
 
 
 class AlimTalkLog(UUIDMixin, Base):
@@ -37,6 +40,9 @@ class AlimTalkLog(UUIDMixin, Base):
     # Identify the originating object — exactly one of these is populated.
     proposal_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    # spec: H-001 §6.1 — vacation periods fan out one row per student, keyed by
+    # (vacation_period_id, recipient_phone, template_id) for idempotency.
+    vacation_period_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
     recipient_phone: Mapped[str] = mapped_column(String(32), nullable=False)
     variables: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
@@ -56,6 +62,12 @@ class AlimTalkLog(UUIDMixin, Base):
     __table_args__ = (
         Index("idx_alimtalk_proposal_template", "proposal_id", "template_id"),
         Index("idx_alimtalk_subscription_template", "subscription_id", "template_id"),
+        Index(
+            "idx_alimtalk_vacation_phone_template",
+            "vacation_period_id",
+            "recipient_phone",
+            "template_id",
+        ),
         Index("idx_alimtalk_sent_at", "sent_at"),
         Index("idx_alimtalk_retry", "success", "retry_count"),
     )

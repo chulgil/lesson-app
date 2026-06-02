@@ -144,6 +144,29 @@ class AlimTalkService:
             variables=variables,
         )
 
+    async def send_teacher_vacation(
+        self,
+        *,
+        vacation_period_id: str,
+        recipient_phone: str,
+        variables: dict[str, str],
+    ) -> AlimTalkLog | None:
+        """LNZ_TEACHER_VACATION fan-out — one row per (vacation, phone).
+
+        Idempotency key is (vacation_period_id, recipient_phone, template_id):
+        the same vacation may impact several students and each phone gets a
+        single send. Caller (vacation service) drives one call per impacted
+        student.
+        """
+        return await self._send_with_log(
+            template_id=AlimTalkTemplate.teacher_vacation.value,
+            proposal_id=None,
+            subscription_id=None,
+            vacation_period_id=vacation_period_id,
+            recipient_phone=recipient_phone,
+            variables=variables,
+        )
+
     # ------------------------------------------------------------------ internals
 
     async def _send_with_log(
@@ -154,12 +177,19 @@ class AlimTalkService:
         subscription_id: str | None,
         recipient_phone: str,
         variables: dict[str, str],
+        vacation_period_id: str | None = None,
     ) -> AlimTalkLog | None:
         if not recipient_phone:
             logger.info("alimtalk skipped: recipient phone empty template=%s", template_id)
             return None
 
-        existing = await self._find_existing(template_id, proposal_id, subscription_id)
+        existing = await self._find_existing(
+            template_id,
+            proposal_id,
+            subscription_id,
+            vacation_period_id,
+            recipient_phone,
+        )
         if existing and existing.success:
             return existing
 
@@ -168,6 +198,7 @@ class AlimTalkService:
                 template_id=template_id,
                 proposal_id=proposal_id,
                 subscription_id=subscription_id,
+                vacation_period_id=vacation_period_id,
                 recipient_phone=recipient_phone,
                 variables=variables,
             )
@@ -192,6 +223,7 @@ class AlimTalkService:
             template_id=template_id,
             proposal_id=proposal_id,
             subscription_id=subscription_id,
+            vacation_period_id=vacation_period_id,
             recipient_phone=recipient_phone,
             variables=variables,
             success=result.success,
@@ -225,14 +257,23 @@ class AlimTalkService:
         template_id: str,
         proposal_id: str | None,
         subscription_id: str | None,
+        vacation_period_id: str | None = None,
+        recipient_phone: str | None = None,
     ) -> AlimTalkLog | None:
-        if proposal_id is None and subscription_id is None:
+        # Need at least one identity key (proposal / subscription / vacation).
+        if proposal_id is None and subscription_id is None and vacation_period_id is None:
             return None
         stmt = select(AlimTalkLog).where(AlimTalkLog.template_id == template_id)
         if proposal_id is not None:
             stmt = stmt.where(AlimTalkLog.proposal_id == proposal_id)
         if subscription_id is not None:
             stmt = stmt.where(AlimTalkLog.subscription_id == subscription_id)
+        if vacation_period_id is not None:
+            stmt = stmt.where(AlimTalkLog.vacation_period_id == vacation_period_id)
+            # Vacation fans out per student — phone is part of the key so two
+            # students never collide on the same vacation row.
+            if recipient_phone is not None:
+                stmt = stmt.where(AlimTalkLog.recipient_phone == recipient_phone)
         result = await self.db.scalars(stmt)
         return result.first()
 
@@ -244,11 +285,13 @@ class AlimTalkService:
         subscription_id: str | None,
         recipient_phone: str,
         variables: dict[str, str],
+        vacation_period_id: str | None = None,
     ) -> AlimTalkLog:
         log = AlimTalkLog(
             template_id=template_id,
             proposal_id=proposal_id,
             subscription_id=subscription_id,
+            vacation_period_id=vacation_period_id,
             recipient_phone=recipient_phone,
             variables=variables,
             success=False,
