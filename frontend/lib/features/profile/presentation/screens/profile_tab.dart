@@ -391,7 +391,10 @@ class ProfileTab extends ConsumerWidget {
 
   Widget _buildLifetimePromoBanner(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(appBillingSnapshotProvider).valueOrNull;
-    if (snapshot == null || !snapshot.lifetimeOfferActive) {
+    // #415 Phase B2: 세션 dismiss state 체크. 닫혀 있으면 banner 미노출
+    // (다음 부팅 시 lifetime 윈도우 활성이면 다시 노출 — promo blindness 완화).
+    final dismissed = ref.watch(lifetimePromoDismissedProvider);
+    if (snapshot == null || !snapshot.lifetimeOfferActive || dismissed) {
       return const SizedBox.shrink();
     }
     return Padding(
@@ -399,6 +402,9 @@ class ProfileTab extends ConsumerWidget {
       child: LifetimePromoBanner(
         endsAt: snapshot.lifetimeOfferEndsAt!,
         onBuy: () => handleBuyLifetime(context: context, ref: ref),
+        onDismiss:
+            () =>
+                ref.read(lifetimePromoDismissedProvider.notifier).state = true,
       ),
     );
   }

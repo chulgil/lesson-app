@@ -159,8 +159,8 @@ Future<void> handleBuyPro({
   switch (outcome) {
     case IapPurchaseCancelled():
       _showSnack(messenger, AppStrings.paywallPurchaseCancelled);
-    case IapPurchaseFailure():
-      _showSnack(messenger, AppStrings.paywallPurchaseFailed);
+    case IapPurchaseFailure(:final message):
+      _showSnack(messenger, classifyPurchaseFailureMessage(message));
     case IapPurchaseSuccess(:final purchase):
       try {
         final result = await repo.validatePurchase(
@@ -184,6 +184,30 @@ Future<void> handleBuyPro({
         _showSnack(messenger, AppStrings.paywallPurchaseFailed);
       }
   }
+}
+
+/// IapPurchaseFailure.message 를 사용자 친화 SnackBar 문구로 분류. #415 Phase B3.
+///
+/// 알려진 패턴:
+/// - network / connection / internet / timeout → 네트워크 안내
+/// - payment / card / declined / denied → 결제 거절 안내
+/// - 그 외 (store_error / store_rejected_request / 알 수 없는 store 메시지) → store 일반 오류
+@visibleForTesting
+String classifyPurchaseFailureMessage(String message) {
+  final lower = message.toLowerCase();
+  if (lower.contains('network') ||
+      lower.contains('connection') ||
+      lower.contains('internet') ||
+      lower.contains('timeout')) {
+    return AppStrings.paywallPurchaseFailedNetwork;
+  }
+  if (lower.contains('payment') ||
+      lower.contains('card') ||
+      lower.contains('declined') ||
+      lower.contains('denied')) {
+    return AppStrings.paywallPurchaseFailedPaymentDeclined;
+  }
+  return AppStrings.paywallPurchaseFailedStore;
 }
 
 /// Lifetime 1회 결제 흐름 — M5 출시 후 90일 한정 얼리어답터.
@@ -218,8 +242,8 @@ Future<void> handleBuyLifetime({
   switch (outcome) {
     case IapPurchaseCancelled():
       _showSnack(messenger, AppStrings.paywallLifetimePurchaseCancelled);
-    case IapPurchaseFailure():
-      _showSnack(messenger, AppStrings.paywallLifetimePurchaseFailed);
+    case IapPurchaseFailure(:final message):
+      _showSnack(messenger, classifyPurchaseFailureMessage(message));
     case IapPurchaseSuccess(:final purchase):
       try {
         final result = await repo.validatePurchase(

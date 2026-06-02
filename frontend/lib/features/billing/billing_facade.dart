@@ -31,6 +31,8 @@ export 'presentation/providers/app_billing_provider.dart'
         appBillingRepositoryProvider,
         appBillingSnapshotProvider,
         iapServiceProvider;
+export 'presentation/providers/lifetime_promo_dismissed_provider.dart'
+    show lifetimePromoDismissedProvider;
 export 'presentation/utils/billing_guard_actions.dart'
     show
         guardAddStudentNavigation,

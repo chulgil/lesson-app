@@ -559,6 +559,57 @@ void main() {
     });
   });
 
+  group('classifyPurchaseFailureMessage (Phase B3 #415)', () {
+    test('network keyword → network 안내', () {
+      expect(
+        classifyPurchaseFailureMessage('Network unreachable'),
+        AppStrings.paywallPurchaseFailedNetwork,
+      );
+      expect(
+        classifyPurchaseFailureMessage('store_timeout'),
+        AppStrings.paywallPurchaseFailedNetwork,
+      );
+      expect(
+        classifyPurchaseFailureMessage('connection lost'),
+        AppStrings.paywallPurchaseFailedNetwork,
+      );
+      expect(
+        classifyPurchaseFailureMessage('No internet'),
+        AppStrings.paywallPurchaseFailedNetwork,
+      );
+    });
+
+    test('payment/card/declined/denied → payment_declined 안내', () {
+      expect(
+        classifyPurchaseFailureMessage('Payment was declined'),
+        AppStrings.paywallPurchaseFailedPaymentDeclined,
+      );
+      expect(
+        classifyPurchaseFailureMessage('Card expired'),
+        AppStrings.paywallPurchaseFailedPaymentDeclined,
+      );
+      expect(
+        classifyPurchaseFailureMessage('Denied by issuer'),
+        AppStrings.paywallPurchaseFailedPaymentDeclined,
+      );
+    });
+
+    test('store_error / store_rejected_request / unknown → store 일반 오류', () {
+      expect(
+        classifyPurchaseFailureMessage('store_error'),
+        AppStrings.paywallPurchaseFailedStore,
+      );
+      expect(
+        classifyPurchaseFailureMessage('store_rejected_request'),
+        AppStrings.paywallPurchaseFailedStore,
+      );
+      expect(
+        classifyPurchaseFailureMessage('Some unexpected store glitch'),
+        AppStrings.paywallPurchaseFailedStore,
+      );
+    });
+  });
+
   group('handleBuyPro (Phase C)', () {
     testWidgets('store unavailable → 안내 SnackBar, 검증 미호출', (tester) async {
       await _useTallSurface(tester);
@@ -679,7 +730,9 @@ void main() {
       await tester.tap(find.text('go'));
       await tester.pumpAndSettle();
 
-      expect(find.text(AppStrings.paywallPurchaseFailed), findsOneWidget);
+      // Phase B3: store_error 메시지는 classifyPurchaseFailureMessage 가
+      // paywallPurchaseFailedStore 로 분류.
+      expect(find.text(AppStrings.paywallPurchaseFailedStore), findsOneWidget);
       expect(repo.validatePurchaseCalls, 0);
       expect(iap.completePurchaseCalls, 0);
     });

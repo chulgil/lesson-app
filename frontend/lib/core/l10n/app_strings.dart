@@ -8071,8 +8071,18 @@ class AppStrings {
   /// Pro 구매 — 사용자가 store sheet 취소.
   static const paywallPurchaseCancelled = '구매를 취소했어요.';
 
-  /// Pro 구매 실패 — store/network/검증 에러.
+  /// Pro 구매 실패 — store/network/검증 에러 (fallback / unclassified).
   static const paywallPurchaseFailed = '구매를 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
+
+  /// Pro 구매 실패 — 네트워크 단절 / store 응답 timeout. #415 Phase B3.
+  static const paywallPurchaseFailedNetwork = '연결이 불안정해요. 다시 시도해주세요.';
+
+  /// Pro 구매 실패 — Apple/Google 이 결제 거절 (카드 만료, 한도 초과 등). #415 Phase B3.
+  static const paywallPurchaseFailedPaymentDeclined =
+      '결제가 거절되었어요. 결제 수단을 확인해주세요.';
+
+  /// Pro 구매 실패 — store 내부 에러 (StoreKit/PlayBilling). #415 Phase B3.
+  static const paywallPurchaseFailedStore = '스토어 오류가 발생했어요. 잠시 후 다시 시도해주세요.';
 
   /// Trial 시작 성공.
   static const paywallTrialStarted = '14일 무료 체험이 시작되었어요.';
@@ -8121,6 +8131,9 @@ class AppStrings {
 
   /// Trial 상태 — 혜택.
   static const billingStatusTrialDetail = '체험 중 · 학생 무제한';
+
+  /// Trial 만료 임박 (D-1 이하) — 추가 안내 한 줄. #415 Phase B1.
+  static const billingStatusTrialUrgent = '곧 만료돼요. 지금 갱신하면 끊김 없이 이어집니다.';
 
   /// Free 사용자용 업그레이드 CTA.
   static const billingFreeUpgradeCta = 'Pro 업그레이드 → ₩9,900/월';
@@ -8197,6 +8210,9 @@ class AppStrings {
 
   /// Lifetime 구매 CTA.
   static const paywallLifetimeBuyCta = 'Lifetime 구매하기';
+
+  /// Lifetime promo banner 닫기 — Semantics 라벨 (스크린리더 / a11y). #415 Phase B2.
+  static const paywallLifetimePromoDismissLabel = '얼리어답터 프로모 배너 닫기';
 
   /// Lifetime 구매 — store 가용성 실패.
   static const paywallLifetimeStoreUnavailable =
