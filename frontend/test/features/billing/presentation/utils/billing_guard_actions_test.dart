@@ -185,6 +185,7 @@ class FakeIapService implements IapService {
 PurchaseDetails _purchaseDetails({
   required String productId,
   required String receipt,
+  PurchaseStatus status = PurchaseStatus.purchased,
 }) {
   return PurchaseDetails(
     productID: productId,
@@ -194,8 +195,48 @@ PurchaseDetails _purchaseDetails({
       source: 'apple',
     ),
     transactionDate: '2026-05-29T00:00:00Z',
-    status: PurchaseStatus.purchased,
+    status: status,
   );
+}
+
+/// E2E 시나리오용 stateful billing repository. startTrial 이 성공하면
+/// 내부 snapshot 을 (tier=pro, status=trial) 로 교체해 다음 fetchSnapshot 이
+/// 새 상태를 반환한다 — production 의 백엔드 동작 + invalidate 흐름 모방.
+class _StatefulBillingRepository implements AppBillingRepository {
+  _StatefulBillingRepository({required AppBillingSnapshot initial})
+    : _snapshot = initial;
+
+  AppBillingSnapshot _snapshot;
+
+  int startTrialCalls = 0;
+  int fetchSnapshotCalls = 0;
+
+  @override
+  Future<AppBillingSnapshot> fetchSnapshot() async {
+    fetchSnapshotCalls++;
+    return _snapshot;
+  }
+
+  @override
+  Future<TrialActivationResult> startTrial() async {
+    startTrialCalls++;
+    _snapshot = _snapshot.copyWith(
+      plan: BillingPlan.pro,
+      status: BillingStatus.trial,
+      trialUsed: true,
+    );
+    return const TrialActivationResult(success: true, message: 'started');
+  }
+
+  @override
+  Future<IapValidationResult> validatePurchase({
+    required String platform,
+    required String receipt,
+    required String productId,
+  }) async {
+    // E2E 시나리오에서는 호출되지 않는다. 호출되면 명시적으로 실패.
+    throw UnimplementedError('not used in E2E');
+  }
 }
 
 ProductDetails _productDetails(String id) {
@@ -1131,5 +1172,130 @@ void main() {
       );
       expect(iap.completePurchaseCalls, 0);
     });
+  });
+
+  group('E2E BillingGuard 시나리오 (Phase D1 #415)', () {
+    testWidgets('5학생 free → 가드 차단 → 체험 시작 → snapshot trial → 6학생 add 통과', (
+      tester,
+    ) async {
+      await _useTallSurface(tester);
+      final repo = _StatefulBillingRepository(
+        initial: _snapshot(
+          plan: BillingPlan.free,
+          status: BillingStatus.active,
+        ),
+      );
+      var pass = 0;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appBillingRepositoryProvider.overrideWithValue(repo),
+            studentRepositoryProvider.overrideWithValue(
+              _FakeStudentRepository(5),
+            ),
+          ],
+          child: MaterialApp(
+            home: Consumer(
+              builder: (context, ref, _) {
+                return Scaffold(
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed:
+                          () => guardAddStudentNavigation(
+                            context: context,
+                            ref: ref,
+                            onPass: () => pass++,
+                          ),
+                      child: const Text('go'),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 1. 첫 번째 tap — 5학생 + free → guard 차단 → FreeLimitSheet 노출
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+      expect(pass, 0);
+      expect(find.byKey(FreeLimitSheet.startTrialButtonKey), findsOneWidget);
+
+      // 2. "체험 시작" tap → handleStartTrial → repo.startTrial() flip → invalidate
+      await tester.tap(find.byKey(FreeLimitSheet.startTrialButtonKey));
+      await tester.pumpAndSettle();
+      expect(repo.startTrialCalls, 1);
+      // 시트가 닫혔는지 확인
+      expect(find.byKey(FreeLimitSheet.startTrialButtonKey), findsNothing);
+
+      // 3. 두 번째 tap — snapshot now (pro, trial) → BillingGuard.isUnlimited → onPass 실행
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+      expect(
+        pass,
+        1,
+        reason: 'trial 시작 후 학생 카운트 5 여도 무제한 plan → guard 통과 → onPass 실행',
+      );
+      expect(
+        repo.fetchSnapshotCalls,
+        greaterThan(1),
+        reason: 'invalidate 후 새 fetch 호출되어야 함',
+      );
+    });
+  });
+
+  group('handleBuyPro restored purchase (Phase D2 #415)', () {
+    testWidgets(
+      'PurchaseStatus.restored → success 흐름 동일 (paywallPurchaseSuccess + complete + invalidate)',
+      (tester) async {
+        await _useTallSurface(tester);
+        final repo = _FakeBillingRepository(
+          _snapshot(plan: BillingPlan.free, status: BillingStatus.active),
+          validatePurchaseResult: const IapValidationResult(
+            granted: true,
+            message: 'ok',
+          ),
+        );
+        // device 전환 → 이전 구매가 자동 복원되는 시나리오. StoreKitIapService
+        // 의 production 분기는 PurchaseStatus.restored 도 IapPurchaseSuccess 로
+        // 매핑한다 (iap_service.dart purchase loop 의 case purchased: case restored:).
+        final iap = FakeIapService(
+          products: [_productDetails(proMonthlyProductId)],
+          outcome: IapPurchaseSuccess(
+            _purchaseDetails(
+              productId: proMonthlyProductId,
+              receipt: 'restored-receipt',
+              status: PurchaseStatus.restored,
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(
+          _harness(
+            snapshot: _snapshot(
+              plan: BillingPlan.free,
+              status: BillingStatus.active,
+            ),
+            studentCount: 0,
+            repository: repo,
+            iapService: iap,
+            onTap: (ctx, ref) async {
+              await handleBuyPro(context: ctx, ref: ref);
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('go'));
+        await tester.pumpAndSettle();
+
+        // restored 도 success 와 동일 처리: 백엔드 검증 + complete + 성공 SnackBar.
+        expect(find.text(AppStrings.paywallPurchaseSuccess), findsOneWidget);
+        expect(repo.validatePurchaseCalls, 1);
+        expect(iap.completePurchaseCalls, 1);
+      },
+    );
   });
 }

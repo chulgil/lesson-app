@@ -18,9 +18,8 @@ AppBillingSnapshot _snapshot({
     plan: plan,
     status: status,
     startedAt: DateTime.utc(2026, 1, 1),
-    expiresAt: status == BillingStatus.expired
-        ? DateTime.utc(2025, 12, 1)
-        : null,
+    expiresAt:
+        status == BillingStatus.expired ? DateTime.utc(2025, 12, 1) : null,
     source: 'test',
     originalTransactionId: null,
     trialUsed: false,
@@ -206,7 +205,9 @@ void main() {
         expect(decision.reason, FeatureGateReason.planExpired);
       });
 
-      test('pro + cancelled → blocked planExpired', () {
+      test('pro + cancelled → allowed (현재 기간 active 유지, 만료는 expired)', () {
+        // BillingStatus.cancelled: isActiveOrTrial=true — 다음 갱신만 차단,
+        // 현재 기간 pro 혜택은 유지. 실제 차단은 BillingStatus.expired.
         final decision = guard.requireTier(
           snapshot: _snapshot(
             plan: BillingPlan.pro,
@@ -214,8 +215,8 @@ void main() {
           ),
           required: TierRequirement.pro,
         );
-        expect(decision.allowed, isFalse);
-        expect(decision.reason, FeatureGateReason.planExpired);
+        expect(decision.allowed, isTrue);
+        expect(decision.reason, FeatureGateReason.allowed);
       });
 
       test('studio + active → allowed (상위 tier)', () {
