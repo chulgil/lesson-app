@@ -330,11 +330,12 @@ if (teacher.phoneVerifiedAt != null) {
 
 ### Phase 2: 백엔드 (1주)
 
-- `User.phoneVerifiedAt`, `phoneNumber`, `marketingConsentAt` 필드 추가
-- 기존 가입자 마이그레이션 (`phoneVerifiedAt = signup_date` backfill)
-- E3 진입 게이트 미들웨어 (`require_phone_verification_for_subscription_issue`) — 선생님 한정
-- 학생 가입 시점 게이트 (`require_phone_verification_for_student_signup`) — 만 14세 검증
-- 약관 통합 동의 처리 (필수 묶음 + 마케팅 별도)
+- `User.phoneVerifiedAt`, `phoneNumber` 필드 추가 (별도 작업 — 통신사 PASS 통합 시점)
+- ✅ `User.terms_accepted_at`, `User.marketing_consent_at` 필드 + Alembic `user_consent_fields` (2026-06-02 B2)
+- ✅ `POST /api/v1/auth/consent` 엔드포인트 + `AuthService.accept_terms` (2026-06-02 B2)
+- 기존 가입자 마이그레이션 (`phoneVerifiedAt = signup_date` backfill) — PASS 통합 시
+- E3 진입 게이트 미들웨어 (`require_phone_verification_for_subscription_issue`) — 선생님 한정 (별도 작업 BE 측)
+- 학생 가입 시점 게이트 (`require_phone_verification_for_student_signup`) — 만 14세 검증 (PASS 통합 의존)
 
 ### Phase 3: 프론트엔드 — 선생님·학부모 (1주)
 
@@ -366,3 +367,4 @@ if (teacher.phoneVerifiedAt != null) {
 | 1.0 | 2026-06-01 | 초안 — E2E 감사 #10 A-C2 대응 (이슈 #430) |
 | 1.1 | 2026-06-02 | 역할별 차등 정책 추가. 학생 직접 가입은 만 14세 검증을 위해 SSO 직후 전화인증 유지(정보통신망법 제31조). 약관 통합은 별도 페이지 분리 제거 의미로 한정 — 마케팅 동의는 법(정보통신망법 제50조)상 별도 체크박스 필수 |
 | 1.2 | 2026-06-02 | §3.4 PASS 통합 전 학생 직접 가입 임시 안전망 추가. PASS 본인인증 통합 완료까지 학생 직접 가입은 `StudentSignupBlockedScreen` 으로 안내 (정책 갭 보장) |
+| 1.3 | 2026-06-02 | B2 — `User.terms_accepted_at` / `marketing_consent_at` 필드 + Alembic + `POST /auth/consent` 엔드포인트 + FE wiring. 마케팅 동의 영속 저장으로 정보통신망법 §50 별도 동의 기록 의무 충족 |
