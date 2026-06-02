@@ -7686,6 +7686,43 @@ class AppStrings {
   /// 학생별 미리보기 항목 카운트 ("3건").
   static String vacationImpactStudentCount(int count) => '$count건';
 
+  // ── 활성 휴가 카드 + 24h Recovery (H-001 FE Phase 3) ────────────────
+
+  /// 활성 휴가 섹션 제목 (등록된 휴가 목록 표시).
+  static const vacationActiveSection = '등록된 휴가';
+
+  /// 활성 휴가 없음 (빈 상태).
+  static const vacationActiveEmpty = '등록된 휴가가 없습니다.';
+
+  /// 휴가 취소 버튼 (Recovery).
+  static const vacationCancelLabel = '휴가 취소';
+
+  /// 휴가 취소 확인 다이얼로그 제목.
+  static const vacationCancelConfirmTitle = '휴가를 취소할까요?';
+
+  /// 휴가 취소 확인 다이얼로그 본문 (24h Recovery 안내).
+  static const vacationCancelConfirmBody =
+      '등록 후 24시간 이내, 시작 전인 휴가만 취소할 수 있어요. 자동 연장된 수강권 만료일도 원래대로 돌아갑니다.';
+
+  /// 취소 성공 SnackBar.
+  static const vacationCancelSuccess = '휴가를 취소했어요.';
+
+  /// 취소 실패 — 일반 (서버 4xx/5xx).
+  static const vacationCancelFailed = '휴가를 취소하지 못했어요.';
+
+  /// 취소 실패 — 24h 윈도우 초과 (서버 409).
+  static const vacationCancelWindowExpired = '등록 후 24시간이 지나 취소할 수 없어요.';
+
+  /// 취소 실패 — 이미 시작된 휴가 (서버 409).
+  static const vacationCancelAlreadyStarted = '이미 시작된 휴가는 취소할 수 없어요.';
+
+  /// 취소 실패 — 이미 취소된 휴가 (서버 400).
+  static const vacationCancelAlreadyCancelled = '이미 취소된 휴가예요.';
+
+  /// 활성 휴가 카드 — 기간 표시 helper (예: "8/1 ~ 8/5").
+  static String vacationCardDateRange(String start, String end) =>
+      '$start ~ $end';
+
   // ── First Availability Quest (#422) ─────────────────────────────────
   // Spec: docs/specs/onboarding/teacher_first_availability_setup.md
 
