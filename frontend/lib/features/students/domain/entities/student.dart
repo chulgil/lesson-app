@@ -195,8 +195,13 @@ class Student {
     return DateTime.now().difference(connectedAt!).inDays < 7;
   }
 
-  /// V2: Check if student has app connection
-  bool get isAppConnected => connectionStatus == ConnectionStatus.connected;
+  /// V2: Check if student has app connection.
+  ///
+  /// G3 Phase B-2 — derives from `connectedAt` rather than the deprecated
+  /// `connectionStatus` enum. `connectedAt` is set by the BE invite-accept
+  /// flow alongside the (deprecated) status write; this lets us retire the
+  /// status writer without changing the user-visible signal.
+  bool get isAppConnected => connectedAt != null;
 
   /// Monthly lesson count based on lessons per week
   int get monthlyLessonCount => lessonsPerWeek * 4;

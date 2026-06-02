@@ -130,9 +130,7 @@ async def test_get_invite_by_id_and_code_for_frontend_confirm_screen(
 
 
 @pytest.mark.asyncio
-async def test_public_invite_landing_returns_json_contract(
-    client: AsyncClient, auth_headers, create_test_user
-):
+async def test_public_invite_landing_returns_json_contract(client: AsyncClient, auth_headers, create_test_user):
     """Ghost consumes JSON data from the public invite landing API."""
     await create_test_user(user_id="test-user-id", role="teacher", name="홍길동")
 
@@ -264,11 +262,7 @@ async def test_duplicate_pending_connection_request_keeps_latest_only(
     notifications = await client.get("/api/v1/notifications", headers=auth_headers)
     assert notifications.status_code == 200
     notification_items = notifications.json()["items"]
-    connection_notifications = [
-        item
-        for item in notification_items
-        if item["type"] == "connectionRequestReceived"
-    ]
+    connection_notifications = [item for item in notification_items if item["type"] == "connectionRequestReceived"]
     assert len(connection_notifications) == 1
     assert connection_notifications[0]["action_url"] == "/invite/requests"
     assert connection_notifications[0]["data"]["connectionRequestId"] == first.json()["id"]
@@ -417,6 +411,10 @@ async def test_accept_invite_code_request_adds_student_to_teacher_roster(
     assert roster.json()["total"] == 1
     assert roster.json()["items"][0]["id"] == student_id
     assert roster.json()["items"][0]["teacher_id"] == "test-user-id-prof"
+    # G3 Phase B-2 — `connected_at` is the canonical app-connected signal
+    # (replacing the deprecated `connection_status` writer). Invite accept
+    # must set it on the roster row.
+    assert roster.json()["items"][0]["connected_at"] is not None
 
 
 @pytest.mark.asyncio
