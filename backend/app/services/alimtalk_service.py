@@ -189,6 +189,29 @@ class AlimTalkService:
             variables=variables,
         )
 
+    async def send_teacher_vacation_returned(
+        self,
+        *,
+        vacation_period_id: str,
+        recipient_phone: str,
+        variables: dict[str, str],
+    ) -> AlimTalkLog | None:
+        """LNZ_TEACHER_VACATION_RETURNED — daily cron announce (spec §6.3).
+
+        Sent the morning after a vacation's end_date for every student/phone
+        that originally received the LNZ_TEACHER_VACATION notice. Idempotency
+        key is identical (vacation_period_id, recipient_phone, template_id) —
+        cron retries on a future day are safe.
+        """
+        return await self._send_with_log(
+            template_id=AlimTalkTemplate.teacher_vacation_returned.value,
+            proposal_id=None,
+            subscription_id=None,
+            vacation_period_id=vacation_period_id,
+            recipient_phone=recipient_phone,
+            variables=variables,
+        )
+
     # ------------------------------------------------------------------ internals
 
     async def _send_with_log(

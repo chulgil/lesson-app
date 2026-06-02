@@ -32,6 +32,9 @@ class AlimTalkTemplate(str, Enum):
     # spec: §7.3 Recovery — sent when a teacher cancels a vacation within the
     # 24h window. Students whose lessons were restored need to know.
     teacher_vacation_cancelled = "LNZ_TEACHER_VACATION_CANCELLED"
+    # spec: §6.3 — daily cron at KST 08:05 announces the teacher's return for
+    # vacations whose end_date was yesterday. One send per (vacation, phone).
+    teacher_vacation_returned = "LNZ_TEACHER_VACATION_RETURNED"
 
 
 class AlimTalkLog(UUIDMixin, Base):
