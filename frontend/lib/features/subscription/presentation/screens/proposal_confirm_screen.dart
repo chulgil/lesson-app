@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../auth/presentation/widgets/phone_verification_gate_modal.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
@@ -44,9 +46,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     );
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.paymentConfirm,
-      ),
+      appBar: const NotebookDetailAppBar(title: AppStrings.paymentConfirm),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
@@ -199,11 +199,17 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.inkTertiary,
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     AppStrings.loadDataFailed,
-                    style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -222,10 +228,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     SubscriptionTemplate template,
     SubscriptionProposal proposal,
   ) {
-    final price =
-        proposal.hasDiscount
-            ? template.price - (proposal.discountAmount ?? 0)
-            : template.price;
+    final price = proposal.hasDiscount
+        ? template.price - (proposal.discountAmount ?? 0)
+        : template.price;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
@@ -305,19 +310,19 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         Expanded(
           flex: 2,
           child: ElevatedButton(
-            onPressed:
-                isProcessing ? null : () => _confirmPayment(proposal, template),
+            onPressed: isProcessing
+                ? null
+                : () => _confirmPayment(proposal, template),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
-            child:
-                isProcessing
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : const Text(AppStrings.paymentVerifyToIssueButton),
+            child: isProcessing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text(AppStrings.paymentVerifyToIssueButton),
           ),
         ),
       ],
@@ -345,10 +350,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         usedLessons: 0,
         startDate: now,
         endDate: now.add(Duration(days: template.validityDays)),
-        amount:
-            proposal.hasDiscount
-                ? template.price - (proposal.discountAmount ?? 0)
-                : template.price,
+        amount: proposal.hasDiscount
+            ? template.price - (proposal.discountAmount ?? 0)
+            : template.price,
         status: SubscriptionStatus.active,
         createdAt: now,
         bonusCount: 0,
@@ -382,6 +386,12 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         // Refresh the list
         ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
       }
+    } on PhoneVerificationRequiredException catch (_) {
+      // #430 G1 §4.3 — E3 게이트. 미인증 선생님이 수강권을 발급하려 할 때
+      // 인증 안내 다이얼로그 노출.
+      if (mounted) {
+        await PhoneVerificationGate.show(context);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -403,15 +413,14 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   Future<void> _showInquiryDialog(SubscriptionProposal proposal) async {
     final result = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: AppStrings.paymentUnverifiedAction,
-            content: const Text(AppStrings.paymentInquiryDialogBody),
-            cancelLabel: AppStrings.cancel,
-            onCancel: () => Navigator.pop(context, false),
-            confirmLabel: AppStrings.sendMessage,
-            onConfirm: () => Navigator.pop(context, true),
-          ),
+      builder: (context) => NotebookAlertDialog(
+        title: AppStrings.paymentUnverifiedAction,
+        content: const Text(AppStrings.paymentInquiryDialogBody),
+        cancelLabel: AppStrings.cancel,
+        onCancel: () => Navigator.pop(context, false),
+        confirmLabel: AppStrings.sendMessage,
+        onConfirm: () => Navigator.pop(context, true),
+      ),
     );
 
     if (result == true && mounted) {
