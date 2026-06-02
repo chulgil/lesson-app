@@ -5618,6 +5618,11 @@ class AppStrings {
   static const questTitlePracticeAssign = '연습 과제 등록';
   static const questRewardPracticeAssign = '학생 연습 관리 시작';
 
+  // Quest Board — Phase C (보상 퀘스트)
+  /// #430 G1 — 선택 보상 퀘스트: 전화인증 → 인증 선생님 배지.
+  /// 정책: docs/specs/user/phone_verification_policy.md §2.
+  static const questTitlePhoneVerification = '전화인증';
+
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';

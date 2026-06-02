@@ -37,6 +37,8 @@ class QuestBoardCard extends ConsumerWidget {
     final hasCompletedLesson = ref.watch(homeHasCompletedLessonProvider);
     final hasLessonNote = ref.watch(hasWrittenLessonNoteProvider);
     final hasPracticeAssigned = ref.watch(hasAssignedPracticeProvider);
+    // #430 G1 — Phase C 보상 퀘스트 (전화인증 → 인증 선생님 배지)
+    final isPhoneVerified = ref.watch(homeTeacherPhoneVerifiedProvider);
 
     final allDone =
         hasSlots &&
@@ -48,7 +50,8 @@ class QuestBoardCard extends ConsumerWidget {
         hasSubscription &&
         hasCompletedLesson &&
         hasLessonNote &&
-        hasPracticeAssigned;
+        hasPracticeAssigned &&
+        isPhoneVerified;
 
     if (allDone) return const SizedBox.shrink();
 
@@ -64,6 +67,7 @@ class QuestBoardCard extends ConsumerWidget {
       hasCompletedLesson: hasCompletedLesson,
       hasLessonNote: hasLessonNote,
       hasPracticeAssigned: hasPracticeAssigned,
+      isPhoneVerified: isPhoneVerified,
     );
 
     return Padding(
@@ -113,6 +117,7 @@ class QuestBoardCard extends ConsumerWidget {
     required bool hasCompletedLesson,
     required bool hasLessonNote,
     required bool hasPracticeAssigned,
+    required bool isPhoneVerified,
   }) {
     // Quest order designed by teacher workflow:
     //
@@ -229,6 +234,20 @@ class QuestBoardCard extends ConsumerWidget {
         isCompleted: hasPracticeAssigned,
         isLocked: slotsBlocker,
         onTap: null,
+      ),
+      // ── Phase C (보상 퀘스트) ──
+      // 정책: docs/specs/user/phone_verification_policy.md §2 — 전화인증은
+      // 선택 보상 퀘스트로 "인증 선생님 배지" 부여. 첫 수강권 발급(E3)
+      // 게이트 도달 전 자발 인증을 유도한다.
+      _Quest(
+        step: 11,
+        title: AppStrings.questTitlePhoneVerification,
+        reward: AppStrings.questRewardVerified,
+        isCompleted: isPhoneVerified,
+        isLocked: slotsBlocker,
+        onTap: slotsBlocker
+            ? null
+            : () => context.push(AppRoutes.teacherPhoneVerification),
       ),
     ];
   }
