@@ -1,8 +1,11 @@
-# Onboarding Quest System v2
+# Onboarding Quest System v2 (Archived)
 
-> 상태: 📋 설계 완료 (기존 onboarding_master.md 대체)
-> Last updated: 2026-05-07
-> 관련: [onboarding_master.md](onboarding_master.md) (v1 레거시), [help_manual_spec.md](help_manual_spec.md)
+> ⛔ **DEPRECATED — 읽기 전용 참조용**
+> 공식 SSOT: [`teacher_onboarding_v3_spec.md`](../../onboarding/teacher_onboarding_v3_spec.md)
+> archive 안내: [README](README.md)
+> archive 이관일: 2026-06-01 (E2E 감사 #8 AB-H3)
+> 흡수 항목: 퀘스트 보드, 프로필 완성도 게이지 — 모두 v3 의 QuestBoardCard 에 통합
+> Last updated (archive 전): 2026-05-07
 
 ## 0. 설계 철학
 

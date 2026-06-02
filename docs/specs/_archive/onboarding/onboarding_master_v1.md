@@ -1,8 +1,11 @@
-# Onboarding System Master Spec (v1 — Legacy)
+# Onboarding System Master Spec (v1 — Legacy / Archived)
 
-> ⚠️ **v2 재설계됨**: [onboarding_quest_v2.md](onboarding_quest_v2.md) 참조
-> 구현 상태: ✅ v1 구현 완료 (Mock 모드) → v2 퀘스트 시스템으로 대체 예정
-> Last updated: 2026-05-07 (프로필 사진 선택 정책/악기 선택 시트 회귀 기준 반영)
+> ⛔ **DEPRECATED — 읽기 전용 참조용**
+> 공식 SSOT: [`teacher_onboarding_v3_spec.md`](../../onboarding/teacher_onboarding_v3_spec.md)
+> archive 안내: [README](README.md)
+> archive 이관일: 2026-06-01 (E2E 감사 #8 AB-H3)
+> 흡수 항목: 첫 가용시간 인터스티셜, 가입 → 대시보드 직진 — 모두 v3 에 통합
+> Last updated (archive 전): 2026-05-07
 
 ## 1. 개요
 
