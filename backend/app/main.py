@@ -44,6 +44,23 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         register_daily_kst_job(run_payment_reminder_d1, job_id=JOB_ID_D1, hour=9, minute=0)
         register_daily_kst_job(run_payment_reminder_d3, job_id=JOB_ID_D3, hour=9, minute=1)
         register_daily_kst_job(run_payment_reminder_d7_final, job_id=JOB_ID_D7, hour=9, minute=2)
+
+        # KST 08:05 daily — vacation return announcements (#4 H-001 §6.3).
+        # Runs *before* the payment reminders to keep mid-morning fan-outs
+        # batched within the same alimtalk send window.
+        from app.jobs.vacation_return_jobs import (
+            JOB_ID as JOB_ID_VAC_RETURN,
+        )
+        from app.jobs.vacation_return_jobs import (
+            run_vacation_return_announcement,
+        )
+
+        register_daily_kst_job(
+            run_vacation_return_announcement,
+            job_id=JOB_ID_VAC_RETURN,
+            hour=8,
+            minute=5,
+        )
         start_scheduler()
 
     yield
