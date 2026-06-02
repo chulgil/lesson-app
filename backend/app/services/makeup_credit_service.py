@@ -351,6 +351,28 @@ class MakeupCreditService:
         sub_ids = [s for s in (await self.db.scalars(sub_ids_stmt)).all() if s]
         return {sub_id: await self.recalculate_scheduled_lessons(sub_id) for sub_id in sub_ids}
 
+    async def recompute_for_subscriptions(
+        self,
+        subscription_ids: Iterable[str],
+    ) -> dict[str, int]:
+        """Recompute scheduled_lessons for an explicit list of subscriptions (#7 H-002).
+
+        Faster than `recalculate_for_bookings` when the bulkChange caller already
+        knows which subscriptions are impacted (typical for time-shift / day-shift
+        operations that don't materialize fresh booking rows).
+
+        Returns {subscription_id: new_scheduled_lessons}. Unknown ids are silently
+        skipped to keep the call defensive against stale inputs.
+        """
+        unique_ids = {sid for sid in subscription_ids if sid}
+        result: dict[str, int] = {}
+        for sub_id in unique_ids:
+            sub = await self.db.get(Subscription, sub_id)
+            if sub is None:
+                continue
+            result[sub_id] = await self.recalculate_scheduled_lessons(sub_id)
+        return result
+
 
 __all__ = [
     "DEFAULT_EXPIRY_DAYS",
