@@ -7723,6 +7723,33 @@ class AppStrings {
   static String vacationCardDateRange(String start, String end) =>
       '$start ~ $end';
 
+  // ── 휴가 처리 옵션 (H-001 spec §4.1 step 3 / §5) ─────────────────────
+
+  /// 처리 옵션 섹션 제목.
+  static const vacationDispositionSection = '어떻게 처리할까요?';
+
+  /// 보강 크레딧 적립 라벨.
+  static const vacationDispositionMakeupCreditLabel = '보강 크레딧 적립';
+
+  /// 보강 크레딧 적립 — 권장 표시 (suffix).
+  static const vacationDispositionRecommended = '권장';
+
+  /// 보강 크레딧 적립 설명.
+  static const vacationDispositionMakeupCreditDescription = '학생이 나중에 보강 예약 가능';
+
+  /// 무료 처리 라벨.
+  static const vacationDispositionFreeCancelLabel = '무료 처리';
+
+  /// 무료 처리 설명.
+  static const vacationDispositionFreeCancelDescription = '수강권 차감 없이 취소';
+
+  /// 이월 라벨.
+  static const vacationDispositionRollForwardLabel = '다음 회차로 이월';
+
+  /// 이월 설명 — 휴가 일수만큼 만료일 자동 연장.
+  static const vacationDispositionRollForwardDescription =
+      '수강권 만료일이 휴가 일수만큼 자동 연장';
+
   // ── First Availability Quest (#422) ─────────────────────────────────
   // Spec: docs/specs/onboarding/teacher_first_availability_setup.md
 

@@ -76,6 +76,12 @@ void main() {
       expect(find.text(AppStrings.vacationModeTitle), findsOneWidget);
       expect(find.text(AppStrings.vacationStartDateLabel), findsOneWidget);
       expect(find.text(AppStrings.vacationEndDateLabel), findsOneWidget);
+      // Scroll to the submit button — disposition section pushed it offscreen.
+      await tester.scrollUntilVisible(
+        find.text(AppStrings.vacationRegisterButton),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text(AppStrings.vacationRegisterButton), findsOneWidget);
       // Range not picked → submit must be disabled
       final submit = tester.widget<FilledButton>(find.byType(FilledButton));
