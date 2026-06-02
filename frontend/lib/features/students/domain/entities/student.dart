@@ -5,8 +5,7 @@ import '../../../../core/models/shared_enums.dart';
 import 'lesson_slot.dart';
 
 // Re-export shared enums for convenience
-export '../../../../core/models/shared_enums.dart'
-    show AgeGroup, ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
+export '../../../../core/models/shared_enums.dart' show AgeGroup, PracticeLevel;
 
 part 'student.g.dart';
 
@@ -101,8 +100,8 @@ class Student {
   final DateTime? birthDate; // 생년월일 (비공개, 연령 그룹 자동 계산용)
   final AgeGroup? manualAgeGroup; // 수동 설정 연령 그룹 (학생 앱 미사용 시)
 
-  // V2: Connection status (mutual follow system)
-  final ConnectionStatus connectionStatus; // App connection status
+  // V2: App connection signal (G3 Phase B-2 — `connectedAt` is the SSOT;
+  // the legacy `connectionStatus` enum + BE column were dropped in B-2b).
   final DateTime?
   connectedAt; // When mutual follow was established (for newStudent check)
 
@@ -150,7 +149,6 @@ class Student {
     this.isActive = true,
     this.birthDate,
     this.manualAgeGroup,
-    this.connectionStatus = ConnectionStatus.offline,
     this.connectedAt,
     this.breakReason,
     this.expectedReturnDate,
@@ -197,10 +195,9 @@ class Student {
 
   /// V2: Check if student has app connection.
   ///
-  /// G3 Phase B-2 — derives from `connectedAt` rather than the deprecated
-  /// `connectionStatus` enum. `connectedAt` is set by the BE invite-accept
-  /// flow alongside the (deprecated) status write; this lets us retire the
-  /// status writer without changing the user-visible signal.
+  /// G3 Phase B-2b — `connectedAt` is the canonical signal. The legacy
+  /// `connectionStatus` enum + BE column were removed; this getter remains
+  /// the public API for FE callers.
   bool get isAppConnected => connectedAt != null;
 
   /// Monthly lesson count based on lessons per week
@@ -308,7 +305,6 @@ class Student {
     bool? isActive,
     DateTime? birthDate,
     AgeGroup? manualAgeGroup,
-    ConnectionStatus? connectionStatus,
     DateTime? connectedAt,
     String? breakReason,
     DateTime? expectedReturnDate,
@@ -347,7 +343,6 @@ class Student {
       isActive: isActive ?? this.isActive,
       birthDate: birthDate ?? this.birthDate,
       manualAgeGroup: manualAgeGroup ?? this.manualAgeGroup,
-      connectionStatus: connectionStatus ?? this.connectionStatus,
       connectedAt: connectedAt ?? this.connectedAt,
       breakReason: breakReason ?? this.breakReason,
       expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,

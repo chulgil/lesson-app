@@ -33,7 +33,6 @@ class StudentResponse(BaseModel):
     profile_color: str | None = None
     birth_date: _dt.date | None = None
     age_group: str | None = None
-    connection_status: str | None = None
     connected_at: _dt.datetime | None = None
     practice_level: str | None = None
     break_reason: str | None = None
@@ -90,7 +89,6 @@ class StudentCreate(BaseModel):
         default=None,
         validation_alias=AliasChoices("age_group", "manual_age_group"),
     )
-    connection_status: str | None = None
     practice_level: str | None = None
     break_reason: str | None = None
     expected_return_date: _dt.date | None = None
@@ -132,7 +130,6 @@ class StudentUpdate(BaseModel):
         default=None,
         validation_alias=AliasChoices("age_group", "manual_age_group"),
     )
-    connection_status: str | None = None
     practice_level: str | None = None
     break_reason: str | None = None
     expected_return_date: _dt.date | None = None
