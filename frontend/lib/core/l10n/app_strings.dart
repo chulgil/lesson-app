@@ -8159,6 +8159,26 @@ class AppStrings {
   /// Studio 업그레이드 CTA.
   static const billingStudioUpgradeCta = 'Studio 업그레이드';
 
+  // ── FeatureLockedSheet 진입 기능명 (#415 Phase A1) ─────
+  // dashboard analytics 에 가드 적용 시 sheet 본문에 "{featureName} — ..." 로 prefix 노출.
+
+  /// 월간 통계 리포트 진입 차단 — 기능명.
+  static const featureLockedMonthlyStats = '월간 통계 리포트';
+
+  // ── 구독 관리/영수증 native store deep-link (#415 Phase A2) ──
+  // SubscriptionStatusCard 의 "플랜 관리"/"영수증" 탭 시 Apple App Store / Google Play
+  // 구독 관리 페이지로 이동. backend 자체 관리 화면이 준비되기 전까지 native store 가 SSOT.
+
+  /// Apple/Google 구독 관리 페이지 진입 직전 안내.
+  static const billingManageStoreOpening = '스토어 구독 관리 페이지를 열고 있어요…';
+
+  /// 구독 관리 deep-link 실패 폴백.
+  static const billingManageStoreFailed =
+      '스토어 구독 관리 페이지를 열 수 없어요. 설정 → 구독에서 확인해주세요.';
+
+  /// 영수증 deep-link 안내 — store 구독 화면이 영수증을 포함한다.
+  static const billingReceiptStoreOpening = '스토어에서 영수증을 확인할 수 있어요. 페이지를 여는 중…';
+
   // ── LifetimePromoBanner Phase C2 (#415) ──────────────────
   // spec/paywall_spec.md §1, §6.2 — M5 출시 후 90일 한정 얼리어답터.
 

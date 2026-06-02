@@ -16,6 +16,7 @@ import 'package:lessonaza/features/billing/domain/entities/billing_status.dart';
 import 'package:lessonaza/features/billing/domain/entities/iap_validation_result.dart';
 import 'package:lessonaza/features/billing/domain/entities/trial_activation_result.dart';
 import 'package:lessonaza/features/billing/domain/repositories/app_billing_repository.dart';
+import 'package:lessonaza/features/billing/domain/services/billing_guard.dart';
 import 'package:lessonaza/features/billing/presentation/providers/app_billing_provider.dart';
 import 'package:lessonaza/features/billing/presentation/utils/billing_guard_actions.dart';
 import 'package:lessonaza/features/billing/presentation/widgets/free_limit_sheet.dart';
@@ -332,6 +333,229 @@ void main() {
       expect(pass, 0);
       expect(find.text(AppStrings.paywallPlanExpiredTitle), findsOneWidget);
       expect(find.byKey(FreeLimitSheet.startTrialButtonKey), findsNothing);
+    });
+  });
+
+  group('guardProFeatureNavigation (Phase A1 #415)', () {
+    testWidgets('pro + active, required=pro → onPass 실행, sheet 미노출', (
+      tester,
+    ) async {
+      await _useTallSurface(tester);
+      var pass = 0;
+      await tester.pumpWidget(
+        _harness(
+          snapshot: _snapshot(
+            plan: BillingPlan.pro,
+            status: BillingStatus.active,
+          ),
+          studentCount: 0,
+          onTap: (ctx, ref) {
+            guardProFeatureNavigation(
+              context: ctx,
+              ref: ref,
+              required: TierRequirement.pro,
+              featureName: AppStrings.featureLockedMonthlyStats,
+              onPass: () => pass++,
+            );
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+
+      expect(pass, 1);
+      expect(find.text(AppStrings.featureLockedProTitle), findsNothing);
+    });
+
+    testWidgets(
+      'free, required=pro → FeatureLockedSheet 노출 (tierTooLow), onPass 미호출',
+      (tester) async {
+        await _useTallSurface(tester);
+        var pass = 0;
+        await tester.pumpWidget(
+          _harness(
+            snapshot: _snapshot(
+              plan: BillingPlan.free,
+              status: BillingStatus.active,
+            ),
+            studentCount: 0,
+            onTap: (ctx, ref) {
+              guardProFeatureNavigation(
+                context: ctx,
+                ref: ref,
+                required: TierRequirement.pro,
+                featureName: AppStrings.featureLockedMonthlyStats,
+                onPass: () => pass++,
+              );
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('go'));
+        await tester.pumpAndSettle();
+
+        expect(pass, 0);
+        expect(find.text(AppStrings.featureLockedProTitle), findsOneWidget);
+        // sheet 본문에 featureName prefix 가 노출되어야 한다.
+        expect(
+          find.textContaining(AppStrings.featureLockedMonthlyStats),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'pro + expired, required=pro → planExpired sheet 노출, onPass 미호출',
+      (tester) async {
+        await _useTallSurface(tester);
+        var pass = 0;
+        await tester.pumpWidget(
+          _harness(
+            snapshot: _snapshot(
+              plan: BillingPlan.pro,
+              status: BillingStatus.expired,
+            ),
+            studentCount: 0,
+            onTap: (ctx, ref) {
+              guardProFeatureNavigation(
+                context: ctx,
+                ref: ref,
+                required: TierRequirement.pro,
+                featureName: AppStrings.featureLockedMonthlyStats,
+                onPass: () => pass++,
+              );
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('go'));
+        await tester.pumpAndSettle();
+
+        expect(pass, 0);
+        expect(find.text(AppStrings.featureLockedProTitle), findsOneWidget);
+      },
+    );
+
+    testWidgets('studio + active, required=pro → onPass 실행 (상위 tier)', (
+      tester,
+    ) async {
+      await _useTallSurface(tester);
+      var pass = 0;
+      await tester.pumpWidget(
+        _harness(
+          snapshot: _snapshot(
+            plan: BillingPlan.studio,
+            status: BillingStatus.active,
+          ),
+          studentCount: 0,
+          onTap: (ctx, ref) {
+            guardProFeatureNavigation(
+              context: ctx,
+              ref: ref,
+              required: TierRequirement.pro,
+              featureName: AppStrings.featureLockedMonthlyStats,
+              onPass: () => pass++,
+            );
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+
+      expect(pass, 1);
+    });
+
+    testWidgets(
+      'lifetime, required=studio → Studio sheet 노출 (lifetime != studio)',
+      (tester) async {
+        await _useTallSurface(tester);
+        var pass = 0;
+        await tester.pumpWidget(
+          _harness(
+            snapshot: _snapshot(
+              plan: BillingPlan.lifetime,
+              status: BillingStatus.active,
+            ),
+            studentCount: 0,
+            onTap: (ctx, ref) {
+              guardProFeatureNavigation(
+                context: ctx,
+                ref: ref,
+                required: TierRequirement.studio,
+                featureName: '학원 다중 강사',
+                onPass: () => pass++,
+              );
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('go'));
+        await tester.pumpAndSettle();
+
+        expect(pass, 0);
+        expect(find.text(AppStrings.featureLockedStudioTitle), findsOneWidget);
+      },
+    );
+
+    testWidgets('snapshot 로딩 실패 → fail-open, onPass 실행 (server SSOT 정책)', (
+      tester,
+    ) async {
+      await _useTallSurface(tester);
+      var pass = 0;
+      final repo = _FakeBillingRepository(
+        _snapshot(plan: BillingPlan.free, status: BillingStatus.active),
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appBillingRepositoryProvider.overrideWithValue(repo),
+            studentRepositoryProvider.overrideWithValue(
+              _FakeStudentRepository(0),
+            ),
+            appBillingSnapshotProvider.overrideWith(
+              (ref) => Future<AppBillingSnapshot>.error(
+                Exception('snapshot load failed'),
+              ),
+            ),
+          ],
+          child: MaterialApp(
+            home: Consumer(
+              builder: (context, ref, _) {
+                return Scaffold(
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed:
+                          () => guardProFeatureNavigation(
+                            context: context,
+                            ref: ref,
+                            required: TierRequirement.pro,
+                            featureName: AppStrings.featureLockedMonthlyStats,
+                            onPass: () => pass++,
+                          ),
+                      child: const Text('go'),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('go'));
+      await tester.pumpAndSettle();
+
+      // fail-open: 차단하지 않고 onPass 실행. 백엔드가 server-side 가드.
+      expect(pass, 1);
+      expect(find.text(AppStrings.featureLockedProTitle), findsNothing);
     });
   });
 

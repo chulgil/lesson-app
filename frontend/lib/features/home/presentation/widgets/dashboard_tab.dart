@@ -15,6 +15,7 @@ import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../billing/billing_facade.dart';
 import '../../../practice/domain/entities/practice_loop_stats.dart';
 import '../../../practice/practice_facade.dart';
 import '../../../profile/profile_facade.dart';
@@ -46,12 +47,11 @@ class DashboardTab extends ConsumerWidget {
     final today = DateTime(now.year, now.month, now.day);
     final todayLessons = dashboard.lessons.whenData((lessons) {
       return lessons.where((lesson) {
-          final lessonDate = lesson.date;
-          return lessonDate.year == today.year &&
-              lessonDate.month == today.month &&
-              lessonDate.day == today.day;
-        }).toList()
-        ..sort((a, b) => a.startTime.compareTo(b.startTime));
+        final lessonDate = lesson.date;
+        return lessonDate.year == today.year &&
+            lessonDate.month == today.month &&
+            lessonDate.day == today.day;
+      }).toList()..sort((a, b) => a.startTime.compareTo(b.startTime));
     });
 
     return Stack(
@@ -107,17 +107,14 @@ class DashboardTab extends ConsumerWidget {
 
                   todayLessons.when(
                     data: (lessons) => _buildLessonsList(context, lessons),
-                    loading:
-                        () => const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(AppSpacing.space4),
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                    error:
-                        (error, _) => _buildErrorCard(
-                          AppStrings.dashboardLessonsLoadError,
-                        ),
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(AppSpacing.space4),
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                    error: (error, _) =>
+                        _buildErrorCard(AppStrings.dashboardLessonsLoadError),
                   ),
 
                   const SizedBox(height: AppSpacing.space6),
@@ -162,7 +159,7 @@ class DashboardTab extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space6),
 
                   // ── Fine. 통계 링크 ──
-                  _buildAnalyticsLink(context),
+                  _buildAnalyticsLink(context, ref),
 
                   const SizedBox(height: AppSpacing.space8),
                 ],
@@ -264,51 +261,45 @@ class DashboardTab extends ConsumerWidget {
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
     final todayCard = todayLessons.when(
-      data:
-          (lessons) => StatCard(
-            title: AppStrings.todayLessons,
-            value: AppStrings.usageCountShort(lessons.length),
-            color: AppColors.ink,
-            icon: Icons.today,
-            onTap: onViewAllLessons,
-          ),
-      loading:
-          () => StatCard(
-            title: AppStrings.todayLessons,
-            value: '-',
-            color: AppColors.ink,
-            icon: Icons.today,
-          ),
-      error:
-          (_, __) => StatCard(
-            title: AppStrings.todayLessons,
-            value: '-',
-            color: AppColors.ink,
-          ),
+      data: (lessons) => StatCard(
+        title: AppStrings.todayLessons,
+        value: AppStrings.usageCountShort(lessons.length),
+        color: AppColors.ink,
+        icon: Icons.today,
+        onTap: onViewAllLessons,
+      ),
+      loading: () => StatCard(
+        title: AppStrings.todayLessons,
+        value: '-',
+        color: AppColors.ink,
+        icon: Icons.today,
+      ),
+      error: (_, __) => StatCard(
+        title: AppStrings.todayLessons,
+        value: '-',
+        color: AppColors.ink,
+      ),
     );
 
     final monthCard = lessonStatsAsync.when(
-      data:
-          (stats) => StatCard(
-            title: AppStrings.dashboardThisMonth,
-            value: AppStrings.usageCountShort(stats['completed'] ?? 0),
-            color: AppColors.ink,
-            icon: Icons.check_circle_outline,
-            onTap: () => context.push(AppRoutes.analytics),
-          ),
-      loading:
-          () => StatCard(
-            title: AppStrings.dashboardThisMonth,
-            value: '-',
-            color: AppColors.ink,
-            icon: Icons.check_circle_outline,
-          ),
-      error:
-          (_, __) => StatCard(
-            title: AppStrings.dashboardThisMonth,
-            value: '-',
-            color: AppColors.ink,
-          ),
+      data: (stats) => StatCard(
+        title: AppStrings.dashboardThisMonth,
+        value: AppStrings.usageCountShort(stats['completed'] ?? 0),
+        color: AppColors.ink,
+        icon: Icons.check_circle_outline,
+        onTap: () => context.push(AppRoutes.analytics),
+      ),
+      loading: () => StatCard(
+        title: AppStrings.dashboardThisMonth,
+        value: '-',
+        color: AppColors.ink,
+        icon: Icons.check_circle_outline,
+      ),
+      error: (_, __) => StatCard(
+        title: AppStrings.dashboardThisMonth,
+        value: '-',
+        color: AppColors.ink,
+      ),
     );
 
     return StatCardRow(cards: [todayCard, monthCard]);
@@ -484,10 +475,9 @@ class DashboardTab extends ConsumerWidget {
                 Expanded(
                   child: LessonCard(
                     lesson: lesson,
-                    onTap:
-                        () => context.push(
-                          AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
-                        ),
+                    onTap: () => context.push(
+                      AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                    ),
                   ),
                 ),
               ],
@@ -519,7 +509,10 @@ class DashboardTab extends ConsumerWidget {
 
   /// "Fine." 푸터 — 악보 마지막 종지부 인용.
   /// Playfair Display italic "Fine." + 통계 더보기 링크.
-  Widget _buildAnalyticsLink(BuildContext context) {
+  ///
+  /// #415 Phase A1 — 통계 리포트는 paywall_spec.md §7 의 Pro 전용 기능. 진입 전
+  /// guardProFeatureNavigation 으로 가드 → free 면 FeatureLockedSheet 노출.
+  Widget _buildAnalyticsLink(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         const ThinRule(),
@@ -531,7 +524,13 @@ class DashboardTab extends ConsumerWidget {
             Text('Fine.', style: NotebookTypography.fine),
             const Spacer(),
             TextButton.icon(
-              onPressed: () => context.push(AppRoutes.analytics),
+              onPressed: () => guardProFeatureNavigation(
+                context: context,
+                ref: ref,
+                required: TierRequirement.pro,
+                featureName: AppStrings.featureLockedMonthlyStats,
+                onPass: () => context.push(AppRoutes.analytics),
+              ),
               icon: const Icon(Icons.bar_chart, size: 16, color: AppColors.ink),
               label: Text(
                 AppStrings.dashboardAnalyticsMoreLink,

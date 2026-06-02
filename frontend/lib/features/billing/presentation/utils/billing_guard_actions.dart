@@ -21,6 +21,7 @@ import '../../data/services/iap_service.dart';
 import '../../domain/entities/app_billing_snapshot.dart';
 import '../../domain/services/billing_guard.dart';
 import '../providers/app_billing_provider.dart';
+import '../widgets/feature_locked_sheet.dart';
 import '../widgets/free_limit_sheet.dart';
 
 /// 학생 추가 동작 전에 결제 한도를 확인하고 [onPass] 를 호출한다.
@@ -64,6 +65,62 @@ Future<void> guardAddStudentNavigation({
     trialAvailable: !snapshot.trialUsed,
     onBuyPro: () => handleBuyPro(context: context, ref: ref),
     onStartTrial: () => handleStartTrial(context: context, ref: ref),
+  );
+}
+
+/// Pro/Studio 전용 기능 진입 가드.
+///
+/// 호출 패턴:
+///   await guardProFeatureNavigation(
+///     context: context,
+///     ref: ref,
+///     required: TierRequirement.pro,
+///     featureName: AppStrings.featureLockedMonthlyStats,
+///     onPass: () => context.push(AppRoutes.analytics),
+///   );
+///
+/// 흐름:
+/// 1. 스냅샷 로딩 실패 시 fail-open (서버가 SSOT — `guardAddStudentNavigation` 과 동일 정책).
+/// 2. `BillingGuard.requireTier` 통과 → [onPass] 실행.
+/// 3. tierTooLow → [FeatureLockedSheet] 노출, 사용자가 업그레이드 누르면 [handleBuyPro] (또는 Studio 의 경우 동일 CTA, M5 후속 단계에서 분기).
+/// 4. planExpired → 동일 sheet 노출 (Pro 갱신 안내). 7일 유예 동안 동일 paywall UX 재사용.
+Future<void> guardProFeatureNavigation({
+  required BuildContext context,
+  required WidgetRef ref,
+  required TierRequirement required,
+  required String featureName,
+  required VoidCallback onPass,
+}) async {
+  AppBillingSnapshot snapshot;
+  try {
+    snapshot = await ref.read(appBillingSnapshotProvider.future);
+  } catch (_) {
+    // fail-open — 백엔드가 server-side enforcement 책임 (paywall_spec.md §5
+    // default-deny). 클라이언트 가드는 UX 안내 layer.
+    if (!context.mounted) return;
+    onPass();
+    return;
+  }
+  if (!context.mounted) return;
+
+  const guard = BillingGuard();
+  final decision = guard.requireTier(snapshot: snapshot, required: required);
+
+  if (decision.allowed) {
+    onPass();
+    return;
+  }
+
+  final lockedTier = switch (required) {
+    TierRequirement.pro => LockedFeatureTier.pro,
+    TierRequirement.studio => LockedFeatureTier.studio,
+  };
+
+  await showFeatureLockedSheet(
+    context: context,
+    tier: lockedTier,
+    featureName: featureName,
+    onUpgrade: () => handleBuyPro(context: context, ref: ref),
   );
 }
 
