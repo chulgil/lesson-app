@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -44,11 +46,22 @@ class AuthNotifier extends _$AuthNotifier {
   ///
   /// 정책: `docs/specs/user/phone_verification_policy.md §2.3` — 필수
   /// 묶음(서비스 이용약관 + 개인정보 처리방침)과 마케팅 동의는 별도로 기록.
-  /// 백엔드 영속 저장은 Phase 2 의 `User.termsAcceptedAt` /
-  /// `User.marketingConsentAt` 마이그레이션에서 처리.
+  /// 로컬 state 를 즉시 갱신하고 백엔드에는 POST /auth/consent 로 영속
+  /// 저장 (실패해도 UX 는 차단하지 않음 — 다음 진입 시 재시도 가능).
   void acceptTerms({bool marketingConsent = false}) {
     _termsAgreed = true;
     _marketingConsent = marketingConsent;
+    // Fire-and-forget — 백엔드 저장 실패는 가입 흐름을 차단하지 않는다.
+    // (인증 토큰 없는 상태 등에서 호출되면 조용히 실패한다.)
+    unawaited(_persistConsent(marketingConsent: marketingConsent));
+  }
+
+  Future<void> _persistConsent({required bool marketingConsent}) async {
+    try {
+      await _authRepository.acceptTerms(marketingConsent: marketingConsent);
+    } catch (e) {
+      debugPrint('[Auth] consent persist failed: $e');
+    }
   }
 
   @override

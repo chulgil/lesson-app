@@ -36,6 +36,18 @@ class User(UUIDMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
+    # #430 G1 B2 — 약관 동의 기록 (phone_verification_policy.md §5.2)
+    # 서비스 이용약관 + 개인정보 처리방침은 필수 묶음으로 한 시각에 기록.
+    # 마케팅 정보 수신은 정보통신망법 제50조에 따라 별도 동의로 기록.
+    terms_accepted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    marketing_consent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
     # i18n / localization
     locale: Mapped[str] = mapped_column(String(10), nullable=False, default="ko")
     country: Mapped[str] = mapped_column(String(2), nullable=False, default="KR")

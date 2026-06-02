@@ -63,10 +63,20 @@ class RemoteAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AuthUser> acceptTerms({required bool marketingConsent}) async {
+    final response = await _apiClient.post(
+      '/auth/consent',
+      data: {'marketing_consent': marketingConsent},
+    );
+    return AuthUser.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
   Future<void> logout() async {
     final refreshToken = await _tokenStorage.getRefreshToken();
-    await _apiClient.post('/auth/logout', data: {
-      if (refreshToken != null) 'refresh_token': refreshToken,
-    });
+    await _apiClient.post(
+      '/auth/logout',
+      data: {if (refreshToken != null) 'refresh_token': refreshToken},
+    );
   }
 }

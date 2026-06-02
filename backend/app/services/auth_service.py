@@ -216,6 +216,30 @@ class AuthService:
         await self.db.refresh(user)
         return user
 
+    async def accept_terms(self, user: Any, marketing_consent: bool) -> Any:
+        """#430 G1 B2 — 약관 동의 영속 저장.
+
+        본 메서드 호출 자체가 필수 묶음(서비스 이용약관 + 개인정보 처리방침)
+        동의를 의미한다. 마케팅 정보 수신은 정보통신망법 제50조에 따라 별도
+        시각으로 기록된다 (false 일 때는 None 유지).
+
+        재호출 시 마케팅 동의만 갱신되고 terms_accepted_at 은 최초 동의
+        시각을 유지한다 (감사 추적성).
+        """
+        from datetime import datetime
+
+        now = datetime.now(UTC)
+        if user.terms_accepted_at is None:
+            user.terms_accepted_at = now
+        if marketing_consent:
+            user.marketing_consent_at = now
+        else:
+            user.marketing_consent_at = None
+        self.db.add(user)
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user
+
     # ------------------------------------------------------------------
     # Provider-specific user info fetching
     # ------------------------------------------------------------------

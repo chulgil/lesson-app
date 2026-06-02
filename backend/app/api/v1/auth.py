@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, status  # noqa: F401  (Header used in string Annotated below)
+from fastapi import APIRouter, Body, Depends, Header, status  # noqa: F401  (Header used in string Annotated below)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
@@ -18,7 +18,7 @@ from app.schemas.auth import (
     TokenResponse,
 )
 from app.schemas.common import SuccessResponse
-from app.schemas.user import RoleUpdate, UserResponse
+from app.schemas.user import RoleUpdate, TermsConsentRequest, UserResponse
 from app.services.auth_service import AuthService
 
 router = APIRouter()
@@ -126,4 +126,26 @@ async def update_my_role(
     """Set the role for a newly registered user (role must be null)."""
     service = AuthService(db)
     user = await service.update_new_user_role(current_user, body.role)
+    return UserResponse.model_validate(user)
+
+
+@router.post(
+    "/consent",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Record terms agreement and optional marketing consent",
+)
+async def accept_terms(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    body: Annotated[TermsConsentRequest, Body()] = TermsConsentRequest(),
+) -> UserResponse:
+    """#430 G1 B2 — 약관 동의 영속 저장.
+
+    호출 자체가 필수 묶음(서비스 이용약관 + 개인정보 처리방침) 동의를
+    의미한다. `marketing_consent` 는 정보통신망법 제50조에 따라 별도로
+    기록된다.
+    """
+    service = AuthService(db)
+    user = await service.accept_terms(current_user, body.marketing_consent)
     return UserResponse.model_validate(user)

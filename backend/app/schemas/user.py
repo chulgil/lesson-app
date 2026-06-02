@@ -1,6 +1,5 @@
 """User-related schemas."""
 
-
 import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -22,7 +21,22 @@ class UserResponse(BaseModel):
     timezone: str | None = None
     currency: str | None = None
     onboarding_completed: bool = False
+    # #430 G1 B2 — phone_verification_policy.md §5.2
+    terms_accepted_at: _dt.datetime | None = None
+    marketing_consent_at: _dt.datetime | None = None
     created_at: _dt.datetime | None = None
+
+
+class TermsConsentRequest(BaseModel):
+    """#430 G1 B2 — 약관 동의 기록 요청.
+
+    필수 묶음(서비스 이용약관 + 개인정보 처리방침) 은 본 요청 자체로
+    동의된 것으로 간주된다(클라이언트는 필수 미체크 시 요청 자체를 보내지
+    않는다). 마케팅 정보 수신은 정보통신망법 제50조에 따라 별도 필드로
+    기록한다.
+    """
+
+    marketing_consent: bool = False
 
 
 class UserUpdate(BaseModel):
