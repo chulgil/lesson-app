@@ -296,11 +296,26 @@ async def test_contract_student_response_all_fields(client, auth_headers, create
     data = resp.json()
     # All fields should be present (even if null)
     expected_fields = [
-        "id", "teacher_id", "name", "instrument", "level", "status",
-        "phone", "parent_phone", "parent_name", "email",
-        "lesson_day", "lesson_time", "lesson_duration",
-        "birth_date", "age_group", "connection_status",
-        "practice_level", "break_reason", "notes", "is_active",
+        "id",
+        "teacher_id",
+        "name",
+        "instrument",
+        "level",
+        "status",
+        "phone",
+        "parent_phone",
+        "parent_name",
+        "email",
+        "lesson_day",
+        "lesson_time",
+        "lesson_duration",
+        "birth_date",
+        "age_group",
+        "connected_at",
+        "practice_level",
+        "break_reason",
+        "notes",
+        "is_active",
     ]
     for field in expected_fields:
         assert field in data, f"Missing field: {field}"
@@ -530,9 +545,7 @@ async def test_contract_subscription_proposal_response_contains_required_fronten
 
 
 @pytest.mark.asyncio
-async def test_contract_subscription_use_lesson_records_frontend_context(
-    client, auth_headers, create_test_user
-):
+async def test_contract_subscription_use_lesson_records_frontend_context(client, auth_headers, create_test_user):
     """RemoteSubscriptionRepository.useLesson sends teacher_name and instrument for usage history."""
     await create_test_user()
     student_resp = await client.post(
@@ -852,9 +865,7 @@ async def test_contract_schedule_exception_rich_format(client, auth_headers, cre
 
 
 @pytest.mark.asyncio
-async def test_contract_schedule_availability_delete(
-    client, auth_headers, create_test_user
-):
+async def test_contract_schedule_availability_delete(client, auth_headers, create_test_user):
     """Frontend teacher availability repository calls DELETE /schedule/availability."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -990,9 +1001,7 @@ async def test_contract_schedule_slots_date_range_returns_dates_and_full_slots(
 
 
 @pytest.mark.asyncio
-async def test_contract_group_bookings_frontend_shapes_and_body_actions(
-    client, auth_headers, create_test_user
-):
+async def test_contract_group_bookings_frontend_shapes_and_body_actions(client, auth_headers, create_test_user):
     """RemoteGroupClassBookingRepository expects paginated /groups/bookings and body actions."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1073,9 +1082,7 @@ async def test_contract_group_bookings_frontend_shapes_and_body_actions(
 
 
 @pytest.mark.asyncio
-async def test_contract_booking_update_and_delete(
-    client, auth_headers, create_test_user
-):
+async def test_contract_booking_update_and_delete(client, auth_headers, create_test_user):
     """Frontend booking repository calls PUT/DELETE /bookings/{id}."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1178,9 +1185,7 @@ async def test_contract_booking_create_preserves_frontend_student_and_date_alias
 
 
 @pytest.mark.asyncio
-async def test_contract_slot_booking_accepts_availability_slot_payload(
-    client, auth_headers, create_test_user
-):
+async def test_contract_slot_booking_accepts_availability_slot_payload(client, auth_headers, create_test_user):
     """RemoteTeacherAvailabilityRepository books a computed slot with slot_id only."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1325,9 +1330,7 @@ async def test_contract_practice_log_get_by_id(client, auth_headers, create_test
 
 
 @pytest.mark.asyncio
-async def test_contract_practice_log_list_frontend_shape_and_filters(
-    client, auth_headers, create_test_user
-):
+async def test_contract_practice_log_list_frontend_shape_and_filters(client, auth_headers, create_test_user):
     """Frontend practice repository expects /practice-logs to return {items: [...]}."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1371,9 +1374,7 @@ async def test_contract_practice_log_list_frontend_shape_and_filters(
 
 
 @pytest.mark.asyncio
-async def test_contract_practice_log_frontend_create_and_weekly_defaults(
-    client, auth_headers, create_test_user
-):
+async def test_contract_practice_log_frontend_create_and_weekly_defaults(client, auth_headers, create_test_user):
     """RemotePracticeRepository posts student_id in body and omits week_start."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1403,9 +1404,7 @@ async def test_contract_practice_log_frontend_create_and_weekly_defaults(
 
 
 @pytest.mark.asyncio
-async def test_contract_practice_streak_update_and_record(
-    client, auth_headers, create_test_user
-):
+async def test_contract_practice_streak_update_and_record(client, auth_headers, create_test_user):
     """Frontend practice repository calls PUT /practice/streak and POST /practice/streak/record."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1430,9 +1429,7 @@ async def test_contract_practice_streak_update_and_record(
 
 
 @pytest.mark.asyncio
-async def test_contract_teaching_resource_get_by_id(
-    client, auth_headers, create_test_user
-):
+async def test_contract_teaching_resource_get_by_id(client, auth_headers, create_test_user):
     """Frontend teaching resource repository calls GET /settings/teaching-resources/{id}."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1466,8 +1463,10 @@ async def test_contract_lesson_request_crud(client, auth_headers, student_auth_h
     """Frontend calls /schedule/lesson-requests for full CRUD."""
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(
-        user_id="test-student-id", role="student",
-        name="Student", email="student@test.com",
+        user_id="test-student-id",
+        role="student",
+        name="Student",
+        email="student@test.com",
     )
 
     # Create (as student)
@@ -1514,9 +1513,7 @@ async def test_contract_lesson_request_crud(client, auth_headers, student_auth_h
 
 
 @pytest.mark.asyncio
-async def test_contract_lesson_policy_frontend_repository(
-    client, auth_headers, create_test_user
-):
+async def test_contract_lesson_policy_frontend_repository(client, auth_headers, create_test_user):
     """Frontend calls /lesson-policies/* with LessonPolicy JSON field names."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1656,9 +1653,7 @@ async def test_contract_lesson_policy_class_policy_overrides_teacher_default(
 
 
 @pytest.mark.asyncio
-async def test_lesson_policy_class_policy_requires_owned_class(
-    client, create_test_user, db_session
-):
+async def test_lesson_policy_class_policy_requires_owned_class(client, create_test_user, db_session):
     """Teachers cannot create class policies for another teacher's class."""
     from app.models.lesson import LessonClass
 
@@ -1691,9 +1686,7 @@ async def test_lesson_policy_class_policy_requires_owned_class(
 
 
 @pytest.mark.asyncio
-async def test_lesson_policy_mutations_are_scoped_to_owning_teacher(
-    client, create_test_user
-):
+async def test_lesson_policy_mutations_are_scoped_to_owning_teacher(client, create_test_user):
     """Teachers cannot create, update, or delete another teacher's policy."""
     await create_test_user(user_id="teacher-a-id", role="teacher", email="teacher-a-policy@test.com")
     await create_test_user(user_id="teacher-b-id", role="teacher", email="teacher-b-policy@test.com")
@@ -1747,9 +1740,7 @@ async def test_lesson_policy_mutations_are_scoped_to_owning_teacher(
 
 
 @pytest.mark.asyncio
-async def test_contract_follow_list_and_notification_update(
-    client, auth_headers, create_test_user
-):
+async def test_contract_follow_list_and_notification_update(client, auth_headers, create_test_user):
     """Frontend follow repository calls GET /follows and PATCH /follows/{id}."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1778,9 +1769,7 @@ async def test_contract_follow_list_and_notification_update(
 
 
 @pytest.mark.asyncio
-async def test_contract_gamification_badge_award(
-    client, auth_headers, create_test_user
-):
+async def test_contract_gamification_badge_award(client, auth_headers, create_test_user):
     """Frontend gamification repository calls POST /gamification/{student_id}/badges."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1814,9 +1803,7 @@ async def test_contract_gamification_badge_award(
 
 
 @pytest.mark.asyncio
-async def test_contract_subscription_settings_flat_crud(
-    client, auth_headers, create_test_user
-):
+async def test_contract_subscription_settings_flat_crud(client, auth_headers, create_test_user):
     """Frontend calls flat /subscription-settings routes."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -1934,9 +1921,7 @@ async def test_subscription_settings_flat_routes_are_scoped_to_teacher_profile(c
 
 
 @pytest.mark.asyncio
-async def test_contract_manual_teacher_crud(
-    client, student_auth_headers, create_test_user
-):
+async def test_contract_manual_teacher_crud(client, student_auth_headers, create_test_user):
     """Frontend student home repository calls /manual-teachers CRUD."""
     await create_test_user(
         user_id="test-student-id",
@@ -1994,9 +1979,7 @@ async def test_contract_manual_teacher_crud(
 
 
 @pytest.mark.asyncio
-async def test_contract_posts_and_monthly_analytics(
-    client, auth_headers, create_test_user
-):
+async def test_contract_posts_and_monthly_analytics(client, auth_headers, create_test_user):
     """Frontend feed and analytics repositories call /posts and /analytics/monthly-stats."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -2027,9 +2010,7 @@ async def test_contract_posts_and_monthly_analytics(
 
 
 @pytest.mark.asyncio
-async def test_contract_posts_are_persisted_and_filtered(
-    client, auth_headers, create_test_user
-):
+async def test_contract_posts_are_persisted_and_filtered(client, auth_headers, create_test_user):
     """Posts should be persisted so follow feed can load teacher/academy announcements."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -2077,15 +2058,11 @@ async def test_contract_posts_are_persisted_and_filtered(
     )
     assert by_authors.status_code == 200
     assert by_authors.json()["total"] == 3
-    assert {item["id"] for item in by_authors.json()["items"]} == {
-        item["id"] for item in created
-    }
+    assert {item["id"] for item in by_authors.json()["items"]} == {item["id"] for item in created}
 
 
 @pytest.mark.asyncio
-async def test_contract_post_create_rejects_unowned_author(
-    client, auth_headers, create_test_user
-):
+async def test_contract_post_create_rejects_unowned_author(client, auth_headers, create_test_user):
     """Teachers must not create feed posts for an unrelated author_id."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -2104,9 +2081,7 @@ async def test_contract_post_create_rejects_unowned_author(
 
 
 @pytest.mark.asyncio
-async def test_contract_monthly_analytics_aggregates_lessons_and_students(
-    client, auth_headers, create_test_user
-):
+async def test_contract_monthly_analytics_aggregates_lessons_and_students(client, auth_headers, create_test_user):
     """Monthly analytics should aggregate teacher lessons and active students."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
@@ -2183,7 +2158,7 @@ async def test_contract_monthly_analytics_aggregates_lessons_and_students(
         {"month": "2026-02-01T00:00:00", "lesson_count": 0, "revenue": 0},
         {"month": "2026-03-01T00:00:00", "lesson_count": 0, "revenue": 0},
         {"month": "2026-04-01T00:00:00", "lesson_count": 1, "revenue": 0},
-        {"month": "2026-05-01T00:00:00", "lesson_count": 3, "revenue": 0}
+        {"month": "2026-05-01T00:00:00", "lesson_count": 3, "revenue": 0},
     ]
 
 
@@ -2268,7 +2243,7 @@ async def test_contract_monthly_analytics_aggregates_confirmed_subscription_reve
         {"month": "2026-02-01T00:00:00", "lesson_count": 0, "revenue": 0},
         {"month": "2026-03-01T00:00:00", "lesson_count": 0, "revenue": 0},
         {"month": "2026-04-01T00:00:00", "lesson_count": 0, "revenue": 70000},
-        {"month": "2026-05-01T00:00:00", "lesson_count": 0, "revenue": 120000}
+        {"month": "2026-05-01T00:00:00", "lesson_count": 0, "revenue": 120000},
     ]
 
 
@@ -2470,9 +2445,7 @@ async def test_contract_relationship_status_with_metadata(client, auth_headers, 
 
 
 @pytest.mark.asyncio
-async def test_contract_relationship_schedule_metadata_without_status(
-    client, auth_headers, create_test_user
-):
+async def test_contract_relationship_schedule_metadata_without_status(client, auth_headers, create_test_user):
     """Frontend recordSchedule patches schedule fields without a status value."""
     await create_test_user()
     invite_resp = await client.post(

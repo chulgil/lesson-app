@@ -62,64 +62,6 @@ enum AgeGroup {
   }
 }
 
-/// Connection status for mutual follow system
-/// Used by: Student, Invite
-///
-/// **DEPRECATED — RelationshipStatus is the SSOT (G3 Phase B).**
-///
-/// spec: docs/specs/review/2026-06-01-teacher-e2e/30-gap-catalog.md
-/// #5 D-G3 `이중 상태 충돌`. New surface logic must read from
-/// `features/relationship/.../RelationshipStatus` (FE) and
-/// `app.models.relationship.RelationStatus` (BE).
-///
-/// This enum is retained while `Student.connectionStatus` (FE entity field
-/// and BE column) is still in use; data migration + column drop will land
-/// in Phase B-2.
-@Deprecated('Use RelationshipStatus — G3 Phase B (gap-catalog #5)')
-enum ConnectionStatus {
-  offline, // Manual registration only (no app)
-  inviteSent, // I followed, waiting for follow back
-  inviteReceived, // They followed me, I haven't followed back
-  connected, // Mutual follow established
-  disconnected; // Was connected, but one side unfollowed
-
-  String get label {
-    switch (this) {
-      case ConnectionStatus.offline:
-        return '오프라인';
-      case ConnectionStatus.inviteSent:
-        return '초대 보냄';
-      case ConnectionStatus.inviteReceived:
-        return '초대 받음';
-      case ConnectionStatus.connected:
-        return '연결됨';
-      case ConnectionStatus.disconnected:
-        return '연결 끊김';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case ConnectionStatus.offline:
-        return AppColors.inkTertiary;
-      case ConnectionStatus.inviteSent:
-        return AppColors.paperAccent;
-      case ConnectionStatus.inviteReceived:
-        return AppColors.ink;
-      case ConnectionStatus.connected:
-        return AppColors.paperOk;
-      case ConnectionStatus.disconnected:
-        return AppColors.inkTertiary;
-    }
-  }
-
-  /// Whether this status represents an app-connected user
-  bool get isAppConnected => this == ConnectionStatus.connected;
-
-  /// Whether action button should show "Re-connect" instead of "Invite"
-  bool get showReconnectButton => this == ConnectionStatus.disconnected;
-}
-
 /// Practice level for integrated indicator
 /// Used by: Student, Invite
 enum PracticeLevel {
@@ -172,34 +114,5 @@ enum PracticeLevel {
       case PracticeLevel.onBreak:
         return 0;
     }
-  }
-}
-
-/// Helper class to calculate connection status from follow relationships
-class ConnectionStatusHelper {
-  /// Calculate ConnectionStatus from follow relationships
-  static ConnectionStatus calculateStatus({
-    required bool iFollowThem,
-    required bool theyFollowMe,
-    required bool hasAppAccount,
-  }) {
-    if (!hasAppAccount) return ConnectionStatus.offline;
-    if (iFollowThem && theyFollowMe) return ConnectionStatus.connected;
-    if (iFollowThem && !theyFollowMe) return ConnectionStatus.inviteSent;
-    if (!iFollowThem && theyFollowMe) return ConnectionStatus.inviteReceived;
-    return ConnectionStatus.disconnected;
-  }
-
-  /// Calculate PracticeLevel from practice days in last 7 days
-  static PracticeLevel calculatePracticeLevel({
-    required int practiceDaysInLast7Days,
-    required bool isOnBreak,
-    required bool isNewStudent,
-  }) {
-    if (isOnBreak) return PracticeLevel.onBreak;
-    if (isNewStudent) return PracticeLevel.newStudent;
-    if (practiceDaysInLast7Days >= 5) return PracticeLevel.excellent;
-    if (practiceDaysInLast7Days >= 3) return PracticeLevel.average;
-    return PracticeLevel.poor;
   }
 }

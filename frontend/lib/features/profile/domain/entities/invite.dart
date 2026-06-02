@@ -2,8 +2,7 @@
 // Moved from lib/features/profile/domain/entities/invite.dart for Clean Architecture
 
 // Re-export shared enums for backward compatibility
-export '../../../../core/models/shared_enums.dart'
-    show ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
+export '../../../../core/models/shared_enums.dart' show PracticeLevel;
 
 /// Method used to send/receive invitation
 enum InviteMethod {
@@ -316,8 +315,9 @@ class Connection {
 
 // ============================================================================
 // V2 Models - Mutual Follow System (invite_system_v2.md)
-// Note: ConnectionStatus, PracticeLevel, ConnectionStatusHelper are defined in
-// lib/core/models/shared_enums.dart and re-exported from this file.
+// Note: PracticeLevel is defined in lib/core/models/shared_enums.dart and
+// re-exported from this file. (ConnectionStatus + ConnectionStatusHelper
+// were removed in G3 Phase B-2b — RelationshipStatus is the SSOT.)
 // ============================================================================
 
 /// Follow relationship for V2 mutual follow system

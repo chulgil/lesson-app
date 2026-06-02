@@ -29,29 +29,6 @@ class AgeGroup(str, enum.Enum):
     adult = "adult"
 
 
-class ConnectionStatus(str, enum.Enum):
-    """**DEPRECATED — RelationshipStatus is the SSOT (G3 Phase A).**
-
-    spec: docs/specs/review/2026-06-01-teacher-e2e/30-gap-catalog.md #5 D-G3 `이중 상태 충돌`.
-    Use `app.models.relationship.RelationStatus` for new code and surface logic.
-    This enum is kept for the legacy `Student.connection_status` column until
-    Phase B migrates writes; readers should prefer `relation_status_for_student`
-    or the resolver helpers exposed by the relation service.
-
-    Mapping (canonical, see resolver):
-      offline / disconnected   → RelationStatus.disconnected | inactive | pending
-      inviteSent               → RelationStatus.pending (sent by teacher)
-      inviteReceived           → RelationStatus.pending (sent by student)
-      connected                → RelationStatus.active | trialBooked
-    """
-
-    offline = "offline"
-    inviteSent = "inviteSent"
-    inviteReceived = "inviteReceived"
-    connected = "connected"
-    disconnected = "disconnected"
-
-
 class PracticeLevel(str, enum.Enum):
     newStudent = "newStudent"
     excellent = "excellent"
@@ -107,12 +84,9 @@ class Student(UUIDMixin, TimestampMixin, Base):
     lesson_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     lesson_duration: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
 
-    # Connection
-    connection_status: Mapped[ConnectionStatus] = mapped_column(
-        Enum(ConnectionStatus, native_enum=True),
-        nullable=False,
-        default=ConnectionStatus.offline,
-    )
+    # Connection (G3 Phase B-2b — `connection_status` column dropped;
+    # `connected_at` is the canonical app-connected signal, alongside
+    # `TeacherStudentRelation.status`).
     connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Practice
@@ -136,5 +110,4 @@ class Student(UUIDMixin, TimestampMixin, Base):
         Index("idx_students_user_id", "user_id"),
         Index("idx_students_teacher_id", "teacher_id"),
         Index("idx_students_status", "status"),
-        Index("idx_students_connection", "connection_status"),
     )
