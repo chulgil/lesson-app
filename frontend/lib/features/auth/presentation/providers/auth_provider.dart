@@ -30,13 +30,25 @@ class AuthNotifier extends _$AuthNotifier {
   late final TokenStorage _tokenStorage;
   late final AuthRepository _authRepository;
 
-  /// Whether the user has agreed to terms in this session.
+  /// Whether the user has agreed to required terms in this session.
   bool _termsAgreed = false;
   bool get termsAgreed => _termsAgreed;
 
-  /// Mark terms as accepted (in-memory, valid for this session).
-  void acceptTerms() {
+  /// Whether the user opted into marketing communications.
+  ///
+  /// 정보통신망법 제50조에 따라 마케팅 정보 수신은 별도 동의로 관리한다.
+  bool _marketingConsent = false;
+  bool get marketingConsent => _marketingConsent;
+
+  /// Mark required terms as accepted with optional marketing consent.
+  ///
+  /// 정책: `docs/specs/user/phone_verification_policy.md §2.3` — 필수
+  /// 묶음(서비스 이용약관 + 개인정보 처리방침)과 마케팅 동의는 별도로 기록.
+  /// 백엔드 영속 저장은 Phase 2 의 `User.termsAcceptedAt` /
+  /// `User.marketingConsentAt` 마이그레이션에서 처리.
+  void acceptTerms({bool marketingConsent = false}) {
     _termsAgreed = true;
+    _marketingConsent = marketingConsent;
   }
 
   @override
@@ -44,6 +56,7 @@ class AuthNotifier extends _$AuthNotifier {
     _tokenStorage = ref.read(tokenStorageProvider);
     _authRepository = ref.read(authRepositoryProvider);
     _termsAgreed = false;
+    _marketingConsent = false;
 
     // In mock mode at startup, skip auto-login (no stored tokens to check).
     // Uses ref.read (not watch) so mode changes after login don't reset auth state.

@@ -1,30 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
-import '../providers/auth_provider.dart';
 
-/// Terms agreement screen shown after OAuth login for new users.
-/// Required by Korean privacy law before role selection.
-class TermsAgreementScreen extends ConsumerStatefulWidget {
-  const TermsAgreementScreen({super.key});
+/// 약관 동의 상태 값 객체.
+///
+/// `requiredAccepted` 가 `true` 여야 가입 진행이 허용된다. `marketingConsent`
+/// 는 정보통신망법 제50조에 따라 별도 동의 항목으로 별도 저장된다.
+class TermsAgreementState {
+  const TermsAgreementState({
+    required this.requiredAccepted,
+    required this.marketingConsent,
+  });
 
-  @override
-  ConsumerState<TermsAgreementScreen> createState() =>
-      _TermsAgreementScreenState();
+  final bool requiredAccepted;
+  final bool marketingConsent;
+
+  static const initial = TermsAgreementState(
+    requiredAccepted: false,
+    marketingConsent: false,
+  );
 }
 
-class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
+/// 약관 동의 섹션 — 가입 흐름에 인라인 통합되는 위젯.
+///
+/// 정책: [phone_verification_policy.md §2.3](../../../../../../../docs/specs/user/phone_verification_policy.md)
+/// 별도 페이지 분리 제거. 필수 묶음(서비스 이용약관 + 개인정보 처리방침) 1탭과
+/// 마케팅 정보 수신(선택) 별도 1탭의 2단 구조.
+class TermsAgreementSection extends StatefulWidget {
+  const TermsAgreementSection({super.key, required this.onChanged});
+
+  final ValueChanged<TermsAgreementState> onChanged;
+
+  @override
+  State<TermsAgreementSection> createState() => _TermsAgreementSectionState();
+}
+
+class _TermsAgreementSectionState extends State<TermsAgreementSection> {
   bool _termsOfService = false;
   bool _privacyPolicy = false;
   bool _marketingConsent = false;
@@ -34,130 +52,85 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
   bool get _allChecked =>
       _termsOfService && _privacyPolicy && _marketingConsent;
 
-  void _toggleAll(bool? value) {
-    setState(() {
-      _termsOfService = value ?? false;
-      _privacyPolicy = value ?? false;
-      _marketingConsent = value ?? false;
-    });
-  }
-
-  void _onContinue() {
-    ref.read(authNotifierProvider.notifier).acceptTerms();
-    context.go(AppRoutes.roleSelect);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return NotebookScreenScaffold(
-      backgroundColor: AppColors.paperDark,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppSpacing.space8),
-
-              // Notebook × Score §7.17: 화면 진입 타이틀 Playfair.
-              Text(
-                AppStrings.authTermsAgreement,
-                style: NotebookTypography.sectionTitle,
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '원활한 서비스 이용을 위해\n아래 약관에 동의해 주세요.',
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.space8),
-
-              // Select all
-              _buildSelectAllItem(),
-
-              const SizedBox(height: 16),
-              const ThinRule(),
-              const SizedBox(height: 16),
-
-              // Individual items
-              _buildTermItem(
-                required: true,
-                label: AppStrings.authTermsOfService,
-                value: _termsOfService,
-                onChanged: (v) => setState(() => _termsOfService = v ?? false),
-                onViewContent:
-                    () => _showTermsContent(
-                      context,
-                      '서비스 이용약관',
-                      _termsOfServiceContent,
-                    ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              _buildTermItem(
-                required: true,
-                label: AppStrings.authPrivacyPolicy,
-                value: _privacyPolicy,
-                onChanged: (v) => setState(() => _privacyPolicy = v ?? false),
-                onViewContent:
-                    () => _showTermsContent(
-                      context,
-                      '개인정보 수집·이용 동의',
-                      _privacyPolicyContent,
-                    ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              _buildTermItem(
-                required: false,
-                label: AppStrings.authMarketingConsent,
-                value: _marketingConsent,
-                onChanged:
-                    (v) => setState(() => _marketingConsent = v ?? false),
-                onViewContent:
-                    () => _showTermsContent(
-                      context,
-                      '마케팅 정보 수신 동의',
-                      _marketingConsentContent,
-                    ),
-              ),
-
-              const Spacer(),
-
-              // Continue button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: FilledButton(
-                  onPressed: _allRequired ? _onContinue : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.paperAccent,
-                    disabledBackgroundColor: AppColors.paperAccent.withValues(
-                      alpha: 0.3,
-                    ),
-                    shape: RoundedRectangleBorder(),
-                  ),
-                  child: Text(
-                    '계속',
-                    // Notebook × Score §7.50: Vermillion CTA foreground = paper.
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.paper,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
-        ),
+  void _emit() {
+    widget.onChanged(
+      TermsAgreementState(
+        requiredAccepted: _allRequired,
+        marketingConsent: _marketingConsent,
       ),
     );
   }
 
+  void _toggleAll(bool value) {
+    setState(() {
+      _termsOfService = value;
+      _privacyPolicy = value;
+      _marketingConsent = value;
+    });
+    _emit();
+  }
+
+  void _setTerms(bool value) {
+    setState(() => _termsOfService = value);
+    _emit();
+  }
+
+  void _setPrivacy(bool value) {
+    setState(() => _privacyPolicy = value);
+    _emit();
+  }
+
+  void _setMarketing(bool value) {
+    setState(() => _marketingConsent = value);
+    _emit();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSelectAllItem(),
+        const SizedBox(height: AppSpacing.space3),
+        const ThinRule(),
+        const SizedBox(height: AppSpacing.space3),
+        _buildTermItem(
+          required: true,
+          label: AppStrings.authTermsOfService,
+          value: _termsOfService,
+          onChanged: _setTerms,
+          onViewContent: () =>
+              _showTermsContent(context, '서비스 이용약관', _termsOfServiceContent),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        _buildTermItem(
+          required: true,
+          label: AppStrings.authPrivacyPolicy,
+          value: _privacyPolicy,
+          onChanged: _setPrivacy,
+          onViewContent: () => _showTermsContent(
+            context,
+            '개인정보 수집·이용 동의',
+            _privacyPolicyContent,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        _buildTermItem(
+          required: false,
+          label: AppStrings.authMarketingConsent,
+          value: _marketingConsent,
+          onChanged: _setMarketing,
+          onViewContent: () => _showTermsContent(
+            context,
+            '마케팅 정보 수신 동의',
+            _marketingConsentContent,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSelectAllItem() {
-    // Notebook × Score §7.113·§7.114: 전체 동의 카드 각진화 (약관 종이 기하).
     return InkWell(
       onTap: () => _toggleAll(!_allChecked),
       child: Container(
@@ -168,13 +141,13 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(
-            color:
-                _allChecked ? AppColors.paperAccent : AppColors.inkQuaternary,
+            color: _allChecked
+                ? AppColors.paperAccent
+                : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
           children: [
-            // Notebook × Score: Material Checkbox 대신 연필 사각 체크박스.
             Padding(
               padding: const EdgeInsets.all(AppSpacing.space1),
               child: PencilBox(checked: _allChecked, size: 20),
@@ -196,13 +169,12 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
     required bool required,
     required String label,
     required bool value,
-    required ValueChanged<bool?> onChanged,
+    required ValueChanged<bool> onChanged,
     required VoidCallback onViewContent,
   }) {
     final tag = required ? '[필수]' : '[선택]';
     final tagColor = required ? AppColors.paperAccent : AppColors.inkTertiary;
 
-    // Notebook × Score §7.113·§7.114: 약관 개별 항목 각진화.
     return InkWell(
       onTap: () => onChanged(!value),
       child: Padding(
@@ -212,7 +184,6 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
         ),
         child: Row(
           children: [
-            // Notebook × Score: Material Checkbox 대신 연필 사각 체크박스.
             Padding(
               padding: const EdgeInsets.all(AppSpacing.space1),
               child: PencilBox(checked: value, size: 18),
@@ -244,9 +215,11 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
   }
 
   void _showTermsContent(BuildContext context, String title, String content) {
-    showNotebookModalBottomSheet<void>(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(),
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.7,
@@ -256,16 +229,12 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
           builder: (context, scrollController) {
             return Column(
               children: [
-                // Handle bar
                 const BottomSheetHandle(),
-                // Title
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.space4),
-                  // Notebook × Score §7.27: 바텀시트 제목 Playfair.
                   child: Text(title, style: NotebookTypography.sectionTitle),
                 ),
                 const ThinRule(),
-                // Content
                 Expanded(
                   child: SingleChildScrollView(
                     controller: scrollController,
