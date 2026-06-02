@@ -37,12 +37,21 @@ Ghost 테마는 위 경로를 라우팅하고, 필요한 데이터는 FastAPI �
 
 ### 3.2 앱 딥링크
 
-| 용도 | 딥링크 |
-|------|--------|
-| 초대 연결 | `lessonapp://invite/{code}` |
-| 레슨 요약 앱 열기 | `lessonapp://student/summary/{token}` |
+| 용도 | 딥링크 | 등록 상태 |
+|------|--------|---------|
+| 초대 연결 | `lessonapp://invite/{code}` | ✅ iOS Info.plist + Android AndroidManifest.xml (#416) |
+| 레슨 요약 앱 열기 | `lessonapp://student/summary/{token}` | ✅ 동일 |
 
 딥링크의 iOS/Android 등록은 frontend/native 작업이다. 백엔드는 URL 계약과 응답 필드만 보장한다.
+
+#### 3.2.1 Universal Link / App Link (후속 — 미구현)
+
+`https://lessonaza.com/invite/{code}` 같은 https URL 을 앱이 직접 열기 위해서는 다음이 필요하다.
+
+- iOS: `Associated Domains` entitlement + `apple-app-site-association` (백엔드 도메인 `.well-known/`)
+- Android: AndroidManifest.xml `<intent-filter android:autoVerify="true">` + `assetlinks.json`
+
+본 작업은 `lessonaza.com` 도메인 발급 + 백엔드 `.well-known` 정적 호스팅 결정 후 별도 PR 로 진행한다 (#416 §4 "선택" 항목).
 
 ## 4. 백엔드 공개 API 계약
 
