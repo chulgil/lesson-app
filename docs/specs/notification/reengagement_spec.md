@@ -135,7 +135,7 @@ stateDiagram-v2
 
 | 사용자 유형 | 제안 |
 |------------|------|
-| 무료 사용자 | TrialPro 14일 무료 |
+| 무료 사용자 | Pro 체험 14일 무료 (`tier=pro, status=trial`) |
 | 만료된 Pro | Pro 1개월 50% 할인 코드 |
 | Lifetime | 인센티브 없음 (제거 불가) |
 

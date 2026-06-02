@@ -1,6 +1,7 @@
 # Paywall Spec — 앱 사용료 과금 (Flow B)
 
 > 작성일: 2026-05-18
+> 마지막 업데이트: 2026-06-02 (backend SSOT 동기화 #415 Phase C 후속)
 > 상태: 활성 (마스터 SSOT)
 > 관련: [payment_architecture.md](./payment_architecture.md) §3 미래 정책
 > 옵시디언 원본: `~/Dev/mybrain/10 Projects/레슨앱/11-R4-수익화-상세스펙.md`
@@ -17,7 +18,7 @@
 | 돈 주체 | 선생님/학원 | Lessonaza 앱관리자 |
 | 결제 수단 | 외부 무통장입금/현금 | StoreKit2 / PlayBilling (IAP) |
 | 모델 | `Subscription`, `SubscriptionProposal` | `AppBillingPlan` (신규) |
-| 라우터 | `/subscriptions/*` | `/app/billing/*` (신규) |
+| 라우터 | `/subscriptions/*` | `/me/billing/*` (canonical), `/app/billing/*` (legacy alias, backend가 같은 router를 두 prefix에 mount) |
 | 트리거 | 선생님이 학생에게 수강권 제안 | 선생님이 6번째 학생 추가 시도 |
 
 **물리적 분리**: 흐름 B 모델/서비스/UI는 흐름 A와 동일 파일/테이블에 섞지 않는다.
@@ -28,14 +29,18 @@
 
 | 플랜 | 학생 수 | 가격 (KRW) | 비고 |
 |------|---------|-----------|------|
-| **Free** | 5명 | 0 | 가입 기본값 |
-| **TrialPro** | 무제한 | 0 (14일) | 자동 갱신 없음. 만료 시 Free 복귀 |
-| **Pro 월간** | 무제한 | 9,900/월 | 기본 유료 플랜 |
-| **Pro 연간** | 무제한 | 94,800/년 (7,900/월 환산) | 약 20% 할인 |
-| **Studio 월간** | 무제한 + 학원 기능 | 29,900/월 | 강사 다중 관리 |
-| **Lifetime** | 무제한 (영구) | 199,000 (1회) | M5 출시 후 90일 한정 얼리어답터 |
+| **Free** | 5명 | 0 | 가입 기본값. `tier=free, status=active` |
+| **Pro 체험** | 무제한 | 0 (14일) | 별도 tier 아님 — `tier=pro, status=trial` 조합. 자동 갱신 없음, 만료 시 Free 복귀 |
+| **Pro 월간** | 무제한 | 9,900/월 | 기본 유료 플랜. `tier=pro, status=active` |
+| **Pro 연간** | 무제한 | 94,800/년 (7,900/월 환산) | 약 20% 할인. `tier=pro` 동일 (SKU만 차이) |
+| **Studio 월간** | 무제한 + 학원 기능 | 29,900/월 | 강사 다중 관리. `tier=studio, status=active` |
+| **Lifetime** | 무제한 (영구) | 199,000 (1회) | M5 출시 후 90일 한정 얼리어답터. **프론트엔드 전용 SKU** — 백엔드 `BillingTier` enum 미포함 (M5 후속 확장 예정) |
 
-플랜 ID는 백엔드 enum `BillingPlan`: `free`, `trial_pro`, `pro`, `studio`, `lifetime`.
+**Tier vs Plan 명명**:
+- 백엔드 `BillingTier` enum (canonical): `free`, `pro`, `studio` — 코드: [`backend/app/models/app_billing.py`](../../../backend/app/models/app_billing.py)
+- 백엔드 `BillingPlanStatus` enum: `active`, `trial`, `expired`, `cancelled`
+- 프론트엔드 `BillingPlan` enum: `free`, `pro`, `studio`, `lifetime` — `lifetime` 만 백엔드 enum 보다 앞서 있음 ([billing_plan.dart](../../../frontend/lib/features/billing/domain/entities/billing_plan.dart))
+- 체험(`Pro 체험`)은 별도 tier 가 아니라 `(tier=pro, status=trial)` 튜플로 표현. spec 본문에서 "TrialPro" 라는 용어는 더 이상 사용하지 않는다.
 
 ### 1.1 Lifetime 얼리어답터 오퍼 가용성
 
@@ -56,15 +61,17 @@
 
 ## 2. 상태 전이
 
+상태는 `(tier, status)` 튜플로 표현된다. 다이어그램 노드는 사용자 관점 라벨이고, 괄호 안이 백엔드 enum 값이다.
+
 ```mermaid
 stateDiagram-v2
     [*] --> Free: 가입
-    Free --> TrialPro: 6번째 학생 추가 시도 → 체험 선택
+    Free --> ProTrial: 6번째 학생 추가 시도 → 체험 선택
     Free --> Pro: 직접 구매
     Free --> Studio: 직접 구매
     Free --> Lifetime: 얼리어답터 (90일 한정)
-    TrialPro --> Pro: 14일 내 결제
-    TrialPro --> Free: 14일 만료 (5명 제한 복귀)
+    ProTrial --> Pro: 14일 내 결제
+    ProTrial --> Free: 14일 만료 (5명 제한 복귀)
     Pro --> Studio: 업그레이드
     Pro --> Expired: 결제 실패
     Studio --> Expired: 결제 실패
@@ -73,9 +80,19 @@ stateDiagram-v2
     Lifetime --> Lifetime: 만료 없음
 ```
 
+| 라벨 | 백엔드 매핑 |
+|------|-------------|
+| Free | `tier=free, status=active` |
+| **ProTrial** | `tier=pro, status=trial` (별도 tier 아님) |
+| Pro | `tier=pro, status=active` |
+| Studio | `tier=studio, status=active` |
+| Expired | `tier=pro|studio, status=expired` |
+| Lifetime | `tier=lifetime, status=active` (FE 전용 SKU) |
+
 **중요 규칙**:
-- TrialPro 종료 시 학생 수가 5명을 초과해도 **기존 학생 데이터는 보존**. 신규 학생 추가만 차단.
+- ProTrial 종료 시 학생 수가 5명을 초과해도 **기존 학생 데이터는 보존**. 신규 학생 추가만 차단.
 - Expired 7일 유예 동안 모든 Pro 기능 유지. 8일째에 Free 강등.
+- `trial_used: bool` 컬럼이 backend `app_billing_plans` 에 있어 "체험 1회만 사용 가능" 을 enforce. 재시도 시 409 응답.
 
 ---
 
@@ -106,8 +123,8 @@ sequenceDiagram
 
     alt 14일 체험 선택
         T->>App: "14일 무료 체험"
-        App->>API: POST /app/billing/trial/start
-        API->>API: plan=trial_pro, trial_ends_at=+14d
+        App->>API: POST /me/billing/trial/start
+        API->>API: tier=pro, status=trial, expires_at=+14d, trial_used=true
         App->>T: 체험 배너 + 학생 추가 성공
     else Pro 즉시 구매
         T->>App: "Pro 구매"
@@ -115,9 +132,9 @@ sequenceDiagram
         IAP->>T: 시스템 결제 시트
         T->>IAP: 결제 완료
         IAP->>App: PurchaseDetails (receipt)
-        App->>API: POST /app/billing/verify-purchase
+        App->>API: POST /me/billing/iap/validate
         API->>IAP: 영수증 검증
-        API->>API: plan=pro, expires_at=+1mo
+        API->>API: tier=pro, status=active, expires_at=+1mo
         App->>T: "Pro 활성화" SnackBar
     end
 ```
@@ -126,27 +143,79 @@ sequenceDiagram
 
 ## 4. 데이터 모델
 
-### 4.1 백엔드 — `app_billing_plans` 테이블
+### 4.1 백엔드 — `app_billing_plans` 테이블 (실제 구현)
 
 ```python
-# backend/app/models/app_billing.py (신규)
-class AppBillingPlan(Base):
+# backend/app/models/app_billing.py
+class BillingTier(str, enum.Enum):
+    free = "free"
+    pro = "pro"
+    studio = "studio"
+    # lifetime: 프론트엔드 SKU 만 존재. M5 후속 enum 확장 예정.
+
+
+class BillingPlanStatus(str, enum.Enum):
+    active = "active"
+    trial = "trial"
+    expired = "expired"
+    cancelled = "cancelled"
+
+
+class AppBillingPlan(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "app_billing_plans"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
-    teacher_id: Mapped[str] = mapped_column(ForeignKey("teachers.id"))
-    plan: Mapped[str]  # free | trial_pro | pro | studio | lifetime
-    store_platform: Mapped[str | None]  # ios | android | web
-    original_transaction_id: Mapped[str | None]
-    trial_ends_at: Mapped[datetime | None]
-    expires_at: Mapped[datetime | None]
-    created_at: Mapped[datetime]
-    updated_at: Mapped[datetime]
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False,
+    )
+    tier: Mapped[BillingTier] = mapped_column(
+        Enum(BillingTier, native_enum=True), default=BillingTier.free,
+    )
+    status: Mapped[BillingPlanStatus] = mapped_column(
+        Enum(BillingPlanStatus, native_enum=True), default=BillingPlanStatus.active,
+    )
+    started_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    source: Mapped[str] = mapped_column(String(50), default="admin_grant")
+    original_transaction_id: Mapped[str | None] = mapped_column(String(255))
+    trial_used: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    __table_args__ = (UniqueConstraint("teacher_id"),)
+    # 1 user = 1 plan row (실제 DB UniqueConstraint, 의도 가시화 목적).
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_app_billing_plans_user_id"),
+        Index("idx_app_billing_expires", "expires_at"),
+        Index("idx_app_billing_status", "status"),
+    )
+
+
+class IapReceipt(UUIDMixin, TimestampMixin, Base):
+    """IAP 영수증 감사 로그. Apple/Google 양쪽."""
+    __tablename__ = "iap_receipts"
+    user_id: Mapped[str]            # FK users.id, CASCADE
+    platform: Mapped[IapPlatform]   # apple | google
+    raw_receipt: Mapped[str]        # Text
+    transaction_id: Mapped[str]
+    product_id: Mapped[str]
+    status: Mapped[IapReceiptStatus]  # pending_verification | verified | invalid | expired
+    validated_at: Mapped[datetime | None]
+
+    # (platform, transaction_id) 전역 unique — replay 차단.
+    __table_args__ = (UniqueConstraint("platform", "transaction_id"), ...)
 ```
 
 흐름 A의 `Subscription`/`Payment` 모델과 **별도 테이블, 별도 서비스, 별도 라우터**.
+
+**spec ↔ 코드 명명 매핑** (drift 잔재 정리):
+
+| spec 초안 (deprecated) | 실제 코드 |
+|------------------------|-----------|
+| `teacher_id` | `user_id` (테이블 FK는 users.id) |
+| `plan: str` 단일 컬럼 | `tier: BillingTier` + `status: BillingPlanStatus` 분리 |
+| `trial_pro` (별도 plan 값) | `(tier=pro, status=trial)` 튜플 |
+| `trial_ends_at` | `expires_at` (trial 도 동일 컬럼 사용, `status=trial` 로 trial 식별) |
+| `store_platform` | (없음) — platform 은 `iap_receipts` 에만 저장 |
+| — | `trial_used: bool` 추가 (재시도 enforce) |
+| — | `source: str` 추가 (admin_grant / iap / promo) |
+| — | `IapReceipt` 별도 테이블 (감사 trail) |
 
 ### 4.2 프론트엔드 — Feature 분리
 
@@ -176,26 +245,60 @@ features/billing/                          # 신규 도메인
 
 ## 5. API 인터페이스
 
-| Method | Path | 용도 |
-|--------|------|------|
-| GET | `/app/billing/me` | 현재 선생님 플랜 조회 |
-| POST | `/app/billing/trial/start` | TrialPro 시작 (Free → TrialPro) |
-| POST | `/app/billing/verify-purchase` | IAP 영수증 검증 + 플랜 활성화 |
-| POST | `/app/billing/cancel` | 다음 갱신 차단 (기존 기간은 유지) |
-| GET | `/app/billing/receipts` | 영수증 이력 |
+backend 라우터는 동일 router 를 **두 prefix 에 mount**: `/api/v1/me/billing/*` (canonical) + `/api/v1/app/billing/*` (legacy alias). 신규 호출자는 `/me/billing/*` 사용.
 
-응답 스키마:
+| Method | Canonical Path | 별칭 (deprecated) | 용도 |
+|--------|----------------|-------------------|------|
+| GET | `/me/billing/plan` | `/me/billing/me` | 현재 사용자 plan 조회 (FE 채택) |
+| POST | `/me/billing/trial/start` | — | 14일 Pro 체험 시작. 409 = 이미 사용 |
+| POST | `/me/billing/iap/validate` | `/me/billing/verify-purchase` | IAP 영수증 검증 + 플랜 활성화 |
+| POST | `/me/billing/cancel` | — | 다음 갱신 차단 (기존 기간 유지) |
+| GET | `/me/billing/receipts` | — | IAP 영수증 감사 이력 |
+
+코드: [`backend/app/api/v1/app_billing.py`](../../../backend/app/api/v1/app_billing.py), router mount: [`backend/app/api/v1/__init__.py`](../../../backend/app/api/v1/__init__.py).
+
+**응답 스키마 — `BillingPlanResponse`** (GET `/me/billing/plan`):
 
 ```json
 {
-  "plan": "pro",
-  "store_platform": "ios",
-  "trial_ends_at": null,
-  "expires_at": "2026-06-18T00:00:00Z",
-  "student_count": 12,
-  "student_limit": null  // null = 무제한
+  "id": "uuid",
+  "user_id": "uuid",
+  "tier": "pro",                                    // free | pro | studio
+  "status": "trial",                                // active | trial | expired | cancelled
+  "started_at": "2026-05-18T00:00:00Z",
+  "expires_at": "2026-06-01T00:00:00Z",             // trial 만료 / 다음 갱신 시각
+  "source": "iap",                                  // admin_grant | iap | promo
+  "original_transaction_id": "1000000123456789",    // IAP 결제 시
+  "trial_used": true,                               // 체험 1회 사용 여부
+  "lifetime_offer_ends_at": "2026-08-15T00:00:00Z"  // null = 노출 안함 (lifetime promo)
 }
 ```
+
+**frontend 매퍼**: [`app_billing_dto.dart`](../../../frontend/lib/features/billing/data/repositories/app_billing_dto.dart) 가 snake_case + camelCase 둘 다 허용. 404/401 응답은 `freeFallback` 으로 graceful degradation.
+
+**IAP validate 요청 본문** (POST `/me/billing/iap/validate`):
+
+```json
+{
+  "platform": "apple",    // apple | google
+  "receipt": "MIIToQ...",  // 원본 영수증
+  "product_id": "pro_monthly"
+}
+```
+
+응답 `IapValidateResponse`:
+
+```json
+{
+  "success": true,
+  "message": "Receipt validated and plan activated",
+  "plan_id": "uuid",
+  "tier": "pro",
+  "expires_at": "2026-07-01T00:00:00Z"
+}
+```
+
+**default-deny 가드** (#405): backend 는 production/beta 에서 IAP 검증을 기본 `granted=false` 로 응답하고 영수증만 저장. dev 환경에서 `IAP_AUTO_GRANT_ON_PENDING_DEV_ONLY` 플래그로만 자동 승인. Phase D 에서 Apple S2S + Google RTDN wiring 후 플래그 해제 예정.
 
 ---
 
@@ -413,6 +516,7 @@ IAP 수수료(Apple 15% 소기업 / 30% 일반)는 실수령에서 차감.
 | 2026-05-29 | Lifetime UI는 `AppBillingSnapshot.lifetimeOfferEndsAt` 단일 nullable 필드로 graceful degradation | 백엔드 미응답/윈도우 종료/이미 lifetime 보유 케이스를 한 곳에서 처리. 클라이언트는 시점/할당 로직 무지. |
 | 2026-05-29 | Lifetime 진입점은 프로필 탭 인라인 promo banner (별도 paywall sheet 아님) | 얼리어답터 한정 = 능동 어필 필요. 학생 한도 sheet 와 분리해 일상 결제 흐름 오염 방지. |
 | 2026-05-29 | `productId = 'lifetime'` 으로 StoreKit/Play 상품 ID 고정 | `handleBuyPro` 와 동일 흐름 재사용. spec/IAP/백엔드 검증 키를 단일 문자열로 정렬. |
+| 2026-06-02 | spec → backend SSOT 동기화 (§1·§2·§4.1·§5) | Phase C1 머지 시 외상화된 drift 해결. `trial_pro` 별도 plan 표기를 `(tier=pro, status=trial)` 튜플로 통합. canonical endpoint 를 `/me/billing/*` 로 명시. `/app/billing/*` 는 legacy alias 로 유지 (backend dual mount). |
 
 ---
 
