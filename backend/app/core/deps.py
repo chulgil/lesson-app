@@ -114,6 +114,32 @@ def require_role(*roles: str) -> Callable[..., Any]:
     return role_checker
 
 
+async def require_phone_verified_teacher(
+    teacher_user: Annotated[User, Depends(get_current_teacher)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User:
+    """E3 hard gate — block subscription issuance until the teacher's phone is verified.
+
+    Spec: docs/specs/user/phone_verification_policy.md §4.2 / §5.3.
+    Frontend intercepts the 409 + ``phone_verification_required`` code and
+    routes to the verification flow.
+
+    Returns the verified teacher user so the caller still receives the
+    ``current_user`` it would have gotten from ``get_current_teacher``.
+    """
+    from app.core.exceptions import PhoneVerificationRequiredException
+    from app.models.teacher import Teacher
+
+    teacher_row = await db.scalar(select(Teacher).where(Teacher.user_id == teacher_user.id))
+    # No teacher profile yet: keep current behaviour and let the downstream
+    # service raise a more specific error. The gate is opt-in per route.
+    if teacher_row is None:
+        return teacher_user
+    if not teacher_row.is_phone_verified:
+        raise PhoneVerificationRequiredException("수강권 발급에는 전화인증이 필요해요")
+    return teacher_user
+
+
 async def require_internal_api_key(
     api_key: Annotated[str | None, Depends(internal_api_key_header)],
 ) -> None:
@@ -164,6 +190,7 @@ async def get_pagination(
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 CurrentTeacher = Annotated[User, Depends(get_current_teacher)]
+VerifiedTeacher = Annotated[User, Depends(require_phone_verified_teacher)]
 CurrentStudent = Annotated[User, Depends(get_current_student)]
 CurrentParent = Annotated[User, Depends(get_current_parent)]
 Pagination = Annotated[dict[str, int], Depends(get_pagination)]
