@@ -37,7 +37,6 @@ const _publicPaths = [AppRoutes.login, '/login'];
 const _publicPathPrefixes = ['/student/summary/'];
 
 const _roleSelectPath = AppRoutes.roleSelect;
-const _termsAgreementPath = AppRoutes.termsAgreement;
 
 /// App router configuration
 class AppRouter {
@@ -54,54 +53,46 @@ class AppRouter {
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
-      redirect:
-          useMockData
-              ? null
-              : (context, state) {
-                final authState = ref.read(authNotifierProvider);
-                final currentPath = state.matchedLocation;
-                final isPublic =
-                    _publicPaths.contains(currentPath) ||
-                    _publicPathPrefixes.any(currentPath.startsWith);
-                final isRoleSelect = currentPath == _roleSelectPath;
-                final isTermsAgreement = currentPath == _termsAgreementPath;
+      redirect: useMockData
+          ? null
+          : (context, state) {
+              final authState = ref.read(authNotifierProvider);
+              final currentPath = state.matchedLocation;
+              final isPublic =
+                  _publicPaths.contains(currentPath) ||
+                  _publicPathPrefixes.any(currentPath.startsWith);
+              final isRoleSelect = currentPath == _roleSelectPath;
 
-                if (authState is AuthLoading) return null;
+              if (authState is AuthLoading) return null;
 
-                if (authState is AuthUnauthenticated && !isPublic) {
-                  return AppRoutes.login;
+              if (authState is AuthUnauthenticated && !isPublic) {
+                return AppRoutes.login;
+              }
+
+              // New OAuth signup: terms agreement is collected inline inside
+              // RoleSelectScreen (phone_verification_policy.md §2.3).
+              if (authState is AuthNeedsRole && !isRoleSelect) {
+                return AppRoutes.roleSelect;
+              }
+
+              // Onboarding not completed: redirect to profile setup
+              if (authState is AuthNeedsOnboarding) {
+                final isOnboarding =
+                    currentPath.contains('/onboarding/') ||
+                    currentPath == AppRoutes.studentInviteCode ||
+                    currentPath == AppRoutes.parentInviteCode;
+                if (!isOnboarding && !isRoleSelect) {
+                  return AppRoutes.roleSelect;
                 }
+              }
 
-                // New OAuth signup: terms agreement → role selection
-                if (authState is AuthNeedsRole) {
-                  final termsAgreed =
-                      ref.read(authNotifierProvider.notifier).termsAgreed;
-                  if (!termsAgreed && !isTermsAgreement) {
-                    return AppRoutes.termsAgreement;
-                  }
-                  if (termsAgreed && !isRoleSelect) {
-                    return AppRoutes.roleSelect;
-                  }
-                }
+              if (authState is AuthAuthenticated &&
+                  (isPublic || isRoleSelect)) {
+                return authState.role.homeRoute;
+              }
 
-                // Onboarding not completed: redirect to profile setup
-                if (authState is AuthNeedsOnboarding) {
-                  final isOnboarding =
-                      currentPath.contains('/onboarding/') ||
-                      currentPath == AppRoutes.studentInviteCode ||
-                      currentPath == AppRoutes.parentInviteCode;
-                  if (!isOnboarding && !isRoleSelect) {
-                    return AppRoutes.roleSelect;
-                  }
-                }
-
-                if (authState is AuthAuthenticated &&
-                    (isPublic || isRoleSelect || isTermsAgreement)) {
-                  return authState.role.homeRoute;
-                }
-
-                return null;
-              },
+              return null;
+            },
       routes: [
         // Combine all domain-specific routes
         ...authRoutes,
@@ -119,10 +110,9 @@ class AppRouter {
         ...shareRoutes,
         ...subscriptionRoutes,
       ],
-      errorBuilder:
-          (context, state) => NotebookScreenScaffold(
-            body: Center(child: Text('Page not found: ${state.uri}')),
-          ),
+      errorBuilder: (context, state) => NotebookScreenScaffold(
+        body: Center(child: Text('Page not found: ${state.uri}')),
+      ),
     );
   }
 
@@ -147,9 +137,8 @@ class AppRouter {
       ...shareRoutes,
       ...subscriptionRoutes,
     ],
-    errorBuilder:
-        (context, state) => NotebookScreenScaffold(
-          body: Center(child: Text('Page not found: ${state.uri}')),
-        ),
+    errorBuilder: (context, state) => NotebookScreenScaffold(
+      body: Center(child: Text('Page not found: ${state.uri}')),
+    ),
   );
 }

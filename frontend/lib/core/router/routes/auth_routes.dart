@@ -10,7 +10,6 @@ import '../../../features/auth/presentation/screens/login_screen.dart';
 import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
 import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
-import '../../../features/auth/presentation/screens/terms_agreement_screen.dart';
 import '../../../features/onboarding/presentation/screens/first_availability_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
 import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
@@ -28,14 +27,10 @@ List<GoRoute> authRoutes = [
     builder: (context, state) => const LoginScreen(),
   ),
 
-  // Terms agreement (after first OAuth signup, before role selection)
-  GoRoute(
-    path: AppRoutes.termsAgreement,
-    name: 'termsAgreement',
-    builder: (context, state) => const TermsAgreementScreen(),
-  ),
-
-  // Role selection (after first OAuth signup)
+  // Role selection (after first OAuth signup) — also collects terms inline.
+  // 정책: phone_verification_policy.md §2.3 — 약관 동의 별도 페이지 제거.
+  // 종전 `/terms-agreement` 경로는 deprecated 되고 RoleSelectScreen 안에
+  // TermsAgreementSection 으로 통합됨.
   GoRoute(
     path: AppRoutes.roleSelect,
     name: 'roleSelect',

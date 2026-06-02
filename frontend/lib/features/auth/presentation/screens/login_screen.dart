@@ -366,9 +366,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
         context.go(authState.role.homeRoute);
-      } else if (authState is AuthNeedsRole) {
-        context.go(AppRoutes.termsAgreement);
-      } else if (authState is AuthNeedsOnboarding) {
+      } else if (authState is AuthNeedsRole ||
+          authState is AuthNeedsOnboarding) {
+        // 정책: phone_verification_policy.md §2.3 — 약관 동의는 별도 페이지
+        // 없이 RoleSelectScreen 안에 인라인 통합. 신규 가입(AuthNeedsRole)
+        // 도 곧바로 roleSelect 로 이동.
         context.go(AppRoutes.roleSelect);
       }
     } catch (e) {

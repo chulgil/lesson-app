@@ -8,7 +8,6 @@ class AppRoutes {
   static const splash = '/';
   static const login = '/login';
   static const roleSelect = '/role-select';
-  static const termsAgreement = '/terms-agreement';
   static const parentInviteCode = '/parent/invite-code';
   static const studentInviteCode = '/student/invite-code';
 
