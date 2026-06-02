@@ -34,6 +34,7 @@ class _StubVacationRepository implements VacationRepository {
     required DateTime endDate,
     String? reason,
     required VacationDisposition defaultDisposition,
+    Map<String, VacationDisposition>? perStudentDisposition,
   }) async {
     return VacationPeriod(
       id: 'stub',

@@ -190,6 +190,10 @@ class VacationPeriod(UUIDMixin, TimestampMixin, Base):
         nullable=False,
         default=VacationDisposition.rollForward,
     )
+    # spec §4.2 — student-id → disposition overrides. NULL when no overrides exist.
+    # Backend stores; effective per-student handling is processed by the
+    # makeupCredit / freeCancel pipelines in follow-up work.
+    per_student_disposition: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (

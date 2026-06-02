@@ -27,6 +27,8 @@ class VacationFormState {
   final DateTime? endDate;
   final String reason;
   final VacationDisposition disposition;
+  // spec §4.2 — per-student override. Absent key = "follow default".
+  final Map<String, VacationDisposition> perStudentOverrides;
   final VacationImpactPreview? impact;
   final bool isLoadingImpact;
   final bool isSubmitting;
@@ -37,6 +39,7 @@ class VacationFormState {
     this.endDate,
     this.reason = '',
     this.disposition = VacationDisposition.rollForward,
+    this.perStudentOverrides = const {},
     this.impact,
     this.isLoadingImpact = false,
     this.isSubmitting = false,
@@ -54,18 +57,23 @@ class VacationFormState {
     DateTime? endDate,
     String? reason,
     VacationDisposition? disposition,
+    Map<String, VacationDisposition>? perStudentOverrides,
     VacationImpactPreview? impact,
     bool? isLoadingImpact,
     bool? isSubmitting,
     String? errorMessage,
     bool clearImpact = false,
     bool clearError = false,
+    bool clearOverrides = false,
   }) {
     return VacationFormState(
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       reason: reason ?? this.reason,
       disposition: disposition ?? this.disposition,
+      perStudentOverrides: clearOverrides
+          ? const {}
+          : (perStudentOverrides ?? this.perStudentOverrides),
       impact: clearImpact ? null : (impact ?? this.impact),
       isLoadingImpact: isLoadingImpact ?? this.isLoadingImpact,
       isSubmitting: isSubmitting ?? this.isSubmitting,
@@ -99,6 +107,19 @@ class VacationFormNotifier extends StateNotifier<VacationFormState> {
     state = state.copyWith(disposition: value);
   }
 
+  /// spec §4.2 — Set or clear (`null`) the override for one student.
+  void setStudentOverride(String studentId, VacationDisposition? override) {
+    final next = Map<String, VacationDisposition>.from(
+      state.perStudentOverrides,
+    );
+    if (override == null) {
+      next.remove(studentId);
+    } else {
+      next[studentId] = override;
+    }
+    state = state.copyWith(perStudentOverrides: next);
+  }
+
   Future<void> loadImpact() async {
     if (!state.hasValidRange) return;
     state = state.copyWith(isLoadingImpact: true, clearError: true);
@@ -125,6 +146,9 @@ class VacationFormNotifier extends StateNotifier<VacationFormState> {
         endDate: state.endDate!,
         reason: state.reason.trim().isEmpty ? null : state.reason.trim(),
         defaultDisposition: state.disposition,
+        perStudentDisposition: state.perStudentOverrides.isEmpty
+            ? null
+            : state.perStudentOverrides,
       );
       state = state.copyWith(isSubmitting: false);
       return period;

@@ -7760,6 +7760,21 @@ class AppStrings {
   static const vacationDispositionRollForwardDescription =
       '수강권 만료일이 휴가 일수만큼 자동 연장';
 
+  // ── 학생별 처리 옵션 (spec §4.2) ────────────────────────────────────
+
+  /// 학생별 long-press BottomSheet 제목.
+  static const vacationPerStudentSheetTitle = '이 학생만 다르게 처리';
+
+  /// 학생별 long-press BottomSheet 부제 (안내).
+  static const vacationPerStudentSheetHint = '꾹 눌러서 학생 한 명의 처리 방식을 바꿀 수 있어요.';
+
+  /// "기본값 사용" 라벨 — override 제거 옵션.
+  static const vacationPerStudentUseDefault = '기본값 사용';
+
+  /// override 적용된 카드의 라벨 prefix (예: "다른 처리: 보강 크레딧 적립").
+  static String vacationPerStudentOverrideLabel(String dispositionLabel) =>
+      '다른 처리: $dispositionLabel';
+
   // ── First Availability Quest (#422) ─────────────────────────────────
   // Spec: docs/specs/onboarding/teacher_first_availability_setup.md
 
