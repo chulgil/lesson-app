@@ -8,7 +8,13 @@ from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
+from app.core.deps import (
+    get_current_teacher,
+    get_current_user,
+    get_db,
+    get_pagination,
+    require_phone_verified_teacher,
+)
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
@@ -92,9 +98,14 @@ async def list_subscriptions(
 async def create_subscription(
     body: SubscriptionCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_teacher)],
+    current_user: Annotated[User, Depends(require_phone_verified_teacher)],
 ) -> SubscriptionResponse:
-    """Create a new subscription."""
+    """Create a new subscription.
+
+    Phone verification (E3 hard gate) is enforced at the dependency layer per
+    docs/specs/user/phone_verification_policy.md §4.2 / §5.3. The service still
+    re-checks defensively so programmatic callers cannot bypass the gate.
+    """
     service = SubscriptionService(db)
     return await service.create(body, current_user)
 
@@ -642,8 +653,13 @@ async def confirm_proposal(
     proposal_id: str,
     body: ProposalConfirmRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_teacher)],
+    current_user: Annotated[User, Depends(require_phone_verified_teacher)],
 ) -> SubscriptionProposalResponse:
-    """Confirm a proposal after payment verification."""
+    """Confirm a proposal after payment verification.
+
+    Phone verification (E3 hard gate) is enforced at the dependency layer per
+    docs/specs/user/phone_verification_policy.md §4.2 / §5.3. The service still
+    re-checks defensively so programmatic callers cannot bypass the gate.
+    """
     service = SubscriptionService(db)
     return await service.confirm_proposal(proposal_id, current_user)
