@@ -1526,6 +1526,11 @@ class SubscriptionService:
 
         proposal = await self._get_proposal_for_teacher(proposal_id, current_user)
 
+        # #10 A-C2 — confirming a proposal mints a Subscription, the same hard
+        # gate that `create()` uses. Without this the gate is bypassed via the
+        # proposal flow (#430 phone_verification_policy.md §4).
+        await self._require_phone_verification(current_user)
+
         if proposal.status != "paymentNotified":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
