@@ -86,8 +86,10 @@ stateDiagram-v2
 | 행위 | 가드 | 동작 |
 |------|------|------|
 | 학생 추가 (Free, 5명 초과) | `BillingGuard.checkStudentLimit()` | `FreeLimitSheet` 표시 |
-| Pro 전용 기능 진입 (Free) | `FeatureTierProvider.requirePro()` | `FeatureLockedSheet` 표시 |
-| Studio 전용 기능 진입 (Pro) | `FeatureTierProvider.requireStudio()` | `FeatureLockedSheet` (Studio 업그레이드) |
+| Pro 전용 기능 진입 (Free 선생님) | `BillingGuard.requireTier(TierRequirement.pro)` | `FeatureLockedSheet` 표시 |
+| Studio 전용 기능 진입 (Pro 선생님) | `BillingGuard.requireTier(TierRequirement.studio)` | `FeatureLockedSheet` (Studio 업그레이드) |
+
+**적용 범위 — 선생님 전용**: 본 §3.1 의 가드는 모두 **선생님 화면에만 적용**한다. 학생 화면 (`features/student_home/`, `features/practice/presentation/screens/section_detail_screen.dart` 등 학생 진입 경로) 의 동일 기능 (녹음 비교, 통계 리포트) 은 **무료 접근 유지** — 학생 결제 모델 자체가 현 spec 범위 외이기 때문이다 ([payment_architecture.md](./payment_architecture.md) §1 "흐름 B 미래 정책"). 학생 측 IAP 도입은 시장조사 보고서 [student_billing_research.md](./student_billing_research.md) 참고, 도입 결정 시 별도 spec 분리.
 
 ### 3.2 결제 시퀀스
 
@@ -157,7 +159,7 @@ features/billing/                          # 신규 도메인
 │   ├── repositories/
 │   │   └── app_billing_repository.dart    # interface
 │   └── services/
-│       ├── billing_guard.dart             # checkStudentLimit, requirePro 등
+│       ├── billing_guard.dart             # checkStudentLimit, requireTier(TierRequirement.pro|studio)
 │       └── feature_tier_provider.dart     # Pro/Studio 기능 분기
 ├── data/
 │   └── repositories/
@@ -292,7 +294,7 @@ Trial:  ⏰ TRIAL  D-9 종료   체험 중 · 학생 무제한
 
 ---
 
-## 7. 기능 분기 (FeatureTierProvider)
+## 7. 기능 분기 (BillingGuard.requireTier)
 
 | 기능 | Free | Pro | Studio |
 |------|:----:|:---:|:------:|
@@ -304,7 +306,9 @@ Trial:  ⏰ TRIAL  D-9 종료   체험 중 · 학생 무제한
 | 학원 다중 강사 | ✗ | ✗ | ○ |
 | 학원 통계 대시보드 | ✗ | ✗ | ○ |
 
-`FeatureTierProvider`는 화면 진입 시 호출하여 `requirePro()` / `requireStudio()` 실패 시 `FeatureLockedSheet` 노출.
+`BillingGuard.requireTier(TierRequirement.pro|studio)` 는 **선생님 화면 진입 시점에 호출**. 실패 시 `FeatureLockedSheet` 노출. 실제 구현: [`billing_guard.dart`](../../../frontend/lib/features/billing/domain/services/billing_guard.dart) + 헬퍼 [`guardProFeatureNavigation`](../../../frontend/lib/features/billing/presentation/utils/billing_guard_actions.dart) (snapshot 로딩 실패 시 fail-open, 서버가 SSOT).
+
+본 §7 의 Pro/Studio 게이팅은 **선생님 user 관점**이다. 같은 기능을 학생이 자기 화면 (`features/student_home/`, `practice_summary_section.dart`, `section_detail_screen.dart` 등) 에서 진입할 때는 가드를 적용하지 않는다 — §3.1 의 "적용 범위 — 선생님 전용" 참조. 학생 측 결제 도입 시 별도 정책 spec 분리 (현재 시장조사 단계, [student_billing_research.md](./student_billing_research.md)).
 
 ---
 
