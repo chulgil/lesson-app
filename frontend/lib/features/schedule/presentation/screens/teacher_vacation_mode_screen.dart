@@ -5,6 +5,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../domain/entities/vacation_period.dart';
 import '../providers/vacation_providers.dart';
 
@@ -28,12 +30,14 @@ class TeacherVacationModeScreen extends ConsumerWidget {
     final state = ref.watch(vacationFormProvider);
     final notifier = ref.read(vacationFormProvider.notifier);
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.vacationModeTitle)),
+    return NotebookScreenScaffold(
+      appBarTitle: AppStrings.vacationModeTitle,
       body: ListView(
         padding: EdgeInsets.all(AppSpacing.space4),
         children: [
+          // Active vacations + 24h Recovery (spec §7 + §9.1).
+          const _ActiveVacationSection(),
+          SizedBox(height: AppSpacing.space4),
           _SectionHeader(text: AppStrings.vacationPeriodSection),
           SizedBox(height: AppSpacing.space2),
           _DateRow(
@@ -301,5 +305,131 @@ class _SubmitButton extends StatelessWidget {
             )
           : const Text(AppStrings.vacationRegisterButton),
     );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Active vacation card + Recovery (H-001 FE Phase 3).
+// Spec: docs/specs/schedule/teacher_vacation_mode.md §7.
+// ──────────────────────────────────────────────────────────────
+
+class _ActiveVacationSection extends ConsumerWidget {
+  const _ActiveVacationSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final listAsync = ref.watch(vacationListProvider);
+    return listAsync.when(
+      data: (vacations) {
+        if (vacations.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionHeader(text: AppStrings.vacationActiveSection),
+            SizedBox(height: AppSpacing.space2),
+            ...vacations.map((v) => _ActiveVacationCard(period: v)),
+          ],
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _ActiveVacationCard extends ConsumerWidget {
+  final VacationPeriod period;
+  const _ActiveVacationCard({required this.period});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: EdgeInsets.only(bottom: AppSpacing.space2),
+      padding: EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.vacationCardDateRange(
+                    _formatShortDate(period.startDate),
+                    _formatShortDate(period.endDate),
+                  ),
+                  style: AppTypography.bodyLarge.copyWith(color: AppColors.ink),
+                ),
+                if (period.reason != null && period.reason!.isNotEmpty) ...[
+                  SizedBox(height: AppSpacing.space1),
+                  Text(
+                    period.reason!,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () => _confirmCancel(context, ref),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+              foregroundColor: AppColors.paperAccent,
+              side: const BorderSide(color: AppColors.paperAccent),
+            ),
+            child: const Text(AppStrings.vacationCancelLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _formatShortDate(DateTime d) {
+    return '${d.month}/${d.day}';
+  }
+
+  Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => NotebookAlertDialog(
+        title: AppStrings.vacationCancelConfirmTitle,
+        content: const Text(AppStrings.vacationCancelConfirmBody),
+        confirmLabel: AppStrings.vacationCancelLabel,
+        cancelLabel: AppStrings.cancel,
+        isDestructive: true,
+        onConfirm: () => Navigator.pop(ctx, true),
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
+    );
+    if (result != true || !context.mounted) return;
+    try {
+      await ref.read(vacationActionsProvider).cancel(period.id);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.vacationCancelSuccess)),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      final message = e.toString();
+      // Map server error semantics to friendly text (spec §7.2).
+      final friendly = message.contains('이미 시작')
+          ? AppStrings.vacationCancelAlreadyStarted
+          : message.contains('24')
+          ? AppStrings.vacationCancelWindowExpired
+          : message.contains('이미 취소')
+          ? AppStrings.vacationCancelAlreadyCancelled
+          : AppStrings.vacationCancelFailed;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(friendly)));
+    }
   }
 }

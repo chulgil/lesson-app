@@ -45,6 +45,16 @@ class _StubVacationRepository implements VacationRepository {
       createdAt: DateTime.now(),
     );
   }
+
+  @override
+  Future<List<VacationPeriod>> listVacations({
+    bool includeCancelled = false,
+  }) async => [];
+
+  @override
+  Future<VacationPeriod> cancelVacation(String periodId) async {
+    throw UnimplementedError();
+  }
 }
 
 void main() {

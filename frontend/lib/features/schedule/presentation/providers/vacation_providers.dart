@@ -141,3 +141,35 @@ final vacationFormProvider =
     ) {
       return VacationFormNotifier(ref.watch(vacationRepositoryProvider));
     });
+
+// ──────────────────────────────────────────────────────────────
+// Vacation list + Recovery (spec §7 + §9.1) — H-001 FE Phase 3.
+// ──────────────────────────────────────────────────────────────
+
+/// Active vacations for the signed-in teacher.
+final vacationListProvider = FutureProvider.autoDispose<List<VacationPeriod>>((
+  ref,
+) async {
+  final repository = ref.watch(vacationRepositoryProvider);
+  return repository.listVacations();
+});
+
+/// Actions used by the active vacation card — cancel + invalidate.
+final vacationActionsProvider = Provider<VacationActions>(
+  (ref) => VacationActions(ref),
+);
+
+class VacationActions {
+  VacationActions(this._ref);
+
+  final Ref _ref;
+
+  /// Cancel a vacation. Throws on server error; UI maps message → friendly text.
+  Future<void> cancel(String periodId) async {
+    final repo = _ref.read(vacationRepositoryProvider);
+    await repo.cancelVacation(periodId);
+    _ref.invalidate(vacationListProvider);
+  }
+
+  void refresh() => _ref.invalidate(vacationListProvider);
+}

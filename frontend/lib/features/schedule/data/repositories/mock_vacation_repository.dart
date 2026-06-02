@@ -39,4 +39,41 @@ class MockVacationRepository implements VacationRepository {
     _periods.add(period);
     return period;
   }
+
+  @override
+  Future<List<VacationPeriod>> listVacations({
+    bool includeCancelled = false,
+  }) async {
+    final filtered = includeCancelled
+        ? _periods
+        : _periods.where((p) => p.cancelledAt == null).toList();
+    final sorted = [...filtered]
+      ..sort((a, b) => b.startDate.compareTo(a.startDate));
+    return sorted;
+  }
+
+  @override
+  Future<VacationPeriod> cancelVacation(String periodId) async {
+    final index = _periods.indexWhere((p) => p.id == periodId);
+    if (index == -1) {
+      throw Exception('Vacation not found: $periodId');
+    }
+    final current = _periods[index];
+    if (current.cancelledAt != null) {
+      throw Exception('Vacation already cancelled');
+    }
+    final cancelled = VacationPeriod(
+      id: current.id,
+      teacherId: current.teacherId,
+      startDate: current.startDate,
+      endDate: current.endDate,
+      reason: current.reason,
+      defaultDisposition: current.defaultDisposition,
+      cancelledAt: DateTime.now(),
+      createdAt: current.createdAt,
+      updatedAt: DateTime.now(),
+    );
+    _periods[index] = cancelled;
+    return cancelled;
+  }
 }
