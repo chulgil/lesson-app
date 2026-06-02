@@ -176,6 +176,15 @@ class VacationService:
 
             logging.getLogger(__name__).exception("vacation alimtalk fan-out failed period=%s", period.id)
 
+        # spec §6.2 — in-app notification per impacted student with a
+        # disposition-aware body. Fire-and-forget mirrors the alimtalk path.
+        try:
+            await self._send_vacation_in_app(period, override_map, impacted_student_ids, vacation_days)
+        except Exception:  # noqa: BLE001
+            import logging
+
+            logging.getLogger(__name__).exception("vacation in-app fan-out failed period=%s", period.id)
+
         await self.db.flush()
         await self.db.refresh(period)
         return VacationPeriodResponse.model_validate(period)
@@ -229,6 +238,99 @@ class VacationService:
                     "disposition": disposition_value,
                     "reason": period.reason or "",
                 },
+            )
+
+    async def _send_vacation_in_app(
+        self,
+        period: VacationPeriod,
+        override_map: dict[str, VacationDisposition],
+        student_ids: set[str],
+        vacation_days: int,
+    ) -> None:
+        """spec §6.2 — in-app notification per impacted student.
+
+        Disposition-aware body:
+          - rollForward   → "만료일 {N}일 연장됨"
+          - freeCancel    → "{count}건 무료 취소됨"
+          - makeupCredit  → "보강 {count}회 적립됨"
+
+        Students without a linked ``user_id`` are skipped (no in-app target).
+        Bookings per student come from the same window as alimtalk fan-out so
+        the count is consistent across channels.
+        """
+        from app.models.student import Student
+        from app.services.notification_service import NotificationService
+
+        if not student_ids:
+            return
+        students = (await self.db.scalars(select(Student).where(Student.id.in_(student_ids)))).all()
+        bookings = await self._impacted_bookings(
+            teacher_id=period.teacher_id,
+            start_date=period.start_date,
+            end_date=period.end_date,
+        )
+        booking_counts: dict[str, int] = {}
+        for booking in bookings:
+            booking_counts[booking.student_id] = booking_counts.get(booking.student_id, 0) + 1
+
+        notification_service = NotificationService(self.db)
+        for student in students:
+            if not student.user_id:
+                continue
+            effective = override_map.get(student.id, period.default_disposition)
+            count = booking_counts.get(student.id, 0)
+            title, body = _build_vacation_in_app_message(
+                disposition=effective,
+                count=count,
+                vacation_days=vacation_days,
+            )
+            await notification_service.create_and_send(
+                user_id=student.user_id,
+                notification_type="teacherVacation",
+                title=title,
+                body=body,
+                data={
+                    "vacation_period_id": period.id,
+                    "disposition": effective.value if hasattr(effective, "value") else str(effective),
+                    "impacted_count": count,
+                },
+                is_push=True,
+                is_in_app=True,
+            )
+
+    async def _send_vacation_simple_in_app(
+        self,
+        *,
+        student_ids: set[str],
+        vacation_period_id: str,
+        notification_type: str,
+        title: str,
+        body: str,
+    ) -> None:
+        """Fan-out a fixed-body in-app notification to impacted students.
+
+        Used by cancel (§7.3) and the daily return cron (§6.3) where the
+        message is the same across dispositions. Students without a linked
+        ``user_id`` are skipped.
+        """
+        from app.models.student import Student
+        from app.services.notification_service import NotificationService
+
+        if not student_ids:
+            return
+        students = (await self.db.scalars(select(Student).where(Student.id.in_(student_ids)))).all()
+        notification_service = NotificationService(self.db)
+        for student in students:
+            if not student.user_id:
+                continue
+            await notification_service.create_and_send(
+                user_id=student.user_id,
+                notification_type=notification_type,
+                title=title,
+                body=body,
+                data={"vacation_period_id": vacation_period_id},
+                is_push=True,
+                is_in_app=True,
             )
 
     async def _apply_dispositions(
@@ -359,6 +461,20 @@ class VacationService:
             import logging
 
             logging.getLogger(__name__).exception("vacation cancelled alimtalk fan-out failed period=%s", period.id)
+
+        # spec §7.3 — in-app notification mirror. Same audience as alimtalk.
+        try:
+            await self._send_vacation_simple_in_app(
+                student_ids=cancelled_student_ids,
+                vacation_period_id=period.id,
+                notification_type="teacherVacationCancelled",
+                title="휴가 취소 안내",
+                body="선생님 휴가가 취소됐어요. 예정대로 레슨을 진행해요.",
+            )
+        except Exception:  # noqa: BLE001
+            import logging
+
+            logging.getLogger(__name__).exception("vacation cancelled in-app fan-out failed period=%s", period.id)
 
         await self.db.flush()
         await self.db.refresh(period)
@@ -572,3 +688,26 @@ class VacationService:
 def _to_model_disposition(value: VacationDisposition) -> VacationDispositionModel:
     """Schema-enum → ORM-enum (same string value, but distinct Python classes)."""
     return VacationDispositionModel(value.value)
+
+
+def _build_vacation_in_app_message(
+    *,
+    disposition: VacationDispositionModel | VacationDisposition,
+    count: int,
+    vacation_days: int,
+) -> tuple[str, str]:
+    """Build a disposition-aware (title, body) pair for in-app notifications.
+
+    Spec: docs/specs/schedule/teacher_vacation_mode.md §6.2.
+    """
+    value = disposition.value if hasattr(disposition, "value") else str(disposition)
+    title = "선생님 휴가 안내"
+    if value == VacationDisposition.rollForward.value:
+        body = f"수강권 만료일이 {vacation_days}일 연장됐어요."
+    elif value == VacationDisposition.freeCancel.value:
+        body = f"{count}건이 무료 취소됐어요."
+    elif value == VacationDisposition.makeupCredit.value:
+        body = f"보강 {count}회가 적립됐어요."
+    else:
+        body = "선생님 휴가로 영향 받는 레슨이 있어요."
+    return title, body

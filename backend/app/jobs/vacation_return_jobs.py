@@ -42,6 +42,9 @@ async def _send_returns_for_period(session: AsyncSession, period: VacationPeriod
     """
     from app.models.student import Student
     from app.services.alimtalk_service import build_alimtalk_service
+    from app.services.notification_service import (
+        NotificationService,  # spec §6.3 in-app companion
+    )
 
     student_ids: set[str] = set()
 
@@ -70,22 +73,43 @@ async def _send_returns_for_period(session: AsyncSession, period: VacationPeriod
 
     students = (await session.scalars(select(Student).where(Student.id.in_(student_ids)))).all()
     service = build_alimtalk_service(session)
+    notification_service = NotificationService(session)
     sent = 0
     for student in students:
         phone = student.parent_phone or student.phone or ""
-        if not phone:
-            continue
-        log = await service.send_teacher_vacation_returned(
-            vacation_period_id=period.id,
-            recipient_phone=phone,
-            variables={
-                "student_name": student.name or "",
-                "vacation_end": period.end_date.isoformat(),
-                "reason": period.reason or "",
-            },
-        )
-        if log is not None and log.success:
-            sent += 1
+        if phone:
+            log = await service.send_teacher_vacation_returned(
+                vacation_period_id=period.id,
+                recipient_phone=phone,
+                variables={
+                    "student_name": student.name or "",
+                    "vacation_end": period.end_date.isoformat(),
+                    "reason": period.reason or "",
+                },
+            )
+            if log is not None and log.success:
+                sent += 1
+        # spec §6.3 — in-app companion. Each cron run re-creates a fresh
+        # Notification row; the alimtalk-side idempotency key prevents
+        # duplicate vendor sends but in-app delivery is by design a per-day
+        # rerun. Future work: dedupe by (user_id, vacation_period_id, type).
+        if student.user_id:
+            try:
+                await notification_service.create_and_send(
+                    user_id=student.user_id,
+                    notification_type="teacherVacationReturned",
+                    title="선생님 복귀",
+                    body=f"{student.name or '학생'} 학생, 선생님이 휴가에서 복귀했어요.",
+                    data={"vacation_period_id": period.id},
+                    is_push=True,
+                    is_in_app=True,
+                )
+            except Exception:  # noqa: BLE001
+                import logging
+
+                logging.getLogger(__name__).exception(
+                    "vacation return in-app failed period=%s student=%s", period.id, student.id
+                )
     return sent
 
 
