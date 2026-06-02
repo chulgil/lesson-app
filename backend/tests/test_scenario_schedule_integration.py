@@ -46,6 +46,7 @@ async def _dev_login_headers(
 @pytest.mark.asyncio
 async def test_signup_settings_connection_to_schedule_confirmation_card(
     client: AsyncClient,
+    db_session,
 ):
     """
     Real user journey from API signup to schedule adjustment:
@@ -232,6 +233,22 @@ async def test_signup_settings_connection_to_schedule_confirmation_card(
     assert accepted_proposal.status_code == 200, accepted_proposal.text
     assert accepted_proposal.json()["status"] == "paymentNotified"
 
+    # #10 A-C2 — confirm_proposal hits the phone-verification hard gate. The
+    # dev-login flow does not auto-verify, so flip the teacher row before
+    # exercising the issuance path.
+    from sqlalchemy import select as _select
+
+    from app.models.teacher import Teacher as _Teacher
+
+    _teacher_row = await db_session.scalar(_select(_Teacher).where(_Teacher.user_id == teacher_user_id))
+    if _teacher_row is not None and not _teacher_row.is_phone_verified:
+        _teacher_row.is_phone_verified = True
+        from datetime import UTC as _UTC
+        from datetime import datetime as _datetime
+
+        _teacher_row.phone_verified_at = _datetime.now(_UTC)
+        await db_session.flush()
+
     confirmed_proposal = await client.patch(
         f"/api/v1/subscriptions-proposals/{subscription_proposal_id}/confirm",
         headers=teacher_headers,
@@ -290,9 +307,7 @@ async def test_signup_settings_connection_to_schedule_confirmation_card(
         headers=teacher_headers,
     )
     assert teacher_pending_changes.status_code == 200, teacher_pending_changes.text
-    assert [event["id"] for event in teacher_pending_changes.json()] == [
-        student_change_request.json()["id"]
-    ]
+    assert [event["id"] for event in teacher_pending_changes.json()] == [student_change_request.json()["id"]]
 
     teacher_accepts_change = await client.post(
         f"/api/v1/subscriptions/{subscription_id}/events",
@@ -355,15 +370,14 @@ async def test_signup_settings_connection_to_schedule_confirmation_card(
     assert me_after_setup.status_code == 200, me_after_setup.text
     assert me_after_setup.json()["role"] == "teacher"
 
+
 # ─────────────────────────────────────────────────────────────────────────
 # 1. Trial lesson full lifecycle
 # ─────────────────────────────────────────────────────────────────────────
 
 
 @pytest.mark.asyncio
-async def test_trial_lesson_full_lifecycle(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_trial_lesson_full_lifecycle(teacher: TeacherActions, student: StudentActions):
     """
     Complete trial lesson flow:
     선생님 가입 → 학생 가입 → 초대/연결 → 체험레슨 요청 →
@@ -381,9 +395,7 @@ async def test_trial_lesson_full_lifecycle(
     invite_code = invite["invite_code"]
     assert invite_code is not None
 
-    req_id = await student.send_connection_request(
-        "test-user-id", method="inviteCode", invite_code=invite_code
-    )
+    req_id = await student.send_connection_request("test-user-id", method="inviteCode", invite_code=invite_code)
 
     pending = await teacher.list_pending_requests()
     assert_total(pending, 1)
@@ -418,9 +430,7 @@ async def test_trial_lesson_full_lifecycle(
     assert_status(approved, "timeConfirmed")
 
     # ── Phase 5: 학생 등록 + 체험레슨 생성 ───────────────────
-    sid = await teacher.create_student(
-        "체험학생", instrument="violin", level="beginner"
-    )
+    sid = await teacher.create_student("체험학생", instrument="violin", level="beginner")
 
     lesson_id = await teacher.create_lesson(
         sid,
@@ -447,18 +457,12 @@ async def test_trial_lesson_full_lifecycle(
     )
 
     # ── Phase 7: 수강권 제안 → 정규 전환 ────────────────────
-    tmpl_id = await teacher.create_template(
-        "바이올린 4회권", lessons_count=4, amount=200000
-    )
+    tmpl_id = await teacher.create_template("바이올린 4회권", lessons_count=4, amount=200000)
 
-    proposal_id = await teacher.send_proposal(
-        sid, tmpl_id, lesson_request_id=request_id
-    )
+    proposal_id = await teacher.send_proposal(sid, tmpl_id, lesson_request_id=request_id)
 
     # 레슨 요청 상태를 proposalSent로
-    updated = await teacher.update_lesson_request_status(
-        request_id, "proposalSent", proposal_id=proposal_id
-    )
+    updated = await teacher.update_lesson_request_status(request_id, "proposalSent", proposal_id=proposal_id)
     assert_status(updated, "proposalSent")
 
     # 학생이 수강권 수락
@@ -468,9 +472,7 @@ async def test_trial_lesson_full_lifecycle(
     await teacher.confirm_proposal(proposal_id)
 
     # 레슨 요청 완료
-    completed_req = await teacher.update_lesson_request_status(
-        request_id, "completed"
-    )
+    completed_req = await teacher.update_lesson_request_status(request_id, "completed")
     assert_status(completed_req, "completed")
 
 
@@ -480,9 +482,7 @@ async def test_trial_lesson_full_lifecycle(
 
 
 @pytest.mark.asyncio
-async def test_regular_lesson_time_negotiation(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_regular_lesson_time_negotiation(teacher: TeacherActions, student: StudentActions):
     """
     Regular lesson with 2-round time negotiation:
     학생 요청 → 선생님 대안 제시 → 학생 역제안 →
@@ -545,26 +545,24 @@ async def test_regular_lesson_time_negotiation(
     )
     assert round2["current_round"] == 2
 
-    confirmed = await student.accept_alternative(
-        request_id, 0, message="수요일 3시로 할게요!"
-    )
+    confirmed = await student.accept_alternative(request_id, 0, message="수요일 3시로 할게요!")
     assert_status(confirmed, "timeConfirmed")
     assert confirmed["preferred_day"] == 2  # 수요일
     assert confirmed["preferred_time"] == "15:00"
 
     # ── Phase 5: 학생 등록 + 수강권 발급 ─────────────────────
     sid = await teacher.create_student(
-        "입시생", instrument="piano", level="intermediate",
-        monthly_fee=240000, lessons_per_week=1, lesson_duration=60,
+        "입시생",
+        instrument="piano",
+        level="intermediate",
+        monthly_fee=240000,
+        lessons_per_week=1,
+        lesson_duration=60,
     )
 
-    await teacher.create_template(
-        "피아노 월정액", lessons_count=4, amount=240000
-    )
+    await teacher.create_template("피아노 월정액", lessons_count=4, amount=240000)
 
-    sub_id = await teacher.create_subscription(
-        sid, total_lessons=4, amount=240000, type="monthly"
-    )
+    sub_id = await teacher.create_subscription(sid, total_lessons=4, amount=240000, type="monthly")
     sub = await teacher.get_subscription(sub_id)
     assert sub["total_lessons"] == 4
     assert sub["remaining_lessons"] == 4
@@ -595,9 +593,7 @@ async def test_regular_lesson_time_negotiation(
 
 
 @pytest.mark.asyncio
-async def test_rejection_and_rerequest(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_rejection_and_rerequest(teacher: TeacherActions, student: StudentActions):
     """
     Teacher rejects → student re-requests with different time:
     첫 요청 거절 → 재신청 → 승인.
@@ -614,9 +610,7 @@ async def test_rejection_and_rerequest(
         message="토요일 오전 가능할까요?",
     )
 
-    rejected = await teacher.reject_lesson_request(
-        request_id1, reason="토요일은 레슨이 없습니다"
-    )
+    rejected = await teacher.reject_lesson_request(request_id1, reason="토요일은 레슨이 없습니다")
     assert_status(rejected, "rejected")
     assert rejected["decline_reason"] == "토요일은 레슨이 없습니다"
 
@@ -700,9 +694,7 @@ async def test_group_class_schedule_attendance(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_student_requests_to_multiple_teachers(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_student_requests_to_multiple_teachers(teacher: TeacherActions, student: StudentActions):
     """
     Student sends requests to the same teacher with different instruments:
     한 학생이 같은 선생님에게 악기별 요청.
@@ -756,9 +748,7 @@ async def test_student_requests_to_multiple_teachers(
 
 
 @pytest.mark.asyncio
-async def test_withdraw_approval_and_redecide(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_withdraw_approval_and_redecide(teacher: TeacherActions, student: StudentActions):
     """
     Teacher approves → withdraws → proposes alternative instead:
     승인 → 철회 → 대안 제안 → 학생 수락.
@@ -809,9 +799,7 @@ async def test_withdraw_approval_and_redecide(
 
 
 @pytest.mark.asyncio
-async def test_accept_preferred_slot_from_schedule(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_accept_preferred_slot_from_schedule(teacher: TeacherActions, student: StudentActions):
     """
     Teacher views student's preferred slots on schedule grid,
     selects one directly → approved without negotiation:
@@ -850,9 +838,7 @@ async def test_accept_preferred_slot_from_schedule(
 
 
 @pytest.mark.asyncio
-async def test_full_e2e_request_to_lesson(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_full_e2e_request_to_lesson(teacher: TeacherActions, student: StudentActions):
     """
     Complete flow matching current frontend:
     요청 → 일정비교 → 대안제시 → 학생수락 → 학생등록 → 수강권 → 레슨 → 완료.
@@ -883,30 +869,43 @@ async def test_full_e2e_request_to_lesson(
 
     # ── Phase 3: 학생이 수요일 4시 수락 ──────────────────────
     confirmed = await student.accept_alternative(
-        request_id, 0, message="수요일 4시로 할게요!",
+        request_id,
+        0,
+        message="수요일 4시로 할게요!",
     )
     assert_status(confirmed, "timeConfirmed")
 
     # ── Phase 4: 학생 등록 + 수강권 ──────────────────────────
     sid = await teacher.create_student(
-        "신규학생", instrument="violin", level="beginner",
-        monthly_fee=200000, lessons_per_week=1,
+        "신규학생",
+        instrument="violin",
+        level="beginner",
+        monthly_fee=200000,
+        lessons_per_week=1,
     )
 
     tmpl_id = await teacher.create_template(
-        "바이올린 4회", lessons_count=4, amount=200000,
+        "바이올린 4회",
+        lessons_count=4,
+        amount=200000,
     )
 
     sub_id = await teacher.create_subscription(
-        sid, total_lessons=4, amount=200000,
+        sid,
+        total_lessons=4,
+        amount=200000,
     )
 
     # ── Phase 5: 수강권 제안 연결 ────────────────────────────
     proposal_id = await teacher.send_proposal(
-        sid, tmpl_id, lesson_request_id=request_id,
+        sid,
+        tmpl_id,
+        lesson_request_id=request_id,
     )
     await teacher.update_lesson_request_status(
-        request_id, "proposalSent", proposal_id=proposal_id,
+        request_id,
+        "proposalSent",
+        proposal_id=proposal_id,
     )
 
     await student.accept_proposal(proposal_id, tmpl_id)
@@ -915,8 +914,11 @@ async def test_full_e2e_request_to_lesson(
 
     # ── Phase 6: 첫 레슨 생성 + 차감 ────────────────────────
     lesson_id = await teacher.create_lesson(
-        sid, date="2026-04-02", start_time="16:00",
-        duration=60, instrument="violin",
+        sid,
+        date="2026-04-02",
+        start_time="16:00",
+        duration=60,
+        instrument="violin",
     )
     await teacher.complete_lesson(lesson_id)
     await teacher.use_lesson(sub_id, lesson_id)
@@ -936,9 +938,7 @@ async def test_full_e2e_request_to_lesson(
 
 
 @pytest.mark.asyncio
-async def test_teacher_vacation_setting_blocks_student_slot_search(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_teacher_vacation_setting_blocks_student_slot_search(teacher: TeacherActions, student: StudentActions):
     """
     Teacher sets weekly availability with vacation mode →
     student searches slots inside/outside vacation period.
@@ -982,9 +982,7 @@ async def test_teacher_vacation_setting_blocks_student_slot_search(
 
 
 @pytest.mark.asyncio
-async def test_teacher_vacation_disable_reopens_student_slot_search(
-    teacher: TeacherActions, student: StudentActions
-):
+async def test_teacher_vacation_disable_reopens_student_slot_search(teacher: TeacherActions, student: StudentActions):
     """
     Teacher disables vacation mode →
     student can book slots in the previously blocked period again.
