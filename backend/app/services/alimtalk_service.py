@@ -167,6 +167,28 @@ class AlimTalkService:
             variables=variables,
         )
 
+    async def send_teacher_vacation_cancelled(
+        self,
+        *,
+        vacation_period_id: str,
+        recipient_phone: str,
+        variables: dict[str, str],
+    ) -> AlimTalkLog | None:
+        """LNZ_TEACHER_VACATION_CANCELLED — Recovery fan-out (spec §7.3).
+
+        Mirrors `send_teacher_vacation` (same key shape) so the announce/cancel
+        pair stays balanced per (vacation_period_id, recipient_phone). One
+        cancellation row per impacted student/phone.
+        """
+        return await self._send_with_log(
+            template_id=AlimTalkTemplate.teacher_vacation_cancelled.value,
+            proposal_id=None,
+            subscription_id=None,
+            vacation_period_id=vacation_period_id,
+            recipient_phone=recipient_phone,
+            variables=variables,
+        )
+
     # ------------------------------------------------------------------ internals
 
     async def _send_with_log(
