@@ -64,6 +64,18 @@ enum AgeGroup {
 
 /// Connection status for mutual follow system
 /// Used by: Student, Invite
+///
+/// **DEPRECATED — RelationshipStatus is the SSOT (G3 Phase B).**
+///
+/// spec: docs/specs/review/2026-06-01-teacher-e2e/30-gap-catalog.md
+/// #5 D-G3 `이중 상태 충돌`. New surface logic must read from
+/// `features/relationship/.../RelationshipStatus` (FE) and
+/// `app.models.relationship.RelationStatus` (BE).
+///
+/// This enum is retained while `Student.connectionStatus` (FE entity field
+/// and BE column) is still in use; data migration + column drop will land
+/// in Phase B-2.
+@Deprecated('Use RelationshipStatus — G3 Phase B (gap-catalog #5)')
 enum ConnectionStatus {
   offline, // Manual registration only (no app)
   inviteSent, // I followed, waiting for follow back
