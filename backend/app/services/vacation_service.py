@@ -342,11 +342,81 @@ class VacationService:
 
         period.cancelled_at = now
         vacation_days = (period.end_date - period.start_date).days + 1
+
+        # Capture impacted student ids *before* revert flips bookings back —
+        # the alimtalk fan-out wants the same audience that originally received
+        # the LNZ_TEACHER_VACATION notice (whether their booking was free-cancel,
+        # makeup-credit, or rollForward).
+        cancelled_student_ids = await self._cancelled_student_ids_for_period(period)
+
         await self._revert_dispositions(period=period, vacation_days=vacation_days)
+
+        # spec §7.3 — fire-and-forget alimtalk fan-out announcing the cancellation.
+        # Vacation cancellation must not fail on vendor errors.
+        try:
+            await self._send_vacation_cancelled_alimtalk(period, cancelled_student_ids)
+        except Exception:  # noqa: BLE001
+            import logging
+
+            logging.getLogger(__name__).exception("vacation cancelled alimtalk fan-out failed period=%s", period.id)
 
         await self.db.flush()
         await self.db.refresh(period)
         return VacationPeriodResponse.model_validate(period)
+
+    async def _cancelled_student_ids_for_period(
+        self,
+        period: VacationPeriod,
+    ) -> set[str]:
+        """Student ids whose bookings were attached to this period.
+
+        For freeCancel / makeupCredit the bookings carry `vacation_period_id`.
+        For rollForward they don't — fall back to the same window-scan used at
+        register time. Union covers both paths so the announce/cancel audience
+        matches.
+        """
+        rows = (
+            await self.db.scalars(
+                select(LessonBooking).where(
+                    LessonBooking.vacation_period_id == period.id,
+                )
+            )
+        ).all()
+        students = {b.student_id for b in rows}
+        fallback = await self._impacted_student_ids(
+            teacher_id=period.teacher_id,
+            start_date=period.start_date,
+            end_date=period.end_date,
+        )
+        return students | fallback
+
+    async def _send_vacation_cancelled_alimtalk(
+        self,
+        period: VacationPeriod,
+        student_ids: set[str],
+    ) -> None:
+        """LNZ_TEACHER_VACATION_CANCELLED — Recovery fan-out (spec §7.3)."""
+        from app.models.student import Student
+        from app.services.alimtalk_service import build_alimtalk_service
+
+        if not student_ids:
+            return
+        students = (await self.db.scalars(select(Student).where(Student.id.in_(student_ids)))).all()
+        service = build_alimtalk_service(self.db)
+        for student in students:
+            phone = student.parent_phone or student.phone or ""
+            if not phone:
+                continue
+            await service.send_teacher_vacation_cancelled(
+                vacation_period_id=period.id,
+                recipient_phone=phone,
+                variables={
+                    "student_name": student.name or "",
+                    "vacation_start": period.start_date.isoformat(),
+                    "vacation_end": period.end_date.isoformat(),
+                    "reason": period.reason or "",
+                },
+            )
 
     async def _revert_dispositions(
         self,

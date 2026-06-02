@@ -29,6 +29,9 @@ class AlimTalkTemplate(str, Enum):
     # spec: docs/specs/schedule/teacher_vacation_mode.md §6.1 — sent right after
     # a teacher registers a vacation period that impacts the student.
     teacher_vacation = "LNZ_TEACHER_VACATION"
+    # spec: §7.3 Recovery — sent when a teacher cancels a vacation within the
+    # 24h window. Students whose lessons were restored need to know.
+    teacher_vacation_cancelled = "LNZ_TEACHER_VACATION_CANCELLED"
 
 
 class AlimTalkLog(UUIDMixin, Base):
