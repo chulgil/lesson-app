@@ -5994,6 +5994,25 @@ class AppStrings {
   static const authSelectRole = '역할을 선택하세요';
   static const authRoleSetupFailed = '역할 설정 실패. 다시 시도해주세요.';
   static const authLoginFailed = '로그인 실패. 다시 시도해주세요.';
+
+  // 학생 직접 가입 안전망 (phone_verification_policy.md §3.2)
+  /// 학생 직접 가입 차단 화면 제목.
+  static const studentSignupBlockedTitle = '학생 직접 가입은 준비 중이에요';
+
+  /// 학생 직접 가입 차단 화면 본문.
+  static const studentSignupBlockedBody =
+      '안전한 가입을 위해 본인 인증 시스템을 준비하고 있어요.\n'
+      '만 14세 미만이라면 부모님 계정의 자녀 프로필로 활동할 수 있어요.';
+
+  /// CTA — 학부모 가입으로 이동.
+  static const studentSignupBlockedParentCta = '부모님 계정으로 시작하기';
+
+  /// CTA — 선생님이 보낸 초대코드 입력.
+  static const studentSignupBlockedInviteCta = '선생님이 보낸 초대코드가 있어요';
+
+  /// 안내 — 학부모 도움 안내 (부가 설명).
+  static const studentSignupBlockedHelper =
+      '본인 인증 통합 후에는 학생 직접 가입이 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
   static const authTermsAgreement = '서비스 이용 동의';
   static const authTermsOfService = '서비스 이용약관 동의';

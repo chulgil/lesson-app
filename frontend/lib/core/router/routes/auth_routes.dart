@@ -14,6 +14,7 @@ import '../../../features/onboarding/presentation/screens/first_availability_set
 import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
 import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/student_profile_setup_screen.dart';
+import '../../../features/onboarding/presentation/screens/student_signup_blocked_screen.dart';
 import '../../../features/onboarding/presentation/screens/student_tutorial_screen.dart';
 import '../../../features/onboarding/presentation/screens/tutorial_screen.dart';
 import '../app_routes.dart';
@@ -84,6 +85,14 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.studentProfileSetup,
     name: 'studentProfileSetup',
     builder: (context, state) => const StudentProfileSetupScreen(),
+  ),
+
+  // Student Onboarding - Signup Blocked (임시 안전망 — PASS 본인인증 통합 전)
+  // 정책: phone_verification_policy.md §3.2 — 만 14세 검증 부재로 인한 차단.
+  GoRoute(
+    path: AppRoutes.studentSignupBlocked,
+    name: 'studentSignupBlocked',
+    builder: (context, state) => const StudentSignupBlockedScreen(),
   ),
 
   // Student Onboarding - Tutorial

@@ -23,6 +23,12 @@ class AppRoutes {
   static const studentProfileSetup = '/student/onboarding/profile-setup';
   static const studentTutorial = '/student/onboarding/tutorial';
 
+  /// 임시 안전망 — 학생 직접 가입은 통신사 본인인증(PASS) 통합 전까지 차단.
+  /// 정책: docs/specs/user/phone_verification_policy.md §3.2.
+  /// PASS 통합 시점에 [teacherPhoneVerification] 와 같은 학생용 전화인증
+  /// 화면 라우트로 교체될 placeholder.
+  static const studentSignupBlocked = '/student/onboarding/signup-blocked';
+
   // Home routes
   static const home = '/home';
   static const studentHome = '/student-home';

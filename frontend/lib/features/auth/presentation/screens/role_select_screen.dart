@@ -80,9 +80,11 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
       case UserRole.teacher:
         context.go(AppRoutes.teacherProfileSetup);
       case UserRole.student:
-        // 정책: 학생 직접 가입은 만 14세 검증을 위해 SSO 직후 전화인증 필수.
-        // (phone_verification_policy.md §3.2) — 라우터 분기 wiring 은 별도 작업.
-        context.go(AppRoutes.studentProfileSetup);
+        // 임시 안전망 — 만 14세 검증용 통신사 본인인증(PASS) 통합 전까지
+        // 학생 직접 가입은 차단 화면으로 안내한다.
+        // 정책: phone_verification_policy.md §3.2.
+        // PASS 통합 시 학생용 전화인증 화면 라우트로 교체.
+        context.go(AppRoutes.studentSignupBlocked);
       case UserRole.parent:
         context.go(AppRoutes.parentInviteCode);
     }
@@ -91,12 +93,11 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
-    final userName =
-        authState is AuthNeedsRole
-            ? authState.name
-            : authState is AuthNeedsOnboarding
-            ? authState.name
-            : '';
+    final userName = authState is AuthNeedsRole
+        ? authState.name
+        : authState is AuthNeedsOnboarding
+        ? authState.name
+        : '';
 
     return NotebookScreenScaffold(
       body: SafeArea(
