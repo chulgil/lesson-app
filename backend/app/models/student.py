@@ -30,6 +30,21 @@ class AgeGroup(str, enum.Enum):
 
 
 class ConnectionStatus(str, enum.Enum):
+    """**DEPRECATED — RelationshipStatus is the SSOT (G3 Phase A).**
+
+    spec: docs/specs/review/2026-06-01-teacher-e2e/30-gap-catalog.md #5 D-G3 `이중 상태 충돌`.
+    Use `app.models.relationship.RelationStatus` for new code and surface logic.
+    This enum is kept for the legacy `Student.connection_status` column until
+    Phase B migrates writes; readers should prefer `relation_status_for_student`
+    or the resolver helpers exposed by the relation service.
+
+    Mapping (canonical, see resolver):
+      offline / disconnected   → RelationStatus.disconnected | inactive | pending
+      inviteSent               → RelationStatus.pending (sent by teacher)
+      inviteReceived           → RelationStatus.pending (sent by student)
+      connected                → RelationStatus.active | trialBooked
+    """
+
     offline = "offline"
     inviteSent = "inviteSent"
     inviteReceived = "inviteReceived"
