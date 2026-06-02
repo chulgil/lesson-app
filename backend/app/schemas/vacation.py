@@ -23,12 +23,15 @@ class VacationPeriodCreate(BaseModel):
     """Request body for POST /api/teacher/vacation.
 
     Spec §9.1: 휴가 등록 — start/end 기간 + 기본 처리 옵션.
+    §4.2 — `per_student_disposition` overrides per-student handling.
     """
 
     start_date: _dt.date
     end_date: _dt.date
     reason: str | None = Field(default=None, max_length=200)
     default_disposition: VacationDisposition = VacationDisposition.rollForward
+    # student_id → disposition. Omitted/empty means "use default for everyone".
+    per_student_disposition: dict[str, VacationDisposition] | None = None
 
     @model_validator(mode="after")
     def validate_date_range(self) -> VacationPeriodCreate:
@@ -48,6 +51,7 @@ class VacationPeriodResponse(BaseModel):
     end_date: _dt.date
     reason: str | None = None
     default_disposition: VacationDisposition
+    per_student_disposition: dict[str, VacationDisposition] | None = None
     cancelled_at: _dt.datetime | None = None
     created_at: _dt.datetime
     updated_at: _dt.datetime | None = None

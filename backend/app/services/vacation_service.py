@@ -131,12 +131,19 @@ class VacationService:
         if vacation_days <= 0:
             raise ValueError("vacation period must cover at least 1 day")
 
+        # spec §4.2 — per-student disposition overrides stored as JSON.
+        # Effective per-student handling (makeupCredit / freeCancel) is a follow-up.
+        per_student = (
+            {sid: d.value for sid, d in data.per_student_disposition.items()} if data.per_student_disposition else None
+        )
+
         period = VacationPeriod(
             teacher_id=teacher_id,
             start_date=data.start_date,
             end_date=data.end_date,
             reason=data.reason,
             default_disposition=_to_model_disposition(data.default_disposition),
+            per_student_disposition=per_student,
         )
         self.db.add(period)
 

@@ -12,11 +12,15 @@ abstract class VacationRepository {
 
   /// Register a new vacation period and (for rollForward) auto-extend
   /// impacted subscriptions on the backend side.
+  ///
+  /// [perStudentDisposition] (spec §4.2) overrides the default disposition for
+  /// individual students. Pass `null` or empty when no overrides apply.
   Future<VacationPeriod> registerVacation({
     required DateTime startDate,
     required DateTime endDate,
     String? reason,
     required VacationDisposition defaultDisposition,
+    Map<String, VacationDisposition>? perStudentDisposition,
   });
 
   /// List the teacher's vacation periods (active by default).

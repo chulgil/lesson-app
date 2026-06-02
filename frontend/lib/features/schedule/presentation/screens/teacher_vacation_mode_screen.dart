@@ -249,12 +249,15 @@ class _ImpactSection extends StatelessWidget {
   }
 }
 
-class _ImpactSummary extends StatelessWidget {
+class _ImpactSummary extends ConsumerWidget {
   final VacationImpactPreview impact;
   const _ImpactSummary({required this.impact});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final overrides = ref.watch(
+      vacationFormProvider.select((s) => s.perStudentOverrides),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -265,30 +268,173 @@ class _ImpactSummary extends StatelessWidget {
           ),
           style: AppTypography.bodyLarge.copyWith(color: AppColors.ink),
         ),
+        SizedBox(height: AppSpacing.space1),
+        Text(
+          AppStrings.vacationPerStudentSheetHint,
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+        ),
         SizedBox(height: AppSpacing.space2),
         for (final student in impact.impactedStudents.take(10))
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    student.studentName ?? student.studentId,
-                    style: AppTypography.bodyMedium,
-                  ),
+          _ImpactStudentRow(
+            student: student,
+            dispositionOverride: overrides[student.studentId],
+            onLongPress:
+                () => _openPerStudentSheet(
+                  context,
+                  ref,
+                  studentId: student.studentId,
+                  studentLabel: student.studentName ?? student.studentId,
                 ),
-                Text(
-                  AppStrings.vacationImpactStudentCount(student.lessonCount),
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                ),
-              ],
-            ),
           ),
       ],
     );
   }
+}
+
+/// Schema-enum → user-facing label. Used by per-student row + sheet.
+String _dispositionLabel(VacationDisposition d) {
+  switch (d) {
+    case VacationDisposition.makeupCredit:
+      return AppStrings.vacationDispositionMakeupCreditLabel;
+    case VacationDisposition.freeCancel:
+      return AppStrings.vacationDispositionFreeCancelLabel;
+    case VacationDisposition.rollForward:
+      return AppStrings.vacationDispositionRollForwardLabel;
+  }
+}
+
+class _ImpactStudentRow extends StatelessWidget {
+  final VacationImpactedStudent student;
+  final VacationDisposition? dispositionOverride;
+  final VoidCallback onLongPress;
+  const _ImpactStudentRow({
+    required this.student,
+    required this.dispositionOverride,
+    required this.onLongPress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onLongPress: onLongPress,
+      onTap: onLongPress,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    student.studentName ?? student.studentId,
+                    style: AppTypography.bodyMedium,
+                  ),
+                  if (dispositionOverride != null) ...[
+                    SizedBox(height: 2),
+                    Text(
+                      AppStrings.vacationPerStudentOverrideLabel(
+                        _dispositionLabel(dispositionOverride!),
+                      ),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.paperAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Text(
+              AppStrings.vacationImpactStudentCount(student.lessonCount),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _openPerStudentSheet(
+  BuildContext context,
+  WidgetRef ref, {
+  required String studentId,
+  required String studentLabel,
+}) async {
+  final current = ref.read(vacationFormProvider).perStudentOverrides[studentId];
+  final selected = await showModalBottomSheet<VacationDisposition?>(
+    context: context,
+    backgroundColor: AppColors.paper,
+    showDragHandle: true,
+    builder: (sheetCtx) {
+      return SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.space4,
+            0,
+            AppSpacing.space4,
+            AppSpacing.space4,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.vacationPerStudentSheetTitle,
+                style: AppTypography.headingSmall.copyWith(
+                  color: AppColors.ink,
+                ),
+              ),
+              SizedBox(height: AppSpacing.space1),
+              Text(
+                studentLabel,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              SizedBox(height: AppSpacing.space3),
+              for (final option in VacationDisposition.values)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(_dispositionLabel(option)),
+                  trailing:
+                      current == option
+                          ? const Icon(
+                            Icons.check,
+                            color: AppColors.paperAccent,
+                          )
+                          : null,
+                  onTap: () => Navigator.pop(sheetCtx, option),
+                ),
+              const Divider(height: 1),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text(AppStrings.vacationPerStudentUseDefault),
+                trailing:
+                    current == null
+                        ? const Icon(Icons.check, color: AppColors.paperAccent)
+                        : null,
+                onTap: () => Navigator.pop(sheetCtx, null),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  // If the user dismissed by tapping the scrim, selected is null *and* we
+  // were already at "no override". Treat dismiss as no-op via mounted check.
+  if (!context.mounted) return;
+  // showModalBottomSheet returns the popped value; null means user picked
+  // "기본값 사용". To distinguish dismiss vs explicit "기본값 사용", we always
+  // apply the popped value (Map<...> = null is safe).
+  ref
+      .read(vacationFormProvider.notifier)
+      .setStudentOverride(studentId, selected);
 }
 
 class _SubmitButton extends StatelessWidget {

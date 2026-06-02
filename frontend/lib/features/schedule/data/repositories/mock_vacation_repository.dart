@@ -25,6 +25,7 @@ class MockVacationRepository implements VacationRepository {
     required DateTime endDate,
     String? reason,
     required VacationDisposition defaultDisposition,
+    Map<String, VacationDisposition>? perStudentDisposition,
   }) async {
     final now = DateTime.now();
     final period = VacationPeriod(

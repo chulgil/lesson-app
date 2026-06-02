@@ -29,6 +29,7 @@ class RemoteVacationRepository implements VacationRepository {
     required DateTime endDate,
     String? reason,
     required VacationDisposition defaultDisposition,
+    Map<String, VacationDisposition>? perStudentDisposition,
   }) async {
     final response = await _apiClient.post(
       '/teacher/vacation',
@@ -37,6 +38,11 @@ class RemoteVacationRepository implements VacationRepository {
         'end_date': _formatDate(endDate),
         if (reason != null && reason.isNotEmpty) 'reason': reason,
         'default_disposition': _dispositionToWire(defaultDisposition),
+        if (perStudentDisposition != null && perStudentDisposition.isNotEmpty)
+          'per_student_disposition': {
+            for (final entry in perStudentDisposition.entries)
+              entry.key: _dispositionToWire(entry.value),
+          },
       },
     );
     return _periodFromJson(response.data as Map<String, dynamic>);
