@@ -562,7 +562,7 @@ class InviteService:
     ) -> None:
         """Attach an accepted app connection to the teacher-owned student roster."""
         from app.models.relationship import RelationStatus, TeacherStudentRelation
-        from app.models.student import ConnectionStatus, Student
+        from app.models.student import Student
         from app.services.teacher_id_resolver import resolve_teacher_id
 
         teacher_id = await resolve_teacher_id(self.db, teacher_user_id)
@@ -580,7 +580,9 @@ class InviteService:
             student.teacher_id = teacher_id
             student.is_active = True
 
-        student.connection_status = ConnectionStatus.connected
+        # G3 Phase B-2 — deprecated `connection_status` writer removed.
+        # `connected_at` is now the canonical "app-connected" signal alongside
+        # `TeacherStudentRelation.status`. Column drop lands in Phase B-2b.
         student.connected_at = connected_at
 
         relation = await self.db.scalar(
