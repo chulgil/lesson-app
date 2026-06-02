@@ -247,6 +247,9 @@ class LessonBooking(UUIDMixin, TimestampMixin, Base):
         default=BookingStatus.pending,
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # H-001 spec §3.3 — set when this booking was cancelled by a vacation period.
+    # Used by Recovery to restore the affected bookings + drop the makeup credits.
+    vacation_period_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
     __table_args__ = (
         Index("idx_booking_teacher", "teacher_id"),
@@ -254,6 +257,7 @@ class LessonBooking(UUIDMixin, TimestampMixin, Base):
         Index("idx_booking_subscription", "subscription_id"),
         Index("idx_booking_date", "scheduled_date"),
         Index("idx_booking_status", "status"),
+        Index("idx_booking_vacation_period", "vacation_period_id"),
     )
 
 

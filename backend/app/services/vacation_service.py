@@ -146,18 +146,75 @@ class VacationService:
             per_student_disposition=per_student,
         )
         self.db.add(period)
+        await self.db.flush()  # need period.id before processing dispositions
 
-        if data.default_disposition == VacationDisposition.rollForward:
-            await self._auto_extend_impacted_subscriptions(
-                teacher_id=teacher_id,
-                start_date=data.start_date,
-                end_date=data.end_date,
-                vacation_days=vacation_days,
-            )
+        # spec §5 — disposition-aware processing per affected booking.
+        override_map = data.per_student_disposition or {}
+        await self._apply_dispositions(
+            period=period,
+            default_disposition=data.default_disposition,
+            override_map=override_map,
+            vacation_days=vacation_days,
+        )
 
         await self.db.flush()
         await self.db.refresh(period)
         return VacationPeriodResponse.model_validate(period)
+
+    async def _apply_dispositions(
+        self,
+        *,
+        period: VacationPeriod,
+        default_disposition: VacationDisposition,
+        override_map: dict[str, VacationDisposition],
+        vacation_days: int,
+    ) -> None:
+        """Route every impacted booking through its effective disposition.
+
+        Per-student `override_map` wins over `default_disposition`. rollForward
+        bookings stay active and the subscription's `auto_extended_days` grows
+        once per impacted subscription. freeCancel / makeupCredit cancel the
+        booking and link it back to the period via `vacation_period_id` so
+        Recovery can revert it cleanly.
+        """
+        from app.services.makeup_credit_service import MakeupCreditService
+
+        bookings = await self._impacted_bookings(
+            teacher_id=period.teacher_id,
+            start_date=period.start_date,
+            end_date=period.end_date,
+        )
+        if not bookings:
+            return
+
+        roll_forward_sub_ids: set[str] = set()
+        makeup_service: MakeupCreditService | None = None
+
+        for booking in bookings:
+            effective = override_map.get(booking.student_id, default_disposition)
+
+            if effective == VacationDisposition.rollForward:
+                if booking.subscription_id is not None:
+                    roll_forward_sub_ids.add(booking.subscription_id)
+                continue
+
+            # freeCancel / makeupCredit both cancel the booking.
+            booking.status = BookingStatus.cancelled
+            booking.vacation_period_id = period.id
+
+            if effective == VacationDisposition.makeupCredit:
+                if makeup_service is None:
+                    makeup_service = MakeupCreditService(self.db)
+                await makeup_service.accrue_for_vacation(
+                    student_id=booking.student_id,
+                    teacher_id=period.teacher_id,
+                    vacation_id=period.id,
+                    vacation_end_date=datetime.combine(period.end_date, datetime.min.time(), tzinfo=UTC),
+                    source_lesson_id=booking.id,
+                )
+
+        if roll_forward_sub_ids:
+            await self._auto_extend_subscriptions(roll_forward_sub_ids, vacation_days)
 
     # ------------------------------------------------------------------
     # List vacations (read-only)
@@ -214,18 +271,60 @@ class VacationService:
             )
 
         period.cancelled_at = now
-        if period.default_disposition == VacationDispositionModel.rollForward:
-            vacation_days = (period.end_date - period.start_date).days + 1
-            await self._revert_auto_extended_days(
-                teacher_id=teacher_id,
-                start_date=period.start_date,
-                end_date=period.end_date,
-                vacation_days=vacation_days,
-            )
+        vacation_days = (period.end_date - period.start_date).days + 1
+        await self._revert_dispositions(period=period, vacation_days=vacation_days)
 
         await self.db.flush()
         await self.db.refresh(period)
         return VacationPeriodResponse.model_validate(period)
+
+    async def _revert_dispositions(
+        self,
+        *,
+        period: VacationPeriod,
+        vacation_days: int,
+    ) -> None:
+        """Undo every disposition this vacation performed.
+
+        - rollForward → subtract `auto_extended_days` from any subscription that
+          was paired with a still-active booking when the vacation registered.
+        - freeCancel / makeupCredit → restore the booking back to `confirmed`
+          and detach `vacation_period_id`. makeup credits keyed by the period
+          are removed in bulk.
+        """
+        from app.models.makeup_credit import MakeupCredit
+
+        # 1) Restore bookings cancelled by this vacation.
+        cancelled_bookings = (
+            await self.db.scalars(
+                select(LessonBooking).where(
+                    LessonBooking.vacation_period_id == period.id,
+                )
+            )
+        ).all()
+        revived_sub_ids: set[str] = set()
+        for booking in cancelled_bookings:
+            booking.status = BookingStatus.confirmed
+            booking.vacation_period_id = None
+            if booking.subscription_id is not None:
+                revived_sub_ids.add(booking.subscription_id)
+
+        # 2) Drop accrued credits for this vacation.
+        accrued_credits = (
+            await self.db.scalars(select(MakeupCredit).where(MakeupCredit.source_event_id == period.id))
+        ).all()
+        for credit in accrued_credits:
+            await self.db.delete(credit)
+
+        # 3) Revert rollForward auto-extend. The legacy path only knew the
+        # default disposition; now we revert any subscription whose booking
+        # is *still* active inside the window (i.e. survived as rollForward).
+        await self._revert_auto_extended_days(
+            teacher_id=period.teacher_id,
+            start_date=period.start_date,
+            end_date=period.end_date,
+            vacation_days=vacation_days,
+        )
 
     async def _revert_auto_extended_days(
         self,
@@ -257,6 +356,35 @@ class VacationService:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    async def _impacted_bookings(
+        self,
+        *,
+        teacher_id: str,
+        start_date: date,
+        end_date: date,
+    ) -> list[LessonBooking]:
+        result = await self.db.scalars(
+            select(LessonBooking)
+            .where(LessonBooking.teacher_id == teacher_id)
+            .where(LessonBooking.scheduled_date >= start_date)
+            .where(LessonBooking.scheduled_date <= end_date)
+            .where(LessonBooking.status.in_(_ACTIVE_BOOKING_STATUSES))
+        )
+        return list(result.all())
+
+    async def _auto_extend_subscriptions(
+        self,
+        subscription_ids: set[str],
+        vacation_days: int,
+    ) -> int:
+        """Add vacation_days to auto_extended_days for the given subscriptions."""
+        if not subscription_ids:
+            return 0
+        subscriptions = (await self.db.scalars(select(Subscription).where(Subscription.id.in_(subscription_ids)))).all()
+        for sub in subscriptions:
+            sub.auto_extended_days = (sub.auto_extended_days or 0) + vacation_days
+        return len(subscriptions)
 
     async def _auto_extend_impacted_subscriptions(
         self,
