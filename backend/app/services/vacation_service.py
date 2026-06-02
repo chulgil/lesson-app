@@ -150,6 +150,16 @@ class VacationService:
 
         # spec §5 — disposition-aware processing per affected booking.
         override_map = data.per_student_disposition or {}
+
+        # spec §6.1 — capture impacted students *before* _apply_dispositions
+        # mutates the booking set (freeCancel / makeupCredit flip status to
+        # cancelled, which would otherwise hide them from the fan-out).
+        impacted_student_ids = await self._impacted_student_ids(
+            teacher_id=period.teacher_id,
+            start_date=period.start_date,
+            end_date=period.end_date,
+        )
+
         await self._apply_dispositions(
             period=period,
             default_disposition=data.default_disposition,
@@ -157,9 +167,69 @@ class VacationService:
             vacation_days=vacation_days,
         )
 
+        # Fire-and-forget alimtalk fan-out to impacted students. Must not block
+        # vacation registration on alimtalk vendor errors.
+        try:
+            await self._send_vacation_alimtalk(period, override_map, impacted_student_ids)
+        except Exception:  # noqa: BLE001
+            import logging
+
+            logging.getLogger(__name__).exception("vacation alimtalk fan-out failed period=%s", period.id)
+
         await self.db.flush()
         await self.db.refresh(period)
         return VacationPeriodResponse.model_validate(period)
+
+    async def _impacted_student_ids(
+        self,
+        *,
+        teacher_id: str,
+        start_date: date,
+        end_date: date,
+    ) -> set[str]:
+        bookings = await self._impacted_bookings(
+            teacher_id=teacher_id,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        return {b.student_id for b in bookings}
+
+    async def _send_vacation_alimtalk(
+        self,
+        period: VacationPeriod,
+        override_map: dict[str, VacationDisposition],
+        student_ids: set[str],
+    ) -> None:
+        """LNZ_TEACHER_VACATION fan-out — one send per impacted student/phone.
+
+        `student_ids` is captured by the caller *before* `_apply_dispositions`
+        mutates the booking set, so cancellation paths still receive notice.
+        """
+        from app.models.student import Student
+        from app.services.alimtalk_service import build_alimtalk_service
+
+        if not student_ids:
+            return
+        students = (await self.db.scalars(select(Student).where(Student.id.in_(student_ids)))).all()
+
+        service = build_alimtalk_service(self.db)
+        for student in students:
+            phone = student.parent_phone or student.phone or ""
+            if not phone:
+                continue
+            effective = override_map.get(student.id, period.default_disposition)
+            disposition_value = effective.value if hasattr(effective, "value") else str(effective)
+            await service.send_teacher_vacation(
+                vacation_period_id=period.id,
+                recipient_phone=phone,
+                variables={
+                    "student_name": student.name or "",
+                    "vacation_start": period.start_date.isoformat(),
+                    "vacation_end": period.end_date.isoformat(),
+                    "disposition": disposition_value,
+                    "reason": period.reason or "",
+                },
+            )
 
     async def _apply_dispositions(
         self,
