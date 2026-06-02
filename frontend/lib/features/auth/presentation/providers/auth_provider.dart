@@ -188,6 +188,24 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
+  /// 사용자가 RoleSelectScreen 으로 되돌아가도록 frontend state 를 reset.
+  ///
+  /// #430 G1 B1 — 학생 직접 가입 차단 화면에서 "부모님 계정으로 시작하기"
+  /// 를 눌렀을 때 호출. 백엔드 role 갱신은 다음에 setRole 호출 시 수행되며,
+  /// 본 메서드는 로컬 state 만 AuthNeedsRole 로 되돌린다.
+  Future<void> clearRole() async {
+    final current = state;
+    if (current is AuthNeedsOnboarding) {
+      state = AuthNeedsRole(
+        userId: current.userId,
+        name: current.name,
+        email: current.email,
+        profileImageUrl: current.profileImageUrl,
+      );
+    }
+    // AuthNeedsRole 이면 이미 역할 선택 상태이므로 noop.
+  }
+
   /// Dev-only login (bypasses OAuth for local development).
   ///
   /// In mock mode: creates a local [AuthAuthenticated] state without API call.
