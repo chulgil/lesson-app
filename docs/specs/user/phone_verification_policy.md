@@ -338,11 +338,11 @@ if (teacher.phoneVerifiedAt != null) {
 
 ### Phase 3: 프론트엔드 — 선생님·학부모 (1주)
 
-- 가입 흐름 단축: SSO 결과 화면에 약관 체크박스 통합 → 역할 선택 → B 단계 → 홈
-- 별도 `TermsAgreementScreen` 분리 제거 (체크박스를 SSO 결과 화면으로 이동)
-- E3 진입 게이트 모달 (`PhoneVerificationGateModal`) — 선생님 첫 수강권 발급 시
-- Phase C 퀘스트 카드: "전화인증 → 인증 선생님 배지"
-- `VerificationBadgeChip` 위젯 (#430 후속 완료 — 2026-06-02)
+- ✅ 가입 흐름 단축: SSO 결과 화면에 약관 체크박스 통합 → 역할 선택 → B 단계 → 홈 (2026-06-02 PR #4)
+- ✅ 별도 `TermsAgreementScreen` 분리 제거 (체크박스를 RoleSelectScreen 내 인라인 통합) (2026-06-02 PR #4)
+- ✅ E3 진입 게이트 모달 (`PhoneVerificationGateModal`) — issueSubscription · issueBatch · proposalConfirm wiring (2026-06-02 PR #5)
+- ✅ Phase C 퀘스트 카드: "전화인증 → 인증 선생님 배지" (`QuestBoardCard` step 11) (2026-06-02 PR #2)
+- ✅ `VerificationBadgeChip` 위젯 (2026-06-02 PR #3)
 
 ### Phase 4: 프론트엔드 — 학생 분기 (별도 작업)
 
