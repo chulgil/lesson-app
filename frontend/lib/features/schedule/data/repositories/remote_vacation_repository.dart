@@ -42,6 +42,26 @@ class RemoteVacationRepository implements VacationRepository {
     return _periodFromJson(response.data as Map<String, dynamic>);
   }
 
+  @override
+  Future<List<VacationPeriod>> listVacations({
+    bool includeCancelled = false,
+  }) async {
+    final response = await _apiClient.get(
+      '/teacher/vacation',
+      queryParameters: {if (includeCancelled) 'include_cancelled': 'true'},
+    );
+    final data = response.data as Map<String, dynamic>;
+    final items = (data['vacations'] as List<dynamic>? ?? [])
+        .cast<Map<String, dynamic>>();
+    return items.map(_periodFromJson).toList(growable: false);
+  }
+
+  @override
+  Future<VacationPeriod> cancelVacation(String periodId) async {
+    final response = await _apiClient.delete('/teacher/vacation/$periodId');
+    return _periodFromJson(response.data as Map<String, dynamic>);
+  }
+
   // ──────────────────────────────────────────────────────────
   // JSON helpers
   // ──────────────────────────────────────────────────────────

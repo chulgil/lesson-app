@@ -7696,6 +7696,70 @@ class AppStrings {
   /// 학생별 미리보기 항목 카운트 ("3건").
   static String vacationImpactStudentCount(int count) => '$count건';
 
+  // ── 활성 휴가 카드 + 24h Recovery (H-001 FE Phase 3) ────────────────
+
+  /// 활성 휴가 섹션 제목 (등록된 휴가 목록 표시).
+  static const vacationActiveSection = '등록된 휴가';
+
+  /// 활성 휴가 없음 (빈 상태).
+  static const vacationActiveEmpty = '등록된 휴가가 없습니다.';
+
+  /// 휴가 취소 버튼 (Recovery).
+  static const vacationCancelLabel = '휴가 취소';
+
+  /// 휴가 취소 확인 다이얼로그 제목.
+  static const vacationCancelConfirmTitle = '휴가를 취소할까요?';
+
+  /// 휴가 취소 확인 다이얼로그 본문 (24h Recovery 안내).
+  static const vacationCancelConfirmBody =
+      '등록 후 24시간 이내, 시작 전인 휴가만 취소할 수 있어요. 자동 연장된 수강권 만료일도 원래대로 돌아갑니다.';
+
+  /// 취소 성공 SnackBar.
+  static const vacationCancelSuccess = '휴가를 취소했어요.';
+
+  /// 취소 실패 — 일반 (서버 4xx/5xx).
+  static const vacationCancelFailed = '휴가를 취소하지 못했어요.';
+
+  /// 취소 실패 — 24h 윈도우 초과 (서버 409).
+  static const vacationCancelWindowExpired = '등록 후 24시간이 지나 취소할 수 없어요.';
+
+  /// 취소 실패 — 이미 시작된 휴가 (서버 409).
+  static const vacationCancelAlreadyStarted = '이미 시작된 휴가는 취소할 수 없어요.';
+
+  /// 취소 실패 — 이미 취소된 휴가 (서버 400).
+  static const vacationCancelAlreadyCancelled = '이미 취소된 휴가예요.';
+
+  /// 활성 휴가 카드 — 기간 표시 helper (예: "8/1 ~ 8/5").
+  static String vacationCardDateRange(String start, String end) =>
+      '$start ~ $end';
+
+  // ── 휴가 처리 옵션 (H-001 spec §4.1 step 3 / §5) ─────────────────────
+
+  /// 처리 옵션 섹션 제목.
+  static const vacationDispositionSection = '어떻게 처리할까요?';
+
+  /// 보강 크레딧 적립 라벨.
+  static const vacationDispositionMakeupCreditLabel = '보강 크레딧 적립';
+
+  /// 보강 크레딧 적립 — 권장 표시 (suffix).
+  static const vacationDispositionRecommended = '권장';
+
+  /// 보강 크레딧 적립 설명.
+  static const vacationDispositionMakeupCreditDescription = '학생이 나중에 보강 예약 가능';
+
+  /// 무료 처리 라벨.
+  static const vacationDispositionFreeCancelLabel = '무료 처리';
+
+  /// 무료 처리 설명.
+  static const vacationDispositionFreeCancelDescription = '수강권 차감 없이 취소';
+
+  /// 이월 라벨.
+  static const vacationDispositionRollForwardLabel = '다음 회차로 이월';
+
+  /// 이월 설명 — 휴가 일수만큼 만료일 자동 연장.
+  static const vacationDispositionRollForwardDescription =
+      '수강권 만료일이 휴가 일수만큼 자동 연장';
+
   // ── First Availability Quest (#422) ─────────────────────────────────
   // Spec: docs/specs/onboarding/teacher_first_availability_setup.md
 

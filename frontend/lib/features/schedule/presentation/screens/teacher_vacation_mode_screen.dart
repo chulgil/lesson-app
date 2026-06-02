@@ -5,6 +5,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../domain/entities/vacation_period.dart';
 import '../providers/vacation_providers.dart';
 
@@ -28,12 +30,14 @@ class TeacherVacationModeScreen extends ConsumerWidget {
     final state = ref.watch(vacationFormProvider);
     final notifier = ref.read(vacationFormProvider.notifier);
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(title: const Text(AppStrings.vacationModeTitle)),
+    return NotebookScreenScaffold(
+      appBarTitle: AppStrings.vacationModeTitle,
       body: ListView(
         padding: EdgeInsets.all(AppSpacing.space4),
         children: [
+          // Active vacations + 24h Recovery (spec §7 + §9.1).
+          const _ActiveVacationSection(),
+          SizedBox(height: AppSpacing.space4),
           _SectionHeader(text: AppStrings.vacationPeriodSection),
           SizedBox(height: AppSpacing.space2),
           _DateRow(
@@ -62,6 +66,11 @@ class TeacherVacationModeScreen extends ConsumerWidget {
           _ReasonField(value: state.reason, onChanged: notifier.setReason),
           SizedBox(height: AppSpacing.space4),
           _ImpactSection(state: state, onRefresh: notifier.loadImpact),
+          SizedBox(height: AppSpacing.space4),
+          _DispositionSection(
+            selected: state.disposition,
+            onChange: notifier.setDisposition,
+          ),
           SizedBox(height: AppSpacing.space5),
           _SubmitButton(state: state, onSubmit: () => _onSubmit(context, ref)),
         ],
@@ -205,9 +214,10 @@ class _ImpactSection extends StatelessWidget {
             const _SectionHeader(text: AppStrings.vacationImpactSection),
             const Spacer(),
             TextButton(
-              onPressed: state.hasValidRange && !state.isLoadingImpact
-                  ? onRefresh
-                  : null,
+              onPressed:
+                  state.hasValidRange && !state.isLoadingImpact
+                      ? onRefresh
+                      : null,
               child: const Text(AppStrings.vacationImpactRefresh),
             ),
           ],
@@ -293,13 +303,310 @@ class _SubmitButton extends StatelessWidget {
     return FilledButton(
       onPressed: canSubmit ? onSubmit : null,
       style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
-      child: state.isSubmitting
-          ? const SizedBox(
-              height: 18,
-              width: 18,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Text(AppStrings.vacationRegisterButton),
+      child:
+          state.isSubmitting
+              ? const SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+              : const Text(AppStrings.vacationRegisterButton),
     );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Disposition section — 3 options (H-001 spec §4.1 step 3 / §5).
+// ──────────────────────────────────────────────────────────────
+
+class _DispositionSection extends StatelessWidget {
+  final VacationDisposition selected;
+  final ValueChanged<VacationDisposition> onChange;
+  const _DispositionSection({required this.selected, required this.onChange});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(text: AppStrings.vacationDispositionSection),
+        SizedBox(height: AppSpacing.space2),
+        _DispositionOption(
+          value: VacationDisposition.makeupCredit,
+          label: AppStrings.vacationDispositionMakeupCreditLabel,
+          description: AppStrings.vacationDispositionMakeupCreditDescription,
+          isRecommended: true,
+          groupValue: selected,
+          onChange: onChange,
+        ),
+        _DispositionOption(
+          value: VacationDisposition.freeCancel,
+          label: AppStrings.vacationDispositionFreeCancelLabel,
+          description: AppStrings.vacationDispositionFreeCancelDescription,
+          groupValue: selected,
+          onChange: onChange,
+        ),
+        _DispositionOption(
+          value: VacationDisposition.rollForward,
+          label: AppStrings.vacationDispositionRollForwardLabel,
+          description: AppStrings.vacationDispositionRollForwardDescription,
+          groupValue: selected,
+          onChange: onChange,
+        ),
+      ],
+    );
+  }
+}
+
+class _DispositionOption extends StatelessWidget {
+  final VacationDisposition value;
+  final VacationDisposition groupValue;
+  final String label;
+  final String description;
+  final bool isRecommended;
+  final ValueChanged<VacationDisposition> onChange;
+
+  const _DispositionOption({
+    required this.value,
+    required this.groupValue,
+    required this.label,
+    required this.description,
+    required this.onChange,
+    this.isRecommended = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = value == groupValue;
+    return Padding(
+      padding: EdgeInsets.only(bottom: AppSpacing.space2),
+      child: InkWell(
+        onTap: () => onChange(value),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        child: Container(
+          padding: EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            color: AppColors.paperDark,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: Border.all(
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Radio-like indicator. Custom (not Material Radio) to avoid the
+              // deprecated groupValue/onChanged API in Flutter 3.32+.
+              Container(
+                width: 20,
+                height: 20,
+                margin: EdgeInsets.only(top: 2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkTertiary,
+                    width: 2,
+                  ),
+                ),
+                child:
+                    isSelected
+                        ? Center(
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.paperAccent,
+                            ),
+                          ),
+                        )
+                        : null,
+              ),
+              SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          label,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.ink,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (isRecommended) ...[
+                          SizedBox(width: AppSpacing.space2),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppSpacing.space2,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.paperAccent,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusSmall,
+                              ),
+                            ),
+                            child: Text(
+                              AppStrings.vacationDispositionRecommended,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.paper,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    SizedBox(height: AppSpacing.space1),
+                    Text(
+                      description,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Active vacation card + Recovery (H-001 FE Phase 3).
+// Spec: docs/specs/schedule/teacher_vacation_mode.md §7.
+// ──────────────────────────────────────────────────────────────
+
+class _ActiveVacationSection extends ConsumerWidget {
+  const _ActiveVacationSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final listAsync = ref.watch(vacationListProvider);
+    return listAsync.when(
+      data: (vacations) {
+        if (vacations.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionHeader(text: AppStrings.vacationActiveSection),
+            SizedBox(height: AppSpacing.space2),
+            ...vacations.map((v) => _ActiveVacationCard(period: v)),
+          ],
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _ActiveVacationCard extends ConsumerWidget {
+  final VacationPeriod period;
+  const _ActiveVacationCard({required this.period});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: EdgeInsets.only(bottom: AppSpacing.space2),
+      padding: EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.vacationCardDateRange(
+                    _formatShortDate(period.startDate),
+                    _formatShortDate(period.endDate),
+                  ),
+                  style: AppTypography.bodyLarge.copyWith(color: AppColors.ink),
+                ),
+                if (period.reason != null && period.reason!.isNotEmpty) ...[
+                  SizedBox(height: AppSpacing.space1),
+                  Text(
+                    period.reason!,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () => _confirmCancel(context, ref),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+              foregroundColor: AppColors.paperAccent,
+              side: const BorderSide(color: AppColors.paperAccent),
+            ),
+            child: const Text(AppStrings.vacationCancelLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _formatShortDate(DateTime d) {
+    return '${d.month}/${d.day}';
+  }
+
+  Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => NotebookAlertDialog(
+            title: AppStrings.vacationCancelConfirmTitle,
+            content: const Text(AppStrings.vacationCancelConfirmBody),
+            confirmLabel: AppStrings.vacationCancelLabel,
+            cancelLabel: AppStrings.cancel,
+            isDestructive: true,
+            onConfirm: () => Navigator.pop(ctx, true),
+            onCancel: () => Navigator.pop(ctx, false),
+          ),
+    );
+    if (result != true || !context.mounted) return;
+    try {
+      await ref.read(vacationActionsProvider).cancel(period.id);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.vacationCancelSuccess)),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      final message = e.toString();
+      // Map server error semantics to friendly text (spec §7.2).
+      final friendly =
+          message.contains('이미 시작')
+              ? AppStrings.vacationCancelAlreadyStarted
+              : message.contains('24')
+              ? AppStrings.vacationCancelWindowExpired
+              : message.contains('이미 취소')
+              ? AppStrings.vacationCancelAlreadyCancelled
+              : AppStrings.vacationCancelFailed;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(friendly)));
+    }
   }
 }
