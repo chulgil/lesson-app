@@ -665,6 +665,30 @@ class ScheduleService:
         if availability.teacher_id not in current_teacher_ids:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
+    async def _resolve_student_id_scope(self, user_id: str) -> list[str]:
+        """Return both user and student-profile IDs for a student identifier."""
+        from app.models.student import Student
+
+        student_ids = [user_id]
+        profile_id = await self.db.scalar(select(Student.id).where(Student.user_id == user_id))
+        if profile_id is not None and profile_id not in student_ids:
+            student_ids.append(profile_id)
+        return student_ids
+
+    async def _assert_booking_owner(self, booking: Any, current_user: Any | None) -> None:
+        if current_user is None:
+            return
+
+        current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if getattr(booking, "teacher_id", None) in current_teacher_ids:
+            return
+
+        current_student_ids = await self._resolve_student_id_scope(current_user.id)
+        if getattr(booking, "student_id", None) in current_student_ids:
+            return
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
     # ------------------------------------------------------------------
     # Bookings
     # ------------------------------------------------------------------
@@ -685,7 +709,34 @@ class ScheduleService:
         """List bookings with filters."""
         from app.models.schedule import LessonBooking
 
+        # IDOR guard (#460): scope results to the caller. An explicit teacher_id/
+        # student_id filter only applies when it belongs to the caller; otherwise
+        # fall back to the caller's own teacher/student scope so a non-owner can
+        # never read other users' bookings.
         query = select(LessonBooking)
+        if user is not None:
+            caller_teacher_ids = await self._resolve_teacher_id_scope(user.id)
+            caller_student_ids = await self._resolve_student_id_scope(user.id)
+
+            teacher_match = teacher_id in caller_teacher_ids if teacher_id else False
+            student_match = student_id in caller_student_ids if student_id else False
+
+            if teacher_match:
+                query = query.where(LessonBooking.teacher_id == teacher_id)
+                teacher_id = None
+            if student_match:
+                query = query.where(LessonBooking.student_id == student_id)
+                student_id = None
+            if not teacher_match and not student_match:
+                query = query.where(
+                    or_(
+                        LessonBooking.teacher_id.in_(caller_teacher_ids),
+                        LessonBooking.student_id.in_(caller_student_ids),
+                    )
+                )
+                teacher_id = None
+                student_id = None
+
         if teacher_id:
             query = query.where(LessonBooking.teacher_id == teacher_id)
         if student_id:
@@ -789,6 +840,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
         return BookingResponse.model_validate(booking)
 
     async def update_booking(self, booking_id: str, data: BookingUpdate, current_user: Any) -> BookingResponse:
@@ -798,6 +850,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         update_data.pop("lesson_date", None)
@@ -818,6 +871,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
         await self.db.delete(booking)
         await self.db.flush()
 
@@ -828,6 +882,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
         booking.status = BookingStatus.confirmed
         await self.db.flush()
         await self.db.refresh(booking)
@@ -840,6 +895,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
         booking.status = BookingStatus.cancelled
         booking.notes = reason
         await self.db.flush()
@@ -853,6 +909,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
         booking.status = BookingStatus.cancelled
         booking.notes = reason
         await self.db.flush()
@@ -866,6 +923,7 @@ class ScheduleService:
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        await self._assert_booking_owner(booking, current_user)
         booking.scheduled_date = data.new_date
         booking.scheduled_time = data.new_time
         booking.status = BookingStatus.changeRequested

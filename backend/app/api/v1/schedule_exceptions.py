@@ -70,7 +70,7 @@ async def update_exception(
 ) -> ScheduleExceptionResponse:
     service = ScheduleExtService(db)
     result: ScheduleExceptionResponse = await service.update_exception(
-        exception_id, body.model_dump(exclude_none=True)
+        exception_id, body.model_dump(exclude_none=True), current_user
     )
     return result
 
@@ -87,4 +87,4 @@ async def delete_exception(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> None:
     service = ScheduleExtService(db)
-    await service.delete_exception(exception_id)
+    await service.delete_exception(exception_id, current_user)

@@ -258,6 +258,10 @@ class LessonRequestService:
 
         now = datetime.now(UTC)
         canonical_status = self._canonical_request_status(data.status)
+        # Approval / proposal / subscription-issuing transitions are teacher-only.
+        # Students may only cancel/withdraw or progress their own payment side.
+        if canonical_status in self._TEACHER_ONLY_STATUSES:
+            self._require_actor(current_user, "teacher")
         request.status = canonical_status
         request.status_updated_at = now
 
@@ -581,6 +585,20 @@ class LessonRequestService:
 
         result = await self.db.scalars(query.order_by(RequestEvent.created_at.desc(), RequestEvent.id.desc()))
         return result.first()
+
+    # Canonical statuses that only a teacher may set (approval / proposal /
+    # subscription-issuing / progression). Cancellation/withdrawal and the
+    # student-side payment-notify/proposal-accept transitions stay allowed.
+    _TEACHER_ONLY_STATUSES = frozenset(
+        {
+            "timeConfirmed",
+            "rejected",
+            "proposalSent",
+            "subscriptionIssued",
+            "inProgress",
+            "completed",
+        }
+    )
 
     def _canonical_request_status(self, request_status: str) -> str:
         """Normalize legacy status names to the current UnifiedRequestStatus SSOT."""

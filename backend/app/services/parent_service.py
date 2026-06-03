@@ -504,6 +504,7 @@ class ParentService:
             )
             if invitation is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invitation not found")
+            await self._assert_can_access_invitation(invitation, current_user)
             return ParentInvitationResponse.model_validate(invitation)
 
         query = select(ParentInvitation)
@@ -551,6 +552,7 @@ class ParentService:
         invitation = await self.db.get(ParentInvitation, invitation_id)
         if invitation is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invitation not found")
+        await self._assert_can_access_invitation(invitation, current_user)
         invitation.is_used = True
         await self.db.flush()
         await self.db.refresh(invitation)
@@ -864,11 +866,19 @@ class ParentService:
         return name
 
     async def _assert_can_access_parent(self, parent_id: str, current_user: Any) -> None:
-        from app.models.parent import Parent
+        from app.models.parent import Parent, ParentTeacherConnection
 
         role = self._role(current_user)
         if role == "teacher":
-            return
+            teacher_ids = await self._teacher_id_scope(current_user.id)
+            connected = await self.db.scalar(
+                select(ParentTeacherConnection.id).where(
+                    ParentTeacherConnection.parent_id == parent_id,
+                    ParentTeacherConnection.teacher_id.in_(teacher_ids),
+                )
+            )
+            if connected is not None:
+                return
         if role == "parent":
             parent_user_id = await self.db.scalar(select(Parent.user_id).where(Parent.id == parent_id))
             if parent_user_id == current_user.id:
@@ -920,3 +930,27 @@ class ParentService:
 
     def _role(self, current_user: Any) -> str | None:
         return getattr(getattr(current_user, "role", None), "value", None)
+
+    async def _teacher_id_scope(self, user_id: str) -> list[str]:
+        """Return the teacher identifiers a caller may own.
+
+        Connection rows store Teacher.id (profile ID), but include the
+        User.id too so legacy rows keyed by either are matched.
+        """
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        scope = [user_id]
+        profile_id = await try_resolve_teacher_id(self.db, user_id)
+        if profile_id is not None and profile_id not in scope:
+            scope.append(profile_id)
+        return scope
+
+    async def _assert_can_access_invitation(self, invitation: Any, current_user: Any) -> None:
+        role = self._role(current_user)
+        if role == "teacher":
+            teacher_ids = await self._teacher_id_scope(current_user.id)
+            if invitation.teacher_id in teacher_ids:
+                return
+        elif role == "student" and invitation.student_id == current_user.id:
+            return
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to access invitation")

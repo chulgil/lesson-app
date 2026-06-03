@@ -1,12 +1,15 @@
 """Tests for ScheduleException filtering in get_available_slots (#236)."""
 
 from datetime import date
+from types import SimpleNamespace
 
 import pytest
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
 from app.models.schedule_ext import ExceptionType, ScheduleException
+from app.services.schedule_ext_service import ScheduleExtService
 from app.services.schedule_service import ScheduleService
 
 
@@ -130,6 +133,48 @@ async def test_teacher_scope_exception_blocks_slots(db_session: AsyncSession):
     assert statuses["10:00"] == "unavailable"
     assert statuses["09:30"] == "unavailable"
     assert statuses["11:00"] == "available"
+
+
+@pytest.mark.asyncio
+async def test_exception_idor_blocks_non_owner(db_session: AsyncSession):
+    """Bug #462: non-owner gets 403 on update/delete exception; owner succeeds.
+
+    ScheduleException.teacher_id stores the owning User.id (set from current_user.id).
+    """
+    exc = ScheduleException(
+        id="exc-idor",
+        teacher_id="owner-user-id",
+        type=ExceptionType.holiday,
+        start_date=date(2026, 5, 4),
+        end_date=date(2026, 5, 4),
+        start_time=None,
+        end_time=None,
+        reason="owner scoped",
+    )
+    db_session.add(exc)
+    await db_session.flush()
+
+    svc = ScheduleExtService(db_session)
+    owner = SimpleNamespace(id="owner-user-id")
+    outsider = SimpleNamespace(id="outsider-user-id")
+
+    # Non-owner is forbidden on update
+    with pytest.raises(HTTPException) as exc_update:
+        await svc.update_exception("exc-idor", {"reason": "hacked"}, outsider)
+    assert exc_update.value.status_code == 403
+
+    # Non-owner is forbidden on delete
+    with pytest.raises(HTTPException) as exc_delete:
+        await svc.delete_exception("exc-idor", outsider)
+    assert exc_delete.value.status_code == 403
+
+    # Owner can update
+    updated = await svc.update_exception("exc-idor", {"reason": "new reason"}, owner)
+    assert updated.reason == "new reason"
+
+    # Owner can delete
+    await svc.delete_exception("exc-idor", owner)
+    assert await db_session.get(ScheduleException, "exc-idor") is None
 
 
 @pytest.mark.asyncio

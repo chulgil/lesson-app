@@ -213,6 +213,94 @@ async def test_update_relationship_practice_permissions(
 
 
 @pytest.mark.asyncio
+async def test_relationship_idor_blocks_non_party(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """Bug #463: a non-party user gets 403 on get_by_id and update_status;
+    owning teacher and student succeed."""
+    from app.core.security import create_access_token
+    from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
+
+    # Owning teacher (test-user-id / test-user-id-prof)
+    await create_test_user(user_id="test-user-id", role="teacher")
+    # Owning student
+    await create_test_user(
+        user_id="student-user-id", role="student", email="s@test.com"
+    )
+    # Unrelated teacher (third party)
+    await create_test_user(
+        user_id="outsider-user-id", role="teacher", email="outsider@test.com"
+    )
+
+    db_session.add(
+        Student(
+            id="student-001",
+            user_id="student-user-id",
+            teacher_id="test-user-id-prof",
+            name="student-001",
+            instrument="violin",
+        )
+    )
+    await db_session.flush()
+    db_session.add(
+        TeacherStudentRelation(
+            id="relation-idor",
+            teacher_id="test-user-id-prof",
+            student_id="student-001",
+            status="active",
+            is_app_connected=True,
+        )
+    )
+    await db_session.flush()
+
+    student_headers = {
+        "Authorization": "Bearer "
+        + create_access_token(data={"sub": "student-user-id", "role": "student"})
+    }
+    outsider_headers = {
+        "Authorization": "Bearer "
+        + create_access_token(data={"sub": "outsider-user-id", "role": "teacher"})
+    }
+
+    # Non-party (outsider teacher) is forbidden on GET
+    forbidden_get = await client.get(
+        "/api/v1/relationships/relation-idor", headers=outsider_headers
+    )
+    assert forbidden_get.status_code == 403
+
+    # Non-party is forbidden on PATCH status
+    forbidden_patch = await client.patch(
+        "/api/v1/relationships/relation-idor/status",
+        headers=outsider_headers,
+        json={"status": "active"},
+    )
+    assert forbidden_patch.status_code == 403
+
+    # Owning teacher succeeds
+    teacher_get = await client.get(
+        "/api/v1/relationships/relation-idor", headers=auth_headers
+    )
+    assert teacher_get.status_code == 200
+
+    # Owning student succeeds
+    student_get = await client.get(
+        "/api/v1/relationships/relation-idor", headers=student_headers
+    )
+    assert student_get.status_code == 200
+
+    student_patch = await client.patch(
+        "/api/v1/relationships/relation-idor/status",
+        headers=student_headers,
+        json={"status": "active"},
+    )
+    assert student_patch.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_follow_teacher(client: AsyncClient, auth_headers, create_test_user):
     """POST /api/v1/follows creates a follow relationship."""
     await create_test_user(user_id="test-user-id", role="teacher")

@@ -82,6 +82,7 @@ class LessonService:
         tid = await resolve_teacher_id(self.db, current_user.id)
 
         student_name = data.student_id
+        student = None
         if data.student_id:
             student = await self.db.get(Student, data.student_id)
             if student:

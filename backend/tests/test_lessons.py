@@ -40,6 +40,28 @@ async def test_create_lesson(client: AsyncClient, auth_headers, create_test_user
 
 
 @pytest.mark.asyncio
+async def test_create_lesson_with_empty_student_id_does_not_500(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Empty student_id must not raise NameError (500) (GitHub #466)."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={
+            "student_id": "",
+            "instrument": "violin",
+            "date": "2026-03-10",
+            "start_time": "14:00",
+            "duration": 60,
+        },
+    )
+    # Either a clean creation or a validation error — never a 500 NameError.
+    assert response.status_code != 500
+
+
+@pytest.mark.asyncio
 async def test_create_subscription_lesson_assigns_next_session_number(
     client: AsyncClient,
     auth_headers,

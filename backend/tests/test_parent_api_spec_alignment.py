@@ -33,7 +33,7 @@ async def test_parent_crud_and_relations_match_frontend_contract(
         email="parent@test.com",
     )
 
-    from app.models.parent import Parent, ParentChildRelation
+    from app.models.parent import Parent, ParentChildRelation, ParentTeacherConnection
 
     parent = Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent", phone="01012345678")
     relation = ParentChildRelation(
@@ -44,7 +44,14 @@ async def test_parent_crud_and_relations_match_frontend_contract(
         is_billing_target=True,
         status="active",
     )
-    db_session.add_all([parent, relation])
+    # IDOR fix (#461): teacher↔parent access now requires a connection row.
+    connection = ParentTeacherConnection(
+        id="ptc-id",
+        parent_id="parent-profile-id",
+        teacher_id="test-user-id-prof",
+        student_id="student-user-id",
+    )
+    db_session.add_all([parent, relation, connection])
     await db_session.flush()
 
     list_response = await client.get("/api/v1/parents", headers=auth_headers)
@@ -363,3 +370,112 @@ async def test_parent_notification_settings_endpoint_uses_spec_defaults_and_perm
         params={"parent_id": "other-parent-profile-id"},
     )
     assert forbidden_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_get_parent_is_scoped_to_connected_teacher(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """IDOR #461: only a teacher with a connection (or the parent) can read parent PII."""
+    from app.models.parent import Parent, ParentTeacherConnection
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-get-parent@test.com")
+    await create_test_user(user_id="parent-user-id", role="parent", name="Parent", email="parent-get@test.com")
+
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id", user_id="parent-user-id", name="Parent", phone="01099998888"),
+            ParentTeacherConnection(
+                id="ptc-connected",
+                parent_id="parent-profile-id",
+                teacher_id="test-user-id-prof",
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    # Connected teacher can read.
+    connected = await client.get("/api/v1/parents/parent-profile-id", headers=auth_headers)
+    assert connected.status_code == 200
+    assert connected.json()["phone"] == "01099998888"
+
+    # The parent themselves can read.
+    self_view = await client.get(
+        "/api/v1/parents/parent-profile-id",
+        headers=_headers("parent-user-id", "parent"),
+    )
+    assert self_view.status_code == 200
+
+    # Unlinked teacher is blocked from the parent's PII.
+    unlinked = await client.get(
+        "/api/v1/parents/parent-profile-id",
+        headers=_headers("other-teacher-id", "teacher"),
+    )
+    assert unlinked.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_invitation_code_lookup_and_mark_used_are_scoped_to_owner(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+):
+    """IDOR #461: only the owning teacher can look up by code or mark an invitation used."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.parent import ParentInvitation
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="other-teacher-id", role="teacher", email="other-invite-scope@test.com")
+
+    db_session.add(
+        ParentInvitation(
+            id="scoped-invitation",
+            student_id="student-user-id",
+            teacher_id="test-user-id-prof",
+            source="teacher",
+            parent_phone="01055556666",
+            parent_email="invitee@test.com",
+            invitation_code="SCOPED-CODE",
+            expires_at=datetime.now(UTC) + timedelta(days=7),
+        )
+    )
+    await db_session.flush()
+
+    other_headers = _headers("other-teacher-id", "teacher")
+
+    # Unlinked teacher cannot fetch the invitation (and its PII) by code.
+    unlinked_lookup = await client.get(
+        "/api/v1/parents/invitations",
+        headers=other_headers,
+        params={"code": "SCOPED-CODE"},
+    )
+    assert unlinked_lookup.status_code == 403
+
+    # Unlinked teacher cannot burn the invitation.
+    unlinked_use = await client.patch(
+        "/api/v1/parents/invitations/scoped-invitation/use",
+        headers=other_headers,
+    )
+    assert unlinked_use.status_code == 403
+
+    # Owning teacher can still look up and mark used.
+    owner_lookup = await client.get(
+        "/api/v1/parents/invitations",
+        headers=auth_headers,
+        params={"code": "SCOPED-CODE"},
+    )
+    assert owner_lookup.status_code == 200
+    assert owner_lookup.json()["id"] == "scoped-invitation"
+
+    owner_use = await client.patch(
+        "/api/v1/parents/invitations/scoped-invitation/use",
+        headers=auth_headers,
+    )
+    assert owner_use.status_code == 200
+    assert owner_use.json()["is_used"] is True
