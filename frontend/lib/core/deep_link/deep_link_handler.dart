@@ -74,7 +74,14 @@ class DeepLinkHandler {
   void _handleUri(Uri uri) {
     final route = DeepLinkParser.toRoute(uri);
     if (route == null) return;
-    _navigate(route.path);
+    // Forward the parsed invite code as a query param so the target screen can
+    // prefill + auto-verify it. Without this the code was silently dropped and
+    // CodeInputScreen opened empty.
+    final code = route.code;
+    final path = code == null
+        ? route.path
+        : Uri(path: route.path, queryParameters: {'code': code}).toString();
+    _navigate(path);
   }
 
   Future<void> dispose() async {
