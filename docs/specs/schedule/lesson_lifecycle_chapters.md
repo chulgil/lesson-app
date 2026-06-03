@@ -407,11 +407,12 @@ class ChapterSummary extends StatelessWidget {
 | 사전 안내 (pre-notice) | 종료 +30분 | 선생님에게 `attendanceUnconfirmed` 알림. "24시간 내 미확인 시 자동 완료 + 수강권 1회 차감" 경고 포함 |
 | 자동 완료 (auto-complete) | 종료 +24시간 | `status → completed`. `subscription_id` 가 있으면 수강권 1회 차감. `lessonAutoCompleted` 알림(차감 결과 명시) |
 
-### 차감 규칙
+### 차감 규칙 (통합, product-approved 2026-06-04)
 
-- **자동 완료(24h 미확인) = 차감 O** (product-approved 2026-06-03). 차감은 **멱등** — 같은 `lesson_id`
-  에 `SubscriptionUsage` 행이 이미 있으면 skip(`False` 반환). 스케줄러 재실행에 안전.
-- **수동 완료 = 차감 X** (비대칭). 선생님이 직접 레슨을 완료 처리하는 경로는 별도 차감 로직을 거치며,
-  자동 완료 경로의 `deduct_for_completed_lesson` 을 호출하지 않는다. 자동/수동 차감 정책이 다른 점에 유의.
-- 남은 회차가 0 이하이거나 구독이 없으면 차감하지 않고 완료만 처리한다.
+- **`completed` 전이 = 항상 1회 차감** — 수동(`LessonService.update_status`) / 자동(`AttendanceSchedulerService`)
+  경로 모두 동일하게 `deduct_for_completed_lesson(lesson_id, subscription_id)` 을 호출한다. (#469 의 자동/수동 비대칭 제거)
+- 차감은 **멱등** — 같은 `lesson_id` 에 `SubscriptionUsage` 행이 이미 있으면 skip(`False` 반환).
+  수동 완료 후 자동 완료가 다시 돌거나, 완료 상태를 재저장해도 이중 차감되지 않는다.
+- **휴강/취소(`cancelledByTeacher`, `cancelledMutual`, `cancelled` 등) = 차감 X.** 완료 전이만 차감한다.
+- 남은 회차가 0 이하이거나 `subscription_id` 가 없으면 차감하지 않고 완료만 처리한다.
 | 카카오톡 | 1 chat room, endless scroll | 1 chat, collapsed chapters |
