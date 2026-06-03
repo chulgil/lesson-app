@@ -578,8 +578,8 @@ async def test_regular_lesson_time_negotiation(teacher: TeacherActions, student:
         instrument="piano",
     )
 
+    # 완료 시 자동 1회 차감 (2026-06-04 통합 규칙) — 별도 use_lesson 불필요
     await teacher.complete_lesson(lesson_id)
-    await teacher.use_lesson(sub_id, lesson_id)
 
     sub_after = await teacher.get_subscription(sub_id)
     assert sub_after["remaining_lessons"] == 3
@@ -1143,14 +1143,9 @@ async def test_subscription_creation_preserves_membership_location_and_travel_ti
         duration=60,
         instrument="violin",
     )
+    # 완료 시 자동 1회 차감 (2026-06-04 통합 규칙). 위치/이동시간은 그대로 유지.
     await teacher.complete_lesson(lesson_id)
-    used_response = await teacher.client.patch(
-        f"/api/v1/subscriptions/{created['id']}/use-lesson",
-        headers=teacher.headers,
-        json={"lesson_id": lesson_id},
-    )
-    assert used_response.status_code == 200
-    used = used_response.json()
+    used = await teacher.get_subscription(created["id"])
     assert used["used_lessons"] == 1
     assert used["lesson_location_id"] == location_id
     assert used["travel_time_minutes"] == 25

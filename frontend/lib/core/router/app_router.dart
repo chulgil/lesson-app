@@ -3,6 +3,8 @@
 // This file combines all domain-specific routes into a single router.
 // Individual route definitions are in the routes/ subdirectory.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +40,74 @@ const _publicPathPrefixes = ['/student/summary/'];
 
 const _roleSelectPath = AppRoutes.roleSelect;
 
+/// Pure auth-aware redirect decision (remote mode).
+///
+/// Extracted from the [GoRouter.redirect] closure so the guard rules are unit
+/// testable without a router/widget tree. Returns the path to redirect to, or
+/// ``null`` to allow [currentPath].
+String? resolveAuthRedirect(AuthState authState, String currentPath) {
+  final isPublic =
+      _publicPaths.contains(currentPath) ||
+      _publicPathPrefixes.any(currentPath.startsWith);
+  final isRoleSelect = currentPath == _roleSelectPath;
+
+  if (authState is AuthLoading) return null;
+
+  if (authState is AuthUnauthenticated && !isPublic) {
+    return AppRoutes.login;
+  }
+
+  // New OAuth signup: terms agreement is collected inline inside
+  // RoleSelectScreen (phone_verification_policy.md §2.3).
+  if (authState is AuthNeedsRole && !isRoleSelect) {
+    return AppRoutes.roleSelect;
+  }
+
+  // Onboarding not completed: redirect to profile setup
+  if (authState is AuthNeedsOnboarding) {
+    final isOnboarding =
+        currentPath.contains('/onboarding/') ||
+        currentPath == AppRoutes.studentInviteCode ||
+        currentPath == AppRoutes.parentInviteCode ||
+        // Deep-link invite (lessonapp://invite/code) must survive the
+        // onboarding gate, otherwise the link is silently dropped.
+        currentPath == AppRoutes.inviteCode;
+    if (!isOnboarding && !isRoleSelect) {
+      return AppRoutes.roleSelect;
+    }
+  }
+
+  if (authState is AuthAuthenticated && (isPublic || isRoleSelect)) {
+    return authState.role.homeRoute;
+  }
+
+  return null;
+}
+
+/// Bridges a Riverpod auth state stream to GoRouter's [refreshListenable].
+///
+/// GoRouter re-evaluates [GoRouter.redirect] whenever the supplied
+/// [Listenable] notifies. Wrapping the auth state stream here lets a
+/// **single** router instance react to auth changes without being rebuilt
+/// (avoids GoRouter teardown on every auth/mode change — issue: router
+/// re-creation on each `build`).
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+      (_) => notifyListeners(),
+    );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
 /// App router configuration
 class AppRouter {
   AppRouter._();
@@ -48,51 +118,26 @@ class AppRouter {
   ///
   /// In mock mode: no redirect (existing behavior).
   /// In remote mode: redirects unauthenticated users to /login.
-  static GoRouter createRouter(WidgetRef ref, {required bool useMockData}) {
+  ///
+  /// [refreshListenable] (remote mode only) drives redirect re-evaluation on
+  /// auth state changes. The router itself must be created **once** and reused;
+  /// auth changes flow through this listenable rather than router re-creation.
+  static GoRouter createRouter(
+    WidgetRef ref, {
+    required bool useMockData,
+    Listenable? refreshListenable,
+  }) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
+      refreshListenable: useMockData ? null : refreshListenable,
       redirect: useMockData
           ? null
-          : (context, state) {
-              final authState = ref.read(authNotifierProvider);
-              final currentPath = state.matchedLocation;
-              final isPublic =
-                  _publicPaths.contains(currentPath) ||
-                  _publicPathPrefixes.any(currentPath.startsWith);
-              final isRoleSelect = currentPath == _roleSelectPath;
-
-              if (authState is AuthLoading) return null;
-
-              if (authState is AuthUnauthenticated && !isPublic) {
-                return AppRoutes.login;
-              }
-
-              // New OAuth signup: terms agreement is collected inline inside
-              // RoleSelectScreen (phone_verification_policy.md §2.3).
-              if (authState is AuthNeedsRole && !isRoleSelect) {
-                return AppRoutes.roleSelect;
-              }
-
-              // Onboarding not completed: redirect to profile setup
-              if (authState is AuthNeedsOnboarding) {
-                final isOnboarding =
-                    currentPath.contains('/onboarding/') ||
-                    currentPath == AppRoutes.studentInviteCode ||
-                    currentPath == AppRoutes.parentInviteCode;
-                if (!isOnboarding && !isRoleSelect) {
-                  return AppRoutes.roleSelect;
-                }
-              }
-
-              if (authState is AuthAuthenticated &&
-                  (isPublic || isRoleSelect)) {
-                return authState.role.homeRoute;
-              }
-
-              return null;
-            },
+          : (context, state) => resolveAuthRedirect(
+              ref.read(authNotifierProvider),
+              state.matchedLocation,
+            ),
       routes: [
         // Combine all domain-specific routes
         ...authRoutes,

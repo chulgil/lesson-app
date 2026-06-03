@@ -58,11 +58,11 @@ async def test_fw_subscription_lifecycle(teacher: TeacherActions):
         payment_confirmed=False,
     )
 
-    # Deduct 6 lessons
+    # Deduct 6 lessons. Unified rule (2026-06-04): completing a lesson deducts
+    # one session on its own, so no separate use_lesson call is needed.
     for i in range(6):
         lid = await teacher.create_lesson(sid, date=f"2026-03-{10 + i:02d}")
         await teacher.complete_lesson(lid)
-        await teacher.use_lesson(sub_id, lid)
 
     # Verify remaining
     sub = await teacher.get_subscription(sub_id)
@@ -282,11 +282,10 @@ async def test_fw_subscription_renewal_after_expiry(
     sub = await teacher.get_subscription(sub_id)
     assert_subscription_remaining(sub, 4)
 
-    # Step 2: 4회 레슨 모두 완료 + 차감
+    # Step 2: 4회 레슨 모두 완료 (완료 시 자동 1회 차감 — 2026-06-04 통합 규칙)
     for i in range(4):
         lid = await teacher.create_lesson(sid, date=f"2026-04-{i + 1:02d}", start_time="15:00")
         await teacher.complete_lesson(lid)
-        await teacher.use_lesson(sub_id, lid)
 
     # Step 3: 잔여 0 확인 (만료 상태)
     sub = await teacher.get_subscription(sub_id)
@@ -310,10 +309,9 @@ async def test_fw_subscription_renewal_after_expiry(
     new_sub = await teacher.get_subscription(new_sub_id)
     assert_subscription_remaining(new_sub, 8)
 
-    # Step 8: 새 수강권에서 첫 레슨 차감
+    # Step 8: 새 수강권에서 첫 레슨 완료 (완료 시 자동 1회 차감)
     lid = await teacher.create_lesson(sid, date="2026-04-10", start_time="15:00")
     await teacher.complete_lesson(lid)
-    await teacher.use_lesson(new_sub_id, lid)
 
     new_sub = await teacher.get_subscription(new_sub_id)
     assert_subscription_remaining(new_sub, 7)

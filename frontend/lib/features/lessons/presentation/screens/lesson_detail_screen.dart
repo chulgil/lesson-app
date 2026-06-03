@@ -439,6 +439,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             const SizedBox(height: AppSpacing.space4),
           ],
 
+          // #473: 미확인 레슨 액션(출석 확인/휴강) + 사전 안내 배너 + 차감 결과
+          AttendanceSection(
+            lesson: lesson,
+            isTeacher: widget.isTeacher,
+            onCompleted: () => _tryAutoProposal(lesson),
+          ),
+
           // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨 또는 활성 수강권이 있는 수동 레슨
           _buildScheduleChangeButton(lesson),
 

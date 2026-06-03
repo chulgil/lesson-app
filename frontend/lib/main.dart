@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+
+import 'core/auth/auth_state.dart';
 import 'core/deep_link/deep_link_handler.dart';
 import 'core/l10n/generated/app_localizations.dart';
 import 'core/providers/repository_provider.dart';
@@ -47,6 +50,42 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     with WidgetsBindingObserver {
   DeepLinkHandler? _deepLinkHandler;
 
+  /// Single router instance for the app lifetime. Created once so that auth
+  /// state / mode changes do NOT tear down and rebuild GoRouter on every
+  /// `build` (which loses navigation state and re-runs the deep-link handler).
+  GoRouter? _router;
+
+  /// Drives [GoRouter.redirect] re-evaluation when auth state changes (remote
+  /// mode). Replaces the previous "rebuild the whole router" hack.
+  StreamController<AuthState>? _authRefreshController;
+  GoRouterRefreshStream? _authRefresh;
+
+  /// Builds the router exactly once, wiring auth-state changes to the router's
+  /// [refreshListenable] instead of recreating the router.
+  GoRouter _ensureRouter() {
+    final existing = _router;
+    if (existing != null) return existing;
+
+    final useMockData = ref.read(mockDataModeProvider);
+
+    if (useMockData) {
+      _router = AppRouter.router;
+    } else {
+      _authRefreshController = StreamController<AuthState>.broadcast();
+      // Bridge the Riverpod auth state into a stream the router can listen to.
+      ref.listenManual<AuthState>(authNotifierProvider, (_, next) {
+        _authRefreshController?.add(next);
+      });
+      _authRefresh = GoRouterRefreshStream(_authRefreshController!.stream);
+      _router = AppRouter.createRouter(
+        ref,
+        useMockData: false,
+        refreshListenable: _authRefresh,
+      );
+    }
+    return _router!;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +103,8 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_deepLinkHandler?.dispose());
+    _authRefresh?.dispose();
+    unawaited(_authRefreshController?.close());
     unawaited(ref.read(syncServiceProvider).dispose());
     super.dispose();
   }
@@ -99,15 +140,12 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
 
   @override
   Widget build(BuildContext context) {
-    // Use auth-aware router in remote mode, static router in mock mode
-    final useMockData = ref.watch(mockDataModeProvider);
-    ref.watch(authNotifierProvider);
-    final routerConfig =
-        useMockData
-            ? AppRouter.router
-            : AppRouter.createRouter(ref, useMockData: useMockData);
+    // Single router instance created once; auth/mode changes flow through the
+    // router's refreshListenable, not through router re-creation.
+    final routerConfig = _ensureRouter();
 
     // R2 #318 — lessonapp:// 딥링크 → GoRouter 연결 (1회만 시작).
+    // Uses the single router instance so navigation targets the live router.
     if (_deepLinkHandler == null) {
       _deepLinkHandler = DeepLinkHandler(navigate: routerConfig.go);
       unawaited(_deepLinkHandler!.start());
