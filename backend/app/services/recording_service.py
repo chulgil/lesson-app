@@ -131,12 +131,14 @@ class RecordingService:
 
         rec = await self._get_accessible_recording(recording_id, current_user)
 
-        # Unset previous representative for the same section
+        # Unset previous representative for the same section.
+        # Scope by the target recording's student so a teacher-set rep is
+        # cleared regardless of who owns it (matches practice_service pattern).
         if rec.section_id:
             result = await self.db.scalars(
                 select(PracticeRecording).where(
                     PracticeRecording.section_id == rec.section_id,
-                    PracticeRecording.student_id == current_user.id,
+                    PracticeRecording.student_id == rec.student_id,
                     PracticeRecording.is_representative == True,  # noqa: E712
                 )
             )
@@ -397,8 +399,11 @@ class RecordingService:
                     ExpiresIn=3600,
                 )
             return url
-        except Exception:
-            return ""
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="다운로드 URL 생성에 실패했습니다",
+            ) from e
 
     async def _delete_from_storage(self, file_key: str) -> None:
         """Delete a file from object storage."""

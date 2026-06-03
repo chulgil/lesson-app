@@ -1769,9 +1769,23 @@ async def test_contract_follow_list_and_notification_update(client, auth_headers
 
 
 @pytest.mark.asyncio
-async def test_contract_gamification_badge_award(client, auth_headers, create_test_user):
+async def test_contract_gamification_badge_award(client, auth_headers, create_test_user, db_session):
     """Frontend gamification repository calls POST /gamification/{student_id}/badges."""
+    from app.models.student import Student
+
     await create_test_user(user_id="test-user-id", role="teacher")
+    # Awarding requires an existing Student owned by the acting teacher
+    # (#468 fix: awarding to a non-existent student now 404s instead of
+    # creating an orphan row).
+    db_session.add(
+        Student(
+            id="student-001",
+            teacher_id="test-user-id-prof",
+            name="Owned Student",
+            instrument="violin",
+        )
+    )
+    await db_session.flush()
 
     award_resp = await client.post(
         "/api/v1/gamification/student-001/badges",

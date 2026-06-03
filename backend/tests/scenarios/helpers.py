@@ -11,6 +11,27 @@ Usage in tests:
 from __future__ import annotations
 
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+async def link_student_to_user(
+    db_session: AsyncSession, student_id: str, user_id: str
+) -> None:
+    """Set Student.user_id so the given user legitimately OWNS the profile.
+
+    Production flow: when a student connects to a teacher,
+    ``invite_service._attach_student_to_teacher`` stamps the Student row with the
+    connecting student's ``user_id``. Scenario tests create offline students via
+    ``POST /students`` (user_id NULL), so the accepting student does not own the
+    profile and subscription-proposal access correctly 403s (#468 IDOR fix).
+    This helper models the connected-student state by linking ownership.
+    """
+    from app.models.student import Student
+
+    student = await db_session.get(Student, student_id)
+    assert student is not None, f"Student {student_id} not found"
+    student.user_id = user_id
+    await db_session.flush()
 
 
 class TeacherActions:

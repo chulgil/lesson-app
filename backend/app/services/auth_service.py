@@ -172,7 +172,19 @@ class AuthService:
                 detail="Token has been revoked",
             )
 
-        access_token = create_access_token(data={"sub": payload["sub"], "role": payload.get("role")})
+        # Re-read the user's CURRENT role from DB instead of trusting the
+        # (possibly stale/elevated) role claim in the refresh-token payload.
+        from app.models.user import User
+
+        user = await self.db.get(User, payload["sub"])
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired refresh token",
+            )
+        current_role = getattr(user.role, "value", None)
+
+        access_token = create_access_token(data={"sub": payload["sub"], "role": current_role})
         return RefreshTokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,
@@ -188,6 +200,9 @@ class AuthService:
 
         payload = decode_refresh_token(refresh_token)
         jti = payload.get("jti", "") if payload else ""
+        if not jti:
+            # Undecodable / jti-less token: nothing useful to blacklist.
+            return
         expires_at = datetime.now(UTC) + timedelta(days=30)
 
         blacklist_entry = TokenBlacklist(

@@ -5,8 +5,13 @@ from unittest.mock import patch
 import jwt
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
 
-from app.core.security import create_access_token, create_refresh_token
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    decode_access_token,
+)
 
 
 @pytest.mark.asyncio
@@ -56,6 +61,61 @@ async def test_refresh_token_success(client: AsyncClient, create_test_user):
     data = response.json()
     assert "access_token" in data
     assert data["token_type"] == "bearer"
+
+
+@pytest.mark.asyncio
+async def test_refresh_token_reflects_current_db_role(create_test_user, db_session):
+    """Fix #4: refresh issues an access token with the user's CURRENT DB role,
+    not the (possibly stale/elevated) role baked into the refresh token."""
+    from app.models.user import UserRole
+    from app.services.auth_service import AuthService
+
+    user = await create_test_user(user_id="role-change-user", role="teacher")
+    # Refresh token still carries the OLD elevated role claim.
+    refresh = create_refresh_token(data={"sub": "role-change-user", "role": "teacher"})
+
+    # Role is downgraded in the DB after the refresh token was issued.
+    user.role = UserRole("student")
+    await db_session.flush()
+
+    service = AuthService(db_session)
+    result = await service.refresh_token(refresh)
+
+    decoded = decode_access_token(result.access_token)
+    assert decoded is not None
+    assert decoded["role"] == "student"  # current DB role, not stale "teacher"
+
+
+@pytest.mark.asyncio
+async def test_logout_invalid_token_does_not_create_blacklist_row(create_test_user, db_session):
+    """Fix #5: logout with an undecodable refresh token must not write an empty-jti row."""
+    from app.models.user import TokenBlacklist
+    from app.services.auth_service import AuthService
+
+    await create_test_user(user_id="logout-user", role="teacher")
+
+    service = AuthService(db_session)
+    await service.logout("logout-user", "not-a-valid-token")
+
+    rows = (await db_session.scalars(select(TokenBlacklist))).all()
+    assert rows == []
+
+
+@pytest.mark.asyncio
+async def test_logout_valid_token_creates_blacklist_row(create_test_user, db_session):
+    """Logout with a valid refresh token still blacklists it (happy path unchanged)."""
+    from app.models.user import TokenBlacklist
+    from app.services.auth_service import AuthService
+
+    await create_test_user(user_id="logout-user-2", role="teacher")
+    refresh = create_refresh_token(data={"sub": "logout-user-2", "role": "teacher"})
+
+    service = AuthService(db_session)
+    await service.logout("logout-user-2", refresh)
+
+    rows = (await db_session.scalars(select(TokenBlacklist))).all()
+    assert len(rows) == 1
+    assert rows[0].jti  # non-empty
 
 
 @pytest.mark.asyncio

@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
 from app.schemas.invite import (
+    InviteResponse,
     PublicInviteLandingResponse,
     PublicInviteLandingShare,
     PublicInviteLandingTeacher,
@@ -71,23 +72,53 @@ class InviteService:
         result = await self.db.scalars(query.order_by(Invite.created_at.desc()).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
-    async def get_invite(self, invite_id: str) -> Any:
-        """Get an invite by ID for scan/share confirmation flows."""
+    async def get_invite(self, invite_id: str, current_user: Any) -> Any:
+        """Get an invite by ID — restricted to its creator."""
         from app.models.invite import Invite
 
         invite = await self.db.get(Invite, invite_id)
         if invite is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
+        if invite.creator_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your invite")
         return invite
 
-    async def get_invite_by_code(self, invite_code: str) -> Any:
-        """Get an invite by its short code."""
+    async def get_invite_by_code(self, invite_code: str, current_user: Any) -> Any:
+        """Get an invite by its short code.
+
+        Accessible to any authenticated user so a joining user can resolve the
+        invite before connecting. When the caller is NOT the creator, sensitive
+        fields (qr_code_data, note, invite_url, usage counts) are blanked so a
+        non-creator cannot harvest them.
+        """
         from app.models.invite import Invite
 
         invite = await self.db.scalar(select(Invite).where(Invite.invite_code == invite_code.upper()))
         if invite is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
-        return invite
+        if invite.creator_id == current_user.id:
+            return invite
+        return self._redact_invite_for_non_creator(invite)
+
+    @staticmethod
+    def _redact_invite_for_non_creator(invite: Any) -> Any:
+        """Build an InviteResponse with sensitive fields blanked for non-creators."""
+        return InviteResponse(
+            id=invite.id,
+            creator_id=invite.creator_id,
+            creator_name=invite.creator_name,
+            creator_role=getattr(invite.creator_role, "value", invite.creator_role),
+            invite_code=invite.invite_code,
+            invite_url="",
+            qr_code_data="",
+            status=getattr(invite.status, "value", invite.status),
+            is_single_use=invite.is_single_use,
+            max_uses=None,
+            use_count=0,
+            note=None,
+            expires_at=invite.expires_at,
+            created_at=invite.created_at,
+        )
 
     async def get_public_invite_landing(self, invite_code: str) -> PublicInviteLandingResponse:
         """Return minimal public landing data for Ghost-rendered invite pages."""
@@ -100,9 +131,15 @@ class InviteService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
 
         expires_at = invite.expires_at
-        if expires_at.tzinfo is None:
-            expires_at = expires_at.replace(tzinfo=UTC)
-        if expires_at <= datetime.now(UTC) or invite.status in {
+        # A missing expiry is anomalous data for a public landing; the response
+        # contract requires a concrete expiry, so treat it as unavailable rather
+        # than touching `.tzinfo` (AttributeError → 500).
+        is_expired = expires_at is None
+        if expires_at is not None:
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=UTC)
+            is_expired = expires_at <= datetime.now(UTC)
+        if is_expired or invite.status in {
             InviteStatus.expired,
             InviteStatus.revoked,
             InviteStatus.used,
@@ -513,6 +550,11 @@ class InviteService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
         if conn_req.target_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your request")
+        if getattr(conn_req.status, "value", conn_req.status) != "pending":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Request is not pending",
+            )
 
         now = datetime.now(UTC)
         conn_req.responded_at = now

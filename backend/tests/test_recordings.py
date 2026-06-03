@@ -587,3 +587,120 @@ async def test_share_recording(client: AsyncClient, auth_headers, create_test_us
         headers=auth_headers,
     )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_teacher_set_representative_clears_students_existing_rep(
+    create_test_user,
+    db_session,
+):
+    """Fix #1: teacher setting a student's recording as representative clears the
+    student's pre-existing rep in that section, leaving exactly one is_representative."""
+    teacher = await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="student-user-id",
+        role="student",
+        name="Student",
+        email="student-rep@test.com",
+    )
+
+    from app.models.practice import PracticeRecording
+    from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
+    from app.services.recording_service import RecordingService
+
+    existing_rep = PracticeRecording(
+        id="existing-rep-id",
+        section_id="rep-section",
+        student_id="student-user-id",
+        file_path="recordings/old.m4a",
+        file_key="recordings/old.m4a",
+        file_url="https://storage.example/old.m4a",
+        duration_seconds=100,
+        is_representative=True,
+    )
+    new_target = PracticeRecording(
+        id="new-target-id",
+        section_id="rep-section",
+        student_id="student-user-id",
+        file_path="recordings/new.m4a",
+        file_key="recordings/new.m4a",
+        file_url="https://storage.example/new.m4a",
+        duration_seconds=120,
+        is_representative=False,
+    )
+    db_session.add_all(
+        [
+            Student(
+                id="student-user-id",
+                user_id="student-user-id",
+                teacher_id="test-user-id-prof",
+                name="Student",
+                instrument="violin",
+            ),
+            TeacherStudentRelation(
+                teacher_id="test-user-id-prof",
+                student_id="student-user-id",
+                status="active",
+                is_app_connected=True,
+            ),
+            existing_rep,
+            new_target,
+        ]
+    )
+    await db_session.flush()
+
+    service = RecordingService(db_session)
+    await service.set_representative("new-target-id", teacher)
+
+    reps = (
+        await db_session.scalars(
+            select(PracticeRecording).where(
+                PracticeRecording.section_id == "rep-section",
+                PracticeRecording.is_representative == True,  # noqa: E712
+            )
+        )
+    ).all()
+    assert [r.id for r in reps] == ["new-target-id"]
+
+
+@pytest.mark.asyncio
+async def test_download_url_raises_when_presign_fails(
+    create_test_user,
+    db_session,
+    monkeypatch,
+):
+    """Fix #2: a storage failure surfaces as an HTTP error, not a 200 with empty URL."""
+    from fastapi import HTTPException
+
+    student = await create_test_user(user_id="dl-student", role="student", email="dl@test.com")
+
+    from app.models.practice import PracticeRecording
+    from app.services.recording_service import RecordingService
+
+    db_session.add(
+        PracticeRecording(
+            id="dl-recording-id",
+            section_id="dl-section",
+            student_id="dl-student",
+            file_path="recordings/dl.m4a",
+            file_key="recordings/dl.m4a",
+            file_url="https://storage.example/dl.m4a",
+            duration_seconds=90,
+        )
+    )
+    await db_session.flush()
+
+    # Force the real _generate_presigned_url except-branch by making the
+    # aioboto3 session construction fail inside it.
+    class _BoomSession:
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError("storage down")
+
+    monkeypatch.setattr("aioboto3.Session", _BoomSession)
+
+    service = RecordingService(db_session)
+    with pytest.raises(HTTPException) as exc_info:
+        await service.get_download_url("dl-recording-id", student)
+    assert exc_info.value.status_code in (502, 503)
+    assert exc_info.value.detail == "다운로드 URL 생성에 실패했습니다"

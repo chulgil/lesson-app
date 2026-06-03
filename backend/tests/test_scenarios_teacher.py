@@ -637,9 +637,10 @@ async def test_scenario_settings_full_configuration(client: AsyncClient, auth_he
 
 @pytest.mark.asyncio
 async def test_scenario_proposal_to_subscription(
-    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user, db_session
 ):
     """Teacher proposes subscription → student accepts → subscription issued."""
+    from tests.scenarios.helpers import link_student_to_user
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(
         user_id="test-student-id",
@@ -668,6 +669,10 @@ async def test_scenario_proposal_to_subscription(
         json={"name": "제안학생", "instrument": "piano"},
     )
     student_id = student.json()["id"]
+
+    # Link the offline student to the accepting student's user so it is OWNED,
+    # mirroring the production connect flow (#468 IDOR fix).
+    await link_student_to_user(db_session, student_id, "test-student-id")
 
     # Step 3: Teacher sends proposal
     proposal = await client.post(

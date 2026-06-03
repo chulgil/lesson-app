@@ -11,7 +11,7 @@ from tests.scenarios.assertions import (
     assert_subscription_remaining,
     assert_total,
 )
-from tests.scenarios.helpers import StudentActions, TeacherActions
+from tests.scenarios.helpers import StudentActions, TeacherActions, link_student_to_user
 
 # ===========================================================================
 # Scenario A: 신규 선생님 온보딩 (프레임워크 버전)
@@ -162,10 +162,12 @@ async def test_fw_practice_gamification(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_proposal_flow(teacher: TeacherActions, student: StudentActions):
+async def test_fw_proposal_flow(teacher: TeacherActions, student: StudentActions, db_session):
     """Teacher proposes → student accepts → teacher confirms."""
     tmpl_id = await teacher.create_template("기본 4회", lessons_count=4, amount=160000)
     sid = await teacher.create_student("제안학생", instrument="piano")
+    # Student must OWN the profile to accept the proposal (#468 IDOR fix).
+    await link_student_to_user(db_session, sid, "test-student-id")
 
     proposal_id = await teacher.send_proposal(sid, tmpl_id, message="추천합니다!")
     await student.accept_proposal(proposal_id, tmpl_id)
@@ -267,10 +269,14 @@ async def test_fw_multi_student_day(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_subscription_renewal_after_expiry(teacher: TeacherActions, student: StudentActions):
+async def test_fw_subscription_renewal_after_expiry(
+    teacher: TeacherActions, student: StudentActions, db_session
+):
     """수강권 4회 모두 사용 → 만료 확인 → 선생님 재제안 → 학생 수락 → 새 수강권."""
     # Step 1: 학생 + 첫 수강권 발급 (4회)
     sid = await teacher.create_student("재등록학생", instrument="violin")
+    # Student must OWN the profile to accept the proposal (#468 IDOR fix).
+    await link_student_to_user(db_session, sid, "test-student-id")
     sub_id = await teacher.create_subscription(sid, total_lessons=4, amount=160000)
 
     sub = await teacher.get_subscription(sub_id)
@@ -719,10 +725,14 @@ async def test_fw_trial_lesson_free_setting(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_time_confirmed_to_subscription_proposal(teacher: TeacherActions, student: StudentActions):
+async def test_fw_time_confirmed_to_subscription_proposal(
+    teacher: TeacherActions, student: StudentActions, db_session
+):
     """Time confirmed → Teacher sends subscription proposal → Student accepts."""
     # Step 1: 학생 등록 + 수강권 템플릿 생성
     sid = await teacher.create_student("협상학생", instrument="violin")
+    # Student must OWN the profile to accept the proposal (#468 IDOR fix).
+    await link_student_to_user(db_session, sid, "test-student-id")
     tmpl_id = await teacher.create_template("4회권", lessons_count=4, amount=200000)
 
     # Step 2: 학생이 정규 레슨 신청
