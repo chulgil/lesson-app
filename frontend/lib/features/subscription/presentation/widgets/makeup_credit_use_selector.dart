@@ -46,11 +46,23 @@ class MakeupCreditUseSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasCredit = balance.hasAny;
+    // When the credit option is hidden, a stale makeupCredit selection must not
+    // linger upstream. Surface regularSubscription as the effective source and
+    // notify the parent once after this frame so its state stays valid.
+    final effectiveSelected = (!hasCredit && selected == BookingPaymentSource.makeupCredit)
+        ? BookingPaymentSource.regularSubscription
+        : selected;
+    if (effectiveSelected != selected) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        onChanged(BookingPaymentSource.regularSubscription);
+      });
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _Option(
-          isSelected: selected == BookingPaymentSource.regularSubscription,
+          isSelected:
+              effectiveSelected == BookingPaymentSource.regularSubscription,
           title: AppStrings.makeupCreditUseRegularLabel,
           subtitle: (regularRemaining != null && regularTotal != null)
               ? AppStrings.makeupCreditRegularRemaining(
@@ -63,7 +75,7 @@ class MakeupCreditUseSelector extends StatelessWidget {
         if (hasCredit) ...[
           const SizedBox(height: AppSpacing.space2),
           _Option(
-            isSelected: selected == BookingPaymentSource.makeupCredit,
+            isSelected: effectiveSelected == BookingPaymentSource.makeupCredit,
             title: AppStrings.makeupCreditUseCreditLabel,
             subtitle: AppStrings.makeupCreditUseCreditSubtitle(
               balance.availableCount,
