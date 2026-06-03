@@ -100,6 +100,17 @@ class SubscriptionIssueFlowController {
     return null;
   }
 
+  /// First membership for a student, matching the single-issue screen's default
+  /// selection (`memberships.first`). Used by batch issuance, which has no
+  /// per-student membership picker, so issued subscriptions still carry a
+  /// membership id and surface in teacher-scoped lists.
+  Future<ClassMembership?> firstMembershipForStudent(String studentId) async {
+    final memberships = await _ref.read(
+      subscriptionIssueMembershipsProvider(studentId).future,
+    );
+    return memberships.isNotEmpty ? memberships.first : null;
+  }
+
   Future<void> updateMembershipLocationTravel({
     required String studentId,
     required String membershipId,

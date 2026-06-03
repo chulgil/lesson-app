@@ -440,13 +440,26 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       int failCount = 0;
 
       final now = DateTime.now();
+      final flow = ref.read(subscriptionIssueFlowControllerProvider);
       for (int i = 0; i < allStudentIds.length; i++) {
         final studentId = allStudentIds[i];
         try {
+          // Resolve the student's membership (and teacher) so batch-issued
+          // subscriptions carry a membership id and surface in teacher-scoped
+          // lists / unpaid summary (getByTeacherId filters by membership).
+          final membership = await flow.firstMembershipForStudent(studentId);
+          final membershipId = membership?.id ?? '';
+          final teacherId = membershipId.isEmpty
+              ? null
+              : await flow.teacherIdForMembership(
+                  studentId: studentId,
+                  membershipId: membershipId,
+                );
+
           final subscription = Subscription(
             id: const Uuid().v4(),
             studentId: studentId,
-            membershipId: '',
+            membershipId: membershipId,
             type: selectedType,
             totalLessons: computedTotalLessons,
             lessonsPerMonth: computedLessonsPerMonth,
@@ -471,19 +484,25 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             totalRescheduleAllowance: rescheduleAllowance,
             rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
-          await repository.create(subscription);
+          // create() reassigns the id — link the lesson request to the
+          // persisted subscription, never the discarded local one.
+          final created = await repository.create(subscription);
 
-          // Refresh per-student list providers (batch bypasses the notifier).
-          invalidateSubscriptionListsForStudent(ref, studentId);
+          // Refresh per-student + teacher-scoped list providers (batch
+          // bypasses the notifier).
+          invalidateSubscriptionListsForStudent(
+            ref,
+            studentId,
+            membershipId: membershipId,
+            teacherId: teacherId,
+          );
 
           if (i < lessonRequestIds.length) {
-            await ref
-                .read(subscriptionIssueFlowControllerProvider)
-                .updateLessonRequestForIssuedSubscription(
-                  lessonRequestId: lessonRequestIds[i],
-                  subscriptionId: subscription.id,
-                  status: lessonRequestStatusForIssuedSubscription(),
-                );
+            await flow.updateLessonRequestForIssuedSubscription(
+              lessonRequestId: lessonRequestIds[i],
+              subscriptionId: created.id,
+              status: lessonRequestStatusForIssuedSubscription(),
+            );
           }
 
           successCount++;
