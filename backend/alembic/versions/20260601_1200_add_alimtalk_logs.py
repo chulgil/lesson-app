@@ -48,7 +48,7 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.func.now(),
         ),
-        sa.Column("success", sa.Boolean(), nullable=False, server_default=sa.text("0")),
+        sa.Column("success", sa.Boolean(), nullable=False, server_default=sa.text("false")),
         sa.Column("message_id", sa.String(length=128), nullable=True),
         sa.Column("error", sa.Text(), nullable=True),
         sa.Column("retry_count", sa.Integer(), nullable=False, server_default=sa.text("0")),
