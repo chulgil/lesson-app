@@ -70,12 +70,21 @@ class TeacherVacationModeScreen extends ConsumerWidget {
           _DispositionSection(
             selected: state.disposition,
             onChange: notifier.setDisposition,
+            projectedExtensionDays: _projectedExtensionDays(state),
           ),
           SizedBox(height: AppSpacing.space5),
           _SubmitButton(state: state, onSubmit: () => _onSubmit(context, ref)),
         ],
       ),
     );
+  }
+
+  /// Inclusive day count of the picked range, or null when range is invalid.
+  /// Mirrors VacationPeriod.vacationDays; BE confirms the actual extension.
+  int? _projectedExtensionDays(VacationFormState state) {
+    if (!state.hasValidRange) return null;
+    final diff = state.endDate!.difference(state.startDate!).inDays;
+    return diff < 0 ? null : diff + 1;
   }
 
   Future<void> _onSubmit(BuildContext context, WidgetRef ref) async {
@@ -468,7 +477,16 @@ class _SubmitButton extends StatelessWidget {
 class _DispositionSection extends StatelessWidget {
   final VacationDisposition selected;
   final ValueChanged<VacationDisposition> onChange;
-  const _DispositionSection({required this.selected, required this.onChange});
+
+  /// Projected subscription auto-extension days for rollForward (#431 §5.3).
+  /// Null when no valid range picked yet.
+  final int? projectedExtensionDays;
+
+  const _DispositionSection({
+    required this.selected,
+    required this.onChange,
+    this.projectedExtensionDays,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -499,6 +517,22 @@ class _DispositionSection extends StatelessWidget {
           groupValue: selected,
           onChange: onChange,
         ),
+        // autoExtendedDays 예상치 — rollForward 선택 + 유효 기간일 때만 노출.
+        if (selected == VacationDisposition.rollForward &&
+            projectedExtensionDays != null)
+          Padding(
+            padding: EdgeInsets.only(
+              left: AppSpacing.space2,
+              bottom: AppSpacing.space2,
+            ),
+            child: Text(
+              AppStrings.vacationAutoExtendProjection(projectedExtensionDays!),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
       ],
     );
   }

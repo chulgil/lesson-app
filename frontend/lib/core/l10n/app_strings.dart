@@ -7784,6 +7784,11 @@ class AppStrings {
   static const vacationDispositionRollForwardDescription =
       '수강권 만료일이 휴가 일수만큼 자동 연장';
 
+  /// 이월 선택 시 예상 자동 연장 일수 안내 (autoExtendedDays).
+  /// 계산은 BE 가 확정하며 FE 는 휴가 일수 기준 예상치만 표시. TODO(remote).
+  static String vacationAutoExtendProjection(int days) =>
+      '수강권 만료일이 약 $days일 자동 연장됩니다.';
+
   // ── 학생별 처리 옵션 (spec §4.2) ────────────────────────────────────
 
   /// 학생별 long-press BottomSheet 제목.
@@ -7798,6 +7803,14 @@ class AppStrings {
   /// override 적용된 카드의 라벨 prefix (예: "다른 처리: 보강 크레딧 적립").
   static String vacationPerStudentOverrideLabel(String dispositionLabel) =>
       '다른 처리: $dispositionLabel';
+
+  // ── 가용시간 화면 휴가 배너 (spec §4 캘린더 시각화) ─────────────────
+
+  /// 가용시간 화면에 노출되는 휴가 구간 배너 제목.
+  static const vacationBannerTitle = '등록된 휴가';
+
+  /// 휴가 배너 안내 — 해당 기간 예약 불가.
+  static const vacationBannerHint = '이 기간에는 학생 예약이 잡히지 않아요.';
 
   // ── First Availability Quest (#422) ─────────────────────────────────
   // Spec: docs/specs/onboarding/teacher_first_availability_setup.md

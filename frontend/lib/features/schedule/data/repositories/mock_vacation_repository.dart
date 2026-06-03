@@ -10,12 +10,42 @@ class MockVacationRepository implements VacationRepository {
     required DateTime startDate,
     required DateTime endDate,
   }) async {
-    // Stub: 항상 빈 영향 결과. 실제 영향 계산은 BE 가 담당.
+    // Mock 영향 미리보기 — 실제 영향 계산은 BE 가 담당.
+    // TODO(remote): GET /teacher/vacation/impact 로 대체.
+    // 기간이 0일 이상이면 샘플 학생 N명을 노출해 미리보기 UI 를 검증한다.
+    final days = endDate.difference(startDate).inDays;
+    if (days < 0) {
+      return VacationImpactPreview(
+        startDate: startDate,
+        endDate: endDate,
+        impactedLessonCount: 0,
+        impactedStudentCount: 0,
+      );
+    }
+    const students = [
+      VacationImpactedStudent(
+        studentId: 'mock-student-1',
+        studentName: '김민수',
+        lessonCount: 2,
+      ),
+      VacationImpactedStudent(
+        studentId: 'mock-student-2',
+        studentName: '박서연',
+        lessonCount: 3,
+      ),
+      VacationImpactedStudent(
+        studentId: 'mock-student-3',
+        studentName: '이지원',
+        lessonCount: 2,
+      ),
+    ];
+    final lessonCount = students.fold<int>(0, (sum, s) => sum + s.lessonCount);
     return VacationImpactPreview(
       startDate: startDate,
       endDate: endDate,
-      impactedLessonCount: 0,
-      impactedStudentCount: 0,
+      impactedLessonCount: lessonCount,
+      impactedStudentCount: students.length,
+      impactedStudents: students,
     );
   }
 

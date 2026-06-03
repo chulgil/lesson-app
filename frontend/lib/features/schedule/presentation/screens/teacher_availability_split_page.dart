@@ -13,6 +13,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_preview_grid.dart';
+import '../widgets/availability/availability_vacation_banner.dart';
 import '../widgets/schedule_edit_bottom_sheet.dart';
 import 'time_exception_screen.dart';
 
@@ -90,12 +91,18 @@ class _SplitLayout extends ConsumerWidget {
     if (isWide) {
       return SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: settings),
-            const SizedBox(width: AppSpacing.space5),
-            Expanded(child: preview),
+            const AvailabilityVacationBanner(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: settings),
+                const SizedBox(width: AppSpacing.space5),
+                Expanded(child: preview),
+              ],
+            ),
           ],
         ),
       );
@@ -107,6 +114,7 @@ class _SplitLayout extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const AvailabilityVacationBanner(),
           preview,
           const SizedBox(height: AppSpacing.space5),
           settings,
