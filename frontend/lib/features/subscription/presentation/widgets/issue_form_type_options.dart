@@ -55,11 +55,15 @@ class PackageOptionsSection extends StatelessWidget {
 class MonthlyOptionsSection extends StatelessWidget {
   final int monthsCount;
   final ValueChanged<int> onChanged;
+  final int lessonsPerMonth;
+  final ValueChanged<int> onLessonsPerMonthChanged;
 
   const MonthlyOptionsSection({
     super.key,
     required this.monthsCount,
     required this.onChanged,
+    required this.lessonsPerMonth,
+    required this.onLessonsPerMonthChanged,
   });
 
   @override
@@ -84,6 +88,52 @@ class MonthlyOptionsSection extends StatelessWidget {
                   label: Text(AppStrings.issueFormMonthsLabel(months)),
                   selected: isSelected,
                   onSelected: (_) => onChanged(months),
+                  selectedColor: AppColors.paperAccentSoft,
+                  checkmarkColor: AppColors.paperAccent,
+                  backgroundColor: AppColors.paper,
+                  side: BorderSide(
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
+                  ),
+                  labelStyle: AppTypography.bodyMedium.copyWith(
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
+        ),
+        const SizedBox(height: AppSpacing.space4),
+        // 월 회차: monthly 수강권의 remaining/회차 표시가 깨지지 않도록
+        // lessonsPerMonth 를 반드시 입력받는다.
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children: [
+            Text(
+              AppStrings.issueFormMonthlyLessonsTitle,
+              style: NotebookTypography.sectionTitle,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children:
+              [4, 8, 12].map((count) {
+                final isSelected = lessonsPerMonth == count;
+                return ChoiceChip(
+                  label: Text(
+                    '$count${AppStrings.issueFormLessonsSuffix}',
+                  ),
+                  selected: isSelected,
+                  onSelected: (_) => onLessonsPerMonthChanged(count),
                   selectedColor: AppColors.paperAccentSoft,
                   checkmarkColor: AppColors.paperAccent,
                   backgroundColor: AppColors.paper,
