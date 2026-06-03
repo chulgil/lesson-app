@@ -3,6 +3,7 @@
 // 딥링크 라우팅 계약:
 //   lessonapp://invite/{code}              → /invite/code (code 6자리)
 //   lessonapp://student/summary/{token}    → /student/summary/{token}
+//   lessonapp://lessons/{id}               → /lessons/{id} (레슨 상세)
 // 그 외 URI 는 null 반환 (지원 안 함).
 
 import 'package:flutter_test/flutter_test.dart';
@@ -31,6 +32,31 @@ void main() {
       expect(result!.path, '/student/summary/abc-def-token');
       expect(result.token, 'abc-def-token');
       expect(result.code, isNull);
+    });
+
+    test('lessons URI returns /lessons/{id} path', () {
+      final result = DeepLinkParser.toRoute(
+        Uri.parse('lessonapp://lessons/abc123'),
+      );
+
+      expect(result, isNotNull);
+      expect(result!.path, '/lessons/abc123');
+      expect(result.code, isNull);
+      expect(result.token, isNull);
+    });
+
+    test('lessons without id returns null', () {
+      final result = DeepLinkParser.toRoute(Uri.parse('lessonapp://lessons/'));
+
+      expect(result, isNull);
+    });
+
+    test('lessons with extra segment returns null', () {
+      final result = DeepLinkParser.toRoute(
+        Uri.parse('lessonapp://lessons/abc123/edit'),
+      );
+
+      expect(result, isNull);
     });
 
     test('unknown scheme returns null', () {
