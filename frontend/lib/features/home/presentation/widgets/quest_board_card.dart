@@ -40,6 +40,11 @@ class QuestBoardCard extends ConsumerWidget {
     // #430 G1 — Phase C 보상 퀘스트 (전화인증 → 인증 선생님 배지)
     final isPhoneVerified = ref.watch(homeTeacherPhoneVerifiedProvider);
 
+    // Board dismissal must align with the progress gauge SSOT
+    // (profileCompletionPercent): the 10 mandatory quests sum to 100%. Phone
+    // verification is the optional Phase C reward quest (weight 0, see
+    // phone_verification_policy.md §2), so it must NOT keep the board open —
+    // otherwise the gauge reads 100% while the board lingers. (#430 G1 / #482)
     final allDone =
         hasSlots &&
         hasPhoto &&
@@ -50,8 +55,7 @@ class QuestBoardCard extends ConsumerWidget {
         hasSubscription &&
         hasCompletedLesson &&
         hasLessonNote &&
-        hasPracticeAssigned &&
-        isPhoneVerified;
+        hasPracticeAssigned;
 
     if (allDone) return const SizedBox.shrink();
 
@@ -178,7 +182,11 @@ class QuestBoardCard extends ConsumerWidget {
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
         isLocked: slotsBlocker,
-        onTap: null,
+        // Price table is edited on the lesson-time settings screen (#5 step4
+        // was a NO-OP). Gated by the same slots blocker as the other quests.
+        onTap: slotsBlocker
+            ? null
+            : () => context.push(AppRoutes.lessonTimeSettings),
       ),
       _Quest(
         step: 5,

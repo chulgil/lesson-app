@@ -23,8 +23,11 @@ class ProfileVisibilityScreen extends ConsumerStatefulWidget {
 class _ProfileVisibilityScreenState
     extends ConsumerState<ProfileVisibilityScreen> {
   bool _isLoading = false;
-  late ProfileVisibilitySettings _settings;
+  ProfileVisibilitySettings _settings = const ProfileVisibilitySettings();
   bool _hasChanges = false;
+  // True once we have synced the form from a loaded profile. Prevents a
+  // cold-load Save from PUTting the default settings over the real ones. (#2)
+  bool _syncedFromProfile = false;
 
   @override
   void initState() {
@@ -34,8 +37,21 @@ class _ProfileVisibilityScreenState
 
   void _loadSettings() {
     final profile = ref.read(teacherExtendedProfileProvider).valueOrNull;
-    _settings =
-        profile?.visibilitySettings ?? const ProfileVisibilitySettings();
+    if (profile != null) {
+      _settings = profile.visibilitySettings;
+      _syncedFromProfile = true;
+    }
+  }
+
+  /// Sync the form once the profile finishes loading. If the screen opened
+  /// before the provider resolved, [_loadSettings] captured only the default
+  /// settings; saving then would silently overwrite the real visibility flags
+  /// with defaults. Re-sync as soon as a value arrives, unless the user has
+  /// already started editing. (#2)
+  void _syncOnProfileLoaded(TeacherProfile profile) {
+    if (_syncedFromProfile || _hasChanges) return;
+    _syncedFromProfile = true;
+    _settings = profile.visibilitySettings;
   }
 
   void _updateSettings(ProfileVisibilitySettings newSettings) {
@@ -79,6 +95,14 @@ class _ProfileVisibilityScreenState
 
   @override
   Widget build(BuildContext context) {
+    // Sync the form when the profile resolves after the screen opened. (#2)
+    ref.listen(teacherExtendedProfileProvider, (previous, next) {
+      final profile = next.valueOrNull;
+      if (profile != null) {
+        _syncOnProfileLoaded(profile);
+      }
+    });
+
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
     final academiesAsync = ref.watch(
       teacherAcademiesProvider(
@@ -111,6 +135,9 @@ class _ProfileVisibilityScreenState
                 child: Text(AppStrings.profileVisibilityNullState),
               );
             }
+            // Ensure the form reflects the loaded profile even if the listener
+            // above has not fired yet on this build. (#2)
+            _syncOnProfileLoaded(profile);
             return _buildContent(context, profile, academiesAsync);
           },
         ),

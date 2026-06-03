@@ -153,16 +153,28 @@ class RemoteSettingsRepository implements SettingsRepository {
   /// Push the break/min-booking constraints to the availability endpoint so
   /// the booking engine, which reads them from `/schedule/availability`,
   /// reflects settings changes without requiring a slot re-save.
+  ///
+  /// Best-effort mirror: the authoritative write is the preceding
+  /// `/settings/teacher` PUT, which has already succeeded by the time we get
+  /// here. If only this secondary mirror fails we must NOT surface an error —
+  /// doing so previously made the screen show an error state even though the
+  /// setting was saved. The constraint re-syncs on the next slot save, and the
+  /// booking engine falls back to the settings value. (#19 — partial-failure)
   Future<void> _syncAvailabilityConstraints(TeacherSettings settings) async {
-    await _apiClient.put(
-      '/schedule/availability',
-      data: {
-        'availabilities': _availabilityPayloadFromSlots(settings.availableSlots),
-        'slot_duration_minutes': settings.defaultLessonDuration,
-        'break_time_between_lessons': settings.breakTimeBetweenLessons,
-        'min_booking_hours': settings.minBookingHours,
-      },
-    );
+    try {
+      await _apiClient.put(
+        '/schedule/availability',
+        data: {
+          'availabilities':
+              _availabilityPayloadFromSlots(settings.availableSlots),
+          'slot_duration_minutes': settings.defaultLessonDuration,
+          'break_time_between_lessons': settings.breakTimeBetweenLessons,
+          'min_booking_hours': settings.minBookingHours,
+        },
+      );
+    } catch (_) {
+      // Swallow: primary settings write already persisted (see doc above).
+    }
   }
 
   @override

@@ -508,8 +508,8 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
             title: const Text(AppStrings.profileTrialLessonFree),
             subtitle: Text(
               settings.trialLessonFree
-                  ? '시간 확정 시 바로 예약 완료'
-                  : '시간 확정 후 수강권 제안 필요',
+                  ? AppStrings.profileTrialLessonFreeOn
+                  : AppStrings.profileTrialLessonFreeOff,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkSecondary,
               ),
