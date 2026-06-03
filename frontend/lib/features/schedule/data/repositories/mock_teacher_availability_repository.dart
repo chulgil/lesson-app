@@ -586,10 +586,9 @@ class MockTeacherAvailabilityRepository
         final slotMinute = currentMinutes % 60;
 
         final startTime = ClockTime(hour: slotHour, minute: slotMinute);
-        final endTime = ClockTime(
-          hour: (currentMinutes + lessonDuration) ~/ 60,
-          minute: (currentMinutes + lessonDuration) % 60,
-        );
+        // Use fromMinutes so a slot ending exactly at midnight (1440) wraps to
+        // 00:00 instead of asserting on ClockTime(hour: 24) (#483 symmetry).
+        final endTime = ClockTime.fromMinutes(currentMinutes + lessonDuration);
 
         // Skip if slot is in the past for today
         if (isToday) {
@@ -914,6 +913,8 @@ class MockTeacherAvailabilityRepository
 
 /// Mock lesson history for recommendations
 class _MockLessonHistory {
+  /// DateTime.weekday convention: 1 = Mon .. 7 = Sun. Compared directly against
+  /// `date.weekday` in _isRecommendedSlot — both sides must stay 1-7 (no 0-6).
   final int dayOfWeek;
   final int hour;
   final int minute;
