@@ -13,7 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/deep_link/deep_link_handler.dart';
 
 void main() {
-  test('cold-start invite URI navigates to /invite/code', () async {
+  test('cold-start invite URI forwards code as query param', () async {
     final recorded = <String>[];
 
     final handler = DeepLinkHandler(
@@ -24,7 +24,8 @@ void main() {
 
     await handler.start();
 
-    expect(recorded, ['/invite/code']);
+    // Regression: code must be carried so CodeInputScreen prefills.
+    expect(recorded, ['/invite/code?code=123456']);
 
     await handler.dispose();
   });
@@ -60,7 +61,7 @@ void main() {
     controller.add(Uri.parse('lessonapp://invite/654321'));
     await Future<void>.delayed(Duration.zero); // let stream deliver
 
-    expect(recorded, ['/invite/code']);
+    expect(recorded, ['/invite/code?code=654321']);
 
     await handler.dispose();
     await controller.close();
@@ -99,7 +100,7 @@ void main() {
     await handler.start(); // duplicate call
 
     expect(initialCallCount, 1);
-    expect(recorded, ['/invite/code']);
+    expect(recorded, ['/invite/code?code=111222']);
 
     await handler.dispose();
   });
