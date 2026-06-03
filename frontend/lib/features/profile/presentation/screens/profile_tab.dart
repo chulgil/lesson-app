@@ -814,6 +814,8 @@ class ProfileTab extends ConsumerWidget {
       onConfirm: () async {
         Navigator.pop(context);
         await ref.read(authNotifierProvider.notifier).logout();
+        // Explicit nav after logout (redirect is a secondary safety net).
+        if (context.mounted) context.go(AppRoutes.login);
       },
     );
   }
