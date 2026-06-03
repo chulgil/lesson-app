@@ -7,9 +7,12 @@ part of 'cancellation_defaults_provider.dart';
 // **************************************************************************
 
 String _$cancellationDefaultsRepositoryHash() =>
-    r'b32ab37528ff9c782db4ed2ac3b40e1f1a84f4df';
+    r'85fceb0a221a42feb25b5aea28150df5f8d2ed09';
 
-/// Repository provider for cancellation defaults
+/// Repository provider for cancellation defaults.
+///
+/// No backend endpoint exists yet, so remote mode persists locally
+/// (user-scoped) instead of returning seeded mock data (#5 D-G3).
 ///
 /// Copied from [cancellationDefaultsRepository].
 @ProviderFor(cancellationDefaultsRepository)

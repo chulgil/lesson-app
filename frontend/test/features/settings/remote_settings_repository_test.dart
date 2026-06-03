@@ -135,4 +135,59 @@ void main() {
       expect(settings.availableSlots.single.dayOfWeek, 1);
     },
   );
+
+  test(
+    'updateBreakTime mirrors the value to the availability SSOT (#19)',
+    () async {
+      final requests = <RequestOptions>[];
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requests.add(options);
+            if (options.method == 'PUT' && options.path == '/settings/teacher') {
+              handler.resolve(
+                Response(
+                  requestOptions: options,
+                  data: {
+                    'id': 'teacher-123',
+                    'instruments': ['피아노'],
+                    'default_lesson_duration': 60,
+                    'break_time_between_lessons': 15,
+                    'min_booking_hours': 24,
+                    'created_at': '2026-05-02T00:00:00Z',
+                  },
+                  statusCode: 200,
+                ),
+              );
+              return;
+            }
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: {'teacher_id': 'teacher-123', 'availabilities': []},
+                statusCode: 200,
+              ),
+            );
+          },
+        ),
+      );
+
+      final repository = RemoteSettingsRepository(ApiClient(dio));
+
+      final settings = await repository.updateBreakTime(15);
+
+      // The booking engine reads break/min from /schedule/availability, so a
+      // settings change must also PUT there.
+      final availabilityPut = requests.singleWhere(
+        (request) =>
+            request.method == 'PUT' &&
+            request.path == '/schedule/availability',
+      );
+      final data = availabilityPut.data as Map<String, dynamic>;
+      expect(data['break_time_between_lessons'], 15);
+      expect(data['min_booking_hours'], 24);
+      expect(settings.breakTimeBetweenLessons, 15);
+    },
+  );
 }

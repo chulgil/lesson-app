@@ -15,7 +15,8 @@ export 'presentation/providers/teacher_settings_provider.dart'
     show
         TeacherSettingsNotifier,
         teacherSettingsByIdProvider,
-        teacherSettingsNotifierProvider;
+        teacherSettingsNotifierProvider,
+        teacherSettingsProvider;
 export 'presentation/providers/app_release_provider.dart'
     show
         appNewsFeedProvider,

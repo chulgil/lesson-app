@@ -133,12 +133,36 @@ class RemoteSettingsRepository implements SettingsRepository {
 
   @override
   Future<TeacherSettings> updateBreakTime(int minutes) async {
-    return _updateSettings({'break_time_between_lessons': minutes});
+    final settings = await _updateSettings({
+      'break_time_between_lessons': minutes,
+    });
+    // The booking engine reads break/min from the availability SSOT, not from
+    // /settings/teacher, so mirror the value there too. (#5 D-G3 — SSOT) (#19)
+    await _syncAvailabilityConstraints(settings);
+    return settings;
   }
 
   @override
   Future<TeacherSettings> updateMinBookingHours(int hours) async {
-    return _updateSettings({'min_booking_hours': hours});
+    final settings = await _updateSettings({'min_booking_hours': hours});
+    // Keep the availability SSOT in sync with the settings change. (#19)
+    await _syncAvailabilityConstraints(settings);
+    return settings;
+  }
+
+  /// Push the break/min-booking constraints to the availability endpoint so
+  /// the booking engine, which reads them from `/schedule/availability`,
+  /// reflects settings changes without requiring a slot re-save.
+  Future<void> _syncAvailabilityConstraints(TeacherSettings settings) async {
+    await _apiClient.put(
+      '/schedule/availability',
+      data: {
+        'availabilities': _availabilityPayloadFromSlots(settings.availableSlots),
+        'slot_duration_minutes': settings.defaultLessonDuration,
+        'break_time_between_lessons': settings.breakTimeBetweenLessons,
+        'min_booking_hours': settings.minBookingHours,
+      },
+    );
   }
 
   @override

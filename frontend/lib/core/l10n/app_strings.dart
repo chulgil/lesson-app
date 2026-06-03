@@ -6151,6 +6151,8 @@ class AppStrings {
       '원활한 사용을 위해 v$minVersion 이상으로\n업데이트해 주세요.';
   static String forceUpdateCurrentVersion(String version) => '현재 버전: v$version';
   static const forceUpdateAction = '업데이트하기';
+  static const forceUpdateStoreUnavailable =
+      '스토어를 열 수 없습니다. 앱 스토어에서 직접 업데이트해 주세요.';
   static const studentHomeTermsOfService = '이용약관';
   static const studentHomePrivacyPolicy = '개인정보처리방침';
   static const studentHomeOpenSourceLicense = '오픈소스 라이선스';

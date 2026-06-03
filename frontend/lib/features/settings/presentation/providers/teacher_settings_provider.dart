@@ -67,6 +67,15 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     return _repository.getTeacherSettings();
   }
 
+  /// Refresh the read-side [teacherSettingsProvider] after a successful
+  /// mutation. The notifier and the FutureProvider are separate instances,
+  /// so home/quest screens watching [teacherSettingsProvider] would keep a
+  /// stale value (e.g. first-availability interstitial loops) unless we
+  /// invalidate the read side here. (#5 D-G3 — settings/profile SSOT)
+  void _refreshReadSide() {
+    ref.invalidate(teacherSettingsProvider);
+  }
+
   /// Add an instrument to the list
   Future<void> addInstrument(String instrument) async {
     final current = state.value;
@@ -79,6 +88,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateInstruments(instruments);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.data(current);
       Error.throwWithStackTrace(e, st);
@@ -97,6 +107,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateInstruments(instruments);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.data(current);
       Error.throwWithStackTrace(e, st);
@@ -112,6 +123,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateInstruments(instruments);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       if (current != null) {
         state = AsyncValue.data(current);
@@ -126,6 +138,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateDefaultDuration(duration);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -137,6 +150,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.addCustomDuration(duration);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -148,6 +162,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.removeCustomDuration(duration);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -159,6 +174,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.toggleDuration(duration, isActive);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -170,6 +186,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateTimeSlot(slot);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -181,6 +198,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.toggleTimeSlot(slotId, isActive);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -198,6 +216,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateAvailableSlots(slots);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.data(current);
       Error.throwWithStackTrace(e, st);
@@ -216,6 +235,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateAvailableSlots(slots);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.data(current);
       Error.throwWithStackTrace(e, st);
@@ -226,6 +246,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _repository.getTeacherSettings());
+    _refreshReadSide();
   }
 
   /// Update break time between lessons
@@ -234,6 +255,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateBreakTime(minutes);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -245,6 +267,7 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     try {
       final updated = await _repository.updateMinBookingHours(hours);
       state = AsyncValue.data(updated);
+      _refreshReadSide();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -263,9 +286,12 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     );
     try {
       await _repository.updateBookingGuidanceMessage(effectiveMessage);
+      _refreshReadSide();
     } catch (e, st) {
+      // Roll back to the last known-good value; do not surface an error state
+      // that would replace the rolled-back data and blank the screen.
       state = AsyncValue.data(current);
-      state = AsyncValue.error(e, st);
+      Error.throwWithStackTrace(e, st);
     }
   }
 
@@ -278,9 +304,12 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     state = AsyncValue.data(current.copyWith(trialLessonFree: value));
     try {
       await _repository.updateTrialLessonFree(value);
+      _refreshReadSide();
     } catch (e, st) {
+      // Roll back to the last known-good value; do not overwrite it with an
+      // error state that would blank the settings screen.
       state = AsyncValue.data(current); // Rollback
-      state = AsyncValue.error(e, st);
+      Error.throwWithStackTrace(e, st);
     }
   }
 
@@ -295,9 +324,12 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     state = AsyncValue.data(current.copyWith(lessonPriceTable: priceTable));
     try {
       await _repository.updatePriceTable(priceTable);
+      _refreshReadSide();
     } catch (e, st) {
+      // Roll back to the last known-good value; do not overwrite it with an
+      // error state that would blank the settings screen.
       state = AsyncValue.data(current); // Rollback
-      state = AsyncValue.error(e, st);
+      Error.throwWithStackTrace(e, st);
     }
   }
 }

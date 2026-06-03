@@ -628,7 +628,11 @@ class _UnifiedLessonRequestScreenState
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  AppStrings.pricePerSession(_formatPrice(referencePrice)),
+                  referencePrice == 0
+                      ? AppStrings.freeTrialLesson
+                      : AppStrings.pricePerSession(
+                        _formatPrice(referencePrice),
+                      ),
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.ink,
@@ -771,6 +775,10 @@ class _UnifiedLessonRequestScreenState
             .read(teacherSettingsByIdProvider(widget.params.teacherId))
             .valueOrNull;
     if (settings == null) return null;
+    // Trial lessons are free when the teacher enabled that setting (#5 D-G3).
+    if (_selectedType == LessonRequestType.trial && settings.trialLessonFree) {
+      return 0;
+    }
     return settings.getPrice(_selectedInstrument!, _selectedExperience.name);
   }
 
