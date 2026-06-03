@@ -1,22 +1,28 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../auth/auth_facade.dart';
+import '../../data/repositories/local_cancellation_defaults_repository.dart';
 import '../../data/repositories/mock_cancellation_defaults_repository.dart';
 import '../../domain/entities/cancellation_defaults.dart';
 import '../../domain/repositories/cancellation_defaults_repository.dart';
 
 part 'cancellation_defaults_provider.g.dart';
 
-/// Repository provider for cancellation defaults
+/// Repository provider for cancellation defaults.
+///
+/// No backend endpoint exists yet, so remote mode persists locally
+/// (user-scoped) instead of returning seeded mock data (#5 D-G3).
 @Riverpod(keepAlive: true)
 CancellationDefaultsRepository cancellationDefaultsRepository(
   CancellationDefaultsRepositoryRef ref,
-) => createRepository<CancellationDefaultsRepository>(
+) => createLocalFallbackRepository<CancellationDefaultsRepository>(
   ref: ref,
   mock: () => MockCancellationDefaultsRepository(),
-  remote: (api) {
-    return MockCancellationDefaultsRepository();
-  },
+  fallback:
+      () => LocalCancellationDefaultsRepository(
+        teacherId: ref.watch(currentUserIdProvider),
+      ),
 );
 
 /// Async notifier provider for cancellation defaults
