@@ -60,16 +60,19 @@ class VacationPeriod {
     return diff < 0 ? 0 : diff + 1;
   }
 
-  /// Whether the vacation is still in effect on [reference] (date-only).
+  /// Whether the vacation is in effect on [reference] (date-only).
   ///
-  /// Active means: not cancelled AND the inclusive end date has not passed.
+  /// Active means: not cancelled AND the inclusive start date has already begun
+  /// AND the inclusive end date has not passed. A vacation that starts in the
+  /// future is "scheduled", not active (no banner / no Recovery window yet).
   /// Comparison is date-only so a vacation ending today stays active until the
   /// next calendar day (avoids a midnight off-by-one).
   bool isActiveOn(DateTime reference) {
     if (cancelledAt != null) return false;
     final today = DateTime(reference.year, reference.month, reference.day);
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
     final end = DateTime(endDate.year, endDate.month, endDate.day);
-    return !end.isBefore(today);
+    return !start.isAfter(today) && !end.isBefore(today);
   }
 
   VacationPeriod copyWith({

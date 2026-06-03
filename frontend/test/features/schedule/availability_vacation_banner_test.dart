@@ -79,12 +79,37 @@ Future<void> _pump(WidgetTester tester, List<VacationPeriod> periods) async {
 void main() {
   group('AvailabilityVacationBanner', () {
     testWidgets('shows banner with active vacation range', (tester) async {
-      await _pump(tester, [_period(reason: '여름방학')]);
+      // Must span today: a vacation that already started and has not ended
+      // (#fix2 — future-start vacations are "scheduled", not active).
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final start = today.subtract(const Duration(days: 2));
+      final end = today.add(const Duration(days: 5));
+      await _pump(tester, [
+        _period(reason: '여름방학', startDate: start, endDate: end),
+      ]);
 
       expect(tester.takeException(), isNull);
       expect(find.text(AppStrings.vacationBannerTitle), findsOneWidget);
-      expect(find.text('7/15 ~ 8/31'), findsOneWidget);
+      expect(find.text('${start.month}/${start.day} ~ ${end.month}/${end.day}'),
+          findsOneWidget);
       expect(find.text('여름방학'), findsOneWidget);
+    });
+
+    // Regression (#fix2): a vacation that starts in the future is "scheduled",
+    // not active — the banner must stay hidden until it begins.
+    testWidgets('hides when vacation starts in the future', (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      await _pump(tester, [
+        _period(
+          startDate: today.add(const Duration(days: 10)),
+          endDate: today.add(const Duration(days: 20)),
+        ),
+      ]);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text(AppStrings.vacationBannerTitle), findsNothing);
     });
 
     testWidgets('hides when no active vacation', (tester) async {
