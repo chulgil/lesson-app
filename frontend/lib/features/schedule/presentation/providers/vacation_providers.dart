@@ -49,7 +49,12 @@ class VacationFormState {
   bool get hasValidRange {
     final s = startDate;
     final e = endDate;
-    return s != null && e != null && !e.isBefore(s);
+    if (s == null || e == null || e.isBefore(s)) return false;
+    // Start date must not be in the past (date-only comparison).
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final startDay = DateTime(s.year, s.month, s.day);
+    return !startDay.isBefore(today);
   }
 
   VacationFormState copyWith({

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -297,16 +297,15 @@ class _ScheduleChangeSlotBottomSheetState
       return;
     }
 
-    final endMinute = cellInfo.minute + params.durationMinutes;
-    final endHour = cellInfo.hour + endMinute ~/ 60;
-    final endMin = endMinute % 60;
+    final startTotalMinutes = cellInfo.hour * 60 + cellInfo.minute;
+    final endTotalMinutes = startTotalMinutes + params.durationMinutes;
 
     final slot = TimeSlot(
       id: 'slot_${DateTime.now().millisecondsSinceEpoch}',
-      dayOfWeek: cellInfo.date.weekday % 7,
-      startTime:
-          TimeOfDay(hour: cellInfo.hour, minute: cellInfo.minute).toClockTime(),
-      endTime: TimeOfDay(hour: endHour, minute: endMin).toClockTime(),
+      // DateTime.weekday is 1=Mon..7=Sun, matching TimeSlot.dayOfWeek convention.
+      dayOfWeek: cellInfo.date.weekday,
+      startTime: ClockTime.fromMinutes(startTotalMinutes),
+      endTime: ClockTime.fromMinutes(endTotalMinutes),
       isActive: true,
       specificDate: cellInfo.date,
     );

@@ -21,8 +21,9 @@ class AvailabilityVacationBanner extends ConsumerWidget {
     final listAsync = ref.watch(vacationListProvider);
     return listAsync.when(
       data: (vacations) {
+        final now = DateTime.now();
         final active = vacations
-            .where((v) => v.cancelledAt == null)
+            .where((v) => v.isActiveOn(now))
             .toList(growable: false);
         if (active.isEmpty) return const SizedBox.shrink();
         return Container(
