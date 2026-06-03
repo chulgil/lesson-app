@@ -525,22 +525,38 @@ class _BookingRescheduleScreenState
 
     setState(() => _isLoading = true);
 
+    final newSlotId = _selectedSlot!.id;
+
     try {
-      // 1. Cancel old booking
-      await ref
-          .read(slotBookingNotifierProvider.notifier)
-          .cancelBooking(widget.currentBookingId);
+      // Atomicity: book the new slot FIRST. Only cancel the old booking once
+      // the new one is confirmed, so a failure here never loses the original.
+      final notifier = ref.read(slotBookingNotifierProvider.notifier);
 
-      // 2. Create new booking
-      await ref
-          .read(slotBookingNotifierProvider.notifier)
-          .bookSlotSimple(
-            _selectedSlot!.id,
-            widget.studentId,
-            widget.studentName,
-          );
+      // 1. Create new booking
+      await notifier.bookSlotSimple(
+        newSlotId,
+        widget.studentId,
+        widget.studentName,
+      );
+      // bookSlotSimple swallows errors into AsyncValue.error; surface it.
+      if (ref.read(slotBookingNotifierProvider).hasError) {
+        throw Exception('new slot booking failed');
+      }
 
-      // 3. 🆕 Deduct reschedule allowance from subscription
+      // 2. Cancel old booking. If this fails, roll back the new booking
+      //    so we never end up with two active reservations.
+      try {
+        await notifier.cancelBooking(widget.currentBookingId);
+        if (ref.read(slotBookingNotifierProvider).hasError) {
+          throw Exception('old booking cancel failed');
+        }
+      } catch (cancelError) {
+        await notifier.cancelBooking(newSlotId);
+        rethrow;
+      }
+
+      // 3. 🆕 Deduct reschedule allowance from subscription (only after the
+      //    slot swap succeeded).
       int newRemainingReschedules = widget.remainingReschedules - 1;
       if (widget.subscriptionId != null) {
         final updated = await ref
