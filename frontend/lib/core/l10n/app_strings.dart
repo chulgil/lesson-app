@@ -6036,6 +6036,18 @@ class AppStrings {
   static const authDevStudent = '학생';
   static const authDevParent = '학부모';
 
+  // ── Age Gate (만 14세 미만 차단 안전망) ──
+  // 정책: docs/specs/user/phone_verification_policy.md — 본인인증(PASS) 통합
+  // 전까지의 최소 안전망. 자가신고 기반 확인이며, 정식 연령 검증은 PASS 연동 시
+  // 대체된다.
+  static const authAgeGateTitle = '나이 확인';
+  static const authAgeGateBody =
+      '만 14세 이상만 코드 없이 시작할 수 있어요.\n만 14세 이상이 맞나요?';
+  static const authAgeGateConfirm = '네, 만 14세 이상입니다';
+  static const authAgeGateCancel = '아니요';
+  static const authAgeGateBlocked =
+      '만 14세 미만은 보호자(학부모) 계정을 통해 이용할 수 있어요.';
+
   // ── Settings / Backup ──
   static const settingsBackupCreateFailed = '백업 생성에 실패했습니다. 다시 시도해주세요.';
   static const settingsBackupRestoreFailed = '백업 복원에 실패했습니다. 다시 시도해주세요.';
