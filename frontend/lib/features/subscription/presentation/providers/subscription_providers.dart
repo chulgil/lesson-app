@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
@@ -239,6 +240,32 @@ class MembershipSubscriptionNotifier extends _$MembershipSubscriptionNotifier {
     final repository = ref.read(subscriptionRepositoryProvider);
     await repository.updateStatus(subscription.id, SubscriptionStatus.active);
     ref.invalidateSelf();
+  }
+}
+
+/// Invalidate every subscription list/summary provider that surfaces a newly
+/// issued subscription, so list and detail views reflect it immediately.
+///
+/// Callers that create a subscription through the repository directly (issue
+/// flow, proposal confirmation) MUST call this so the student/teacher facing
+/// providers re-fetch. [membershipId] and [teacherId] are optional and only
+/// invalidated when provided.
+void invalidateSubscriptionListsForStudent(
+  WidgetRef ref,
+  String studentId, {
+  String? membershipId,
+  String? teacherId,
+}) {
+  ref.invalidate(subscriptionNotifierProvider(studentId));
+  ref.invalidate(studentSubscriptionsProvider(studentId));
+  ref.invalidate(activeStudentSubscriptionsProvider(studentId));
+  if (membershipId != null && membershipId.isNotEmpty) {
+    ref.invalidate(membershipSubscriptionProvider(membershipId));
+    ref.invalidate(membershipSubscriptionNotifierProvider(membershipId));
+  }
+  if (teacherId != null && teacherId.isNotEmpty) {
+    ref.invalidate(teacherStudentSubscriptionsProvider(teacherId));
+    ref.invalidate(unpaidSubscriptionsProvider(teacherId));
   }
 }
 

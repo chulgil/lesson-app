@@ -70,6 +70,7 @@ class _IssueSubscriptionScreenState
   int _totalLessons = 8;
   int _validityDays = 90;
   int _monthsCount = 1;
+  int _lessonsPerMonth = 4;
   int _originalAmount = 0;
   bool _hasPrefilledAmount = false;
   int _discountPercent = 0;
@@ -88,6 +89,9 @@ class _IssueSubscriptionScreenState
   bool _policyApplied = false;
   LessonPolicy? _effectivePolicy;
   String? _appliedPolicyMembershipId;
+
+  /// In-flight guard: prevents double-tap from issuing twice.
+  bool _submitting = false;
 
   final _amountController = TextEditingController();
   final _lessonsController = TextEditingController();
@@ -124,6 +128,8 @@ class _IssueSubscriptionScreenState
   int get validityDays => _validityDays;
   @override
   int get monthsCount => _monthsCount;
+  @override
+  int get lessonsPerMonth => _lessonsPerMonth;
   @override
   int get originalAmount => _originalAmount;
   @override
@@ -742,6 +748,9 @@ class _IssueSubscriptionScreenState
       return MonthlyOptionsSection(
         monthsCount: _monthsCount,
         onChanged: (months) => setState(() => _monthsCount = months),
+        lessonsPerMonth: _lessonsPerMonth,
+        onLessonsPerMonthChanged:
+            (count) => setState(() => _lessonsPerMonth = count),
       );
     } else {
       return const TrialOptionsSection();
@@ -763,19 +772,42 @@ class _IssueSubscriptionScreenState
     _validityController.text = defaultDays.toString();
   }
 
+  /// Guarded submit — disables the button while an issue is in flight so a
+  /// double-tap cannot create two subscriptions.
+  Future<void> _handleSubmit() async {
+    if (_submitting) return;
+    setState(() => _submitting = true);
+    try {
+      if (widget.isBatchMode) {
+        await issueBatchSubscription();
+      } else {
+        await issueSubscription();
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
   Widget _buildBottomBar() {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: FilledButton(
-          onPressed:
-              widget.isBatchMode ? issueBatchSubscription : issueSubscription,
+          onPressed: _submitting ? null : _handleSubmit,
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-          child: Text(
-            widget.isBatchMode
-                ? AppStrings.batchIssueButtonLabel(widget.studentIds.length)
-                : AppStrings.proposalTitle,
-          ),
+          child: _submitting
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(
+                  widget.isBatchMode
+                      ? AppStrings.batchIssueButtonLabel(
+                          widget.studentIds.length,
+                        )
+                      : AppStrings.proposalTitle,
+                ),
         ),
       ),
     );

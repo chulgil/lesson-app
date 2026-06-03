@@ -17,6 +17,30 @@ import '../providers/subscription_providers.dart';
 UnifiedRequestStatus lessonRequestStatusForIssuedSubscription() =>
     UnifiedRequestStatus.subscriptionIssued;
 
+/// Add [months] to [from], clamping the day to the target month's last day.
+///
+/// `DateTime(year, month + n, day)` overflows when the source day does not
+/// exist in the target month (e.g. Jan 31 + 1 month → Mar 3 instead of
+/// Feb 28). This keeps the end date inside the intended month.
+DateTime addMonthsClamped(DateTime from, int months) {
+  final targetYear = from.year + ((from.month - 1 + months) ~/ 12);
+  final targetMonth = (from.month - 1 + months) % 12 + 1;
+  // Day 0 of next month = last day of target month.
+  final lastDayOfTargetMonth = DateTime(targetYear, targetMonth + 1, 0).day;
+  final clampedDay =
+      from.day <= lastDayOfTargetMonth ? from.day : lastDayOfTargetMonth;
+  return DateTime(
+    targetYear,
+    targetMonth,
+    clampedDay,
+    from.hour,
+    from.minute,
+    from.second,
+    from.millisecond,
+    from.microsecond,
+  );
+}
+
 mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     on ConsumerState<T> {
   String get primaryStudentId;
@@ -33,6 +57,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   int get totalLessons;
   int get validityDays;
   int get monthsCount;
+  int get lessonsPerMonth;
   int get originalAmount;
   int get discountPercent;
   int get bonusLessons;
@@ -44,7 +69,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   String? get selectedLocationId;
   int get travelTimeMinutes;
 
-  void issueSubscription() async {
+  Future<void> issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
     if (selectedMembershipId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -68,13 +93,11 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     DateTime? endDate;
     int? computedTotalLessons;
+    int? computedLessonsPerMonth;
 
     if (selectedType == SubscriptionType.monthly) {
-      endDate = DateTime(
-        startDate!.year,
-        startDate!.month + monthsCount,
-        startDate!.day,
-      );
+      endDate = addMonthsClamped(startDate!, monthsCount);
+      computedLessonsPerMonth = lessonsPerMonth;
     } else if (selectedType == SubscriptionType.trial) {
       computedTotalLessons = 1;
       endDate = startDate!.add(const Duration(days: 7));
@@ -90,6 +113,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       membershipId: selectedMembershipId!,
       type: selectedType,
       totalLessons: computedTotalLessons,
+      lessonsPerMonth: computedLessonsPerMonth,
       usedLessons: 0,
       bonusCount: bonusLessons,
       bonusReason: effectiveBonusReason,
@@ -116,6 +140,14 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       final repository = ref.read(subscriptionRepositoryProvider);
       await repository.create(subscription);
 
+      // Refresh list/detail providers so the newly issued subscription is
+      // visible immediately (repository.create bypasses the notifier).
+      invalidateSubscriptionListsForStudent(
+        ref,
+        primaryStudentId,
+        membershipId: selectedMembershipId,
+      );
+
       // Update membership with location and travel time if set
       if (selectedLocationId != null || travelTimeMinutes > 0) {
         await _updateMembershipLocationTravel(
@@ -130,6 +162,14 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         subscription.membershipId,
       );
       if (teacherId != null) {
+        // Refresh teacher-scoped lists (e.g. unpaid summary) now that the
+        // teacher is known.
+        invalidateSubscriptionListsForStudent(
+          ref,
+          primaryStudentId,
+          membershipId: selectedMembershipId,
+          teacherId: teacherId,
+        );
         await ref
             .read(subscriptionIssueFlowControllerProvider)
             .activateRelationshipForSubscription(
@@ -337,7 +377,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     }
   }
 
-  void issueBatchSubscription() async {
+  Future<void> issueBatchSubscription() async {
     if (formKey.currentState?.validate() != true) return;
     if (startDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -355,13 +395,11 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     DateTime? endDate;
     int? computedTotalLessons;
+    int? computedLessonsPerMonth;
 
     if (selectedType == SubscriptionType.monthly) {
-      endDate = DateTime(
-        startDate!.year,
-        startDate!.month + monthsCount,
-        startDate!.day,
-      );
+      endDate = addMonthsClamped(startDate!, monthsCount);
+      computedLessonsPerMonth = lessonsPerMonth;
     } else if (selectedType == SubscriptionType.trial) {
       computedTotalLessons = 1;
       endDate = startDate!.add(const Duration(days: 7));
@@ -385,6 +423,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             membershipId: '',
             type: selectedType,
             totalLessons: computedTotalLessons,
+            lessonsPerMonth: computedLessonsPerMonth,
             usedLessons: 0,
             bonusCount: bonusLessons,
             bonusReason: effectiveBonusReason,
@@ -407,6 +446,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
           await repository.create(subscription);
+
+          // Refresh per-student list providers (batch bypasses the notifier).
+          invalidateSubscriptionListsForStudent(ref, studentId);
 
           if (i < lessonRequestIds.length) {
             await ref

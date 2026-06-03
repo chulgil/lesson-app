@@ -3325,6 +3325,9 @@ class AppStrings {
   /// N개월 (월정기 칩 라벨)
   static String issueFormMonthsLabel(int months) => '$months개월';
 
+  /// 월 회차 (월정기 한 달 레슨 횟수 입력 라벨)
+  static const issueFormMonthlyLessonsTitle = '월 회차';
+
   /// 체험 레슨 안내
   static const issueFormTrialNotice =
       '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.';
