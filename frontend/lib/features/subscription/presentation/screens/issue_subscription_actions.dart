@@ -11,6 +11,7 @@ import '../../../auth/presentation/widgets/phone_verification_gate_modal.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../domain/entities/subscription.dart';
+import '../../domain/repositories/subscription_repository.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_providers.dart';
 
@@ -136,9 +137,15 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       rescheduleDeadlineHours: rescheduleDeadlineHours,
     );
 
+    final repository = ref.read(subscriptionRepositoryProvider);
+    String? teacherId;
+    String? createdSubscriptionId;
+
     try {
-      final repository = ref.read(subscriptionRepositoryProvider);
-      await repository.create(subscription);
+      // create() reassigns the id (mock: new uuid / remote: server id), so the
+      // returned subscription is the source of truth — never the local one.
+      final created = await repository.create(subscription);
+      createdSubscriptionId = created.id;
 
       // Refresh list/detail providers so the newly issued subscription is
       // visible immediately (repository.create bypasses the notifier).
@@ -158,9 +165,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       }
 
       // Transition relationship to active (Issue #59)
-      final teacherId = await _getTeacherIdFromMembership(
-        subscription.membershipId,
-      );
+      teacherId = await _getTeacherIdFromMembership(created.membershipId);
       if (teacherId != null) {
         // Refresh teacher-scoped lists (e.g. unpaid summary) now that the
         // teacher is known.
@@ -175,12 +180,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             .activateRelationshipForSubscription(
               teacherId: teacherId,
               studentId: primaryStudentId,
-              subscriptionId: subscription.id,
+              subscriptionId: created.id,
             );
       }
 
       // Create schedule confirmation card for student (Issue #62)
-      await _createScheduleConfirmationCard(subscription);
+      await _createScheduleConfirmationCard(created);
 
       // Update lesson request: link proposal and set status
       if (lessonRequestId != null) {
@@ -188,7 +193,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             .read(subscriptionIssueFlowControllerProvider)
             .updateLessonRequestForIssuedSubscription(
               lessonRequestId: lessonRequestId!,
-              subscriptionId: subscription.id,
+              subscriptionId: created.id,
               status: lessonRequestStatusForIssuedSubscription(),
             );
       }
@@ -220,12 +225,18 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         }
       }
     } on PhoneVerificationRequiredException catch (_) {
+      // A post-create step hit the gate — clean up the orphan so it never
+      // surfaces as an active, unconfirmed subscription (proposal_confirm parity).
+      await _deactivateOrphanSubscription(repository, createdSubscriptionId);
       // #430 G1 §4.3 — E3 게이트. 백엔드가 미인증 선생님에게 발급 차단 시
       // 안내 다이얼로그 + 인증 화면 진입 옵션을 제공한다.
       if (mounted) {
         await PhoneVerificationGate.show(context);
       }
     } catch (e) {
+      // A post-create step failed after the subscription was created —
+      // deactivate the orphan so a retry does not duplicate issuance.
+      await _deactivateOrphanSubscription(repository, createdSubscriptionId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -234,6 +245,21 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           ),
         );
       }
+    }
+  }
+
+  /// Deactivate a subscription that was created but whose post-create wiring
+  /// (relationship / lesson-request link) failed, preventing an orphaned active
+  /// subscription. There is no hard delete, so we mark it expired (inactive).
+  Future<void> _deactivateOrphanSubscription(
+    SubscriptionRepository repo,
+    String? subscriptionId,
+  ) async {
+    if (subscriptionId == null) return;
+    try {
+      await repo.updateStatus(subscriptionId, SubscriptionStatus.expired);
+    } catch (e) {
+      debugPrint('Failed to deactivate orphan subscription: $e');
     }
   }
 
@@ -414,13 +440,26 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       int failCount = 0;
 
       final now = DateTime.now();
+      final flow = ref.read(subscriptionIssueFlowControllerProvider);
       for (int i = 0; i < allStudentIds.length; i++) {
         final studentId = allStudentIds[i];
         try {
+          // Resolve the student's membership (and teacher) so batch-issued
+          // subscriptions carry a membership id and surface in teacher-scoped
+          // lists / unpaid summary (getByTeacherId filters by membership).
+          final membership = await flow.firstMembershipForStudent(studentId);
+          final membershipId = membership?.id ?? '';
+          final teacherId = membershipId.isEmpty
+              ? null
+              : await flow.teacherIdForMembership(
+                  studentId: studentId,
+                  membershipId: membershipId,
+                );
+
           final subscription = Subscription(
             id: const Uuid().v4(),
             studentId: studentId,
-            membershipId: '',
+            membershipId: membershipId,
             type: selectedType,
             totalLessons: computedTotalLessons,
             lessonsPerMonth: computedLessonsPerMonth,
@@ -445,19 +484,25 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             totalRescheduleAllowance: rescheduleAllowance,
             rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
-          await repository.create(subscription);
+          // create() reassigns the id — link the lesson request to the
+          // persisted subscription, never the discarded local one.
+          final created = await repository.create(subscription);
 
-          // Refresh per-student list providers (batch bypasses the notifier).
-          invalidateSubscriptionListsForStudent(ref, studentId);
+          // Refresh per-student + teacher-scoped list providers (batch
+          // bypasses the notifier).
+          invalidateSubscriptionListsForStudent(
+            ref,
+            studentId,
+            membershipId: membershipId,
+            teacherId: teacherId,
+          );
 
           if (i < lessonRequestIds.length) {
-            await ref
-                .read(subscriptionIssueFlowControllerProvider)
-                .updateLessonRequestForIssuedSubscription(
-                  lessonRequestId: lessonRequestIds[i],
-                  subscriptionId: subscription.id,
-                  status: lessonRequestStatusForIssuedSubscription(),
-                );
+            await flow.updateLessonRequestForIssuedSubscription(
+              lessonRequestId: lessonRequestIds[i],
+              subscriptionId: created.id,
+              status: lessonRequestStatusForIssuedSubscription(),
+            );
           }
 
           successCount++;
