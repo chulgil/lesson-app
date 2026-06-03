@@ -1682,6 +1682,10 @@ class AppStrings {
   /// 예약 변경 실패 (스낵바)
   static const bookingRescheduleFailed = '예약 변경에 실패했습니다. 다시 시도해주세요.';
 
+  /// 예약 변경 롤백 실패 — 새 예약 취소까지 실패해 이중 예약이 남을 수 있음 (스낵바)
+  static const bookingRescheduleRollbackFailed =
+      '예약 변경에 실패했고 새 예약 정리도 실패했습니다. 예약 내역을 확인해주세요.';
+
   /// 변경권 모두 사용 (알림 제목)
   static const rescheduleCreditsAllUsedTitle = '변경권을 모두 사용했습니다';
 

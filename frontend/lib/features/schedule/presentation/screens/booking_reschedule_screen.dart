@@ -526,6 +526,10 @@ class _BookingRescheduleScreenState
     setState(() => _isLoading = true);
 
     final newSlotId = _selectedSlot!.id;
+    // Set when the old-booking cancel failed AND the rollback (cancelling the
+    // freshly booked new slot) also failed — the student may now hold two
+    // active reservations and must be warned explicitly.
+    var rollbackFailed = false;
 
     try {
       // Atomicity: book the new slot FIRST. Only cancel the old booking once
@@ -551,7 +555,17 @@ class _BookingRescheduleScreenState
           throw Exception('old booking cancel failed');
         }
       } catch (cancelError) {
-        await notifier.cancelBooking(newSlotId);
+        // Roll back the new booking so we never end up with two active
+        // reservations. If the rollback itself fails, the new slot is still
+        // booked alongside the old one — flag it so the user is told to check.
+        try {
+          await notifier.cancelBooking(newSlotId);
+          if (ref.read(slotBookingNotifierProvider).hasError) {
+            rollbackFailed = true;
+          }
+        } catch (_) {
+          rollbackFailed = true;
+        }
         rethrow;
       }
 
@@ -587,7 +601,11 @@ class _BookingRescheduleScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(AppStrings.bookingRescheduleFailed),
+            content: Text(
+              rollbackFailed
+                  ? AppStrings.bookingRescheduleRollbackFailed
+                  : AppStrings.bookingRescheduleFailed,
+            ),
             backgroundColor: AppColors.paperAccent,
           ),
         );
