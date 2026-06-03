@@ -193,6 +193,33 @@ async def test_update_lesson_status(client: AsyncClient, auth_headers, create_te
 
 
 @pytest.mark.asyncio
+async def test_update_lesson_status_invalid_value_returns_422(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """PATCH /status with an unknown status value returns 422, not a 500 (GitHub #470)."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    create_resp = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={
+            "student_id": "student-001",
+            "date": "2026-03-10",
+            "duration": 60,
+        },
+    )
+    lesson_id = create_resp.json()["id"]
+
+    response = await client.patch(
+        f"/api/v1/lessons/{lesson_id}/status",
+        headers=auth_headers,
+        json={"status": "definitely-not-a-status"},
+    )
+    assert response.status_code == 422
+    assert response.status_code != 500
+
+
+@pytest.mark.asyncio
 async def test_update_lesson_feedback(client: AsyncClient, auth_headers, create_test_user):
     """PUT /api/v1/lessons/{id}/feedback writes feedback on a lesson."""
     await create_test_user(user_id="test-user-id", role="teacher")

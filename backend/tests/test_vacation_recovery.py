@@ -13,7 +13,9 @@ from datetime import UTC, date, datetime, timedelta
 from uuid import uuid4
 
 import pytest
+from freezegun import freeze_time
 from httpx import AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import create_access_token
@@ -27,6 +29,9 @@ from app.models.schedule import (
 )
 from app.models.student import Student
 from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
+from app.schemas.vacation import VacationDisposition as SchemaVacationDisposition
+from app.schemas.vacation import VacationPeriodCreate
+from app.services.vacation_service import VacationService
 
 
 def _headers(user_id: str = "test-user-id") -> dict[str, str]:
@@ -341,3 +346,165 @@ async def test_cancel_already_cancelled_returns_400(
         headers=_headers("t-dup"),
     )
     assert response.status_code == 400
+
+
+# ----------------------------------------------------------------------------
+# #470 Part 1a — KST midnight boundary in cancel_vacation
+# ----------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+# Frozen at UTC 2026-08-31 16:30 → KST 2026-09-01 01:30. The UTC *date* (Aug 31)
+# lags the KST *date* (Sep 1) by a day. A vacation starting "today" in KST
+# (Sep 1) must stay cancellable; comparing against now.date() (UTC Aug 31)
+# would treat start_date (Sep 1) as future and (correctly) allow it, while a
+# vacation starting *yesterday* in KST (Aug 31) must be blocked. The hazard is
+# the off-by-one: under the old UTC compare, an Aug-31-KST start equals UTC
+# today and is wrongly treated as not-yet-started.
+@freeze_time("2026-08-31 16:30:00")
+async def test_cancel_uses_kst_today_for_started_check(
+    db_session: AsyncSession,
+):
+    """Near KST midnight, the started-check uses the KST calendar date.
+
+    A vacation whose start_date is *today in KST* is still cancellable; one that
+    started *yesterday in KST* is blocked — even though the UTC date still reads
+    as the prior day.
+    """
+    from fastapi import HTTPException
+
+    teacher_id = "teacher-kst-boundary"
+
+    # start_date == KST today (Sep 1) → cancellable.
+    today_kst_period = await _seed_vacation(
+        db_session,
+        teacher_id,
+        start=date(2026, 9, 1),
+        end=date(2026, 9, 5),
+        created_hours_ago=1,
+    )
+    # start_date == KST yesterday (Aug 31) → already started → blocked.
+    started_period = await _seed_vacation(
+        db_session,
+        teacher_id,
+        start=date(2026, 8, 31),
+        end=date(2026, 9, 4),
+        created_hours_ago=1,
+    )
+    await db_session.commit()
+
+    service = VacationService(db_session)
+
+    # KST-today start: cancel succeeds.
+    resp = await service.cancel_vacation(today_kst_period, teacher_id)
+    assert resp.cancelled_at is not None
+
+    # KST-yesterday start: blocked with 409 (already started).
+    with pytest.raises(HTTPException) as exc:
+        await service.cancel_vacation(started_period, teacher_id)
+    assert exc.value.status_code == 409
+
+
+# ----------------------------------------------------------------------------
+# #470 Part 1b — revert must not reduce freeCancel / unrelated subscriptions
+# ----------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")  # KST 12:00 — alimtalk send window
+async def test_cancel_revert_does_not_reduce_freecancel_subscription(
+    db_session: AsyncSession,
+):
+    """A freeCancel subscription is never extended, so cancel must not subtract.
+
+    Registration extends auto_extended_days only for rollForward subscriptions.
+    On cancel, the revert must mirror that — a freeCancel subscription that
+    carried an *unrelated* prior extension must keep it intact.
+    """
+    teacher_id = "teacher-revert-iso"
+    lesson_class_id = await _seed_lesson_class(db_session, teacher_id)
+    _, sub_id = await _seed_booking_with_subscription(
+        db_session, teacher_id, lesson_class_id, date(2026, 8, 2)
+    )
+
+    # Unrelated prior extension on this subscription (e.g. an earlier vacation).
+    sub = await db_session.get(Subscription, sub_id)
+    sub.auto_extended_days = 3
+    await db_session.commit()
+
+    service = VacationService(db_session)
+    period = await service.register_vacation(
+        teacher_id,
+        VacationPeriodCreate(
+            start_date=date(2026, 8, 1),
+            end_date=date(2026, 8, 5),
+            default_disposition=SchemaVacationDisposition.freeCancel,
+        ),
+    )
+
+    # freeCancel does NOT extend → the prior 3 days are untouched at register.
+    await db_session.refresh(sub)
+    assert sub.auto_extended_days == 3
+
+    await service.cancel_vacation(period.id, teacher_id)
+
+    # Revert must leave the unrelated 3 days intact (no over-subtraction).
+    await db_session.refresh(sub)
+    assert sub.auto_extended_days == 3
+
+    # And the freeCancel booking is restored to confirmed.
+    booking = (
+        await db_session.scalars(
+            select(LessonBooking).where(LessonBooking.subscription_id == sub_id)
+        )
+    ).first()
+    assert booking is not None
+    assert booking.status == BookingStatus.confirmed
+    assert booking.vacation_period_id is None
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")  # KST 12:00 — alimtalk send window
+async def test_cancel_revert_subtracts_only_rollforward_subscription(
+    db_session: AsyncSession,
+):
+    """Mixed dispositions: only the rollForward subscription is reverted.
+
+    Two students share the teacher's vacation window — one rollForward, one
+    freeCancel (per-student override). Cancel must subtract the vacation days
+    from the rollForward subscription only.
+    """
+    teacher_id = "teacher-revert-mixed"
+    lesson_class_id = await _seed_lesson_class(db_session, teacher_id)
+    roll_student, roll_sub = await _seed_booking_with_subscription(
+        db_session, teacher_id, lesson_class_id, date(2026, 8, 2)
+    )
+    free_student, free_sub = await _seed_booking_with_subscription(
+        db_session, teacher_id, lesson_class_id, date(2026, 8, 3)
+    )
+    await db_session.commit()
+
+    service = VacationService(db_session)
+    period = await service.register_vacation(
+        teacher_id,
+        VacationPeriodCreate(
+            start_date=date(2026, 8, 1),
+            end_date=date(2026, 8, 5),
+            default_disposition=SchemaVacationDisposition.rollForward,
+            per_student_disposition={free_student: SchemaVacationDisposition.freeCancel},
+        ),
+    )
+
+    roll = await db_session.get(Subscription, roll_sub)
+    free = await db_session.get(Subscription, free_sub)
+    await db_session.refresh(roll)
+    await db_session.refresh(free)
+    assert roll.auto_extended_days == 5  # rollForward extended
+    assert free.auto_extended_days == 0  # freeCancel never extended
+
+    await service.cancel_vacation(period.id, teacher_id)
+
+    await db_session.refresh(roll)
+    await db_session.refresh(free)
+    assert roll.auto_extended_days == 0  # reverted
+    assert free.auto_extended_days == 0  # untouched (no negative / no spurious change)
