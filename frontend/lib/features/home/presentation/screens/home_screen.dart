@@ -12,6 +12,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/presentation/providers/onboarding_progress_storage_provider.dart';
 import '../../../onboarding/presentation/widgets/first_availability_interstitial.dart';
 import '../../../profile/profile_ui_facade.dart';
+import '../../../settings/settings_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_ui_facade.dart';
 import '../providers/teacher_profile_completion_provider.dart';
@@ -71,8 +72,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// The dialog itself blocks back-navigation and dismiss, so we only
   /// trigger it once per session — the slot count flips immediately
   /// after the teacher saves a slot, so it will not reopen.
+  ///
+  /// Only decide after settings have finished loading: [hasAvailableSlots]
+  /// derives from [teacherSettingsProvider] and reports `false` while still
+  /// loading, which would otherwise flash the interstitial at teachers who
+  /// already have slots. (#5 D-G3 — settings/profile SSOT)
   void _maybeShowFirstAvailabilityInterstitial() {
     if (_interstitialShown) return;
+    final settingsAsync = ref.read(teacherSettingsProvider);
+    if (!settingsAsync.hasValue) {
+      // Settings not loaded yet — re-check once a value arrives.
+      ref.listenManual(teacherSettingsProvider, (previous, next) {
+        if (next.hasValue && mounted) {
+          _maybeShowFirstAvailabilityInterstitial();
+        }
+      });
+      return;
+    }
     final hasSlots = ref.read(hasAvailableSlotsProvider);
     if (hasSlots) return;
     _interstitialShown = true;

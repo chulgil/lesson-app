@@ -109,6 +109,7 @@ class _CancellationDefaultsContent extends StatefulWidget {
 class _CancellationDefaultsContentState
     extends State<_CancellationDefaultsContent> {
   late TextEditingController _messageController;
+  late TextEditingController _deadlineController;
 
   @override
   void initState() {
@@ -116,11 +117,15 @@ class _CancellationDefaultsContentState
     _messageController = TextEditingController(
       text: widget.defaults.studentCompensationExtraMinutesMessage ?? '',
     );
+    _deadlineController = TextEditingController(
+      text: widget.defaults.cancellationDeadlineHours.toString(),
+    );
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _deadlineController.dispose();
     super.dispose();
   }
 
@@ -177,9 +182,7 @@ class _CancellationDefaultsContentState
                       borderSide: BorderSide(color: AppColors.inkQuaternary),
                     ),
                   ),
-                  controller: TextEditingController(
-                    text: widget.defaults.cancellationDeadlineHours.toString(),
-                  ),
+                  controller: _deadlineController,
                   onChanged: (value) {
                     final hours = int.tryParse(value);
                     if (hours != null && hours > 0) {
