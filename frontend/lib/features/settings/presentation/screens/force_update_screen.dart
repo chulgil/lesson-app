@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,6 +33,9 @@ class ForceUpdateScreen extends StatelessWidget {
     'APP_STORE_ID',
     defaultValue: '',
   );
+
+  /// Android application id, used to deep-link to the Play Store listing.
+  static const String _androidPackage = 'app.lessonaza';
 
   static const String _appName = 'lessonaza';
 
@@ -84,19 +89,42 @@ class ForceUpdateScreen extends StatelessWidget {
   }
 
   Future<void> _openStore(BuildContext context) async {
-    // Direct product page when the App Store id is configured, otherwise a
-    // store search so the button is never a NO-OP. (#5 D-G3)
-    final target =
-        _appStoreId.isNotEmpty
-            ? Uri.parse('https://apps.apple.com/app/$_appName/id$_appStoreId')
-            : Uri.parse('https://apps.apple.com/search?term=$_appName');
+    // Route to the platform's own store; Android must go to the Play Store,
+    // not the App Store. (#5 D-G3)
+    final targets = storeTargets(isAndroid: Platform.isAndroid);
 
-    final launched = await _tryLaunch(target);
-    if (!launched && context.mounted) {
+    for (final target in targets) {
+      if (await _tryLaunch(target)) return;
+    }
+    if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(AppStrings.forceUpdateStoreUnavailable)),
       );
     }
+  }
+
+  /// Ordered list of store deep links to try for the running platform.
+  ///
+  /// Android: prefer the `market://` scheme (opens the Play app directly),
+  /// falling back to the https listing for devices without the Play app.
+  /// Apple: direct product page when the id is configured, otherwise a store
+  /// search so the button is never a NO-OP.
+  @visibleForTesting
+  static List<Uri> storeTargets({required bool isAndroid}) {
+    if (isAndroid) {
+      return [
+        Uri.parse('market://details?id=$_androidPackage'),
+        Uri.parse(
+          'https://play.google.com/store/apps/details?id=$_androidPackage',
+        ),
+      ];
+    }
+    return [
+      if (_appStoreId.isNotEmpty)
+        Uri.parse('https://apps.apple.com/app/$_appName/id$_appStoreId')
+      else
+        Uri.parse('https://apps.apple.com/search?term=$_appName'),
+    ];
   }
 
   Future<bool> _tryLaunch(Uri uri) async {
