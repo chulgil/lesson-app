@@ -7784,6 +7784,11 @@ class AppStrings {
   static const vacationDispositionRollForwardDescription =
       '수강권 만료일이 휴가 일수만큼 자동 연장';
 
+  /// 이월 선택 시 예상 자동 연장 일수 안내 (autoExtendedDays).
+  /// 계산은 BE 가 확정하며 FE 는 휴가 일수 기준 예상치만 표시. TODO(remote).
+  static String vacationAutoExtendProjection(int days) =>
+      '수강권 만료일이 약 $days일 자동 연장됩니다.';
+
   // ── 학생별 처리 옵션 (spec §4.2) ────────────────────────────────────
 
   /// 학생별 long-press BottomSheet 제목.
@@ -7798,6 +7803,97 @@ class AppStrings {
   /// override 적용된 카드의 라벨 prefix (예: "다른 처리: 보강 크레딧 적립").
   static String vacationPerStudentOverrideLabel(String dispositionLabel) =>
       '다른 처리: $dispositionLabel';
+
+  // ── 가용시간 화면 휴가 배너 (spec §4 캘린더 시각화) ─────────────────
+
+  /// 가용시간 화면에 노출되는 휴가 구간 배너 제목.
+  static const vacationBannerTitle = '등록된 휴가';
+
+  /// 휴가 배너 안내 — 해당 기간 예약 불가.
+  static const vacationBannerHint = '이 기간에는 학생 예약이 잡히지 않아요.';
+
+  // ── 보강 크레딧 / Makeup Credit (#432) ──────────────────────────────
+  // Spec: docs/specs/subscription/makeup_credit_spec.md
+
+  /// 보강 크레딧 카드/섹션 제목.
+  static const makeupCreditTitle = '보강 크레딧';
+
+  /// 보유 크레딧 라벨 (학생 카드).
+  static String makeupCreditBalanceLabel(int count) => '보유: $count회';
+
+  /// 가장 빠른 만료 라벨 (D-day 포함).
+  static String makeupCreditEarliestExpiry(String date, int dDay) =>
+      '가장 빠른 만료: $date(D-$dDay)';
+
+  /// 보유 크레딧 0회 안내.
+  static const makeupCreditEmpty = '보유한 보강 크레딧이 없어요.';
+
+  /// 내역 섹션 헤더.
+  static String makeupCreditHistoryHeader(int count) => '내역 ($count건)';
+
+  /// 적립 내역 라벨 (예: "8/3 적립 — 선생님 휴가").
+  static String makeupCreditAccruedLine(String date, String reason) =>
+      '$date 적립 — $reason';
+
+  /// 사용 내역 라벨 (예: "8/20 사용 — 정규 레슨").
+  static String makeupCreditUsedLine(String date) => '$date 사용 — 보강 레슨';
+
+  // 적립 사유 라벨 (MakeupCreditReason).
+  static const makeupCreditReasonTeacherVacation = '선생님 휴가';
+  static const makeupCreditReasonNoShowExempt = '노쇼 면제';
+  static const makeupCreditReasonBulkChangeLoss = '일정 일괄 변경';
+  static const makeupCreditReasonManualGrant = '선생님 지급';
+
+  // 선생님 측 관리.
+
+  /// 선생님 측 학생별 크레딧 관리 섹션 제목.
+  static const makeupCreditManageTitle = '보강 크레딧 관리';
+
+  /// 수동 지급 버튼.
+  static const makeupCreditGrantButton = '수동 지급';
+
+  /// 수동 지급 확인 다이얼로그 제목.
+  static const makeupCreditGrantConfirmTitle = '보강 크레딧을 지급할까요?';
+
+  /// 수동 지급 확인 본문.
+  static const makeupCreditGrantConfirmBody = '학생에게 보강 1회 크레딧을 지급해요. (만료 30일)';
+
+  /// 지급 성공 스낵바.
+  static const makeupCreditGrantSuccess = '보강 크레딧을 지급했어요.';
+
+  /// 지급 실패 스낵바.
+  static const makeupCreditGrantFailed = '보강 크레딧 지급에 실패했어요.';
+
+  /// 회수 버튼.
+  static const makeupCreditRevokeButton = '회수';
+
+  /// 회수 성공 스낵바.
+  static const makeupCreditRevokeSuccess = '보강 크레딧을 회수했어요.';
+
+  /// 회수 실패 스낵바 (이미 사용된 크레딧 등).
+  static const makeupCreditRevokeFailed = '보강 크레딧을 회수하지 못했어요.';
+
+  /// 사용 완료 배지.
+  static const makeupCreditUsedBadge = '사용됨';
+
+  /// 만료 배지.
+  static const makeupCreditExpiredBadge = '만료';
+
+  // 예약 시 크레딧 사용 선택 (spec §5.1).
+
+  /// "정규 수강권 사용" 옵션 라벨.
+  static const makeupCreditUseRegularLabel = '정규 수강권 사용';
+
+  /// 정규 잔여 회차 라벨.
+  static String makeupCreditRegularRemaining(int remaining, int total) =>
+      '남은 회차: $remaining/$total회';
+
+  /// "보강 크레딧 사용" 옵션 라벨.
+  static const makeupCreditUseCreditLabel = '보강 크레딧 사용';
+
+  /// 보유 크레딧 + 만료일 라벨.
+  static String makeupCreditUseCreditSubtitle(int count, String expiry) =>
+      '보유 크레딧: $count회 (만료: $expiry)';
 
   // ── First Availability Quest (#422) ─────────────────────────────────
   // Spec: docs/specs/onboarding/teacher_first_availability_setup.md
