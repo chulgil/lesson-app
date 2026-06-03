@@ -11,6 +11,7 @@ import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/presentation/providers/onboarding_progress_storage_provider.dart';
 import '../../../onboarding/presentation/widgets/first_availability_interstitial.dart';
+import '../../../profile/domain/entities/teacher_settings.dart';
 import '../../../profile/profile_ui_facade.dart';
 import '../../../settings/settings_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
@@ -66,6 +67,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   bool _interstitialShown = false;
+  // Subscription used to wait for settings to load before deciding whether to
+  // show the first-availability interstitial. Held so it can be closed on
+  // dispose and not leaked. (#9)
+  ProviderSubscription<AsyncValue<TeacherSettings>>? _settingsLoadSub;
 
   /// Show the first-availability interstitial when the teacher lands on
   /// the home screen without any active availability slot (#422).
@@ -81,9 +86,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (_interstitialShown) return;
     final settingsAsync = ref.read(teacherSettingsProvider);
     if (!settingsAsync.hasValue) {
-      // Settings not loaded yet — re-check once a value arrives.
-      ref.listenManual(teacherSettingsProvider, (previous, next) {
+      // Settings not loaded yet — re-check once a value arrives. Hold the
+      // subscription so it can be closed (it would otherwise leak for the
+      // lifetime of the container). (#9)
+      _settingsLoadSub?.close();
+      _settingsLoadSub = ref.listenManual(teacherSettingsProvider, (
+        previous,
+        next,
+      ) {
         if (next.hasValue && mounted) {
+          _settingsLoadSub?.close();
+          _settingsLoadSub = null;
           _maybeShowFirstAvailabilityInterstitial();
         }
       });
@@ -113,6 +126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    _settingsLoadSub?.close();
     _coachMarkController.removeListener(_onCoachMarkChanged);
     _coachMarkController.dispose();
     super.dispose();
