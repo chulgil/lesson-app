@@ -32,7 +32,10 @@ List<GoRoute> inviteRoutes = [
   GoRoute(
     path: AppRoutes.inviteCode,
     name: 'inviteCode',
-    builder: (context, state) => const CodeInputScreen(),
+    // Deep links (lessonapp://invite/{code}) pass the 6-digit code via the
+    // `?code=` query param so the field prefills + auto-verifies.
+    builder: (context, state) =>
+        CodeInputScreen(initialCode: state.uri.queryParameters['code']),
   ),
 
   // Confirm Connection
@@ -40,7 +43,10 @@ List<GoRoute> inviteRoutes = [
     path: AppRoutes.inviteConfirm,
     name: 'inviteConfirm',
     builder: (context, state) {
-      final invite = state.extra as Invite;
+      // Nullable cast: the Invite extra can be lost (e.g. deep-link cold start,
+      // process death). Fall back to code re-entry instead of crashing.
+      final invite = state.extra as Invite?;
+      if (invite == null) return const CodeInputScreen();
       return InviteConfirmScreen(invite: invite);
     },
   ),

@@ -76,6 +76,23 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     ref.invalidate(teacherSettingsProvider);
   }
 
+  /// Restore the last known-good value after a failed mutation instead of
+  /// flipping the whole notifier into an error state.
+  ///
+  /// The settings screen renders `state.when(error: ...)` as a full-screen
+  /// error, which would blank a working screen on a transient PUT failure and
+  /// discard the user's other (already-applied) values. Rolling back to
+  /// [previous] keeps the screen usable; if there was no prior value we fall
+  /// back to the error state so the first load can still surface failures.
+  /// These callers are fire-and-forget, so we do not rethrow. (#6 / #19)
+  void _rollbackOrError(TeacherSettings? previous, Object e, StackTrace st) {
+    if (previous != null) {
+      state = AsyncValue.data(previous);
+    } else {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   /// Add an instrument to the list
   Future<void> addInstrument(String instrument) async {
     final current = state.value;
@@ -134,73 +151,73 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
 
   /// Update default lesson duration
   Future<void> updateDefaultDuration(int duration) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.updateDefaultDuration(duration);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
   /// Add a custom lesson duration
   Future<void> addCustomDuration(int duration) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.addCustomDuration(duration);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
   /// Remove a custom lesson duration
   Future<void> removeCustomDuration(int duration) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.removeCustomDuration(duration);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
   /// Toggle duration active/disabled state
   Future<void> toggleDuration(int duration, bool isActive) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.toggleDuration(duration, isActive);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
   /// Update a time slot
   Future<void> updateTimeSlot(TimeSlot slot) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.updateTimeSlot(slot);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
   /// Toggle time slot active status
   Future<void> toggleTimeSlot(String slotId, bool isActive) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.toggleTimeSlot(slotId, isActive);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
@@ -228,8 +245,11 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
   /// Used by the first-availability onboarding quest (#422) to commit
   /// multiple new slots derived from the simple multi-day chip UI.
   Future<void> replaceAvailableSlots(List<TimeSlot> slots) async {
-    final current = state.value;
-    if (current == null) return;
+    // The notifier is lazy: when the only watchers are the read-side
+    // FutureProvider (home/quest), this notifier may be cold so `state.value`
+    // is null on the first call. Warm it from the repository instead of
+    // silently no-op'ing, which previously surfaced as "저장 실패". (#5 D-G3)
+    final current = state.value ?? await future;
 
     state = AsyncValue.data(current.copyWith(availableSlots: slots));
     try {
@@ -251,25 +271,25 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
 
   /// Update break time between lessons
   Future<void> updateBreakTime(int minutes) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.updateBreakTime(minutes);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 
   /// Update minimum booking hours
   Future<void> updateMinBookingHours(int hours) async {
-    state = const AsyncValue.loading();
+    final current = state.value;
     try {
       final updated = await _repository.updateMinBookingHours(hours);
       state = AsyncValue.data(updated);
       _refreshReadSide();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      _rollbackOrError(current, e, st);
     }
   }
 

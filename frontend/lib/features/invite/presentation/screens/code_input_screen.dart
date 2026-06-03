@@ -16,7 +16,11 @@ import '../../../profile/profile_facade.dart';
 
 /// Screen for entering a 6-digit invite code
 class CodeInputScreen extends ConsumerStatefulWidget {
-  const CodeInputScreen({super.key});
+  const CodeInputScreen({super.key, this.initialCode});
+
+  /// Pre-filled 6-digit code from a deep link (lessonapp://invite/{code}).
+  /// When valid, the field auto-fills and submission runs automatically.
+  final String? initialCode;
 
   @override
   ConsumerState<CodeInputScreen> createState() => _CodeInputScreenState();
@@ -35,6 +39,18 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
   @override
   void initState() {
     super.initState();
+    // Deep-link prefill: fill digits + auto-submit when a valid 6-digit code
+    // arrives via the route's ?code= query param.
+    final initial = widget.initialCode;
+    if (initial != null && RegExp(r'^[0-9]{6}$').hasMatch(initial)) {
+      for (int i = 0; i < 6; i++) {
+        _controllers[i].text = initial[i];
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _submitCode();
+      });
+      return;
+    }
     // Auto-focus first field
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNodes[0].requestFocus();

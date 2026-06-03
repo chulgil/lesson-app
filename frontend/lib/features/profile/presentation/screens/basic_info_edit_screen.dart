@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/address_search_field.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/profile_facade.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../students/students_ui_facade.dart';
@@ -44,6 +45,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   String? _addressDetail;
 
   bool _isLoading = false;
+  // True once the form has been populated from a loaded profile. Prevents a
+  // cold-load Save from PUTting empty/default fields over the real ones. (#2)
+  bool _syncedFromProfile = false;
 
   static const int _minIntroductionLength = 20;
   static const int _maxSpecialties = 5;
@@ -69,23 +73,32 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   }
 
   void _loadExistingData() {
-    final profileState = ref.read(teacherExtendedProfileProvider);
-    final profile = profileState.valueOrNull;
+    final profile = ref.read(teacherExtendedProfileProvider).valueOrNull;
     if (profile != null) {
-      _nameController.text = profile.name;
-      _nicknameController.text = profile.nickname ?? profile.name;
-      _introductionController.text = profile.introduction;
-      _teachingStyleController.text = profile.teachingStyle ?? '';
-      if (profile.specialties != null) {
-        _selectedSpecialties.addAll(profile.specialties!);
-      }
-      if (profile.lessonAreas != null) {
-        _lessonAreas.addAll(profile.lessonAreas!);
-      }
-      _postalCode = profile.postalCode;
-      _address = profile.address;
-      _addressDetail = profile.addressDetail;
+      _populateFromProfile(profile);
     }
+  }
+
+  /// Populate every field/controller from [profile]. Called from initState and
+  /// again from a listener when the profile resolves after the screen opened —
+  /// otherwise a cold-load Save would PUT empty fields and wipe nickname,
+  /// specialties, areas and address. Skipped once synced. (#2)
+  void _populateFromProfile(TeacherProfile profile) {
+    if (_syncedFromProfile) return;
+    _syncedFromProfile = true;
+    _nameController.text = profile.name;
+    _nicknameController.text = profile.nickname ?? profile.name;
+    _introductionController.text = profile.introduction;
+    _teachingStyleController.text = profile.teachingStyle ?? '';
+    if (profile.specialties != null) {
+      _selectedSpecialties.addAll(profile.specialties!);
+    }
+    if (profile.lessonAreas != null) {
+      _lessonAreas.addAll(profile.lessonAreas!);
+    }
+    _postalCode = profile.postalCode;
+    _address = profile.address;
+    _addressDetail = profile.addressDetail;
   }
 
   @override
@@ -162,6 +175,17 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Guard against saving before the profile has loaded — otherwise unedited
+    // fields (nickname, specialties, areas, address) would be PUT as empty and
+    // overwrite the real values. (#2)
+    if (!_syncedFromProfile &&
+        ref.read(teacherExtendedProfileProvider).valueOrNull == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.profileSaveErrorRetry)),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -206,6 +230,15 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Populate the form when the profile resolves after the screen opened, so
+    // a cold-load Save cannot wipe existing fields with empty values. (#2)
+    ref.listen(teacherExtendedProfileProvider, (previous, next) {
+      final profile = next.valueOrNull;
+      if (profile != null && mounted) {
+        setState(() => _populateFromProfile(profile));
+      }
+    });
+
     final userId = _userId;
     final profileImagePath =
         ref.watch(profileImageNotifierProvider(userId)).valueOrNull;
