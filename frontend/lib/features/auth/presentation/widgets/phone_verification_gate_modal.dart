@@ -77,8 +77,12 @@ class _PhoneVerificationGateDialog extends StatelessWidget {
                 minimumSize: const Size(0, AppSpacing.buttonHeight),
               ),
               onPressed: () {
+                // Capture the router BEFORE popping. After pop this dialog's
+                // context is dead, so `context.go` here would target a defunct
+                // element. We navigate via the captured router instead.
+                final router = GoRouter.of(context);
                 Navigator.of(context).pop(true);
-                context.go(AppRoutes.teacherPhoneVerification);
+                router.go(AppRoutes.teacherPhoneVerification);
               },
               child: const Text(AppStrings.phoneVerificationGateCtaVerifyNow),
             ),
