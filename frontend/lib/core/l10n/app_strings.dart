@@ -4148,6 +4148,10 @@ class AppStrings {
   /// 입금 확인 → 수강권 발급 (확인 버튼)
   static const paymentVerifyToIssueButton = '입금 확인 → 수강권 발급';
 
+  /// 학생이 아직 수강권을 선택하지 않았습니다 (멀티초이스 미선택 가드)
+  static const proposalAwaitingTemplateSelection =
+      '학생이 아직 수강권을 선택하지 않았습니다';
+
   /// 입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까? (Inquiry 다이얼로그 본문)
   static const paymentInquiryDialogBody =
       '입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까?';
