@@ -6741,6 +6741,11 @@ class AppStrings {
   static const profileGuidanceMessageSection = '레슨 요청 안내';
   static const profileTrialLessonSection = '체험레슨 설정';
   static const profileTrialLessonFree = '체험레슨 무료';
+  // Trial-free toggle subtitles. The setting only controls whether the trial
+  // lesson is charged (reference price 0); it does NOT skip the subscription
+  // proposal / time-confirmation flow. Worded to match actual behavior. (#18)
+  static const profileTrialLessonFreeOn = '체험레슨 수강료를 받지 않아요 (참고가 0원)';
+  static const profileTrialLessonFreeOff = '체험레슨도 수강료를 부과해요';
   static const profilePriceTableSection = '레슨 가격표';
   static const profilePriceTableHint = '예: 50000';
 
