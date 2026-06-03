@@ -1112,6 +1112,33 @@ enum LessonType {
 
 > 코드 위치: `features/schedule/domain/entities/lesson_booking.dart`
 
+### 10.9 LessonVisibility (2개 값) (코드 반영 2026-06-03)
+
+```dart
+enum LessonVisibility {
+  academyFull,      // 학원에 전체 노출 (기본값)
+  academyBusyOnly,  // 학원에는 "바쁨"으로만 노출 (개인 레슨 프라이버시)
+}
+```
+
+학원 소속 선생님이 개인 레슨을 등록할 때, 학원 캘린더에 레슨 상세를 공개할지(`academyFull`) 시간 점유만 표시할지(`academyBusyOnly`) 결정한다. `Lesson.visibility` 필드의 기본값은 `academyFull`.
+
+> 코드 위치: `features/academy/domain/entities/academy_enums.dart` (Lesson 엔티티가 import). `RegularLessonRegistration.isAcademyPrivate == true`이면 `academyBusyOnly`로 설정됨 (`core/booking/entities/lesson_booking.dart`).
+
+### 10.10 Lesson 엔티티 추가 필드 (코드 반영 2026-06-03)
+
+§5.2(레슨 노트 필드)와 §15.2(아카이브 필드 `isArchived`/`archivedAt`) 외에, `Lesson` 엔티티에는 다음 필드도 존재한다.
+
+| 필드 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `academyId` | `String?` | null | 레슨이 학원에 연결된 경우 학원 ID (null = 개인 레슨, §9.2 organizationId 규칙과 동일 의미) |
+| `visibility` | `LessonVisibility` | `academyFull` | 학원 캘린더 노출 수준 (§10.9) |
+| `isPreview` | `bool` | false | 미리보기 레슨 — 수강권 범위를 넘어선(잔여 회차 초과) 레슨을 캘린더에 미리 표시할 때 true |
+| `travelTimeMinutes` | `int` | 0 | 이 레슨 종료 후 선생님 이동 시간(분) |
+| `studentNote` | `String?` | null | 학생이 직접 남기는 레슨 메모 (선생님 피드백과 별개) |
+
+> 코드 위치: `features/lessons/domain/entities/lesson.dart`
+
 ---
 
 ## 11. 구현 파일 매핑
@@ -1342,6 +1369,7 @@ frontend/lib/features/schedule/
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-06-03 | 코드→스펙 드리프트 반영: §10.9 LessonVisibility enum 추가, §10.10 Lesson 엔티티 추가 필드(academyId/visibility/isPreview/travelTimeMinutes/studentNote) 문서화 |
 | 2026-04-23 | §13.2 DRIFT 검증 반영: 레슨 장소 10→60%, 스케줄 확인 카드 10→50%, FCM 0→40% (인프라 완성 반영), 레슨 노트 히스토리 완료→부분 70% (BROKEN 라우트 미등록 표기) |
 | 2026-03-07 | Enum 정의 완전성 보강 (LessonStatus 10값 등), 구현 파일 매핑 추가, 경쟁사 차별점 추가, schedule_master 상호 참조, attendance/gamification 스펙 참조 추가, 깨진 링크 수정 |
 | 2026-03-06 | Master Spec 초안 작성 - 15개 개별 스펙 통합 |
@@ -1708,3 +1736,15 @@ void showLessonActionSheet({
 - `RepertoireArchiveScreen` 보관함 화면
 
 카드 long-press 메뉴에서 "삭제" → "보관"으로 통일.
+
+## 16. 코드 반영 추가 — Booking enums (2026-06-03)
+
+> 코드에는 존재하나 본 스펙에 누락되어 있던 예약(booking) 도메인 enum 3종을 단방향(코드→스펙)으로 반영. 출처: `frontend/lib/core/booking/entities/lesson_booking.dart` (Clean Architecture 정리로 `features/schedule/domain/entities/`에서 `core/booking/`으로 이전됨 — §10.2/§11.1의 옛 경로 표기 정정).
+
+| enum | 값 | 용도 |
+|------|-----|------|
+| `ScheduleType` | `fixed`(고정 시간) / `flexible`(유동 시간) | 정규 레슨의 시간 편성 방식 |
+| `LessonGoal` | `hobby`(취미) / `exam`(입시) / `major`(전공) | 체험 레슨 신청 시 학습 목표 |
+| `ExperienceLevel` | `none`(처음) / `beginner`(1년 미만) / `some`(1-3년) / `experienced`(3년 이상) | 체험 레슨 신청 시 경험 수준. `ExperienceLevel.fromStudentLevel()`로 `StudentLevel`에서 매핑 |
+
+> 참고: `LessonType`(trial/regular/oneTime), `BookingStatus`(7값 + isActive/canStudentModify/canRequestChange/canCancel/canRetry 헬퍼)도 동일 파일에 정의되어 있다. `RegularLessonRegistration.isAcademyPrivate`/`academyId` 필드는 academy 도메인 스펙에서 다룬다.

@@ -646,7 +646,20 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | **Screen** | `presentation/screens/notification_list_screen.dart` | 알림 목록 화면 |
 | **Widget** | `presentation/widgets/notification_bell_icon.dart` | 앱바 알림 벨 아이콘 |
 | **Widget** | `presentation/widgets/notification_item.dart` | 개별 알림 항목 위젯 |
+| **Widget** | `presentation/widgets/context_switch_toast.dart` | 컨텍스트(선생님/원장) 전환 완료 토스트 (3초 자동 해제) (코드 반영 2026-06-03) |
+| **Navigation** | `presentation/navigation/notification_navigation_target.dart` | 알림 → 딥링크 타깃 해석(`resolveNotificationNavigationTarget`) (코드 반영 2026-06-03) |
+| **Screen** | `presentation/screens/academy_announcements_screen.dart` | 학원 공지 목록 (academy 데이터 소비) (코드 반영 2026-06-03) |
+| **Screen** | `presentation/screens/academy_announcement_detail_screen.dart` | 학원 공지 상세 (코드 반영 2026-06-03) |
 | **Route** | `core/router/routes/notification_routes.dart` | 알림 관련 라우트 정의 |
+
+### 알림 딥링크 viewerRole 전달 정책 (코드 반영 2026-06-03)
+
+> 코드: `resolveNotificationNavigationTarget(notification, {viewerRole})` (`notification_navigation_target.dart`)
+
+`actionUrl`이 비어 있지 않은 알림을 탭하면 해당 URL로 이동한다. 다음 경우에는 `extra`에 `{'viewerRole': ...}`를 함께 전달하여 도착 화면이 역할별로 분기하도록 한다.
+
+- `actionUrl`이 `/subscriptions/` 또는 `/schedule/request/` 로 시작
+- `type`이 `scheduleChange*`, `subscriptionExpiringSoon`, `subscriptionExpired`, `paymentReceived`, `paymentRequested`, `paymentReminder`, `paymentConfirmed` 중 하나
 
 ---
 

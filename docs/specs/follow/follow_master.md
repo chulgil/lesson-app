@@ -316,9 +316,58 @@ Future<List<Follow>> followingByType(Ref ref, FollowTargetType type) async {
 
 ---
 
-## 8. 변경 이력
+## 8. 코드 반영 추가 (2026-06-03)
+
+> 코드에 구현되어 있으나 §4 데이터 모델에 누락되어 있던 피드 게시물(TeacherPost) 모델을 단방향(코드→스펙)으로 반영. §3.2 FollowFeedScreen이 표시하는 소식의 실제 데이터 모델이다.
+
+> 소스: `domain/entities/teacher_post.dart`, `domain/repositories/post_repository.dart`, `data/repositories/{mock,remote}_post_repository.dart`, `presentation/providers/post_providers.dart`, `presentation/extensions/teacher_post_visuals.dart`
+
+### 8.1 PostType enum (코드 반영 2026-06-03)
+
+| 값 | 의미 |
+|----|------|
+| `performance` | 공연/발표회 안내 |
+| `event` | 이벤트 (할인/캠페인 등) |
+| `notice` | 일반 공지 |
+
+### 8.2 TeacherPost 엔티티 (코드 반영 2026-06-03)
+
+선생님 또는 학원이 작성한 게시물/공지. FollowFeedScreen에서 팔로워에게 표시.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | String | 고유 ID |
+| authorId | String | 작성자 ID (선생님 또는 학원) |
+| authorName | String | 작성자 표시명 |
+| postType | PostType | 게시물 유형 |
+| title | String | 제목 |
+| content | String | 본문 |
+| createdAt | DateTime | 작성 시점 |
+
+### 8.3 PostRepository (코드 반영 2026-06-03)
+
+| 메서드 | 반환 | 설명 |
+|--------|------|------|
+| `getByAuthor(authorId)` | `List<TeacherPost>` | 특정 작성자의 게시물 |
+| `getByAuthors(authorIds)` | `List<TeacherPost>` | 다수 작성자 게시물 (피드 집계용) |
+
+Mock/Remote 구현 존재.
+
+### 8.4 Provider (코드 반영 2026-06-03)
+
+| Provider | 용도 |
+|----------|------|
+| `postRepositoryProvider` | Repository 인스턴스 (keepAlive, Mock/Remote 전환) |
+| `followFeedProvider(followerId)` | 팔로우한 작성자들의 게시물을 집계해 최신순 피드 반환 |
+
+`followFeedProvider`는 `followRepository.getByFollower(followerId)`로 팔로잉 ID를 모은 뒤 `postRepository.getByAuthors(ids)`로 게시물을 집계한다.
+
+---
+
+## 9. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2026-03-06 | 코드 기반 역설계로 초기 스펙 작성 |
 | 2026-03-07 | 화면 설계 상세(FollowListScreen, FollowFeedScreen, 위젯), Provider 코드 설계, 구현 우선순위 섹션 추가 |
+| 2026-06-03 | 코드 반영: TeacherPost/PostType/PostRepository/followFeedProvider (§8) |

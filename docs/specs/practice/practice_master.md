@@ -1694,6 +1694,103 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 
 ---
 
+## 코드 반영 추가 (2026-06-03)
+
+> 코드에는 구현되어 있으나 위 본문에 누락되어 있던 항목을 단방향(코드→스펙)으로 반영. 각 항목은 코드 경로를 근거로 한다.
+
+### A. 노트 접근 요청 (Note Access Request) — 구현됨
+
+> 소스: `domain/entities/note_access_request.dart`, `domain/repositories/note_access_repository.dart`, `data/repositories/mock_note_access_repository.dart`, `presentation/providers/note_access_provider.dart`, `presentation/screens/note_access_request_screen.dart`, `presentation/widgets/note_access_active_banner.dart`
+
+학원(academy) 구성원이 학생/사용자의 연습 노트에 **한시적 접근 권한**을 요청하고, 사용자가 동의/거절/철회하는 동의(consent) 기반 흐름. JournalPrivacy(1.8.1)와 분리된 별도 요청 단위 모델이다.
+
+#### NoteAccessStatus enum (코드 반영 2026-06-03)
+
+| 값 | 의미 |
+|----|------|
+| `requested` | 요청 전송됨, 응답 대기 |
+| `consented` | 사용자가 공유 동의 |
+| `rejected` | 사용자가 요청 거절 |
+| `revoked` | 동의했던 접근을 철회 |
+
+#### NoteAccessRequest 모델 (코드 반영 2026-06-03)
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | String | 고유 ID |
+| academyId | String | 접근 요청 학원 ID |
+| academyName | String | 표시용 학원명 |
+| reason | String | 요청 사유 |
+| expiresAt | DateTime (UTC) | 접근 권한 만료 시점 |
+| status | NoteAccessStatus | 현재 상태 |
+| recipientUserId | String | 요청을 받은 사용자 ID |
+| requestorUserId | String | 요청을 시작한 사용자 ID |
+| createdAt / updatedAt | DateTime | 생성/수정 시점 (UTC) |
+
+파생 getter: `isActive`(consented && 미만료), `isExpired`, `remainingDays`.
+
+#### Repository (NoteAccessRepository) (코드 반영 2026-06-03)
+
+| 메서드 | 반환 | 설명 |
+|--------|------|------|
+| `getActiveAccess()` | `NoteAccessRequest?` | 현재 활성 접근 권한 |
+| `getAllRequests()` | `List<NoteAccessRequest>` | 요청 이력 전체 |
+| `getRequest(requestId)` | `NoteAccessRequest?` | ID로 조회 |
+| `consentAccess(requestId)` | `NoteAccessRequest` | 공유 동의 |
+| `rejectAccess(requestId)` | `NoteAccessRequest` | 요청 거절 |
+| `revokeAccess(requestId)` | `NoteAccessRequest` | 동의 철회 |
+
+- 라우트: `/note-access/:requestId` (`app_routes.dart`의 `noteAccessRequest`, 화면 `NoteAccessRequestScreen`)
+- 활성 접근 시 화면 상단에 `NoteAccessActiveBanner` 표시
+
+### B. 피치 분석 (Pitch Analysis) — 구현됨
+
+> 소스: `domain/entities/pitch_analysis.dart`
+
+녹음의 음정 정확도를 시간축 주파수 샘플로 분석해 등급(S/A/B/C/D)을 산출한다.
+
+| 모델 | 핵심 필드 / 계산 |
+|------|------------------|
+| `FrequencySample` | timestamp, frequency, noteName, octave, centDeviation; `noteLabel` |
+| `PitchAnalysisMetrics` | averageCentDeviation, stabilityScore(0~1), frequencyMin/Max, totalSamples, inTuneSamples(±10¢), noteDistribution; `inTunePercent`, `grade`, `gradeColorName` |
+| `PitchAnalysisResult` | id, recordingId, samples, metrics, analyzedAt; `computeMetrics()` 정적 산출 |
+
+등급 기준 (코드 반영 2026-06-03): inTunePercent ≥90 S / ≥75 A / ≥60 B / ≥40 C / 그 외 D. stabilityScore는 cent 편차 분산의 역수를 0~1로 정규화(50¢ 분산 → 0).
+
+### C. RecordingFeedback 엔티티 (코드 반영 2026-06-03)
+
+> 소스: `domain/entities/recording_feedback.dart`, `domain/repositories/recording_feedback_repository.dart`, `data/repositories/{mock,remote}_recording_feedback_repository.dart`
+
+5.1.4에서 서술된 선생님 피드백의 데이터 모델 정의.
+
+| 필드 | 타입 |
+|------|------|
+| id / recordingId / teacherId | String |
+| content | String |
+| createdAt | DateTime |
+
+Repository(`RecordingFeedbackRepository`): `list(recordingId)`, `create(recordingId, content, teacherId?)`, `update(recordingId, feedbackId, content)`, `delete(recordingId, feedbackId)`. Mock/Remote 양쪽 구현 존재.
+
+### D. 정렬 enum 구현됨 (코드 반영 2026-06-03)
+
+> 소스: `domain/entities/repertoire_sort_type.dart`, `domain/entities/section_sort_type.dart`, providers `repertoire_sort_provider.dart`, `section_sort_provider.dart`
+
+본문 3.1.5/2.1.5에서 "미완료/미구현"으로 표기된 정렬 옵션의 enum과 정렬 확장은 **구현 완료** 상태이다.
+
+- `RepertoireSortType`: createdDesc(기본), createdAsc, nameAsc, custom — displayName(최신순/오래된순/이름순/사용자지정), iconName, `List<PracticeRepertoire>.sortBy()` 확장
+- `SectionSortType`: createdDesc(기본), createdAsc, nameAsc, measureAsc, lastPracticedDesc, custom — displayName(최신순/오래된순/이름순/마디순/최근연습순/사용자지정), iconName, `List<PracticeSection>.sortBy()` 확장
+
+### E. StudentPracticeOverview 상세 모델 (코드 반영 2026-06-03)
+
+> 소스: `domain/entities/student_practice_overview.dart`
+
+5.1.5에 요약된 모델의 동반 클래스 정의.
+
+- `DailyPracticeEntry`: date, practiceMinutes, hasPracticed
+- `SharedRecording`: recordingId, repertoireName, sectionName, sharedAt, durationSeconds, bpm?, localPath
+
+---
+
 ## 10. 변경 이력
 
 | 날짜 | 변경 내용 |

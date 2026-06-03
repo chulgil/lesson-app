@@ -161,10 +161,59 @@
 
 ---
 
+## 11. 코드 반영 신규 용어 (2026-06-03)
+
+> 코드↔스펙 드리프트 동기화에서 식별된, 코드에는 존재하나 glossary에 미등록이던 FE 엔티티/enum. 각 도메인 마스터 스펙에 본문 반영 완료. (BE 매핑은 백엔드 구현 시 확정)
+
+### 수강권/결제 (Subscription/Billing)
+| 용어 | 영문(FE) | 값 / 구성 |
+|------|----------|-----------|
+| 앱 빌링 스냅샷 | `AppBillingSnapshot` | 현재 플랜·상태 집계 |
+| 빌링 플랜 | `BillingPlan` | free / pro / studio / lifetime |
+| 빌링 상태 | `BillingStatus` | active / trial / expired / cancelled |
+| 빌링 가드 | `BillingGuard` | 학생 한도/만료 차단 판정 (`StudentLimitDecision`, `LimitReason`) |
+| IAP 서비스 | `IapService` / `StoreKitIapService` | 인앱결제 래퍼 (`IapPurchaseOutcome` sealed) |
+| IAP 검증 결과 | `IapValidationResult` | 영수증 검증 결과 |
+| 체험 활성화 결과 | `TrialActivationResult` | 14일 Pro 체험 시작 결과 |
+| 보강 크레딧 잔액 | `MakeupCreditBalance` | 사용 가능 크레딧 집계 (만료순 정렬) |
+
+### 스케줄 (Schedule)
+| 용어 | 영문(FE) | 값 / 구성 |
+|------|----------|-----------|
+| 휴가 처리 방식 | `VacationDisposition` | makeupCredit / freeCancel / rollForward |
+| 휴가 영향 미리보기 | `VacationImpactPreview` | 영향 레슨/학생 집계 (`VacationImpactedStudent`) |
+| 요청 필터 | `RequestFilter` | 요청 목록 필터/정렬 (FE 전용) |
+| 요청 단계 | `RequestPhase` | request / subscription / lessons / completed / terminal |
+| 요청 상태 그룹 | `RequestStatusGroup` | 상태 묶음 (목록 그룹핑) |
+
+### 레슨/관계 (Lesson/Relationship)
+| 용어 | 영문(FE) | 값 / 구성 |
+|------|----------|-----------|
+| 레슨 공개 범위 | `LessonVisibility` | academyFull / academyBusyOnly |
+| 일정 편성 방식 | `ScheduleType` | fixed / flexible |
+| 학습 목표 | `LessonGoal` | hobby / exam / major |
+| 경험 수준 | `ExperienceLevel` | none / beginner / some / experienced |
+| 피드백 프리셋 | `FeedbackPreset` | 일괄 피드백 템플릿 (활성) |
+| 관계 상태 | `RelationshipStatus` | trialBooked / active / expired / past (기존 본문 pending/active/inactive/blocked 오기재 정정) |
+
+### 연습/게이미피케이션/소식 (Practice/Gamification/Follow)
+| 용어 | 영문(FE) | 값 / 구성 |
+|------|----------|-----------|
+| 노트 열람 요청 | `NoteAccessRequest` / `NoteAccessStatus` | requested / consented / rejected / revoked |
+| 피치 분석 결과 | `PitchAnalysisResult` | 음정 분석 (S~D 등급) |
+| 도전 과제 유형/주기 | `ChallengeType` / `ChallengePeriod` | 챌린지 분류 |
+| 랭킹 티어 | `RankingTier` | 주간 랭킹 등급 |
+| 콤보 티어 | `ComboTier` | 튜너 콤보 5단계 (`ComboState`) |
+| 판정 결과 | `JudgementResult` | 튜너 음정 판정 |
+| 선생님 게시물 | `TeacherPost` / `PostType` | performance / event / notice (소식 피드) |
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-03 | §11 코드 반영 신규 용어 — 코드↔스펙 드리프트 동기화로 식별된 FE 엔티티/enum 30여종 등록 (billing/schedule/lesson/relationship/practice/gamification/follow) |
 | 2026-06-01 | E2E 감사 Top 10 반영 — 15용어 추가: 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드/대기, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간, 발신 프로필. ConnectionStatus deprecate 명시 |
 | 2026-05-10 | §10 앱 릴리즈/신뢰 구축: AppVersionSnapshot, AppNewsItem, AppRoadmapItem, AppReleaseSnapshot, AppReviewState 추가 (R6) |
 | 2026-05-07 | §7 알림: lessonCancelledByTeacher, teacherAnnouncement 이벤트 타입 추가 (일괄 작업 v2) |

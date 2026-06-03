@@ -301,6 +301,73 @@ backup_2026-03-01T14-30-00.lessonbackup (ZIP)
 
 ---
 
+## 코드 반영 추가 (2026-06-03)
+
+> 코드에는 존재하나 본 스펙에 누락되었던 항목 (코드→스펙 단방향 반영). 출처: `features/settings/`.
+
+### A. 앱 릴리스/버전 관리 (App Release) (코드 반영 2026-06-03)
+
+강제 업데이트 게이트와 소식·로드맵 피드를 제공하는 서브시스템. 본 스펙 초안(2026-03)에 없었음.
+
+#### A.1 데이터 모델
+
+> 소스: `settings/domain/entities/app_release.dart`
+
+| 엔티티/enum | 필드 | 설명 |
+|------|------|------|
+| `AppRoadmapStatus` (enum) | planned / inProgress / shipped | 로드맵 항목 진행 상태 |
+| `AppVersionSnapshot` | currentVersion, buildNumber?, latestVersion?, minVersion?, checkedAt | 버전 비교 스냅샷 |
+| `AppNewsItem` | id, title, summary, publishedAt, link? | 소식 피드 항목 |
+| `AppRoadmapItem` | id, title, summary, status, targetDate? | 로드맵 항목 |
+| `AppReleaseSnapshot` | version, news[], roadmap[] | 릴리스 통합 스냅샷 |
+| `ReviewPromptPolicy` | completedLessonThreshold(=10), cooldown(=30일) | 평점 프롬프트 정책 값객체 |
+
+- `AppVersionSnapshot.hasUpdate`: latestVersion != currentVersion
+- `AppVersionSnapshot.requiresForceUpdate`: currentVersion < minVersion (semver 비교)
+- `AppVersionSnapshot.displayVersion`: `currentVersion (buildNumber)`
+
+#### A.2 Repository
+
+> 소스: `settings/domain/repositories/app_release_repository.dart`
+
+| 인터페이스 | 메서드 | 구현체 |
+|------|------|------|
+| `AppReleaseRepository` | `fetchReleaseSnapshot()` | `LocalAppReleaseRepository`(mock), `RemoteAppReleaseRepository`(api), `CachedAppReleaseRepository`(캐시) |
+| `AppReviewClient` | `canRequestReview()`, `requestReview()` | `LocalAppReviewClient` (in_app_review 래퍼) — 평점 스펙은 [app_rating_prompt_spec.md](app_rating_prompt_spec.md) |
+
+#### A.3 Provider
+
+> 소스: `settings/presentation/providers/app_release_provider.dart` (모두 keepAlive)
+
+| Provider | 반환 타입 |
+|----------|----------|
+| `appReleaseRepositoryProvider` | AppReleaseRepository (mock/remote 전환) |
+| `appReleaseSnapshotProvider` | `AppReleaseSnapshot` |
+| `appVersionSnapshotProvider` | `AppVersionSnapshot` |
+| `appNewsFeedProvider` | `List<AppNewsItem>` |
+| `appRoadmapFeedProvider` | `List<AppRoadmapItem>` |
+| `reviewPromptPolicyProvider` | `ReviewPromptPolicy` |
+
+#### A.4 화면 / 라우트
+
+| 화면 | 라우트 | 설명 |
+|------|------|------|
+| `ForceUpdateScreen` | (강제 진입 — requiresForceUpdate 시) | 최소 버전 미달 시 업데이트 강제 |
+| `NewsRoadmapScreen` | `/settings/news-roadmap` (`AppRoutes.newsRoadmap`) | 소식 + 로드맵 피드 표시 |
+
+### B. TeacherSettings 누락 필드 (코드 반영 2026-06-03)
+
+> 소스: `profile/domain/entities/teacher_settings.dart` (settings 도메인이 소비). §2.1 표에 없던 필드.
+
+| 필드 | 설명 |
+|------|------|
+| `disabledDurations` | 비활성화한 레슨 시간(기본+커스텀) 목록 |
+| `lessonPriceTable` | `Map<String, Map<String, int>>?` — 악기/레벨별 레슨료 표 |
+| `trialLessonFree` | 체험 레슨 무료 여부 |
+| `bookingGuidanceMessage` | 예약 안내 메시지 |
+
+---
+
 ## 7. 관련 스펙
 
 | 스펙 | 관계 |
@@ -308,6 +375,7 @@ backup_2026-03-01T14-30-00.lessonbackup (ZIP)
 | [연습 시스템](../practice/practice_master.md) | 녹음 관리 대상 (PracticeRecording, PracticeSection) |
 | [백업 구현 스펙](../practice/backup_implementation_spec.md) | 백업 아카이브 포맷 상세 |
 | [학생 홈 프로필 탭](../student_home/student_home_master.md) | 프로필 탭에서 백업/녹음 설정 진입 |
+| [앱스토어 평점 유도](app_rating_prompt_spec.md) | AppReviewClient / ReviewPromptPolicy 활용 |
 | Issue #15 | 데이터 백업 기능 요구사항 |
 
 ---
@@ -317,4 +385,5 @@ backup_2026-03-01T14-30-00.lessonbackup (ZIP)
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2026-03-06 | 코드 기반 역설계로 초기 스펙 작성 |
+| 2026-06-03 | 코드 반영 — App Release 서브시스템(버전/소식/로드맵/강제업데이트), TeacherSettings 누락 필드 추가 |
 | 2026-03-07 | 구현 파일 위치 섹션 추가, 관련 스펙 링크 보강 (practice_master, backup_implementation_spec, student_home_master) |
