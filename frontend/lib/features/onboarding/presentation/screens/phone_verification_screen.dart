@@ -152,6 +152,8 @@ class _PhoneVerificationScreenState
         // Phone verified → complete onboarding → home
         ref.read(teacherOnboardingNotifierProvider.notifier).completeOnboarding();
         await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        // Re-check mounted after the async gap before touching context.
+        if (!mounted) return;
         context.go(AppRoutes.home);
       }
     } else {

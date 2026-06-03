@@ -413,11 +413,13 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
 
         // Refresh proposal list + subscription list/detail views so the new
         // subscription appears immediately (create bypasses the notifier).
+        // membershipId is a synthetic placeholder here (`membership_<id>`), so
+        // passing it would invalidate a non-existent membership provider —
+        // rely on the student + teacher scope, which are real, instead.
         ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
         invalidateSubscriptionListsForStudent(
           ref,
           proposal.studentId,
-          membershipId: subscription.membershipId,
           teacherId: widget.teacherId,
         );
       }
