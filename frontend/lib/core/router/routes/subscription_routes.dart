@@ -10,6 +10,7 @@ import '../../../features/subscription/presentation/screens/teacher_subscription
 import '../../../features/subscription/presentation/screens/subscription_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/issue_subscription_screen.dart';
 import '../../../features/subscription/presentation/screens/lesson_policy_screen.dart';
+import '../../../features/subscription/presentation/screens/makeup_credit_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
 import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
@@ -119,6 +120,15 @@ List<RouteBase> subscriptionRoutes = [
           lessonRequestIds: lessonRequestIds,
         ),
       );
+    },
+  ),
+  // Makeup credit route (#432) must come before parameterized detail route.
+  // Teacher view requires ?studentId=...; student view omits it.
+  GoRoute(
+    path: AppRoutes.makeupCredits,
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'];
+      return MakeupCreditScreen(studentId: studentId);
     },
   ),
   // Policy route must come before detail route
