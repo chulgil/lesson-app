@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
+from freezegun import freeze_time
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +24,11 @@ from app.models.student import Student
 from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
 
 _KST = timezone(timedelta(hours=9))
+
+# UTC 03:00 = KST 12:00 → inside the alimtalk 08:00-20:00 KST send window.
+# Both the cron and `_yesterday_kst()` read `datetime.now()`, so freezing keeps
+# their relative "yesterday" math aligned while pinning the send-window clock.
+_IN_WINDOW_UTC = "2026-06-04 03:00:00"
 
 
 def _reset_shared_mock_client() -> MockAlimTalkClient:
@@ -107,6 +113,7 @@ def _yesterday_kst() -> date:
 
 
 @pytest.mark.asyncio
+@freeze_time(_IN_WINDOW_UTC)
 async def test_cron_announces_return_for_vacations_ended_yesterday(
     db_session: AsyncSession,
 ):
@@ -224,6 +231,7 @@ async def test_cron_skips_vacations_ending_other_days(db_session: AsyncSession):
 
 
 @pytest.mark.asyncio
+@freeze_time(_IN_WINDOW_UTC)
 async def test_cron_is_idempotent_across_runs(db_session: AsyncSession):
     """Re-running the cron the same day does not duplicate alimtalk rows."""
     mock = _reset_shared_mock_client()

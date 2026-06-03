@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime
 from uuid import uuid4
 
 import pytest
+from freezegun import freeze_time
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +24,11 @@ from app.models.subscription import Subscription, SubscriptionStatus, Subscripti
 from app.schemas.vacation import VacationDisposition as SchemaVacationDisposition
 from app.schemas.vacation import VacationPeriodCreate
 from app.services.vacation_service import VacationService
+
+# UTC 03:00 = KST 12:00 → inside the alimtalk 08:00-20:00 KST send window.
+# Far-future vacation dates (year 2126) keep the cancel within the recovery
+# window regardless; freezing only pins the alimtalk send-window clock.
+_IN_WINDOW_UTC = "2026-06-01 03:00:00"
 
 
 async def _seed_student_with_booking(
@@ -103,6 +109,7 @@ def _reset_shared_mock_client() -> MockAlimTalkClient:
 
 
 @pytest.mark.asyncio
+@freeze_time(_IN_WINDOW_UTC)
 async def test_cancel_vacation_fans_out_one_cancelled_alimtalk_per_student(
     db_session: AsyncSession,
 ):
@@ -158,6 +165,7 @@ async def test_cancel_vacation_fans_out_one_cancelled_alimtalk_per_student(
 
 
 @pytest.mark.asyncio
+@freeze_time(_IN_WINDOW_UTC)
 async def test_cancel_vacation_alimtalk_is_idempotent_per_phone(
     db_session: AsyncSession,
 ):

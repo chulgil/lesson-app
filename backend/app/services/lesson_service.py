@@ -335,7 +335,13 @@ class LessonService:
         from app.models.request_event import RequestEvent, RequestEventType
 
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
-        lesson.status = LessonStatus(new_status)
+        try:
+            lesson.status = LessonStatus(new_status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Invalid lesson status: {new_status}",
+            )
 
         # Phase 3 event logging
         role = getattr(getattr(current_user, "role", None), "value", None) or "teacher"
@@ -809,7 +815,13 @@ class LessonService:
         if m is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
         await self._assert_membership_access(m, current_user, require_teacher=True)
-        m.status = ClassMembership.MembershipStatus(new_status)
+        try:
+            m.status = ClassMembership.MembershipStatus(new_status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Invalid membership status: {new_status}",
+            )
         await self.db.flush()
         await self.db.refresh(m)
         return self._membership_response(m)

@@ -16,6 +16,7 @@ Spec: docs/specs/schedule/teacher_vacation_mode.md.
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -23,6 +24,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # Recovery window — spec §7.2
 RECOVERY_WINDOW_HOURS = 24
+
+# KST 자정 기준 — UTC↔KST 경계 hazard (spec §7.2 취소 가능 판정)
+_KST = ZoneInfo("Asia/Seoul")
 
 from app.models.schedule import (
     BookingStatus,
@@ -436,7 +440,11 @@ class VacationService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"휴가 등록 후 {RECOVERY_WINDOW_HOURS}시간이 지나 취소할 수 없습니다.",
             )
-        if period.start_date < now.date():
+        # period.start_date is a KST-intended calendar date. Compare against the
+        # KST "today" — using `now.date()` (UTC) would lag a day during KST
+        # 00:00-09:00 and wrongly (dis)allow cancellation near the boundary.
+        today_kst = datetime.now(_KST).date()
+        if period.start_date < today_kst:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="이미 시작된 휴가는 취소할 수 없습니다.",
@@ -550,7 +558,16 @@ class VacationService:
         """
         from app.models.makeup_credit import MakeupCredit
 
-        # 1) Restore bookings cancelled by this vacation.
+        # 1) Identify the rollForward subscriptions *before* we revive any
+        # freeCancel / makeupCredit booking. Registration extends a subscription
+        # iff it had a rollForward (still-active) booking in the window
+        # (see _apply_dispositions). The exact inverse therefore subtracts only
+        # from subscriptions that were rollForward at registration — i.e. the
+        # active-status bookings in the window that this vacation did NOT cancel.
+        # Cancelled-by-this-vacation bookings carry vacation_period_id == period.id.
+        roll_forward_sub_ids = await self._roll_forward_subscription_ids(period)
+
+        # 2) Restore bookings cancelled by this vacation.
         cancelled_bookings = (
             await self.db.scalars(
                 select(LessonBooking).where(
@@ -558,52 +575,59 @@ class VacationService:
                 )
             )
         ).all()
-        revived_sub_ids: set[str] = set()
         for booking in cancelled_bookings:
             booking.status = BookingStatus.confirmed
             booking.vacation_period_id = None
-            if booking.subscription_id is not None:
-                revived_sub_ids.add(booking.subscription_id)
 
-        # 2) Drop accrued credits for this vacation.
+        # 3) Drop accrued credits for this vacation.
         accrued_credits = (
             await self.db.scalars(select(MakeupCredit).where(MakeupCredit.source_event_id == period.id))
         ).all()
         for credit in accrued_credits:
             await self.db.delete(credit)
 
-        # 3) Revert rollForward auto-extend. The legacy path only knew the
-        # default disposition; now we revert any subscription whose booking
-        # is *still* active inside the window (i.e. survived as rollForward).
+        # 4) Revert rollForward auto-extend — only the subscriptions captured in
+        # step 1. freeCancel / makeupCredit subscriptions (now revived) are NOT
+        # touched because they were never extended at registration.
         await self._revert_auto_extended_days(
-            teacher_id=period.teacher_id,
-            start_date=period.start_date,
-            end_date=period.end_date,
+            subscription_ids=roll_forward_sub_ids,
             vacation_days=vacation_days,
         )
 
-    async def _revert_auto_extended_days(
-        self,
-        teacher_id: str,
-        start_date: date,
-        end_date: date,
-        vacation_days: int,
-    ) -> int:
-        """Mirror of _auto_extend_impacted_subscriptions — subtracts the same delta."""
+    async def _roll_forward_subscription_ids(self, period: VacationPeriod) -> set[str]:
+        """Subscriptions extended at registration (rollForward) for this period.
+
+        Mirrors _apply_dispositions: a subscription is rollForward-extended iff
+        it had an active booking in the window that was NOT cancelled by this
+        vacation. Cancelled bookings carry ``vacation_period_id == period.id``;
+        every other active booking in the window survived as rollForward.
+        """
         bookings = (
             await self.db.scalars(
                 select(LessonBooking)
-                .where(LessonBooking.teacher_id == teacher_id)
-                .where(LessonBooking.scheduled_date >= start_date)
-                .where(LessonBooking.scheduled_date <= end_date)
+                .where(LessonBooking.teacher_id == period.teacher_id)
+                .where(LessonBooking.scheduled_date >= period.start_date)
+                .where(LessonBooking.scheduled_date <= period.end_date)
                 .where(LessonBooking.status.in_(_ACTIVE_BOOKING_STATUSES))
             )
         ).all()
-        impacted_subscription_ids = {b.subscription_id for b in bookings if b.subscription_id is not None}
-        if not impacted_subscription_ids:
+        return {
+            b.subscription_id
+            for b in bookings
+            if b.subscription_id is not None and b.vacation_period_id != period.id
+        }
+
+    async def _revert_auto_extended_days(
+        self,
+        *,
+        subscription_ids: set[str],
+        vacation_days: int,
+    ) -> int:
+        """Subtract the registration delta from the given (rollForward) subscriptions."""
+        if not subscription_ids:
             return 0
         subscriptions = (
-            await self.db.scalars(select(Subscription).where(Subscription.id.in_(impacted_subscription_ids)))
+            await self.db.scalars(select(Subscription).where(Subscription.id.in_(subscription_ids)))
         ).all()
         for sub in subscriptions:
             sub.auto_extended_days = max(0, (sub.auto_extended_days or 0) - vacation_days)

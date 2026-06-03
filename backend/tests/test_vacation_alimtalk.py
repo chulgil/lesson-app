@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime
 from uuid import uuid4
 
 import pytest
+from freezegun import freeze_time
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +24,11 @@ from app.models.subscription import Subscription, SubscriptionStatus, Subscripti
 from app.schemas.vacation import VacationDisposition as SchemaVacationDisposition
 from app.schemas.vacation import VacationPeriodCreate
 from app.services.vacation_service import VacationService
+
+# UTC 03:00 = KST 12:00 → inside the alimtalk 08:00-20:00 KST send window.
+# Without this the fan-out is "deferred" (recorded as failure, carrier untouched)
+# whenever the suite happens to run outside KST business hours, so mock.sent == 0.
+_IN_WINDOW_UTC = "2026-06-01 03:00:00"
 
 
 async def _seed_lesson_class(db: AsyncSession, teacher_id: str) -> str:
@@ -111,6 +117,7 @@ def _reset_shared_mock_client() -> MockAlimTalkClient:
 
 
 @pytest.mark.asyncio
+@freeze_time(_IN_WINDOW_UTC)
 async def test_register_vacation_fans_out_one_alimtalk_per_impacted_student(
     db_session: AsyncSession,
 ):
@@ -203,6 +210,7 @@ async def test_register_vacation_skips_students_without_phone(
 
 
 @pytest.mark.asyncio
+@freeze_time(_IN_WINDOW_UTC)
 async def test_register_vacation_alimtalk_is_idempotent_per_phone(
     db_session: AsyncSession,
 ):
