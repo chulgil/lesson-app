@@ -99,6 +99,7 @@ async def list_my_students(
     service = TeacherService(db)
     return await service.get_students(
         current_user.id,
+        current_user,
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
@@ -211,6 +212,7 @@ async def get_teacher_students(
     service = TeacherService(db)
     return await service.get_students(
         teacher_id,
+        current_user,
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],

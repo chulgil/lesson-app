@@ -108,6 +108,7 @@ class RelationshipService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Relationship not found",
             )
+        await self._assert_relationship_party(relation, current_user)
         return relation
 
     async def update_status(
@@ -130,6 +131,7 @@ class RelationshipService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Relationship not found",
             )
+        await self._assert_relationship_party(relation, current_user)
         if new_status is not None:
             relation.status = RelationStatus(new_status)
 
@@ -203,6 +205,28 @@ class RelationshipService:
 
         await self.db.delete(settings)
         await self.db.flush()
+
+    async def _assert_relationship_party(self, relation: Any, current_user: Any) -> None:
+        """Require the caller to be the teacher or student party of the relation."""
+        role = getattr(getattr(current_user, "role", None), "value", None)
+
+        if role == "teacher":
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            if teacher_id == relation.teacher_id:
+                return
+        elif role == "student":
+            from app.models.student import Student
+
+            student_id = await self.db.scalar(
+                select(Student.id).where(Student.user_id == current_user.id)
+            )
+            if student_id is not None and student_id == relation.student_id:
+                return
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot access another party's relationship",
+        )
 
     def _assert_notification_settings_owner(self, user_id: str, current_user: Any) -> None:
         if user_id != current_user.id:

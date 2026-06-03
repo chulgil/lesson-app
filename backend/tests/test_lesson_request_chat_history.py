@@ -657,6 +657,53 @@ async def test_lesson_request_status_endpoint_accepts_subscription_issued(
 
 
 @pytest.mark.asyncio
+async def test_student_cannot_self_approve_lesson_request(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    """Student must not be able to confirm their own request (GitHub #464)."""
+    await create_test_user(user_id="approve-teacher", role="teacher", name="승인 선생님")
+    await create_test_user(
+        user_id="approve-student",
+        role="student",
+        name="승인 학생",
+        email="approve-student@test.com",
+    )
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("approve-student", "student"),
+        json={
+            "teacher_id": "approve-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    request_id = create_response.json()["id"]
+
+    # Student attempts self-approval (canonicalizes to timeConfirmed) → 403
+    student_attempt = await client.patch(
+        f"/api/v1/schedule/lesson-requests/{request_id}/status",
+        headers=_headers("approve-student", "student"),
+        json={"status": "approved"},
+    )
+    assert student_attempt.status_code == 403
+
+    # Teacher approval succeeds
+    teacher_attempt = await client.patch(
+        f"/api/v1/schedule/lesson-requests/{request_id}/status",
+        headers=_headers("approve-teacher", "teacher"),
+        json={"status": "approved"},
+    )
+    assert teacher_attempt.status_code == 200
+    assert teacher_attempt.json()["status"] == "timeConfirmed"
+
+
+@pytest.mark.asyncio
 async def test_lesson_request_expire_endpoint_expires_pending_and_negotiating_requests(
     client: AsyncClient,
     create_test_user,

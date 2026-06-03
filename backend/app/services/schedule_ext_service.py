@@ -44,12 +44,15 @@ class ScheduleExtService:
         await self.db.refresh(exc)
         return exc
 
-    async def update_exception(self, exception_id: str, data: dict) -> Any:
+    async def update_exception(
+        self, exception_id: str, data: dict, current_user: Any | None = None
+    ) -> Any:
         from app.models.schedule_ext import ScheduleException
 
         exc = await self.db.get(ScheduleException, exception_id)
         if exc is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
+        await self._assert_exception_owner(exc, current_user)
         for key, value in data.items():
             if value is not None:
                 setattr(exc, key, value)
@@ -57,14 +60,53 @@ class ScheduleExtService:
         await self.db.refresh(exc)
         return exc
 
-    async def delete_exception(self, exception_id: str) -> None:
+    async def delete_exception(self, exception_id: str, current_user: Any | None = None) -> None:
         from app.models.schedule_ext import ScheduleException
 
         exc = await self.db.get(ScheduleException, exception_id)
         if exc is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
+        await self._assert_exception_owner(exc, current_user)
         await self.db.delete(exc)
         await self.db.flush()
+
+    async def _assert_exception_owner(self, exception: Any, current_user: Any | None) -> None:
+        if current_user is None:
+            return
+
+        if getattr(exception, "teacher_id", None) is not None:
+            current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+            if exception.teacher_id not in current_teacher_ids:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+            return
+
+        from app.models.schedule import TeacherAvailability
+
+        availability = await self.db.get(TeacherAvailability, exception.teacher_availability_id)
+        if availability is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Exception availability not found",
+            )
+        current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if availability.teacher_id not in current_teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    async def _resolve_teacher_id_scope(self, teacher_id: str) -> list[str]:
+        """Return both user and profile IDs for a teacher identifier."""
+        from app.models.teacher import Teacher
+
+        teacher_ids = [teacher_id]
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            if teacher.user_id not in teacher_ids:
+                teacher_ids.append(teacher.user_id)
+            return teacher_ids
+
+        profile_id = await self.db.scalar(select(Teacher.id).where(Teacher.user_id == teacher_id))
+        if profile_id is not None and profile_id not in teacher_ids:
+            teacher_ids.append(profile_id)
+        return teacher_ids
 
     # -----------------------------------------------------------------------
     # Group Class Schedules

@@ -209,9 +209,18 @@ class TeacherService:
 
         return await self.update(teacher.id, data, current_user)
 
+    async def _assert_self(self, teacher_id: str, current_user: Any) -> None:
+        """Verify the path teacher_id belongs to the authenticated user (IDOR guard)."""
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        resolved = await try_resolve_teacher_id(self.db, current_user.id)
+        if teacher_id not in (current_user.id, resolved):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
     async def get_students(
         self,
         teacher_id: str,
+        current_user: Any,
         *,
         page: int,
         size: int,
@@ -221,6 +230,8 @@ class TeacherService:
     ) -> PaginatedResponse[StudentResponse]:
         """Return students associated with a teacher."""
         from app.models.student import Student
+
+        await self._assert_self(teacher_id, current_user)
 
         query = select(Student).where(Student.teacher_id == teacher_id)
         if status:
@@ -242,6 +253,8 @@ class TeacherService:
 
         from app.models.lesson import Lesson
         from app.models.student import Student
+
+        await self._assert_self(teacher_id, current_user)
 
         today = date.today()
         week_end = today + timedelta(days=7)

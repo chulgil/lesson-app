@@ -424,3 +424,36 @@ async def test_put_my_teacher_profile_creates_profile_when_missing(
     assert data["user_id"] == "test-user-id"
     assert data["instruments"] == ["cello"]
     assert data["introduction"] == "신규 프로필"
+
+
+@pytest.mark.asyncio
+async def test_teacher_cannot_access_other_teacher_roster_and_dashboard(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+):
+    """Teacher B must not read teacher A's /students or /dashboard (GitHub #465)."""
+    from app.core.security import create_access_token
+
+    # Teacher A (owner of profile "test-user-id-prof")
+    await create_test_user(user_id="test-user-id", role="teacher")
+    # Teacher B (attacker)
+    await create_test_user(
+        user_id="teacher-b",
+        role="teacher",
+        name="Teacher B",
+        email="teacher-b@test.com",
+    )
+    teacher_b_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': 'teacher-b', 'role': 'teacher'})}"
+    }
+
+    # Teacher B targeting Teacher A's profile id → 403
+    for path in ("test-user-id-prof/students", "test-user-id-prof/dashboard"):
+        forbidden = await client.get(f"/api/v1/teachers/{path}", headers=teacher_b_headers)
+        assert forbidden.status_code == 403, path
+
+    # Teacher A accessing own profile id → 200
+    for path in ("test-user-id-prof/students", "test-user-id-prof/dashboard"):
+        allowed = await client.get(f"/api/v1/teachers/{path}", headers=auth_headers)
+        assert allowed.status_code == 200, path
