@@ -14,6 +14,7 @@ import '../../../auth/presentation/widgets/phone_verification_gate_modal.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
+import '../../domain/repositories/subscription_repository.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_proposal_providers.dart';
@@ -97,8 +98,10 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   }
 
   Widget _buildProposalCard(SubscriptionProposal proposal) {
+    // Multi-choice proposals must use the student's selected template
+    // (effectiveTemplateId), not the first/base templateId.
     final templateAsync = ref.watch(
-      subscriptionTemplateProvider(proposal.templateId),
+      subscriptionTemplateProvider(proposal.effectiveTemplateId),
     );
     final studentAsync = ref.watch(
       subscriptionIssueStudentProvider(proposal.studentId),
@@ -333,13 +336,32 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     SubscriptionProposal proposal,
     SubscriptionTemplate template,
   ) async {
+    // Multi-choice proposal must have a student selection before issuing.
+    if (proposal.needsTemplateSelection) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.proposalAwaitingTemplateSelection),
+          backgroundColor: AppColors.paperAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _processingProposalId = proposal.id;
     });
 
+    final subscriptionRepo = ref.read(subscriptionRepositoryProvider);
+    String? createdSubscriptionId;
+
     try {
-      // 1. Create subscription
+      // 1. Create subscription. Deposit is confirmed here (manual bank
+      // transfer only — no PG), so seed payment fields accordingly.
       final now = DateTime.now();
+      final discount = proposal.hasDiscount ? (proposal.discountAmount ?? 0) : 0;
+      // Clamp: a discount larger than the price must not yield a negative amount.
+      final amount =
+          (template.price - discount) < 0 ? 0 : (template.price - discount);
       final subscription = Subscription(
         id: const Uuid().v4(),
         studentId: proposal.studentId,
@@ -350,19 +372,25 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         usedLessons: 0,
         startDate: now,
         endDate: now.add(Duration(days: template.validityDays)),
-        amount: proposal.hasDiscount
-            ? template.price - (proposal.discountAmount ?? 0)
-            : template.price,
+        amount: amount,
+        originalAmount: discount > 0 ? template.price : null,
+        discountAmount: discount > 0 ? discount : null,
+        discountReason: discount > 0 ? proposal.discountReason : null,
         status: SubscriptionStatus.active,
         createdAt: now,
         bonusCount: 0,
+        paymentConfirmed: true,
+        paymentMethod: SubscriptionPaymentMethod.bankTransfer,
+        paidAt: now,
+        paymentConfirmedAt: now,
       );
 
       // Create the subscription (using repository directly for now)
-      final subscriptionRepo = ref.read(subscriptionRepositoryProvider);
       final createdSubscription = await subscriptionRepo.create(subscription);
+      createdSubscriptionId = createdSubscription.id;
 
-      // 2. Confirm the proposal with the subscription ID
+      // 2. Confirm the proposal with the subscription ID. If this fails the
+      // subscription would be orphaned, so the catch below deactivates it.
       final proposalNotifier = ref.read(
         subscriptionProposalNotifierProvider.notifier,
       );
@@ -383,16 +411,28 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           ),
         );
 
-        // Refresh the list
+        // Refresh proposal list + subscription list/detail views so the new
+        // subscription appears immediately (create bypasses the notifier).
         ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
+        invalidateSubscriptionListsForStudent(
+          ref,
+          proposal.studentId,
+          membershipId: subscription.membershipId,
+          teacherId: widget.teacherId,
+        );
       }
     } on PhoneVerificationRequiredException catch (_) {
+      // Verification gate fires before/within confirm — clean up the orphan.
+      await _deactivateOrphanSubscription(subscriptionRepo, createdSubscriptionId);
       // #430 G1 §4.3 — E3 게이트. 미인증 선생님이 수강권을 발급하려 할 때
       // 인증 안내 다이얼로그 노출.
       if (mounted) {
         await PhoneVerificationGate.show(context);
       }
     } catch (e) {
+      // Confirm failed after the subscription was created — deactivate the
+      // orphan so it never surfaces as an active, unconfirmed subscription.
+      await _deactivateOrphanSubscription(subscriptionRepo, createdSubscriptionId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -407,6 +447,21 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           _processingProposalId = null;
         });
       }
+    }
+  }
+
+  /// Deactivate a subscription that was created but whose proposal confirmation
+  /// failed, preventing an orphaned active subscription. There is no hard
+  /// delete on the repository, so we mark it expired (inactive).
+  Future<void> _deactivateOrphanSubscription(
+    SubscriptionRepository repo,
+    String? subscriptionId,
+  ) async {
+    if (subscriptionId == null) return;
+    try {
+      await repo.updateStatus(subscriptionId, SubscriptionStatus.expired);
+    } catch (e) {
+      debugPrint('Failed to deactivate orphan subscription: $e');
     }
   }
 

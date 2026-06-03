@@ -46,9 +46,47 @@ void main() {
       expect(find.text('11,000원 / 회'), findsNothing);
     },
   );
+
+  testWidgets(
+    'trial request shows free label when teacher enabled trialLessonFree',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(trialFree: true),
+            ),
+            teacherAvailabilityRepositoryProvider.overrideWithValue(
+              _FakeAvailabilityRepository(),
+            ),
+          ],
+          child: MaterialApp(
+            home: UnifiedLessonRequestScreen(
+              params: UnifiedLessonRequestParams(
+                teacherId: 'target-teacher',
+                teacherName: '김선생',
+                teacherInstruments: ['피아노'],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Screen defaults to a trial request for new students, so a free-trial
+      // teacher must show the free label instead of the reference price.
+      expect(find.text('무료 체험 레슨'), findsOneWidget);
+      expect(find.text('88,000원 / 회'), findsNothing);
+    },
+  );
 }
 
 class _FakeSettingsRepository implements SettingsRepository {
+  _FakeSettingsRepository({this.trialFree = false});
+
+  final bool trialFree;
+
   @override
   Future<TeacherSettings> getTeacherSettings() async =>
       _settings(id: 'current-teacher', guidance: '현재 선생님 안내', price: 11000);
@@ -67,6 +105,7 @@ class _FakeSettingsRepository implements SettingsRepository {
       instruments: const ['피아노'],
       createdAt: DateTime.utc(2026, 5, 2),
       bookingGuidanceMessage: guidance,
+      trialLessonFree: trialFree,
       lessonPriceTable: {
         '피아노': {'beginner': price},
       },

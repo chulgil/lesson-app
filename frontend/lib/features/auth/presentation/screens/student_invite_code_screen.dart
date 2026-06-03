@@ -251,10 +251,42 @@ class _StudentInviteCodeScreenState
     );
   }
 
-  void _handleStartWithoutCode() {
+  Future<void> _handleStartWithoutCode() async {
+    // 만 14세 미만 차단 안전망 (phone_verification_policy.md §2.2).
+    //
+    // 정식 연령 검증은 통신사 본인인증(PASS) 으로 자동 처리될 예정이나, PASS
+    // 통합 전까지 코드 없이 진입하는 학생에 대한 최소 게이트로 자가신고 확인을
+    // 둔다. PASS 연동 시 이 다이얼로그는 본인인증 플로우로 대체한다.
+    final isOverFourteen = await _confirmAgeGate();
+    if (isOverFourteen != true) return;
+
+    if (!mounted) return;
     // Set role to student and go directly to profile setup
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
     context.go(AppRoutes.studentProfileSetup);
+  }
+
+  /// Returns ``true`` when the user self-reports being 만 14세 이상.
+  /// Shows a blocking message and returns ``false`` otherwise.
+  Future<bool?> _confirmAgeGate() {
+    return showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.authAgeGateTitle,
+      message: AppStrings.authAgeGateBody,
+      confirmLabel: AppStrings.authAgeGateConfirm,
+      cancelLabel: AppStrings.authAgeGateCancel,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () {
+        Navigator.of(context).pop(false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(AppStrings.authAgeGateBlocked),
+            backgroundColor: AppColors.paperAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _handleSubmitCode() async {

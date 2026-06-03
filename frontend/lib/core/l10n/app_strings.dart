@@ -3325,6 +3325,9 @@ class AppStrings {
   /// N개월 (월정기 칩 라벨)
   static String issueFormMonthsLabel(int months) => '$months개월';
 
+  /// 월 회차 (월정기 한 달 레슨 횟수 입력 라벨)
+  static const issueFormMonthlyLessonsTitle = '월 회차';
+
   /// 체험 레슨 안내
   static const issueFormTrialNotice =
       '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.';
@@ -4144,6 +4147,10 @@ class AppStrings {
 
   /// 입금 확인 → 수강권 발급 (확인 버튼)
   static const paymentVerifyToIssueButton = '입금 확인 → 수강권 발급';
+
+  /// 학생이 아직 수강권을 선택하지 않았습니다 (멀티초이스 미선택 가드)
+  static const proposalAwaitingTemplateSelection =
+      '학생이 아직 수강권을 선택하지 않았습니다';
 
   /// 입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까? (Inquiry 다이얼로그 본문)
   static const paymentInquiryDialogBody =
@@ -6036,6 +6043,18 @@ class AppStrings {
   static const authDevStudent = '학생';
   static const authDevParent = '학부모';
 
+  // ── Age Gate (만 14세 미만 차단 안전망) ──
+  // 정책: docs/specs/user/phone_verification_policy.md — 본인인증(PASS) 통합
+  // 전까지의 최소 안전망. 자가신고 기반 확인이며, 정식 연령 검증은 PASS 연동 시
+  // 대체된다.
+  static const authAgeGateTitle = '나이 확인';
+  static const authAgeGateBody =
+      '만 14세 이상만 코드 없이 시작할 수 있어요.\n만 14세 이상이 맞나요?';
+  static const authAgeGateConfirm = '네, 만 14세 이상입니다';
+  static const authAgeGateCancel = '아니요';
+  static const authAgeGateBlocked =
+      '만 14세 미만은 보호자(학부모) 계정을 통해 이용할 수 있어요.';
+
   // ── Settings / Backup ──
   static const settingsBackupCreateFailed = '백업 생성에 실패했습니다. 다시 시도해주세요.';
   static const settingsBackupRestoreFailed = '백업 복원에 실패했습니다. 다시 시도해주세요.';
@@ -6132,6 +6151,8 @@ class AppStrings {
       '원활한 사용을 위해 v$minVersion 이상으로\n업데이트해 주세요.';
   static String forceUpdateCurrentVersion(String version) => '현재 버전: v$version';
   static const forceUpdateAction = '업데이트하기';
+  static const forceUpdateStoreUnavailable =
+      '스토어를 열 수 없습니다. 앱 스토어에서 직접 업데이트해 주세요.';
   static const studentHomeTermsOfService = '이용약관';
   static const studentHomePrivacyPolicy = '개인정보처리방침';
   static const studentHomeOpenSourceLicense = '오픈소스 라이선스';
@@ -7996,4 +8017,54 @@ class AppStrings {
 
   /// 게이트 CTA — 나중에 (다이얼로그만 닫기).
   static const phoneVerificationGateCtaLater = '나중에 하기';
+
+  // ── Lesson Attendance Action (#473 미확인 레슨 액션) ──────────
+  /// 액션 카드 제목 — 미확인 레슨 처리 안내.
+  static const attendanceActionTitle = '레슨 처리가 필요해요';
+
+  /// 액션 카드 설명 — 출석 확인 또는 휴강 선택 안내.
+  static const attendanceActionDescription = '종료된 레슨입니다. 출석 확인 또는 휴강으로 처리해주세요.';
+
+  /// 출석 확인 액션 라벨 (= 레슨 완료, 1회 차감).
+  static const attendanceConfirmAction = '출석 확인';
+
+  /// 출석 확인 보조 라벨 — 차감 안내.
+  static const attendanceConfirmSubLabel = '수강권 1회 차감';
+
+  /// 휴강 액션 라벨 (차감 없음).
+  static const attendanceDayOffAction = '휴강';
+
+  /// 휴강 보조 라벨 — 차감 없음 안내.
+  static const attendanceDayOffSubLabel = '차감 없음';
+
+  /// 출석 확인 다이얼로그 제목.
+  static const attendanceConfirmDialogTitle = '출석 확인';
+
+  /// 출석 확인 다이얼로그 본문 — 1회 차감 고지.
+  static const attendanceConfirmDialogMessage = '이 레슨을 출석 확인 처리하시겠습니까?\n수강권 1회가 차감됩니다.';
+
+  /// 휴강 다이얼로그 제목.
+  static const attendanceDayOffDialogTitle = '휴강 처리';
+
+  /// 휴강 다이얼로그 본문 — 차감 없음 고지.
+  static const attendanceDayOffDialogMessage = '이 레슨을 휴강 처리하시겠습니까?\n수강권이 차감되지 않습니다.';
+
+  /// 출석 확인 완료 스낵바.
+  static const attendanceConfirmedSnack = '출석 확인 처리되었습니다';
+
+  /// 휴강 처리 완료 스낵바.
+  static const attendanceDayOffSnack = '휴강 처리되었습니다';
+
+  /// 처리 실패 스낵바.
+  static const attendanceActionFailed = '처리에 실패했습니다. 다시 시도해주세요.';
+
+  /// 사전 안내 배너 — 24시간 후 자동 출석 완료 + 1회 차감 고지.
+  static const attendanceAutoCompleteNotice =
+      '미확인 상태입니다. 종료 후 24시간이 지나면 자동으로 출석 완료 처리되며 수강권 1회가 차감됩니다.';
+
+  /// 차감 결과 — 1회 차감됨 (completed).
+  static const attendanceDeductedResult = '수강권 1회 차감됨';
+
+  /// 차감 결과 — 차감 없음 (휴강/취소).
+  static const attendanceNoDeductionResult = '차감 없음';
 }

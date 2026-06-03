@@ -477,32 +477,8 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
-              TextField(
-                controller: TextEditingController(
-                  text: settings.bookingGuidanceMessage ?? '',
-                ),
-                maxLength: 100,
-                maxLines: 2,
-                decoration: InputDecoration(
-                  hintText: TeacherSettings.defaultGuidanceMessage,
-                  hintStyle: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.paperDark,
-                  border: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.inkQuaternary),
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.inkQuaternary),
-                  ),
-                  counterText: '',
-                ),
-                onChanged: (value) {
-                  ref
-                      .read(teacherSettingsNotifierProvider.notifier)
-                      .updateBookingGuidanceMessage(value);
-                },
+              _GuidanceMessageField(
+                initialValue: settings.bookingGuidanceMessage ?? '',
               ),
               const SizedBox(height: AppSpacing.space2),
               Text(
@@ -826,6 +802,66 @@ class _BookingSettingItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Booking guidance message input.
+///
+/// Owns its [TextEditingController] in state so the caret does not jump while
+/// typing — building a controller inside `build()` would reset selection on
+/// every rebuild. (#5 D-G3)
+class _GuidanceMessageField extends ConsumerStatefulWidget {
+  const _GuidanceMessageField({required this.initialValue});
+
+  final String initialValue;
+
+  @override
+  ConsumerState<_GuidanceMessageField> createState() =>
+      _GuidanceMessageFieldState();
+}
+
+class _GuidanceMessageFieldState extends ConsumerState<_GuidanceMessageField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      maxLength: 100,
+      maxLines: 2,
+      decoration: InputDecoration(
+        hintText: TeacherSettings.defaultGuidanceMessage,
+        hintStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.inkTertiary,
+        ),
+        filled: true,
+        fillColor: AppColors.paperDark,
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.inkQuaternary),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.inkQuaternary),
+        ),
+        counterText: '',
+      ),
+      onChanged: (value) {
+        ref
+            .read(teacherSettingsNotifierProvider.notifier)
+            .updateBookingGuidanceMessage(value);
+      },
     );
   }
 }

@@ -241,7 +241,7 @@ final availableTimeSlotsProvider =
 
 typedef AvailableTimeSlotsRef = ProviderRef<AsyncValue<List<TimeSlot>>>;
 String _$teacherSettingsNotifierHash() =>
-    r'b2cb6a4afa460ef1e626a8d7721c373574b9fcff';
+    r'691702e0da684a2a3cc54f18d3837255c871a9a2';
 
 /// Teacher settings notifier for CRUD operations
 ///

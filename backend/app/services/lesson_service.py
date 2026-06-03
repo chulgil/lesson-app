@@ -302,7 +302,26 @@ class LessonService:
             setattr(lesson, key, value)
         await self.db.flush()
         await self.db.refresh(lesson)
+        # NOTE: LessonUpdate has no ``status`` field — status transitions (and
+        # thus completion deduction) only happen via ``update_status``.
         return LessonResponse.model_validate(lesson)
+
+    async def _deduct_if_completed(self, lesson: Any) -> None:
+        """Deduct one subscription session for a completed lesson.
+
+        Shared entry point for manual (``update`` / ``update_status``) and auto
+        completion. Relies on ``SubscriptionService.deduct_for_completed_lesson``
+        being idempotent (skips when a usage row already exists for the lesson),
+        so re-saving an already-completed lesson never double-deducts. Only
+        ``completed`` deducts; 휴강/취소 statuses do not call this.
+        """
+        if not lesson.subscription_id:
+            return
+        from app.services.subscription_service import SubscriptionService
+
+        await SubscriptionService(self.db).deduct_for_completed_lesson(
+            lesson.id, lesson.subscription_id
+        )
 
     async def delete(self, lesson_id: str, current_user: Any) -> None:
         """Delete a lesson."""
@@ -347,6 +366,12 @@ class LessonService:
 
         await self.db.flush()
         await self.db.refresh(lesson)
+
+        # Unified completion deduction (product-approved 2026-06-04): manual and
+        # auto completion both deduct one session. Idempotent; 휴강/취소 do not.
+        if new_status == LessonStatus.completed.value:
+            await self._deduct_if_completed(lesson)
+
         return LessonResponse.model_validate(lesson)
 
     async def archive(self, lesson_id: str, current_user: Any) -> LessonResponse:

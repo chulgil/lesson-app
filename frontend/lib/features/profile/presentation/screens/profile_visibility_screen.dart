@@ -22,10 +22,8 @@ class ProfileVisibilityScreen extends ConsumerStatefulWidget {
 
 class _ProfileVisibilityScreenState
     extends ConsumerState<ProfileVisibilityScreen> {
-  // ignore: unused_field -- Save CTA is currently hidden while the visibility flow is being rebuilt.
   bool _isLoading = false;
   late ProfileVisibilitySettings _settings;
-  // ignore: unused_field -- Save CTA is currently hidden while the visibility flow is being rebuilt.
   bool _hasChanges = false;
 
   @override
@@ -47,7 +45,6 @@ class _ProfileVisibilityScreenState
     });
   }
 
-  // ignore: unused_element -- Save CTA is currently hidden while the visibility flow is being rebuilt.
   Future<void> _save() async {
     setState(() => _isLoading = true);
 
@@ -57,6 +54,7 @@ class _ProfileVisibilityScreenState
           .updateVisibilitySettings(_settings);
 
       if (mounted) {
+        setState(() => _hasChanges = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(AppStrings.proposalSettingsSavedSnackbar),
@@ -88,26 +86,59 @@ class _ProfileVisibilityScreenState
       ),
     );
 
-    return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.profileVisibilityAppBarTitle,
-      ),
-      body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => const Center(
-              child: Text(AppStrings.profileVisibilityErrorState),
-            ),
-        data: (profile) {
-          if (profile == null) {
-            return const Center(
-              child: Text(AppStrings.profileVisibilityNullState),
-            );
-          }
-          return _buildContent(context, profile, academiesAsync);
-        },
+    return PopScope(
+      canPop: !_hasChanges && !_isLoading,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldLeave = await _confirmDiscard();
+        if (shouldLeave && context.mounted) {
+          context.pop();
+        }
+      },
+      child: NotebookScreenScaffold(
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.profileVisibilityAppBarTitle,
+        ),
+        body: profileAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error:
+              (_, __) => const Center(
+                child: Text(AppStrings.profileVisibilityErrorState),
+              ),
+          data: (profile) {
+            if (profile == null) {
+              return const Center(
+                child: Text(AppStrings.profileVisibilityNullState),
+              );
+            }
+            return _buildContent(context, profile, academiesAsync);
+          },
+        ),
       ),
     );
+  }
+
+  /// Confirm leaving the screen when there are unsaved changes.
+  Future<bool> _confirmDiscard() async {
+    if (!_hasChanges) return true;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text(AppStrings.cancelChangesTitle),
+        content: const Text(AppStrings.exitChangesWithoutSavingConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text(AppStrings.continueEditing),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(AppStrings.exitAction),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   Widget _buildContent(
@@ -254,6 +285,24 @@ class _ProfileVisibilityScreenState
                 ),
             icon: const Icon(Icons.preview),
             label: const Text(AppStrings.profileVisibilityPreviewButton),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // Save button — persists the visibility settings (#5 D-G3)
+        SizedBox(
+          width: double.infinity,
+          height: AppSpacing.buttonHeight,
+          child: FilledButton(
+            onPressed: _isLoading ? null : _save,
+            child:
+                _isLoading
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Text(AppStrings.save),
           ),
         ),
       ],

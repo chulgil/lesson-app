@@ -159,7 +159,6 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     await notifier.pickAndSaveImage(source, context);
   }
 
-  // ignore: unused_element -- Save CTA is currently hidden while the profile edit flow is being rebuilt.
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -375,6 +374,25 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                   _address = result.address;
                   _addressDetail = result.addressDetail;
                 },
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Save button — persists all basic-info fields (#5 D-G3)
+              SizedBox(
+                width: double.infinity,
+                height: AppSpacing.buttonHeight,
+                child: FilledButton(
+                  onPressed: _isLoading ? null : _save,
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text(AppStrings.save),
+                ),
               ),
             ],
           ),
