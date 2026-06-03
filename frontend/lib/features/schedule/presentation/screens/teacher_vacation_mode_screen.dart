@@ -44,6 +44,7 @@ class TeacherVacationModeScreen extends ConsumerWidget {
             label: AppStrings.vacationStartDateLabel,
             date: state.startDate,
             onPick: (d) => notifier.setStartDate(d),
+            disablePast: true,
           ),
           _DateRow(
             label: AppStrings.vacationEndDateLabel,
@@ -127,10 +128,14 @@ class _DateRow extends StatelessWidget {
   final DateTime? date;
   final ValueChanged<DateTime> onPick;
 
+  /// When true, past dates are not selectable (firstDate = today).
+  final bool disablePast;
+
   const _DateRow({
     required this.label,
     required this.date,
     required this.onPick,
+    this.disablePast = false,
   });
 
   @override
@@ -155,10 +160,11 @@ class _DateRow extends StatelessWidget {
 
   Future<void> _pick(BuildContext context) async {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final picked = await showDatePicker(
       context: context,
       initialDate: date ?? now,
-      firstDate: DateTime(now.year - 1),
+      firstDate: disablePast ? today : DateTime(now.year - 1),
       lastDate: DateTime(now.year + 2),
     );
     if (picked != null) onPick(picked);
@@ -676,13 +682,17 @@ class _ActiveVacationSection extends ConsumerWidget {
     final listAsync = ref.watch(vacationListProvider);
     return listAsync.when(
       data: (vacations) {
-        if (vacations.isEmpty) return const SizedBox.shrink();
+        final now = DateTime.now();
+        final active = vacations
+            .where((v) => v.isActiveOn(now))
+            .toList(growable: false);
+        if (active.isEmpty) return const SizedBox.shrink();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionHeader(text: AppStrings.vacationActiveSection),
             SizedBox(height: AppSpacing.space2),
-            ...vacations.map((v) => _ActiveVacationCard(period: v)),
+            ...active.map((v) => _ActiveVacationCard(period: v)),
           ],
         );
       },

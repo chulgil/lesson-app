@@ -528,9 +528,17 @@ class _ExceptionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final upcoming =
         availability.exceptions
-            .where((e) => !e.endDate.isBefore(DateTime.now()))
+            .where(
+              (e) => !DateTime(
+                e.endDate.year,
+                e.endDate.month,
+                e.endDate.day,
+              ).isBefore(today),
+            )
             .toList()
           ..sort((a, b) => a.startDate.compareTo(b.startDate));
 

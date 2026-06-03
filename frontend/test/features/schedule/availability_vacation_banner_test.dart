@@ -44,11 +44,16 @@ class _StubVacationRepository implements VacationRepository {
       throw UnimplementedError();
 }
 
-VacationPeriod _period({DateTime? cancelledAt, String? reason}) => VacationPeriod(
+VacationPeriod _period({
+  DateTime? cancelledAt,
+  String? reason,
+  DateTime? startDate,
+  DateTime? endDate,
+}) => VacationPeriod(
   id: 'v1',
   teacherId: 't1',
-  startDate: DateTime(2026, 7, 15),
-  endDate: DateTime(2026, 8, 31),
+  startDate: startDate ?? DateTime(2026, 7, 15),
+  endDate: endDate ?? DateTime(2026, 8, 31),
   reason: reason,
   defaultDisposition: VacationDisposition.rollForward,
   cancelledAt: cancelledAt,
@@ -87,6 +92,36 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.text(AppStrings.vacationBannerTitle), findsNothing);
+    });
+
+    // Regression (#bug4): a vacation whose end date has already passed must
+    // not be shown as active, even when it was never cancelled.
+    testWidgets('hides when vacation has already ended', (tester) async {
+      final past = DateTime.now().subtract(const Duration(days: 10));
+      await _pump(tester, [
+        _period(
+          startDate: past.subtract(const Duration(days: 5)),
+          endDate: past,
+        ),
+      ]);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text(AppStrings.vacationBannerTitle), findsNothing);
+    });
+
+    // Regression (#bug4): a vacation ending today (date-only) stays active.
+    testWidgets('shows when vacation ends today', (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      await _pump(tester, [
+        _period(
+          startDate: today.subtract(const Duration(days: 3)),
+          endDate: today,
+        ),
+      ]);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text(AppStrings.vacationBannerTitle), findsOneWidget);
     });
   });
 }

@@ -60,6 +60,18 @@ class VacationPeriod {
     return diff < 0 ? 0 : diff + 1;
   }
 
+  /// Whether the vacation is still in effect on [reference] (date-only).
+  ///
+  /// Active means: not cancelled AND the inclusive end date has not passed.
+  /// Comparison is date-only so a vacation ending today stays active until the
+  /// next calendar day (avoids a midnight off-by-one).
+  bool isActiveOn(DateTime reference) {
+    if (cancelledAt != null) return false;
+    final today = DateTime(reference.year, reference.month, reference.day);
+    final end = DateTime(endDate.year, endDate.month, endDate.day);
+    return !end.isBefore(today);
+  }
+
   VacationPeriod copyWith({
     String? id,
     String? teacherId,
