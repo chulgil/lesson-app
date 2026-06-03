@@ -157,18 +157,14 @@ async def test_scenario_subscription_lifecycle(client: AsyncClient, auth_headers
         )
         lesson_id = lesson.json()["id"]
 
-        # Complete and deduct
-        await client.patch(
+        # Complete (auto-deducts one session — 2026-06-04 unified rule; no
+        # separate use-lesson call needed).
+        completed = await client.patch(
             f"/api/v1/lessons/{lesson_id}/status",
             headers=auth_headers,
             json={"status": "completed"},
         )
-        deduct = await client.patch(
-            f"/api/v1/subscriptions/{sub_id}/use-lesson",
-            headers=auth_headers,
-            json={"lesson_id": lesson_id},
-        )
-        assert deduct.status_code == 200
+        assert completed.status_code == 200
 
     # Step 5: Check remaining is 2 (8 - 6)
     sub_detail = await client.get(f"/api/v1/subscriptions/{sub_id}", headers=auth_headers)

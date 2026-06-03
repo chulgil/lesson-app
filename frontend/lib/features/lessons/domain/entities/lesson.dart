@@ -233,6 +233,25 @@ class Lesson {
         : LessonStatus.scheduled;
   }
 
+  /// Lesson end time computed from date + startTime + duration.
+  DateTime get endDateTime => _calculateEndDateTime();
+
+  /// Whether this lesson awaits a teacher confirmation decision:
+  /// still `scheduled` in raw status, but its end time is already in the past.
+  /// Teacher must mark it 출석 확인(completed) or 휴강(cancelledByTeacher),
+  /// otherwise backend auto-completes after 24h.
+  bool get isUnconfirmed =>
+      status == LessonStatus.scheduled &&
+      endDateTime.isBefore(DateTime.now());
+
+  /// Whether the lesson ended within the last 24h (pre-notice window).
+  /// Used to show the auto-complete heads-up banner.
+  bool get isWithinAutoCompleteWindow {
+    if (!isUnconfirmed) return false;
+    final hoursSinceEnd = DateTime.now().difference(endDateTime).inHours;
+    return hoursSinceEnd < 24;
+  }
+
   /// Calculate lesson end time from date + startTime + duration.
   DateTime _calculateEndDateTime() {
     final parts = startTime.split(':');
