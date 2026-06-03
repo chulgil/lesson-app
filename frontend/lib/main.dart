@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'core/auth/auth_state.dart';
 import 'core/deep_link/deep_link_handler.dart';
 import 'core/l10n/generated/app_localizations.dart';
-import 'core/providers/repository_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/startup/app_bootstrap.dart';
 import 'core/startup/startup_provider_observer.dart';
@@ -66,23 +65,17 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     final existing = _router;
     if (existing != null) return existing;
 
-    final useMockData = ref.read(mockDataModeProvider);
-
-    if (useMockData) {
-      _router = AppRouter.router;
-    } else {
-      _authRefreshController = StreamController<AuthState>.broadcast();
-      // Bridge the Riverpod auth state into a stream the router can listen to.
-      ref.listenManual<AuthState>(authNotifierProvider, (_, next) {
-        _authRefreshController?.add(next);
-      });
-      _authRefresh = GoRouterRefreshStream(_authRefreshController!.stream);
-      _router = AppRouter.createRouter(
-        ref,
-        useMockData: false,
-        refreshListenable: _authRefresh,
-      );
-    }
+    // Auth redirect + refreshListenable are wired regardless of mock mode:
+    // mock mode only swaps data repositories, routing/redirect stays identical.
+    // (Previously mock mode used a redirect-less static router, so logout never
+    // bounced back to /login.)
+    _authRefreshController = StreamController<AuthState>.broadcast();
+    // Bridge the Riverpod auth state into a stream the router can listen to.
+    ref.listenManual<AuthState>(authNotifierProvider, (_, next) {
+      _authRefreshController?.add(next);
+    });
+    _authRefresh = GoRouterRefreshStream(_authRefreshController!.stream);
+    _router = AppRouter.createRouter(ref, refreshListenable: _authRefresh);
     return _router!;
   }
 
