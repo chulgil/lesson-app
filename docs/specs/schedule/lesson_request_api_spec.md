@@ -162,3 +162,31 @@ POST /api/lesson-requests/expire (internal/cron)
 | 400 | MAX_SLOTS_EXCEEDED | suggestedSlots > 3개 |
 | 404 | REQUEST_NOT_FOUND | 요청 ID 없음 |
 | 403 | UNAUTHORIZED_ACTION | 권한 없는 액션 |
+
+## FE 필터/정렬 모델 (코드 반영 2026-06-03)
+
+목록 화면(`all_lesson_requests_screen`)의 클라이언트 측 필터·정렬은 불변 값 객체 `RequestFilter` 로 표현된다. API 쿼리(§1)에 없는 FE 전용 필터/정렬을 포함한다.
+
+### RequestFilter 필드
+
+| 필드 | 타입 | 기본 | 설명 |
+|---|---|---|---|
+| `status` | `UnifiedRequestStatus?` | null | 단일 상태 필터 |
+| `statusGroup` | `RequestStatusGroup` | all | 색상 기반 상태 그룹 필터 |
+| `source` | `RequestSourceFilter` | all | 소스 필터 (학원/개인) |
+| `phase` | `RequestPhase?` | null | 단계 필터 |
+| `startDate` / `endDate` | `DateTime?` | null | 기간 범위 |
+| `specificDate` | `DateTime?` | null | 달력 날짜 클릭 단일일 필터 |
+| `sortBy` | `RequestSortBy` | createdAtDesc | 정렬 |
+| `pageSize` / `page` | `int` | 20 / 0 | 페이지네이션 |
+
+`RequestFilter.preset(RequestFilterPreset)` 팩토리로 기간 프리셋 → startDate/endDate 환산.
+
+### 신규 enum
+
+| enum | 값 | 설명 |
+|---|---|---|
+| `RequestSortBy` | `createdAtDesc`, `studentNameAsc` | 정렬 기준 |
+| `RequestFilterPreset` | `oneWeek`, `oneMonth`, `threeMonths`, `custom` | 기간 프리셋 (7/30/90일) |
+| `RequestSourceFilter` | `all`, `academy`, `individual` | 요청 소스 |
+| `RequestStatusGroup` | `all`, `active`, `success`, `warning` | 색상 그룹 — active(pending/approved/negotiating/timeConfirmed), success(completed/proposalAccepted/paymentNotified), warning(cancelled/expired/rejected) |

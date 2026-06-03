@@ -3,6 +3,8 @@
 > 구현 상태: ✅ 구현 완료
 > Last updated: 2026-03-07
 
+> ⚠️ **역방향 드리프트 경고 (코드 검증 2026-06-03)** — 본 스펙이 기술하는 `features/calendar/` 디렉토리·`CalendarTab`·`calendar_event.dart`·`teacherSelectedDateProvider`는 현재 코드에 존재하지 않는다. 캘린더 탭 기능은 `features/schedule/presentation/screens/schedule_tab.dart`로 이전되었고, 주간 캘린더 공통 위젯(`core/widgets/week_calendar_widget.dart`)과 `weekly_calendar_picker.dart`만 잔존한다. 본 문서의 구조/심볼 레퍼런스는 stale 상태이며, `schedule_master.md` + `schedule` 도메인 스펙으로 통합하거나 schedule 기준으로 재작성하는 결정이 필요하다. (코드→스펙 단방향 동기화 범위 밖이라 본 경고만 추가)
+
 ## 1. 개요
 
 선생님(Teacher) 역할 사용자를 위한 스케줄 관리 탭. 주간 캘린더와 날짜별 레슨 목록을 결합하여 일정을 한눈에 파악하고 관리할 수 있도록 한다. 마치 종이 수첩의 일주일 페이지처럼, 날짜를 선택하면 해당 날짜의 레슨 목록이 바로 표시된다.

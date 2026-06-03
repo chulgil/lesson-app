@@ -660,6 +660,8 @@ void onPaymentConfirmed(Proposal proposal) {
 
 해당 미래 스펙이 완성되기 전까지 요금제, PG, 환불, 영수증, 관리자 매출 대시보드, `/billing/*` API는 정의하지 않는다.
 
+> **코드 반영 2026-06-03**: 흐름 B(앱 사용료) 요금제·IAP·영수증은 이미 코드에 구현되어 별도 SSOT([paywall_spec.md](./paywall_spec.md))로 정의됨. 본 §4.4 "미래" 문구는 흐름 A(선생님↔학생 수강료) 한정으로 읽는다 — 수강료 PG는 여전히 미정의(무통장입금 유지). 앱 사용료 결제 모델은 `features/billing` + paywall_spec.md 참조 (`/api/v1/me/billing/*`).
+
 > 상세 정책: [payment_architecture.md](./payment_architecture.md)
 
 ## 5. Lesson Policies

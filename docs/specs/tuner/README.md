@@ -287,3 +287,48 @@ flutter run -d <device_id> --release
 
 ### 향후 개선 사항
 - [ ] 턴어라운드 속도 개선 (현재 약간의 지연)
+
+---
+
+## 11. 코드 반영 추가 (2026-06-03)
+
+> 코드에는 구현되어 있으나 위 본문에 누락되어 있던 항목을 단방향(코드→스펙)으로 반영. 소스: `features/practice/domain/entities/tuner_types.dart`, `presentation/providers/tuner_combo_provider.dart`.
+
+### 11.1 JudgementResult enum (코드 반영 2026-06-03)
+
+콤보/게이미피케이션 판정 결과. cent 편차를 `TunerDifficulty.judge()`로 매핑.
+
+| 값 | colorValue | 의미 |
+|----|-----------|------|
+| `perfect` | 0x9090EE90 (연두) | perfectCent 이내 |
+| `good` | 0x90FFEB3B (노랑) | goodCent 이내 |
+| `miss` | 0x909E9E9E (회색) | 임계값 초과 |
+
+### 11.2 TunerDifficulty 추가 필드 (코드 반영 2026-06-03)
+
+4.3 허용 오차 외에, 각 난이도는 애니메이션 연속성 제어 필드를 함께 보유한다.
+
+| 난이도 | perfectCent | goodCent | gracePeriodMs | reactivationChances |
+|--------|:-----------:|:--------:|:-------------:|:-------------------:|
+| beginner (초보) | 20 | 40 | 600 | 2 |
+| intermediate (중급) | 15 | 30 | 400 | 1 |
+| advanced (고급) | 5 | 10 | 200 | 1 |
+
+- `gracePeriodMs`: 같은 음 연속성에서 허용되는 끊김/공백 시간 (이 시간 내 재개 시 애니메이션 streak 유지)
+- `reactivationChances`: revert 애니메이션 진행 중 재개 허용 횟수
+
+### 11.3 ComboTier enum (코드 반영 2026-06-03)
+
+> 소스: `presentation/providers/tuner_combo_provider.dart` (ComboState, ComboTier)
+
+Perfect 연속(combo count) 기반 시각 효과 등급.
+
+| 값 | minCount | 메시지 | 별 개수 |
+|----|:--------:|--------|:-------:|
+| `none` | 0 | (없음) | 0 |
+| `good` | 5 | 콤보 시작! | 1 |
+| `great` | 10 | 대단해옹! | 2 |
+| `amazing` | 20 | 천재다옹! | 3 |
+| `legendary` | 50 | 전설이다옹! | 3 (골든) |
+
+`ComboState`: count, maxCount, lastJudgement, perfectStartTime; 파생값 `perfectDuration`(초), `isCurtainFullyCovered`(perfect 8초 이상 → 노란 커튼 완전 덮음), `tier`.

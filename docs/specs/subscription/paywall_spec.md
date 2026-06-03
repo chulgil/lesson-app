@@ -331,6 +331,61 @@ Trial:  ⏰ TRIAL  D-9 종료   체험 중 · 학생 무제한
 
 ---
 
+## 8.5 코드 반영 추가 (2026-06-03)
+
+> 코드(`features/billing`)에 구현되었으나 위 본문에 누락된 항목. 코드→스펙 단방향 반영.
+> 정책 정합: 본 결제는 흐름 B(앱 사용료, 선생님/학원 → 앱관리자)에만 적용. 선생님↔학생 수강료 PG 없음(무통장입금 유지). 코드에 수강료 PG 경로 없음 — 정책 일치.
+
+### 8.5.1 실제 클래스/엔티티명 (스펙 §4.2 대비 차이)
+
+| 스펙 표기 | 실제 코드 | 위치 |
+|---|---|---|
+| `app_billing_status.dart` (plan+expiresAt+trialEndsAt) | `AppBillingSnapshot` | `billing/domain/entities/app_billing_snapshot.dart` |
+| `billing_plan.dart` enum | `BillingPlan` (free/pro/studio/lifetime — `trial_pro` 는 별도 tier 아님, `status=trial` 로 표현) | `billing/domain/entities/billing_plan.dart` |
+| (없음) | `BillingStatus` enum: `active`/`trial`/`expired`/`cancelled` | `billing/domain/entities/billing_status.dart` |
+| `paywall_sheet.dart` | 실제 분리 파일: `free_limit_sheet.dart`, `feature_locked_sheet.dart` | `billing/presentation/widgets/` |
+
+`AppBillingSnapshot` 주요 필드: `id`, `userId`, `plan`, `status`, `startedAt`, `expiresAt?`, `source`, `originalTransactionId?`, `trialUsed`, `lifetimeOfferEndsAt?`. 헬퍼: `isUnlimited`, `isActiveOrTrial`, `lifetimeOfferActive`, `freeFallback()` 팩토리.
+
+### 8.5.2 IAP 결과 엔티티 (신규, 스펙 미정의)
+
+| 엔티티 | 필드 | 출처 |
+|---|---|---|
+| `IapValidationResult` | `granted`, `message`, `planId?`, `tier?`, `expiresAt?` | `POST /me/billing/iap/validate` 응답. `granted=false` 면 audit 저장만(pending) |
+| `TrialActivationResult` | `success`, `message`, `planId?`, `expiresAt?` | `POST /me/billing/trial/start` 응답. 중복 체험은 409 → `success=false` |
+
+### 8.5.3 IapService 추상화 (신규)
+
+`billing/data/services/iap_service.dart` — `in_app_purchase` 패키지 래핑. `StoreKitIapService` (production) / `FakeIapService` (test).
+
+- `platform` ('apple'/'google'), `isAvailable()`, `queryProducts(ids)`, `purchase(product)`, `completePurchase(purchase)`
+- 결과 sealed type: `IapPurchaseOutcome` → `IapPurchaseSuccess` / `IapPurchaseCancelled` / `IapPurchaseFailure`
+- receipt 검증은 백엔드 repository 담당. Apple S2S / Google Play Developer API 통합은 Phase D.
+
+### 8.5.4 실제 API 경로 (스펙 §5 대비 차이)
+
+코드 `AppBillingRepository` 가 호출하는 경로는 `/app/billing/*` 가 아니라 `/api/v1/me/billing/*`:
+
+| 메서드 | 실제 경로 | 스펙 §5 표기 |
+|---|---|---|
+| `fetchSnapshot()` | `GET /api/v1/me/billing/plan` | `GET /app/billing/me` |
+| `startTrial()` | `POST /api/v1/me/billing/trial/start` | `POST /app/billing/trial/start` |
+| `validatePurchase()` | `POST /api/v1/me/billing/iap/validate` | `POST /app/billing/verify-purchase` |
+
+`validatePurchase` 파라미터: `platform`('apple'/'google'), `receipt`(Apple=base64 / Google=purchase token), `productId`.
+
+### 8.5.5 BillingGuard 결정 모델 (신규)
+
+`billing/domain/services/billing_guard.dart` — `checkStudentLimit({snapshot, currentStudentCount})` → `StudentLimitDecision{allowed, reason}`.
+
+`LimitReason` enum: `withinLimit` / `freeLimitReached` / `planExpired`(무제한 plan 이라도 `status=expired` 면 차단 = 7일 유예 종료 트리거). `freeStudentLimit = 5`. `effectiveStudentLimit(snapshot)` → 무제한이면 null.
+
+### 8.5.6 Store 상품 ID
+
+`billing/billing_constants.dart`: `proMonthlyProductId = 'pro_monthly'`, `lifetimeProductId = 'lifetime'` (백엔드 `IapValidateRequest.product_id` 와 1:1).
+
+---
+
 ## 9. 수익 예측 (참고)
 
 | 선생님 수 | Free (55%) | Pro (35%) | Studio (10%) | 월 매출 |

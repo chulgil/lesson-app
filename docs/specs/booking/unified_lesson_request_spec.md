@@ -638,3 +638,79 @@ String? bookingGuidanceMessage;
 - 선생님이 변경 시 경고 다이얼로그 표시
 
 > 상세: [subscription_edit_spec.md](../subscription/subscription_edit_spec.md) §11
+
+---
+
+## 코드 반영 추가 (2026-06-03)
+
+> §10 데이터 모델(v2.0)은 설계 시점 기준이며, 실제 구현 enum 값이 일부 달라졌다. 아래는 현행 코드 기준 정정/추가 사항이다.
+> 코드 위치: `features/schedule/domain/entities/unified_lesson_request.dart`
+
+### A. LessonRequestType — 값명 정정
+
+§10.3은 `perSession`으로 표기했으나, **실제 코드는 `package`**를 사용한다.
+
+```dart
+enum LessonRequestType { trial, regular, package }  // perSession (X) → package
+```
+
+### B. UnifiedRequestStatus — 코드 기준 13개 값
+
+§10.5 대비 실제 enum 차이: `approved` 추가, `negotiating`/`subscriptionIssued`/`inProgress` 존재. `proposalAccepted` 다음 단계로 `paymentNotified`까지는 동일.
+
+```dart
+enum UnifiedRequestStatus {
+  pending,            // 선생님 확인 대기
+  approved,           // 선생님 승인 (코드 전용 — 스펙 §10.5 미기재)
+  negotiating,        // 시간 협상 중
+  timeConfirmed,      // 시간 확정
+  proposalSent,       // 수강권 제안 발송됨
+  proposalAccepted,   // 수강권 수락됨
+  paymentNotified,    // 학생/학부모가 입금 완료 알림
+  subscriptionIssued, // 입금 확인 후 수강권 발급 (Phase 2)
+  inProgress,         // 레슨 진행 중 (Phase 3)
+  completed,          // 전체 완료
+  rejected,           // 거절됨
+  cancelled,          // 취소됨
+  expired,            // 만료
+}
+```
+
+상태 분류 헬퍼:
+- `isActive` — pending/approved/negotiating/timeConfirmed/proposalSent/proposalAccepted/paymentNotified/subscriptionIssued/inProgress
+- `isTerminal` — completed/rejected/cancelled/expired
+
+### C. RequestPhase — 신규 enum (스펙 미기재)
+
+챕터 기반 UI를 위한 라이프사이클 단계 enum. `UnifiedRequestStatus`를 3단계 + 종료 단계로 묶는다.
+
+```dart
+enum RequestPhase {
+  request,       // Phase 1: 레슨 신청 → 입금
+  subscription,  // Phase 2: 수강권 발행
+  lessons,       // Phase 3: 레슨 진행
+  completed,     // 전체 완료
+  terminal,      // 거절/취소/만료
+}
+```
+
+### D. ProposalAction — 값 추가
+
+§10.4는 `propose, accept, reject` 3개로 정의했으나, 코드는 **`counterPropose`(역제안)** 가 추가된 4개 값이다.
+
+```dart
+enum ProposalAction { propose, accept, reject, counterPropose }
+```
+
+### E. 구현 위치 정정
+
+§17 "기존 화면 대체 계획"의 신규 엔티티/화면은 `features/booking/`이 아니라 **`features/schedule/`** 아래에 구현되어 있다.
+
+| 항목 | 코드 경로 |
+|------|----------|
+| `UnifiedLessonRequest` 엔티티 | `features/schedule/domain/entities/unified_lesson_request.dart` |
+| Repository (interface) | `features/schedule/domain/repositories/unified_lesson_request_repository.dart` |
+| Repository (Mock/Remote) | `features/schedule/data/repositories/{mock,remote}_unified_lesson_request_repository.dart` |
+| Workflow Service | `features/schedule/domain/services/unified_lesson_request_workflow_service.dart` |
+| Providers | `features/schedule/presentation/providers/unified_lesson_request_providers.dart` |
+| 신청 화면 | `features/schedule/presentation/screens/unified_lesson_request_screen.dart` |

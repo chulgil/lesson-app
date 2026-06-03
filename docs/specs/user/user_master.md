@@ -1769,10 +1769,46 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 
 ---
 
+## 코드 반영 추가 (2026-06-03)
+
+> 코드에는 존재하나 본 스펙에 누락되었던 항목 (코드→스펙 단방향 반영). 출처: `features/auth/`.
+
+### A. 학원-선생님 초대 — auth 측 구현 (코드 반영 2026-06-03)
+
+§3.2 / §3.4 에서 "학원-선생님 초대 ❌ 미구현" 으로 기록되었으나, auth 도메인에 수락/만료 흐름이 구현됨.
+
+| 항목 | 파일 | 설명 |
+|------|------|------|
+| `AcademyInviteAcceptScreen` | `auth/presentation/screens/academy_invite_accept_screen.dart` | 학원 초대 미리보기 → 수락/거절 |
+| `AcademyInviteExpiredScreen` | `auth/presentation/screens/academy_invite_expired_screen.dart` | 만료된 초대 안내 |
+| `academyInvitePreviewProvider` / `academyInviteAcceptProvider` / `academyInviteRejectProvider` | `auth/presentation/providers/academy_invite_provider.dart` | 초대 미리보기·수락·거절 |
+| 라우트 | `AppRoutes.academyInviteAccept = '/academy/accept'`, `AppRoutes.academyInviteExpired = '/academy/expired'` | |
+
+> 비고: `AcademyInvitePreview` 엔티티와 `AcademyInviteRepository` 는 `features/academy/` (소유 밖)에 위치 — cross-domain 재사용.
+
+### B. 컨텍스트 전환 (Context Switch) (코드 반영 2026-06-03)
+
+선생님의 개인/학원 컨텍스트 전환을 위한 repository 계층. §1.5 활동 컨텍스트의 런타임 구현.
+
+| 항목 | 파일 | 설명 |
+|------|------|------|
+| `ContextSwitchRepository` (interface) | `auth/domain/repositories/context_switch_repository.dart` | `switchContext({targetContext})` → `ContextSwitchResult` |
+| `ContextSwitchResult` (value) | 동 파일 | 전환 결과 값객체 |
+| `MockContextSwitchRepository` | `auth/data/repositories/mock_context_switch_repository.dart` | Mock 구현 |
+
+### C. UserRole 표시 변환 분리 (코드 반영 2026-06-03)
+
+> 소스: `auth/presentation/extensions/user_role_visuals.dart`
+
+§1.3 의 `UserRole` enum 표시값(label/emoji/homeRoute)은 flutter-architecture 규칙에 따라 domain enum 에서 분리되어 presentation extension(`user_role_visuals.dart`)으로 이동됨. enum 자체는 순수 값만 보유.
+
+---
+
 ## 12. 변경 이력
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 1.2 | 2026-06-03 | 코드 반영 — 학원-선생님 초대(auth 측 수락/만료 화면·provider·라우트), Context Switch repository, UserRole visuals extension 분리 |
 | 1.1 | 2026-03-07 | Enum 정식 정의 추가 (UserRole, RelationshipStatus dart 코드 블록) |
 | | | 경쟁사 대비 차별점 섹션 추가 (1.2) |
 | | | ConnectionStatus vs RelationshipStatus 용어 명확화 추가 |

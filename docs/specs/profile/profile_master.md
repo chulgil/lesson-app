@@ -130,6 +130,49 @@
 
 ---
 
+## 코드 반영 추가 (2026-06-03)
+
+> 코드에는 존재하나 §3 기존 화면 목록에 누락되었던 항목 (코드→스펙 단방향 반영). 출처: `features/profile/`.
+
+### A. 누락 화면 (코드 반영 2026-06-03)
+
+| 화면 | 파일 | 설명 |
+|------|------|------|
+| `CancellationDefaultsScreen` | `presentation/screens/cancellation_defaults_screen.dart` | 취소/노쇼 기본 정책 설정 |
+| `InstrumentManagementScreen` | `presentation/screens/instrument_management_screen.dart` | 가르치는 악기 추가/제거/순서 |
+| `RepertoireManagementScreen` | `presentation/screens/repertoire_management_screen.dart` | 레퍼토리 관리 |
+| `ProfileVisibilityScreen` | `presentation/screens/profile_visibility_screen.dart` | 공개 프로필 항목별 노출 설정 |
+| `FeedbackTemplateManagementScreen` | `presentation/screens/feedback_template_management_screen.dart` | 피드백 템플릿 관리 — [feedback_template_management.md](feedback_template_management.md) |
+| `InvitePendingListScreen` | `presentation/screens/invite_pending_list_screen.dart` | 대기 중 초대 목록 |
+
+### B. 누락 엔티티 (코드 반영 2026-06-03)
+
+| 엔티티/enum | 파일 | 핵심 필드 |
+|------|------|------|
+| `CancellationDefaults` | `domain/entities/cancellation_defaults.dart` | cancellationDeadlineHours, studentCompensationExtraMinutesEnabled, includeExtraMinutesTextOnLateCancel, studentCompensationExtraMinutesMessage?, notifyOwnerOnLateCancel |
+| `PendingInvite` | `domain/entities/pending_invite.dart` | 대기 초대 표시용 |
+| `VerificationBadge` (enum) | `domain/entities/teacher_profile.dart` | phoneVerified / certified / premium — user_master §2.2 배지 시스템의 enum 정의 |
+
+### C. 누락 위젯 (코드 반영 2026-06-03)
+
+| 위젯 | 파일 | 설명 |
+|------|------|------|
+| `VerificationBadgeChip` | `presentation/widgets/verification_badge_chip.dart` | `VerificationBadge` 3종(phoneVerified/certified/premium) 칩 렌더링. 학생/학부모 노출 — [phone_verification_policy.md §5.4](../user/phone_verification_policy.md) |
+
+### D. 누락 Provider (코드 반영 2026-06-03)
+
+> 소스: `presentation/providers/`
+
+| Provider | 용도 |
+|----------|------|
+| `cancellationDefaultsProvider` | 취소 기본 정책 조회/CRUD |
+| `backgroundImageProvider` | 프로필 배경 이미지 |
+| `profileImageProvider` | 프로필 이미지 — [profile_image_spec.md](profile_image_spec.md) |
+| `invitePendingProvider` | 대기 초대 목록 |
+| `teacherExtendedProfileProvider` | 확장 프로필(경력/자격/학력) |
+
+---
+
 ## 6. 관련 마스터 스펙
 
 - 초대: [user_master.md §3](../user/user_master.md)
@@ -142,6 +185,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-03 | 코드 반영 — 누락 화면 6종, 엔티티 3종(CancellationDefaults/PendingInvite/VerificationBadge), VerificationBadgeChip 위젯, Provider 5종 추가 |
 | 2026-04-16 | 10x Vision UX 개선 — 완성도 게이지, 바로가기 카드, 통계 재정의, 섹션 순서 변경 |
 | 2026-04-15 | 계좌 관리, 입금대기(후불), 미리보기 화면 추가 |
 | 2026-03-12 | 초기 스펙 작성 |

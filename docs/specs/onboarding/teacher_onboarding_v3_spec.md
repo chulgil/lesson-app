@@ -383,6 +383,39 @@ class CoachMarkState {
 | **7단계** | 프로필 리마인더 알림 | LOW | S |
 | **8단계** | 학생 온보딩 코치마크 | LOW | M |
 
+## 코드 반영 추가 (2026-06-03)
+
+> 코드에는 존재하나 본 스펙에 누락되었던 항목 (코드→스펙 단방향 반영). 출처: `features/onboarding/`.
+
+### A. 퀘스트 진행 모델 (코드 반영 2026-06-03)
+
+> 소스: `onboarding/domain/entities/onboarding_progress.dart`
+
+| 엔티티 | 핵심 필드 / 파생값 |
+|------|------|
+| `OnboardingQuest` | id, title, description, isRequired, isComplete, completedAt? |
+| `OnboardingProgress` | userId, quests[], startedAt, completedAt?; 파생: `completedRequiredQuestCount`, `totalRequiredQuestCount`, `totalQuestCount`, `isComplete`, `progressFraction`, `progressPercentage`, `progressLabel`, `requiredQuests` |
+
+`progressPercentage` 가 §6 프로필 완성도 게이지(0~100%)의 산식 근거.
+
+### B. Provider / 저장 (코드 반영 2026-06-03)
+
+| 항목 | 파일 | 설명 |
+|------|------|------|
+| `onboardingProgressProvider` 등 | `presentation/providers/onboarding_providers.dart` | 퀘스트 보드 상태 |
+| 진행상태 영속 저장 | `presentation/providers/onboarding_progress_storage_provider.dart` | userId-scoped 저장 (AsyncNotifier) |
+| `teacherProfileRepositoryProvider` | `presentation/providers/teacher_profile_repository_provider.dart` | 프로필 보상 연동 |
+
+### C. 화면 / 위젯 (코드 반영 2026-06-03)
+
+| 화면/위젯 | 파일 | 설명 |
+|------|------|------|
+| `ProfileSetupScreen` | `presentation/screens/profile_setup_screen.dart` | Phase B 프로필 입력 |
+| `StudentProfileSetupScreen` | `presentation/screens/student_profile_setup_screen.dart` | 학생 프로필 설정 |
+| `FirstAvailabilityCelebrationSheet` | `presentation/widgets/first_availability_celebration_sheet.dart` | 첫 가용시간 설정 완료 축하 시트 |
+| `FirstAvailabilityInterstitial` | `presentation/widgets/first_availability_interstitial.dart` | 가용시간 0개 강제 안내 모달 — [teacher_first_availability_setup.md §4.1](teacher_first_availability_setup.md) |
+| `PhoneVerificationScreen` / `StudentSignupBlockedScreen` | `presentation/screens/` | [phone_verification_policy.md §3](../user/phone_verification_policy.md) |
+
 ## 9. 관련 스펙
 
 | 스펙 | 관계 |
@@ -396,4 +429,5 @@ class CoachMarkState {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-06-03 | 코드 반영 — OnboardingQuest/OnboardingProgress 엔티티, provider/저장, Phase B 화면 및 첫 가용시간 위젯 추가 |
 | 2026-05-31 | v3 초안 — 게임형 튜토리얼 + 프로필 보상 시스템 설계 |

@@ -578,10 +578,56 @@ features/analytics/
 
 ---
 
+## 코드 반영 추가 (2026-06-03)
+
+> 본 섹션은 §3.3(TeacherMonthlyStats/StudentReport/ReportPeriod 중심)·§8(teacher_dashboard_screen / student_report_screen 중심)보다 실제 구현이 앞서간 부분을 단방향으로 반영한 것이다. 실제 화면은 단일 `analytics_dashboard_screen.dart` + 탭 구조이며, Mock + Remote 이중 Repository가 존재한다.
+
+### AnalyticsRepository 인터페이스 (Mock + Remote)
+
+코드: `features/analytics/domain/repositories/analytics_repository.dart`
+
+| 메서드 | 반환 | 비고 |
+|--------|------|------|
+| `getTeacherMonthlyStats(month)` | `TeacherMonthlyStats` | 월간 핵심 지표 |
+| `getStudentProgress(...)` | `StudentProgressData` | 학생 성장(출석/연습/레퍼토리/녹음/피드백) |
+| `getRevenueAnalytics({...})` | `RevenueAnalyticsData` | 수익 추이/학생별 비중 |
+| `getRetentionAnalytics()` | `RetentionAnalyticsData` | 이탈 위험/갱신/재직기간 분포 |
+| `getStudentSummaryList(month)` | `List<StudentSummaryItem>` | 학생 요약 목록 |
+
+구현: `data/repositories/mock_analytics_repository.dart`, `data/repositories/remote_analytics_repository.dart` (← Mock + Remote 이중 구현)
+
+### 도메인 엔티티/enum (analytics_models.dart, analytics_data.dart, teacher_stats.dart)
+
+- `analytics_models.dart`: `WeeklyPracticePoint`, `AttendanceDay`, `RepertoirePiece`, `RecordingEntry`, `FeedbackHighlight`, `StudentProgressData`, `MonthlyRevenueTrend`, `StudentRevenuePortion`, `RevenueAnalyticsData`, `AtRiskStudent`, `MonthlyRenewalTrend`, `TenureDistribution`, `RetentionAnalyticsData`, `StudentSummaryItem`
+- enum: `AttendanceStatus { present, absent, cancelled, noLesson }`, `RepertoireStatus { planned, inProgress, completed }`, `RiskLevel { high, medium, low }`, `AnalyticsPeriod { oneMonth, threeMonths, sixMonths, oneYear }`
+- `analytics_data.dart`: `TeacherMonthlySummary`, `WeeklyPracticeSummary`, `AttendanceDay`, `RepertoireProgressItem`, `StudentProgress`, `MonthlyRevenue`, `StudentRevenue`, `RevenueAnalytics`, `StudentAnalyticsSummary`
+- `teacher_stats.dart`: `MonthlyTrend`, `StudentPracticeRank`, `TeacherMonthlyStats`
+
+> §3.2의 `ReportPeriod` 대신 코드는 `AnalyticsPeriod` enum을 사용한다 (oneMonth/threeMonths/sixMonths/oneYear). (← `analytics_models.dart`)
+
+### Provider 구성
+
+코드: `features/analytics/presentation/providers/analytics_providers.dart`
+
+`teacherMonthlyStatsProvider`, `teacherMonthlySummaryProvider`, `studentProgressDataProvider`, `studentProgressProvider`, `revenueAnalyticsDataProvider`, `revenueAnalyticsProvider`, `retentionAnalyticsProvider`, `studentSummaryListProvider`, `studentAnalyticsSummaryProvider`
+
+### 화면/위젯 (실제 구현)
+
+| 레이어 | 파일 |
+|--------|------|
+| 화면 | `presentation/screens/analytics_dashboard_screen.dart` (탭 기반 단일 대시보드) |
+| 탭 위젯 | `analytics_summary_tab.dart`, `student_growth_tab.dart`, `revenue_analytics_tab.dart` |
+| 차트/리스트 | `practice_ranking_list.dart`, `repertoire_progress_list.dart`, `simple_bar_chart.dart`, `practice_weekly_line_chart.dart`, `monthly_trend_chart.dart`, `revenue_pie_chart.dart` |
+
+> §8의 `student_report_screen.dart`(❌Phase3)는 미구현 상태이며, 실제 학생 성장/수익/리텐션은 위 탭 구조로 구현되었다.
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-06-03 | 코드 반영: AnalyticsRepository 인터페이스(Mock+Remote), analytics_models/data 엔티티·enum, 9개 Provider, 탭 기반 대시보드 화면/위젯 추가 |
 | 2026-05-31 | Phase G 메서드 임시 처리 목록 추가 (getStudentProgress, getRevenueAnalytics, getRetentionAnalytics, getStudentSummaryList) |
 | 2026-03-11 | Phase 1+2 구현 완료 반영 (#97). fl_chart → CustomPaint 변경, 구현 파일 위치 업데이트 |
 | 2026-03-07 | 위젯 구조, 화면 플로우, 경쟁사 상세 분석, Mock 데이터 설계, 구현 파일 위치 섹션 추가 |

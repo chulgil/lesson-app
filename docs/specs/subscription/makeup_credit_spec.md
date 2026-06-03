@@ -275,6 +275,7 @@ bulkChange(subscriptionId, newDayOfWeek, newTime)
 | GET | `/api/students/me/makeup-credits` | 학생 측 보유 크레딧 목록 |
 | GET | `/api/teachers/me/makeup-credits` | 선생님 측 발급한 크레딧 목록 |
 | POST | `/api/teachers/me/makeup-credits` | 수동 지급 (§4.4) |
+| DELETE | `/api/teachers/me/makeup-credits/:id` | 미사용 크레딧 회수 (오발급 정리, 이미 사용 시 409) (코드 반영 2026-06-03) |
 | POST | `/api/bookings` (확장) | `useCredit: bool` 파라미터 |
 
 ### 8.2 일괄변경 엔드포인트 확장
@@ -377,6 +378,38 @@ grep -rn "scheduledLessons" backend/app/models/  # ≥ 1
 | [teacher_vacation_mode.md](../schedule/teacher_vacation_mode.md) | 적립 트리거 (a) — 휴가 처리 옵션의 보강 크레딧 자동 등록 |
 | [subscription_master.md](subscription_master.md) §2 | `scheduledLessons`, `bonusCount` 필드 확장 |
 | [subscription_schedule_change_spec.md](../schedule/subscription_schedule_change_spec.md) | `bulkChange` 재계산 로직 |
+
+---
+
+## 코드 반영 추가 (2026-06-03)
+
+> 코드(`features/subscription`)에 구현되었으나 위 본문에 누락된 항목. 코드→스펙 단방향 반영.
+
+### A. MakeupCreditBalance 집계 (UI 편의)
+
+학생 보유 크레딧 잔액을 요약하는 값 객체. `features/subscription/domain/entities/makeup_credit.dart`.
+
+| 멤버 | 설명 |
+|---|---|
+| `available: List<MakeupCredit>` | 사용 가능(미사용 + 미만료) 크레딧, 만료 임박 순 정렬 |
+| `availableCount: int` | 보유 가능 회차 수 |
+| `hasAny: bool` | 보유 여부 |
+| `earliestExpiry: DateTime?` | 가장 빠른 만료 시각 (§9.1 카드 "가장 빠른 만료" 표기 근거) |
+| `MakeupCreditBalance.fromCredits(credits, now)` | 만료/사용 필터 + 정렬 팩토리 |
+
+MakeupCredit 자체 헬퍼: `isUsed`, `isExpired(now)`, `isAvailable(now)`, `daysUntilExpiry(now)` (§6 만료 정책 판정에 사용).
+
+### B. revokeCredit 회수 메서드
+
+`MakeupCreditRepository.revokeCredit(creditId)` — §9.2 "회수" UI 의 백엔드 계약. 이미 사용된 크레딧은 서버가 409 로 거부. (위 §8.1 DELETE 엔드포인트 참조)
+
+`grantCredit` 시그니처: `studentId`, `sourceSubscriptionId?`, `reasonNote?` (수동 지급은 항상 `reason=manualGrant`).
+
+### C. 라우트
+
+| 라우트 | 화면 | 비고 |
+|---|---|---|
+| `/subscriptions/makeup-credits` | `MakeupCreditScreen` | `?studentId=` 있으면 선생님 뷰(학생별 발급/회수), 없으면 학생 본인 보유 뷰. `AppRoutes.makeupCredits` |
 
 ---
 

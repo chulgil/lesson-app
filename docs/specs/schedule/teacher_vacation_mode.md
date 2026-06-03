@@ -77,9 +77,33 @@ enum VacationDisposition {
 }
 ```
 
+> `updatedAt` (nullable) 필드 추가 (코드 반영 2026-06-03). 휴가 기간 수정 시각 트래킹. `defaultDisposition` 기본값은 `rollForward` (코드 반영 2026-06-03).
+>
+> 파생 getter `vacationDays` (코드 반영 2026-06-03): 시작~종료 양끝 포함 일수. rollForward 선택 시 §5.3 수강권 자동 연장 예상치 표시에 사용 (음수면 0).
+
 ### 3.3 영향 레슨 추적
 
 휴가 등록 시 영향 받는 `LessonBooking` 을 식별하고 각 레슨에 `vacationPeriodId` 외래키 부여 (rollback 용).
+
+### 3.4 영향 미리보기 모델 (코드 반영 2026-06-03)
+
+§4.1 step 2 영향 미리보기는 다음 값 객체로 표현된다. `GET /api/teacher/vacation/impact` 응답 매핑.
+
+```dart
+class VacationImpactPreview {
+  final DateTime startDate;
+  final DateTime endDate;
+  final int impactedLessonCount;
+  final int impactedStudentCount;
+  final List<VacationImpactedStudent> impactedStudents;
+}
+
+class VacationImpactedStudent {
+  final String studentId;
+  final String? studentName;
+  final int lessonCount;
+}
+```
 
 ---
 
@@ -135,6 +159,20 @@ enum VacationDisposition {
 ### 4.2 학생별 다른 처리 (선택)
 
 미리보기 화면에서 학생별 long-press → 개별 처리 옵션 변경 가능 (예: A는 보강 크레딧, B는 이월).
+
+> 구현 상세 (코드 반영 2026-06-03): 학생 행 tap/long-press → 바텀시트로 3옵션 + "기본값 사용" 선택. 오버라이드는 `Map<studentId, VacationDisposition>` 으로 폼 상태에 보관, 등록 시 `perStudentDisposition` 으로 전송. 키 부재 = 기본 처리 따름.
+
+### 4.3 rollForward 연장 예상치 노출 (코드 반영 2026-06-03)
+
+처리 옵션 화면에서 `rollForward` 선택 + 유효 기간일 때, `vacationDays` 기반 수강권 자동 연장 예상 일수를 인라인 표시 (`vacationAutoExtendProjection`). 실제 연장 일수는 BE 가 최종 확정.
+
+### 4.4 라우트 (코드 반영 2026-06-03)
+
+진입 라우트: `/schedule/vacation` (`AppRoutes.teacherVacationMode` → `TeacherVacationModeScreen`).
+
+### 4.5 가용 시간 화면 휴가 배너 (코드 반영 2026-06-03)
+
+선생님 가용 시간(availability) 화면 상단에 활성 휴가 기간을 안내하는 배너(`AvailabilityVacationBanner`) 노출. 취소되지 않은(`cancelledAt == null`) 휴가만 표시하며 기간·사유를 행 단위로 렌더. 캘린더 셀 음영은 예약 그리드 소유, 배너는 경량 안내만 담당.
 
 ---
 
@@ -198,6 +236,8 @@ enum VacationDisposition {
 - 등록 후 **24시간 이내** 만 가능
 - 첫 영향 레슨의 원래 일시가 이미 지났으면 불가 (이미 학생에게 영향 발생)
 
+> 서버 오류 → 친화 메시지 매핑 (코드 반영 2026-06-03): "이미 시작" → 이미 시작됨 안내, "24" → 24h 윈도우 만료, "이미 취소" → 이미 취소됨. 그 외 → 일반 실패. 취소 전 `NotebookAlertDialog` 확인 (destructive).
+
 ### 7.3 자동 처리
 
 - 모든 영향 레슨 복원 (`cancelledByTeacher` → 원 상태)
@@ -232,6 +272,17 @@ enum VacationDisposition {
 | GET | `/api/teachers/me/vacations` | 휴가 목록 |
 | GET | `/api/teachers/me/vacations/preview` | 기간 입력 시 영향 레슨 미리보기 |
 | DELETE | `/api/teachers/me/vacations/:id` | 24h 내 일괄 취소 |
+
+### 9.1.1 FE Repository 계약 (코드 반영 2026-06-03)
+
+`VacationRepository` (Mock/Remote) 메서드:
+
+| 메서드 | 매핑 |
+|---|---|
+| `previewImpact(startDate, endDate)` → `VacationImpactPreview` | GET preview |
+| `registerVacation(startDate, endDate, reason?, defaultDisposition, perStudentDisposition?)` → `VacationPeriod` | POST 등록 |
+| `listVacations({includeCancelled = false})` → `List<VacationPeriod>` | GET 목록. `includeCancelled` true 시 취소분 포함 |
+| `cancelVacation(periodId)` → `VacationPeriod` | DELETE (24h Recovery) |
 
 ### 9.2 트랜잭션 처리
 

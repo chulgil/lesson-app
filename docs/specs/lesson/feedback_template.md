@@ -139,3 +139,33 @@ CRUD는 변경 후 위 Future*Providers를 invalidate해 화면이 자동 리프
 - 백엔드 영속화 (현재 Mock in-memory)
 - 템플릿 공유 (선생님 간)
 - 학생별 가중치 (특정 학생에게 자주 쓰는 템플릿 상단 노출)
+
+## 코드 반영 추가 (2026-06-03)
+
+> "배경"에서 `feedback_preset` chip line은 UI 진입점에서 제거됐다고 명시하나, **`FeedbackPreset` 엔티티/레포지토리/프로바이더는 코드에 그대로 활성 상태**다. 시드 정합 검증용으로만 남은 것이 아니라, 별도 CRUD 스택과 실제 백엔드 API가 동작한다.
+
+### FeedbackPreset 엔티티 (활성)
+
+`features/lessons/domain/entities/feedback_preset.dart`
+
+| 필드 | 타입 | 설명 |
+|---|---|---|
+| `id` | `String` | UUID |
+| `text` | `String` | 프리셋 짧은 문구 (예: "음정 주의") |
+| `teacherId` | `String?` | 소유 선생님 (null = 기본 프리셋) |
+| `sortOrder` | `int` | 노출 정렬 순서 |
+| `isDefault` | `bool` | 시스템 기본 제공 프리셋 여부 |
+| `isHidden` | `bool` | 선생님이 숨김 처리 (soft delete) |
+| `createdAt` | `DateTime` | 생성 시각 |
+
+### 레이어
+
+| 레이어 | 파일 |
+|---|---|
+| Repository (interface) | `features/lessons/domain/repositories/feedback_preset_repository.dart` — `getPresets / addPreset / updatePreset / deletePreset / restorePreset` |
+| Repository (Mock) | `features/lessons/data/repositories/mock_feedback_preset_repository.dart` |
+| Repository (Remote) | `features/lessons/data/repositories/remote_feedback_preset_repository.dart` — 백엔드 `/settings/feedback-presets` (GET/POST/PATCH/DELETE) |
+| Provider | `features/lessons/presentation/providers/feedback_preset_providers.dart` — `FeedbackPresetNotifier` (`addPreset / updatePreset / deletePreset`) |
+| 사용 화면 | `features/lessons/presentation/screens/bulk_feedback_screen.dart` (일괄 피드백 작성 시 프리셋 칩 사용) |
+
+> 결론: 프리셋은 레슨 상세/빠른 피드백의 **본문 누적 chip line**에서만 제거됐고, 일괄 피드백(BulkFeedbackScreen) 경로에서는 계속 사용된다. `isHidden`/`restorePreset`은 숨김-복원 soft delete 패턴을 지원한다.
