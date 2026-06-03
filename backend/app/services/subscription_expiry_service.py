@@ -48,12 +48,20 @@ def compute_days_left(sub: Subscription, *, today_kst: date) -> int | None:
 
 
 def _next_status(current: SubscriptionStatus, days_left: int) -> SubscriptionStatus:
-    """Idempotent 전이 결정 — 입력이 이미 목적지면 동일 값 반환."""
+    """Idempotent 전이 결정 — 입력이 이미 목적지면 동일 값 반환.
+
+    #468 (1c): days_left >= 0 이면 만료 상태(expired)도 복구된다. 예) 만료된
+    수강권의 end_date 를 연장하면 days_left 가 다시 양수가 되어 active/
+    expiringSoon 로 되돌아온다. (이전에는 한 번 expired 가 되면 영구 고착)
+    """
     if days_left < 0:
         return SubscriptionStatus.expired
     if days_left <= EXPIRING_THRESHOLD_DAYS:
         return SubscriptionStatus.expiringSoon
-    # 7 < days_left → active 유지 (이미 expiringSoon 인 경우는 건드리지 않음)
+    # 7 < days_left → active 로 복구/유지.
+    # current 가 expired 였더라도 end_date 연장 시 active 로 되돌린다.
+    if current == SubscriptionStatus.expired:
+        return SubscriptionStatus.active
     return current
 
 

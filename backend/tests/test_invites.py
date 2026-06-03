@@ -105,7 +105,10 @@ async def test_create_invite_unauthenticated(client: AsyncClient):
 async def test_get_invite_by_id_and_code_for_frontend_confirm_screen(
     client: AsyncClient, auth_headers, student_auth_headers, create_test_user
 ):
-    """RemoteInviteRepository needs direct invite lookup for scanned/shared codes."""
+    """RemoteInviteRepository needs direct invite lookup for scanned/shared codes.
+
+    GET-by-id is creator-only (security); the joiner resolves invites by code.
+    """
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(
         user_id="test-student-id",
@@ -117,10 +120,12 @@ async def test_get_invite_by_id_and_code_for_frontend_confirm_screen(
     create_resp = await client.post("/api/v1/invites/", headers=auth_headers, json={})
     invite = create_resp.json()
 
-    by_id = await client.get(f"/api/v1/invites/{invite['id']}", headers=student_auth_headers)
+    # Creator can fetch their own invite by id.
+    by_id = await client.get(f"/api/v1/invites/{invite['id']}", headers=auth_headers)
     assert by_id.status_code == 200
     assert by_id.json()["id"] == invite["id"]
 
+    # Joining user resolves the invite via the code lookup.
     by_code = await client.get(
         f"/api/v1/invites/code/{invite['invite_code']}",
         headers=student_auth_headers,

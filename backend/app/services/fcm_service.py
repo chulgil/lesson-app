@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from typing import Any
@@ -162,7 +163,7 @@ class FcmService:
         ]
 
         try:
-            response = messaging.send_each(messages)
+            response = await asyncio.to_thread(messaging.send_each, messages)
 
             for i, send_response in enumerate(response.responses):
                 if send_response.exception is not None:
@@ -217,7 +218,7 @@ class FcmService:
         )
 
         try:
-            messaging.send(message)
+            await asyncio.to_thread(messaging.send, message)
             return True
         except Exception:
             logger.exception("FCM topic send failed for topic %s", topic)

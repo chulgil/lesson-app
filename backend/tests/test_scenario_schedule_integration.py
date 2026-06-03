@@ -19,7 +19,7 @@ import pytest
 from httpx import AsyncClient
 
 from tests.scenarios.assertions import assert_status, assert_total
-from tests.scenarios.helpers import StudentActions, TeacherActions
+from tests.scenarios.helpers import StudentActions, TeacherActions, link_student_to_user
 
 
 async def _dev_login_headers(
@@ -377,7 +377,7 @@ async def test_signup_settings_connection_to_schedule_confirmation_card(
 
 
 @pytest.mark.asyncio
-async def test_trial_lesson_full_lifecycle(teacher: TeacherActions, student: StudentActions):
+async def test_trial_lesson_full_lifecycle(teacher: TeacherActions, student: StudentActions, db_session):
     """
     Complete trial lesson flow:
     선생님 가입 → 학생 가입 → 초대/연결 → 체험레슨 요청 →
@@ -431,6 +431,8 @@ async def test_trial_lesson_full_lifecycle(teacher: TeacherActions, student: Stu
 
     # ── Phase 5: 학생 등록 + 체험레슨 생성 ───────────────────
     sid = await teacher.create_student("체험학생", instrument="violin", level="beginner")
+    # Student must OWN the profile to accept the proposal (#468 IDOR fix).
+    await link_student_to_user(db_session, sid, "test-student-id")
 
     lesson_id = await teacher.create_lesson(
         sid,
@@ -838,7 +840,7 @@ async def test_accept_preferred_slot_from_schedule(teacher: TeacherActions, stud
 
 
 @pytest.mark.asyncio
-async def test_full_e2e_request_to_lesson(teacher: TeacherActions, student: StudentActions):
+async def test_full_e2e_request_to_lesson(teacher: TeacherActions, student: StudentActions, db_session):
     """
     Complete flow matching current frontend:
     요청 → 일정비교 → 대안제시 → 학생수락 → 학생등록 → 수강권 → 레슨 → 완료.
@@ -883,6 +885,8 @@ async def test_full_e2e_request_to_lesson(teacher: TeacherActions, student: Stud
         monthly_fee=200000,
         lessons_per_week=1,
     )
+    # Student must OWN the profile to accept the proposal (#468 IDOR fix).
+    await link_student_to_user(db_session, sid, "test-student-id")
 
     tmpl_id = await teacher.create_template(
         "바이올린 4회",

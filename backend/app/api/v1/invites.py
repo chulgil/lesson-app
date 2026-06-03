@@ -82,7 +82,7 @@ async def get_invite_by_code(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> InviteResponse:
     service = InviteService(db)
-    result: InviteResponse = await service.get_invite_by_code(invite_code)
+    result: InviteResponse = await service.get_invite_by_code(invite_code, current_user)
     return result
 
 
@@ -310,5 +310,5 @@ async def get_invite(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> InviteResponse:
     service = InviteService(db)
-    result: InviteResponse = await service.get_invite(invite_id)
+    result: InviteResponse = await service.get_invite(invite_id, current_user)
     return result

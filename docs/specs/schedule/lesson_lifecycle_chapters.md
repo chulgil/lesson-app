@@ -392,4 +392,26 @@ class ChapterSummary extends StatelessWidget {
 | JIRA | 1 ticket, status changes, comments | 1 request, chapters, events |
 | Amazon | 1 order → status timeline | 1 request → phase timeline |
 | GitHub PR | code → review → CI → merge | request → schedule → payment → lessons |
+
+## 출석 미확인 자동 완료 + 수강권 차감 (#469, 결정 2026-06-03)
+
+> 백엔드 `AttendanceSchedulerService` (`backend/app/services/attendance_scheduler_service.py`).
+> 차감 코어: `SubscriptionService.deduct_for_completed_lesson(lesson_id, subscription_id)` (user-agnostic, idempotent).
+
+레슨이 `scheduled` 상태로 출석 확인되지 않으면 다음 2단계로 처리한다. 두 임계는 모두
+**KST 기준 레슨 종료시각**(`date + start_time("HH:MM") + duration` 분) 기준으로 산정한다.
+(이전 구현은 `Lesson.date < threshold.date()` 로 `start_time` 과 UTC/KST 오프셋을 무시하는 버그가 있었음.)
+
+| 단계 | 임계 | 동작 |
+|------|------|------|
+| 사전 안내 (pre-notice) | 종료 +30분 | 선생님에게 `attendanceUnconfirmed` 알림. "24시간 내 미확인 시 자동 완료 + 수강권 1회 차감" 경고 포함 |
+| 자동 완료 (auto-complete) | 종료 +24시간 | `status → completed`. `subscription_id` 가 있으면 수강권 1회 차감. `lessonAutoCompleted` 알림(차감 결과 명시) |
+
+### 차감 규칙
+
+- **자동 완료(24h 미확인) = 차감 O** (product-approved 2026-06-03). 차감은 **멱등** — 같은 `lesson_id`
+  에 `SubscriptionUsage` 행이 이미 있으면 skip(`False` 반환). 스케줄러 재실행에 안전.
+- **수동 완료 = 차감 X** (비대칭). 선생님이 직접 레슨을 완료 처리하는 경로는 별도 차감 로직을 거치며,
+  자동 완료 경로의 `deduct_for_completed_lesson` 을 호출하지 않는다. 자동/수동 차감 정책이 다른 점에 유의.
+- 남은 회차가 0 이하이거나 구독이 없으면 차감하지 않고 완료만 처리한다.
 | 카카오톡 | 1 chat room, endless scroll | 1 chat, collapsed chapters |

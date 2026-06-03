@@ -589,9 +589,9 @@ async def get_proposal(
 )
 async def expire_old_proposals(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> SuccessResponse:
-    """Mark stale proposals as expired."""
+    """Mark stale proposals as expired (teacher only — #468 1d)."""
     service = SubscriptionService(db)
     count = await service.expire_old_proposals()
     return SuccessResponse(message=f"Processed {count} expired proposals")

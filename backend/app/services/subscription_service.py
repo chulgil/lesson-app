@@ -259,12 +259,33 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
+    def _record_lesson_usage(self, sub: Any, *, lesson_id: str | None, **usage_fields: Any) -> None:
+        """Core deduction side-effects (no access checks).
+
+        Creates a ``SubscriptionUsage`` row, bumps ``used_lessons`` and stamps
+        ``first_lesson_consumed_at`` (#426). Shared by the teacher-facing
+        ``deduct_lesson`` and the scheduler-facing
+        ``deduct_for_completed_lesson``.
+        """
+        from app.models.subscription import SubscriptionUsage
+
+        usage = SubscriptionUsage(
+            subscription_id=sub.id,
+            lesson_id=lesson_id,
+            **usage_fields,
+        )
+        self.db.add(usage)
+
+        sub.used_lessons = (sub.used_lessons or 0) + 1
+
+        # #426: stamp first lesson consumption — blocks Undo of payment confirmation.
+        if sub.first_lesson_consumed_at is None:
+            sub.first_lesson_consumed_at = datetime.now(UTC)
+
     async def deduct_lesson(
         self, subscription_id: str, data: UseLessonRequest, current_user: Any
     ) -> SubscriptionResponse:
         """Deduct a lesson usage from a subscription."""
-        from app.models.subscription import SubscriptionUsage
-
         sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
         remaining = self._remaining_lessons(sub)
@@ -274,9 +295,8 @@ class SubscriptionService:
                 detail="No remaining lessons",
             )
 
-        # Record usage
-        usage = SubscriptionUsage(
-            subscription_id=subscription_id,
+        self._record_lesson_usage(
+            sub,
             lesson_id=data.lesson_id,
             type=data.type,
             teacher_name=data.teacher_name,
@@ -284,18 +304,45 @@ class SubscriptionService:
             note=data.note,
             deducted=data.deducted,
         )
-        self.db.add(usage)
-
-        # Update counters
-        sub.used_lessons = (sub.used_lessons or 0) + 1
-
-        # #426: stamp first lesson consumption — blocks Undo of payment confirmation.
-        if sub.first_lesson_consumed_at is None:
-            sub.first_lesson_consumed_at = datetime.now(UTC)
 
         await self.db.flush()
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
+
+    async def deduct_for_completed_lesson(self, lesson_id: str, subscription_id: str) -> bool:
+        """User-agnostic, idempotent deduction for an auto-completed lesson (#469).
+
+        Called by the attendance scheduler (no current_user / access checks).
+        Skips and returns ``False`` if a usage row already exists for
+        ``lesson_id`` (idempotent on re-run) or the subscription is missing /
+        out of remaining lessons. Returns ``True`` when a deduction is recorded.
+        """
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        # Idempotency: bail if this lesson already consumed a session.
+        existing = await self.db.scalar(
+            select(SubscriptionUsage.id).where(SubscriptionUsage.lesson_id == lesson_id)
+        )
+        if existing is not None:
+            return False
+
+        sub = await self.db.get(Subscription, subscription_id)
+        if sub is None:
+            return False
+
+        remaining = self._remaining_lessons(sub)
+        if remaining is not None and remaining <= 0:
+            return False
+
+        self._record_lesson_usage(
+            sub,
+            lesson_id=lesson_id,
+            type="lesson",
+            note="24시간 미확인 자동 완료 차감",
+            deducted=True,
+        )
+        await self.db.flush()
+        return True
 
     async def use_reschedule(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Use a reschedule credit from a subscription."""
@@ -1265,20 +1312,16 @@ class SubscriptionService:
             if proposal.teacher_id in identifiers:
                 return proposal
         elif role == "student":
+            # #468 (1a): a student may only read a proposal addressed to one of
+            # their own linked Student profiles. The previous role-only bypass
+            # that granted access to ANY proposal whose Student.user_id IS NULL
+            # was an IDOR (an unrelated student could read another teacher's
+            # offline-student proposal) — removed.
             identifiers = await self.access.student_identifiers(current_user)
             if proposal.student_id in identifiers:
                 return proposal
-            if await self._is_unlinked_student_profile(proposal.student_id):
-                return proposal
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-
-    async def _is_unlinked_student_profile(self, student_id: str) -> bool:
-        """Legacy compatibility for teacher-created offline student profiles."""
-        from app.models.student import Student
-
-        student = await self.db.get(Student, student_id)
-        return student is not None and student.user_id is None
 
     async def _get_proposal_for_teacher(self, proposal_id: str, current_user: Any) -> Any:
         """Return a proposal only if the current teacher owns it."""
@@ -1520,11 +1563,22 @@ class SubscriptionService:
             ProposalPaymentStatus,
             ProposalStatus,
             Subscription,
+            SubscriptionProposal,
             SubscriptionStatus,
             SubscriptionTemplate,
         )
 
-        proposal = await self._get_proposal_for_teacher(proposal_id, current_user)
+        # Access gate (ownership + 404).
+        await self._get_proposal_for_teacher(proposal_id, current_user)
+
+        # #468 (1b): re-fetch the proposal row with FOR UPDATE so concurrent
+        # confirm requests serialize on the same row. This prevents the
+        # double-issue race where two callers both observe an empty
+        # ``subscription_id`` and each mint a Subscription. No-op on SQLite,
+        # real row lock on Postgres. No DB migration / unique index added.
+        proposal = await self.db.scalar(
+            select(SubscriptionProposal).where(SubscriptionProposal.id == proposal_id).with_for_update()
+        )
 
         # #10 A-C2 — confirming a proposal mints a Subscription, the same hard
         # gate that `create()` uses. Without this the gate is bypassed via the

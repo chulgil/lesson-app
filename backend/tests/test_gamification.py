@@ -13,10 +13,30 @@ def _headers(user_id: str, role: str = "teacher") -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
 
+def _add_owned_student(
+    db_session: AsyncSession,
+    student_id: str,
+    teacher_id: str = "test-user-id-prof",
+) -> None:
+    """Seed a Student owned by the default test teacher."""
+    db_session.add(
+        Student(
+            id=student_id,
+            teacher_id=teacher_id,
+            name="Owned Student",
+            instrument="violin",
+        )
+    )
+
+
 @pytest.mark.asyncio
-async def test_get_student_gamification_empty(client: AsyncClient, auth_headers, create_test_user):
+async def test_get_student_gamification_empty(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """GET /gamification/{student_id} with no data should return zero state."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    _add_owned_student(db_session, "student-1")
+    await db_session.flush()
 
     response = await client.get(
         "/api/v1/gamification/student-1",
@@ -32,9 +52,13 @@ async def test_get_student_gamification_empty(client: AsyncClient, auth_headers,
 
 
 @pytest.mark.asyncio
-async def test_award_points(client: AsyncClient, auth_headers, create_test_user):
+async def test_award_points(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """POST /gamification/points should create a point entry."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    _add_owned_student(db_session, "student-1")
+    await db_session.flush()
 
     response = await client.post(
         "/api/v1/gamification/points",
@@ -53,9 +77,13 @@ async def test_award_points(client: AsyncClient, auth_headers, create_test_user)
 
 
 @pytest.mark.asyncio
-async def test_award_points_updates_total(client: AsyncClient, auth_headers, create_test_user):
+async def test_award_points_updates_total(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """Awarding points should be reflected in the gamification summary."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    _add_owned_student(db_session, "s1")
+    await db_session.flush()
 
     # Award 150 points (crosses level 2 threshold at 100)
     await client.post(
@@ -71,9 +99,13 @@ async def test_award_points_updates_total(client: AsyncClient, auth_headers, cre
 
 
 @pytest.mark.asyncio
-async def test_award_points_boundary_level_up(client: AsyncClient, auth_headers, create_test_user):
+async def test_award_points_boundary_level_up(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """Points at exact level boundary should level up."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    _add_owned_student(db_session, "s2")
+    await db_session.flush()
 
     # Award exactly 100 (level 2 threshold)
     await client.post(
@@ -230,9 +262,21 @@ async def test_other_teacher_cannot_award_badges_to_existing_student(
 
 
 @pytest.mark.asyncio
-async def test_award_points_unauthorized_student(client: AsyncClient, student_auth_headers, create_test_user):
-    """POST /gamification/points as student should return 403."""
+async def test_award_points_unauthorized_student(
+    client: AsyncClient, student_auth_headers, create_test_user, db_session: AsyncSession
+):
+    """POST /gamification/points as student for someone else's record should return 403."""
     await create_test_user(user_id="test-student-id", role="student", email="student@test.com")
+    # Student row belongs to another user → student actor must be rejected.
+    db_session.add(
+        Student(
+            id="s1",
+            user_id="another-student-user",
+            name="Other Student",
+            instrument="violin",
+        )
+    )
+    await db_session.flush()
 
     response = await client.post(
         "/api/v1/gamification/points",
@@ -240,3 +284,42 @@ async def test_award_points_unauthorized_student(client: AsyncClient, student_au
         json={"student_id": "s1", "points": 10, "type": "practiceComplete", "description": "x"},
     )
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_award_points_nonexistent_student_returns_404(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Fix #3: awarding points to a non-existent student must not create an orphan row."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/gamification/points",
+        headers=auth_headers,
+        json={"student_id": "ghost-student", "points": 50, "type": "practiceComplete", "description": "x"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_award_badge_nonexistent_student_returns_404(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Fix #3: awarding a badge to a non-existent student must not create an orphan row."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/gamification/ghost-student/badges",
+        headers=auth_headers,
+        json={
+            "badges": [
+                {
+                    "name": "First Practice",
+                    "description": "Completed first practice",
+                    "icon": "music_note",
+                    "rarity": "common",
+                }
+            ]
+        },
+    )
+    assert response.status_code == 404

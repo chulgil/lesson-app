@@ -90,12 +90,12 @@ class GamificationService:
         }
 
     async def _assert_student_access(self, student_id: str, current_user: Any) -> None:
-        """Enforce ownership when the student profile exists."""
+        """Enforce ownership; reject access to a non-existent student."""
         from app.models.student import Student
 
         student = await self.db.get(Student, student_id)
         if student is None:
-            return
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
 
         role = getattr(current_user, "role", None)
         role_value = getattr(role, "value", role)
