@@ -73,6 +73,12 @@ void main() {
       expect(resolveAuthRedirect(onboarding, AppRoutes.inviteCode), isNull);
     });
 
+    test('/invite/confirm survives onboarding gate', () {
+      // Regression: code submission pushes to inviteConfirm with an Invite
+      // extra; redirecting here would drop the extra and break the flow.
+      expect(resolveAuthRedirect(onboarding, AppRoutes.inviteConfirm), isNull);
+    });
+
     test('student invite code path allowed', () {
       expect(
         resolveAuthRedirect(onboarding, AppRoutes.studentInviteCode),

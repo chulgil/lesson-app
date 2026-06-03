@@ -71,7 +71,10 @@ String? resolveAuthRedirect(AuthState authState, String currentPath) {
         currentPath == AppRoutes.parentInviteCode ||
         // Deep-link invite (lessonapp://invite/code) must survive the
         // onboarding gate, otherwise the link is silently dropped.
-        currentPath == AppRoutes.inviteCode;
+        currentPath == AppRoutes.inviteCode ||
+        // Code submission pushes to inviteConfirm carrying the Invite extra;
+        // a redirect here would drop the extra and break the connection flow.
+        currentPath == AppRoutes.inviteConfirm;
     if (!isOnboarding && !isRoleSelect) {
       return AppRoutes.roleSelect;
     }
@@ -114,30 +117,30 @@ class AppRouter {
 
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  /// Create router with optional auth-aware redirect.
+  /// Create router with auth-aware redirect.
   ///
-  /// In mock mode: no redirect (existing behavior).
-  /// In remote mode: redirects unauthenticated users to /login.
+  /// Redirect + [refreshListenable] are applied **regardless of mock mode**:
+  /// mock mode only swaps data repositories, while routing/redirect must behave
+  /// identically. Previously mock mode produced a static router with no redirect,
+  /// so a single early `mockDataModeProvider` read (default USE_MOCK=true) cached
+  /// a redirect-less router that never re-evaluated auth — leaving logout stuck.
   ///
-  /// [refreshListenable] (remote mode only) drives redirect re-evaluation on
-  /// auth state changes. The router itself must be created **once** and reused;
-  /// auth changes flow through this listenable rather than router re-creation.
+  /// [refreshListenable] drives redirect re-evaluation on auth state changes.
+  /// The router itself must be created **once** and reused; auth changes flow
+  /// through this listenable rather than router re-creation.
   static GoRouter createRouter(
     WidgetRef ref, {
-    required bool useMockData,
     Listenable? refreshListenable,
   }) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
-      refreshListenable: useMockData ? null : refreshListenable,
-      redirect: useMockData
-          ? null
-          : (context, state) => resolveAuthRedirect(
-              ref.read(authNotifierProvider),
-              state.matchedLocation,
-            ),
+      refreshListenable: refreshListenable,
+      redirect: (context, state) => resolveAuthRedirect(
+        ref.read(authNotifierProvider),
+        state.matchedLocation,
+      ),
       routes: [
         // Combine all domain-specific routes
         ...authRoutes,
@@ -160,30 +163,4 @@ class AppRouter {
       ),
     );
   }
-
-  /// Legacy static router (mock mode only, for backward compatibility).
-  static final router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.login,
-    debugLogDiagnostics: true,
-    routes: [
-      ...authRoutes,
-      ...homeRoutes,
-      ...lessonRoutes,
-      ...studentRoutes,
-      ...profileRoutes,
-      ...scheduleRoutes,
-      ...practiceRoutes,
-      ...parentRoutes,
-      ...searchRoutes,
-      ...inviteRoutes,
-      ...notificationRoutes,
-      ...settingsRoutes,
-      ...shareRoutes,
-      ...subscriptionRoutes,
-    ],
-    errorBuilder: (context, state) => NotebookScreenScaffold(
-      body: Center(child: Text('Page not found: ${state.uri}')),
-    ),
-  );
 }
