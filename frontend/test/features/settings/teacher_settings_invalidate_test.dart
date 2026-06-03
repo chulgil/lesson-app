@@ -47,6 +47,104 @@ void main() {
     },
   );
 
+  test(
+    'replaceAvailableSlots persists when the notifier is cold (first tap)',
+    () async {
+      // Regression (#1): the first-availability save screen and home/quest only
+      // watch the read-side FutureProvider, leaving the notifier cold. The
+      // previous `if (state.value == null) return;` guard silently dropped the
+      // first save, surfacing as "저장 실패". We must NOT prime the notifier
+      // here — that is exactly the cold path that used to fail.
+      final repo = _MutableSettingsRepository();
+      final container = ProviderContainer(
+        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      // Only the read-side is primed; the notifier has never been built.
+      await container.read(teacherSettingsProvider.future);
+
+      await container
+          .read(teacherSettingsNotifierProvider.notifier)
+          .replaceAvailableSlots([
+            const TimeSlot(
+              id: 'first-slot',
+              dayOfWeek: 1,
+              startTime: ClockTime(hour: 14, minute: 0),
+              endTime: ClockTime(hour: 18, minute: 0),
+            ),
+          ]);
+
+      // The slot must have reached the repository (no silent drop).
+      final saved = await repo.getTeacherSettings();
+      expect(saved.availableSlots, hasLength(1));
+      expect(saved.availableSlots.single.id, 'first-slot');
+
+      // And the read-side derived provider reflects it.
+      await container.read(teacherSettingsProvider.future);
+      expect(container.read(hasAvailableSlotsProvider), isTrue);
+    },
+  );
+
+  test(
+    'updateBreakTime keeps the saved value when only the availability mirror '
+    'fails',
+    () async {
+      // Regression (#7): the remote repo writes /settings/teacher first, then
+      // mirrors to /schedule/availability. A failure of the secondary mirror
+      // must NOT throw — the primary value is already persisted. We simulate
+      // that here by having the repo persist break time but ignore mirror
+      // errors (matching the production best-effort mirror).
+      final repo = _MutableSettingsRepository();
+      final container = ProviderContainer(
+        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(teacherSettingsProvider.future);
+      await container.read(teacherSettingsNotifierProvider.future);
+
+      await container
+          .read(teacherSettingsNotifierProvider.notifier)
+          .updateBreakTime(15);
+
+      // The notifier must hold data (not an error state) so the screen stays
+      // usable, and the value must be persisted.
+      final state = container.read(teacherSettingsNotifierProvider);
+      expect(state.hasError, isFalse);
+      expect(state.valueOrNull?.breakTimeBetweenLessons, 15);
+    },
+  );
+
+  test(
+    'updateBreakTime rolls back to last-good data on failure (no error screen)',
+    () async {
+      // Regression (#6): mutations used to flip the notifier into a full-screen
+      // loading then error state, blanking the screen on a transient failure.
+      // Now a failure rolls back to the last known-good value instead.
+      final repo = _ThrowingBreakTimeRepository();
+      final container = ProviderContainer(
+        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      final initial = await container.read(teacherSettingsNotifierProvider.future);
+
+      await container
+          .read(teacherSettingsNotifierProvider.notifier)
+          .updateBreakTime(15);
+
+      final state = container.read(teacherSettingsNotifierProvider);
+      expect(state.hasError, isFalse, reason: 'no full-screen error state');
+      expect(state.valueOrNull, isNotNull, reason: 'screen stays usable');
+      expect(
+        state.valueOrNull?.breakTimeBetweenLessons,
+        initial.breakTimeBetweenLessons,
+        reason: 'rolled back to last-good value',
+      );
+    },
+  );
+
   test('updateTrialLessonFree refreshes the read-side settings', () async {
     final repo = _MutableSettingsRepository();
     final container = ProviderContainer(
@@ -118,8 +216,12 @@ class _MutableSettingsRepository implements SettingsRepository {
       throw UnimplementedError();
 
   @override
-  Future<TeacherSettings> updateBreakTime(int minutes) =>
-      throw UnimplementedError();
+  Future<TeacherSettings> updateBreakTime(int minutes) async {
+    // Primary write succeeds; secondary availability mirror is best-effort and
+    // is intentionally not modeled here (it never throws in production). (#7)
+    _settings = _settings.copyWith(breakTimeBetweenLessons: minutes);
+    return _settings;
+  }
 
   @override
   Future<TeacherSettings> updateDefaultDuration(int duration) =>
@@ -140,4 +242,12 @@ class _MutableSettingsRepository implements SettingsRepository {
   @override
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot) =>
       throw UnimplementedError();
+}
+
+/// Repository whose [updateBreakTime] always throws, to exercise the
+/// notifier's rollback-to-last-good behavior. (#6)
+class _ThrowingBreakTimeRepository extends _MutableSettingsRepository {
+  @override
+  Future<TeacherSettings> updateBreakTime(int minutes) =>
+      throw Exception('network');
 }

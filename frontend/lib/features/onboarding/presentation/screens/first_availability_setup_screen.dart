@@ -270,28 +270,27 @@ class _FirstAvailabilitySetupScreenState
     });
 
     final notifier = ref.read(teacherSettingsNotifierProvider.notifier);
-    final current = ref.read(teacherSettingsNotifierProvider).value;
-    if (current == null) {
-      setState(() {
-        _isSubmitting = false;
-        _errorMessage = AppStrings.firstAvailabilitySaveFailed;
-      });
-      return;
-    }
-
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final newSlots = <TimeSlot>[
-      ...current.availableSlots,
-      for (final day in _selectedDays)
-        TimeSlot(
-          id: 'first_${now}_$day',
-          dayOfWeek: day,
-          startTime: _startTime,
-          endTime: _endTime,
-        ),
-    ];
 
     try {
+      // Resolve current settings from the warm read-side FutureProvider that
+      // home/quest already watch. The notifier is lazy and may be cold (never
+      // built) here, so `notifier.state.value` is null on the first tap, which
+      // previously failed with "저장 실패". Awaiting the FutureProvider future
+      // guarantees a non-null snapshot before we replace the slots. (#5 D-G3)
+      final current = await ref.read(teacherSettingsProvider.future);
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final newSlots = <TimeSlot>[
+        ...current.availableSlots,
+        for (final day in _selectedDays)
+          TimeSlot(
+            id: 'first_${now}_$day',
+            dayOfWeek: day,
+            startTime: _startTime,
+            endTime: _endTime,
+          ),
+      ];
+
       // Persist via the existing settings notifier — reuses the
       // updateAvailableSlots repository path (mock + remote both wired).
       await notifier.replaceAvailableSlots(newSlots);
