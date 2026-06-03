@@ -53,5 +53,23 @@ void main() {
       );
       expect(p.isActiveOn(ref), isFalse);
     });
+
+    // Regression (#fix2): a vacation that starts in the future is "scheduled",
+    // not active — it must not show as 진행 중 / no banner / no Recovery yet.
+    test('inactive when start date is in the future', () {
+      final p = _period(
+        startDate: DateTime(2026, 6, 10),
+        endDate: DateTime(2026, 6, 20),
+      );
+      expect(p.isActiveOn(ref), isFalse);
+    });
+
+    test('active when start date is today', () {
+      final p = _period(
+        startDate: DateTime(2026, 6, 4),
+        endDate: DateTime(2026, 6, 20),
+      );
+      expect(p.isActiveOn(ref), isTrue);
+    });
   });
 }

@@ -279,8 +279,17 @@ extension TimeSlotVisualX on TimeSlot {
     return '$dayName $timeRange';
   }
 
-  String get timeRange =>
-      '${startTime.format24Hour()} - ${endTime.format24Hour()}';
+  String get timeRange {
+    // A slot ending at midnight wraps to 00:00 (ClockTime.fromMinutes(1440)).
+    // Show it as 24:00 (day-end) instead of an apparent 23:00 - 00:00 backwards
+    // range. Only applies when the end is midnight AND start is not (real slot),
+    // never to a true 00:00 - hh:mm slot.
+    final isMidnightEnd = endTime.hour == 0 && endTime.minute == 0;
+    final endLabel = (isMidnightEnd && startTime.inMinutes > 0)
+        ? '24:00'
+        : endTime.format24Hour();
+    return '${startTime.format24Hour()} - $endLabel';
+  }
 }
 
 const _fullDayNames = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];

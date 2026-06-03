@@ -414,76 +414,11 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
     }
   }
 
-  /// Reschedule a booking to a new slot
-  Future<AvailabilitySlot?> rescheduleBooking({
-    required String oldSlotId,
-    required String newSlotId,
-    required String studentId,
-    required String studentName,
-    String? teacherId,
-    String? teacherName,
-    bool isTeacherInitiated = false,
-  }) async {
-    state = const AsyncValue.loading();
-
-    try {
-      final repository = ref.read(teacherAvailabilityRepositoryProvider);
-
-      // Get old slot info before cancelling
-      AvailabilitySlot? oldSlot;
-      try {
-        // Try to get the old slot info for notification
-        final slots = await repository.getAvailableSlotsForDateRange(
-          teacherId ?? '',
-          DateTime.now().subtract(const Duration(days: 30)),
-          DateTime.now().add(const Duration(days: 60)),
-          currentStudentId: studentId,
-        );
-        oldSlot = slots.firstWhere(
-          (s) => s.id == oldSlotId,
-          orElse: () => slots.first,
-        );
-      } catch (_) {
-        // Ignore if we can't find the old slot
-      }
-
-      // Cancel old booking
-      await repository.cancelBooking(oldSlotId);
-
-      // Create new booking
-      final newSlot = await repository.bookSlot(
-        newSlotId,
-        studentId,
-        studentName,
-      );
-
-      state = AsyncValue.data(newSlot);
-
-      // Send reschedule notification
-      if (teacherName != null && oldSlot != null) {
-        final notification =
-            BookingNotificationService.createRescheduleNotification(
-              userId: studentId,
-              teacherName: teacherName,
-              oldDate: oldSlot.date,
-              oldTime: oldSlot.startTime.toFlutterTimeOfDay(),
-              newDate: newSlot.date,
-              newTime: newSlot.startTime.toFlutterTimeOfDay(),
-              isTeacherInitiated: isTeacherInitiated,
-            );
-        // TODO: Send notification via notification service
-        debugPrint('Reschedule notification created: ${notification.title}');
-      }
-
-      // Invalidate related providers to refresh data
-      ref.invalidateSelf();
-
-      return newSlot;
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      return null;
-    }
-  }
+  // NOTE: A non-atomic rescheduleBooking() (cancel-old-then-book-new) used to
+  // live here. It was removed (#483 Lore-rejected: that order can lose the
+  // original booking if the new booking fails). Reschedule is now orchestrated
+  // by BookingRescheduleScreen._performReschedule (book-new-then-cancel-old
+  // with rollback). No call sites remained.
 }
 
 // ============================================================

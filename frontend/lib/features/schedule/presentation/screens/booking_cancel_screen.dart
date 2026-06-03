@@ -519,9 +519,13 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref
-          .read(slotBookingNotifierProvider.notifier)
-          .cancelBooking(widget.bookingId);
+      final notifier = ref.read(slotBookingNotifierProvider.notifier);
+      await notifier.cancelBooking(widget.bookingId);
+      // cancelBooking swallows errors into AsyncValue.error; surface it so a
+      // failed cancel never deducts a reschedule allowance or shows success.
+      if (ref.read(slotBookingNotifierProvider).hasError) {
+        throw Exception('booking cancel failed');
+      }
 
       // Deduct reschedule allowance for student cancellations
       if (!widget.isTeacherCancel &&
