@@ -16,6 +16,7 @@ import '../widgets/notes/note_preview_card.dart';
 import '../widgets/practice_tools_modal.dart';
 import '../widgets/section_detail/section_detail_widgets.dart';
 import '../widgets/recording_comparison_sheet.dart';
+import '../widgets/youtube/practice_youtube_player.dart';
 import 'section_detail_recording_mixin.dart';
 
 /// Section detail screen showing section info and recordings
@@ -177,6 +178,23 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
             repertoireStartDate: repertoireStartDate,
             selectedDate: widget.selectedDate,
           ),
+
+          // §3.5 YouTube loop player — only when teacher attached a video.
+          if (section.youtubeVideoId != null &&
+              section.youtubeVideoId!.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              AppStrings.youtubeLoopVideoHeading,
+              style: NotebookTypography.sectionTitle,
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            PracticeYoutubePlayer(
+              videoId: section.youtubeVideoId!,
+              sectionId: section.id,
+              teacherStartSeconds: section.youtubeStartSeconds,
+              teacherEndSeconds: section.youtubeEndSeconds,
+            ),
+          ],
 
           const SizedBox(height: AppSpacing.space4),
 

@@ -8289,4 +8289,113 @@ class AppStrings {
 
   /// 피드백 미입력/나중에 버튼.
   static const ratingFeedbackLater = '나중에';
+
+  // ============================================================
+  // §3.5 YouTube 구간 반복 연습 — practice/youtube_loop_practice_spec.md
+  // ============================================================
+
+  /// 진입점 시각 affordance — 영상 있는 섹션 라벨 ("영상 구간 0:42-1:15")
+  static const youtubeLoopSectionLabel = '영상 구간';
+
+  /// 진입점 카드 부제 — 영상으로 따라 연습.
+  static const youtubeLoopAffordanceSubtitle = '영상 따라 연습';
+
+  /// 섹션 상세 영상 영역 헤딩.
+  static const youtubeLoopVideoHeading = '영상 따라 연습';
+
+  /// 반복 토글 ON.
+  static const youtubeLoopRepeatOn = '반복 ON';
+
+  /// 반복 토글 OFF.
+  static const youtubeLoopRepeatOff = '반복 OFF';
+
+  /// 속도 선택 라벨.
+  static const youtubeLoopSpeedLabel = '속도';
+
+  /// 리셋 버튼 (선생님 디폴트 복원).
+  static const youtubeLoopResetSegment = '리셋';
+
+  /// 목표 횟수 라벨 ("반복: 3 / 5").
+  static const youtubeLoopRepeatCountLabel = '반복';
+
+  /// 카운트인 토글 라벨.
+  static const youtubeLoopCountInToggle = '카운트인';
+
+  /// 카운트인 소리 토글 라벨.
+  static const youtubeLoopCountInSoundToggle = '카운트인 소리';
+
+  /// 카운트인 ON 설명 ("3-2-1 후 재생").
+  static const youtubeLoopCountInDescription = '3-2-1 후 재생';
+
+  /// 연습 시작 버튼 — 섹션 상세 하단.
+  static const youtubeLoopStartPractice = '연습 시작';
+
+  /// 영상 비공개/삭제 빈 상태.
+  static const youtubeLoopVideoUnavailable = '영상을 불러올 수 없습니다';
+
+  /// 빈 상태 보조 액션 — 선생님에게 알리기.
+  static const youtubeLoopNotifyTeacher = '선생님에게 알리기';
+
+  /// 네트워크 오류 재시도.
+  static const youtubeLoopRetry = '다시 시도';
+
+  /// 외부 YouTube 앱 fallback.
+  static const youtubeLoopOpenExternal = 'YouTube에서 열기';
+
+  /// 미니 플레이어 확장 툴팁.
+  static const youtubeLoopExpandFullscreen = '전체 화면';
+
+  /// 풀스크린 닫기 툴팁.
+  static const youtubeLoopExitFullscreen = '닫기';
+
+  /// 목표 도달 알림.
+  static const youtubeLoopTargetReached = '목표 횟수 달성! 잘했어요.';
+
+  /// 마커 드래그 안내 (semantic).
+  static const youtubeLoopMarkerSemanticStart = '시작 마커';
+
+  /// 마커 드래그 안내 (semantic).
+  static const youtubeLoopMarkerSemanticEnd = '끝 마커';
+
+  /// 영상 미니 플레이어 진입점 (녹음 화면 상단).
+  static const youtubeLoopMiniPlayerTitle = '영상 따라 연습';
+
+  /// 카운트인 시작 안내 ("3-2-1 후 시작합니다").
+  static const youtubeLoopCountInStarting = '3-2-1 후 시작합니다';
+
+  // -- AudioMixMode 표시 라벨 (audio_mix_visuals.dart 에서 사용) --
+
+  static const audioMixModeVideoOnlyTitle = '영상만';
+  static const audioMixModeVideoOnlyDescription = '녹음 없이 영상만 봅니다.';
+  static const audioMixModeRecordOnlyTitle = '녹음만';
+  static const audioMixModeRecordOnlyDescription = '영상은 일시정지, 녹음만 진행합니다.';
+  static const audioMixModeMixedTitle = '영상 + 녹음';
+  static const audioMixModeMixedDescription = '영상과 녹음을 함께 진행합니다 (혼합 녹음).';
+  static const audioMixModeVideoMutedTitle = '영상 음소거 + 녹음';
+  static const audioMixModeVideoMutedDescription = '영상은 시각만, 소리는 끄고 녹음합니다.';
+  static const audioMixModeHeadphoneOnlyTitle = '헤드폰 + 녹음 (권장)';
+  static const audioMixModeHeadphoneOnlyDescription =
+      '헤드폰으로 영상 소리를 듣고 마이크로 녹음합니다.';
+  static const audioMixModeMetronomeMixedTitle = '영상 + 메트로놈 + 녹음';
+  static const audioMixModeMetronomeMixedDescription =
+      '세 가지가 동시에 진행됩니다. 헤드폰 사용을 권장합니다.';
+
+  // -- AudioMixGuideDialog --
+
+  static const audioMixGuideTitle = '녹음 모드 선택';
+  static const audioMixGuideMessageNoHeadphone =
+      '헤드폰을 권장합니다. 메트로놈/영상 소리가 녹음에 섞일 수 있어요.';
+  static const audioMixGuideMessageWithHeadphone =
+      '헤드폰이 연결되어 있어요. 안전하게 함께 녹음할 수 있어요.';
+  static const audioMixGuideContinueAnyway = '그대로 진행';
+  static const audioMixGuideMuteVideo = '영상 음소거';
+  static const audioMixGuideHeadphonePrompt = '헤드폰 연결 안내';
+
+  // -- 진입점 카운터 라벨 --
+
+  static const youtubeLoopCounterOf = '/';
+
+  // -- 풀스크린 토글 --
+
+  static const youtubeLoopMiniPlayerOpen = '영상 열기';
 }

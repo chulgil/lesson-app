@@ -13,6 +13,7 @@ import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../features/practice/presentation/widgets/note/practice_note_card.dart';
 import '../../../../features/practice/presentation/widgets/notes/note_edit_dialog.dart';
+import '../../../../features/practice/presentation/widgets/youtube/section_video_affordance.dart';
 import '../providers/student_home_session_provider.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 
@@ -63,9 +64,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      onPressed: () => context.push(
-                        '${AppRoutes.repertoireHistory}?studentId=$studentId',
-                      ),
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                          ),
                       icon: const Icon(
                         Icons.history,
                         color: AppColors.ink,
@@ -94,9 +96,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => context.push(
-                        '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                      ),
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                          ),
                       icon: const Icon(
                         Icons.add,
                         color: AppColors.ink,
@@ -202,30 +205,32 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 ],
               );
             },
-            loading: () => Row(
-              children: [
-                Text(
-                  _formatDate(_selectedDate),
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
+            loading:
+                () => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
                 ),
-                const Spacer(),
-                _buildSortDropdown(),
-              ],
-            ),
-            error: (_, __) => Row(
-              children: [
-                Text(
-                  _formatDate(_selectedDate),
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
+            error:
+                (_, __) => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
                 ),
-                const Spacer(),
-                _buildSortDropdown(),
-              ],
-            ),
           ),
         ),
 
@@ -242,8 +247,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               return _buildRepertoireList(sortedRepertoires, studentId);
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) =>
-                Center(child: Text(AppStrings.profileVisibilityErrorState)),
+            error:
+                (_, __) =>
+                    Center(child: Text(AppStrings.profileVisibilityErrorState)),
           ),
         ),
       ],
@@ -269,37 +275,42 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       onSelected: (type) {
         ref.read(repertoireSortTypeStateProvider.notifier).setSortType(type);
       },
-      itemBuilder: (context) => RepertoireSortType.values
-          .where((type) => type != RepertoireSortType.custom)
-          .map((type) {
-            return PopupMenuItem<RepertoireSortType>(
-              value: type,
-              child: Row(
-                children: [
-                  Icon(
-                    _getSortIcon(type),
-                    size: 18,
-                    color: type == sortType
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    type.displayName,
-                    style: TextStyle(
-                      color: type == sortType
-                          ? AppColors.paperAccent
-                          : AppColors.ink,
-                      fontWeight: type == sortType
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          })
-          .toList(),
+      itemBuilder:
+          (context) =>
+              RepertoireSortType.values
+                  .where((type) => type != RepertoireSortType.custom)
+                  .map((type) {
+                    return PopupMenuItem<RepertoireSortType>(
+                      value: type,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getSortIcon(type),
+                            size: 18,
+                            color:
+                                type == sortType
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkSecondary,
+                          ),
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(
+                            type.displayName,
+                            style: TextStyle(
+                              color:
+                                  type == sortType
+                                      ? AppColors.paperAccent
+                                      : AppColors.ink,
+                              fontWeight:
+                                  type == sortType
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
+                  .toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space2,
@@ -696,15 +707,16 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
           // Sections list
           if (_isExpanded && visibleSections.isNotEmpty)
             Column(
-              children: visibleSections.map((section) {
-                return _SectionTile(
-                  section: section,
-                  repertoireId: widget.repertoire.id,
-                  studentId: widget.studentId,
-                  selectedDate: widget.selectedDate,
-                  isToday: widget.isToday,
-                );
-              }).toList(),
+              children:
+                  visibleSections.map((section) {
+                    return _SectionTile(
+                      section: section,
+                      repertoireId: widget.repertoire.id,
+                      studentId: widget.studentId,
+                      selectedDate: widget.selectedDate,
+                      isToday: widget.isToday,
+                    );
+                  }).toList(),
             ),
 
           if (_isExpanded && visibleSections.isEmpty)
@@ -811,12 +823,12 @@ class _SectionTile extends ConsumerWidget {
                     Text(
                       section.pieceName,
                       style: AppTypography.bodyMedium.copyWith(
-                        decoration: isCompletedForDate
-                            ? TextDecoration.lineThrough
-                            : null,
-                        color: isCompletedForDate
-                            ? AppColors.inkSecondary
-                            : null,
+                        decoration:
+                            isCompletedForDate
+                                ? TextDecoration.lineThrough
+                                : null,
+                        color:
+                            isCompletedForDate ? AppColors.inkSecondary : null,
                       ),
                     ),
                     Text(
@@ -829,6 +841,16 @@ class _SectionTile extends ConsumerWidget {
                 ),
               ),
 
+              // §3.5 YouTube loop entry-point affordance — only when video exists.
+              if (section.youtubeUrl != null) ...[
+                const SizedBox(width: AppSpacing.space2),
+                SectionVideoAffordance(
+                  startSeconds: section.youtubeStartSeconds,
+                  endSeconds: section.youtubeEndSeconds,
+                  stacked: true,
+                ),
+              ],
+
               // Repeat toggle (only for today)
               if (isToday)
                 IconButton(
@@ -839,9 +861,10 @@ class _SectionTile extends ConsumerWidget {
                   },
                   icon: Icon(
                     Icons.repeat,
-                    color: section.isRepeat
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary.withValues(alpha: 0.5),
+                    color:
+                        section.isRepeat
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary.withValues(alpha: 0.5),
                     size: 20,
                   ),
                   tooltip: section.isRepeat ? '매일 반복' : '반복 안함',
