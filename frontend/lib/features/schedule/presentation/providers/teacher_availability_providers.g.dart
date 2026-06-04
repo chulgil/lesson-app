@@ -1568,7 +1568,7 @@ final selectedDateProvider =
 
 typedef _$SelectedDate = AutoDisposeNotifier<DateTime>;
 String _$slotBookingNotifierHash() =>
-    r'5ab97944f387e646fbd1d2b8ab26eff67d91b1b4';
+    r'e086e574292d2a020a5bb0878079182bb709b010';
 
 /// See also [SlotBookingNotifier].
 @ProviderFor(SlotBookingNotifier)

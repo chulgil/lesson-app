@@ -6453,6 +6453,25 @@ class AppStrings {
   static const practiceGoalResetTitle = '목표 초기화';
   static const practiceGoalResetConfirm = '모든 목표 설정을 초기화할까요?';
 
+  // -- Goal Progress Widget --
+  static const goalProgressTitle = '연습 목표';
+  static const goalProgressDaily = '오늘';
+  static const goalProgressWeekly = '이번 주';
+  static const goalProgressTime = '시간';
+  static const goalProgressSection = '섹션';
+  static const goalProgressDay = '연습일';
+  static const goalProgressEmptyTitle = '연습 목표를 설정해 보세요';
+  static const goalProgressEmptyAction = '목표 설정';
+  static const goalProgressEditTooltip = '목표 수정';
+
+  // -- Goal Achieved Dialog --
+  static const goalAchievedDailyTitle = '오늘의 목표 달성!';
+  static const goalAchievedWeeklyTitle = '이번 주 목표 달성!';
+  static const goalAchievedDailyMessage = '오늘의 연습 목표를 모두 달성했어요. 멋져요!';
+  static const goalAchievedWeeklyMessage =
+      '이번 주 연습 목표를 모두 달성했어요. 한 주 정말 수고했어요!';
+  static const goalAchievedConfirm = '확인';
+
   // -- Section Management --
   static const practiceRestore = '복원';
   static const practicePermanentDelete = '영구 삭제';
