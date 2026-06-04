@@ -5221,6 +5221,34 @@ class AppStrings {
   /// 복원 중 오류 발생: $error (복원 catch 블록 실패 사유 포매터)
   static String restoreErrorFormat(Object error) => '복원 중 오류 발생: $error';
 
+  // ── Practice Backup Phase 1 (practice §6.3 — Issue #497) ────────────────
+  /// 백업 (Phase 1 다이얼로그/메뉴 공통 타이틀)
+  static const backupTitle = '백업';
+
+  /// 백업 내보내기 (ZIP 생성 CTA)
+  static const backupExport = '백업 내보내기';
+
+  /// 백업 복원 (ZIP 복원 CTA)
+  static const backupRestore = '백업 복원';
+
+  /// 백업 생성 중... (진행 다이얼로그 헤더 — create)
+  static const backupExporting = '백업 생성 중...';
+
+  /// 백업 복원 중... (진행 다이얼로그 헤더 — restore)
+  static const backupRestoring = '백업 복원 중...';
+
+  /// 백업이 완료되었습니다. (스낵바 — create success)
+  static const backupSuccess = '백업이 완료되었습니다.';
+
+  /// 백업에 실패했습니다. (스낵바 — create/restore failure 헤더)
+  static const backupFailure = '백업에 실패했습니다.';
+
+  /// 백업을 복원하시겠습니까? 중복되는 파일은 건너뜁니다. (복원 확인 다이얼로그 본문)
+  static const backupRestoreConfirm = '백업을 복원하시겠습니까? 중복되는 파일은 건너뜁니다.';
+
+  /// ZIP 인코딩에 실패했습니다. (archive 패키지 encode 반환 null 시 throw)
+  static const backupEncodeFailure = 'ZIP 인코딩에 실패했습니다.';
+
   // ── All Recordings Screen (전체 녹음 관리 5-3d-5) ────────────────────────
   /// 전체 녹음 파일 (AppBar 타이틀)
   static const allRecordingsAppBarTitle = '전체 녹음 파일';
