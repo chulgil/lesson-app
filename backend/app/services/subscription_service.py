@@ -320,9 +320,7 @@ class SubscriptionService:
         from app.models.subscription import Subscription, SubscriptionUsage
 
         # Idempotency: bail if this lesson already consumed a session.
-        existing = await self.db.scalar(
-            select(SubscriptionUsage.id).where(SubscriptionUsage.lesson_id == lesson_id)
-        )
+        existing = await self.db.scalar(select(SubscriptionUsage.id).where(SubscriptionUsage.lesson_id == lesson_id))
         if existing is not None:
             return False
 
@@ -826,6 +824,8 @@ class SubscriptionService:
                 "subscription_id": sub.id,
                 "amount": str(sub.amount or 0),
             },
+            # #423 — alimtalk fail → FCM push fallback to the linked user.
+            fallback_user_id=student.user_id,
         )
 
     async def undo_confirm_payment(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
@@ -1404,6 +1404,8 @@ class SubscriptionService:
                 "proposal_id": proposal.id,
                 "expires_at": proposal.expires_at.isoformat() if proposal.expires_at else "",
             },
+            # #423 — alimtalk fail → FCM push fallback to the linked user.
+            fallback_user_id=student.user_id,
         )
 
     async def _assert_proposal_create_resources(self, data: SubscriptionProposalCreate, teacher_ids: list[str]) -> None:
