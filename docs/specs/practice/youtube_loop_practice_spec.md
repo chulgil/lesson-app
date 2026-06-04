@@ -246,9 +246,14 @@ class PracticeLoopSpeeds {
 
 ```
 정상: 구간 끝 → 카운트인 (선택) → seekTo(start) → 카운터 +1
-목표 도달: 알림 + 뱃지 trigger (#490 onPracticeRepeat — 후속)
+목표 도달: 알림 + 뱃지 trigger (#490 onPracticeRepeat — #508 완료)
 수동 리셋: 카운터 0
 ```
+
+뱃지 연동 (#508):
+- 목표 횟수 도달 시 `BadgeChecker.onPracticeRepeat({sectionId, completedCount})` 호출
+- 누적 카운트 (학생별 scoped, Hive `practice_repeat_totals` box) 10/50/100 회 도달 시 신규 뱃지 (`practiceRepeat10/50/100`) 획득
+- `BadgePopupListener` 가 자동 popup
 
 ### 4.7 시각 affordance 톤
 
@@ -442,7 +447,7 @@ YouTube 적용 (옵션 A + E 채택):
 ## 9. 후속 작업 (별도 이슈)
 
 - 멀티 마커 (북마크 N구간)
-- 뱃지 시스템 #490 `onPracticeRepeat` trigger 연동
+- 뱃지 시스템 #490 `onPracticeRepeat` trigger 연동 (#508 완료)
 - 선생님 측 학생별 반복 통계
 - 영상 메모 (구간별 손글씨)
 - 다른 비디오 플랫폼 (Vimeo, 직접 업로드)
@@ -490,8 +495,16 @@ YouTube 적용 (옵션 A + E 채택):
 | Screen 통합 | `practice/.../recording_result_screen.dart` (진입점 5 — 영상 일시정지) | 갱신 |
 | Card | `practice/.../section_card.dart` 또는 동급 (진입점 1/2 affordance) | 갱신 |
 | Strings | `core/l10n/app_strings.dart` (35-40 키) | 갱신 |
+| Entity (#508) | `features/practice/domain/entities/badge.dart` (+ `practiceRepeat10/50/100`) | 갱신 |
+| Service (#508) | `features/practice/domain/services/badge_checker.dart` (+ `onPracticeRepeat` + `cumulativeRepeatCount`) | 갱신 |
+| Repository (#508) | `features/practice/domain/repositories/practice_repeat_total_repository.dart` | 생성 |
+| Repository (#508) | `features/practice/data/repositories/hive_practice_repeat_total_repository.dart` (box `practice_repeat_totals`) | 생성 |
+| Provider (#508) | `presentation/providers/practice_loop_provider.dart` — `incrementCompletedCount` 목표 도달 시 badge trigger | 갱신 |
+| Extension (#508) | `presentation/extensions/badge_visuals.dart` (+ 3 visual) | 갱신 |
+| Strings (#508) | `core/l10n/app_strings.dart` (+ `badgePracticeRepeat10/50/100Name` + `badgePracticeRepeatDescription`) | 갱신 |
 
 ## 12. 변경 이력
 
 - 2026-06-04 v1: D1-D6 초안
 - 2026-06-04 v2: D7-D9 + 진입점 5단계 + 카운트인 + 속도 5단계 + 메트로놈 통합 패턴 통합
+- 2026-06-04 v3 (#508): 뱃지 onPracticeRepeat trigger 연동 — 10/50/100 회 뱃지 + 누적 카운트 storage
