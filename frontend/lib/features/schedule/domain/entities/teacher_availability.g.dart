@@ -11,7 +11,7 @@ TeacherAvailability _$TeacherAvailabilityFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       teacherId: json['teacher_id'] as String,
       slotDurationMinutes:
-          (json['slot_duration_minutes'] as num?)?.toInt() ?? 60,
+          (json['slot_duration_minutes'] as num?)?.toInt() ?? 50,
       weeklySchedules: (json['weekly_schedules'] as List<dynamic>?)
               ?.map((e) => WeeklySchedule.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -25,9 +25,9 @@ TeacherAvailability _$TeacherAvailabilityFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-      slotStartInterval: (json['slot_start_interval'] as num?)?.toInt() ?? 30,
+      slotStartInterval: (json['slot_start_interval'] as num?)?.toInt() ?? 60,
       breakTimeBetweenLessons:
-          (json['break_time_between_lessons'] as num?)?.toInt() ?? 0,
+          (json['break_time_between_lessons'] as num?)?.toInt() ?? 10,
       minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 24,
     );
 

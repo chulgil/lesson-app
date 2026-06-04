@@ -6,7 +6,9 @@ import '../../../../core/utils/time_format_utils.dart';
 import '../../data/repositories/mock_practice_stats_repository.dart';
 import '../../data/repositories/remote_practice_stats_repository.dart';
 import '../../domain/entities/entities.dart';
+import '../../domain/entities/practice_report.dart';
 import '../../domain/repositories/practice_stats_repository.dart';
+import '../../domain/services/practice_report_calculator.dart';
 
 part 'practice_report_provider.g.dart';
 
@@ -172,4 +174,91 @@ class ReportDate extends _$ReportDate {
   void reset() {
     state = build();
   }
+}
+
+/// Report period selection for the practice report screen.
+enum PracticeReportPeriod { weekly, monthly }
+
+/// Currently selected report period (toggle state on the report screen).
+@riverpod
+class PracticeReportPeriodController extends _$PracticeReportPeriodController {
+  @override
+  PracticeReportPeriod build() => PracticeReportPeriod.weekly;
+
+  void select(PracticeReportPeriod period) {
+    state = period;
+  }
+}
+
+/// Calculator provider (pure, no I/O).
+@riverpod
+PracticeReportCalculator practiceReportCalculator(Ref ref) =>
+    const PracticeReportCalculator();
+
+/// Build calculator inputs from PracticeStatsReport (a temporary adapter
+/// until raw practice logs are exposed by the repository).
+List<DailyPracticeInput> _inputsFromStatsReport(PracticeStatsReport source) {
+  final inputs = <DailyPracticeInput>[];
+  if (source.repertoireStats.isEmpty || source.dailyStats.isEmpty) {
+    return inputs;
+  }
+  final totalSeconds = source.totalPracticeSeconds;
+  if (totalSeconds == 0) return inputs;
+
+  // Distribute repertoire seconds across days proportional to that day's share.
+  for (final daily in source.dailyStats) {
+    if (daily.practiceSeconds == 0) continue;
+    final dayShare = daily.practiceSeconds / totalSeconds;
+    for (final rep in source.repertoireStats) {
+      final seconds = (rep.practiceSeconds * dayShare).round();
+      if (seconds == 0) continue;
+      inputs.add(
+        DailyPracticeInput(
+          date: daily.date,
+          repertoireId: rep.repertoireId,
+          repertoireName: rep.repertoireName,
+          practiceSeconds: seconds,
+        ),
+      );
+    }
+  }
+  return inputs;
+}
+
+/// Weekly practice report (new entity, §5.2).
+@Riverpod(keepAlive: false)
+Future<WeeklyReport> practiceWeeklyReport(
+  Ref ref,
+  WeeklyReportParams params,
+) async {
+  final repository = ref.watch(practiceReportRepositoryProvider);
+  final statsReport = await repository.getWeeklyReport(
+    params.studentId,
+    params.weekStart,
+  );
+  final calculator = ref.watch(practiceReportCalculatorProvider);
+  return calculator.calculateWeekly(
+    weekStart: params.weekStart,
+    inputs: _inputsFromStatsReport(statsReport),
+  );
+}
+
+/// Monthly practice report (new entity, §5.2).
+@Riverpod(keepAlive: false)
+Future<MonthlyReport> practiceMonthlyReport(
+  Ref ref,
+  MonthlyReportParams params,
+) async {
+  final repository = ref.watch(practiceReportRepositoryProvider);
+  final statsReport = await repository.getMonthlyReport(
+    params.studentId,
+    params.year,
+    params.month,
+  );
+  final calculator = ref.watch(practiceReportCalculatorProvider);
+  return calculator.calculateMonthly(
+    year: params.year,
+    month: params.month,
+    inputs: _inputsFromStatsReport(statsReport),
+  );
 }

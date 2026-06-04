@@ -7,7 +7,7 @@ part of 'practice_note_provider.dart';
 // **************************************************************************
 
 String _$practiceNoteRepositoryHash() =>
-    r'6dedfb9b51b9b807f1e2d6a18f9a7c453ab5b4da';
+    r'7e606a6ba084f0a073b16e6585b0f18d94076d9f';
 
 /// Practice note repository provider - switches between Mock and Remote.
 ///

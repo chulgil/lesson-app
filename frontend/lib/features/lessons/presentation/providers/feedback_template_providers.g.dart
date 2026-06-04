@@ -7,7 +7,7 @@ part of 'feedback_template_providers.dart';
 // **************************************************************************
 
 String _$feedbackTemplateRepositoryHash() =>
-    r'30a796220b18285e47c08973764b010dd9044ef2';
+    r'23e04ab6e39d2d8b5381b290a386c42364b016a9';
 
 /// Repository provider — singleton mock for now.
 ///

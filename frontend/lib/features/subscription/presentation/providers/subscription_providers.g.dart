@@ -1953,7 +1953,7 @@ class _PendingScheduleChangeRequestsProviderElement
 }
 
 String _$subscriptionNotifierHash() =>
-    r'03fca4a3bb48fcf5bad1ba660640dbbca8d4cc7e';
+    r'24e0e6f1447869fa6153d37100e4407803a19efa';
 
 abstract class _$SubscriptionNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<Subscription>> {

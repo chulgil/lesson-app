@@ -3295,8 +3295,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5668,10 +5668,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5808,12 +5807,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6557,6 +6555,21 @@ class AppStrings {
   static const practiceRepertoireEmptySubtitle = '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요';
   static const practiceSectionAddLabel = '섹션 추가';
   static const practiceStatsAppBarTitle = '연습 통계';
+
+  // -- Practice Report (§5.2 주간/월간 리포트) --
+  static const practiceReportTitle = '연습 리포트';
+  static const practiceReportWeekly = '주간';
+  static const practiceReportMonthly = '월간';
+  static const practiceReportTotalMinutes = '총 연습 시간';
+  static const practiceReportPracticeDays = '연습 일수';
+  static const practiceReportAvgMinutes = '평균 연습 시간';
+  static const practiceReportEmpty = '아직 연습 기록이 없습니다';
+  static const practiceReportEmptyChart = '표시할 연습 기록이 없습니다';
+  static const practiceReportEmptyRepertoire = '연습한 레퍼토리가 없습니다';
+  static const practiceReportDailyChartTitle = '일별 연습 시간';
+  static const practiceReportRepertoireRatioTitle = '레퍼토리 비중';
+  static const practiceReportMinutesUnit = '분';
+  static const practiceReportDaysUnit = '일';
 
   // -- Section Edit/Add --
   static const practiceStartMeasureGreaterError = '시작 마디가 끝 마디보다 클 수 없습니다';
