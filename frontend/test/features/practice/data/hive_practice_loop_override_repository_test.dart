@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:lessonaza/features/practice/data/repositories/hive_practice_loop_override_repository.dart';
+import 'package:lessonaza/features/practice/domain/entities/loop_bookmark.dart';
 import 'package:lessonaza/features/practice/domain/entities/loop_memo.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_loop_override.dart';
 import 'package:lessonaza/features/practice/domain/value_objects/audio_mix_mode.dart';
@@ -157,6 +158,81 @@ void main() {
         expect(loaded, isNotNull);
         expect(loaded!.studentMemos, isEmpty);
         expect(loaded.overrideStartSeconds, 30);
+      },
+    );
+
+    test('round-trips bookmarks + activeBookmarkId (#511)', () async {
+      final repo = HivePracticeLoopOverrideRepository();
+      const b1 = LoopBookmark(
+        id: 'b1',
+        name: '도입',
+        startSeconds: 0,
+        endSeconds: 12,
+        colorIndex: 0,
+      );
+      const b2 = LoopBookmark(
+        id: 'b2',
+        name: '엔딩',
+        startSeconds: 60,
+        endSeconds: 80,
+        colorIndex: 1,
+      );
+      await repo.save(
+        PracticeLoopOverride(
+          sectionId: 'sec-1',
+          studentUserId: 'stu-1',
+          lastPlayedAt: DateTime(2026, 6, 4),
+          bookmarks: const [b1, b2],
+          activeBookmarkId: 'b2',
+        ),
+      );
+
+      final loaded = await repo.findFor(
+        studentUserId: 'stu-1',
+        sectionId: 'sec-1',
+      );
+      expect(loaded, isNotNull);
+      expect(loaded!.bookmarks, [b1, b2]);
+      expect(loaded.activeBookmarkId, 'b2');
+    });
+
+    test(
+      'migrates legacy single-override record into a "기본" bookmark (#511)',
+      () async {
+        // Simulate a legacy record persisted before #511 — has overrideStart /
+        // overrideEnd but no `bookmarks` key.
+        final box = await Hive.openBox<String>(
+          HivePracticeLoopOverrideRepository.boxName,
+        );
+        const legacyKey = 'stu-1:sec-1';
+        final legacyJson = <String, dynamic>{
+          'sectionId': 'sec-1',
+          'studentUserId': 'stu-1',
+          'overrideStartSeconds': 30,
+          'overrideEndSeconds': 60,
+          'playbackSpeed': 1.0,
+          'targetRepeatCount': 5,
+          'completedRepeatCount': 0,
+          'countInEnabled': false,
+          'countInSoundEnabled': true,
+          'audioMixMode': 'videoOnly',
+          'lastPlayedAt': DateTime(2026, 6, 4).toIso8601String(),
+          // No `bookmarks`, no `activeBookmarkId` — pre-#511 schema.
+        };
+        await box.put(legacyKey, jsonEncode(legacyJson));
+
+        final repo = HivePracticeLoopOverrideRepository();
+        final loaded = await repo.findFor(
+          studentUserId: 'stu-1',
+          sectionId: 'sec-1',
+        );
+        expect(loaded, isNotNull);
+        expect(loaded!.bookmarks.length, 1);
+        final migrated = loaded.bookmarks.single;
+        expect(migrated.name, PracticeLoopOverride.defaultBookmarkName);
+        expect(migrated.startSeconds, 30);
+        expect(migrated.endSeconds, 60);
+        expect(loaded.activeBookmarkId, migrated.id);
       },
     );
 

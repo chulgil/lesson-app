@@ -5,6 +5,7 @@ import '../../data/repositories/hive_practice_loop_override_repository.dart';
 import '../../data/repositories/hive_practice_repeat_total_repository.dart';
 import '../../data/services/audio_session_audio_routing_service.dart';
 import '../../data/services/audio_session_practice_audio_mix_service.dart';
+import '../../domain/entities/loop_bookmark.dart';
 import '../../domain/entities/loop_memo.dart';
 import '../../domain/entities/practice_loop_override.dart';
 import '../../domain/repositories/practice_loop_override_repository.dart';
@@ -198,9 +199,10 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
     if (current == null) return;
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
-    final next = current.studentMemos
-        .map((m) => m.id == id ? m.copyWith(text: trimmed) : m)
-        .toList();
+    final next =
+        current.studentMemos
+            .map((m) => m.id == id ? m.copyWith(text: trimmed) : m)
+            .toList();
     await _persist(current.copyWith(studentMemos: next));
   }
 
@@ -212,5 +214,101 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
         .where((m) => m.id != id)
         .toList(growable: false);
     await _persist(current.copyWith(studentMemos: next));
+  }
+
+  // -- #511: 멀티 마커 북마크 N구간 --
+
+  /// Returns the next free color slot index. Slots cycle 0..4 so the timeline
+  /// stays distinguishable even after one bookmark is deleted and another is
+  /// added. Spec: #511.
+  int _nextColorIndex(List<LoopBookmark> existing) {
+    final used = existing.map((b) => b.colorIndex).toSet();
+    for (var i = 0; i < PracticeLoopOverride.maxBookmarks; i++) {
+      if (!used.contains(i)) return i;
+    }
+    return existing.length % PracticeLoopOverride.maxBookmarks;
+  }
+
+  /// Append a bookmark covering [startSeconds]–[endSeconds] with [name].
+  ///
+  /// Silently no-ops when the cap is reached — the UI guards against this
+  /// path, so reaching it from production means a stale snapshot. Returns the
+  /// new bookmark's id, or `null` if the addition was rejected.
+  Future<String?> addBookmark({
+    required String name,
+    required int startSeconds,
+    required int endSeconds,
+  }) async {
+    final current = state.valueOrNull;
+    if (current == null) return null;
+    if (current.isBookmarkLimitReached) return null;
+    if (endSeconds <= startSeconds) return null;
+    final trimmedName =
+        name.trim().isEmpty
+            ? PracticeLoopOverride.defaultBookmarkName
+            : name.trim();
+    final id = 'bookmark-${DateTime.now().microsecondsSinceEpoch}';
+    final bookmark = LoopBookmark(
+      id: id,
+      name: trimmedName,
+      startSeconds: startSeconds,
+      endSeconds: endSeconds,
+      colorIndex: _nextColorIndex(current.bookmarks),
+    );
+    final next = [...current.bookmarks, bookmark];
+    await _persist(current.copyWith(bookmarks: next, activeBookmarkId: id));
+    return id;
+  }
+
+  /// Update an existing bookmark's name and/or range.
+  Future<void> updateBookmark({
+    required String id,
+    String? name,
+    int? startSeconds,
+    int? endSeconds,
+  }) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    final next =
+        current.bookmarks.map((b) {
+          if (b.id != id) return b;
+          final nextStart = startSeconds ?? b.startSeconds;
+          final nextEnd = endSeconds ?? b.endSeconds;
+          final trimmed = name?.trim();
+          return b.copyWith(
+            name: (trimmed == null || trimmed.isEmpty) ? b.name : trimmed,
+            startSeconds: nextStart,
+            endSeconds: nextEnd > nextStart ? nextEnd : b.endSeconds,
+          );
+        }).toList();
+    await _persist(current.copyWith(bookmarks: next));
+  }
+
+  /// Delete a bookmark by id. Also clears the active selection when it points
+  /// at the removed bookmark.
+  Future<void> deleteBookmark(String id) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    final next = current.bookmarks
+        .where((b) => b.id != id)
+        .toList(growable: false);
+    final clearActive = current.activeBookmarkId == id;
+    await _persist(
+      current.copyWith(bookmarks: next, clearActiveBookmarkId: clearActive),
+    );
+  }
+
+  /// Select [id] as the active bookmark. Passing `null` clears the selection
+  /// so the student returns to the teacher / override defaults.
+  Future<void> selectBookmark(String? id) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    if (id == null) {
+      await _persist(current.copyWith(clearActiveBookmarkId: true));
+      return;
+    }
+    final exists = current.bookmarks.any((b) => b.id == id);
+    if (!exists) return;
+    await _persist(current.copyWith(activeBookmarkId: id));
   }
 }

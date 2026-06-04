@@ -4,7 +4,9 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../domain/entities/loop_bookmark.dart';
 import '../../../domain/value_objects/practice_loop_speeds.dart';
+import 'bookmark_manager_sheet.dart';
 
 /// Control row — repeat toggle, speed picker (5 steps), reset, count-in.
 ///
@@ -25,6 +27,13 @@ class LoopControls extends StatelessWidget {
   final bool countInSoundEnabled;
   final ValueChanged<bool> onCountInSoundChanged;
 
+  /// Bookmark selector data (#511). When [bookmarks] is empty the row collapses
+  /// and only the "북마크 관리" affordance is shown.
+  final List<LoopBookmark> bookmarks;
+  final String? activeBookmarkId;
+  final ValueChanged<String?>? onBookmarkSelected;
+  final VoidCallback? onManageBookmarks;
+
   const LoopControls({
     super.key,
     required this.repeatEnabled,
@@ -36,6 +45,10 @@ class LoopControls extends StatelessWidget {
     required this.onCountInChanged,
     required this.countInSoundEnabled,
     required this.onCountInSoundChanged,
+    this.bookmarks = const [],
+    this.activeBookmarkId,
+    this.onBookmarkSelected,
+    this.onManageBookmarks,
   });
 
   @override
@@ -94,7 +107,123 @@ class LoopControls extends StatelessWidget {
                 ),
             ],
           ),
+          if (onManageBookmarks != null) ...[
+            const SizedBox(height: AppSpacing.space2),
+            _BookmarkRow(
+              bookmarks: bookmarks,
+              activeBookmarkId: activeBookmarkId,
+              onBookmarkSelected: onBookmarkSelected,
+              onManage: onManageBookmarks!,
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _BookmarkRow extends StatelessWidget {
+  final List<LoopBookmark> bookmarks;
+  final String? activeBookmarkId;
+  final ValueChanged<String?>? onBookmarkSelected;
+  final VoidCallback onManage;
+
+  const _BookmarkRow({
+    required this.bookmarks,
+    required this.activeBookmarkId,
+    required this.onBookmarkSelected,
+    required this.onManage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        if (bookmarks.isNotEmpty)
+          Expanded(
+            child: _BookmarkDropdown(
+              bookmarks: bookmarks,
+              activeBookmarkId: activeBookmarkId,
+              onSelected: onBookmarkSelected,
+            ),
+          )
+        else
+          const Spacer(),
+        const SizedBox(width: AppSpacing.space2),
+        TextButton(
+          onPressed: onManage,
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.paperAccent,
+            minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+          ),
+          child: const Text(AppStrings.bookmarkManage),
+        ),
+      ],
+    );
+  }
+}
+
+class _BookmarkDropdown extends StatelessWidget {
+  final List<LoopBookmark> bookmarks;
+  final String? activeBookmarkId;
+  final ValueChanged<String?>? onSelected;
+
+  const _BookmarkDropdown({
+    required this.bookmarks,
+    required this.activeBookmarkId,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.inkQuaternary),
+        borderRadius: BorderRadius.zero,
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String?>(
+          isExpanded: true,
+          value: activeBookmarkId,
+          hint: const Text(
+            AppStrings.bookmarkSelect,
+            style: AppTypography.bodySmall,
+          ),
+          icon: const Icon(Icons.expand_more, color: AppColors.inkSecondary),
+          onChanged: onSelected,
+          items: [
+            for (final bookmark in bookmarks)
+              DropdownMenuItem<String?>(
+                value: bookmark.id,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: BookmarkManagerSheet.colorFor(
+                          bookmark.colorIndex,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    Flexible(
+                      child: Text(
+                        bookmark.name,
+                        style: AppTypography.bodySmall,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

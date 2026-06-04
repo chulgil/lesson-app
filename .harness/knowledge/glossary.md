@@ -85,6 +85,8 @@
 | 재생 루퍼 | Playback Looper | `PlaybackLooper` | — | §3.5 순수 루프 알고리즘 (seek-back / count-in / target-reached 판정) |
 | 오디오 라우팅 서비스 | Audio Routing Service | `AudioRoutingService` | — | §3.5 헤드폰 감지 — `audio_session` 기반 |
 | 카운트인 오버레이 | Count-In Overlay | `CountInOverlay` | — | §3.5 3-2-1 카운트인 오버레이 (Playfair 60-72pt) |
+| 구간 반복 북마크 | Loop Bookmark | `LoopBookmark` | — | §3.5 #511 학생이 영상에 마킹한 N구간 (도입/전개/엔딩 등). 최대 5개, 색 슬롯 자동 할당 |
+| 북마크 관리 시트 | Bookmark Manager Sheet | `BookmarkManagerSheet` | — | §3.5 #511 북마크 추가/수정/삭제/선택 바텀시트 |
 
 ---
 
@@ -325,6 +327,7 @@
 | 2026-06-04 | §12 학원(Academy) 수강권/청구/정산 (AC-M1 그룹 C) — BillingRule/Invoice/Payment/Settlement/Subscription/TeacherPayoutOverride 6 엔티티 + 8 enum + subscriptions.academy_id + lessons.academy_id/visibility 컬럼 + AcademyInvitePreview FE 호환. FE 갭 #513 |
 | 2026-06-04 | §12 학원(Academy) 권한 계층 (AC-M1 그룹 B) 추가 — ContextSwitchLog + AcademyDelegation + AcademyDelegationAction + AcademyActivityLog 4 엔티티 + 5 enum (AcademyContext/ContextSwitchTrigger/DelegationReason/DelegationState/DelegationRevokeReason) |
 | 2026-06-04 | §12 학원(Academy) 도메인 신설 — AC-M1 그룹 A 4 엔티티 + 3 enum + 정책 용어 6종. 마일스톤: AC-M1 |
+| 2026-06-04 | §5 연습: §3.5 후속 #511 신규 용어 2건 — LoopBookmark, BookmarkManagerSheet (멀티 마커 N구간) |
 | 2026-06-04 | §5 연습: §3.5 YouTube 구간 반복 연습 신규 용어 5건 — PracticeLoopOverride, AudioMixMode, PlaybackLooper, AudioRoutingService, CountInOverlay (#506) |
 | 2026-06-03 | §11 코드 반영 신규 용어 — 코드↔스펙 드리프트 동기화로 식별된 FE 엔티티/enum 30여종 등록 (billing/schedule/lesson/relationship/practice/gamification/follow) |
 | 2026-06-01 | E2E 감사 Top 10 반영 — 15용어 추가: 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드/대기, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간, 발신 프로필. ConnectionStatus deprecate 명시 |

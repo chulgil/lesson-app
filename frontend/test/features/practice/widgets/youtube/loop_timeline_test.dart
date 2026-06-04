@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/features/practice/domain/entities/loop_bookmark.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/youtube/loop_timeline.dart';
 
 void main() {
@@ -84,5 +85,74 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('renders multi-marker bookmark bars (#511)', (tester) async {
+      const bookmarks = [
+        LoopBookmark(
+          id: 'b1',
+          name: '도입',
+          startSeconds: 10,
+          endSeconds: 30,
+          colorIndex: 0,
+        ),
+        LoopBookmark(
+          id: 'b2',
+          name: '엔딩',
+          startSeconds: 100,
+          endSeconds: 140,
+          colorIndex: 1,
+        ),
+      ];
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: LoopTimeline(
+              totalDurationSeconds: 180,
+              currentPositionSeconds: 50,
+              startSeconds: 10,
+              endSeconds: 30,
+              bookmarks: bookmarks,
+              activeBookmarkId: 'b1',
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'renders bookmarks inside narrow column without crashing (regression)',
+      (tester) async {
+        const bookmarks = [
+          LoopBookmark(
+            id: 'b1',
+            name: '도입',
+            startSeconds: 0,
+            endSeconds: 5,
+            colorIndex: 0,
+          ),
+        ];
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 160,
+                child: LoopTimeline(
+                  totalDurationSeconds: 60,
+                  currentPositionSeconds: 0,
+                  startSeconds: 0,
+                  endSeconds: 60,
+                  bookmarks: bookmarks,
+                  activeBookmarkId: 'b1',
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }
