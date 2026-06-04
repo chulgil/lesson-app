@@ -13,9 +13,11 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/practice_loop_override.dart';
 import '../../../domain/services/playback_looper.dart';
+import '../../../domain/services/youtube_ad_detector.dart';
 import '../../../domain/value_objects/practice_loop_speeds.dart';
 import '../../providers/practice_loop_provider.dart';
 import '../../providers/practice_youtube_pause_signal.dart';
+import 'ad_notice_overlay.dart';
 import 'count_in_overlay.dart';
 import 'loop_controls.dart';
 import 'loop_timeline.dart';
@@ -55,16 +57,20 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   bool _showCountIn = false;
   bool _seekInFlight = false;
 
+  /// §3.5 #509 — heuristic ad detector + auto-pause state.
+  final YoutubeAdDetector _adDetector = YoutubeAdDetector();
+  bool _showAdNotice = false;
+  bool _adAutoPausedOnce = false;
+
   @override
   void initState() {
     super.initState();
     if (!_supportsIframe) return;
     _controller = YoutubePlayerController.fromVideoId(
       videoId: widget.videoId,
-      startSeconds:
-          (widget.teacherStartSeconds ?? 0) > 0
-              ? widget.teacherStartSeconds!.toDouble()
-              : null,
+      startSeconds: (widget.teacherStartSeconds ?? 0) > 0
+          ? widget.teacherStartSeconds!.toDouble()
+          : null,
       params: const YoutubePlayerParams(
         showControls: true,
         showFullscreenButton: false,
@@ -88,12 +94,41 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
         _totalDuration = dur;
       });
     }
+
+    // §3.5 #509 — clear ad-flag when player leaves the playing state for
+    // a non-buffering reason (paused, ended, cued). Buffering can occur
+    // mid-ad so we leave the flag alone there.
+    final st = value.playerState;
+    if (st == PlayerState.paused ||
+        st == PlayerState.ended ||
+        st == PlayerState.cued) {
+      _adDetector.onResumeOrPause();
+    }
   }
 
   void _onVideoState(YoutubeVideoState state) {
     if (!mounted) return;
     final pos = state.position.inSeconds.toDouble();
-    setState(() => _currentPosition = pos);
+
+    // §3.5 #509 — feed the detector before computing the loop decision so
+    // ad windows protect the repeat counter (best effort).
+    final isPlaying = _controller?.value.playerState == PlayerState.playing;
+    final adActive = _adDetector.observe(
+      positionSeconds: pos,
+      isPlaying: isPlaying,
+    );
+
+    setState(() {
+      _currentPosition = pos;
+      _showAdNotice = adActive;
+    });
+
+    if (adActive && !_adAutoPausedOnce) {
+      _adAutoPausedOnce = true;
+      _controller?.pauseVideo();
+    } else if (!adActive) {
+      _adAutoPausedOnce = false;
+    }
 
     final overrideAsync = ref.read(
       practiceLoopOverrideNotifierProvider(widget.sectionId),
@@ -115,8 +150,19 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
     final decision = looper.evaluate(
       positionSeconds: pos,
       completedCount: override.completedRepeatCount,
+      isAdPlaying: adActive,
     );
     _handleDecision(decision);
+  }
+
+  /// §3.5 #509 — manual resume after the user confirms the ad ended.
+  Future<void> _onResumeFromAd() async {
+    _adDetector.onResumeOrPause();
+    _adAutoPausedOnce = false;
+    if (mounted) {
+      setState(() => _showAdNotice = false);
+    }
+    await _controller?.playVideo();
   }
 
   Future<void> _handleDecision(PlaybackLoopDecision decision) async {
@@ -126,6 +172,7 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
         return;
       case PlaybackLoopAction.seekBack:
         _seekInFlight = true;
+        _adDetector.onExplicitSeek();
         await _controller?.seekTo(
           seconds: (decision.seekToSeconds ?? 0).toDouble(),
           allowSeekAhead: true,
@@ -172,10 +219,9 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   Future<void> _onCountInCompleted() async {
     if (!mounted) return;
     setState(() => _showCountIn = false);
-    final override =
-        ref
-            .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
-            .valueOrNull;
+    final override = ref
+        .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
+        .valueOrNull;
     final start =
         override?.effectiveStartSeconds(widget.teacherStartSeconds) ??
         widget.teacherStartSeconds ??
@@ -220,11 +266,10 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
 
     return overrideAsync.when(
       data: (override) => _buildContent(override),
-      loading:
-          () => const SizedBox(
-            height: 240,
-            child: Center(child: CircularProgressIndicator()),
-          ),
+      loading: () => const SizedBox(
+        height: 240,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (_, __) => _buildError(),
     );
   }
@@ -260,22 +305,23 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
             ],
           ),
         ),
+        // §3.5 #509 — ad notice + manual resume.
+        if (_showAdNotice) ...[
+          const SizedBox(height: AppSpacing.space2),
+          AdNoticeOverlay(onResume: _onResumeFromAd),
+        ],
         const SizedBox(height: AppSpacing.space2),
         LoopTimeline(
           totalDurationSeconds: _totalDuration,
           currentPositionSeconds: _currentPosition,
           startSeconds: start.toDouble(),
           endSeconds: end,
-          onStartChanged:
-              (v) => notifier.setSegment(
-                startSeconds: v.round(),
-                endSeconds: end.round(),
-              ),
-          onEndChanged:
-              (v) => notifier.setSegment(
-                startSeconds: start,
-                endSeconds: v.round(),
-              ),
+          onStartChanged: (v) => notifier.setSegment(
+            startSeconds: v.round(),
+            endSeconds: end.round(),
+          ),
+          onEndChanged: (v) =>
+              notifier.setSegment(startSeconds: start, endSeconds: v.round()),
         ),
         const SizedBox(height: AppSpacing.space2),
         LoopControls(

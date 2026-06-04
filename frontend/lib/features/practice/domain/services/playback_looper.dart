@@ -36,11 +36,24 @@ class PlaybackLooper {
        assert(targetRepeatCount >= 1);
 
   /// Decision based on the current [positionSeconds] and how many loops have completed.
+  ///
+  /// When [isAdPlaying] is true, the loop is paused — the playhead position
+  /// reported by the iframe API during ads is unreliable (resets to 0 or
+  /// reports the ad's own timeline), so we skip the seek-back / count-up to
+  /// protect the repeat counter from spurious increments. #509
   PlaybackLoopDecision evaluate({
     required double positionSeconds,
     required int completedCount,
+    bool isAdPlaying = false,
   }) {
     if (!loopEnabled) {
+      return const PlaybackLoopDecision(
+        action: PlaybackLoopAction.continuePlaying,
+      );
+    }
+
+    // §3.5 #509 — protect counter during ad playback.
+    if (isAdPlaying) {
       return const PlaybackLoopDecision(
         action: PlaybackLoopAction.continuePlaying,
       );
