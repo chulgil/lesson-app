@@ -3,6 +3,7 @@ library;
 
 export 'domain/entities/practice_item.dart';
 export 'domain/entities/practice_log.dart';
+export 'domain/entities/practice_note.dart';
 export 'domain/entities/practice_repertoire.dart';
 export 'domain/entities/repertoire_sort_type.dart';
 export 'domain/entities/metronome_settings.dart'
@@ -25,6 +26,12 @@ export 'presentation/providers/piece_crud_provider.dart'
         studentRepertoireNotifierProvider;
 export 'presentation/providers/practice_crud_provider.dart';
 export 'presentation/providers/practice_item_providers.dart';
+export 'presentation/providers/practice_note_provider.dart'
+    show
+        PracticeNoteCrud,
+        practiceNoteCrudProvider,
+        practiceNoteRepositoryProvider,
+        sectionNotesProvider;
 export 'presentation/providers/practice_overview_provider.dart'
     show studentPracticeOverviewProvider;
 export 'presentation/providers/practice_repertoire_crud_provider.dart';

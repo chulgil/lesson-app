@@ -11,6 +11,8 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/practice_facade.dart';
+import '../../../../features/practice/presentation/widgets/note/practice_note_card.dart';
+import '../../../../features/practice/presentation/widgets/notes/note_edit_dialog.dart';
 import '../providers/student_home_session_provider.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 
@@ -68,16 +70,30 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       icon: const Icon(
                         Icons.history,
                         color: AppColors.ink,
-                        size: 22,
+                        size: 20,
                       ),
                       tooltip: AppStrings.repertoireHistory,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
-                        minWidth: 32,
+                        minWidth: 28,
                         minHeight: 32,
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.space1),
+                    // #492 §2.4 노트 작성 진입점 (헤더 액션).
+                    IconButton(
+                      onPressed: () => _onAddNotePressed(repertoiresAsync),
+                      icon: const Icon(
+                        Icons.edit_note,
+                        color: AppColors.ink,
+                        size: 20,
+                      ),
+                      tooltip: AppStrings.practiceNoteAddTooltip,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 28,
+                        minHeight: 32,
+                      ),
+                    ),
                     IconButton(
                       onPressed:
                           () => context.push(
@@ -86,12 +102,12 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       icon: const Icon(
                         Icons.add,
                         color: AppColors.ink,
-                        size: 22,
+                        size: 20,
                       ),
                       tooltip: AppStrings.repertoireAdd,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
-                        minWidth: 32,
+                        minWidth: 28,
                         minHeight: 32,
                       ),
                     ),
@@ -375,23 +391,183 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     List<PracticeRepertoire> repertoires,
     String studentId,
   ) {
+    // §2.4 학생 홈 통합: 선택한 날짜의 표시 가능한 섹션을 모아
+    // 노트 카드 섹션을 레퍼토리 리스트 하단에 노출한다.
+    final visibleSections = _collectVisibleSections(repertoires);
+
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenPadding,
         AppSpacing.space3,
         AppSpacing.screenPadding,
-        0,
+        AppSpacing.space6,
       ),
-      itemCount: repertoires.length,
+      itemCount: repertoires.length + (visibleSections.isEmpty ? 0 : 1),
       itemBuilder: (context, index) {
-        final repertoire = repertoires[index];
-        return _RepertoireCard(
-          repertoire: repertoire,
-          selectedDate: _selectedDate,
-          studentId: studentId,
-          isToday: _isToday(),
+        if (index < repertoires.length) {
+          final repertoire = repertoires[index];
+          return _RepertoireCard(
+            repertoire: repertoire,
+            selectedDate: _selectedDate,
+            studentId: studentId,
+            isToday: _isToday(),
+          );
+        }
+        return _PracticeNoteSection(sections: visibleSections);
+      },
+    );
+  }
+
+  List<_SectionLink> _collectVisibleSections(
+    List<PracticeRepertoire> repertoires,
+  ) {
+    final result = <_SectionLink>[];
+    for (final repertoire in repertoires) {
+      final sections = repertoire.getSectionsForDate(_selectedDate);
+      for (final section in sections) {
+        result.add(
+          _SectionLink(
+            sectionId: section.id,
+            pieceName: section.pieceName,
+            rangeText: section.rangeText,
+          ),
+        );
+      }
+    }
+    return result;
+  }
+
+  /// 헤더 노트 추가 버튼 핸들러.
+  /// 표시 가능한 섹션이 1개면 즉시 다이얼로그, 여러 개면 섹션 선택 시트.
+  Future<void> _onAddNotePressed(
+    AsyncValue<List<PracticeRepertoire>> repertoiresAsync,
+  ) async {
+    final repertoires = repertoiresAsync.valueOrNull ?? const [];
+    final sections = _collectVisibleSections(repertoires);
+
+    if (sections.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceNoteNoSectionsHint)),
+      );
+      return;
+    }
+
+    final picked =
+        sections.length == 1 ? sections.first : await _pickSection(sections);
+    if (picked == null) return;
+    if (!mounted) return;
+
+    final content = await NoteEditDialog.show(context);
+    if (content == null) return;
+
+    await ref
+        .read(practiceNoteCrudProvider.notifier)
+        .createNote(sectionId: picked.sectionId, content: content);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.practiceNoteAddedSnack)),
+      );
+    }
+  }
+
+  Future<_SectionLink?> _pickSection(List<_SectionLink> sections) {
+    return showModalBottomSheet<_SectionLink>(
+      context: context,
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.space4,
+                  AppSpacing.space4,
+                  AppSpacing.space4,
+                  AppSpacing.space2,
+                ),
+                child: Text(
+                  AppStrings.practiceNotePickSection,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              for (final section in sections)
+                ListTile(
+                  leading: Icon(
+                    Icons.library_music,
+                    color: AppColors.paperAccent,
+                    size: 20,
+                  ),
+                  title: Text(section.pieceName),
+                  subtitle: Text(section.rangeText),
+                  onTap: () => Navigator.of(sheetContext).pop(section),
+                ),
+              const SizedBox(height: AppSpacing.space2),
+            ],
+          ),
         );
       },
+    );
+  }
+}
+
+/// 선택된 날짜의 가시 섹션을 가벼운 값 객체로 캡쳐. (#492 노트 카드 라우팅에만 사용)
+class _SectionLink {
+  const _SectionLink({
+    required this.sectionId,
+    required this.pieceName,
+    required this.rangeText,
+  });
+
+  final String sectionId;
+  final String pieceName;
+  final String rangeText;
+}
+
+/// §2.4 학생 홈 노트 섹션. 가시 섹션 각각에 [PracticeNoteCard] 를 노출.
+class _PracticeNoteSection extends StatelessWidget {
+  const _PracticeNoteSection({required this.sections});
+
+  final List<_SectionLink> sections;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            0,
+            AppSpacing.space4,
+            0,
+            AppSpacing.space2,
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.edit_note, color: AppColors.inkSecondary, size: 20),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                AppStrings.practiceNoteSectionTitle,
+                style: AppTypography.headingSmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        for (final section in sections)
+          PracticeNoteCard(
+            sectionId: section.sectionId,
+            sectionTitle: section.pieceName,
+            sectionSubtitle: section.rangeText,
+          ),
+      ],
     );
   }
 }
