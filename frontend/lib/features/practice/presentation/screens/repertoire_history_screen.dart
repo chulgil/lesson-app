@@ -1,20 +1,23 @@
-// Repertoire history timeline screen
+// Repertoire history timeline screen (§3.4).
+//
+// Thin wiring layer: reads `repertoireTimelineProvider`, delegates the
+// timeline rendering to `RepertoireHistoryTimeline`, and shows empty /
+// error states. All UI strings live in `AppStrings`.
 
 import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../providers/repertoire_history_provider.dart';
-import '../widgets/history_summary_card.dart';
-import '../widgets/month_group_header.dart';
-import '../widgets/repertoire_timeline_card.dart';
+import '../widgets/history/repertoire_history_timeline.dart';
 
-/// Screen displaying the full repertoire history grouped by month
+/// Screen displaying the full repertoire history grouped by month.
 class RepertoireHistoryScreen extends ConsumerWidget {
   final String studentId;
 
@@ -25,97 +28,65 @@ class RepertoireHistoryScreen extends ConsumerWidget {
     final timelineAsync = ref.watch(repertoireTimelineProvider(studentId));
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceRepertoireHistoryTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceRepertoireHistoryTitle,
+      ),
       body: timelineAsync.when(
         data: (timeline) {
           if (timeline.totalCount == 0) {
-            return _buildEmptyState();
+            return const _EmptyState();
           }
-          return _buildTimeline(timeline);
+          return RepertoireHistoryTimeline(timeline: timeline);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => _buildErrorState(ref, error),
-      ),
-    );
-  }
-
-  /// Build the timeline content with summary card and month groups
-  Widget _buildTimeline(timeline) {
-    // Build a flat list of widgets: summary + (header + cards) per month
-    final items = <Widget>[];
-
-    // Summary card at top
-    items.add(
-      Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.space3),
-        child: HistorySummaryCard(
-          totalCount: timeline.totalCount,
-          completedCount: timeline.completedCount,
-          inProgressCount: timeline.inProgressCount,
+        error: (error, stack) => _ErrorState(
+          onRetry: () => ref.invalidate(repertoireTimelineProvider(studentId)),
         ),
       ),
     );
-
-    items.add(const SizedBox(height: AppSpacing.space3));
-
-    // Month groups
-    for (final monthGroup in timeline.monthGroups) {
-      items.add(MonthGroupHeader(monthGroup: monthGroup));
-      for (final repertoire in monthGroup.repertoires) {
-        items.add(RepertoireTimelineCard(repertoire: repertoire));
-      }
-      items.add(const SizedBox(height: AppSpacing.space2));
-    }
-
-    // Bottom padding
-    items.add(const SizedBox(height: AppSpacing.space8));
-
-    return ListView(children: items);
   }
+}
 
-  /// Empty state when no repertoires exist
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.library_music_outlined,
-            size: 64,
-            color: AppColors.inkSecondary.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '아직 레퍼토리가 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
+/// Empty state — reuses `EmptyStateWidget` (§3.4.6 edge case).
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const EmptyStateWidget(
+      icon: Icons.library_music_outlined,
+      title: AppStrings.practiceRepertoireHistoryEmptyTitle,
+      subtitle: AppStrings.practiceRepertoireHistoryEmptySubtitle,
     );
   }
+}
 
-  /// Error state
-  Widget _buildErrorState(WidgetRef ref, Object error) {
+/// Error state with retry action.
+class _ErrorState extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _ErrorState({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
+          const Icon(
+            Icons.error_outline,
+            size: 64,
+            color: AppColors.paperAccent,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '오류가 발생했습니다',
+            AppStrings.errorOccurred,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
-          TextButton(
-            onPressed:
-                () => ref.invalidate(repertoireTimelineProvider(studentId)),
-            child: const Text(AppStrings.retry),
-          ),
+          TextButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
         ],
       ),
     );
