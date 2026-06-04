@@ -302,6 +302,33 @@ class MakeupCreditService:
         return list(result.all())
 
     # ------------------------------------------------------------------
+    # Revoke
+    # ------------------------------------------------------------------
+
+    async def revoke_credit(
+        self,
+        *,
+        credit_id: str,
+        teacher_id: str,
+    ) -> None:
+        """Spec §8.1 DELETE — teacher revokes a mistakenly granted credit.
+
+        Raises:
+            ValueError: credit not found.
+            PermissionError: credit belongs to another teacher.
+            RuntimeError: credit already used (caller maps to HTTP 409).
+        """
+        credit = await self.db.get(MakeupCredit, credit_id)
+        if credit is None:
+            raise ValueError(f"MakeupCredit not found: {credit_id}")
+        if credit.teacher_id != teacher_id:
+            raise PermissionError(f"MakeupCredit {credit_id} not owned by teacher {teacher_id}")
+        if credit.used_at is not None:
+            raise RuntimeError(f"MakeupCredit {credit_id} already used at {credit.used_at}")
+        await self.db.delete(credit)
+        await self.db.flush()
+
+    # ------------------------------------------------------------------
     # scheduled_lessons track
     # ------------------------------------------------------------------
 

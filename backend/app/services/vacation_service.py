@@ -122,21 +122,22 @@ class VacationService:
         teacher_id: str,
         data: VacationPeriodCreate,
     ) -> VacationPeriodResponse:
-        """Create a VacationPeriod and auto-extend impacted subscriptions.
+        """Create a VacationPeriod and apply disposition processing per spec §5.
 
-        Spec §5.3: rollForward (default) — 영향 받는 수강권의
-        auto_extended_days += vacation_days.
+        Per-booking effective disposition follows per_student_disposition override
+        (if present) else default_disposition. Disposition handlers:
+        - rollForward  → Subscription.auto_extended_days += vacation_days (§5.3)
+        - freeCancel   → LessonBooking.status = cancelled (§5.2)
+        - makeupCredit → MakeupCredit accrual + booking cancel (§5.1)
 
-        본 1차 작업은 rollForward 의 만료일 자동 연장만 수행한다.
-        makeupCredit / freeCancel 의 실제 처리 (MakeupCredit 적립, 레슨 취소)는
-        후속 PR.
+        Side effects: LNZ_TEACHER_VACATION alimtalk + in-app notification
+        fan-out to impacted students (§6.1, §6.2).
         """
         vacation_days = (data.end_date - data.start_date).days + 1
         if vacation_days <= 0:
             raise ValueError("vacation period must cover at least 1 day")
 
         # spec §4.2 — per-student disposition overrides stored as JSON.
-        # Effective per-student handling (makeupCredit / freeCancel) is a follow-up.
         per_student = (
             {sid: d.value for sid, d in data.per_student_disposition.items()} if data.per_student_disposition else None
         )
@@ -612,9 +613,7 @@ class VacationService:
             )
         ).all()
         return {
-            b.subscription_id
-            for b in bookings
-            if b.subscription_id is not None and b.vacation_period_id != period.id
+            b.subscription_id for b in bookings if b.subscription_id is not None and b.vacation_period_id != period.id
         }
 
     async def _revert_auto_extended_days(
@@ -626,9 +625,7 @@ class VacationService:
         """Subtract the registration delta from the given (rollForward) subscriptions."""
         if not subscription_ids:
             return 0
-        subscriptions = (
-            await self.db.scalars(select(Subscription).where(Subscription.id.in_(subscription_ids)))
-        ).all()
+        subscriptions = (await self.db.scalars(select(Subscription).where(Subscription.id.in_(subscription_ids)))).all()
         for sub in subscriptions:
             sub.auto_extended_days = max(0, (sub.auto_extended_days or 0) - vacation_days)
         return len(subscriptions)

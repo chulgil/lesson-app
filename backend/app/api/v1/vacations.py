@@ -3,12 +3,16 @@
 Spec: docs/specs/schedule/teacher_vacation_mode.md §9.
 
 본 모듈 범위:
-- POST           — 휴가 등록 + 영향 미리보기
+- POST           — 휴가 등록 + 영향 미리보기 + disposition 처리 (§5.1/5.2/5.3)
 - GET   /        — 목록 (active 기본, include_cancelled=true 옵션)
 - GET   /impact  — 기간 입력 시 영향 미리보기
 - DELETE /{id}   — 24h 내 일괄 취소 (auto_extended_days revert)
 
-후속 PR: 알림톡 발송 (LNZ_TEACHER_VACATION) · makeupCredit/freeCancel 실 처리.
+Disposition 처리 (vacation_service._apply_dispositions):
+- rollForward  → Subscription.auto_extended_days += vacation_days
+- freeCancel   → LessonBooking.status = cancelled
+- makeupCredit → MakeupCredit 적립 + booking cancel
+알림: LNZ_TEACHER_VACATION 알림톡 fan-out + 인앱 알림 (vacation_service).
 """
 
 from __future__ import annotations

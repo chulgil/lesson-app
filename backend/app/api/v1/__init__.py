@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from app.api.v1 import (
+    academies,
     address,
     ai_notes,
     analytics,
@@ -23,6 +24,7 @@ from app.api.v1 import (
     lesson_summaries,
     lessons,
     locations,
+    makeup_credits,
     manual_teachers,
     memberships,
     notifications,
@@ -52,6 +54,12 @@ from app.api.v1 import (
 
 api_router = APIRouter()
 
+api_router.include_router(academies.router, prefix="/academies", tags=["academies"])
+api_router.include_router(
+    academies.public_router,
+    prefix="/public/academies/invites",
+    tags=["academies-public"],
+)
 api_router.include_router(address.router, prefix="/address", tags=["address"])
 api_router.include_router(app_version.router, prefix="/app/version", tags=["app-version"])
 api_router.include_router(app_billing.router, prefix="/me/billing", tags=["billing"])
@@ -120,6 +128,16 @@ api_router.include_router(
     vacations.router,
     prefix="/teacher/vacation",
     tags=["vacation"],
+)
+api_router.include_router(
+    makeup_credits.student_router,
+    prefix="/students/me/makeup-credits",
+    tags=["makeup-credits"],
+)
+api_router.include_router(
+    makeup_credits.teacher_router,
+    prefix="/teachers/me/makeup-credits",
+    tags=["makeup-credits"],
 )
 api_router.include_router(
     student_summary.router,

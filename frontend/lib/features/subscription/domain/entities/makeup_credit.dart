@@ -21,6 +21,9 @@ enum MakeupCreditReason {
 
   /// (d) 선생님 수동 지급 (예외 처리 안전망).
   manualGrant,
+
+  /// (e) 일괄변경 결과 새 월에 5주차 발생 시 자동 적립 (spec §7.1).
+  fifthWeekBonus,
 }
 
 /// A single makeup credit. One credit == one makeup lesson the student may book.
@@ -128,8 +131,9 @@ class MakeupCreditBalance {
     List<MakeupCredit> credits,
     DateTime now,
   ) {
-    final available = credits.where((c) => c.isAvailable(now)).toList()
-      ..sort((a, b) => a.expiresAt.compareTo(b.expiresAt));
+    final available =
+        credits.where((c) => c.isAvailable(now)).toList()
+          ..sort((a, b) => a.expiresAt.compareTo(b.expiresAt));
     return MakeupCreditBalance(available: available);
   }
 }

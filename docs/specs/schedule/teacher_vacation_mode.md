@@ -268,10 +268,13 @@ class VacationImpactedStudent {
 
 | Method | 경로 | 설명 |
 |---|---|---|
-| POST | `/api/teachers/me/vacations` | 휴가 등록 (영향 레슨 일괄 처리 포함) |
-| GET | `/api/teachers/me/vacations` | 휴가 목록 |
-| GET | `/api/teachers/me/vacations/preview` | 기간 입력 시 영향 레슨 미리보기 |
-| DELETE | `/api/teachers/me/vacations/:id` | 24h 내 일괄 취소 |
+| POST | `/api/v1/teacher/vacation` | 휴가 등록 (영향 레슨 일괄 처리 포함) |
+| GET | `/api/v1/teacher/vacation` | 휴가 목록 (`include_cancelled=true` 옵션) |
+| GET | `/api/v1/teacher/vacation/impact` | 기간 입력 시 영향 레슨 미리보기 (`?start=&end=`) |
+| DELETE | `/api/v1/teacher/vacation/{id}` | 24h 내 일괄 취소 |
+
+> 경로는 코드 실태 반영(`backend/app/api/v1/__init__.py` prefix `/teacher/vacation`).
+> FE 호출 경로도 동일(`frontend/lib/features/schedule/data/repositories/remote_vacation_repository.dart`).
 
 ### 9.1.1 FE Repository 계약 (코드 반영 2026-06-03)
 

@@ -197,9 +197,11 @@ app/
 
 | 기능 | 엔드포인트 | 설명 |
 |------|-----------|------|
-| 공지 생성 | `POST /api/v1/announcements` | 휴강/일반 공지 → 전체 활성 학생 알림 + 휴강일 마킹 |
+| 공지 생성 | `POST /api/v1/announcements` | 휴강/일반 공지 → 전체 활성 학생 알림 + 휴강일 마킹 (레슨 record 변경 없음) |
 | 공지 목록 | `GET /api/v1/announcements` | 선생님의 공지 목록 |
 | 휴강일 조회 | `GET /api/v1/announcements/day-offs` | 기간별 휴강일 목록 (스케줄 표시용) |
+| 레슨 일괄 취소 | `POST /api/v1/lessons/bulk-cancel` | 특정 날짜 + 학생 목록의 레슨 record 실제 취소 + 알림 (BulkTeacherActionService) |
+| 레슨 일괄 취소 미리보기 | `POST /api/v1/lessons/bulk-cancel/preview` | 동일 입력의 취소 대상 미리보기 (mutation 없음) |
 
 **공지 생성 요청/응답:**
 - Request: `{ teacher_id, type("dayOff"|"general"), dates?[], message }`
@@ -207,7 +209,9 @@ app/
 - 휴강 타입: 해당 날짜에 수업 있는 학생 목록을 `affected_lessons`로 반환 (레슨 자동 취소 안 함)
 - 일반 타입: 전체 활성 학생에게 알림만
 
-**v3 변경: v2의 `POST /lessons/bulk-cancel`은 제거됨. 공지와 레슨 취소가 분리됨.**
+**v3 변경: v2의 통합 흐름(공지 = 레슨 자동 취소)이 두 흐름으로 분리됨.**
+- 공지(`/announcements`): 알림 + 휴강일 마킹만. 레슨 record는 변경하지 않음.
+- 레슨 취소(`/lessons/bulk-cancel`): 학생·날짜 선택 후 실제 레슨 record 취소 + 알림. `/preview` 로 미리보기 가능.
 
 ### R2 학생 설치 웹 랜딩/레슨 요약 공유 계약 (2026-05-10)
 

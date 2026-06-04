@@ -58,8 +58,8 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
 
   static List<MakeupCredit> _listFromResponse(dynamic data) {
     final map = data as Map<String, dynamic>;
-    final items = (map['credits'] as List<dynamic>? ?? [])
-        .cast<Map<String, dynamic>>();
+    final items =
+        (map['credits'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
     return items.map(_fromJson).toList(growable: false);
   }
 
@@ -72,9 +72,10 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
       reason: _reasonFromWire(json['reason'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       expiresAt: DateTime.parse(json['expires_at'] as String),
-      usedAt: json['used_at'] != null
-          ? DateTime.parse(json['used_at'] as String)
-          : null,
+      usedAt:
+          json['used_at'] != null
+              ? DateTime.parse(json['used_at'] as String)
+              : null,
       usedLessonId: json['used_lesson_id'] as String?,
       sourceEventId: json['source_event_id'] as String?,
     );
@@ -88,6 +89,8 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
         return MakeupCreditReason.noShowExempt;
       case 'bulkChangeLoss':
         return MakeupCreditReason.bulkChangeLoss;
+      case 'fifthWeekBonus':
+        return MakeupCreditReason.fifthWeekBonus;
       case 'manualGrant':
       default:
         return MakeupCreditReason.manualGrant;

@@ -38,6 +38,7 @@ PUBLIC_API_OPERATIONS = {
     ("POST", "/api/v1/auth/token/refresh"),
     ("GET", "/api/v1/address/search"),
     ("GET", "/api/v1/app/version"),
+    ("GET", "/api/v1/public/academies/invites/{token}/preview"),
     ("GET", "/api/v1/public/invites/{code}/landing"),
     ("GET", "/api/v1/public/student-summaries/{token}"),
     ("GET", "/api/v1/teachers/public/{teacher_id}"),
@@ -179,9 +180,7 @@ def test_openapi_operation_ids_are_unique() -> None:
             operation_locations.setdefault(operation_id, []).append(f"{method.upper()} {path}")
 
     duplicates = {
-        operation_id: locations
-        for operation_id, locations in operation_locations.items()
-        if len(locations) > 1
+        operation_id: locations for operation_id, locations in operation_locations.items() if len(locations) > 1
     }
 
     assert duplicates == {}

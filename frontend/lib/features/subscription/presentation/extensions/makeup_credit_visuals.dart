@@ -15,6 +15,8 @@ extension MakeupCreditReasonVisualX on MakeupCreditReason {
         return AppStrings.makeupCreditReasonBulkChangeLoss;
       case MakeupCreditReason.manualGrant:
         return AppStrings.makeupCreditReasonManualGrant;
+      case MakeupCreditReason.fifthWeekBonus:
+        return AppStrings.makeupCreditReasonFifthWeekBonus;
     }
   }
 }
