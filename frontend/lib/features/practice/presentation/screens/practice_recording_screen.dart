@@ -12,21 +12,31 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
 import '../../../../features/practice/practice_facade.dart';
+import '../../domain/services/quick_recording_service.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
 
 /// Screen for recording practice audio for a repertoire.
+///
+/// When [quickMode] is true the screen resolves the default
+/// "무제 > 바로 녹음" repertoire/section for [studentId] via
+/// [QuickRecordingService] before rendering — see spec §4.3.
 class PracticeRecordingScreen extends ConsumerStatefulWidget {
   const PracticeRecordingScreen({
     super.key,
     required this.repertoireId,
     required this.repertoireName,
     required this.studentId,
+    this.quickMode = false,
   });
 
   final String repertoireId;
   final String repertoireName;
   final String studentId;
+
+  /// When true, ignore [repertoireId]/[repertoireName] and auto-resolve the
+  /// default quick-record destination for [studentId].
+  final bool quickMode;
 
   @override
   ConsumerState<PracticeRecordingScreen> createState() =>
@@ -37,6 +47,37 @@ class _PracticeRecordingScreenState
     extends ConsumerState<PracticeRecordingScreen> {
   Timer? _durationTimer;
   Duration _recordingDuration = Duration.zero;
+
+  /// Resolved quick-record target (null until [_resolveQuickModeIfNeeded]
+  /// completes when [PracticeRecordingScreen.quickMode] is true).
+  QuickRecordingTarget? _quickTarget;
+  bool _quickResolveStarted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveQuickModeIfNeeded();
+  }
+
+  Future<void> _resolveQuickModeIfNeeded() async {
+    if (!widget.quickMode || _quickResolveStarted) return;
+    _quickResolveStarted = true;
+    try {
+      final service = QuickRecordingService(
+        ref.read(practiceRepertoireRepositoryProvider),
+      );
+      final target = await service.ensureDefaultsForStudent(widget.studentId);
+      if (!mounted) return;
+      setState(() => _quickTarget = target);
+    } catch (_) {
+      // Stay on legacy path — _effectiveRepertoireId falls back to widget args.
+    }
+  }
+
+  String get _effectiveRepertoireId =>
+      _quickTarget?.repertoire.id ?? widget.repertoireId;
+  String get _effectiveRepertoireName =>
+      _quickTarget?.repertoire.name ?? widget.repertoireName;
 
   @override
   void dispose() {
@@ -60,8 +101,17 @@ class _PracticeRecordingScreenState
 
   @override
   Widget build(BuildContext context) {
+    // Quick mode pre-resolve: show spinner until target is ready.
+    if (widget.quickMode && _quickTarget == null) {
+      return const NotebookScreenScaffold(
+        appBar: NotebookDetailAppBar(title: AppStrings.quickRecordSectionTitle),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final effectiveRepertoireId = _effectiveRepertoireId;
     final state = ref.watch(
-      recordingNotifierProvider(widget.repertoireId, widget.studentId),
+      recordingNotifierProvider(effectiveRepertoireId, widget.studentId),
     );
 
     // Show recovery message as snackbar
@@ -77,7 +127,7 @@ class _PracticeRecordingScreenState
         ref
             .read(
               recordingNotifierProvider(
-                widget.repertoireId,
+                effectiveRepertoireId,
                 widget.studentId,
               ).notifier,
             )
@@ -87,76 +137,75 @@ class _PracticeRecordingScreenState
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: widget.repertoireName,
+        title: _effectiveRepertoireName,
         customActions:
             (state.representativeRecording != null &&
-                    !state.representativeRecording!.isShared)
-                ? [
-                  TextButton.icon(
-                    onPressed: _shareWithTeacher,
-                    icon: const Icon(Icons.share),
-                    label: const Text(AppStrings.practiceShareToTeacherAction),
-                  ),
-                ]
-                : null,
-      ),
-      body:
-          state.isLoading
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(),
-                    if (state.isRecovering) ...[
-                      SizedBox(height: AppSpacing.space3),
-                      Text(
-                        '녹음 파일 복구 중...',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                    ],
-                  ],
+                !state.representativeRecording!.isShared)
+            ? [
+                TextButton.icon(
+                  onPressed: _shareWithTeacher,
+                  icon: const Icon(Icons.share),
+                  label: const Text(AppStrings.practiceShareToTeacherAction),
                 ),
-              )
-              : Column(
+              ]
+            : null,
+      ),
+      body: state.isLoading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Recording section
-                  _RecordingSection(
-                    isRecording: state.isRecording,
-                    isPaused: state.isPaused,
-                    duration: _recordingDuration,
-                    onStart: () => _startRecording(),
-                    onStop: () => _stopRecording(),
-                    onCancel: () => _cancelRecording(),
-                  ),
-
-                  const ThinRule(),
-
-                  // Recordings list
-                  Expanded(
-                    child:
-                        state.recordings.isEmpty
-                            ? _EmptyRecordingsView()
-                            : _RecordingsList(
-                              recordings: state.recordings,
-                              onPlay:
-                                  (recording) => _openPlayerSheet(recording),
-                              onDelete: (id) => _deleteRecording(context, id),
-                              onSetRepresentative:
-                                  (id) => _setRepresentative(id),
-                              repertoireId: widget.repertoireId,
-                              studentId: widget.studentId,
-                            ),
-                  ),
+                  const CircularProgressIndicator(),
+                  if (state.isRecovering) ...[
+                    SizedBox(height: AppSpacing.space3),
+                    Text(
+                      '녹음 파일 복구 중...',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                  ],
                 ],
               ),
+            )
+          : Column(
+              children: [
+                // Recording section
+                _RecordingSection(
+                  isRecording: state.isRecording,
+                  isPaused: state.isPaused,
+                  duration: _recordingDuration,
+                  onStart: () => _startRecording(),
+                  onStop: () => _stopRecording(),
+                  onCancel: () => _cancelRecording(),
+                ),
+
+                const ThinRule(),
+
+                // Recordings list
+                Expanded(
+                  child: state.recordings.isEmpty
+                      ? _EmptyRecordingsView()
+                      : _RecordingsList(
+                          recordings: state.recordings,
+                          onPlay: (recording) => _openPlayerSheet(recording),
+                          onDelete: (id) => _deleteRecording(context, id),
+                          onSetRepresentative: (id) => _setRepresentative(id),
+                          repertoireId: effectiveRepertoireId,
+                          studentId: widget.studentId,
+                        ),
+                ),
+              ],
+            ),
     );
   }
 
   Future<void> _startRecording() async {
     final notifier = ref.read(
-      recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
+      recordingNotifierProvider(
+        _effectiveRepertoireId,
+        widget.studentId,
+      ).notifier,
     );
     final success = await notifier.startRecording();
     if (success) {
@@ -167,7 +216,10 @@ class _PracticeRecordingScreenState
   Future<void> _stopRecording() async {
     _stopDurationTimer();
     final notifier = ref.read(
-      recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
+      recordingNotifierProvider(
+        _effectiveRepertoireId,
+        widget.studentId,
+      ).notifier,
     );
     await notifier.stopRecording();
     setState(() {
@@ -178,7 +230,10 @@ class _PracticeRecordingScreenState
   Future<void> _cancelRecording() async {
     _stopDurationTimer();
     final notifier = ref.read(
-      recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
+      recordingNotifierProvider(
+        _effectiveRepertoireId,
+        widget.studentId,
+      ).notifier,
     );
     await notifier.cancelRecording();
     setState(() {
@@ -190,7 +245,7 @@ class _PracticeRecordingScreenState
     RecordingPlayerSheet.show(
       context,
       recording: recording,
-      repertoireId: widget.repertoireId,
+      repertoireId: _effectiveRepertoireId,
       studentId: widget.studentId,
     );
   }
@@ -201,30 +256,27 @@ class _PracticeRecordingScreenState
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceRecordingDeleteTitle),
-            content: const Text(AppStrings.practiceRecordingDeleteConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                child: const Text(AppStrings.delete),
-              ),
-            ],
+      builder: (context) => NotebookAlertDialog(
+        title: const Text(AppStrings.practiceRecordingDeleteTitle),
+        content: const Text(AppStrings.practiceRecordingDeleteConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text(AppStrings.cancel),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
+            child: const Text(AppStrings.delete),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
       final notifier = ref.read(
         recordingNotifierProvider(
-          widget.repertoireId,
+          _effectiveRepertoireId,
           widget.studentId,
         ).notifier,
       );
@@ -234,7 +286,10 @@ class _PracticeRecordingScreenState
 
   Future<void> _setRepresentative(String recordingId) async {
     final notifier = ref.read(
-      recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
+      recordingNotifierProvider(
+        _effectiveRepertoireId,
+        widget.studentId,
+      ).notifier,
     );
     await notifier.setAsRepresentative(recordingId);
   }
@@ -242,27 +297,26 @@ class _PracticeRecordingScreenState
   Future<void> _shareWithTeacher() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (dialogContext) => NotebookAlertDialog(
-            title: const Text(AppStrings.practiceShareToTeacherTitle),
-            content: const Text(AppStrings.practiceShareToTeacherConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, false),
-                child: const Text(AppStrings.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, true),
-                child: const Text(AppStrings.practiceShare),
-              ),
-            ],
+      builder: (dialogContext) => NotebookAlertDialog(
+        title: const Text(AppStrings.practiceShareToTeacherTitle),
+        content: const Text(AppStrings.practiceShareToTeacherConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text(AppStrings.cancel),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text(AppStrings.practiceShare),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
       final notifier = ref.read(
         recordingNotifierProvider(
-          widget.repertoireId,
+          _effectiveRepertoireId,
           widget.studentId,
         ).notifier,
       );
@@ -392,15 +446,15 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
 
   @override
   Widget build(BuildContext context) {
-    final waveformStyle =
-        widget.isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
+    final waveformStyle = widget.isRecording
+        ? WaveformStyle.amplitude
+        : WaveformStyle.wave;
     final waveformIsActive = widget.isRecording && !widget.isPaused;
 
     // Get amplitude stream only when recording - this ensures fresh stream each time
-    final amplitudeStream =
-        widget.isRecording
-            ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
-            : null;
+    final amplitudeStream = widget.isRecording
+        ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
+        : null;
 
     // Check microphone permission
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
@@ -444,8 +498,9 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
           Container(
             height: 100,
             decoration: BoxDecoration(
-              color:
-                  widget.isRecording ? AppColors.paperAccent : AppColors.paper,
+              color: widget.isRecording
+                  ? AppColors.paperAccent
+                  : AppColors.paper,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.zero,
@@ -453,10 +508,9 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 style: waveformStyle,
                 isActive: waveformIsActive,
                 height: 100,
-                waveColor:
-                    widget.isRecording
-                        ? AppColors.paper
-                        : AppColors.paperAccent,
+                waveColor: widget.isRecording
+                    ? AppColors.paper
+                    : AppColors.paperAccent,
                 amplitudeStream: amplitudeStream,
               ),
             ),
@@ -468,10 +522,9 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
             _formatDuration(widget.duration),
             style: AppTypography.displayMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color:
-                  widget.isRecording
-                      ? AppColors.paperAccent
-                      : AppColors.inkSecondary,
+              color: widget.isRecording
+                  ? AppColors.paperAccent
+                  : AppColors.inkSecondary,
             ),
           ),
           SizedBox(height: AppSpacing.space2),
@@ -521,38 +574,35 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   width: 72,
                   height: 72,
                   child: IconButton.filled(
-                    onPressed:
-                        hasMicPermission
-                            ? widget.onStart
-                            : () async {
-                              // Request permission when mic is not available
-                              final granted =
-                                  await ref
-                                      .read(audioRecorderServiceProvider)
-                                      .requestPermission();
-                              if (granted) {
-                                ref.invalidate(microphonePermissionProvider);
-                              } else {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-                                      ),
+                    onPressed: hasMicPermission
+                        ? widget.onStart
+                        : () async {
+                            // Request permission when mic is not available
+                            final granted = await ref
+                                .read(audioRecorderServiceProvider)
+                                .requestPermission();
+                            if (granted) {
+                              ref.invalidate(microphonePermissionProvider);
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
                                     ),
-                                  );
-                                }
+                                  ),
+                                );
                               }
-                            },
+                            }
+                          },
                     icon: Icon(
                       hasMicPermission ? Icons.mic : Icons.mic_off,
                       size: 36,
                     ),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          hasMicPermission
-                              ? AppColors.paperAccent
-                              : AppColors.inkSecondary,
+                      backgroundColor: hasMicPermission
+                          ? AppColors.paperAccent
+                          : AppColors.inkSecondary,
                     ),
                     tooltip: hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
                   ),
@@ -667,10 +717,9 @@ class _RecordingItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotebookCard(
       elevation: recording.isRepresentative ? 2 : 0,
-      color:
-          recording.isRepresentative
-              ? AppColors.paperAccentSoft
-              : AppColors.paper,
+      color: recording.isRepresentative
+          ? AppColors.paperAccentSoft
+          : AppColors.paper,
       child: ListTile(
         leading: IconButton.filled(
           onPressed: onPlay,
@@ -737,43 +786,39 @@ class _RecordingItem extends StatelessWidget {
                 break;
             }
           },
-          itemBuilder:
-              (context) => [
-                if (!recording.isRepresentative)
-                  const PopupMenuItem(
-                    value: 'representative',
-                    child: Row(
-                      children: [
-                        Icon(Icons.star_outline),
-                        SizedBox(width: AppSpacing.space2),
-                        Text(AppStrings.practiceSelectAsRepresentative),
-                      ],
-                    ),
-                  ),
-                const PopupMenuItem(
-                  value: 'share_external',
-                  child: Row(
-                    children: [
-                      Icon(Icons.share),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(AppStrings.practiceShareExternal),
-                    ],
-                  ),
+          itemBuilder: (context) => [
+            if (!recording.isRepresentative)
+              const PopupMenuItem(
+                value: 'representative',
+                child: Row(
+                  children: [
+                    Icon(Icons.star_outline),
+                    SizedBox(width: AppSpacing.space2),
+                    Text(AppStrings.practiceSelectAsRepresentative),
+                  ],
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_outline, color: AppColors.paperAccent),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(
-                        '삭제',
-                        style: TextStyle(color: AppColors.paperAccent),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
+            const PopupMenuItem(
+              value: 'share_external',
+              child: Row(
+                children: [
+                  Icon(Icons.share),
+                  SizedBox(width: AppSpacing.space2),
+                  Text(AppStrings.practiceShareExternal),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_outline, color: AppColors.paperAccent),
+                  SizedBox(width: AppSpacing.space2),
+                  Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

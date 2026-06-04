@@ -6500,6 +6500,13 @@ class AppStrings {
   static const practiceSharedToTeacherSnack = '선생님께 공유했어요';
   static const practiceSelectAsRepresentative = '대표로 선택';
   static const practiceTeacherFeedbackArrived = '선생님 피드백이 도착했어요';
+
+  // Quick recording (§4.3 바로 녹음)
+  static const quickRecordButton = '바로 녹음';
+  static const quickRecordSectionTitle = '바로 녹음';
+  static const quickRecordRepertoireName = '무제';
+  static const quickRecordHint = '레퍼토리/섹션을 선택하지 않고 바로 녹음을 시작합니다';
+  static const quickRecordTooltip = '바로 녹음 시작';
   static const practiceJournalTitle = '연습 일지';
   static const practiceJournalContinuousDays = '연속 일수';
   static const practiceJournalBestRun = '최고 연속 일수';
