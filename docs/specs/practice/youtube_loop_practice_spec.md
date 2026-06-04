@@ -255,7 +255,29 @@ class PracticeLoopSpeeds {
 - 누적 카운트 (학생별 scoped, Hive `practice_repeat_totals` box) 10/50/100 회 도달 시 신규 뱃지 (`practiceRepeat10/50/100`) 획득
 - `BadgePopupListener` 가 자동 popup
 
-### 4.7 시각 affordance 톤
+### 4.7 광고 검출 + 자동 일시정지 (#509)
+
+YouTube iframe 재생 중 광고 등장 시 자동 일시정지. 연습 흐름 보호 + 반복 카운터 보호.
+
+**검출 알고리즘** (`YoutubeAdDetector` — best effort):
+- iframe API 가 명시적 광고 이벤트 미노출 → 휴리스틱 조합
+  1. 재생 위치 0 으로 리셋 (광고 시작 신호)
+  2. 큰 후방 점프 (광고 → 본 영상 복귀 신호)
+  3. `playing` 상태 지속 + duration 변화
+- 100% 정확도 보장 불가 — 따라서 [재개]는 수동
+
+**동작**:
+- 광고 시작 추론 → 영상 일시정지 + `AdNoticeOverlay` 표시 ("광고 종료 후 [재개]")
+- 광고 중 PlaybackLooper 카운터 정지 (`isAdPlaying` 인자)
+- 학생 [재개] 탭 → 영상 다시 재생
+- skippable / non-skippable 구분 불가 — 통일 처리
+
+**UI** (`AdNoticeOverlay`):
+- 영상 위 paper 60% 반투명 오버레이
+- 텍스트: `AppStrings.youtubeAdDetected` / `youtubeAdHint`
+- 버튼: `AppStrings.youtubeAdResume` (paperAccent, 각진, 평면)
+
+### 4.8 시각 affordance 톤
 
 - 영상 글리프: `NotebookGlyph` play (▶ 또는 chevronRight ›) — Material `Icons.play_arrow` 는 컨트롤 패널 내부에서만
 - 라벨: `NotebookTypography.tempoMono` — "구간 00:42 -- 01:15"
@@ -458,7 +480,7 @@ YouTube 적용 (옵션 A + E 채택):
 | 위험 | 영향 | 완화 |
 |------|------|------|
 | YouTube iframe seekTo 1초 오차 | 정확도 ↓ | 정수 초 + 100ms 마진 |
-| 영상 광고 (skippable) | 흐름 끊김 | 광고 검출 → 일시정지 |
+| 영상 광고 (skippable) | 흐름 끊김 | 광고 검출 (#509 `YoutubeAdDetector` 휴리스틱) → 자동 일시정지 + 수동 [재개] |
 | 영상 삭제/비공개 | 에러 | 빈 상태 + 선생님 알림 |
 | 마이크에 영상/메트로놈 음성 혼입 | 녹음 품질 ↓ | 헤드폰 권장 + 가이드 다이얼로그 |
 | 데이터 사용량 | LTE 부담 | 360p 기본 + Wi-Fi 시 고화질 |
@@ -502,9 +524,15 @@ YouTube 적용 (옵션 A + E 채택):
 | Provider (#508) | `presentation/providers/practice_loop_provider.dart` — `incrementCompletedCount` 목표 도달 시 badge trigger | 갱신 |
 | Extension (#508) | `presentation/extensions/badge_visuals.dart` (+ 3 visual) | 갱신 |
 | Strings (#508) | `core/l10n/app_strings.dart` (+ `badgePracticeRepeat10/50/100Name` + `badgePracticeRepeatDescription`) | 갱신 |
+| Service (#509) | `domain/services/youtube_ad_detector.dart` (위치 점프 휴리스틱) | 생성 |
+| Service (#509) | `domain/services/playback_looper.dart` — `isAdPlaying` 인자 추가 | 갱신 |
+| Widget (#509) | `presentation/widgets/youtube/ad_notice_overlay.dart` (paper/paperAccent UI) | 생성 |
+| Widget (#509) | `presentation/widgets/youtube/practice_youtube_player.dart` — detector wiring + 오버레이 통합 | 갱신 |
+| Strings (#509) | `core/l10n/app_strings.dart` (+ `youtubeAdDetected/Resume/Hint/Skippable`) | 갱신 |
 
 ## 12. 변경 이력
 
 - 2026-06-04 v1: D1-D6 초안
 - 2026-06-04 v2: D7-D9 + 진입점 5단계 + 카운트인 + 속도 5단계 + 메트로놈 통합 패턴 통합
 - 2026-06-04 v3 (#508): 뱃지 onPracticeRepeat trigger 연동 — 10/50/100 회 뱃지 + 누적 카운트 storage
+- 2026-06-04 v3 (#509): YouTube 광고 검출 + 자동 일시정지 — `YoutubeAdDetector` 휴리스틱 + `AdNoticeOverlay` + PlaybackLooper 카운터 보호
