@@ -6608,6 +6608,10 @@ class AppStrings {
   // -- Screens --
   static const practiceArchiveTitle = '아카이브';
   static const practiceRepertoireHistoryTitle = '레퍼토리 히스토리';
+  // §3.4.6 — empty state when student has no repertoires yet.
+  static const practiceRepertoireHistoryEmptyTitle = '아직 레퍼토리가 없습니다';
+  static const practiceRepertoireHistoryEmptySubtitle =
+      '레퍼토리를 추가하면\n이곳에 월별 히스토리가 쌓입니다';
   static const practiceSectionSearchHint = '레퍼토리 또는 섹션 검색...';
   static const practiceEdit = '편집';
   static const practiceMoveToArchive = '아카이브로 이동';
