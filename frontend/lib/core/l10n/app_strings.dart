@@ -3295,8 +3295,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5668,10 +5668,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5808,12 +5807,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6443,6 +6441,13 @@ class AppStrings {
   static const practiceSharedToTeacherSnack = '선생님께 공유했어요';
   static const practiceSelectAsRepresentative = '대표로 선택';
   static const practiceTeacherFeedbackArrived = '선생님 피드백이 도착했어요';
+
+  // Quick recording (§4.3 바로 녹음)
+  static const quickRecordButton = '바로 녹음';
+  static const quickRecordSectionTitle = '바로 녹음';
+  static const quickRecordRepertoireName = '무제';
+  static const quickRecordHint = '레퍼토리/섹션을 선택하지 않고 바로 녹음을 시작합니다';
+  static const quickRecordTooltip = '바로 녹음 시작';
   static const practiceJournalTitle = '연습 일지';
   static const practiceJournalContinuousDays = '연속 일수';
   static const practiceJournalBestRun = '최고 연속 일수';

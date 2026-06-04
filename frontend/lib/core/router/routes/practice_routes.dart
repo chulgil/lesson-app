@@ -84,6 +84,8 @@ List<GoRoute> practiceRoutes = [
   ),
 
   // Practice Recording
+  // Pass `?quick=true&studentId=<id>` to enter quick recording mode —
+  // the screen resolves the default "무제 > 바로 녹음" target automatically.
   GoRoute(
     path: AppRoutes.practiceRecording,
     name: 'practiceRecording',
@@ -91,10 +93,12 @@ List<GoRoute> practiceRoutes = [
       final repertoireId = state.pathParameters['repertoireId'] ?? '';
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       final repertoireName = state.uri.queryParameters['name'] ?? '';
+      final quickMode = state.uri.queryParameters['quick'] == 'true';
       return PracticeRecordingScreen(
         repertoireId: repertoireId,
         repertoireName: repertoireName,
         studentId: studentId,
+        quickMode: quickMode,
       );
     },
   ),
