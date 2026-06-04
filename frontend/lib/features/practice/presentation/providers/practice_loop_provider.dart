@@ -2,14 +2,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/hive_practice_loop_override_repository.dart';
+import '../../data/repositories/hive_practice_repeat_total_repository.dart';
 import '../../data/services/audio_session_audio_routing_service.dart';
 import '../../data/services/audio_session_practice_audio_mix_service.dart';
 import '../../domain/entities/practice_loop_override.dart';
 import '../../domain/repositories/practice_loop_override_repository.dart';
+import '../../domain/repositories/practice_repeat_total_repository.dart';
 import '../../domain/services/audio_routing_service.dart';
+import '../../domain/services/badge_checker.dart';
 import '../../domain/services/practice_audio_mix_service.dart';
 import '../../domain/value_objects/audio_mix_mode.dart';
 import '../../domain/value_objects/practice_loop_speeds.dart';
+import 'badge_provider.dart';
 
 part 'practice_loop_provider.g.dart';
 
@@ -18,6 +22,12 @@ part 'practice_loop_provider.g.dart';
 PracticeLoopOverrideRepository practiceLoopOverrideRepository(
   PracticeLoopOverrideRepositoryRef ref,
 ) => HivePracticeLoopOverrideRepository();
+
+/// Singleton repository for cumulative repeat counts (#508).
+@Riverpod(keepAlive: true)
+PracticeRepeatTotalRepository practiceRepeatTotalRepository(
+  PracticeRepeatTotalRepositoryRef ref,
+) => HivePracticeRepeatTotalRepository();
 
 /// Singleton audio routing service (headphone detection).
 @Riverpod(keepAlive: true)
@@ -108,12 +118,30 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
   Future<void> incrementCompletedCount() async {
     final current = state.valueOrNull;
     if (current == null) return;
+    final nextCount = current.completedRepeatCount + 1;
     await _persist(
       current.copyWith(
-        completedRepeatCount: current.completedRepeatCount + 1,
+        completedRepeatCount: nextCount,
         lastPlayedAt: DateTime.now(),
       ),
     );
+
+    // Badge trigger (#508) — fire only when the per-section target is reached
+    // so we do not hammer the checker on every loop. Cumulative total is
+    // stored per student so badges survive section changes.
+    if (nextCount < current.targetRepeatCount) return;
+    final studentUserId = ref.read(currentUserIdProvider);
+    final totalRepo = ref.read(practiceRepeatTotalRepositoryProvider);
+    final newTotal = await totalRepo.increment(
+      studentUserId: studentUserId,
+      by: nextCount,
+    );
+    ref
+        .read(practiceBadgeStateNotifierProvider(studentUserId).notifier)
+        .evaluate(
+          stats: PracticeStatsSnapshot(cumulativeRepeatCount: newTotal),
+          trigger: BadgeTrigger.onPracticeRepeat,
+        );
   }
 
   Future<void> resetCompletedCount() async {

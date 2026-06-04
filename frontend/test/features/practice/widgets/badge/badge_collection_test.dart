@@ -9,7 +9,7 @@ import 'package:lessonaza/features/practice/presentation/widgets/badge/badge_col
 
 void main() {
   group('BadgeCollection smoke', () {
-    testWidgets('renders all 14 badges with locked state by default', (
+    testWidgets('renders all 17 badges with locked state by default', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -26,7 +26,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.text('뱃지 컬렉션'), findsOneWidget);
-      expect(find.text('0 / 14'), findsOneWidget);
+      expect(find.text('0 / 17'), findsOneWidget);
       // Category labels (all four).
       expect(find.text('꾸준함'), findsOneWidget);
       expect(find.text('성실함'), findsOneWidget);
@@ -64,8 +64,8 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      // firstPractice + streak3 awarded → 2/14.
-      expect(find.text('2 / 14'), findsOneWidget);
+      // firstPractice + streak3 awarded → 2/17.
+      expect(find.text('2 / 17'), findsOneWidget);
     });
 
     testWidgets('renders inside narrow viewport without overflow', (

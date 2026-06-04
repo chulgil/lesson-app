@@ -26,6 +26,26 @@ final practiceLoopOverrideRepositoryProvider =
 
 typedef PracticeLoopOverrideRepositoryRef
     = ProviderRef<PracticeLoopOverrideRepository>;
+String _$practiceRepeatTotalRepositoryHash() =>
+    r'9ccc6de23899af8ca070c0b49da7d2070d001a48';
+
+/// Singleton repository for cumulative repeat counts (#508).
+///
+/// Copied from [practiceRepeatTotalRepository].
+@ProviderFor(practiceRepeatTotalRepository)
+final practiceRepeatTotalRepositoryProvider =
+    Provider<PracticeRepeatTotalRepository>.internal(
+  practiceRepeatTotalRepository,
+  name: r'practiceRepeatTotalRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceRepeatTotalRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef PracticeRepeatTotalRepositoryRef
+    = ProviderRef<PracticeRepeatTotalRepository>;
 String _$audioRoutingServiceHash() =>
     r'7b3eb73e458c3c5f115c896615be88f9d6980dd7';
 
@@ -64,7 +84,7 @@ final practiceAudioMixServiceProvider =
 
 typedef PracticeAudioMixServiceRef = ProviderRef<PracticeAudioMixService>;
 String _$practiceLoopOverrideNotifierHash() =>
-    r'7013c3fbd236ee50db7192250504830f9de8930c';
+    r'0bfc66e8c53837fd3ddb752406ec698a4213eefc';
 
 /// Copied from Dart SDK
 class _SystemHash {

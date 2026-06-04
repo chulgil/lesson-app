@@ -39,6 +39,9 @@ class PracticeStatsSnapshot {
   /// Manual flag — performance attendance recorded by the teacher.
   final bool hasPerformanceAttended;
 
+  /// Cumulative count of completed repeat-section loops (#508).
+  final int cumulativeRepeatCount;
+
   const PracticeStatsSnapshot({
     this.totalPracticeCount = 0,
     this.currentStreakDays = 0,
@@ -49,6 +52,7 @@ class PracticeStatsSnapshot {
     this.repertoireCompletedCount = 0,
     this.likeCount = 0,
     this.hasPerformanceAttended = false,
+    this.cumulativeRepeatCount = 0,
   });
 
   PracticeStatsSnapshot copyWith({
@@ -61,6 +65,7 @@ class PracticeStatsSnapshot {
     int? repertoireCompletedCount,
     int? likeCount,
     bool? hasPerformanceAttended,
+    int? cumulativeRepeatCount,
   }) {
     return PracticeStatsSnapshot(
       totalPracticeCount: totalPracticeCount ?? this.totalPracticeCount,
@@ -78,6 +83,8 @@ class PracticeStatsSnapshot {
       likeCount: likeCount ?? this.likeCount,
       hasPerformanceAttended:
           hasPerformanceAttended ?? this.hasPerformanceAttended,
+      cumulativeRepeatCount:
+          cumulativeRepeatCount ?? this.cumulativeRepeatCount,
     );
   }
 }
@@ -93,6 +100,9 @@ enum BadgeTrigger {
 
   /// Awarded when a new recording is saved.
   onRecording,
+
+  /// Awarded when a repeat-loop target is reached (#508).
+  onPracticeRepeat,
 
   /// Manual / explicit re-check (no specific trigger).
   manual,
@@ -160,6 +170,23 @@ class BadgeChecker {
     now: now,
   );
 
+  /// Convenience — invoked when a repeat-loop target is reached (#508).
+  ///
+  /// [sectionId] is accepted for telemetry/symmetry with the call site; the
+  /// evaluator itself only uses the cumulative count carried by [stats].
+  List<Badge> onPracticeRepeat({
+    required PracticeStatsSnapshot stats,
+    required Set<String> earnedBadgeIds,
+    String? sectionId,
+    int? completedCount,
+    DateTime? now,
+  }) => evaluate(
+    stats: stats,
+    earnedBadgeIds: earnedBadgeIds,
+    trigger: BadgeTrigger.onPracticeRepeat,
+    now: now,
+  );
+
   /// Manually grant a single badge (e.g., performance attendance).
   Badge grantManual(BadgeType type, {DateTime? now}) =>
       Badge.earned(type, at: now ?? DateTime.now());
@@ -186,7 +213,12 @@ class BadgeChecker {
       case BadgeType.lovedStudent:
         // Practice / task completions and feedback all funnel through
         // PointAwardService — covered by onPoint or onRecording.
-        return trigger != BadgeTrigger.onStreak;
+        return trigger != BadgeTrigger.onStreak &&
+            trigger != BadgeTrigger.onPracticeRepeat;
+      case BadgeType.practiceRepeat10:
+      case BadgeType.practiceRepeat50:
+      case BadgeType.practiceRepeat100:
+        return trigger == BadgeTrigger.onPracticeRepeat;
       case BadgeType.performance:
         return false;
     }
@@ -220,6 +252,12 @@ class BadgeChecker {
         return s.likeCount >= 5;
       case BadgeType.lovedStudent:
         return s.likeCount >= 20;
+      case BadgeType.practiceRepeat10:
+        return s.cumulativeRepeatCount >= 10;
+      case BadgeType.practiceRepeat50:
+        return s.cumulativeRepeatCount >= 50;
+      case BadgeType.practiceRepeat100:
+        return s.cumulativeRepeatCount >= 100;
       case BadgeType.performance:
         return s.hasPerformanceAttended;
     }
