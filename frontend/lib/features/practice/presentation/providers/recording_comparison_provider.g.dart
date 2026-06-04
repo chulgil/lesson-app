@@ -7,7 +7,7 @@ part of 'recording_comparison_provider.dart';
 // **************************************************************************
 
 String _$recordingComparisonNotifierHash() =>
-    r'98ecf29e6542e0d69a77af090bc0a1f6467011e5';
+    r'f13b352fc24d41b207163d067a088a242a0ed404';
 
 /// Comparison state notifier.
 ///
