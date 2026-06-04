@@ -1,5 +1,6 @@
 import '../value_objects/audio_mix_mode.dart';
 import '../value_objects/practice_loop_speeds.dart';
+import 'loop_memo.dart';
 
 /// Student-side override of teacher's default loop section for a [PracticeSection].
 ///
@@ -41,6 +42,12 @@ class PracticeLoopOverride {
   /// Last time this section was played.
   final DateTime lastPlayedAt;
 
+  /// Student-authored memos pinned to playback positions inside this section.
+  ///
+  /// Ordered by [LoopMemo.atSeconds] ascending for deterministic display.
+  /// Spec: GH #510 — loop memo follow-up for §3.5.
+  final List<LoopMemo> studentMemos;
+
   const PracticeLoopOverride({
     required this.sectionId,
     required this.studentUserId,
@@ -53,6 +60,7 @@ class PracticeLoopOverride {
     this.countInSoundEnabled = true,
     this.audioMixMode = AudioMixMode.videoOnly,
     required this.lastPlayedAt,
+    this.studentMemos = const [],
   });
 
   PracticeLoopOverride copyWith({
@@ -69,6 +77,7 @@ class PracticeLoopOverride {
     bool? countInSoundEnabled,
     AudioMixMode? audioMixMode,
     DateTime? lastPlayedAt,
+    List<LoopMemo>? studentMemos,
   }) {
     return PracticeLoopOverride(
       sectionId: sectionId ?? this.sectionId,
@@ -86,6 +95,7 @@ class PracticeLoopOverride {
       countInSoundEnabled: countInSoundEnabled ?? this.countInSoundEnabled,
       audioMixMode: audioMixMode ?? this.audioMixMode,
       lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,
+      studentMemos: studentMemos ?? this.studentMemos,
     );
   }
 
@@ -113,9 +123,19 @@ class PracticeLoopOverride {
     'countInSoundEnabled': countInSoundEnabled,
     'audioMixMode': audioMixMode.name,
     'lastPlayedAt': lastPlayedAt.toIso8601String(),
+    'studentMemos': studentMemos.map((m) => m.toJson()).toList(),
   };
 
   static PracticeLoopOverride fromJson(Map<String, dynamic> json) {
+    // Migration: older records (pre-#510) have no `studentMemos` key —
+    // default to an empty list so existing data continues to load.
+    final memosRaw = json['studentMemos'] as List<dynamic>?;
+    final memos = memosRaw == null
+        ? const <LoopMemo>[]
+        : memosRaw
+              .map((m) => LoopMemo.fromJson(m as Map<String, dynamic>))
+              .toList();
+
     return PracticeLoopOverride(
       sectionId: json['sectionId'] as String,
       studentUserId: json['studentUserId'] as String,
@@ -135,6 +155,7 @@ class PracticeLoopOverride {
       lastPlayedAt: DateTime.parse(
         (json['lastPlayedAt'] as String?) ?? DateTime.now().toIso8601String(),
       ),
+      studentMemos: memos,
     );
   }
 }

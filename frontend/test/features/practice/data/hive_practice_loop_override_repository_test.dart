@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:lessonaza/features/practice/data/repositories/hive_practice_loop_override_repository.dart';
+import 'package:lessonaza/features/practice/domain/entities/loop_memo.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_loop_override.dart';
 import 'package:lessonaza/features/practice/domain/value_objects/audio_mix_mode.dart';
 
@@ -97,6 +99,66 @@ void main() {
       );
       expect(result, isNull);
     });
+
+    test('round-trips studentMemos (#510)', () async {
+      final repo = HivePracticeLoopOverrideRepository();
+      final memo = LoopMemo(
+        id: 'memo-1',
+        atSeconds: 25,
+        text: '여기 보잉',
+        createdAt: DateTime(2026, 6, 4, 10, 0),
+      );
+      await repo.save(
+        PracticeLoopOverride(
+          sectionId: 'sec-1',
+          studentUserId: 'stu-1',
+          lastPlayedAt: DateTime(2026, 6, 4),
+          studentMemos: [memo],
+        ),
+      );
+      final loaded = await repo.findFor(
+        studentUserId: 'stu-1',
+        sectionId: 'sec-1',
+      );
+      expect(loaded, isNotNull);
+      expect(loaded!.studentMemos.length, 1);
+      expect(loaded.studentMemos.first, equals(memo));
+    });
+
+    test(
+      'migrates legacy records without studentMemos to empty list (#510)',
+      () async {
+        // Simulate a legacy record persisted before #510 — no `studentMemos` key.
+        final box = await Hive.openBox<String>(
+          HivePracticeLoopOverrideRepository.boxName,
+        );
+        const legacyKey = 'stu-1:sec-1';
+        final legacyJson = <String, dynamic>{
+          'sectionId': 'sec-1',
+          'studentUserId': 'stu-1',
+          'overrideStartSeconds': 30,
+          'overrideEndSeconds': 60,
+          'playbackSpeed': 0.75,
+          'targetRepeatCount': 5,
+          'completedRepeatCount': 0,
+          'countInEnabled': false,
+          'countInSoundEnabled': true,
+          'audioMixMode': 'videoOnly',
+          'lastPlayedAt': DateTime(2026, 6, 4).toIso8601String(),
+          // Note: no `studentMemos` key — pre-#510 schema.
+        };
+        await box.put(legacyKey, jsonEncode(legacyJson));
+
+        final repo = HivePracticeLoopOverrideRepository();
+        final loaded = await repo.findFor(
+          studentUserId: 'stu-1',
+          sectionId: 'sec-1',
+        );
+        expect(loaded, isNotNull);
+        expect(loaded!.studentMemos, isEmpty);
+        expect(loaded.overrideStartSeconds, 30);
+      },
+    );
 
     test('findAllForStudent returns only matching student records', () async {
       final repo = HivePracticeLoopOverrideRepository();

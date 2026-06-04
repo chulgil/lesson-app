@@ -5,6 +5,7 @@ import '../../data/repositories/hive_practice_loop_override_repository.dart';
 import '../../data/repositories/hive_practice_repeat_total_repository.dart';
 import '../../data/services/audio_session_audio_routing_service.dart';
 import '../../data/services/audio_session_practice_audio_mix_service.dart';
+import '../../domain/entities/loop_memo.dart';
 import '../../domain/entities/practice_loop_override.dart';
 import '../../domain/repositories/practice_loop_override_repository.dart';
 import '../../domain/repositories/practice_repeat_total_repository.dart';
@@ -167,5 +168,49 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
     if (current == null) return;
     await _persist(current.copyWith(audioMixMode: mode));
     await ref.read(practiceAudioMixServiceProvider).apply(mode);
+  }
+
+  // -- #510: 영상 구간별 손글씨 메모 --
+
+  /// Append a memo at [atSeconds] with [text] (UI is expected to enforce the
+  /// 100-char limit). Returns the new memo's id.
+  Future<String> addMemo({required int atSeconds, required String text}) async {
+    final current = state.valueOrNull;
+    if (current == null) return '';
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return '';
+    final id = 'memo-${DateTime.now().microsecondsSinceEpoch}';
+    final memo = LoopMemo(
+      id: id,
+      atSeconds: atSeconds,
+      text: trimmed,
+      createdAt: DateTime.now(),
+    );
+    final next = [...current.studentMemos, memo]
+      ..sort((a, b) => a.atSeconds.compareTo(b.atSeconds));
+    await _persist(current.copyWith(studentMemos: next));
+    return id;
+  }
+
+  /// Update an existing memo's text.
+  Future<void> updateMemo({required String id, required String text}) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+    final next = current.studentMemos
+        .map((m) => m.id == id ? m.copyWith(text: trimmed) : m)
+        .toList();
+    await _persist(current.copyWith(studentMemos: next));
+  }
+
+  /// Delete a memo by id.
+  Future<void> deleteMemo(String id) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    final next = current.studentMemos
+        .where((m) => m.id != id)
+        .toList(growable: false);
+    await _persist(current.copyWith(studentMemos: next));
   }
 }

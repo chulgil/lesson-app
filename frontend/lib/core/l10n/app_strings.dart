@@ -3295,8 +3295,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5696,9 +5696,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5835,11 +5836,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -8380,6 +8382,38 @@ class AppStrings {
 
   /// 광고 스킵 가능 시 안내 (best effort, 정확도 보장 X).
   static const youtubeAdSkippable = '광고가 끝나면 [재개]를 눌러 주세요';
+
+  // -- §3.5 후속 (#510): 영상 구간별 손글씨 메모 --
+
+  /// 메모 작성 모달 입력 힌트.
+  static const loopMemoAddHint = '여기에 메모를 적어주세요';
+
+  /// 메모 추가 버튼 / 액션 라벨.
+  static const loopMemoAdd = '메모 추가';
+
+  /// 메모 수정 액션 라벨.
+  static const loopMemoEdit = '수정';
+
+  /// 메모 삭제 액션 라벨.
+  static const loopMemoDelete = '삭제';
+
+  /// 메모 삭제 확인 다이얼로그.
+  static const loopMemoDeleteConfirm = '이 메모를 삭제할까요?';
+
+  /// 메모 저장 액션 라벨.
+  static const loopMemoSave = '저장';
+
+  /// 메모 취소 액션 라벨.
+  static const loopMemoCancel = '취소';
+
+  /// 메모 입력 길이 안내 (100자 제한).
+  static const loopMemoMaxLength = '최대 100자';
+
+  /// 메모 빈 상태 안내.
+  static const loopMemoEmpty = '메모가 없습니다';
+
+  /// 메모 마커 semantic.
+  static const loopMemoMarkerSemantic = '메모 마커';
 
   // -- AudioMixMode 표시 라벨 (audio_mix_visuals.dart 에서 사용) --
 
