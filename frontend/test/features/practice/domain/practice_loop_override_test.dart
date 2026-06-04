@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/features/practice/domain/entities/loop_bookmark.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_loop_override.dart';
 import 'package:lessonaza/features/practice/domain/value_objects/audio_mix_mode.dart';
 import 'package:lessonaza/features/practice/domain/value_objects/practice_loop_speeds.dart';
@@ -122,6 +123,154 @@ void main() {
       expect(AudioMixMode.videoOnly.name, 'videoOnly');
       expect(AudioMixMode.headphoneOnly.name, 'headphoneOnly');
       expect(AudioMixMode.metronomeMixed.name, 'metronomeMixed');
+    });
+  });
+
+  group('PracticeLoopOverride bookmarks — #511', () {
+    final ts = DateTime(2026, 6, 4, 10, 0);
+
+    test('limit constant is 5 (UI cognitive cap)', () {
+      expect(PracticeLoopOverride.maxBookmarks, 5);
+    });
+
+    test('isBookmarkLimitReached flips at the cap', () {
+      List<LoopBookmark> mk(int n) => List.generate(
+        n,
+        (i) => LoopBookmark(
+          id: 'b$i',
+          name: 'name $i',
+          startSeconds: i,
+          endSeconds: i + 5,
+          colorIndex: i,
+        ),
+      );
+
+      expect(
+        PracticeLoopOverride(
+          sectionId: 'sec-1',
+          studentUserId: 'stu-1',
+          lastPlayedAt: ts,
+          bookmarks: mk(4),
+        ).isBookmarkLimitReached,
+        false,
+      );
+      expect(
+        PracticeLoopOverride(
+          sectionId: 'sec-1',
+          studentUserId: 'stu-1',
+          lastPlayedAt: ts,
+          bookmarks: mk(5),
+        ).isBookmarkLimitReached,
+        true,
+      );
+    });
+
+    test('activeBookmark resolves the selected id, or null when missing', () {
+      const b = LoopBookmark(
+        id: 'b1',
+        name: '도입',
+        startSeconds: 0,
+        endSeconds: 10,
+        colorIndex: 0,
+      );
+
+      final selected = PracticeLoopOverride(
+        sectionId: 'sec-1',
+        studentUserId: 'stu-1',
+        lastPlayedAt: ts,
+        bookmarks: const [b],
+        activeBookmarkId: 'b1',
+      );
+      expect(selected.activeBookmark, b);
+
+      final wrongId = selected.copyWith(activeBookmarkId: 'nope');
+      expect(wrongId.activeBookmark, isNull);
+
+      final cleared = selected.copyWith(clearActiveBookmarkId: true);
+      expect(cleared.activeBookmark, isNull);
+      expect(cleared.activeBookmarkId, isNull);
+    });
+
+    test('json round trip preserves bookmarks + activeBookmarkId', () {
+      const b1 = LoopBookmark(
+        id: 'b1',
+        name: '도입',
+        startSeconds: 0,
+        endSeconds: 10,
+        colorIndex: 0,
+      );
+      const b2 = LoopBookmark(
+        id: 'b2',
+        name: '엔딩',
+        startSeconds: 60,
+        endSeconds: 90,
+        colorIndex: 1,
+      );
+
+      final o = PracticeLoopOverride(
+        sectionId: 'sec-1',
+        studentUserId: 'stu-1',
+        lastPlayedAt: ts,
+        bookmarks: const [b1, b2],
+        activeBookmarkId: 'b2',
+      );
+
+      final decoded = PracticeLoopOverride.fromJson(o.toJson());
+      expect(decoded.bookmarks, [b1, b2]);
+      expect(decoded.activeBookmarkId, 'b2');
+      expect(decoded.activeBookmark, b2);
+    });
+
+    test(
+      'legacy single-override record migrates into a single "기본" bookmark',
+      () {
+        // Pre-#511 record: has overrideStart/end but no `bookmarks` key.
+        final legacyJson = <String, dynamic>{
+          'sectionId': 'sec-1',
+          'studentUserId': 'stu-1',
+          'overrideStartSeconds': 30,
+          'overrideEndSeconds': 60,
+          'playbackSpeed': 0.75,
+          'targetRepeatCount': 5,
+          'completedRepeatCount': 0,
+          'countInEnabled': false,
+          'countInSoundEnabled': true,
+          'audioMixMode': 'videoOnly',
+          'lastPlayedAt': ts.toIso8601String(),
+          // No `studentMemos`, no `bookmarks`, no `activeBookmarkId`.
+        };
+
+        final decoded = PracticeLoopOverride.fromJson(legacyJson);
+
+        expect(decoded.bookmarks.length, 1);
+        final migrated = decoded.bookmarks.single;
+        expect(migrated.name, PracticeLoopOverride.defaultBookmarkName);
+        expect(migrated.startSeconds, 30);
+        expect(migrated.endSeconds, 60);
+        expect(migrated.colorIndex, 0);
+        expect(decoded.activeBookmarkId, migrated.id);
+      },
+    );
+
+    test('legacy record without overrideStart/end stays bookmark-less', () {
+      final legacyJson = <String, dynamic>{
+        'sectionId': 'sec-1',
+        'studentUserId': 'stu-1',
+        'overrideStartSeconds': null,
+        'overrideEndSeconds': null,
+        'playbackSpeed': 1.0,
+        'targetRepeatCount': 5,
+        'completedRepeatCount': 0,
+        'countInEnabled': false,
+        'countInSoundEnabled': true,
+        'audioMixMode': 'videoOnly',
+        'lastPlayedAt': ts.toIso8601String(),
+      };
+
+      final decoded = PracticeLoopOverride.fromJson(legacyJson);
+
+      expect(decoded.bookmarks, isEmpty);
+      expect(decoded.activeBookmarkId, isNull);
     });
   });
 }

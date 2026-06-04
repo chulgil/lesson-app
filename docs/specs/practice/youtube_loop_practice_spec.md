@@ -100,6 +100,26 @@ class PracticeLoopOverride {
 }
 ```
 
+### 3.6 신규 entity — LoopBookmark (#511)
+
+학생이 영상의 어려운 구간을 여러 개 마킹할 수 있게 한다. 한 곡의 도입/전개/엔딩처럼 별개 패시지를 색이 다른 마커로 구분해서 빠르게 점프 + 반복.
+
+```dart
+class LoopBookmark {
+  final String id;          // 'bookmark-<μs>' — 자동 생성
+  final String name;        // 학생 입력 라벨 (빈 값이면 "기본")
+  final int startSeconds;   // 구간 시작
+  final int endSeconds;     // 구간 끝 (> start)
+  final int colorIndex;     // 0-4 색 슬롯 (자동 할당, 사용자 색 선택 X)
+}
+```
+
+마이그레이션: 기존 (#506 / #510) 레코드는 `bookmarks` 키가 없으므로 `fromJson` 단계에서 `overrideStart/end` 가 있으면 "기본" 북마크 1개로 변환 (`activeBookmarkId` = 새 북마크 id). 데이터 손실 0.
+
+`PracticeLoopOverride` 확장 (#511):
+- `bookmarks: List<LoopBookmark>` — 최대 5개 (`PracticeLoopOverride.maxBookmarks`)
+- `activeBookmarkId: String?` — 현재 선택된 북마크 id (null = 오버라이드/디폴트 사용)
+
 ### 3.5 신규 entity — LoopMemo (#510)
 
 학생이 영상의 특정 시각에 남기는 자유 메모. 노트 X 악보 컨셉의 자필 주석 (Gaegu, Tier 1 hand). `PracticeLoopOverride.studentMemos` 안에 임베드.
@@ -325,6 +345,47 @@ playhead 보다 뒤에 그려 영상 진행을 가리지 않는다.
 - 자동 생성 라벨에는 Pretendard 유지, 학생 자유 입력만 Gaegu
 ```
 
+### 4.10 멀티 마커 북마크 (#511)
+
+학생이 한 곡 안에서 여러 어려운 구간(도입/전개/엔딩 등)을 동시에 마킹 + 선택 + 점프할 수 있게 한다. #506 의 단일 A-B 구간 확장.
+
+```
+[컨트롤 패널 추가 행]
+[구간 선택 ▼]  [북마크 관리]
+   ↑드롭다운       ↑탭 → 바텀시트
+```
+
+**컨트롤 (`LoopControls`)**:
+- 드롭다운 — 북마크 1개 이상일 때만 표시. 각 항목: 색 dot + 이름.
+- 선택 → 컨트롤러가 `selectBookmark(id)` 호출 → 영상 seek + 반복 모드 ON
+- [북마크 관리] — `BookmarkManagerSheet` 모달 오픈
+
+**관리 바텀시트 (`BookmarkManagerSheet`)**:
+- 헤더: "북마크 관리"  |  카운터 `N / 5`
+- 본문: 북마크 행 리스트 (선택/이름/삭제 액션)
+- 하단: `[북마크 추가  m:ss–m:ss]` FilledButton (현재 A-B 구간 저장)
+- 빈 상태: "아직 북마크가 없어요. 구간을 정하고 추가해 보세요."
+- 5개 도달 시: 안내 텍스트 + 추가 버튼 비활성
+
+**타임라인 (`LoopTimeline`)**:
+- 각 북마크는 점선 위에 색이 다른 작은 바 (높이 4px, 활성은 6px)
+- 활성 북마크는 더 두꺼운 바로 강조
+- A/B 마커 + 메모 dot 과 공존 (z-order: 점선 → 북마크 바 → 활성 구간 → 메모 dot → 플레이헤드 → 마커)
+
+**색 슬롯 (5종, 자동 할당)**:
+1. `paperAccent` (빨강)
+2. `paperOk` (녹색)
+3. `inkSecondary` (잉크)
+4. `paperTrial` (앰버)
+5. `paperHighlight` (형광)
+
+사용자는 색을 직접 고르지 않는다 (인지 부하 최소화). 생성 순서대로 빈 슬롯에 할당, 삭제 시 슬롯 재사용.
+
+**제약**:
+- 최대 5개 (`PracticeLoopOverride.maxBookmarks`) — UI 인지 부하 보호
+- 이름 빈 값 → "기본" 자동 적용
+- end <= start 입력 → 저장 거부 (UI + Provider 양쪽 가드)
+
 ### 4.9 시각 affordance 톤
 
 - 영상 글리프: `NotebookGlyph` play (▶ 또는 chevronRight ›) — Material `Icons.play_arrow` 는 컨트롤 패널 내부에서만
@@ -484,6 +545,19 @@ YouTube 적용 (옵션 A + E 채택):
 - [ ] 기존 (#506) 레코드 — studentMemos 키 부재 시 빈 리스트로 마이그레이션
 - [ ] 카운트인 진행 중에는 메모 오버레이 숨김 (영상 가림 방지)
 
+### 7.10 멀티 마커 북마크 (#511)
+
+- [ ] 학생이 [북마크 관리] → 시트에서 [북마크 추가] → 현재 A-B 구간을 이름과 함께 저장
+- [ ] 북마크 리스트에서 선택 → 해당 구간으로 점프 + 반복 모드 자동 ON
+- [ ] LoopTimeline 에 모든 북마크 시각화 (5색 분리, 활성 북마크 더 두꺼움)
+- [ ] [구간 선택 ▼] 드롭다운에서 색 dot + 이름으로 선택 가능
+- [ ] 북마크 5개 제한 — [추가] 버튼 비활성 + `bookmarkLimitReached` 메시지
+- [ ] 기존 단일 override 호환 — 마이그레이션으로 "기본" 북마크 1개 생성, 데이터 손실 0
+- [ ] Hive 마이그레이션 (기존 #506 #510 레코드 — `bookmarks` 키 부재 시 빈 리스트 또는 "기본" 1개)
+- [ ] 이름 빈 값 → "기본" 자동 적용
+- [ ] end <= start 입력 → 저장 거부
+- [ ] 색 슬롯 자동 할당 (사용자 색 선택 X)
+
 ### 7.9 에러 처리
 
 - [ ] 영상 비공개/삭제 → 빈 상태 + "선생님에게 알리기"
@@ -502,6 +576,10 @@ YouTube 적용 (옵션 A + E 채택):
 - `PracticeLoopSpeeds.allowed` 검증
 - `LoopMemo` 직렬화/역직렬화 + copyWith + equality (#510)
 - Hive 마이그레이션 — studentMemos 키 부재 레코드를 빈 리스트로 로드 (#510)
+- `LoopBookmark` 직렬화/역직렬화 + copyWith + equality + colorIndex 기본값 (#511)
+- `PracticeLoopOverride.bookmarks/activeBookmarkId` JSON round-trip + `isBookmarkLimitReached` + `activeBookmark` 분기 (#511)
+- Hive 마이그레이션 — `bookmarks` 키 부재 + `overrideStart/end` 존재 → "기본" 북마크 1개로 변환 (#511)
+- Hive 마이그레이션 — `bookmarks` 키 부재 + `overrideStart/end` 부재 → bookmarks 빈 리스트 (#511)
 
 ### 8.2 위젯 smoke test
 
@@ -514,6 +592,9 @@ YouTube 적용 (옵션 A + E 채택):
 - `PracticeYoutubeMiniPlayer` (재생 위치 유지 + 풀스크린 전환)
 - `LoopMemoOverlay` (빈 상태 / 시각 도달 시 카드 표시 / 작성 모달 + 저장) (#510)
 - `LoopTimeline` 메모 dot 회귀 — 좁은 폭에서도 예외 없음 (#510)
+- `BookmarkManagerSheet` (빈 상태 / 리스트 + 범위 라벨 / 5개 도달 시 추가 비활성 / onSelect 콜백 / 추가 흐름이 현재 A-B 구간 forward) (#511)
+- `LoopTimeline` 멀티 마커 — 5색 bar 표시 + 좁은 폭 회귀 (#511)
+- `LoopControls` 드롭다운 — 북마크 목록 + 선택 콜백 + 빈 상태에서 [북마크 관리] 버튼만 (#511)
 
 ### 8.3 화면 smoke test
 
@@ -534,7 +615,7 @@ YouTube 적용 (옵션 A + E 채택):
 
 ## 9. 후속 작업 (별도 이슈)
 
-- 멀티 마커 (북마크 N구간)
+- 멀티 마커 (북마크 N구간) — #511 에서 구현 완료
 - 뱃지 시스템 #490 `onPracticeRepeat` trigger 연동 (#508 완료)
 - 선생님 측 학생별 반복 통계
 - 영상 메모 (구간별 손글씨) — #510 에서 구현 완료
@@ -598,6 +679,14 @@ YouTube 적용 (옵션 A + E 채택):
 | Widget (#509) | `presentation/widgets/youtube/ad_notice_overlay.dart` (paper/paperAccent UI) | 생성 |
 | Widget (#509) | `presentation/widgets/youtube/practice_youtube_player.dart` — detector wiring + 오버레이 통합 | 갱신 |
 | Strings (#509) | `core/l10n/app_strings.dart` (+ `youtubeAdDetected/Resume/Hint/Skippable`) | 갱신 |
+| Entity (#511) | `features/practice/domain/entities/loop_bookmark.dart` | 생성 |
+| Entity (#511) | `features/practice/domain/entities/practice_loop_override.dart` — `bookmarks` + `activeBookmarkId` + `maxBookmarks` + 마이그레이션 | 갱신 |
+| Widget (#511) | `features/practice/presentation/widgets/youtube/bookmark_manager_sheet.dart` (추가/수정/삭제/선택) | 생성 |
+| Widget (#511) | `features/practice/presentation/widgets/youtube/loop_timeline.dart` — `bookmarks` + `activeBookmarkId` 멀티 마커 시각화 | 갱신 |
+| Widget (#511) | `features/practice/presentation/widgets/youtube/loop_controls.dart` — `[구간 선택 ▼]` 드롭다운 + `[북마크 관리]` 행 | 갱신 |
+| Repository (#511) | `features/practice/data/repositories/hive_practice_loop_override_repository.dart` — 마이그레이션 분기 (단일 → 멀티) | 갱신 |
+| Provider (#511) | `features/practice/presentation/providers/practice_loop_provider.dart` — `addBookmark/updateBookmark/deleteBookmark/selectBookmark` + 5 슬롯 자동 색 할당 | 갱신 |
+| Strings (#511) | `core/l10n/app_strings.dart` (+ `bookmarkAdd/Manage/Select/Name/Delete/DeleteConfirm/Save/Cancel/LimitReached/Default/Empty/MarkerSemantic`) | 갱신 |
 
 ## 12. 변경 이력
 
@@ -606,3 +695,4 @@ YouTube 적용 (옵션 A + E 채택):
 - 2026-06-04 v3 (#508): 뱃지 onPracticeRepeat trigger 연동 — 10/50/100 회 뱃지 + 누적 카운트 storage
 - 2026-06-04 v3 (#509): YouTube 광고 검출 + 자동 일시정지 — `YoutubeAdDetector` 휴리스틱 + `AdNoticeOverlay` + PlaybackLooper 카운터 보호
 - 2026-06-04 v3 (#510): 영상 구간별 손글씨 메모 (Gaegu) — LoopMemo entity + 오버레이 + 마이그레이션
+- 2026-06-04 v4 (#511): 멀티 마커 북마크 N구간 — LoopBookmark entity + BookmarkManagerSheet + LoopTimeline 멀티 마커 + LoopControls 드롭다운 + 5 슬롯 색 + 5개 제한 + 단일→멀티 마이그레이션

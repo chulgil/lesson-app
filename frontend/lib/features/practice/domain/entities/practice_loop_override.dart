@@ -1,5 +1,6 @@
 import '../value_objects/audio_mix_mode.dart';
 import '../value_objects/practice_loop_speeds.dart';
+import 'loop_bookmark.dart';
 import 'loop_memo.dart';
 
 /// Student-side override of teacher's default loop section for a [PracticeSection].
@@ -9,6 +10,15 @@ import 'loop_memo.dart';
 ///
 /// Spec: docs/specs/practice/youtube_loop_practice_spec.md §3.2
 class PracticeLoopOverride {
+  /// Maximum number of bookmarks a student may keep per section. Cap exists to
+  /// avoid cognitive overload in the timeline + manager sheet. Spec: #511.
+  static const int maxBookmarks = 5;
+
+  /// Default bookmark name used by the legacy-migration path.
+  /// Spec: #511 — pre-#511 single-override records become a single "기본"
+  /// bookmark so existing data is preserved.
+  static const String defaultBookmarkName = '기본';
+
   /// Practice section this override targets.
   final String sectionId;
 
@@ -48,6 +58,16 @@ class PracticeLoopOverride {
   /// Spec: GH #510 — loop memo follow-up for §3.5.
   final List<LoopMemo> studentMemos;
 
+  /// Student-authored multi-bookmark passages (#511). At most
+  /// [maxBookmarks] entries; the UI prevents creating more.
+  ///
+  /// Legacy single-override records are migrated into a single "기본" bookmark.
+  final List<LoopBookmark> bookmarks;
+
+  /// Id of the currently selected bookmark, or `null` when the student uses
+  /// the override / teacher defaults directly. Spec: #511.
+  final String? activeBookmarkId;
+
   const PracticeLoopOverride({
     required this.sectionId,
     required this.studentUserId,
@@ -61,6 +81,8 @@ class PracticeLoopOverride {
     this.audioMixMode = AudioMixMode.videoOnly,
     required this.lastPlayedAt,
     this.studentMemos = const [],
+    this.bookmarks = const [],
+    this.activeBookmarkId,
   });
 
   PracticeLoopOverride copyWith({
@@ -78,6 +100,9 @@ class PracticeLoopOverride {
     AudioMixMode? audioMixMode,
     DateTime? lastPlayedAt,
     List<LoopMemo>? studentMemos,
+    List<LoopBookmark>? bookmarks,
+    String? activeBookmarkId,
+    bool clearActiveBookmarkId = false,
   }) {
     return PracticeLoopOverride(
       sectionId: sectionId ?? this.sectionId,
@@ -96,6 +121,10 @@ class PracticeLoopOverride {
       audioMixMode: audioMixMode ?? this.audioMixMode,
       lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,
       studentMemos: studentMemos ?? this.studentMemos,
+      bookmarks: bookmarks ?? this.bookmarks,
+      activeBookmarkId: clearActiveBookmarkId
+          ? null
+          : (activeBookmarkId ?? this.activeBookmarkId),
     );
   }
 
@@ -109,6 +138,20 @@ class PracticeLoopOverride {
   /// True if either start or end is overridden.
   bool get hasOverride =>
       overrideStartSeconds != null || overrideEndSeconds != null;
+
+  /// True when no more bookmarks may be added. Spec: #511.
+  bool get isBookmarkLimitReached => bookmarks.length >= maxBookmarks;
+
+  /// Resolves the currently-selected bookmark, or `null` when no selection is
+  /// active or the id no longer matches an existing bookmark.
+  LoopBookmark? get activeBookmark {
+    final id = activeBookmarkId;
+    if (id == null) return null;
+    for (final b in bookmarks) {
+      if (b.id == id) return b;
+    }
+    return null;
+  }
 
   /// JSON encoding for portability (Hive uses custom adapter for performance).
   Map<String, dynamic> toJson() => {
@@ -124,6 +167,8 @@ class PracticeLoopOverride {
     'audioMixMode': audioMixMode.name,
     'lastPlayedAt': lastPlayedAt.toIso8601String(),
     'studentMemos': studentMemos.map((m) => m.toJson()).toList(),
+    'bookmarks': bookmarks.map((b) => b.toJson()).toList(),
+    'activeBookmarkId': activeBookmarkId,
   };
 
   static PracticeLoopOverride fromJson(Map<String, dynamic> json) {
@@ -136,11 +181,42 @@ class PracticeLoopOverride {
               .map((m) => LoopMemo.fromJson(m as Map<String, dynamic>))
               .toList();
 
+    final overrideStart = json['overrideStartSeconds'] as int?;
+    final overrideEnd = json['overrideEndSeconds'] as int?;
+
+    // Migration: pre-#511 records have no `bookmarks` key. If the student had
+    // a single override start/end pair, materialise it as a single "기본"
+    // bookmark so the multi-marker UI is consistent across legacy data.
+    final bookmarksRaw = json['bookmarks'] as List<dynamic>?;
+    final List<LoopBookmark> bookmarks;
+    String? activeBookmarkId = json['activeBookmarkId'] as String?;
+    if (bookmarksRaw == null) {
+      if (overrideStart != null &&
+          overrideEnd != null &&
+          overrideEnd > overrideStart) {
+        final migrated = LoopBookmark(
+          id: 'bookmark-legacy-default',
+          name: defaultBookmarkName,
+          startSeconds: overrideStart,
+          endSeconds: overrideEnd,
+          colorIndex: 0,
+        );
+        bookmarks = [migrated];
+        activeBookmarkId ??= migrated.id;
+      } else {
+        bookmarks = const [];
+      }
+    } else {
+      bookmarks = bookmarksRaw
+          .map((b) => LoopBookmark.fromJson(b as Map<String, dynamic>))
+          .toList();
+    }
+
     return PracticeLoopOverride(
       sectionId: json['sectionId'] as String,
       studentUserId: json['studentUserId'] as String,
-      overrideStartSeconds: json['overrideStartSeconds'] as int?,
-      overrideEndSeconds: json['overrideEndSeconds'] as int?,
+      overrideStartSeconds: overrideStart,
+      overrideEndSeconds: overrideEnd,
       playbackSpeed:
           (json['playbackSpeed'] as num?)?.toDouble() ??
           PracticeLoopSpeeds.defaultSpeed,
@@ -156,6 +232,8 @@ class PracticeLoopOverride {
         (json['lastPlayedAt'] as String?) ?? DateTime.now().toIso8601String(),
       ),
       studentMemos: memos,
+      bookmarks: bookmarks,
+      activeBookmarkId: activeBookmarkId,
     );
   }
 }

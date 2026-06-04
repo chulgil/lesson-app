@@ -8450,4 +8450,42 @@ class AppStrings {
   // -- 풀스크린 토글 --
 
   static const youtubeLoopMiniPlayerOpen = '영상 열기';
+
+  // -- §3.5 후속 (#511): 멀티 마커 북마크 N구간 --
+
+  /// 북마크 추가 액션 라벨 — 현재 A-B 구간 저장.
+  static const bookmarkAdd = '북마크 추가';
+
+  /// 북마크 관리 버튼 (목록/추가/삭제 시트 열기).
+  static const bookmarkManage = '북마크 관리';
+
+  /// 북마크 선택 드롭다운 placeholder.
+  static const bookmarkSelect = '구간 선택';
+
+  /// 북마크 이름 입력 라벨/placeholder.
+  static const bookmarkName = '이름';
+
+  /// 북마크 삭제 액션 라벨.
+  static const bookmarkDelete = '삭제';
+
+  /// 북마크 삭제 확인 다이얼로그.
+  static const bookmarkDeleteConfirm = '이 북마크를 삭제할까요?';
+
+  /// 북마크 저장 액션 라벨.
+  static const bookmarkSave = '저장';
+
+  /// 북마크 취소 액션 라벨.
+  static const bookmarkCancel = '취소';
+
+  /// 북마크 5개 제한 도달 메시지 (UI 인지 부하 보호).
+  static const bookmarkLimitReached = '북마크는 최대 5개까지 만들 수 있어요';
+
+  /// 마이그레이션으로 생성된 기본 북마크 이름.
+  static const bookmarkDefault = '기본';
+
+  /// 북마크 빈 상태 안내 (관리 시트 첫 진입).
+  static const bookmarkEmpty = '아직 북마크가 없어요. 구간을 정하고 추가해 보세요.';
+
+  /// 타임라인 북마크 마커 semantic.
+  static const bookmarkMarkerSemantic = '북마크 마커';
 }
