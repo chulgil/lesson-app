@@ -251,6 +251,44 @@
 
 `AcademyCreate.also_register_as_teacher=true` — 학원장이 학원 생성 시 본인을 강사로도 자동 등록 (소규모 음악학원 흔한 패턴). 두 멤버 행 자동 생성 (owner + teacher).
 
+### 수강권/청구/정산 (AC-M1 그룹 C, 2026-06-04)
+
+| 용어 (한글) | 클래스 (BE+FE) | 정의 |
+|------|----------|------|
+| 학원 청구·배분 규칙 | `AcademyBillingRule` | 학원당 1행. 청구일/납부기한/계좌/배분 모드/세금 정책 |
+| 강사 배분 모드 override | `AcademyTeacherPayoutOverride` | 강사별 다른 정산 모드. effective_from/until 히스토리 |
+| 학원 귀속 수강권 정책 | `AcademySubscription` | subscriptions 본체 1:1. ownership + 12h 정책 + 학생보상 정책 (FE 1:1) |
+| 학원 청구서 | `AcademyInvoice` | 월간 학생별 청구서. period(year,month) 유니크. status: draft→sent→paid→overdue→cancelled |
+| 학원 수금 | `AcademyPayment` | 청구서 × 1 + N 수금 (부분 수금 지원). source: manual/csv_import/fuzzy_match |
+| 강사 배분 명세 | `AcademySettlement` | 월간 강사 페이 산출 + 학원장 확정 + 송금 마킹. adjustment_log audit 영구 보존 |
+
+| Enum (그룹 C) | 값 |
+|---|---|
+| `TeacherDistributionType` | hourly / revenue_share / per_student |
+| `SubscriptionOwnership` | academy / teacher (수강권 귀속) |
+| `SettlementBase` | attendance / invoiced / completed_invoice |
+| `InvoiceStatus` | draft / sent / paid / overdue / cancelled |
+| `PaymentMethod` | transfer / cash / card |
+| `PaymentSource` | manual / csv_import / fuzzy_match |
+| `SettlementStatus` | draft / confirmed / transferred |
+| `LessonVisibility` | academyFull / academyBusyOnly (academy_schedule_authority §2.3) |
+
+### 그룹 C UX 1탭 흐름
+
+- POST /billing/invoices (월간 청구서 자동 또는 수기 생성) — 학원장 1탭
+- POST /billing/invoices/bulk-send (전체 발송) — 학원장 1탭
+- POST /billing/payments (수금 1탭 마킹)
+- POST /billing/settlements/calculate (강사 배분 자동 산출, 수금 80% 시점)
+- POST /billing/settlements/{id}/confirm → /transfer (송금 완료 1탭)
+
+### 그룹 C 정합 결정 (2026-06-04)
+
+- AcademySubscription 신규 테이블 채택 (이전 결정 "academy_subscriptions 안 만듦" 변경) — spec §2.2 + FE 1:1 매핑 우선
+- subscriptions.academy_id 컬럼 추가 (빠른 조회 denormalization)
+- lessons.academy_id + visibility 컬럼 추가 (학원 컨텍스트 가시성)
+- AcademyInvitePreview 응답 FE 호환 변경 (token + 중첩 academy + owner_name)
+- FE 갭 (Type C 6 영역) → GitHub Issue #513
+
 ### 권한 계층 (AC-M1 그룹 B, 2026-06-04)
 
 | 용어 (한글) | 클래스 (BE) | 정의 |
@@ -283,6 +321,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | §12 학원(Academy) 수강권/청구/정산 (AC-M1 그룹 C) — BillingRule/Invoice/Payment/Settlement/Subscription/TeacherPayoutOverride 6 엔티티 + 8 enum + subscriptions.academy_id + lessons.academy_id/visibility 컬럼 + AcademyInvitePreview FE 호환. FE 갭 #513 |
 | 2026-06-04 | §12 학원(Academy) 권한 계층 (AC-M1 그룹 B) 추가 — ContextSwitchLog + AcademyDelegation + AcademyDelegationAction + AcademyActivityLog 4 엔티티 + 5 enum (AcademyContext/ContextSwitchTrigger/DelegationReason/DelegationState/DelegationRevokeReason) |
 | 2026-06-04 | §12 학원(Academy) 도메인 신설 — AC-M1 그룹 A 4 엔티티 + 3 enum + 정책 용어 6종. 마일스톤: AC-M1 |
 | 2026-06-04 | §5 연습: §3.5 YouTube 구간 반복 연습 신규 용어 5건 — PracticeLoopOverride, AudioMixMode, PlaybackLooper, AudioRoutingService, CountInOverlay (#506) |

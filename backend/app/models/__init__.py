@@ -1,4 +1,39 @@
 # Import all models so Alembic can detect them via Base.metadata
+from app.models.academy import (  # noqa: F401
+    Academy,
+    AcademyInvite,
+    AcademyInviteState,
+    AcademyMember,
+    AcademyMemberRole,
+    AcademyStudent,
+    AcademyStudentStatus,
+)
+from app.models.academy_billing import (  # noqa: F401
+    AcademyBillingRule,
+    AcademyInvoice,
+    AcademyPayment,
+    AcademySettlement,
+    AcademySubscription,
+    AcademyTeacherPayoutOverride,
+    InvoiceStatus,
+    PaymentMethod,
+    PaymentSource,
+    SettlementBase,
+    SettlementStatus,
+    SubscriptionOwnership,
+    TeacherDistributionType,
+)
+from app.models.academy_governance import (  # noqa: F401
+    AcademyActivityLog,
+    AcademyContext,
+    AcademyDelegation,
+    AcademyDelegationAction,
+    ContextSwitchLog,
+    ContextSwitchTrigger,
+    DelegationReason,
+    DelegationRevokeReason,
+    DelegationState,
+)
 from app.models.app_billing import AppBillingPlan, IapReceipt  # noqa: F401
 from app.models.app_version import AppNews, AppRoadmap, AppVersion  # noqa: F401
 from app.models.base import Base  # noqa: F401

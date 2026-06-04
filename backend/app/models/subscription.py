@@ -165,6 +165,15 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     discount_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     original_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
+    # Academy ownership (AC-M1 그룹 C). 개인 강사 수강권은 NULL.
+    # spec: docs/specs/web/academy/billing_settlement_spec.md §2.
+    # academy_subscriptions 신규 테이블 만들지 않고 기존 subscriptions 에 컬럼 추가.
+    academy_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("academies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
     __table_args__ = (
         CheckConstraint(
             "used_lessons >= 0 AND bonus_count >= 0 AND total_reschedule_allowance >= 0 "

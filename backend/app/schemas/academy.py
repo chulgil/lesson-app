@@ -222,13 +222,16 @@ class AcademyInviteListResponse(BaseModel):
 
 
 class AcademyInvitePreview(BaseModel):
-    """공개 endpoint — 토큰 미리보기 (학원/역할 최소 정보, 학원장 PII 마스킹)."""
+    """공개 endpoint — 토큰 미리보기.
 
-    academy_id: str
-    academy_name: str
-    academy_slug: str
+    FE `AcademyInvitePreview` (frontend/lib/features/academy/.../academy_invite_repository.dart)
+    와 1:1 매핑: token + academy(중첩 Academy 객체) + ownerName + roles.
+    """
+
+    token: str  # FE 가 URL 에서 받은 raw token (확인용)
+    academy: AcademyResponse  # 중첩 — FE Academy 객체로 매핑
+    owner_name: str  # 마스킹된 학원장 이름 (성씨만)
     roles: list[str]
-    invited_by_name: str  # 학원장 이름 (성씨만 노출)
     expires_at: _dt.datetime
     is_expired: bool
 

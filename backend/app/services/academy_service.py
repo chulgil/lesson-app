@@ -310,12 +310,13 @@ class AcademyService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Academy not found")
         inviter = await self.db.get(User, invite.invited_by_user_id)
         inviter_name = _mask_owner_name(inviter.name if inviter else None)
+        from app.schemas.academy import AcademyResponse as _AcademyResponse
+
         return AcademyInvitePreview(
-            academy_id=academy.id,
-            academy_name=academy.name,
-            academy_slug=academy.slug,
+            token=raw_token,
+            academy=_AcademyResponse.model_validate(academy),
+            owner_name=inviter_name,
             roles=list(invite.roles or []),
-            invited_by_name=inviter_name,
             expires_at=invite.expires_at,
             is_expired=_ensure_aware(invite.expires_at) < _utcnow() or invite.state != AcademyInviteState.pending,
         )

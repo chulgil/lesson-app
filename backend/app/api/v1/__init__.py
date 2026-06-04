@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     academies,
+    academy_billing,
     academy_governance,
     address,
     ai_notes,
@@ -65,6 +66,11 @@ api_router.include_router(
     academy_governance.router,
     prefix="/academies",
     tags=["academies-governance"],
+)
+api_router.include_router(
+    academy_billing.router,
+    prefix="/academies",
+    tags=["academies-billing"],
 )
 api_router.include_router(address.router, prefix="/address", tags=["address"])
 api_router.include_router(app_version.router, prefix="/app/version", tags=["app-version"])

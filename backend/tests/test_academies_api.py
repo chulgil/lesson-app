@@ -282,9 +282,10 @@ async def test_invite_full_lifecycle_owner_issue_other_accept(
     preview_resp = await client.get(f"/api/v1/public/academies/invites/{token}/preview")
     assert preview_resp.status_code == 200
     preview = preview_resp.json()
-    assert preview["academy_slug"] == "invite-flow"
+    assert preview["academy"]["slug"] == "invite-flow"
     assert preview["is_expired"] is False
-    assert preview["invited_by_name"].startswith("김")  # 마스킹
+    assert preview["owner_name"].startswith("김")  # 마스킹
+    assert preview["token"] == token  # FE 호환 — raw token 노출 확인
 
     # 3. 다른 사용자가 수락.
     accept_resp = await client.post(

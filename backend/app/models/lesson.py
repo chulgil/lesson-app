@@ -50,6 +50,17 @@ class LessonSource(str, enum.Enum):
     subscription_generated = "subscriptionGenerated"
 
 
+class LessonVisibility(str, enum.Enum):
+    """Academy context visibility (academy_schedule_authority §2.3).
+
+    academy_full: 학원에 전체 공개 (학생명·내용). 학원 레슨 기본값.
+    academy_busy_only: 학원에 busy 만 표시 (강사 개인 레슨).
+    """
+
+    academy_full = "academyFull"
+    academy_busy_only = "academyBusyOnly"
+
+
 class LocationType(str, enum.Enum):
     academyRoom = "academyRoom"
     teacherStudio = "teacherStudio"
@@ -81,9 +92,7 @@ class LessonClass(UUIDMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
-    __table_args__ = (
-        Index("idx_class_teacher", "teacher_id"),
-    )
+    __table_args__ = (Index("idx_class_teacher", "teacher_id"),)
 
 
 class ClassMembership(UUIDMixin, TimestampMixin, Base):
@@ -190,6 +199,19 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
     is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # Academy context (AC-M1 그룹 C). academy_schedule_authority §2.3.
+    # NULL = 강사 개인 레슨 (학원 무관). visibility 는 학원 컨텍스트에서만 의미.
+    academy_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("academies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    visibility: Mapped[LessonVisibility] = mapped_column(
+        Enum(LessonVisibility, native_enum=True),
+        nullable=False,
+        default=LessonVisibility.academy_full,
+    )
+
     __table_args__ = (
         Index("idx_lesson_student", "student_id"),
         Index("idx_lesson_teacher", "teacher_id"),
@@ -200,6 +222,7 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
         Index("idx_lesson_subscription", "subscription_id"),
         Index("idx_lesson_subscription_session", "subscription_id", "session_number"),
         Index("idx_lesson_teacher_date", "teacher_id", "date"),
+        Index("idx_lesson_academy", "academy_id"),
         CheckConstraint(
             "session_number IS NULL OR session_number >= 1",
             name="ck_lessons_session_number_positive",
@@ -221,9 +244,7 @@ class LessonPiece(UUIDMixin, Base):
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    __table_args__ = (
-        Index("idx_piece_lesson", "lesson_id"),
-    )
+    __table_args__ = (Index("idx_piece_lesson", "lesson_id"),)
 
 
 class LessonRecording(UUIDMixin, Base):
@@ -239,6 +260,4 @@ class LessonRecording(UUIDMixin, Base):
     transcription: Mapped[str | None] = mapped_column(Text, nullable=True)
     ai_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    __table_args__ = (
-        Index("idx_lesson_rec_lesson", "lesson_id"),
-    )
+    __table_args__ = (Index("idx_lesson_rec_lesson", "lesson_id"),)
