@@ -1,7 +1,7 @@
 # 카카오 알림톡 연동 스펙
 
-> 작성일: 2026-05-31 (2026-06-01 — E2E 감사 #2 E2-C2 보강)
-> 상태: 초안 (구현 대기)
+> 작성일: 2026-05-31 (2026-06-04 — Phase 3 백엔드 구현 완료)
+> 상태: **백엔드 구현 완료** — 카카오 사업자 등록·심사 외부 대기
 > 관련 이슈: #423
 > 관련 스펙: [notification_master.md](./notification_master.md), [payment_architecture.md](../subscription/payment_architecture.md)
 > **5종 템플릿 본문 + 정책**: [alimtalk_templates.md](alimtalk_templates.md) (LNZ_INVOICE / LNZ_PAYMENT_REMINDER_D1/D3/D7 / LNZ_PAYMENT_CONFIRM / LNZ_TEACHER_VACATION)
@@ -668,3 +668,4 @@ KAKAO_ALIMTALK_ENABLED=true   → 베타 검증 완료 후 활성화
 | 날짜 | 버전 | 내용 | 작성자 |
 |------|------|------|--------|
 | 2026-05-31 | 1.0 | 초안 작성 | Claude |
+| 2026-06-04 | 1.1 | Phase 3 백엔드 구현 완료 — 5종 enum (`AlimTalkTemplate`) + `AlimTalkService` (08:00-20:00 KST 게이트, D+7 야간 예외, 멱등성, 폴백) + 트리거 wiring (`subscription_service` / `payment_reminder_jobs`) + 15 테스트 PASS. 추가: 알림톡 실패 → FCM 푸시 폴백 1회 (`_DefaultPushFallback`). 외부 대기: 카카오 사업자/심사 (§3.1) | Claude |

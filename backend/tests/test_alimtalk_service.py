@@ -174,3 +174,174 @@ async def test_payment_confirm_idempotent_by_subscription_id(db_session: AsyncSe
     assert len(client.sent) == 1
     rows = (await db_session.scalars(select(AlimTalkLog).where(AlimTalkLog.subscription_id == "sub-A"))).all()
     assert len(rows) == 1
+
+
+# ---------------------------------------------------------------- fallback dispatcher
+
+
+class _SpyFallback:
+    """Test double for the push fallback dispatcher.
+
+    Captures each (user_id, template_id, variables) tuple so tests can assert
+    the fallback is fired exactly once per alimtalk failure.
+    """
+
+    def __init__(self, raise_exc: Exception | None = None) -> None:
+        self.calls: list[tuple[str, str, dict[str, str]]] = []
+        self.raise_exc = raise_exc
+
+    async def __call__(self, user_id: str, template_id: str, variables: dict[str, str]) -> None:
+        self.calls.append((user_id, template_id, dict(variables)))
+        if self.raise_exc is not None:
+            raise self.raise_exc
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")
+async def test_fallback_dispatched_on_failure(db_session: AsyncSession):
+    """When alimtalk fails and `fallback_user_id` is given, FCM push fallback fires once."""
+    client = MockAlimTalkClient(next_failure=True, next_error="carrier 503")
+    fallback = _SpyFallback()
+    service = AlimTalkService(client, db_session, fallback_dispatcher=fallback)
+
+    log = await service.send_invoice(
+        proposal_id="fallback-proposal",
+        recipient_phone="010-2222-3333",
+        variables=VARIABLES,
+        fallback_user_id="user-123",
+    )
+
+    assert log is not None
+    assert log.success is False
+    assert log.fallback_channel == "push"
+    assert len(fallback.calls) == 1
+    user_id, template_id, vars_passed = fallback.calls[0]
+    assert user_id == "user-123"
+    assert template_id == AlimTalkTemplate.invoice.value
+    assert vars_passed == VARIABLES
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")
+async def test_fallback_not_dispatched_on_success(db_session: AsyncSession):
+    """Successful alimtalk → fallback dispatcher must NOT fire (no duplicate push)."""
+    client = MockAlimTalkClient()
+    fallback = _SpyFallback()
+    service = AlimTalkService(client, db_session, fallback_dispatcher=fallback)
+
+    await service.send_invoice(
+        proposal_id="success-proposal",
+        recipient_phone="010-2222-3333",
+        variables=VARIABLES,
+        fallback_user_id="user-123",
+    )
+
+    assert fallback.calls == []
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")
+async def test_fallback_skipped_when_user_id_missing(db_session: AsyncSession):
+    """No `fallback_user_id` → audit-only; fallback dispatcher is not invoked."""
+    client = MockAlimTalkClient(next_failure=True, next_error="carrier 503")
+    fallback = _SpyFallback()
+    service = AlimTalkService(client, db_session, fallback_dispatcher=fallback)
+
+    log = await service.send_invoice(
+        proposal_id="audit-only-proposal",
+        recipient_phone="010-2222-3333",
+        variables=VARIABLES,
+        # fallback_user_id omitted on purpose
+    )
+
+    assert log is not None
+    assert log.success is False
+    assert log.fallback_channel == "push"  # audit trail still records intent
+    assert fallback.calls == []  # but no FCM push fired
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")
+async def test_fallback_exception_does_not_propagate(db_session: AsyncSession):
+    """Failure inside the fallback dispatcher must not break the alimtalk caller."""
+    client = MockAlimTalkClient(next_failure=True, next_error="carrier 503")
+    fallback = _SpyFallback(raise_exc=RuntimeError("fcm down"))
+    service = AlimTalkService(client, db_session, fallback_dispatcher=fallback)
+
+    # Must complete without raising — alimtalk audit still works even if push fails.
+    log = await service.send_invoice(
+        proposal_id="fallback-explodes-proposal",
+        recipient_phone="010-2222-3333",
+        variables=VARIABLES,
+        fallback_user_id="user-123",
+    )
+
+    assert log is not None
+    assert log.success is False
+    assert len(fallback.calls) == 1  # we still attempted the fallback
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")
+async def test_fallback_fires_for_payment_reminder(db_session: AsyncSession):
+    """D+N reminder failure also routes to the FCM push fallback."""
+    client = MockAlimTalkClient(next_failure=True, next_error="carrier 503")
+    fallback = _SpyFallback()
+    service = AlimTalkService(client, db_session, fallback_dispatcher=fallback)
+
+    await service.send_payment_reminder(
+        proposal_id="reminder-proposal",
+        d_day=3,
+        recipient_phone="010-4444-5555",
+        variables=VARIABLES,
+        fallback_user_id="user-456",
+    )
+
+    assert len(fallback.calls) == 1
+    user_id, template_id, _ = fallback.calls[0]
+    assert user_id == "user-456"
+    assert template_id == AlimTalkTemplate.reminder_d3.value
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 13:00:00")  # 22:00 KST — deferred window
+async def test_fallback_not_dispatched_on_deferred(db_session: AsyncSession):
+    """Deferred send (outside window) → no carrier call, no fallback dispatch."""
+    client = MockAlimTalkClient()
+    fallback = _SpyFallback()
+    service = AlimTalkService(client, db_session, fallback_dispatcher=fallback)
+
+    log = await service.send_invoice(
+        proposal_id="deferred-proposal",
+        recipient_phone="010-9999-1111",
+        variables=VARIABLES,
+        fallback_user_id="user-789",
+    )
+
+    assert log is not None
+    assert log.success is False
+    assert "send window" in (log.error or "")
+    assert fallback.calls == []  # deferred is not a real failure
+
+
+@pytest.mark.asyncio
+@freeze_time("2026-06-01 03:00:00")
+async def test_fallback_default_none_preserves_legacy_behavior(db_session: AsyncSession):
+    """Constructing AlimTalkService without `fallback_dispatcher` keeps the audit-only behavior.
+
+    Important for existing unit tests + ops scripts that drive the service
+    directly without FCM wiring.
+    """
+    client = MockAlimTalkClient(next_failure=True, next_error="carrier 503")
+    service = AlimTalkService(client, db_session)  # no dispatcher
+
+    log = await service.send_invoice(
+        proposal_id="legacy-proposal",
+        recipient_phone="010-2222-3333",
+        variables=VARIABLES,
+        fallback_user_id="user-123",  # ignored because dispatcher is None
+    )
+
+    assert log is not None
+    assert log.success is False
+    assert log.fallback_channel == "push"

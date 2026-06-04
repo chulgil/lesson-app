@@ -53,6 +53,8 @@ async def _send_student_alimtalk(session: AsyncSession, proposal: SubscriptionPr
             "proposal_id": proposal.id,
             "d_day": str(d_day),
         },
+        # #423 — alimtalk fail → FCM push fallback to the linked user.
+        fallback_user_id=student.user_id,
     )
 
 

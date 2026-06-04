@@ -21,6 +21,7 @@ Invariants enforced here (not on the carrier):
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta, timezone
 
 from sqlalchemy import select
@@ -56,9 +57,90 @@ def get_alimtalk_client() -> AlimTalkClient:
     )
 
 
+# #423 — push fallback dispatcher signature. Called once per failed send when a
+# caller provides `fallback_user_id`. Returns nothing; failures inside the
+# fallback path are logged and swallowed (a failed fallback must not recurse).
+FallbackDispatcher = Callable[[str, str, dict[str, str]], Awaitable[None]]
+
+
+class _DefaultPushFallback:
+    """Real-world fallback: FCM push via NotificationService.
+
+    Kept out of `build_alimtalk_service` import path until call-time so the
+    service module stays lightweight for unit tests that pass their own
+    fallback callable.
+    """
+
+    def __init__(self, db: AsyncSession) -> None:
+        self._db = db
+
+    async def __call__(
+        self,
+        user_id: str,
+        template_id: str,
+        variables: dict[str, str],
+    ) -> None:
+        # Local import — NotificationService pulls FCM which is heavy.
+        from app.services.notification_service import NotificationService
+
+        notif_type = _ALIMTALK_TO_NOTIFICATION_TYPE.get(template_id, "paymentReminder")
+        title, body = _fallback_message(template_id, variables)
+        try:
+            notif_service = NotificationService(self._db)
+            await notif_service.create_and_send(
+                user_id=user_id,
+                notification_type=notif_type,
+                title=title,
+                body=body,
+                data={
+                    "alimtalk_template": template_id,
+                    "alimtalk_fallback": True,
+                },
+            )
+        except Exception:  # noqa: BLE001 — fallback must not propagate
+            logger.exception("alimtalk push fallback failed template=%s user=%s", template_id, user_id)
+
+
+# Map alimtalk template → in-app notification type. Used by the default fallback
+# dispatcher to pick the correct notification channel for the student/parent.
+_ALIMTALK_TO_NOTIFICATION_TYPE: dict[str, str] = {
+    AlimTalkTemplate.invoice.value: "paymentRequested",
+    AlimTalkTemplate.reminder_d1.value: "paymentReminder",
+    AlimTalkTemplate.reminder_d3.value: "paymentReminder",
+    AlimTalkTemplate.reminder_d7.value: "paymentReminder",
+    AlimTalkTemplate.payment_confirm.value: "paymentConfirmed",
+}
+
+
+def _fallback_message(template_id: str, variables: dict[str, str]) -> tuple[str, str]:
+    """Build a short fallback push title/body when alimtalk could not be delivered."""
+    student = variables.get("student_name", "")
+    if template_id == AlimTalkTemplate.invoice.value:
+        return (
+            "수강료 안내",
+            f"{student} 학생 수강권 제안을 확인해 주세요." if student else "수강권 제안을 확인해 주세요.",
+        )
+    if template_id == AlimTalkTemplate.payment_confirm.value:
+        return ("입금 확인 완료", f"{student} 학생 수강권이 발급되었습니다." if student else "수강권이 발급되었습니다.")
+    if template_id.startswith("LNZ_PAYMENT_REMINDER_D"):
+        d_day = variables.get("d_day", "")
+        suffix = f" (D+{d_day})" if d_day else ""
+        return ("입금 확인 대기" + suffix, "수강료 입금이 아직 확인되지 않았습니다.")
+    return ("알림", "새로운 알림이 있습니다.")
+
+
 def build_alimtalk_service(db: AsyncSession) -> AlimTalkService:
-    """Convenience factory used by triggers in other services + cron jobs."""
-    return AlimTalkService(get_alimtalk_client(), db)
+    """Convenience factory used by triggers in other services + cron jobs.
+
+    Wires the default push fallback dispatcher so that real failures route to
+    FCM. Tests construct AlimTalkService directly and may pass their own
+    `fallback_dispatcher` (or none) to keep assertions narrow.
+    """
+    return AlimTalkService(
+        get_alimtalk_client(),
+        db,
+        fallback_dispatcher=_DefaultPushFallback(db),
+    )
 
 
 KST = timezone(timedelta(hours=9))
@@ -83,9 +165,19 @@ def _in_send_window(template_id: str, now: datetime | None = None) -> bool:
 class AlimTalkService:
     """Coordinates the 5 templates + idempotency + send window + fallback log."""
 
-    def __init__(self, client: AlimTalkClient, db: AsyncSession) -> None:
+    def __init__(
+        self,
+        client: AlimTalkClient,
+        db: AsyncSession,
+        *,
+        fallback_dispatcher: FallbackDispatcher | None = None,
+    ) -> None:
         self.client = client
         self.db = db
+        # #423 — invoked once per failed send when the caller supplies a
+        # `fallback_user_id`. `None` means "audit-only" (caller doesn't want
+        # the in-app push). Existing unit tests rely on this default.
+        self._fallback_dispatcher = fallback_dispatcher
 
     # ------------------------------------------------------------------ public API
 
@@ -95,6 +187,7 @@ class AlimTalkService:
         proposal_id: str,
         recipient_phone: str,
         variables: dict[str, str],
+        fallback_user_id: str | None = None,
     ) -> AlimTalkLog | None:
         return await self._send_with_log(
             template_id=AlimTalkTemplate.invoice.value,
@@ -102,6 +195,7 @@ class AlimTalkService:
             subscription_id=None,
             recipient_phone=recipient_phone,
             variables=variables,
+            fallback_user_id=fallback_user_id,
         )
 
     async def send_payment_reminder(
@@ -111,6 +205,7 @@ class AlimTalkService:
         d_day: int,
         recipient_phone: str,
         variables: dict[str, str],
+        fallback_user_id: str | None = None,
     ) -> AlimTalkLog | None:
         template_map = {
             1: AlimTalkTemplate.reminder_d1,
@@ -126,6 +221,7 @@ class AlimTalkService:
             subscription_id=None,
             recipient_phone=recipient_phone,
             variables=variables,
+            fallback_user_id=fallback_user_id,
         )
 
     async def send_payment_confirm(
@@ -135,6 +231,7 @@ class AlimTalkService:
         recipient_phone: str,
         variables: dict[str, str],
         proposal_id: str | None = None,
+        fallback_user_id: str | None = None,
     ) -> AlimTalkLog | None:
         return await self._send_with_log(
             template_id=AlimTalkTemplate.payment_confirm.value,
@@ -142,6 +239,7 @@ class AlimTalkService:
             subscription_id=subscription_id,
             recipient_phone=recipient_phone,
             variables=variables,
+            fallback_user_id=fallback_user_id,
         )
 
     async def send_teacher_vacation(
@@ -223,6 +321,7 @@ class AlimTalkService:
         recipient_phone: str,
         variables: dict[str, str],
         vacation_period_id: str | None = None,
+        fallback_user_id: str | None = None,
     ) -> AlimTalkLog | None:
         if not recipient_phone:
             logger.info("alimtalk skipped: recipient phone empty template=%s", template_id)
@@ -262,6 +361,12 @@ class AlimTalkService:
             if not result.success:
                 existing.fallback_channel = "push"
             await self.db.flush()
+            await self._maybe_dispatch_fallback(
+                result=result,
+                template_id=template_id,
+                variables=variables,
+                fallback_user_id=fallback_user_id,
+            )
             return existing
 
         log = AlimTalkLog(
@@ -279,7 +384,47 @@ class AlimTalkService:
         )
         self.db.add(log)
         await self.db.flush()
+        await self._maybe_dispatch_fallback(
+            result=result,
+            template_id=template_id,
+            variables=variables,
+            fallback_user_id=fallback_user_id,
+        )
         return log
+
+    async def _maybe_dispatch_fallback(
+        self,
+        *,
+        result: AlimTalkResult,
+        template_id: str,
+        variables: dict[str, str],
+        fallback_user_id: str | None,
+    ) -> None:
+        """Dispatch FCM push fallback exactly once when alimtalk failed.
+
+        Spec: alimtalk_templates.md §5 — failed sends route to in-app push
+        (and SMS for CRITICAL). This method fires the FCM half; SMS is out of
+        scope for #423 because no SMS infrastructure exists yet.
+
+        Guarded by:
+          * carrier success → no fallback (delivery already worked)
+          * `fallback_user_id is None` → caller is audit-only
+          * `self._fallback_dispatcher is None` → service wasn't wired (unit tests)
+        Failure inside the dispatcher itself is swallowed by the dispatcher to
+        prevent recursion (alimtalk fail → push fail → alimtalk retry...).
+        """
+        if result.success:
+            return
+        if fallback_user_id is None or self._fallback_dispatcher is None:
+            return
+        try:
+            await self._fallback_dispatcher(fallback_user_id, template_id, variables)
+        except Exception:  # noqa: BLE001 — defensive; dispatcher already swallows
+            logger.exception(
+                "alimtalk fallback dispatch raised template=%s user=%s",
+                template_id,
+                fallback_user_id,
+            )
 
     async def _safe_send(
         self,

@@ -1,7 +1,7 @@
 # 카카오 알림톡 템플릿 — 입금 자동화 5종 (Alimtalk Templates)
 
-> 작성일: 2026-06-01
-> 상태: 스펙 초안
+> 작성일: 2026-06-01 (2026-06-04 — Phase 3 백엔드 구현 완료)
+> 상태: **Phase 3 (백엔드) 완료** — Phase 2 (카카오 사업자/심사) 외부 선행 대기 중
 > 출처: E2E 감사 Top 10 #2 E2-C2 — `docs/specs/review/2026-06-01-teacher-e2e/30-gap-catalog.md`
 > 관련 이슈: #423
 > 관련 스펙: [kakao_alimtalk_spec.md](kakao_alimtalk_spec.md), [subscription_master.md §3·§4](../subscription/subscription_master.md), [notification_master.md](notification_master.md)
@@ -289,24 +289,33 @@ SMS (CRITICAL 만) → 발송 또는 종료
 
 ## 9. 구현 범위 (Phase 별)
 
-### Phase 1: 스펙 + 글로서리 (본 작업)
+### Phase 1: 스펙 + 글로서리 (본 작업) — DONE
 
 - 본 파일 작성
 - glossary 에 "알림톡", "발신 프로필", "입금 대기" 추가 (메인 세션)
 - `kakao_alimtalk_spec.md §4` 인덱스 갱신 (메인 세션)
 
-### Phase 2: 카카오 사업자/심사 (2주, 운영팀 주도)
+### Phase 2: 카카오 사업자/심사 (2주, 운영팀 주도) — 외부 대기
 
 - 사업자 등록, 채널 인증, 딜러사 계약
 - 5종 템플릿 등록 및 심사 요청
 
-### Phase 3: 백엔드 (1-2주)
+### Phase 3: 백엔드 (1-2주) — DONE (2026-06-04)
 
-- 5종 발송 트리거 (`subscription_service.py` 에 `LNZ_INVOICE` 즉시 발송 + cron `LNZ_PAYMENT_REMINDER_D1/D3/D7`)
-- 야간 큐 적재 로직 (`alimtalk_queue.py`)
-- 폴백 정책 분기 (CRITICAL vs HIGH)
+- [x] 5종 발송 트리거
+  - [x] `subscription_service.py` 에 `LNZ_INVOICE` 즉시 발송 (line 1399)
+  - [x] `subscription_service.py` 에 `LNZ_PAYMENT_CONFIRM` 즉시 발송 (line 821)
+  - [x] cron `LNZ_PAYMENT_REMINDER_D1/D3/D7` (`backend/app/jobs/payment_reminder_jobs.py`)
+- [x] 발신 가능 시간 게이트 08:00-20:00 KST (`alimtalk_service._in_send_window`)
+- [x] `LNZ_PAYMENT_REMINDER_D7` 야간 예외 (`_WINDOW_BYPASS_TEMPLATES`)
+- [x] 야간 큐 적재 (`_record_deferred` — `error="deferred: outside 08:00-20:00 KST send window"`)
+- [x] 멱등성 — `(proposal_id, template_id)` / `(subscription_id, template_id)` 유일
+- [x] 폴백 — 알림톡 실패 시 FCM 푸시 1회 (재귀 방지) — `_DefaultPushFallback` (2026-06-04 추가)
+- [x] 발송 로그 — `AlimTalkLog` 테이블 + `fallback_channel` 컬럼
+- [x] 캐리어 추상화 — `AlimTalkClient` Protocol, `MockAlimTalkClient` (테스트/로컬), `KakaoAlimTalkClient` (실 발신, 대행사 키 대기)
+- [x] 테스트 — `tests/test_alimtalk_service.py` 15케이스 PASS
 
-### Phase 4: 측정 + 튜닝 (1주)
+### Phase 4: 측정 + 튜닝 (1주) — TODO (Phase 2 후)
 
 - 발송 성공률 대시보드
 - 입금 회수율 비교 (도입 전후)
@@ -318,3 +327,4 @@ SMS (CRITICAL 만) → 발송 또는 종료
 | 버전 | 날짜 | 내용 |
 |---|---|---|
 | 1.0 | 2026-06-01 | 초안 — E2E 감사 #2 E2-C2 대응 |
+| 1.1 | 2026-06-04 | Phase 3 백엔드 구현 완료 — 5종 트리거 / 발신 시간 게이트 / 폴백 / 15 테스트 PASS. Phase 2 카카오 사업자 등록 대기 |
