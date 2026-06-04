@@ -92,5 +92,51 @@ void main() {
       expect(d.action, PlaybackLoopAction.seekBack);
       expect(d.seekToSeconds, 10);
     });
+
+    // §3.5 #509 — ad-playing flag must protect the counter.
+    test('ad playing → continuePlaying even at loop boundary', () {
+      const looper = PlaybackLooper(
+        startSeconds: 10,
+        endSeconds: 30,
+        targetRepeatCount: 5,
+        loopEnabled: true,
+        countInEnabled: false,
+      );
+      final d = looper.evaluate(
+        positionSeconds: 30,
+        completedCount: 1,
+        isAdPlaying: true,
+      );
+      expect(d.action, PlaybackLoopAction.continuePlaying);
+      expect(d.nextCompletedCount, isNull);
+    });
+
+    test('ad playing → does not trigger completeTarget', () {
+      const looper = PlaybackLooper(
+        startSeconds: 10,
+        endSeconds: 30,
+        targetRepeatCount: 3,
+        loopEnabled: true,
+        countInEnabled: false,
+      );
+      final d = looper.evaluate(
+        positionSeconds: 30,
+        completedCount: 2,
+        isAdPlaying: true,
+      );
+      expect(d.action, PlaybackLoopAction.continuePlaying);
+    });
+
+    test('ad playing flag default false preserves prior behaviour', () {
+      const looper = PlaybackLooper(
+        startSeconds: 10,
+        endSeconds: 30,
+        targetRepeatCount: 5,
+        loopEnabled: true,
+        countInEnabled: false,
+      );
+      final d = looper.evaluate(positionSeconds: 30, completedCount: 1);
+      expect(d.action, PlaybackLoopAction.seekBack);
+    });
   });
 }

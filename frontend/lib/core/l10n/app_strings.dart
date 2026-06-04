@@ -8367,6 +8367,20 @@ class AppStrings {
   /// 카운트인 시작 안내 ("3-2-1 후 시작합니다").
   static const youtubeLoopCountInStarting = '3-2-1 후 시작합니다';
 
+  // -- §3.5 #509 광고 검출 알림 --
+
+  /// 광고 감지 시 표시되는 제목.
+  static const youtubeAdDetected = '광고가 재생 중이에요';
+
+  /// 광고 끝났을 때 다시 재생을 시작하는 버튼.
+  static const youtubeAdResume = '재개';
+
+  /// 광고 알림 보조 설명 — 반복 카운터 보호 안내.
+  static const youtubeAdHint = '광고 중에는 반복 횟수가 올라가지 않아요';
+
+  /// 광고 스킵 가능 시 안내 (best effort, 정확도 보장 X).
+  static const youtubeAdSkippable = '광고가 끝나면 [재개]를 눌러 주세요';
+
   // -- AudioMixMode 표시 라벨 (audio_mix_visuals.dart 에서 사용) --
 
   static const audioMixModeVideoOnlyTitle = '영상만';
