@@ -15,6 +15,7 @@ import '../../domain/entities/section_sort_type.dart';
 import '../providers/repertoire_archive_provider.dart';
 import '../providers/section_sort_provider.dart';
 import '../widgets/section_management/section_sort_dropdown.dart';
+import '../widgets/youtube/section_video_affordance.dart';
 
 /// Repertoire detail screen with date settings and aggregated stats
 class RepertoireDetailScreen extends ConsumerStatefulWidget {
@@ -519,11 +520,23 @@ class _SectionListTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      section.rangeText,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          section.rangeText,
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.inkSecondary,
+                          ),
+                        ),
+                        // §3.5 YouTube loop entry-point affordance
+                        if (section.youtubeUrl != null) ...[
+                          const SizedBox(width: AppSpacing.space2),
+                          SectionVideoAffordance(
+                            startSeconds: section.youtubeStartSeconds,
+                            endSeconds: section.youtubeEndSeconds,
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),

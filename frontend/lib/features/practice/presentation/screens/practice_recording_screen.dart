@@ -15,6 +15,8 @@ import '../../../../features/practice/practice_facade.dart';
 import '../../domain/services/quick_recording_service.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
+import '../widgets/youtube/practice_youtube_mini_player.dart';
+import '../providers/practice_youtube_pause_signal.dart';
 
 /// Screen for recording practice audio for a repertoire.
 ///
@@ -28,6 +30,7 @@ class PracticeRecordingScreen extends ConsumerStatefulWidget {
     required this.repertoireName,
     required this.studentId,
     this.quickMode = false,
+    this.sectionId,
   });
 
   final String repertoireId;
@@ -37,6 +40,10 @@ class PracticeRecordingScreen extends ConsumerStatefulWidget {
   /// When true, ignore [repertoireId]/[repertoireName] and auto-resolve the
   /// default quick-record destination for [studentId].
   final bool quickMode;
+
+  /// Optional source section — when set and the section has a YouTube video,
+  /// the mini player is rendered above the recording controls (§3.5 entry-point 4).
+  final String? sectionId;
 
   @override
   ConsumerState<PracticeRecordingScreen> createState() =>
@@ -140,63 +147,72 @@ class _PracticeRecordingScreenState
         title: _effectiveRepertoireName,
         customActions:
             (state.representativeRecording != null &&
-                !state.representativeRecording!.isShared)
-            ? [
-                TextButton.icon(
-                  onPressed: _shareWithTeacher,
-                  icon: const Icon(Icons.share),
-                  label: const Text(AppStrings.practiceShareToTeacherAction),
-                ),
-              ]
-            : null,
+                    !state.representativeRecording!.isShared)
+                ? [
+                  TextButton.icon(
+                    onPressed: _shareWithTeacher,
+                    icon: const Icon(Icons.share),
+                    label: const Text(AppStrings.practiceShareToTeacherAction),
+                  ),
+                ]
+                : null,
       ),
-      body: state.isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  if (state.isRecovering) ...[
-                    SizedBox(height: AppSpacing.space3),
-                    Text(
-                      '녹음 파일 복구 중...',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.inkSecondary,
+      body:
+          state.isLoading
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    if (state.isRecovering) ...[
+                      SizedBox(height: AppSpacing.space3),
+                      Text(
+                        '녹음 파일 복구 중...',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.inkSecondary,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
+                ),
+              )
+              : Column(
+                children: [
+                  // §3.5 YouTube loop mini player — only when the source
+                  // section has a teacher-marked video.
+                  if (widget.sectionId != null)
+                    _YoutubeMiniPlayerSlot(sectionId: widget.sectionId!),
+
+                  // Recording section
+                  _RecordingSection(
+                    isRecording: state.isRecording,
+                    isPaused: state.isPaused,
+                    duration: _recordingDuration,
+                    onStart: () => _startRecording(),
+                    onStop: () => _stopRecording(),
+                    onCancel: () => _cancelRecording(),
+                  ),
+
+                  const ThinRule(),
+
+                  // Recordings list
+                  Expanded(
+                    child:
+                        state.recordings.isEmpty
+                            ? _EmptyRecordingsView()
+                            : _RecordingsList(
+                              recordings: state.recordings,
+                              onPlay:
+                                  (recording) => _openPlayerSheet(recording),
+                              onDelete: (id) => _deleteRecording(context, id),
+                              onSetRepresentative:
+                                  (id) => _setRepresentative(id),
+                              repertoireId: effectiveRepertoireId,
+                              studentId: widget.studentId,
+                            ),
+                  ),
                 ],
               ),
-            )
-          : Column(
-              children: [
-                // Recording section
-                _RecordingSection(
-                  isRecording: state.isRecording,
-                  isPaused: state.isPaused,
-                  duration: _recordingDuration,
-                  onStart: () => _startRecording(),
-                  onStop: () => _stopRecording(),
-                  onCancel: () => _cancelRecording(),
-                ),
-
-                const ThinRule(),
-
-                // Recordings list
-                Expanded(
-                  child: state.recordings.isEmpty
-                      ? _EmptyRecordingsView()
-                      : _RecordingsList(
-                          recordings: state.recordings,
-                          onPlay: (recording) => _openPlayerSheet(recording),
-                          onDelete: (id) => _deleteRecording(context, id),
-                          onSetRepresentative: (id) => _setRepresentative(id),
-                          repertoireId: effectiveRepertoireId,
-                          studentId: widget.studentId,
-                        ),
-                ),
-              ],
-            ),
     );
   }
 
@@ -222,6 +238,8 @@ class _PracticeRecordingScreenState
       ).notifier,
     );
     await notifier.stopRecording();
+    // §3.5 entry-point 5: tell the YouTube player to pause.
+    ref.read(practiceYoutubePauseTickerProvider.notifier).state++;
     setState(() {
       _recordingDuration = Duration.zero;
     });
@@ -256,21 +274,24 @@ class _PracticeRecordingScreenState
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => NotebookAlertDialog(
-        title: const Text(AppStrings.practiceRecordingDeleteTitle),
-        content: const Text(AppStrings.practiceRecordingDeleteConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(AppStrings.cancel),
+      builder:
+          (context) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceRecordingDeleteTitle),
+            content: const Text(AppStrings.practiceRecordingDeleteConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
+                child: const Text(AppStrings.delete),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
-            child: const Text(AppStrings.delete),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -297,20 +318,21 @@ class _PracticeRecordingScreenState
   Future<void> _shareWithTeacher() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => NotebookAlertDialog(
-        title: const Text(AppStrings.practiceShareToTeacherTitle),
-        content: const Text(AppStrings.practiceShareToTeacherConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(AppStrings.cancel),
+      builder:
+          (dialogContext) => NotebookAlertDialog(
+            title: const Text(AppStrings.practiceShareToTeacherTitle),
+            content: const Text(AppStrings.practiceShareToTeacherConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text(AppStrings.practiceShare),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(AppStrings.practiceShare),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -446,15 +468,15 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
 
   @override
   Widget build(BuildContext context) {
-    final waveformStyle = widget.isRecording
-        ? WaveformStyle.amplitude
-        : WaveformStyle.wave;
+    final waveformStyle =
+        widget.isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
     final waveformIsActive = widget.isRecording && !widget.isPaused;
 
     // Get amplitude stream only when recording - this ensures fresh stream each time
-    final amplitudeStream = widget.isRecording
-        ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
-        : null;
+    final amplitudeStream =
+        widget.isRecording
+            ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
+            : null;
 
     // Check microphone permission
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
@@ -498,9 +520,8 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
           Container(
             height: 100,
             decoration: BoxDecoration(
-              color: widget.isRecording
-                  ? AppColors.paperAccent
-                  : AppColors.paper,
+              color:
+                  widget.isRecording ? AppColors.paperAccent : AppColors.paper,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.zero,
@@ -508,9 +529,10 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 style: waveformStyle,
                 isActive: waveformIsActive,
                 height: 100,
-                waveColor: widget.isRecording
-                    ? AppColors.paper
-                    : AppColors.paperAccent,
+                waveColor:
+                    widget.isRecording
+                        ? AppColors.paper
+                        : AppColors.paperAccent,
                 amplitudeStream: amplitudeStream,
               ),
             ),
@@ -522,9 +544,10 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
             _formatDuration(widget.duration),
             style: AppTypography.displayMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color: widget.isRecording
-                  ? AppColors.paperAccent
-                  : AppColors.inkSecondary,
+              color:
+                  widget.isRecording
+                      ? AppColors.paperAccent
+                      : AppColors.inkSecondary,
             ),
           ),
           SizedBox(height: AppSpacing.space2),
@@ -574,35 +597,38 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   width: 72,
                   height: 72,
                   child: IconButton.filled(
-                    onPressed: hasMicPermission
-                        ? widget.onStart
-                        : () async {
-                            // Request permission when mic is not available
-                            final granted = await ref
-                                .read(audioRecorderServiceProvider)
-                                .requestPermission();
-                            if (granted) {
-                              ref.invalidate(microphonePermissionProvider);
-                            } else {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+                    onPressed:
+                        hasMicPermission
+                            ? widget.onStart
+                            : () async {
+                              // Request permission when mic is not available
+                              final granted =
+                                  await ref
+                                      .read(audioRecorderServiceProvider)
+                                      .requestPermission();
+                              if (granted) {
+                                ref.invalidate(microphonePermissionProvider);
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               }
-                            }
-                          },
+                            },
                     icon: Icon(
                       hasMicPermission ? Icons.mic : Icons.mic_off,
                       size: 36,
                     ),
                     style: IconButton.styleFrom(
-                      backgroundColor: hasMicPermission
-                          ? AppColors.paperAccent
-                          : AppColors.inkSecondary,
+                      backgroundColor:
+                          hasMicPermission
+                              ? AppColors.paperAccent
+                              : AppColors.inkSecondary,
                     ),
                     tooltip: hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
                   ),
@@ -717,9 +743,10 @@ class _RecordingItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotebookCard(
       elevation: recording.isRepresentative ? 2 : 0,
-      color: recording.isRepresentative
-          ? AppColors.paperAccentSoft
-          : AppColors.paper,
+      color:
+          recording.isRepresentative
+              ? AppColors.paperAccentSoft
+              : AppColors.paper,
       child: ListTile(
         leading: IconButton.filled(
           onPressed: onPlay,
@@ -786,41 +813,83 @@ class _RecordingItem extends StatelessWidget {
                 break;
             }
           },
-          itemBuilder: (context) => [
-            if (!recording.isRepresentative)
-              const PopupMenuItem(
-                value: 'representative',
-                child: Row(
-                  children: [
-                    Icon(Icons.star_outline),
-                    SizedBox(width: AppSpacing.space2),
-                    Text(AppStrings.practiceSelectAsRepresentative),
-                  ],
+          itemBuilder:
+              (context) => [
+                if (!recording.isRepresentative)
+                  const PopupMenuItem(
+                    value: 'representative',
+                    child: Row(
+                      children: [
+                        Icon(Icons.star_outline),
+                        SizedBox(width: AppSpacing.space2),
+                        Text(AppStrings.practiceSelectAsRepresentative),
+                      ],
+                    ),
+                  ),
+                const PopupMenuItem(
+                  value: 'share_external',
+                  child: Row(
+                    children: [
+                      Icon(Icons.share),
+                      SizedBox(width: AppSpacing.space2),
+                      Text(AppStrings.practiceShareExternal),
+                    ],
+                  ),
                 ),
-              ),
-            const PopupMenuItem(
-              value: 'share_external',
-              child: Row(
-                children: [
-                  Icon(Icons.share),
-                  SizedBox(width: AppSpacing.space2),
-                  Text(AppStrings.practiceShareExternal),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete_outline, color: AppColors.paperAccent),
-                  SizedBox(width: AppSpacing.space2),
-                  Text('삭제', style: TextStyle(color: AppColors.paperAccent)),
-                ],
-              ),
-            ),
-          ],
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, color: AppColors.paperAccent),
+                      SizedBox(width: AppSpacing.space2),
+                      Text(
+                        '삭제',
+                        style: TextStyle(color: AppColors.paperAccent),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
         ),
       ),
+    );
+  }
+}
+
+/// §3.5 entry-point 4 — renders [PracticeYoutubeMiniPlayer] only when the
+/// section has a teacher-marked video. Otherwise renders nothing
+/// (regression-safe for non-video sections).
+class _YoutubeMiniPlayerSlot extends ConsumerWidget {
+  const _YoutubeMiniPlayerSlot({required this.sectionId});
+
+  final String sectionId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sectionAsync = ref.watch(sectionProvider(sectionId));
+    return sectionAsync.maybeWhen(
+      data: (section) {
+        final videoId = section?.youtubeVideoId;
+        if (section == null || videoId == null || videoId.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.space3,
+            AppSpacing.space3,
+            AppSpacing.space3,
+            0,
+          ),
+          child: PracticeYoutubeMiniPlayer(
+            videoId: videoId,
+            sectionId: section.id,
+            sectionTitle: section.pieceName,
+            teacherStartSeconds: section.youtubeStartSeconds,
+            teacherEndSeconds: section.youtubeEndSeconds,
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 }
