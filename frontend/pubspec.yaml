@@ -76,6 +76,9 @@ dependencies:
   in_app_purchase: ^3.2.0      # #415 R4 Phase C — StoreKit2 / PlayBilling IAP
   youtube_player_iframe: ^5.2.2
 
+  # Charts (practice reports §5.2)
+  fl_chart: ^0.69.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

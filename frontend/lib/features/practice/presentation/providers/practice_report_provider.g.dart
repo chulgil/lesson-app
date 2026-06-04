@@ -367,6 +367,314 @@ final currentMonthProvider =
 );
 
 typedef CurrentMonthRef = AutoDisposeProviderRef<({int year, int month})>;
+String _$practiceReportCalculatorHash() =>
+    r'0afb160d88ca577526389f6f214314dbd04529e5';
+
+/// Calculator provider (pure, no I/O).
+///
+/// Copied from [practiceReportCalculator].
+@ProviderFor(practiceReportCalculator)
+final practiceReportCalculatorProvider =
+    AutoDisposeProvider<PracticeReportCalculator>.internal(
+  practiceReportCalculator,
+  name: r'practiceReportCalculatorProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceReportCalculatorHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef PracticeReportCalculatorRef
+    = AutoDisposeProviderRef<PracticeReportCalculator>;
+String _$practiceWeeklyReportHash() =>
+    r'd0a685a234d9c00c03815b9310482ad691e48964';
+
+/// Weekly practice report (new entity, §5.2).
+///
+/// Copied from [practiceWeeklyReport].
+@ProviderFor(practiceWeeklyReport)
+const practiceWeeklyReportProvider = PracticeWeeklyReportFamily();
+
+/// Weekly practice report (new entity, §5.2).
+///
+/// Copied from [practiceWeeklyReport].
+class PracticeWeeklyReportFamily extends Family<AsyncValue<WeeklyReport>> {
+  /// Weekly practice report (new entity, §5.2).
+  ///
+  /// Copied from [practiceWeeklyReport].
+  const PracticeWeeklyReportFamily();
+
+  /// Weekly practice report (new entity, §5.2).
+  ///
+  /// Copied from [practiceWeeklyReport].
+  PracticeWeeklyReportProvider call(
+    ({String studentId, DateTime weekStart}) params,
+  ) {
+    return PracticeWeeklyReportProvider(
+      params,
+    );
+  }
+
+  @override
+  PracticeWeeklyReportProvider getProviderOverride(
+    covariant PracticeWeeklyReportProvider provider,
+  ) {
+    return call(
+      provider.params,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'practiceWeeklyReportProvider';
+}
+
+/// Weekly practice report (new entity, §5.2).
+///
+/// Copied from [practiceWeeklyReport].
+class PracticeWeeklyReportProvider
+    extends AutoDisposeFutureProvider<WeeklyReport> {
+  /// Weekly practice report (new entity, §5.2).
+  ///
+  /// Copied from [practiceWeeklyReport].
+  PracticeWeeklyReportProvider(
+    ({String studentId, DateTime weekStart}) params,
+  ) : this._internal(
+          (ref) => practiceWeeklyReport(
+            ref as PracticeWeeklyReportRef,
+            params,
+          ),
+          from: practiceWeeklyReportProvider,
+          name: r'practiceWeeklyReportProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceWeeklyReportHash,
+          dependencies: PracticeWeeklyReportFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeWeeklyReportFamily._allTransitiveDependencies,
+          params: params,
+        );
+
+  PracticeWeeklyReportProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.params,
+  }) : super.internal();
+
+  final ({String studentId, DateTime weekStart}) params;
+
+  @override
+  Override overrideWith(
+    FutureOr<WeeklyReport> Function(PracticeWeeklyReportRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PracticeWeeklyReportProvider._internal(
+        (ref) => create(ref as PracticeWeeklyReportRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        params: params,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<WeeklyReport> createElement() {
+    return _PracticeWeeklyReportProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PracticeWeeklyReportProvider && other.params == params;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, params.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin PracticeWeeklyReportRef on AutoDisposeFutureProviderRef<WeeklyReport> {
+  /// The parameter `params` of this provider.
+  ({String studentId, DateTime weekStart}) get params;
+}
+
+class _PracticeWeeklyReportProviderElement
+    extends AutoDisposeFutureProviderElement<WeeklyReport>
+    with PracticeWeeklyReportRef {
+  _PracticeWeeklyReportProviderElement(super.provider);
+
+  @override
+  ({String studentId, DateTime weekStart}) get params =>
+      (origin as PracticeWeeklyReportProvider).params;
+}
+
+String _$practiceMonthlyReportHash() =>
+    r'5e8e080155b2cce50cec1f3877eaf1024488e60f';
+
+/// Monthly practice report (new entity, §5.2).
+///
+/// Copied from [practiceMonthlyReport].
+@ProviderFor(practiceMonthlyReport)
+const practiceMonthlyReportProvider = PracticeMonthlyReportFamily();
+
+/// Monthly practice report (new entity, §5.2).
+///
+/// Copied from [practiceMonthlyReport].
+class PracticeMonthlyReportFamily extends Family<AsyncValue<MonthlyReport>> {
+  /// Monthly practice report (new entity, §5.2).
+  ///
+  /// Copied from [practiceMonthlyReport].
+  const PracticeMonthlyReportFamily();
+
+  /// Monthly practice report (new entity, §5.2).
+  ///
+  /// Copied from [practiceMonthlyReport].
+  PracticeMonthlyReportProvider call(
+    ({int month, String studentId, int year}) params,
+  ) {
+    return PracticeMonthlyReportProvider(
+      params,
+    );
+  }
+
+  @override
+  PracticeMonthlyReportProvider getProviderOverride(
+    covariant PracticeMonthlyReportProvider provider,
+  ) {
+    return call(
+      provider.params,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'practiceMonthlyReportProvider';
+}
+
+/// Monthly practice report (new entity, §5.2).
+///
+/// Copied from [practiceMonthlyReport].
+class PracticeMonthlyReportProvider
+    extends AutoDisposeFutureProvider<MonthlyReport> {
+  /// Monthly practice report (new entity, §5.2).
+  ///
+  /// Copied from [practiceMonthlyReport].
+  PracticeMonthlyReportProvider(
+    ({int month, String studentId, int year}) params,
+  ) : this._internal(
+          (ref) => practiceMonthlyReport(
+            ref as PracticeMonthlyReportRef,
+            params,
+          ),
+          from: practiceMonthlyReportProvider,
+          name: r'practiceMonthlyReportProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$practiceMonthlyReportHash,
+          dependencies: PracticeMonthlyReportFamily._dependencies,
+          allTransitiveDependencies:
+              PracticeMonthlyReportFamily._allTransitiveDependencies,
+          params: params,
+        );
+
+  PracticeMonthlyReportProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.params,
+  }) : super.internal();
+
+  final ({int month, String studentId, int year}) params;
+
+  @override
+  Override overrideWith(
+    FutureOr<MonthlyReport> Function(PracticeMonthlyReportRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PracticeMonthlyReportProvider._internal(
+        (ref) => create(ref as PracticeMonthlyReportRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        params: params,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<MonthlyReport> createElement() {
+    return _PracticeMonthlyReportProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PracticeMonthlyReportProvider && other.params == params;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, params.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin PracticeMonthlyReportRef on AutoDisposeFutureProviderRef<MonthlyReport> {
+  /// The parameter `params` of this provider.
+  ({int month, String studentId, int year}) get params;
+}
+
+class _PracticeMonthlyReportProviderElement
+    extends AutoDisposeFutureProviderElement<MonthlyReport>
+    with PracticeMonthlyReportRef {
+  _PracticeMonthlyReportProviderElement(super.provider);
+
+  @override
+  ({int month, String studentId, int year}) get params =>
+      (origin as PracticeMonthlyReportProvider).params;
+}
+
 String _$reportDateHash() => r'e429f15d1e57e55516df00a4e2f2831a2cf58ae4';
 
 /// Report date state notifier
@@ -384,5 +692,25 @@ final reportDateProvider =
 );
 
 typedef _$ReportDate = AutoDisposeNotifier<ReportDateState>;
+String _$practiceReportPeriodControllerHash() =>
+    r'e47d626c80fc17b934442982ff330dcb2038de3a';
+
+/// Currently selected report period (toggle state on the report screen).
+///
+/// Copied from [PracticeReportPeriodController].
+@ProviderFor(PracticeReportPeriodController)
+final practiceReportPeriodControllerProvider = AutoDisposeNotifierProvider<
+    PracticeReportPeriodController, PracticeReportPeriod>.internal(
+  PracticeReportPeriodController.new,
+  name: r'practiceReportPeriodControllerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceReportPeriodControllerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$PracticeReportPeriodController
+    = AutoDisposeNotifier<PracticeReportPeriod>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

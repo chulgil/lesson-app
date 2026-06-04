@@ -6634,6 +6634,21 @@ class AppStrings {
   static const practiceSectionAddLabel = '섹션 추가';
   static const practiceStatsAppBarTitle = '연습 통계';
 
+  // -- Practice Report (§5.2 주간/월간 리포트) --
+  static const practiceReportTitle = '연습 리포트';
+  static const practiceReportWeekly = '주간';
+  static const practiceReportMonthly = '월간';
+  static const practiceReportTotalMinutes = '총 연습 시간';
+  static const practiceReportPracticeDays = '연습 일수';
+  static const practiceReportAvgMinutes = '평균 연습 시간';
+  static const practiceReportEmpty = '아직 연습 기록이 없습니다';
+  static const practiceReportEmptyChart = '표시할 연습 기록이 없습니다';
+  static const practiceReportEmptyRepertoire = '연습한 레퍼토리가 없습니다';
+  static const practiceReportDailyChartTitle = '일별 연습 시간';
+  static const practiceReportRepertoireRatioTitle = '레퍼토리 비중';
+  static const practiceReportMinutesUnit = '분';
+  static const practiceReportDaysUnit = '일';
+
   // -- Section Edit/Add --
   static const practiceStartMeasureGreaterError = '시작 마디가 끝 마디보다 클 수 없습니다';
   static const practiceStartLineGreaterError = '시작 줄이 끝 줄보다 클 수 없습니다';
