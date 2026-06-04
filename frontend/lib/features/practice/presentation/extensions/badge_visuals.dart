@@ -104,6 +104,27 @@ extension BadgeTypeVisuals on BadgeType {
           icon: Icons.trending_up,
           accent: AppColors.paperTrial,
         );
+      case BadgeType.practiceRepeat10:
+        return BadgeVisual(
+          name: AppStrings.badgePracticeRepeat10Name,
+          description: AppStrings.badgePracticeRepeatDescription,
+          icon: Icons.repeat,
+          accent: AppColors.paperTrial,
+        );
+      case BadgeType.practiceRepeat50:
+        return BadgeVisual(
+          name: AppStrings.badgePracticeRepeat50Name,
+          description: AppStrings.badgePracticeRepeatDescription,
+          icon: Icons.repeat_on,
+          accent: AppColors.paperTrial,
+        );
+      case BadgeType.practiceRepeat100:
+        return BadgeVisual(
+          name: AppStrings.badgePracticeRepeat100Name,
+          description: AppStrings.badgePracticeRepeatDescription,
+          icon: Icons.replay_circle_filled,
+          accent: AppColors.paperTrial,
+        );
       case BadgeType.firstLike:
         return BadgeVisual(
           name: AppStrings.practiceBadgeFirstLikeName,

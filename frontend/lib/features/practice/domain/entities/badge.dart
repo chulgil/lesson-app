@@ -40,6 +40,9 @@ enum BadgeType {
   firstPiece,
   fivePieces,
   challengeKing,
+  practiceRepeat10,
+  practiceRepeat50,
+  practiceRepeat100,
 
   // Special
   firstLike,
@@ -73,6 +76,12 @@ extension BadgeTypeMeta on BadgeType {
         return 'five_pieces';
       case BadgeType.challengeKing:
         return 'challenge_king';
+      case BadgeType.practiceRepeat10:
+        return 'practice_repeat_10';
+      case BadgeType.practiceRepeat50:
+        return 'practice_repeat_50';
+      case BadgeType.practiceRepeat100:
+        return 'practice_repeat_100';
       case BadgeType.firstLike:
         return 'first_like';
       case BadgeType.lovedStudent:
@@ -97,6 +106,9 @@ extension BadgeTypeMeta on BadgeType {
       case BadgeType.firstPiece:
       case BadgeType.fivePieces:
       case BadgeType.challengeKing:
+      case BadgeType.practiceRepeat10:
+      case BadgeType.practiceRepeat50:
+      case BadgeType.practiceRepeat100:
         return BadgeCategory.challenge;
       case BadgeType.firstLike:
       case BadgeType.lovedStudent:

@@ -13,7 +13,9 @@ void main() {
         at: DateTime(2026, 6, 4),
       );
       await tester.pumpWidget(
-        MaterialApp(home: Scaffold(body: BadgePopup(badge: badge))),
+        MaterialApp(
+          home: Scaffold(body: BadgePopup(badge: badge)),
+        ),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -26,7 +28,9 @@ void main() {
     testWidgets('renders streak badge with proper labels', (tester) async {
       final badge = Badge.earned(BadgeType.streak7);
       await tester.pumpWidget(
-        MaterialApp(home: Scaffold(body: BadgePopup(badge: badge))),
+        MaterialApp(
+          home: Scaffold(body: BadgePopup(badge: badge)),
+        ),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -61,10 +65,25 @@ void main() {
 
       final badge = Badge.earned(BadgeType.streak100);
       await tester.pumpWidget(
-        MaterialApp(home: Scaffold(body: BadgePopup(badge: badge))),
+        MaterialApp(
+          home: Scaffold(body: BadgePopup(badge: badge)),
+        ),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders practiceRepeat10 badge (#508)', (tester) async {
+      final badge = Badge.earned(BadgeType.practiceRepeat10);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: BadgePopup(badge: badge)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('반복 연습 10회'), findsOneWidget);
+      expect(find.text('구간 반복 누적 횟수 달성'), findsOneWidget);
     });
   });
 }

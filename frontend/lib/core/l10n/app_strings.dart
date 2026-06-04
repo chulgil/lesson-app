@@ -6151,6 +6151,10 @@ class AppStrings {
   static const practiceBadgeLovedStudentDesc = '좋아요 20회 받기';
   static const practiceBadgePerformanceName = '무대 경험';
   static const practiceBadgePerformanceDesc = '발표회 참가';
+  static const badgePracticeRepeat10Name = '반복 연습 10회';
+  static const badgePracticeRepeat50Name = '반복 연습 50회';
+  static const badgePracticeRepeat100Name = '반복 연습 100회';
+  static const badgePracticeRepeatDescription = '구간 반복 누적 횟수 달성';
 
   // ── Follow ──
   static const followFollowing = '팔로잉';

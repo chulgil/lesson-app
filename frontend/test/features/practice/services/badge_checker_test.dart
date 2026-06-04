@@ -212,6 +212,93 @@ void main() {
     });
   });
 
+  group('practiceRepeat ladder (#508)', () {
+    test('not awarded below 10 cumulative reps', () {
+      final r = checker.onPracticeRepeat(
+        stats: const PracticeStatsSnapshot(cumulativeRepeatCount: 9),
+        earnedBadgeIds: const {},
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isFalse);
+    });
+    test('practiceRepeat10 awarded at 10 cumulative reps', () {
+      final r = checker.onPracticeRepeat(
+        stats: const PracticeStatsSnapshot(cumulativeRepeatCount: 10),
+        earnedBadgeIds: const {},
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isTrue);
+      expect(types.contains(BadgeType.practiceRepeat50), isFalse);
+      expect(types.contains(BadgeType.practiceRepeat100), isFalse);
+    });
+    test('practiceRepeat50 at 50 includes practiceRepeat10', () {
+      final r = checker.onPracticeRepeat(
+        stats: const PracticeStatsSnapshot(cumulativeRepeatCount: 50),
+        earnedBadgeIds: const {},
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isTrue);
+      expect(types.contains(BadgeType.practiceRepeat50), isTrue);
+      expect(types.contains(BadgeType.practiceRepeat100), isFalse);
+    });
+    test('practiceRepeat100 at 100 awards all three tiers when unowned', () {
+      final r = checker.onPracticeRepeat(
+        stats: const PracticeStatsSnapshot(cumulativeRepeatCount: 100),
+        earnedBadgeIds: const {},
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isTrue);
+      expect(types.contains(BadgeType.practiceRepeat50), isTrue);
+      expect(types.contains(BadgeType.practiceRepeat100), isTrue);
+    });
+    test('repeat badges live in challenge category', () {
+      expect(BadgeType.practiceRepeat10.category, BadgeCategory.challenge);
+      expect(BadgeType.practiceRepeat50.category, BadgeCategory.challenge);
+      expect(BadgeType.practiceRepeat100.category, BadgeCategory.challenge);
+    });
+    test('onPracticeRepeat excludes non-repeat practice badges', () {
+      // Even with totalPracticeCount/likeCount that would normally trigger
+      // other badges, the onPracticeRepeat trigger only handles repeat tiers.
+      final r = checker.onPracticeRepeat(
+        stats: const PracticeStatsSnapshot(
+          totalPracticeCount: 1,
+          likeCount: 5,
+          cumulativeRepeatCount: 10,
+        ),
+        earnedBadgeIds: const {},
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isTrue);
+      expect(types.contains(BadgeType.firstPractice), isFalse);
+      expect(types.contains(BadgeType.firstLike), isFalse);
+    });
+    test('onPoint does not award repeat badges', () {
+      final r = checker.onPoint(
+        stats: const PracticeStatsSnapshot(cumulativeRepeatCount: 100),
+        earnedBadgeIds: const {},
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isFalse);
+      expect(types.contains(BadgeType.practiceRepeat100), isFalse);
+    });
+    test('already-earned repeat badges are skipped', () {
+      final r = checker.onPracticeRepeat(
+        stats: const PracticeStatsSnapshot(cumulativeRepeatCount: 50),
+        earnedBadgeIds: ids({BadgeType.practiceRepeat10}),
+        now: now,
+      );
+      final types = r.map((b) => b.type).toSet();
+      expect(types.contains(BadgeType.practiceRepeat10), isFalse);
+      expect(types.contains(BadgeType.practiceRepeat50), isTrue);
+    });
+  });
+
   group('Badge entity', () {
     test('locked + earned factories', () {
       final locked = Badge.locked(BadgeType.firstPractice);
