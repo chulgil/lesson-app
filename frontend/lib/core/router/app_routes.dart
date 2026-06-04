@@ -66,6 +66,8 @@ class AppRoutes {
   static const practiceNotes = '/practice/section/:sectionId/notes';
   static const practiceGoalSettings = '/practice/goal/settings';
   static const practiceStats = '/practice/stats';
+  // #512 — teacher-side per-student YouTube loop repeat stats.
+  static const practiceLoopStats = '/practice/loop-stats';
   static const repertoireHistory = '/practice/history';
   static const tuner = '/practice/tuner';
 

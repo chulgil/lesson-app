@@ -14,6 +14,7 @@ import '../../../features/practice/presentation/screens/section_detail_screen.da
 import '../../../features/practice/presentation/screens/repertoire_archive_screen.dart';
 import '../../../features/practice/presentation/screens/practice_note_list_screen.dart';
 import '../../../features/practice/presentation/screens/practice_goal_setting_screen.dart';
+import '../../../features/practice/presentation/screens/practice_loop_stats_screen.dart';
 import '../../../features/practice/presentation/screens/practice_stats_screen.dart';
 import '../../../features/practice/presentation/screens/repertoire_history_screen.dart';
 import '../../../features/practice/presentation/screens/tuner_screen.dart';
@@ -190,6 +191,18 @@ List<GoRoute> practiceRoutes = [
     builder: (context, state) {
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return PracticeStatsScreen(studentId: studentId);
+    },
+  ),
+
+  // Practice Loop Stats (#512) — teacher-side per-student repeat stats
+  GoRoute(
+    path: AppRoutes.practiceLoopStats,
+    name: 'practiceLoopStats',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'];
+      return PracticeLoopStatsScreen(
+        studentId: studentId?.isNotEmpty == true ? studentId : null,
+      );
     },
   ),
 

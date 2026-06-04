@@ -16,6 +16,7 @@ import '../../domain/services/practice_audio_mix_service.dart';
 import '../../domain/value_objects/audio_mix_mode.dart';
 import '../../domain/value_objects/practice_loop_speeds.dart';
 import 'badge_provider.dart';
+import 'practice_loop_stats_provider.dart';
 
 part 'practice_loop_provider.g.dart';
 
@@ -121,12 +122,25 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
     final current = state.valueOrNull;
     if (current == null) return;
     final nextCount = current.completedRepeatCount + 1;
+    final now = DateTime.now();
     await _persist(
-      current.copyWith(
-        completedRepeatCount: nextCount,
-        lastPlayedAt: DateTime.now(),
-      ),
+      current.copyWith(completedRepeatCount: nextCount, lastPlayedAt: now),
     );
+
+    // #512 — queue the latest cumulative (section, count) snapshot for the
+    // teacher stats sync. Flushed at session end via [flushLoopStatsQueue].
+    // Failure is silent: offline queue persists for retry.
+    try {
+      await ref
+          .read(loopStatsSyncActionsProvider)
+          .queueDelta(
+            sectionId: current.sectionId,
+            repeatCount: nextCount,
+            lastPlayedAt: now,
+          );
+    } catch (_) {
+      // Swallow — the sync queue is best-effort and not part of the loop UX.
+    }
 
     // Badge trigger (#508) — fire only when the per-section target is reached
     // so we do not hammer the checker on every loop. Cumulative total is
@@ -199,10 +213,9 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
     if (current == null) return;
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
-    final next =
-        current.studentMemos
-            .map((m) => m.id == id ? m.copyWith(text: trimmed) : m)
-            .toList();
+    final next = current.studentMemos
+        .map((m) => m.id == id ? m.copyWith(text: trimmed) : m)
+        .toList();
     await _persist(current.copyWith(studentMemos: next));
   }
 
@@ -243,10 +256,9 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
     if (current == null) return null;
     if (current.isBookmarkLimitReached) return null;
     if (endSeconds <= startSeconds) return null;
-    final trimmedName =
-        name.trim().isEmpty
-            ? PracticeLoopOverride.defaultBookmarkName
-            : name.trim();
+    final trimmedName = name.trim().isEmpty
+        ? PracticeLoopOverride.defaultBookmarkName
+        : name.trim();
     final id = 'bookmark-${DateTime.now().microsecondsSinceEpoch}';
     final bookmark = LoopBookmark(
       id: id,
@@ -269,18 +281,17 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
   }) async {
     final current = state.valueOrNull;
     if (current == null) return;
-    final next =
-        current.bookmarks.map((b) {
-          if (b.id != id) return b;
-          final nextStart = startSeconds ?? b.startSeconds;
-          final nextEnd = endSeconds ?? b.endSeconds;
-          final trimmed = name?.trim();
-          return b.copyWith(
-            name: (trimmed == null || trimmed.isEmpty) ? b.name : trimmed,
-            startSeconds: nextStart,
-            endSeconds: nextEnd > nextStart ? nextEnd : b.endSeconds,
-          );
-        }).toList();
+    final next = current.bookmarks.map((b) {
+      if (b.id != id) return b;
+      final nextStart = startSeconds ?? b.startSeconds;
+      final nextEnd = endSeconds ?? b.endSeconds;
+      final trimmed = name?.trim();
+      return b.copyWith(
+        name: (trimmed == null || trimmed.isEmpty) ? b.name : trimmed,
+        startSeconds: nextStart,
+        endSeconds: nextEnd > nextStart ? nextEnd : b.endSeconds,
+      );
+    }).toList();
     await _persist(current.copyWith(bookmarks: next));
   }
 

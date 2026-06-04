@@ -35,6 +35,7 @@ from app.api.v1 import (
     posts,
     practice,
     practice_logs,
+    practice_loop_stats,
     profile_images,
     recordings,
     relationships,
@@ -160,4 +161,14 @@ api_router.include_router(
 api_router.include_router(
     student_summary.router,
     tags=["public-sharing"],
+)
+api_router.include_router(
+    practice_loop_stats.student_router,
+    prefix="/students/me/practice-loop-stats",
+    tags=["practice-loop-stats"],
+)
+api_router.include_router(
+    practice_loop_stats.teacher_router,
+    prefix="/teachers/me/practice-loop-stats",
+    tags=["practice-loop-stats"],
 )
