@@ -1675,6 +1675,95 @@ Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
 | Entity | `domain/entities/recording_comparison.dart` | 생성 필요 |
 | Widget | `presentation/widgets/recording_comparison_sheet.dart` | 생성 필요 |
 
+#### 연습 노트 학생 홈 통합 (Practice Note Integration)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/practice_note.dart` | 정의 완료 |
+| Repository | `domain/repositories/practice_note_repository.dart` + `data/repositories/mock_practice_note_repository.dart` | 정의 완료 |
+| Provider | `presentation/providers/practice_note_provider.dart` | 정의 완료 |
+| Widget | `presentation/widgets/note/practice_note_card.dart` | 생성 필요 |
+| Screen 통합 | `features/student_home/presentation/screens/student_practice_tab.dart` 에 노트 카드 wiring | 갱신 필요 |
+
+#### 레퍼토리 히스토리 (Repertoire History)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/repertoire_history_entry.dart` | 생성 필요 |
+| Provider | `presentation/providers/repertoire_history_provider.dart` | 생성 필요 |
+| Screen | `presentation/screens/repertoire_history_screen.dart` | 존재 — 본문 미구현 |
+| Widget | `presentation/widgets/history/repertoire_history_timeline.dart` | 생성 필요 |
+
+#### 바로 녹음 (Quick Recording)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Constant | `core/constants/practice_defaults.dart` (default section ID: `default_quick_record_section`) | 생성 필요 |
+| Service | `domain/services/quick_recording_service.dart` (디폴트 섹션 자동 생성/조회) | 생성 필요 |
+| Widget | `presentation/widgets/quick_record/quick_record_button.dart` | 생성 필요 |
+| Screen wiring | `presentation/screens/practice_recording_screen.dart` 에 quick 모드 진입점 | 갱신 필요 |
+
+#### 주간/월간 리포트 (Weekly / Monthly Report)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/practice_report.dart` (WeeklyReport, MonthlyReport, RepertoireRatio) | 생성 필요 |
+| Service | `domain/services/practice_report_calculator.dart` | 생성 필요 |
+| Provider | `presentation/providers/practice_report_provider.dart` | 생성 필요 |
+| Screen | `presentation/screens/practice_report_screen.dart` | 생성 필요 |
+| Widget | `presentation/widgets/report/practice_chart.dart` (fl_chart 기반) | 생성 필요 |
+| Widget | `presentation/widgets/report/repertoire_ratio_bar.dart` | 생성 필요 |
+
+#### 백업 시스템 (Backup Phase 1)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/backup_archive.dart` | 생성 필요 |
+| Service | `domain/services/backup_service.dart` (ZIP 생성/복원) | 생성 필요 |
+| Service | `data/services/file_backup_service.dart` (`.lessonbackup` ZIP I/O — `archive` 패키지) | 생성 필요 |
+| Provider | `presentation/providers/backup_provider.dart` | 생성 필요 |
+| Screen | `presentation/screens/backup_settings_screen.dart` | 존재 — Phase 1 wiring 필요 |
+| Widget | `presentation/widgets/backup/backup_progress_dialog.dart` | 생성 필요 |
+
+#### 백업 시스템 (Backup Phase 2, iCloud / Google Drive)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Service | `data/services/icloud_backup_service.dart` (iOS only, `cloud_kit` 또는 `path_provider` + iCloud Container) | 생성 필요 |
+| Service | `data/services/google_drive_backup_service.dart` (`googleapis` + `driveAppdataScope`) | 생성 필요 |
+| iOS plugin | `ios/Runner/CloudBackupPlugin.swift` | 생성 필요 |
+
+---
+
+### 8.3 의존성 그래프 (2026-06-04, Wave 분류)
+
+8개 기능을 의존성 + 작업 격리 가능성으로 3 Wave 분류한다. 각 Wave 내부는 병렬, Wave 사이는 순차.
+
+**Wave 1 — 독립 entity 기반 화면 (병렬 4건):**
+
+| 기능 | 의존 | 격리 가능 |
+|------|------|----------|
+| 뱃지 시스템 | PointAwardService (gamification — 호출만, 변경 없음) | O |
+| 연습 목표 위젯 | PracticeGoal entity (있음) | O |
+| 연습 노트 학생 홈 통합 | PracticeNote entity/provider (있음) | O |
+| 레퍼토리 히스토리 | Repertoire entity (있음) | O |
+
+**Wave 2 — Recording 인프라 의존 (병렬 2건):**
+
+| 기능 | 의존 | 격리 가능 |
+|------|------|----------|
+| 바로 녹음 | Recording domain + PracticeSection (디폴트 섹션 추가) | O |
+| 녹음 비교 (A/B) | Recording playback service | O |
+
+**Wave 3 — 큰 데이터 작업 (병렬 2건):**
+
+| 기능 | 의존 | 격리 가능 |
+|------|------|----------|
+| 주간/월간 리포트 | PracticeStats + Recording 데이터 | O |
+| 백업 Phase 1 (ZIP) | Hive box + Recording file system | O |
+
+> Backup Phase 2 (iCloud/Drive) 는 Phase 1 의존 — Wave 3 종료 후 Wave 4.
+
 ---
 
 ## 9. 관련 스펙
