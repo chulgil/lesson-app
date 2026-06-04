@@ -321,6 +321,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | AC-M2 Context Toggle API — POST /auth/context/switch + GET /auth/context. JWT 페이로드 확장 (active_context/academy_id/teacher_id). ContextSwitchLog 자동 기록 + 학원장 자동 복귀 시 활성 위임 auto_end. billing_settlement_spec §1 결제 원칙 명확화 (PG/카드 외부 단말기/자동 송금 X). PaymentMethod.card docstring 보강 |
 | 2026-06-04 | §12 학원(Academy) 수강권/청구/정산 (AC-M1 그룹 C) — BillingRule/Invoice/Payment/Settlement/Subscription/TeacherPayoutOverride 6 엔티티 + 8 enum + subscriptions.academy_id + lessons.academy_id/visibility 컬럼 + AcademyInvitePreview FE 호환. FE 갭 #513 |
 | 2026-06-04 | §12 학원(Academy) 권한 계층 (AC-M1 그룹 B) 추가 — ContextSwitchLog + AcademyDelegation + AcademyDelegationAction + AcademyActivityLog 4 엔티티 + 5 enum (AcademyContext/ContextSwitchTrigger/DelegationReason/DelegationState/DelegationRevokeReason) |
 | 2026-06-04 | §12 학원(Academy) 도메인 신설 — AC-M1 그룹 A 4 엔티티 + 3 enum + 정책 용어 6종. 마일스톤: AC-M1 |

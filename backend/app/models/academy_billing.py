@@ -77,11 +77,14 @@ class InvoiceStatus(str, enum.Enum):
 
 
 class PaymentMethod(str, enum.Enum):
-    """수금 방법."""
+    """수금 방법. 모두 학원장이 수기 마킹 (앱이 결제 처리 X).
 
-    transfer = "transfer"  # 무통장입금
-    cash = "cash"
-    card = "card"  # 카드 (앱 외부 결제)
+    Policy: payment_architecture.md 흐름 A' — 학원↔학생 수강료는 외부 결제.
+    """
+
+    transfer = "transfer"  # 무통장입금 (학원장이 통장 확인 후 마킹)
+    cash = "cash"  # 현금 (학원장이 받은 후 마킹)
+    card = "card"  # 외부 카드 단말기/POS 결제 (학부모 결제 → 학원장이 마킹). 앱이 카드 처리 X.
 
 
 class PaymentSource(str, enum.Enum):
