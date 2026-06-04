@@ -6596,6 +6596,14 @@ class AppStrings {
   static const practiceNoteDeleteTitle = '노트 삭제';
   static const practiceNoteDeleteConfirm = '이 연습노트를 삭제할까요?';
   static const practiceNoteDeletedSnack = '연습노트가 삭제되었습니다';
+  // 학생 홈 연습 탭의 노트 섹션 라벨/안내 (#492)
+  static const practiceNoteSectionTitle = '오늘의 연습노트';
+  static const practiceNoteHomeEmpty = '아직 작성한 연습노트가 없습니다';
+  static const practiceNoteAdd = '노트 추가';
+  static const practiceNoteAddTooltip = '연습노트 추가';
+  static const practiceNoteShowMore = '전체보기';
+  static const practiceNotePickSection = '노트를 작성할 섹션을 선택하세요';
+  static const practiceNoteNoSectionsHint = '먼저 연습할 레퍼토리/섹션을 추가해 주세요';
 
   // -- Screens --
   static const practiceArchiveTitle = '아카이브';
