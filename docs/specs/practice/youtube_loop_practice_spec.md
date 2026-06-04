@@ -393,6 +393,53 @@ playhead 보다 뒤에 그려 영상 진행을 가리지 않는다.
 - 색: `AppColors.paperAccent` (#9B1B12)
 - 빈 상태: 영상 없는 섹션은 변경 0 (regression 금지)
 
+### 4.11 선생님 측 학생별 반복 통계 (#512)
+
+학생이 #506 영상 반복 연습 시 각 섹션의 누적 반복 횟수를 백그라운드로 동기화하면, 선생님이 진척도 + 어려운 구간을 한눈에 볼 수 있다. 게이미피케이션 (#508) 뱃지는 학생 측 UX, 본 §은 **선생님 측 학생별 진척도 리포트**.
+
+```
+[학생] 영상 반복 → onPracticeRepeat → 로컬 Hive 큐 적재 (idempotent)
+                                       ↓
+        세션 종료 (영상 위젯 dispose) → 배치 flush → POST /api/v1/students/me/practice-loop-stats/sync
+                                       ↓
+[선생님] 홈 대시보드 카드 → /practice/loop-stats → 학생 카드 → 드릴다운 (차트 + 히트맵)
+```
+
+#### 4.11.1 동기화 정책 (정책 결정)
+
+| 항목 | 결정 | 근거 |
+|---|---|---|
+| 동기화 시점 | **세션 종료 시 배치** | 매 반복마다 sync 시 백엔드 부하 ↑↑ |
+| 동기화 전송 데이터 | sectionId, repeatCount, lastPlayedAt | 프라이버시 — 메모/북마크 본문 X |
+| 권한 범위 | **학생별** (`Student.teacher_id` 일치만) | 학원별 권한은 AC-M1/M2 후속 |
+| 멱등성 | 서버는 `max(stored, incoming)` 유지 | 오프라인 재flush 안전 |
+
+#### 4.11.2 선생님 화면
+
+**진입점**: `home/presentation/widgets/dashboard_tab.dart` → `_LoopStatsEntryCard` (대시보드 카드, 동기화된 학생 0명이면 자동 숨김).
+
+**화면**: `PracticeLoopStatsScreen` (라우트 `AppRoutes.practiceLoopStats` = `/practice/loop-stats`).
+
+두 모드:
+- **요약 모드** (default): 학생 카드 리스트 — `StudentRepeatStats` (이름 + 총 반복 + 마지막 연습). `?studentId` 쿼리 없이 진입.
+- **드릴다운 모드**: 한 학생 + 1주/1개월 토글 + `StudentRepeatChart` (BarChart) + `StudentLoopHeatmap` (음영 리스트). `?studentId=<id>` 또는 요약 카드 탭.
+
+#### 4.11.3 위젯
+
+| 위젯 | 역할 |
+|---|---|
+| `_LoopStatsEntryCard` | 대시보드 진입 카드 (요약 0명 시 숨김) |
+| `PracticeLoopStatsScreen` | 요약/드릴다운 라우팅 + 토글 |
+| `StudentRepeatChart` | fl_chart `BarChart` — 구간별 반복 횟수 |
+| `StudentLoopHeatmap` | 어려운 구간 시각화 — `Color.lerp(paper, paperAccent, intensity)` |
+
+#### 4.11.4 오프라인 큐 (`LoopStatsSyncService`)
+
+- Hive box `practice_loop_stats_queue`, 키 `{studentUserId}:{sectionId}` — 학생별 격리
+- `enqueue()` 는 학생/섹션당 최신 delta만 보관 (덮어쓰기, 큐 크기 폭증 방지)
+- `flush(studentUserId)` 성공 시 큐 클리어, 실패 시 다음 flush 까지 보존
+- 트리거: `practice_youtube_player.dart#dispose` (세션 종료 = 영상 위젯 dispose)
+
 ## 5. 기술 명세
 
 ### 5.1 의존성
@@ -687,6 +734,26 @@ YouTube 적용 (옵션 A + E 채택):
 | Repository (#511) | `features/practice/data/repositories/hive_practice_loop_override_repository.dart` — 마이그레이션 분기 (단일 → 멀티) | 갱신 |
 | Provider (#511) | `features/practice/presentation/providers/practice_loop_provider.dart` — `addBookmark/updateBookmark/deleteBookmark/selectBookmark` + 5 슬롯 자동 색 할당 | 갱신 |
 | Strings (#511) | `core/l10n/app_strings.dart` (+ `bookmarkAdd/Manage/Select/Name/Delete/DeleteConfirm/Save/Cancel/LimitReached/Default/Empty/MarkerSemantic`) | 갱신 |
+| Model (#512) | `backend/app/models/practice_loop_stats.py` — `PracticeLoopStats` (student, section, repeat_count, last_played_at) | 생성 |
+| Schema (#512) | `backend/app/schemas/practice_loop_stats.py` — Sync / List / Summary Pydantic | 생성 |
+| Service (#512) | `backend/app/services/practice_loop_stats_service.py` — idempotent sync + window 필터 | 생성 |
+| API (#512) | `backend/app/api/v1/practice_loop_stats.py` — student sync + teacher list/summary | 생성 |
+| Migration (#512) | `backend/alembic/versions/20260604_1500_add_practice_loop_stats.py` | 생성 |
+| Tests (#512) | `backend/tests/test_practice_loop_stats_api.py` — 9 시나리오 (멱등성/권한/시간 윈도우) | 생성 |
+| Entity (#512) | `features/practice/domain/entities/practice_loop_stats.dart` — PracticeLoopStats / StudentRepeatStats / PendingLoopStatsSync / Window enum | 생성 |
+| Repository (#512) | `features/practice/domain/repositories/practice_loop_stats_repository.dart` (인터페이스) | 생성 |
+| Repository (#512) | `features/practice/data/repositories/remote_practice_loop_stats_repository.dart` (REST) | 생성 |
+| Repository (#512) | `features/practice/data/repositories/mock_practice_loop_stats_repository.dart` (DEV) | 생성 |
+| Service (#512) | `features/practice/data/services/loop_stats_sync_service.dart` — Hive 큐 + flush | 생성 |
+| Provider (#512) | `features/practice/presentation/providers/practice_loop_stats_provider.dart` — 저장소/큐/액션 5종 | 생성 |
+| Provider (#512) | `features/practice/presentation/providers/practice_loop_provider.dart` — `incrementCompletedCount` 큐 적재 hook | 갱신 |
+| Widget (#512) | `features/practice/presentation/widgets/youtube/practice_youtube_player.dart` — `dispose` 시 flush | 갱신 |
+| Screen (#512) | `features/practice/presentation/screens/practice_loop_stats_screen.dart` — 요약/드릴다운 모드 + 1주/1개월 토글 | 생성 |
+| Widget (#512) | `features/practice/presentation/widgets/stats/student_repeat_chart.dart` (fl_chart BarChart) | 생성 |
+| Widget (#512) | `features/practice/presentation/widgets/stats/student_loop_heatmap.dart` (음영 리스트) | 생성 |
+| Routes (#512) | `core/router/app_routes.dart` + `routes/practice_routes.dart` — `practiceLoopStats` | 갱신 |
+| Dashboard (#512) | `features/home/presentation/widgets/dashboard_tab.dart` — `_LoopStatsEntryCard` (0명 자동 숨김) | 갱신 |
+| Strings (#512) | `core/l10n/app_strings.dart` (+ `teacherStats*` 14 키) | 갱신 |
 
 ## 12. 변경 이력
 
@@ -696,3 +763,4 @@ YouTube 적용 (옵션 A + E 채택):
 - 2026-06-04 v3 (#509): YouTube 광고 검출 + 자동 일시정지 — `YoutubeAdDetector` 휴리스틱 + `AdNoticeOverlay` + PlaybackLooper 카운터 보호
 - 2026-06-04 v3 (#510): 영상 구간별 손글씨 메모 (Gaegu) — LoopMemo entity + 오버레이 + 마이그레이션
 - 2026-06-04 v4 (#511): 멀티 마커 북마크 N구간 — LoopBookmark entity + BookmarkManagerSheet + LoopTimeline 멀티 마커 + LoopControls 드롭다운 + 5 슬롯 색 + 5개 제한 + 단일→멀티 마이그레이션
+- 2026-06-04 v5 (#512): 선생님 측 학생별 반복 통계 — PracticeLoopStats 백엔드(모델/마이그레이션/서비스/API) + 프론트 PracticeLoopStatsScreen + StudentRepeatChart + StudentLoopHeatmap + LoopStatsSyncService 오프라인 큐 + 대시보드 진입 카드 + 세션 종료 시 배치 sync

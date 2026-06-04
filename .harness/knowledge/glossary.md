@@ -87,6 +87,11 @@
 | 카운트인 오버레이 | Count-In Overlay | `CountInOverlay` | — | §3.5 3-2-1 카운트인 오버레이 (Playfair 60-72pt) |
 | 구간 반복 북마크 | Loop Bookmark | `LoopBookmark` | — | §3.5 #511 학생이 영상에 마킹한 N구간 (도입/전개/엔딩 등). 최대 5개, 색 슬롯 자동 할당 |
 | 북마크 관리 시트 | Bookmark Manager Sheet | `BookmarkManagerSheet` | — | §3.5 #511 북마크 추가/수정/삭제/선택 바텀시트 |
+| 구간 반복 통계 | Practice Loop Stats | `PracticeLoopStats` | `PracticeLoopStats` | §3.5 #512 (학생, 섹션) 누적 반복 횟수 — 선생님 통계 + 학생 동기화 SSOT |
+| 학생 반복 통계 | Student Repeat Stats | `StudentRepeatStats` | `PracticeLoopStatsStudentSummary` | §3.5 #512 학생 단위 roll-up (대시보드 카드) |
+| 루프 통계 동기화 서비스 | Loop Stats Sync Service | `LoopStatsSyncService` | — | §3.5 #512 오프라인 큐 + 세션 종료 배치 동기화 |
+| 학생 반복 차트 | Student Repeat Chart | `StudentRepeatChart` | — | §3.5 #512 구간별 반복 횟수 막대 차트 (fl_chart BarChart) |
+| 학생 루프 히트맵 | Student Loop Heatmap | `StudentLoopHeatmap` | — | §3.5 #512 어려운 구간 시각화 — 반복 횟수 비례 음영 |
 
 ---
 
@@ -327,6 +332,7 @@
 | 2026-06-04 | §12 학원(Academy) 수강권/청구/정산 (AC-M1 그룹 C) — BillingRule/Invoice/Payment/Settlement/Subscription/TeacherPayoutOverride 6 엔티티 + 8 enum + subscriptions.academy_id + lessons.academy_id/visibility 컬럼 + AcademyInvitePreview FE 호환. FE 갭 #513 |
 | 2026-06-04 | §12 학원(Academy) 권한 계층 (AC-M1 그룹 B) 추가 — ContextSwitchLog + AcademyDelegation + AcademyDelegationAction + AcademyActivityLog 4 엔티티 + 5 enum (AcademyContext/ContextSwitchTrigger/DelegationReason/DelegationState/DelegationRevokeReason) |
 | 2026-06-04 | §12 학원(Academy) 도메인 신설 — AC-M1 그룹 A 4 엔티티 + 3 enum + 정책 용어 6종. 마일스톤: AC-M1 |
+| 2026-06-04 | §5 연습: §3.5 후속 #512 신규 용어 5건 — PracticeLoopStats, StudentRepeatStats, LoopStatsSyncService, StudentRepeatChart, StudentLoopHeatmap (선생님 측 학생별 반복 통계 + 오프라인 동기화) |
 | 2026-06-04 | §5 연습: §3.5 후속 #511 신규 용어 2건 — LoopBookmark, BookmarkManagerSheet (멀티 마커 N구간) |
 | 2026-06-04 | §5 연습: §3.5 YouTube 구간 반복 연습 신규 용어 5건 — PracticeLoopOverride, AudioMixMode, PlaybackLooper, AudioRoutingService, CountInOverlay (#506) |
 | 2026-06-03 | §11 코드 반영 신규 용어 — 코드↔스펙 드리프트 동기화로 식별된 FE 엔티티/enum 30여종 등록 (billing/schedule/lesson/relationship/practice/gamification/follow) |

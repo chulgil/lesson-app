@@ -16,6 +16,7 @@ import '../../../domain/services/playback_looper.dart';
 import '../../../domain/services/youtube_ad_detector.dart';
 import '../../../domain/value_objects/practice_loop_speeds.dart';
 import '../../providers/practice_loop_provider.dart';
+import '../../providers/practice_loop_stats_provider.dart';
 import '../../providers/practice_youtube_pause_signal.dart';
 import 'ad_notice_overlay.dart';
 import 'count_in_overlay.dart';
@@ -69,10 +70,9 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
     if (!_supportsIframe) return;
     _controller = YoutubePlayerController.fromVideoId(
       videoId: widget.videoId,
-      startSeconds:
-          (widget.teacherStartSeconds ?? 0) > 0
-              ? widget.teacherStartSeconds!.toDouble()
-              : null,
+      startSeconds: (widget.teacherStartSeconds ?? 0) > 0
+          ? widget.teacherStartSeconds!.toDouble()
+          : null,
       params: const YoutubePlayerParams(
         showControls: true,
         showFullscreenButton: false,
@@ -221,10 +221,9 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   Future<void> _onCountInCompleted() async {
     if (!mounted) return;
     setState(() => _showCountIn = false);
-    final override =
-        ref
-            .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
-            .valueOrNull;
+    final override = ref
+        .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
+        .valueOrNull;
     final start =
         override?.effectiveStartSeconds(widget.teacherStartSeconds) ??
         widget.teacherStartSeconds ??
@@ -248,6 +247,10 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   void dispose() {
     _videoStateSub?.cancel();
     _controller?.close();
+    // #512 — session end: flush the loop stats queue. Best-effort; the queue
+    // persists across failures so the next session retries automatically.
+    // ignore: unawaited_futures
+    ref.read(loopStatsSyncActionsProvider).flush();
     super.dispose();
   }
 
@@ -269,11 +272,10 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
 
     return overrideAsync.when(
       data: (override) => _buildContent(override),
-      loading:
-          () => const SizedBox(
-            height: 240,
-            child: Center(child: CircularProgressIndicator()),
-          ),
+      loading: () => const SizedBox(
+        height: 240,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (_, __) => _buildError(),
     );
   }
@@ -305,14 +307,12 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
                   child: LoopMemoOverlay(
                     memos: override.studentMemos,
                     currentPositionSeconds: _currentPosition.round(),
-                    onAdd:
-                        (text) => notifier.addMemo(
-                          atSeconds: _currentPosition.round(),
-                          text: text,
-                        ),
-                    onEdit:
-                        (memo, text) =>
-                            notifier.updateMemo(id: memo.id, text: text),
+                    onAdd: (text) => notifier.addMemo(
+                      atSeconds: _currentPosition.round(),
+                      text: text,
+                    ),
+                    onEdit: (memo, text) =>
+                        notifier.updateMemo(id: memo.id, text: text),
                     onDelete: (memo) => notifier.deleteMemo(memo.id),
                   ),
                 ),
@@ -338,16 +338,12 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
           startSeconds: start.toDouble(),
           endSeconds: end,
           memoSeconds: override.studentMemos.map((m) => m.atSeconds).toList(),
-          onStartChanged:
-              (v) => notifier.setSegment(
-                startSeconds: v.round(),
-                endSeconds: end.round(),
-              ),
-          onEndChanged:
-              (v) => notifier.setSegment(
-                startSeconds: start,
-                endSeconds: v.round(),
-              ),
+          onStartChanged: (v) => notifier.setSegment(
+            startSeconds: v.round(),
+            endSeconds: end.round(),
+          ),
+          onEndChanged: (v) =>
+              notifier.setSegment(startSeconds: start, endSeconds: v.round()),
         ),
         const SizedBox(height: AppSpacing.space2),
         LoopControls(
