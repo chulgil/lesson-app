@@ -752,3 +752,4 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 2026-03-07 | 알림 유형 상세 테이블(트리거/제목/본문/아이콘/딥링크), Provider 코드 설계, 구현 파일 위치 섹션 추가 |
 | 2026-03-30 | FCM 푸시 알림 인프라 구현 (FcmService, DeviceToken 모델/API, Firebase 설정 가이드) |
 | 2026-05-31 | 백엔드 알림 발송 구현: lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired. 백엔드 발송 구현 상태 테이블 추가. 프로필 리마인더 3종(profileReminder24h/3d/7d) 추가. LocalNotificationService.\_onNotificationTapped payload 파싱 역할 명시 |
+| 2026-06-04 | FE `NotificationType` enum 에 7종 추가 — BE 가 발송하지만 FE 가 매핑/렌더링하지 못한 갭 해소: 결제 미확인 3종(paymentPendingD1/D3/D7Final), 스케줄 확정 1종(scheduleConfirmationRequired), 프로필 리마인더 3종(profileReminder24h/3d/7d). targetRole 매핑(학생/선생/both) + 우선순위(D3/D7Final/scheduleConfirm/profile7d=high) 분기 추가 |

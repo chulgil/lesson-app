@@ -1346,5 +1346,28 @@ class _FollowedAcademiesProviderElement
   @override
   String get followerId => (origin as FollowedAcademiesProvider).followerId;
 }
+
+String _$followNotifierHash() => r'70cdb70657392feb1bddac80b72150cd64a74497';
+
+/// Follow/unfollow actions per spec §4 Provider 설계.
+///
+/// Stateless notifier — actions invalidate the related read-side providers
+/// (`isFollowingProvider`, `followerCountProvider`, `followedTeachersProvider`,
+/// `followedAcademiesProvider`).
+///
+/// Copied from [FollowNotifier].
+@ProviderFor(FollowNotifier)
+final followNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<FollowNotifier, void>.internal(
+  FollowNotifier.new,
+  name: r'followNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$followNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$FollowNotifier = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

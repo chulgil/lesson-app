@@ -3295,8 +3295,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -4153,8 +4153,7 @@ class AppStrings {
   static const paymentVerifyToIssueButton = '입금 확인 → 수강권 발급';
 
   /// 학생이 아직 수강권을 선택하지 않았습니다 (멀티초이스 미선택 가드)
-  static const proposalAwaitingTemplateSelection =
-      '학생이 아직 수강권을 선택하지 않았습니다';
+  static const proposalAwaitingTemplateSelection = '학생이 아직 수강권을 선택하지 않았습니다';
 
   /// 입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까? (Inquiry 다이얼로그 본문)
   static const paymentInquiryDialogBody =
@@ -5669,9 +5668,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5808,11 +5808,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6052,12 +6053,10 @@ class AppStrings {
   // 전까지의 최소 안전망. 자가신고 기반 확인이며, 정식 연령 검증은 PASS 연동 시
   // 대체된다.
   static const authAgeGateTitle = '나이 확인';
-  static const authAgeGateBody =
-      '만 14세 이상만 코드 없이 시작할 수 있어요.\n만 14세 이상이 맞나요?';
+  static const authAgeGateBody = '만 14세 이상만 코드 없이 시작할 수 있어요.\n만 14세 이상이 맞나요?';
   static const authAgeGateConfirm = '네, 만 14세 이상입니다';
   static const authAgeGateCancel = '아니요';
-  static const authAgeGateBlocked =
-      '만 14세 미만은 보호자(학부모) 계정을 통해 이용할 수 있어요.';
+  static const authAgeGateBlocked = '만 14세 미만은 보호자(학부모) 계정을 통해 이용할 수 있어요.';
 
   // ── Settings / Backup ──
   static const settingsBackupCreateFailed = '백업 생성에 실패했습니다. 다시 시도해주세요.';
@@ -8050,13 +8049,15 @@ class AppStrings {
   static const attendanceConfirmDialogTitle = '출석 확인';
 
   /// 출석 확인 다이얼로그 본문 — 1회 차감 고지.
-  static const attendanceConfirmDialogMessage = '이 레슨을 출석 확인 처리하시겠습니까?\n수강권 1회가 차감됩니다.';
+  static const attendanceConfirmDialogMessage =
+      '이 레슨을 출석 확인 처리하시겠습니까?\n수강권 1회가 차감됩니다.';
 
   /// 휴강 다이얼로그 제목.
   static const attendanceDayOffDialogTitle = '휴강 처리';
 
   /// 휴강 다이얼로그 본문 — 차감 없음 고지.
-  static const attendanceDayOffDialogMessage = '이 레슨을 휴강 처리하시겠습니까?\n수강권이 차감되지 않습니다.';
+  static const attendanceDayOffDialogMessage =
+      '이 레슨을 휴강 처리하시겠습니까?\n수강권이 차감되지 않습니다.';
 
   /// 출석 확인 완료 스낵바.
   static const attendanceConfirmedSnack = '출석 확인 처리되었습니다';
@@ -8076,4 +8077,86 @@ class AppStrings {
 
   /// 차감 결과 — 차감 없음 (휴강/취소).
   static const attendanceNoDeductionResult = '차감 없음';
+
+  // ============================================================
+  // G15 학원장 일괄 휴강 (BulkClosure) — 강사 시점
+  // 정책 SSOT: docs/specs/web/academy/owner_bulk_closure_spec.md §5
+  // ============================================================
+
+  /// 휴강 상세 화면 AppBar.
+  static const bulkClosureDetailTitle = '학원 휴강 안내';
+
+  /// 학원 사유 / 강사 페이 보장 안내 (§5.2).
+  static const bulkClosureAcademyReasonNote =
+      '학원 사유 — 강사 페이 영향 없음 (정산은 학원에서 별도 처리)';
+
+  /// 학생 변경권 미차감 안내 (§4.1).
+  static const bulkClosureNoCreditNote = '학생 변경권은 차감되지 않습니다';
+
+  /// 영향 레슨 카드 헤더.
+  static String bulkClosureAffectedHeader(int count) => '내 영향 레슨 ($count건)';
+
+  /// 상태 라벨 — proposed (의견 윈도우 진행).
+  static const bulkClosureStatusProposed = '의견 입력 가능';
+
+  /// 상태 라벨 — applied (보강 입력 대기).
+  static const bulkClosureStatusApplied = '보강 일정 입력 대기';
+
+  /// 상태 라벨 — makeupCompleted (강사 입력 완료).
+  static const bulkClosureStatusMakeupCompleted = '보강 일정 완료';
+
+  /// 상태 라벨 — cancelled.
+  static const bulkClosureStatusCancelled = '취소됨';
+
+  /// 의견 윈도우 카운트다운.
+  static String bulkClosureWindowRemaining(int minutes) =>
+      '유예 종료까지 $minutes분 남음';
+
+  /// 의견 윈도우 만료 안내.
+  static const bulkClosureWindowExpired = '의견 윈도우 종료';
+
+  /// 의견 입력 섹션 제목.
+  static const bulkClosureOpinionTitle = '의견 입력 (학원장에게 전달)';
+
+  /// 의견 입력 placeholder.
+  static const bulkClosureOpinionHint = '예: 발표회 리허설 일정과 겹칩니다.';
+
+  /// 의견 보내기 버튼.
+  static const bulkClosureOpinionSubmit = '의견 보내기';
+
+  /// 의견 전송 성공 스낵바.
+  static const bulkClosureOpinionSent = '의견이 전달되었습니다';
+
+  /// 의견 전송 실패 스낵바.
+  static const bulkClosureOpinionFailed = '의견 전송에 실패했습니다. 다시 시도해주세요.';
+
+  /// 보강 입력 화면 진입 버튼.
+  static const bulkClosureMakeupInputCta = '보강 일정 입력하기';
+
+  /// 자동 적용 안내.
+  static const bulkClosureAutoApplyHint =
+      '1시간 후 자동 적용됩니다. 학원장이 즉시 적용할 수도 있습니다.';
+
+  // ============================================================
+  // App Rating Prompt — 만족도 → 스토어 평가 / 피드백
+  // 정책 SSOT: docs/specs/settings/app_rating_prompt_spec.md §8–9
+  // ============================================================
+
+  /// 만족도 다이얼로그 제목.
+  static const ratingPromptTitle = '레슨아자, 어떠세요?';
+
+  /// 긍정 응답 (스토어 평가 요청).
+  static const ratingPromptYes = '네, 도움돼요!';
+
+  /// 부정 응답 (피드백 다이얼로그로 전환).
+  static const ratingPromptNo = '아쉬워요';
+
+  /// 피드백 다이얼로그 제목.
+  static const ratingFeedbackTitle = '의견을 들려주세요';
+
+  /// 피드백 전송 버튼.
+  static const ratingFeedbackSend = '의견 보내기';
+
+  /// 피드백 미입력/나중에 버튼.
+  static const ratingFeedbackLater = '나중에';
 }

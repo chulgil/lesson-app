@@ -8,3 +8,4 @@ export 'academy_member_repository.dart';
 export 'academy_repository.dart';
 export 'academy_subscription_repository.dart';
 export 'academy_visibility_repository.dart';
+export 'bulk_closure_repository.dart';

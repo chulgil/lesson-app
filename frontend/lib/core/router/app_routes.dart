@@ -196,6 +196,15 @@ class AppRoutes {
   static const academyInquiries = '/academy/:academyId/inquiries';
   static const academyInquiryDetail =
       '/academy/:academyId/inquiries/:inquiryId';
+  // G15 학원장 일괄 휴강 (강사 시점)
+  // 정책 SSOT: docs/specs/web/academy/owner_bulk_closure_spec.md §5
+  static const academyBulkClosureDetail =
+      '/academy/:academyId/closures/:closureId';
+  static const academyMakeupInput =
+      '/academy/:academyId/closures/:closureId/makeup';
+  // 강사 시점 활동 타임라인 (academy_master.md §6.1 라우트 등록)
+  static const academyActivityTimeline =
+      '/academy/:academyId/teachers/:actorMemberId/activity';
   static const noteAccessRequest = '/note-access/:requestId';
 
   // Public sharing routes (R2 #318 — 토큰 기반 읽기 전용 요약)

@@ -28,6 +28,7 @@ import 'routes/notification_routes.dart';
 import 'routes/settings_routes.dart';
 import 'routes/share_routes.dart';
 import 'routes/subscription_routes.dart';
+import 'routes/academy_routes.dart';
 
 // Re-export AppRoutes for convenient imports
 export 'app_routes.dart';
@@ -97,9 +98,7 @@ String? resolveAuthRedirect(AuthState authState, String currentPath) {
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-      (_) => notifyListeners(),
-    );
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
   }
 
   late final StreamSubscription<dynamic> _subscription;
@@ -128,19 +127,17 @@ class AppRouter {
   /// [refreshListenable] drives redirect re-evaluation on auth state changes.
   /// The router itself must be created **once** and reused; auth changes flow
   /// through this listenable rather than router re-creation.
-  static GoRouter createRouter(
-    WidgetRef ref, {
-    Listenable? refreshListenable,
-  }) {
+  static GoRouter createRouter(WidgetRef ref, {Listenable? refreshListenable}) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
       refreshListenable: refreshListenable,
-      redirect: (context, state) => resolveAuthRedirect(
-        ref.read(authNotifierProvider),
-        state.matchedLocation,
-      ),
+      redirect:
+          (context, state) => resolveAuthRedirect(
+            ref.read(authNotifierProvider),
+            state.matchedLocation,
+          ),
       routes: [
         // Combine all domain-specific routes
         ...authRoutes,
@@ -157,10 +154,12 @@ class AppRouter {
         ...settingsRoutes,
         ...shareRoutes,
         ...subscriptionRoutes,
+        ...academyRoutes,
       ],
-      errorBuilder: (context, state) => NotebookScreenScaffold(
-        body: Center(child: Text('Page not found: ${state.uri}')),
-      ),
+      errorBuilder:
+          (context, state) => NotebookScreenScaffold(
+            body: Center(child: Text('Page not found: ${state.uri}')),
+          ),
     );
   }
 }

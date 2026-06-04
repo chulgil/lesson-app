@@ -21,6 +21,8 @@ import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/extensions/subscription_visuals.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
+import '../../../auth/domain/entities/user_role.dart';
+import '../../../settings/presentation/widgets/show_app_rating_prompt_helper.dart';
 
 /// Lesson detail screen with recording and notes
 class LessonDetailScreen extends ConsumerStatefulWidget {
@@ -275,7 +277,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (lesson.subscriptionId != null) {
         // Connected lesson → navigate to subscription detail for proper cancel flow
         context.push(
-          AppRoutes.subscriptionDetail.replaceFirst(':id', lesson.subscriptionId!),
+          AppRoutes.subscriptionDetail.replaceFirst(
+            ':id',
+            lesson.subscriptionId!,
+          ),
           extra: {'viewerRole': widget.isTeacher ? 'teacher' : 'student'},
         );
       } else {
@@ -326,6 +331,24 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           // Auto-propose regular lessons if student has no active subscription
           if (widget.isTeacher && lesson.teacherId != null) {
             _tryAutoProposal(lesson);
+          }
+
+          // App rating prompt — fires only when trigger conditions allow
+          // (spec: docs/specs/settings/app_rating_prompt_spec.md §2-5).
+          if (widget.isTeacher && mounted) {
+            final completedCount =
+                ref
+                    .read(lessonsNotifierProvider)
+                    .value
+                    ?.where((l) => l.status == LessonStatus.completed)
+                    .length ??
+                0;
+            await showAppRatingPromptIfNeeded(
+              context: context,
+              ref: ref,
+              userRole: UserRole.teacher,
+              completedLessonCount: completedCount,
+            );
           }
         } catch (e) {
           if (mounted) {

@@ -108,6 +108,40 @@
 
 > 합계: 8 Repository, 메서드 21개.
 
+### 4.1 G15 일괄 휴강 — 강사 시점 FE 구현 (2026-06-04)
+
+§2.7 의 강사 시점 흐름(휴강 안내 수신 → 1시간 의견 윈도우 → 적용 후 보강 입력) 이 FE 측에 구현됨. **학원장 작성/적용/취소 UI 는 web 콘솔에서 처리하며 lesson-app FE 책임이 아니다**. 정책 SSOT: [web/academy/owner_bulk_closure_spec.md §5](../web/academy/owner_bulk_closure_spec.md).
+
+| 항목 | 코드 위치 | 비고 |
+|------|----------|------|
+| `BulkClosureRepository` 인터페이스 | `features/academy/domain/repositories/bulk_closure_repository.dart` | `listByTeacherMember`/`getById`/`submitTeacherOpinion`/`submitMakeupSchedule` |
+| `MockBulkClosureRepository` 구현 | `features/academy/data/repositories/mock_bulk_closure_repository.dart` | BE 대기. seed: `addClosure(teacherMemberId, closure)` |
+| Provider | `features/academy/presentation/providers/bulk_closure_provider.dart` | `bulkClosureRepositoryProvider`(keepAlive), `teacherBulkClosuresProvider(teacherMemberId)`, `bulkClosureDetailProvider(closureId)`, `bulkClosureNotifierProvider` |
+| 휴강 상세 화면 (강사 의견 + 보강 진입) | `features/academy/presentation/screens/bulk_closure_detail_screen.dart` | status 분기 — proposed: 의견 입력 + 1h 카운트다운 / applied: 보강 입력 CTA / makeupCompleted·cancelled: 결과 요약 |
+| 보강 입력 화면 | `features/schedule/presentation/screens/makeup_lesson_input_screen.dart` | 이미 존재. router 가 `BulkClosure` extra 로 받아서 보강 시각 일괄 입력 |
+| 라우트 | `core/router/routes/academy_routes.dart` (신규) | `academyBulkClosureDetail` (`/academy/:academyId/closures/:closureId`), `academyMakeupInput` (`.../makeup`), `academyActivityTimeline` (`/academy/:academyId/teachers/:actorMemberId/activity`) |
+| l10n 키 | `core/l10n/app_strings.dart` | `bulkClosure*` 16개 (제목/상태/카운트다운/의견/CTA/안내문) |
+| 테스트 | `test/features/academy/bulk_closure_repository_test.dart` | 7개 — listByTeacherMember / 의견 윈도우 / 보강 일괄 저장 + 상태 전이 |
+
+**enum 상태 매핑 (web ↔ FE):**
+
+| web (`AcademyClosure.status`) | FE (`ClosureStatus`) | 강사 시점 의미 |
+|---|---|---|
+| `draft` / `preview` | (미노출) | 학원장이 작성 중 — 강사에게 미공개 |
+| `teacher_grace` | `proposed` | 1시간 의견 윈도우 진행 |
+| `applied` (강사 보강 미입력) | `applied` | 강사가 보강 일정 입력해야 함 |
+| `applied` + 모든 영향 레슨 makeupAt | `makeupCompleted` | FE 측 파생 상태 |
+| `cancelled` | `cancelled` | 학원장이 취소 |
+
+**FE 책임 경계:**
+
+- ❌ 학원장 휴강 작성/적용/취소: web 콘솔
+- ❌ 학생 카톡/인앱 알림 발송: BE 잡 + notification 도메인
+- ❌ 영향 레슨 enumerate: BE (`AcademyClosureAffectedLesson` 캐시) — FE 는 BE 가 제공한 `affectedLessons` 리스트만 표시
+- ✅ 강사 의견 제출 (윈도우 내)
+- ✅ 강사 보강 시각 일괄 입력 (status=applied 일 때)
+- ✅ 영향 레슨 본인 시점 표시
+
 ---
 
 ## 5. Provider
@@ -122,6 +156,27 @@
 | `teacherAcademiesProvider(teacherId)` | `academy_visibility_provider.dart` | `@riverpod` family Future | 강사 소속 학원 목록 |
 | `academyVisibilityNotifierProvider` | `academy_visibility_provider.dart` | `AsyncNotifier<void>` | `updateConsent(...)` 후 `teacherAcademiesProvider` invalidate |
 | `academyDetailProvider` | `academy_detail_provider.dart` | (예약 파일) | 현재 내용 없음. `AcademyDetailScreen`은 search feature의 `academyInfoProvider`/`academyTeachersProvider` 사용 |
+
+### 5.1 강사 초대 토큰 Provider (auth feature 안)
+
+`AcademyInviteRepository` 의 진입 Provider 들은 도메인은 academy 이지만 코드 위치는 `features/auth/presentation/providers/academy_invite_provider.dart` 다. `AcademyInviteAcceptScreen`/`AcademyInviteExpiredScreen` 이 직접 사용한다.
+
+| Provider | 종류 | 책임 |
+|----------|------|------|
+| `academyInviteRepositoryProvider` | `@riverpod` | `MockAcademyInviteRepository` 반환 (BE 대기) |
+| `academyInvitePreviewProvider(token)` | `@riverpod` family Future | `getInvitePreview(token)` — 토큰 미리보기 (학원명/역할 등) |
+| `academyInviteAcceptProvider(token)` | `@riverpod` family Future | `acceptInvite(token, publicPageConsent:false)` (현재 동의값 false 기본) |
+| `academyInviteRejectProvider(token)` | `@riverpod` family Future | `rejectInvite(token)` — 거절 처리 |
+
+**에러 분류 정책 (2026-06-04 확정):** `AcademyInviteAcceptScreen` 은 `getInvitePreview` 호출 시 발생한 예외 메시지를 다음 코드로 매핑한 뒤 화면 분기를 결정한다.
+
+| 분류 | 트리거 메시지 패턴 | 처리 |
+|------|-----------------|------|
+| `expired` | "expired", "만료" 등 | `AcademyInviteExpiredScreen` 으로 redirect (`/academy/expired`) |
+| `already_used` | "already used", "이미 사용" | accept 화면 안에서 안내 + 메인 복귀 버튼 |
+| `not_found` | "not found", "찾을 수 없" | accept 화면 안에서 안내 + 메인 복귀 버튼 |
+
+> 향후 BE 연동 시 Repository 메서드 시그니처를 `throws AcademyInviteError(code, message)` 같은 sealed exception 으로 좁히면 위 문자열 매칭을 제거할 수 있다.
 
 ### Facade
 `academy_facade.dart`는 cross-feature 공개 경계로 다음만 export:
@@ -188,4 +243,5 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | 갭 검증 결과 반영: §4.1 G15 강사 시점 FE 구현(BulkClosureRepository/Provider/BulkClosureDetailScreen + 라우트 3개 + l10n 16키 + 7테스트), §5.1 강사 초대 토큰 Provider 4종 + 에러 분류 정책(`expired`/`already_used`/`not_found`) 문서화. AcademyActivityTimeline 라우트 등록(`/academy/:academyId/teachers/:actorMemberId/activity`) |
 | 2026-06-03 | 코드 역공학으로 앱 academy 마스터 스펙 신설 |

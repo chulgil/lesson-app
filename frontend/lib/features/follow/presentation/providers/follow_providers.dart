@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
@@ -99,4 +101,65 @@ Future<List<Follow>> followedAcademies(
 ) async {
   final repository = ref.watch(followRepositoryProvider);
   return repository.getByFollowerAndType(followerId, FollowTargetType.academy);
+}
+
+/// Follow/unfollow actions per spec §4 Provider 설계.
+///
+/// Stateless notifier — actions invalidate the related read-side providers
+/// (`isFollowingProvider`, `followerCountProvider`, `followedTeachersProvider`,
+/// `followedAcademiesProvider`).
+@riverpod
+class FollowNotifier extends _$FollowNotifier {
+  @override
+  FutureOr<void> build() {}
+
+  /// Follow [followingId] (defaults to teacher target).
+  Future<void> follow({
+    required String followerId,
+    required String followingId,
+    FollowTargetType targetType = FollowTargetType.teacher,
+  }) async {
+    final repository = ref.read(followRepositoryProvider);
+    await repository.follow(
+      followerId: followerId,
+      followingId: followingId,
+      targetType: targetType,
+    );
+    _invalidateRelated(followerId, followingId, targetType);
+  }
+
+  /// Unfollow [followingId].
+  Future<void> unfollow({
+    required String followerId,
+    required String followingId,
+    FollowTargetType targetType = FollowTargetType.teacher,
+  }) async {
+    final repository = ref.read(followRepositoryProvider);
+    await repository.unfollow(followerId, followingId);
+    _invalidateRelated(followerId, followingId, targetType);
+  }
+
+  void _invalidateRelated(
+    String followerId,
+    String followingId,
+    FollowTargetType targetType,
+  ) {
+    ref.invalidate(
+      isFollowingProvider(followerId: followerId, followingId: followingId),
+    );
+    ref.invalidate(followerCountProvider(followingId));
+    ref.invalidate(followingCountProvider(followerId));
+    if (targetType == FollowTargetType.teacher) {
+      ref.invalidate(followedTeachersProvider(followerId));
+    } else if (targetType == FollowTargetType.academy) {
+      ref.invalidate(followedAcademiesProvider(followerId));
+    }
+    ref.invalidate(userFollowingProvider(followerId));
+    ref.invalidate(
+      userFollowingByTypeProvider(
+        followerId: followerId,
+        targetType: targetType,
+      ),
+    );
+  }
 }

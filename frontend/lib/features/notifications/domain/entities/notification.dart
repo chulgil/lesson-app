@@ -75,6 +75,17 @@ enum NotificationType {
   // System auto-send notices (teacher sees "sent to student" notification)
   paymentReminderSentNotice, // System sent payment reminder to student
   renewalReminderSentNotice, // System sent renewal reminder to student
+  // Payment pending reminder series (BE: payment_reminder_jobs.py)
+  // 학생용 — 입금 대기 상태에서 D-1/D-3/D-7 reminder
+  paymentPendingD1, // 입금 D-1 reminder (1일 경과)
+  paymentPendingD3, // 입금 D-3 reminder (3일 경과)
+  paymentPendingD7Final, // 입금 D-7 final reminder (7일 경과, 마지막)
+  // Schedule confirmation required (BE: schedule_confirmation_service.py)
+  scheduleConfirmationRequired, // 양측 확정 필요
+  // Profile reminder series (BE: profile_reminder_service.py) — 선생님용
+  profileReminder24h, // 가입 24h — 프로필 완성 reminder
+  profileReminder3d, // 가입 3일 — 프로필 완성 reminder
+  profileReminder7d, // 가입 7일 — 프로필 완성 final reminder
 }
 
 /// Notification priority levels
@@ -108,6 +119,10 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.proposalReminder72h: // Golden time ending
       case NotificationType.subscriptionExpiringSoon:
       case NotificationType.subscriptionExpired:
+      case NotificationType.paymentPendingD3:
+      case NotificationType.paymentPendingD7Final:
+      case NotificationType.scheduleConfirmationRequired:
+      case NotificationType.profileReminder7d: // Final reminder
         return NotificationPriority.high;
 
       case NotificationType.streakMilestone:
@@ -191,7 +206,20 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.teacherNoshow:
       case NotificationType.compensationApplied:
       case NotificationType.lessonNoteShared:
+      case NotificationType.paymentPendingD1:
+      case NotificationType.paymentPendingD3:
+      case NotificationType.paymentPendingD7Final:
         return 'student';
+
+      // Teacher-only — profile reminder series
+      case NotificationType.profileReminder24h:
+      case NotificationType.profileReminder3d:
+      case NotificationType.profileReminder7d:
+        return 'teacher';
+
+      // Both — schedule confirmation required
+      case NotificationType.scheduleConfirmationRequired:
+        return 'both';
 
       // Both roles
       case NotificationType.lessonBooked:

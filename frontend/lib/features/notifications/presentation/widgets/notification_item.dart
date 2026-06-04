@@ -31,10 +31,7 @@ class NotificationItem extends StatelessWidget {
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
-            color:
-                isUnread
-                    ? AppColors.paperAccentSoft
-                    : AppColors.paper,
+            color: isUnread ? AppColors.paperAccentSoft : AppColors.paper,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -266,6 +263,22 @@ class NotificationItem extends StatelessWidget {
       case NotificationType.paymentReminderSentNotice:
       case NotificationType.renewalReminderSentNotice:
         return Icons.send_outlined;
+
+      // Payment pending reminder series (학생용 D-1/D-3/D-7)
+      case NotificationType.paymentPendingD1:
+      case NotificationType.paymentPendingD3:
+      case NotificationType.paymentPendingD7Final:
+        return Icons.receipt_long_outlined;
+
+      // Schedule confirmation required (양측 확정)
+      case NotificationType.scheduleConfirmationRequired:
+        return Icons.event_available_outlined;
+
+      // Profile reminder series (선생님용 24h/3d/7d)
+      case NotificationType.profileReminder24h:
+      case NotificationType.profileReminder3d:
+      case NotificationType.profileReminder7d:
+        return Icons.person_outline;
     }
   }
 

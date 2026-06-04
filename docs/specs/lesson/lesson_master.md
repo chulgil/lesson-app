@@ -416,6 +416,41 @@ bool get needsPaymentConfirmation =>
 | **noDeduction** | 차감 없음 | 차감 없음 |
 | **reschedule** | 보강으로 전환 | 보강 +1 |
 
+#### 시나리오 C-2: 종료 후 미확정 출석 처리 (24h 자동완료) (#473, 2026-06-04 정책 승인)
+
+시나리오 C 가 "시작 후 15분 미도착" 분기인 것과 별개로, 정상 진행된(또는 도착 여부가 명확하지 않은) 레슨이 **종료 시각을 넘기고도 `scheduled` 상태로 남아 있는** 경우의 처리.
+
+```
+레슨 종료 (endDateTime < now)
+    -> 레슨 상세 화면 진입 시 선생님 surface 노출:
+       [출석 확인 / 휴강] 2지선다 (AttendanceActionCard)
+    -> 종료 후 0~24h:
+       사전 안내 배너 (AttendanceAutoCompleteBanner) 표시
+       선생님이 수동으로 1회 차감(출석) 또는 0회 차감(휴강) 선택
+    -> 종료 후 24h 초과:
+       백엔드가 자동으로 completed 로 전환 (= 1회 차감)
+       (BE 잡 — 본 스펙 §11.1 참조)
+```
+
+**상태 전이:**
+
+| 선생님 액션 | 결과 status | 수강권 처리 |
+|------------|-------------|-----------|
+| "출석 확인" | `completed` | 1회 차감 |
+| "휴강" | `cancelledByTeacher` | 차감 없음 |
+| 24h 무응답 (자동) | `completed` | 1회 차감 |
+
+**시나리오 C(노쇼) 와의 구분:**
+
+| 항목 | C: 당일 노쇼 | C-2: 종료 후 미확정 |
+|------|--------------|--------------------|
+| 트리거 시점 | 시작 + 15분 (학생 미도착) | 종료 시각 통과 |
+| 사용 정책 enum | `NoShowPolicy` (4종) | 없음 — 출석 확인/휴강 2지선다 |
+| 자동 처리 | 5분 미응답 → 노쇼 자동 | 24h 미응답 → completed 자동 |
+| 차감 정책 | 정책 enum 에 따라 가변 | 출석=1회, 휴강=0회 (고정) |
+
+**UI/엔티티 매핑:** §10.10 `isUnconfirmed`/`isWithinAutoCompleteWindow` 게터, §11.2 `attendance_*` 4개 위젯.
+
 #### 시나리오 D: 정기 시간 일괄 변경
 
 ```
@@ -1137,7 +1172,15 @@ enum LessonVisibility {
 | `travelTimeMinutes` | `int` | 0 | 이 레슨 종료 후 선생님 이동 시간(분) |
 | `studentNote` | `String?` | null | 학생이 직접 남기는 레슨 메모 (선생님 피드백과 별개) |
 
-> 코드 위치: `features/lessons/domain/entities/lesson.dart`
+**파생 게터** (코드 반영 2026-06-04, #473):
+
+| 게터 | 반환 | 조건 / 용도 |
+|------|------|-------------|
+| `endDateTime` | `DateTime` | `date + startTime + duration` 으로 계산된 레슨 종료 시각 |
+| `isUnconfirmed` | `bool` | `status == scheduled && endDateTime < now` — 종료됐으나 출석 처리 안 된 레슨. §3.6 시나리오 C-2 트리거 |
+| `isWithinAutoCompleteWindow` | `bool` | `isUnconfirmed && 종료 이후 24h 미만` — 24h 자동완료 사전 안내 배너 표시 조건 |
+
+> 코드 위치: `features/lessons/domain/entities/lesson.dart` (필드 + 게터)
 
 ---
 
@@ -1178,6 +1221,25 @@ enum LessonVisibility {
 | 레슨 노트 히스토리 | `features/lessons/presentation/screens/lesson_note_history_screen.dart` |
 | 그룹 클래스 상세 | `features/schedule/presentation/screens/group_class_detail_screen.dart` |
 | 그룹 출석 관리 | `features/schedule/presentation/screens/group_class_attendance_screen.dart` |
+
+### 11.2.1 종료 후 미확정 출석 (#473) 위젯 매핑 (2026-06-04)
+
+§3.6 시나리오 C-2 의 UI 컴포지션 — `lesson_detail_screen.dart` 안에서 `AttendanceSection` 이 lesson 상태에 따라 분기.
+
+| 스펙 항목 | 코드 파일 | 책임 |
+|----------|----------|------|
+| 출석 surface 진입 게이트 (선생님 전용 + 상태 분기) | `features/lessons/presentation/widgets/lesson_detail/attendance_section.dart` | `lesson.isUnconfirmed` 시 배너+카드, 그 외 종료 상태 시 차감 결과 칩, 그 외엔 미렌더 |
+| 출석/휴강 2지선다 카드 | `features/lessons/presentation/widgets/lesson_detail/attendance_action_card.dart` | "출석 확인 / 휴강" 두 버튼 — stateless + callback-driven |
+| 출석/휴강 액션 실행 (확인 다이얼로그 + provider 호출 + Snack) | `features/lessons/presentation/widgets/lesson_detail/attendance_actions.dart` | `confirmAttendance` → status=`completed`, `markDayOff` → status=`cancelledByTeacher` |
+| 24h 자동완료 사전 안내 배너 + 차감 결과 칩 | `features/lessons/presentation/widgets/lesson_detail/attendance_status_banners.dart` | `AttendanceAutoCompleteBanner` (사전 안내) + `AttendanceDeductionResultChip` (차감/차감없음) |
+
+**l10n 키** (`core/l10n/app_strings.dart`, `attendance*` 접두어, 17개):
+
+`attendanceActionTitle`, `attendanceActionDescription`, `attendanceConfirmAction`/`attendanceConfirmSubLabel`, `attendanceDayOffAction`/`attendanceDayOffSubLabel`, `attendanceConfirmDialogTitle`/`attendanceConfirmDialogMessage`, `attendanceDayOffDialogTitle`/`attendanceDayOffDialogMessage`, `attendanceConfirmedSnack`, `attendanceDayOffSnack`, `attendanceActionFailed`, `attendanceAutoCompleteNotice`, `attendanceDeductedResult`, `attendanceNoDeductionResult`.
+
+> 위 키들은 `AppStrings` 클래스 안의 attendance 섹션에 정의됨. UX 규칙(`AppStrings` 만 사용, 하드코딩 금지)을 그대로 따른다.
+
+**테스트:** `frontend/test/features/lessons/presentation/widgets/attendance_action_card_test.dart`, `attendance_status_banners_test.dart`.
 
 ### 11.3 Provider -> 코드 매핑
 
@@ -1369,6 +1431,7 @@ frontend/lib/features/schedule/
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-06-04 | 코드→스펙 드리프트 반영(#473): §3.6 시나리오 C-2(종료 후 미확정 출석 / 24h 자동완료) 신설, §10.10 파생 게터 `isUnconfirmed`/`isWithinAutoCompleteWindow`/`endDateTime` 명시, §11.2.1 attendance widget 4개 + 17개 AppStrings 키 매핑 추가 |
 | 2026-06-03 | 코드→스펙 드리프트 반영: §10.9 LessonVisibility enum 추가, §10.10 Lesson 엔티티 추가 필드(academyId/visibility/isPreview/travelTimeMinutes/studentNote) 문서화 |
 | 2026-04-23 | §13.2 DRIFT 검증 반영: 레슨 장소 10→60%, 스케줄 확인 카드 10→50%, FCM 0→40% (인프라 완성 반영), 레슨 노트 히스토리 완료→부분 70% (BROKEN 라우트 미등록 표기) |
 | 2026-03-07 | Enum 정의 완전성 보강 (LessonStatus 10값 등), 구현 파일 매핑 추가, 경쟁사 차별점 추가, schedule_master 상호 참조, attendance/gamification 스펙 참조 추가, 깨진 링크 수정 |
