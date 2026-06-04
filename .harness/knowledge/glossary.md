@@ -246,12 +246,39 @@
 
 `AcademyCreate.also_register_as_teacher=true` — 학원장이 학원 생성 시 본인을 강사로도 자동 등록 (소규모 음악학원 흔한 패턴). 두 멤버 행 자동 생성 (owner + teacher).
 
+### 권한 계층 (AC-M1 그룹 B, 2026-06-04)
+
+| 용어 (한글) | 클래스 (BE) | 정의 |
+|------|----------|------|
+| 컨텍스트 토글 감사 | `ContextSwitchLog` | 학원장↔강사 모드 전환 1건 = 1 행. 영구 보존 (분쟁 증거 + 노트 일시 접근 사전 검증) |
+| 임시 권한 위임 | `AcademyDelegation` | 학원장 부재 시 부분 권한 위임. ends_at 필수 (영구 권한 금지). 한 학원당 동시 1개만 |
+| 위임 액션 감사 | `AcademyDelegationAction` | 위임 활성 기간 동안 delegatee 가 수행한 액션 1건 = 1 행. 학원장 사후 검토 owner_reviewed_at |
+| 학원 활동 타임라인 | `AcademyActivityLog` | 강사 액션 사후 가시성 (NFR-A-5). actor_name 직접 저장 (퇴직 후에도 audit 보존) |
+
+| Enum 클래스 | 값 |
+|-----------|-----|
+| `AcademyContext` | `academy_owner` / `teacher` |
+| `ContextSwitchTrigger` | `user` (명시 토글) / `session_resume` (4h 만료 후 복원) |
+| `DelegationReason` | `trip` / `sick` / `vacation` / `event` / `other` |
+| `DelegationState` | `scheduled` / `active` / `expired` / `revoked` / `auto_ended` |
+| `DelegationRevokeReason` | `owner_returned` (자동 감지) / `owner_manual` / `expired` / `delegatee_declined` |
+
+### 정책 용어 (그룹 B 추가)
+
+| 용어 | 의미 |
+|---|---|
+| 학원장 자동 복귀 감지 | 학원장이 콘솔 로그인 시 활성 위임 자동 종료 (`revoked_reason=owner_returned`) |
+| 명시 confirmation | 비밀번호 직접 검증 미지원(OAuth 기반) → `confirmation=true` 토글로 대체. 향후 PIN/SMS 도입 |
+| 전체 승인 검토 | 학원장이 audit 행을 1탭으로 일괄 승인. 30일 후 자동 승인 (delegatee 보호) |
+| 사후 가시성 | 강사 액션을 사전 승인 없이 진행 + 학원장이 timeline 으로 사후 확인 (무조건 위임 모델) |
+
 ---
 
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | §12 학원(Academy) 권한 계층 (AC-M1 그룹 B) 추가 — ContextSwitchLog + AcademyDelegation + AcademyDelegationAction + AcademyActivityLog 4 엔티티 + 5 enum (AcademyContext/ContextSwitchTrigger/DelegationReason/DelegationState/DelegationRevokeReason) |
 | 2026-06-04 | §12 학원(Academy) 도메인 신설 — AC-M1 그룹 A 4 엔티티 + 3 enum + 정책 용어 6종. 마일스톤: AC-M1 |
 | 2026-06-03 | §11 코드 반영 신규 용어 — 코드↔스펙 드리프트 동기화로 식별된 FE 엔티티/enum 30여종 등록 (billing/schedule/lesson/relationship/practice/gamification/follow) |
 | 2026-06-01 | E2E 감사 Top 10 반영 — 15용어 추가: 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드/대기, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간, 발신 프로필. ConnectionStatus deprecate 명시 |

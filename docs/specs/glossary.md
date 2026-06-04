@@ -372,6 +372,11 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 수습 강사 | Onboarding Teacher | onboarding_until 기한 동안 학생 매칭 제한 + 학원장 사전 감독 |
 | 신뢰 위임자 (매니저) | Trusted Substitute | 학원장 부재 시 영구 위임 패턴 가능한 강사 |
 | 학원 멤버 권한 차단 | Member Access Revoked | 퇴직/해고 처리. 행 보존 + 접근만 차단 |
+| 컨텍스트 토글 | Context Switch | 학원장 ↔ 강사 모드 전환. ContextSwitchLog 영구 audit |
+| 임시 권한 위임 | Temporary Delegation | 학원장 부재 시 부분 권한 위임. 시간 제한 + 동시 1개 |
+| 위임 액션 감사 | Delegation Action Audit | 위임 기간 동안 delegatee 액션 1건 = 1 행. 학원장 사후 검토 |
+| 학원 활동 타임라인 | Academy Activity Log | 강사 액션 사후 가시성. actor_name 스냅샷 (퇴직 후 보존) |
+| 학원장 자동 복귀 감지 | Owner Auto Return | 학원장 콘솔 로그인 → 활성 위임 자동 종료 |
 
 ---
 
@@ -379,6 +384,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-04 | — | ContextSwitchLog / AcademyDelegation / AcademyDelegationAction / AcademyActivityLog + 5 enum + 권한 계층 정책 5종 | AC-M1 그룹 B BE 권한 계층 (.harness glossary §12 동기화) |
 | 2026-06-04 | — | Academy / AcademyMember / AcademyStudent / AcademyInvite + 3 enum + 정책 용어 | AC-M1 그룹 A BE 도메인 모델링 (.harness glossary §12 동기화) |
 | 2026-06-01 | ConnectionStatus | RelationshipStatus.invitePending 통합 | E2E 감사: 초대·관계 이중 상태 충돌 해소 (D-G3) |
 | 2026-06-01 | — | 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간 | E2E 감사 Top 10 반영 (.harness/knowledge/glossary.md SSOT 동기화) |
