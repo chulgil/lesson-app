@@ -19,8 +19,13 @@ class LoopTimeline extends StatelessWidget {
   final ValueChanged<double>? onStartChanged;
   final ValueChanged<double>? onEndChanged;
 
+  /// Optional memo positions (seconds). Each entry renders as a small
+  /// paperAccent dot. #510.
+  final List<int> memoSeconds;
+
   static const _height = 48.0;
   static const _markerSize = 16.0;
+  static const _memoDotSize = 6.0;
 
   const LoopTimeline({
     super.key,
@@ -31,6 +36,7 @@ class LoopTimeline extends StatelessWidget {
     this.editable = true,
     this.onStartChanged,
     this.onEndChanged,
+    this.memoSeconds = const [],
   });
 
   double _fraction(double seconds) {
@@ -117,6 +123,25 @@ class LoopTimeline extends StatelessWidget {
                       top: _height / 2 - 2,
                       child: Container(height: 4, color: AppColors.paperAccent),
                     ),
+                    // Memo dots (#510) — rendered behind playhead.
+                    for (final seconds in memoSeconds)
+                      Positioned(
+                        left:
+                            _fraction(seconds.toDouble()) * width -
+                            _memoDotSize / 2,
+                        top: _height / 2 - _memoDotSize / 2,
+                        child: Semantics(
+                          label: AppStrings.loopMemoMarkerSemantic,
+                          child: Container(
+                            width: _memoDotSize,
+                            height: _memoDotSize,
+                            decoration: const BoxDecoration(
+                              color: AppColors.paperAccent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ),
                     // Playhead
                     Positioned(
                       left: _fraction(currentPositionSeconds) * width - 1,
@@ -133,17 +158,16 @@ class LoopTimeline extends StatelessWidget {
                         editable: editable,
                         semanticLabel:
                             AppStrings.youtubeLoopMarkerSemanticStart,
-                        onDrag:
-                            editable
-                                ? (delta) {
-                                  final newSeconds =
-                                      startSeconds +
-                                      delta.dx / width * totalDurationSeconds;
-                                  onStartChanged?.call(
-                                    newSeconds.clamp(0.0, endSeconds - 1),
-                                  );
-                                }
-                                : null,
+                        onDrag: editable
+                            ? (delta) {
+                                final newSeconds =
+                                    startSeconds +
+                                    delta.dx / width * totalDurationSeconds;
+                                onStartChanged?.call(
+                                  newSeconds.clamp(0.0, endSeconds - 1),
+                                );
+                              }
+                            : null,
                       ),
                     ),
                     // End marker
@@ -152,20 +176,19 @@ class LoopTimeline extends StatelessWidget {
                       child: _Marker(
                         editable: editable,
                         semanticLabel: AppStrings.youtubeLoopMarkerSemanticEnd,
-                        onDrag:
-                            editable
-                                ? (delta) {
-                                  final newSeconds =
-                                      endSeconds +
-                                      delta.dx / width * totalDurationSeconds;
-                                  onEndChanged?.call(
-                                    newSeconds.clamp(
-                                      startSeconds + 1,
-                                      totalDurationSeconds,
-                                    ),
-                                  );
-                                }
-                                : null,
+                        onDrag: editable
+                            ? (delta) {
+                                final newSeconds =
+                                    endSeconds +
+                                    delta.dx / width * totalDurationSeconds;
+                                onEndChanged?.call(
+                                  newSeconds.clamp(
+                                    startSeconds + 1,
+                                    totalDurationSeconds,
+                                  ),
+                                );
+                              }
+                            : null,
                       ),
                     ),
                   ],
@@ -204,15 +227,14 @@ class _Marker extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.paperAccent,
             shape: BoxShape.circle,
-            boxShadow:
-                editable
-                    ? [
-                      BoxShadow(
-                        color: AppColors.paperAccent.withValues(alpha: 0.3),
-                        blurRadius: 4,
-                      ),
-                    ]
-                    : null,
+            boxShadow: editable
+                ? [
+                    BoxShadow(
+                      color: AppColors.paperAccent.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                    ),
+                  ]
+                : null,
           ),
         ),
       ),
@@ -227,10 +249,9 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = 1.5;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5;
     const dash = 4.0;
     const gap = 4.0;
     final centerY = size.height / 2;

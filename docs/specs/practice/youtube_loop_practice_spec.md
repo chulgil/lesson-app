@@ -96,8 +96,24 @@ class PracticeLoopOverride {
   final bool countInSoundEnabled;          // 카운트인 소리 ON/OFF (기본 true)
   final AudioMixMode audioMixMode;         // 영상+녹음 모드
   final DateTime lastPlayedAt;
+  final List<LoopMemo> studentMemos;       // #510 — 구간별 학생 메모
 }
 ```
+
+### 3.5 신규 entity — LoopMemo (#510)
+
+학생이 영상의 특정 시각에 남기는 자유 메모. 노트 X 악보 컨셉의 자필 주석 (Gaegu, Tier 1 hand). `PracticeLoopOverride.studentMemos` 안에 임베드.
+
+```dart
+class LoopMemo {
+  final String id;            // 'memo-<μs>' — 자동 생성
+  final int atSeconds;        // 메모 위치 (영상 시각, 정수)
+  final String text;          // 100자 제한, Gaegu 손글씨
+  final DateTime createdAt;
+}
+```
+
+마이그레이션: 기존 (#506) 레코드는 `studentMemos` 키가 없으므로 `fromJson` 단계에서 빈 리스트로 기본값 적용 — 기존 데이터 손실 없음.
 
 ### 3.3 신규 enum
 
@@ -277,7 +293,39 @@ YouTube iframe 재생 중 광고 등장 시 자동 일시정지. 연습 흐름 �
 - 텍스트: `AppStrings.youtubeAdDetected` / `youtubeAdHint`
 - 버튼: `AppStrings.youtubeAdResume` (paperAccent, 각진, 평면)
 
-### 4.8 시각 affordance 톤
+### 4.8 영상 구간별 메모 (#510)
+
+학생이 어려운 구간에 짧은 자유 메모를 남긴다. 노트 X 악보 자필 주석 톤.
+
+```
+[+ 메모 버튼] 영상 우하단 paperAccent 라벨 (Pretendard 작은 라벨)
+    ↓ 탭
+바텀시트 작성 모달:
+    paper 배경, 각진 모서리, elevation 0
+    TextField (Gaegu 16pt) + 100자 카운터
+    [취소] [저장 — paperAccent FilledButton]
+    ↓ 저장
+PracticeLoopOverride.studentMemos 에 atSeconds = 현재 재생 위치로 append
+
+[메모 표시]
+영상 재생 → 시각 도달 시 (atSeconds <= pos < atSeconds + 3) 상단 메모 카드 표시:
+    paper 배경 (94% alpha), paperAccent 1px 테두리, BorderRadius.zero
+    Gaegu 손글씨 본문 (ink 색) + paperAccent 삭제 라벨
+    ↓ 메모 탭 → 수정 모달 (같은 바텀시트)
+    ↓ 삭제 탭 → 확인 다이얼로그 → studentMemos 제거
+
+[타임라인 마커]
+LoopTimeline 각 메모 atSeconds 위치에 작은 paperAccent dot (6x6)
+playhead 보다 뒤에 그려 영상 진행을 가리지 않는다.
+
+[제약]
+- 100자 제한 — 짧은 인사이트만 (영상 흐름 깨짐 방지)
+- 한 번에 1 메모만 표시 — 겹칠 경우 가장 먼저 매칭된 메모 1건
+- 표시 시간 3초 — atSeconds + 3 가 지나면 자동 사라짐
+- 자동 생성 라벨에는 Pretendard 유지, 학생 자유 입력만 Gaegu
+```
+
+### 4.9 시각 affordance 톤
 
 - 영상 글리프: `NotebookGlyph` play (▶ 또는 chevronRight ›) — Material `Icons.play_arrow` 는 컨트롤 패널 내부에서만
 - 라벨: `NotebookTypography.tempoMono` — "구간 00:42 -- 01:15"
@@ -422,7 +470,21 @@ YouTube 적용 (옵션 A + E 채택):
 - [ ] 진입점 글리프 NotebookGlyph (Material 아님)
 - [ ] notebook 시그니처 영역 위반 0건
 
-### 7.8 에러 처리
+### 7.8 영상 구간별 메모 (#510)
+
+- [ ] [+ 메모] 버튼 영상 우하단 표시 (paperAccent)
+- [ ] 버튼 탭 → 작성 모달 (Gaegu 폰트 + 100자 제한)
+- [ ] 저장 → 현재 재생 위치 (atSeconds) 에 LoopMemo append
+- [ ] 영상 재생 중 atSeconds 도달 → 메모 카드 3초간 표시
+- [ ] 한 번에 1 메모만 표시 (겹침 시 첫 매칭만)
+- [ ] 메모 카드 탭 → 수정 모달 (기존 텍스트 prefilled)
+- [ ] 메모 카드 [삭제] 탭 → 확인 다이얼로그 → 제거
+- [ ] LoopTimeline 메모 위치 작은 paperAccent dot 표시
+- [ ] Hive 사용자별 scoped 저장 (PracticeLoopOverride.studentMemos)
+- [ ] 기존 (#506) 레코드 — studentMemos 키 부재 시 빈 리스트로 마이그레이션
+- [ ] 카운트인 진행 중에는 메모 오버레이 숨김 (영상 가림 방지)
+
+### 7.9 에러 처리
 
 - [ ] 영상 비공개/삭제 → 빈 상태 + "선생님에게 알리기"
 - [ ] 네트워크 끊김 → 재시도 버튼
@@ -438,6 +500,8 @@ YouTube 적용 (옵션 A + E 채택):
 - `PracticeAudioMixService` 6 모드별 audio session 설정 변환
 - Hive 저장소 (오버라이드 / 리셋 / 사용자별 분리)
 - `PracticeLoopSpeeds.allowed` 검증
+- `LoopMemo` 직렬화/역직렬화 + copyWith + equality (#510)
+- Hive 마이그레이션 — studentMemos 키 부재 레코드를 빈 리스트로 로드 (#510)
 
 ### 8.2 위젯 smoke test
 
@@ -448,6 +512,8 @@ YouTube 적용 (옵션 A + E 채택):
 - `CountInOverlay` (3→2→1→onComplete 콜백)
 - `AudioMixGuideDialog` (헤드폰 감지 시 / 미감지 시)
 - `PracticeYoutubeMiniPlayer` (재생 위치 유지 + 풀스크린 전환)
+- `LoopMemoOverlay` (빈 상태 / 시각 도달 시 카드 표시 / 작성 모달 + 저장) (#510)
+- `LoopTimeline` 메모 dot 회귀 — 좁은 폭에서도 예외 없음 (#510)
 
 ### 8.3 화면 smoke test
 
@@ -471,7 +537,7 @@ YouTube 적용 (옵션 A + E 채택):
 - 멀티 마커 (북마크 N구간)
 - 뱃지 시스템 #490 `onPracticeRepeat` trigger 연동 (#508 완료)
 - 선생님 측 학생별 반복 통계
-- 영상 메모 (구간별 손글씨)
+- 영상 메모 (구간별 손글씨) — #510 에서 구현 완료
 - 다른 비디오 플랫폼 (Vimeo, 직접 업로드)
 - 실기기 검증 결과에 따른 헤드폰 강제 모드 (D8 후속)
 
@@ -492,7 +558,8 @@ YouTube 적용 (옵션 A + E 채택):
 
 | 계층 | 파일 | 상태 |
 |------|------|------|
-| Entity | `domain/entities/practice_loop_override.dart` | 생성 |
+| Entity | `domain/entities/practice_loop_override.dart` | 생성 (#510 — studentMemos 추가) |
+| Entity | `domain/entities/loop_memo.dart` (#510) | 생성 |
 | Enum | `domain/value_objects/audio_mix_mode.dart` | 생성 (6종) |
 | 상수 | `domain/value_objects/practice_loop_speeds.dart` | 생성 |
 | Repository (인터페이스) | `domain/repositories/practice_loop_override_repository.dart` | 생성 |
@@ -509,6 +576,8 @@ YouTube 적용 (옵션 A + E 채택):
 | Widget | `presentation/widgets/youtube/audio_mix_guide_dialog.dart` (헤드폰 가이드) | 생성 |
 | Widget | `presentation/widgets/youtube/practice_youtube_mini_player.dart` (녹음 화면) | 생성 |
 | Widget | `presentation/widgets/youtube/section_video_affordance.dart` (진입점 글리프+라벨) | 생성 |
+| Widget | `presentation/widgets/youtube/loop_memo_overlay.dart` (#510 — 메모 오버레이 + 작성 모달) | 생성 |
+| Repository (Hive) | `data/repositories/hive_practice_loop_override_repository.dart` (#510 마이그레이션) | 갱신 |
 | Extension | `presentation/extensions/audio_mix_visuals.dart` (enum 라벨 변환) | 생성 |
 | Screen 통합 | `student_home/.../student_practice_tab.dart` (진입점 1) | 갱신 |
 | Screen 통합 | `practice/.../repertoire_detail_screen.dart` (진입점 2) — 정확한 파일명 grep | 갱신 |
@@ -536,3 +605,4 @@ YouTube 적용 (옵션 A + E 채택):
 - 2026-06-04 v2: D7-D9 + 진입점 5단계 + 카운트인 + 속도 5단계 + 메트로놈 통합 패턴 통합
 - 2026-06-04 v3 (#508): 뱃지 onPracticeRepeat trigger 연동 — 10/50/100 회 뱃지 + 누적 카운트 storage
 - 2026-06-04 v3 (#509): YouTube 광고 검출 + 자동 일시정지 — `YoutubeAdDetector` 휴리스틱 + `AdNoticeOverlay` + PlaybackLooper 카운터 보호
+- 2026-06-04 v3 (#510): 영상 구간별 손글씨 메모 (Gaegu) — LoopMemo entity + 오버레이 + 마이그레이션

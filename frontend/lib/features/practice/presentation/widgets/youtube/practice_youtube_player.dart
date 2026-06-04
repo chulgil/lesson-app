@@ -20,6 +20,7 @@ import '../../providers/practice_youtube_pause_signal.dart';
 import 'ad_notice_overlay.dart';
 import 'count_in_overlay.dart';
 import 'loop_controls.dart';
+import 'loop_memo_overlay.dart';
 import 'loop_timeline.dart';
 import 'repeat_counter.dart';
 
@@ -68,9 +69,10 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
     if (!_supportsIframe) return;
     _controller = YoutubePlayerController.fromVideoId(
       videoId: widget.videoId,
-      startSeconds: (widget.teacherStartSeconds ?? 0) > 0
-          ? widget.teacherStartSeconds!.toDouble()
-          : null,
+      startSeconds:
+          (widget.teacherStartSeconds ?? 0) > 0
+              ? widget.teacherStartSeconds!.toDouble()
+              : null,
       params: const YoutubePlayerParams(
         showControls: true,
         showFullscreenButton: false,
@@ -219,9 +221,10 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   Future<void> _onCountInCompleted() async {
     if (!mounted) return;
     setState(() => _showCountIn = false);
-    final override = ref
-        .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
-        .valueOrNull;
+    final override =
+        ref
+            .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
+            .valueOrNull;
     final start =
         override?.effectiveStartSeconds(widget.teacherStartSeconds) ??
         widget.teacherStartSeconds ??
@@ -266,10 +269,11 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
 
     return overrideAsync.when(
       data: (override) => _buildContent(override),
-      loading: () => const SizedBox(
-        height: 240,
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading:
+          () => const SizedBox(
+            height: 240,
+            child: Center(child: CircularProgressIndicator()),
+          ),
       error: (_, __) => _buildError(),
     );
   }
@@ -295,6 +299,23 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
                 color: Colors.black,
                 child: YoutubePlayer(controller: _controller!),
               ),
+              // Memo overlay (#510) — only when count-in is not active.
+              if (!_showCountIn)
+                Positioned.fill(
+                  child: LoopMemoOverlay(
+                    memos: override.studentMemos,
+                    currentPositionSeconds: _currentPosition.round(),
+                    onAdd:
+                        (text) => notifier.addMemo(
+                          atSeconds: _currentPosition.round(),
+                          text: text,
+                        ),
+                    onEdit:
+                        (memo, text) =>
+                            notifier.updateMemo(id: memo.id, text: text),
+                    onDelete: (memo) => notifier.deleteMemo(memo.id),
+                  ),
+                ),
               if (_showCountIn)
                 Positioned.fill(
                   child: ColoredBox(
@@ -316,12 +337,17 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
           currentPositionSeconds: _currentPosition,
           startSeconds: start.toDouble(),
           endSeconds: end,
-          onStartChanged: (v) => notifier.setSegment(
-            startSeconds: v.round(),
-            endSeconds: end.round(),
-          ),
-          onEndChanged: (v) =>
-              notifier.setSegment(startSeconds: start, endSeconds: v.round()),
+          memoSeconds: override.studentMemos.map((m) => m.atSeconds).toList(),
+          onStartChanged:
+              (v) => notifier.setSegment(
+                startSeconds: v.round(),
+                endSeconds: end.round(),
+              ),
+          onEndChanged:
+              (v) => notifier.setSegment(
+                startSeconds: start,
+                endSeconds: v.round(),
+              ),
         ),
         const SizedBox(height: AppSpacing.space2),
         LoopControls(

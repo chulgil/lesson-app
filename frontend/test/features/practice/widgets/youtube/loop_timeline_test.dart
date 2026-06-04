@@ -66,5 +66,23 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('renders memo dots without exceptions (#510)', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LoopTimeline(
+              totalDurationSeconds: 180,
+              currentPositionSeconds: 50,
+              startSeconds: 0,
+              endSeconds: 180,
+              memoSeconds: const [15, 60, 120],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
   });
 }
