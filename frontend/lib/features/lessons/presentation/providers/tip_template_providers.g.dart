@@ -7,7 +7,7 @@ part of 'tip_template_providers.dart';
 // **************************************************************************
 
 String _$tipTemplateRepositoryHash() =>
-    r'ac137c8e47785058d8a63e25b0c751b71b0aed14';
+    r'fb9fe3fc6f79dce3c4474ff71c3d8832f15af6ec';
 
 /// Repository provider
 ///

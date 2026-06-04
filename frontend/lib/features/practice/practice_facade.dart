@@ -45,5 +45,7 @@ export 'presentation/providers/recording_provider.dart'
         RecordingState,
         recordingNotifierProvider;
 export 'presentation/providers/repertoire_sort_provider.dart';
+export 'presentation/widgets/goal/goal_progress_widget.dart'
+    show GoalProgressWidget;
 export 'presentation/providers/smart_recording_provider.dart'
     show smartRecordingNotifierProvider, smartRecordingSettingsNotifierProvider;
