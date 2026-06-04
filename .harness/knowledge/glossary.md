@@ -209,10 +209,50 @@
 
 ---
 
+## 12. 학원 (Academy) — AC-M1 그룹 A (2026-06-04)
+
+> 코드: `backend/app/models/academy.py` + `frontend/lib/features/academy/`
+> 스펙 SSOT: `docs/specs/web/academy/` (콘솔/정책) + `docs/specs/academy/academy_master.md` (앱 FE)
+
+### 핵심 엔티티 (BE ↔ FE 동일 클래스명)
+
+| 용어 (한글) | 클래스 (BE+FE) | 정의 |
+|------|----------|------|
+| 학원 | `Academy` | 학원 1개 (slug, name, owner_user_id, business_number). 1 학원 = 1 행 |
+| 학원 소속 | `AcademyMember` | 학원장 또는 강사. (academy_id, user_id, role) 조합. 한 user 가 같은 학원에서 owner+teacher 겸직 시 행 2개 |
+| 학원 학생 | `AcademyStudent` | 학원이 등록한 학생. lesson-app User 와 연결 nullable (학원만 등록한 학생 케이스 지원) |
+| 강사 초대 | `AcademyInvite` | 토큰 기반 강사 초대. `token_hash` 저장 (raw 발급 시 1회만 노출) |
+
+### Enum
+
+| 용어 | Enum 클래스 | 값 |
+|------|-----------|-----|
+| 학원 멤버 역할 | `AcademyMemberRole` | `owner` (학원장), `teacher` (강사) |
+| 학원 학생 상태 | `AcademyStudentStatus` | `waiting` 등록대기 / `matched` 강사매칭 / `active` 정규수업 / `paused` 일시중단 / `alumni` 퇴원 |
+| 초대 상태 | `AcademyInviteState` | `pending` / `accepted` / `declined` / `expired` / `revoked` |
+
+### 정책 용어
+
+| 용어 | 의미 |
+|---|---|
+| 공개 페이지 노출 동의 | `AcademyMember.public_page_consent` — 강사가 본인 학원 공개 페이지 노출 동의. 기본 false |
+| 수습 강사 onboarding | `AcademyMember.onboarding_until` — 기한 동안 학생 매칭 제한 + activity 추가 표식 |
+| 강사 권한 차단 | `AcademyMember.access_revoked_at` — 퇴직 처리. 행 삭제 X, audit 보존 |
+| 신뢰 위임자 (매니저) | `AcademyMember.delegate_role` — `trusted_substitute` 패턴 (영구 위임 옵션) |
+| 학원 슬러그 | `Academy.slug` — 공개 페이지 URL 식별자 (`academy.lessonaza.app/{slug}`) |
+| 입금자 매칭 메모 코드 | `AcademyStudent.deposit_code` — 무통장입금 fuzzy 매칭 보조 신호 (payment_matching_spec §3.5) |
+
+### UX 1탭 onboarding
+
+`AcademyCreate.also_register_as_teacher=true` — 학원장이 학원 생성 시 본인을 강사로도 자동 등록 (소규모 음악학원 흔한 패턴). 두 멤버 행 자동 생성 (owner + teacher).
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | §12 학원(Academy) 도메인 신설 — AC-M1 그룹 A 4 엔티티 + 3 enum + 정책 용어 6종. 마일스톤: AC-M1 |
 | 2026-06-03 | §11 코드 반영 신규 용어 — 코드↔스펙 드리프트 동기화로 식별된 FE 엔티티/enum 30여종 등록 (billing/schedule/lesson/relationship/practice/gamification/follow) |
 | 2026-06-01 | E2E 감사 Top 10 반영 — 15용어 추가: 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드/대기, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간, 발신 프로필. ConnectionStatus deprecate 명시 |
 | 2026-05-10 | §10 앱 릴리즈/신뢰 구축: AppVersionSnapshot, AppNewsItem, AppRoadmapItem, AppReleaseSnapshot, AppReviewState 추가 (R6) |

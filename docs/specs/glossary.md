@@ -356,10 +356,30 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 ---
 
+## 11. 학원 (Academy) — AC-M1 그룹 A (2026-06-04)
+
+> 상세: `.harness/knowledge/glossary.md §12`. 본 섹션은 관계/역할 중심 요약.
+
+| 용어 (한글) | 영문 | 정의 |
+|------|------|------|
+| 학원 | Academy | 학원 1개 (slug + 이름 + 사업자번호 + 학원장). 공개 페이지 URL `academy.lessonaza.app/{slug}` |
+| 학원장 | Academy Owner | 학원 소유자. role=owner. 학원 전체 운영 권한 |
+| 학원 강사 | Academy Teacher | 학원 소속 강사. role=teacher. 본인 담당 학생만 |
+| 학원 학생 | Academy Student | 학원이 등록한 학생. 5상태 (등록대기/매칭/정규/일시중단/퇴원) |
+| 강사 초대 | Academy Invite | 학원장이 강사를 부르는 토큰 (이메일/카톡으로 공유). 만료 + 일회용 |
+| 학원 슬러그 | Academy Slug | URL 식별자 (예: `jaepark-music`) |
+| 학원장 겸직 강사 | Owner-Teacher | 학원장 본인이 학생도 가르치는 경우. 같은 user 가 owner+teacher 행 2개 |
+| 수습 강사 | Onboarding Teacher | onboarding_until 기한 동안 학생 매칭 제한 + 학원장 사전 감독 |
+| 신뢰 위임자 (매니저) | Trusted Substitute | 학원장 부재 시 영구 위임 패턴 가능한 강사 |
+| 학원 멤버 권한 차단 | Member Access Revoked | 퇴직/해고 처리. 행 보존 + 접근만 차단 |
+
+---
+
 ## 용어 변경 이력
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-04 | — | Academy / AcademyMember / AcademyStudent / AcademyInvite + 3 enum + 정책 용어 | AC-M1 그룹 A BE 도메인 모델링 (.harness glossary §12 동기화) |
 | 2026-06-01 | ConnectionStatus | RelationshipStatus.invitePending 통합 | E2E 감사: 초대·관계 이중 상태 충돌 해소 (D-G3) |
 | 2026-06-01 | — | 휴가 모드, 알림톡, 입금 대기/추적/되돌리기, 수강권 자동 연장, 스케줄된 회차, 보강 크레딧, 초대 코드, 첫 가용시간, 인증 선생님 배지, 레슨 1회 시간, 쉬는 시간 | E2E 감사 Top 10 반영 (.harness/knowledge/glossary.md SSOT 동기화) |
 | 2026-05-07 | 체험레슨 수강권 "불필요" | 체험레슨 수강권 **"필수"** (유료 기본, 무료 선택) | 실제 운영: 체험도 유료가 대부분이므로 수강권+변경권 정책 동일 적용 |

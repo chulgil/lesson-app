@@ -251,6 +251,140 @@ sequenceDiagram
 | 학부모가 동일 내용 반복 (스팸) | rate limit 차단 + IP 기록 |
 | 답변 작성 중 스레드 다른 사람이 종료 | 충돌 경고 + 저장 차단 |
 
-## 11. 변경 이력
+## 11. 영업시간 + 영업시간 외 자동 응답 (1인 학원장 야간 해방)
+
+> 시장조사 input: `.harness/research/academy_market_2026.md` §B P0 #2 — 소규모 학원장 매일 페인 "카톡 야간 응대"
+
+### 11.1 배경
+
+1인 학원장(겸직 강사) 의 가장 큰 일상 페인은 **본인이 강사라 수업 중 즉답 불가** + **퇴근 후/주말 야간 카톡 응대 끊임없음**. 학부모는 즉답을 기대하고, 미답변 시 컴플레인 누적 → 이탈 신호로 전환 (→ [student_retention_signals_spec.md](student_retention_signals_spec.md)).
+
+본 §11~§12 는 학원장이 **명확한 영업시간을 선언하고 시간 외 문의는 자동 응답 + 다음 영업일 일괄 처리** 워크플로우를 정의한다. 학원장의 야간/주말을 보호하면서 학부모에게도 명확한 기대치를 제공.
+
+### 11.2 데이터 모델
+
+```python
+class AcademyOfficeHours(Base):
+    """학원 영업시간 (학원 1행). 요일별 시작/종료."""
+    academy_id = Column(FK, PK)
+    weekday_hours = Column(JSON)
+    # weekday_hours 예:
+    # {
+    #   "mon": {"open": "10:00", "close": "20:00"},
+    #   "tue": {"open": "10:00", "close": "20:00"},
+    #   ...
+    #   "sat": {"open": "10:00", "close": "18:00"},
+    #   "sun": null  # 휴무
+    # }
+    timezone = Column(String, default="Asia/Seoul")
+    holiday_dates = Column(JSON, default=list)   # ["2026-12-25", "2027-01-01"]
+    auto_response_enabled = Column(Boolean, default=True)
+    night_silent_enabled = Column(Boolean, default=True)  # §12 야간 알림 silent
+    urgent_keywords = Column(JSON, default=list)  # §12.3 긴급 키워드 (즉시 알림)
+```
+
+학원장 설정 화면: `/settings/office-hours`. 기본값 평일 10-20시 / 토 10-18시 / 일 휴무.
+
+### 11.3 영업시간 외 자동 응답 흐름
+
+```mermaid
+sequenceDiagram
+    학부모->>API: 카톡 문의 (22:30)
+    API->>DB: AcademyInquiry 행 (received_at)
+    API->>API: is_within_office_hours() == false
+    API->>Kakao: 자동 응답 (template: after_hours_v1)
+    Note over Kakao,학부모: "영업시간 외입니다.<br/>내일 09:30 답변 드립니다."
+    API->>DB: inquiry.auto_response_sent_at
+    Note over DB: 학원장 알림 silent (§12)
+```
+
+### 11.4 자동 응답 템플릿 라이브러리
+
+사전 등록 카톡 알림톡:
+
+| 템플릿 ID | 발송 조건 | 본문 |
+|---|---|---|
+| `after_hours_v1` | 영업시간 외 + auto_response_enabled | `[{academy}] 영업시간 외 문의입니다.\n다음 영업일 {next_open_time} 답변 드립니다.\n급한 일은 [긴급 응답] 키워드를 보내주세요.` |
+| `weekend_v1` | 토 마감 후 또는 일 종일 | `[{academy}] 주말입니다. 월요일 {open_time} 답변 드립니다.` |
+| `holiday_v1` | holiday_dates 일치 | `[{academy}] 오늘은 휴무입니다. {next_business_day} 답변 드립니다.` |
+| `vacation_v1` | 학원장 휴가 (§11.5) | `[{academy}] 학원장 휴가 중 ({end_date} 까지). 복귀 후 답변 드립니다.` |
+
+학원장이 템플릿 본문 커스터마이즈 가능 (변수 보존 검증).
+
+### 11.5 학원장 휴가 모드 연동
+
+[teacher_vacation_mode.md](../../../schedule/teacher_vacation_mode.md) 의 휴가 등록과 별개로, **학원장(겸직 강사) 본인이 콘솔에서 휴가 선언** 시:
+- `auto_response_enabled` 동안 `vacation_v1` 템플릿으로 응답
+- 휴가 종료일까지 모든 inbox 알림 silent (긴급 키워드 제외)
+- 복귀 시 누적 inbox 일괄 알림 ("휴가 중 X건 누적")
+
+## 12. 야간/주말 silent + 일괄 알림 (학원장 보호)
+
+### 12.1 야간 알림 silent
+
+`night_silent_enabled=true` 시 영업시간 외 수신된 inquiry 의:
+- 학원장 푸시 알림 차단
+- 카톡 알림톡 차단
+- 콘솔 헤더 배지에는 누적 표시
+
+학부모에게는 §11.4 자동 응답만 발송.
+
+### 12.2 다음 영업일 아침 일괄 알림
+
+영업 시작 30분 전 (예: 09:30) 학원장에게 일괄 알림:
+
+```
+[Lessonaza] 오늘 09:30 — 어제/주말 동안 7건 문의 누적
+• 5건 신규 가입 문의 (피아노 3, 바이올린 2)
+• 1건 일정 변경 요청
+• 1건 결제 문의
+[콘솔에서 확인]
+```
+
+알림톡 템플릿: `morning_digest_v1`. 학원장이 한 번에 우선순위 보고 처리 시작.
+
+### 12.3 긴급 키워드 예외 (즉시 알림)
+
+학원장이 `urgent_keywords` 에 등록한 단어가 학부모 메시지에 포함되면 야간 silent 우회 + 즉시 알림.
+
+기본 키워드 (학원장 편집 가능): `["응급", "긴급", "사고", "다쳤", "병원"]`
+
+예시:
+- "아이가 학원 가는 길에 다쳤어요" → urgent_keywords 매칭 → 학원장 즉시 카톡 + 푸시 + 자동 응답 보내지 않음 (긴급 상황엔 자동 응답 부적절)
+- "안녕하세요 등록 문의입니다" → 매칭 없음 → §11.3 자동 응답
+
+데이터 모델:
+
+```python
+class AcademyInquiry(Base):
+    # ... 기존 ...
+    detected_urgent = Column(Boolean, default=False)
+    auto_response_sent_at = Column(DateTime, nullable=True)
+    suppressed_until = Column(DateTime, nullable=True)  # silent 해제 시각 (아침 digest)
+```
+
+### 12.4 학원장 야간 직접 답변 override
+
+학원장이 야간에 본인 의지로 답변 가능. 단, 콘솔/lesson-app 응답 시 학부모에게 "보통 영업시간 외엔 답변 안 드리지만 빠르게 답변드립니다" 자동 prefix 제안 (옵션 토글).
+
+이유: 학부모가 "지난번엔 야간에도 답하시더니?" 같은 기대치 인플레이션 방지.
+
+### 12.5 학원장 모바일 야간 미니멀
+
+야간에 학원장이 lesson-app 진입 시 콘솔 → 핵심 단축 화면 자동 표시:
+- 누적 문의 카운트
+- 긴급 키워드 매칭 건 (있으면 빨강 강조)
+- "긴급만 처리 / 전체 보기 / 내일 처리" 3개 액션
+
+### 12.6 분쟁 예방 audit
+
+- 자동 응답 발송 시 `auto_response_sent_at` 영구 보존
+- 긴급 키워드 매칭 시 `detected_urgent=true` + 알림 발송 시각 기록
+- 학원장이 야간 직접 답변 시 `replied_at` + 비고 ("학원장 야간 직접 답변")
+- 분쟁 시 ("왜 답변 안 했나요") 자동 응답 + 영업시간 + 누적 알림 이력 증거
+
+## 13. 변경 이력
+
+- 2026-06-04: §11 영업시간 + 영업시간 외 자동 응답 / §12 야간 silent + 일괄 알림 + 긴급 키워드 예외 추가 (시장조사 P0 #2 응답: 1인 학원장 야간 해방. 학원장 영업시간 선언 + 자동 응답 + 다음 영업일 일괄 처리 + 긴급 키워드 예외 + 야간 분쟁 audit)
 
 - 2026-05-20: 초안

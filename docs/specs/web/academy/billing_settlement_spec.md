@@ -142,6 +142,8 @@ class AcademySettlement(Base):
 
 ### 4.2 CSV 임포트 (AC-M6)
 
+> 상세 매칭 알고리즘 / 한국 특수 패턴 / 수기 입력 / OCR 흐름은 [payment_matching_spec.md](payment_matching_spec.md) SSOT.
+
 ```
 1. /billing/payments → "은행 거래내역 CSV 업로드"
 2. POST /api/v1/academies/{id}/billing/payments/csv-import
@@ -253,6 +255,83 @@ class AcademySettlement(Base):
 - 학원장 메모 (선택)
 - 송금 안내 (예: 계좌이체 예정)
 
+### 6.5 강사별 모드 혼합 (소규모 학원 현실)
+
+`AcademyBillingRule.teacher_distribution_*` 은 학원 단위 기본값이지만, 강사별 override 가 가능해야 한다. 소규모 음악학원에서 흔한 패턴:
+
+- 학원장 본인(겸직 강사): `revenue_share` 100% (자기 학생은 자기 매출)
+- 고용 강사 A (정규): `hourly` 30,000/시간
+- 외주 강사 B (파트타임): `revenue_share` 60%
+- 입시 전담 강사 C: `per_student` 단가 (학생당 30만원)
+
+데이터 모델 확장:
+
+```python
+class AcademyTeacherPayoutOverride(Base):
+    """강사별 정산 모드 override. 학원 기본값과 다른 경우만 행 생성."""
+    academy_id = Column(FK, PK1)
+    teacher_member_id = Column(FK, PK2)
+    distribution_type = Column(Enum("hourly", "revenue_share", "per_student"))
+    distribution_config = Column(JSON)               # 모드별 파라미터
+    effective_from = Column(Date)                    # 이 정책 시작일
+    effective_until = Column(Date, nullable=True)    # 변경 전까지 유효
+    note = Column(String, nullable=True)             # 계약 변경 사유
+```
+
+원칙:
+- override 행이 없으면 `AcademyBillingRule` 기본값 적용
+- 정책 변경 시 새 override 행 생성 + 이전 행에 `effective_until` 설정 (히스토리 보존)
+- 정산 계산 시 `period_year-month` 의 1일 기준 활성 override 선택
+
+UI: `/billing/settlement/policies` — 강사별 행. 학원장이 "기본값 사용" 토글 또는 모드/단가 override.
+
+### 6.6 정산 기준 + 엣지케이스
+
+**계산 베이스 선택** (학원 단위, `AcademyBillingRule.settlement_base`):
+
+| 베이스 | 정의 | 권장 |
+|---|---|---|
+| `attendance` | 실제 출석 완료된 레슨만 (status=`completed`) | 시간당/학생당 모드 |
+| `invoiced` | 학생 청구액 기준 (출결 무관) | 수강료% 모드 |
+| `completed_invoice` | 출석 완료 AND 청구 발생한 레슨 (교집합) | 보수적 — 분쟁 최소 |
+
+**엣지케이스 매트릭스:**
+
+| 상황 | hourly | revenue_share | per_student |
+|---|---|---|---|
+| 학생 결석 (`no_show`) | 강사가 대기했으면 carry (학원 정책 토글) | 청구 발생 시 share 적용 | carry (월 단위 단가는 동일) |
+| 강사 사유 휴강 → 보강 | 보강 시 hourly 적용 (중복 X) | 원래 청구는 그대로, 보강은 추가 없음 | carry |
+| 학원장 휴원 (bulk closure) | hourly 미적용 (강사가 없음) | 청구 시 share 적용 (보강 시 carry) | carry (월 단가 보장) |
+| 학생 중도 휴원 (월 중) | 출석한 회차만 hourly | 청구된 부분만 share (일할) | 일할 계산 (월×일수/총일수) |
+| 노쇼 면제 (`MakeupCredit` 발급) | hourly 미적용 (강사 시간 보상 X) | 청구 발생 시 share | carry |
+
+**기본값:** `settlement_base=attendance`. 학원장이 정책 변경 시 강사들에게 알림 + 다음 달부터 적용 (소급 금지).
+
+### 6.7 강사 서명 + 분쟁 audit trail
+
+명세서 신뢰성 = 학원 운영 분쟁의 핵심. `AcademySettlement` 확장:
+
+```python
+class AcademySettlement(Base):
+    # ... 기존 필드 ...
+    teacher_acknowledged_at = Column(DateTime, nullable=True)  # 강사 확인
+    teacher_dispute_note = Column(Text, nullable=True)         # 강사 이의 메모
+    adjustment_log = Column(JSON, default=list)                # 학원장 수정 이력
+    # adjustment_log 항목: {at, by_user_id, from_amount, to_amount, reason}
+```
+
+흐름:
+1. `status=confirmed` 시점 → 강사 lesson-app 인박스에 명세서 + "확인" CTA
+2. 강사 "확인" 클릭 → `teacher_acknowledged_at` 기록
+3. 강사 이의 시 → "이의 제기" → `teacher_dispute_note` 입력 + 학원장 알림
+4. 학원장이 수정 시 → `adjusted_amount` + `adjustment_log` 항목 추가 (이전값/사유 보존)
+5. 학원장 "재확정" → 강사에게 재확인 요청
+6. 송금 후 → `status=transferred` + `transferred_at`
+
+**audit trail 보존:** `adjustment_log` 는 영구 보존 (3.4.3 노트 일시 접근 audit 와 동일 정책). 분쟁 시 운영자 어드민이 조회 가능.
+
+UI: 정산 표 행 클릭 → 사이드패널 → 학원장 수정 이력 + 강사 확인 상태 시각화.
+
 ## 7. 세금계산서 / 현금영수증 (R-AO-19, Year 2 NTS 연동)
 
 ### 7.1 발행 정보 폼
@@ -265,6 +344,33 @@ class AcademySettlement(Base):
 ### 7.2 발행 처리 (Year 2)
 
 NTS API 연동 후 자동 발행. Year 1 은 학원장이 직접 NTS 홈택스에서 발행 (앱은 정보 폼만 제공).
+
+### 7.3 Year 1 현금영수증 수기 발급 보조 (학원법 의무)
+
+**배경:** 학원법(학원의 설립·운영 및 과외교습에 관한 법률) 시행령에 따라 학원은 수강료 결제 시 현금영수증을 의무 발급해야 한다. NTS 자동 발급 (Year 2) 전까지 학원장이 홈택스에서 수기 발급하는데, 발급 누락 = 가산세 위험. 한국 음악학원 SaaS 중 발급 보조 도구를 제공하는 곳이 없어 차별화 기회.
+
+**보조 도구 (앱은 발급 대행 X, 보조만):**
+
+1. **발급 대상 자동 식별** — `AcademyPayment.method='cash'` 또는 `method='transfer'` 의 모든 행을 "발급 대상" 으로 표시. `cash_receipt_issued=false` 행은 액션 박스에 누적.
+2. **발급 체크리스트 (월말)** — `/billing/cash-receipts?period=YYYY-MM` 화면. 학생별 행:
+   - 학부모 휴대폰/사업자번호 (사전 입력)
+   - 발급 금액 (수금액 자동)
+   - "홈택스 발급 → 완료 체크" 버튼
+3. **발급 안내 카드** — 학원장이 홈택스 페이지 캡처 또는 발급번호 입력 → `cash_receipt_issued=true`, `cash_receipt_ref` (선택적 발급번호 메모)
+4. **누락 경고** — 매월 5일 (전월분 발급 기한 직전) 미발급 행이 있으면 학원장 알림: "5월분 현금영수증 12건 미발급 — 가산세 위험"
+5. **세무사 export 와 연동** — 발급 누락 행은 §12 export CSV 에 별도 컬럼으로 표시 (세무사가 확인 후 일괄 처리 가능)
+
+**데이터 모델 확장:**
+
+```python
+class AcademyInvoice(Base):
+    # ... 기존 ...
+    cash_receipt_issued_at = Column(DateTime, nullable=True)  # 발급 완료 시각
+    cash_receipt_ref = Column(String, nullable=True)           # 홈택스 발급번호 (선택)
+    cash_receipt_target_no = Column(String, nullable=True)     # 휴대폰/사업자번호 (발급 대상)
+```
+
+**원칙:** 앱이 NTS API 를 호출하지 않는다 (Year 2 까지). 단순 발급 추적 + 누락 방지 알림으로 차별화. 학원장이 홈택스에서 발급한 사실을 앱에 기록만 한다.
 
 ## 8. 통계 / 매출 (R-AO-20)
 
@@ -294,6 +400,105 @@ NTS API 연동 후 자동 발행. Year 1 은 학원장이 직접 NTS 홈택스�
 | CSV 매칭 0건 (포맷 불일치) | 에러 표시 + 형식 가이드 링크 |
 | 배분 합계 > 수금 합계 (계산 오류) | 학원장에게 경고 + 확정 차단 |
 
-## 11. 변경 이력
+## 11. 한 달 마감 워크플로우 (학원장 모바일 우선)
+
+소규모 음악학원 학원장의 매월 말일 ~ 5일 사이 최대 부담. 5단계를 모바일에서 3-5분 안에 마칠 수 있도록 통합 화면 제공.
+
+**진입:** `/billing/monthly-close?period=2026-05` (모바일 우선 디자인). 학원장 대시보드 액션 박스 "5월 마감 시작" → 진입.
+
+### 11.1 5단계 진행 모델
+
+```
+┌─────────────────────────────────────────────┐
+│ 5월 마감                              [닫기] │
+│ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │
+│ ① 청구  ② 수금  ③ 미수금  ④ 정산  ⑤ 세무 │
+│   ✓      ✓      45/50   12 강사  3 발급  │
+└─────────────────────────────────────────────┘
+```
+
+각 단계는 **명시적 "다음" 클릭으로만 전진** (자동 진행 금지). 학원장이 어느 단계에서든 중단·재개 가능.
+
+| 단계 | 의미 | 차단 조건 | 액션 |
+|---|---|---|---|
+| ① 청구 | `AcademyInvoice` 전체 발송 완료 | draft 행 있음 | "발송 확정" |
+| ② 수금 | paid 학생 비율 ≥ 80% | sent 행 > 20% | "수금 확정 (현재 X%)" |
+| ③ 미수금 | overdue 행 처리 | overdue 행 있고 학원장 미확인 | "분할/연기 메모" 또는 "다음 달로 carry" |
+| ④ 정산 | `AcademySettlement` 전체 transferred | confirmed 후 미송금 | "강사별 송금 완료 체크" (외부 송금 후) |
+| ⑤ 세무 | 현금영수증·세금계산서 발급 완료 | cash_receipt_issued=false 있음 | "발급 체크 (홈택스 외부)" |
+
+### 11.2 모바일 화면 흐름
+
+- 한 화면에 한 단계 (스와이프 또는 "다음")
+- 각 단계 상단 "체크리스트" + 하단 "다음" 버튼
+- 단계 내 액션은 모두 1탭 단위 (예: ② 의 "전체 수금" 일괄 마킹)
+- 끝나면 "5월 마감 완료" + 다음 달 청구 예약일 표시 (예: "6월 청구는 6월 24일 23:59 자동 생성")
+
+### 11.3 마감 후 잠금
+
+`AcademyMonthlyCloseLog` 행 생성. 잠금된 기간(period)의 데이터 변경 시 학원장 재확인 다이얼로그 ("5월은 마감되었습니다. 데이터 변경은 6월 정산에 carry 됩니다."). 강제 차단 X — 학원장 재량.
+
+```python
+class AcademyMonthlyCloseLog(Base):
+    academy_id = Column(FK, PK1)
+    period_year = Column(Integer, PK2)
+    period_month = Column(Integer, PK3)
+    closed_at = Column(DateTime)
+    closed_by_user_id = Column(FK users)
+    step_completion = Column(JSON)  # {invoice: at, payment: at, ...} 단계별 완료 시각
+```
+
+### 11.4 학원장 외출 시 (모바일 마감)
+
+데이터/네트워크가 끊겨도 단계 진행 가능하도록 각 단계 액션은 멱등성 보장 (이미 paid 행에 "수금 확정" 재요청 시 200). 학원장이 지하철·카페에서 마감하는 시나리오.
+
+## 12. 세무사 Export (Year 1 ~ 영구)
+
+**배경:** 한국 음악학원장은 분기/연간 세무사에게 자료 전달. 현재 학원장은 수기로 엑셀 작성 → 평균 1-2시간 잡무. CSV/엑셀 자동 export 로 차별화.
+
+### 12.1 export 종류
+
+| 종류 | 엔드포인트 | 포맷 | 용도 |
+|---|---|---|---|
+| 청구·수금 명세 | `GET /api/v1/academies/{id}/billing/export/invoices?from=&to=` | CSV / XLSX | 부가세 신고 (매출 자료) |
+| 강사 정산 명세 | `GET /.../billing/export/settlements?from=&to=` | CSV / XLSX | 사업소득 원천징수 자료 |
+| 현금영수증 발급 명세 | `GET /.../billing/export/cash-receipts?from=&to=` | CSV / XLSX | 발급 누락 점검 + 세무사 일괄 처리 |
+| 통합 (Zip) | `GET /.../billing/export/all?from=&to=` | ZIP (위 3개 + 학원 정보 PDF) | 분기 세무 전달 |
+
+### 12.2 컬럼 표준 (KSI — Korean Studio Invoice)
+
+세무사가 받아 즉시 사용 가능한 컬럼 (한국 음악학원 SaaS 공통 표준 부재 → Lessonaza 표준 정의):
+
+**청구·수금 명세 (invoices.csv):**
+
+| 컬럼 | 예 | 비고 |
+|---|---|---|
+| 기간 | 2026-05 | YYYY-MM |
+| 학생 ID | acdst_42 | 내부 ID |
+| 학생명 | 김지민 |  |
+| 학부모명 | 김아버지 | 발급 대상 |
+| 사업자/주민번호 | 010-1234-5678 | 발급 대상 식별 |
+| 청구금액 | 200000 | 원 |
+| 수금금액 | 200000 |  |
+| 미수금 | 0 |  |
+| 수금일 | 2026-05-03 |  |
+| 수금방법 | transfer | transfer/cash/card |
+| 영수증 종류 | cash_receipt | cash_receipt/tax_invoice/none |
+| 영수증 발급 | true |  |
+| 영수증 발급일 | 2026-05-04 |  |
+| 영수증 발급번호 | (선택) | 홈택스 발급번호 |
+
+### 12.3 학원장 화면
+
+`/billing/export` — 분기 선택 + 종류 토글 → "내려받기" → 학원장 PC 다운로드 (또는 이메일 발송 옵션). 세무사에게 이메일 첨부.
+
+### 12.4 권한 / 감사
+
+- `Depends(current_academy_owner)` — 강사 access 차단
+- export 요청은 `AuditLog` (user_id, period, type, downloaded_at)
+- export 파일에 PII 포함 — TTL signed URL (1h) 또는 즉시 stream download
+
+## 13. 변경 이력
 
 - 2026-05-19: 초안
+- 2026-06-04: §6.5 강사별 모드 혼합 / §6.6 정산 기준 + 엣지케이스 / §6.7 강사 서명 + audit / §7.3 현금영수증 Year 1 보조 / §11 한 달 마감 워크플로우 / §12 세무사 export 추가 (시장조사+갭분석 결과 반영, 소규모 음악학원 학원장 모바일 마감 우선)

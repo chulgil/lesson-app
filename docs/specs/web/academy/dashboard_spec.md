@@ -82,13 +82,82 @@
 
 각 단계 클릭 시 `/billing/{invoices,payments,settlement}` 이동.
 
+### 3.4 경영 인사이트 KPI (4개 카드, §3.2 다음 행)
+
+기본 KPI(§3.2 매출/학생수/강사수)는 빠른 진단용. 본 §3.4 는 학원장이 의사결정에 쓰는 경영 지표.
+
+| 카드 | 값 | 계산 | 클릭 시 |
+|---|---|---|---|
+| **미수금** | ₩X (N명) | `SUM(invoice.total - paid_amount) WHERE status IN (sent, overdue)` + 학생 카운트 | `/billing/payments?filter=unpaid` |
+| **강사 평균 ROI** | ₩X / 시간 | `이번 달 강사 발생 매출 합계 / 강사 레슨 시간 합계`. 강사별 ROI 는 [teacher_management_spec.md](teacher_management_spec.md) 강사 상세에서 | `/teachers?sort=roi_desc` |
+| **신규 학생 (이번 달)** | N명 | `AcademyStudent.registered_at` 이번 달 + status != alumni | `/students?filter=new_this_month` |
+| **이탈 학생 (이번 달)** | N명 | `AcademyStudent.status='alumni' AND status_changed_at` 이번 달 | `/students?filter=churned_this_month` |
+
+**원칙:**
+- 모든 카드는 MoM 변화 동반 (`+12%` / `-3명` 등)
+- 미수금이 ₩0 / 이탈 0명 등 호전 시그널은 초록, 악화는 빨강
+- 큰 숫자는 천 단위 콤마 (₩12,400,000), 모바일은 단축 (₩12.4M)
+
+### 3.5 출석 추세 (차트 위젯)
+
+12주 (3개월) sparkline + 학원 평균 출석률 큰 숫자.
+
+```
+┌─────────────────────────────────────────┐
+│ 출석률   93%  (▲2.1%p MoM)               │
+│ ▁▂▃▅▄▃▄▅▆▅▆▇   ← 주별 학원 평균       │
+│ 임계치 < 80% → 위험 표시 (전체 평균만)  │
+└─────────────────────────────────────────┘
+```
+
+- 학원 평균만 표시 (학생 개별 출석은 NFR-A-5 위반 — 차단)
+- 임계치 80% 미만이면 카드 테두리 빨강 + 액션 박스에 "이번 주 출석률 X%" 표시
+- 강사별 출석률은 [teacher_management_spec.md](teacher_management_spec.md) 강사 상세에서
+
+**API:** `GET /api/v1/academies/{id}/stats/attendance?weeks=12`
+```json
+{
+  "current_pct": 93.2,
+  "mom_delta_pct": 2.1,
+  "weekly_series": [88.5, 89.2, ..., 93.2]
+}
+```
+
+### 3.6 학생 LTV (Lifetime Value, 코호트 요약)
+
+```
+┌─────────────────────────────────────────────────┐
+│ 평균 LTV   ₩2,840,000   /  평균 재학  14.2개월 │
+│ ─────────────────────────────────────────────── │
+│ 코호트별 (등록월) — 위험 코호트만 빨강:         │
+│ 2026-03  ₩820,000  3.1개월  ⚠️ 평균 미달        │
+│ 2026-02  ₩1,400,000  4.0개월                    │
+└─────────────────────────────────────────────────┘
+```
+
+**계산:**
+- 학생 LTV = `SUM(해당 학생의 모든 paid invoice)` (등록 ~ 현재)
+- 평균 LTV = 활성 + alumni 합산 평균
+- 평균 재학 = `현재시각 - registered_at` 평균 (alumni 는 `status_changed_at`)
+- 코호트 = 등록월 단위. 평균 미달 (이전 코호트의 평균 LTV 대비 70% 미만) 코호트는 빨강 표시 + 학원장 알림 ("3월 등록 학생 이탈률 높음 — 강사 매칭 점검")
+
+**원칙:**
+- 학생 PII 노출 X — 코호트 집계만
+- 클릭 시 `/students?filter=cohort_2026_03` (학생 이름만, 노트/녹음 X)
+- 학원장 의사결정용: "어느 시점부터 이탈이 늘었나" 시각적 파악
+
+**API:** `GET /api/v1/academies/{id}/stats/ltv?cohort_months=6`
+
 ## 4. 데이터 SSOT
 
 | 위젯 | API | 데이터 출처 |
 |---|---|---|
 | Action Box | `GET /api/v1/academies/{id}/dashboard/tasks` | aggregate query |
-| KPI | `GET /api/v1/academies/{id}/stats/dashboard` | 미리 계산된 월간 집계 + 캐시 (TTL 5분) |
+| KPI (§3.2 기본) | `GET /api/v1/academies/{id}/stats/dashboard` | 미리 계산된 월간 집계 + 캐시 (TTL 5분) |
 | 정산 진행 | `GET /api/v1/academies/{id}/billing/progress?period=YYYY-MM` | invoices + payments 집계 |
+| 경영 KPI (§3.4) | `GET /api/v1/academies/{id}/stats/insights` | 미수금 + 강사 ROI + 신규/이탈 학생, 캐시 TTL 30분 |
+| 출석 추세 (§3.5) | `GET /api/v1/academies/{id}/stats/attendance?weeks=12` | 주별 출석률 + 학원 평균 |
+| LTV 코호트 (§3.6) | `GET /api/v1/academies/{id}/stats/ltv?cohort_months=6` | 등록월 코호트 LTV + 평균 재학 |
 
 ## 5. 성능 (NFR-A-2)
 
@@ -113,3 +182,4 @@
 ## 8. 변경 이력
 
 - 2026-05-19: 초안
+- 2026-06-04: §3.4 경영 KPI 4개 카드 (미수금/강사 ROI/신규·이탈 학생) / §3.5 출석 추세 sparkline / §3.6 학생 LTV 코호트 위젯 추가 (갭분석 H#2, H#7 응답)

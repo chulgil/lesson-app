@@ -436,14 +436,19 @@ def detect_conflicts(teacher_user_id, start_at, end_at, exclude_lesson_id=None):
         외부
 
 [색상]
-● 초록: 정상
+● 초록: 정상 정규 레슨
 ⚡ 주황: 12h 이내 변경 발생 (timeline 으로 이동)
 ● 빨강: 충돌 감지
 ◐ 회색: busy (강사 개인 레슨)
 ⭐ 수습 강사 액션은 추가 표식
+🔵 파랑: 대강 (substitute) — 원래 강사 부재 (teacher_absence_and_substitute_spec)
+🟣 보라: 발표회 / 리허설 (recital_workflow_spec)
+⬛ 검정: 휴가 / 휴원 (개인 강사 vacation or 학원 강사 absence)
+🟡 노랑: 보강 (makeup_credit 사용)
 ```
 
 > **3차 변경**: 기존 노랑 셀 (admin_review 대기) 제거 — 승인 큐 없음. 대신 ⚡ 주황 (12h 이내 변경) + ⭐ (수습 강사 액션) 추가.
+> **2026-06-04 추가**: 학원 컨텍스트 신규 색상 4종 (🔵 대강, 🟣 발표회, ⬛ 휴가, 🟡 보강) 추가. 보강된 학원 운영 흐름 통합 가시화.
 
 ### 8.3 헤더 배지
 
@@ -455,7 +460,9 @@ def detect_conflicts(teacher_user_id, start_at, end_at, exclude_lesson_id=None):
 
 ### 8.4 API
 
-`GET /api/v1/academies/{id}/schedule/master?week=2026-W22&teacher_id=&conflict_only=&late_window_only=`
+`GET /api/v1/academies/{id}/schedule/master?week=2026-W22&teacher_id=&conflict_only=&late_window_only=&include=substitute,recital,vacation,makeup,studio`
+
+> 2026-06-04 추가: `include` 파라미터로 표시 운영 흐름 선택 가능. 기본값 `lesson,substitute,vacation` (정규 + 대강 + 휴가만).
 
 ```json
 {
@@ -492,6 +499,77 @@ def detect_conflicts(teacher_user_id, start_at, end_at, exclude_lesson_id=None):
   "onboarding_teachers": 1
 }
 ```
+
+### 8.5 통합 사용 표시 (학원 운영 흐름 통합)
+
+마스터 스케줄 셀은 다음 운영 흐름의 통합 표시 — 한 화면에서 학원 운영 현황 한눈에 파악.
+
+| 운영 흐름 | 셀 표시 | 클릭 시 이동 |
+|---|---|---|
+| 정규 레슨 (LessonBooking) | ● 초록 + 강사명/악기 | 레슨 상세 |
+| 강사 대강 (AcademyLessonCoverage) | 🔵 파랑 + "원→대강" | [teacher_absence_and_substitute_spec.md](teacher_absence_and_substitute_spec.md) |
+| 발표회 / 리허설 (AcademyRecital) | 🟣 보라 + 발표회명 | [recital_workflow_spec.md](recital_workflow_spec.md) |
+| 강사 휴가 (AcademyTeacherAbsence) | ⬛ 검정 (해당 강사 슬롯 전체) | 휴가 상세 |
+| 학원장 휴원 (AcademyAnnouncement type=dayOff) | ⬛ 검정 (학원 전체) | [announcements_spec.md](announcements_spec.md) |
+| 보강 (MakeupCredit 사용 — 비정규 시간) | 🟡 노랑 | 보강 상세 |
+| 공간 점유 (rehearsal/maintenance — AcademyStudioUsage) | ⬜ 흰색 / "점검" 라벨 | [studio_utilization_spec.md](studio_utilization_spec.md) |
+| 발표회 영향 강사 휴가 동시 | 🟣 + ⬛ 겹침 → 강조 | 충돌 검토 |
+
+### 8.6 충돌 감지 매트릭스 (확장)
+
+기존 §7 의 강사↔강사 충돌 외 추가 충돌 감지:
+
+| 충돌 유형 | 감지 | 처리 |
+|---|---|---|
+| 같은 시간 같은 강사 2건 (double booking) | 즉시 빨강 셀 | 학원장 액션 박스 |
+| 같은 시간 같은 방 2건 | 빨강 + "방 충돌" 라벨 | 방 변경 또는 일정 조정 |
+| 휴가 기간 + 정규 레슨 (대강 미매칭) | 검정 위 빨강 X | [teacher_absence §4 대강 매칭](teacher_absence_and_substitute_spec.md) |
+| 발표회 + 정규 레슨 동시 | 보라 + 빨강 강조 | 정규 레슨 일정 조정 필요 |
+| 방 점검 + 정규 레슨 | 흰색 + 빨강 강조 | 방 변경 |
+| 학원 휴원 + 정규 레슨 | 검정 + 빨강 | 일괄 휴강 처리 |
+
+학원장 대시보드 Action Box "충돌 N건" 클릭 시 충돌 리스트 (1탭 해결 옵션 제공).
+
+### 8.7 학원장 대시보드 위젯 (오늘의 마스터)
+
+[dashboard_spec.md](dashboard_spec.md) 의 §3.7 "오늘의 학원" 위젯으로 노출 (확장 영역):
+
+```
+┌─────────────────────────────────────────────┐
+│ 오늘의 학원 (6/4 수)                       │
+├─────────────────────────────────────────────┤
+│ 정규 레슨: 12건                            │
+│ 대강 진행: 2건 (이선생 부재 → 김선생 대강) │
+│ 발표회 리허설: P3 14:00-16:00              │
+│ 보강: 1건                                  │
+│ 충돌: ⚠ 0건                                │
+│                                             │
+│ [마스터 스케줄 보기 →]                     │
+└─────────────────────────────────────────────┘
+```
+
+API: `GET /api/v1/academies/{id}/schedule/today-summary`
+
+```json
+{
+  "date": "2026-06-04",
+  "lesson_count": 12,
+  "substitute_count": 2,
+  "rehearsal_count": 1,
+  "makeup_count": 1,
+  "conflict_count": 0,
+  "vacant_slot_count": 4,
+  "studios_idle": ["P3 (10:00-13:00)"]
+}
+```
+
+### 8.8 마스터 스케줄 모바일 (학원장)
+
+가로 모드 / 세로 모드 자동 전환:
+- 가로: 주간 grid 그대로 (좁은 셀)
+- 세로: 일간 timeline (요일 선택)
+- 충돌/대강/발표회 색상 셀 유지
+- 학원장 한 손으로 확인 가능
 
 ## 9. 권한 매트릭스 (§6.4.7 옵시디언 매트릭스)
 
@@ -541,3 +619,4 @@ def detect_conflicts(teacher_user_id, start_at, end_at, exclude_lesson_id=None):
   - 삭제: `AcademyMember.delegated_permissions` JSON, `ScheduleChangeRequest` 5상태 머신 모델 전체, §3 권한 토글 UI, §4 요청-확정 워크플로우.
   - 신규: §2.4 `AcademyActivityLog` 모델, §4 활동 timeline, §5 수습 강사 onboarding (Q11), `AcademyMember.onboarding_until` 옵션 필드.
   - 변경: §3 강사 직접 변경 흐름, §7 충돌 처리 옵션 단순화 ("변경 요청" → "직접 변경"), §8 마스터 스케줄 노랑 셀(admin_review) 제거 + 12h 주황 셀 + 수습 강사 ⭐ 표식 추가, §9 권한 매트릭스 단순화.
+- 2026-06-04: §8 마스터 스케줄 강화 — 4종 색상 추가 (🔵 대강, 🟣 발표회, ⬛ 휴가, 🟡 보강) + §8.5 운영 흐름 통합 표시 + §8.6 충돌 감지 매트릭스 확장 + §8.7 학원장 대시보드 위젯 + §8.8 모바일 뷰. 보강된 학원 운영 흐름 (teacher_absence, recital, studio_utilization, makeup_credit) 통합 가시화.
