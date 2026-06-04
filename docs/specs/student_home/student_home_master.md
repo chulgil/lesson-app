@@ -152,6 +152,27 @@
 - 24시간 유효
 - 코드 복사/공유(share_plus) 기능
 
+**학부모 초대 상세 정책 (2026-06-04 명시):**
+
+| 항목 | 정책 |
+|------|------|
+| 코드 포맷 | 6자리 대문자 영문+숫자 (`A-Z0-9`) — 혼동 문자(0/O, 1/I) 제외 |
+| 유효 기간 | 생성 후 **24시간** — `ParentInvitation.expiresAt` |
+| 재발송 정책 | 만료된 코드 위에 새 코드 생성 가능 — 이전 코드 즉시 무효 (DB 에서 status=expired) |
+| 동시 발급 한도 | 학생당 활성 코드 1개 — 활성 중 새로 발급 시 기존 코드 자동 만료 |
+| 사용 후 처리 | 학부모가 코드 입력 → 연결 성공 시 즉시 무효화 (`status=used`) |
+
+**학원 초대 vs 학부모 초대 구분 (2026-06-04 범위 명시):**
+
+| 구분 | 학원 초대 (academy) | 학부모 초대 (parent) |
+|------|------------------|---------------------|
+| 진입 화면 | `StudentInviteCodeScreen` (auth feature) | `_showInviteCodeDialog()` (student_profile_tab) |
+| 만료 처리 화면 | `AcademyInviteExpiredScreen` (`/academy/expired`) | 다이얼로그 안에서 안내 |
+| 에러 분류 | `expired` / `already_used` / `not_found` — academy_master.md §5.1 | 단순 인밸리드 메시지 |
+| 도메인 | academy + auth | student + parent_home |
+
+> G9 만료 토큰 처리 wiring (#390): `StudentInviteCodeScreen` 의 token 검증 실패 시 `expired` 에러 → `/academy/expired` 로 redirect. 본 화면(`student_profile_tab` 의 학부모 초대 다이얼로그) 와는 무관.
+
 **로그아웃:**
 - 확인 다이얼로그 후 로그인 화면으로 이동
 

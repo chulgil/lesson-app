@@ -91,6 +91,13 @@ class PracticeRecording {
 
   final int? bpm; // Metronome BPM used during recording
 
+  /// 메트로놈 사용 여부 (spec metronome_master.md §8.3 — 2026-06-04 추가).
+  final bool usedMetronome;
+
+  /// 박자 (`TimeSignature.index`). null = 미사용.
+  /// enum 정의: `practice/domain/entities/metronome_settings.dart`.
+  final int? timeSignatureIndex;
+
   final bool isRepresentative;
 
   final DateTime createdAt;
@@ -101,6 +108,8 @@ class PracticeRecording {
     required this.filePath,
     required this.durationSeconds,
     this.bpm,
+    this.usedMetronome = false,
+    this.timeSignatureIndex,
     this.isRepresentative = false,
     required this.createdAt,
   });
@@ -121,6 +130,8 @@ class PracticeRecording {
     String? filePath,
     int? durationSeconds,
     int? bpm,
+    bool? usedMetronome,
+    int? timeSignatureIndex,
     bool? isRepresentative,
     DateTime? createdAt,
   }) {
@@ -130,6 +141,8 @@ class PracticeRecording {
       filePath: filePath ?? this.filePath,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       bpm: bpm ?? this.bpm,
+      usedMetronome: usedMetronome ?? this.usedMetronome,
+      timeSignatureIndex: timeSignatureIndex ?? this.timeSignatureIndex,
       isRepresentative: isRepresentative ?? this.isRepresentative,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -802,7 +815,9 @@ class PracticeRepertoire {
           .toList();
     }
 
-    return sections.where((section) => section.isVisibleForDate(dateOnly)).toList();
+    return sections
+        .where((section) => section.isVisibleForDate(dateOnly))
+        .toList();
   }
 
   PracticeRepertoire copyWith({

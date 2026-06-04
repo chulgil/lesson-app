@@ -80,6 +80,25 @@
 
 > connection_status 컬럼/enum drop(2026-06) 이후 FE 관계의 연결 시점은 `appConnectedAt` + `isAppConnected` 가 SSOT 이다. 별도 connectionStatus 필드는 존재하지 않는다.
 
+#### appConnectedAt 이원 SSOT 정책 (2026-06-04 명시)
+
+`Student.connectedAt` 과 `TeacherStudentRelation.appConnectedAt` 가 동일 의미를 다른 위치에서 갖는다. 다음 규칙을 적용한다.
+
+| 사용처 | 권위 소스 |
+|--------|----------|
+| 학생 카드/리스트 UI (선생님 시점 학생 목록) | `Student.connectedAt` — `students_tab.dart` 의 `isAppConnected` 매핑이 이 필드를 우선 사용 |
+| 관계 도메인 비즈니스 로직 (체험/정기/회차권 발급 권한 검사) | `TeacherStudentRelation.appConnectedAt` — `effectiveStatus` 계산에 사용 |
+| 신규 연결 이벤트 (초대 수락, 학원 매칭) | 양쪽 모두 동일 시각으로 업데이트 — Repository 가 동기 보장 |
+| BE 응답 매핑 | BE 가 두 필드를 같은 값으로 반환 (`appConnectedAt` 단일 컬럼 → 양쪽 entity 에 매핑) |
+
+**불일치 시 처리:** Repository 레이어에서 BE 응답 매핑 시 두 필드가 다르면 `appConnectedAt` 우선 — `Student.connectedAt` 를 덮어쓴다. 별도 sync 로직은 두지 않는다 (단일 BE 컬럼이 진실).
+
+**Migration history (2026-06):**
+1. Phase A: `ConnectionStatus` enum + `connection_status` 컬럼 deprecation 시작
+2. Phase B-2a: connection_status writer 제거, `appConnectedAt` 단독 SSOT
+3. Phase B-2b: `connection_status` 컬럼/엔티티/enum drop (#459)
+4. **Phase B-3 (예정)**: `Student.connectedAt` 또는 `TeacherStudentRelation.appConnectedAt` 중 하나만 남기는 단일화 — `students_tab.dart` 사용처 마이그레이션 선행
+
 엔티티 파생 getter/메서드: `effectiveStatus`(수동등록·미연결 시 active), `canSharePractice({practiceShareEnabled})`, `isExpired`, `isPast`, `hasValidSubscription`, `daysUntilPast`, `daysSinceExpired`, `hasPreviousSchedule`, `previousScheduleLabel`. (← `teacher_student_relation.dart`)
 
 ### NotificationSetting 엔티티 (관계 단위 알림 설정)

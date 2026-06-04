@@ -5952,6 +5952,16 @@ class AppStrings {
   static const filterLocation = '지역';
   static const filterLessonType = '레슨 방식';
   static const filterMinExperience = '최소 경력';
+  // Fee range (search_master.md §39, 2026-06-04)
+  static const filterFeeRange = '레슨료 범위 (원)';
+  static const filterFeeMinHint = '최소';
+  static const filterFeeMaxHint = '최대';
+  // Profile completion level (search_master.md §42, 2026-06-04)
+  static const filterMinCompletionLevel = '최소 프로필 완성도';
+  static const completionAny = '상관없음';
+  static const completionBasic = '기본 (60%+)';
+  static const completionStandard = '표준 (80%+)';
+  static const completionComplete = '완전 (100%)';
   // Experience options
   static const experienceAny = '상관없음';
   static const experience3plus = '3년 이상';
@@ -7872,6 +7882,7 @@ class AppStrings {
   static const makeupCreditReasonNoShowExempt = '노쇼 면제';
   static const makeupCreditReasonBulkChangeLoss = '일정 일괄 변경';
   static const makeupCreditReasonManualGrant = '선생님 지급';
+  static const makeupCreditReasonFifthWeekBonus = '5주차 보너스';
 
   // 선생님 측 관리.
 

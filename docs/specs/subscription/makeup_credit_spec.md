@@ -88,6 +88,32 @@ enum MakeupCreditReason {
 }
 ```
 
+**파생 게터 (코드 반영 2026-06-04):** `isUsed` (`usedAt != null`), `isExpired(now)` (`expiresAt < now && !isUsed`), `isAvailable(now)` (`!isUsed && !isExpired(now)`), `daysUntilExpiry(now)` — UI 만료 임박 표시용.
+
+### 3.1.1 MakeupCreditBalance — UI 집계 값 객체 (2026-06-04 본문 통합)
+
+학생/선생님 화면(§9 카드)이 의존하는 잔액 집계 값 객체.
+
+```dart
+class MakeupCreditBalance {
+  final List<MakeupCredit> available;    // 사용 가능한 크레딧 (정렬: expiresAt asc)
+  final int availableCount;              // available.length
+  final bool hasAny;                     // availableCount > 0
+  final DateTime? earliestExpiry;        // available.firstOrNull?.expiresAt
+
+  factory MakeupCreditBalance.fromCredits(
+    List<MakeupCredit> credits,
+    DateTime now,
+  );
+}
+```
+
+| 필드 | 정책 |
+|------|------|
+| `fromCredits()` 팩토리 | 입력 list 를 `isAvailable(now)` 필터 + `expiresAt` 오름차순 정렬 후 집계 |
+| `earliestExpiry` | UI 가 "곧 만료" 강조용 — D-3/D-1 임박 시 색상 분기 |
+| Provider 노출 | `studentMakeupCreditsProvider`, `teacherMakeupCreditsProvider` 가 `MakeupCreditBalance` 반환 |
+
 ### 3.2 Subscription 모델 확장
 
 기존 `Subscription` 에 다음 필드 추가:

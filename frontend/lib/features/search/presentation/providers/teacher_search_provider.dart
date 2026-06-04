@@ -70,6 +70,12 @@ class TeacherSearchFilterState extends _$TeacherSearchFilterState {
     state = state.copyWith(hasVerifiedCertificate: value);
   }
 
+  /// 최소 프로필 완성도 (`TeacherProfile.completionLevel` 비교용).
+  /// search_master.md §39-42 — 2026-06-04 wiring.
+  void updateMinCompletionLevel(ProfileCompletionLevel? level) {
+    state = state.copyWith(minCompletionLevel: level);
+  }
+
   void clearFilter() {
     // Preserve teacherType when clearing filter
     final tabType = ref.read(teacherSearchTabStateProvider);

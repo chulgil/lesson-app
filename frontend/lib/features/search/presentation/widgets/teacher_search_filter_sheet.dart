@@ -162,6 +162,20 @@ class _TeacherSearchFilterSheetState
                         },
                         activeThumbColor: AppColors.paperAccent,
                       ),
+
+                      const SizedBox(height: AppSpacing.space6),
+
+                      // Fee range (search_master.md §39 — minFee/maxFee, 2026-06-04)
+                      _buildSectionTitle(AppStrings.filterFeeRange),
+                      const SizedBox(height: AppSpacing.space2),
+                      _buildFeeRangeInput(),
+
+                      const SizedBox(height: AppSpacing.space6),
+
+                      // Minimum profile completion (search_master.md §42, 2026-06-04)
+                      _buildSectionTitle(AppStrings.filterMinCompletionLevel),
+                      const SizedBox(height: AppSpacing.space2),
+                      _buildCompletionLevelSelection(),
                     ],
                   ),
                 ),
@@ -186,6 +200,13 @@ class _TeacherSearchFilterSheetState
                           notifier.updateMinExperience(_filter.minExperience);
                           notifier.updateHasVerifiedCertificate(
                             _filter.hasVerifiedCertificate,
+                          );
+                          notifier.updateFeeRange(
+                            minFee: _filter.minFee,
+                            maxFee: _filter.maxFee,
+                          );
+                          notifier.updateMinCompletionLevel(
+                            _filter.minCompletionLevel,
                           );
                           Navigator.pop(context);
                         },
@@ -297,6 +318,85 @@ class _TeacherSearchFilterSheetState
           onSelected: (value) {
             setState(() {
               _filter = _filter.copyWith(minExperience: options[index]);
+            });
+          },
+          selectedColor: AppColors.paperAccentSoft,
+        );
+      }),
+    );
+  }
+
+  /// Fee range (minFee / maxFee) — text input fields side by side.
+  Widget _buildFeeRangeInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            initialValue: _filter.minFee?.toString() ?? '',
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: AppStrings.filterFeeMinHint,
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            onChanged: (value) {
+              final parsed = int.tryParse(value);
+              setState(() {
+                _filter = _filter.copyWith(minFee: parsed);
+              });
+            },
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        const Text('~'),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: TextFormField(
+            initialValue: _filter.maxFee?.toString() ?? '',
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: AppStrings.filterFeeMaxHint,
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            onChanged: (value) {
+              final parsed = int.tryParse(value);
+              setState(() {
+                _filter = _filter.copyWith(maxFee: parsed);
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Min profile completion level — ChoiceChip row (Any / basic / standard / complete).
+  Widget _buildCompletionLevelSelection() {
+    final options = <ProfileCompletionLevel?>[
+      null,
+      ProfileCompletionLevel.basic,
+      ProfileCompletionLevel.standard,
+      ProfileCompletionLevel.complete,
+    ];
+    final labels = [
+      AppStrings.completionAny,
+      AppStrings.completionBasic,
+      AppStrings.completionStandard,
+      AppStrings.completionComplete,
+    ];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: List.generate(options.length, (index) {
+        final isSelected = _filter.minCompletionLevel == options[index];
+        return ChoiceChip(
+          label: Text(labels[index]),
+          selected: isSelected,
+          onSelected: (value) {
+            setState(() {
+              _filter = _filter.copyWith(minCompletionLevel: options[index]);
             });
           },
           selectedColor: AppColors.paperAccentSoft,

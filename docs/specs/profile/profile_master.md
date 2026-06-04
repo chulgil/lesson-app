@@ -171,6 +171,46 @@
 | `invitePendingProvider` | 대기 초대 목록 |
 | `teacherExtendedProfileProvider` | 확장 프로필(경력/자격/학력) |
 
+### E. CancellationDefaults 로컬 영속성 정책 (2026-06-04 명시)
+
+`CancellationDefaults` 는 BE 엔드포인트가 없는 동안 **Hive 로컬 저장** 으로 동작한다 — `LocalCancellationDefaultsRepository` (`data/repositories/local_cancellation_defaults_repository.dart`).
+
+| 항목 | 정책 |
+|------|------|
+| 저장 위치 | Hive box `cancellation_defaults` — 사용자별 key scoping (`teacher:<userId>:cancellation_defaults`) |
+| 수명 | 앱 재시작 후에도 유지 (MockRepository 와 달리 영속) |
+| BE 마이그레이션 시점 | #5 D-G3 에서 `RemoteCancellationDefaultsRepository` 추가 + Mock/Local 토글. 마이그레이션 직후 한 번만 local → remote sync (사용자 첫 BE 호출 시) |
+| Conflict 처리 | BE 응답이 우선. local 만 가지고 있던 값은 sync 후 BE 응답으로 덮어쓰기 |
+
+> 정책 사유: 취소 기본값은 사용자가 한 번 설정하면 자주 바뀌지 않으므로 로컬 캐시가 합리적. BE 미도입 기간에도 사용자 경험을 유지하기 위해 Mock 대신 Local 사용.
+
+### F. ProfileVisibilitySettings 저장 메커니즘 (2026-06-04 명시)
+
+`ProfileVisibilityScreen` 의 토글 상태는 `TeacherProfile.visibilitySettings` 필드(`ProfileVisibilitySettings` 값 객체)로 저장. `updateVisibilitySettings()` provider 액션이 BE PUT 호출 → 성공 시 캐시 invalidate.
+
+| 필드 | 정책 |
+|------|------|
+| `showEducation` / `showCareer` / `showCertificates` / `showRepertoire` / `showReviews` | 토글 — 기본값 모두 true |
+| `showPhoneNumber` | 학생/학부모에게 노출 — 기본값 false (개인정보 보호) |
+| 저장 위치 | BE — `PUT /teachers/me/visibility` (mock 동일 인터페이스) |
+| Optimistic update | 미적용 — BE 응답 대기 후 state 반영 (실패 시 토글 원복) |
+
+### G. LessonTimeSettingsScreen 화면 구조 (2026-06-04 명시)
+
+`LessonTimeSettingsScreen` 은 settings 도메인의 `teacherSettingsProvider` 를 cross-domain 으로 소비한다. 화면 구조:
+
+| 섹션 | 필드 | 기본값 |
+|------|------|--------|
+| 기본 레슨 시간 | `defaultDurationMinutes` | 60 |
+| 휴식 시간 | `breakMinutes` | 10 |
+| 최소 예약 시간 | `minBookingHours` | 24 (시간 단위) |
+| 시간대 | `timezone` | 시스템 로케일 기본 |
+| 가이드 메시지 | `guideMessage`?, 학생에게 표시 | null |
+| 시범 레슨 정책 | `trialPolicy` (`free`/`paid`/`disabled`) | `free` |
+| 가격표 | `pricingNote`?, 자유 텍스트 | null |
+
+**저장 흐름:** `teacherSettingsNotifierProvider.update*()` 호출 → `RemoteSettingsRepository` 가 BE 호출 + availability mirror best-effort (`/schedule/availability` 동기화 실패 무시). 성공 시 `teacherSettingsProvider` invalidate.
+
 ---
 
 ## 6. 관련 마스터 스펙
@@ -185,6 +225,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | §E CancellationDefaults Hive 영속성 정책 명시 (LocalCancellationDefaultsRepository, BE 마이그레이션 시점 sync 규칙). §F ProfileVisibilitySettings 저장 메커니즘 (필드별 기본값, optimistic update 미적용). §G LessonTimeSettingsScreen 화면 구조 (7개 필드, cross-domain teacherSettings 소비) |
 | 2026-06-03 | 코드 반영 — 누락 화면 6종, 엔티티 3종(CancellationDefaults/PendingInvite/VerificationBadge), VerificationBadgeChip 위젯, Provider 5종 추가 |
 | 2026-04-16 | 10x Vision UX 개선 — 완성도 게이지, 바로가기 카드, 통계 재정의, 섹션 순서 변경 |
 | 2026-04-15 | 계좌 관리, 입금대기(후불), 미리보기 화면 추가 |

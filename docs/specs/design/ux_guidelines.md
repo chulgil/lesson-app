@@ -626,3 +626,4 @@ Notebook x Score 표면은 평면 종이 계약을 따른다. 카드에 그림�
 | 2026-05-09 | 헤더 + 액션 우선 규칙: 동일 엔티티 add 액션은 헤더에서만 노출하고 바디 중복 CTA를 제거한다 |
 | 2026-05-09 | **§4.3 상세 화면 헤더 통일** — `NotebookDetailAppBar` 공통 위젯 + 적용 규칙. 모든 상세 화면 헤더 일관성 (back/close leading, enum 기반 actions, bottom border). `Icons.more_vert` (세로 ⋮) 통일, `more_horiz` 금지 |
 | 2026-05-05 | **회계식 기존 표현 → "입금대기(후불)" 용어 변경** — 회계/채권 뉘앙스를 줄이고 후불 발급 상태를 명확히 드러내도록 통일. indicatorLabel 예시, Top 1 우선순위 라벨 갱신. **갱신 제안 수동 UI 삭제** — 자동 서비스(AutoProposal/ProposalReminder/SubscriptionRenewal)로 대체, `onRenewalTap` 제거. **SubscriptionCard compact 기간 표시 삭제** — `_formatCompactPeriod` 제거 |
+| 2026-06-04 | **l10n SSOT 분류 가이드 추가** — 도메인별 AppStrings 접두어 정착: `makeupCredit*` (수강권 보강), `attendance*` (lesson 24h 출석), `vacation*` (선생님 휴가), `firstAvailability*` (온보딩 첫 가용시간), `bulkClosure*` (학원 일괄 휴강), `ratingPrompt*` / `ratingFeedback*` (앱 평가). 각 도메인 spec 의 §11.x 또는 §매핑 섹션에서 키 목록을 참조한다. UI 문구 추가 시 해당 접두어를 따른다 |

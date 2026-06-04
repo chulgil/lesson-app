@@ -26,18 +26,24 @@
 |:---:|------|:---:|:---:|
 | 1 | Header (Lessonaza + 알림 벨) | - | 항상 |
 | 2 | ProgrammeTitle (오늘의 레슨 + 날짜) | - | 항상 |
-| 3 | TimeContextBanner (다음 레슨) | **시간 한정** | 오늘 레슨 있을 때 |
-| 4 | TodayLessons (오늘 레슨 리스트) | **시간 한정** | 항상 (빈 상태 포함) |
-| 5 | GettingStartedCard (신규 사용자) | 안내 | 학생 0명일 때만 |
-| 6 | StatsRow (오늘/이번달) | 요약 | 항상 |
-| 7 | UrgentAlertZone (긴급 알림) | **긴급** | 긴급 1+건 있을 때 |
-| 8 | LessonRequestSection (레슨 요청) | 대응 필요 | 요청 1+건 있을 때 |
-| 9 | ScheduleChangeRequestSection (스케줄 변경) | 대응 필요 | 변경 1+건 있을 때 |
-| 10 | AssignmentSummarySection (과제) | 참고 | 과제 1+건 있을 때 |
-| 11 | Analytics Link | 참고 | 항상 |
+| 3 | DemoDashboardOverlay | 데모 | 데모 모드 활성 시만 |
+| 4 | SyncFailureBanner | **긴급** | 동기화 실패 시만 |
+| 5 | PendingRequestsSection | 대응 필요 | 대기 요청 있을 때 |
+| 6 | TimeContextBanner (시간대 인사) | **시간 한정** | 항상 (시간 기반 메시지 분기) |
+| 7 | TodayLessons (오늘 레슨 리스트) | **시간 한정** | 항상 (빈 상태 포함) |
+| 8 | PaymentPendingCard | **긴급** | 입금 대기 1+건 있을 때 (#424) |
+| 9 | InvitePendingCard | **대응** | 초대 대기 1+건 있을 때 (#5 D-G3) |
+| 10 | QuestBoardCard | 안내 | 온보딩 Phase B-C 진행 중일 때 (#422, #482) |
+| 11 | StatsRow (오늘/이번달) | 요약 | 항상 |
+| 12 | UrgentAlertZone (긴급 알림) | **긴급** | 긴급 1+건 있을 때 |
+| 13 | LessonRequestSection (레슨 요청) | 대응 필요 | 요청 1+건 있을 때 |
+| 14 | ScheduleChangeRequestSection (스케줄 변경) | 대응 필요 | 변경 1+건 있을 때 |
+| 15 | AssignmentSummarySection (과제) | 참고 | 과제 1+건 있을 때 |
+| 16 | Analytics Link | 참고 | 항상 |
 
 > **수강권 섹션 제거** (2026-04): 수강권 관리는 "수강관리" 탭에서 수행. 홈은 오늘·이벤트 중심.
 > **레이아웃 재배치** (2026-05-07): 오늘 레슨 리스트를 다음 레슨 배너 바로 아래로 이동. 입금대기 등 긴급 알림은 통계(오늘/이번달) 아래로 이동.
+> **신규 카드 추가** (2026-06-04 코드→스펙 정합): PaymentPendingCard / InvitePendingCard / QuestBoardCard 가 TodayLessons 와 StatsRow 사이에 wiring 됨. GettingStartedCard 는 코드에서 사용되지 않음 — 신규 사용자 안내는 QuestBoardCard 가 담당.
 
 ---
 
@@ -169,7 +175,7 @@
 | 긴급 알림 Top 1 + Expandable | 진행 중 | 2026-04-16 업데이트 |
 | 오늘 레슨 Progressive Disclosure | 진행 중 | 2026-04-16 업데이트 |
 | 과제 대시보드 (#101) | 완료 | 전체 학생 주간 현황 |
-| 시간대 인식 홈 (10x Vision) | 미착수 | 향후 Phase |
+| 시간대 인식 홈 (10x Vision) | ✅ 구현 완료 (2026-06-04 정정) | `TimeContextBanner` 시간 기반 메시지 분기 — `dashboard_tab.dart` §6 위치 |
 | 이벤트 섹션 통합 | 미착수 | 향후 Phase |
 
 ---
@@ -187,6 +193,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-04 | 코드→스펙 드리프트 반영: §2.1 섹션 순서를 코드 실측에 맞춰 11 → 16 행으로 갱신 (PaymentPendingCard/InvitePendingCard/QuestBoardCard/SyncFailureBanner/PendingRequestsSection 추가). §5 TimeContextBanner "미착수" → "구현 완료" 정정. GettingStartedCard 코드 미사용 명시 — 신규 사용자 안내는 QuestBoardCard 가 담당 |
 | 2026-05-07 | 스케줄 변경 요청 리스트 아이템을 레슨 요청과 동일 형식으로 통일 — Line1: 이름·악기·레벨, Line2: 소속·타입·이벤트 |
 | 2026-05-07 | 섹션 순서 재배치 — 오늘 레슨 리스트를 다음 레슨 바로 아래로 이동, 입금대기(긴급 알림)를 통계 아래로 이동 |
 | 2026-04-16 | UX 개선 스펙 추가 — 긴급 알림 Top 1 정책, 오늘 레슨 Progressive Disclosure, 섹션 순서 확정, 수강권 섹션 제거 명시 |

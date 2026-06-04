@@ -716,7 +716,7 @@ final teacherSearchTabStateProvider = AutoDisposeNotifierProvider<
 
 typedef _$TeacherSearchTabState = AutoDisposeNotifier<TeacherSearchType>;
 String _$teacherSearchFilterStateHash() =>
-    r'ead91ff78703c92b9cc7ba99999644e2fe573cd3';
+    r'44dacbd1a57e636619277177222f7f562547fba5';
 
 /// Current search filter state
 ///

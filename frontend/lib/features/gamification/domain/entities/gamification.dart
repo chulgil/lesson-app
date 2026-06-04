@@ -105,12 +105,7 @@ class PracticeBadge {
 }
 
 /// PracticeBadge rarity levels.
-enum BadgeRarity {
-  common,
-  rare,
-  epic,
-  legendary,
-}
+enum BadgeRarity { common, rare, epic, legendary }
 
 /// Level definition with title and required points.
 @JsonSerializable()
@@ -131,13 +126,17 @@ class LevelDefinition {
   Map<String, dynamic> toJson() => _$LevelDefinitionToJson(this);
 
   /// All level definitions.
+  ///
+  /// BE `LEVEL_THRESHOLDS` (`backend/app/services/gamification_service.py`)
+  /// 와 동일한 7단계 + 동일 명칭/임계값. BE 가 SSOT.
   static const List<LevelDefinition> levels = [
     LevelDefinition(level: 1, title: '초보 연습생', minPoints: 0),
-    LevelDefinition(level: 2, title: '열정 연습생', minPoints: 100),
-    LevelDefinition(level: 3, title: '꾸준한 연주자', minPoints: 300),
-    LevelDefinition(level: 4, title: '실력파 연주자', minPoints: 600),
-    LevelDefinition(level: 5, title: '음악 마스터', minPoints: 1000),
-    LevelDefinition(level: 6, title: '전설의 연주자', minPoints: 1500),
+    LevelDefinition(level: 2, title: '열심히 하는 연습생', minPoints: 100),
+    LevelDefinition(level: 3, title: '꾸준한 연습생', minPoints: 300),
+    LevelDefinition(level: 4, title: '실력 있는 연습생', minPoints: 600),
+    LevelDefinition(level: 5, title: '연습의 달인', minPoints: 1000),
+    LevelDefinition(level: 6, title: '음악 장인', minPoints: 1500),
+    LevelDefinition(level: 7, title: '전설의 연습생', minPoints: 2500),
   ];
 
   /// Get level for given points.

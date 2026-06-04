@@ -293,6 +293,23 @@ booked -> available (취소)
 - "이후 더 이상 변경/취소가 불가합니다"
 - [취소] [변경하기]
 
+#### 3.3.1.1 변경/취소 원자성 정책 (2026-06-04 명시)
+
+`BookingRescheduleScreen` / `BookingCancelScreen` 의 액션은 **BE 가 단일 트랜잭션** 으로 처리한다. FE 의 분리된 두 호출(차감 + 슬롯 재예약) 사이 race condition 을 방지한다.
+
+| 액션 | BE 엔드포인트 | 트랜잭션 범위 |
+|------|--------------|--------------|
+| Reschedule | `PATCH /bookings/{id}/reschedule` | (1) 기존 슬롯 해제 (2) 새 슬롯 점유 (3) `usedRescheduleCount += 1` 을 **한 트랜잭션** 으로 처리. (2) 실패 시 (1)/(3) 모두 롤백 |
+| Cancel | `DELETE /bookings/{id}` | (1) 슬롯 반환 (2) `usedRescheduleCount += 1` (3) 학생 알림 — 단일 트랜잭션. 학생 측에서 동시 다른 booking 의 `usedRescheduleCount` 변경과 충돌 없음 |
+| 동시성 가드 | `LessonBooking.version` 컬럼 (optimistic lock) | 클라이언트가 보낸 `version` 이 서버 현재 값과 다르면 409 → FE 가 invalidate + 재조회 후 재시도 안내 |
+
+**FE 책임 경계:**
+- ❌ FE 가 `usedRescheduleCount` 를 직접 증가시키지 않음 — BE 응답으로만 갱신
+- ❌ FE 가 슬롯 점유와 카운트 차감을 분리 호출하지 않음 — 단일 액션 호출
+- ✅ BE 응답으로 받은 새 `LessonBooking` 으로 캐시 invalidate
+
+> 참고: 2026-06-04 verify-spec 갭 검증에서 식별된 동시성 리스크는 BE 트랜잭션 보장으로 해결. FE 코드 변경 불필요.
+
 #### 3.3.2 선생님 레슨 취소
 
 - 학생 변경 횟수 차감 안 함
