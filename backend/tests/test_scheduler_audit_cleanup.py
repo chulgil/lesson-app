@@ -241,3 +241,159 @@ async def test_admin_list_filters_by_denial_code(
     body = response.json()
     assert body["total_count"] == 1
     assert body["logs"][0]["denial_code"] == "FORBIDDEN_NOT_YOUR_STUDENT"
+
+
+# ---------------------------------------------------------------------------
+# POST /announcements/process-scheduled — §5 예약 발송 cron
+# ---------------------------------------------------------------------------
+
+
+SCHED_ENDPOINT = "/api/v1/scheduler/announcements/process-scheduled"
+
+
+async def _seed_owner_academy(client: AsyncClient, create_test_user) -> str:
+    """학원장 + 학원 + 자기 자신 강사. Returns academy_id."""
+    from uuid import uuid4
+
+    from app.core.security import create_access_token
+
+    OWNER_ID = "sched-owner"
+    await create_test_user(user_id=OWNER_ID, role="teacher", email="sched@test.com", name="김원장")
+    headers = {"Authorization": f"Bearer {create_access_token(data={'sub': OWNER_ID, 'role': 'teacher'})}"}
+    resp = await client.post(
+        "/api/v1/academies",
+        headers=headers,
+        json={
+            "slug": f"sch-{uuid4().hex[:8]}",
+            "name": "예약 발송 테스트",
+            "also_register_as_teacher": True,
+        },
+    )
+    assert resp.status_code == 201
+    return resp.json()["id"]
+
+
+async def _create_announcement(
+    db_session: AsyncSession,
+    *,
+    academy_id: str,
+    scheduled_at: datetime | None,
+    status_value: str,
+):
+    """공지 행 직접 삽입."""
+    from app.models.academy_announcement import (
+        AcademyAnnouncement,
+        AcademyAnnouncementAudience,
+        AcademyAnnouncementStatus,
+    )
+
+    ann = AcademyAnnouncement(
+        academy_id=academy_id,
+        author_user_id="sched-owner",
+        title="예약 공지",
+        body_markdown="x",
+        audience=AcademyAnnouncementAudience.teachers,
+        channels=["inapp"],
+        scheduled_at=scheduled_at,
+        status=AcademyAnnouncementStatus(status_value),
+    )
+    db_session.add(ann)
+    await db_session.commit()
+    await db_session.refresh(ann)
+    return ann
+
+
+async def test_process_scheduled_sends_past_due(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """scheduled_at 과거 + status=scheduled → sent 로 전환."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    academy_id = await _seed_owner_academy(client, create_test_user)
+    ann = await _create_announcement(
+        db_session,
+        academy_id=academy_id,
+        scheduled_at=datetime.now(UTC) - timedelta(hours=1),
+        status_value="scheduled",
+    )
+
+    response = await client.post(SCHED_ENDPOINT, headers={"X-Internal-API-Key": "test-internal-key"})
+    assert response.status_code == 200
+    assert response.json()["processed"] == 1
+
+    await db_session.refresh(ann)
+    assert ann.status.value == "sent"
+    assert ann.sent_at is not None
+
+
+async def test_process_scheduled_ignores_future(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """scheduled_at 미래 → 변경 없음."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    academy_id = await _seed_owner_academy(client, create_test_user)
+    ann = await _create_announcement(
+        db_session,
+        academy_id=academy_id,
+        scheduled_at=datetime.now(UTC) + timedelta(hours=1),
+        status_value="scheduled",
+    )
+
+    response = await client.post(SCHED_ENDPOINT, headers={"X-Internal-API-Key": "test-internal-key"})
+    assert response.status_code == 200
+    assert response.json()["processed"] == 0
+
+    await db_session.refresh(ann)
+    assert ann.status.value == "scheduled"
+
+
+async def test_process_scheduled_ignores_already_sent(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """이미 sent → 변경 없음 (status check 통과 못 함)."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    academy_id = await _seed_owner_academy(client, create_test_user)
+    ann = await _create_announcement(
+        db_session,
+        academy_id=academy_id,
+        scheduled_at=datetime.now(UTC) - timedelta(hours=1),
+        status_value="sent",
+    )
+
+    response = await client.post(SCHED_ENDPOINT, headers={"X-Internal-API-Key": "test-internal-key"})
+    assert response.json()["processed"] == 0
+    await db_session.refresh(ann)
+    assert ann.status.value == "sent"  # unchanged
+
+
+async def test_process_scheduled_requires_internal_api_key(client: AsyncClient, monkeypatch) -> None:
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    response = await client.post(SCHED_ENDPOINT)
+    assert response.status_code == 401
+
+
+async def test_process_scheduled_no_scheduled_at_ignored(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """scheduled_at IS NULL + status=draft → 즉시 발송 흐름 대상 아님 (cron 무시)."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    academy_id = await _seed_owner_academy(client, create_test_user)
+    await _create_announcement(
+        db_session,
+        academy_id=academy_id,
+        scheduled_at=None,
+        status_value="draft",
+    )
+    response = await client.post(SCHED_ENDPOINT, headers={"X-Internal-API-Key": "test-internal-key"})
+    assert response.json()["processed"] == 0

@@ -140,3 +140,22 @@ async def list_all_access_denials_admin(
         "logs": [ContextAccessDenialLogResponse.model_validate(log).model_dump(mode="json") for log in logs],
         "total_count": total,
     }
+
+
+@router.post(
+    "/announcements/process-scheduled",
+    status_code=status.HTTP_200_OK,
+    summary="Process scheduled academy announcements (§5 cron — scheduled_at <= now)",
+)
+async def process_scheduled_announcements(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict[str, int]:
+    """Spec §5 — 예약된 academy 공지 중 도래한 행을 자동 발송.
+
+    1분 간격 cron 호출 가정. 조건: ``status in (draft, scheduled) AND
+    scheduled_at IS NOT NULL AND scheduled_at <= now()``. 처리 행 수 반환.
+    """
+    from app.services.academy_announcement_service import AcademyAnnouncementService
+
+    processed = await AcademyAnnouncementService(db).process_due_scheduled_announcements()
+    return {"processed": processed}

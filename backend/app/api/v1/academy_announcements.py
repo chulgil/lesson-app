@@ -29,6 +29,7 @@ from app.schemas.academy_announcement import (
     AcademyAnnouncementCreate,
     AcademyAnnouncementListResponse,
     AcademyAnnouncementResponse,
+    AcademyAnnouncementStatsResponse,
     AudienceCountByRole,
 )
 from app.services.academy_announcement_service import AcademyAnnouncementService
@@ -177,6 +178,43 @@ async def mark_announcement_read(
         "user_id": recipient.user_id,
         "read_at": recipient.read_at.isoformat() if recipient.read_at else None,
     }
+
+
+@router.get(
+    "/announcements/{announcement_id}/stats",
+    response_model=AcademyAnnouncementStatsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Announcement read stats (owner only) — spec §7 read_rate + by_role + unread_users",
+    dependencies=[Depends(require_owner_context)],
+)
+async def get_academy_announcement_stats(
+    announcement_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> AcademyAnnouncementStatsResponse:
+    """발송 공지의 읽음 통계 — 학원장 화면 (미열람자 명단 + 1:1 재발송 후보).
+
+    spec §7 — read_rate 전체 + role별 분해 + 미열람 user 명단. 카톡 발송 통계
+    (kakao_delivered) 는 별도 후속.
+    """
+    from app.schemas.academy_announcement import (
+        AcademyAnnouncementStatsRoleBreakdown,
+        AcademyAnnouncementUnreadUserItem,
+    )
+
+    service = AcademyAnnouncementService(db)
+    stats = await service.get_announcement_stats(
+        announcement_id=announcement_id,
+        by_user_id=current_user.id,
+    )
+    return AcademyAnnouncementStatsResponse(
+        target_count=stats["target_count"],
+        delivered_count=stats["delivered_count"],
+        read_count=stats["read_count"],
+        read_rate=stats["read_rate"],
+        by_role={k: AcademyAnnouncementStatsRoleBreakdown(**v) for k, v in stats["by_role"].items()},
+        unread_users=[AcademyAnnouncementUnreadUserItem(**u) for u in stats["unread_users"]],
+    )
 
 
 __all__ = ["router"]
