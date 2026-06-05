@@ -117,6 +117,143 @@ class AcademyAnnouncementService:
             )
         return announcement
 
+    async def send(
+        self,
+        *,
+        announcement_id: str,
+        by_user_id: str,
+    ) -> AcademyAnnouncement:
+        """공지 발송 — draft 상태에서 audience enumerate → Recipient 행 생성.
+
+        Spec §4 발송 시퀀스 중 BE 단계만 구현. 카톡/푸시 발송은 별도 큐 작업.
+
+        절차:
+        1. 학원장 권한 확인 (assert_owner)
+        2. status 가 draft 또는 scheduled 일 때만 진행 (이미 sent/cancelled 면 409)
+        3. audience enumerate → 대상 user_id + role 수집 (중복 user_id 는 skip)
+        4. AcademyAnnouncementRecipient 일괄 INSERT
+        5. announcement.target_count / sent_at / status=sent 갱신
+        """
+        from datetime import UTC, datetime
+
+        from app.models.academy_announcement import (
+            AcademyAnnouncementRecipient,
+        )
+        from app.models.academy_announcement import (
+            AcademyAnnouncementRecipientRole as RecipientRole,
+        )
+        from app.services.academy_service import AcademyService
+
+        announcement = await self.db.get(AcademyAnnouncement, announcement_id)
+        if announcement is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Announcement not found",
+            )
+        await AcademyService(self.db).assert_owner(announcement.academy_id, by_user_id)
+        if announcement.status not in (ModelStatus.draft, ModelStatus.scheduled):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Cannot send announcement in status={announcement.status.value}",
+            )
+
+        recipients = await self._enumerate_recipients(
+            academy_id=announcement.academy_id,
+            audience=announcement.audience,
+            audience_filter=announcement.audience_filter,
+        )
+
+        # UNIQUE (announcement_id, user_id) 충돌 방지 — 같은 user 가 학생+학부모
+        # 중복 매칭되면 우선순위 teacher > parent > student 으로 1행만.
+        priority = {RecipientRole.teacher: 0, RecipientRole.parent: 1, RecipientRole.student: 2}
+        dedup: dict[str, RecipientRole] = {}
+        for user_id, role in recipients:
+            existing = dedup.get(user_id)
+            if existing is None or priority[role] < priority[existing]:
+                dedup[user_id] = role
+
+        for user_id, role in dedup.items():
+            self.db.add(
+                AcademyAnnouncementRecipient(
+                    announcement_id=announcement.id,
+                    user_id=user_id,
+                    role=role,
+                )
+            )
+
+        announcement.target_count = len(dedup)
+        announcement.sent_at = datetime.now(UTC)
+        announcement.status = ModelStatus.sent
+        await self.db.flush()
+        return announcement
+
+    async def _enumerate_recipients(
+        self,
+        *,
+        academy_id: str,
+        audience: ModelAudience,
+        audience_filter: dict | None,
+    ) -> list[tuple[str, AcademyAnnouncementRecipientRole]]:
+        """audience 분기별 대상 (user_id, role) 목록. resolve_audience_count 와
+        동일 기준 (활성 멤버 + matched/active 학생).
+        """
+        from app.models.academy import (
+            AcademyMember,
+            AcademyMemberRole,
+            AcademyStudent,
+            AcademyStudentStatus,
+        )
+        from app.models.academy_announcement import (
+            AcademyAnnouncementRecipientRole as RecipientRole,
+        )
+
+        active_statuses = (AcademyStudentStatus.matched, AcademyStudentStatus.active)
+        out: list[tuple[str, RecipientRole]] = []
+
+        include_teachers = audience in (ModelAudience.all, ModelAudience.teachers)
+        include_students = audience in (
+            ModelAudience.all,
+            ModelAudience.students,
+            ModelAudience.teacher_students,
+        )
+        include_parents = audience in (
+            ModelAudience.all,
+            ModelAudience.parents,
+            ModelAudience.teacher_students,
+        )
+
+        if include_teachers:
+            rows = await self.db.scalars(
+                select(AcademyMember.user_id)
+                .where(AcademyMember.academy_id == academy_id)
+                .where(AcademyMember.role == AcademyMemberRole.teacher)
+                .where(AcademyMember.access_revoked_at.is_(None))
+            )
+            for uid in rows.all():
+                out.append((uid, RecipientRole.teacher))
+
+        if include_students or include_parents:
+            students_stmt = select(AcademyStudent).where(
+                AcademyStudent.academy_id == academy_id,
+                AcademyStudent.status.in_(active_statuses),
+            )
+            if audience == ModelAudience.teacher_students:
+                tm_id = (audience_filter or {}).get("teacher_member_id")
+                if not tm_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="audience=teacher_students requires audience_filter.teacher_member_id",
+                    )
+                students_stmt = students_stmt.where(AcademyStudent.teacher_member_id == tm_id)
+            students = (await self.db.scalars(students_stmt)).all()
+            for s in students:
+                if include_students and s.student_user_id:
+                    out.append((s.student_user_id, RecipientRole.student))
+                if include_parents and s.parent_user_id:
+                    out.append((s.parent_user_id, RecipientRole.parent))
+
+        return out
+
     async def resolve_audience_count(
         self,
         *,
@@ -229,3 +366,162 @@ class AcademyAnnouncementService:
                 "student": student_part,
             },
         }
+
+    # ------------------------------------------------------------------
+    # Send flow — §4 발송 시퀀스
+    # ------------------------------------------------------------------
+
+    async def send_announcement(
+        self,
+        *,
+        announcement_id: str,
+        by_user_id: str,
+    ) -> AcademyAnnouncement:
+        """draft → sending → sent (synchronous fanout).
+
+        spec §4:
+        1. 대상자 enumerate (audience → user_id set)
+        2. AcademyAnnouncementRecipient N행 생성 (UNIQUE 보장)
+        3. target_count 갱신, status='sent' (inapp 채널 즉시 마킹)
+
+        실제 채널 발송 (kakao + 푸시)은 별도 큐 작업 — 본 메서드는 인앱
+        recipient row 생성과 status 전이만 담당.
+        """
+        from app.models.academy import (
+            AcademyMember,
+            AcademyMemberRole,
+            AcademyStudent,
+            AcademyStudentStatus,
+        )
+        from app.models.academy_announcement import (
+            AcademyAnnouncementRecipient,
+            AcademyAnnouncementRecipientRole,
+        )
+        from app.services.academy_service import AcademyService
+
+        announcement = await self.db.scalar(
+            select(AcademyAnnouncement).where(AcademyAnnouncement.id == announcement_id)
+        )
+        if announcement is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+        await AcademyService(self.db).assert_owner(announcement.academy_id, by_user_id)
+        if announcement.status != ModelStatus.draft:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Cannot send announcement in status '{announcement.status.value}'",
+            )
+
+        # ---- 대상자 enumerate ----
+        active_statuses = (AcademyStudentStatus.matched, AcademyStudentStatus.active)
+        recipients: list[tuple[str, AcademyAnnouncementRecipientRole]] = []
+
+        async def _add_teachers() -> None:
+            teacher_users = await self.db.scalars(
+                select(AcademyMember.user_id)
+                .where(AcademyMember.academy_id == announcement.academy_id)
+                .where(AcademyMember.role == AcademyMemberRole.teacher)
+                .where(AcademyMember.access_revoked_at.is_(None))
+            )
+            for uid in teacher_users.all():
+                recipients.append((uid, AcademyAnnouncementRecipientRole.teacher))
+
+        async def _add_students_and_parents(*, students_only: bool = False, parents_only: bool = False) -> None:
+            students_q = select(AcademyStudent).where(
+                AcademyStudent.academy_id == announcement.academy_id,
+                AcademyStudent.status.in_(active_statuses),
+            )
+            if announcement.audience == ModelAudience.teacher_students:
+                tmid = (announcement.audience_filter or {}).get("teacher_member_id")
+                if tmid:
+                    students_q = students_q.where(AcademyStudent.teacher_member_id == tmid)
+            rows = (await self.db.scalars(students_q)).all()
+            for s in rows:
+                if not parents_only and s.student_user_id:
+                    recipients.append((s.student_user_id, AcademyAnnouncementRecipientRole.student))
+                if not students_only and s.parent_user_id:
+                    recipients.append((s.parent_user_id, AcademyAnnouncementRecipientRole.parent))
+
+        if announcement.audience == ModelAudience.all:
+            await _add_teachers()
+            await _add_students_and_parents()
+        elif announcement.audience == ModelAudience.teachers:
+            await _add_teachers()
+        elif announcement.audience == ModelAudience.students:
+            await _add_students_and_parents(students_only=True)
+        elif announcement.audience == ModelAudience.parents:
+            await _add_students_and_parents(parents_only=True)
+        elif announcement.audience == ModelAudience.teacher_students:
+            await _add_students_and_parents()
+
+        # ---- UNIQUE 보장 — 같은 user 중복 방지 (예: 학부모/학생 동일 user) ----
+        seen: set[str] = set()
+        deduped: list[tuple[str, AcademyAnnouncementRecipientRole]] = []
+        for uid, role in recipients:
+            if uid in seen:
+                continue
+            seen.add(uid)
+            deduped.append((uid, role))
+
+        # ---- Recipient N행 + status 전이 ----
+        from datetime import UTC, datetime
+
+        sent_at = datetime.now(UTC)
+        inapp_enabled = "inapp" in (announcement.channels or [])
+        for uid, role in deduped:
+            self.db.add(
+                AcademyAnnouncementRecipient(
+                    announcement_id=announcement.id,
+                    user_id=uid,
+                    role=role,
+                    delivered_at=sent_at if inapp_enabled else None,
+                    inapp_delivered=inapp_enabled,
+                )
+            )
+
+        announcement.status = ModelStatus.sent
+        announcement.target_count = len(deduped)
+        announcement.delivered_count = len(deduped) if inapp_enabled else 0
+        announcement.sent_at = sent_at
+        await self.db.commit()
+        await self.db.refresh(announcement)
+        return announcement
+
+    # ------------------------------------------------------------------
+    # Read flow — §6.1 인앱 읽음 표시
+    # ------------------------------------------------------------------
+
+    async def mark_read(
+        self,
+        *,
+        announcement_id: str,
+        user_id: str,
+    ) -> "AcademyAnnouncementRecipient":  # noqa: F821 — string forward ref OK
+        """수신자 본인이 공지를 열람한 시점을 기록 + read_count 갱신.
+
+        멱등 — 이미 읽음 마킹된 경우 read_at 갱신 없이 반환.
+        본인 행이 없으면 404 (수신 대상이 아님).
+        """
+        from app.models.academy_announcement import AcademyAnnouncementRecipient
+        from datetime import UTC, datetime
+
+        recipient = await self.db.scalar(
+            select(AcademyAnnouncementRecipient)
+            .where(AcademyAnnouncementRecipient.announcement_id == announcement_id)
+            .where(AcademyAnnouncementRecipient.user_id == user_id)
+        )
+        if recipient is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not a recipient of this announcement")
+        if recipient.read_at is not None:
+            return recipient
+
+        recipient.read_at = datetime.now(UTC)
+
+        announcement = await self.db.scalar(
+            select(AcademyAnnouncement).where(AcademyAnnouncement.id == announcement_id)
+        )
+        if announcement is not None:
+            announcement.read_count = (announcement.read_count or 0) + 1
+
+        await self.db.commit()
+        await self.db.refresh(recipient)
+        return recipient

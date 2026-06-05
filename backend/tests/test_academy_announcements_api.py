@@ -438,13 +438,14 @@ async def test_audience_preview_non_owner_403(client: AsyncClient, db_session: A
     assert response.status_code == 403
 
 
-
 # ---------------------------------------------------------------------------
 # GET /academies/{id}/announcements/audience-preview — 작성 미리보기
 # ---------------------------------------------------------------------------
 
 
-async def _add_students(db_session, academy_id, count_with_user, count_with_parent, status_value="active", teacher_member_id=None):
+async def _add_students(
+    db_session, academy_id, count_with_user, count_with_parent, status_value="active", teacher_member_id=None
+):
     """헬퍼: 학원 학생 N건 추가 (테스트 픽스처 단순화)."""
     from datetime import UTC, datetime
 
@@ -494,9 +495,7 @@ async def test_audience_preview_all_returns_total_by_role(
     assert data["by_role"] == {"teacher": 1, "parent": 2, "student": 3}
 
 
-async def test_audience_preview_teachers_only(
-    client: AsyncClient, db_session: AsyncSession, create_test_user
-) -> None:
+async def test_audience_preview_teachers_only(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
     academy_id = await _create_academy(client, create_test_user)
     await _add_students(db_session, academy_id, count_with_user=3, count_with_parent=2)
 
@@ -556,3 +555,183 @@ async def test_audience_preview_blocked_in_teacher_context(
         params={"audience": "all"},
     )
     assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# POST /announcements/{id}/send — fanout
+# PATCH /announcements/{id}/recipients/me/read — 읽음
+# ---------------------------------------------------------------------------
+
+
+async def _seed_with_audience(db_session, client, create_test_user):
+    """학원 + 강사 멤버 (owner 겸직) + 학생 3명 (가입 user id 채움) + 학부모 2명."""
+    academy_id = await _create_academy(client, create_test_user)
+
+    # 학생 user 3 + 학부모 user 2 등록
+    for i in range(3):
+        await create_test_user(user_id=f"stu-{i}", role="student", email=f"s{i}@t.com", name=f"학생{i}")
+    for i in range(2):
+        await create_test_user(user_id=f"par-{i}", role="parent", email=f"p{i}@t.com", name=f"부모{i}")
+
+    await _add_students(db_session, academy_id, count_with_user=0, count_with_parent=0)
+    # 정확한 user_id 지정으로 학생/학부모 4건 생성
+    from datetime import UTC, datetime
+
+    from app.models.academy import AcademyStudent, AcademyStudentStatus
+
+    for i in range(3):
+        db_session.add(
+            AcademyStudent(
+                academy_id=academy_id,
+                name=f"학생레코드{i}",
+                status=AcademyStudentStatus.active,
+                student_user_id=f"stu-{i}",
+                registered_at=datetime.now(UTC),
+            )
+        )
+    for i in range(2):
+        db_session.add(
+            AcademyStudent(
+                academy_id=academy_id,
+                name=f"학부모자녀{i}",
+                status=AcademyStudentStatus.active,
+                parent_user_id=f"par-{i}",
+                registered_at=datetime.now(UTC),
+            )
+        )
+    await db_session.commit()
+    return academy_id
+
+
+async def _create_draft(client, academy_id, audience="all", title="t", body="b"):
+    resp = await client.post(
+        f"/api/v1/academies/{academy_id}/announcements",
+        headers=_owner_headers(),
+        json={"title": title, "body_markdown": body, "audience": audience},
+    )
+    assert resp.status_code == 201, resp.text
+    return resp.json()["id"]
+
+
+async def test_send_announcement_fans_out_recipients(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="all")
+
+    resp = await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    # teacher 1 (owner=teacher 겸직) + student 3 + parent 2 = 6
+    assert body["status"] == "sent"
+    assert body["target_count"] == 6
+    assert body["delivered_count"] == 6  # inapp 채널 기본
+    assert body["sent_at"] is not None
+
+
+async def test_send_announcement_blocked_in_teacher_context(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id)
+
+    teacher_headers = _owner_headers(active_context="teacher", academy_id=academy_id)
+    resp = await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=teacher_headers,
+    )
+    assert resp.status_code == 403
+
+
+async def test_send_announcement_conflict_if_already_sent(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="teachers")
+
+    first = await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    assert first.status_code == 200
+
+    second = await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    assert second.status_code == 409
+
+
+async def test_mark_read_sets_read_at_and_increments_count(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="students")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    # 학생 본인 토큰
+    stu_token = create_access_token(data={"sub": "stu-0", "role": "student"})
+    resp = await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers={"Authorization": f"Bearer {stu_token}"},
+    )
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["read_at"] is not None
+
+    # 공지 read_count 확인 (학원장이 통계 확인)
+    detail = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}",
+        headers=_owner_headers(),
+    )
+    assert detail.json()["read_count"] == 1
+
+
+async def test_mark_read_idempotent(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="students")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    stu_token = create_access_token(data={"sub": "stu-0", "role": "student"})
+    headers = {"Authorization": f"Bearer {stu_token}"}
+
+    first = await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers=headers,
+    )
+    second = await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers=headers,
+    )
+    assert first.json()["read_at"] == second.json()["read_at"]
+
+    # read_count 는 1 (중복 증가 안 함) — 학원장이 통계 확인
+    detail = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}",
+        headers=_owner_headers(),
+    )
+    assert detail.json()["read_count"] == 1
+
+
+async def test_mark_read_non_recipient_returns_404(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="teachers")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    stu_token = create_access_token(data={"sub": "stu-0", "role": "student"})
+    resp = await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers={"Authorization": f"Bearer {stu_token}"},
+    )
+    assert resp.status_code == 404
