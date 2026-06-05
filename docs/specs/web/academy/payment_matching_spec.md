@@ -298,3 +298,4 @@ POST /api/v1/academies/{id}/billing/match-transaction
 ## 11. 변경 이력
 
 - 2026-06-04: 초안 (시장조사 P0 #1 응답 + 한국 무통장입금 특수 패턴 매트릭스 + fuzzy 알고리즘 신호 분리 + 1인 학원장 모바일 수기 입력 흐름)
+- 2026-06-05: §2 데이터 모델 BE 추가. `AcademyBankTransaction` (1 통장 거래 = 1 행, depositor_raw/memo_raw 원문 영구 보존 + match_score/match_features JSON) + `AcademyPaymentMatchSuggestion` (1 tx × N 후보, user_decision audit) 2 테이블 + 3 enum (`source` 3종 csv/manual/ocr, `state` 4단계 unmatched→suggested→matched/ignored, `decision` 3단계 pending/accepted/rejected). FK 관계: academy_id, matched_invoice_id, matched_by_user_id (audit), suggestion → bank_transaction + invoice. 인덱스 6종 (academy×state, academy×state×tx_at, matched_invoice 역참조, suggestion tx×score 정렬, suggestion invoice 역참조, UNIQUE per pair). Alembic migration (`ac_m3_payment_matching`, revises `ac_m3_academy_announcements`). models/__init__ export. fuzzy 알고리즘 (§3) / endpoint / OCR / CSV 파싱 / fraud 신호는 별도 후속 작업. AC-M3 payment matching 진입 첫 스텝.
