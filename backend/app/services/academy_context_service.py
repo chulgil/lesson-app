@@ -131,14 +131,17 @@ class AcademyContextService:
         ip: str | None = None,
         user_agent: str | None = None,
         current_active_context: str | None = None,
+        current_jti: str | None = None,
     ) -> ContextSwitchResponse:
-        """컨텍스트 전환 — context_toggle_spec §4.1.
+        """컨텍스트 전환 — context_toggle_spec §4.1, §7.2.
 
         절차:
         1. can_switch_context 검증 (§3.2): AcademyMember.exists
-        2. 새 JWT 발급 (active_context/academy_id/teacher_id 포함)
-        3. ContextSwitchLog 자동 기록
-        4. target=academy_owner 면 활성 위임 자동 종료 (학원장 자동 복귀 감지)
+        2. 새 JWT 발급 (active_context/academy_id/teacher_id 포함, 자동 jti)
+        3. 이전 access token jti 가 있으면 ``TokenBlacklist`` 에 추가
+           (§7.2 동시 세션 금지 — 토글 직후 이전 JWT 401).
+        4. ContextSwitchLog 자동 기록
+        5. target=academy_owner 면 활성 위임 자동 종료 (학원장 자동 복귀 감지)
         """
         target_role = _context_to_role(body.target_context)
         member = await self.db.scalar(
@@ -174,6 +177,20 @@ class AcademyContextService:
             "teacher_id": teacher_id,
         }
         new_token = create_access_token(data=token_payload)
+
+        # AC-M2 §7.2: 이전 access token jti 즉시 만료 (동시 세션 금지).
+        if current_jti:
+            from datetime import UTC, datetime, timedelta
+
+            from app.core.config import settings
+            from app.models.user import TokenBlacklist
+
+            # 이미 등록되어 있지 않을 때만 추가 (idempotent).
+            existing = await self.db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == current_jti))
+            if existing is None:
+                expires_at = datetime.now(UTC) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+                self.db.add(TokenBlacklist(jti=current_jti, user_id=user.id, expires_at=expires_at))
+                await self.db.flush()
 
         # ContextSwitchLog 기록.
         gov = AcademyGovernanceService(self.db)

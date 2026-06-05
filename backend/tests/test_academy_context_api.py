@@ -214,3 +214,117 @@ async def test_owner_return_auto_ends_active_delegation(
     # 위임 state 확인.
     await db_session.refresh(delegation)
     assert delegation.state == DelegationState.auto_ended
+
+
+# ---------------------------------------------------------------------------
+# GET /auth/me/access-denials — 학원 무관 본인 audit 조회 (spec §9)
+# ---------------------------------------------------------------------------
+
+
+async def test_global_access_denials_includes_academy_less_records(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """학원 관련 차단 + 학원 무관 차단 모두 본인 audit 에 포함."""
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+
+    # 학원 관련 차단 발생
+    resp_owner = await client.get(
+        f"/api/v1/academies/{academy_id}/billing/subscriptions",
+        headers=_owner_headers(active_context="teacher", academy_id=academy_id),
+    )
+    assert resp_owner.status_code == 403
+
+    # 학원 무관 차단 발생 (recordings)
+    resp_global = await client.get(
+        "/api/v1/recordings",
+        headers=_owner_headers(active_context="academy_owner"),
+    )
+    assert resp_global.status_code == 403
+
+    # /auth/me/access-denials 는 두 행 모두 포함
+    response = await client.get(
+        "/api/v1/auth/me/access-denials",
+        headers=_owner_headers(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 2
+    codes = sorted(log["denial_code"] for log in body["logs"])
+    assert codes == ["FORBIDDEN_ACADEMY_OWNER_SCOPE", "FORBIDDEN_TEACHER_SCOPE"]
+
+
+async def test_global_access_denials_excludes_other_user(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """다른 user 의 차단은 제외."""
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    await create_test_user(user_id=OTHER_USER_ID, role="teacher", email="other@test.com")
+
+    # OTHER user 가 차단당함
+    other_token = create_access_token(data={"sub": OTHER_USER_ID, "role": "teacher", "active_context": "academy_owner"})
+    resp_other = await client.get(
+        "/api/v1/recordings",
+        headers={"Authorization": f"Bearer {other_token}"},
+    )
+    assert resp_other.status_code == 403
+
+    # 본인 audit 조회는 OTHER 차단 미포함
+    response = await client.get(
+        "/api/v1/auth/me/access-denials",
+        headers=_owner_headers(),
+    )
+    assert response.status_code == 200
+    assert response.json()["total_count"] == 0
+
+
+async def test_global_access_denials_filters_by_denial_code(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """denial_code 쿼리 파라미터로 필터링."""
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+
+    # 2종류 차단 발생
+    await client.get(
+        f"/api/v1/academies/{academy_id}/billing/subscriptions",
+        headers=_owner_headers(active_context="teacher", academy_id=academy_id),
+    )
+    await client.get(
+        "/api/v1/recordings",
+        headers=_owner_headers(active_context="academy_owner"),
+    )
+
+    response = await client.get(
+        "/api/v1/auth/me/access-denials?denial_code=FORBIDDEN_TEACHER_SCOPE",
+        headers=_owner_headers(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 1
+    assert body["logs"][0]["denial_code"] == "FORBIDDEN_TEACHER_SCOPE"
+
+
+async def test_global_access_denials_requires_auth(client: AsyncClient) -> None:
+    """인증 없는 호출 → 401."""
+    response = await client.get("/api/v1/auth/me/access-denials")
+    assert response.status_code == 401
+
+
+async def test_global_access_denials_works_in_teacher_context(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """본인 데이터 조회는 모드 무관 — teacher 모드에서도 통과."""
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+
+    # academy_owner 모드로 차단 1건 발생
+    await client.get(
+        "/api/v1/recordings",
+        headers=_owner_headers(active_context="academy_owner"),
+    )
+
+    # teacher 모드에서도 본인 audit 조회 가능
+    response = await client.get(
+        "/api/v1/auth/me/access-denials",
+        headers=_owner_headers(active_context="teacher", academy_id=academy_id),
+    )
+    assert response.status_code == 200
+    assert response.json()["total_count"] == 1

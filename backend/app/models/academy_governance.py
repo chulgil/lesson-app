@@ -277,11 +277,53 @@ class AcademyActivityLog(UUIDMixin, Base):
     )
 
 
+class ContextAccessDenialLog(UUIDMixin, Base):
+    """권한 매트릭스 차단 audit (context_toggle_spec §6.3, §9).
+
+    1년 보존. 컨텍스트 모드 위반 시 기록. 응답 detail.audit_id 가 본 행의 id.
+
+    구조:
+    - user_id (필수): 차단당한 user
+    - active_context: 차단 시점의 JWT 페이로드 active_context (None 가능)
+    - academy_id: 학원 관련 호출이면 채움 (None 가능)
+    - denial_code: FORBIDDEN_TEACHER_SCOPE / FORBIDDEN_ACADEMY_OWNER_SCOPE / FORBIDDEN_NOT_YOUR_STUDENT
+    - endpoint_path / http_method: 차단된 라우트
+    - target_resource_id: 차단된 자원 id (학생 id 등)
+    - denied_at: 차단 시각
+    """
+
+    __tablename__ = "context_access_denial_logs"
+
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    active_context: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    academy_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("academies.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    denial_code: Mapped[str] = mapped_column(String(50), nullable=False)
+    endpoint_path: Mapped[str] = mapped_column(String(200), nullable=False)
+    http_method: Mapped[str] = mapped_column(String(10), nullable=False)
+    target_resource_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    denied_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (
+        Index("idx_context_denial_user_time", "user_id", "denied_at"),
+        Index("idx_context_denial_academy_time", "academy_id", "denied_at"),
+        Index("idx_context_denial_code_time", "denial_code", "denied_at"),
+    )
+
+
 __all__ = [
     "AcademyActivityLog",
     "AcademyContext",
     "AcademyDelegation",
     "AcademyDelegationAction",
+    "ContextAccessDenialLog",
     "ContextSwitchLog",
     "ContextSwitchTrigger",
     "DelegationReason",

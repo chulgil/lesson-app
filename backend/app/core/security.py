@@ -19,6 +19,7 @@ KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me"
 # Apple JWKS endpoint
 APPLE_JWKS_URL = "https://appleid.apple.com/auth/keys"
 
+
 def _assert_safe_jwt_secret() -> None:
     """Prevent production-like environments from signing tokens with weak defaults."""
     if settings.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS:
@@ -28,15 +29,23 @@ def _assert_safe_jwt_secret() -> None:
 
 
 def create_access_token(data: dict[str, Any]) -> str:
-    """Create a JWT access token with expiration."""
+    """Create a JWT access token with expiration + unique jti.
+
+    AC-M2 §7.2: access token 도 jti 를 부여해 컨텍스트 토글 시 ``TokenBlacklist``
+    로 즉시 만료시킬 수 있도록 한다. jti 가 호출자 ``data`` 에 이미 있으면
+    유지 (재사용은 거의 없지만 명시적 override 허용).
+    """
     _assert_safe_jwt_secret()
     to_encode = data.copy()
     expire = datetime.now(UTC) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({
-        "exp": expire,
-        "iat": datetime.now(UTC),
-        "type": "access",
-    })
+    to_encode.update(
+        {
+            "exp": expire,
+            "iat": datetime.now(UTC),
+            "type": "access",
+        }
+    )
+    to_encode.setdefault("jti", str(uuid.uuid4()))
     return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
@@ -45,12 +54,14 @@ def create_refresh_token(data: dict[str, Any]) -> str:
     _assert_safe_jwt_secret()
     to_encode = data.copy()
     expire = datetime.now(UTC) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({
-        "exp": expire,
-        "iat": datetime.now(UTC),
-        "type": "refresh",
-        "jti": str(uuid.uuid4()),
-    })
+    to_encode.update(
+        {
+            "exp": expire,
+            "iat": datetime.now(UTC),
+            "type": "refresh",
+            "jti": str(uuid.uuid4()),
+        }
+    )
     return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 

@@ -31,6 +31,7 @@ from app.models.academy_governance import (
     AcademyContext,
     AcademyDelegation,
     AcademyDelegationAction,
+    ContextAccessDenialLog,
     ContextSwitchLog,
     ContextSwitchTrigger,
     DelegationRevokeReason,
@@ -99,6 +100,30 @@ class AcademyGovernanceService:
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = int((await self.db.scalar(count_stmt)) or 0)
         result = await self.db.scalars(stmt.order_by(ContextSwitchLog.switched_at.desc()).limit(limit))
+        return list(result.all()), total
+
+    async def list_access_denials_for_user(
+        self,
+        *,
+        user_id: str,
+        academy_id: str | None = None,
+        denial_code: str | None = None,
+        limit: int = 100,
+    ) -> tuple[list[ContextAccessDenialLog], int]:
+        """학원장 본인 권한 매트릭스 차단 로그 조회 (감사 투명성, §9).
+
+        academy_id 지정 시 해당 학원 관련 차단만. None 이면 전부 (학원 무관
+        포함). denial_code 지정 시 해당 차단 코드만. 운영자 어드민은 별도
+        endpoint.
+        """
+        stmt = select(ContextAccessDenialLog).where(ContextAccessDenialLog.user_id == user_id)
+        if academy_id is not None:
+            stmt = stmt.where(ContextAccessDenialLog.academy_id == academy_id)
+        if denial_code is not None:
+            stmt = stmt.where(ContextAccessDenialLog.denial_code == denial_code)
+        count_stmt = select(func.count()).select_from(stmt.subquery())
+        total = int((await self.db.scalar(count_stmt)) or 0)
+        result = await self.db.scalars(stmt.order_by(ContextAccessDenialLog.denied_at.desc()).limit(limit))
         return list(result.all()), total
 
     # ------------------------------------------------------------------

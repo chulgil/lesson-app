@@ -47,6 +47,16 @@ async def get_current_user(
     except Exception:
         raise credentials_exception
 
+    # AC-M2 §7.2: access token revocation 체크. jti 가 TokenBlacklist 에 있으면
+    # 컨텍스트 토글로 만료된 이전 토큰 — 즉시 401. jti 없는 레거시 토큰은 통과.
+    jti: str | None = payload.get("jti")
+    if jti:
+        from app.models.user import TokenBlacklist
+
+        revoked = await db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == jti))
+        if revoked is not None:
+            raise credentials_exception
+
     user = await db.scalar(select(User).where(User.id == user_id))
     if user is None:
         raise credentials_exception

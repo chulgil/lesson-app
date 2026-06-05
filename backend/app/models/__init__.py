@@ -28,6 +28,7 @@ from app.models.academy_governance import (  # noqa: F401
     AcademyContext,
     AcademyDelegation,
     AcademyDelegationAction,
+    ContextAccessDenialLog,
     ContextSwitchLog,
     ContextSwitchTrigger,
     DelegationReason,

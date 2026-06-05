@@ -13,6 +13,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.context_deps import require_owner_context
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.academy_governance import (
@@ -25,6 +26,8 @@ from app.schemas.academy_governance import (
     AcademyDelegationListResponse,
     AcademyDelegationResponse,
     AcademyDelegationRevokeRequest,
+    ContextAccessDenialLogListResponse,
+    ContextAccessDenialLogResponse,
     ContextSwitchLogListResponse,
     ContextSwitchLogResponse,
     DelegationState,
@@ -32,7 +35,8 @@ from app.schemas.academy_governance import (
 from app.services.academy_governance_service import AcademyGovernanceService
 from app.services.academy_service import AcademyService
 
-router = APIRouter()
+# AC-M2 권한 매트릭스: 콘솔 owner 전용. teacher 모드 JWT → 403.
+router = APIRouter(dependencies=[Depends(require_owner_context)])
 
 
 # ---------------------------------------------------------------------------
@@ -63,6 +67,42 @@ async def list_my_context_switches(
     )
     return ContextSwitchLogListResponse(
         logs=[ContextSwitchLogResponse.model_validate(log) for log in logs],
+        total_count=total,
+    )
+
+
+# ---------------------------------------------------------------------------
+# ContextAccessDenialLog — 학원장 본인 권한 매트릭스 차단 audit (§9 투명성)
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/{academy_id}/access-denials/me",
+    response_model=ContextAccessDenialLogListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List my context access denial history for this academy (transparency)",
+)
+async def list_my_access_denials(
+    academy_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    limit: Annotated[int, Query(ge=1, le=500)] = 100,
+) -> ContextAccessDenialLogListResponse:
+    """학원장이 본인의 권한 매트릭스 차단 audit 를 조회 (spec §9).
+
+    academy_id 관련 차단만 반환 — 학원 무관 차단(예: recordings)은 본 endpoint
+    범위 밖. 운영자 어드민은 별도 endpoint.
+    """
+    academy_service = AcademyService(db)
+    my_academies = await academy_service.list_academies_for_user(current_user.id)
+    if not any(a.id == academy_id for a in my_academies):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
+    service = AcademyGovernanceService(db)
+    logs, total = await service.list_access_denials_for_user(
+        user_id=current_user.id, academy_id=academy_id, limit=limit
+    )
+    return ContextAccessDenialLogListResponse(
+        logs=[ContextAccessDenialLogResponse.model_validate(log) for log in logs],
         total_count=total,
     )
 

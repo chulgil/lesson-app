@@ -14,6 +14,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.context_deps import require_owner_context
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.academy_billing import (
@@ -41,7 +42,8 @@ from app.schemas.academy_billing import (
 from app.services.academy_billing_service import AcademyBillingService
 from app.services.academy_service import AcademyService
 
-router = APIRouter()
+# AC-M2 권한 매트릭스: 콘솔 owner 전용. teacher 모드 JWT → 403.
+router = APIRouter(dependencies=[Depends(require_owner_context)])
 
 
 # ---------------------------------------------------------------------------
