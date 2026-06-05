@@ -12,6 +12,7 @@ export 'academy_delegation.dart';
 export 'academy_delegation_action.dart';
 export 'academy_invoice.dart';
 export 'academy_payment.dart';
+export 'academy_settlement.dart';
 export 'academy_subscription.dart';
 export 'academy_teacher_payout_override.dart';
 export 'billing_enums.dart';
