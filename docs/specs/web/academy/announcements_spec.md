@@ -222,3 +222,4 @@ sequenceDiagram
 ## 10. 변경 이력
 
 - 2026-05-20: 초안
+- 2026-06-05: §2 데이터 모델 BE 추가. `AcademyAnnouncement` + `AcademyAnnouncementRecipient` 2 테이블 + 3 enum (`audience` 5종, `status` 5단계, `recipient_role` 3종). UNIQUE (announcement_id, user_id) 제약 + 3 인덱스. Alembic migration (`ac_m3_academy_announcements`, revises `ac_m2_user_tokens_revoked_at`). models/__init__ export. service / endpoint / audience targeting / 카톡 알림톡 발송은 별도 후속 작업. AC-M3 진입 첫 스텝.
