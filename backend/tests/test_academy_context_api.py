@@ -328,3 +328,85 @@ async def test_global_access_denials_works_in_teacher_context(
     )
     assert response.status_code == 200
     assert response.json()["total_count"] == 1
+
+
+# ---------------------------------------------------------------------------
+# §7.2 다중 디바이스 일괄 만료 (user.tokens_revoked_at epoch)
+# ---------------------------------------------------------------------------
+
+
+async def test_switch_revokes_other_device_tokens(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """디바이스 A 의 토글이 디바이스 B 의 다른 jti 토큰도 401로 만료시킨다."""
+    import asyncio
+
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+
+    # 디바이스 A — 토글 호출용
+    device_a = _owner_headers(active_context="academy_owner", academy_id=academy_id)
+    # 디바이스 B — 다른 jti의 별개 활성 토큰 (사전 호출 가능 확인)
+    device_b = _owner_headers(active_context="academy_owner", academy_id=academy_id)
+    assert _decode(device_a["Authorization"].split()[1])["jti"] != _decode(device_b["Authorization"].split()[1])["jti"]
+    pre_b = await client.get("/api/v1/auth/context", headers=device_b)
+    assert pre_b.status_code == 200
+
+    # 토글 시각이 디바이스 B 의 iat 보다 뒤가 되도록 약간의 지연.
+    await asyncio.sleep(1.1)
+
+    switch = await client.post(
+        "/api/v1/auth/context/switch",
+        headers=device_a,
+        json={"target_context": "teacher", "academy_id": academy_id},
+    )
+    assert switch.status_code == 200
+    new_token = switch.json()["access_token"]
+
+    # 디바이스 B 토큰 → 401 (epoch 검증으로 일괄 만료)
+    post_b = await client.get("/api/v1/auth/context", headers=device_b)
+    assert post_b.status_code == 401
+
+    # 새 토큰 → 200 (iat > epoch)
+    post_new = await client.get(
+        "/api/v1/auth/context",
+        headers={"Authorization": f"Bearer {new_token}"},
+    )
+    assert post_new.status_code == 200
+
+
+async def test_switch_sets_user_tokens_revoked_at_epoch(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """토글 시 user.tokens_revoked_at 갱신."""
+    from app.models.user import User
+
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    user_before = await db_session.get(User, OWNER_USER_ID)
+    assert user_before.tokens_revoked_at is None
+
+    await client.post(
+        "/api/v1/auth/context/switch",
+        headers=_owner_headers(active_context="academy_owner", academy_id=academy_id),
+        json={"target_context": "teacher", "academy_id": academy_id},
+    )
+
+    await db_session.refresh(user_before)
+    assert user_before.tokens_revoked_at is not None
+
+
+async def test_token_issued_before_epoch_is_rejected(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """user.tokens_revoked_at 직접 갱신 → 그 이전 발급 토큰 401."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.user import User
+
+    await create_test_user(user_id=OWNER_USER_ID, role="teacher", name="김원장")
+    # 오래된 토큰 (epoch 이전 발급) 시뮬레이션 — User.tokens_revoked_at 를 미래로 설정.
+    user = await db_session.get(User, OWNER_USER_ID)
+    user.tokens_revoked_at = datetime.now(UTC) + timedelta(seconds=10)
+    await db_session.commit()
+
+    response = await client.get("/api/v1/auth/context", headers=_owner_headers())
+    assert response.status_code == 401
