@@ -960,3 +960,224 @@ async def test_stats_blocked_in_teacher_context(
         headers=teacher_headers,
     )
     assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# §4 카카오 알림톡 채널 wiring
+# ---------------------------------------------------------------------------
+
+
+async def _set_user_phones(db_session, owner_phone: str | None = None, stu_phones: dict | None = None, par_phones: dict | None = None):
+    """헬퍼: User.phone 컬럼을 직접 갱신 (테스트 환경에서 단순화)."""
+    from sqlalchemy import update
+
+    from app.models.user import User as UserModel
+
+    if owner_phone is not None:
+        await db_session.execute(update(UserModel).where(UserModel.id == OWNER_USER_ID).values(phone=owner_phone))
+    for uid, phone in (stu_phones or {}).items():
+        await db_session.execute(update(UserModel).where(UserModel.id == uid).values(phone=phone))
+    for uid, phone in (par_phones or {}).items():
+        await db_session.execute(update(UserModel).where(UserModel.id == uid).values(phone=phone))
+    await db_session.commit()
+
+
+async def _create_kakao_draft(client, academy_id, audience="all"):
+    resp = await client.post(
+        f"/api/v1/academies/{academy_id}/announcements",
+        headers=_owner_headers(),
+        json={
+            "title": "휴원 안내",
+            "body_markdown": "다음 주 월요일 휴원합니다.",
+            "audience": audience,
+            "channels": ["inapp", "kakao"],
+            "kakao_template_id": "closure_notice_v1",
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    return resp.json()["id"]
+
+
+async def test_send_kakao_calls_alimtalk_for_users_with_phone(
+    client: AsyncClient, db_session: AsyncSession, create_test_user, monkeypatch
+) -> None:
+    """kakao 채널 활성 시 User.phone 있는 수신자에게 알림톡 호출."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    # 학생 3 중 2명만 phone, 학부모 2 중 1명만 phone
+    await _set_user_phones(
+        db_session,
+        owner_phone="010-9000-0000",
+        stu_phones={"stu-0": "010-1111-1111", "stu-1": "010-2222-2222"},
+        par_phones={"par-0": "010-3333-3333"},
+    )
+
+    from app.services import alimtalk_service as alim_module
+
+    sent_messages: list[tuple[str, str]] = []
+
+    class _RecordingMock:
+        async def send(self, *, template_id: str, recipient_phone: str, variables: dict):
+            sent_messages.append((template_id, recipient_phone))
+            from app.core.alimtalk_client import AlimTalkResult
+            return AlimTalkResult(success=True, message_id=f"mock-{len(sent_messages)}")
+
+    monkeypatch.setattr(alim_module, "_shared_mock_client", _RecordingMock())
+    # ALIMTALK_USE_MOCK 가 true 라고 가정 (테스트 기본 settings)
+
+    ann_id = await _create_kakao_draft(client, academy_id, audience="all")
+    resp = await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    assert resp.status_code == 200, resp.text
+
+    # 학원장(owner=teacher 겸직) 010-9000 + 학생 010-1111, 010-2222 + 학부모 010-3333 = 4건
+    phones = sorted(p for _, p in sent_messages)
+    assert phones == ["010-1111-1111", "010-2222-2222", "010-3333-3333", "010-9000-0000"]
+    assert all(t == "closure_notice_v1" for t, _ in sent_messages)
+
+
+async def test_send_kakao_marks_recipient_kakao_delivered(
+    client: AsyncClient, db_session: AsyncSession, create_test_user, monkeypatch
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    await _set_user_phones(db_session, stu_phones={"stu-0": "010-1111-1111"})
+
+    from app.services import alimtalk_service as alim_module
+    from app.core.alimtalk_client import AlimTalkResult
+
+    class _AlwaysOk:
+        async def send(self, **_):
+            return AlimTalkResult(success=True, message_id="ok")
+
+    monkeypatch.setattr(alim_module, "_shared_mock_client", _AlwaysOk())
+
+    ann_id = await _create_kakao_draft(client, academy_id, audience="students")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    # recipient row 의 kakao_delivered 확인
+    from sqlalchemy import select
+
+    from app.models.academy_announcement import AcademyAnnouncementRecipient
+
+    rows = (
+        await db_session.execute(
+            select(AcademyAnnouncementRecipient).where(
+                AcademyAnnouncementRecipient.announcement_id == ann_id
+            )
+        )
+    ).scalars().all()
+    # phone 있는 stu-0 만 True
+    by_uid = {r.user_id: r.kakao_delivered for r in rows}
+    assert by_uid["stu-0"] is True
+    assert by_uid["stu-1"] is False
+    assert by_uid["stu-2"] is False
+
+
+async def test_send_without_kakao_template_id_skips_alimtalk(
+    client: AsyncClient, db_session: AsyncSession, create_test_user, monkeypatch
+) -> None:
+    """channels 에 kakao 가 있어도 kakao_template_id 없으면 알림톡 호출 안 함."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    await _set_user_phones(db_session, stu_phones={"stu-0": "010-1111-1111"})
+
+    from app.services import alimtalk_service as alim_module
+    from app.core.alimtalk_client import AlimTalkResult
+
+    sent: list = []
+
+    class _Record:
+        async def send(self, **kw):
+            sent.append(kw)
+            return AlimTalkResult(success=True)
+
+    monkeypatch.setattr(alim_module, "_shared_mock_client", _Record())
+
+    # kakao_template_id 없이 작성
+    resp = await client.post(
+        f"/api/v1/academies/{academy_id}/announcements",
+        headers=_owner_headers(),
+        json={
+            "title": "공지",
+            "body_markdown": "본문",
+            "audience": "students",
+            "channels": ["inapp", "kakao"],
+        },
+    )
+    ann_id = resp.json()["id"]
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    assert sent == []
+
+
+async def test_send_kakao_failure_does_not_break_fanout(
+    client: AsyncClient, db_session: AsyncSession, create_test_user, monkeypatch
+) -> None:
+    """알림톡 발송 실패 시 recipient.kakao_delivered=False, inapp / status 는 정상."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    await _set_user_phones(db_session, stu_phones={"stu-0": "010-1111-1111"})
+
+    from app.services import alimtalk_service as alim_module
+    from app.core.alimtalk_client import AlimTalkResult
+
+    class _AlwaysFail:
+        async def send(self, **_):
+            return AlimTalkResult(success=False, error="carrier 503")
+
+    monkeypatch.setattr(alim_module, "_shared_mock_client", _AlwaysFail())
+
+    ann_id = await _create_kakao_draft(client, academy_id, audience="students")
+    resp = await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    body = resp.json()
+    assert body["status"] == "sent"  # status 전이는 정상
+    assert body["target_count"] == 3
+    assert body["delivered_count"] == 3  # inapp 활성 → inapp 기준
+
+    from sqlalchemy import select
+
+    from app.models.academy_announcement import AcademyAnnouncementRecipient
+
+    rows = (
+        await db_session.execute(
+            select(AcademyAnnouncementRecipient).where(
+                AcademyAnnouncementRecipient.announcement_id == ann_id
+            )
+        )
+    ).scalars().all()
+    assert all(r.kakao_delivered is False for r in rows)
+    assert all(r.inapp_delivered is True for r in rows)
+
+
+async def test_send_inapp_only_skips_kakao_entirely(
+    client: AsyncClient, db_session: AsyncSession, create_test_user, monkeypatch
+) -> None:
+    """channels=[inapp] 만 있으면 알림톡 호출 0건."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    await _set_user_phones(db_session, stu_phones={"stu-0": "010-1111-1111"})
+
+    from app.services import alimtalk_service as alim_module
+    from app.core.alimtalk_client import AlimTalkResult
+
+    sent: list = []
+
+    class _Record:
+        async def send(self, **kw):
+            sent.append(kw)
+            return AlimTalkResult(success=True)
+
+    monkeypatch.setattr(alim_module, "_shared_mock_client", _Record())
+
+    ann_id = await _create_draft(client, academy_id, audience="students")  # channels 기본 inapp
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+    assert sent == []
