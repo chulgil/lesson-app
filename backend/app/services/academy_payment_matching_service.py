@@ -356,5 +356,107 @@ class AcademyPaymentMatchingService:
         )
         return list(result.all())
 
+    # ------------------------------------------------------------------
+    # §6.2 일괄 매칭 화면 (inbox)
+    # ------------------------------------------------------------------
+
+    async def list_matching_inbox(
+        self, *, academy_id: str
+    ) -> tuple[
+        list[
+            tuple[
+                AcademyBankTransaction,
+                AcademyPaymentMatchSuggestion | None,
+                AcademyInvoice | None,
+                AcademyStudent | None,
+            ]
+        ],
+        int,
+        int,
+    ]:
+        """학원장 일괄 매칭 화면용 묶음 조회.
+
+        반환: (rows, suggested_count, unmatched_count) — rows 는 N+1 회피용으로 각
+        tx 의 top-1 suggestion + invoice + 학생을 미리 join 한 결과.
+
+        - 대상: state=suggested 또는 state=unmatched (처리 대기 행만)
+        - matched/ignored 행은 제외 (§6.2 "각 행을 빠르게 처리")
+        """
+        # 1. 처리 대기 tx 행 조회.
+        txs = list(
+            (
+                await self.db.scalars(
+                    select(AcademyBankTransaction)
+                    .where(AcademyBankTransaction.academy_id == academy_id)
+                    .where(
+                        AcademyBankTransaction.state.in_(
+                            [
+                                AcademyBankTransactionState.unmatched,
+                                AcademyBankTransactionState.suggested,
+                            ]
+                        )
+                    )
+                    .order_by(AcademyBankTransaction.tx_at.desc())
+                )
+            ).all()
+        )
+        if not txs:
+            return [], 0, 0
+
+        tx_ids = [tx.id for tx in txs]
+
+        # 2. 각 tx 의 top-1 (pending) suggestion 1회 조회.
+        sugg_rows = (
+            (
+                await self.db.execute(
+                    select(AcademyPaymentMatchSuggestion)
+                    .where(AcademyPaymentMatchSuggestion.bank_transaction_id.in_(tx_ids))
+                    .where(AcademyPaymentMatchSuggestion.user_decision == AcademyPaymentMatchSuggestionDecision.pending)
+                    .order_by(AcademyPaymentMatchSuggestion.score.desc())
+                )
+            )
+            .scalars()
+            .all()
+        )
+        top_by_tx: dict[str, AcademyPaymentMatchSuggestion] = {}
+        for sugg in sugg_rows:
+            # 점수 desc 순회 — 첫 등장이 top-1.
+            top_by_tx.setdefault(sugg.bank_transaction_id, sugg)
+
+        # 3. top suggestion 의 invoice + 학생 1회 join.
+        invoice_ids = [s.invoice_id for s in top_by_tx.values()]
+        inv_student_map: dict[str, tuple[AcademyInvoice, AcademyStudent]] = {}
+        if invoice_ids:
+            inv_rows = (
+                await self.db.execute(
+                    select(AcademyInvoice, AcademyStudent)
+                    .join(AcademyStudent, AcademyInvoice.academy_student_id == AcademyStudent.id)
+                    .where(AcademyInvoice.id.in_(invoice_ids))
+                )
+            ).all()
+            for inv, st in inv_rows:
+                inv_student_map[inv.id] = (inv, st)
+
+        # 4. 묶음 조립 + 집계.
+        suggested_count = 0
+        unmatched_count = 0
+        rows: list[
+            tuple[
+                AcademyBankTransaction,
+                AcademyPaymentMatchSuggestion | None,
+                AcademyInvoice | None,
+                AcademyStudent | None,
+            ]
+        ] = []
+        for tx in txs:
+            if tx.state == AcademyBankTransactionState.suggested:
+                suggested_count += 1
+            else:
+                unmatched_count += 1
+            top = top_by_tx.get(tx.id)
+            inv, st = inv_student_map.get(top.invoice_id, (None, None)) if top else (None, None)
+            rows.append((tx, top, inv, st))
+        return rows, suggested_count, unmatched_count
+
 
 __all__ = ["AcademyPaymentMatchingService"]

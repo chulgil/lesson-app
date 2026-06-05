@@ -30,6 +30,8 @@ from app.schemas.academy_payment_matching import (
     AcademyPaymentMatchSuggestionListResponse,
     AcademyPaymentMatchSuggestionResponse,
     BankTransactionState,
+    MatchingInboxResponse,
+    MatchingInboxRowResponse,
 )
 from app.services.academy_payment_matching_service import AcademyPaymentMatchingService
 from app.services.academy_service import AcademyService
@@ -173,6 +175,39 @@ async def list_suggestions(
     return AcademyPaymentMatchSuggestionListResponse(
         suggestions=[AcademyPaymentMatchSuggestionResponse.model_validate(s) for s in suggestions],
         total_count=len(suggestions),
+    )
+
+
+@router.get(
+    "/{academy_id}/billing/payments/matching/inbox",
+    response_model=MatchingInboxResponse,
+    status_code=status.HTTP_200_OK,
+    summary="§6.2 일괄 매칭 화면 — tx + top suggestion + invoice/학생 묶음 (owner only)",
+)
+async def matching_inbox(
+    academy_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> MatchingInboxResponse:
+    await AcademyService(db).assert_owner(academy_id, current_user.id)
+    rows, suggested_count, unmatched_count = await AcademyPaymentMatchingService(db).list_matching_inbox(
+        academy_id=academy_id
+    )
+    return MatchingInboxResponse(
+        rows=[
+            MatchingInboxRowResponse(
+                bank_transaction=AcademyBankTransactionResponse.model_validate(tx),
+                top_suggestion=(AcademyPaymentMatchSuggestionResponse.model_validate(top) if top is not None else None),
+                top_invoice_id=inv.id if inv is not None else None,
+                top_invoice_total=inv.total_amount if inv is not None else None,
+                top_invoice_period=(f"{inv.period_year:04d}-{inv.period_month:02d}" if inv is not None else None),
+                top_student_name=student.name if student is not None else None,
+            )
+            for (tx, top, inv, student) in rows
+        ],
+        total_count=len(rows),
+        suggested_count=suggested_count,
+        unmatched_count=unmatched_count,
     )
 
 

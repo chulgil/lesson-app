@@ -101,6 +101,26 @@ class AcademyPaymentMatchSuggestionListResponse(BaseModel):
     total_count: int
 
 
+class MatchingInboxRowResponse(BaseModel):
+    """§6.2 일괄 매칭 화면 1행 — tx + top-1 suggestion + invoice/학생 미리보기."""
+
+    bank_transaction: AcademyBankTransactionResponse
+    top_suggestion: AcademyPaymentMatchSuggestionResponse | None
+    top_invoice_id: str | None
+    top_invoice_total: int | None
+    top_invoice_period: str | None  # "YYYY-MM"
+    top_student_name: str | None
+
+
+class MatchingInboxResponse(BaseModel):
+    """§6.2 처리 대기 행 묶음 — state=unmatched/suggested 만."""
+
+    rows: list[MatchingInboxRowResponse]
+    total_count: int
+    suggested_count: int
+    unmatched_count: int
+
+
 __all__ = [
     "AcademyBankTransactionCreate",
     "AcademyBankTransactionListResponse",
@@ -111,5 +131,7 @@ __all__ = [
     "AcademyPaymentMatchSuggestionResponse",
     "BankTransactionSource",
     "BankTransactionState",
+    "MatchingInboxResponse",
+    "MatchingInboxRowResponse",
     "SuggestionDecision",
 ]
