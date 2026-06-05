@@ -60,6 +60,101 @@ void main() {
       expect(updated.description, '레슨 1개 완료');
       expect(updated.createdAt, original.createdAt);
     });
+
+    test('new BE-aligned fields default to null', () {
+      final log = AcademyActivityLog(
+        id: 'log_001',
+        academyId: 'acad_001',
+        actorMemberId: 'member_001',
+        actorName: '김선생님',
+        actionType: 'lesson_created',
+        description: '레슨 1개 생성',
+        createdAt: DateTime(2026, 5, 28),
+      );
+
+      expect(log.targetResourceType, isNull);
+      expect(log.targetResourceId, isNull);
+      expect(log.metadata, isNull);
+    });
+
+    test('copyWith preserves new BE-aligned fields', () {
+      final original = AcademyActivityLog(
+        id: 'log_001',
+        academyId: 'acad_001',
+        actorMemberId: 'member_001',
+        actorName: '김선생님',
+        actionType: 'lesson_created',
+        description: '레슨 1개 생성',
+        createdAt: DateTime(2026, 5, 28),
+        targetResourceType: 'lesson',
+        targetResourceId: 'lesson_42',
+        metadata: const {'before': 'A', 'after': 'B'},
+      );
+
+      final updated = original.copyWith(description: '수정됨');
+
+      expect(updated.targetResourceType, equals('lesson'));
+      expect(updated.targetResourceId, equals('lesson_42'));
+      expect(updated.metadata, equals(const {'before': 'A', 'after': 'B'}));
+      expect(updated.description, equals('수정됨'));
+    });
+
+    test('equality covers metadata content (not Map identity)', () {
+      final base = AcademyActivityLog(
+        id: 'log_001',
+        academyId: 'acad_001',
+        actorMemberId: 'member_001',
+        actorName: '김선생님',
+        actionType: 'schedule_changed',
+        description: '시간 변경',
+        createdAt: DateTime(2026, 5, 28),
+        targetResourceType: 'lesson',
+        targetResourceId: 'lesson_42',
+        metadata: const {'before': '14:00', 'after': '15:00'},
+      );
+      final equal = AcademyActivityLog(
+        id: 'log_001',
+        academyId: 'acad_001',
+        actorMemberId: 'member_001',
+        actorName: '김선생님',
+        actionType: 'schedule_changed',
+        description: '시간 변경',
+        createdAt: DateTime(2026, 5, 28),
+        targetResourceType: 'lesson',
+        targetResourceId: 'lesson_42',
+        metadata: {'before': '14:00', 'after': '15:00'}, // 다른 Map 인스턴스
+      );
+      final different = base.copyWith(
+        metadata: const {'before': '14:00', 'after': '16:00'},
+      );
+
+      expect(base, equals(equal));
+      expect(base.hashCode, equals(equal.hashCode));
+      expect(base, isNot(equals(different)));
+    });
+
+    test('null metadata equals null metadata', () {
+      final a = AcademyActivityLog(
+        id: 'log_001',
+        academyId: 'acad_001',
+        actorMemberId: 'member_001',
+        actorName: '김선생님',
+        actionType: 'lesson_created',
+        description: '레슨 생성',
+        createdAt: DateTime(2026, 5, 28),
+      );
+      final b = AcademyActivityLog(
+        id: 'log_001',
+        academyId: 'acad_001',
+        actorMemberId: 'member_001',
+        actorName: '김선생님',
+        actionType: 'lesson_created',
+        description: '레슨 생성',
+        createdAt: DateTime(2026, 5, 28),
+      );
+
+      expect(a, equals(b));
+    });
   });
 
   group('AcademyActivityTimelineItem highlight', () {
