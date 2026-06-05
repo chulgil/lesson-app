@@ -116,3 +116,116 @@ class AcademyAnnouncementService:
                 detail="Not a member",
             )
         return announcement
+
+    async def resolve_audience_count(
+        self,
+        *,
+        academy_id: str,
+        by_user_id: str,
+        audience: ModelAudience,
+        audience_filter: dict | None = None,
+    ) -> dict[str, int | dict[str, int]]:
+        """공지 작성 화면 미리보기용 — spec §3.1 "대상 수" 산출.
+
+        Returns: ``{"target_count": N, "by_role": {"teacher": T, "parent": P, "student": S}}``
+
+        분류:
+        - all: 활성 강사 멤버 + 학원 학생(active/matched)의 student/parent
+        - teachers: 활성 강사 멤버만
+        - students: AcademyStudent 의 student_user_id NULL 아닌 활성 학생
+        - parents: AcademyStudent 의 parent_user_id NULL 아닌 활성 학생
+        - teacher_students: filter[teacher_member_id] 매칭 학생들의 student/parent
+
+        제외: status=alumni / paused, member.access_revoked_at IS NOT NULL.
+        """
+        from app.models.academy import (
+            AcademyMember,
+            AcademyMemberRole,
+            AcademyStudent,
+            AcademyStudentStatus,
+        )
+        from app.services.academy_service import AcademyService
+
+        await AcademyService(self.db).assert_owner(academy_id, by_user_id)
+
+        # ---- 강사 멤버 활성 카운트 (재사용) ----
+        teacher_count = int(
+            (
+                await self.db.scalar(
+                    select(func.count(AcademyMember.id))
+                    .where(AcademyMember.academy_id == academy_id)
+                    .where(AcademyMember.role == AcademyMemberRole.teacher)
+                    .where(AcademyMember.access_revoked_at.is_(None))
+                )
+            )
+            or 0
+        )
+
+        # ---- 학원 학생 base 쿼리 (active/matched 만, alumni/paused 제외) ----
+        active_statuses = (AcademyStudentStatus.matched, AcademyStudentStatus.active)
+        students_base = select(AcademyStudent).where(
+            AcademyStudent.academy_id == academy_id,
+            AcademyStudent.status.in_(active_statuses),
+        )
+
+        # ---- teacher_students 분기는 매칭 강사 필터 추가 ----
+        if audience == ModelAudience.teacher_students:
+            teacher_member_id = (audience_filter or {}).get("teacher_member_id")
+            if not teacher_member_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="audience=teacher_students requires audience_filter.teacher_member_id",
+                )
+            students_base = students_base.where(AcademyStudent.teacher_member_id == teacher_member_id)
+
+        # 가입한 학생 user 수
+        student_user_count = int(
+            (
+                await self.db.scalar(
+                    select(func.count()).select_from(
+                        students_base.where(AcademyStudent.student_user_id.is_not(None)).subquery()
+                    )
+                )
+            )
+            or 0
+        )
+        # 가입한 학부모 user 수
+        parent_user_count = int(
+            (
+                await self.db.scalar(
+                    select(func.count()).select_from(
+                        students_base.where(AcademyStudent.parent_user_id.is_not(None)).subquery()
+                    )
+                )
+            )
+            or 0
+        )
+
+        teacher_part = 0
+        parent_part = 0
+        student_part = 0
+
+        if audience == ModelAudience.all:
+            teacher_part = teacher_count
+            parent_part = parent_user_count
+            student_part = student_user_count
+        elif audience == ModelAudience.teachers:
+            teacher_part = teacher_count
+        elif audience == ModelAudience.students:
+            student_part = student_user_count
+        elif audience == ModelAudience.parents:
+            parent_part = parent_user_count
+        elif audience == ModelAudience.teacher_students:
+            # 특정 강사 학생의 student + parent (강사 본인은 미포함)
+            parent_part = parent_user_count
+            student_part = student_user_count
+
+        target_count = teacher_part + parent_part + student_part
+        return {
+            "target_count": target_count,
+            "by_role": {
+                "teacher": teacher_part,
+                "parent": parent_part,
+                "student": student_part,
+            },
+        }

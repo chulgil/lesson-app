@@ -73,3 +73,16 @@ class AcademyAnnouncementResponse(BaseModel):
 class AcademyAnnouncementListResponse(BaseModel):
     announcements: list[AcademyAnnouncementResponse] = Field(default_factory=list)
     total_count: int
+
+
+class AudienceCountByRole(BaseModel):
+    teacher: int = 0
+    parent: int = 0
+    student: int = 0
+
+
+class AcademyAnnouncementAudiencePreviewResponse(BaseModel):
+    """공지 작성 화면 미리보기 — spec §3.1 "대상 수: 124명 (강사 8, 학부모 87, 학생 29)"."""
+
+    target_count: int
+    by_role: AudienceCountByRole
