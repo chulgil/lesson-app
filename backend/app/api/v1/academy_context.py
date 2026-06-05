@@ -118,7 +118,7 @@ async def switch_context(
     authorization: Annotated[str | None, Header()] = None,
     user_agent: Annotated[str | None, Header(alias="User-Agent")] = None,
 ) -> ContextSwitchResponse:
-    current_ctx, _, _, current_jti = _extract_context_from_token(authorization)
+    current_ctx, current_academy_id, _, current_jti = _extract_context_from_token(authorization)
     ip = request.client.host if request.client else None
     service = AcademyContextService(db)
     return await service.switch_context(
@@ -127,6 +127,7 @@ async def switch_context(
         ip=ip,
         user_agent=user_agent,
         current_active_context=current_ctx,
+        current_academy_id=current_academy_id,
         current_jti=current_jti,
     )
 

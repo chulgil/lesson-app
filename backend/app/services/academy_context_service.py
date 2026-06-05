@@ -131,6 +131,7 @@ class AcademyContextService:
         ip: str | None = None,
         user_agent: str | None = None,
         current_active_context: str | None = None,
+        current_academy_id: str | None = None,
         current_jti: str | None = None,
     ) -> ContextSwitchResponse:
         """컨텍스트 전환 — context_toggle_spec §4.1, §7.2.
@@ -139,9 +140,14 @@ class AcademyContextService:
         1. can_switch_context 검증 (§3.2): AcademyMember.exists
         2. 새 JWT 발급 (active_context/academy_id/teacher_id 포함, 자동 jti)
         3. 이전 access token jti 가 있으면 ``TokenBlacklist`` 에 추가
-           (§7.2 동시 세션 금지 — 토글 직후 이전 JWT 401).
-        4. ContextSwitchLog 자동 기록
-        5. target=academy_owner 면 활성 위임 자동 종료 (학원장 자동 복귀 감지)
+           (호출자 토큰 즉시 무효)
+        4. **같은 학원** owner↔teacher 토글 시 user.tokens_revoked_at epoch
+           갱신 — 다른 디바이스 동시 세션 만료. **학원 변경 토글**
+           (current_academy_id != body.academy_id) 은 epoch 미갱신 —
+           spec §7.2 multi-academy 예외: 학원 2개 이상 소유 학원장은 학원별로
+           별도 세션 허용.
+        5. ContextSwitchLog 자동 기록
+        6. target=academy_owner 면 활성 위임 자동 종료 (학원장 자동 복귀 감지)
         """
         target_role = _context_to_role(body.target_context)
         member = await self.db.scalar(
@@ -178,18 +184,19 @@ class AcademyContextService:
         }
         new_token = create_access_token(data=token_payload)
 
-        # AC-M2 §7.2: 이전 토큰 만료.
-        # 1) jti 단건 blacklist — 호출자 토큰 즉시 무효
-        # 2) user.tokens_revoked_at epoch 갱신 — 같은 user 의 다른 디바이스
-        #    활성 토큰도 일괄 만료 (다중 디바이스 동시 세션 금지). 새 토큰은
-        #    직후 발급되므로 iat > tokens_revoked_at 이라 통과.
+        # AC-M2 §7.2: 이전 토큰 만료 — 두 가지 메커니즘.
+        # 1) jti 단건 blacklist — 호출자 토큰 즉시 무효 (학원 변경 토글 포함 항상)
+        # 2) user.tokens_revoked_at epoch 갱신 — **같은 학원** 모드 토글일 때만.
+        #    학원 변경 토글은 epoch 미갱신 (§7.2 multi-academy 예외).
         from datetime import UTC, datetime, timedelta
 
         from app.core.config import settings
         from app.models.user import TokenBlacklist
 
         now = datetime.now(UTC)
-        user.tokens_revoked_at = now
+        is_same_academy_switch = current_academy_id is not None and current_academy_id == body.academy_id
+        if is_same_academy_switch:
+            user.tokens_revoked_at = now
         if current_jti:
             existing = await self.db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == current_jti))
             if existing is None:
