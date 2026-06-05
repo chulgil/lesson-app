@@ -328,3 +328,92 @@ async def test_global_access_denials_works_in_teacher_context(
     )
     assert response.status_code == 200
     assert response.json()["total_count"] == 1
+
+
+# ---------------------------------------------------------------------------
+# §7.2 JWT revocation — 토글 직후 이전 JWT 만료, 새 JWT 통과
+# ---------------------------------------------------------------------------
+
+
+async def test_switch_revokes_previous_access_token(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """CT-09 시나리오: 토글 직후 이전 access token 으로 호출 → 401."""
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    previous_headers = _owner_headers(active_context="academy_owner", academy_id=academy_id)
+    # 호출 가능 확인
+    pre = await client.get("/api/v1/auth/context", headers=previous_headers)
+    assert pre.status_code == 200
+
+    # 토글 — 이전 토큰의 jti 가 TokenBlacklist 에 추가됨
+    switch = await client.post(
+        "/api/v1/auth/context/switch",
+        headers=previous_headers,
+        json={"target_context": "teacher", "academy_id": academy_id},
+    )
+    assert switch.status_code == 200
+    new_token = switch.json()["access_token"]
+
+    # 이전 토큰 → 401
+    post_prev = await client.get("/api/v1/auth/context", headers=previous_headers)
+    assert post_prev.status_code == 401
+
+    # 새 토큰 → 200
+    post_new = await client.get(
+        "/api/v1/auth/context",
+        headers={"Authorization": f"Bearer {new_token}"},
+    )
+    assert post_new.status_code == 200
+
+
+async def test_switch_records_jti_in_token_blacklist(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """토글 시 이전 토큰 jti 가 TokenBlacklist 에 정확히 등록되는지 검증."""
+    from app.models.user import TokenBlacklist
+
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    headers = _owner_headers(active_context="academy_owner", academy_id=academy_id)
+    previous_jti = _decode(headers["Authorization"].split()[1])["jti"]
+
+    await client.post(
+        "/api/v1/auth/context/switch",
+        headers=headers,
+        json={"target_context": "teacher", "academy_id": academy_id},
+    )
+
+    row = await db_session.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == previous_jti))
+    assert row is not None
+    assert row.user_id == OWNER_USER_ID
+
+
+async def test_jti_less_legacy_token_still_works(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """레거시 토큰 (jti 없음) 은 blacklist 통과 — backward compat."""
+    await create_test_user(user_id=OWNER_USER_ID, role="teacher", name="김원장")
+    # jti 를 제거하기 위해 수동으로 토큰 생성 (decode → del jti → re-encode)
+    raw = create_access_token(data={"sub": OWNER_USER_ID, "role": "teacher"})
+    payload = _decode(raw)
+    payload.pop("jti", None)
+    legacy = _jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+    response = await client.get(
+        "/api/v1/auth/context",
+        headers={"Authorization": f"Bearer {legacy}"},
+    )
+    assert response.status_code == 200
+
+
+async def test_new_access_token_includes_jti(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """create_access_token 자동 jti 부여 — payload 에 uuid 형식 jti 포함."""
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    response = await client.post(
+        "/api/v1/auth/context/switch",
+        headers=_owner_headers(active_context="academy_owner", academy_id=academy_id),
+        json={"target_context": "teacher", "academy_id": academy_id},
+    )
+    assert response.status_code == 200
+    payload = _decode(response.json()["access_token"])
+    assert "jti" in payload
+    assert len(payload["jti"]) >= 32  # uuid4 length
