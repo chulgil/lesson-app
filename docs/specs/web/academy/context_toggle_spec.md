@@ -93,6 +93,43 @@ class ContextSwitchLog(Base):
 
 조회 권한: 본인 + 운영자 어드민만. 학원장이 자기 자신 로그 조회 가능 (투명성).
 
+### 3.4 ContextAccessDenialLog (§6.3 차단 audit — 신설)
+
+```python
+class ContextAccessDenialLog(Base):
+    """권한 매트릭스 차단 감사 — §6.3 차단 응답 detail.audit_id 가 본 행의 id.
+
+    1년 보존 (§9). 운영자 cron 으로 정기 cleanup."""
+    id = Column(PK)
+    user_id = Column(FK users)
+    active_context = Column(String(20), nullable=True)   # JWT 페이로드의 active_context (None 가능)
+    academy_id = Column(FK academies, nullable=True)     # 학원 무관 차단(recordings 등)은 NULL
+    denial_code = Column(String(50))                     # FORBIDDEN_TEACHER_SCOPE / FORBIDDEN_ACADEMY_OWNER_SCOPE / FORBIDDEN_NOT_YOUR_STUDENT
+    endpoint_path = Column(String(200))                  # 차단된 라우트
+    http_method = Column(String(10))
+    target_resource_id = Column(String(100), nullable=True)  # 학생 id 등 (선택)
+    denied_at = Column(DateTime)
+```
+
+조회 권한: 본인(`/auth/me/access-denials`) + 학원장 본인 학원 단위(`/academies/{id}/access-denials/me`) + 운영자 어드민 전체(`/scheduler/audit/access-denials`).
+
+### 3.5 TokenBlacklist + User.tokens_revoked_at (§7.2 세션 격리 — 재사용)
+
+```python
+class TokenBlacklist(Base):
+    """logout / 컨텍스트 토글 시 호출자 토큰 jti 1건 즉시 무효."""
+    jti = Column(String(255), unique=True)
+    user_id = Column(FK users)
+    expires_at = Column(DateTime)
+
+class User(Base):
+    # 기존 컬럼 …
+    tokens_revoked_at = Column(DateTime, nullable=True)
+    # ↑ 같은 학원 owner↔teacher 토글 시 갱신. access_token.iat <= tokens_revoked_at 이면 401.
+    #   같은 user 의 모든 디바이스 토큰 일괄 만료 (jti 추적 없이).
+    #   학원 변경 토글 (academy_id 다름) 은 갱신 안 함 — §7.2 multi-academy 예외.
+```
+
 ## 4. 토글 API
 
 ### 4.1 컨텍스트 전환
@@ -343,3 +380,4 @@ lesson-app 상단 더 보기 메뉴 (학원장 겸직만 표시):
 - 2026-06-05 (5): §9 보존 정책 cron 구현. `AcademyGovernanceService.cleanup_old_access_denials(retention_days=365)` 신설 — `ContextAccessDenialLog.denied_at < cutoff` 행 일괄 삭제. `POST /api/v1/scheduler/audit/cleanup-context-denials?retention_days=` endpoint 추가 (router-level `require_internal_api_key`). 회귀 테스트 5건 (인증 401 × 2 + default 365일 삭제 / retention_days override / 빈 결과 0). 운영자 cron 으로 매일 호출 가능. 분쟁 대응 연장 / GDPR 단축은 retention_days 인자로 override.
 - 2026-06-05 (6): §9 운영자 어드민 전체 audit 조회 endpoint. `AcademyGovernanceService.list_all_access_denials(user_id?, academy_id?, denial_code?, from_at?, to_at?, limit)` — user_id 강제 필터 없이 전체 audit 조회. `GET /api/v1/scheduler/audit/access-denials` endpoint 추가 (internal_api_key 보호, scheduler 라우터 재사용). 본인 조회 `/auth/me/access-denials` 와 권한 경계 분리 — 운영자 도구만 호출. 회귀 테스트 5건 (인증 401 + 모든 user audit 반환 + user_id 필터 + 시각 범위 필터 + denial_code 필터). §9 transparency 3면 (본인 학원 단위 + 본인 전체 + 운영자 전체) 모두 구현 완료. AC-M2 backend §6/§7.2/§8.4/§9 모든 항목 종결.
 - 2026-06-05 (7): §7.2 multi-academy 예외 구현. 학원 2개 이상 소유 학원장이 학원 A → 학원 B 로 전환할 때 학원 A 의 다른 디바이스 세션을 보존. `switch_context` service 에 `current_academy_id` 인자 추가 — `current_academy_id == body.academy_id` (같은 학원 owner↔teacher 토글) 일 때만 `user.tokens_revoked_at` epoch 갱신. 학원 변경 토글은 호출자 jti blacklist 만 (epoch 무관). endpoint 의 `_extract_context_from_token` 두 번째 튜플 값(academy_id)을 service 에 전달. 회귀 테스트 3건 (같은 학원 토글 → 다른 디바이스 만료 / 학원 A→B → A 다른 디바이스 보존 / 학원 A→B → caller jti 만 blacklist + epoch 미갱신). spec §7.2 의 multi-academy 예외 ("학원 2개 이상 소유 학원장 — 학원별로 별도 세션 허용") 충족.
+- 2026-06-05 (8): spec 본문 drift 정리. §3.3 ContextSwitchLog 다음에 §3.4 ContextAccessDenialLog 모델 정의 + §3.5 TokenBlacklist · User.tokens_revoked_at 정의 추가. 그동안 changelog 에만 명시되어 있던 BE 구현 모델 3종을 spec 본문에 직접 명시 — AC-M2 backend §6/§7.2/§8.4/§9 의 모든 영구 데이터 구조가 §3 데이터 모델 섹션에 모여 신규 협업자가 한 곳에서 파악 가능. 코드 변경 없음.
