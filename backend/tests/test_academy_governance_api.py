@@ -16,11 +16,37 @@ from app.models.academy_governance import (
     AcademyActivityLog,
     AcademyContext,
     AcademyDelegationAction,
+    ContextAccessDenialLog,
     ContextSwitchLog,
     ContextSwitchTrigger,
 )
 
 pytestmark = pytest.mark.asyncio
+
+
+async def _seed_denial(
+    db_session: AsyncSession,
+    *,
+    user_id: str,
+    academy_id: str | None,
+    denial_code: str = "FORBIDDEN_TEACHER_SCOPE",
+    endpoint_path: str = "/api/v1/test",
+    target_resource_id: str | None = None,
+) -> ContextAccessDenialLog:
+    """audit 행 수기 삽입 헬퍼."""
+    log = ContextAccessDenialLog(
+        user_id=user_id,
+        active_context="teacher",
+        academy_id=academy_id,
+        denial_code=denial_code,
+        endpoint_path=endpoint_path,
+        http_method="GET",
+        target_resource_id=target_resource_id,
+        denied_at=datetime.now(UTC),
+    )
+    db_session.add(log)
+    await db_session.commit()
+    return log
 
 
 OWNER_USER_ID = "test-user-id"
@@ -400,3 +426,100 @@ async def test_context_switch_log_lists_own_only(
     body = response.json()
     assert body["total_count"] == 1  # 본인 것만
     assert body["logs"][0]["user_id"] == OWNER_USER_ID
+
+
+# ---------------------------------------------------------------------------
+# ContextAccessDenialLog — /access-denials/me (spec §9 transparency)
+# ---------------------------------------------------------------------------
+
+
+async def test_access_denial_log_lists_own_for_academy(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    """본인 차단 audit 만 반환, 다른 user 의 audit + 다른 학원 audit 는 제외."""
+    academy_id, _ = await _create_academy_with_teacher(client, db_session, create_test_user)
+    other_academy_id = str(uuid4())
+
+    # 본인 + 해당 학원
+    own = await _seed_denial(
+        db_session,
+        user_id=OWNER_USER_ID,
+        academy_id=academy_id,
+        denial_code="FORBIDDEN_NOT_YOUR_STUDENT",
+        endpoint_path=f"/api/v1/academies/students/{uuid4()}",
+        target_resource_id=str(uuid4()),
+    )
+    # 본인 + 다른 학원 (제외 대상)
+    await _seed_denial(db_session, user_id=OWNER_USER_ID, academy_id=other_academy_id)
+    # 다른 user + 해당 학원 (제외 대상)
+    await _seed_denial(db_session, user_id=OTHER_USER_ID, academy_id=academy_id)
+
+    response = await client.get(
+        f"/api/v1/academies/{academy_id}/access-denials/me",
+        headers=_owner_headers(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 1
+    log = body["logs"][0]
+    assert log["id"] == own.id
+    assert log["user_id"] == OWNER_USER_ID
+    assert log["academy_id"] == academy_id
+    assert log["denial_code"] == "FORBIDDEN_NOT_YOUR_STUDENT"
+    assert log["target_resource_id"] == own.target_resource_id
+
+
+async def test_access_denial_log_empty_when_no_denials(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    academy_id, _ = await _create_academy_with_teacher(client, db_session, create_test_user)
+    response = await client.get(
+        f"/api/v1/academies/{academy_id}/access-denials/me",
+        headers=_owner_headers(),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 0
+    assert body["logs"] == []
+
+
+async def test_access_denial_log_non_member_forbidden(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    """비멤버가 호출 → 403 Not a member."""
+    academy_id, _ = await _create_academy_with_teacher(client, db_session, create_test_user)
+    # OTHER_USER_ID 는 강사 멤버라 통과 — 별도 비멤버 user 로 검사.
+    non_member_id = "non-member-user"
+    await create_test_user(user_id=non_member_id, role="teacher", email="nm@test.com")
+    non_member_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': non_member_id, 'role': 'teacher'})}"
+    }
+    response = await client.get(
+        f"/api/v1/academies/{academy_id}/access-denials/me",
+        headers=non_member_headers,
+    )
+    assert response.status_code == 403
+
+
+async def test_access_denial_log_teacher_context_blocked(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    """teacher 모드 JWT → router-level require_owner_context 에 의해 403 + audit 기록."""
+    academy_id, _ = await _create_academy_with_teacher(client, db_session, create_test_user)
+    teacher_headers = {
+        "Authorization": f"Bearer {create_access_token(data={'sub': OWNER_USER_ID, 'role': 'teacher', 'active_context': 'teacher', 'academy_id': academy_id})}"
+    }
+    response = await client.get(
+        f"/api/v1/academies/{academy_id}/access-denials/me",
+        headers=teacher_headers,
+    )
+    assert response.status_code == 403
+    assert response.json()["detail"]["error"] == "FORBIDDEN_TEACHER_SCOPE"

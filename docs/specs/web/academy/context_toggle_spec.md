@@ -237,6 +237,13 @@ lesson-app 상단 더 보기 메뉴 (학원장 겸직만 표시):
   "audit_id": "...",
   "remediation": "학원장 모드로 전환 후 다시 시도하세요."
 }
+
+{
+  "error": "FORBIDDEN_NOT_YOUR_STUDENT",     // 강사 모드 + 본인 매칭이 아닌 학생 접근
+  "message": "본인이 담당하지 않는 학생입니다.",
+  "audit_id": "...",
+  "remediation": "학원장에게 매칭을 요청하거나, 학원장 모드로 전환 후 다시 시도하세요."
+}
 ```
 
 모든 차단 호출은 `AuditLog` 기록 (user_id, active_context, endpoint, target_resource_id, timestamp).
@@ -325,3 +332,9 @@ lesson-app 상단 더 보기 메뉴 (학원장 겸직만 표시):
 ## 11. 변경 이력
 
 - 2026-05-21: 초안. README.md §3차 분리·노출 정책 결정 + 6차 lesson-app/web 분담 결정 후속. 권한 매트릭스 (§6), 세션 격리 (§7), 엣지 케이스 (§8), 감사 (§9), 테스트 (§10) 신설. `console_overview_spec.md §6` 의 요약을 확장하는 위치.
+- 2026-06-04: §6 권한 매트릭스 BE 구현. `backend/app/core/context_deps.py` 의 `require_owner_context` / `require_teacher_context` dependency 로 router-level 격리. 적용: 콘솔 owner — `academy_billing`, `academy_governance`. lesson-app teacher — `recordings`, `practice_logs`, `ai_notes`, `lesson_summaries`. 차단 응답은 §6.3 표준 (`FORBIDDEN_TEACHER_SCOPE` / `FORBIDDEN_ACADEMY_OWNER_SCOPE`). active_context 미지정 토큰 (AC-M1 호환) 은 통과 — 기존 `assert_owner` / `get_current_teacher` 가 권한 강제. 회귀 테스트 8건 (`test_context_permission_matrix.py`). 향후 학원 차원 announcements 엔드포인트 / 학생 access-request 라우트는 신설 시 동일 패턴 적용.
+- 2026-06-04 (2): `academies.py` endpoint 단위 적용. owner-only 7개 endpoint (`PATCH /{id}`, `POST /members/{id}/revoke`, `POST /{id}/students`, `PATCH /students/{id}`, `POST /{id}/invites`, `GET /{id}/invites`, `POST /invites/{id}/revoke`) 에 `dependencies=[Depends(require_owner_context)]` 부착. 공용 endpoint (학원 생성/조회/내 학원 목록/멤버 목록/내 동의/초대 수락·거절) 는 라우터 일괄 적용 부적합으로 제외. 강사 모드에서 본인 학생만 보여야 할 `GET /{id}/students` 와 `GET /students/{id}` 는 서비스 단 필터링 필요 (별도 작업). 회귀 테스트 8건 추가 — 누적 16건.
+- 2026-06-04 (3): `GET /{id}/students` + `GET /students/{id}` 강사 모드 격리. `academy_service.list_students` 에 `teacher_user_id_filter` 추가 — `AcademyMember(user_id, role=teacher, academy_id)` join 으로 본인 매칭 학생만 반환. `get_student` endpoint 는 강사 모드 + 본인 매칭 아닌 학생 → 403 + `FORBIDDEN_NOT_YOUR_STUDENT` (신규 차단 코드, §6.3 표준 준수). list 는 200 + 필터링된 결과 (정보 누출 없음). 회귀 테스트 6건 추가 — 누적 22건. 권한 매트릭스 (§6) BE 구현 완료.
+- 2026-06-04 (4): §9 AuditLog 통합. `ContextAccessDenialLog` 모델 신설 (`backend/app/models/academy_governance.py`) + Alembic migration (`ac_m2_context_denial_log`, revises `ac_m1_group_c_billing`). 차단 응답 detail.audit_id 가 본 행의 id 와 일치하도록 `context_deps.record_access_denial` 헬퍼 신설 — 메인 db 세션에 add + commit 하여 후속 rollback 무관 보존. 컬럼: user_id, active_context, academy_id?, denial_code, endpoint_path, http_method, target_resource_id?, denied_at. 3개 인덱스 (user/academy/code × time). 적용: `require_owner_context`, `require_teacher_context`, `get_student` FORBIDDEN_NOT_YOUR_STUDENT. 보존 정책: 1년 (cleanup 작업은 별도). 회귀 테스트 5건 추가 — 누적 27건. §6, §9 BE 구현 완료.
+- 2026-06-05: §9 학원장 본인 audit 조회 endpoint 추가. `GET /api/v1/academies/{id}/access-denials/me` — 본인 학원 관련 권한 차단 audit 조회 (transparency). ContextSwitchLog `/me` endpoint 와 동일 패턴 + 동일 권한 (멤버 + owner_context). schemas: `ContextAccessDenialLogResponse` / `ListResponse`. service: `AcademyGovernanceService.list_access_denials_for_user(user_id, academy_id?, limit)`. router-level `require_owner_context` 가 teacher 모드 차단 (학원장 모드여야 audit 조회). 회귀 테스트 4건 (본인 audit만 + 다른 학원/user 제외 + 비멤버 403 + teacher 모드 차단). 미해결: 학원 무관 차단(예: recordings) 의 본인 조회 endpoint, 운영자 어드민 전체 조회.
+- 2026-06-05 (2): §9 학원 무관 본인 audit 조회 endpoint 추가. `GET /api/v1/auth/me/access-denials?denial_code=&limit=` — 본인 차단 audit 전체 (학원 관련 + 학원 무관 recordings/practice_logs 등 포함). 권한: 인증만 — active_context 무관 (본인 데이터는 모드 무관). service 메서드에 `denial_code` 옵션 필터 추가. 회귀 테스트 5건 (학원 무관 포함 + 다른 user 제외 + denial_code 필터 + 인증 필요 + teacher 모드도 통과). §9 transparency 양면 (학원 단위 + 사용자 단위) 모두 구현 완료.

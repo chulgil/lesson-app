@@ -246,15 +246,47 @@ class AcademyService:
         return student
 
     async def list_students(
-        self, *, academy_id: str, status_filter: AcademyStudentStatus | None = None
+        self,
+        *,
+        academy_id: str,
+        status_filter: AcademyStudentStatus | None = None,
+        teacher_user_id_filter: str | None = None,
     ) -> tuple[list[AcademyStudent], int]:
+        """학생 목록. teacher_user_id_filter 지정 시 해당 강사 매칭 학생만 반환.
+
+        AC-M2 §6.2 강사 모드 격리: lesson-app teacher 컨텍스트에서는 본인 매칭
+        학생만 보여야 함. 매칭은 ``AcademyStudent.teacher_member_id`` →
+        ``AcademyMember(user_id, role=teacher, academy_id)`` 로 해석.
+        """
         stmt = select(AcademyStudent).where(AcademyStudent.academy_id == academy_id)
         if status_filter is not None:
             stmt = stmt.where(AcademyStudent.status == status_filter)
+        if teacher_user_id_filter is not None:
+            member_id = await self.db.scalar(
+                select(AcademyMember.id).where(
+                    AcademyMember.academy_id == academy_id,
+                    AcademyMember.user_id == teacher_user_id_filter,
+                    AcademyMember.role == AcademyMemberRole.teacher,
+                    AcademyMember.access_revoked_at.is_(None),
+                )
+            )
+            # 강사 자격이 없거나 회수된 경우 빈 결과 — None == None 매칭 회피용으로 sentinel.
+            stmt = stmt.where(AcademyStudent.teacher_member_id == (member_id or "__none__"))
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = int((await self.db.scalar(count_stmt)) or 0)
         result = await self.db.scalars(stmt.order_by(AcademyStudent.registered_at.desc()))
         return list(result.all()), total
+
+    async def get_teacher_member_id_for_user(self, *, academy_id: str, user_id: str) -> str | None:
+        """해당 학원에서 user의 활성 강사 AcademyMember.id 반환. 없으면 None."""
+        return await self.db.scalar(
+            select(AcademyMember.id).where(
+                AcademyMember.academy_id == academy_id,
+                AcademyMember.user_id == user_id,
+                AcademyMember.role == AcademyMemberRole.teacher,
+                AcademyMember.access_revoked_at.is_(None),
+            )
+        )
 
     async def get_student(self, student_id: str) -> AcademyStudent:
         student = await self.db.get(AcademyStudent, student_id)

@@ -74,6 +74,27 @@ class ContextSwitchLogListResponse(BaseModel):
     total_count: int
 
 
+class ContextAccessDenialLogResponse(BaseModel):
+    """조회 only — 권한 매트릭스 차단 시 시스템이 자동 기록 (§6.3, §9)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    user_id: str
+    active_context: str | None = None
+    academy_id: str | None = None
+    denial_code: str
+    endpoint_path: str
+    http_method: str
+    target_resource_id: str | None = None
+    denied_at: _dt.datetime
+
+
+class ContextAccessDenialLogListResponse(BaseModel):
+    logs: list[ContextAccessDenialLogResponse] = []
+    total_count: int
+
+
 # ---------------------------------------------------------------------------
 # AcademyDelegation
 # ---------------------------------------------------------------------------

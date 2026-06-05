@@ -7,12 +7,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.context_deps import require_teacher_context
 from app.core.deps import get_current_teacher, get_db
 from app.models.user import User
 from app.schemas.share import LessonSummaryShareRequest, LessonSummaryShareResponse
 from app.services.share_token_service import ShareTokenService
 
-router = APIRouter()
+# AC-M2 권한 매트릭스: 학원장 모드 JWT → 403 (레슨 요약 공유는 강사 권한).
+router = APIRouter(dependencies=[Depends(require_teacher_context)])
 
 
 @router.post(

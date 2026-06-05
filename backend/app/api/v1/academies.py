@@ -7,9 +7,10 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.context_deps import ActiveContext, record_access_denial, require_owner_context
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.academy import (
@@ -103,6 +104,7 @@ async def get_academy(
     response_model=AcademyResponse,
     status_code=status.HTTP_200_OK,
     summary="Update academy (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def update_academy(
     academy_id: str,
@@ -174,6 +176,7 @@ async def update_member_consent(
     response_model=AcademyMemberResponse,
     status_code=status.HTTP_200_OK,
     summary="Revoke a member's access (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def revoke_member(
     member_id: str,
@@ -195,6 +198,7 @@ async def revoke_member(
     response_model=AcademyStudentResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a student (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def create_student(
     academy_id: str,
@@ -217,6 +221,7 @@ async def list_students(
     academy_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
+    context: ActiveContext,
     status_filter: Annotated[AcademyStudentStatus | None, Query(alias="status")] = None,
 ) -> AcademyStudentListResponse:
     service = AcademyService(db)
@@ -225,7 +230,14 @@ async def list_students(
         from fastapi import HTTPException
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
-    students, total = await service.list_students(academy_id=academy_id, status_filter=status_filter)
+    # AC-M2 §6.2: 강사 모드 격리 — 본인 매칭 학생만 반환.
+    active_context, _, _ = context
+    teacher_user_id_filter = current_user.id if active_context == "teacher" else None
+    students, total = await service.list_students(
+        academy_id=academy_id,
+        status_filter=status_filter,
+        teacher_user_id_filter=teacher_user_id_filter,
+    )
     return AcademyStudentListResponse(
         students=[AcademyStudentResponse.model_validate(s) for s in students],
         total_count=total,
@@ -240,8 +252,10 @@ async def list_students(
 )
 async def get_student(
     student_id: str,
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
+    context: ActiveContext,
 ) -> AcademyStudentResponse:
     service = AcademyService(db)
     student = await service.get_student(student_id)
@@ -250,6 +264,31 @@ async def get_student(
         from fastapi import HTTPException
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
+    # AC-M2 §6.2: 강사 모드 + 본인 매칭이 아닌 학생 → 403 FORBIDDEN_NOT_YOUR_STUDENT + audit (§9).
+    active_context, _, _ = context
+    if active_context == "teacher":
+        member_id = await service.get_teacher_member_id_for_user(academy_id=student.academy_id, user_id=current_user.id)
+        if member_id is None or student.teacher_member_id != member_id:
+            from fastapi import HTTPException
+
+            audit_id = await record_access_denial(
+                db=db,
+                request=request,
+                user_id=current_user.id,
+                active_context=active_context,
+                academy_id=student.academy_id,
+                denial_code="FORBIDDEN_NOT_YOUR_STUDENT",
+                target_resource_id=student.id,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "error": "FORBIDDEN_NOT_YOUR_STUDENT",
+                    "message": "본인이 담당하지 않는 학생입니다.",
+                    "audit_id": audit_id,
+                    "remediation": "학원장에게 매칭을 요청하거나, 학원장 모드로 전환 후 다시 시도하세요.",
+                },
+            )
     return AcademyStudentResponse.model_validate(student)
 
 
@@ -258,6 +297,7 @@ async def get_student(
     response_model=AcademyStudentResponse,
     status_code=status.HTTP_200_OK,
     summary="Update student (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def update_student(
     student_id: str,
@@ -280,6 +320,7 @@ async def update_student(
     response_model=AcademyInviteCreatedResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Issue a teacher invite (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def create_invite(
     academy_id: str,
@@ -302,6 +343,7 @@ async def create_invite(
     response_model=AcademyInviteListResponse,
     status_code=status.HTTP_200_OK,
     summary="List invites (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def list_invites(
     academy_id: str,
@@ -323,6 +365,7 @@ async def list_invites(
     response_model=AcademyInviteResponse,
     status_code=status.HTTP_200_OK,
     summary="Revoke a pending invite (owner only)",
+    dependencies=[Depends(require_owner_context)],
 )
 async def revoke_invite(
     invite_id: str,
