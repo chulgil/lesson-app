@@ -405,7 +405,7 @@ class AcademyAnnouncementService:
         if announcement is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
         await AcademyService(self.db).assert_owner(announcement.academy_id, by_user_id)
-        if announcement.status != ModelStatus.draft:
+        if announcement.status not in (ModelStatus.draft, ModelStatus.scheduled):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Cannot send announcement in status '{announcement.status.value}'",
@@ -486,6 +486,120 @@ class AcademyAnnouncementService:
         await self.db.refresh(announcement)
         return announcement
 
+    async def get_announcement_stats(
+        self,
+        *,
+        announcement_id: str,
+        by_user_id: str,
+    ) -> dict:
+        """공지 통계 — spec §7. read_rate + by_role + unread_users 명단.
+
+        권한: 학원장만 (assert_owner). 발송된(`status=sent`) 공지 우선이지만
+        draft/scheduled 도 호출 가능 — recipient 0 → 0 통계.
+        """
+        from app.models.academy_announcement import (
+            AcademyAnnouncementRecipient,
+            AcademyAnnouncementRecipientRole,
+        )
+        from app.models.user import User as UserModel
+        from app.services.academy_service import AcademyService
+
+        announcement = await self.db.get(AcademyAnnouncement, announcement_id)
+        if announcement is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Announcement not found",
+            )
+        await AcademyService(self.db).assert_owner(announcement.academy_id, by_user_id)
+
+        # ---- 역할별 target / read 집계 ----
+        rows = (
+            await self.db.scalars(
+                select(AcademyAnnouncementRecipient).where(
+                    AcademyAnnouncementRecipient.announcement_id == announcement_id
+                )
+            )
+        ).all()
+
+        by_role: dict[str, dict[str, int | float]] = {}
+        for role in AcademyAnnouncementRecipientRole:
+            by_role[role.value] = {"target": 0, "read": 0, "rate": 0.0}
+
+        unread_user_ids: list[tuple[str, str]] = []  # (user_id, role)
+        for r in rows:
+            role_key = r.role.value
+            by_role[role_key]["target"] += 1
+            if r.read_at is not None:
+                by_role[role_key]["read"] += 1
+            else:
+                unread_user_ids.append((r.user_id, role_key))
+
+        for role_key, bd in by_role.items():
+            t = bd["target"]
+            bd["rate"] = round(bd["read"] / t, 4) if t > 0 else 0.0
+
+        # ---- unread_users — User.name 보강 ----
+        unread_users: list[dict] = []
+        if unread_user_ids:
+            uids = list({uid for uid, _ in unread_user_ids})
+            users = (await self.db.scalars(select(UserModel).where(UserModel.id.in_(uids)))).all()
+            name_map = {u.id: u.name for u in users}
+            for uid, role_key in unread_user_ids:
+                unread_users.append(
+                    {
+                        "user_id": uid,
+                        "name": name_map.get(uid, ""),
+                        "role": role_key,
+                    }
+                )
+
+        total = announcement.target_count or 0
+        read_rate = round((announcement.read_count or 0) / total, 4) if total > 0 else 0.0
+
+        return {
+            "target_count": total,
+            "delivered_count": announcement.delivered_count or 0,
+            "read_count": announcement.read_count or 0,
+            "read_rate": read_rate,
+            "by_role": by_role,
+            "unread_users": unread_users,
+        }
+
+    async def process_due_scheduled_announcements(self) -> int:
+        """예약된 공지 중 scheduled_at 도래한 행을 send_announcement 흐름으로 발송 (§5).
+
+        조건: ``status in (draft, scheduled) AND scheduled_at IS NOT NULL
+        AND scheduled_at <= now()``. cron 으로 1분 간격 호출 (운영 정책).
+        ``send_announcement`` 를 author_user_id 로 호출 — assert_owner 가
+        author 본인이므로 자연 통과.
+
+        Returns: 발송 처리한 announcement 행 수.
+        """
+        from datetime import UTC, datetime
+
+        now = datetime.now(UTC)
+        due_announcements = (
+            await self.db.scalars(
+                select(AcademyAnnouncement)
+                .where(AcademyAnnouncement.status.in_((ModelStatus.draft, ModelStatus.scheduled)))
+                .where(AcademyAnnouncement.scheduled_at.is_not(None))
+                .where(AcademyAnnouncement.scheduled_at <= now)
+            )
+        ).all()
+
+        processed = 0
+        for ann in due_announcements:
+            try:
+                await self.send_announcement(
+                    announcement_id=ann.id,
+                    by_user_id=ann.author_user_id,
+                )
+                processed += 1
+            except HTTPException:
+                # 개별 실패는 cron 전체 중단을 일으키지 않는다. 추후 audit 보강.
+                continue
+        return processed
+
     # ------------------------------------------------------------------
     # Read flow — §6.1 인앱 읽음 표시
     # ------------------------------------------------------------------
@@ -495,14 +609,15 @@ class AcademyAnnouncementService:
         *,
         announcement_id: str,
         user_id: str,
-    ) -> "AcademyAnnouncementRecipient":  # noqa: F821 — string forward ref OK
+    ) -> AcademyAnnouncementRecipient:  # noqa: F821 — string forward ref OK
         """수신자 본인이 공지를 열람한 시점을 기록 + read_count 갱신.
 
         멱등 — 이미 읽음 마킹된 경우 read_at 갱신 없이 반환.
         본인 행이 없으면 404 (수신 대상이 아님).
         """
-        from app.models.academy_announcement import AcademyAnnouncementRecipient
         from datetime import UTC, datetime
+
+        from app.models.academy_announcement import AcademyAnnouncementRecipient
 
         recipient = await self.db.scalar(
             select(AcademyAnnouncementRecipient)

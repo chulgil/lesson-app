@@ -735,3 +735,228 @@ async def test_mark_read_non_recipient_returns_404(
         headers={"Authorization": f"Bearer {stu_token}"},
     )
     assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /announcements/{id}/stats — §7 읽음 통계
+# ---------------------------------------------------------------------------
+
+
+async def test_stats_returns_zeroes_for_unsent(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """draft 상태(recipient 0) → 모든 카운트 0."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="all")
+
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(),
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["target_count"] == 0
+    assert body["read_count"] == 0
+    assert body["read_rate"] == 0.0
+    assert body["unread_users"] == []
+    # by_role 키 3종 모두 존재
+    assert set(body["by_role"].keys()) == {"teacher", "parent", "student"}
+
+
+async def test_stats_after_send_and_one_read(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """발송 + 학생 1명 read → 통계 정확성 + unread_users 나머지."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="all")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    # 학생 1명만 read
+    from app.core.security import create_access_token as _cat
+
+    stu_token = _cat(data={"sub": "stu-0", "role": "student"})
+    read_resp = await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers={"Authorization": f"Bearer {stu_token}"},
+    )
+    assert read_resp.status_code == 200
+
+    stats = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(),
+    )
+    assert stats.status_code == 200, stats.text
+    body = stats.json()
+    # all = 강사 1 + 학생 3 + 학부모 2 = 6
+    assert body["target_count"] == 6
+    assert body["read_count"] == 1
+    assert body["read_rate"] == round(1 / 6, 4)
+    # by_role
+    assert body["by_role"]["teacher"]["target"] == 1
+    assert body["by_role"]["teacher"]["read"] == 0
+    assert body["by_role"]["student"]["target"] == 3
+    assert body["by_role"]["student"]["read"] == 1
+    assert body["by_role"]["student"]["rate"] == round(1 / 3, 4)
+    assert body["by_role"]["parent"]["target"] == 2
+    assert body["by_role"]["parent"]["read"] == 0
+    # unread_users — 강사 1 + 학생 2 + 학부모 2 = 5
+    assert len(body["unread_users"]) == 5
+    unread_user_ids = {u["user_id"] for u in body["unread_users"]}
+    assert "stu-0" not in unread_user_ids  # 읽은 학생은 제외
+
+
+async def test_stats_blocked_in_teacher_context(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """강사 모드 토큰 → 403 FORBIDDEN_TEACHER_SCOPE (require_owner_context)."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="teachers")
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(active_context="teacher", academy_id=academy_id),
+    )
+    assert resp.status_code == 403
+    assert resp.json()["detail"]["error"] == "FORBIDDEN_TEACHER_SCOPE"
+
+
+async def test_stats_non_owner_returns_403(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """비owner → assert_owner 차단 403."""
+    from app.core.security import create_access_token as _cat
+
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="all")
+    await create_test_user(user_id=OTHER_USER_ID, role="teacher", email="oth@test.com")
+    other_headers = {"Authorization": f"Bearer {_cat(data={'sub': OTHER_USER_ID, 'role': 'teacher'})}"}
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=other_headers,
+    )
+    assert resp.status_code == 403
+
+
+async def test_stats_404_when_not_found(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    await _seed_with_audience(db_session, client, create_test_user)
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{uuid4()}/stats",
+        headers=_owner_headers(),
+    )
+    assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /announcements/{id}/stats — §7 통계 (학원장)
+# ---------------------------------------------------------------------------
+
+
+async def test_stats_returns_zero_when_draft(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="all")
+
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(),
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["target_count"] == 0
+    assert body["read_count"] == 0
+    assert body["read_rate"] == 0.0
+    assert body["unread_users"] == []
+
+
+async def test_stats_after_send_has_target_and_unread(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="all")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(),
+    )
+    body = resp.json()
+    # 강사 1 + 학생 3 + 학부모 2 = 6명
+    assert body["target_count"] == 6
+    assert body["read_count"] == 0
+    # 모두 미열람
+    assert len(body["unread_users"]) == 6
+    # by_role 분해
+    assert body["by_role"]["teacher"]["target"] == 1
+    assert body["by_role"]["student"]["target"] == 3
+    assert body["by_role"]["parent"]["target"] == 2
+
+
+async def test_stats_partial_read_rate(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="students")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    # 학생 3명 중 1명만 읽음
+    stu_token = create_access_token(data={"sub": "stu-0", "role": "student"})
+    await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers={"Authorization": f"Bearer {stu_token}"},
+    )
+
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(),
+    )
+    body = resp.json()
+    assert body["target_count"] == 3
+    assert body["read_count"] == 1
+    # 1/3 → 0.3333
+    assert abs(body["read_rate"] - 0.3333) < 0.001
+    assert body["by_role"]["student"]["target"] == 3
+    assert body["by_role"]["student"]["read"] == 1
+    # 미열람 = 2명
+    assert len(body["unread_users"]) == 2
+    assert all(u["role"] == "student" for u in body["unread_users"])
+
+
+async def test_stats_unread_users_has_user_id_and_role(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="parents")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=_owner_headers(),
+    )
+    body = resp.json()
+    unread_ids = {u["user_id"] for u in body["unread_users"]}
+    assert unread_ids == {"par-0", "par-1"}
+    assert all(u["role"] == "parent" for u in body["unread_users"])
+
+
+async def test_stats_blocked_in_teacher_context(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    ann_id = await _create_draft(client, academy_id, audience="teachers")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    teacher_headers = _owner_headers(active_context="teacher", academy_id=academy_id)
+    resp = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}/stats",
+        headers=teacher_headers,
+    )
+    assert resp.status_code == 403

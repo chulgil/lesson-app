@@ -86,3 +86,30 @@ class AcademyAnnouncementAudiencePreviewResponse(BaseModel):
 
     target_count: int
     by_role: AudienceCountByRole
+
+
+class AcademyAnnouncementStatsRoleBreakdown(BaseModel):
+    """역할별 target/read/rate — spec §7."""
+
+    target: int = 0
+    read: int = 0
+    rate: float = 0.0
+
+
+class AcademyAnnouncementUnreadUserItem(BaseModel):
+    """미열람 수신자 1명 — 학원장 1:1 재발송 후보."""
+
+    user_id: str
+    name: str
+    role: str  # teacher / parent / student
+
+
+class AcademyAnnouncementStatsResponse(BaseModel):
+    """발송 공지 통계 — spec §7. 학원장 전용."""
+
+    target_count: int = 0
+    delivered_count: int = 0
+    read_count: int = 0
+    read_rate: float = 0.0
+    by_role: dict[str, AcademyAnnouncementStatsRoleBreakdown] = Field(default_factory=dict)
+    unread_users: list[AcademyAnnouncementUnreadUserItem] = Field(default_factory=list)
