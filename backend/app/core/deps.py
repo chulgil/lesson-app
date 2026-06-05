@@ -60,6 +60,18 @@ async def get_current_user(
     user = await db.scalar(select(User).where(User.id == user_id))
     if user is None:
         raise credentials_exception
+    # AC-M2 §7.2: 다중 디바이스 일괄 만료. user.tokens_revoked_at 갱신 후 발급된
+    # 토큰만 유효 — iat 가 epoch 보다 이전이면 401. jti 추적 없이도 같은 user 의
+    # 모든 활성 디바이스가 한 번에 만료.
+    revoked_at = user.tokens_revoked_at
+    token_iat = payload.get("iat")
+    if revoked_at is not None and token_iat is not None:
+        from datetime import UTC, datetime
+
+        iat_dt = datetime.fromtimestamp(token_iat, tz=UTC)
+        epoch_dt = revoked_at if revoked_at.tzinfo else revoked_at.replace(tzinfo=UTC)
+        if iat_dt < epoch_dt:
+            raise credentials_exception
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

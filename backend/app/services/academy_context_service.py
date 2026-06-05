@@ -178,19 +178,24 @@ class AcademyContextService:
         }
         new_token = create_access_token(data=token_payload)
 
-        # AC-M2 §7.2: 이전 access token jti 즉시 만료 (동시 세션 금지).
+        # AC-M2 §7.2: 이전 토큰 만료.
+        # 1) jti 단건 blacklist — 호출자 토큰 즉시 무효
+        # 2) user.tokens_revoked_at epoch 갱신 — 같은 user 의 다른 디바이스
+        #    활성 토큰도 일괄 만료 (다중 디바이스 동시 세션 금지). 새 토큰은
+        #    직후 발급되므로 iat > tokens_revoked_at 이라 통과.
+        from datetime import UTC, datetime, timedelta
+
+        from app.core.config import settings
+        from app.models.user import TokenBlacklist
+
+        now = datetime.now(UTC)
+        user.tokens_revoked_at = now
         if current_jti:
-            from datetime import UTC, datetime, timedelta
-
-            from app.core.config import settings
-            from app.models.user import TokenBlacklist
-
-            # 이미 등록되어 있지 않을 때만 추가 (idempotent).
             existing = await self.db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == current_jti))
             if existing is None:
-                expires_at = datetime.now(UTC) + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+                expires_at = now + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
                 self.db.add(TokenBlacklist(jti=current_jti, user_id=user.id, expires_at=expires_at))
-                await self.db.flush()
+        await self.db.flush()
 
         # ContextSwitchLog 기록.
         gov = AcademyGovernanceService(self.db)
@@ -226,6 +231,94 @@ class AcademyContextService:
             member_id=member.id,
             redirect_url=redirect_url,
         )
+
+    # ------------------------------------------------------------------
+    # §8.4 Session resume — 재로그인 시 직전 active_context 자동 복원
+    # ------------------------------------------------------------------
+
+    async def restore_last_context(self, user_id: str) -> dict[str, str | None]:
+        """가장 최근 ContextSwitchLog 행으로 직전 컨텍스트 복원.
+
+        Spec §8.4:
+        - 직전 컨텍스트 권한이 여전히 활성이면 그대로 복원
+        - 박탈됐으면 fallback (학원장 권한 있으면 owner 우선, 없으면 teacher)
+        - 멤버십 0개 또는 ContextSwitchLog 0개면 빈 dict (payload 미확장)
+
+        Returns:
+            ``{"active_context": str | None, "academy_id": str | None,
+               "teacher_id": str | None}`` — payload 에 merge 할 dict.
+            컨텍스트 복원이 불가능하면 모든 값이 None.
+        """
+        from app.models.academy_governance import ContextSwitchLog
+        from app.models.teacher import Teacher
+
+        empty: dict[str, str | None] = {
+            "active_context": None,
+            "academy_id": None,
+            "teacher_id": None,
+        }
+
+        last_log = await self.db.scalar(
+            select(ContextSwitchLog)
+            .where(ContextSwitchLog.user_id == user_id)
+            .order_by(ContextSwitchLog.switched_at.desc())
+            .limit(1)
+        )
+        if last_log is not None:
+            target_role = (
+                AcademyMemberRole.owner
+                if last_log.to_context == ContextEnum.academy_owner
+                else AcademyMemberRole.teacher
+            )
+            still_active = await self.db.scalar(
+                select(AcademyMember)
+                .where(AcademyMember.user_id == user_id)
+                .where(AcademyMember.academy_id == last_log.academy_id)
+                .where(AcademyMember.role == target_role)
+                .where(AcademyMember.access_revoked_at.is_(None))
+            )
+            if still_active is not None:
+                teacher_id: str | None = None
+                if target_role == AcademyMemberRole.teacher:
+                    teacher_id = await self.db.scalar(select(Teacher.id).where(Teacher.user_id == user_id))
+                return {
+                    "active_context": last_log.to_context.value,
+                    "academy_id": last_log.academy_id,
+                    "teacher_id": teacher_id,
+                }
+            # 권한 박탈 — fallback 으로 떨어짐.
+
+        # Fallback: 어떤 학원이든 활성 owner 멤버십 우선, 없으면 teacher.
+        owner_member = await self.db.scalar(
+            select(AcademyMember)
+            .where(AcademyMember.user_id == user_id)
+            .where(AcademyMember.role == AcademyMemberRole.owner)
+            .where(AcademyMember.access_revoked_at.is_(None))
+            .order_by(AcademyMember.created_at.asc())
+            .limit(1)
+        )
+        if owner_member is not None:
+            return {
+                "active_context": ContextEnum.academy_owner.value,
+                "academy_id": owner_member.academy_id,
+                "teacher_id": None,
+            }
+        teacher_member = await self.db.scalar(
+            select(AcademyMember)
+            .where(AcademyMember.user_id == user_id)
+            .where(AcademyMember.role == AcademyMemberRole.teacher)
+            .where(AcademyMember.access_revoked_at.is_(None))
+            .order_by(AcademyMember.created_at.asc())
+            .limit(1)
+        )
+        if teacher_member is not None:
+            teacher_id = await self.db.scalar(select(Teacher.id).where(Teacher.user_id == user_id))
+            return {
+                "active_context": ContextEnum.teacher.value,
+                "academy_id": teacher_member.academy_id,
+                "teacher_id": teacher_id,
+            }
+        return empty
 
     # ------------------------------------------------------------------
     # Internal
