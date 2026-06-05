@@ -310,6 +310,26 @@ class AlimTalkService:
             variables=variables,
         )
 
+    async def send_academy_announcement(
+        self,
+        *,
+        kakao_template_id: str,
+        recipient_phone: str,
+        variables: dict[str, str],
+    ) -> bool:
+        """AC-M3 §4 — 학원 공지를 카톡 알림톡 1건 발송.
+
+        AlimTalkLog 행은 생성하지 않는다 (recipient.kakao_delivered 가 SOR).
+        idempotency / fallback / send window 검사도 호출자(announcement
+        send 흐름)가 채임 — 이 메서드는 단발 "보냈는지" 응답만 한다.
+
+        Returns: 발송 성공 여부 (success bool).
+        """
+        if not recipient_phone:
+            return False
+        result = await self._safe_send(kakao_template_id, recipient_phone, variables)
+        return bool(result.success)
+
     # ------------------------------------------------------------------ internals
 
     async def _send_with_log(

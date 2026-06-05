@@ -467,7 +467,45 @@ class AcademyAnnouncementService:
 
         sent_at = datetime.now(UTC)
         inapp_enabled = "inapp" in (announcement.channels or [])
+        kakao_enabled = "kakao" in (announcement.channels or []) and announcement.kakao_template_id is not None
+
+        # AC-M3 §4 kakao 채널 wiring — 알림톡 발송은 recipient 별 phone 필요.
+        # User.phone 일괄 조회 (N+1 회피).
+        from app.models.user import User as UserModel
+
+        user_phone_map: dict[str, str | None] = {}
+        if kakao_enabled and deduped:
+            uids = [uid for uid, _ in deduped]
+            phone_rows = await self.db.execute(select(UserModel.id, UserModel.phone).where(UserModel.id.in_(uids)))
+            user_phone_map = {uid: phone for uid, phone in phone_rows.all()}
+
+        # 알림톡 변수 — 학원명까지는 별도 join 비용이라 본 PR 에서는 title/body
+        # 두 변수만 (BE 가 알 수 있는 범위). 실제 알림톡 템플릿이 더 많은 변수를
+        # 요구하면 announcement.audience_filter 등에서 보강.
+        kakao_variables = {
+            "title": announcement.title or "",
+            "body": (announcement.body_markdown or "")[:300],
+        }
+
+        alimtalk_service = None
+        if kakao_enabled:
+            from app.services.alimtalk_service import AlimTalkService, get_alimtalk_client
+
+            alimtalk_service = AlimTalkService(get_alimtalk_client(), self.db)
+
+        kakao_delivered_count = 0
         for uid, role in deduped:
+            kakao_delivered = False
+            if kakao_enabled and alimtalk_service is not None:
+                recipient_phone = user_phone_map.get(uid)
+                if recipient_phone:
+                    kakao_delivered = await alimtalk_service.send_academy_announcement(
+                        kakao_template_id=announcement.kakao_template_id or "",
+                        recipient_phone=recipient_phone,
+                        variables=kakao_variables,
+                    )
+                    if kakao_delivered:
+                        kakao_delivered_count += 1
             self.db.add(
                 AcademyAnnouncementRecipient(
                     announcement_id=announcement.id,
@@ -475,12 +513,20 @@ class AcademyAnnouncementService:
                     role=role,
                     delivered_at=sent_at if inapp_enabled else None,
                     inapp_delivered=inapp_enabled,
+                    kakao_delivered=kakao_delivered,
                 )
             )
 
         announcement.status = ModelStatus.sent
         announcement.target_count = len(deduped)
-        announcement.delivered_count = len(deduped) if inapp_enabled else 0
+        # delivered_count = inapp 또는 kakao 중 하나라도 성공한 unique user 수.
+        # 본 PR 에서는 inapp 활성 시 = target_count (인앱 즉시 마킹), 그 외에는
+        # kakao 성공만 카운트. 둘 다 활성이면 inapp 기준 유지 (kakao 는
+        # kakao_delivered_count 별도 audit).
+        if inapp_enabled:
+            announcement.delivered_count = len(deduped)
+        else:
+            announcement.delivered_count = kakao_delivered_count
         announcement.sent_at = sent_at
         await self.db.commit()
         await self.db.refresh(announcement)
