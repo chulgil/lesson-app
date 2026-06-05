@@ -2,12 +2,13 @@
 
 Spec: docs/specs/web/academy/announcements_spec.md §2-§3.
 
-POST   /academies/{academy_id}/announcements   — 학원장 단방향 공지 draft 생성
-GET    /academies/{academy_id}/announcements   — 학원 멤버 목록 조회
-GET    /academies/announcements/{id}           — 단건 조회
+POST   /academies/{academy_id}/announcements                  — 학원장 단방향 공지 draft 생성
+GET    /academies/{academy_id}/announcements/audience-preview — 작성 미리보기 (대상 수, owner)
+GET    /academies/{academy_id}/announcements                  — 학원 멤버 목록 조회
+GET    /academies/announcements/{id}                          — 단건 조회
 
 권한:
-- POST: 학원장 + ``require_owner_context`` (context_toggle_spec §6.2 차단 매트릭스)
+- POST + audience-preview: 학원장 + ``require_owner_context`` (context_toggle_spec §6.2)
 - GET (목록/단건): 학원 멤버 — active_context 무관
 """
 
@@ -15,16 +16,20 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.context_deps import require_owner_context
 from app.core.deps import get_current_user, get_db
+from app.models.academy_announcement import AcademyAnnouncementAudience as ModelAudience
 from app.models.user import User
 from app.schemas.academy_announcement import (
+    AcademyAnnouncementAudience,
+    AcademyAnnouncementAudiencePreviewResponse,
     AcademyAnnouncementCreate,
     AcademyAnnouncementListResponse,
     AcademyAnnouncementResponse,
+    AudienceCountByRole,
 )
 from app.services.academy_announcement_service import AcademyAnnouncementService
 
@@ -51,6 +56,39 @@ async def create_academy_announcement(
         body=body,
     )
     return AcademyAnnouncementResponse.model_validate(announcement)
+
+
+@router.get(
+    "/{academy_id}/announcements/audience-preview",
+    response_model=AcademyAnnouncementAudiencePreviewResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Preview target count by audience (owner only) — spec §3.1 대상 수 미리보기",
+    dependencies=[Depends(require_owner_context)],
+)
+async def preview_announcement_audience(
+    academy_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    audience: Annotated[AcademyAnnouncementAudience, Query()],
+    teacher_member_id: Annotated[str | None, Query(max_length=36)] = None,
+) -> AcademyAnnouncementAudiencePreviewResponse:
+    """공지 작성 화면에서 대상 수를 미리 보여주는 헬퍼 (spec §3.1).
+
+    teacher_member_id 쿼리는 audience=teacher_students 일 때 audience_filter
+    로 들어간다.
+    """
+    audience_filter = {"teacher_member_id": teacher_member_id} if teacher_member_id else None
+    service = AcademyAnnouncementService(db)
+    result = await service.resolve_audience_count(
+        academy_id=academy_id,
+        by_user_id=current_user.id,
+        audience=ModelAudience(audience.value),
+        audience_filter=audience_filter,
+    )
+    return AcademyAnnouncementAudiencePreviewResponse(
+        target_count=result["target_count"],
+        by_role=AudienceCountByRole(**result["by_role"]),
+    )
 
 
 @router.get(
