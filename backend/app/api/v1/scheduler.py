@@ -98,3 +98,45 @@ async def cleanup_context_access_denials(
 
     deleted = await AcademyGovernanceService(db).cleanup_old_access_denials(retention_days=retention_days)
     return {"deleted": deleted, "retention_days": retention_days}
+
+
+@router.get(
+    "/audit/access-denials",
+    status_code=status.HTTP_200_OK,
+    summary="Admin: list ContextAccessDenialLog across all users (§9 operator transparency)",
+)
+async def list_all_access_denials_admin(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user_id: str | None = None,
+    academy_id: str | None = None,
+    denial_code: str | None = None,
+    from_at: str | None = None,
+    to_at: str | None = None,
+    limit: int = 100,
+) -> dict:
+    """Spec §9 — 운영자 어드민 전체 audit 조회.
+
+    본인 조회용 `/auth/me/access-denials` 와 분리. internal_api_key 보호로
+    운영자 도구에서만 호출. `from_at` / `to_at` 은 ISO-8601 datetime 문자열.
+    """
+    from datetime import datetime
+
+    from app.schemas.academy_governance import (
+        ContextAccessDenialLogResponse,
+    )
+    from app.services.academy_governance_service import AcademyGovernanceService
+
+    from_dt = datetime.fromisoformat(from_at) if from_at else None
+    to_dt = datetime.fromisoformat(to_at) if to_at else None
+    logs, total = await AcademyGovernanceService(db).list_all_access_denials(
+        user_id=user_id,
+        academy_id=academy_id,
+        denial_code=denial_code,
+        from_at=from_dt,
+        to_at=to_dt,
+        limit=limit,
+    )
+    return {
+        "logs": [ContextAccessDenialLogResponse.model_validate(log).model_dump(mode="json") for log in logs],
+        "total_count": total,
+    }

@@ -126,6 +126,38 @@ class AcademyGovernanceService:
         result = await self.db.scalars(stmt.order_by(ContextAccessDenialLog.denied_at.desc()).limit(limit))
         return list(result.all()), total
 
+    async def list_all_access_denials(
+        self,
+        *,
+        user_id: str | None = None,
+        academy_id: str | None = None,
+        denial_code: str | None = None,
+        from_at: datetime | None = None,
+        to_at: datetime | None = None,
+        limit: int = 100,
+    ) -> tuple[list[ContextAccessDenialLog], int]:
+        """운영자 어드민용 — user_id 강제 필터 없이 전체 audit 조회 (§9).
+
+        모든 인자가 None 이면 최근 limit 건. 분쟁 대응 / 보안 모니터링 등
+        운영자 도구에서 호출. 본인 조회용 ``list_access_denials_for_user`` 와
+        분리되어 권한 경계가 명확.
+        """
+        stmt = select(ContextAccessDenialLog)
+        if user_id is not None:
+            stmt = stmt.where(ContextAccessDenialLog.user_id == user_id)
+        if academy_id is not None:
+            stmt = stmt.where(ContextAccessDenialLog.academy_id == academy_id)
+        if denial_code is not None:
+            stmt = stmt.where(ContextAccessDenialLog.denial_code == denial_code)
+        if from_at is not None:
+            stmt = stmt.where(ContextAccessDenialLog.denied_at >= from_at)
+        if to_at is not None:
+            stmt = stmt.where(ContextAccessDenialLog.denied_at <= to_at)
+        count_stmt = select(func.count()).select_from(stmt.subquery())
+        total = int((await self.db.scalar(count_stmt)) or 0)
+        result = await self.db.scalars(stmt.order_by(ContextAccessDenialLog.denied_at.desc()).limit(limit))
+        return list(result.all()), total
+
     async def cleanup_old_access_denials(self, *, retention_days: int = 365) -> int:
         """ContextAccessDenialLog 보존 기간 (default 1년) 이전 행 일괄 삭제.
 
