@@ -132,4 +132,51 @@ async def get_academy_announcement(
     return AcademyAnnouncementResponse.model_validate(announcement)
 
 
+@router.post(
+    "/announcements/{announcement_id}/send",
+    response_model=AcademyAnnouncementResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Send announcement (owner only) — draft → sent + recipient fanout",
+    dependencies=[Depends(require_owner_context)],
+)
+async def send_academy_announcement(
+    announcement_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> AcademyAnnouncementResponse:
+    """draft → sent. 대상자 enumerate + AcademyAnnouncementRecipient N행 생성.
+
+    spec §4 발송 시퀀스 — 인앱은 즉시 마킹, 카톡/푸시 채널은 별도 큐 작업.
+    """
+    service = AcademyAnnouncementService(db)
+    sent = await service.send_announcement(
+        announcement_id=announcement_id,
+        by_user_id=current_user.id,
+    )
+    return AcademyAnnouncementResponse.model_validate(sent)
+
+
+@router.patch(
+    "/announcements/{announcement_id}/recipients/me/read",
+    status_code=status.HTTP_200_OK,
+    summary="Mark announcement as read (recipient self, idempotent)",
+)
+async def mark_announcement_read(
+    announcement_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> dict[str, object]:
+    """수신자 본인이 공지를 열람한 시점을 기록 (spec §6.1 인앱 자동 마킹)."""
+    service = AcademyAnnouncementService(db)
+    recipient = await service.mark_read(
+        announcement_id=announcement_id,
+        user_id=current_user.id,
+    )
+    return {
+        "announcement_id": recipient.announcement_id,
+        "user_id": recipient.user_id,
+        "read_at": recipient.read_at.isoformat() if recipient.read_at else None,
+    }
+
+
 __all__ = ["router"]
