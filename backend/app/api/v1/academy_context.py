@@ -1,8 +1,9 @@
 """Academy context endpoints — AC-M2.
 
-Spec: docs/specs/web/academy/context_toggle_spec.md §4, §9.
+Spec: docs/specs/web/academy/context_toggle_spec.md §4, §7.2, §9.
 
 POST /auth/context/switch       — 컨텍스트 전환 + 새 JWT + 자동 위임 정리
+                                  + 이전 JWT 즉시 만료 (§7.2)
 GET  /auth/context              — 현재 컨텍스트 + 사용 가능한 컨텍스트 리스트
 GET  /auth/me/access-denials    — 본인 권한 매트릭스 차단 audit 전체 조회
                                   (학원 무관 포함, 모든 모드 허용 — §9 transparency)
@@ -64,18 +65,21 @@ async def list_my_access_denials_global(
     )
 
 
-def _extract_context_from_token(authorization: str | None) -> tuple[str | None, str | None, str | None]:
-    """JWT 페이로드에서 active_context/academy_id/teacher_id 추출."""
+def _extract_context_from_token(
+    authorization: str | None,
+) -> tuple[str | None, str | None, str | None, str | None]:
+    """JWT 페이로드에서 (active_context, academy_id, teacher_id, jti) 추출."""
     if not authorization or not authorization.lower().startswith("bearer "):
-        return None, None, None
+        return None, None, None, None
     token = authorization.split(None, 1)[1]
     payload = decode_access_token(token)
     if payload is None:
-        return None, None, None
+        return None, None, None, None
     return (
         payload.get("active_context"),
         payload.get("academy_id"),
         payload.get("teacher_id"),
+        payload.get("jti"),
     )
 
 
@@ -90,7 +94,7 @@ async def get_current_context(
     current_user: Annotated[User, Depends(get_current_user)],
     authorization: Annotated[str | None, Header()] = None,
 ) -> ContextResponse:
-    active_context, academy_id, teacher_id = _extract_context_from_token(authorization)
+    active_context, academy_id, teacher_id, _jti = _extract_context_from_token(authorization)
     service = AcademyContextService(db)
     return await service.get_current_context(
         user=current_user,
@@ -114,7 +118,7 @@ async def switch_context(
     authorization: Annotated[str | None, Header()] = None,
     user_agent: Annotated[str | None, Header(alias="User-Agent")] = None,
 ) -> ContextSwitchResponse:
-    current_ctx, _, _ = _extract_context_from_token(authorization)
+    current_ctx, _, _, current_jti = _extract_context_from_token(authorization)
     ip = request.client.host if request.client else None
     service = AcademyContextService(db)
     return await service.switch_context(
@@ -123,6 +127,7 @@ async def switch_context(
         ip=ip,
         user_agent=user_agent,
         current_active_context=current_ctx,
+        current_jti=current_jti,
     )
 
 
