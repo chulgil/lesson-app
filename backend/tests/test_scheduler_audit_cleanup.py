@@ -118,3 +118,126 @@ async def test_cleanup_returns_zero_when_nothing_to_delete(
     response = await client.post(ENDPOINT, headers={"X-Internal-API-Key": "test-internal-key"})
     assert response.status_code == 200
     assert response.json()["deleted"] == 0
+
+
+# ---------------------------------------------------------------------------
+# GET /audit/access-denials — 운영자 어드민 전체 조회 (§9)
+# ---------------------------------------------------------------------------
+
+
+ADMIN_LIST_ENDPOINT = "/api/v1/scheduler/audit/access-denials"
+
+
+async def test_admin_list_requires_internal_api_key(client: AsyncClient, monkeypatch) -> None:
+    """인증 없으면 401."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    response = await client.get(ADMIN_LIST_ENDPOINT)
+    assert response.status_code == 401
+
+
+async def test_admin_list_returns_all_users_audit(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """운영자 조회는 모든 user 의 audit 반환 (본인 조회와 구분)."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    u1 = await create_test_user(user_id="admin-list-u1", role="teacher")
+    u2 = await create_test_user(user_id="admin-list-u2", role="teacher", email="u2@test.com")
+    now = datetime.now(UTC)
+    db_session.add_all(
+        [
+            _denial(user_id=u1.id, denied_at=now - timedelta(hours=1)),
+            _denial(user_id=u2.id, denied_at=now - timedelta(hours=2)),
+        ]
+    )
+    await db_session.commit()
+
+    response = await client.get(ADMIN_LIST_ENDPOINT, headers={"X-Internal-API-Key": "test-internal-key"})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 2
+    user_ids = {log["user_id"] for log in body["logs"]}
+    assert user_ids == {u1.id, u2.id}
+
+
+async def test_admin_list_filters_by_user_id(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """`?user_id=` 로 특정 user 만 필터링."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    u1 = await create_test_user(user_id="admin-filter-u1", role="teacher")
+    u2 = await create_test_user(user_id="admin-filter-u2", role="teacher", email="u2f@test.com")
+    now = datetime.now(UTC)
+    db_session.add_all([_denial(user_id=u1.id, denied_at=now), _denial(user_id=u2.id, denied_at=now)])
+    await db_session.commit()
+
+    response = await client.get(
+        f"{ADMIN_LIST_ENDPOINT}?user_id={u1.id}",
+        headers={"X-Internal-API-Key": "test-internal-key"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 1
+    assert body["logs"][0]["user_id"] == u1.id
+
+
+async def test_admin_list_filters_by_time_range(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """`?from_at=&to_at=` 로 시각 범위 필터."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    user = await create_test_user(user_id="admin-time-u", role="teacher")
+    now = datetime.now(UTC)
+    db_session.add_all(
+        [
+            _denial(user_id=user.id, denied_at=now - timedelta(days=10)),  # 범위 밖
+            _denial(user_id=user.id, denied_at=now - timedelta(days=3)),  # 범위 내
+            _denial(user_id=user.id, denied_at=now - timedelta(days=1)),  # 범위 내
+        ]
+    )
+    await db_session.commit()
+
+    from_at = (now - timedelta(days=5)).isoformat()
+    to_at = now.isoformat()
+    response = await client.get(
+        ADMIN_LIST_ENDPOINT,
+        params={"from_at": from_at, "to_at": to_at},
+        headers={"X-Internal-API-Key": "test-internal-key"},
+    )
+    assert response.status_code == 200
+    assert response.json()["total_count"] == 2
+
+
+async def test_admin_list_filters_by_denial_code(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+    monkeypatch,
+) -> None:
+    """`?denial_code=` 로 차단 코드별 조회."""
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
+    user = await create_test_user(user_id="admin-code-u", role="teacher")
+    now = datetime.now(UTC)
+    teacher_scope = _denial(user_id=user.id, denied_at=now)
+    teacher_scope.denial_code = "FORBIDDEN_TEACHER_SCOPE"
+    not_yours = _denial(user_id=user.id, denied_at=now)
+    not_yours.denial_code = "FORBIDDEN_NOT_YOUR_STUDENT"
+    db_session.add_all([teacher_scope, not_yours])
+    await db_session.commit()
+
+    response = await client.get(
+        f"{ADMIN_LIST_ENDPOINT}?denial_code=FORBIDDEN_NOT_YOUR_STUDENT",
+        headers={"X-Internal-API-Key": "test-internal-key"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total_count"] == 1
+    assert body["logs"][0]["denial_code"] == "FORBIDDEN_NOT_YOUR_STUDENT"
