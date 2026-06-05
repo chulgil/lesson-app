@@ -328,3 +328,107 @@ async def test_global_access_denials_works_in_teacher_context(
     )
     assert response.status_code == 200
     assert response.json()["total_count"] == 1
+
+
+# ---------------------------------------------------------------------------
+# §7.2 multi-academy 예외 — 학원 변경 토글은 다른 학원 세션 유지
+# ---------------------------------------------------------------------------
+
+
+async def _create_second_owner_academy(client: AsyncClient, db_session: AsyncSession) -> str:
+    """기존 OWNER_USER_ID 가 학원장인 두 번째 학원 셋업. Returns academy_id."""
+    resp = await client.post(
+        "/api/v1/academies",
+        headers=_owner_headers(),
+        json={
+            "slug": f"second-{uuid4().hex[:8]}",
+            "name": "두 번째 학원",
+            "also_register_as_teacher": False,
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    return resp.json()["id"]
+
+
+async def test_same_academy_switch_revokes_other_devices(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """같은 학원 owner↔teacher 토글: 다른 디바이스 토큰 만료 (기존 동작 회귀 보호)."""
+    import asyncio
+
+    academy_id = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    device_a = _owner_headers(active_context="academy_owner", academy_id=academy_id)
+    device_b = _owner_headers(active_context="academy_owner", academy_id=academy_id)
+    assert _decode(device_a["Authorization"].split()[1])["jti"] != _decode(device_b["Authorization"].split()[1])["jti"]
+    await asyncio.sleep(1.1)
+
+    switch = await client.post(
+        "/api/v1/auth/context/switch",
+        headers=device_a,
+        json={"target_context": "teacher", "academy_id": academy_id},
+    )
+    assert switch.status_code == 200
+
+    # 디바이스 B → 401 (같은 학원이므로 epoch 갱신)
+    post_b = await client.get("/api/v1/auth/context", headers=device_b)
+    assert post_b.status_code == 401
+
+
+async def test_cross_academy_switch_preserves_other_academy_session(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """학원 A → 학원 B 전환: 학원 A 의 다른 디바이스 토큰은 그대로 살아있음.
+
+    spec §7.2 multi-academy 예외 — 학원별 별도 세션 허용.
+    """
+    academy_a = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    academy_b = await _create_second_owner_academy(client, db_session)
+
+    # 학원 A 디바이스 (다른 디바이스로 가정 — 호출자와 별개)
+    other_device_a = _owner_headers(active_context="academy_owner", academy_id=academy_a)
+    # 호출자: 학원 A → 학원 B 로 전환
+    caller = _owner_headers(active_context="academy_owner", academy_id=academy_a)
+
+    switch = await client.post(
+        "/api/v1/auth/context/switch",
+        headers=caller,
+        json={"target_context": "academy_owner", "academy_id": academy_b},
+    )
+    assert switch.status_code == 200
+
+    # 학원 A 다른 디바이스 토큰 → 200 (epoch 미갱신)
+    post_other = await client.get("/api/v1/auth/context", headers=other_device_a)
+    assert post_other.status_code == 200
+
+
+async def test_cross_academy_switch_revokes_caller_jti_only(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """학원 A → 학원 B 전환: 호출자 토큰만 blacklist (epoch 무관)."""
+    academy_a = await _create_academy_with_owner_teacher(client, db_session, create_test_user)
+    academy_b = await _create_second_owner_academy(client, db_session)
+
+    caller = _owner_headers(active_context="academy_owner", academy_id=academy_a)
+    caller_jti = _decode(caller["Authorization"].split()[1])["jti"]
+
+    await client.post(
+        "/api/v1/auth/context/switch",
+        headers=caller,
+        json={"target_context": "academy_owner", "academy_id": academy_b},
+    )
+
+    # 호출자 토큰으로 재호출 → 401 (jti blacklist)
+    post_caller = await client.get("/api/v1/auth/context", headers=caller)
+    assert post_caller.status_code == 401
+
+    # blacklist 에 caller_jti 만 등록 (epoch 갱신 없으므로 다른 토큰은 영향 없음)
+    from app.models.user import TokenBlacklist
+
+    row = await db_session.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == caller_jti))
+    assert row is not None
+
+    # User.tokens_revoked_at 갱신 안 됨 (학원 변경 토글)
+    from app.models.user import User as _User
+
+    user = await db_session.get(_User, OWNER_USER_ID)
+    assert user.tokens_revoked_at is None
