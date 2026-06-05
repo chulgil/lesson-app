@@ -48,6 +48,14 @@ class User(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
 
+    # AC-M2 §7.2: 다중 디바이스 일괄 만료용 epoch.
+    # 토글/강제 로그아웃 시 갱신. ``access_token.iat`` 가 본 값보다 이전이면 401.
+    # jti 추적 없이도 같은 user 의 모든 활성 토큰을 한 번에 만료시킨다.
+    tokens_revoked_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
     # i18n / localization
     locale: Mapped[str] = mapped_column(String(10), nullable=False, default="ko")
     country: Mapped[str] = mapped_column(String(2), nullable=False, default="KR")

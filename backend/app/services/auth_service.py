@@ -50,8 +50,14 @@ class AuthService:
 
         # Generate tokens
         from app.core.security import create_access_token, create_refresh_token
+        from app.services.academy_context_service import AcademyContextService
 
-        access_token = create_access_token(data={"sub": user.id, "role": getattr(user.role, "value", None)})
+        # AC-M2 §8.4: 재로그인 시 직전 active_context 자동 복원.
+        ctx = await AcademyContextService(self.db).restore_last_context(user.id)
+        payload: dict[str, Any] = {"sub": user.id, "role": getattr(user.role, "value", None)}
+        if ctx["active_context"]:
+            payload.update(ctx)
+        access_token = create_access_token(data=payload)
         refresh_token = create_refresh_token(data={"sub": user.id})
 
         return TokenResponse(
@@ -137,10 +143,14 @@ class AuthService:
         await self._ensure_role_profile(user, role_enum)
 
         from app.core.security import create_access_token, create_refresh_token
+        from app.services.academy_context_service import AcademyContextService
 
-        access_token = create_access_token(
-            data={"sub": user.id, "role": role_enum.value if role_enum else None},
-        )
+        # AC-M2 §8.4: dev_login 도 동일하게 직전 active_context 복원.
+        ctx = await AcademyContextService(self.db).restore_last_context(user.id)
+        payload: dict[str, Any] = {"sub": user.id, "role": role_enum.value if role_enum else None}
+        if ctx["active_context"]:
+            payload.update(ctx)
+        access_token = create_access_token(data=payload)
         refresh_token = create_refresh_token(data={"sub": user.id})
 
         return TokenResponse(
@@ -184,7 +194,14 @@ class AuthService:
             )
         current_role = getattr(user.role, "value", None)
 
-        access_token = create_access_token(data={"sub": payload["sub"], "role": current_role})
+        # AC-M2 §8.4: refresh 토큰 갱신 시에도 직전 active_context 복원.
+        from app.services.academy_context_service import AcademyContextService
+
+        ctx = await AcademyContextService(self.db).restore_last_context(payload["sub"])
+        new_payload: dict[str, Any] = {"sub": payload["sub"], "role": current_role}
+        if ctx["active_context"]:
+            new_payload.update(ctx)
+        access_token = create_access_token(data=new_payload)
         return RefreshTokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,
