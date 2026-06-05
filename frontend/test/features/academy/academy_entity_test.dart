@@ -399,6 +399,7 @@ void main() {
       final subscription = AcademySubscription(
         id: 'sub_1',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
         studentId: 'student_1',
         teacherMemberId: 'member_1',
         ownership: SubscriptionOwnership.academy,
@@ -408,11 +409,14 @@ void main() {
         studentCompensationExtraMinutesMessage: 'Test message',
         notifyOwnerOnLateCancel: true,
         createdAt: now,
+        createdByUserId: 'owner_1',
       );
 
       expect(subscription.id, equals('sub_1'));
       expect(subscription.academyId, equals('acad_1'));
+      expect(subscription.subscriptionId, equals('subscription_1'));
       expect(subscription.studentId, equals('student_1'));
+      expect(subscription.createdByUserId, equals('owner_1'));
       expect(subscription.teacherMemberId, equals('member_1'));
       expect(subscription.ownership, equals(SubscriptionOwnership.academy));
       expect(subscription.cancellationDeadlineHours, equals(24));
@@ -432,6 +436,7 @@ void main() {
       final subscription = AcademySubscription(
         id: 'sub_1',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
         studentId: 'student_1',
         teacherMemberId: 'member_1',
         ownership: SubscriptionOwnership.teacher,
@@ -443,6 +448,67 @@ void main() {
       expect(subscription.includeExtraMinutesTextOnLateCancel, isTrue);
       expect(subscription.studentCompensationExtraMinutesMessage, isNull);
       expect(subscription.notifyOwnerOnLateCancel, isTrue);
+      expect(subscription.createdByUserId, isNull);
+    });
+
+    test('assert: cancellationDeadlineHours must be in 0..168', () {
+      expect(
+        () => AcademySubscription(
+          id: 'x',
+          academyId: 'a',
+          subscriptionId: 's',
+          studentId: 'st',
+          teacherMemberId: 'm',
+          ownership: SubscriptionOwnership.academy,
+          cancellationDeadlineHours: 169,
+          createdAt: DateTime.now(),
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => AcademySubscription(
+          id: 'x',
+          academyId: 'a',
+          subscriptionId: 's',
+          studentId: 'st',
+          teacherMemberId: 'm',
+          ownership: SubscriptionOwnership.academy,
+          cancellationDeadlineHours: -1,
+          createdAt: DateTime.now(),
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('subscriptionId 변경 시 equality 깨짐', () {
+      final now = DateTime.now();
+      final a = AcademySubscription(
+        id: 'sub_1',
+        academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
+        studentId: 'student_1',
+        teacherMemberId: 'member_1',
+        ownership: SubscriptionOwnership.academy,
+        createdAt: now,
+      );
+      final b = a.copyWith(subscriptionId: 'subscription_2');
+      expect(a, isNot(equals(b)));
+    });
+
+    test('createdByUserId 변경 시 equality 깨짐', () {
+      final now = DateTime.now();
+      final a = AcademySubscription(
+        id: 'sub_1',
+        academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
+        studentId: 'student_1',
+        teacherMemberId: 'member_1',
+        ownership: SubscriptionOwnership.academy,
+        createdAt: now,
+        createdByUserId: 'owner_1',
+      );
+      final b = a.copyWith(createdByUserId: 'owner_2');
+      expect(a, isNot(equals(b)));
     });
 
     test('should support copyWith', () {
@@ -450,6 +516,7 @@ void main() {
       final subscription = AcademySubscription(
         id: 'sub_1',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
         studentId: 'student_1',
         teacherMemberId: 'member_1',
         ownership: SubscriptionOwnership.academy,
@@ -473,6 +540,7 @@ void main() {
       final sub1 = AcademySubscription(
         id: 'sub_1',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
         studentId: 'student_1',
         teacherMemberId: 'member_1',
         ownership: SubscriptionOwnership.academy,
@@ -482,6 +550,7 @@ void main() {
       final sub2 = AcademySubscription(
         id: 'sub_1',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
         studentId: 'student_1',
         teacherMemberId: 'member_1',
         ownership: SubscriptionOwnership.academy,
