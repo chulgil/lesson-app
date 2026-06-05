@@ -15,11 +15,13 @@ class MockAcademySubscriptionRepository
   void _initializeMockData() {
     final now = DateTime.now();
 
-    // Create 8 mock subscriptions (academy: 6, teacher: 2)
+    // Create 8 mock subscriptions (academy: 6, teacher: 2).
+    // subscriptionId 는 본체 Subscription FK — mock 에서는 'subscription_N' 패턴.
     _subscriptions = {
       'sub_1': AcademySubscription(
         id: 'sub_1',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_1',
         studentId: 'student_1',
         teacherMemberId: 'member_2',
         ownership: SubscriptionOwnership.academy,
@@ -32,6 +34,7 @@ class MockAcademySubscriptionRepository
       'sub_2': AcademySubscription(
         id: 'sub_2',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_2',
         studentId: 'student_2',
         teacherMemberId: 'member_2',
         ownership: SubscriptionOwnership.academy,
@@ -45,6 +48,7 @@ class MockAcademySubscriptionRepository
       'sub_3': AcademySubscription(
         id: 'sub_3',
         academyId: 'acad_2',
+        subscriptionId: 'subscription_3',
         studentId: 'student_5',
         teacherMemberId: 'member_4',
         ownership: SubscriptionOwnership.academy,
@@ -54,6 +58,7 @@ class MockAcademySubscriptionRepository
       'sub_4': AcademySubscription(
         id: 'sub_4',
         academyId: 'acad_2',
+        subscriptionId: 'subscription_4',
         studentId: 'student_6',
         teacherMemberId: 'member_4',
         ownership: SubscriptionOwnership.academy,
@@ -63,6 +68,7 @@ class MockAcademySubscriptionRepository
       'sub_5': AcademySubscription(
         id: 'sub_5',
         academyId: 'acad_3',
+        subscriptionId: 'subscription_5',
         studentId: 'student_9',
         teacherMemberId: 'member_6',
         ownership: SubscriptionOwnership.academy,
@@ -72,6 +78,7 @@ class MockAcademySubscriptionRepository
       'sub_6': AcademySubscription(
         id: 'sub_6',
         academyId: 'acad_3',
+        subscriptionId: 'subscription_6',
         studentId: 'student_10',
         teacherMemberId: 'member_6',
         ownership: SubscriptionOwnership.academy,
@@ -81,6 +88,7 @@ class MockAcademySubscriptionRepository
       'sub_7': AcademySubscription(
         id: 'sub_7',
         academyId: 'acad_1',
+        subscriptionId: 'subscription_7',
         studentId: 'student_1',
         teacherMemberId: 'member_2',
         ownership: SubscriptionOwnership.teacher,
@@ -91,6 +99,7 @@ class MockAcademySubscriptionRepository
       'sub_8': AcademySubscription(
         id: 'sub_8',
         academyId: 'acad_2',
+        subscriptionId: 'subscription_8',
         studentId: 'student_6',
         teacherMemberId: 'member_4',
         ownership: SubscriptionOwnership.teacher,
