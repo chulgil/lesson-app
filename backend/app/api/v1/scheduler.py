@@ -78,3 +78,23 @@ async def run_all(
         "auto_completed": auto_completed,
         "alerts_sent": alerts,
     }
+
+
+@router.post(
+    "/audit/cleanup-context-denials",
+    status_code=status.HTTP_200_OK,
+    summary="Cleanup ContextAccessDenialLog rows older than retention (§9: 1년 default)",
+)
+async def cleanup_context_access_denials(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    retention_days: int = 365,
+) -> dict[str, int]:
+    """Spec §9 — 권한 매트릭스 차단 audit 1년 보존 cron.
+
+    retention_days 를 override 하면 운영 정책에 따라 연장/단축 가능
+    (예: 분쟁 대응 연장 또는 GDPR 단축 요청).
+    """
+    from app.services.academy_governance_service import AcademyGovernanceService
+
+    deleted = await AcademyGovernanceService(db).cleanup_old_access_denials(retention_days=retention_days)
+    return {"deleted": deleted, "retention_days": retention_days}

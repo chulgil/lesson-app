@@ -126,6 +126,24 @@ class AcademyGovernanceService:
         result = await self.db.scalars(stmt.order_by(ContextAccessDenialLog.denied_at.desc()).limit(limit))
         return list(result.all()), total
 
+    async def cleanup_old_access_denials(self, *, retention_days: int = 365) -> int:
+        """ContextAccessDenialLog 보존 기간 (default 1년) 이전 행 일괄 삭제.
+
+        Spec §9: "권한 차단 응답 → AuditLog 1년 보존". 정기 cron 으로 호출되며
+        삭제된 행 수를 반환한다. 운영 정책에 따라 retention_days 를 override
+        할 수 있다 (예: 분쟁 대응을 위한 임시 연장).
+        """
+        from datetime import UTC, datetime, timedelta
+
+        from sqlalchemy import delete as sa_delete
+
+        cutoff = datetime.now(UTC) - timedelta(days=retention_days)
+        result = await self.db.execute(
+            sa_delete(ContextAccessDenialLog).where(ContextAccessDenialLog.denied_at < cutoff)
+        )
+        await self.db.commit()
+        return result.rowcount or 0
+
     # ------------------------------------------------------------------
     # AcademyDelegation
     # ------------------------------------------------------------------
