@@ -58,6 +58,37 @@ class PracticeLoopStatsService:
         self.db = db
 
     # ------------------------------------------------------------------
+    # Student access — router boundary 검증 (architecture contract: router 는
+    # DB 직접 접근 금지. 학생 조회/소유권 검증을 service 로 위임).
+    # ------------------------------------------------------------------
+
+    async def get_student_for_sync(self, student_id: str) -> Student | None:
+        """sync 흐름용. Student 가 없거나 teacher 미연결이면 None (no-op)."""
+        student = await self.db.scalar(select(Student).where(Student.id == student_id))
+        if student is None or not student.teacher_id:
+            return None
+        return student
+
+    async def assert_teacher_owns_student(self, *, teacher_id: str, student_id: str) -> None:
+        """teacher 모드 ownership 검증. 학생 없음 → 404, 타 강사 → 403.
+
+        Spec §5 privacy — a teacher may only see their own students' stats.
+        """
+        from fastapi import HTTPException, status
+
+        student = await self.db.scalar(select(Student).where(Student.id == student_id))
+        if student is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Student not found",
+            )
+        if student.teacher_id != teacher_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorised for this student",
+            )
+
+    # ------------------------------------------------------------------
     # Student sync
     # ------------------------------------------------------------------
 
