@@ -8,6 +8,13 @@ from app.models.academy import (  # noqa: F401
     AcademyStudent,
     AcademyStudentStatus,
 )
+from app.models.academy_announcement import (  # noqa: F401
+    AcademyAnnouncement,
+    AcademyAnnouncementAudience,
+    AcademyAnnouncementRecipient,
+    AcademyAnnouncementRecipientRole,
+    AcademyAnnouncementStatus,
+)
 from app.models.academy_billing import (  # noqa: F401
     AcademyBillingRule,
     AcademyInvoice,
