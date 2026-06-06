@@ -621,6 +621,8 @@ class AppStrings {
   static const scheduleChangeCounter = '다른 일정 제안';
   static const scheduleChangeConfirmed = '시간이 변경되었습니다';
   static const scheduleChangeRecommended = '추천';
+  static const scheduleChangeResponseNeeded = '일정 변경 응답이 필요합니다';
+  static const scheduleChangeResponseAction = '일정 변경 응답 필요 →';
 
   // ── Progress Bar Phase Labels ─────────────────────────────
 

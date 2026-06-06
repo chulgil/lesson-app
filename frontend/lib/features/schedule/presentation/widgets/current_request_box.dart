@@ -610,10 +610,82 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   // ── Phase 3: Lesson Progress ───────────────────────────────
 
   Widget _buildPhase3Lessons() {
-    // Subscription summary card + message input only.
+    // Check for a pending schedule change proposal that the viewer must respond to.
+    final pendingScheduleChange = _pendingScheduleChangeEvent();
+    if (pendingScheduleChange != null) {
+      return _buildScheduleChangeResponseBanner();
+    }
+    // Subscription summary card + link to detail.
     // Lesson management (attendance, schedule change) is handled in
     // the subscription detail screen and calendar.
     return _buildSubscriptionSummary();
+  }
+
+  /// Returns the latest unresolved scheduleChangeProposed or
+  /// scheduleChangeCountered event that was sent by the *opponent* (i.e. the
+  /// viewer needs to respond).
+  RequestEvent? _pendingScheduleChangeEvent() {
+    if (widget.events.isEmpty) return null;
+
+    // Walk from most recent to oldest.
+    for (int i = widget.events.length - 1; i >= 0; i--) {
+      final event = widget.events[i];
+      final type = event.eventType;
+
+      // A resolution event means there is no longer a pending proposal.
+      if (type == RequestEventType.scheduleChangeAccepted ||
+          type == RequestEventType.scheduleChanged) {
+        return null;
+      }
+
+      // Pending proposal/counter from the opponent.
+      if (type == RequestEventType.scheduleChangeProposed ||
+          type == RequestEventType.scheduleChangeCountered) {
+        final sentByTeacher = event.actorType == ProposerRole.teacher;
+        final viewerIsTeacher = _isTeacher;
+        // If opponent sent it, the viewer must respond.
+        if (sentByTeacher != viewerIsTeacher) {
+          return event;
+        }
+        // Viewer sent it — they are waiting, no banner needed.
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Banner shown when the viewer must respond to a schedule change proposal.
+  Widget _buildScheduleChangeResponseBanner() {
+    return Row(
+      children: [
+        Icon(Icons.swap_horiz_rounded, color: AppColors.paperAccent, size: 18),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Text(
+            AppStrings.scheduleChangeResponseNeeded,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        TextButton(
+          onPressed: widget.onScheduleChangeResponse ?? widget.onViewSubscription,
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            AppStrings.scheduleChangeResponseAction,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.paperAccent,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   // ── Phase 4: Completed ─────────────────────────────────────
