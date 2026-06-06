@@ -334,6 +334,11 @@ class SubscriptionService:
         if sub is None:
             return False
 
+        # Skip deduction if the subscription has not been payment-confirmed.
+        # Mirrors the guard in deduct_lesson() for the manual path.
+        if not sub.payment_confirmed:
+            return False
+
         remaining = self._remaining_lessons(sub)
         if remaining is not None and remaining <= 0:
             return False
