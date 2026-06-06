@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../auth/auth_facade.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
@@ -30,6 +31,13 @@ class ChildProfileFormScreen extends ConsumerStatefulWidget {
 
 class _ChildProfileFormScreenState
     extends ConsumerState<ChildProfileFormScreen> {
+  /// Resolve the parent id from auth when none was passed, instead of the
+  /// 'parent_1' mock seed default. (#586)
+  String get _parentId =>
+      widget.parentId.isNotEmpty
+          ? widget.parentId
+          : ref.read(currentUserIdProvider);
+
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late int _selectedBirthYear;
@@ -106,7 +114,7 @@ class _ChildProfileFormScreenState
         );
       } else {
         await manager.addChildProfile(
-          parentId: widget.parentId,
+          parentId: _parentId,
           name: _nameController.text.trim(),
           birthYear: _selectedBirthYear,
           instrument: _selectedInstrument,
@@ -477,7 +485,7 @@ class _ChildProfileFormScreenState
       final manager = ref.read(childProfileManagerProvider.notifier);
       await manager.deleteChildProfile(
         widget.existingProfile!.id,
-        widget.parentId,
+        _parentId,
       );
 
       if (mounted) {

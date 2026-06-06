@@ -9,9 +9,15 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/note_access_request.dart';
 import '../providers/note_access_provider.dart';
 
-/// Banner to display active note access permission and allow revocation
+/// Banner to display active note access permission and allow revocation.
+///
+/// [studentId] scopes the banner to a specific note owner (recipient). When
+/// provided, the banner only shows if the active access belongs to that
+/// student — so a multi-child parent never sees another child's access. (#586)
 class NoteAccessActiveBanner extends ConsumerStatefulWidget {
-  const NoteAccessActiveBanner({super.key});
+  final String? studentId;
+
+  const NoteAccessActiveBanner({super.key, this.studentId});
 
   @override
   ConsumerState<NoteAccessActiveBanner> createState() =>
@@ -29,6 +35,12 @@ class _NoteAccessActiveBannerState
         .when(
           data: (access) {
             if (access == null || !access.isActive) {
+              return const SizedBox.shrink();
+            }
+            // Scope to the selected child: hide if the active access belongs
+            // to a different student. (#586)
+            if (widget.studentId != null &&
+                access.recipientUserId != widget.studentId) {
               return const SizedBox.shrink();
             }
 

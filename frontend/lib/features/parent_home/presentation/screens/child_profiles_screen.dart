@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../auth/auth_facade.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
@@ -21,13 +22,17 @@ class ChildProfilesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profilesAsync = ref.watch(childProfilesProvider(parentId));
+    // Resolve from the authenticated user when no parentId was passed, instead
+    // of falling back to the 'parent_1' mock seed id. (#586)
+    final pid =
+        parentId.isNotEmpty ? parentId : ref.watch(currentUserIdProvider);
+    final profilesAsync = ref.watch(childProfilesProvider(pid));
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.parentHomeChildManagement,
         actions: const [DetailAppBarAction.add],
-        onAction: (_) => _navigateToAddChild(context),
+        onAction: (_) => _navigateToAddChild(context, pid),
       ),
       body: profilesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -49,7 +54,7 @@ class ChildProfilesScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space2),
                   TextButton(
                     onPressed:
-                        () => ref.invalidate(childProfilesProvider(parentId)),
+                        () => ref.invalidate(childProfilesProvider(pid)),
                     child: const Text(AppStrings.retry),
                   ),
                 ],
@@ -59,7 +64,7 @@ class ChildProfilesScreen extends ConsumerWidget {
           if (profiles.isEmpty) {
             return _buildEmptyState(context);
           }
-          return _buildProfileList(context, ref, profiles);
+          return _buildProfileList(context, ref, profiles, pid);
         },
       ),
     );
@@ -101,6 +106,7 @@ class ChildProfilesScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<ChildProfile> profiles,
+    String pid,
   ) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -108,7 +114,7 @@ class ChildProfilesScreen extends ConsumerWidget {
       itemBuilder: (context, index) {
         return _ChildProfileCard(
           profile: profiles[index],
-          onTap: () => _navigateToEditChild(context, profiles[index]),
+          onTap: () => _navigateToEditChild(context, profiles[index], pid),
           onSwitchToChild:
               () => _switchToChildView(context, ref, profiles[index]),
         );
@@ -116,22 +122,26 @@ class ChildProfilesScreen extends ConsumerWidget {
     );
   }
 
-  void _navigateToAddChild(BuildContext context) {
+  void _navigateToAddChild(BuildContext context, String pid) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChildProfileFormScreen(parentId: parentId),
+        builder: (context) => ChildProfileFormScreen(parentId: pid),
       ),
     );
   }
 
-  void _navigateToEditChild(BuildContext context, ChildProfile profile) {
+  void _navigateToEditChild(
+    BuildContext context,
+    ChildProfile profile,
+    String pid,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder:
             (context) => ChildProfileFormScreen(
-              parentId: parentId,
+              parentId: pid,
               existingProfile: profile,
             ),
       ),
