@@ -225,7 +225,8 @@ class QuestBoardCard extends ConsumerWidget {
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
         isLocked: slotsBlocker,
-        onTap: null,
+        // Navigate to lesson list so teacher can add/complete a lesson.
+        onTap: slotsBlocker ? null : () => context.push(AppRoutes.lessons),
       ),
       _Quest(
         step: 9,
@@ -233,7 +234,11 @@ class QuestBoardCard extends ConsumerWidget {
         reward: AppStrings.questRewardLessonNote,
         isCompleted: hasLessonNote,
         isLocked: slotsBlocker,
-        onTap: null,
+        // Quick-feedback list lets teacher write lesson notes after completion.
+        onTap:
+            slotsBlocker
+                ? null
+                : () => context.push(AppRoutes.quickFeedbackList),
       ),
       _Quest(
         step: 10,
@@ -241,7 +246,11 @@ class QuestBoardCard extends ConsumerWidget {
         reward: AppStrings.questRewardPracticeAssign,
         isCompleted: hasPracticeAssigned,
         isLocked: slotsBlocker,
-        onTap: null,
+        // Assignment dashboard lets teacher assign practice to students.
+        onTap:
+            slotsBlocker
+                ? null
+                : () => context.push(AppRoutes.assignmentDashboard),
       ),
       // ── Phase C (보상 퀘스트) ──
       // 정책: docs/specs/user/phone_verification_policy.md §2 — 전화인증은
