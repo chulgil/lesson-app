@@ -13,9 +13,9 @@ import '../../domain/repositories/academy_announcement_repository.dart';
 /// 주의: 학원→멤버 단방향 `academy_announcement` 시스템. 강사→학생
 /// `teacher_announcement` 와는 별개 (issue #554 영역 4).
 ///
-/// BE 의 `AcademyAnnouncementResponse` 는 집계 `read_count` 만 노출하고
-/// 수신자 본인 읽음 여부(`is_read`)는 제공하지 않는다. 따라서 목록/상세에서
-/// `isRead` 는 `false` 로 매핑한다. 읽음 마킹은 markAsRead 가 BE 에 반영한다.
+/// BE 의 `AcademyAnnouncementResponse` 는 집계 `read_count` 와 함께 수신자 본인
+/// 읽음 여부 `read_by_me` 를 노출한다. 목록/상세에서 이를 `isRead` 로 매핑한다.
+/// 읽음 마킹은 markAsRead 가 BE 에 반영하고 다음 조회에서 `read_by_me=true` 가 된다.
 class RemoteAcademyAnnouncementRepository
     implements AcademyAnnouncementRepository {
   final ApiClient _apiClient;
@@ -52,8 +52,8 @@ class RemoteAcademyAnnouncementRepository
       title: json['title'] as String,
       body: json['body_markdown'] as String,
       sentAt: DateTime.parse(sentRaw),
-      // BE 응답에 수신자 본인 읽음 필드 없음 — 항상 false (위 클래스 주석 참조).
-      isRead: false,
+      // 수신자 본인 읽음 여부 (BE read_by_me). 누락 시 보수적으로 false.
+      isRead: json['read_by_me'] as bool? ?? false,
     );
   }
 }
