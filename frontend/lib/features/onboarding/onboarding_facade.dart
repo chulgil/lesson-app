@@ -10,3 +10,5 @@ export 'presentation/providers/onboarding_providers.dart'
         teacherOnboardingNotifierProvider;
 export 'presentation/providers/onboarding_progress_storage_provider.dart'
     show OnboardingProgressStorageState, onboardingProgressStorageProvider;
+export 'presentation/widgets/first_availability_interstitial.dart'
+    show showFirstAvailabilityInterstitial;

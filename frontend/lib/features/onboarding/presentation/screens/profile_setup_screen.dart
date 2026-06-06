@@ -14,7 +14,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/image_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../features/auth/auth_facade.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';

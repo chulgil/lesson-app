@@ -11,7 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/auth_facade.dart';
-import '../../../profile/presentation/providers/invite_provider.dart';
+import '../../../profile/profile_facade.dart';
 
 /// Parent invite code input screen
 /// Parents enter an invite code from the teacher to connect with their child

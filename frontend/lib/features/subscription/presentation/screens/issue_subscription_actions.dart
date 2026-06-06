@@ -7,7 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../auth/presentation/widgets/phone_verification_gate_modal.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../domain/entities/subscription.dart';

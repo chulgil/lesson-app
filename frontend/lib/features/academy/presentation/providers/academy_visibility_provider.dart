@@ -1,16 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../domain/repositories/academy_visibility_repository.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_academy_visibility_repository.dart';
+import '../../data/repositories/remote_academy_visibility_repository.dart';
+import '../../domain/repositories/academy_visibility_repository.dart';
 
 part 'academy_visibility_provider.g.dart';
 
-// Provider for AcademyVisibilityRepository (singleton)
+// Provider for AcademyVisibilityRepository — switches Mock ↔ Remote (#554).
 @Riverpod(keepAlive: true)
-AcademyVisibilityRepository academyVisibilityRepository(Ref ref) {
-  return MockAcademyVisibilityRepository();
-}
+AcademyVisibilityRepository academyVisibilityRepository(Ref ref) =>
+    createRepository<AcademyVisibilityRepository>(
+      ref: ref,
+      mock: () => MockAcademyVisibilityRepository(),
+      remote: (api) => RemoteAcademyVisibilityRepository(api),
+    );
 
 // Provider for listing teacher's academies
 @riverpod

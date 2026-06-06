@@ -7,7 +7,7 @@ part of 'academy_activity_provider.dart';
 // **************************************************************************
 
 String _$academyActivityRepositoryHash() =>
-    r'99478004a7919eca6ac0cf78652792c51b243865';
+    r'c58f34ce76b076ab067864a416eca1c48e4bfbb6';
 
 /// See also [academyActivityRepository].
 @ProviderFor(academyActivityRepository)

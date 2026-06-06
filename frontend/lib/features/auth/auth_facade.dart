@@ -6,3 +6,5 @@ export 'presentation/providers/user_role_provider.dart'
         CurrentUserRoleProviderNotifierCompat,
         currentUserIdProvider,
         currentUserRoleProvider;
+export 'presentation/widgets/phone_verification_gate_modal.dart'
+    show PhoneVerificationGate;

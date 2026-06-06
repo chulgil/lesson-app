@@ -29,3 +29,5 @@ export 'presentation/providers/app_release_provider.dart'
         shouldPromptForReviewProvider;
 export 'presentation/providers/orphan_recording_provider.dart'
     show allSectionsForAssignmentProvider;
+export 'presentation/widgets/show_app_rating_prompt_helper.dart'
+    show showAppRatingPromptIfNeeded;
