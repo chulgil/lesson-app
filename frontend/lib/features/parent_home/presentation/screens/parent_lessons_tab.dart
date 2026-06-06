@@ -10,374 +10,467 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../auth/auth_facade.dart';
+import '../../../lessons/lessons_facade.dart' as lessons;
+import '../../domain/entities/child_profile.dart';
+import '../providers/child_profile_provider.dart';
+import '../providers/parent_crud_provider.dart';
 
-/// Parent lessons tab for viewing child's lesson schedule
+/// Parent lessons tab for viewing the selected child's lesson schedule.
+///
+/// Resolves the selected child -> linked student -> real lessons. Lesson notes
+/// are gated by [ParentVisibilitySettings] set by the teacher (data-privacy P0).
 class ParentLessonsTab extends ConsumerWidget {
   const ParentLessonsTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final now = DateTime.now();
+    final parentId = ref.watch(currentUserIdProvider);
+    final selectedProfile = ref.watch(selectedChildProfileProvider);
+    final childrenAsync = ref.watch(childProfilesProvider(parentId));
+
     return ColoredBox(
       color: AppColors.paper,
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Notebook × Score: §1.2 #5 Masthead — tier-1 진입 시그니처.
-              NotebookMasthead(
-                eyebrow: 'LESSONAZA',
-                meta: 'VOL. ${now.month} · NO. ${now.day}',
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              const ThinRule(),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Calendar view placeholder
-              _buildCalendarHeader(),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Upcoming lessons
-              // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text(
-                AppStrings.parentHomeUpcomingLessons,
-                style: NotebookTypography.sectionTitle,
-              ),
-              const SizedBox(height: AppSpacing.space3),
-
-              _LessonCard(
-                lessonId: 'lesson_upcoming_1',
-                date: now.add(const Duration(days: 1)),
-                startTime: '14:00',
-                endTime: '15:00',
-                teacherName: '김선생님',
-                status: LessonStatus.confirmed,
-                onTap:
-                    () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(
-                        ':id',
-                        'lesson_upcoming_1',
-                      ),
-                    ),
-              ),
-
-              const SizedBox(height: AppSpacing.space3),
-
-              _LessonCard(
-                lessonId: 'lesson_upcoming_2',
-                date: now.add(const Duration(days: 8)),
-                startTime: '14:00',
-                endTime: '15:00',
-                teacherName: '김선생님',
-                status: LessonStatus.confirmed,
-                onTap:
-                    () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(
-                        ':id',
-                        'lesson_upcoming_2',
-                      ),
-                    ),
-              ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // Past lessons
-              // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
-              Text(
-                AppStrings.parentHomePastLessons,
-                style: NotebookTypography.sectionTitle,
-              ),
-              const SizedBox(height: AppSpacing.space3),
-
-              _LessonCard(
-                lessonId: 'lesson_1',
-                date: now.subtract(const Duration(days: 6)),
-                startTime: '14:00',
-                endTime: '15:00',
-                teacherName: '김선생님',
-                status: LessonStatus.completed,
-                hasNote: true,
-                onTap:
-                    () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_1'),
-                    ),
-                onViewNote: () => _showLessonNoteSheet(context, 'lesson_1'),
-              ),
-
-              const SizedBox(height: AppSpacing.space3),
-
-              _LessonCard(
-                lessonId: 'lesson_2',
-                date: now.subtract(const Duration(days: 13)),
-                startTime: '14:00',
-                endTime: '15:00',
-                teacherName: '김선생님',
-                status: LessonStatus.completed,
-                hasNote: true,
-                onTap:
-                    () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_2'),
-                    ),
-                onViewNote: () => _showLessonNoteSheet(context, 'lesson_2'),
-              ),
-
-              const SizedBox(height: AppSpacing.space5),
-
-              // Notebook × Score: §1.2 #6 "Fine." 페이지 종지부.
-              const ThinRule(),
-              const SizedBox(height: AppSpacing.space3),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text('Fine.', style: NotebookTypography.fine),
-                  const Spacer(),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.space6),
-            ],
+        child: childrenAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => const _LessonsMessageState(
+            message: AppStrings.parentHomeLessonLoadError,
           ),
+          data: (profiles) {
+            if (profiles.isEmpty) {
+              return const _LessonsMessageState(
+                message: AppStrings.parentHomeNoChildren,
+              );
+            }
+            final profile = selectedProfile ?? profiles.first;
+            return _ChildLessonsView(profile: profile);
+          },
         ),
       ),
     );
   }
+}
 
-  void _showLessonNoteSheet(BuildContext context, String lessonId) {
-    showNotebookModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder:
-          (context) => DraggableScrollableSheet(
-            initialChildSize: 0.7,
-            minChildSize: 0.5,
-            maxChildSize: 0.95,
-            expand: false,
-            builder:
-                (context, scrollController) => Container(
-                  padding: const EdgeInsets.all(AppSpacing.space4),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Handle
-                      const Center(
-                        child: BottomSheetHandle(
-                          margin: EdgeInsets.only(bottom: AppSpacing.space4),
-                        ),
-                      ),
-                      // Header
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Notebook × Score: 바텀시트 섹션 헤더 (§7.17/§7.27) — Playfair sectionTitle.
-                          Text(
-                            AppStrings.parentHomeLessonNote,
-                            style: NotebookTypography.sectionTitle,
-                          ),
-                          TextButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              context.push(
-                                AppRoutes.lessonDetail.replaceFirst(
-                                  ':id',
-                                  lessonId,
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.open_in_new, size: 16),
-                            label: const Text(AppStrings.parentHomeViewDetail),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.space4),
-                      // Content
-                      Expanded(
-                        child: ListView(
-                          controller: scrollController,
-                          children: [
-                            // Lesson info
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.space3),
-                              decoration: BoxDecoration(
-                                color: AppColors.paperDark,
-                                borderRadius: BorderRadius.zero,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.calendar_today,
-                                    size: 16,
-                                    color: AppColors.inkSecondary,
-                                  ),
-                                  const SizedBox(width: AppSpacing.space2),
-                                  Text(
-                                    '12월 21일 (토) 14:00 - 15:00',
-                                    style: AppTypography.bodySmall.copyWith(
-                                      color: AppColors.inkSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.space4),
+/// Renders a child's real lessons (upcoming / past) or a not-linked state.
+class _ChildLessonsView extends ConsumerWidget {
+  const _ChildLessonsView({required this.profile});
 
-                            // Note content
-                            Text(
-                              '수업 내용',
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.space2),
-                            Text(
-                              '• 스케일 연습: A장조 3옥타브 연습. 음정 안정성이 많이 향상되었습니다.\n'
-                              '• 에튀드: 크로이처 No.2 마무리. 다음 주부터 No.3 시작 예정.\n'
-                              '• 곡 연습: 모차르트 소나타 1악장 익스포지션 부분. 비브라토 적용 연습.',
-                              style: AppTypography.bodyMedium,
-                            ),
-                            const SizedBox(height: AppSpacing.space4),
+  final ChildProfile profile;
 
-                            // Teacher comment
-                            Text(
-                              '선생님 코멘트',
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.space2),
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.space3),
-                              decoration: BoxDecoration(
-                                color: AppColors.paperAccentSoft.withValues(
-                                  alpha: 0.2,
-                                ),
-                                borderRadius: BorderRadius.zero,
-                                border: Border.all(
-                                  color: AppColors.paperAccentSoft,
-                                ),
-                              ),
-                              child: Text(
-                                '이번 주 연습을 정말 열심히 해왔네요! 특히 스케일의 음정이 많이 안정되었어요. '
-                                '다음 주까지 비브라토 연습에 집중해서 모차르트 곡에 적용해보세요. '
-                                '화이팅입니다! 💪',
-                                style: AppTypography.bodyMedium,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.space4),
-
-                            // Practice assignments
-                            Text(
-                              '과제',
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.space2),
-                            _buildAssignmentItem(
-                              title: '스케일 연습',
-                              description: 'A장조 3옥타브 (메트로놈 ♩=80)',
-                              priority: 'must',
-                            ),
-                            _buildAssignmentItem(
-                              title: '비브라토 연습',
-                              description: '느린 템포로 꾸준히 연습',
-                              priority: 'should',
-                            ),
-                            _buildAssignmentItem(
-                              title: '모차르트 소나타',
-                              description: '1악장 전체 암보',
-                              priority: 'must',
-                            ),
-                            const SizedBox(height: AppSpacing.space4),
-
-                            // Recording (if any)
-                            Text(
-                              '녹음',
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.space2),
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.space3),
-                              decoration: BoxDecoration(
-                                color: AppColors.paperDark,
-                                borderRadius: BorderRadius.zero,
-                              ),
-                              child: Row(
-                                children: [
-                                  // §7.132: round → 사각 play 버튼. white → paper.
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.paperAccent,
-                                    ),
-                                    child: const Icon(
-                                      Icons.play_arrow,
-                                      color: AppColors.paper,
-                                    ),
-                                  ),
-                                  const SizedBox(width: AppSpacing.space3),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '모차르트 소나타 녹음',
-                                          style: AppTypography.bodyMedium,
-                                        ),
-                                        Text(
-                                          '3:24',
-                                          style: AppTypography.caption.copyWith(
-                                            color: AppColors.inkSecondary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-          ),
-    );
-  }
-
-  Widget _buildAssignmentItem({
-    required String title,
-    required String description,
-    required String priority,
-  }) {
-    Color priorityColor;
-    String priorityLabel;
-
-    switch (priority) {
-      case 'must':
-        priorityColor = AppColors.paperAccent;
-        priorityLabel = '필수';
-        break;
-      case 'should':
-        priorityColor = AppColors.paperAccent;
-        priorityLabel = '권장';
-        break;
-      default:
-        priorityColor = AppColors.paperOk;
-        priorityLabel = '선택';
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final linkedStudentId = profile.linkedStudentId;
+    if (linkedStudentId == null) {
+      return const _LessonsMessageState(
+        message: AppStrings.parentHomeChildNotLinked,
+        hint: AppStrings.parentHomeChildNotLinkedHint,
+      );
     }
 
+    final lessonsAsync = ref.watch(
+      lessons.lessonsByStudentProvider(linkedStudentId),
+    );
+
+    return lessonsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const _LessonsMessageState(
+        message: AppStrings.parentHomeLessonLoadError,
+      ),
+      data: (allLessons) => _LessonsList(
+        profile: profile,
+        lessonItems: allLessons,
+        onRefresh: () =>
+            ref.invalidate(lessons.lessonsByStudentProvider(linkedStudentId)),
+      ),
+    );
+  }
+}
+
+class _LessonsList extends StatelessWidget {
+  const _LessonsList({
+    required this.profile,
+    required this.lessonItems,
+    required this.onRefresh,
+  });
+
+  final ChildProfile profile;
+  final List<lessons.Lesson> lessonItems;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final visible = lessonItems.where((l) => !l.isArchived).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final upcoming = visible
+        .where((l) => l.displayStatus == lessons.LessonStatus.scheduled)
+        .toList();
+    final past = visible
+        .where((l) => l.displayStatus != lessons.LessonStatus.scheduled)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    return RefreshIndicator(
+      onRefresh: () async => onRefresh(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Notebook × Score: §1.2 #5 Masthead — tier-1 진입 시그니처.
+            NotebookMasthead(
+              eyebrow: 'LESSONAZA',
+              meta: 'VOL. ${now.month} · NO. ${now.day}',
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            const ThinRule(),
+            const SizedBox(height: AppSpacing.space4),
+
+            // Upcoming lessons
+            // Notebook × Score: 페이지 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17 패턴).
+            Text(
+              AppStrings.parentHomeUpcomingLessons,
+              style: NotebookTypography.sectionTitle,
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            if (upcoming.isEmpty)
+              const _LessonsEmptyRow(
+                message: AppStrings.parentHomeNoUpcomingLessons,
+              )
+            else
+              for (final lesson in upcoming) ...[
+                _LessonCard(
+                  profile: profile,
+                  lesson: lesson,
+                  onTap: () => context.push(
+                    AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space3),
+              ],
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // Past lessons
+            Text(
+              AppStrings.parentHomePastLessons,
+              style: NotebookTypography.sectionTitle,
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            if (past.isEmpty)
+              const _LessonsEmptyRow(
+                message: AppStrings.parentHomeNoPastLessons,
+              )
+            else
+              for (final lesson in past) ...[
+                _LessonCard(
+                  profile: profile,
+                  lesson: lesson,
+                  onTap: () => context.push(
+                    AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                  ),
+                  onViewNote: () =>
+                      _showLessonNoteSheet(context, profile, lesson),
+                ),
+                const SizedBox(height: AppSpacing.space3),
+              ],
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // Notebook × Score: §1.2 #6 "Fine." 페이지 종지부.
+            const ThinRule(),
+            const SizedBox(height: AppSpacing.space3),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text('Fine.', style: NotebookTypography.fine),
+                const Spacer(),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space6),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Opens the lesson note sheet. The sheet itself resolves visibility settings
+/// and gates note / recording / detailed feedback content.
+void _showLessonNoteSheet(
+  BuildContext context,
+  ChildProfile profile,
+  lessons.Lesson lesson,
+) {
+  showNotebookModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => _LessonNoteSheet(profile: profile, lesson: lesson),
+  );
+}
+
+class _LessonNoteSheet extends ConsumerWidget {
+  const _LessonNoteSheet({required this.profile, required this.lesson});
+
+  final ChildProfile profile;
+  final lessons.Lesson lesson;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // teacherId/studentId 획득: 레슨의 teacherId 우선, 없으면 자녀의 연결 선생님.
+    final teacherId = lesson.teacherId ?? profile.teacherId;
+    final studentId = lesson.studentId;
+
+    // 게이트가 없으면(선생님 미연결) 권한 확인 불가 → 빈 안내 상태로.
+    if (teacherId == null) {
+      return _NoteSheetShell(
+        lesson: lesson,
+        child: const _NoteBlockedState(
+          message: AppStrings.parentHomeLessonNoteNotShared,
+        ),
+      );
+    }
+
+    final settingsAsync = ref.watch(
+      visibilitySettingsProvider((teacherId: teacherId, studentId: studentId)),
+    );
+
+    return _NoteSheetShell(
+      lesson: lesson,
+      child: settingsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const _NoteBlockedState(
+          message: AppStrings.parentHomeLessonLoadError,
+        ),
+        data: (settings) {
+          // 기본값: 노트 ON, 녹음/상세피드백 OFF. settings null이면 기본 적용.
+          final canViewNotes = settings?.canViewLessonNotes ?? true;
+          final canViewRecordings = settings?.canViewRecordings ?? false;
+          final canViewFeedback = settings?.canViewDetailedFeedback ?? false;
+
+          if (!canViewNotes) {
+            return const _NoteBlockedState(
+              message: AppStrings.parentHomeLessonNoteNotShared,
+            );
+          }
+
+          return _LessonNoteContent(
+            lesson: lesson,
+            canViewRecordings: canViewRecordings,
+            canViewFeedback: canViewFeedback,
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Shared sheet chrome (handle + header with detail link).
+class _NoteSheetShell extends StatelessWidget {
+  const _NoteSheetShell({required this.lesson, required this.child});
+
+  final lessons.Lesson lesson;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) => Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: BottomSheetHandle(
+                margin: EdgeInsets.only(bottom: AppSpacing.space4),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Notebook × Score: 바텀시트 섹션 헤더 (§7.17/§7.27) — Playfair sectionTitle.
+                Text(
+                  AppStrings.parentHomeLessonNote,
+                  style: NotebookTypography.sectionTitle,
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push(
+                      AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                    );
+                  },
+                  icon: const Icon(Icons.open_in_new, size: 16),
+                  label: const Text(AppStrings.parentHomeViewDetail),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                children: [
+                  _LessonInfoRow(lesson: lesson),
+                  const SizedBox(height: AppSpacing.space4),
+                  child,
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LessonInfoRow extends StatelessWidget {
+  const _LessonInfoRow({required this.lesson});
+
+  final lessons.Lesson lesson;
+
+  @override
+  Widget build(BuildContext context) {
+    final start = lesson.startTime;
+    final end = formatTimeHM(lesson.endDateTime);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: const BoxDecoration(
+        color: AppColors.paperDark,
+        borderRadius: BorderRadius.zero,
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.calendar_today,
+            size: 16,
+            color: AppColors.inkSecondary,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Text(
+            '${formatDateMDWithDayParens(lesson.date)} $start - $end',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Lesson note body — note/comment/assignments always; recordings gated.
+class _LessonNoteContent extends StatelessWidget {
+  const _LessonNoteContent({
+    required this.lesson,
+    required this.canViewRecordings,
+    required this.canViewFeedback,
+  });
+
+  final lessons.Lesson lesson;
+  final bool canViewRecordings;
+  final bool canViewFeedback;
+
+  @override
+  Widget build(BuildContext context) {
+    final keyPoints = lesson.keyPoints ?? const <String>[];
+    final assignments = lesson.assignments ?? const <String>[];
+    final recordings = lesson.recordings ?? const <lessons.LessonRecording>[];
+    final hasFeedback =
+        lesson.feedback != null && lesson.feedback!.trim().isNotEmpty;
+
+    final hasAnyContent = keyPoints.isNotEmpty ||
+        assignments.isNotEmpty ||
+        (canViewFeedback && hasFeedback) ||
+        (canViewRecordings && recordings.isNotEmpty);
+
+    if (!hasAnyContent) {
+      return const _NoteBlockedState(
+        message: AppStrings.parentHomeLessonNoteEmpty,
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (keyPoints.isNotEmpty) ...[
+          _SectionLabel(AppStrings.parentHomeLessonNoteContent),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            keyPoints.map((p) => '• $p').join('\n'),
+            style: AppTypography.bodyMedium,
+          ),
+          const SizedBox(height: AppSpacing.space4),
+        ],
+
+        // 상세 피드백 — canViewDetailedFeedback 기준.
+        if (canViewFeedback && hasFeedback) ...[
+          _SectionLabel(AppStrings.parentHomeLessonTeacherComment),
+          const SizedBox(height: AppSpacing.space2),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.paperAccentSoft.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.zero,
+              border: Border.all(color: AppColors.paperAccentSoft),
+            ),
+            child: Text(lesson.feedback!, style: AppTypography.bodyMedium),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+        ],
+
+        if (assignments.isNotEmpty) ...[
+          _SectionLabel(AppStrings.parentHomeLessonAssignments),
+          const SizedBox(height: AppSpacing.space2),
+          for (final assignment in assignments)
+            _AssignmentItem(title: assignment),
+          const SizedBox(height: AppSpacing.space4),
+        ],
+
+        // 녹음 — canViewRecordings true 일 때만 렌더.
+        if (canViewRecordings && recordings.isNotEmpty) ...[
+          _SectionLabel(AppStrings.parentHomeLessonRecording),
+          const SizedBox(height: AppSpacing.space2),
+          for (final recording in recordings)
+            _RecordingItem(recording: recording),
+        ],
+      ],
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+    );
+  }
+}
+
+class _AssignmentItem extends StatelessWidget {
+  const _AssignmentItem({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       padding: const EdgeInsets.all(AppSpacing.space3),
@@ -388,33 +481,64 @@ class ParentLessonsTab extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: priorityColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.zero,
-            ),
+          const Icon(
+            Icons.check_box_outline_blank,
+            size: 18,
+            color: AppColors.inkTertiary,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
             child: Text(
-              priorityLabel,
-              style: AppTypography.captionSmall.copyWith(
-                color: priorityColor,
-                fontWeight: FontWeight.bold,
+              title,
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const SizedBox(width: AppSpacing.space2),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecordingItem extends StatelessWidget {
+  const _RecordingItem({required this.recording});
+
+  final lessons.LessonRecording recording;
+
+  @override
+  Widget build(BuildContext context) {
+    final minutes = recording.duration.inMinutes;
+    final seconds = recording.duration.inSeconds % 60;
+    final durationLabel = '$minutes:${seconds.toString().padLeft(2, '0')}';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: const BoxDecoration(
+        color: AppColors.paperDark,
+        borderRadius: BorderRadius.zero,
+      ),
+      child: Row(
+        children: [
+          // §7.132: round → 사각 play 버튼. white → paper.
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(color: AppColors.paperAccent),
+            child: const Icon(Icons.play_arrow, color: AppColors.paper),
+          ),
+          const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  formatDateMDWithDayParens(recording.recordedAt),
+                  style: AppTypography.bodyMedium,
                 ),
                 Text(
-                  description,
+                  durationLabel,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -426,57 +550,31 @@ class ParentLessonsTab extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildCalendarHeader() {
-    final now = DateTime.now();
-    final monthName = formatYearMonth(now);
+/// Blocked / empty content state inside the note sheet.
+class _NoteBlockedState extends StatelessWidget {
+  const _NoteBlockedState({required this.message});
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.zero,
-      ),
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space6),
       child: Column(
         children: [
-          Center(
-            child: Text(monthName, style: AppTypography.headingSmall),
+          const Icon(
+            Icons.lock_outline,
+            size: 40,
+            color: AppColors.inkTertiary,
           ),
-          const SizedBox(height: AppSpacing.space2),
-          // Mini calendar week days
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children:
-                ['일', '월', '화', '수', '목', '금', '토']
-                    .map(
-                      (day) => SizedBox(
-                        width: 36,
-                        child: Text(
-                          day,
-                          style: AppTypography.caption.copyWith(
-                            color:
-                                day == '일'
-                                    ? AppColors.paperAccent
-                                    : day == '토'
-                                    ? AppColors.paperAccent
-                                    : AppColors.inkSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
-                    .toList(),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          // Placeholder for calendar grid
-          Container(
-            height: 200,
-            alignment: Alignment.center,
-            child: Text(
-              '월간 캘린더 뷰',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
+          const SizedBox(height: AppSpacing.space3),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -485,34 +583,37 @@ class ParentLessonsTab extends ConsumerWidget {
   }
 }
 
-enum LessonStatus { confirmed, completed, cancelled }
-
 class _LessonCard extends StatelessWidget {
-  final String lessonId;
-  final DateTime date;
-  final String startTime;
-  final String endTime;
-  final String teacherName;
-  final LessonStatus status;
-  final bool hasNote;
-  final VoidCallback? onTap;
-  final VoidCallback? onViewNote;
-
   const _LessonCard({
-    required this.lessonId,
-    required this.date,
-    required this.startTime,
-    required this.endTime,
-    required this.teacherName,
-    required this.status,
-    this.hasNote = false,
+    required this.profile,
+    required this.lesson,
     this.onTap,
     this.onViewNote,
   });
 
+  final ChildProfile profile;
+  final lessons.Lesson lesson;
+  final VoidCallback? onTap;
+  final VoidCallback? onViewNote;
+
+  bool get _isPast => lesson.displayStatus != lessons.LessonStatus.scheduled;
+
+  bool get _hasNote {
+    final keyPoints = lesson.keyPoints ?? const <String>[];
+    final assignments = lesson.assignments ?? const <String>[];
+    final recordings = lesson.recordings ?? const <lessons.LessonRecording>[];
+    return lesson.hasFeedback ||
+        keyPoints.isNotEmpty ||
+        assignments.isNotEmpty ||
+        recordings.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isPast = status == LessonStatus.completed;
+    final isPast = _isPast;
+    final teacherName = lesson.teacherName ?? profile.teacherName ?? '';
+    final timeLabel =
+        '${lesson.startTime} - ${formatTimeHM(lesson.endDateTime)}';
 
     return InkWell(
       onTap: onTap,
@@ -531,30 +632,27 @@ class _LessonCard extends StatelessWidget {
               width: 56,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
               decoration: BoxDecoration(
-                color:
-                    isPast
-                        ? AppColors.paperDark
-                        : AppColors.paperAccentSoft.withValues(alpha: 0.2),
+                color: isPast
+                    ? AppColors.paperDark
+                    : AppColors.paperAccentSoft.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.zero,
               ),
               child: Column(
                 children: [
                   Text(
-                    '${date.day}',
+                    '${lesson.date.day}',
                     style: AppTypography.headingMedium.copyWith(
-                      color:
-                          isPast
-                              ? AppColors.inkSecondary
-                              : AppColors.paperAccent,
+                      color: isPast
+                          ? AppColors.inkSecondary
+                          : AppColors.paperAccent,
                     ),
                   ),
                   Text(
-                    formatWeekdayShort(date),
+                    formatWeekdayShort(lesson.date),
                     style: AppTypography.caption.copyWith(
-                      color:
-                          isPast
-                              ? AppColors.inkTertiary
-                              : AppColors.paperAccent,
+                      color: isPast
+                          ? AppColors.inkTertiary
+                          : AppColors.paperAccent,
                     ),
                   ),
                 ],
@@ -569,20 +667,21 @@ class _LessonCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '정규 레슨',
+                        AppStrings.parentHomeRegularLesson,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color:
-                              isPast ? AppColors.inkSecondary : AppColors.ink,
+                          color: isPast ? AppColors.inkSecondary : AppColors.ink,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
-                      _buildStatusBadge(),
+                      _StatusBadge(status: lesson.displayStatus),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.space1),
                   Text(
-                    '$startTime - $endTime • $teacherName',
+                    teacherName.isEmpty
+                        ? timeLabel
+                        : '$timeLabel • $teacherName',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -591,45 +690,49 @@ class _LessonCard extends StatelessWidget {
               ),
             ),
             // Actions
-            if (hasNote)
+            if (onViewNote != null && _hasNote)
               IconButton(
                 onPressed: onViewNote,
-                icon: Icon(Icons.note_outlined, color: AppColors.paperAccent),
-                tooltip: '레슨 노트',
+                icon: const Icon(
+                  Icons.note_outlined,
+                  color: AppColors.paperAccent,
+                ),
+                tooltip: AppStrings.parentHomeLessonNote,
               ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildStatusBadge() {
-    Color bgColor;
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+
+  final lessons.LessonStatus status;
+
+  @override
+  Widget build(BuildContext context) {
     Color textColor;
     String label;
 
     switch (status) {
-      case LessonStatus.confirmed:
-        bgColor = AppColors.paperDark;
+      case lessons.LessonStatus.scheduled:
+      case lessons.LessonStatus.reschedulePending:
         textColor = AppColors.paperOk;
         label = AppStrings.parentHomeLessonScheduled;
-        break;
-      case LessonStatus.completed:
-        bgColor = AppColors.paperDark;
+      case lessons.LessonStatus.completed:
         textColor = AppColors.inkSecondary;
         label = AppStrings.parentHomeLessonCompleted;
-        break;
-      case LessonStatus.cancelled:
-        bgColor = AppColors.paperAccentSoft;
+      default:
         textColor = AppColors.paperAccent;
         label = AppStrings.parentHomeLessonCancelled;
-        break;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: bgColor,
+      decoration: const BoxDecoration(
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.zero,
       ),
       child: Text(
@@ -637,6 +740,69 @@ class _LessonCard extends StatelessWidget {
         style: AppTypography.captionSmall.copyWith(
           color: textColor,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class _LessonsEmptyRow extends StatelessWidget {
+  const _LessonsEmptyRow({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        borderRadius: BorderRadius.zero,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Text(
+        message,
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+      ),
+    );
+  }
+}
+
+/// Full-tab centered message state (no children / not linked / error).
+class _LessonsMessageState extends StatelessWidget {
+  const _LessonsMessageState({required this.message, this.hint});
+
+  final String message;
+  final String? hint;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.event_note_outlined,
+              size: 56,
+              color: AppColors.inkTertiary,
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
+            Text(message, style: NotebookTypography.sectionTitle),
+            if (hint != null) ...[
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                hint!,
+                textAlign: TextAlign.center,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

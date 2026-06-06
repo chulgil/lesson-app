@@ -6463,6 +6463,20 @@ class AppStrings {
   static const parentHomePriorityShould = '권장';
   static const parentHomePriorityCould = '선택';
   static const parentHomeCompletedLabel = '완료됨';
+  // ── Parent Lessons tab (실데이터) + 노트 접근동의 게이트 ──────
+  static const parentHomeNoUpcomingLessons = '예정된 레슨이 없습니다';
+  static const parentHomeNoPastLessons = '지난 레슨이 없습니다';
+  static const parentHomeLessonLoadError = '레슨 정보를 불러오지 못했습니다';
+  static const parentHomeChildNotLinked = '아직 선생님과 연결되지 않았습니다';
+  static const parentHomeChildNotLinkedHint = '선생님 연결 후 레슨 일정이 표시됩니다';
+  static const parentHomeLessonNoteContent = '수업 내용';
+  static const parentHomeLessonTeacherComment = '선생님 코멘트';
+  static const parentHomeLessonAssignments = '과제';
+  static const parentHomeLessonRecording = '녹음';
+  static const parentHomeLessonNoteEmpty = '아직 작성된 레슨 노트가 없습니다';
+  // 레슨 노트 접근 동의 게이트 (data-privacy P0)
+  static const parentHomeLessonNoteNotShared = '선생님이 노트 공유를 허용하지 않았습니다';
+  static const parentHomeLessonFeedbackNotShared = '선생님이 상세 피드백 공유를 허용하지 않았습니다';
 
   // ── Schedule (추가) ───────────────────────────────────────
 
