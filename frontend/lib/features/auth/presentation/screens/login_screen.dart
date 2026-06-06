@@ -318,6 +318,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
     } catch (e) {
+      // Dev-login failed — revert mock mode so real auth paths are unaffected.
+      ref.read(dataModeProvider.notifier).setMockMode(false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
