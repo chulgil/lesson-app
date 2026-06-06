@@ -328,7 +328,7 @@ lesson.subscriptionId == null (레거시 데이터)
 | 프론트 취소 분기 (`lesson_detail_screen.dart`) | ✅ 구현 |
 | 백엔드 자동 수강권 생성 (`lesson_service.create()`) | ✅ 구현 |
 | 보너스 레슨 (남은 횟수 0 → total_lessons/bonus_count 증가) | ✅ 구현 |
-| `cancel_lesson_bottom_sheet.dart` (취소 사유 UI) | ❌ 미구현 |
+| `cancel_lesson_bottom_sheet.dart` (취소 사유 UI) | ✅ 구현 완료 (PR #564) |
 | `update_status()` 가드 (수강권 레슨 직접 취소 차단) | ❌ 미구현 (2단계) |
 | 레거시 데이터 마이그레이션 | ❌ 미구현 (4단계) |
 
