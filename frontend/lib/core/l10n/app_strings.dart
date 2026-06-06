@@ -103,6 +103,9 @@ class AppStrings {
   /// 수락 처리 중 오류
   static const acceptError = '수락 처리 중 오류가 발생했습니다';
 
+  /// 취소 처리 중 오류
+  static const cancelError = '취소 처리 중 오류가 발생했습니다';
+
   /// 역제안 전송 중 오류
   static const counterProposeError = '역제안 전송 중 오류가 발생했습니다';
 
@@ -6018,6 +6021,7 @@ class AppStrings {
   // ── Onboarding ──
   static const onboardingRoleSelect = '역할 선택';
   static const onboardingPhoneVerification = '휴대폰 인증';
+  static const onboardingContinueWithQuest = '퀘스트 보드에서 계속';
   static const onboardingProfileSetup = '프로필 설정';
   static const onboardingTutorial = '튜토리얼';
   static const onboardingCompleted = '완료';

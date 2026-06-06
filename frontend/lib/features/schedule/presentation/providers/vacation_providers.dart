@@ -162,6 +162,7 @@ class VacationForm extends _$VacationForm {
             : state.perStudentOverrides,
       );
       state = state.copyWith(isSubmitting: false);
+      ref.invalidate(vacationListProvider);
       return period;
     } catch (e) {
       state = state.copyWith(isSubmitting: false, errorMessage: e.toString());

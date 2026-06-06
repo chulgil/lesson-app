@@ -14,6 +14,13 @@ import '../app_routes.dart';
 
 /// Lesson management routes
 List<GoRoute> lessonRoutes = [
+  // Lessons root — entry point for adding a lesson (quest 8)
+  GoRoute(
+    path: AppRoutes.lessons,
+    name: 'lessons',
+    builder: (context, state) => const AddLessonScreen(),
+  ),
+
   // Add Lesson
   GoRoute(
     path: AppRoutes.addLesson,
