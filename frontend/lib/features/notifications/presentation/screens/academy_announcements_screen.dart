@@ -8,7 +8,7 @@ import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
-import 'package:lessonaza/features/academy/presentation/providers/academy_announcement_provider.dart';
+import 'package:lessonaza/features/academy/academy_facade.dart';
 
 class AcademyAnnouncementsScreen extends ConsumerWidget {
   const AcademyAnnouncementsScreen({required this.academyId, super.key});

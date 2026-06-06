@@ -1043,7 +1043,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 .map(
                   (s) => TimeSlotOption(
                     id: s.id,
-                    dayOfWeek: s.dayOfWeek,
+                    // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
+                    dayOfWeek: s.dayOfWeek - 1,
                     startTime:
                         '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
                     endTime:
@@ -1140,7 +1141,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     .map(
                       (s) => TimeSlotOption(
                         id: s.id,
-                        dayOfWeek: s.dayOfWeek,
+                        // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
+                        dayOfWeek: s.dayOfWeek - 1,
                         startTime:
                             '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
                         endTime:

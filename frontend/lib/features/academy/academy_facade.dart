@@ -8,3 +8,5 @@ export 'presentation/providers/academy_visibility_provider.dart'
         academyVisibilityNotifierProvider,
         academyVisibilityRepositoryProvider,
         teacherAcademiesProvider;
+export 'presentation/providers/academy_announcement_provider.dart'
+    show academyAnnouncementRepositoryProvider, academyAnnouncementsProvider;

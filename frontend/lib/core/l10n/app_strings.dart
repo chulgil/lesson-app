@@ -6070,6 +6070,7 @@ class AppStrings {
   static const studentSignupBlockedHelper =
       '본인 인증 통합 후에는 학생 직접 가입이 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
+  static const authParentLoginNotReady = '학부모 로그인은 준비 중입니다.';
   static const authTermsAgreement = '서비스 이용 동의';
   static const authTermsOfService = '서비스 이용약관 동의';
   static const authPrivacyPolicy = '개인정보 수집·이용 동의';
