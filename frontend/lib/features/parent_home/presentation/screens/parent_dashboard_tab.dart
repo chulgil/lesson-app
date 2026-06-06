@@ -12,8 +12,13 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/utils/date_utils.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../lessons/lessons_facade.dart';
+import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
+import '../../../students/students_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
@@ -62,9 +67,27 @@ class ParentDashboardTab extends ConsumerWidget {
 
             final profile = selectedProfile ?? profiles.first;
 
+            final linkedStudentId = profile.linkedStudentId;
+
             return RefreshIndicator(
               onRefresh: () async {
                 ref.invalidate(childProfilesProvider(parentId));
+                if (linkedStudentId != null) {
+                  ref.invalidate(lessonsByStudentProvider(linkedStudentId));
+                  ref.invalidate(practiceStreakProvider(linkedStudentId));
+                  ref.invalidate(
+                    weeklyPracticeItemsProvider(linkedStudentId),
+                  );
+                  ref.invalidate(
+                    practiceItemsByStudentProvider(linkedStudentId),
+                  );
+                  ref.invalidate(
+                    studentSubscriptionsProvider(linkedStudentId),
+                  );
+                  ref.invalidate(
+                    activeStudentMembershipsProvider(linkedStudentId),
+                  );
+                }
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -100,7 +123,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _buildQuickStats(),
+                      child: _QuickStatsSection(profile: profile),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -110,7 +133,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _buildUpcomingLesson(),
+                      child: _UpcomingLessonSection(profile: profile),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -120,7 +143,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _buildPracticeStreak(),
+                      child: _PracticeStreakSection(profile: profile),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -130,7 +153,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _buildRecentAssignments(),
+                      child: _RecentAssignmentsSection(profile: profile),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -140,7 +163,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _buildPaymentStatus(),
+                      child: _PaymentStatusSection(profile: profile),
                     ),
 
                     const SizedBox(height: AppSpacing.space5),
@@ -538,14 +561,110 @@ class ParentDashboardTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickStats() {
+}
+
+/// Returns the nearest future scheduled lesson, or null.
+Lesson? _nextScheduledLesson(List<Lesson> lessons) {
+  final now = DateTime.now();
+  final upcoming =
+      lessons
+          .where(
+            (l) =>
+                l.status == LessonStatus.scheduled &&
+                !l.isArchived &&
+                l.date.isAfter(now.subtract(const Duration(days: 1))),
+          )
+          .toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
+  return upcoming.isEmpty ? null : upcoming.first;
+}
+
+/// Returns active subscriptions (positive remaining) for the student.
+List<Subscription> _activeSubscriptions(List<Subscription> subscriptions) {
+  return subscriptions
+      .where((s) => s.status == SubscriptionStatus.active)
+      .toList();
+}
+
+/// Empty placeholder for unlinked / no-data sections.
+class _SectionEmpty extends StatelessWidget {
+  const _SectionEmpty({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+      child: Text(
+        message,
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+      ),
+    );
+  }
+}
+
+/// 빠른 통계 — 이번주 레슨 / 과제 완료 / 연습 스트릭 (실데이터).
+class _QuickStatsSection extends ConsumerWidget {
+  const _QuickStatsSection({required this.profile});
+
+  final ChildProfile profile;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final studentId = profile.linkedStudentId;
+    if (studentId == null) {
+      return const _SectionEmpty(message: AppStrings.parentHomeNotLinked);
+    }
+
+    final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
+    final weeklyItemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
+    final streakAsync = ref.watch(practiceStreakProvider(studentId));
+
+    final weeklyLessonCount = lessonsAsync.maybeWhen(
+      data: (lessons) {
+        final now = DateTime.now();
+        final monday = DateTime(
+          now.year,
+          now.month,
+          now.day,
+        ).subtract(Duration(days: now.weekday - 1));
+        final sunday = monday.add(const Duration(days: 7));
+        return lessons
+            .where(
+              (l) =>
+                  !l.isArchived &&
+                  l.date.isAfter(
+                    monday.subtract(const Duration(seconds: 1)),
+                  ) &&
+                  l.date.isBefore(sunday),
+            )
+            .length;
+      },
+      orElse: () => null,
+    );
+
+    final assignmentLabel = weeklyItemsAsync.maybeWhen(
+      data: (items) {
+        if (items.isEmpty) return '0/0';
+        final done = items.where((i) => i.isCompleted).length;
+        return '$done/${items.length}';
+      },
+      orElse: () => null,
+    );
+
+    final streakLabel = streakAsync.maybeWhen(
+      data: (streak) => '${streak.currentStreak}일',
+      orElse: () => null,
+    );
+
     return Row(
       children: [
         Expanded(
           child: StatCard(
             icon: Icons.calendar_today,
             label: AppStrings.parentHomeWeeklyLesson,
-            value: '1회',
+            value: weeklyLessonCount == null ? '-' : '$weeklyLessonCount회',
             color: AppColors.paperAccent,
           ),
         ),
@@ -554,7 +673,7 @@ class ParentDashboardTab extends ConsumerWidget {
           child: StatCard(
             icon: Icons.assignment_turned_in,
             label: AppStrings.parentHomeAssignmentDone,
-            value: '4/5',
+            value: assignmentLabel ?? '-',
             color: AppColors.paperOk,
           ),
         ),
@@ -563,241 +682,414 @@ class ParentDashboardTab extends ConsumerWidget {
           child: StatCard(
             icon: Icons.local_fire_department,
             label: AppStrings.parentHomePracticeStreak,
-            value: '12일',
+            value: streakLabel ?? '-',
             color: AppColors.paperAccent,
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildUpcomingLesson() {
+/// 다음 레슨 — 가장 가까운 미래 scheduled 레슨 (실데이터).
+class _UpcomingLessonSection extends ConsumerWidget {
+  const _UpcomingLessonSection({required this.profile});
+
+  final ChildProfile profile;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final studentId = profile.linkedStudentId;
+    if (studentId == null) {
+      return SectionCard(
+        romanIndex: 0,
+        title: AppStrings.parentHomeNextLesson,
+        icon: Icons.event,
+        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
+      );
+    }
+
+    final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
+
     return SectionCard(
       romanIndex: 0,
-      title: '다음 레슨',
+      title: AppStrings.parentHomeNextLesson,
       icon: Icons.event,
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.zero,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '28',
-                style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.paperAccent,
-                ),
-              ),
-              Text(
-                '토',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.paperAccent,
-                ),
-              ),
-            ],
-          ),
-        ),
-        title: const Text(AppStrings.parentHomeRegularLesson),
-        subtitle: Text(
-          '오후 2:00 - 3:00 • 김선생님',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
-          ),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space2,
-            vertical: AppSpacing.space1,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.paperDark,
-            borderRadius: BorderRadius.zero,
-          ),
-          // "D-N" = 시스템 자동 임박 인디케이터 → Tier 4 Pretendard italic
-          // (README §1.1 4계층, §7.127 Gaegu 회피). paperOk 유지.
-          child: Text(
-            'D-1',
-            style: NotebookTypography.indicatorLabel.copyWith(
-              color: AppColors.paperOk,
+      child: lessonsAsync.when(
+        loading:
+            () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              child: Center(child: CircularProgressIndicator()),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPracticeStreak() {
-    // Practice days this week (Mon-Sun)
-    final today = DateTime.now();
-    final monday = today.subtract(Duration(days: today.weekday - 1));
-    final practiceStatus = [true, true, true, true, true, false, false]; // Demo
-
-    return SectionCard(
-      romanIndex: 1,
-      title: '이번 주 연습',
-      icon: Icons.local_fire_department,
-      trailing: Text(
-        '5일 연습',
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.paperOk,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: List.generate(7, (index) {
-          final day = monday.add(Duration(days: index));
-          final practiced = practiceStatus[index];
-          final isToday = index == today.weekday - 1;
-          final isPast = index < today.weekday - 1;
-          final dayLabel = ['월', '화', '수', '목', '금', '토', '일'][index];
-
-          return Column(
-            children: [
-              Text(
-                dayLabel,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.inkSecondary,
+        error:
+            (_, __) =>
+                const _SectionEmpty(message: AppStrings.errorOccurred),
+        data: (lessons) {
+          final next = _nextScheduledLesson(lessons);
+          if (next == null) {
+            return const _SectionEmpty(
+              message: AppStrings.parentHomeNoUpcomingLesson,
+            );
+          }
+          final dDay =
+              DateTime(
+                next.date.year,
+                next.date.month,
+                next.date.day,
+              ).difference(
+                DateTime.now().copyWith(
+                  hour: 0,
+                  minute: 0,
+                  second: 0,
+                  millisecond: 0,
+                  microsecond: 0,
                 ),
+              ).inDays;
+          final teacherName = next.teacherName ?? profile.teacherName;
+          return ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.paperAccentSoft.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.zero,
               ),
-              const SizedBox(height: AppSpacing.space1),
-              // §7.132: round → 사각 day cell (Notebook 메타포).
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color:
-                      practiced
-                          ? AppColors.paperOk
-                          : isToday
-                          ? AppColors.paperAccentSoft
-                          : isPast
-                          ? AppColors.paperAccentSoft
-                          : AppColors.paperDark,
-                  border:
-                      isToday
-                          ? Border.all(color: AppColors.paperAccent, width: 2)
-                          : null,
-                ),
-                child: Center(
-                  child:
-                      practiced
-                          ? const Icon(
-                            Icons.check,
-                            size: 18,
-                            color: AppColors.paper,
-                          )
-                          : Text(
-                            '${day.day}',
-                            style: AppTypography.bodySmall.copyWith(
-                              color:
-                                  isToday
-                                      ? AppColors.paperAccent
-                                      : AppColors.inkSecondary,
-                            ),
-                          ),
-                ),
-              ),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildRecentAssignments() {
-    return SectionCard(
-      romanIndex: 2,
-      title: '과제 현황',
-      icon: Icons.assignment,
-      trailing: null,
-      child: Column(
-        children: const [
-          AssignmentItem(
-            title: '스케일 연습',
-            dueDate: '내일 마감',
-            isCompleted: false,
-            priority: 'must',
-          ),
-          ThinRule(),
-          AssignmentItem(
-            title: '비브라토 연습',
-            dueDate: '완료됨',
-            isCompleted: true,
-            priority: 'should',
-          ),
-          ThinRule(),
-          AssignmentItem(
-            title: '모차르트 소나타 1악장',
-            dueDate: '2일 남음',
-            isCompleted: false,
-            priority: 'must',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentStatus() {
-    return SectionCard(
-      romanIndex: 3,
-      title: '입금 상태',
-      icon: Icons.payment,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('1월 수강료', style: AppTypography.bodyMedium),
-                  Text(
-                    '입금 예정일: 12/28',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '300,000원',
+                    '${next.date.day}',
                     style: AppTypography.headingSmall.copyWith(
                       color: AppColors.paperAccent,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.paperAccentSoft,
-                      borderRadius: BorderRadius.zero,
-                    ),
-                    // "입금대기(후불)" = 시스템 자동 긴급도 인디케이터 → Tier 4 Pretendard
-                    // italic (README §1.1 4계층, §7.127 Gaegu 회피).
-                    child: Text(
-                      '입금대기(후불)',
-                      style: NotebookTypography.indicatorLabel,
+                  Text(
+                    LessonDateUtils.getWeekdayNameKorean(next.date.weekday),
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
+            title: const Text(AppStrings.parentHomeRegularLesson),
+            subtitle: Text(
+              teacherName == null
+                  ? next.startTime
+                  : '${next.startTime} • $teacherName',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: AppSpacing.space1,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.paperDark,
+                borderRadius: BorderRadius.zero,
+              ),
+              // "D-N" = 시스템 자동 임박 인디케이터 → Tier 4 Pretendard italic
+              // (README §1.1 4계층, §7.127 Gaegu 회피). paperOk 유지.
+              child: Text(
+                dDay <= 0 ? 'D-DAY' : 'D-$dDay',
+                style: NotebookTypography.indicatorLabel.copyWith(
+                  color: AppColors.paperOk,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// 이번 주 연습 — practiceStreak 기반 (실데이터).
+class _PracticeStreakSection extends ConsumerWidget {
+  const _PracticeStreakSection({required this.profile});
+
+  final ChildProfile profile;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final studentId = profile.linkedStudentId;
+    if (studentId == null) {
+      return SectionCard(
+        romanIndex: 1,
+        title: AppStrings.parentHomeThisWeekPractice,
+        icon: Icons.local_fire_department,
+        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
+      );
+    }
+
+    final streakAsync = ref.watch(practiceStreakProvider(studentId));
+    final today = DateTime.now();
+    final monday = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).subtract(Duration(days: today.weekday - 1));
+
+    return streakAsync.when(
+      loading:
+          () => SectionCard(
+            romanIndex: 1,
+            title: AppStrings.parentHomeThisWeekPractice,
+            icon: Icons.local_fire_department,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              child: Center(child: CircularProgressIndicator()),
+            ),
           ),
-          const SizedBox(height: AppSpacing.space3),
-          // TODO: payment verification flow — removed NO-OP button
-        ],
+      error:
+          (_, __) => SectionCard(
+            romanIndex: 1,
+            title: AppStrings.parentHomeThisWeekPractice,
+            icon: Icons.local_fire_department,
+            child: const _SectionEmpty(message: AppStrings.errorOccurred),
+          ),
+      data: (streak) {
+        // Derive which weekdays were practiced from streak window.
+        // currentStreak counts consecutive days ending at lastPracticeDate.
+        final lastDate = streak.lastPracticeDate;
+        final practicedDays = <int>{}; // 0=Mon ... 6=Sun
+        if (lastDate != null && streak.currentStreak > 0) {
+          final lastDay = DateTime(
+            lastDate.year,
+            lastDate.month,
+            lastDate.day,
+          );
+          for (var i = 0; i < streak.currentStreak; i++) {
+            final d = lastDay.subtract(Duration(days: i));
+            if (!d.isBefore(monday) &&
+                d.isBefore(monday.add(const Duration(days: 7)))) {
+              practicedDays.add(d.weekday - 1);
+            }
+          }
+        }
+
+        return SectionCard(
+          romanIndex: 1,
+          title: AppStrings.parentHomeThisWeekPractice,
+          icon: Icons.local_fire_department,
+          trailing: Text(
+            '${practicedDays.length}일 연습',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.paperOk,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(7, (index) {
+              final day = monday.add(Duration(days: index));
+              final practiced = practicedDays.contains(index);
+              final isToday = index == today.weekday - 1;
+              final isPast = index < today.weekday - 1;
+              final dayLabel = LessonDateUtils.getWeekdayNameKorean(index + 1);
+
+              return Column(
+                children: [
+                  Text(
+                    dayLabel,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  // §7.132: round → 사각 day cell (Notebook 메타포).
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color:
+                          practiced
+                              ? AppColors.paperOk
+                              : isToday
+                              ? AppColors.paperAccentSoft
+                              : isPast
+                              ? AppColors.paperAccentSoft
+                              : AppColors.paperDark,
+                      border:
+                          isToday
+                              ? Border.all(
+                                color: AppColors.paperAccent,
+                                width: 2,
+                              )
+                              : null,
+                    ),
+                    child: Center(
+                      child:
+                          practiced
+                              ? const Icon(
+                                Icons.check,
+                                size: 18,
+                                color: AppColors.paper,
+                              )
+                              : Text(
+                                '${day.day}',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color:
+                                      isToday
+                                          ? AppColors.paperAccent
+                                          : AppColors.inkSecondary,
+                                ),
+                              ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// 과제 현황 — 이번 주 연습 항목 (실데이터).
+class _RecentAssignmentsSection extends ConsumerWidget {
+  const _RecentAssignmentsSection({required this.profile});
+
+  final ChildProfile profile;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final studentId = profile.linkedStudentId;
+    if (studentId == null) {
+      return SectionCard(
+        romanIndex: 2,
+        title: AppStrings.parentHomeAssignmentStatus,
+        icon: Icons.assignment,
+        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
+      );
+    }
+
+    final itemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
+
+    return SectionCard(
+      romanIndex: 2,
+      title: AppStrings.parentHomeAssignmentStatus,
+      icon: Icons.assignment,
+      child: itemsAsync.when(
+        loading:
+            () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+        error:
+            (_, __) =>
+                const _SectionEmpty(message: AppStrings.errorOccurred),
+        data: (items) {
+          if (items.isEmpty) {
+            return const _SectionEmpty(
+              message: AppStrings.parentHomeNoAssignment,
+            );
+          }
+          final sorted = [...items]
+            ..sort(
+              (a, b) => a.priority.sortOrder.compareTo(b.priority.sortOrder),
+            );
+          final visible = sorted.take(3).toList();
+          final children = <Widget>[];
+          for (var i = 0; i < visible.length; i++) {
+            final item = visible[i];
+            children.add(
+              AssignmentItem(
+                title: item.title,
+                dueDate:
+                    item.isCompleted
+                        ? AppStrings.parentHomeCompletedLabel
+                        : _priorityLabel(item.priority),
+                isCompleted: item.isCompleted,
+                priority: item.priority.name,
+              ),
+            );
+            if (i < visible.length - 1) children.add(const ThinRule());
+          }
+          return Column(children: children);
+        },
+      ),
+    );
+  }
+
+  String _priorityLabel(PracticePriority priority) {
+    switch (priority) {
+      case PracticePriority.must:
+        return AppStrings.parentHomePriorityMust;
+      case PracticePriority.should:
+        return AppStrings.parentHomePriorityShould;
+      case PracticePriority.could:
+        return AppStrings.parentHomePriorityCould;
+    }
+  }
+}
+
+/// 수강권 잔여 — 활성 수강권 잔여 회차 (실데이터).
+class _PaymentStatusSection extends ConsumerWidget {
+  const _PaymentStatusSection({required this.profile});
+
+  final ChildProfile profile;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final studentId = profile.linkedStudentId;
+    if (studentId == null) {
+      return SectionCard(
+        romanIndex: 3,
+        title: AppStrings.parentHomeRemainingLesson,
+        icon: Icons.confirmation_number_outlined,
+        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
+      );
+    }
+
+    final subscriptionsAsync = ref.watch(
+      studentSubscriptionsProvider(studentId),
+    );
+
+    return SectionCard(
+      romanIndex: 3,
+      title: AppStrings.parentHomeRemainingLesson,
+      icon: Icons.confirmation_number_outlined,
+      child: subscriptionsAsync.when(
+        loading:
+            () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+        error:
+            (_, __) =>
+                const _SectionEmpty(message: AppStrings.errorOccurred),
+        data: (subscriptions) {
+          final active = _activeSubscriptions(subscriptions);
+          if (active.isEmpty) {
+            return const _SectionEmpty(
+              message: AppStrings.noSubscriptionsRegisteredTitle,
+            );
+          }
+          final totalRemaining = active.fold<int>(
+            0,
+            (sum, s) => sum + (s.remainingLessons ?? 0),
+          );
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                AppStrings.parentHomeRemainingLesson,
+                style: AppTypography.bodyMedium,
+              ),
+              Text(
+                '$totalRemaining회',
+                style: AppTypography.headingSmall.copyWith(
+                  color: AppColors.paperAccent,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

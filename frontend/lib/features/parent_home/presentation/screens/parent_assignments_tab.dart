@@ -7,6 +7,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../practice/practice_facade.dart';
+import '../providers/child_profile_provider.dart';
 
 /// Parent assignments tab for viewing child's assignments
 class ParentAssignmentsTab extends ConsumerWidget {
@@ -14,85 +16,151 @@ class ParentAssignmentsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedProfile = ref.watch(selectedChildProfileProvider);
+    final studentId = selectedProfile?.linkedStudentId;
+
     return NotebookScreenScaffold(
       appBar: AppBar(
         title: const Text(AppStrings.parentHomeAssignmentStatus),
         centerTitle: true,
         actions: const [],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        children: [
-          // Progress summary
-          _buildProgressSummary(),
+      body:
+          studentId == null
+              ? const _UnlinkedState()
+              : _AssignmentsBody(studentId: studentId),
+    );
+  }
+}
 
-          const SizedBox(height: AppSpacing.space6),
+/// Real-data body scoped to the selected child's linked student id.
+class _AssignmentsBody extends ConsumerWidget {
+  const _AssignmentsBody({required this.studentId});
 
-          // Incomplete assignments
-          _SectionHeader(
-            title: '미완료 과제',
-            count: 2,
-            color: AppColors.paperAccent,
+  final String studentId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
+
+    return itemsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const _ErrorState(),
+      data: (items) {
+        final incomplete =
+            items.where((i) => !i.isCompleted).toList()
+              ..sort(
+                (a, b) =>
+                    a.priority.sortOrder.compareTo(b.priority.sortOrder),
+              );
+        final completed = items.where((i) => i.isCompleted).toList();
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(weeklyPracticeItemsProvider(studentId));
+          },
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(AppSpacing.screenPadding),
+            children: [
+              _ProgressSummary(
+                total: items.length,
+                completed: completed.length,
+                incomplete: incomplete.length,
+              ),
+              const SizedBox(height: AppSpacing.space6),
+              if (items.isEmpty)
+                const _EmptyAssignments()
+              else ...[
+                if (incomplete.isNotEmpty) ...[
+                  _SectionHeader(
+                    title: AppStrings.parentHomeIncompleteAssignment,
+                    count: incomplete.length,
+                    color: AppColors.paperAccent,
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  ..._assignmentCards(incomplete),
+                  const SizedBox(height: AppSpacing.space6),
+                ],
+                if (completed.isNotEmpty) ...[
+                  _SectionHeader(
+                    title: AppStrings.parentHomeCompletedAssignment,
+                    count: completed.length,
+                    color: AppColors.paperOk,
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  ..._assignmentCards(completed),
+                ],
+              ],
+            ],
           ),
-          const SizedBox(height: AppSpacing.space3),
-
-          _AssignmentCard(
-            title: '스케일 연습',
-            description: 'G Major 3옥타브 스케일, 메트로놈 80 bpm으로 연습',
-            dueDate: '내일',
-            priority: AssignmentPriority.must,
-            isCompleted: false,
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          _AssignmentCard(
-            title: '모차르트 소나타 1악장',
-            description: '전체 통주 + 카덴차 외우기',
-            dueDate: '2일 남음',
-            priority: AssignmentPriority.must,
-            isCompleted: false,
-          ),
-
-          const SizedBox(height: AppSpacing.space6),
-
-          // Completed assignments
-          _SectionHeader(title: '완료된 과제', count: 5, color: AppColors.paperOk),
-          const SizedBox(height: AppSpacing.space3),
-
-          _AssignmentCard(
-            title: '비브라토 연습',
-            description: '손목 비브라토 연습, 느린 속도로',
-            dueDate: '완료됨',
-            priority: AssignmentPriority.should,
-            isCompleted: true,
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          _AssignmentCard(
-            title: '활 긋기 연습',
-            description: '전궁 연습 10분',
-            dueDate: '완료됨',
-            priority: AssignmentPriority.could,
-            isCompleted: true,
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          _AssignmentCard(
-            title: '포지션 이동 연습',
-            description: '1-3 포지션 이동 연습곡',
-            dueDate: '완료됨',
-            priority: AssignmentPriority.should,
-            isCompleted: true,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildProgressSummary() {
+  List<Widget> _assignmentCards(List<PracticeItem> items) {
+    final cards = <Widget>[];
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      cards.add(
+        _AssignmentCard(
+          title: item.title,
+          description: item.description ?? '',
+          dueDate:
+              item.isCompleted
+                  ? AppStrings.parentHomeCompletedLabel
+                  : _priorityLabel(item.priority),
+          priority: _mapPriority(item.priority),
+          isCompleted: item.isCompleted,
+        ),
+      );
+      if (i < items.length - 1) {
+        cards.add(const SizedBox(height: AppSpacing.space3));
+      }
+    }
+    return cards;
+  }
+
+  static AssignmentPriority _mapPriority(PracticePriority priority) {
+    switch (priority) {
+      case PracticePriority.must:
+        return AssignmentPriority.must;
+      case PracticePriority.should:
+        return AssignmentPriority.should;
+      case PracticePriority.could:
+        return AssignmentPriority.could;
+    }
+  }
+
+  static String _priorityLabel(PracticePriority priority) {
+    switch (priority) {
+      case PracticePriority.must:
+        return AppStrings.parentHomePriorityMust;
+      case PracticePriority.should:
+        return AppStrings.parentHomePriorityShould;
+      case PracticePriority.could:
+        return AppStrings.parentHomePriorityCould;
+    }
+  }
+}
+
+class _ProgressSummary extends StatelessWidget {
+  const _ProgressSummary({
+    required this.total,
+    required this.completed,
+    required this.incomplete,
+  });
+
+  final int total;
+  final int completed;
+  final int incomplete;
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = total == 0 ? 0.0 : completed / total;
+    final percent = (ratio * 100).round();
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -110,7 +178,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
             children: [
               // §7.132: accent 배너 텍스트 white → paper.
               Text(
-                '이번 주 과제',
+                AppStrings.parentHomeWeeklyAssignment,
                 style: NotebookTypography.sectionTitle.copyWith(
                   color: AppColors.paper,
                 ),
@@ -125,7 +193,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
                   borderRadius: BorderRadius.zero,
                 ),
                 child: Text(
-                  '71% 완료',
+                  '$percent% ${AppStrings.parentHomeLessonCompleted}',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.paper,
                     fontWeight: FontWeight.bold,
@@ -139,7 +207,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           ClipRRect(
             borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
-              value: 0.71,
+              value: ratio,
               backgroundColor: AppColors.paper.withValues(alpha: 0.2),
               valueColor: const AlwaysStoppedAnimation<Color>(AppColors.paper),
               minHeight: 8,
@@ -149,20 +217,114 @@ class ParentAssignmentsTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _ProgressStat(label: '전체', value: '7', color: AppColors.paper),
               _ProgressStat(
-                label: '완료',
-                value: '5',
+                label: AppStrings.parentHomeTotal,
+                value: '$total',
+                color: AppColors.paper,
+              ),
+              _ProgressStat(
+                label: AppStrings.parentHomeLessonCompleted,
+                value: '$completed',
                 color: AppColors.paperDark,
               ),
               _ProgressStat(
-                label: '진행중',
-                value: '2',
+                label: AppStrings.parentHomeInProgress,
+                value: '$incomplete',
                 color: AppColors.paperAccentSoft,
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _UnlinkedState extends StatelessWidget {
+  const _UnlinkedState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.link_off, size: 56, color: AppColors.inkTertiary),
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.parentHomeNotLinked,
+              textAlign: TextAlign.center,
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              AppStrings.parentHomeNotLinkedDesc,
+              textAlign: TextAlign.center,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyAssignments extends StatelessWidget {
+  const _EmptyAssignments();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.space6),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.assignment_outlined,
+            size: 56,
+            color: AppColors.inkTertiary,
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Text(
+            AppStrings.parentHomeNoAssignment,
+            style: NotebookTypography.sectionTitle.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.space6),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.paperAccent,
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              AppStrings.errorOccurred,
+              style: NotebookTypography.sectionTitle,
+            ),
+          ],
+        ),
       ),
     );
   }
