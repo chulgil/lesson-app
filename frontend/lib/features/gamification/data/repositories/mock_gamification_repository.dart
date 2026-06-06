@@ -27,7 +27,9 @@ class MockGamificationRepository implements GamificationRepository {
       earnedBadges: [
         ...awarded,
         PracticeBadge(
-          id: 'badge_1',
+          // ID must match badge_award_provider.autoBadgeConditions to prevent
+          // re-award of already-earned badges.
+          id: 'badge_first_practice',
           name: '첫 연습',
           description: '첫 번째 연습을 완료했습니다',
           icon: 'music_note',
@@ -36,7 +38,7 @@ class MockGamificationRepository implements GamificationRepository {
           isEarned: true,
         ),
         PracticeBadge(
-          id: 'badge_2',
+          id: 'badge_streak_7',
           name: '7일 스트릭',
           description: '7일 연속 연습을 달성했습니다',
           icon: 'local_fire_department',
@@ -45,7 +47,7 @@ class MockGamificationRepository implements GamificationRepository {
           isEarned: true,
         ),
         PracticeBadge(
-          id: 'badge_3',
+          id: 'badge_weekly_all_clear',
           name: '목표 달성자',
           description: '연습 목표를 3회 달성했습니다',
           icon: 'emoji_events',
@@ -54,7 +56,7 @@ class MockGamificationRepository implements GamificationRepository {
           isEarned: true,
         ),
         const PracticeBadge(
-          id: 'badge_4',
+          id: 'badge_streak_30',
           name: '30일 스트릭',
           description: '30일 연속 연습을 달성하세요',
           icon: 'whatshot',
@@ -62,7 +64,7 @@ class MockGamificationRepository implements GamificationRepository {
           isEarned: false,
         ),
         const PracticeBadge(
-          id: 'badge_5',
+          id: 'badge_consistency',
           name: '연습 마스터',
           description: '총 100시간 연습을 달성하세요',
           icon: 'star',

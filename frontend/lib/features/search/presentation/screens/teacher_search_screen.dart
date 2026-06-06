@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,6 +30,8 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   late TabController _tabController;
+  Timer? _debounce;
+  bool _isLoadingMore = false;
 
   @override
   void initState() {
@@ -39,6 +43,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     _searchController.dispose();
@@ -57,16 +62,25 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
   }
 
   void _onScroll() {
+    if (_isLoadingMore) return;
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      ref.read(teacherSearchResultsProvider.notifier).loadMore();
+      _isLoadingMore = true;
+      ref
+          .read(teacherSearchResultsProvider.notifier)
+          .loadMore()
+          .whenComplete(() => _isLoadingMore = false);
     }
   }
 
   void _onSearch(String query) {
-    ref
-        .read(teacherSearchFilterStateProvider.notifier)
-        .updateKeyword(query.isEmpty ? null : query);
+    // Debounce: wait 400ms after the last keystroke before querying the API.
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      ref
+          .read(teacherSearchFilterStateProvider.notifier)
+          .updateKeyword(query.isEmpty ? null : query);
+    });
   }
 
   @override

@@ -22,8 +22,17 @@ AnalyticsRepository analyticsRepository(AnalyticsRepositoryRef ref) =>
     );
 
 @Riverpod(keepAlive: true)
-MockAnalyticsService analyticsService(AnalyticsServiceRef ref) =>
-    MockAnalyticsService();
+MockAnalyticsService analyticsService(AnalyticsServiceRef ref) {
+  // TODO(remote): replace MockAnalyticsService with a real implementation
+  // once the analytics service backend endpoint is available.
+  // For now always returns mock data — gated so it's obvious in real mode.
+  if (!ref.watch(mockDataModeProvider)) {
+    // Real mode: still uses mock until backend is implemented.
+    // This makes the missing implementation visible in non-mock environments.
+    assert(false, 'analyticsService has no remote implementation yet');
+  }
+  return MockAnalyticsService();
+}
 
 @riverpod
 Future<TeacherMonthlyStats> teacherMonthlyStats(
