@@ -6810,6 +6810,9 @@ class AppStrings {
   static const contextToggleLoadingMessage = '계정을 전환 중입니다...';
   static const contextToggleSwitchedToTeacher = '개인 강사 계정으로 전환되었습니다';
   static const contextToggleSwitchedToOwner = '학원장 계정으로 전환되었습니다';
+  static const contextToggleSwitchFailed = '계정 전환에 실패했습니다. 다시 시도해주세요.';
+  static const contextToggleOwnerContext = '학원장 계정';
+  static const contextToggleTeacherContext = '개인 강사 계정';
   static const profileCertificateEmpty = '등록된 자격증이 없습니다';
   static const profileCertificateAdd = '자격증 추가';
 

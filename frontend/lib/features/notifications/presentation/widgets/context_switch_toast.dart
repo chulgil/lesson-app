@@ -74,7 +74,10 @@ class _ContextSwitchToastState extends State<ContextSwitchToast> {
   }
 
   String _getContextSwitchMessage() {
-    if (widget.activeContext == 'owner') {
+    // Accept both the backend wire value (`academy_owner`) and the legacy
+    // short form (`owner`).
+    if (widget.activeContext == 'academy_owner' ||
+        widget.activeContext == 'owner') {
       return AppStrings.contextToggleSwitchedToOwner;
     }
     return AppStrings.contextToggleSwitchedToTeacher;
