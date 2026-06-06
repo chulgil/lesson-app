@@ -6,8 +6,37 @@ import '../../domain/repositories/context_switch_repository.dart';
 /// Mock implementation of ContextSwitchRepository for development.
 class MockContextSwitchRepository implements ContextSwitchRepository {
   @override
+  Future<ContextInfo> getContext() async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Mock dual-role user: owner + teacher in the same academy.
+    return const ContextInfo(
+      userId: 'mock-user',
+      activeContext: 'teacher',
+      academyId: 'mock-academy',
+      teacherId: 'mock-teacher',
+      availableContexts: [
+        AvailableContext(
+          context: 'academy_owner',
+          academyId: 'mock-academy',
+          label: '모의 학원 학원장',
+          memberId: 'mock-member-owner',
+        ),
+        AvailableContext(
+          context: 'teacher',
+          academyId: 'mock-academy',
+          label: '모의 학원 강사',
+          memberId: 'mock-member-teacher',
+        ),
+      ],
+    );
+  }
+
+  @override
   Future<ContextSwitchResult> switchContext({
     required String targetContext,
+    String? academyId,
   }) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 800));

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/auth_facade.dart';
-import '../../../auth/data/repositories/mock_context_switch_repository.dart';
 import '../../../notifications/notifications_facade.dart';
+
+/// Backend wire value for the academy-owner context.
+const _ownerContext = 'academy_owner';
 
 /// Dialog to confirm context switch between teacher and academy owner roles.
 ///
-/// Displays current context and target context, then switches after confirmation.
-/// Shows loading indicator during switch operation.
+/// Loads the real available contexts (GET /auth/context), shows the current →
+/// target labels, then calls POST /auth/context/switch on confirm. The new
+/// access token is persisted and context-derived state is invalidated.
 class ContextToggleDialog extends ConsumerStatefulWidget {
   const ContextToggleDialog({super.key});
 
@@ -27,7 +30,7 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authNotifierProvider);
+    final contextInfo = ref.watch(currentContextProvider);
 
     return Dialog(
       backgroundColor: AppColors.paper,
@@ -44,9 +47,37 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
                 style: AppTypography.headingMedium,
               ),
               const SizedBox(height: AppSpacing.space4),
-              _buildContextInfo(authState),
-              const SizedBox(height: AppSpacing.space4),
-              _buildActionButtons(context),
+              contextInfo.when(
+                data: (info) {
+                  final target = _resolveTarget(info);
+                  if (target == null) {
+                    return Text(
+                      AppStrings.contextToggleSwitchFailed,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    );
+                  }
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildContextInfo(info, target),
+                      const SizedBox(height: AppSpacing.space4),
+                      _buildActionButtons(context, info, target),
+                    ],
+                  );
+                },
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(AppSpacing.space4),
+                  child: CircularProgressIndicator(),
+                ),
+                error: (_, __) => Text(
+                  AppStrings.contextToggleSwitchFailed,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -54,7 +85,18 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
     );
   }
 
-  Widget _buildContextInfo(AuthState authState) {
+  /// The context the user would switch into: the available context whose wire
+  /// value differs from the active one. Falls back to the first available
+  /// context when no context is active yet. Null when nothing to toggle.
+  AvailableContext? _resolveTarget(ContextInfo info) {
+    if (info.availableContexts.isEmpty) return null;
+    for (final candidate in info.availableContexts) {
+      if (candidate.context != info.activeContext) return candidate;
+    }
+    return info.availableContexts.first;
+  }
+
+  Widget _buildContextInfo(ContextInfo info, AvailableContext target) {
     return Column(
       children: [
         // Current context
@@ -75,7 +117,7 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
               ),
               const SizedBox(height: AppSpacing.space2),
               Text(
-                _currentContextLabel(authState),
+                _currentContextLabel(info, target),
                 style: AppTypography.headingSmall.copyWith(
                   color: AppColors.paperAccent,
                 ),
@@ -111,10 +153,7 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
-              Text(
-                _targetContextLabel(authState),
-                style: AppTypography.headingSmall,
-              ),
+              Text(target.label, style: AppTypography.headingSmall),
             ],
           ),
         ),
@@ -122,21 +161,22 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
     );
   }
 
-  String _currentContextLabel(AuthState authState) {
-    if (authState is AuthAuthenticated) {
-      // For now, assume we're always in teacher context and can switch to owner
-      // In production, this would check the actual active context
-      return '개인 강사 계정';
+  String _currentContextLabel(ContextInfo info, AvailableContext target) {
+    // Prefer the labelled current context from the available list.
+    for (final candidate in info.availableContexts) {
+      if (candidate.context == info.activeContext) return candidate.label;
     }
-    return 'Unknown';
+    // No active context selected — name it by the opposite of the target.
+    return target.context == _ownerContext
+        ? AppStrings.contextToggleTeacherContext
+        : AppStrings.contextToggleOwnerContext;
   }
 
-  String _targetContextLabel(AuthState authState) {
-    // If we're in teacher context, show owner academy as target
-    return '학원장 계정';
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    ContextInfo info,
+    AvailableContext target,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -148,43 +188,66 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: FilledButton(
-            onPressed: _isLoading ? null : () => _handleContextSwitch(context),
-            child:
-                _isLoading
-                    ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.paper,
-                        ),
+            onPressed: _isLoading
+                ? null
+                : () => _handleContextSwitch(context, target),
+            child: _isLoading
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.paper,
                       ),
-                    )
-                    : Text(AppStrings.contextToggleConfirm),
+                    ),
+                  )
+                : Text(AppStrings.contextToggleConfirm),
           ),
         ),
       ],
     );
   }
 
-  Future<void> _handleContextSwitch(BuildContext context) async {
+  Future<void> _handleContextSwitch(
+    BuildContext context,
+    AvailableContext target,
+  ) async {
     setState(() => _isLoading = true);
 
     try {
-      final repository = ref.read(mockContextSwitchRepositoryProvider);
-      final result = await repository.switchContext(targetContext: 'owner');
+      final repository = ref.read(contextSwitchRepositoryProvider);
+      final result = await repository.switchContext(
+        targetContext: target.context,
+        academyId: target.academyId,
+      );
+
+      await _persistAccessToken(result.tokens.accessToken);
+      // Refresh the context list so the toggle reflects the new active context.
+      ref.invalidate(currentContextProvider);
 
       if (!context.mounted) return;
       Navigator.pop(context);
       _showContextSwitchToast(context, result.activeContext);
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('계정 전환 실패: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.contextToggleSwitchFailed)),
+      );
       setState(() => _isLoading = false);
     }
+  }
+
+  /// Persist the freshly issued access token, keeping the existing refresh
+  /// token (the switch endpoint only rotates the access token).
+  Future<void> _persistAccessToken(String accessToken) async {
+    if (accessToken.isEmpty) return;
+    final tokenStorage = ref.read(tokenStorageProvider);
+    final refreshToken = await tokenStorage.getRefreshToken() ?? '';
+    await tokenStorage.saveTokens(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
   }
 
   void _showContextSwitchToast(BuildContext context, String activeContext) {

@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/profile/presentation/widgets/context_toggle_dialog.dart';
 
+import 'fake_context_switch_repository.dart';
+
 void main() {
+  Widget wrap() {
+    return ProviderScope(
+      overrides: [
+        contextSwitchRepositoryProvider.overrideWithValue(
+          FakeContextSwitchRepository(),
+        ),
+      ],
+      child: const MaterialApp(
+        home: Scaffold(body: ContextToggleDialog()),
+      ),
+    );
+  }
+
   group('ContextToggleDialog', () {
     testWidgets('dialog renders without crashing', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ProviderScope(child: ContextToggleDialog())),
-        ),
-      );
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
       // Dialog should render without exception
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('dialog displays title', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ProviderScope(child: ContextToggleDialog())),
-        ),
-      );
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
       // Verify title text is displayed
       expect(find.text('계정 전환'), findsWidgets);
@@ -30,11 +40,8 @@ void main() {
     testWidgets('dialog displays context info sections', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ProviderScope(child: ContextToggleDialog())),
-        ),
-      );
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
       // Verify context sections are displayed
       expect(find.text('현재 계정'), findsWidgets);
@@ -42,11 +49,8 @@ void main() {
     });
 
     testWidgets('dialog has action buttons', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ProviderScope(child: ContextToggleDialog())),
-        ),
-      );
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
       // Verify buttons are present
       expect(find.text('취소'), findsWidgets);
@@ -54,11 +58,8 @@ void main() {
     });
 
     testWidgets('cancel button closes dialog', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: ProviderScope(child: ContextToggleDialog())),
-        ),
-      );
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
 
       // Find and tap cancel button
       final cancelButton = find.text('취소');
