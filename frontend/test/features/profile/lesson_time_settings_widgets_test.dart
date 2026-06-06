@@ -170,4 +170,49 @@ void main() {
     expect(savedSlot?.startTime, const ClockTime(hour: 10, minute: 30));
     expect(savedSlot?.endTime, const ClockTime(hour: 12, minute: 0));
   });
+
+  testWidgets('DurationOptionItem 사용 토글이 Switch 대신 라운드 박스로 렌더', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: DurationOptionItem(
+            duration: 50,
+            isDefault: true,
+            isDisabled: false,
+            isCustom: false,
+            isOnlyActive: false,
+            onTap: () {},
+            onToggle: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Switch), findsNothing);
+    expect(find.text(AppStrings.profileDurationInUse), findsOneWidget);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+  });
+
+  testWidgets('DurationOptionItem 토글 박스 탭 → onToggle(반전값) 호출', (tester) async {
+    bool? toggled;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: DurationOptionItem(
+            duration: 50,
+            isDefault: false,
+            isDisabled: false, // 사용중 → 탭 시 해제(false) 전달
+            isCustom: false,
+            isOnlyActive: false,
+            onTap: () {},
+            onToggle: (v) => toggled = v,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text(AppStrings.profileDurationInUse));
+    await tester.pumpAndSettle();
+    expect(toggled, isFalse);
+  });
 }
