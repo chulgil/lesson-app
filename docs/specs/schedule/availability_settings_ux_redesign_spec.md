@@ -2,7 +2,7 @@
 
 > 작성일: 2026-03-12 (2026-06-01 — E2E 감사 #9 C-G2 보강)
 > 도메인: schedule
-> 상태: 스펙 작성 (구현 전)
+> 상태: ✅ 구현 완료 (TeacherAvailabilitySplitPage — Split 레이아웃 + 실시간 미리보기, 2026-06-06)
 > 관련 이슈: #429
 > 관련 문서: [schedule_master.md §2](schedule_master.md), [teacher_first_availability_setup.md](../onboarding/teacher_first_availability_setup.md) (간소 진입)
 
