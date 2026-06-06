@@ -6070,6 +6070,7 @@ class AppStrings {
   static const studentSignupBlockedHelper =
       '본인 인증 통합 후에는 학생 직접 가입이 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
+  static const authParentLoginNotReady = '학부모 로그인은 준비 중입니다.';
   static const authTermsAgreement = '서비스 이용 동의';
   static const authTermsOfService = '서비스 이용약관 동의';
   static const authPrivacyPolicy = '개인정보 수집·이용 동의';
@@ -6810,6 +6811,9 @@ class AppStrings {
   static const contextToggleLoadingMessage = '계정을 전환 중입니다...';
   static const contextToggleSwitchedToTeacher = '개인 강사 계정으로 전환되었습니다';
   static const contextToggleSwitchedToOwner = '학원장 계정으로 전환되었습니다';
+  static const contextToggleSwitchFailed = '계정 전환에 실패했습니다. 다시 시도해주세요.';
+  static const contextToggleOwnerContext = '학원장 계정';
+  static const contextToggleTeacherContext = '개인 강사 계정';
   static const profileCertificateEmpty = '등록된 자격증이 없습니다';
   static const profileCertificateAdd = '자격증 추가';
 

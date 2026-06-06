@@ -696,7 +696,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   }
 
   String _formatBookingDate() {
-    final weekday = dayOfWeekLabel(widget.bookingDate.weekday);
+    // dayOfWeekLabel expects 0=Mon..6=Sun; DateTime.weekday is 1=Mon..7=Sun
+    final weekday = dayOfWeekLabel(widget.bookingDate.weekday - 1);
     final hour = widget.startTime.hour.toString().padLeft(2, '0');
     final minute = widget.startTime.minute.toString().padLeft(2, '0');
     return '${widget.bookingDate.month}/${widget.bookingDate.day}($weekday) $hour:$minute';

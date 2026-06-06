@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../profile/domain/repositories/teacher_profile_repository.dart';
@@ -58,8 +59,9 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
   bool verifyCode(String code) {
     final current = state.phoneVerification;
 
-    // Debug: allow any 6-digit code for testing
-    if (code.length == 6) {
+    // Mock/dev only: accept any 6-digit code (no real SMS/OTP backend wired).
+    // In real mode this falls through to actual code verification below.
+    if (ref.read(mockDataModeProvider) && code.length == 6) {
       final verified = (current ??
               PhoneVerification(
                 phoneNumber: '',

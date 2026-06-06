@@ -2,26 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../academy/academy.dart';
+import '../../../auth/auth_facade.dart';
 import 'context_toggle_dialog.dart';
 
-/// Provides a context toggle menu item for profile tab.
+/// Profile-tab entry point for the owner ↔ teacher context toggle.
 ///
-/// Returns a [_MenuItem] that can be used in profile menu sections.
-/// Only shown when user has both R-AO (owner) and R-AT (teacher) roles.
+/// Watches the real available contexts (GET /auth/context). The toggle row is
+/// only rendered when the user can actually switch (2+ contexts); single-context
+/// users (and the loading/error states) render nothing.
 class ContextToggleButton extends ConsumerWidget {
   const ContextToggleButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // This widget should be inserted into profile menu where needed
-    // Use buildMenuItem() method to get the _MenuItem for profile menu
-    return const SizedBox.shrink();
+    final contextInfo = ref.watch(currentContextProvider);
+    return contextInfo.maybeWhen(
+      data: (info) {
+        if (!info.canToggle) return const SizedBox.shrink();
+        return ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space4,
+          ),
+          leading: const Icon(
+            Icons.swap_horiz_rounded,
+            color: AppColors.ink,
+          ),
+          title: Text(
+            AppStrings.contextToggleButtonLabel,
+            style: AppTypography.bodyMedium,
+          ),
+          subtitle: Text(
+            AppStrings.contextToggleButtonSubtitle,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+          trailing: const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.inkSecondary,
+          ),
+          onTap: () {
+            showDialog<void>(
+              context: context,
+              builder: (ctx) => const ContextToggleDialog(),
+            );
+          },
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
   }
 
   /// Returns a [_MenuItem] for use in profile menu sections.
   ///
-  /// Returns null if user doesn't have both roles.
+  /// Returns null if user doesn't have both roles. Retained for callers that
+  /// build the profile menu from a flat list of [AcademyMember]s.
   // ignore: library_private_types_in_public_api
   static Future<_MenuItem?> buildMenuItem(
     BuildContext context,

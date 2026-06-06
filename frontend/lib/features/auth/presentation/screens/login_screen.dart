@@ -229,7 +229,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: AppSpacing.space5),
         GestureDetector(
-          onTap: () => showParentLoginSheet(context),
+          onTap: () {
+            // Parent login is a mock test-scenario picker (no real OAuth wired).
+            // In real mode it must not grant unauthenticated access to parentHome.
+            if (ref.read(mockDataModeProvider)) {
+              showParentLoginSheet(context);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(AppStrings.authParentLoginNotReady),
+                ),
+              );
+            }
+          },
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.symmetric(
