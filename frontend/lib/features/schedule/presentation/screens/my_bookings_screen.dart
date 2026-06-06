@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -15,6 +17,7 @@ import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import 'booking_cancel_screen.dart';
 import 'booking_reschedule_screen.dart';
+import 'lesson_booking_screen.dart';
 
 /// My bookings screen
 ///
@@ -58,7 +61,17 @@ class MyBookingsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: const NotebookDetailAppBar(title: AppStrings.myBookingsTitle),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.myBookingsTitle,
+        // 학생 선착순 직접 예약 진입 (#580). navigation/utility 아이콘 — Material 허용.
+        customActions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: AppColors.ink),
+            tooltip: AppStrings.bookAction,
+            onPressed: () => _openDirectBooking(context),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -77,7 +90,7 @@ class MyBookingsScreen extends ConsumerWidget {
                           .toList();
 
                   if (myBookings.isEmpty) {
-                    return _buildEmptyState();
+                    return _buildEmptyState(context);
                   }
 
                   return _buildBookingList(context, ref, myBookings);
@@ -180,11 +193,48 @@ class MyBookingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
-    return const EmptyStateWidget(
-      icon: Icons.event_available,
-      title: AppStrings.noBookings,
-      subtitle: AppStrings.bookNewLesson,
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const EmptyStateWidget(
+            icon: Icons.event_available,
+            title: AppStrings.noBookings,
+            subtitle: AppStrings.bookNewLesson,
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          FilledButton(
+            onPressed: () => _openDirectBooking(context),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(0, AppSpacing.buttonHeight),
+              backgroundColor: AppColors.paperAccent,
+            ),
+            child: Text(
+              AppStrings.bookAction,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.paper,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Open the first-come direct booking screen (#580).
+  void _openDirectBooking(BuildContext context) {
+    context.push(
+      AppRoutes.lessonDirectBooking,
+      extra: LessonBookingParams(
+        teacherId: teacherId,
+        teacherName: teacherName,
+        studentId: studentId,
+        studentName: studentName,
+        instrument: instrument,
+        subscriptionId: subscriptionId,
+      ),
     );
   }
 

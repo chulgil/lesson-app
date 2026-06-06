@@ -15,6 +15,7 @@ import '../../../features/schedule/presentation/screens/unified_lesson_request_s
 import '../../../features/schedule/presentation/screens/request_completion_screen.dart';
 import '../../../features/schedule/presentation/screens/all_lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/request_detail_screen.dart';
+import '../../../features/schedule/presentation/screens/lesson_booking_screen.dart';
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
@@ -134,6 +135,21 @@ List<GoRoute> scheduleRoutes = [
   ),
 
   // My Bookings (student view of their bookings)
+  // 학생 선착순 직접 예약 (#580 student_direct_booking_spec)
+  GoRoute(
+    path: AppRoutes.lessonDirectBooking,
+    name: 'lessonDirectBooking',
+    builder: (context, state) {
+      final extra = state.extra;
+      if (extra is! LessonBookingParams) {
+        return const NotebookScreenScaffold(
+          body: Center(child: Text(AppStrings.cannotLoadData)),
+        );
+      }
+      return LessonBookingScreen(params: extra);
+    },
+  ),
+
   GoRoute(
     path: AppRoutes.myBookings,
     name: 'myBookings',

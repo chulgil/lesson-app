@@ -121,6 +121,9 @@ class AppRoutes {
   static const registerRegularLesson = '/schedule/regular/register';
   static const bookingList = '/schedule/bookings';
   static const lessonBooking = '/schedule/book-lesson';
+
+  /// Student first-come direct slot booking (#580 student_direct_booking_spec).
+  static const lessonDirectBooking = '/schedule/booking/direct';
   static const lessonRequest = '/schedule/lesson-request';
   static const lessonRequests = '/schedule/lesson-requests';
   static const myBookings = '/schedule/my-bookings';

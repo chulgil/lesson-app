@@ -1792,6 +1792,31 @@ class AppStrings {
   /// 예약하기
   static const bookAction = '예약하기';
 
+  // ── 학생 직접 예약 (#580 student_direct_booking_spec) ──────────────
+  /// 레슨 예약 (AppBar)
+  static const lessonBookingTitle = '레슨 예약';
+
+  /// 예약할 시간을 선택하세요 (슬롯 선택 안내)
+  static const lessonBookingSelectTimeLabel = '예약할 시간을 선택하세요';
+
+  /// 예약 확인 다이얼로그 제목
+  static const lessonBookingConfirmTitle = '레슨 예약';
+
+  /// 예약 확인 메시지: "6/10(화) 15:00 레슨을 예약할까요?"
+  static String lessonBookingConfirmMessage(String date, String time) =>
+      '$date $time 레슨을 예약할까요?';
+
+  /// 예약 완료 스낵바: "6/10(화) 15:00 예약이 확정되었습니다"
+  static String lessonBookingConfirmed(String date, String time) =>
+      '$date $time 예약이 확정되었습니다';
+
+  /// 예약 실패 (이미 다른 학생이 예약한 슬롯 등)
+  static const lessonBookingFailed = '예약에 실패했습니다. 다른 시간을 선택해주세요';
+
+  /// 미리보기: "선생님 · 50분 · 잔여 N회"
+  static String lessonBookingPreview(String teacher, int minutes) =>
+      '$teacher · $minutes분';
+
   /// 클래스 소개 (섹션 제목)
   static const classDescription = '클래스 소개';
 
