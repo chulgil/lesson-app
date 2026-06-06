@@ -7,7 +7,7 @@ import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
-import 'package:lessonaza/features/academy/data/repositories/mock_academy_announcement_repository.dart';
+import 'package:lessonaza/features/academy/presentation/providers/academy_announcement_provider.dart';
 
 class AcademyAnnouncementDetailScreen extends ConsumerWidget {
   const AcademyAnnouncementDetailScreen({
@@ -65,8 +65,10 @@ class AcademyAnnouncementDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _markAsRead(WidgetRef ref) async {
-    final repo = MockAcademyAnnouncementRepository();
+    final repo = ref.read(academyAnnouncementRepositoryProvider);
     await repo.markAsRead(announcement.id);
+    // 읽음 마킹 후 목록 갱신 — 미열람 점이 사라지도록 list provider invalidate.
+    ref.invalidate(academyAnnouncementsProvider(announcement.academyId));
   }
 
   String _formatDate(DateTime dateTime) {

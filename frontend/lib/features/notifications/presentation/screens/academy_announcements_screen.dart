@@ -8,16 +8,7 @@ import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
-import 'package:lessonaza/features/academy/data/repositories/mock_academy_announcement_repository.dart';
-
-final _announcementListProvider =
-    FutureProvider.family<List<AcademyAnnouncement>, String>((
-      ref,
-      academyId,
-    ) async {
-      final repo = MockAcademyAnnouncementRepository();
-      return repo.listByAcademy(academyId);
-    });
+import 'package:lessonaza/features/academy/presentation/providers/academy_announcement_provider.dart';
 
 class AcademyAnnouncementsScreen extends ConsumerWidget {
   const AcademyAnnouncementsScreen({required this.academyId, super.key});
@@ -26,7 +17,7 @@ class AcademyAnnouncementsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final announcementAsync = ref.watch(_announcementListProvider(academyId));
+    final announcementAsync = ref.watch(academyAnnouncementsProvider(academyId));
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(title: AppStrings.announcementsTitle),
