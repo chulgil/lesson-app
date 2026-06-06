@@ -68,6 +68,21 @@ class BulkClosure {
   }
 }
 
+/// 보강 입력 화면 라우트 인자.
+///
+/// 적용된 휴강([BulkClosure])과 진입 강사([teacherMemberId])를 함께 전달한다.
+/// 실제 저장(BulkClosureNotifier.submitMakeupSchedule)은 router 빌더가
+/// 수행하므로 화면은 콜백만 주입받는다.
+class MakeupRouteExtra {
+  final BulkClosure closure;
+  final String teacherMemberId;
+
+  const MakeupRouteExtra({
+    required this.closure,
+    required this.teacherMemberId,
+  });
+}
+
 enum ClosureStatus {
   /// 의견 윈도우 진행 중 (강사 의견 가능).
   proposed,

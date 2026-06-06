@@ -5,10 +5,12 @@
 // docs/specs/academy/academy_master.md §6.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../widgets/notebook/notebook_surfaces.dart';
 import '../../../features/academy/domain/entities/bulk_closure.dart';
+import '../../../features/academy/presentation/providers/bulk_closure_provider.dart';
 import '../../../features/academy/presentation/screens/academy_activity_timeline_screen.dart';
 import '../../../features/academy/presentation/screens/bulk_closure_detail_screen.dart';
 import '../../../features/schedule/presentation/screens/makeup_lesson_input_screen.dart';
@@ -45,23 +47,26 @@ List<GoRoute> academyRoutes = [
     path: AppRoutes.academyMakeupInput,
     name: 'academyMakeupInput',
     builder: (context, state) {
+      // 진입 부모(BulkClosureDetailScreen)가 closure + teacherMemberId 를
+      // [MakeupRouteExtra] 로 전달한다. 실제 저장은 BulkClosureNotifier 가
+      // 수행하며, router 빌더가 ProviderScope 를 통해 호출한다 (placeholder 금지).
       final extra = state.extra;
-      if (extra is! BulkClosure) {
+      if (extra is! MakeupRouteExtra) {
         return const NotebookScreenScaffold(
           body: Center(child: Text('휴강 정보를 불러올 수 없습니다.')),
         );
       }
+      final container = ProviderScope.containerOf(context);
       return MakeupLessonInputScreen(
-        closure: extra,
-        // 저장 콜백은 router 가 직접 책임 — push 한 화면이
-        // pop 후 부모(BulkClosureDetail)가 invalidate 함.
+        closure: extra.closure,
         onSaveAll: (Map<String, DateTime> makeupByLessonId) async {
-          // 실제 저장은 BulkClosureNotifier 가 수행 — 진입 부모에서 처리.
-          // 본 라우트 빌더는 Repository 호출 책임을 가지지 않는다.
-          //
-          // 따라서 BulkClosureDetailScreen 에서 push 할 때 onSaveAll 을
-          // 갈아끼우거나, 본 화면을 ProviderScope 안에서 ConsumerWidget 으로
-          // 직접 호출하는 방식으로 확장한다. 현 시점은 placeholder.
+          await container
+              .read(bulkClosureNotifierProvider.notifier)
+              .submitMakeupSchedule(
+                closureId: extra.closure.id,
+                makeupByLessonId: makeupByLessonId,
+                teacherMemberId: extra.teacherMemberId,
+              );
         },
       );
     },
