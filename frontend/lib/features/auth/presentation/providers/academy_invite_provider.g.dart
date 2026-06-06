@@ -7,9 +7,9 @@ part of 'academy_invite_provider.dart';
 // **************************************************************************
 
 String _$academyInviteRepositoryHash() =>
-    r'b514f0ce6d418458f0dca84afcd5c0aa5cda73e4';
+    r'a9a3866480f3fb103d3b48480c52d283cdf8e6e4';
 
-/// Mock academy invite repository provider
+/// Academy invite repository provider — mock/remote switch by data mode (#554).
 ///
 /// Copied from [academyInviteRepository].
 @ProviderFor(academyInviteRepository)

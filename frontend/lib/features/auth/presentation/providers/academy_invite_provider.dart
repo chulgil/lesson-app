@@ -1,16 +1,22 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../../academy/data/repositories/mock_academy_invite_repository.dart';
+import '../../../academy/data/repositories/remote_academy_invite_repository.dart';
 import '../../../academy/domain/repositories/academy_invite_repository.dart';
 
 part 'academy_invite_provider.g.dart';
 
-/// Mock academy invite repository provider
+/// Academy invite repository provider — mock/remote switch by data mode (#554).
 @riverpod
 AcademyInviteRepository academyInviteRepository(
   AcademyInviteRepositoryRef ref,
 ) {
-  return MockAcademyInviteRepository();
+  return createRepository<AcademyInviteRepository>(
+    ref: ref,
+    mock: () => MockAcademyInviteRepository(),
+    remote: (apiClient) => RemoteAcademyInviteRepository(apiClient),
+  );
 }
 
 /// Academy invite preview provider — loads invite details by token
