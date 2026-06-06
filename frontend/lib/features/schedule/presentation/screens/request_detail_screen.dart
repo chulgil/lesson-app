@@ -1409,14 +1409,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final reason = await showCancelLessonBottomSheet(context);
     if (reason == null || !context.mounted) return;
 
-    final actions = UnifiedLessonRequestActions(ref);
-    actions.cancelRequest(
-      request.id,
-      viewerRole == 'teacher' ? request.teacherId : request.studentId,
-      viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student,
-      request.teacherId,
-      request.studentId,
-      reason: reason,
-    );
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.cancelRequest(
+        request.id,
+        viewerRole == 'teacher' ? request.teacherId : request.studentId,
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student,
+        request.teacherId,
+        request.studentId,
+        reason: reason,
+      );
+    } catch (e) {
+      if (context.mounted) {
+        _showError(AppStrings.cancelError);
+      }
+    }
   }
 }
