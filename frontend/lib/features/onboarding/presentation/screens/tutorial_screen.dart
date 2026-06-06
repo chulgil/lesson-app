@@ -99,7 +99,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
         .markTeacherOnboardingCompleted();
     // Mark onboarding as completed on the server (remote mode)
     if (!ref.read(mockDataModeProvider)) {
-      ref.read(authNotifierProvider.notifier).completeOnboarding();
+      await ref.read(authNotifierProvider.notifier).completeOnboarding();
     }
     if (!mounted) return;
     context.go(AppRoutes.home);

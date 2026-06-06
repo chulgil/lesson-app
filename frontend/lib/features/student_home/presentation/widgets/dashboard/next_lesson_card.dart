@@ -121,6 +121,9 @@ class NextLessonCard extends ConsumerWidget {
             'teacherId': booking.teacherId,
             'teacherName': booking.teacherName,
             'instrument': booking.instrument,
+            'subscriptionId': null,
+            'remainingReschedules': 0,
+            'totalReschedules': 0,
           },
         );
       },

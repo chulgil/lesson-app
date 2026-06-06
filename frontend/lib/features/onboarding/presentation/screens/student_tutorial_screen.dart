@@ -80,18 +80,18 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
     }
   }
 
-  void _skipTutorial() {
-    _navigateToHome();
+  Future<void> _skipTutorial() async {
+    await _navigateToHome();
   }
 
-  void _completeTutorial() {
-    _navigateToHome();
+  Future<void> _completeTutorial() async {
+    await _navigateToHome();
   }
 
-  void _navigateToHome() {
+  Future<void> _navigateToHome() async {
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
     if (!ref.read(mockDataModeProvider)) {
-      ref.read(authNotifierProvider.notifier).completeOnboarding();
+      await ref.read(authNotifierProvider.notifier).completeOnboarding();
     }
     if (!mounted) return;
     context.go(AppRoutes.studentHome);
@@ -233,20 +233,13 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
       children: [
         _ProgressStep(
           step: 1,
-          label: AppStrings.onboardingPhone,
-          isActive: false,
-          isCompleted: true,
-        ),
-        const SizedBox(width: AppSpacing.space1),
-        _ProgressStep(
-          step: 2,
           label: AppStrings.onboardingProfile,
           isActive: false,
           isCompleted: true,
         ),
         const SizedBox(width: AppSpacing.space1),
         _ProgressStep(
-          step: 3,
+          step: 2,
           label: AppStrings.onboardingTutorial,
           isActive: true,
         ),

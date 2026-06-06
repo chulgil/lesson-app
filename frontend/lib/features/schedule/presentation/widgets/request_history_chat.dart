@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -14,6 +15,7 @@ import '../extensions/request_event_visuals.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import 'proposal_chat_card.dart';
 import 'schedule_change_slot_bottom_sheet.dart';
+import '../providers/unified_lesson_request_providers.dart';
 
 /// Chat-style history of all events in a lesson request.
 ///
@@ -558,30 +560,65 @@ class RequestHistoryChat extends StatelessWidget {
         // CTA: makeup request (student-facing only — teacher already knows).
         if (viewerRole == 'student' && request != null) ...[
           const SizedBox(height: AppSpacing.space2),
-          GestureDetector(
-            onTap: () async {
-              if (!context.mounted) return;
-              await showScheduleChangeSlotBottomSheet(
-                context,
-                params: ScheduleChangeSlotParams(
-                  teacherId: request!.teacherId,
-                  studentId: request!.studentId,
-                  durationMinutes: request!.preferredDuration,
-                  currentScheduleLabel:
-                      request!.preferredSlots.isNotEmpty
-                          ? request!.preferredSlots.first.displayLabel
-                          : '-',
-                  isBulkChange: false,
+          Consumer(
+            builder: (consumerContext, ref, _) {
+              return GestureDetector(
+                onTap: () async {
+                  if (!consumerContext.mounted) return;
+                  final result = await showScheduleChangeSlotBottomSheet(
+                    consumerContext,
+                    params: ScheduleChangeSlotParams(
+                      teacherId: request!.teacherId,
+                      studentId: request!.studentId,
+                      durationMinutes: request!.preferredDuration,
+                      currentScheduleLabel:
+                          request!.preferredSlots.isNotEmpty
+                              ? request!.preferredSlots.first.displayLabel
+                              : '-',
+                      isBulkChange: false,
+                    ),
+                  );
+                  if (result == null || !consumerContext.mounted) return;
+
+                  // Record schedule change proposed event (mirrors _handleScheduleChange pattern)
+                  try {
+                    final actions = UnifiedLessonRequestActions(ref);
+                    await actions.recordScheduleChangeProposed(
+                      request!.id,
+                      request!.studentId,
+                      ProposerRole.student,
+                      request!.teacherId,
+                      request!.studentId,
+                      changeType: ScheduleChangeType.singleLesson,
+                      suggestedSlots:
+                          result.slots
+                              .map(
+                                (s) => TimeSlotOption(
+                                  id: s.id,
+                                  // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
+                                  dayOfWeek: s.dayOfWeek - 1,
+                                  startTime:
+                                      '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                                  endTime:
+                                      '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                                ),
+                              )
+                              .toList(),
+                      message: result.message.isEmpty ? null : result.message,
+                    );
+                  } catch (_) {
+                    // Silently ignore — UI already dismissed; parent screen will refresh
+                  }
+                },
+                child: Text(
+                  AppStrings.bulkCancelRescheduleCta,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.paperAccent,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               );
             },
-            child: Text(
-              AppStrings.bulkCancelRescheduleCta,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.paperAccent,
-                decoration: TextDecoration.underline,
-              ),
-            ),
           ),
         ],
       ],

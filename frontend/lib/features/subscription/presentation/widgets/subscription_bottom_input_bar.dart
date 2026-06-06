@@ -39,6 +39,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   final ScheduleEventAction? onWithdrawScheduleDecision;
   final void Function(RequestEvent event)? onCancellationFreeProcess;
   final void Function(RequestEvent event)? onCancellationAcknowledge;
+  final VoidCallback? onCancelLesson;
 
   const SubscriptionBottomInputBar({
     super.key,
@@ -54,6 +55,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     this.onWithdrawScheduleDecision,
     this.onCancellationFreeProcess,
     this.onCancellationAcknowledge,
+    this.onCancelLesson,
   });
 
   @override
@@ -123,23 +125,69 @@ class SubscriptionBottomInputBar extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
-            SizedBox(
-              width: double.infinity,
-              height: AppSpacing.buttonHeightSmall,
-              child: ElevatedButton(
-                onPressed: onScheduleChange,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent,
-                  shape: RoundedRectangleBorder(),
-                ),
-                child: Text(
-                  AppStrings.scheduleChangeButton,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color: AppColors.paper,
+            if (viewerRole == 'student') ...[
+              // Student: schedule change + cancel lesson buttons side-by-side
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: AppSpacing.buttonHeightSmall,
+                      child: OutlinedButton(
+                        onPressed: onCancelLesson,
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.inkQuaternary),
+                          shape: RoundedRectangleBorder(),
+                        ),
+                        child: Text(
+                          AppStrings.actionLessonCancel,
+                          style: AppTypography.buttonSmall.copyWith(
+                            color: AppColors.inkSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: SizedBox(
+                      height: AppSpacing.buttonHeightSmall,
+                      child: ElevatedButton(
+                        onPressed: onScheduleChange,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.paperAccent,
+                          shape: RoundedRectangleBorder(),
+                        ),
+                        child: Text(
+                          AppStrings.scheduleChangeButton,
+                          style: AppTypography.buttonSmall.copyWith(
+                            color: AppColors.paper,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              // Teacher: schedule change button only
+              SizedBox(
+                width: double.infinity,
+                height: AppSpacing.buttonHeightSmall,
+                child: ElevatedButton(
+                  onPressed: onScheduleChange,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.paperAccent,
+                    shape: RoundedRectangleBorder(),
+                  ),
+                  child: Text(
+                    AppStrings.scheduleChangeButton,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.paper,
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ],
         ],
       ),
