@@ -99,6 +99,36 @@ void main() {
         isNull,
       );
     });
+
+    test('parentHome NOT whitelisted during onboarding → roleSelect (#582)', () {
+      // Contract behind #582: a parent who has not completed onboarding cannot
+      // reach /parent-home. The parent invite screen must call
+      // completeOnboarding() before navigating, otherwise it bounces here.
+      const parentOnboarding = AuthNeedsOnboarding(
+        userId: 'u',
+        name: 'n',
+        email: 'e',
+        role: UserRole.parent,
+      );
+      expect(
+        resolveAuthRedirect(parentOnboarding, AppRoutes.parentHome),
+        AppRoutes.roleSelect,
+      );
+    });
+
+    test('authenticated parent reaches parentHome (post-onboarding) (#582)', () {
+      const authedParent = AuthAuthenticated(
+        userId: 'u',
+        name: 'n',
+        email: 'e',
+        role: UserRole.parent,
+      );
+      // Once onboarding is complete, the gate lets parentHome through.
+      expect(
+        resolveAuthRedirect(authedParent, AppRoutes.parentHome),
+        isNull,
+      );
+    });
   });
 
   group('resolveAuthRedirect — authenticated', () {

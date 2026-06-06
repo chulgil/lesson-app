@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -258,27 +260,47 @@ class _ParentInviteCodeScreenState
 
     try {
       final code = _codeController.text.trim().toUpperCase();
-      final repo = ref.read(inviteRepositoryProvider);
-      final invite = await repo.getInviteByCode(code);
 
-      if (!mounted) return;
-
-      if (invite == null) {
-        setState(() {
-          _errorMessage = AppStrings.authInviteCodeInvalid;
-        });
-        return;
+      if (ref.read(mockDataModeProvider)) {
+        // Mock: validate code shape via the invite repository.
+        final repo = ref.read(inviteRepositoryProvider);
+        final invite = await repo.getInviteByCode(code);
+        if (!mounted) return;
+        if (invite == null) {
+          setState(() => _errorMessage = AppStrings.authInviteCodeInvalid);
+          return;
+        }
+        if (!invite.isValid) {
+          setState(() => _errorMessage = AppStrings.authInviteCodeExpired);
+          return;
+        }
+      } else {
+        // Remote: create the connection request (mirror student flow). The
+        // server resolves the target from the invite code. Without this the
+        // "child connected" toast was a no-op (#583).
+        final apiClient = ref.read(apiClientProvider);
+        try {
+          await apiClient.post(
+            '/invites/connection-requests',
+            data: {
+              'target_id': '',
+              'method': 'inviteCode',
+              'invite_code': code,
+            },
+          );
+        } catch (_) {
+          if (mounted) {
+            setState(() => _errorMessage = AppStrings.authInviteCodeInvalid);
+          }
+          return;
+        }
       }
 
-      if (!invite.isValid) {
-        setState(() {
-          _errorMessage = AppStrings.authInviteCodeExpired;
-        });
-        return;
-      }
-
-      // Set role to parent
+      // Set role + complete onboarding so the auth gate lets /parent-home
+      // through (otherwise AuthNeedsOnboarding bounces to roleSelect, #582).
       ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
+      await _completeParentOnboarding();
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -301,9 +323,18 @@ class _ParentInviteCodeScreenState
     }
   }
 
-  void _handleSkip() {
-    // Set role to parent and navigate to empty home
+  Future<void> _handleSkip() async {
+    // Set role to parent and navigate to empty home.
     ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
+    await _completeParentOnboarding();
+    if (!mounted) return;
     context.go(AppRoutes.parentHome);
+  }
+
+  /// Mark onboarding complete so the auth gate lets /parent-home through.
+  /// Mock/dev mode already authenticates via dev-login, so skip the call.
+  Future<void> _completeParentOnboarding() async {
+    if (ref.read(mockDataModeProvider)) return;
+    await ref.read(authNotifierProvider.notifier).completeOnboarding();
   }
 }
