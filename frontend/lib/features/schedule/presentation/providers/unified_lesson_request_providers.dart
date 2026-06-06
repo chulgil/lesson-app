@@ -420,13 +420,23 @@ class UnifiedLessonRequestActions {
     );
     final result = await _repository.update(updated);
 
+    // Phase 3 statuses (subscriptionIssued / inProgress) use lessonCancelled;
+    // Phase 1 negotiation statuses use cancel.
+    final isPhase3 =
+        request.status == UnifiedRequestStatus.subscriptionIssued ||
+        request.status == UnifiedRequestStatus.inProgress;
+    final eventType =
+        isPhase3
+            ? RequestEventType.lessonCancelled
+            : RequestEventType.cancel;
+
     await _repository.addEvent(
       RequestEvent(
         id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
         requestId: requestId,
         actorType: actorType,
         actorId: actorId,
-        eventType: RequestEventType.cancel,
+        eventType: eventType,
         message: reason,
         createdAt: DateTime.now(),
       ),
