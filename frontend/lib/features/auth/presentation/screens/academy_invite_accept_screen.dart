@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
+import '../../../../features/academy/academy_facade.dart';
 import '../providers/academy_invite_provider.dart';
 import 'academy_invite_expired_screen.dart';
 
@@ -47,6 +48,9 @@ class _AcademyInviteAcceptScreenState
         widget.token,
         publicPageConsent: _publicPageConsent,
       );
+      // Refresh cached academy providers so the home screen reflects the
+      // newly joined academy without requiring a manual reload.
+      ref.invalidate(teacherAcademiesProvider);
       if (mounted) {
         context.go(AppRoutes.home);
       }

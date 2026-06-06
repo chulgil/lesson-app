@@ -122,6 +122,9 @@ class StudentHomeBookingActions {
     if (studentId != null) {
       _ref.invalidate(studentHomeNextLessonProvider(studentId));
       _ref.invalidate(studentHomeTrialBookingsProvider(studentId));
+      // Also refresh the weekly schedule grid so cancelled lesson markers
+      // disappear from the lessons tab calendar immediately.
+      _ref.invalidate(studentHomeLessonsScheduleProvider(studentId));
     }
     return booking;
   }

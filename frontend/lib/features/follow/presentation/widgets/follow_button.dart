@@ -33,6 +33,10 @@ class FollowButton extends ConsumerWidget {
     final asyncIsFollowing = ref.watch(
       isFollowingProvider(followerId: followerId, followingId: followingId),
     );
+    // Guard against double-tap: while follow/unfollow is in progress the
+    // FollowNotifier state is AsyncLoading — disable the button during that time.
+    final isActionInProgress =
+        ref.watch(followNotifierProvider).isLoading;
 
     return asyncIsFollowing.when(
       loading: () => _LoadingPill(compact: compact),
@@ -41,11 +45,13 @@ class FollowButton extends ConsumerWidget {
             label: AppStrings.followFollow,
             accent: true,
             compact: compact,
-            onPressed: () => _follow(ref),
+            onPressed: isActionInProgress ? () {} : () => _follow(ref),
           ),
       data:
           (isFollowing) =>
-              isFollowing
+              isActionInProgress
+                  ? _LoadingPill(compact: compact)
+                  : isFollowing
                   ? _ActionButton(
                     label: AppStrings.followFollowing,
                     accent: false,
