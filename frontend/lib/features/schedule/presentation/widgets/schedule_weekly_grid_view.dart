@@ -15,7 +15,9 @@ import '../../../../core/utils/name_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
+import '../../domain/entities/vacation_period.dart';
 import '../providers/teacher_availability_providers.dart';
+import '../providers/vacation_providers.dart';
 import '../providers/week_lessons_provider.dart';
 import '../utils/schedule_visual_helpers.dart';
 
@@ -67,18 +69,24 @@ class _ScheduleWeeklyGridViewState
     final availabilityAsync = ref.watch(
       teacherAvailabilityProvider('teacher_1'),
     );
+    final vacationsAsync = ref.watch(vacationListProvider);
 
     return weekLessonsAsync.when(
       data: (lessons) {
         final availability = availabilityAsync.valueOrNull;
-        return _buildGrid(lessons, availability);
+        final vacations = vacationsAsync.valueOrNull ?? const [];
+        return _buildGrid(lessons, availability, vacations);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text(AppStrings.scheduleLoadFailed('$e'))),
     );
   }
 
-  Widget _buildGrid(List<Lesson> lessons, TeacherAvailability? availability) {
+  Widget _buildGrid(
+    List<Lesson> lessons,
+    TeacherAvailability? availability,
+    List<VacationPeriod> vacations,
+  ) {
     if (lessons.isEmpty) {
       return _buildEmptyWeek();
     }
@@ -111,7 +119,7 @@ class _ScheduleWeeklyGridViewState
     final uniqueLessonCounts = _countUniqueLessons(lessons);
 
     // §7.123 — Determine column rest kind per day (vacation > holiday > regular > none)
-    final restKinds = _getRestKinds(availability);
+    final restKinds = _getRestKinds(availability, vacations);
 
     // Check if current week contains today
     final isCurrentWeek =
@@ -735,15 +743,35 @@ class _ScheduleWeeklyGridViewState
   ///
   /// 우선순위: vacation > holiday > regular > none.
   /// availability null 또는 weeklySchedules 비었으면 모두 none (휴무 미표시).
-  Map<int, ColumnRestKind> _getRestKinds(TeacherAvailability? availability) {
-    if (availability == null) return const {};
-    final hasAnyWorkDay = availability.weeklySchedules.any((s) => s.isActive);
-    if (!hasAnyWorkDay && availability.exceptions.isEmpty) {
-      return const {};
+  /// VacationPeriod 범위 내 날짜는 vacation 으로 표시 (#568).
+  Map<int, ColumnRestKind> _getRestKinds(
+    TeacherAvailability? availability,
+    List<VacationPeriod> vacations,
+  ) {
+    if (availability == null && vacations.isEmpty) return const {};
+    if (availability != null) {
+      final hasAnyWorkDay = availability.weeklySchedules.any((s) => s.isActive);
+      if (!hasAnyWorkDay &&
+          availability.exceptions.isEmpty &&
+          vacations.isEmpty) {
+        return const {};
+      }
     }
     final result = <int, ColumnRestKind>{};
     for (var dayIndex = 0; dayIndex < 7; dayIndex++) {
       final date = _weekStart.add(Duration(days: dayIndex));
+      // VacationPeriod 체크: 취소되지 않은 휴가 범위 내 날짜 (#568)
+      final isInVacation = vacations.any((v) {
+        if (v.cancelledAt != null) return false;
+        final d = DateTime(date.year, date.month, date.day);
+        final start = DateTime(v.startDate.year, v.startDate.month, v.startDate.day);
+        final end = DateTime(v.endDate.year, v.endDate.month, v.endDate.day);
+        return !d.isBefore(start) && !d.isAfter(end);
+      });
+      if (isInVacation) {
+        result[dayIndex] = ColumnRestKind.vacation;
+        continue;
+      }
       final kind = columnRestKindForDate(
         availability: availability,
         date: date,
