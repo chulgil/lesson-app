@@ -288,6 +288,12 @@ class SubscriptionService:
         """Deduct a lesson usage from a subscription."""
         sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
+        if not sub.payment_confirmed:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="입금이 확인되지 않은 수강권에서는 레슨을 차감할 수 없습니다.",
+            )
+
         remaining = self._remaining_lessons(sub)
         if remaining is not None and remaining <= 0:
             raise HTTPException(

@@ -21,6 +21,7 @@ class SubscriptionResponse(BaseModel):
     travel_time_minutes: int | None = None
     type: str | None = None
     status: str | None = None
+
     total_lessons: int | None = None
     used_lessons: int = 0
 
@@ -39,6 +40,11 @@ class SubscriptionResponse(BaseModel):
     amount: int | None = None
     start_date: _dt.date | None = None
     end_date: _dt.date | None = None
+    # Vacation-extended actual expiry (end_date + auto_extended_days).
+    # Exposed so the frontend can show the correct expiration date without
+    # recomputing auto_extended_days client-side.
+    effective_end_date: _dt.date | None = None
+    auto_extended_days: int = 0
     lessons_per_month: int | None = None
     bonus_count: int = 0
     billing_type: str | None = None
