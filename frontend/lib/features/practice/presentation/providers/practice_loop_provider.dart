@@ -148,9 +148,13 @@ class PracticeLoopOverrideNotifier extends _$PracticeLoopOverrideNotifier {
     if (nextCount < current.targetRepeatCount) return;
     final studentUserId = ref.read(currentUserIdProvider);
     final totalRepo = ref.read(practiceRepeatTotalRepositoryProvider);
+    // Increment by 1 per target achievement, not by nextCount.
+    // nextCount is the per-section cumulative; adding it each time the target
+    // is reached would compound (e.g. target=5 → +5, not +1) and inflate
+    // the global total, causing badges to trigger prematurely.
     final newTotal = await totalRepo.increment(
       studentUserId: studentUserId,
-      by: nextCount,
+      by: 1,
     );
     ref
         .read(practiceBadgeStateNotifierProvider(studentUserId).notifier)

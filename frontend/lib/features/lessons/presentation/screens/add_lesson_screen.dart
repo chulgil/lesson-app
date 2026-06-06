@@ -8,11 +8,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../features/profile/profile_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../students/presentation/extensions/student_domain_visuals.dart';
-import '../providers/lesson_crud_provider.dart';
+import '../../lessons_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 import '../widgets/lesson_form/lesson_location_section.dart';
@@ -46,6 +45,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   TimeOfDay _selectedTime = const TimeOfDay(hour: 14, minute: 0);
   int _lessonDuration = 60;
   bool _isRecurring = false;
+  bool _isSaving = false;
   final Set<int> _recurringDays = {};
   bool _enableReminder = true;
   int _reminderMinutes = 30;
@@ -173,7 +173,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const LessonFormSectionTitle(AppStrings.lessonLocationLabel),
               const SizedBox(height: AppSpacing.space3),
               LessonLocationSection(
-                teacherId: 'teacher_1',
+                teacherId: ref.watch(currentTeacherIdProvider),
                 selectedLocationId: _selectedLocation?.id,
                 onSelected: (loc) {
                   setState(() => _selectedLocation = loc);
@@ -244,7 +244,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 width: double.infinity,
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
-                  onPressed: _saveLesson,
+                  onPressed: _isSaving ? null : _saveLesson,
                   child: Text(
                     _isRecurring
                         ? AppStrings.reserveRecurringLessonButton
@@ -500,6 +500,16 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   }
 
   Future<void> _saveLesson() async {
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
+    try {
+      await _doSaveLesson();
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _doSaveLesson() async {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -664,12 +674,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           ),
         );
       } else {
-        // Single lesson creation
-        await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
+        // Single lesson creation — capture the returned Lesson so its server-
+        // assigned id is used for subscription usage (not the local empty id).
+        final savedLesson =
+            await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
 
         // If past lesson (record mode), auto-deduct subscription
         if (isPastLesson) {
-          await _recordSubscriptionUsage(lesson);
+          await _recordSubscriptionUsage(savedLesson);
         }
 
         // Invalidate the lessonsProvider to refresh calendar

@@ -249,7 +249,8 @@ class BadgeChecker {
       case BadgeType.challengeKing:
         return s.challengePracticeCompletedCount >= 10;
       case BadgeType.firstLike:
-        return s.likeCount >= 5;
+        // Award on first like received (>= 1), not 5.
+        return s.likeCount >= 1;
       case BadgeType.lovedStudent:
         return s.likeCount >= 20;
       case BadgeType.practiceRepeat10:

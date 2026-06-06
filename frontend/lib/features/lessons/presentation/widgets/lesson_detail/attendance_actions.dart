@@ -5,6 +5,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../domain/entities/lesson.dart';
+import '../../providers/lesson_confirmation_provider.dart';
 import '../../providers/lesson_crud_provider.dart';
 
 /// #473: 출석 확인 → 레슨 완료(completed) 처리. 수강권 1회 차감.
@@ -27,8 +28,11 @@ Future<void> confirmAttendance(
   if (confirmed != true || !context.mounted) return;
 
   try {
-    final updatedLesson = lesson.copyWith(status: LessonStatus.completed);
-    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    // Use LessonConfirmationNotifier which records subscription usage (1 deduction).
+    // The previous updateLesson path skipped deduction — this is the correct route.
+    await ref
+        .read(lessonConfirmationNotifierProvider.notifier)
+        .confirmLessonCompleted(lesson);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(AppStrings.attendanceConfirmedSnack)),

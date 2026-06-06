@@ -35,6 +35,8 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   final _addressController = TextEditingController();
   final _addressDetailController = TextEditingController();
 
+  bool _isSaving = false;
+
   String? _selectedInstrument;
   StudentLevel _selectedLevel = StudentLevel.intermediate;
   late TextEditingController _monthlyFeeController;
@@ -207,7 +209,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
                 width: double.infinity,
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
-                  onPressed: _saveStudent,
+                  onPressed: _isSaving ? null : _saveStudent,
                   child: const Text(AppStrings.studentAddLabel),
                 ),
               ),
@@ -235,6 +237,19 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   }
 
   Future<void> _saveStudent() async {
+    if (_isSaving) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    setState(() => _isSaving = true);
+    try {
+      await _doSaveStudent();
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _doSaveStudent() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
