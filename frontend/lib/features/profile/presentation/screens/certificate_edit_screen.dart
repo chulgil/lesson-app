@@ -173,7 +173,11 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               ? null
               : _certificateNumberController.text.trim(),
       imageUrl: imageUrl ?? '',
-      status: CertificateStatus.pending,
+      // In edit mode, preserve the existing status (e.g. approved) so a minor
+      // correction does not reset the certificate back to pending review.
+      status: _isEdit
+          ? _existingCertificate!.status
+          : CertificateStatus.pending,
       submittedAt: _isEdit ? _existingCertificate!.submittedAt : now,
     );
 

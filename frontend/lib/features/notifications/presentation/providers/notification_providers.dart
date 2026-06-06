@@ -476,7 +476,11 @@ class NotificationActions extends _$NotificationActions {
   Future<void> markAsRead(String notificationId) async {
     final apiRepo = ref.read(notificationApiRepositoryProvider);
     if (apiRepo != null) {
-      await apiRepo.markAsRead(notificationId);
+      try {
+        await apiRepo.markAsRead(notificationId);
+      } catch (_) {
+        // Best-effort: server error must not prevent local list refresh.
+      }
     }
     ref.invalidate(userNotificationsProvider);
   }
@@ -485,7 +489,11 @@ class NotificationActions extends _$NotificationActions {
   Future<void> markAllAsRead() async {
     final apiRepo = ref.read(notificationApiRepositoryProvider);
     if (apiRepo != null) {
-      await apiRepo.markAllAsRead();
+      try {
+        await apiRepo.markAllAsRead();
+      } catch (_) {
+        // Best-effort: refresh the list regardless.
+      }
     }
     ref.invalidate(userNotificationsProvider);
   }

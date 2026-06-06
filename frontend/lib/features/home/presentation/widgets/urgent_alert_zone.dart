@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../lessons/lessons_ui_facade.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../providers/home_dashboard_provider.dart';
 
 /// Urgent alerts zone — **Notebook × Score 스타일 "긴급 메모 스트립"**.
 ///
@@ -166,6 +167,13 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
         await notifier.confirmLessonCompleted(lesson);
       } else {
         await notifier.handleLessonNonCompletion(lesson, result);
+      }
+      // Refresh the home dashboard so lesson stats / needsConfirmation list
+      // and unpaid summary reflect the updated lesson state immediately.
+      if (lesson.teacherId != null) {
+        await ref
+            .read(homeDashboardRefreshProvider)
+            .refresh(lesson.teacherId!);
       }
     }
   }

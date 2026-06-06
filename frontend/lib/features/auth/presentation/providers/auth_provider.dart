@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/auth/auth_state.dart';
@@ -280,6 +281,15 @@ class AuthNotifier extends _$AuthNotifier {
       // Best-effort server logout
     }
     await _tokenStorage.clearTokens();
+    // Clear per-user Hive data so the next login does not inherit previous
+    // user's notification settings (privacy: data-privacy.md §Level-2).
+    try {
+      if (Hive.isBoxOpen('notification_settings')) {
+        await Hive.box('notification_settings').clear();
+      }
+    } catch (_) {
+      // Best-effort: Hive may not be open during unit tests.
+    }
     state = const AuthUnauthenticated();
   }
 
