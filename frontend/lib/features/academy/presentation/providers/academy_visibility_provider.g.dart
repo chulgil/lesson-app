@@ -7,7 +7,7 @@ part of 'academy_visibility_provider.dart';
 // **************************************************************************
 
 String _$academyVisibilityRepositoryHash() =>
-    r'9ada68652f66e70b1baefd625740a0b3dc996b64';
+    r'8e46ac91923ea76a9b22b298b05a61f5448b0659';
 
 /// See also [academyVisibilityRepository].
 @ProviderFor(academyVisibilityRepository)
