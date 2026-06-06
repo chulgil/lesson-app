@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -339,21 +340,27 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           );
         }
       }
-    } catch (e) {
-      if (mounted) {
-        final errorMessage = e.toString();
-        // Already connected is a success case
-        if (errorMessage.contains('이미 연결')) {
-          _showAlreadyConnectedDialog(widget.invite.creatorRole.label);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: AppColors.paperAccent,
-            ),
-          );
-        }
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      // 409 means the relationship already exists — treat as success.
+      if (e.statusCode == 409) {
+        _showAlreadyConnectedDialog(widget.invite.creatorRole.label);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(AppStrings.inviteConnectionFailed),
+            backgroundColor: AppColors.paperAccent,
+          ),
+        );
       }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(AppStrings.inviteConnectionFailed),
+          backgroundColor: AppColors.paperAccent,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_invite_repository.dart';
@@ -194,6 +195,9 @@ class ConnectionRequester extends _$ConnectionRequester {
       return request;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+      // Rethrow typed API errors so the caller can distinguish conflict (409)
+      // from generic network failures and show the appropriate UI.
+      if (e is ApiException) rethrow;
       return null;
     }
   }
