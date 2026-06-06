@@ -139,7 +139,9 @@ void main() {
       expect(decision.reason, LimitReason.planExpired);
     });
 
-    test('cancelled (현재 기간 active 와 별개) → blocked planExpired', () {
+    test('cancelled (현재 기간 active 와 동일) → allowed (다음 갱신 차단, 현재 기간 유지)', () {
+      // BillingStatus.cancelled: isActiveOrTrial=true, 현재 기간 pro 혜택 유지.
+      // 만료는 BillingStatus.expired.
       final decision = guard.checkStudentLimit(
         snapshot: _snapshot(
           plan: BillingPlan.pro,
@@ -147,8 +149,8 @@ void main() {
         ),
         currentStudentCount: 3,
       );
-      expect(decision.allowed, isFalse);
-      expect(decision.reason, LimitReason.planExpired);
+      expect(decision.allowed, isTrue);
+      expect(decision.reason, LimitReason.withinLimit);
     });
   });
 
