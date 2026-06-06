@@ -22,6 +22,7 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
+import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
 import '../widgets/schedule_change_slot_bottom_sheet.dart';
 import '../widgets/schedule_change_type_bottom_sheet.dart';
@@ -1399,29 +1400,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     _showError(AppStrings.modifyRequestPreparing);
   }
 
-  void _handleCancel(
+  Future<void> _handleCancel(
     BuildContext context,
     WidgetRef ref,
     UnifiedLessonRequest request,
-  ) {
-    showNotebookDialog(
-      context: context,
-      title: AppStrings.cancelRequestTitle,
-      content: const Text(AppStrings.cancelRequestMessage),
-      cancelLabel: AppStrings.no,
-      confirmLabel: AppStrings.cancelRequestAction,
-      isDestructive: true,
-      onConfirm: () {
-        Navigator.of(context).pop();
-        final actions = UnifiedLessonRequestActions(ref);
-        actions.cancelRequest(
-          request.id,
-          viewerRole == 'teacher' ? request.teacherId : request.studentId,
-          viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student,
-          request.teacherId,
-          request.studentId,
-        );
-      },
+  ) async {
+    // Show reason picker bottom sheet per lesson_cancellation_flow_spec §2.
+    final reason = await showCancelLessonBottomSheet(context);
+    if (reason == null || !context.mounted) return;
+
+    final actions = UnifiedLessonRequestActions(ref);
+    actions.cancelRequest(
+      request.id,
+      viewerRole == 'teacher' ? request.teacherId : request.studentId,
+      viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student,
+      request.teacherId,
+      request.studentId,
+      reason: reason,
     );
   }
 }
