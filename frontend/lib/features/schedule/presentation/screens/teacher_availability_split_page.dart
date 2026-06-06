@@ -12,6 +12,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
+import '../../../settings/settings_facade.dart';
 import '../widgets/availability/availability_preview_grid.dart';
 import '../widgets/availability/availability_vacation_banner.dart';
 import '../widgets/schedule_edit_bottom_sheet.dart';
@@ -265,6 +266,7 @@ class _WeeklySchedulePanel extends ConsumerWidget {
       await notifier.addWeeklySchedule(result);
     }
     ref.invalidate(teacherAvailabilityProvider(teacherId));
+    ref.invalidate(teacherSettingsProvider);
   }
 }
 
@@ -447,6 +449,7 @@ class _LessonSettingsPanel extends ConsumerWidget {
           breakTimeBetweenLessons: breakTimeBetweenLessons,
         );
     ref.invalidate(teacherAvailabilityProvider(teacherId));
+    ref.invalidate(teacherSettingsProvider);
   }
 }
 
