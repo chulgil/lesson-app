@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 
 /// Second-stage feedback dialog — shown when user picks 아쉬워요.
 ///
@@ -38,8 +39,8 @@ class _AppRatingFeedbackDialogState extends State<AppRatingFeedbackDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text(AppStrings.ratingFeedbackTitle),
+    return NotebookAlertDialog(
+      titleWidget: const Text(AppStrings.ratingFeedbackTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -7,6 +7,8 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../domain/entities/loop_memo.dart';
 
 /// Display + author affordance for the student-authored loop memos pinned to a
@@ -106,11 +108,7 @@ class _LoopMemoOverlayState extends State<LoopMemoOverlay> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            backgroundColor: AppColors.paper,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+          (ctx) => NotebookAlertDialog(
             content: const Text(
               AppStrings.loopMemoDeleteConfirm,
               style: AppTypography.bodyMedium,
@@ -137,10 +135,8 @@ class _LoopMemoOverlayState extends State<LoopMemoOverlay> {
 
   Future<String?> _showEditor({required String initialText}) async {
     final controller = TextEditingController(text: initialText);
-    final result = await showModalBottomSheet<String>(
+    final result = await showNotebookModalBottomSheet<String>(
       context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: AppColors.ink.withValues(alpha: 0.45),
       isScrollControlled: true,
       builder: (ctx) {
         return Padding(

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../domain/entities/practice_report.dart';
 import '../providers/practice_report_provider.dart';
 import '../widgets/report/practice_chart.dart';
@@ -21,13 +22,8 @@ class PracticeReportScreen extends ConsumerWidget {
     final period = ref.watch(practiceReportPeriodControllerProvider);
     final dateState = ref.watch(reportDateProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: const Text(AppStrings.practiceReportTitle),
-        backgroundColor: AppColors.paper,
-        elevation: 0,
-      ),
+    return NotebookScreenScaffold(
+      appBarTitle: AppStrings.practiceReportTitle,
       body: Column(
         children: [
           _PeriodToggle(period: period),

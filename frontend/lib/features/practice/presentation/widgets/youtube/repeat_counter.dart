@@ -5,6 +5,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 
 /// Loop repeat counter — shows "completed / target" with a small progress bar.
 ///
@@ -96,10 +97,8 @@ class RepeatCounter extends StatelessWidget {
     int current,
     ValueChanged<int> onChanged,
   ) async {
-    final selected = await showModalBottomSheet<int>(
+    final selected = await showNotebookModalBottomSheet<int>(
       context: context,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder: (sheetContext) {
         return SafeArea(
           top: false,
