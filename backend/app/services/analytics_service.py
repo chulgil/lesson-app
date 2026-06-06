@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import calendar
+import datetime as _dt
 from datetime import datetime
 from typing import Any
 
@@ -10,7 +11,14 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.analytics import MonthlyTrendResponse, StudentPracticeRankResponse, TeacherMonthlyStatsResponse
+from app.schemas.analytics import (
+    AttendanceCalendarEntry,
+    DailyPracticePoint,
+    MonthlyTrendResponse,
+    StudentPracticeRankResponse,
+    StudentProgressResponse,
+    TeacherMonthlyStatsResponse,
+)
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 
@@ -222,3 +230,113 @@ class AnalyticsService:
             )
         )
         return result or 0
+
+    async def get_student_progress(
+        self,
+        teacher_id: str,
+        student_id: str,
+        period_days: int = 30,
+    ) -> StudentProgressResponse:
+        """Return attendance and practice progress for a student over the given period."""
+        from app.models.lesson import Lesson, LessonStatus
+        from app.models.practice_log import PracticeLog
+        from app.models.student import Student
+
+        end = _dt.date.today()
+        start = end - _dt.timedelta(days=period_days - 1)
+
+        # Verify student belongs to teacher.
+        student = await self.db.scalar(
+            select(Student).where(
+                Student.id == student_id,
+                Student.teacher_id == teacher_id,
+            )
+        )
+        if student is None:
+            return StudentProgressResponse(
+                student_id=student_id,
+                student_name="",
+                period_start=start,
+                period_end=end,
+                total_lessons=0,
+                attended_lessons=0,
+                attendance_rate=0.0,
+                total_practice_minutes=0,
+                practice_streak_days=0,
+                practice_achievement_rate=0.0,
+                weekly_practice=[],
+                attendance_calendar=[],
+            )
+
+        # Lessons in the period.
+        lessons = (
+            await self.db.scalars(
+                select(Lesson).where(
+                    Lesson.student_id == student_id,
+                    Lesson.date >= _dt.datetime.combine(start, _dt.time.min),
+                    Lesson.date < _dt.datetime.combine(end + _dt.timedelta(days=1), _dt.time.min),
+                )
+            )
+        ).all()
+
+        total = len(lessons)
+        attended = sum(1 for l in lessons if l.status == LessonStatus.completed)
+        attendance_rate = attended / total if total > 0 else 0.0
+
+        attendance_calendar = [
+            AttendanceCalendarEntry(
+                date=l.date.date() if isinstance(l.date, datetime) else l.date,
+                status=l.status.value,
+            )
+            for l in lessons
+        ]
+
+        # Practice logs.
+        logs = (
+            await self.db.scalars(
+                select(PracticeLog).where(
+                    PracticeLog.student_id == student_id,
+                    PracticeLog.date >= start,
+                    PracticeLog.date <= end,
+                )
+            )
+        ).all()
+
+        total_minutes = sum(l.total_minutes for l in logs)
+        log_by_date = {l.date: l.total_minutes for l in logs}
+        weekly_practice = [
+            DailyPracticePoint(
+                date=start + _dt.timedelta(days=i),
+                minutes=log_by_date.get(start + _dt.timedelta(days=i), 0),
+            )
+            for i in range(period_days)
+        ]
+
+        # Streak: count consecutive days with > 0 practice ending at today.
+        streak = 0
+        check = end
+        while check >= start:
+            if log_by_date.get(check, 0) > 0:
+                streak += 1
+                check -= _dt.timedelta(days=1)
+            else:
+                break
+
+        # Achievement rate: fraction of days in period with any practice.
+        days_with_practice = sum(1 for m in log_by_date.values() if m > 0)
+        achievement_rate = days_with_practice / period_days
+
+        return StudentProgressResponse(
+            student_id=student_id,
+            student_name=student.name,
+            period_start=start,
+            period_end=end,
+            total_lessons=total,
+            attended_lessons=attended,
+            attendance_rate=attendance_rate,
+            total_practice_minutes=total_minutes,
+            practice_streak_days=streak,
+            practice_achievement_rate=achievement_rate,
+            weekly_practice=weekly_practice,
+            attendance_calendar=attendance_calendar,
+        )

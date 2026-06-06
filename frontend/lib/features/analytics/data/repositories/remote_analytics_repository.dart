@@ -24,15 +24,28 @@ class RemoteAnalyticsRepository implements AnalyticsRepository {
     String studentId, {
     required AnalyticsPeriod period,
   }) async {
+    final periodDays = switch (period) {
+      AnalyticsPeriod.oneMonth => 30,
+      AnalyticsPeriod.threeMonths => 90,
+      AnalyticsPeriod.sixMonths => 180,
+      AnalyticsPeriod.oneYear => 365,
+    };
+
+    final response = await _apiClient.get(
+      '/analytics/students/$studentId/progress',
+      queryParameters: {'period_days': periodDays},
+    );
+    final data = response.data as Map<String, dynamic>;
     return StudentProgressData(
       studentId: studentId,
-      studentName: '학생',
-      attendanceRate: 0,
-      attendedLessons: 0,
-      totalLessons: 0,
-      practiceAchievementRate: 0,
-      totalPracticeMinutes: 0,
-      practiceStreakDays: 0,
+      studentName: data['student_name'] as String? ?? '',
+      attendanceRate: ((data['attendance_rate'] as num?) ?? 0).toDouble(),
+      attendedLessons: (data['attended_lessons'] as int?) ?? 0,
+      totalLessons: (data['total_lessons'] as int?) ?? 0,
+      practiceAchievementRate:
+          ((data['practice_achievement_rate'] as num?) ?? 0).toDouble(),
+      totalPracticeMinutes: (data['total_practice_minutes'] as int?) ?? 0,
+      practiceStreakDays: (data['practice_streak_days'] as int?) ?? 0,
       weeklyPractice: const [],
       attendanceCalendar: const [],
       repertoire: const [],

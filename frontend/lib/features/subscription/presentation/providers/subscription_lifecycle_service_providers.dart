@@ -8,6 +8,7 @@ import '../../domain/services/auto_proposal_service.dart';
 import '../../domain/services/subscription_expiry_monitor.dart';
 import '../../domain/services/subscription_renewal_service.dart';
 import 'proposal_settings_providers.dart';
+import 'subscription_issue_flow_provider.dart';
 import 'subscription_proposal_providers.dart';
 import 'subscription_providers.dart';
 import 'subscription_template_providers.dart';
@@ -148,13 +149,24 @@ SubscriptionExpiryMonitor subscriptionExpiryMonitor(
         () => ref.read(expiringSoonSubscriptionsProvider.future),
     loadExpiredSubscriptions:
         () => ref.read(expiredSubscriptionsProvider.future),
-    triggerSubscriptionRenewal: (subscription) {
-      // TODO: resolve teacherId from membership/class relationship.
-      ref
+    triggerSubscriptionRenewal: (subscription) async {
+      // Resolve teacherId via membership → lessonClass chain.
+      // Falls back to empty string if the membership chain cannot be resolved
+      // (e.g. student removed from class), which skips the renewal proposal.
+      final teacherId = await ref
+          .read(subscriptionIssueFlowControllerProvider)
+          .teacherIdForMembership(
+            studentId: subscription.studentId,
+            membershipId: subscription.membershipId,
+          ) ?? '';
+
+      if (teacherId.isEmpty) return;
+
+      await ref
           .read(subscriptionRenewalServiceProvider)
           .triggerOnSubscriptionLow(
             subscription: subscription,
-            teacherId: '',
+            teacherId: teacherId,
             initiator: RenewalInitiator.system,
           );
     },
