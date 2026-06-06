@@ -150,8 +150,8 @@ class _ProfileVisibilityScreenState
     if (!_hasChanges) return true;
     final result = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text(AppStrings.cancelChangesTitle),
+      builder: (dialogContext) => NotebookAlertDialog(
+        title: AppStrings.cancelChangesTitle,
         content: const Text(AppStrings.exitChangesWithoutSavingConfirm),
         actions: [
           TextButton(

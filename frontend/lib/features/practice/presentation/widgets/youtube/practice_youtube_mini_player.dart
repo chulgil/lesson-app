@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../../core/widgets/notebook/notebook_glyph.dart';
 import 'practice_youtube_player.dart';
 
@@ -31,11 +32,9 @@ class PracticeYoutubeMiniPlayer extends StatelessWidget {
   });
 
   Future<void> _openFullscreen(BuildContext context) async {
-    await showModalBottomSheet<void>(
+    await showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       builder: (sheetContext) {
         final mediaQuery = MediaQuery.of(sheetContext);
         return SizedBox(

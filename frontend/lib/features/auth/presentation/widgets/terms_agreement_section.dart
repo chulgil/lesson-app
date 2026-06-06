@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 
@@ -215,11 +216,9 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
   }
 
   void _showTermsContent(BuildContext context, String title, String content) {
-    showModalBottomSheet<void>(
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(),
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.7,

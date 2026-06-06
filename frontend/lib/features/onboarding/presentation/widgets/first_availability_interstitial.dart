@@ -37,9 +37,8 @@ class FirstAvailabilityInterstitialDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: AppColors.paper,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(),
       insetPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space6,
         vertical: AppSpacing.space6,

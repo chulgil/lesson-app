@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/practice_facade.dart';
@@ -485,10 +486,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   }
 
   Future<_SectionLink?> _pickSection(List<_SectionLink> sections) {
-    return showModalBottomSheet<_SectionLink>(
+    return showNotebookModalBottomSheet<_SectionLink>(
       context: context,
-      backgroundColor: AppColors.paper,
-      shape: const RoundedRectangleBorder(),
       builder: (sheetContext) {
         return SafeArea(
           child: Column(

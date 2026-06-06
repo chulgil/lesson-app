@@ -292,13 +292,13 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Video canvas (black is intentional — media exception).
+        // Video canvas (ink backdrop — Notebook deep ink behind media).
         AspectRatio(
           aspectRatio: 16 / 9,
           child: Stack(
             children: [
               Container(
-                color: Colors.black,
+                color: AppColors.ink,
                 child: YoutubePlayer(controller: _controller!),
               ),
               // Memo overlay (#510) — only when count-in is not active.

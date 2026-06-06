@@ -5,6 +5,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../domain/entities/loop_bookmark.dart';
 import '../../../domain/entities/practice_loop_override.dart';
 import '../../extensions/audio_mix_visuals.dart';
@@ -77,9 +78,7 @@ class BookmarkManagerSheet extends StatelessWidget {
     await showDialog<void>(
       context: context,
       builder: (dialogCtx) {
-        return AlertDialog(
-          backgroundColor: AppColors.paper,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        return NotebookAlertDialog(
           content: TextField(
             controller: controller,
             autofocus: true,
@@ -124,11 +123,7 @@ class BookmarkManagerSheet extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
-          (ctx) => AlertDialog(
-            backgroundColor: AppColors.paper,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+          (ctx) => NotebookAlertDialog(
             content: const Text(
               AppStrings.bookmarkDeleteConfirm,
               style: AppTypography.bodyMedium,
