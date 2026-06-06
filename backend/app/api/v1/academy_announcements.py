@@ -108,8 +108,17 @@ async def list_academy_announcements(
         academy_id=academy_id,
         by_user_id=current_user.id,
     )
+    read_ids = await service.read_announcement_ids(
+        announcement_ids=[a.id for a in announcements],
+        user_id=current_user.id,
+    )
+    items: list[AcademyAnnouncementResponse] = []
+    for a in announcements:
+        resp = AcademyAnnouncementResponse.model_validate(a)
+        resp.read_by_me = str(a.id) in read_ids
+        items.append(resp)
     return AcademyAnnouncementListResponse(
-        announcements=[AcademyAnnouncementResponse.model_validate(a) for a in announcements],
+        announcements=items,
         total_count=total,
     )
 
@@ -130,7 +139,13 @@ async def get_academy_announcement(
         announcement_id=announcement_id,
         by_user_id=current_user.id,
     )
-    return AcademyAnnouncementResponse.model_validate(announcement)
+    read_ids = await service.read_announcement_ids(
+        announcement_ids=[announcement.id],
+        user_id=current_user.id,
+    )
+    resp = AcademyAnnouncementResponse.model_validate(announcement)
+    resp.read_by_me = str(announcement.id) in read_ids
+    return resp
 
 
 @router.post(

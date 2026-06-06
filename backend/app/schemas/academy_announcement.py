@@ -67,6 +67,9 @@ class AcademyAnnouncementResponse(BaseModel):
     target_count: int = 0
     delivered_count: int = 0
     read_count: int = 0
+    # Per-recipient read flag for the requesting user (recipient row read_at set).
+    # Defaults False; aggregate read_count stays separate for the owner view.
+    read_by_me: bool = False
     created_at: _dt.datetime
 
 

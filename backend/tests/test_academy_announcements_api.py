@@ -692,6 +692,54 @@ async def test_mark_read_sets_read_at_and_increments_count(
     assert detail.json()["read_count"] == 1
 
 
+async def test_read_by_me_reflects_recipient_read_state(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """member-recipient(owner=teacher 겸직) read_by_me: 읽기 전 false → 마킹 후 true.
+    per-announcement 격리: 읽지 않은 다른 공지는 false 유지."""
+    academy_id = await _seed_with_audience(db_session, client, create_test_user)
+    # audience="all" 이면 owner(teacher 겸직)도 수신자가 된다.
+    ann_id = await _create_draft(client, academy_id, audience="all")
+    await client.post(
+        f"/api/v1/academies/announcements/{ann_id}/send",
+        headers=_owner_headers(),
+    )
+
+    # 읽기 전 — read_by_me=false (상세)
+    before = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}", headers=_owner_headers()
+    )
+    assert before.json()["read_by_me"] is False
+
+    # 읽음 마킹
+    marked = await client.patch(
+        f"/api/v1/academies/announcements/{ann_id}/recipients/me/read",
+        headers=_owner_headers(),
+    )
+    assert marked.status_code == 200, marked.text
+
+    # 읽음 후 — read_by_me=true (상세 + 목록 양쪽)
+    after = await client.get(
+        f"/api/v1/academies/announcements/{ann_id}", headers=_owner_headers()
+    )
+    assert after.json()["read_by_me"] is True
+    listed = await client.get(
+        f"/api/v1/academies/{academy_id}/announcements", headers=_owner_headers()
+    )
+    target = next(a for a in listed.json()["announcements"] if a["id"] == ann_id)
+    assert target["read_by_me"] is True
+
+    # per-announcement 격리 — 읽지 않은 다른 공지는 false
+    other_id = await _create_draft(client, academy_id, audience="all", title="t2")
+    await client.post(
+        f"/api/v1/academies/announcements/{other_id}/send", headers=_owner_headers()
+    )
+    other = await client.get(
+        f"/api/v1/academies/announcements/{other_id}", headers=_owner_headers()
+    )
+    assert other.json()["read_by_me"] is False
+
+
 async def test_mark_read_idempotent(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
     academy_id = await _seed_with_audience(db_session, client, create_test_user)
     ann_id = await _create_draft(client, academy_id, audience="students")

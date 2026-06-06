@@ -94,6 +94,26 @@ class AcademyAnnouncementService:
         result = await self.db.scalars(stmt.order_by(AcademyAnnouncement.created_at.desc()))
         return list(result.all()), total
 
+    async def read_announcement_ids(
+        self,
+        *,
+        announcement_ids: list[str],
+        user_id: str,
+    ) -> set[str]:
+        """주어진 공지들 중 user 가 읽은(recipient.read_at 존재) 공지 id 집합."""
+        if not announcement_ids:
+            return set()
+
+        from app.models.academy_announcement import AcademyAnnouncementRecipient
+
+        stmt = select(AcademyAnnouncementRecipient.announcement_id).where(
+            AcademyAnnouncementRecipient.announcement_id.in_(announcement_ids),
+            AcademyAnnouncementRecipient.user_id == user_id,
+            AcademyAnnouncementRecipient.read_at.is_not(None),
+        )
+        rows = await self.db.scalars(stmt)
+        return {str(r) for r in rows.all()}
+
     async def get_announcement(
         self,
         *,
