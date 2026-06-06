@@ -496,7 +496,9 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: subscription.studentId,
+      actorId: _isTeacher
+          ? (_getTeacherId() ?? subscription.studentId)
+          : subscription.studentId,
       eventType: RequestEventType.scheduleChangeAccepted,
       suggestedSlots: event.suggestedSlots,
       selectedSlotIndex: slotIndex,
@@ -552,7 +554,9 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: subscription.studentId,
+      actorId: _isTeacher
+          ? (_getTeacherId() ?? subscription.studentId)
+          : subscription.studentId,
       eventType: RequestEventType.scheduleChangeCountered,
       suggestedSlots: suggestedSlots,
       message: result.message.isEmpty ? null : result.message,
@@ -666,7 +670,9 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: subscription.studentId,
+      actorId: _isTeacher
+          ? (_getTeacherId() ?? subscription.studentId)
+          : subscription.studentId,
       eventType: RequestEventType.scheduleChangeProposed,
       scheduleChangeType: changeType,
       suggestedSlots: suggestedSlots,
@@ -704,7 +710,9 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: ProposerRole.teacher,
-      actorId: subscription.studentId,
+      actorId: _isTeacher
+          ? (_getTeacherId() ?? subscription.studentId)
+          : subscription.studentId,
       eventType: RequestEventType.cancellationCreditRefunded,
       changeCreditUsed: 0,
       changeCreditRemainingAfter:

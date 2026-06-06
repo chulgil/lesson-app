@@ -418,6 +418,10 @@ class AmountInputSection extends StatelessWidget {
             if (value == null || value.isEmpty) {
               return AppStrings.issueFormAmountValidation;
             }
+            final parsed = int.tryParse(value.replaceAll(',', ''));
+            if (parsed == null || parsed <= 0) {
+              return AppStrings.issueFormAmountValidation;
+            }
             return null;
           },
         ),

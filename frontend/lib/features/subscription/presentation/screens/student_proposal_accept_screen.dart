@@ -328,6 +328,10 @@ class _StudentProposalAcceptScreenState
       // Notify payment (student selected and will pay)
       await notifier.notifyPayment(proposal.id);
 
+      // Invalidate so the proposal list reflects the new paymentNotified state
+      // without requiring a manual refresh.
+      ref.invalidate(subscriptionProposalProvider(proposal.id));
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

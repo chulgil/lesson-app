@@ -91,9 +91,14 @@ class AppBillingSnapshot {
       plan == BillingPlan.studio ||
       plan == BillingPlan.lifetime;
 
-  /// 활성 상태인지 (active 또는 trial).
+  /// 활성 상태인지 (active, trial, 또는 cancelled).
+  ///
+  /// cancelled는 다음 갱신을 차단하지만 현재 기간은 유지되므로
+  /// 기간 만료 전까지 active와 동일하게 취급한다.
   bool get isActiveOrTrial =>
-      status == BillingStatus.active || status == BillingStatus.trial;
+      status == BillingStatus.active ||
+      status == BillingStatus.trial ||
+      status == BillingStatus.cancelled;
 
   AppBillingSnapshot copyWith({
     String? id,

@@ -6,6 +6,7 @@ import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/remote_subscription_repository.dart';
+import 'payment_tracking_provider.dart';
 import '../../data/repositories/sync_aware_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
@@ -267,6 +268,10 @@ void invalidateSubscriptionListsForStudent(
     ref.invalidate(teacherStudentSubscriptionsProvider(teacherId));
     ref.invalidate(unpaidSubscriptionsProvider(teacherId));
   }
+  // Payment pending dashboard counts must also refresh so the teacher/student
+  // home badges reflect the new subscription state immediately.
+  ref.invalidate(paymentPendingListProvider);
+  ref.invalidate(paymentPendingCountProvider);
 }
 
 // ═══════════════════════════════════════════════════════════════════
