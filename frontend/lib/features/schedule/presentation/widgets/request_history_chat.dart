@@ -13,6 +13,7 @@ import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/request_event_visuals.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import 'proposal_chat_card.dart';
+import 'schedule_change_slot_bottom_sheet.dart';
 
 /// Chat-style history of all events in a lesson request.
 ///
@@ -81,7 +82,7 @@ class RequestHistoryChat extends StatelessWidget {
         vertical: AppSpacing.space4,
       ),
       itemCount: chronological.length + headerCount,
-      itemBuilder: (context, index) {
+      itemBuilder: (itemContext, index) {
         // First item: system guide message (only when showGuide is true)
         if (showGuide && index == 0) {
           return _buildSystemGuide();
@@ -114,7 +115,7 @@ class RequestHistoryChat extends StatelessWidget {
         return Column(
           children: [
             if (dateSeparator != null) dateSeparator,
-            _buildChatBubble(event, isMyMessage, isMessageOnly: isMessageOnly),
+            _buildChatBubble(itemContext, event, isMyMessage, isMessageOnly: isMessageOnly),
           ],
         );
       },
@@ -123,6 +124,7 @@ class RequestHistoryChat extends StatelessWidget {
 
   /// Chat bubble: left (opponent) or right (me)
   Widget _buildChatBubble(
+    BuildContext context,
     RequestEvent event,
     bool isMyMessage, {
     bool isMessageOnly = false,
@@ -209,6 +211,7 @@ class RequestHistoryChat extends StatelessWidget {
                     ),
                   ),
                   child: _buildBubbleContent(
+                    context,
                     event,
                     isMessageOnly: isMessageOnly,
                   ),
@@ -297,10 +300,14 @@ class RequestHistoryChat extends StatelessWidget {
   }
 
   /// Bubble inner content: status text + optional slots + optional message
-  Widget _buildBubbleContent(RequestEvent event, {bool isMessageOnly = false}) {
+  Widget _buildBubbleContent(
+    BuildContext context,
+    RequestEvent event, {
+    bool isMessageOnly = false,
+  }) {
     // §7.119 v2: 선생님 휴강/공지 이벤트는 전용 버블로 렌더링
     if (event.eventType == RequestEventType.lessonCancelledByTeacher) {
-      return _buildTeacherCancelContent(event);
+      return _buildTeacherCancelContent(context, event);
     }
     if (event.eventType == RequestEventType.teacherAnnouncement) {
       return _buildTeacherAnnouncementContent(event);
@@ -488,14 +495,15 @@ class RequestHistoryChat extends StatelessWidget {
                 color: AppColors.inkTertiary,
               ),
             ),
-            // TODO: CTA "보강 일정 요청하기" — pending reschedule navigation implementation
+            // CTA: makeup request — visible to students viewing teacher-cancel bubbles.
+
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTeacherCancelContent(RequestEvent event) {
+  Widget _buildTeacherCancelContent(BuildContext context, RequestEvent event) {
     final session = event.sessionNumber;
     final remaining = event.changeCreditRemainingAfter;
 
@@ -547,14 +555,35 @@ class RequestHistoryChat extends StatelessWidget {
               color: AppColors.inkTertiary,
             ),
           ),
-        // CTA: reschedule
-        const SizedBox(height: AppSpacing.space2),
-        Text(
-          AppStrings.bulkCancelRescheduleCta,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.paperAccent,
+        // CTA: makeup request (student-facing only — teacher already knows).
+        if (viewerRole == 'student' && request != null) ...[
+          const SizedBox(height: AppSpacing.space2),
+          GestureDetector(
+            onTap: () async {
+              if (!context.mounted) return;
+              await showScheduleChangeSlotBottomSheet(
+                context,
+                params: ScheduleChangeSlotParams(
+                  teacherId: request!.teacherId,
+                  studentId: request!.studentId,
+                  durationMinutes: request!.preferredDuration,
+                  currentScheduleLabel:
+                      request!.preferredSlots.isNotEmpty
+                          ? request!.preferredSlots.first.displayLabel
+                          : '-',
+                  isBulkChange: false,
+                ),
+              );
+            },
+            child: Text(
+              AppStrings.bulkCancelRescheduleCta,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+                decoration: TextDecoration.underline,
+              ),
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
