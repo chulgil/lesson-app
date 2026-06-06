@@ -16,6 +16,7 @@ import '../../../lessons/lessons_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/presentation/widgets/cancel_lesson_bottom_sheet.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../students/students_ui_facade.dart';
@@ -455,6 +456,8 @@ class _SubscriptionDetailBodyState
             onCancellationFreeProcess:
                 (event) => _handleCancellationFreeProcess(context, event),
             onCancellationAcknowledge: _handleCancellationAcknowledge,
+            onCancelLesson:
+                _isTeacher ? null : () => _handleCancelLesson(context),
           ),
         );
       },
@@ -736,6 +739,26 @@ class _SubscriptionDetailBodyState
     // No-op: cancellation is already confirmed. This just dismisses the bar.
     // The UI will transition back to default when the next event is checked.
     if (mounted) _showSuccess(AppStrings.cancellationAcknowledge);
+  }
+
+  /// Student: open cancel-lesson bottom sheet and record cancellation event.
+  Future<void> _handleCancelLesson(BuildContext context) async {
+    final reason = await showCancelLessonBottomSheet(context);
+    if (reason == null || !mounted) return;
+
+    final event = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: ProposerRole.student,
+      actorId: subscription.studentId,
+      eventType: RequestEventType.lessonCancelled,
+      message: reason,
+      sessionNumber: _selectedSession,
+      createdAt: DateTime.now(),
+    );
+
+    addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
+    if (mounted) _showSuccess(AppStrings.cancelRequestCompletedDeducted);
   }
 }
 
