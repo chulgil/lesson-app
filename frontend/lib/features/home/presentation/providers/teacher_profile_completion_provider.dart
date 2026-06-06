@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../onboarding/onboarding_facade.dart';
-import '../../../settings/presentation/providers/teacher_settings_provider.dart';
+import '../../../settings/settings_facade.dart';
 import 'assignment_summary_provider.dart';
 import 'home_lesson_summary_provider.dart';
 

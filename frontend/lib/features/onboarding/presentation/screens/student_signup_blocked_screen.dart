@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/auth_facade.dart';
 
 /// #430 G1 B1 — 학생 직접 가입 임시 안전망 화면.
 ///

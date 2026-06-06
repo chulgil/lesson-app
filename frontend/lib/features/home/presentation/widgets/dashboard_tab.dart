@@ -16,7 +16,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_loop_stats.dart';
-import '../../../practice/presentation/providers/practice_loop_stats_provider.dart';
+import '../../../practice/practice_facade.dart';
 import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';

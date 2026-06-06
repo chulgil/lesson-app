@@ -26,6 +26,8 @@ export 'presentation/providers/piece_crud_provider.dart'
         studentRepertoireNotifierProvider;
 export 'presentation/providers/practice_crud_provider.dart';
 export 'presentation/providers/practice_item_providers.dart';
+export 'presentation/providers/practice_loop_stats_provider.dart'
+    show practiceLoopStatsSummaryProvider;
 export 'presentation/providers/practice_note_provider.dart'
     show
         PracticeNoteCrud,

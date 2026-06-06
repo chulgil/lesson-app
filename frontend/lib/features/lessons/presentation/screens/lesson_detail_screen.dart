@@ -22,7 +22,7 @@ import '../../../subscription/presentation/extensions/subscription_visuals.dart'
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
 import '../../../auth/domain/entities/user_role.dart';
-import '../../../settings/presentation/widgets/show_app_rating_prompt_helper.dart';
+import '../../../settings/settings_facade.dart';
 
 /// Lesson detail screen with recording and notes
 class LessonDetailScreen extends ConsumerStatefulWidget {

@@ -13,7 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../providers/practice_reminder_provider.dart';
 import '../providers/student_home_profile_provider.dart';
 import '../widgets/language_select_sheet.dart';

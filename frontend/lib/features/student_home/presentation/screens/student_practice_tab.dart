@@ -12,9 +12,7 @@ import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/practice_facade.dart';
-import '../../../../features/practice/presentation/widgets/note/practice_note_card.dart';
-import '../../../../features/practice/presentation/widgets/notes/note_edit_dialog.dart';
-import '../../../../features/practice/presentation/widgets/youtube/section_video_affordance.dart';
+import '../../../../features/practice/practice_ui_facade.dart';
 import '../providers/student_home_session_provider.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 
