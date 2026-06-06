@@ -22,6 +22,7 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
+import '../extensions/cancel_reason_visuals.dart';
 import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
 import '../widgets/schedule_change_slot_bottom_sheet.dart';
@@ -1406,6 +1407,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
   ) async {
     // Show reason picker bottom sheet per lesson_cancellation_flow_spec §2.
+    // Phase 1 (pre-subscription) has no credit concept — record reason label only.
     final reason = await showCancelLessonBottomSheet(context);
     if (reason == null || !context.mounted) return;
 
@@ -1417,7 +1419,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student,
         request.teacherId,
         request.studentId,
-        reason: reason,
+        reason: reason.label,
       );
     } catch (e) {
       if (context.mounted) {

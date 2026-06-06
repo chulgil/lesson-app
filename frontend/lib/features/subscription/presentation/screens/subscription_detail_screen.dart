@@ -745,19 +745,75 @@ class _SubscriptionDetailBodyState
     final reason = await showCancelLessonBottomSheet(context);
     if (reason == null || !mounted) return;
 
+    // Credit policy (lesson_cancellation_flow_spec §2, §3.3, §7, §8.2).
+    final now = DateTime.now();
+    final lessonStart = _sessionStartTime() ?? now;
+    final outcome = const CancellationCreditPolicy().compute(
+      reason: reason,
+      lessonStart: lessonStart,
+      now: now,
+      deadlineHours: subscription.effectiveCancelDeadlineHours,
+      usedReschedule: subscription.usedRescheduleCount,
+      maxReschedule: subscription.effectiveRescheduleAllowance,
+    );
+
+    // §8.2: after-deadline student cancel with no credits left → block.
+    if (outcome.blocked) {
+      _showEventMessage(
+        AppStrings.rescheduleCreditsExhausted,
+        color: AppColors.paperAccent,
+        icon: Icons.error_outline,
+      );
+      return;
+    }
+
     final event = RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: ProposerRole.student,
       actorId: subscription.studentId,
       eventType: RequestEventType.lessonCancelled,
-      message: reason,
+      message: reason.label,
       sessionNumber: _selectedSession,
-      createdAt: DateTime.now(),
+      changeCreditUsed: outcome.creditUsed,
+      changeCreditRemainingAfter: outcome.remainingAfter,
+      keepsSessionNumber: true,
+      createdAt: now,
     );
 
     addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
-    if (mounted) _showSuccess(AppStrings.cancelRequestCompletedDeducted);
+    if (mounted) {
+      _showSuccess(
+        outcome.creditUsed > 0
+            ? AppStrings.cancelRequestCompletedDeducted
+            : AppStrings.cancelRequestCompletedFree,
+      );
+    }
+  }
+
+  /// Resolve the scheduled start datetime of the currently selected session,
+  /// combining the lesson's date + "HH:mm" startTime. Null when unknown.
+  DateTime? _sessionStartTime() {
+    final lessons =
+        ref.read(lessonsByStudentProvider(subscription.studentId)).valueOrNull;
+    if (lessons == null) return null;
+    final subLessons =
+        lessons.where((l) => l.subscriptionId == subscription.id).toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
+    final idx = _selectedSession - 1;
+    if (idx < 0 || idx >= subLessons.length) return null;
+    final lesson = subLessons[idx];
+    final parts = lesson.startTime.split(':');
+    if (parts.length != 2) return lesson.date;
+    final hour = int.tryParse(parts[0]) ?? 0;
+    final minute = int.tryParse(parts[1]) ?? 0;
+    return DateTime(
+      lesson.date.year,
+      lesson.date.month,
+      lesson.date.day,
+      hour,
+      minute,
+    );
   }
 }
 

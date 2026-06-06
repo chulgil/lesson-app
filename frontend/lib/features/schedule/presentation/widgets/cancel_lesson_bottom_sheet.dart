@@ -10,11 +10,13 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../domain/entities/cancel_reason.dart';
+import '../extensions/cancel_reason_visuals.dart';
 
 /// Shows a bottom sheet to select a cancellation reason before confirming.
-/// Returns the selected reason string, or null if the user dismissed.
-Future<String?> showCancelLessonBottomSheet(BuildContext context) {
-  return showNotebookBottomSheet<String>(
+/// Returns the selected [CancelReason], or null if the user dismissed.
+Future<CancelReason?> showCancelLessonBottomSheet(BuildContext context) {
+  return showNotebookBottomSheet<CancelReason>(
     context: context,
     isScrollControlled: true,
     padding: EdgeInsets.zero,
@@ -32,14 +34,9 @@ class _CancelLessonBottomSheet extends StatefulWidget {
 }
 
 class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
-  String? _selected;
+  CancelReason? _selected;
 
-  static const _reasons = [
-    AppStrings.cancelReasonStudentSchedule,
-    AppStrings.cancelReasonStudentSick,
-    AppStrings.cancelReasonTeacher,
-    AppStrings.cancelReasonMutual,
-  ];
+  static const _reasons = CancelReason.values;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +76,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
             const SizedBox(height: AppSpacing.space3),
             for (final reason in _reasons) ...[
               _ReasonTile(
-                label: reason,
+                label: reason.label,
                 isSelected: _selected == reason,
                 onTap: () => setState(() => _selected = reason),
               ),

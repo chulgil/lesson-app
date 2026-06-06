@@ -1288,6 +1288,9 @@ class AppStrings {
   /// 취소 요청 완료 (레슨 횟수 1회 차감)
   static const cancelRequestCompletedDeducted = '취소 요청 완료 (레슨 횟수 1회 차감)';
 
+  /// 취소 요청 완료 (마감 전 · 변경/취소권 미사용)
+  static const cancelRequestCompletedFree = '취소 완료 · 마감 시간 전 취소로 변경/취소권 미사용';
+
   /// 취소 요청 완료 (횟수 유지)
   static const cancelRequestCompletedKept = '취소 요청 완료 (횟수 유지)';
 

@@ -329,7 +329,10 @@ lesson.subscriptionId == null (레거시 데이터)
 | 백엔드 자동 수강권 생성 (`lesson_service.create()`) | ✅ 구현 |
 | 보너스 레슨 (남은 횟수 0 → total_lessons/bonus_count 증가) | ✅ 구현 |
 | `cancel_lesson_bottom_sheet.dart` (취소 사유 UI) | ✅ 구현 완료 (PR #564) |
-| `update_status()` 가드 (수강권 레슨 직접 취소 차단) | ❌ 미구현 (2단계) |
+| `CancelReason` enum + 사유별 크레딧 정책 (`CancellationCreditPolicy`) | ✅ 구현 완료 (#578) |
+| 마감 전/후 크레딧 계산 + §8.2 차단 가드 (FE) | ✅ 구현 완료 (#578) |
+| `update_status()` 가드 (수강권 레슨 직접 취소 차단, BE) | ❌ 미구현 (2단계) |
+| BE 권위 크레딧 차감 (마감/사유 반영) | ❌ 미구현 — FE 정책이 표시·UX 담당, BE `use_reschedule`는 단순 차감만 |
 | 레거시 데이터 마이그레이션 | ❌ 미구현 (4단계) |
 
 ## 10. 일정 변경 스펙과의 관계
