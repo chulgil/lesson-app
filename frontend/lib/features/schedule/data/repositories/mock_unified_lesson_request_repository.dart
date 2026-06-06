@@ -445,7 +445,9 @@ class MockUnifiedLessonRequestRepository
         actorId: 'student_5',
         eventType: RequestEventType.cancel,
         message: '일정이 변경되어 취소합니다',
-        createdAt: today.subtract(const Duration(hours: 2)),
+        // Must be deterministically after the initialRequest (now - 1 day);
+        // `today - 2h` flipped event ordering when wall-clock was past 22:00.
+        createdAt: now.subtract(const Duration(hours: 2)),
       ),
     ]);
 
