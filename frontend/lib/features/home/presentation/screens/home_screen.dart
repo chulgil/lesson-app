@@ -116,8 +116,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _wasCoachMarkActive = _coachMarkController.isActive;
   }
 
+  // Subscription used to wait for the onboarding-progress storage (Hive) to
+  // finish loading before deciding whether to start the coach mark. On the
+  // first frame the provider is still AsyncLoading, so valueOrNull is null and
+  // a single sync read would skip the coach mark entirely. (#7)
+  ProviderSubscription<AsyncValue<OnboardingProgressStorageState>>?
+  _coachMarkLoadSub;
+
   void _maybeStartCoachMark() {
-    final storage = ref.read(onboardingProgressStorageProvider).valueOrNull;
+    final storageAsync = ref.read(onboardingProgressStorageProvider);
+    if (!storageAsync.hasValue) {
+      // Storage not loaded yet — re-check once a value arrives, then clean up.
+      _coachMarkLoadSub?.close();
+      _coachMarkLoadSub = ref.listenManual(onboardingProgressStorageProvider, (
+        previous,
+        next,
+      ) {
+        if (next.hasValue && mounted) {
+          _coachMarkLoadSub?.close();
+          _coachMarkLoadSub = null;
+          _maybeStartCoachMark();
+        }
+      });
+      return;
+    }
+    final storage = storageAsync.valueOrNull;
     if (storage != null && !storage.coachMarkCompleted) {
       _coachMarkController.start();
     }
@@ -126,6 +149,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void dispose() {
     _settingsLoadSub?.close();
+    _coachMarkLoadSub?.close();
     _coachMarkController.removeListener(_onCoachMarkChanged);
     _coachMarkController.dispose();
     super.dispose();

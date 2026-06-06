@@ -148,8 +148,10 @@ class RemoteTeacherStudentRelationRepository
     required String studentId,
     required String subscriptionId,
   }) async {
+    final relation = await getRelation(teacherId, studentId);
+    if (relation == null) throw Exception('Relation not found');
     final response = await _apiClient.patch(
-      '/relationships/$teacherId/status',
+      '/relationships/${relation.id}/status',
       data: {'status': 'active', 'subscription_id': subscriptionId},
     );
     return TeacherStudentRelation.fromJson(

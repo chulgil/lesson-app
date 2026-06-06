@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -322,6 +323,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
     try {
       final code = _code;
       final invite = await ref.read(inviteByCodeProvider(code).future);
+      if (!mounted) return;
 
       if (invite == null) {
         setState(() {
@@ -340,11 +342,16 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
         return;
       }
 
-      if (mounted) {
-        // Navigate to confirmation screen
-        context.push(AppRoutes.inviteConfirm, extra: invite);
-      }
+      // Navigate to confirmation screen
+      context.push(AppRoutes.inviteConfirm, extra: invite);
+    } on NotFoundException {
+      // Backend returns 404 for unknown/revoked codes (never null).
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = AppStrings.inviteCodeNotFound;
+      });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = AppStrings.inviteCodeLookupError;
       });

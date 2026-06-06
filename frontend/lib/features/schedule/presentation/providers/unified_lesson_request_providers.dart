@@ -1015,6 +1015,7 @@ class UnifiedLessonRequestActions {
     ref.invalidate(pendingUnifiedRequestCountProvider(teacherId));
     ref.invalidate(studentUnifiedRequestsProvider(studentId));
     ref.invalidate(todayRequestsProvider(teacherId));
+    ref.invalidate(studentTodayRequestsProvider(studentId));
     if (requestId != null) {
       ref.invalidate(requestEventsProvider(requestId));
       ref.invalidate(unifiedRequestByIdProvider(requestId));

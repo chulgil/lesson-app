@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -262,12 +263,15 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
 
       if (parsed != null) {
         if (parsed.type == _QrType.academy) {
-          // Navigate to academy detail screen
+          // Stop scanning before navigating so the live camera does not
+          // re-detect and push the same route repeatedly.
+          await _scannerController.stop();
           if (mounted) {
-            context.push(
+            await context.push(
               AppRoutes.academyDetail.replaceFirst(':id', parsed.value),
             );
           }
+          if (mounted) await _scannerController.start();
         } else if (parsed.type == _QrType.invite) {
           // Look up the invite
           final invite = await ref.read(
@@ -275,10 +279,12 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
           );
 
           if (invite != null && invite.isValid) {
+            // Stop scanning before navigating (see academy branch).
+            await _scannerController.stop();
             if (mounted) {
-              // Navigate to confirmation screen
-              context.push(AppRoutes.inviteConfirm, extra: invite);
+              await context.push(AppRoutes.inviteConfirm, extra: invite);
             }
+            if (mounted) await _scannerController.start();
           } else {
             _showError(AppStrings.inviteCodeInvalid);
           }
@@ -286,6 +292,9 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
       } else {
         _showError(AppStrings.inviteScanInvalidQr);
       }
+    } on NotFoundException {
+      // Backend returns 404 for unknown/revoked codes (never null).
+      _showError(AppStrings.inviteCodeInvalid);
     } catch (e) {
       _showError(AppStrings.inviteScanProcessingError);
     } finally {

@@ -459,7 +459,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             _handleViewSubscription(context, events);
           },
         ),
-      if (!isTerminal)
+      // Only offer cancel when the state machine actually allows it.
+      // subscriptionIssued/inProgress are non-terminal but not cancellable
+      // via this flow, so guard on canTransitionTo (SSOT) not !isTerminal.
+      if (request.canTransitionTo(UnifiedRequestStatus.cancelled))
         (
           Icons.cancel_outlined,
           AppStrings.cancelRequestAction,
