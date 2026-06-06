@@ -10,7 +10,9 @@ void main() {
         ).readAsStringSync();
 
     expect(source, contains('createLocalFallbackRepository'));
-    expect(source, contains('_EmptyNoteAccessRepository'));
+    // EmptyNoteAccessRepository moved to data/repositories (layer boundary
+    // contract); provider now imports it instead of an inline private class.
+    expect(source, contains('EmptyNoteAccessRepository'));
     expect(source, isNot(contains('remote:')));
   });
 
