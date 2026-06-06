@@ -103,6 +103,9 @@ class AppStrings {
   /// 수락 처리 중 오류
   static const acceptError = '수락 처리 중 오류가 발생했습니다';
 
+  /// 취소 처리 중 오류
+  static const cancelError = '취소 처리 중 오류가 발생했습니다';
+
   /// 역제안 전송 중 오류
   static const counterProposeError = '역제안 전송 중 오류가 발생했습니다';
 
