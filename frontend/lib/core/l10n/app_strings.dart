@@ -6021,6 +6021,7 @@ class AppStrings {
   // ── Onboarding ──
   static const onboardingRoleSelect = '역할 선택';
   static const onboardingPhoneVerification = '휴대폰 인증';
+  static const onboardingContinueWithQuest = '퀘스트 보드에서 계속';
   static const onboardingProfileSetup = '프로필 설정';
   static const onboardingTutorial = '튜토리얼';
   static const onboardingCompleted = '완료';

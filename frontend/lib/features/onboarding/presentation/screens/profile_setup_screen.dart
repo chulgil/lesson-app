@@ -356,7 +356,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         _ProgressDivider(isActive: false),
         _ProgressStep(
           step: 2,
-          label: AppStrings.onboardingPhoneVerification,
+          label: AppStrings.onboardingContinueWithQuest,
           isActive: false,
         ),
       ],

@@ -204,7 +204,7 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
     final onboardingProfile = onboardingState.profile!;
     final profile = TeacherProfile(
       id: 'profile_${DateTime.now().millisecondsSinceEpoch}',
-      userId: onboardingState.userId!,
+      userId: onboardingState.userId ?? (throw Exception('userId is required for onboarding')),
       name: onboardingProfile.name,
       profileImage: onboardingProfile.profileImage,
       instruments: onboardingProfile.instruments,
