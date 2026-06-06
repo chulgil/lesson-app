@@ -6449,6 +6449,20 @@ class AppStrings {
   static const parentHomeInProgress = '진행중';
   static const parentHomeChildAddTitle = '자녀 추가';
   static const parentHomeChildEditTitle = '자녀 정보 수정';
+  // ── Parent Dashboard / Assignments (실데이터) ──────────────
+  static const parentHomeNotLinked = '선생님과 연결되지 않았습니다';
+  static const parentHomeNotLinkedDesc = '선생님 연결 후 레슨·연습 정보가 표시됩니다';
+  static const parentHomeNoUpcomingLesson = '예정된 레슨이 없습니다';
+  static const parentHomeNoAssignment = '등록된 과제가 없습니다';
+  static const parentHomeRemainingLesson = '수강권 잔여';
+  static const parentHomeThisWeekPractice = '이번 주 연습';
+  static const parentHomeIncompleteAssignment = '미완료 과제';
+  static const parentHomeCompletedAssignment = '완료된 과제';
+  static const parentHomeWeeklyAssignment = '이번 주 과제';
+  static const parentHomePriorityMust = '필수';
+  static const parentHomePriorityShould = '권장';
+  static const parentHomePriorityCould = '선택';
+  static const parentHomeCompletedLabel = '완료됨';
 
   // ── Schedule (추가) ───────────────────────────────────────
 
