@@ -43,10 +43,8 @@ class GoalAchievedDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: AppColors.paper,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        side: BorderSide(color: AppColors.inkQuaternary),
-      ),
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space5),
         child: Column(

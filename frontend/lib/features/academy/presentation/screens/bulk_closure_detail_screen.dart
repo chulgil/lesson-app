@@ -134,7 +134,15 @@ class _BulkClosureDetailScreenState
     final path = AppRoutes.academyMakeupInput
         .replaceAll(':academyId', closure.academyId)
         .replaceAll(':closureId', closure.id);
-    context.push(path, extra: closure);
+    // closure 와 teacherMemberId 를 함께 전달한다. 실제 저장(BulkClosureNotifier)
+    // 은 router 빌더가 ProviderScope 를 통해 수행한다.
+    context.push(
+      path,
+      extra: MakeupRouteExtra(
+        closure: closure,
+        teacherMemberId: widget.teacherMemberId,
+      ),
+    );
   }
 }
 

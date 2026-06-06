@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_vacation_repository.dart';
 import '../../data/repositories/remote_vacation_repository.dart';
 import '../../domain/entities/vacation_period.dart';
 import '../../domain/repositories/vacation_repository.dart';
+
+part 'vacation_providers.g.dart';
 
 /// Repository provider — switches between Mock and Remote (#431).
 ///
@@ -87,10 +90,13 @@ class VacationFormState {
   }
 }
 
-class VacationFormNotifier extends StateNotifier<VacationFormState> {
-  VacationFormNotifier(this._repository) : super(const VacationFormState());
+@riverpod
+class VacationForm extends _$VacationForm {
+  @override
+  VacationFormState build() => const VacationFormState();
 
-  final VacationRepository _repository;
+  VacationRepository get _repository =>
+      ref.read(vacationRepositoryProvider);
 
   void setStartDate(DateTime date) {
     state = state.copyWith(
@@ -163,13 +169,6 @@ class VacationFormNotifier extends StateNotifier<VacationFormState> {
     }
   }
 }
-
-final vacationFormProvider =
-    StateNotifierProvider.autoDispose<VacationFormNotifier, VacationFormState>((
-      ref,
-    ) {
-      return VacationFormNotifier(ref.watch(vacationRepositoryProvider));
-    });
 
 // ──────────────────────────────────────────────────────────────
 // Vacation list + Recovery (spec §7 + §9.1) — H-001 FE Phase 3.

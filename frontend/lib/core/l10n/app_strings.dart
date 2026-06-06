@@ -1730,6 +1730,9 @@ class AppStrings {
   /// 드롭인 클래스 (배지)
   static const groupClassDropin = '드롭인 클래스';
 
+  /// 그룹 클래스 정보를 불러올 수 없습니다 (route extra 누락 placeholder)
+  static const groupClassInfoUnavailable = '그룹 클래스 정보를 불러올 수 없습니다.';
+
   /// 오류가 발생했습니다. 다시 시도해주세요.
   static const errorTryAgain = '오류가 발생했습니다. 다시 시도해주세요.';
 
@@ -6103,6 +6106,11 @@ class AppStrings {
       '이 백업을 삭제하시겠습니까?\n삭제된 백업은 복구할 수 없습니다.';
   static const settingsRecordingFiles = '녹음 파일';
   static const settingsTotalSize = '전체 용량';
+
+  // ── Practice Overview (집계 준비 중 placeholder) ──
+  static const studentPracticeOverviewPreparingTitle = '연습 통계 준비 중';
+  static const studentPracticeOverviewPreparingSubtitle =
+      '학생의 연습 기록 집계 기능을 준비하고 있어요.';
 
   // ── Gamification ──
   static const gamificationContinue = '계속하기';

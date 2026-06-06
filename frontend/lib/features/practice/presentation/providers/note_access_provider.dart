@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../data/repositories/empty_note_access_repository.dart';
 import '../../data/repositories/mock_note_access_repository.dart';
 import '../../domain/entities/note_access_request.dart';
 import '../../domain/repositories/note_access_repository.dart';
@@ -13,34 +14,8 @@ NoteAccessRepository noteAccessRepository(NoteAccessRepositoryRef ref) {
   return createLocalFallbackRepository<NoteAccessRepository>(
     ref: ref,
     mock: () => MockNoteAccessRepository(),
-    fallback: () => _EmptyNoteAccessRepository(),
+    fallback: () => EmptyNoteAccessRepository(),
   );
-}
-
-class _EmptyNoteAccessRepository implements NoteAccessRepository {
-  @override
-  Future<NoteAccessRequest?> getActiveAccess() async => null;
-
-  @override
-  Future<List<NoteAccessRequest>> getAllRequests() async => const [];
-
-  @override
-  Future<NoteAccessRequest?> getRequest(String requestId) async => null;
-
-  @override
-  Future<NoteAccessRequest> consentAccess(String requestId) async {
-    throw UnsupportedError('Note access API is not available in remote mode.');
-  }
-
-  @override
-  Future<NoteAccessRequest> rejectAccess(String requestId) async {
-    throw UnsupportedError('Note access API is not available in remote mode.');
-  }
-
-  @override
-  Future<NoteAccessRequest> revokeAccess(String requestId) async {
-    throw UnsupportedError('Note access API is not available in remote mode.');
-  }
 }
 
 /// Get the current active note access (banner display)

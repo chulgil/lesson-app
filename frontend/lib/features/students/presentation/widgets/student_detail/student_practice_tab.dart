@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_utils.dart';
+import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../auth/auth_facade.dart';
 import '../../../../practice/practice_facade.dart';
 import '../../../../practice/practice_ui_facade.dart';
@@ -32,8 +33,17 @@ class StudentPracticeTab extends ConsumerWidget {
               ),
             ),
           ),
-      data:
-          (overview) => ListView(
+      data: (overview) {
+        // Remote aggregation not yet available → empty overview. Show a
+        // "준비 중" placeholder instead of misleading zero-progress cards.
+        if (overview.weeklyEntries.isEmpty) {
+          return const EmptyStateWidget(
+            icon: Icons.insights_outlined,
+            title: AppStrings.studentPracticeOverviewPreparingTitle,
+            subtitle: AppStrings.studentPracticeOverviewPreparingSubtitle,
+          );
+        }
+        return ListView(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             children: [
               _WeeklySummaryCard(overview: overview),
@@ -50,7 +60,8 @@ class StudentPracticeTab extends ConsumerWidget {
               _DetailStatsButton(studentId: studentId),
               const SizedBox(height: AppSpacing.space8),
             ],
-          ),
+        );
+      },
     );
   }
 }

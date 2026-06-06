@@ -2,6 +2,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../domain/entities/metronome_settings.dart';
 import '../../domain/entities/piece.dart';
 import '../../domain/entities/practice_item.dart';
+import '../../domain/entities/practice_loop_stats.dart';
 import '../../domain/entities/practice_streak.dart';
 import '../../domain/entities/recording.dart';
 import '../../domain/entities/repertoire_timeline.dart';
@@ -177,6 +178,19 @@ extension StorageStatusDisplay on StorageStatus {
 
 extension MonthGroupDisplay on MonthGroup {
   String get label => '$year년 $month월';
+}
+
+extension PracticeLoopStatsDisplay on PracticeLoopStats {
+  /// Display label that combines piece + section names with sensible fallback.
+  String get displayLabel {
+    if (pieceName != null && pieceName!.isNotEmpty) {
+      if (sectionName != null && sectionName!.isNotEmpty) {
+        return '$pieceName · $sectionName';
+      }
+      return pieceName!;
+    }
+    return sectionName ?? sectionId;
+  }
 }
 
 extension ClefTypeDisplay on ClefType {

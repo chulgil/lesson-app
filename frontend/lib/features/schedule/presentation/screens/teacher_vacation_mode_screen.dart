@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../domain/entities/vacation_period.dart';
 import '../providers/vacation_providers.dart';
@@ -380,63 +381,46 @@ Future<void> _openPerStudentSheet(
   required String studentLabel,
 }) async {
   final current = ref.read(vacationFormProvider).perStudentOverrides[studentId];
-  final selected = await showModalBottomSheet<VacationDisposition?>(
+  final selected = await showNotebookBottomSheet<VacationDisposition?>(
     context: context,
-    backgroundColor: AppColors.paper,
-    showDragHandle: true,
     builder: (sheetCtx) {
-      return SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.space4,
-            0,
-            AppSpacing.space4,
-            AppSpacing.space4,
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.vacationPerStudentSheetTitle,
+            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.vacationPerStudentSheetTitle,
-                style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.ink,
-                ),
-              ),
-              SizedBox(height: AppSpacing.space1),
-              Text(
-                studentLabel,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-              SizedBox(height: AppSpacing.space3),
-              for (final option in VacationDisposition.values)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(_dispositionLabel(option)),
-                  trailing:
-                      current == option
-                          ? const Icon(
-                            Icons.check,
-                            color: AppColors.paperAccent,
-                          )
-                          : null,
-                  onTap: () => Navigator.pop(sheetCtx, option),
-                ),
-              const Divider(height: 1),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text(AppStrings.vacationPerStudentUseDefault),
-                trailing:
-                    current == null
-                        ? const Icon(Icons.check, color: AppColors.paperAccent)
-                        : null,
-                onTap: () => Navigator.pop(sheetCtx, null),
-              ),
-            ],
+          SizedBox(height: AppSpacing.space1),
+          Text(
+            studentLabel,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
-        ),
+          SizedBox(height: AppSpacing.space3),
+          for (final option in VacationDisposition.values)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(_dispositionLabel(option)),
+              trailing:
+                  current == option
+                      ? const Icon(Icons.check, color: AppColors.paperAccent)
+                      : null,
+              onTap: () => Navigator.pop(sheetCtx, option),
+            ),
+          const Divider(height: 1),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text(AppStrings.vacationPerStudentUseDefault),
+            trailing:
+                current == null
+                    ? const Icon(Icons.check, color: AppColors.paperAccent)
+                    : null,
+            onTap: () => Navigator.pop(sheetCtx, null),
+          ),
+        ],
       );
     },
   );

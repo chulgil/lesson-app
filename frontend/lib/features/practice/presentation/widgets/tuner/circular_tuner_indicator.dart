@@ -52,7 +52,8 @@ class CircularTunerIndicator extends ConsumerWidget {
             painter: _CircleBackgroundPainter(),
           ),
 
-          // Note labels around the circle (tappable for future sound playback)
+          // Note labels around the circle (static — sound playback not yet
+          // implemented, so no tap affordance is exposed)
           for (var i = 0; i < NoteName.values.length; i++)
             _NoteLabel(
               key: ValueKey('note_${i}_$size'), // Force rebuild on size change
@@ -61,9 +62,6 @@ class CircularTunerIndicator extends ConsumerWidget {
               totalNotes: NoteName.values.length,
               circleSize: size,
               enharmonicMode: settings.enharmonicMode,
-              onTap: () {
-                // TODO: Play note sound when tapped
-              },
             ),
 
           // Fish indicator (follows around the circle)
@@ -98,7 +96,7 @@ class _CircleBackgroundPainter extends CustomPainter {
 }
 
 /// Individual note label widget.
-class _NoteLabel extends ConsumerStatefulWidget {
+class _NoteLabel extends ConsumerWidget {
   const _NoteLabel({
     super.key,
     required this.note,
@@ -106,7 +104,6 @@ class _NoteLabel extends ConsumerStatefulWidget {
     required this.totalNotes,
     required this.circleSize,
     required this.enharmonicMode,
-    this.onTap,
   });
 
   final NoteName note;
@@ -114,27 +111,17 @@ class _NoteLabel extends ConsumerStatefulWidget {
   final int totalNotes;
   final double circleSize;
   final EnharmonicMode enharmonicMode;
-  final VoidCallback? onTap;
 
   @override
-  ConsumerState<_NoteLabel> createState() => _NoteLabelState();
-}
-
-class _NoteLabelState extends ConsumerState<_NoteLabel> {
-  bool _isTapped = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Watch tuner state for perfect highlight
     final tunerState = ref.watch(tunerProvider);
     final displayNote = ref.watch(currentDisplayNoteProvider);
-    final isPerfectMatch =
-        tunerState.isPerfect && displayNote?.name == widget.note;
+    final isPerfectMatch = tunerState.isPerfect && displayNote?.name == note;
     // Calculate position on circle
     // Start from top (12 o'clock = C) and go clockwise
-    final angle =
-        (2 * math.pi * widget.index / widget.totalNotes) - (math.pi / 2);
-    final radius = widget.circleSize / 2 - 25; // Position inside the circle
+    final angle = (2 * math.pi * index / totalNotes) - (math.pi / 2);
+    final radius = circleSize / 2 - 25; // Position inside the circle
 
     final x = radius * math.cos(angle);
     final y = radius * math.sin(angle);
@@ -144,33 +131,21 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
 
     // Determine colors
     final baseColor =
-        widget.note.isAccidental
+        note.isAccidental
             ? AppColors.tunerAccidentalNote
             : AppColors.tunerNaturalNote;
-    final activeColor =
-        widget.note.isAccidental
-            ? AppColors.tunerAccidentalNoteActive
-            : AppColors.tunerNaturalNoteActive;
 
     // Scale sizes based on circle size (base size 280), increased by 1.2x
-    final scale = widget.circleSize / 280.0;
+    final scale = circleSize / 280.0;
     final normalFontSize = 14.4 * scale; // 12 * 1.2
-    final tappedFontSize = 16.8 * scale; // 14 * 1.2
     final horizontalPadding = 10.8 * scale; // 9 * 1.2
     final verticalPadding = 6.0 * scale; // 5 * 1.2
-
-    // Only change style when tapped, not on pitch match
-    final isEnlarged = _isTapped;
 
     // Color logic: highlight on perfect pitch match (instant, no animation)
     Color backgroundColor;
     Color textColor;
 
-    if (_isTapped) {
-      // Tapped: darker color (no border)
-      backgroundColor = activeColor;
-      textColor = AppColors.paper;
-    } else if (isPerfectMatch) {
+    if (isPerfectMatch) {
       // Perfect pitch match: instant bright highlight
       backgroundColor = AppColors.tunerCentPerfect.withValues(alpha: 0.7);
       textColor = AppColors.paperOk;
@@ -182,26 +157,18 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
 
     return Transform.translate(
       offset: Offset(x, y),
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _isTapped = true),
-        onTapUp: (_) {
-          setState(() => _isTapped = false);
-          widget.onTap?.call();
-        },
-        onTapCancel: () => setState(() => _isTapped = false),
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: verticalPadding,
-          ),
-          decoration: BoxDecoration(color: backgroundColor),
-          child: Text(
-            displayText,
-            style: TextStyle(
-              fontSize: isEnlarged ? tappedFontSize : normalFontSize,
-              fontWeight: isEnlarged ? FontWeight.bold : FontWeight.normal,
-              color: textColor,
-            ),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: verticalPadding,
+        ),
+        decoration: BoxDecoration(color: backgroundColor),
+        child: Text(
+          displayText,
+          style: TextStyle(
+            fontSize: normalFontSize,
+            fontWeight: FontWeight.normal,
+            color: textColor,
           ),
         ),
       ),
@@ -209,15 +176,13 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
   }
 
   String _getDisplayText() {
-    switch (widget.enharmonicMode) {
+    switch (enharmonicMode) {
       case EnharmonicMode.sharpOnly:
-        return widget.note.sharpName;
+        return note.sharpName;
       case EnharmonicMode.flatOnly:
-        return widget.note.flatName;
+        return note.flatName;
       case EnharmonicMode.both:
-        return widget.note.isAccidental
-            ? widget.note.enharmonicName
-            : widget.note.sharpName;
+        return note.isAccidental ? note.enharmonicName : note.sharpName;
     }
   }
 }

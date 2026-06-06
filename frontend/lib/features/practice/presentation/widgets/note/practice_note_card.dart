@@ -8,6 +8,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../../core/widgets/swipe_action_tile.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/practice_note_provider.dart';
@@ -218,10 +219,8 @@ class PracticeNoteCard extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.paper,
-          shape: const RoundedRectangleBorder(),
-          title: const Text(AppStrings.practiceNoteDeleteTitle),
+        return NotebookAlertDialog(
+          title: AppStrings.practiceNoteDeleteTitle,
           content: const Text(AppStrings.practiceNoteDeleteConfirm),
           actions: [
             TextButton(

@@ -12,6 +12,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../providers/backup_provider.dart';
 
 /// Modal progress UI driven by [backupControllerProvider].
@@ -28,9 +29,9 @@ class BackupProgressDialog extends ConsumerWidget {
 
     return PopScope(
       canPop: !progress.isRunning,
-      child: AlertDialog(
-        backgroundColor: AppColors.paper,
-        title: Text(title, style: AppTypography.headingSmall),
+      child: NotebookAlertDialog(
+        titleWidget: Text(title, style: AppTypography.headingSmall),
+        actions: const [],
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

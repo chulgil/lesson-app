@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_note.dart';
+import 'package:lessonaza/features/practice/domain/entities/practice_progress.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_repertoire.dart';
+import 'package:lessonaza/features/practice/presentation/providers/practice_goal_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/practice_note_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import 'package:lessonaza/features/student_home/presentation/screens/student_practice_tab.dart';
@@ -40,6 +42,28 @@ void main() {
       );
     }
 
+    // #492: goalStatusProvider transitively watches MockPracticeGoalRepository,
+    // whose Future.delayed (~850ms) chain leaks a Timer past widget disposal.
+    // Override with an immediately-resolved GoalStatus (no goal set) so the tab
+    // renders without scheduling mock timers.
+    GoalStatus fakeGoalStatus() {
+      final now = DateTime.now();
+      return GoalStatus(
+        goal: null,
+        todayProgress: DailyPracticeProgress(
+          date: now,
+          practiceTimeSeconds: 0,
+          completedSectionCount: 0,
+        ),
+        weeklyProgress: WeeklyPracticeProgress(
+          weekStart: now,
+          totalTimeSeconds: 0,
+          practiceDayCount: 0,
+          dailyProgress: const [],
+        ),
+      );
+    }
+
     testWidgets('renders without exceptions when repertoire has sections', (
       tester,
     ) async {
@@ -54,6 +78,7 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('student-1'),
+            goalStatusProvider('student-1').overrideWith((_) async => fakeGoalStatus()),
             studentRepertoiresProvider(
               'student-1',
             ).overrideWith((_) async => [repertoire]),
@@ -87,6 +112,7 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('student-1'),
+            goalStatusProvider('student-1').overrideWith((_) async => fakeGoalStatus()),
             studentRepertoiresProvider(
               'student-1',
             ).overrideWith((_) async => const <PracticeRepertoire>[]),
@@ -127,6 +153,7 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('student-1'),
+            goalStatusProvider('student-1').overrideWith((_) async => fakeGoalStatus()),
             studentRepertoiresProvider(
               'student-1',
             ).overrideWith((_) async => [repertoire]),

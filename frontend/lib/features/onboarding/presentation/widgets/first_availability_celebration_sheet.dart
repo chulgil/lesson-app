@@ -4,22 +4,19 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 
 /// Shows the celebration sheet after the first availability slot is saved
 /// (#422). Per spec §4.3 this is a modal sheet with a single CTA that
 /// returns the teacher to the quest board.
 Future<void> showFirstAvailabilityCelebrationSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
+  return showNotebookModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppColors.paper,
-    isDismissible: false,
-    enableDrag: false,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusMedium),
-      ),
-    ),
-    builder: (sheetContext) => const FirstAvailabilityCelebrationSheet(),
+    builder:
+        (sheetContext) => const PopScope(
+          canPop: false,
+          child: FirstAvailabilityCelebrationSheet(),
+        ),
   );
 }
 

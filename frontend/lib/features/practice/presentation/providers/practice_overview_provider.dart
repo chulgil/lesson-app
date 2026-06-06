@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../domain/entities/student_practice_overview.dart';
 
 part 'practice_overview_provider.g.dart';
@@ -12,8 +13,21 @@ Future<StudentPracticeOverview> studentPracticeOverview(
   Ref ref,
   String studentId,
 ) async {
-  // Remote API not yet available — mock fallback for all modes
+  // Remote aggregation API not yet available.
+  // Mock mode: show sample data. Remote mode: return an empty overview (no
+  // weekly entries) so the UI shows a "준비 중" placeholder instead of fake
+  // progress.
   // TODO(remote): Replace with real repository call when backend is ready
+  if (!ref.watch(mockDataModeProvider)) {
+    return StudentPracticeOverview(
+      studentId: studentId,
+      studentName: '',
+      practiceDaysThisWeek: 0,
+      totalPracticeMinutes: 0,
+      sharedRecordings: const [],
+      weeklyEntries: const [],
+    );
+  }
   return _generateMockOverview(studentId);
 }
 
