@@ -99,7 +99,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           .updateProfile(profile);
       ref.read(teacherOnboardingNotifierProvider.notifier).submitProfile();
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Persist the entered name/instruments/introduction to the backend
+      // (PUT /teachers/me/profile, upsert). Without this the onboarding
+      // profile is only held in memory and is lost on completion. (#14)
+      await ref
+          .read(currentTeacherProfileNotifierProvider.notifier)
+          .createFromOnboarding(ref.read(teacherOnboardingNotifierProvider));
 
       // #430: Phone verification moved to optional quest + E3 (subscription
       // issuance) hard gate. SSO → terms → role → profile (B) → home direct.

@@ -6,6 +6,7 @@ export 'presentation/providers/teacher_profile_repository_provider.dart'
 export 'presentation/providers/onboarding_providers.dart'
     show
         currentTeacherProfileProvider,
+        currentTeacherProfileNotifierProvider,
         teacherOnboardingCompletedProvider,
         teacherOnboardingNotifierProvider;
 export 'presentation/providers/onboarding_progress_storage_provider.dart'
