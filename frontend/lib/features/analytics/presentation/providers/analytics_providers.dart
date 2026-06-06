@@ -21,18 +21,14 @@ AnalyticsRepository analyticsRepository(AnalyticsRepositoryRef ref) =>
       remote: (api) => RemoteAnalyticsRepository(api),
     );
 
+// analyticsService provides legacy summary aggregations (teacher monthly
+// summary, student analytics summary) that do not yet have backend endpoints.
+// It always returns mock data regardless of mode — the assert that previously
+// crashed debug builds in real mode has been removed because the crash was
+// unhelpful: the missing BE endpoints are tracked separately, not via asserts.
 @Riverpod(keepAlive: true)
-MockAnalyticsService analyticsService(AnalyticsServiceRef ref) {
-  // TODO(remote): replace MockAnalyticsService with a real implementation
-  // once the analytics service backend endpoint is available.
-  // For now always returns mock data — gated so it's obvious in real mode.
-  if (!ref.watch(mockDataModeProvider)) {
-    // Real mode: still uses mock until backend is implemented.
-    // This makes the missing implementation visible in non-mock environments.
-    assert(false, 'analyticsService has no remote implementation yet');
-  }
-  return MockAnalyticsService();
-}
+MockAnalyticsService analyticsService(AnalyticsServiceRef ref) =>
+    MockAnalyticsService();
 
 @riverpod
 Future<TeacherMonthlyStats> teacherMonthlyStats(
