@@ -1,7 +1,10 @@
 // Schedule and booking route definitions
 
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_strings.dart';
+import '../../widgets/notebook/notebook_surfaces.dart';
 import '../../../features/schedule/domain/entities/unified_lesson_request.dart';
 import '../../../features/schedule/domain/entities/group_class.dart';
 import '../../../features/schedule/domain/entities/group_class_schedule.dart';
@@ -215,7 +218,12 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.groupClassDetail,
     name: 'groupClassDetail',
     builder: (context, state) {
-      final extra = state.extra as Map<String, dynamic>;
+      final extra = state.extra as Map<String, dynamic>?;
+      if (extra == null) {
+        return const NotebookScreenScaffold(
+          body: Center(child: Text(AppStrings.groupClassInfoUnavailable)),
+        );
+      }
       return GroupClassDetailScreen(
         scheduleId: state.pathParameters['id'] ?? extra['scheduleId'],
         studentId: extra['studentId'],
@@ -230,7 +238,12 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.groupClassAttendance,
     name: 'groupClassAttendance',
     builder: (context, state) {
-      final extra = state.extra as Map<String, dynamic>;
+      final extra = state.extra as Map<String, dynamic>?;
+      if (extra == null) {
+        return const NotebookScreenScaffold(
+          body: Center(child: Text(AppStrings.groupClassInfoUnavailable)),
+        );
+      }
       return GroupClassAttendanceScreen(
         scheduleId: state.pathParameters['id'] ?? extra['scheduleId'],
         schedule: extra['schedule'] as GroupClassSchedule,

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../domain/entities/challenge.dart';
 
 part 'challenge_provider.g.dart';
@@ -8,8 +9,13 @@ part 'challenge_provider.g.dart';
 /// Provides the list of active challenges for a student.
 @riverpod
 Future<List<Challenge>> studentChallenges(Ref ref, String studentId) async {
-  // Remote API not yet available — mock fallback for all modes
+  // Remote aggregation API not yet available.
+  // Mock mode: show sample challenges. Remote mode: return empty (no fake
+  // progress) until the backend aggregation endpoint exists.
   // TODO(remote): Replace with repository call when backend is ready
+  if (!ref.watch(mockDataModeProvider)) {
+    return const [];
+  }
   return _generateMockChallenges();
 }
 
