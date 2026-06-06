@@ -158,13 +158,18 @@ class StudentProfileTab extends ConsumerWidget {
               Positioned(
                 right: 0,
                 bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(color: AppColors.paperDark),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    size: 16,
-                    color: AppColors.ink,
+                child: GestureDetector(
+                  onTap: () => context.push(AppRoutes.profileEdit),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: AppColors.paperDark,
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 16,
+                      color: AppColors.ink,
+                    ),
                   ),
                 ),
               ),
