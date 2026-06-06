@@ -16,6 +16,7 @@ import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../extensions/subscription_template_visuals.dart';
+import '../../../students/students_facade.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
@@ -362,11 +363,21 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       // Clamp: a discount larger than the price must not yield a negative amount.
       final amount =
           (template.price - discount) < 0 ? 0 : (template.price - discount);
+      // Resolve the student's active membership to attach the subscription
+      // to the correct class context. Falls back to the first membership if
+      // the student has multiple active memberships.
+      final memberships = await ref.read(
+        activeStudentMembershipsProvider(proposal.studentId).future,
+      );
+      final membershipId =
+          memberships.isNotEmpty
+              ? memberships.first.id
+              : 'membership_${proposal.studentId}';
+
       final subscription = Subscription(
         id: const Uuid().v4(),
         studentId: proposal.studentId,
-        membershipId:
-            'membership_${proposal.studentId}', // TODO: Get actual membership
+        membershipId: membershipId,
         type: SubscriptionType.package,
         totalLessons: template.totalLessons,
         usedLessons: 0,

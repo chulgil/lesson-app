@@ -207,7 +207,10 @@ class _FirstAvailabilitySetupScreenState
       child: TextButton(
         onPressed: () {
           // Skip to full settings — recorded as opt-out per spec §5.3.
-          context.go(AppRoutes.lessonTimeSettings);
+          // pushReplacement (not go) so the simple setup is replaced but the
+          // back button still returns to home instead of dead-ending. (bug:
+          // go() reset the whole nav stack → back did nothing)
+          context.pushReplacement(AppRoutes.lessonTimeSettings);
         },
         child: const Text(AppStrings.firstAvailabilityAdvancedAction),
       ),

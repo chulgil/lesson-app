@@ -102,15 +102,72 @@ class DurationOptionItem extends StatelessWidget {
               onPressed: onDelete,
               tooltip: '삭제',
             ),
-          // Active/Disable switch
-          Switch(
-            value: !isDisabled,
-            onChanged: isOnlyActive ? null : (value) => onToggle(value),
-            activeThumbColor: AppColors.paperAccent,
+          // Active/Disable — rounded visual toggle box (replaces Switch).
+          _DurationToggleBox(
+            isActive: !isDisabled,
+            // 마지막 1개(isOnlyActive)는 해제 불가 — 항상 사용 유지.
+            onTap: isOnlyActive ? null : () => onToggle(isDisabled),
           ),
         ],
       ),
       onTap: isDisabled ? null : onTap,
+    );
+  }
+}
+
+/// Rounded visual select/deselect box used as the lesson-duration toggle.
+/// Active = vermillion filled with check; inactive = outlined muted.
+class _DurationToggleBox extends StatelessWidget {
+  final bool isActive;
+  final VoidCallback? onTap;
+
+  const _DurationToggleBox({required this.isActive, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final disabledLook = onTap == null;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space2,
+        ),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.paperAccent : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          border: Border.all(
+            color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isActive ? Icons.check_rounded : Icons.remove_rounded,
+              size: 16,
+              color: isActive ? AppColors.paper : AppColors.inkTertiary,
+            ),
+            const SizedBox(width: AppSpacing.space1),
+            Text(
+              isActive
+                  ? AppStrings.profileDurationInUse
+                  : AppStrings.profileDurationOff,
+              style: AppTypography.bodySmall.copyWith(
+                color:
+                    isActive
+                        ? AppColors.paper
+                        : (disabledLook
+                            ? AppColors.inkQuaternary
+                            : AppColors.inkSecondary),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

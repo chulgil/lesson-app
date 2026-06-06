@@ -141,8 +141,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return;
     }
     final storage = storageAsync.valueOrNull;
-    if (storage != null && !storage.coachMarkCompleted) {
-      _coachMarkController.start();
+    if (storage == null || storage.coachMarkCompleted) return;
+
+    // The blocking first-availability interstitial is the single source of
+    // "set lesson time" guidance. The lesson-time coach mark duplicated it and
+    // re-prompted "레슨 시간을 설정하세요" even after the teacher had already set
+    // it (the interstitial sets slots, then the rebuilt home re-ran this and
+    // started the coach mark). Once slots exist the action is done → mark the
+    // coach mark complete; before slots exist the interstitial handles it, so
+    // we never auto-start the coach mark.
+    final settingsAsync = ref.read(teacherSettingsProvider);
+    if (settingsAsync.hasValue && ref.read(hasAvailableSlotsProvider)) {
+      ref
+          .read(onboardingProgressStorageProvider.notifier)
+          .markCoachMarkCompleted();
     }
   }
 

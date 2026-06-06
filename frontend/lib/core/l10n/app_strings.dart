@@ -6944,6 +6944,10 @@ class AppStrings {
   static const profileLessonTimeTitle = '레슨 시간 설정';
   static const profileLessonTimeError = '오류가 발생했습니다.';
   static const profileLessonTimeOptionsSection = '레슨 시간 옵션';
+  /// 레슨 시간 사용 토글 박스 — 사용중
+  static const profileDurationInUse = '사용';
+  /// 레슨 시간 사용 토글 박스 — 사용 안 함
+  static const profileDurationOff = '해제';
   static const profileBookingSettingsSection = '예약 설정';
   static const profileBreakTimeTitle = '레슨 간 휴식 시간';
   static const profileMinBookingTitle = '최소 예약 가능 시간';
