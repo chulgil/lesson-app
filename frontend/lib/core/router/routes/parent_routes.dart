@@ -13,7 +13,7 @@ List<GoRoute> parentRoutes = [
     path: AppRoutes.addChildProfile,
     name: 'addChildProfile',
     builder: (context, state) {
-      final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
+      final parentId = state.uri.queryParameters['parentId'] ?? '';
       return ChildProfileFormScreen(parentId: parentId);
     },
   ),
@@ -23,7 +23,7 @@ List<GoRoute> parentRoutes = [
     path: AppRoutes.editChildProfile,
     name: 'editChildProfile',
     builder: (context, state) {
-      final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
+      final parentId = state.uri.queryParameters['parentId'] ?? '';
       return ChildProfileFormScreen(
         parentId: parentId,
       );
@@ -35,7 +35,7 @@ List<GoRoute> parentRoutes = [
     path: AppRoutes.childProfiles,
     name: 'childProfiles',
     builder: (context, state) {
-      final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
+      final parentId = state.uri.queryParameters['parentId'] ?? '';
       return ChildProfilesScreen(parentId: parentId);
     },
   ),

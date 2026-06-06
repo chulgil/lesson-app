@@ -114,7 +114,8 @@ class ParentDashboardTab extends ConsumerWidget {
                     _buildChildHeader(context, profile),
 
                     // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
-                    const NoteAccessActiveBanner(),
+                    // 선택 자녀(linkedStudentId) 스코프 — 타 자녀 배너 노출 방지 (#586)
+                    NoteAccessActiveBanner(studentId: profile.linkedStudentId),
 
                     const SizedBox(height: AppSpacing.space4),
 
