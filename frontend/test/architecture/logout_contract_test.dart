@@ -31,14 +31,18 @@ void main() {
     expect(source, contains('authNotifierProvider.notifier).logout()'));
   });
 
-  test('student role selection requires profile setup before invite flow', () {
+  test('student role selection routes to signup-blocked until age-14 PASS', () {
+    // Contract: a student picking the student role is sent straight to the
+    // signup-blocked screen until carrier-based age-14 identity verification
+    // (PASS) is integrated. Direct student signup is blocked, NOT routed to
+    // profile setup. Policy: phone_verification_policy.md §3.2.
     final source =
         File(
           'lib/features/auth/presentation/screens/role_select_screen.dart',
         ).readAsStringSync();
 
     final studentCase = RegExp(
-      r'case UserRole\.student:\s*context\.go\(AppRoutes\.studentProfileSetup\);',
+      r'case UserRole\.student:[\s\S]*?context\.go\(AppRoutes\.studentSignupBlocked\);',
       multiLine: true,
     );
 
