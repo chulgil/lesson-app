@@ -128,7 +128,7 @@ class ParentProfileTab extends ConsumerWidget {
                   icon: Icons.logout,
                   label: AppStrings.profileLogoutLabel,
                   labelColor: AppColors.paperAccent,
-                  onTap: () => _showLogoutDialog(context),
+                  onTap: () => _showLogoutDialog(context, ref),
                 ),
               ],
             ),
@@ -140,7 +140,7 @@ class ParentProfileTab extends ConsumerWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showNotebookDialog<void>(
       context: context,
       title: AppStrings.parentHomeLogout,
@@ -148,9 +148,12 @@ class ParentProfileTab extends ConsumerWidget {
       confirmLabel: AppStrings.parentHomeLogout,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
-      onConfirm: () {
+      onConfirm: () async {
         Navigator.pop(context);
-        context.go(AppRoutes.login);
+        // Call auth logout so tokens are cleared and keepAlive providers
+        // do not leak previous user's data to the next session.
+        await ref.read(authNotifierProvider.notifier).logout();
+        if (context.mounted) context.go(AppRoutes.login);
       },
     );
   }

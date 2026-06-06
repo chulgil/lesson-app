@@ -86,12 +86,17 @@ class UserProfile {
     }
   }
 
-  /// Copy with new values
+  /// Copy with new values.
+  ///
+  /// [clearActiveChildId] explicitly sets activeChildId to null.
+  /// Use this instead of passing `activeChildId: null` which is ignored by the
+  /// `??` guard in the standard copyWith pattern.
   UserProfile copyWith({
     String? userId,
     String? userName,
     ProfileType? activeProfile,
     String? activeChildId,
+    bool clearActiveChildId = false,
     bool? hasStudentProfile,
     String? studentTeacherId,
     String? studentTeacherName,
@@ -101,7 +106,8 @@ class UserProfile {
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       activeProfile: activeProfile ?? this.activeProfile,
-      activeChildId: activeChildId ?? this.activeChildId,
+      activeChildId:
+          clearActiveChildId ? null : (activeChildId ?? this.activeChildId),
       hasStudentProfile: hasStudentProfile ?? this.hasStudentProfile,
       studentTeacherId: studentTeacherId ?? this.studentTeacherId,
       studentTeacherName: studentTeacherName ?? this.studentTeacherName,
@@ -111,13 +117,19 @@ class UserProfile {
 
   /// Switch to parent profile
   UserProfile switchToParent() {
-    return copyWith(activeProfile: ProfileType.parent, activeChildId: null);
+    return copyWith(
+      activeProfile: ProfileType.parent,
+      clearActiveChildId: true,
+    );
   }
 
   /// Switch to student profile (if available)
   UserProfile switchToStudent() {
     if (!hasStudentProfile) return this;
-    return copyWith(activeProfile: ProfileType.student, activeChildId: null);
+    return copyWith(
+      activeProfile: ProfileType.student,
+      clearActiveChildId: true,
+    );
   }
 
   /// Switch to child profile
