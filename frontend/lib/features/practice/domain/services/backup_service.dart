@@ -8,7 +8,7 @@ import '../entities/backup_archive.dart';
 /// Progress callback signature used by [BackupService].
 ///
 /// [progress] is in `[0.0, 1.0]`. [status] is a localized message suitable
-/// for UI display (e.g. AppStrings.backupZipCompressing).
+/// for UI display (e.g. the "백업 zip 압축 중" progress copy).
 typedef BackupProgressCallback = void Function(double progress, String status);
 
 /// Abstraction over the ZIP backup pipeline.

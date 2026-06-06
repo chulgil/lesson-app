@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
@@ -46,6 +45,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // DEV accounts visibility follows the centralized runtime data mode.
+    final showDevAccounts = ref.watch(mockDataModeProvider);
     return NotebookScreenScaffold(
       body: PaperScaffold(
         child: SafeArea(
@@ -75,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: AppSpacing.space4),
                     _buildSocialButtons(context),
                     // DEV accounts only in mock mode (hidden in beta/production)
-                    if (EnvironmentConfig.useMockData) ...[
+                    if (showDevAccounts) ...[
                       const SizedBox(height: AppSpacing.space6),
                       _buildDevAccountsSection(),
                     ],

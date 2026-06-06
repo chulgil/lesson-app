@@ -7,7 +7,7 @@ part of 'note_access_provider.dart';
 // **************************************************************************
 
 String _$noteAccessRepositoryHash() =>
-    r'e521a429ab0be9f643560011484364e99f1327fd';
+    r'803307a78cfb87adde19de87aa0804fedb30d869';
 
 /// Note access repository provider - switches between Mock and Remote
 ///

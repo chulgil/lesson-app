@@ -39,17 +39,6 @@ class PracticeLoopStats {
     this.pieceName,
     this.sectionName,
   });
-
-  /// Display label that combines piece + section names with sensible fallback.
-  String get displayLabel {
-    if (pieceName != null && pieceName!.isNotEmpty) {
-      if (sectionName != null && sectionName!.isNotEmpty) {
-        return '$pieceName · $sectionName';
-      }
-      return pieceName!;
-    }
-    return sectionName ?? sectionId;
-  }
 }
 
 /// Roll-up of one student's repeats for the dashboard summary card.
