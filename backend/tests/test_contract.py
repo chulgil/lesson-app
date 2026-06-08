@@ -1893,10 +1893,13 @@ async def test_contract_subscription_settings_flat_crud(client, auth_headers, cr
     assert by_user_resp.status_code == 200
     assert by_user_resp.json()["id"] == created["id"]
 
-    org_create_resp = await client.post(
+    # 보안 회귀: organization_id 만으로 다른 학원 설정 생성 시도 → 400 (Organization 모델 부재).
+    # 이전 동작은 ``_assert_subscription_settings_owner`` 가 organization_id 분기를 silently 스킵해
+    # 임의 teacher 가 다른 학원 설정을 생성/수정할 수 있는 P0 IDOR 였다.
+    org_only_resp = await client.post(
         "/api/v1/subscription-settings",
         json={
-            "organization_id": "org-001",
+            "organization_id": "some-other-org",
             "renewal_alert_threshold": 1,
             "renewal_alert_days": 7,
             "discount_policies": [],
@@ -1906,14 +1909,7 @@ async def test_contract_subscription_settings_flat_crud(client, auth_headers, cr
         },
         headers=auth_headers,
     )
-    assert org_create_resp.status_code == 201
-
-    org_resp = await client.get(
-        "/api/v1/subscription-settings/organization/org-001",
-        headers=auth_headers,
-    )
-    assert org_resp.status_code == 200
-    assert org_resp.json()["organization_id"] == "org-001"
+    assert org_only_resp.status_code == 400
 
 
 @pytest.mark.asyncio

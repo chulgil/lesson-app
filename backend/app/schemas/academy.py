@@ -237,10 +237,19 @@ class AcademyInvitePreview(BaseModel):
 
 
 class AcademyInviteAcceptRequest(BaseModel):
-    """강사가 토큰 수락 시 공개 페이지 노출 동의 여부."""
+    """강사가 토큰 수락 시 공개 페이지 노출 동의 여부.
 
+    token 은 access log / referrer / 브라우저 history 노출 차단을 위해 optional body 로도
+    받는다. body.token 이 있으면 우선, 없으면 query string ``?token=`` 로 폴백 (BC).
+    Flutter 클라이언트 마이그레이션 완료 후 query 지원 제거 예정.
+    """
+
+    token: str | None = Field(default=None, min_length=1)
     public_page_consent: bool = False
 
 
 class AcademyInviteRejectRequest(BaseModel):
+    """token 은 optional body — 새 클라이언트는 body 사용 권장 (access log 노출 차단)."""
+
+    token: str | None = Field(default=None, min_length=1)
     reason: str | None = Field(default=None, max_length=500)

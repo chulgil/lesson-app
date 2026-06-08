@@ -387,13 +387,23 @@ async def accept_invite(
     body: AcademyInviteAcceptRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-    token: Annotated[str, Query(min_length=1)],
+    token: Annotated[str | None, Query(min_length=1)] = None,
 ) -> AcademyMemberResponse:
-    # TODO(security): token 을 body 로 이동해 access log / referrer 노출 차단.
-    # 현재 frontend (Flutter) 가 Query 파라미터로 전달하므로 호환성 유지.
+    """Accept an invite. token 은 body 우선, 없으면 query 폴백 (Flutter BC).
+
+    TODO(security): Flutter 마이그레이션 완료 후 query 지원 제거 — access log / referrer 노출 차단.
+    """
+    raw_token = body.token or token
+    if not raw_token:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="token is required (in body or query)",
+        )
     service = AcademyService(db)
     member = await service.accept_invite(
-        raw_token=token,
+        raw_token=raw_token,
         by_user_id=current_user.id,
         public_page_consent=body.public_page_consent,
     )
@@ -410,12 +420,23 @@ async def decline_invite(
     body: AcademyInviteRejectRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-    token: Annotated[str, Query(min_length=1)],
+    token: Annotated[str | None, Query(min_length=1)] = None,
 ) -> AcademyInviteResponse:
-    # TODO(security): token 을 body 로 이동해 access log / referrer 노출 차단.
+    """Decline an invite. token 은 body 우선, 없으면 query 폴백 (Flutter BC).
+
+    by_user_id 를 service 에 전달 — invite.note 에 audit 기록 (#594).
+    """
+    raw_token = body.token or token
+    if not raw_token:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="token is required (in body or query)",
+        )
     service = AcademyService(db)
     invite = await service.decline_invite(
-        raw_token=token,
+        raw_token=raw_token,
         by_user_id=current_user.id,
         reason=body.reason,
     )
