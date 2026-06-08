@@ -143,7 +143,16 @@ async def test_scenario_subscription_lifecycle(client: AsyncClient, auth_headers
     sub_id = sub.json()["id"]
     assert sub.json()["remaining_lessons"] == 8
 
-    # Step 4: Create lessons and deduct one by one
+    # Step 4: Confirm payment — PR #538 / #596 의 payment_confirmed 게이트 도입 후, lesson
+    # 완료 시 자동 차감은 입금 확정된 수강권에만 적용된다.
+    pay = await client.patch(
+        f"/api/v1/subscriptions/{sub_id}/confirm-payment",
+        headers=auth_headers,
+        json={"payment_method": "bankTransfer"},
+    )
+    assert pay.status_code == 200
+
+    # Step 5: Create lessons and deduct one by one
     for i in range(6):
         lesson = await client.post(
             "/api/v1/lessons",
@@ -166,19 +175,11 @@ async def test_scenario_subscription_lifecycle(client: AsyncClient, auth_headers
         )
         assert completed.status_code == 200
 
-    # Step 5: Check remaining is 2 (8 - 6)
+    # Step 6: Check remaining is 2 (8 - 6)
     sub_detail = await client.get(f"/api/v1/subscriptions/{sub_id}", headers=auth_headers)
     assert sub_detail.status_code == 200
     assert sub_detail.json()["remaining_lessons"] == 2
     assert sub_detail.json()["used_lessons"] == 6
-
-    # Step 6: Confirm payment
-    pay = await client.patch(
-        f"/api/v1/subscriptions/{sub_id}/confirm-payment",
-        headers=auth_headers,
-        json={"payment_method": "bankTransfer"},
-    )
-    assert pay.status_code == 200
 
 
 # ===========================================================================

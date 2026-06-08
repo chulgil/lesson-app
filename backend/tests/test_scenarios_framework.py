@@ -48,7 +48,12 @@ async def test_fw_teacher_onboarding(teacher: TeacherActions):
 
 @pytest.mark.asyncio
 async def test_fw_subscription_lifecycle(teacher: TeacherActions):
-    """Template → subscription → deduct 6/8 → verify remaining → payment."""
+    """Template → subscription → payment_confirm → deduct 6/8 → verify remaining.
+
+    PR #538 / #596 의 ``payment_confirmed`` 게이트 도입 후, 입금 미확정 수강권은 lesson
+    완료 시 차감되지 않는다. 따라서 deduct 시나리오를 검증하려면 payment_confirm 을 먼저
+    호출해야 한다.
+    """
     await teacher.create_template("바이올린 8회", lessons_count=8, amount=320000)
     sid = await teacher.create_student("이서연")
     sub_id = await teacher.create_subscription(
@@ -57,6 +62,9 @@ async def test_fw_subscription_lifecycle(teacher: TeacherActions):
         amount=320000,
         payment_confirmed=False,
     )
+
+    # 입금 확정 — 이후 lesson 완료가 자동 차감되도록.
+    await teacher.confirm_payment(sub_id)
 
     # Deduct 6 lessons. Unified rule (2026-06-04): completing a lesson deducts
     # one session on its own, so no separate use_lesson call is needed.
@@ -67,9 +75,6 @@ async def test_fw_subscription_lifecycle(teacher: TeacherActions):
     # Verify remaining
     sub = await teacher.get_subscription(sub_id)
     assert_subscription_remaining(sub, 2)
-
-    # Confirm payment
-    await teacher.confirm_payment(sub_id)
 
 
 # ===========================================================================
@@ -269,9 +274,7 @@ async def test_fw_multi_student_day(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_subscription_renewal_after_expiry(
-    teacher: TeacherActions, student: StudentActions, db_session
-):
+async def test_fw_subscription_renewal_after_expiry(teacher: TeacherActions, student: StudentActions, db_session):
     """수강권 4회 모두 사용 → 만료 확인 → 선생님 재제안 → 학생 수락 → 새 수강권."""
     # Step 1: 학생 + 첫 수강권 발급 (4회)
     sid = await teacher.create_student("재등록학생", instrument="violin")
@@ -723,9 +726,7 @@ async def test_fw_trial_lesson_free_setting(teacher: TeacherActions):
 
 
 @pytest.mark.asyncio
-async def test_fw_time_confirmed_to_subscription_proposal(
-    teacher: TeacherActions, student: StudentActions, db_session
-):
+async def test_fw_time_confirmed_to_subscription_proposal(teacher: TeacherActions, student: StudentActions, db_session):
     """Time confirmed → Teacher sends subscription proposal → Student accepts."""
     # Step 1: 학생 등록 + 수강권 템플릿 생성
     sid = await teacher.create_student("협상학생", instrument="violin")
