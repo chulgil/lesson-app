@@ -30,7 +30,11 @@ class AiNotesService:
         pieces: list[str] | None = None,
         current_user: Any,
     ) -> AiNoteResponse:
-        """Full pipeline: upload audio → STT → GPT → structured notes."""
+        """Full pipeline: upload audio → STT → GPT → structured notes.
+
+        lesson.teacher_id 가 current_user 의 강사 ID 와 일치하는지 검증 — 다른 강사의
+        lesson 에 AI 노트를 덮어쓰는 IDOR write 를 차단한다.
+        """
         from app.models.lesson import Lesson
 
         # Verify lesson exists
@@ -40,6 +44,7 @@ class AiNotesService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Lesson not found",
             )
+        await self._assert_lesson_teacher(lesson, current_user)
 
         # Read audio content
         audio_content = await file.read()
@@ -80,13 +85,14 @@ class AiNotesService:
             created_at=datetime.now(UTC),
         )
 
-    async def get_by_lesson_id(self, lesson_id: str) -> AiNoteResponse | None:
-        """Get existing AI notes for a lesson."""
+    async def get_by_lesson_id(self, lesson_id: str, current_user: Any) -> AiNoteResponse | None:
+        """Get existing AI notes for a lesson — lesson 소유 강사만 조회 가능."""
         from app.models.lesson import Lesson
 
         lesson = await self.db.get(Lesson, lesson_id)
         if lesson is None:
             return None
+        await self._assert_lesson_teacher(lesson, current_user)
 
         # Check if lesson has AI-generated content
         if not lesson.feedback and not lesson.key_points:
@@ -103,6 +109,26 @@ class AiNotesService:
             created_at=lesson.created_at,
         )
 
+    async def _assert_lesson_teacher(self, lesson: Any, current_user: Any) -> None:
+        """lesson.teacher_id 가 current_user 의 강사 ID 와 일치하는지 검증.
+
+        다른 강사의 lesson 의 feedback/key_points/practice_tips 를 덮어쓰거나 조회하는
+        IDOR write/read 차단.
+        """
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        teacher_id = getattr(lesson, "teacher_id", None)
+        if teacher_id is None:
+            return
+        teacher_profile_id = await try_resolve_teacher_id(self.db, current_user.id)
+        # User.id (직접) 또는 Teacher.id (resolved) 어느 것과도 일치할 수 있다.
+        if teacher_id == current_user.id or (teacher_profile_id is not None and teacher_id == teacher_profile_id):
+            return
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not the owning teacher for this lesson",
+        )
+
     async def _transcribe(self, audio_content: bytes) -> str:
         """Transcribe audio using OpenAI Whisper API."""
         try:
@@ -114,7 +140,6 @@ class AiNotesService:
             client = openai.AsyncOpenAI(timeout=120.0)
 
             # Create a temporary file-like object for the API
-
             audio_file = io.BytesIO(audio_content)
             audio_file.name = "lesson_recording.m4a"
 

@@ -1001,9 +1001,27 @@ async def test_contract_schedule_slots_date_range_returns_dates_and_full_slots(
 
 
 @pytest.mark.asyncio
-async def test_contract_group_bookings_frontend_shapes_and_body_actions(client, auth_headers, create_test_user):
+async def test_contract_group_bookings_frontend_shapes_and_body_actions(
+    client, auth_headers, create_test_user, db_session
+):
     """RemoteGroupClassBookingRepository expects paginated /groups/bookings and body actions."""
+    from sqlalchemy import select
+
+    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.teacher import Teacher
+
     await create_test_user(user_id="test-user-id", role="teacher")
+    # Group class ownership 검증 — 실제 LessonClass 가 있어야 schedule 생성 가능.
+    teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == "test-user-id"))
+    db_session.add(
+        LessonClass(
+            id="group-001",
+            teacher_id=teacher_profile_id or "test-user-id",
+            name="Test Group",
+            type=LessonClassType.private,
+        )
+    )
+    await db_session.flush()
 
     schedule_resp = await client.post(
         "/api/v1/groups/schedules",

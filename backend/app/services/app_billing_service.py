@@ -72,17 +72,15 @@ class AppBillingService:
     async def activate_trial(self, user_id: str, days: int = 14) -> AppBillingPlan:
         """Activate 14-day Pro trial if not already used.
 
-        Args:
-            user_id: User ID
-            days: Trial duration in days (default 14)
-
-        Returns:
-            Updated AppBillingPlan
-
-        Raises:
-            ValueError: If trial already used
+        동시 두 호출이 모두 ``trial_used=False`` 체크를 통과해 trial 이 두 번 부여
+        (`days + days` 일 만료) 되는 race 를 막기 위해 row lock 후 재확인.
         """
-        plan = await self.get_active_plan(user_id)
+        # plan 존재 보장 — 없으면 free tier 생성.
+        await self.get_active_plan(user_id)
+        # row lock + 재조회 — 검증·갱신 직렬화.
+        plan = await self.db.scalar(select(AppBillingPlan).where(AppBillingPlan.user_id == user_id).with_for_update())
+        if plan is None:
+            raise ValueError("Billing plan missing after creation")
 
         if plan.trial_used:
             raise ValueError("Trial already used for this account")

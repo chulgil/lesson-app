@@ -69,4 +69,4 @@ async def get_ai_notes(
 ) -> AiNoteResponse | None:
     """Return existing AI-generated notes for a lesson."""
     service = AiNotesService(db)
-    return await service.get_by_lesson_id(lesson_id)
+    return await service.get_by_lesson_id(lesson_id, current_user)

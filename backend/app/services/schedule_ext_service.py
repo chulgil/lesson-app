@@ -44,9 +44,7 @@ class ScheduleExtService:
         await self.db.refresh(exc)
         return exc
 
-    async def update_exception(
-        self, exception_id: str, data: dict, current_user: Any | None = None
-    ) -> Any:
+    async def update_exception(self, exception_id: str, data: dict, current_user: Any | None = None) -> Any:
         from app.models.schedule_ext import ScheduleException
 
         exc = await self.db.get(ScheduleException, exception_id)
@@ -109,41 +107,107 @@ class ScheduleExtService:
         return teacher_ids
 
     # -----------------------------------------------------------------------
+    # Group ownership assertions — IDOR 방어용 헬퍼.
+    # -----------------------------------------------------------------------
+
+    async def _assert_group_class_teacher(self, group_class_id: str, current_user: Any) -> None:
+        """LessonClass.teacher_id 가 current_user 의 강사 ID 와 일치하는지 검증."""
+        from app.models.lesson import LessonClass
+
+        lc_teacher_id = await self.db.scalar(select(LessonClass.teacher_id).where(LessonClass.id == group_class_id))
+        if lc_teacher_id is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group class not found")
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if lc_teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not the owning teacher")
+
+    async def _assert_schedule_teacher(self, schedule_id: str, current_user: Any) -> Any:
+        """GroupClassSchedule → LessonClass → teacher_id 검증. schedule row 반환."""
+        from app.models.lesson import LessonClass
+        from app.models.schedule_ext import GroupClassSchedule
+
+        schedule = await self.db.get(GroupClassSchedule, schedule_id)
+        if schedule is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
+        lc_teacher_id = await self.db.scalar(
+            select(LessonClass.teacher_id).where(LessonClass.id == schedule.group_class_id)
+        )
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if lc_teacher_id is None or lc_teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not the owning teacher")
+        return schedule
+
+    async def _assert_booking_actor(self, booking_id: str, current_user: Any) -> Any:
+        """booking 의 schedule.group_class.teacher 또는 booking.student_id 본인만 허용.
+
+        - 강사 모드: schedule → group_class → teacher_id 가 current_user 와 일치하면 OK.
+        - 학생 모드: booking.student_id 가 current_user.id (또는 매핑된 student.id) 와 일치하면 OK.
+        """
+        from app.models.lesson import LessonClass
+        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+
+        booking = await self.db.get(GroupClassBooking, booking_id)
+        if booking is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        # 강사 검증.
+        schedule = await self.db.get(GroupClassSchedule, booking.schedule_id)
+        if schedule is not None:
+            lc_teacher_id = await self.db.scalar(
+                select(LessonClass.teacher_id).where(LessonClass.id == schedule.group_class_id)
+            )
+            teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+            if lc_teacher_id is not None and lc_teacher_id in teacher_ids:
+                return booking
+        # 학생 검증 (자기 booking).
+        if booking.student_id == current_user.id:
+            return booking
+        from app.models.student import Student
+
+        student_profile_id = await self.db.scalar(select(Student.id).where(Student.user_id == current_user.id))
+        if student_profile_id is not None and booking.student_id == student_profile_id:
+            return booking
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized for this booking")
+
+    # -----------------------------------------------------------------------
     # Group Class Schedules
     # -----------------------------------------------------------------------
 
     async def get_group_schedules(
-        self, group_class_id: str, *, page: int, size: int, offset: int
+        self,
+        group_class_id: str,
+        *,
+        page: int,
+        size: int,
+        offset: int,
+        current_user: Any,
     ) -> PaginatedResponse:
         from app.models.schedule_ext import GroupClassSchedule
 
-        query = select(GroupClassSchedule).where(
-            GroupClassSchedule.group_class_id == group_class_id
-        )
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
+        await self._assert_group_class_teacher(group_class_id, current_user)
+        query = select(GroupClassSchedule).where(GroupClassSchedule.group_class_id == group_class_id)
+        total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
 
-        result = await self.db.scalars(
-            query.order_by(GroupClassSchedule.start_time).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(GroupClassSchedule.start_time).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
-    async def create_group_schedule(self, data: dict) -> Any:
+    async def create_group_schedule(self, data: dict, current_user: Any) -> Any:
         from app.models.schedule_ext import GroupClassSchedule
 
+        # body 의 group_class_id 가 본인 클래스인지 검증 — IDOR write 차단.
+        group_class_id = data.get("group_class_id")
+        if not group_class_id:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="group_class_id is required")
+        await self._assert_group_class_teacher(group_class_id, current_user)
         schedule = GroupClassSchedule(**data)
         self.db.add(schedule)
         await self.db.flush()
         await self.db.refresh(schedule)
         return schedule
 
-    async def cancel_group_schedule(self, schedule_id: str, reason: str | None) -> Any:
-        from app.models.schedule_ext import GroupClassSchedule, GroupScheduleStatus
+    async def cancel_group_schedule(self, schedule_id: str, reason: str | None, current_user: Any) -> Any:
+        from app.models.schedule_ext import GroupScheduleStatus
 
-        schedule = await self.db.get(GroupClassSchedule, schedule_id)
-        if schedule is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
+        schedule = await self._assert_schedule_teacher(schedule_id, current_user)
         schedule.status = GroupScheduleStatus.cancelled
         schedule.cancel_reason = reason
         await self.db.flush()
@@ -154,12 +218,26 @@ class ScheduleExtService:
     # Group Class Bookings
     # -----------------------------------------------------------------------
 
-    async def create_group_booking(self, data: dict) -> Any:
+    async def create_group_booking(self, data: dict, current_user: Any) -> Any:
+        from app.models.lesson import LessonClass
         from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
+        from app.models.student import Student
 
         schedule = await self.db.get(GroupClassSchedule, data["schedule_id"])
         if schedule is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
+        # 호출자가 강사 본인 (해당 클래스 소유자) 이거나 학생 본인이어야 한다.
+        lc_teacher_id = await self.db.scalar(
+            select(LessonClass.teacher_id).where(LessonClass.id == schedule.group_class_id)
+        )
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        is_owning_teacher = lc_teacher_id is not None and lc_teacher_id in teacher_ids
+        student_profile_id = await self.db.scalar(select(Student.id).where(Student.user_id == current_user.id))
+        is_self_student = (
+            data.get("student_id") in {current_user.id, student_profile_id} if data.get("student_id") else False
+        )
+        if not (is_owning_teacher or is_self_student):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to create this booking")
 
         if schedule.current_bookings >= schedule.max_capacity:
             if schedule.waitlist_capacity and schedule.waitlist_count < schedule.waitlist_capacity:
@@ -189,12 +267,14 @@ class ScheduleExtService:
         await self.db.refresh(booking)
         return booking
 
-    async def cancel_group_booking(self, booking_id: str, reason: str | None) -> Any:
-        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
+    async def cancel_group_booking(self, booking_id: str, reason: str | None, current_user: Any) -> Any:
+        from app.models.schedule_ext import (
+            GroupBookingStatus,
+            GroupClassSchedule,
+            GroupScheduleStatus,
+        )
 
-        booking = await self.db.get(GroupClassBooking, booking_id)
-        if booking is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        booking = await self._assert_booking_actor(booking_id, current_user)
 
         was_confirmed = booking.status == "confirmed"
         booking.status = GroupBookingStatus.cancelled
@@ -236,12 +316,11 @@ class ScheduleExtService:
                 schedule.current_bookings += 1
                 schedule.waitlist_count = max(0, schedule.waitlist_count - 1)
 
-    async def mark_attendance(self, booking_id: str, attended: bool) -> Any:
-        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
+    async def mark_attendance(self, booking_id: str, attended: bool, current_user: Any) -> Any:
+        from app.models.schedule_ext import GroupBookingStatus
 
-        booking = await self.db.get(GroupClassBooking, booking_id)
-        if booking is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+        # 출석 마킹은 강사 또는 학생 본인만. _assert_booking_actor 가 두 케이스 다 처리.
+        booking = await self._assert_booking_actor(booking_id, current_user)
         booking.status = GroupBookingStatus.attended if attended else GroupBookingStatus.noShow
         if attended:
             booking.attended_at = datetime.now(UTC)
@@ -249,9 +328,11 @@ class ScheduleExtService:
         await self.db.refresh(booking)
         return booking
 
-    async def get_bookings_for_schedule(self, schedule_id: str) -> list[Any]:
+    async def get_bookings_for_schedule(self, schedule_id: str, current_user: Any) -> list[Any]:
         from app.models.schedule_ext import GroupClassBooking
 
+        # schedule 소유 강사만 — 강사가 자기 클래스 출석부 조회.
+        await self._assert_schedule_teacher(schedule_id, current_user)
         result = await self.db.scalars(
             select(GroupClassBooking)
             .where(GroupClassBooking.schedule_id == schedule_id)
@@ -262,53 +343,71 @@ class ScheduleExtService:
     async def list_bookings(
         self,
         *,
+        current_user: Any,
         schedule_id: str | None = None,
         student_id: str | None = None,
         status: str | None = None,
         active: bool | None = None,
         upcoming: bool | None = None,
     ) -> list[Any]:
-        """List group bookings with flexible filters."""
+        """List group bookings with flexible filters — caller 권한으로 자동 스코프."""
+        from app.models.lesson import LessonClass
         from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+        from app.models.student import Student
 
-        query = select(GroupClassBooking)
+        # 호출자 신원 — 강사면 자기 클래스의 booking 만, 학생이면 자기 booking 만.
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        student_profile_id = await self.db.scalar(select(Student.id).where(Student.user_id == current_user.id))
+
+        query = (
+            select(GroupClassBooking)
+            .join(
+                GroupClassSchedule,
+                GroupClassBooking.schedule_id == GroupClassSchedule.id,
+            )
+            .join(LessonClass, GroupClassSchedule.group_class_id == LessonClass.id)
+        )
+
+        if student_profile_id is not None:
+            # 학생 본인 booking 만 — 다른 student_id 필터는 무시 (silently scope 좁힘).
+            query = query.where(GroupClassBooking.student_id == student_profile_id)
+        else:
+            # 강사: 본인 클래스 스코프 + (선택적) student_id 필터.
+            query = query.where(LessonClass.teacher_id.in_(teacher_ids))
+            if student_id:
+                query = query.where(GroupClassBooking.student_id == student_id)
+
         if schedule_id:
             query = query.where(GroupClassBooking.schedule_id == schedule_id)
-        if student_id:
-            query = query.where(GroupClassBooking.student_id == student_id)
         if status:
             query = query.where(GroupClassBooking.status == status)
         if active:
-            query = query.where(
-                GroupClassBooking.status.in_(["confirmed", "attended"])
-            )
+            query = query.where(GroupClassBooking.status.in_(["confirmed", "attended"]))
         if upcoming:
-            query = (
-                query.join(
-                    GroupClassSchedule,
-                    GroupClassBooking.schedule_id == GroupClassSchedule.id,
-                )
-                .where(GroupClassSchedule.start_time > datetime.now(UTC))
-                .where(GroupClassBooking.status.in_(["confirmed", "waitlist"]))
+            query = query.where(GroupClassSchedule.start_time > datetime.now(UTC)).where(
+                GroupClassBooking.status.in_(["confirmed", "waitlist"])
             )
         result = await self.db.scalars(query.order_by(GroupClassBooking.created_at))
         return list(result.all())
 
-    async def get_booking_by_id(self, booking_id: str) -> Any:
-        """Get a single group booking by ID."""
+    async def get_booking_by_id(self, booking_id: str, current_user: Any) -> Any:
+        """Get a single group booking by ID — owner 만 조회 가능."""
+        return await self._assert_booking_actor(booking_id, current_user)
+
+    async def _get_booking_raw(self, booking_id: str) -> Any:
+        """Internal: raw get without ownership check (사용 시 caller 가 검증해야 함)."""
         from app.models.schedule_ext import GroupClassBooking
 
         booking = await self.db.get(GroupClassBooking, booking_id)
         if booking is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         return booking
 
-    async def promote_from_waitlist_public(self, schedule_id: str) -> Any | None:
-        """Promote next waitlisted booking (public API)."""
+    async def promote_from_waitlist_public(self, schedule_id: str, current_user: Any) -> Any | None:
+        """Promote next waitlisted booking (public API) — schedule 소유 강사만."""
         from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
 
+        await self._assert_schedule_teacher(schedule_id, current_user)
         waitlist = await self.db.scalars(
             select(GroupClassBooking)
             .where(
@@ -328,10 +427,11 @@ class ScheduleExtService:
         await self.db.refresh(first)
         return first
 
-    async def auto_cancel_waitlist(self, schedule_id: str) -> list[Any]:
-        """Cancel all waitlisted bookings for a schedule."""
+    async def auto_cancel_waitlist(self, schedule_id: str, current_user: Any) -> list[Any]:
+        """Cancel all waitlisted bookings for a schedule — schedule 소유 강사만."""
         from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
 
+        await self._assert_schedule_teacher(schedule_id, current_user)
         result = await self.db.scalars(
             select(GroupClassBooking).where(
                 GroupClassBooking.schedule_id == schedule_id,
@@ -349,15 +449,14 @@ class ScheduleExtService:
             await self.db.refresh(b)
         return cancelled
 
-    async def batch_mark_attendance(self, attendance_list: list[dict]) -> list[Any]:
-        """Mark attendance for multiple bookings at once."""
-        from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking
+    async def batch_mark_attendance(self, attendance_list: list[dict], current_user: Any) -> list[Any]:
+        """Mark attendance for multiple bookings at once — 각 booking 소유 강사만."""
+        from app.models.schedule_ext import GroupBookingStatus
 
         results = []
         for item in attendance_list:
-            booking = await self.db.get(GroupClassBooking, item["booking_id"])
-            if booking is None:
-                continue
+            # 각 booking 마다 강사 ownership 검증 — cross-tenant 일괄 변경 차단.
+            booking = await self._assert_booking_actor(item["booking_id"], current_user)
             attended = item.get("attended", True)
             booking.status = GroupBookingStatus.attended if attended else GroupBookingStatus.noShow
             if attended:
@@ -368,15 +467,9 @@ class ScheduleExtService:
             await self.db.refresh(b)
         return results
 
-    async def deduct_subscription(self, booking_id: str) -> Any:
-        """Mark a booking's subscription as deducted."""
-        from app.models.schedule_ext import GroupClassBooking
-
-        booking = await self.db.get(GroupClassBooking, booking_id)
-        if booking is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found"
-            )
+    async def deduct_subscription(self, booking_id: str, current_user: Any) -> Any:
+        """Mark a booking's subscription as deducted — booking 소유 강사만."""
+        booking = await self._assert_booking_actor(booking_id, current_user)
         booking.subscription_deducted = True
         await self.db.flush()
         await self.db.refresh(booking)
@@ -386,28 +479,34 @@ class ScheduleExtService:
     # No-Show Records
     # -----------------------------------------------------------------------
 
-    async def create_no_show_record(self, data: dict, teacher_id: str) -> Any:
+    async def create_no_show_record(self, data: dict, current_user: Any) -> Any:
         from app.models.schedule_ext import NoShowRecord
 
-        record = NoShowRecord(teacher_id=teacher_id, **data)
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        # body 의 teacher_id 는 무시하고 caller 의 강사 ID 를 강제로 사용한다 (IDOR 차단).
+        canonical_teacher_id = teacher_ids[0]
+        # body 의 student_id 가 본인 학생인지 검증.
+        student_id = data.get("student_id")
+        if student_id:
+            from app.models.student import Student
+
+            student_teacher_id = await self.db.scalar(select(Student.teacher_id).where(Student.id == student_id))
+            if student_teacher_id is None or student_teacher_id not in teacher_ids:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your student")
+        clean_data = {k: v for k, v in data.items() if k not in {"teacher_id"}}
+        record = NoShowRecord(teacher_id=canonical_teacher_id, **clean_data)
         self.db.add(record)
         await self.db.flush()
         await self.db.refresh(record)
         return record
 
-    async def get_no_show_records(
-        self, teacher_id: str, *, page: int, size: int, offset: int
-    ) -> PaginatedResponse:
+    async def get_no_show_records(self, teacher_id: str, *, page: int, size: int, offset: int) -> PaginatedResponse:
         from app.models.schedule_ext import NoShowRecord
 
         query = select(NoShowRecord).where(NoShowRecord.teacher_id == teacher_id)
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
+        total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
 
-        result = await self.db.scalars(
-            query.order_by(NoShowRecord.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(NoShowRecord.created_at.desc()).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
     # -----------------------------------------------------------------------
@@ -423,9 +522,7 @@ class ScheduleExtService:
         await self.db.refresh(change)
         return change
 
-    async def respond_to_schedule_change(
-        self, change_id: str, action: str, response_message: str | None
-    ) -> Any:
+    async def respond_to_schedule_change(self, change_id: str, action: str, response_message: str | None) -> Any:
         from app.models.schedule_ext import LessonScheduleChange, ScheduleChangeStatus
 
         change = await self.db.get(LessonScheduleChange, change_id)
@@ -438,18 +535,14 @@ class ScheduleExtService:
         await self.db.refresh(change)
         return change
 
-    async def get_pending_changes(
-        self, teacher_id: str, *, page: int, size: int, offset: int
-    ) -> PaginatedResponse:
+    async def get_pending_changes(self, teacher_id: str, *, page: int, size: int, offset: int) -> PaginatedResponse:
         from app.models.schedule_ext import LessonScheduleChange
 
         query = select(LessonScheduleChange).where(
             LessonScheduleChange.teacher_id == teacher_id,
             LessonScheduleChange.status == "pending",
         )
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
+        total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
 
         result = await self.db.scalars(
             query.order_by(LessonScheduleChange.requested_at.desc()).offset(offset).limit(size)
