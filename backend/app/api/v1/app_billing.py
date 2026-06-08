@@ -107,7 +107,11 @@ async def validate_iap_receipt(
             user_id=current_user.id,
             platform=request.platform,
             raw_receipt=request.receipt,
-            transaction_id=request.product_id,  # Will be populated from validated receipt
+            # transaction_id 는 실제 receipt parser 가 추출하기 전까지 None — service 에서
+            # raw_receipt + user_id hash 로 합성. product_id 를 transaction_id 로 쓰던
+            # 기존 placeholder 는 (platform, transaction_id) UNIQUE 위반으로 같은 SKU 의
+            # 두 번째 사용자 결제부터 모두 차단되던 P0.
+            transaction_id=None,
             product_id=request.product_id,
         )
         # Always commit so the audit-trail receipt is persisted, even when the
