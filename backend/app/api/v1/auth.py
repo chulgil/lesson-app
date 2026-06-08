@@ -8,6 +8,11 @@ from fastapi import APIRouter, Body, Depends, Header, status  # noqa: F401  (Hea
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
+from app.core.rate_limit import (  # noqa: F401  사용되는 곳이 데코레이터 `dependencies=` 리스트라 ruff 가 detect 못함.
+    auth_dev_login_rate_limit,
+    auth_oauth_rate_limit,
+    auth_refresh_rate_limit,
+)
 from app.models.user import User
 from app.schemas.auth import (
     DevLoginRequest,
@@ -29,13 +34,17 @@ router = APIRouter()
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
     summary="OAuth login (Google / Kakao / Apple)",
+    dependencies=[auth_oauth_rate_limit],
 )
 async def oauth_login(
     provider: str,
     body: OAuthRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> TokenResponse:
-    """Exchange an OAuth authorization code or identity token for JWT tokens."""
+    """Exchange an OAuth authorization code or identity token for JWT tokens.
+
+    per-IP rate limit (20/min) — credential-stuffing / token-replay 방어.
+    """
     service = AuthService(db)
     return await service.oauth_login(provider, body)
 
@@ -45,6 +54,7 @@ async def oauth_login(
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
     summary="Dev login (development env, or beta with X-Internal-API-Key)",
+    dependencies=[auth_dev_login_rate_limit],
 )
 async def dev_login(
     body: DevLoginRequest,
@@ -56,6 +66,8 @@ async def dev_login(
     Allowed in `development` unconditionally, and in `beta` if the request carries
     a valid `X-Internal-API-Key` header matching `settings.INTERNAL_API_KEY`.
     Production always rejects.
+
+    per-IP rate limit (10/min) — beta dev-login bruteforce 차단.
     """
     service = AuthService(db)
     return await service.dev_login(body, internal_api_key=internal_api_key)
@@ -66,12 +78,16 @@ async def dev_login(
     response_model=RefreshTokenResponse,
     status_code=status.HTTP_200_OK,
     summary="Refresh access token",
+    dependencies=[auth_refresh_rate_limit],
 )
 async def refresh_token(
     body: RefreshTokenRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> RefreshTokenResponse:
-    """Generate a new access token using a refresh token."""
+    """Generate a new access token using a refresh token.
+
+    per-IP rate limit (20/min) — jti / refresh_token bruteforce 추측 차단.
+    """
     service = AuthService(db)
     return await service.refresh_token(body.refresh_token)
 
