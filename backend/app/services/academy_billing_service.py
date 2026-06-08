@@ -451,8 +451,20 @@ class AcademyBillingService:
         by_user_id: str,
         dispute_note: str | None = None,
     ) -> AcademySettlement:
-        """강사가 명세서 확인 또는 이의 제기."""
+        """강사가 명세서 확인 또는 이의 제기.
+
+        spec billing_settlement_spec §6.4. 본인 정산서만 acknowledge 할 수 있도록
+        settlement.teacher_member_id 의 user_id 가 by_user_id 와 일치하는지 검증.
+        """
+        from app.models.academy import AcademyMember
+
         s = await self.get_settlement(settlement_id)
+        member = await self.db.scalar(select(AcademyMember).where(AcademyMember.id == s.teacher_member_id))
+        if member is None or member.user_id != by_user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not the assigned teacher for this settlement",
+            )
         s.teacher_acknowledged_at = _utcnow()
         if dispute_note:
             s.teacher_dispute_note = dispute_note

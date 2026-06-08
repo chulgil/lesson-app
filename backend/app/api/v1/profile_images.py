@@ -94,5 +94,13 @@ async def delete_image(
             entity_id=entity_id,
             image_url=None,
         )
+    else:
+        # 알 수 없는 image_type 은 silently 200 으로 응답하지 않고 명시적 422.
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Unknown image_type: {image_type}",
+        )
 
     return ProfileImageDeleteResponse()

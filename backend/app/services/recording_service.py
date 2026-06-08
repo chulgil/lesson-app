@@ -92,9 +92,7 @@ class RecordingService:
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
 
-        result = await self.db.scalars(
-            query.order_by(PracticeRecording.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(PracticeRecording.created_at.desc()).offset(offset).limit(size))
         items = [RecordingResponse.model_validate(r) for r in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -373,10 +371,14 @@ class RecordingService:
                     ContentType=file.content_type or "audio/m4a",
                 )
             return f"{settings.VULTR_STORAGE_ENDPOINT}/{settings.VULTR_STORAGE_BUCKET}/{file_key}"
-        except Exception as e:
+        except Exception:
+            # S3 SDK raw 에러 (인프라 정보) 가 응답에 노출되지 않도록 로그만 남긴다.
+            import logging
+
+            logging.getLogger(__name__).exception("Recording upload to object storage failed")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to upload file: {e}",
+                detail="Failed to upload file",
             )
 
     async def _generate_presigned_url(self, file_key: str) -> str:

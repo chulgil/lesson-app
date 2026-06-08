@@ -28,6 +28,7 @@ from app.schemas.academy_announcement import (
     AcademyAnnouncementAudiencePreviewResponse,
     AcademyAnnouncementCreate,
     AcademyAnnouncementListResponse,
+    AcademyAnnouncementReadResponse,
     AcademyAnnouncementResponse,
     AcademyAnnouncementStatsResponse,
     AudienceCountByRole,
@@ -174,6 +175,7 @@ async def send_academy_announcement(
 
 @router.patch(
     "/announcements/{announcement_id}/recipients/me/read",
+    response_model=AcademyAnnouncementReadResponse,
     status_code=status.HTTP_200_OK,
     summary="Mark announcement as read (recipient self, idempotent)",
 )
@@ -181,18 +183,18 @@ async def mark_announcement_read(
     announcement_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-) -> dict[str, object]:
+) -> AcademyAnnouncementReadResponse:
     """수신자 본인이 공지를 열람한 시점을 기록 (spec §6.1 인앱 자동 마킹)."""
     service = AcademyAnnouncementService(db)
     recipient = await service.mark_read(
         announcement_id=announcement_id,
         user_id=current_user.id,
     )
-    return {
-        "announcement_id": recipient.announcement_id,
-        "user_id": recipient.user_id,
-        "read_at": recipient.read_at.isoformat() if recipient.read_at else None,
-    }
+    return AcademyAnnouncementReadResponse(
+        announcement_id=recipient.announcement_id,
+        user_id=recipient.user_id,
+        read_at=recipient.read_at,
+    )
 
 
 @router.get(

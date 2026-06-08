@@ -209,14 +209,24 @@ class AuthService:
         )
 
     async def logout(self, user_id: str, refresh_token: str) -> None:
-        """Blacklist the given refresh token."""
+        """Blacklist the given refresh token.
+
+        Caller must already be authenticated as ``user_id``. The provided
+        ``refresh_token`` 이 정말 그 사용자의 것인지 payload sub 으로 검증해서,
+        타 사용자의 jti 를 알아낸 공격자가 임의 토큰을 무효화하지 못하게 막는다.
+        """
         from datetime import timedelta
 
         from app.core.security import decode_refresh_token
         from app.models.user import TokenBlacklist
 
         payload = decode_refresh_token(refresh_token)
-        jti = payload.get("jti", "") if payload else ""
+        if payload is None:
+            return
+        # sub 불일치 = 본인 토큰 아님. 침묵 반환 (타임 oracle 방지).
+        if payload.get("sub") != user_id:
+            return
+        jti = payload.get("jti", "")
         if not jti:
             # Undecodable / jti-less token: nothing useful to blacklist.
             return

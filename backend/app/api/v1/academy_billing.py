@@ -14,7 +14,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.context_deps import require_owner_context
+from app.core.context_deps import require_owner_context, require_teacher_context
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.academy_billing import (
@@ -29,6 +29,7 @@ from app.schemas.academy_billing import (
     AcademyPaymentCreate,
     AcademyPaymentListResponse,
     AcademyPaymentResponse,
+    AcademySettlementAcknowledgeRequest,  # noqa: F401  ruff 가 `from __future__ import annotations` 환경에서 사용 미감지 — FastAPI runtime 에서 ForwardRef 해석에 필요.
     AcademySettlementAdjustRequest,
     AcademySettlementListResponse,
     AcademySettlementResponse,
@@ -44,6 +45,10 @@ from app.services.academy_service import AcademyService
 
 # AC-M2 권한 매트릭스: 콘솔 owner 전용. teacher 모드 JWT → 403.
 router = APIRouter(dependencies=[Depends(require_owner_context)])
+# 강사용 라우트 — lesson-app 인박스에서 호출하는 정산서 확인/이의 제기 등.
+# spec billing_settlement_spec §6.4 의 '강사 확인 CTA' 흐름이 owner 라우트와 같은
+# router 에 있으면 require_owner_context 가 teacher 모드를 403 으로 차단해 호출 불가.
+teacher_router = APIRouter(dependencies=[Depends(require_teacher_context)])
 
 
 # ---------------------------------------------------------------------------
@@ -410,7 +415,7 @@ async def mark_transferred(
     return AcademySettlementResponse.model_validate(updated)
 
 
-@router.post(
+@teacher_router.post(
     "/billing/settlements/{settlement_id}/acknowledge",
     response_model=AcademySettlementResponse,
     status_code=status.HTTP_200_OK,
@@ -418,21 +423,18 @@ async def mark_transferred(
 )
 async def acknowledge_settlement(
     settlement_id: str,
+    body: AcademySettlementAcknowledgeRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-    dispute_note: Annotated[str | None, Query()] = None,
 ) -> AcademySettlementResponse:
-    # 강사 본인 검증은 service 에서 — 현재는 member 이기만 하면 acknowledge 허용 (자세한 본인 검증 향후).
-    service = AcademyBillingService(db)
-    s = await service.get_settlement(settlement_id)
-    academy_service = AcademyService(db)
-    my_academies = await academy_service.list_academies_for_user(current_user.id)
-    if not any(a.id == s.academy_id for a in my_academies):
-        from fastapi import HTTPException
+    """spec billing_settlement_spec §6.4 — 강사가 lesson-app 인박스에서 정산서 확인/이의.
 
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
+    본 라우트는 ``teacher_router`` (require_teacher_context) 에 마운트 — owner 컨텍스트
+    JWT 로는 호출 불가. 본인 정산서인지 검증은 service 안에서 처리.
+    """
+    service = AcademyBillingService(db)
     updated = await service.teacher_acknowledge(
-        settlement_id=settlement_id, by_user_id=current_user.id, dispute_note=dispute_note
+        settlement_id=settlement_id, by_user_id=current_user.id, dispute_note=body.dispute_note
     )
     return AcademySettlementResponse.model_validate(updated)
 

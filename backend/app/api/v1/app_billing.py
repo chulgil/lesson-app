@@ -130,12 +130,17 @@ async def validate_iap_receipt(
             tier=None,
             expires_at=None,
         )
-    except Exception as e:
+    except Exception:
+        # 외부 라이브러리 traceback / DB 에러 메시지가 응답에 노출되는 것을 막는다.
+        # 상세는 서버 로그에만 남기고, 클라이언트에는 generic 한 메시지만 반환.
+        import logging
+
+        logging.getLogger(__name__).exception("IAP receipt validation failed for user=%s", current_user.id)
         await db.rollback()
 
         return IapValidateResponse(
             success=False,
-            message=f"Receipt validation failed: {str(e)}",
+            message="Receipt validation failed",
             plan_id=None,
             tier=None,
             expires_at=None,

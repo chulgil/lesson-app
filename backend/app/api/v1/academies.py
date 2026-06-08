@@ -389,6 +389,8 @@ async def accept_invite(
     current_user: Annotated[User, Depends(get_current_user)],
     token: Annotated[str, Query(min_length=1)],
 ) -> AcademyMemberResponse:
+    # TODO(security): token 을 body 로 이동해 access log / referrer 노출 차단.
+    # 현재 frontend (Flutter) 가 Query 파라미터로 전달하므로 호환성 유지.
     service = AcademyService(db)
     member = await service.accept_invite(
         raw_token=token,
@@ -410,8 +412,13 @@ async def decline_invite(
     current_user: Annotated[User, Depends(get_current_user)],
     token: Annotated[str, Query(min_length=1)],
 ) -> AcademyInviteResponse:
+    # TODO(security): token 을 body 로 이동해 access log / referrer 노출 차단.
     service = AcademyService(db)
-    invite = await service.decline_invite(raw_token=token, reason=body.reason)
+    invite = await service.decline_invite(
+        raw_token=token,
+        by_user_id=current_user.id,
+        reason=body.reason,
+    )
     return AcademyInviteResponse.model_validate(invite)
 
 
