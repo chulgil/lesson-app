@@ -29,10 +29,15 @@ class SubscriptionType(str, enum.Enum):
 
 
 class SubscriptionStatus(str, enum.Enum):
+    # spec subscription_master.md §2.3 — 7-상태 lifecycle.
+    pending = "pending"  # 발급 후 입금 확인 전.
     active = "active"
-    expiringSoon = "expiringSoon"
+    expiringSoon = "expiringSoon"  # noqa: N815
+    exhausted = "exhausted"  # 횟수 소진 — expired 와 분리.
     expired = "expired"
     paused = "paused"
+    suspended = "suspended"  # 일시 정지 (운영 측 강제).
+    cancelled = "cancelled"  # terminal — 환불·취소.
 
 
 class BillingType(str, enum.Enum):

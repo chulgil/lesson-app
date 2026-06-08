@@ -1,9 +1,8 @@
 """Teacher-related schemas."""
 
-
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.lesson import LessonResponse
 from app.schemas.user import UserResponse
@@ -56,6 +55,37 @@ class TeacherCertificateResponse(BaseModel):
     rejection_reason: str | None = None
     submitted_at: _dt.datetime | None = None
     reviewed_at: _dt.datetime | None = None
+
+
+class TeacherCertificateCreate(BaseModel):
+    """Teacher certificate submission (Phase 21 — teacher_registration.md §3).
+
+    spec 의 자격증 업로드 → 검토 → 승인/반려 흐름. status 는 submission 시 ``pending``,
+    검토 endpoint (별도) 에서 admin 이 ``approved`` / ``rejected`` 로 전이.
+    """
+
+    type: str = Field(..., min_length=1, max_length=50)
+    name: str = Field(..., min_length=1, max_length=200)
+    issuing_body: str | None = Field(default=None, max_length=200)
+    issue_date: _dt.datetime | None = None
+    certificate_number: str | None = Field(default=None, max_length=100)
+    image_url: str | None = None
+
+
+class TeacherCertificateUpdate(BaseModel):
+    """미제출 / rejected 상태에서 재제출 시 갱신할 수 있는 필드."""
+
+    type: str | None = Field(default=None, min_length=1, max_length=50)
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    issuing_body: str | None = Field(default=None, max_length=200)
+    issue_date: _dt.datetime | None = None
+    certificate_number: str | None = Field(default=None, max_length=100)
+    image_url: str | None = None
+
+
+class TeacherCertificateListResponse(BaseModel):
+    items: list[TeacherCertificateResponse] = []
+    total: int
 
 
 # ---------------------------------------------------------------------------

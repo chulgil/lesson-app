@@ -42,13 +42,10 @@ class TeacherService:
             .order_by(TeacherEducation.sort_order)
         )
         career = await self.db.scalars(
-            select(TeacherCareer)
-            .where(TeacherCareer.teacher_id == teacher.id)
-            .order_by(TeacherCareer.sort_order)
+            select(TeacherCareer).where(TeacherCareer.teacher_id == teacher.id).order_by(TeacherCareer.sort_order)
         )
         certificates = await self.db.scalars(
-            select(TeacherCertificate)
-            .where(TeacherCertificate.teacher_id == teacher.id)
+            select(TeacherCertificate).where(TeacherCertificate.teacher_id == teacher.id)
         )
 
         response = TeacherResponse.model_validate(teacher)
@@ -71,6 +68,8 @@ class TeacherService:
         lesson_type: str | None = None,
         min_experience: int | None = None,
         has_verified_certificate: bool | None = None,
+        fee_min: int | None = None,
+        fee_max: int | None = None,
     ) -> PaginatedResponse[TeacherResponse]:
         """List / search teachers with pagination."""
         from app.models.teacher import CertificateStatus, Teacher, TeacherCertificate
@@ -87,6 +86,12 @@ class TeacherService:
             query = query.where(Teacher.lesson_types.cast(String).ilike(f"%{lesson_type}%"))
         if min_experience is not None:
             query = query.where(Teacher.experience_years >= min_experience)
+        # spec teacher_registration.md §4.2 — feeRange 필터.
+        # teacher 의 fee_max 가 검색의 fee_min 보다 작거나, fee_min 이 검색 fee_max 보다 크면 제외.
+        if fee_min is not None:
+            query = query.where((Teacher.fee_max.is_(None)) | (Teacher.fee_max >= fee_min))
+        if fee_max is not None:
+            query = query.where((Teacher.fee_min.is_(None)) | (Teacher.fee_min <= fee_max))
         if has_verified_certificate is True:
             approved_certificate_exists = (
                 select(TeacherCertificate.id)
@@ -128,9 +133,7 @@ class TeacherService:
         """Return a teacher profile by the owning user ID."""
         from app.models.teacher import Teacher
 
-        teacher = await self.db.scalar(
-            select(Teacher).where(Teacher.user_id == user_id)
-        )
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
         if teacher is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
         return await self._enrich_response(teacher)
@@ -152,9 +155,7 @@ class TeacherService:
             .order_by(TeacherEducation.sort_order)
         )
         career_rows = await self.db.scalars(
-            select(TeacherCareer)
-            .where(TeacherCareer.teacher_id == teacher.id)
-            .order_by(TeacherCareer.sort_order)
+            select(TeacherCareer).where(TeacherCareer.teacher_id == teacher.id).order_by(TeacherCareer.sort_order)
         )
 
         return TeacherPublicProfileResponse(
@@ -259,29 +260,30 @@ class TeacherService:
         today = date.today()
         week_end = today + timedelta(days=7)
 
-        total_students = await self.db.scalar(
-            select(func.count()).where(Student.teacher_id == teacher_id)
-        ) or 0
-        active_students = await self.db.scalar(
-            select(func.count()).where(Student.teacher_id == teacher_id, Student.status == "active")
-        ) or 0
-
-        today_lessons = await self.db.scalar(
-            select(func.count()).where(Lesson.teacher_id == teacher_id, Lesson.date == today)
-        ) or 0
-        week_lessons = await self.db.scalar(
-            select(func.count()).where(
-                Lesson.teacher_id == teacher_id,
-                Lesson.date >= today,
-                Lesson.date < week_end,
+        total_students = await self.db.scalar(select(func.count()).where(Student.teacher_id == teacher_id)) or 0
+        active_students = (
+            await self.db.scalar(
+                select(func.count()).where(Student.teacher_id == teacher_id, Student.status == "active")
             )
-        ) or 0
+            or 0
+        )
+
+        today_lessons = (
+            await self.db.scalar(select(func.count()).where(Lesson.teacher_id == teacher_id, Lesson.date == today)) or 0
+        )
+        week_lessons = (
+            await self.db.scalar(
+                select(func.count()).where(
+                    Lesson.teacher_id == teacher_id,
+                    Lesson.date >= today,
+                    Lesson.date < week_end,
+                )
+            )
+            or 0
+        )
 
         upcoming_result = await self.db.scalars(
-            select(Lesson)
-            .where(Lesson.teacher_id == teacher_id, Lesson.date >= today)
-            .order_by(Lesson.date)
-            .limit(5)
+            select(Lesson).where(Lesson.teacher_id == teacher_id, Lesson.date >= today).order_by(Lesson.date).limit(5)
         )
         from app.schemas.lesson import LessonResponse
 
@@ -295,3 +297,110 @@ class TeacherService:
             unpaid_count=0,
             upcoming_lessons=upcoming,
         )
+
+    # ---------------------------------------------------------------------------
+    # Certificate CRUD — teacher_registration.md §3 (자격증 업로드 → 검토 → 승인/반려)
+    # ---------------------------------------------------------------------------
+
+    async def list_my_certificates(self, user_id: str) -> list:
+        """Return certificates owned by the authenticated teacher."""
+        from datetime import UTC, datetime  # noqa: F401
+
+        from app.models.teacher import Teacher, TeacherCertificate
+
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
+        result = await self.db.scalars(
+            select(TeacherCertificate).where(TeacherCertificate.teacher_id == teacher.id)
+        )
+        return [TeacherCertificateResponse.model_validate(c) for c in result.all()]
+
+    async def create_my_certificate(self, user_id: str, data: dict) -> TeacherCertificateResponse:
+        """Submit a new certificate for review. status starts as ``pending``."""
+        from datetime import UTC, datetime
+
+        from app.models.teacher import CertificateStatus, CertificateType, Teacher, TeacherCertificate
+
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
+        try:
+            cert_type = CertificateType(data["type"])
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown certificate type: {data['type']}",
+            ) from exc
+        certificate = TeacherCertificate(
+            teacher_id=teacher.id,
+            type=cert_type,
+            name=data["name"],
+            issuing_body=data.get("issuing_body"),
+            issue_date=data.get("issue_date"),
+            certificate_number=data.get("certificate_number"),
+            image_url=data.get("image_url"),
+            status=CertificateStatus.pending,
+            submitted_at=datetime.now(UTC),
+        )
+        self.db.add(certificate)
+        await self.db.flush()
+        await self.db.refresh(certificate)
+        return TeacherCertificateResponse.model_validate(certificate)
+
+    async def update_my_certificate(
+        self, user_id: str, certificate_id: str, data: dict
+    ) -> TeacherCertificateResponse:
+        """Re-submit a certificate. status 가 approved 면 갱신 차단."""
+        from app.models.teacher import CertificateStatus, CertificateType, Teacher, TeacherCertificate
+
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
+        certificate = await self.db.scalar(
+            select(TeacherCertificate)
+            .where(TeacherCertificate.id == certificate_id)
+            .where(TeacherCertificate.teacher_id == teacher.id)
+        )
+        if certificate is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Certificate not found")
+        if certificate.status == CertificateStatus.approved:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Approved certificates cannot be edited",
+            )
+        if "type" in data and data["type"] is not None:
+            try:
+                certificate.type = CertificateType(data["type"])
+            except ValueError as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f"Unknown certificate type: {data['type']}",
+                ) from exc
+        for key in ("name", "issuing_body", "issue_date", "certificate_number", "image_url"):
+            if key in data and data[key] is not None:
+                setattr(certificate, key, data[key])
+        # 재제출 시 status 를 pending 으로 reset.
+        certificate.status = CertificateStatus.pending
+        certificate.rejection_reason = None
+        certificate.reviewed_at = None
+        await self.db.flush()
+        await self.db.refresh(certificate)
+        return TeacherCertificateResponse.model_validate(certificate)
+
+    async def delete_my_certificate(self, user_id: str, certificate_id: str) -> None:
+        """Delete a certificate. approved 상태도 삭제 허용 — 본인이 self-revoke 가능."""
+        from app.models.teacher import Teacher, TeacherCertificate
+
+        teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
+        certificate = await self.db.scalar(
+            select(TeacherCertificate)
+            .where(TeacherCertificate.id == certificate_id)
+            .where(TeacherCertificate.teacher_id == teacher.id)
+        )
+        if certificate is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Certificate not found")
+        await self.db.delete(certificate)
+        await self.db.flush()

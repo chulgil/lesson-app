@@ -9,6 +9,9 @@ from app.models.base import Base, UUIDMixin
 
 
 class RelationStatus(StrEnum):
+    # spec invite_lifecycle_spec.md §4.1 — 초대 전송됨 vs 체험 예약됨 구분용.
+    # invitePending: 초대 발송 + 학생이 아직 가입 / 체험 예약 안 함.
+    invitePending = "invitePending"  # noqa: N815
     pending = "pending"
     trialBooked = "trialBooked"  # noqa: N815
     active = "active"

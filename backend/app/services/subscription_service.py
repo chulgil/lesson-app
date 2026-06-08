@@ -409,22 +409,49 @@ class SubscriptionService:
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=f"Unknown subscription status: {new_status}",
             ) from exc
+        # spec subscription_master.md §2.3 — 7-상태 lifecycle 전이 매트릭스.
         valid_transitions: dict[SubscriptionStatus, set[SubscriptionStatus]] = {
+            SubscriptionStatus.pending: {
+                # 입금 확인 → 활성, 또는 시간 만료, 또는 사용자 취소.
+                SubscriptionStatus.active,
+                SubscriptionStatus.cancelled,
+                SubscriptionStatus.expired,
+            },
             SubscriptionStatus.active: {
                 SubscriptionStatus.expiringSoon,
+                SubscriptionStatus.exhausted,
                 SubscriptionStatus.expired,
                 SubscriptionStatus.paused,
+                SubscriptionStatus.suspended,
+                SubscriptionStatus.cancelled,
             },
             SubscriptionStatus.expiringSoon: {
                 SubscriptionStatus.active,
+                SubscriptionStatus.exhausted,
                 SubscriptionStatus.expired,
                 SubscriptionStatus.paused,
+                SubscriptionStatus.suspended,
+                SubscriptionStatus.cancelled,
             },
             SubscriptionStatus.paused: {
                 SubscriptionStatus.active,
                 SubscriptionStatus.expired,
+                SubscriptionStatus.suspended,
+                SubscriptionStatus.cancelled,
+            },
+            SubscriptionStatus.suspended: {
+                # 운영 측 강제 일시정지 — 활성/만료/취소 로만 복귀.
+                SubscriptionStatus.active,
+                SubscriptionStatus.expired,
+                SubscriptionStatus.cancelled,
+            },
+            SubscriptionStatus.exhausted: {
+                # 횟수 소진 — 만료 / 환불 (cancelled) 만 가능.
+                SubscriptionStatus.expired,
+                SubscriptionStatus.cancelled,
             },
             SubscriptionStatus.expired: set(),  # terminal — 어떤 상태로도 복귀 불가.
+            SubscriptionStatus.cancelled: set(),  # terminal — 환불·취소 후 복귀 불가.
         }
         if target != sub.status and target not in valid_transitions.get(sub.status, set()):
             raise HTTPException(
