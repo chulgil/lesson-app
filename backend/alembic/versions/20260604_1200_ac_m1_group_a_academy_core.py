@@ -169,7 +169,9 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("token_hash", sa.String(128), nullable=False, unique=True),
-        sa.Column("roles", sa.JSON(), nullable=False, server_default=sa.text("'[]'::json")),
+        # NOTE: PostgreSQL 전용 ``::json`` cast 제거 — SQLite (tests) 에서 ``unrecognized token: ":"`` 로 실패.
+        # ``sa.text("'[]'")`` 는 PostgreSQL JSON 컬럼에도 안전 (자동 cast 됨).
+        sa.Column("roles", sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
         sa.Column("target_email", sa.String(255), nullable=True),
         sa.Column("target_phone", sa.String(30), nullable=True),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
