@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,22 +11,72 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
 import '../providers/home_lesson_summary_provider.dart';
 import '../providers/teacher_profile_completion_provider.dart';
 
-// ignore: widget-smoke-test
-// Smoke test deferred: ConsumerWidget requires live Riverpod container;
-// covered by integration tests for DashboardTab.
+/// 가입 직후 첫 도착 시 자동 완료된 카드를 표시하는 시간 (§8.2).
+const _kFirstArrivalRevealDuration = Duration(seconds: 2);
+
+/// Quest 분류 그룹 — §13 퀘스트 시스템 (3-group).
+enum QuestGroup {
+  /// Q1~Q5 — 학생에게 보일 정보 준비 (가용시간/사진/소개/레슨비/계좌).
+  profile,
+
+  /// Q6~Q10 — 학생 연결 → 실제 운영 흐름 (학생/수강권/레슨/노트/숙제).
+  operation,
+
+  /// Q11 — 선택 보너스 (전화인증 = 인증 선생님 배지).
+  bonus,
+}
 
 /// Quest Board — profile completion gamification widget.
 ///
-/// Replaces the old Getting Started checklist with a quest-style board
-/// that shows a completion gauge and per-quest unlock rewards.
-class QuestBoardCard extends ConsumerWidget {
+/// 학습 가이드 + 단축 진입점. 모든 퀘스트는 선택 (가입 흐름 첫 가용시간만 강제).
+/// 3-group 시맨틱 분류 + Q6→{Q7~Q10} Lock 매트릭스 단순화 (§13).
+///
+/// 자동 완료 즉시 소거 (§8.2):
+/// - 일반 진입: 완료된 카드는 build 시점에 filter out (이미 본 카드)
+/// - 가입 직후 첫 도착 (5분 윈도우): 완료된 카드도 2초 표시 후 소거
+class QuestBoardCard extends ConsumerStatefulWidget {
   const QuestBoardCard({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QuestBoardCard> createState() => _QuestBoardCardState();
+}
+
+class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
+  /// 가입 직후 첫 도착 윈도우 안이면 true — 2초 후 false 로 전환.
+  bool _revealCompleted = false;
+  Timer? _revealTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // build() async — 첫 frame 직후 future 완료를 await 한 뒤 reveal 판정.
+    // `ref.read(provider).value` 는 sync 라 AsyncLoading 시점에 null 반환 — race 회피.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final value = await ref.read(questFirstShownProvider.future);
+      if (!mounted) return;
+      if (QuestFirstShown.isWithin(value)) {
+        setState(() => _revealCompleted = true);
+        _revealTimer = Timer(_kFirstArrivalRevealDuration, () {
+          if (mounted) setState(() => _revealCompleted = false);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _revealTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final percent = ref.watch(profileCompletionPercentProvider);
     final hasSlots = ref.watch(hasAvailableSlotsProvider);
     final studentsAsync = ref.watch(homeStudentsProvider);
@@ -37,15 +89,12 @@ class QuestBoardCard extends ConsumerWidget {
     final hasCompletedLesson = ref.watch(homeHasCompletedLessonProvider);
     final hasLessonNote = ref.watch(hasWrittenLessonNoteProvider);
     final hasPracticeAssigned = ref.watch(hasAssignedPracticeProvider);
-    // #430 G1 — Phase C 보상 퀘스트 (전화인증 → 인증 선생님 배지)
+    // Phase C 보상 — phone_verification_policy.md §2.
     final isPhoneVerified = ref.watch(homeTeacherPhoneVerifiedProvider);
 
-    // Board dismissal must align with the progress gauge SSOT
-    // (profileCompletionPercent): the 10 mandatory quests sum to 100%. Phone
-    // verification is the optional Phase C reward quest (weight 0, see
-    // phone_verification_policy.md §2), so it must NOT keep the board open —
-    // otherwise the gauge reads 100% while the board lingers. (#430 G1 / #482)
-    final allDone =
+    // Board dismissal aligns with profileCompletionPercent SSOT
+    // (10 mandatory quests sum to 100%, Q11 is bonus weight 0).
+    final allMandatoryDone =
         hasSlots &&
         hasPhoto &&
         hasIntro &&
@@ -57,7 +106,7 @@ class QuestBoardCard extends ConsumerWidget {
         hasLessonNote &&
         hasPracticeAssigned;
 
-    if (allDone) return const SizedBox.shrink();
+    if (allMandatoryDone) return const SizedBox.shrink();
 
     final quests = _buildQuests(
       context: context,
@@ -74,36 +123,64 @@ class QuestBoardCard extends ConsumerWidget {
       isPhoneVerified: isPhoneVerified,
     );
 
+    // 그룹별 분류: counter 는 전체 (완료 포함), visible 은 reveal 윈도우 외이면
+    // 미완료만 표시 (§8.2 즉시 소거 — "이미 본 카드 노출하지 않음").
+    final byGroupAll = <QuestGroup, List<_Quest>>{
+      for (final g in QuestGroup.values)
+        g: quests.where((q) => q.group == g).toList(),
+    };
+    final byGroupVisible = <QuestGroup, List<_Quest>>{
+      for (final g in QuestGroup.values)
+        g:
+            byGroupAll[g]!
+                .where((q) => _revealCompleted || !q.isCompleted)
+                .toList(),
+    };
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header row: QUEST BOARD + progress gauge
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Expanded(
-                child: NotebookSectionHeader(label: AppStrings.questBoardTitle),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              _ProgressGauge(percent: percent),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            AppStrings.questBoardIntro,
-            style: NotebookTypography.handMedium.copyWith(
-color: AppColors.inkSecondary,
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.topCenter,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Expanded(
+                  child: NotebookSectionHeader(
+                    label: AppStrings.questBoardTitle,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                _ProgressGauge(percent: percent),
+              ],
             ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          for (int i = 0; i < quests.length; i++) ...[
-            _QuestItem(quest: quests[i], index: i),
-            if (i < quests.length - 1)
-              const SizedBox(height: AppSpacing.space2),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              AppStrings.questBoardIntro,
+              style: NotebookTypography.handMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            for (final group in QuestGroup.values) ...[
+              if (byGroupVisible[group]!.isNotEmpty) ...[
+                _QuestGroupSection(
+                  group: group,
+                  quests: byGroupVisible[group]!,
+                  totalInGroup: byGroupAll[group]!.length,
+                  completedInGroup:
+                      byGroupAll[group]!.where((q) => q.isCompleted).length,
+                ),
+                if (group != QuestGroup.bonus)
+                  const SizedBox(height: AppSpacing.space3),
+              ],
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -122,148 +199,126 @@ color: AppColors.inkSecondary,
     required bool hasPracticeAssigned,
     required bool isPhoneVerified,
   }) {
-    // Quest order designed by teacher workflow:
-    //
-    // === Setup Phase (프로필 & 설정) ===
-    // 1. Lesson time settings — students can't book without this
-    //    (blocker quest #422 — locks all other quests until done)
-    // 2. Profile photo — builds trust, enables search visibility
-    // 3. Introduction — unlocks web profile sharing
-    // 4. Lesson price — shows pricing to students
-    // 5. Bank account — students need to know where to pay
-    //
-    // === Action Phase (실제 레슨 운영) ===
-    // 6. First student invite — connect with a student
-    // 7. First subscription — issue subscription to start managing
-    // 8. First lesson completed — complete the full workflow
-    // 9. First lesson note — provide feedback to student
-    // 10. First practice assigned — assign homework
-    //
-    // #422: When `hasSlots == false`, quests 2..10 are locked — onTap is
-    // forced to null so users see the disabled affordance with the
-    // "가용시간 설정 후 진행 가능" hint until they complete quest 1.
-    // The blocker quest itself uses the simple setup screen.
-    final bool slotsBlocker = !hasSlots;
+    // §7 Lock 매트릭스 — Q6 → {Q7, Q8, Q9, Q10} 만 유지.
+    // slotsBlocker (모든 퀘스트 잠금) 패턴 제거 — 모든 퀘스트는 의무 아님.
+    VoidCallback onLockedTap() => () {
+      // Q6 (학생 초대) 로 자동 이동 + 토스트 안내.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.questLockedStudentRequiredToast),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      context.push(AppRoutes.invite);
+    };
+
     return [
-      // ── Setup Phase ──
+      // ── 🪪 프로필 설정 그룹 (Q1~Q5) ──
       _Quest(
-        step: 1,
+        id: 'q1',
+        group: QuestGroup.profile,
         title: AppStrings.questTitleSlots,
         reward: AppStrings.questRewardSlots,
         isCompleted: hasSlots,
-        // Blocker quest — first availability simple UI per spec
-        // docs/specs/onboarding/teacher_first_availability_setup.md.
-        onTap: () => context.push(AppRoutes.teacherFirstAvailability),
+        // §5.1 — Q1 진입 라우트 변경: teacherFirstAvailability → teacherAvailability (split_page).
+        onTap: () => context.push(AppRoutes.teacherAvailability),
       ),
       _Quest(
-        step: 2,
+        id: 'q2',
+        group: QuestGroup.profile,
         title: AppStrings.questTitlePhoto,
         reward: AppStrings.questRewardSearch,
         isCompleted: hasPhoto,
-        isLocked: slotsBlocker,
-        onTap: slotsBlocker
-            ? null
-            : () => context.push(AppRoutes.basicInfoEdit),
+        onTap: () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
-        step: 3,
+        id: 'q3',
+        group: QuestGroup.profile,
         title: AppStrings.questTitleIntro,
         reward: AppStrings.questRewardWebProfile,
         isCompleted: hasIntro,
-        isLocked: slotsBlocker,
-        onTap: slotsBlocker
-            ? null
-            : () => context.push(AppRoutes.basicInfoEdit),
+        onTap: () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
-        step: 4,
+        id: 'q4',
+        group: QuestGroup.profile,
         title: AppStrings.questTitlePrice,
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
-        isLocked: slotsBlocker,
-        // Price table is edited on the lesson-time settings screen (#5 step4
-        // was a NO-OP). Gated by the same slots blocker as the other quests.
-        onTap: slotsBlocker
-            ? null
-            : () => context.push(AppRoutes.lessonTimeSettings),
+        onTap: () => context.push(AppRoutes.lessonTimeSettings),
       ),
       _Quest(
-        step: 5,
+        id: 'q5',
+        group: QuestGroup.profile,
         title: AppStrings.questTitleBankAccount,
         reward: AppStrings.questRewardBankAccount,
         isCompleted: hasBankAcc,
-        isLocked: slotsBlocker,
-        onTap: slotsBlocker
-            ? null
-            : () => context.push(AppRoutes.bankAccountEdit),
+        onTap: () => context.push(AppRoutes.bankAccountEdit),
       ),
-      // ── Action Phase ──
+      // ── 🎓 운영 시작 그룹 (Q6~Q10) ──
       _Quest(
-        step: 6,
+        id: 'q6',
+        group: QuestGroup.operation,
         title: AppStrings.questTitleStudent,
         reward: AppStrings.questRewardConnection,
         isCompleted: hasStudents,
-        isLocked: slotsBlocker,
-        onTap: slotsBlocker ? null : () => context.push(AppRoutes.invite),
+        onTap: () => context.push(AppRoutes.invite),
       ),
       _Quest(
-        step: 7,
+        id: 'q7',
+        group: QuestGroup.operation,
         title: AppStrings.questTitleSubscription,
         reward: AppStrings.questRewardSubscription,
         isCompleted: hasSubscription,
-        isLocked: slotsBlocker,
-        onTap: slotsBlocker
-            ? null
-            : (hasStudents
-                  ? () => context.push(AppRoutes.issueSubscription)
-                  : null),
+        isLocked: !hasStudents,
+        onTap:
+            hasStudents
+                ? () => context.push(AppRoutes.issueSubscription)
+                : onLockedTap(),
       ),
       _Quest(
-        step: 8,
+        id: 'q8',
+        group: QuestGroup.operation,
         title: AppStrings.questTitleFirstLesson,
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
-        isLocked: slotsBlocker,
-        // Navigate to lesson list so teacher can add/complete a lesson.
-        onTap: slotsBlocker ? null : () => context.push(AppRoutes.lessons),
+        isLocked: !hasStudents,
+        onTap:
+            hasStudents ? () => context.push(AppRoutes.lessons) : onLockedTap(),
       ),
       _Quest(
-        step: 9,
+        id: 'q9',
+        group: QuestGroup.operation,
         title: AppStrings.questTitleLessonNote,
         reward: AppStrings.questRewardLessonNote,
         isCompleted: hasLessonNote,
-        isLocked: slotsBlocker,
-        // Quick-feedback list lets teacher write lesson notes after completion.
+        isLocked: !hasStudents,
         onTap:
-            slotsBlocker
-                ? null
-                : () => context.push(AppRoutes.quickFeedbackList),
+            hasStudents
+                ? () => context.push(AppRoutes.quickFeedbackList)
+                : onLockedTap(),
       ),
       _Quest(
-        step: 10,
+        id: 'q10',
+        group: QuestGroup.operation,
         title: AppStrings.questTitlePracticeAssign,
         reward: AppStrings.questRewardPracticeAssign,
         isCompleted: hasPracticeAssigned,
-        isLocked: slotsBlocker,
-        // Assignment dashboard lets teacher assign practice to students.
+        isLocked: !hasStudents,
         onTap:
-            slotsBlocker
-                ? null
-                : () => context.push(AppRoutes.assignmentDashboard),
+            hasStudents
+                ? () => context.push(AppRoutes.assignmentDashboard)
+                : onLockedTap(),
       ),
-      // ── Phase C (보상 퀘스트) ──
-      // 정책: docs/specs/user/phone_verification_policy.md §2 — 전화인증은
-      // 선택 보상 퀘스트로 "인증 선생님 배지" 부여. 첫 수강권 발급(E3)
-      // 게이트 도달 전 자발 인증을 유도한다.
+      // ── ✨ 선택 보너스 그룹 (Q11) ──
       _Quest(
-        step: 11,
+        id: 'q11',
+        group: QuestGroup.bonus,
         title: AppStrings.questTitlePhoneVerification,
         reward: AppStrings.questRewardVerified,
         isCompleted: isPhoneVerified,
-        isLocked: slotsBlocker,
-        onTap: slotsBlocker
-            ? null
-            : () => context.push(AppRoutes.teacherPhoneVerification),
+        // Bonus — lock 없음, 자유 진입.
+        onTap: () => context.push(AppRoutes.teacherPhoneVerification),
       ),
     ];
   }
@@ -272,24 +327,104 @@ color: AppColors.inkSecondary,
 // ── Internal data model ───────────────────────────────────────────────────────
 
 class _Quest {
-  final int step;
+  /// 퀘스트 고유 ID — q1~q11 (AnimatedSwitcher key 용).
+  final String id;
+  final QuestGroup group;
   final String title;
   final String? reward;
   final bool isCompleted;
   final VoidCallback? onTap;
-  // #422 — locked by the first-availability blocker quest. When true,
-  // the quest item shows the "가용시간 설정 후 진행 가능" hint instead
-  // of the original reward copy.
+
+  /// Lock 상태 — Q7~Q10 만 hasStudents == false 일 때 true.
   final bool isLocked;
 
   const _Quest({
-    required this.step,
+    required this.id,
+    required this.group,
     required this.title,
     required this.reward,
     required this.isCompleted,
     required this.onTap,
     this.isLocked = false,
   });
+}
+
+// ── Group section ─────────────────────────────────────────────────────────────
+
+class _QuestGroupSection extends StatelessWidget {
+  final QuestGroup group;
+
+  /// 화면에 보이는 quest 목록 (완료 카드 filter 적용 후).
+  final List<_Quest> quests;
+
+  /// 그룹 내 전체 quest 수 (counter 표시용).
+  final int totalInGroup;
+
+  /// 그룹 내 완료된 quest 수 (counter 표시용).
+  final int completedInGroup;
+
+  const _QuestGroupSection({
+    required this.group,
+    required this.quests,
+    required this.totalInGroup,
+    required this.completedInGroup,
+  });
+
+  String get _label {
+    switch (group) {
+      case QuestGroup.profile:
+        return AppStrings.questGroupProfileLabel;
+      case QuestGroup.operation:
+        return AppStrings.questGroupOperationLabel;
+      case QuestGroup.bonus:
+        return AppStrings.questGroupBonusLabel;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+          child: Row(
+            children: [
+              Text(
+                _label,
+                style: NotebookTypography.pieceTitle.copyWith(
+                  fontSize: 14,
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                '($completedInGroup/$totalInGroup)',
+                style: NotebookTypography.roman.copyWith(
+                  fontSize: 12,
+                  color: AppColors.inkTertiary,
+                ),
+              ),
+              if (group == QuestGroup.bonus) ...[
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.questGroupBonusOptionalTag,
+                  style: NotebookTypography.roman.copyWith(
+                    fontSize: 11,
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        for (int i = 0; i < quests.length; i++) ...[
+          _QuestItem(quest: quests[i], isBonus: group == QuestGroup.bonus),
+          if (i < quests.length - 1) const SizedBox(height: AppSpacing.space2),
+        ],
+      ],
+    );
+  }
 }
 
 // ── Progress gauge ────────────────────────────────────────────────────────────
@@ -336,33 +471,34 @@ class _ProgressGauge extends StatelessWidget {
 
 class _QuestItem extends StatelessWidget {
   final _Quest quest;
-  final int index;
 
-  const _QuestItem({required this.quest, required this.index});
+  /// Bonus 그룹은 외곽 점선 카드 (§10.1).
+  final bool isBonus;
+
+  const _QuestItem({required this.quest, this.isBonus = false});
 
   @override
   Widget build(BuildContext context) {
     final isEnabled = quest.onTap != null;
-    final accentColor = quest.isCompleted
-        ? AppColors.paperOk
-        : isEnabled
-        ? AppColors.ink
-        : AppColors.inkTertiary;
+    final accentColor =
+        quest.isCompleted
+            ? AppColors.paperOk
+            : isEnabled
+            ? AppColors.ink
+            : AppColors.inkTertiary;
 
-    return Opacity(
-      opacity: !quest.isCompleted && !isEnabled ? 0.5 : 1.0,
-      child: InkWell(
-        onTap: quest.onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Roman numeral or check glyph
-              SizedBox(
-                width: 28,
-                child: quest.isCompleted
-                    ? const Padding(
+    final content = InkWell(
+      onTap: quest.onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 28,
+              child:
+                  quest.isCompleted
+                      ? const Padding(
                         padding: EdgeInsets.only(top: 2),
                         child: NotebookGlyph(
                           NotebookGlyph.check,
@@ -370,64 +506,128 @@ class _QuestItem extends StatelessWidget {
                           color: AppColors.paperOk,
                         ),
                       )
-                    : Text(
-                        romanOf(quest.step - 1),
-                        style: NotebookTypography.roman.copyWith(
+                      : quest.isLocked
+                      ? Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(
+                          Icons.lock_outline,
+                          size: 14,
                           color: accentColor,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      quest.title,
-                      style: NotebookTypography.pieceTitle.copyWith(
-                        fontSize: 15,
-                        color: quest.isCompleted
-                            ? AppColors.inkTertiary
-                            : AppColors.ink,
-                        decoration: quest.isCompleted
-                            ? TextDecoration.lineThrough
-                            : null,
-                      ),
+                      )
+                      : const SizedBox.shrink(),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    quest.title,
+                    style: NotebookTypography.pieceTitle.copyWith(
+                      fontSize: 15,
+                      color:
+                          quest.isCompleted
+                              ? AppColors.inkTertiary
+                              : AppColors.ink,
+                      decoration:
+                          quest.isCompleted ? TextDecoration.lineThrough : null,
                     ),
-                    if (quest.reward != null && !quest.isCompleted) ...[
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          NotebookGlyph(
-                            NotebookGlyph.arrowRight,
-                            size: 12,
-                            color: AppColors.inkTertiary,
-                          ),
-                          const SizedBox(width: 3),
-                          Expanded(
-                            child: Text(
-                              quest.isLocked
-                                  ? AppStrings.firstAvailabilityLockedHint
-                                  : quest.reward!,
-                              style: NotebookTypography.roman.copyWith(
-                                fontSize: 12,
-                                color: AppColors.inkTertiary,
-                              ),
+                  ),
+                  if (quest.reward != null && !quest.isCompleted) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const NotebookGlyph(
+                          NotebookGlyph.arrowRight,
+                          size: 12,
+                          color: AppColors.inkTertiary,
+                        ),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            quest.isLocked
+                                ? AppStrings.questLockedStudentRequiredHint
+                                : quest.reward!,
+                            style: NotebookTypography.roman.copyWith(
+                              fontSize: 12,
+                              color: AppColors.inkTertiary,
                             ),
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ],
-                ),
+                ],
               ),
-              if (isEnabled && !quest.isCompleted)
-                const Icon(Icons.chevron_right, color: AppColors.ink, size: 18),
-            ],
-          ),
+            ),
+            if (isEnabled && !quest.isCompleted)
+              const Icon(Icons.chevron_right, color: AppColors.ink, size: 18),
+          ],
         ),
       ),
     );
+
+    if (isBonus) {
+      return DottedBorderContainer(child: content);
+    }
+    return content;
   }
+}
+
+// ── Dotted border (Bonus 그룹 카드) ─────────────────────────────────────────────
+
+class DottedBorderContainer extends StatelessWidget {
+  final Widget child;
+
+  const DottedBorderContainer({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _DottedBorderPainter(color: AppColors.inkTertiary),
+      child: child,
+    );
+  }
+}
+
+class _DottedBorderPainter extends CustomPainter {
+  final Color color;
+  static const double _dashWidth = 4;
+  static const double _dashGap = 3;
+
+  _DottedBorderPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 1
+          ..style = PaintingStyle.stroke;
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final path = Path()..addRect(rect);
+    _drawDashedPath(canvas, path, paint);
+  }
+
+  void _drawDashedPath(Canvas canvas, Path source, Paint paint) {
+    final dashed = Path();
+    for (final metric in source.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final next = distance + _dashWidth;
+        dashed.addPath(
+          metric.extractPath(distance, next.clamp(0, metric.length)),
+          Offset.zero,
+        );
+        distance = next + _dashGap;
+      }
+    }
+    canvas.drawPath(dashed, paint);
+  }
+
+  @override
+  bool shouldRepaint(_DottedBorderPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
