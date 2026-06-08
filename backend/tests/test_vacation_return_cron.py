@@ -192,8 +192,12 @@ async def test_cron_skips_cancelled_vacations(db_session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_cron_skips_vacations_ending_other_days(db_session: AsyncSession):
-    """Only vacations whose end_date equals yesterday in KST trigger the cron."""
+async def test_cron_skips_vacations_outside_catchup_window(db_session: AsyncSession):
+    """Phase 19 catch-up: end_date 가 어제~7일 전 범위 안인 vacation 만 trigger.
+
+    7일 보다 더 오래 전 종료 (영구 유실 위험은 spec 상 그 시점에는 의미 없음) 와 미래 종료는 skip.
+    alimtalk 멱등 키 ``(vacation_period_id, recipient_phone, template_id)`` 가 중복 발송 차단.
+    """
     mock = _reset_shared_mock_client()
     teacher_id = "teacher-return-3"
     yesterday = _yesterday_kst()
@@ -204,17 +208,19 @@ async def test_cron_skips_vacations_ending_other_days(db_session: AsyncSession):
         name="Y",
         phone="010-4444-4444",
         parent_phone=None,
-        scheduled=yesterday - timedelta(days=5),
+        scheduled=yesterday - timedelta(days=10),
     )
 
+    # 7일 보다 더 오래 전 종료 — catch-up window 밖, skip.
     db_session.add(
         VacationPeriod(
-            id=f"vac-too-early-{uuid4()}",
+            id=f"vac-too-old-{uuid4()}",
             teacher_id=teacher_id,
-            start_date=yesterday - timedelta(days=10),
-            end_date=yesterday - timedelta(days=5),
+            start_date=yesterday - timedelta(days=15),
+            end_date=yesterday - timedelta(days=10),
         )
     )
+    # 미래 종료 — skip.
     db_session.add(
         VacationPeriod(
             id=f"vac-future-{uuid4()}",

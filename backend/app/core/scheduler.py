@@ -50,8 +50,9 @@ def advisory_lock_key(job_name: str) -> int:
 async def try_advisory_lock(conn: _AsyncBindLike, *, key: int) -> bool:
     """Postgres `pg_try_advisory_lock` — 다른 dialect (sqlite test) 는 항상 True.
 
-    호출자는 같은 connection 에서 작업 종료 후 자동 unlock (session 종료) 또는
-    `pg_advisory_unlock` 으로 명시 해제.
+    **중요**: PG advisory lock 은 session-scope 라 connection pool 에 반환되면 다음 사용자가
+    그 connection 을 빌리면서 lock 도 함께 빌리게 된다. 누수 방지를 위해 호출자는 작업 종료 후
+    반드시 ``release_advisory_lock`` 을 ``finally`` 블록에서 호출해야 한다.
     """
     bind = conn.get_bind()
     if bind.dialect.name != "postgresql":
@@ -62,6 +63,21 @@ async def try_advisory_lock(conn: _AsyncBindLike, *, key: int) -> bool:
     if not acquired:
         logger.info("advisory_lock not acquired (held by another instance) key=%s", key)
     return acquired
+
+
+async def release_advisory_lock(conn: _AsyncBindLike, *, key: int) -> None:
+    """Postgres `pg_advisory_unlock` — connection pool 누수 차단.
+
+    SQLite / 기타 dialect 는 노옵. PG 에서 unlock 실패해도 예외를 던지지 않고 logger.warning
+    만 남긴다 (이미 작업은 끝났고 다음 cycle 에서 lock 재시도하면 됨).
+    """
+    bind = conn.get_bind()
+    if bind.dialect.name != "postgresql":
+        return
+    try:
+        await conn.execute(text("SELECT pg_advisory_unlock(:key)").bindparams(key=key))
+    except Exception:  # noqa: BLE001
+        logger.warning("advisory_lock release failed key=%s — connection 회수 시 자연 해제 기대", key)
 
 
 def get_scheduler() -> AsyncIOScheduler:
