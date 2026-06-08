@@ -324,10 +324,31 @@
 
 ---
 
+## 13. 퀘스트 시스템 (Quest System) — 2026-06-08
+
+선생님 학습 가이드 + 단축 진입점. **의무 아님** — 점수가 아닌 행동 격려.
+
+| 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
+|------|------|-----------|-----------|------|
+| 퀘스트 | Quest | `_Quest` | — | 선생님 학습 가이드 + 단축 진입점 (의무 아님). 11개 항목 (Q1~Q11) |
+| 프로필 설정 그룹 | Profile Setup Group | `QuestGroup.profile` | — | Q1~Q5 (가용시간/사진/소개/레슨비/계좌) |
+| 운영 시작 그룹 | Operation Group | `QuestGroup.operation` | — | Q6~Q10 (학생/수강권/레슨/노트/숙제) |
+| 선택 보너스 그룹 | Bonus Group | `QuestGroup.bonus` | — | Q11 (전화인증) — `[선택]` 라벨 + 점선 카드 |
+| 자동 완료 트리거 | Auto-Complete Trigger | (reactive provider) | — | 입력 즉시 퀘스트 완료 감지 + 카드 즉시 소거 |
+| 퀘스트 축하 카드 | Quest Celebration Card | `QuestCelebrationCard` | — | 11/11 완료 시 1회 표시 (`User.questCelebratedAt` 으로 1회성 보장) |
+| 가입 직후 첫 도착 | Signup First Arrival | `questFirstShownProvider` | — | SharedPreferences 기반 — 가입 직후 1회만 카드 2초 표시 (5분 윈도우) |
+| Lock 매트릭스 | Lock Matrix | `_QuestLockMatrix` | — | Q6(학생) → {Q7, Q8, Q9, Q10} 잠금 해제 트리거 (학생 등록 전 운영 행동 불가) |
+| dual-write 마이그레이션 | Dual-Write Migration | — | `teacher_availability_diff.py` | 단계 1~4: dual-write → reader 교체 → deprecate → 필드 제거 (in-flight 데이터 손실 방지) |
+
+**SSOT 정렬**: 가용시간은 `TeacherAvailability` (schedule 도메인) 단일 — `TeacherSettings.availableSlots` 는 dual-write 단계 후 deprecate.
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-08 | §13 퀘스트 시스템 신설 — 11 항목 / 3 그룹 (profile/operation/bonus) / Lock 매트릭스 단순화 (Q6→{Q7~Q10}) / 자동 완료 트리거 / 가입 직후 첫 도착 + 축하 카드 (1회성) / dual-write 마이그레이션 4 단계. 본 §13 은 `.harness/spec/2026-06-08-teacher-quest-system.md` O4 결정 |
 | 2026-06-04 | AC-M2 Context Toggle API — POST /auth/context/switch + GET /auth/context. JWT 페이로드 확장 (active_context/academy_id/teacher_id). ContextSwitchLog 자동 기록 + 학원장 자동 복귀 시 활성 위임 auto_end. billing_settlement_spec §1 결제 원칙 명확화 (PG/카드 외부 단말기/자동 송금 X). PaymentMethod.card docstring 보강 |
 | 2026-06-04 | §12 학원(Academy) 수강권/청구/정산 (AC-M1 그룹 C) — BillingRule/Invoice/Payment/Settlement/Subscription/TeacherPayoutOverride 6 엔티티 + 8 enum + subscriptions.academy_id + lessons.academy_id/visibility 컬럼 + AcademyInvitePreview FE 호환. FE 갭 #513 |
 | 2026-06-04 | §12 학원(Academy) 권한 계층 (AC-M1 그룹 B) 추가 — ContextSwitchLog + AcademyDelegation + AcademyDelegationAction + AcademyActivityLog 4 엔티티 + 5 enum (AcademyContext/ContextSwitchTrigger/DelegationReason/DelegationState/DelegationRevokeReason) |

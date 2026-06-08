@@ -3331,8 +3331,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5631,6 +5631,25 @@ class AppStrings {
   /// Quest Board 인트로 안내 — 프로필 완성 유도.
   static const questBoardIntro = '프로필을 완성하면 학생에게 더 많이 노출돼요!';
 
+  // §13 퀘스트 시스템 — 3-group 분류 헤더 (Job 4)
+  /// 그룹 1 — 프로필 설정 (Q1~Q5, 학생에게 보일 정보 준비).
+  static const questGroupProfileLabel = '프로필 설정';
+
+  /// 그룹 2 — 운영 시작 (Q6~Q10, 실제 레슨 운영 흐름).
+  static const questGroupOperationLabel = '운영 시작';
+
+  /// 그룹 3 — 선택 보너스 (Q11, 신뢰도 강화 보상).
+  static const questGroupBonusLabel = '선택 보너스';
+
+  /// 선택 보너스 그룹 라벨 (점선 카드 외).
+  static const questGroupBonusOptionalTag = '[선택]';
+
+  /// Lock 토스트 — Q7~Q10 클릭 시 Q6 으로 이동 안내.
+  static const questLockedStudentRequiredToast = '먼저 학생을 초대해주세요';
+
+  /// Lock hint — Q7~Q10 카드 reward 영역 (학생 없을 때).
+  static const questLockedStudentRequiredHint = '학생 초대 후 진행 가능';
+
   /// Quest I — 이름 + 악기 설정 타이틀.
   static const questTitleNameInstrument = '이름 + 악기 설정';
 
@@ -5732,9 +5751,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5871,11 +5891,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6944,8 +6965,10 @@ class AppStrings {
   static const profileLessonTimeTitle = '레슨 시간 설정';
   static const profileLessonTimeError = '오류가 발생했습니다.';
   static const profileLessonTimeOptionsSection = '레슨 시간 옵션';
+
   /// 레슨 시간 사용 토글 박스 — 사용중
   static const profileDurationInUse = '사용';
+
   /// 레슨 시간 사용 토글 박스 — 사용 안 함
   static const profileDurationOff = '해제';
   static const profileBookingSettingsSection = '예약 설정';

@@ -29,6 +29,9 @@ AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
+      questCelebratedAt: json['quest_celebrated_at'] == null
+          ? null
+          : DateTime.parse(json['quest_celebrated_at'] as String),
     );
 
 Map<String, dynamic> _$AuthUserToJson(AuthUser instance) => <String, dynamic>{
@@ -40,6 +43,7 @@ Map<String, dynamic> _$AuthUserToJson(AuthUser instance) => <String, dynamic>{
       'onboarding_completed': instance.onboardingCompleted,
       'auth_provider': instance.authProvider,
       'created_at': instance.createdAt?.toIso8601String(),
+      'quest_celebrated_at': instance.questCelebratedAt?.toIso8601String(),
     };
 
 const _$UserRoleEnumMap = {

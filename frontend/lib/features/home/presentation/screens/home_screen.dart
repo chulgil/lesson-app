@@ -10,7 +10,7 @@ import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/onboarding_facade.dart';
-import '../../../profile/domain/entities/teacher_settings.dart';
+import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
 import '../../../profile/profile_ui_facade.dart';
 import '../../../settings/settings_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
@@ -60,51 +60,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _coachMarkController.addListener(_onCoachMarkChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _maybeShowFirstAvailabilityInterstitial();
       _maybeStartCoachMark();
+      _markQuestFirstShown();
     });
   }
 
-  bool _interstitialShown = false;
-  // Subscription used to wait for settings to load before deciding whether to
-  // show the first-availability interstitial. Held so it can be closed on
-  // dispose and not leaked. (#9)
-  ProviderSubscription<AsyncValue<TeacherSettings>>? _settingsLoadSub;
+  // §13 퀘스트 시스템 (2026-06-08): first-availability interstitial 제거.
+  // 가입 흐름에서 first_availability_setup_screen 이 이미 슬롯 1개 필수 강제.
+  // home 진입 시점에 추가 강제 안 함 — 퀘스트 카드 (선택) 로 안내.
+  // Supersedes: docs/specs/onboarding/teacher_first_availability_setup.md §2 블로커 정책.
 
-  /// Show the first-availability interstitial when the teacher lands on
-  /// the home screen without any active availability slot (#422).
-  /// The dialog itself blocks back-navigation and dismiss, so we only
-  /// trigger it once per session — the slot count flips immediately
-  /// after the teacher saves a slot, so it will not reopen.
+  /// 가입 직후 첫 도착 시점을 기록 (§13 Signup First Arrival).
   ///
-  /// Only decide after settings have finished loading: [hasAvailableSlots]
-  /// derives from [teacherSettingsProvider] and reports `false` while still
-  /// loading, which would otherwise flash the interstitial at teachers who
-  /// already have slots. (#5 D-G3 — settings/profile SSOT)
-  void _maybeShowFirstAvailabilityInterstitial() {
-    if (_interstitialShown) return;
-    final settingsAsync = ref.read(teacherSettingsProvider);
-    if (!settingsAsync.hasValue) {
-      // Settings not loaded yet — re-check once a value arrives. Hold the
-      // subscription so it can be closed (it would otherwise leak for the
-      // lifetime of the container). (#9)
-      _settingsLoadSub?.close();
-      _settingsLoadSub = ref.listenManual(teacherSettingsProvider, (
-        previous,
-        next,
-      ) {
-        if (next.hasValue && mounted) {
-          _settingsLoadSub?.close();
-          _settingsLoadSub = null;
-          _maybeShowFirstAvailabilityInterstitial();
-        }
-      });
-      return;
-    }
-    final hasSlots = ref.read(hasAvailableSlotsProvider);
-    if (hasSlots) return;
-    _interstitialShown = true;
-    showFirstAvailabilityInterstitial(context);
+  /// 이미 기록된 값이 있으면 무시 (덮어쓰기 X — 5분 윈도우 유지).
+  /// QuestBoardCard 가 윈도우 내라면 자동 완료 카드를 2초 표시 후 소거.
+  void _markQuestFirstShown() {
+    final current = ref.read(questFirstShownProvider).value;
+    if (current != null) return;
+    // ignore: discarded_futures — fire-and-forget, 첫 도착 기록은 best-effort.
+    ref.read(questFirstShownProvider.notifier).markShown();
   }
 
   void _onCoachMarkChanged() {
@@ -160,7 +134,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
-    _settingsLoadSub?.close();
     _coachMarkLoadSub?.close();
     _coachMarkController.removeListener(_onCoachMarkChanged);
     _coachMarkController.dispose();
@@ -228,9 +201,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
     final isSelected = _currentIndex == index;
-    final accentColor = isSelected
-        ? AppColors.paperAccent
-        : AppColors.inkTertiary;
+    final accentColor =
+        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
 
     return InkWell(
       key: key,
