@@ -122,6 +122,13 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     total_reschedule_allowance: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     used_reschedule_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     reschedule_deadline_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
+    # spec subscription_edit_spec.md §7.1 — 수강권별 추가 변경권 / 개별 취소 기준시간 override.
+    bonus_reschedule_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    override_cancel_deadline_hours: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # spec §2.2 / §11.3 — 수강권별 레슨 장소 + 이동시간.
+    lesson_location_type: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    lesson_location_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    travel_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Payment
     payment_confirmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

@@ -393,6 +393,101 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
+    async def patch_reschedule_credits(
+        self,
+        subscription_id: str,
+        additional_count: int,
+        reason: str | None,
+        current_user: Any,
+    ) -> SubscriptionResponse:
+        """spec subscription_edit_spec.md §2.1 / §6.1 — 수강권 변경권 추가 (bonus)."""
+        from app.models.subscription import Subscription
+
+        if additional_count <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="additional_count must be positive",
+            )
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub.bonus_reschedule_count = (sub.bonus_reschedule_count or 0) + additional_count
+        if reason:
+            sub.bonus_reason = reason
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return await self._subscription_response(sub)
+
+    async def patch_lesson_location(
+        self,
+        subscription_id: str,
+        location_type: str,
+        location_id: str | None,
+        travel_time_minutes: int | None,
+        current_user: Any,
+    ) -> SubscriptionResponse:
+        """spec §2.2 / §6.1 — 수강권 레슨 장소 + 이동시간 통합 변경."""
+        from app.models.subscription import Subscription
+
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub.lesson_location_type = location_type
+        sub.lesson_location_id = location_id
+        if travel_time_minutes is not None:
+            sub.travel_time_minutes = travel_time_minutes
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return await self._subscription_response(sub)
+
+    async def patch_travel_time(
+        self,
+        subscription_id: str,
+        travel_time_minutes: int,
+        current_user: Any,
+    ) -> SubscriptionResponse:
+        """spec §2.2 / §6.1 — 이동시간 단독 수정."""
+        from app.models.subscription import Subscription
+
+        if travel_time_minutes < 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="travel_time_minutes must be non-negative",
+            )
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub.travel_time_minutes = travel_time_minutes
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return await self._subscription_response(sub)
+
+    async def patch_cancel_deadline(
+        self,
+        subscription_id: str,
+        override_hours: int | None,
+        current_user: Any,
+    ) -> SubscriptionResponse:
+        """spec §2.4 / §6.1 — 수강권별 개별 취소 기준시간 (null = 기본 정책)."""
+        from app.models.subscription import Subscription
+
+        if override_hours is not None and override_hours < 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="override_cancel_deadline_hours must be non-negative",
+            )
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        sub.override_cancel_deadline_hours = override_hours
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return await self._subscription_response(sub)
+
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status.
 
@@ -832,7 +927,11 @@ class SubscriptionService:
         return result.first()
 
     async def _subscription_response(self, sub: Any) -> SubscriptionResponse:
-        """Build a subscription response enriched with membership schedule context."""
+        """Build a subscription response enriched with membership schedule context.
+
+        spec subscription_edit_spec.md §11.3 — 수강권 본인 값이 있으면 우선,
+        없으면 membership(학생 신청 시점)의 값을 폴백.
+        """
         from app.models.lesson import ClassMembership
 
         response = SubscriptionResponse.model_validate(sub)
@@ -843,8 +942,10 @@ class SubscriptionService:
         if membership is None:
             return response
 
-        response.lesson_location_id = membership.lesson_location_id
-        response.travel_time_minutes = membership.travel_time_minutes
+        if response.lesson_location_id is None:
+            response.lesson_location_id = membership.lesson_location_id
+        if response.travel_time_minutes is None:
+            response.travel_time_minutes = membership.travel_time_minutes
         return response
 
     def _remaining_lessons(self, sub: Any) -> int | None:
