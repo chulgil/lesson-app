@@ -380,10 +380,30 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 ---
 
+## 12. 퀘스트 시스템 (Quest System) — 2026-06-08
+
+선생님 학습 가이드 + 단축 진입점. **의무 아님** — 점수가 아닌 행동 격려.
+
+| 한글 | 영문 | 설명 |
+|------|------|------|
+| 퀘스트 | Quest | 선생님 학습 가이드 + 단축 진입점. 11 항목 (Q1~Q11) |
+| 프로필 설정 그룹 | Profile Setup Group | Q1~Q5 (가용시간/사진/소개/레슨비/계좌) |
+| 운영 시작 그룹 | Operation Group | Q6~Q10 (학생/수강권/레슨/노트/숙제) |
+| 선택 보너스 그룹 | Bonus Group | Q11 (전화인증) — `[선택]` 라벨 + 점선 카드 |
+| 자동 완료 트리거 | Auto-Complete Trigger | 입력 즉시 퀘스트 완료 감지 + 카드 즉시 소거 |
+| 퀘스트 축하 카드 | Quest Celebration Card | 11/11 완료 시 1회 표시. `User.questCelebratedAt` 으로 1회성 보장 |
+| 가입 직후 첫 도착 | Signup First Arrival | 가입 직후 1회만 카드 2초 표시 (5분 윈도우, SharedPreferences) |
+| Lock 매트릭스 | Lock Matrix | Q6(학생 등록) → {Q7, Q8, Q9, Q10} 잠금 해제 트리거 |
+
+**SSOT 정렬**: 가용시간은 `TeacherAvailability` (schedule 도메인) 단일.
+
+---
+
 ## 용어 변경 이력
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-08 | — | §12 퀘스트 시스템 — 3 그룹 (profile/operation/bonus) + Lock 매트릭스 + 자동 완료 + 축하 카드 (1회성) + 가입 직후 첫 도착 | 선생님 퀘스트 재정의 (.harness/knowledge/glossary.md §13 동기화) |
 | 2026-06-04 | — | ContextSwitchLog / AcademyDelegation / AcademyDelegationAction / AcademyActivityLog + 5 enum + 권한 계층 정책 5종 | AC-M1 그룹 B BE 권한 계층 (.harness glossary §12 동기화) |
 | 2026-06-04 | — | Academy / AcademyMember / AcademyStudent / AcademyInvite + 3 enum + 정책 용어 | AC-M1 그룹 A BE 도메인 모델링 (.harness glossary §12 동기화) |
 | 2026-06-01 | ConnectionStatus | RelationshipStatus.invitePending 통합 | E2E 감사: 초대·관계 이중 상태 충돌 해소 (D-G3) |
