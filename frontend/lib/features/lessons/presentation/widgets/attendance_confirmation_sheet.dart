@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/lesson.dart';
 import 'lesson_confirmation_dialog.dart';
@@ -338,10 +339,11 @@ class _AttendanceConfirmationSheetState
         ),
         child: Row(
           children: [
-            Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? reason.color : AppColors.inkTertiary,
-              size: 20,
+            NotebookRadio<LessonNonCompletionReason>(
+              value: reason,
+              groupValue: isSelected ? reason : null,
+              onChanged: (_) => onTap(),
+              activeColor: reason.color,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(

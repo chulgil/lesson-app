@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../domain/entities/lesson.dart';
 
 /// Reason for lesson not being conducted
@@ -455,9 +456,11 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
         ),
         child: Row(
           children: [
-            Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? reason.color : AppColors.inkTertiary,
+            NotebookRadio<LessonNonCompletionReason>(
+              value: reason,
+              groupValue: isSelected ? reason : null,
+              onChanged: (_) => onTap(),
+              activeColor: reason.color,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(

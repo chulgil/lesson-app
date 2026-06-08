@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart' show AppStrings;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
 import '../../domain/entities/request_event.dart';
@@ -573,10 +574,10 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ),
         child: Row(
           children: [
-            Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              size: 18,
-              color: isSelected ? AppColors.paperAccent : AppColors.inkTertiary,
+            NotebookRadio<String>(
+              value: template.id,
+              groupValue: _selectedTemplateId,
+              onChanged: (v) => setState(() => _selectedTemplateId = v),
             ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(

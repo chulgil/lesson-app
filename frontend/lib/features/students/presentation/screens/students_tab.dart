@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
@@ -439,14 +440,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                       final isSelected = _currentFilter == filter;
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          isSelected
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_unchecked,
-                          color:
-                              isSelected
-                                  ? AppColors.paperAccent
-                                  : AppColors.inkTertiary,
+                        leading: NotebookRadio<StudentFilter>(
+                          value: filter,
+                          groupValue: isSelected ? filter : null,
+                          onChanged: (_) => Navigator.of(context).pop(filter),
                         ),
                         title: Text(
                           filter.label,
@@ -547,14 +544,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 ...StudentSortOption.values.map((option) {
                   final isSelected = _sortOption == option;
                   return ListTile(
-                    leading: Icon(
-                      isSelected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_unchecked,
-                      color:
-                          isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.inkTertiary,
+                    leading: NotebookRadio<StudentSortOption>(
+                      value: option,
+                      groupValue: isSelected ? option : null,
+                      onChanged: (_) {
+                        setState(() => _sortOption = option);
+                        Navigator.pop(context);
+                      },
                     ),
                     title: Text(option.label),
                     onTap: () {
