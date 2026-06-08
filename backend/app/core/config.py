@@ -112,6 +112,10 @@ class Settings(BaseSettings):
     ALIMTALK_API_KEY: str = ""
     ALIMTALK_SENDER_PROFILE: str = ""
 
+    # CSP report-only mode (Phase 17). 빈 문자열이면 위반 신고 endpoint 명시 없이 정책만 전송 —
+    # 브라우저 콘솔에서만 위반 가시. URL 설정 시 신고 페이로드가 그 endpoint 로 POST 된다.
+    CSP_REPORT_URI: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 

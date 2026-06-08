@@ -107,3 +107,59 @@ def test_runtime_config_skips_in_development(monkeypatch) -> None:
     monkeypatch.setattr(settings, "CORS_ORIGINS", ["*"])
 
     validate_runtime_configuration()  # 예외 없이 통과 (development 게이트).
+
+
+# ---------------------------------------------------------------------------
+# Phase 17 — CSP report-only mode
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_csp_report_only_not_applied_in_testing(client: AsyncClient) -> None:
+    """TESTING=1 환경에서는 CSP 헤더가 부착되지 않는다 (pytest 단순화)."""
+    response = await client.get("/health")
+    assert response.status_code == 200
+    assert "content-security-policy-report-only" not in response.headers
+
+
+@pytest.mark.asyncio
+async def test_csp_report_only_applied_in_production_like(client: AsyncClient, monkeypatch) -> None:
+    """production_like 환경 + TESTING=False 면 CSP report-only 헤더가 부착된다."""
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "TESTING", False)
+    response = await client.get("/health")
+    assert response.status_code == 200
+    policy = response.headers.get("content-security-policy-report-only", "")
+    # 핵심 directive 들이 존재해야 한다.
+    assert "default-src 'self'" in policy
+    assert "frame-ancestors 'none'" in policy
+    assert "base-uri 'self'" in policy
+    assert "form-action 'self'" in policy
+    # report-uri 미설정 시 report-uri directive 미존재.
+    assert "report-uri" not in policy
+
+
+@pytest.mark.asyncio
+async def test_csp_report_only_includes_report_uri_when_set(client: AsyncClient, monkeypatch) -> None:
+    """CSP_REPORT_URI 가 설정되면 정책에 report-uri directive 가 포함된다."""
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "TESTING", False)
+    monkeypatch.setattr(settings, "CSP_REPORT_URI", "https://csp-reports.lessonaza.app/report")
+
+    response = await client.get("/health")
+    assert response.status_code == 200
+    policy = response.headers.get("content-security-policy-report-only", "")
+    assert "report-uri https://csp-reports.lessonaza.app/report" in policy
+
+
+@pytest.mark.asyncio
+async def test_csp_enforce_header_never_emitted(client: AsyncClient, monkeypatch) -> None:
+    """본 PR 은 report-only 만 부착 — 강제 모드 (Content-Security-Policy) 는 emit 하지 않는다.
+
+    frontend 호환성 데이터 수집 전 강제로 전환되면 inline script 등이 차단되어 사이트가 깨질 위험.
+    """
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "TESTING", False)
+    response = await client.get("/health")
+    assert response.status_code == 200
+    assert "content-security-policy" not in (k.lower() for k in response.headers)

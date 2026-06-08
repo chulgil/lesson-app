@@ -1,6 +1,6 @@
 {
-  "updated_at": 1780894976,
-  "updated_at_iso": "2026-06-08T05:02:56Z",
+  "updated_at": 1780895666,
+  "updated_at_iso": "2026-06-08T05:14:26Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -11,12 +11,28 @@
     "spec/2026-05-10-r6-trust-building.md": "c33a5cbf63336178cf45fb5ee11172cbfcdca2a8",
     "spec/2026-06-08-teacher-quest-system.md": "d547db15a7646981fef42cfecf8e982d9bdfd49c"
   },
-  "changed": [],
-  "added": [],
+  "changed": [
+    "spec/2026-05-04-chat-message-visual-contract.md",
+    "spec/2026-05-04-notebook-surface-ssot.md",
+    "spec/2026-05-07-backend-loop-verification-contract.md",
+    "spec/2026-05-08-action-priority-contract.md",
+    "spec/2026-05-09-offline-sync-verification.md",
+    "spec/2026-05-10-r6-trust-building.md",
+    "spec/2026-06-08-teacher-quest-system.md"
+  ],
+  "added": [
+    "spec/2026-05-04-chat-message-visual-contract.md",
+    "spec/2026-05-04-notebook-surface-ssot.md",
+    "spec/2026-05-07-backend-loop-verification-contract.md",
+    "spec/2026-05-08-action-priority-contract.md",
+    "spec/2026-05-09-offline-sync-verification.md",
+    "spec/2026-05-10-r6-trust-building.md",
+    "spec/2026-06-08-teacher-quest-system.md"
+  ],
   "removed": [],
   "summary": {
-    "changed_total": 0,
-    "added": 0,
+    "changed_total": 7,
+    "added": 7,
     "removed": 0,
     "domains_touched": [],
     "domain_counts": {},
