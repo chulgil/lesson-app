@@ -206,6 +206,66 @@ void main() {
     expect(find.text(AppStrings.questTitleSlots), findsOneWidget);
     expect(find.text(AppStrings.questTitlePhoto), findsOneWidget);
   });
+
+  // ── §9 완료 임계값 공개 (Job 6) ──
+
+  testWidgets('Q3 소개글 카드에 임계값 hint "최소 20자" 노출', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[2] = hasIntroductionProvider.overrideWithValue(false);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.textContaining(AppStrings.questThresholdIntroHint),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Q4 레슨비 카드에 임계값 hint "최소 1개 가격 항목" 노출', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[3] = hasPriceTableProvider.overrideWithValue(false);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.textContaining(AppStrings.questThresholdPriceHint),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Q10 숙제 카드에 임계값 hint "1건 등록" 노출 (학생 있음 — lock 미적용)', (
+    tester,
+  ) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[7] = hasAssignedPracticeProvider.overrideWithValue(false);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.textContaining(AppStrings.questThresholdPracticeHint),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Q7 lock 상태 — 임계값 hint 대신 lock hint 우선', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: true);
+    overrides[5] = hasIssuedSubscriptionProvider.overrideWithValue(false);
+    overrides[10] = homeStudentsProvider.overrideWith((ref) async => []);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    // Q7 은 threshold 없으므로 영향 없지만, 다른 lock Q (예: Q10) 의 threshold 가 hide 되는지 확인.
+    // Q10 도 lock + threshold 있음 — lock hint 우선, threshold 안 보임.
+    expect(find.text(AppStrings.questLockedStudentRequiredHint), findsWidgets);
+    expect(
+      find.text('· ${AppStrings.questThresholdPracticeHint}'),
+      findsNothing,
+    );
+  });
 }
 
 /// 가입 직후 첫 도착 윈도우 simulation — markShown 된 상태로 시작.

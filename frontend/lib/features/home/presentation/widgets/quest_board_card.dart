@@ -131,10 +131,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
     };
     final byGroupVisible = <QuestGroup, List<_Quest>>{
       for (final g in QuestGroup.values)
-        g:
-            byGroupAll[g]!
-                .where((q) => _revealCompleted || !q.isCompleted)
-                .toList(),
+        g: byGroupAll[g]!
+            .where((q) => _revealCompleted || !q.isCompleted)
+            .toList(),
     };
 
     return Padding(
@@ -172,8 +171,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
                   group: group,
                   quests: byGroupVisible[group]!,
                   totalInGroup: byGroupAll[group]!.length,
-                  completedInGroup:
-                      byGroupAll[group]!.where((q) => q.isCompleted).length,
+                  completedInGroup: byGroupAll[group]!
+                      .where((q) => q.isCompleted)
+                      .length,
                 ),
                 if (group != QuestGroup.bonus)
                   const SizedBox(height: AppSpacing.space3),
@@ -237,6 +237,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         title: AppStrings.questTitleIntro,
         reward: AppStrings.questRewardWebProfile,
         isCompleted: hasIntro,
+        thresholdHint: AppStrings.questThresholdIntroHint,
         onTap: () => context.push(AppRoutes.basicInfoEdit),
       ),
       _Quest(
@@ -245,6 +246,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         title: AppStrings.questTitlePrice,
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
+        thresholdHint: AppStrings.questThresholdPriceHint,
         onTap: () => context.push(AppRoutes.lessonTimeSettings),
       ),
       _Quest(
@@ -271,10 +273,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         reward: AppStrings.questRewardSubscription,
         isCompleted: hasSubscription,
         isLocked: !hasStudents,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.issueSubscription)
-                : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.issueSubscription)
+            : onLockedTap(),
       ),
       _Quest(
         id: 'q8',
@@ -283,8 +284,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
         isLocked: !hasStudents,
-        onTap:
-            hasStudents ? () => context.push(AppRoutes.lessons) : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.lessons)
+            : onLockedTap(),
       ),
       _Quest(
         id: 'q9',
@@ -293,10 +295,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         reward: AppStrings.questRewardLessonNote,
         isCompleted: hasLessonNote,
         isLocked: !hasStudents,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.quickFeedbackList)
-                : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.quickFeedbackList)
+            : onLockedTap(),
       ),
       _Quest(
         id: 'q10',
@@ -305,10 +306,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         reward: AppStrings.questRewardPracticeAssign,
         isCompleted: hasPracticeAssigned,
         isLocked: !hasStudents,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.assignmentDashboard)
-                : onLockedTap(),
+        thresholdHint: AppStrings.questThresholdPracticeHint,
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.assignmentDashboard)
+            : onLockedTap(),
       ),
       // ── ✨ 선택 보너스 그룹 (Q11) ──
       _Quest(
@@ -338,6 +339,10 @@ class _Quest {
   /// Lock 상태 — Q7~Q10 만 hasStudents == false 일 때 true.
   final bool isLocked;
 
+  /// 임계값 hint (§9) — 완료 조건이 boolean 이 아닌 quest 만 표시.
+  /// 예: Q3 "최소 20자", Q4 "최소 1개 가격", Q10 "1건 등록".
+  final String? thresholdHint;
+
   const _Quest({
     required this.id,
     required this.group,
@@ -346,6 +351,7 @@ class _Quest {
     required this.isCompleted,
     required this.onTap,
     this.isLocked = false,
+    this.thresholdHint,
   });
 }
 
@@ -480,12 +486,11 @@ class _QuestItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = quest.onTap != null;
-    final accentColor =
-        quest.isCompleted
-            ? AppColors.paperOk
-            : isEnabled
-            ? AppColors.ink
-            : AppColors.inkTertiary;
+    final accentColor = quest.isCompleted
+        ? AppColors.paperOk
+        : isEnabled
+        ? AppColors.ink
+        : AppColors.inkTertiary;
 
     final content = InkWell(
       onTap: quest.onTap,
@@ -496,26 +501,25 @@ class _QuestItem extends StatelessWidget {
           children: [
             SizedBox(
               width: 28,
-              child:
-                  quest.isCompleted
-                      ? const Padding(
-                        padding: EdgeInsets.only(top: 2),
-                        child: NotebookGlyph(
-                          NotebookGlyph.check,
-                          size: 16,
-                          color: AppColors.paperOk,
-                        ),
-                      )
-                      : quest.isLocked
-                      ? Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(
-                          Icons.lock_outline,
-                          size: 14,
-                          color: accentColor,
-                        ),
-                      )
-                      : const SizedBox.shrink(),
+              child: quest.isCompleted
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 2),
+                      child: NotebookGlyph(
+                        NotebookGlyph.check,
+                        size: 16,
+                        color: AppColors.paperOk,
+                      ),
+                    )
+                  : quest.isLocked
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Icon(
+                        Icons.lock_outline,
+                        size: 14,
+                        color: accentColor,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -526,12 +530,12 @@ class _QuestItem extends StatelessWidget {
                     quest.title,
                     style: NotebookTypography.pieceTitle.copyWith(
                       fontSize: 15,
-                      color:
-                          quest.isCompleted
-                              ? AppColors.inkTertiary
-                              : AppColors.ink,
-                      decoration:
-                          quest.isCompleted ? TextDecoration.lineThrough : null,
+                      color: quest.isCompleted
+                          ? AppColors.inkTertiary
+                          : AppColors.ink,
+                      decoration: quest.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                   if (quest.reward != null && !quest.isCompleted) ...[
@@ -556,6 +560,23 @@ class _QuestItem extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                  ],
+                  // §9 임계값 hint — 조건이 boolean 이 아닌 quest 만 (Q3/Q4/Q10).
+                  // lock 상태에선 lock hint 우선 (임계값 안 보이게).
+                  if (quest.thresholdHint != null &&
+                      !quest.isCompleted &&
+                      !quest.isLocked) ...[
+                    const SizedBox(height: 2),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(
+                        '· ${quest.thresholdHint}',
+                        style: NotebookTypography.roman.copyWith(
+                          fontSize: 11,
+                          color: AppColors.inkTertiary,
+                        ),
+                      ),
                     ),
                   ],
                 ],
@@ -600,11 +621,10 @@ class _DottedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = 1
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
 
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final path = Path()..addRect(rect);
