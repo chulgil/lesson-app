@@ -9,6 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, validate_runtime_configuration
 from app.core.exceptions import register_exception_handlers
 from app.core.i18n import LocaleMiddleware
+from app.core.security_headers import (
+    SecurityHeadersMiddleware,  # noqa: F401  add_middleware 에서 사용 — ruff 가 데코레이터 인자 detect 못함.
+)
 
 
 @asynccontextmanager
@@ -82,14 +85,28 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# CORS middleware — allow_methods / allow_headers 를 명시적으로 화이트리스트한다.
+# wildcard ``*`` 는 allow_credentials=True 와 결합하면 일부 브라우저에서 CORS spec 위반으로
+# 차단되거나, custom request header (예: ``X-Internal-API-Key``) 가 prefli ght 에서 누락된다.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Accept",
+        "Accept-Language",
+        "Authorization",
+        "Content-Type",
+        "X-Internal-API-Key",
+        "X-Requested-With",
+        "X-Forwarded-For",
+    ],
 )
+
+# 응답 기본 보안 헤더 — clickjacking / MIME sniffing / referrer 누설 차단.
+# CORS 이후에 추가해 preflight 응답에도 헤더가 부착되도록 한다.
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Locale middleware (reads Accept-Language header)
 app.add_middleware(LocaleMiddleware)

@@ -119,10 +119,31 @@ settings = Settings()
 
 
 def validate_runtime_configuration() -> None:
-    """Validate secrets that must be strong before serving production-like traffic."""
+    """Validate secrets and runtime knobs that must be safe before serving production-like traffic.
+
+    production / beta 에서는 다음을 거부:
+    - 약한 INTERNAL_API_KEY / JWT_SECRET_KEY
+    - DEBUG=True (stack trace · debug endpoint 노출)
+    - CORS_ORIGINS 가 비어 있거나 wildcard (``*``) — credentials 인증 wildcard 는 CSRF 우회 위험
+    - CORS_ORIGINS 에 localhost / 127.0.0.1 / http:// 포함 — production 도메인 외 origin 허용은 사고
+    """
     if settings.ENVIRONMENT not in PRODUCTION_LIKE_ENVIRONMENTS:
         return
     if len(settings.INTERNAL_API_KEY) < 32:
         raise RuntimeError("INTERNAL_API_KEY must be set to a strong secret in production-like environments")
     if settings.JWT_SECRET_KEY in INSECURE_JWT_SECRETS or len(settings.JWT_SECRET_KEY) < 32:
         raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
+    if settings.DEBUG:
+        raise RuntimeError("DEBUG must be False in production-like environments (stack trace exposure risk)")
+    origins = settings.CORS_ORIGINS or []
+    if not origins:
+        raise RuntimeError("CORS_ORIGINS must be set explicitly in production-like environments")
+    if "*" in origins:
+        # allow_credentials=True 와 wildcard 조합은 CORS spec 위반 + CSRF 우회 risk.
+        raise RuntimeError("CORS_ORIGINS must not contain '*' wildcard in production-like environments")
+    for origin in origins:
+        lowered = origin.lower()
+        if "localhost" in lowered or "127.0.0.1" in lowered:
+            raise RuntimeError(f"CORS_ORIGINS must not include local origin in production-like environments: {origin}")
+        if lowered.startswith("http://"):
+            raise RuntimeError(f"CORS_ORIGINS must use https:// in production-like environments: {origin}")
