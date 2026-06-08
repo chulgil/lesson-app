@@ -5660,6 +5660,22 @@ class AppStrings {
   /// Q10 숙제 — 1건 등록 임계값 hint.
   static const questThresholdPracticeHint = '1건 등록 시 완료';
 
+  // §8.3 전체 완료 축하 카드 (Job 7-FE)
+  /// 축하 카드 제목 — 11/11 완료 시 1회 표시.
+  static const questCelebrationTitle = '모든 준비를 마치셨어요!';
+
+  /// 축하 카드 본문.
+  static const questCelebrationBody = '이제 본격적으로 레슨을 운영해보세요.';
+
+  /// 축하 카드 액션 1 — 오늘의 레슨.
+  static const questCelebrationActionLessons = '오늘의 레슨 보기';
+
+  /// 축하 카드 액션 2 — 주간 통계 (현재 라우트 미존재, practiceStats 로 대체).
+  static const questCelebrationActionStats = '주간 통계';
+
+  /// 축하 카드 dismiss 라벨 (semantics + IconButton tooltip).
+  static const questCelebrationDismiss = '닫기';
+
   /// Quest I — 이름 + 악기 설정 타이틀.
   static const questTitleNameInstrument = '이름 + 악기 설정';
 

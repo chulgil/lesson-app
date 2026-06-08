@@ -11,9 +11,11 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../profile/presentation/providers/quest_celebration_provider.dart';
 import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
 import '../providers/home_lesson_summary_provider.dart';
 import '../providers/teacher_profile_completion_provider.dart';
+import 'quest_celebration_card.dart';
 
 /// 가입 직후 첫 도착 시 자동 완료된 카드를 표시하는 시간 (§8.2).
 const _kFirstArrivalRevealDuration = Duration(seconds: 2);
@@ -106,7 +108,15 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
         hasLessonNote &&
         hasPracticeAssigned;
 
-    if (allMandatoryDone) return const SizedBox.shrink();
+    if (allMandatoryDone) {
+      // §8.3 전체 완료 — 축하 카드 1회 표시 (Hive local fallback, BE 미구현).
+      // TODO(#608): BE PATCH 완료 후 authUser.questCelebratedAt 조건 추가.
+      final celebrationDismissed = ref
+          .watch(questCelebrationProvider)
+          .valueOrNull;
+      if (celebrationDismissed != null) return const SizedBox.shrink();
+      return const QuestCelebrationCard();
+    }
 
     final quests = _buildQuests(
       context: context,
