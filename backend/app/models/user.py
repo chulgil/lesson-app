@@ -56,6 +56,13 @@ class User(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
 
+    # 2026-06-08 §13 퀘스트 시스템: 11/11 완료 시 축하 카드 1회 표시 보장.
+    # 기기 재설치 후에도 false-positive 재표시 방지 (FE Hive 가 아닌 BE 필드).
+    quest_celebrated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
     # i18n / localization
     locale: Mapped[str] = mapped_column(String(10), nullable=False, default="ko")
     country: Mapped[str] = mapped_column(String(2), nullable=False, default="KR")
