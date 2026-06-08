@@ -62,6 +62,12 @@ class SubscriptionResponse(BaseModel):
     discount_reason: str | None = None
     original_amount: int | None = None
     reschedule_deadline_hours: int = 12
+    # spec subscription_edit_spec.md §7.1 — 추가 변경권 / 개별 취소 기준시간 / 장소.
+    bonus_reschedule_count: int = 0
+    override_cancel_deadline_hours: int | None = None
+    lesson_location_type: str | None = None
+    lesson_location_id: str | None = None
+    travel_time_minutes: int | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 
@@ -256,6 +262,34 @@ class UseRescheduleRequest(BaseModel):
     """Use a reschedule credit from a subscription."""
 
     lesson_id: str | None = None
+
+
+# spec subscription_edit_spec.md §6.1 — 4 가지 PATCH endpoint 요청 스키마.
+class RescheduleCreditsPatchRequest(BaseModel):
+    """수강권 변경권 추가."""
+
+    additional_count: int
+    reason: str | None = None
+
+
+class LessonLocationPatchRequest(BaseModel):
+    """수강권 레슨 장소 변경."""
+
+    location_type: str
+    location_id: str | None = None
+    travel_time_minutes: int | None = None
+
+
+class TravelTimePatchRequest(BaseModel):
+    """수강권 이동시간 단독 수정."""
+
+    travel_time_minutes: int
+
+
+class CancelDeadlinePatchRequest(BaseModel):
+    """수강권 개별 취소 기준시간 수정 (null = 기본 정책 복귀)."""
+
+    override_cancel_deadline_hours: int | None = None
 
 
 class UpdateStatusRequest(BaseModel):

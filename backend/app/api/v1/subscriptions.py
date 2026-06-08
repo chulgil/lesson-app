@@ -18,13 +18,16 @@ from app.core.deps import (
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
-from app.schemas.subscription import (
+from app.schemas.subscription import (  # noqa: F401  RescheduleCreditsPatchRequest 등 4 PATCH 스키마는 string annotation 으로만 사용되어 ruff 가 unused 로 오판.
+    CancelDeadlinePatchRequest,
     ConfirmPaymentRequest,
+    LessonLocationPatchRequest,
     NotifyPaymentRequest,
     PendingPaymentCountResponse,
     PendingPaymentResponse,
     ProposalConfirmRequest,
     ProposalRespondRequest,
+    RescheduleCreditsPatchRequest,
     SubscriptionCreate,
     SubscriptionDepositSummaryResponse,
     SubscriptionProposalCreate,
@@ -36,6 +39,7 @@ from app.schemas.subscription import (
     SubscriptionUpdate,
     SubscriptionUsageCreate,
     SubscriptionUsageResponse,
+    TravelTimePatchRequest,
     UpdateStatusRequest,
     UseLessonRequest,
 )
@@ -670,3 +674,93 @@ async def confirm_proposal(
     """
     service = SubscriptionService(db)
     return await service.confirm_proposal(proposal_id, current_user)
+
+
+# spec subscription_edit_spec.md §6.1 — 4 PATCH endpoint (수강권 수정).
+
+
+@router.patch(
+    "/{subscription_id}/reschedule-credits",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Add reschedule credits to subscription (teacher)",
+)
+async def patch_reschedule_credits(
+    subscription_id: str,
+    body: RescheduleCreditsPatchRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """수강권 변경권 추가 (bonus). spec §2.1."""
+    service = SubscriptionService(db)
+    return await service.patch_reschedule_credits(
+        subscription_id,
+        body.additional_count,
+        body.reason,
+        current_user,
+    )
+
+
+@router.patch(
+    "/{subscription_id}/location",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update lesson location of subscription (teacher)",
+)
+async def patch_lesson_location(
+    subscription_id: str,
+    body: LessonLocationPatchRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """수강권 레슨 장소 + 이동시간 변경. spec §2.2."""
+    service = SubscriptionService(db)
+    return await service.patch_lesson_location(
+        subscription_id,
+        body.location_type,
+        body.location_id,
+        body.travel_time_minutes,
+        current_user,
+    )
+
+
+@router.patch(
+    "/{subscription_id}/travel-time",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update travel time of subscription (teacher)",
+)
+async def patch_travel_time(
+    subscription_id: str,
+    body: TravelTimePatchRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """이동시간 단독 수정. spec §2.2."""
+    service = SubscriptionService(db)
+    return await service.patch_travel_time(
+        subscription_id,
+        body.travel_time_minutes,
+        current_user,
+    )
+
+
+@router.patch(
+    "/{subscription_id}/cancel-deadline",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Override cancellation deadline of subscription (teacher)",
+)
+async def patch_cancel_deadline(
+    subscription_id: str,
+    body: CancelDeadlinePatchRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """수강권 개별 취소 기준시간. null = 기본 정책 복귀. spec §2.4."""
+    service = SubscriptionService(db)
+    return await service.patch_cancel_deadline(
+        subscription_id,
+        body.override_cancel_deadline_hours,
+        current_user,
+    )
