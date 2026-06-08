@@ -78,6 +78,14 @@ class AcademyAnnouncementListResponse(BaseModel):
     total_count: int
 
 
+class AcademyAnnouncementReadResponse(BaseModel):
+    """spec §6.1 인앱 자동 마킹 응답 — recipient 가 본 공지의 마킹 시각."""
+
+    announcement_id: str
+    user_id: str
+    read_at: _dt.datetime | None = None
+
+
 class AudienceCountByRole(BaseModel):
     teacher: int = 0
     parent: int = 0

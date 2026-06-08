@@ -383,19 +383,34 @@ class AcademyService:
             self.db.add(member)
             created_members.append(member)
         await self.db.flush()
+        # 모든 role 이 무효라면 invite 상태를 바꾸지 않고 422 — 토큰 재사용 가능 유지.
+        if not created_members:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invite has no acceptable roles",
+            )
         invite.state = AcademyInviteState.accepted
         invite.accepted_at = now
-        invite.accepted_member_id = created_members[0].id if created_members else None
+        invite.accepted_member_id = created_members[0].id
         await self.db.flush()
         # 첫 번째 멤버 (보통 teacher) 반환.
         return created_members[0]
 
-    async def decline_invite(self, *, raw_token: str, reason: str | None = None) -> AcademyInvite:
+    async def decline_invite(
+        self,
+        *,
+        raw_token: str,
+        by_user_id: str,
+        reason: str | None = None,
+    ) -> AcademyInvite:
         invite = await self._load_active_invite(raw_token)
         invite.state = AcademyInviteState.declined
         invite.declined_at = _utcnow()
+        # by_user_id 를 note 에 audit 으로 기록 — 누가 거절했는지 추적.
+        decline_note = f"\n[declined] by={by_user_id}"
         if reason:
-            invite.note = (invite.note or "") + f"\n[declined] {reason}"
+            decline_note += f" reason={reason}"
+        invite.note = (invite.note or "") + decline_note
         await self.db.flush()
         return invite
 

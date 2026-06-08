@@ -75,6 +75,13 @@ api_router.include_router(
     prefix="/academies",
     tags=["academies-billing"],
 )
+# spec billing_settlement_spec §6.4 — 강사 lesson-app 인박스의 정산서 확인 CTA.
+# owner-only router 와 prefix 는 같지만 require_teacher_context 로 분리한다.
+api_router.include_router(
+    academy_billing.teacher_router,
+    prefix="/academies",
+    tags=["academies-billing-teacher"],
+)
 api_router.include_router(
     academy_announcements.router,
     prefix="/academies",

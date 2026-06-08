@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import HTTPException, UploadFile, status
@@ -74,12 +74,10 @@ class AiNotesService:
             feedback=structured.get("feedback"),
             key_points=structured.get("keyPoints", []),
             practice_tips=structured.get("practiceTips"),
-            suggested_assignments=[
-                SuggestedAssignment(**a) for a in structured.get("suggestedAssignments", [])
-            ],
+            suggested_assignments=[SuggestedAssignment(**a) for a in structured.get("suggestedAssignments", [])],
             transcription=transcription,
             status="completed",
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
         )
 
     async def get_by_lesson_id(self, lesson_id: str) -> AiNoteResponse | None:
@@ -114,6 +112,7 @@ class AiNotesService:
 
             # Create a temporary file-like object for the API
             import io
+
             audio_file = io.BytesIO(audio_content)
             audio_file.name = "lesson_recording.m4a"
 
@@ -127,10 +126,14 @@ class AiNotesService:
         except ImportError:
             # OpenAI not installed — return placeholder
             return "[OpenAI SDK not installed — transcription unavailable]"
-        except Exception as e:
+        except Exception:
+            # OpenAI SDK raw 에러 (API key 등 인프라 정보) 가 응답에 노출되지 않도록 로그만 남긴다.
+            import logging
+
+            logging.getLogger(__name__).exception("Whisper transcription failed")
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Transcription failed: {e}",
+                detail="Transcription failed",
             )
 
     async def _structure_notes(
@@ -182,8 +185,12 @@ JSON 형식으로 응답하세요.
                 "practiceTips": "OpenAI SDK를 설치하세요: pip install openai",
                 "suggestedAssignments": [],
             }
-        except Exception as e:
+        except Exception:
+            # GPT SDK raw 에러 (API key 등 인프라 정보) 가 응답에 노출되지 않도록 로그만 남긴다.
+            import logging
+
+            logging.getLogger(__name__).exception("Note generation via GPT failed")
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Note generation failed: {e}",
+                detail="Note generation failed",
             )

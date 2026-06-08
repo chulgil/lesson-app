@@ -315,6 +315,15 @@ class AcademySettlementTransferRequest(BaseModel):
     note: str | None = None
 
 
+class AcademySettlementAcknowledgeRequest(BaseModel):
+    """강사가 정산서를 확인/이의 제기.
+
+    dispute_note 는 자유 텍스트 (민감 가능성) 이므로 query 가 아닌 body 로 받는다.
+    """
+
+    dispute_note: str | None = Field(default=None, max_length=2000)
+
+
 # ---------------------------------------------------------------------------
 # Billing Progress (대시보드 위젯)
 # ---------------------------------------------------------------------------

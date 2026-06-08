@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db, require_internal_api_key
@@ -112,7 +112,7 @@ async def list_all_access_denials_admin(
     denial_code: str | None = None,
     from_at: str | None = None,
     to_at: str | None = None,
-    limit: int = 100,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 100,
 ) -> dict:
     """Spec §9 — 운영자 어드민 전체 audit 조회.
 
@@ -126,8 +126,15 @@ async def list_all_access_denials_admin(
     )
     from app.services.academy_governance_service import AcademyGovernanceService
 
-    from_dt = datetime.fromisoformat(from_at) if from_at else None
-    to_dt = datetime.fromisoformat(to_at) if to_at else None
+    # 잘못된 ISO 문자열은 422 로 명시적 반환 — 미처리 시 500 + unhandled_exception_handler 로 빠진다.
+    try:
+        from_dt = datetime.fromisoformat(from_at) if from_at else None
+        to_dt = datetime.fromisoformat(to_at) if to_at else None
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="from_at / to_at 은 ISO-8601 datetime 형식이어야 합니다.",
+        ) from exc
     logs, total = await AcademyGovernanceService(db).list_all_access_denials(
         user_id=user_id,
         academy_id=academy_id,
