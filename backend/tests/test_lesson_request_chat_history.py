@@ -65,9 +65,7 @@ async def test_teacher_student_schedule_negotiation_records_chat_history(
         f"/api/v1/schedule/lesson-requests/{request_id}/counter-propose",
         headers=student_headers,
         json={
-            "slots": [
-                {"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}
-            ],
+            "slots": [{"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}],
             "message": "수요일 3시는 가능할까요?",
         },
     )
@@ -202,11 +200,7 @@ async def test_lesson_request_chat_history_blocks_unrelated_users(
     other_teacher_action = await client.post(
         f"/api/v1/schedule/lesson-requests/{request_id}/propose-alternatives",
         headers=_headers("other-teacher", "teacher"),
-        json={
-            "slots": [
-                {"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}
-            ]
-        },
+        json={"slots": [{"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}]},
     )
     assert other_teacher_action.status_code == 403
 
@@ -246,9 +240,7 @@ async def test_unified_lesson_request_actions_endpoint_records_events(
         headers=_headers("action-teacher", "teacher"),
         json={
             "action": "proposeAlternative",
-            "slots": [
-                {"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}
-            ],
+            "slots": [{"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}],
             "message": "수요일 3시가 가능합니다.",
         },
     )
@@ -523,9 +515,7 @@ async def test_lesson_request_accepts_frontend_spec_keys_and_camel_case_actions(
         headers=_headers("alias-teacher", "teacher"),
         json={
             "action": "proposeAlternative",
-            "suggestedSlots": [
-                {"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}
-            ],
+            "suggestedSlots": [{"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}],
             "message": "camelCase 액션으로 제안합니다",
         },
     )
@@ -708,10 +698,19 @@ async def test_lesson_request_expire_endpoint_expires_pending_and_negotiating_re
     client: AsyncClient,
     create_test_user,
     db_session: AsyncSession,
+    monkeypatch,
 ) -> None:
+    """`/expire` 는 cron 호출용 internal 라우트 — internal API key 로 게이팅된다.
+
+    actor 검증 없이 전 pending/negotiating 요청을 일괄 expire 하므로 일반 사용자가
+    호출 가능하면 데이터 손실 + 서비스 거부 가능.
+    """
     from datetime import UTC, datetime, timedelta
 
+    from app.core.config import settings
     from app.models.schedule import LessonRequest
+
+    monkeypatch.setattr(settings, "INTERNAL_API_KEY", "test-internal-key")
 
     await create_test_user(user_id="expire-teacher", role="teacher", name="만료 선생님")
     await create_test_user(
@@ -745,9 +744,16 @@ async def test_lesson_request_expire_endpoint_expires_pending_and_negotiating_re
         created_ids.append(request_id)
     await db_session.flush()
 
-    expire_response = await client.post(
+    # 일반 사용자 (teacher) 호출은 401 — internal API key 가 없어서.
+    teacher_attempt = await client.post(
         "/api/v1/schedule/lesson-requests/expire",
         headers=_headers("expire-teacher", "teacher"),
+    )
+    assert teacher_attempt.status_code == 401
+
+    expire_response = await client.post(
+        "/api/v1/schedule/lesson-requests/expire",
+        headers={"X-Internal-API-Key": "test-internal-key"},
     )
     assert expire_response.status_code == 200
     assert expire_response.json()["message"] == "Processed 2 expired requests"

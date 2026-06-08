@@ -591,9 +591,16 @@ async def expire_old_proposals(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> SuccessResponse:
-    """Mark stale proposals as expired (teacher only — #468 1d)."""
+    """Mark stale proposals as expired (teacher only — #468 1d).
+
+    본인 강사 계정의 만료된 pending proposal 만 expire 한다 — service 가 teacher_id 로
+    범위를 제한한다.
+    """
+    from app.services.teacher_id_resolver import resolve_teacher_id
+
+    teacher_id = await resolve_teacher_id(db, current_user.id)
     service = SubscriptionService(db)
-    count = await service.expire_old_proposals()
+    count = await service.expire_old_proposals(teacher_id)
     return SuccessResponse(message=f"Processed {count} expired proposals")
 
 

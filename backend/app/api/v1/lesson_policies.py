@@ -27,7 +27,7 @@ async def get_teacher_policy(
 ) -> LessonPolicyResponse:
     """Return a teacher default lesson policy."""
     service = LessonPolicyService(db)
-    return await service.get_teacher_policy(teacher_id)
+    return await service.get_teacher_policy(teacher_id, current_user)
 
 
 @router.get(
@@ -42,7 +42,7 @@ async def get_class_policy(
 ) -> LessonPolicyResponse:
     """Return a class-specific lesson policy."""
     service = LessonPolicyService(db)
-    return await service.get_class_policy(lesson_class_id)
+    return await service.get_class_policy(lesson_class_id, current_user)
 
 
 @router.get(
@@ -58,7 +58,7 @@ async def get_effective_policy(
 ) -> LessonPolicyResponse:
     """Return the effective policy, currently the teacher default policy."""
     service = LessonPolicyService(db)
-    return await service.get_effective_policy(teacher_id, lesson_class_id)
+    return await service.get_effective_policy(teacher_id, current_user, lesson_class_id)
 
 
 @router.post(
