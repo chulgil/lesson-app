@@ -121,9 +121,8 @@ class GettingStartedCard extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space2),
               Text(
                 AppStrings.gettingStartedIntro,
-                style: NotebookTypography.hand.copyWith(
-                  fontSize: 14,
-                  color: AppColors.inkSecondary,
+                style: NotebookTypography.handMedium.copyWith(
+color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),

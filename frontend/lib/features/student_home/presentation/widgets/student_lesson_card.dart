@@ -228,9 +228,8 @@ class StudentLessonCard extends StatelessWidget {
                       // Notebook × Score: 피드백 프리뷰는 손글씨 주석처럼 Gaegu로.,
                       child: Text(
                         lesson.feedback!,
-                        style: NotebookTypography.hand.copyWith(
-                          fontSize: 13,
-                          color: AppColors.paperPencil,
+                        style: NotebookTypography.handSmall.copyWith(
+color: AppColors.paperPencil,
                           height: 1.3,
                         ),
                         maxLines: 2,

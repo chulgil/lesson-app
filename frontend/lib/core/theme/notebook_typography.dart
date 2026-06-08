@@ -168,6 +168,33 @@ class NotebookTypography {
     height: 1.5,
   );
 
+  /// 손글씨 보조 — 피드백 프리뷰·학생 노트·연습 팁·메모 본문 등 부속 자필.
+  /// `hand`(16) 보다 작은 사이즈로 카드 안의 본문 텍스트 위계 표현.
+  static TextStyle get handSmall => GoogleFonts.gaegu(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    color: AppColors.paperPencil,
+    height: 1.5,
+  );
+
+  /// 손글씨 중간 — 퀘스트 카드·시작 안내·축하 시트의 본문 자필.
+  /// `hand`(16)와 `handSmall`(13) 사이의 안내 톤.
+  static TextStyle get handMedium => GoogleFonts.gaegu(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.paperPencil,
+    height: 1.5,
+  );
+
+  /// 손글씨 강조 헤더 — 카드 타이틀·강조 자필 헤더.
+  /// `hand`(16) 보다 살짝 작지만 카드 안에서 시각 위계를 만드는 헤더 톤.
+  static TextStyle get handLarge => GoogleFonts.gaegu(
+    fontSize: 15,
+    fontWeight: FontWeight.w400,
+    color: AppColors.paperPencil,
+    height: 1.5,
+  );
+
   /// 손글씨 강조 — "지금", "발표회!" 등.
   static TextStyle get handEmphasis => GoogleFonts.gaegu(
     fontSize: 13,

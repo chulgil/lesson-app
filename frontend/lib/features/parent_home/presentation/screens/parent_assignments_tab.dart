@@ -475,9 +475,8 @@ class _AssignmentCard extends StatelessWidget {
                 // §7.130: 선생님 작성 과제 설명 → Tier 1 Gaegu hand.
                 Text(
                   description,
-                  style: NotebookTypography.hand.copyWith(
-                    fontSize: 13,
-                    color: AppColors.inkSecondary,
+                  style: NotebookTypography.handSmall.copyWith(
+color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),

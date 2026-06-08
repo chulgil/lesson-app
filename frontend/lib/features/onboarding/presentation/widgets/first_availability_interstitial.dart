@@ -60,9 +60,8 @@ class FirstAvailabilityInterstitialDialog extends StatelessWidget {
             const SizedBox(height: AppSpacing.space3),
             Text(
               AppStrings.firstAvailabilityInterstitialDescription,
-              style: NotebookTypography.hand.copyWith(
-                fontSize: 14,
-                color: AppColors.inkSecondary,
+              style: NotebookTypography.handMedium.copyWith(
+color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),

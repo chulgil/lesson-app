@@ -146,9 +146,8 @@ class _NotePreviewCard extends StatelessWidget {
             if (lesson.feedback != null)
               Text(
                 lesson.feedback!,
-                style: NotebookTypography.hand.copyWith(
-                  fontSize: 13,
-                  height: 1.3,
+                style: NotebookTypography.handSmall.copyWith(
+height: 1.3,
                   color: AppColors.paperPencil,
                 ),
                 maxLines: 2,
