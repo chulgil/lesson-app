@@ -101,13 +101,18 @@ class RelationshipResponse(BaseModel):
 
     @field_serializer("status")
     def serialize_status(self, value: str | None) -> str | None:
-        """Return only statuses understood by the Flutter relationship enum."""
+        """Return only statuses understood by the Flutter relationship enum.
+
+        spec invite_lifecycle_spec.md §4.1 — ``invitePending`` 신규값을 그대로 노출. 학생이
+        아직 가입하지 않은 초대 상태를 "체험 예약됨" 과 구분 (frontend "초대 대기" UI).
+        """
         raw = getattr(value, "value", value)
         return {
             "pending": "trialBooked",
             "connected": "active",
             "inactive": "past",
             "disconnected": "past",
+            # invitePending 은 그대로 통과 — 신규 frontend 가 인식.
         }.get(raw, raw)
 
     @computed_field
@@ -328,7 +333,9 @@ async def update_relationship_status(
     """Change the status of a relationship (e.g. disconnect)."""
     service = RelationshipService(db)
     result: RelationshipResponse = await service.update_status(
-        relationship_id, body.status, current_user,
+        relationship_id,
+        body.status,
+        current_user,
         subscription_id=body.subscription_id,
         booking_id=body.booking_id,
         last_lesson_day=body.last_lesson_day,

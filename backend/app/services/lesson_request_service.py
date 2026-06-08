@@ -57,9 +57,7 @@ class LessonRequestService:
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
 
-        result = await self.db.scalars(
-            query.order_by(LessonRequest.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(LessonRequest.created_at.desc()).offset(offset).limit(size))
         items = [await self._to_response(r) for r in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -70,9 +68,7 @@ class LessonRequestService:
         if not instrument or not experience_level:
             return None
 
-        result = await self.db.scalars(
-            select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id)
-        )
+        result = await self.db.scalars(select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id))
         settings = result.first()
         if settings is None or settings.lesson_price_table is None:
             return None
@@ -88,9 +84,7 @@ class LessonRequestService:
         """Create a unified lesson request."""
         from app.models.schedule import LessonRequest
 
-        preferred_slots = [
-            slot.model_dump(mode="json") for slot in data.preferred_slots
-        ]
+        preferred_slots = [slot.model_dump(mode="json") for slot in data.preferred_slots]
         primary_slot = preferred_slots[0] if preferred_slots else None
         preferred_day = data.preferred_day
         preferred_time = data.preferred_time
@@ -99,9 +93,7 @@ class LessonRequestService:
             preferred_time = preferred_time or primary_slot.get("start_time")
 
         # Auto-match price from teacher's price table
-        suggested_price = await self._match_price(
-            data.teacher_id, data.instrument, data.experience_level
-        )
+        suggested_price = await self._match_price(data.teacher_id, data.instrument, data.experience_level)
 
         request = LessonRequest(
             student_id=current_user.id,
@@ -116,6 +108,8 @@ class LessonRequestService:
             preferred_time=preferred_time,
             preferred_duration=data.preferred_duration,
             preferred_slots=preferred_slots,
+            # spec §18 — 학생 신청 시 희망 장소 (수강권 발급 디폴트 전달용).
+            preferred_location_type=data.preferred_location_type,
             is_returning_student=data.is_returning_student,
             suggested_price=suggested_price,
             # Legacy fields
@@ -182,9 +176,7 @@ class LessonRequestService:
         suggested_slots = [slot.model_dump(mode="json") for slot in data.suggested_slots]
         event_type = RequestEventType(data.event_type)
         schedule_change_type = (
-            ScheduleChangeType(data.schedule_change_type)
-            if data.schedule_change_type is not None
-            else None
+            ScheduleChangeType(data.schedule_change_type) if data.schedule_change_type is not None else None
         )
         proposed_day_of_week = data.proposed_day_of_week
         proposed_time = data.proposed_time
@@ -232,19 +224,14 @@ class LessonRequestService:
         await self.db.refresh(event)
         return RequestEventResponse.model_validate(event)
 
-    async def update(
-        self, request_id: str, data: LessonRequestUpdate, current_user: Any
-    ) -> LessonRequestResponse:
+    async def update(self, request_id: str, data: LessonRequestUpdate, current_user: Any) -> LessonRequestResponse:
         """Update a lesson request."""
         request = await self._get_request_for_user(request_id, current_user)
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             if key == "preferred_slots" and value is not None:
-                value = [
-                    slot.model_dump(mode="json") if hasattr(slot, "model_dump") else slot
-                    for slot in value
-                ]
+                value = [slot.model_dump(mode="json") if hasattr(slot, "model_dump") else slot for slot in value]
             setattr(request, key, value)
         await self.db.flush()
         await self.db.refresh(request)
@@ -285,11 +272,7 @@ class LessonRequestService:
             actor_id=current_user.id,
             event_type=self._event_type_for_status(data.status),
             message=data.decline_reason,
-            subscription_id=(
-                data.proposal_id
-                if canonical_status in ("proposalSent", "subscriptionIssued")
-                else None
-            ),
+            subscription_id=(data.proposal_id if canonical_status in ("proposalSent", "subscriptionIssued") else None),
         )
         await self.db.flush()
         await self.db.refresh(request)
@@ -619,10 +602,7 @@ class LessonRequestService:
         query = await self._apply_access_filter(query, current_user)
         rows = (await self.db.execute(query)).all()
         return LessonRequestCalendarResponse(
-            items=[
-                LessonRequestCalendarItem(day_of_week=int(day), count=int(count))
-                for day, count in rows
-            ]
+            items=[LessonRequestCalendarItem(day_of_week=int(day), count=int(count)) for day, count in rows]
         )
 
     async def process_expired(self) -> int:
@@ -656,9 +636,7 @@ class LessonRequestService:
         from app.models.settings import ProposalSettings
 
         settings = await self.db.scalar(
-            select(ProposalSettings).where(
-                ProposalSettings.teacher_id == request.teacher_id
-            )
+            select(ProposalSettings).where(ProposalSettings.teacher_id == request.teacher_id)
         )
         if settings is None or not settings.auto_proposal_enabled:
             return

@@ -8,7 +8,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_teacher, get_db
+from app.core.deps import (  # noqa: F401  get_current_user 는 string annotation 으로 사용 — ruff 가 detect 못함.
+    get_current_teacher,
+    get_current_user,
+    get_db,
+)
 from app.models.user import User
 from app.schemas.teacher_announcement import (
     TeacherAnnouncementCreate,
@@ -53,6 +57,25 @@ async def list_teacher_announcements(
     """
     service = AnnouncementService(db)
     return await service.list_announcements(teacher_id=teacher_id, current_user=current_user)
+
+
+@router.get(
+    "/visible",
+    response_model=list[TeacherAnnouncementResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List visible announcements for student / parent",
+)
+async def list_visible_announcements(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[TeacherAnnouncementResponse]:
+    """학생/학부모 시점 — 활성 연결된 선생님(들)의 announcement 본문 조회.
+
+    spec student_home_master.md / notification_master.md — 학생이 notifications 메타데이터로만
+    보고 본문 (휴강 사유 등) 직접 조회 불가하던 P0 보완.
+    """
+    service = AnnouncementService(db)
+    return await service.list_visible_announcements(current_user=current_user)
 
 
 @router.get(
