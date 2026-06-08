@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
@@ -99,40 +98,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       children: [
         // Ornament ❦ ❦ ❦
-        Text(
-          '\u2766 \u2766 \u2766',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 22,
-            color: AppColors.inkTertiary,
-            letterSpacing: 10,
-            height: 1,
-          ),
-        ),
+        Text('\u2766 \u2766 \u2766', style: NotebookTypography.splashOrnament),
         const SizedBox(height: AppSpacing.space4),
 
         // "A handbook for" eyebrow (italic, uppercase)
         Text(
           'A HANDBOOK FOR',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            fontStyle: FontStyle.italic,
-            color: AppColors.inkSecondary,
-            letterSpacing: 3,
-          ),
+          style: NotebookTypography.mastheadLabel.copyWith(letterSpacing: 3),
         ),
         const SizedBox(height: AppSpacing.space3),
 
         // Main title "Lessonaza" — Playfair 56
         Text(
           'Lessonaza',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 56,
-            fontWeight: FontWeight.w700,
-            color: AppColors.ink,
-            letterSpacing: -1.5,
-            height: 1,
-          ),
+          style: NotebookTypography.displayMassive.copyWith(height: 1),
         ),
         const SizedBox(height: AppSpacing.space3),
 
@@ -147,10 +126,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Italic serif slogan
         Text(
           '선생님을 위한 레슨 노트.',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 15,
-            fontStyle: FontStyle.italic,
+          style: NotebookTypography.fine.copyWith(
             color: AppColors.inkSecondary,
+            fontWeight: FontWeight.w400,
             height: 1.5,
           ),
           textAlign: TextAlign.center,
@@ -160,10 +138,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Handwritten sub-note
         Text(
           '— 시작하시겠어요?',
-          style: NotebookTypography.hand.copyWith(
-            color: AppColors.paperPencil,
-            fontSize: 16,
-          ),
+          style: NotebookTypography.hand.copyWith(color: AppColors.paperPencil),
         ),
       ],
     );
@@ -252,7 +227,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               '학부모이신가요?',
               style: NotebookTypography.hand.copyWith(
                 color: AppColors.paperAccent,
-                fontSize: 16,
                 decoration: TextDecoration.underline,
                 decorationColor: AppColors.paperAccent,
               ),
@@ -273,9 +247,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         Text(
           'TERMS · PRIVACY · MMXXVI',
-          style: GoogleFonts.ibmPlexMono(
-            fontSize: 9,
-            fontWeight: FontWeight.w400,
+          style: NotebookTypography.metaMono.copyWith(
             color: AppColors.inkTertiary,
             letterSpacing: 1.5,
           ),
@@ -460,11 +432,8 @@ class _NotebookAuthBtn extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           label,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+          style: NotebookTypography.buttonLabelSerif.copyWith(
             color: fg,
-            letterSpacing: 1,
             height: 1.1,
           ),
         ),

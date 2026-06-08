@@ -124,6 +124,33 @@ class NotebookTypography {
     color: AppColors.ink,
   );
 
+  /// Splash 거대 브랜드 표지 — 로그인 화면 "Lessonaza" 56pt.
+  /// `masthead`(38)보다 큰 단일 사용 토큰. 표지 한 곳에서만 사용.
+  static TextStyle get displayMassive => GoogleFonts.playfairDisplay(
+    fontSize: 56,
+    fontWeight: FontWeight.w700,
+    color: AppColors.ink,
+    letterSpacing: -1.5,
+  );
+
+  /// Splash 장식 라인 — "❀ ❀ ❀" 같은 표지 ornament.
+  /// 큰 letterSpacing(10) + height 1 로 페이지 흐름 분리용.
+  static TextStyle get splashOrnament => GoogleFonts.playfairDisplay(
+    fontSize: 22,
+    color: AppColors.inkTertiary,
+    letterSpacing: 10,
+    height: 1,
+  );
+
+  /// 소셜 로그인 버튼 라벨 — Playfair 15/w600.
+  /// `fine`(15/italic) 과 사이즈는 같지만 not italic + w600. 버튼 전용.
+  /// 색상은 호출부에서 `copyWith(color: ...)` 으로 지정 (provider 별 fg).
+  static TextStyle get buttonLabelSerif => GoogleFonts.playfairDisplay(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 1,
+  );
+
   /// 섹션 라벨 — 업퍼케이스 sans.
   /// 예: "레슨요청 · 14", "스케줄변경요청 · 5"
   static TextStyle get sectionLabel => const TextStyle(
