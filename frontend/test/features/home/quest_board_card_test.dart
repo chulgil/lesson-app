@@ -16,6 +16,7 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/home/presentation/providers/home_lesson_summary_provider.dart';
 import 'package:lessonaza/features/home/presentation/providers/teacher_profile_completion_provider.dart';
 import 'package:lessonaza/features/home/presentation/widgets/quest_board_card.dart';
+import 'package:lessonaza/features/profile/presentation/providers/quest_celebration_provider.dart';
 import 'package:lessonaza/features/profile/presentation/providers/quest_first_shown_provider.dart';
 import 'package:lessonaza/features/students/domain/entities/student.dart';
 
@@ -27,6 +28,28 @@ class _FakeQuestFirstShown extends QuestFirstShown {
 
   @override
   Future<void> markShown() async {}
+}
+
+/// 축하 카드 이미 dismiss 된 상태 — 기본값 (기존 "board hides" 테스트 의도 유지).
+class _DismissedCelebration extends QuestCelebration {
+  @override
+  Future<DateTime?> build() async => DateTime.utc(2026, 1, 1);
+
+  @override
+  Future<void> markCelebrated() async {}
+}
+
+/// 축하 카드 아직 dismiss 안 된 상태 — 11/11 완료 + 카드 표시 테스트용.
+class _PendingCelebration extends QuestCelebration {
+  bool markCelebratedCalled = false;
+
+  @override
+  Future<DateTime?> build() async => null;
+
+  @override
+  Future<void> markCelebrated() async {
+    markCelebratedCalled = true;
+  }
 }
 
 /// Overrides that complete all 10 mandatory quests. Phone verification is
@@ -53,6 +76,9 @@ List<Override> _allMandatoryDone({required bool phoneVerified}) => [
     ],
   ),
   questFirstShownProvider.overrideWith(_FakeQuestFirstShown.new),
+  // 기본값: 이미 dismiss 된 상태 — 기존 "board hides" 회귀 테스트 의도 유지.
+  // 카드 표시 테스트는 _PendingCelebration 으로 override 교체.
+  questCelebrationProvider.overrideWith(_DismissedCelebration.new),
 ];
 
 Future<void> _pump(WidgetTester tester, List<Override> overrides) async {
@@ -265,6 +291,53 @@ void main() {
       find.text('· ${AppStrings.questThresholdPracticeHint}'),
       findsNothing,
     );
+  });
+
+  // ── §8.3 전체 완료 축하 카드 분기 (Job 7) ──
+
+  testWidgets('11/11 완료 + 축하 카드 미dismiss → QuestCelebrationCard 표시', (
+    tester,
+  ) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    // 축하 카드 pending 상태로 교체.
+    overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+      _PendingCelebration.new,
+    );
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    // 축하 카드 본문 표시.
+    expect(find.text(AppStrings.questCelebrationTitle), findsOneWidget);
+    expect(find.text(AppStrings.questCelebrationBody), findsOneWidget);
+    // 기존 quest 헤더는 미표시 (board 자체는 hidden).
+    expect(find.text(AppStrings.questBoardTitle), findsNothing);
+  });
+
+  testWidgets('11/11 완료 + 축하 카드 이미 dismiss → 완전 hidden (회귀)', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    // 기본값 _DismissedCelebration 사용.
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    // 축하 카드도, 기존 board 도 모두 hidden.
+    expect(find.text(AppStrings.questCelebrationTitle), findsNothing);
+    expect(find.text(AppStrings.questBoardTitle), findsNothing);
+  });
+
+  testWidgets('미완료 상태에서는 celebration 카드 미표시 (board 표시)', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[0] = hasAvailableSlotsProvider.overrideWithValue(false);
+    overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+      _PendingCelebration.new,
+    );
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questCelebrationTitle), findsNothing);
+    expect(find.text(AppStrings.questBoardTitle), findsOneWidget);
   });
 }
 
