@@ -112,7 +112,8 @@ def upgrade() -> None:
             sa.ForeignKey("academy_members.id", ondelete="RESTRICT"),
             nullable=False,
         ),
-        sa.Column("permissions", sa.JSON(), nullable=False, server_default=sa.text("'[]'::json")),
+        # NOTE: PostgreSQL 전용 ``::json`` cast 제거 — SQLite 호환.
+        sa.Column("permissions", sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
         sa.Column("starts_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("ends_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("reason", delegation_reason, nullable=False),
