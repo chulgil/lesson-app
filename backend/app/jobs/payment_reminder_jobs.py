@@ -18,8 +18,15 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal
-from app.core.scheduler import advisory_lock_key, try_advisory_lock
+from app.core.scheduler import (  # noqa: F401  release 는 finally 블록에서 사용 — ruff 가 일부 케이스에서 detect 못함.
+    advisory_lock_key,
+    release_advisory_lock,
+    try_advisory_lock,
+)
 from app.models.subscription import ProposalStatus, SubscriptionProposal
+
+# 외부 API (alimtalk / FCM push) 호출 timeout — 한 row 가 worker 무한 점유 차단.
+_EXTERNAL_CALL_TIMEOUT_SECONDS = 10.0
 
 logger = logging.getLogger(__name__)
 
@@ -94,29 +101,45 @@ async def _run_payment_reminder(
     """Common D+N runner. Pass `session` from tests; production opens a fresh one."""
 
     async def _do(s: AsyncSession) -> dict[str, Any]:
-        now = datetime.now(UTC)
-        window_end = now - timedelta(days=n_days)
-        window_start = now - timedelta(days=n_days + 1)
+        import asyncio
 
+        now = datetime.now(UTC)
+        # window 를 "n_days 전 이전에 생성되었고 아직 미발송" 으로 확장 — 이전엔 [now-n-1, now-n)
+        # 24h slice 였어서 cron 이 하루 missed (advisory lock 실패 / 인스턴스 중단) 되면 그 날의
+        # candidate 가 영구 유실되던 P0 차단. NULL 가드 (column.is_(None)) 가 이미 idempotency 보장.
+        cutoff = now - timedelta(days=n_days)
         column = getattr(SubscriptionProposal, reminder_field)
 
         result = await s.scalars(
-            select(SubscriptionProposal).where(
+            select(SubscriptionProposal)
+            .where(
                 SubscriptionProposal.status.in_(_ACTIVE),
-                SubscriptionProposal.created_at >= window_start,
-                SubscriptionProposal.created_at < window_end,
+                SubscriptionProposal.created_at <= cutoff,
                 column.is_(None),
                 SubscriptionProposal.expires_at > now,
             )
+            # 동시 실행 시 같은 row 가 두 worker 에 처리되는 것을 차단. SQLite (test) 에서는 no-op.
+            .with_for_update(skip_locked=True)
         )
         candidates = list(result.all())
         sent = 0
         for proposal in candidates:
-            ok = await _send_teacher_push(s, proposal, notification_type)
+            # 외부 호출 timeout — 한 row 가 worker 무한 점유 방지.
+            try:
+                ok = await asyncio.wait_for(
+                    _send_teacher_push(s, proposal, notification_type),
+                    timeout=_EXTERNAL_CALL_TIMEOUT_SECONDS,
+                )
+            except TimeoutError:
+                logger.warning("payment reminder teacher push timeout proposal=%s", proposal.id)
+                ok = False
             # #423 — alimtalk to student/parent in parallel with the teacher push.
             try:
-                await _send_student_alimtalk(s, proposal, n_days)
-            except Exception:  # noqa: BLE001
+                await asyncio.wait_for(
+                    _send_student_alimtalk(s, proposal, n_days),
+                    timeout=_EXTERNAL_CALL_TIMEOUT_SECONDS,
+                )
+            except (TimeoutError, Exception):  # noqa: BLE001
                 logger.exception(
                     "alimtalk LNZ_PAYMENT_REMINDER_D%d trigger failed proposal=%s",
                     n_days,
@@ -143,7 +166,12 @@ async def _run_payment_reminder(
         if not acquired:
             logger.info("%s: advisory lock not acquired, skip cycle", job_id)
             return {"job_id": job_id, "candidates": 0, "sent": 0, "n_days": n_days, "lock_acquired": False}
-        out = await _do(new_session)
+        try:
+            out = await _do(new_session)
+        finally:
+            # PG advisory lock 누수 차단 — pool 반환된 connection 이 lock 을 들고 있으면 다음 사용자가
+            # 무관한 코드에서 그 lock 을 들고 있는 상태가 된다.
+            await release_advisory_lock(new_session, key=lock_key)
         out["lock_acquired"] = True
         return out
 

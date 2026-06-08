@@ -14,7 +14,11 @@ import logging
 from typing import Any
 
 from app.core.database import AsyncSessionLocal
-from app.core.scheduler import advisory_lock_key, try_advisory_lock
+from app.core.scheduler import (  # noqa: F401  release 는 finally 블록에서 사용 — ruff 가 일부 케이스에서 detect 못함.
+    advisory_lock_key,
+    release_advisory_lock,
+    try_advisory_lock,
+)
 from app.services.subscription_expiry_dispatcher import SubscriptionExpiryDispatcher
 from app.services.subscription_expiry_service import SubscriptionExpiryService
 
@@ -54,16 +58,26 @@ async def run_subscription_expiry_job() -> dict[str, Any]:
                 "lock_acquired": False,
             }
 
-        service = SubscriptionExpiryService(session)
-        check = await service.run_daily_check()
+        try:
+            service = SubscriptionExpiryService(session)
+            check = await service.run_daily_check()
 
-        dispatcher = SubscriptionExpiryDispatcher(session)
-        dispatch = await dispatcher.dispatch_milestones(
-            check["milestones"],
-            today_kst=check["today_kst"],
-        )
+            # status 전이를 먼저 commit — 이후 dispatch 가 실패해도 전이는 보존되어 다음 cycle 에서
+            # dedup_log 가 dispatch 만 redo 한다. 이전엔 단일 commit 으로 묶여 dispatch 실패 시
+            # 전이도 rollback 되었다.
+            await session.commit()
 
-        await session.commit()
+            dispatcher = SubscriptionExpiryDispatcher(session)
+            dispatch = await dispatcher.dispatch_milestones(
+                check["milestones"],
+                today_kst=check["today_kst"],
+            )
+
+            await session.commit()
+        finally:
+            # PG advisory lock 누수 차단 — pool 반환된 connection 이 lock 을 들고 있으면
+            # 다음 사용자가 무관한 코드에서 그 lock 을 들고 있는 상태가 된다.
+            await release_advisory_lock(session, key=lock_key)
 
         result = {
             "transitions": check["transitions"],

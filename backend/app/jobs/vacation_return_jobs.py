@@ -20,7 +20,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal
-from app.core.scheduler import advisory_lock_key, try_advisory_lock
+from app.core.scheduler import (  # noqa: F401  release 는 finally 블록에서 사용 — ruff 가 일부 케이스에서 detect 못함.
+    advisory_lock_key,
+    release_advisory_lock,
+    try_advisory_lock,
+)
 from app.models.schedule import LessonBooking, VacationPeriod
 
 logger = logging.getLogger(__name__)
@@ -117,15 +121,19 @@ async def _run(session: AsyncSession | None = None) -> dict[str, Any]:
     """Common runner — accepts an injected session (tests) or opens one (prod)."""
 
     async def _do(s: AsyncSession) -> dict[str, Any]:
-        # KST "yesterday" — vacation_end_date == yesterday means the teacher is
-        # back today, so we announce the return now.
+        # KST "yesterday" — vacation_end_date == yesterday means the teacher is back today.
+        # 검색 윈도우를 어제 단일 날짜에서 최근 7일 범위로 확장 — cron 이 하루 missed (advisory
+        # lock 실패 / 인스턴스 중단 / 배포 윈도우) 되어도 catch-up 가능. alimtalk 멱등 키
+        # (vacation_period_id, recipient_phone, template_id) 가 중복 발송을 차단하므로 안전.
         today_kst = datetime.now(UTC).astimezone(_KST).date()
         target = today_kst - timedelta(days=1)
+        catch_up_floor = today_kst - timedelta(days=7)
 
         periods = (
             await s.scalars(
                 select(VacationPeriod).where(
-                    VacationPeriod.end_date == target,
+                    VacationPeriod.end_date <= target,
+                    VacationPeriod.end_date >= catch_up_floor,
                     VacationPeriod.cancelled_at.is_(None),
                 )
             )
@@ -154,7 +162,11 @@ async def _run(session: AsyncSession | None = None) -> dict[str, Any]:
         if not acquired:
             logger.info("%s: advisory lock not acquired, skip cycle", JOB_ID)
             return {"job_id": JOB_ID, "periods": 0, "sent": 0, "lock_acquired": False}
-        out = await _do(new_session)
+        try:
+            out = await _do(new_session)
+        finally:
+            # PG advisory lock 누수 차단.
+            await release_advisory_lock(new_session, key=lock_key)
         out["lock_acquired"] = True
         return out
 
