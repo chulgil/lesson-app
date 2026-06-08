@@ -3331,8 +3331,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5650,6 +5650,16 @@ class AppStrings {
   /// Lock hint — Q7~Q10 카드 reward 영역 (학생 없을 때).
   static const questLockedStudentRequiredHint = '학생 초대 후 진행 가능';
 
+  // §13 퀘스트 임계값 hint (Job 6) — 스펙 §9 완료 임계값 공개
+  /// Q3 소개글 — 최소 20자 임계값 hint (카드 본문 표시).
+  static const questThresholdIntroHint = '최소 20자 입력 시 완료';
+
+  /// Q4 레슨비 — 최소 1개 가격 항목 임계값 hint.
+  static const questThresholdPriceHint = '최소 1개 가격 항목 등록 시 완료';
+
+  /// Q10 숙제 — 1건 등록 임계값 hint.
+  static const questThresholdPracticeHint = '1건 등록 시 완료';
+
   /// Quest I — 이름 + 악기 설정 타이틀.
   static const questTitleNameInstrument = '이름 + 악기 설정';
 
@@ -5751,10 +5761,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5891,12 +5900,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'

@@ -118,8 +118,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
   Future<void> _onTapProfileImage() async {
     final userId = _userId;
-    final currentPath =
-        ref.read(profileImageNotifierProvider(userId)).valueOrNull;
+    final currentPath = ref
+        .read(profileImageNotifierProvider(userId))
+        .valueOrNull;
 
     final action = await showImagePickerBottomSheet(
       context,
@@ -135,10 +136,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       return;
     }
 
-    final source =
-        action == ImagePickerAction.camera
-            ? ImageSource.camera
-            : ImageSource.gallery;
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
 
     if (!mounted) return;
     await notifier.pickAndSaveImage(source, context);
@@ -146,8 +146,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
   Future<void> _onTapBackgroundImage() async {
     final userId = _userId;
-    final currentPath =
-        ref.read(backgroundImageNotifierProvider(userId)).valueOrNull;
+    final currentPath = ref
+        .read(backgroundImageNotifierProvider(userId))
+        .valueOrNull;
 
     final action = await showImagePickerBottomSheet(
       context,
@@ -163,10 +164,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       return;
     }
 
-    final source =
-        action == ImagePickerAction.camera
-            ? ImageSource.camera
-            : ImageSource.gallery;
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
 
     if (!mounted) return;
     await notifier.pickAndSaveImage(source, context);
@@ -240,10 +240,12 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     });
 
     final userId = _userId;
-    final profileImagePath =
-        ref.watch(profileImageNotifierProvider(userId)).valueOrNull;
-    final backgroundImagePath =
-        ref.watch(backgroundImageNotifierProvider(userId)).valueOrNull;
+    final profileImagePath = ref
+        .watch(profileImageNotifierProvider(userId))
+        .valueOrNull;
+    final backgroundImagePath = ref
+        .watch(backgroundImageNotifierProvider(userId))
+        .valueOrNull;
     final name = _nameController.text;
     final initial = name.isNotEmpty ? name[0] : '?';
 
@@ -417,14 +419,13 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _save,
-                  child:
-                      _isLoading
-                          ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Text(AppStrings.save),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(AppStrings.save),
                 ),
               ),
             ],
@@ -438,52 +439,50 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children:
-          _specialtyOptions.map((specialty) {
-            final isSelected = _selectedSpecialties.contains(specialty);
-            return FilterChip(
-              label: Text(specialty),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  if (selected) {
-                    if (_selectedSpecialties.length >= _maxSpecialties) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppStrings.profileBasicInfoMaxSelections(
-                              _maxSpecialties,
-                            ),
-                          ),
-                          behavior: SnackBarBehavior.floating,
-                          duration: const Duration(seconds: 2),
+      children: _specialtyOptions.map((specialty) {
+        final isSelected = _selectedSpecialties.contains(specialty);
+        return FilterChip(
+          label: Text(specialty),
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              if (selected) {
+                if (_selectedSpecialties.length >= _maxSpecialties) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppStrings.profileBasicInfoMaxSelections(
+                          _maxSpecialties,
                         ),
-                      );
-                      return;
-                    }
-                    _selectedSpecialties.add(specialty);
-                  } else {
-                    _selectedSpecialties.remove(specialty);
-                  }
-                });
-              },
-              selectedColor: AppColors.paperAccentSoft,
-              checkmarkColor: AppColors.paperAccent,
-              labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.paperAccent : AppColors.ink,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color:
-                      isSelected
-                          ? AppColors.paperAccent
-                          : AppColors.inkQuaternary,
-                ),
-              ),
-              backgroundColor: AppColors.paper,
-            );
-          }).toList(),
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+                _selectedSpecialties.add(specialty);
+              } else {
+                _selectedSpecialties.remove(specialty);
+              }
+            });
+          },
+          selectedColor: AppColors.paperAccentSoft,
+          checkmarkColor: AppColors.paperAccent,
+          labelStyle: AppTypography.bodyMedium.copyWith(
+            color: isSelected ? AppColors.paperAccent : AppColors.ink,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: isSelected
+                  ? AppColors.paperAccent
+                  : AppColors.inkQuaternary,
+            ),
+          ),
+          backgroundColor: AppColors.paper,
+        );
+      }).toList(),
     );
   }
 
@@ -533,23 +532,20 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children:
-          _lessonAreas.map((area) {
-            return Chip(
-              label: Text(area),
-              deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () {
-                setState(() => _lessonAreas.remove(area));
-              },
-              labelStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.ink,
-              ),
-              backgroundColor: AppColors.paperDark,
-              shape: const RoundedRectangleBorder(
-                side: BorderSide(color: AppColors.inkQuaternary),
-              ),
-            );
-          }).toList(),
+      children: _lessonAreas.map((area) {
+        return Chip(
+          label: Text(area),
+          deleteIcon: const Icon(Icons.close, size: 16),
+          onDeleted: () {
+            setState(() => _lessonAreas.remove(area));
+          },
+          labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+          backgroundColor: AppColors.paperDark,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: AppColors.inkQuaternary),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -573,6 +569,8 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   }
 
   Widget _buildCharacterCount() {
+    // §9 임계값 공개: "N/20자 (최소 20자)" + 미달 회색, 도달 primary 색.
+    // 도달 시 사용자에게 "퀘스트 자동 완료" 시그널 — primary ink 색으로 강조.
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: _introductionController,
       builder: (context, value, _) {
@@ -582,11 +580,11 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           alignment: Alignment.centerRight,
           child: Text(
             isSufficient
-                ? '$length자'
-                : '$length자 (최소 $_minIntroductionLength자)',
+                ? '$length/$_minIntroductionLength자'
+                : '$length/$_minIntroductionLength자 (최소 $_minIntroductionLength자)',
             style: AppTypography.caption.copyWith(
-              color:
-                  isSufficient ? AppColors.inkTertiary : AppColors.paperAccent,
+              color: isSufficient ? AppColors.ink : AppColors.inkTertiary,
+              fontWeight: isSufficient ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         );
