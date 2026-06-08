@@ -372,12 +372,17 @@ class AnnouncementService:
             student_ids.append(my_student.id)
         else:
             # parent 케이스 — children 조회.
-            from app.models.parent import ParentChildRelation
+            # FIX (Phase 23): ParentChildRelation.parent_id 는 Parent.id 인데 current_user.id 는
+            # User.id. 이전 (Phase 22) 코드는 두 ID 를 직접 비교해 매칭 0건 → 학부모는 자녀 선생님
+            # announcement 본문 영구 0건. Parent 를 user_id 로 먼저 resolve.
+            from app.models.parent import Parent, ParentChildRelation
 
-            parent_rel = await self.db.scalars(
-                select(ParentChildRelation.student_id).where(ParentChildRelation.parent_id == current_user.id)
-            )
-            student_ids.extend(s for s in parent_rel.all() if s)
+            parent_profile_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == current_user.id))
+            if parent_profile_id is not None:
+                parent_rel = await self.db.scalars(
+                    select(ParentChildRelation.student_id).where(ParentChildRelation.parent_id == parent_profile_id)
+                )
+                student_ids.extend(s for s in parent_rel.all() if s)
 
         if not student_ids:
             return []

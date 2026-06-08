@@ -26,9 +26,7 @@ class TeacherSettings(UUIDMixin, TimestampMixin, Base):
     trial_lesson_free: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     booking_guidance_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    __table_args__ = (
-        Index("uk_teacher_settings", "teacher_id", unique=True),
-    )
+    __table_args__ = (Index("uk_teacher_settings", "teacher_id", unique=True),)
 
 
 class SubscriptionSettings(UUIDMixin, TimestampMixin, Base):
@@ -41,16 +39,16 @@ class SubscriptionSettings(UUIDMixin, TimestampMixin, Base):
     renewal_alert_threshold: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     renewal_alert_days: Mapped[int] = mapped_column(Integer, nullable=False, default=7)
     renewal_alert_days_set: Mapped[list | None] = mapped_column(
-        JSON, nullable=True, default=lambda: [14, 7, 1, 0],
+        JSON,
+        nullable=True,
+        default=lambda: [14, 7, 1, 0],
     )
     discount_policies: Mapped[dict | list | None] = mapped_column(JSON, nullable=True, default=list)
     enable_push_notification: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     enable_badge: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     notify_parent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    __table_args__ = (
-        Index("uk_sub_settings_teacher", "teacher_id", unique=True),
-    )
+    __table_args__ = (Index("uk_sub_settings_teacher", "teacher_id", unique=True),)
 
 
 class ProposalSettings(UUIDMixin, Base):
@@ -69,9 +67,7 @@ class ProposalSettings(UUIDMixin, Base):
     auto_renewal_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    __table_args__ = (
-        Index("uk_proposal_settings_teacher", "teacher_id", unique=True),
-    )
+    __table_args__ = (Index("uk_proposal_settings_teacher", "teacher_id", unique=True),)
 
 
 class NotificationSettings(UUIDMixin, TimestampMixin, Base):
@@ -86,9 +82,7 @@ class NotificationSettings(UUIDMixin, TimestampMixin, Base):
     lesson_reminder_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     payment_reminder_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    __table_args__ = (
-        Index("uk_notif_settings", "user_id", "target_user_id", unique=True),
-    )
+    __table_args__ = (Index("uk_notif_settings", "user_id", "target_user_id", unique=True),)
 
 
 class ParentNotificationSettings(UUIDMixin, TimestampMixin, Base):
@@ -112,10 +106,13 @@ class ParentNotificationSettings(UUIDMixin, TimestampMixin, Base):
     lesson_note_update: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     weekly_report: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     monthly_report: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # spec parent_system.md §12.7 — 4개 카테고리 추가 (수강권 잔여 / 만료 임박 / 등록 완료 / 레슨 장소 변경).
+    subscription_low_remaining: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    subscription_expiring_soon: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    subscription_registered: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    lesson_location_change: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    __table_args__ = (
-        Index("uk_parent_notif_settings", "parent_id", unique=True),
-    )
+    __table_args__ = (Index("uk_parent_notif_settings", "parent_id", unique=True),)
 
 
 class FeedbackPreset(UUIDMixin, Base):
@@ -134,9 +131,7 @@ class FeedbackPreset(UUIDMixin, Base):
         server_default=func.now(),
     )
 
-    __table_args__ = (
-        Index("idx_feedback_preset_teacher", "teacher_id"),
-    )
+    __table_args__ = (Index("idx_feedback_preset_teacher", "teacher_id"),)
 
 
 class FeedbackCategory(str, enum.Enum):
@@ -207,9 +202,7 @@ class TeachingResource(UUIDMixin, TimestampMixin, Base):
     external_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     instrument: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
-    __table_args__ = (
-        Index("idx_resource_teacher", "teacher_id"),
-    )
+    __table_args__ = (Index("idx_resource_teacher", "teacher_id"),)
 
 
 class TeachingResourceTag(UUIDMixin, Base):

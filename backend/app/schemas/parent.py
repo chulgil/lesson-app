@@ -1,6 +1,5 @@
 """Parent-related schemas."""
 
-
 import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict
@@ -106,8 +105,7 @@ class ChildProfileResponse(BaseModel):
 
     model_config = ConfigDict(
         alias_generator=lambda field_name: "".join(
-            word.capitalize() if index else word
-            for index, word in enumerate(field_name.split("_"))
+            word.capitalize() if index else word for index, word in enumerate(field_name.split("_"))
         ),
         populate_by_name=True,
     )
@@ -125,8 +123,7 @@ class ChildProfileCreate(BaseModel):
 
     model_config = ConfigDict(
         alias_generator=lambda field_name: "".join(
-            word.capitalize() if index else word
-            for index, word in enumerate(field_name.split("_"))
+            word.capitalize() if index else word for index, word in enumerate(field_name.split("_"))
         ),
         populate_by_name=True,
     )
@@ -144,8 +141,7 @@ class ChildProfileUpdate(BaseModel):
 
     model_config = ConfigDict(
         alias_generator=lambda field_name: "".join(
-            word.capitalize() if index else word
-            for index, word in enumerate(field_name.split("_"))
+            word.capitalize() if index else word for index, word in enumerate(field_name.split("_"))
         ),
         populate_by_name=True,
     )
@@ -159,8 +155,7 @@ class ChildTeacherConnectRequest(BaseModel):
 
     model_config = ConfigDict(
         alias_generator=lambda field_name: "".join(
-            word.capitalize() if index else word
-            for index, word in enumerate(field_name.split("_"))
+            word.capitalize() if index else word for index, word in enumerate(field_name.split("_"))
         ),
         populate_by_name=True,
     )
@@ -248,6 +243,11 @@ class ParentNotificationSettingsResponse(BaseModel):
     lesson_note_update: bool = False
     weekly_report: bool = True
     monthly_report: bool = True
+    # spec parent_system.md §12.7 — 추가 4 카테고리.
+    subscription_low_remaining: bool = True
+    subscription_expiring_soon: bool = True
+    subscription_registered: bool = True
+    lesson_location_change: bool = True
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 
@@ -271,3 +271,8 @@ class ParentNotificationSettingsUpdate(BaseModel):
     lesson_note_update: bool | None = None
     weekly_report: bool | None = None
     monthly_report: bool | None = None
+    # spec parent_system.md §12.7 — 추가 4 카테고리.
+    subscription_low_remaining: bool | None = None
+    subscription_expiring_soon: bool | None = None
+    subscription_registered: bool | None = None
+    lesson_location_change: bool | None = None

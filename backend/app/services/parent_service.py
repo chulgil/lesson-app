@@ -101,9 +101,7 @@ class ParentService:
         parent = await self._get_parent_or_404(parent_id)
         await self._assert_can_access_parent(parent.id, current_user)
 
-        relations = await self.db.scalars(
-            select(ParentChildRelation).where(ParentChildRelation.parent_id == parent.id)
-        )
+        relations = await self.db.scalars(select(ParentChildRelation).where(ParentChildRelation.parent_id == parent.id))
         for relation in relations.all():
             await self.db.delete(relation)
         await self.db.delete(parent)
@@ -113,9 +111,7 @@ class ParentService:
         """Return the parent profile."""
         from app.models.parent import Parent
 
-        parent = await self.db.scalar(
-            select(Parent).where(Parent.user_id == current_user.id)
-        )
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == current_user.id))
         if parent is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent profile not found")
         return ParentResponse.model_validate(parent)
@@ -124,9 +120,7 @@ class ParentService:
         """Update the parent profile."""
         from app.models.parent import Parent
 
-        parent = await self.db.scalar(
-            select(Parent).where(Parent.user_id == current_user.id)
-        )
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == current_user.id))
         if parent is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent profile not found")
 
@@ -141,15 +135,11 @@ class ParentService:
         """Return the list of linked children."""
         from app.models.parent import Parent, ParentChildRelation
 
-        parent = await self.db.scalar(
-            select(Parent).where(Parent.user_id == current_user.id)
-        )
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == current_user.id))
         if parent is None:
             return []
 
-        relations = await self.db.scalars(
-            select(ParentChildRelation).where(ParentChildRelation.parent_id == parent.id)
-        )
+        relations = await self.db.scalars(select(ParentChildRelation).where(ParentChildRelation.parent_id == parent.id))
 
         return [self._relation_response(relation) for relation in relations.all()]
 
@@ -159,24 +149,34 @@ class ParentService:
         from app.models.relationship import TeacherStudentRelation
         from app.models.student import Student
 
-        parent = await self.db.scalar(
-            select(Parent).where(Parent.user_id == current_user.id)
-        )
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == current_user.id))
         if parent is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent profile not found")
 
-        invitation = await self.db.scalar(
-            select(ParentInvitation).where(
-                ParentInvitation.invitation_code == invite_code,
-                ParentInvitation.expires_at > datetime.now(UTC),
-            )
+        # spec parent_system.md §3 — expired/not-found 구분: expired = 410 Gone, not-found = 404.
+        invitation_any = await self.db.scalar(
+            select(ParentInvitation).where(ParentInvitation.invitation_code == invite_code)
         )
+        now_utc = datetime.now(UTC)
+
+        def _is_active(invite: ParentInvitation | None) -> bool:
+            if invite is None:
+                return False
+            exp = invite.expires_at
+            # SQLite 는 timezone 정보를 strip — naive 면 UTC 로 가정.
+            if exp.tzinfo is None:
+                exp = exp.replace(tzinfo=UTC)
+            return exp > now_utc
+
+        invitation = invitation_any if _is_active(invitation_any) else None
         relation = await self.db.scalar(
             select(TeacherStudentRelation).where(
                 TeacherStudentRelation.invite_code == invite_code,
             )
         )
         if invitation is None and relation is None:
+            if invitation_any is not None:
+                raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invite code expired")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid invite code")
 
         student_id = invitation.student_id if invitation is not None else relation.student_id  # type: ignore[union-attr]
@@ -499,9 +499,7 @@ class ParentService:
         from app.models.parent import ParentInvitation
 
         if code:
-            invitation = await self.db.scalar(
-                select(ParentInvitation).where(ParentInvitation.invitation_code == code)
-            )
+            invitation = await self.db.scalar(select(ParentInvitation).where(ParentInvitation.invitation_code == code))
             if invitation is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invitation not found")
             await self._assert_can_access_invitation(invitation, current_user)
@@ -573,9 +571,7 @@ class ParentService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed to view relations")
         await self._assert_can_view_student_relations(student_id, current_user)
 
-        result = await self.db.scalars(
-            select(ParentChildRelation).where(ParentChildRelation.student_id == student_id)
-        )
+        result = await self.db.scalars(select(ParentChildRelation).where(ParentChildRelation.student_id == student_id))
         items = [self._relation_response(relation) for relation in result.all()]
         return PaginatedResponse.create(items=items, total=len(items), page=1, size=max(len(items), 1))
 
@@ -858,9 +854,7 @@ class ParentService:
         from app.models.user import User
 
         result = await self.db.execute(
-            select(User.name)
-            .join(Teacher, Teacher.user_id == User.id)
-            .where(Teacher.id == teacher_id)
+            select(User.name).join(Teacher, Teacher.user_id == User.id).where(Teacher.id == teacher_id)
         )
         name: str | None = result.scalar_one_or_none()
         return name
@@ -922,9 +916,7 @@ class ParentService:
         alphabet = string.ascii_uppercase + string.digits
         while True:
             code = "".join(secrets.choice(alphabet) for _ in range(8))
-            exists = await self.db.scalar(
-                select(ParentInvitation.id).where(ParentInvitation.invitation_code == code)
-            )
+            exists = await self.db.scalar(select(ParentInvitation.id).where(ParentInvitation.invitation_code == code))
             if exists is None:
                 return code
 
