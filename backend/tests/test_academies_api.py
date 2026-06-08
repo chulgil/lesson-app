@@ -419,3 +419,54 @@ async def test_member_consent_owner_cannot_change_teachers_consent(
     )
     assert response.status_code == 200
     assert response.json()["public_page_consent"] is True
+
+
+async def test_invite_accept_supports_token_in_body(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    """Body 로도 token 을 받을 수 있어야 한다 — access log 노출 차단을 위한 점진 마이그레이션."""
+    from sqlalchemy import select
+
+    from app.models.academy import AcademyMember
+
+    await _seed_owner(create_test_user)
+    await _seed_other_user(create_test_user)
+    academy_resp = await client.post(
+        "/api/v1/academies",
+        headers=_owner_headers(),
+        json={"slug": "body-token-test", "name": "Body 토큰 테스트"},
+    )
+    academy_id = academy_resp.json()["id"]
+    issue_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/invites",
+        headers=_owner_headers(),
+        json={"roles": ["teacher"]},
+    )
+    token = issue_resp.json()["token"]
+
+    # body 로 token 전달 (query 없이) — 새 클라이언트 흐름.
+    accept_resp = await client.post(
+        "/api/v1/academies/invites/accept",
+        headers=_other_user_headers(),
+        json={"token": token, "public_page_consent": True},
+    )
+    assert accept_resp.status_code == 200
+    inserted = await db_session.scalar(select(AcademyMember).where(AcademyMember.user_id == OTHER_USER_ID))
+    assert inserted is not None
+
+
+async def test_invite_accept_returns_422_when_token_missing(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    """token 이 query 와 body 모두에 없으면 422."""
+    await _seed_owner(create_test_user)
+    await _seed_other_user(create_test_user)
+    response = await client.post(
+        "/api/v1/academies/invites/accept",
+        headers=_other_user_headers(),
+        json={"public_page_consent": False},
+    )
+    assert response.status_code == 422

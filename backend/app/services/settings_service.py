@@ -26,9 +26,7 @@ class SettingsService:
         from app.models.settings import TeacherSettings
 
         teacher_id = await self._resolve_teacher_user_id(teacher_id)
-        settings = await self.db.scalar(
-            select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id)
-        )
+        settings = await self.db.scalar(select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id))
         if settings is None:
             settings = TeacherSettings(teacher_id=teacher_id)
             self.db.add(settings)
@@ -77,10 +75,11 @@ class SettingsService:
             await self.db.refresh(settings)
         return settings
 
-    async def get_subscription_settings_by_teacher(self, teacher_id: str) -> Any:
+    async def get_subscription_settings_by_teacher(self, teacher_id: str, current_user: Any) -> Any:
         from app.models.settings import SubscriptionSettings
 
         teacher_id = await self._resolve_subscription_teacher_id(teacher_id)
+        await self._assert_can_read_teacher_settings(teacher_id, current_user)
         settings = await self.db.scalar(
             select(SubscriptionSettings).where(SubscriptionSettings.teacher_id == teacher_id)
         )
@@ -88,7 +87,7 @@ class SettingsService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
         return settings
 
-    async def get_subscription_settings_by_organization(self, organization_id: str) -> Any:
+    async def get_subscription_settings_by_organization(self, organization_id: str, current_user: Any) -> Any:
         from app.models.settings import SubscriptionSettings
 
         settings = await self.db.scalar(
@@ -96,7 +95,31 @@ class SettingsService:
         )
         if settings is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription settings not found")
+        # settings 의 실제 teacher_id 가 current_user 의 강사 ID 와 일치해야 한다 — organization_id 만으로는 무검증.
+        if settings.teacher_id is not None:
+            await self._assert_can_read_teacher_settings(settings.teacher_id, current_user)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Cannot read organization-only subscription settings",
+            )
         return settings
+
+    async def _assert_can_read_teacher_settings(self, teacher_id: str, current_user: Any) -> None:
+        """teacher_id 가 current_user 의 강사 ID 와 일치하는지 검증 — IDOR 차단."""
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        my_teacher_id = await try_resolve_teacher_id(self.db, current_user.id)
+        if my_teacher_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only teachers can read subscription settings",
+            )
+        if teacher_id != my_teacher_id and teacher_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Cannot read another teacher's subscription settings",
+            )
 
     async def create_subscription_settings(self, data: dict, current_user: Any | None = None) -> Any:
         from app.models.settings import SubscriptionSettings
@@ -165,15 +188,20 @@ class SettingsService:
         return await resolve_teacher_id(self.db, teacher_id)
 
     async def _assert_subscription_settings_owner(self, data: dict, current_user: Any) -> None:
-        """Allow flat subscription settings writes only for the current teacher profile."""
+        """Allow flat subscription settings writes only for the current teacher profile.
+
+        organization_id 가 있어도 검증을 우회하지 않는다 — 기존 분기는 organization 모델이
+        없는 상태에서 임의 teacher 가 ``{"organization_id": "X"}`` 만 보내면 다른 학원의
+        설정을 생성/수정할 수 있는 P0 IDOR 였다. 항상 teacher_id 일치를 요구.
+        """
         from app.services.teacher_id_resolver import resolve_teacher_id
 
         teacher_id = data.get("teacher_id")
-        organization_id = data.get("organization_id")
-        if organization_id is not None:
-            return
         if teacher_id is None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="teacher_id is required")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="teacher_id is required for subscription settings",
+            )
         teacher_id = await self._resolve_subscription_teacher_id(teacher_id)
         current_teacher_id = await resolve_teacher_id(self.db, current_user.id)
         if teacher_id != current_teacher_id:
@@ -186,9 +214,7 @@ class SettingsService:
     async def get_proposal_settings(self, teacher_id: str) -> Any:
         from app.models.settings import ProposalSettings
 
-        settings = await self.db.scalar(
-            select(ProposalSettings).where(ProposalSettings.teacher_id == teacher_id)
-        )
+        settings = await self.db.scalar(select(ProposalSettings).where(ProposalSettings.teacher_id == teacher_id))
         if settings is None:
             settings = ProposalSettings(teacher_id=teacher_id)
             self.db.add(settings)
@@ -245,9 +271,7 @@ class SettingsService:
         from app.models.settings import ParentNotificationSettings
 
         settings = await self.db.scalar(
-            select(ParentNotificationSettings).where(
-                ParentNotificationSettings.parent_id == parent_id
-            )
+            select(ParentNotificationSettings).where(ParentNotificationSettings.parent_id == parent_id)
         )
         if settings is None:
             settings = ParentNotificationSettings(parent_id=parent_id)
@@ -607,13 +631,9 @@ class SettingsService:
                     tag_exists,
                 )
             )
-        total = await self.db.scalar(
-            select(func.count()).select_from(stmt.subquery())
-        ) or 0
+        total = await self.db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
 
-        result = await self.db.scalars(
-            stmt.order_by(TeachingResource.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(stmt.order_by(TeachingResource.created_at.desc()).offset(offset).limit(size))
         items = [await self._teaching_resource_response(resource) for resource in result.unique().all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -622,9 +642,7 @@ class SettingsService:
 
         if not ids:
             return []
-        result = await self.db.scalars(
-            select(TeachingResource).where(TeachingResource.id.in_(ids))
-        )
+        result = await self.db.scalars(select(TeachingResource).where(TeachingResource.id.in_(ids)))
         return [await self._teaching_resource_response(resource) for resource in result.all()]
 
     async def get_teaching_resource(self, resource_id: str, teacher_id: str) -> Any:

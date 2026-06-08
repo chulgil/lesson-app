@@ -27,7 +27,7 @@ async def get_by_teacher(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> SubscriptionSettingsResponse:
     service = SettingsService(db)
-    result: SubscriptionSettingsResponse = await service.get_subscription_settings_by_teacher(teacher_id)
+    result: SubscriptionSettingsResponse = await service.get_subscription_settings_by_teacher(teacher_id, current_user)
     return result
 
 
@@ -43,7 +43,9 @@ async def get_by_organization(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> SubscriptionSettingsResponse:
     service = SettingsService(db)
-    result: SubscriptionSettingsResponse = await service.get_subscription_settings_by_organization(organization_id)
+    result: SubscriptionSettingsResponse = await service.get_subscription_settings_by_organization(
+        organization_id, current_user
+    )
     return result
 
 
