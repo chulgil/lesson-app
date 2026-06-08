@@ -346,3 +346,79 @@ class AnnouncementService:
     def _normalize_dates(self, dates: list[date]) -> list[date]:
         """Normalize/sort/unique dates."""
         return sorted(set(dates))
+
+    async def list_visible_announcements(
+        self,
+        *,
+        current_user: Any,
+    ) -> list[TeacherAnnouncementResponse]:
+        """학생/학부모 시점 — 본인이 연결된 활성 선생님(들)의 announcement 본문 조회.
+
+        spec student_home_master.md / notification_master.md — 학생이 휴강 공지 본문을 직접
+        조회할 수 있도록 한다. notifications 메타데이터로만 보고 본문 알 수 없던 P0 보완.
+
+        권한:
+        - student / parent: 본인이 student 면 자기 학생의 활성 선생님 announcement 만.
+        - parent 면 자녀들의 활성 선생님 announcement 합집합.
+        """
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+        from app.models.student import Student
+        from app.models.teacher_announcement import TeacherAnnouncement, TeacherAnnouncementType
+
+        # 1) caller 의 student 식별 (parent 면 자녀들).
+        student_ids: list[str] = []
+        my_student = await self.db.scalar(select(Student).where(Student.user_id == current_user.id))
+        if my_student is not None:
+            student_ids.append(my_student.id)
+        else:
+            # parent 케이스 — children 조회.
+            from app.models.parent import ParentChildRelation
+
+            parent_rel = await self.db.scalars(
+                select(ParentChildRelation.student_id).where(ParentChildRelation.parent_id == current_user.id)
+            )
+            student_ids.extend(s for s in parent_rel.all() if s)
+
+        if not student_ids:
+            return []
+
+        # 2) 활성 선생님 ID 들 — invitePending/disconnected/expired/inactive 제외.
+        active_relations = await self.db.scalars(
+            select(TeacherStudentRelation.teacher_id)
+            .where(TeacherStudentRelation.student_id.in_(student_ids))
+            .where(
+                TeacherStudentRelation.status.in_(
+                    [RelationStatus.active, RelationStatus.trialBooked, RelationStatus.pending]
+                )
+            )
+        )
+        teacher_ids = list({tid for tid in active_relations.all() if tid})
+        if not teacher_ids:
+            return []
+
+        # 3) 그 선생님들의 announcement 들 newest first.
+        rows = await self.db.scalars(
+            select(TeacherAnnouncement)
+            .where(TeacherAnnouncement.teacher_id.in_(teacher_ids))
+            .order_by(TeacherAnnouncement.created_at.desc())
+        )
+
+        results: list[TeacherAnnouncementResponse] = []
+        for announcement in rows.all():
+            dates: list[date] = []
+            affected_lessons: list[AffectedLesson] = []
+            if announcement.type == TeacherAnnouncementType.day_off:
+                dates = await self._announcement_dates(announcement.id)
+            results.append(
+                TeacherAnnouncementResponse(
+                    id=announcement.id,
+                    teacher_id=announcement.teacher_id,
+                    type="dayOff" if announcement.type == TeacherAnnouncementType.day_off else "general",
+                    dates=dates,
+                    message=announcement.message,
+                    created_at=announcement.created_at,
+                    notified_count=announcement.notified_count,
+                    affected_lessons=affected_lessons,
+                )
+            )
+        return results

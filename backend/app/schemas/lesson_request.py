@@ -45,6 +45,12 @@ class LessonRequestCreate(BaseModel):
         max_length=3,
         validation_alias=AliasChoices("preferred_slots", "preferredSlots"),
     )
+    # spec unified_lesson_request_spec.md §18 — 학생 신청 시 희망 장소.
+    preferred_location_type: str | None = Field(
+        default=None,
+        max_length=30,
+        validation_alias=AliasChoices("preferred_location_type", "preferredLocationType"),
+    )
     message: str | None = Field(default=None, max_length=500)
     is_returning_student: bool = Field(
         default=False,
@@ -89,6 +95,8 @@ class LessonRequestResponse(BaseModel):
     preferred_time: str | None = None
     preferred_duration: int | None = None
     preferred_slots: list["PreferredTimeSlotSchema"] = Field(default_factory=list)
+    # spec unified_lesson_request_spec.md §18 — 학생 신청 시 희망 장소.
+    preferred_location_type: str | None = None
     is_returning_student: bool = False
     time_proposals: list | dict | None = None
     current_round: int = 0
@@ -187,9 +195,19 @@ class LessonRequestStatusUpdate(BaseModel):
     """Change lesson request status."""
 
     status: Literal[
-        "pending", "approved", "rejected", "negotiating", "timeConfirmed",
-        "proposalSent", "proposalAccepted", "paymentNotified",
-        "subscriptionIssued", "inProgress", "completed", "cancelled", "expired",
+        "pending",
+        "approved",
+        "rejected",
+        "negotiating",
+        "timeConfirmed",
+        "proposalSent",
+        "proposalAccepted",
+        "paymentNotified",
+        "subscriptionIssued",
+        "inProgress",
+        "completed",
+        "cancelled",
+        "expired",
     ]
     decline_reason: str | None = Field(default=None, max_length=500)
     proposal_id: str | None = None

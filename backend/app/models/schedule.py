@@ -279,6 +279,9 @@ class LessonRequest(UUIDMixin, Base):
     preferred_time: Mapped[str | None] = mapped_column(String(5), nullable=True)  # HH:MM
     preferred_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)  # minutes
     preferred_slots: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # spec unified_lesson_request_spec.md §18 (2026-05-07) — 학생 신청 시 희망 장소 전달.
+    # studentHome / academyRoom / teacherStudio / externalPlace / online — 자유 string 으로 저장.
+    preferred_location_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
     is_returning_student: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     time_proposals: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     current_round: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
