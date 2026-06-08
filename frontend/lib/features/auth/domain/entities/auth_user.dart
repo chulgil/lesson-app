@@ -40,6 +40,11 @@ class AuthUser {
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
 
+  /// 11개 퀘스트 모두 완료 시점. 축하 카드 1회성 보장용 (§13 퀘스트 시스템).
+  /// null = 미완료, DateTime = 축하 카드 이미 표시됨.
+  @JsonKey(name: 'quest_celebrated_at')
+  final DateTime? questCelebratedAt;
+
   const AuthUser({
     required this.id,
     required this.email,
@@ -49,6 +54,7 @@ class AuthUser {
     this.onboardingCompleted = false,
     this.authProvider,
     this.createdAt,
+    this.questCelebratedAt,
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>
