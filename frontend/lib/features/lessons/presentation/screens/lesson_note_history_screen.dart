@@ -316,9 +316,8 @@ class _NoteCard extends StatelessWidget {
                     // Notebook × Score: 연습 팁도 손글씨 메모로 렌더.
                     child: Text(
                       lesson.practiceTips!,
-                      style: NotebookTypography.hand.copyWith(
-                        fontSize: 13,
-                        height: 1.3,
+                      style: NotebookTypography.handSmall.copyWith(
+height: 1.3,
                         color: AppColors.paperPencil,
                       ),
                       maxLines: 1,
@@ -345,9 +344,8 @@ class _NoteCard extends StatelessWidget {
                     // Notebook × Score: 학생 메모도 여백에 끼적인 손글씨 느낌으로.
                     child: Text(
                       lesson.studentNote!,
-                      style: NotebookTypography.hand.copyWith(
-                        fontSize: 13,
-                        height: 1.3,
+                      style: NotebookTypography.handSmall.copyWith(
+height: 1.3,
                         color: AppColors.paperPencil,
                       ),
                       maxLines: 2,

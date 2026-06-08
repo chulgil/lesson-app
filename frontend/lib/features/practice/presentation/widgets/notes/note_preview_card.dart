@@ -78,9 +78,8 @@ class NotePreviewCard extends ConsumerWidget {
               // (README §1.1.1, §7.129 사용자 입력 정렬).
               Text(
                 latestNote.content,
-                style: NotebookTypography.hand.copyWith(
-                  fontSize: 13,
-                  color: AppColors.ink,
+                style: NotebookTypography.handSmall.copyWith(
+color: AppColors.ink,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

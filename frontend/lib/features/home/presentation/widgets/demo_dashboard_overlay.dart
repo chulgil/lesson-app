@@ -53,10 +53,9 @@ class DemoDashboardOverlay extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space2),
                   Text(
                     AppStrings.demoDashboardOverlayDescription,
-                    style: NotebookTypography.hand.copyWith(
+                    style: NotebookTypography.handLarge.copyWith(
                       color: AppColors.inkSecondary,
-                      fontSize: 15,
-                    ),
+),
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Row(

@@ -250,9 +250,8 @@ class PracticeItemsSection extends ConsumerWidget {
                         // §7.130: 선생님 작성 과제 설명 → Tier 1 Gaegu hand.
                         Text(
                           item.description!,
-                          style: NotebookTypography.hand.copyWith(
-                            fontSize: 13,
-                            color:
+                          style: NotebookTypography.handSmall.copyWith(
+color:
                                 item.isCompleted
                                     ? AppColors.inkTertiary
                                     : AppColors.inkSecondary,

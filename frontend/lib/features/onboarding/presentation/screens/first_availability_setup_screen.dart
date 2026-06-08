@@ -59,10 +59,9 @@ class _FirstAvailabilitySetupScreenState
                 const SizedBox(height: AppSpacing.space4),
                 Text(
                   _errorMessage!,
-                  style: NotebookTypography.hand.copyWith(
+                  style: NotebookTypography.handSmall.copyWith(
                     color: AppColors.paperAccent,
-                    fontSize: 13,
-                  ),
+),
                 ),
               ],
               const SizedBox(height: AppSpacing.space6),
@@ -343,10 +342,9 @@ class _DayChip extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           label,
-          style: NotebookTypography.hand.copyWith(
+          style: NotebookTypography.handLarge.copyWith(
             color: isSelected ? AppColors.paper : AppColors.ink,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -391,10 +389,9 @@ class _TimeField extends StatelessWidget {
             ),
             Text(
               value.format24Hour(),
-              style: NotebookTypography.hand.copyWith(
+              style: NotebookTypography.handLarge.copyWith(
                 color: AppColors.ink,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -414,10 +411,9 @@ class _DefaultLine extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Text(
         '· $text',
-        style: NotebookTypography.hand.copyWith(
+        style: NotebookTypography.handSmall.copyWith(
           color: AppColors.inkSecondary,
-          fontSize: 13,
-        ),
+),
       ),
     );
   }

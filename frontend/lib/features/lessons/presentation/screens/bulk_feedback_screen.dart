@@ -442,9 +442,8 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                       // §7.130: 미리보기 = 선생님 자필 피드백 → Tier 1 Gaegu hand.
                       Text(
                         fullFeedback,
-                        style: NotebookTypography.hand.copyWith(
-                          fontSize: 13,
-                          color: AppColors.ink,
+                        style: NotebookTypography.handSmall.copyWith(
+color: AppColors.ink,
                         ),
                       ),
                     ],

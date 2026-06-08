@@ -316,9 +316,8 @@ class _NoteRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     note.content,
-                    style: NotebookTypography.hand.copyWith(
-                      fontSize: 14,
-                      color: AppColors.ink,
+                    style: NotebookTypography.handMedium.copyWith(
+color: AppColors.ink,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
