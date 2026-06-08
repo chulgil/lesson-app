@@ -9,7 +9,15 @@ from app.core.deps import get_current_teacher, get_current_user, get_db, get_pag
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.student import StudentCreate, StudentResponse
-from app.schemas.teacher import TeacherDashboardResponse, TeacherPublicProfileResponse, TeacherResponse, TeacherUpdate
+from app.schemas.teacher import (  # noqa: F401  Certificate * 는 endpoint decorator response_model 에서 사용 — ruff 가 일부 detect 못함.
+    TeacherCertificateCreate,
+    TeacherCertificateResponse,
+    TeacherCertificateUpdate,
+    TeacherDashboardResponse,
+    TeacherPublicProfileResponse,
+    TeacherResponse,
+    TeacherUpdate,
+)
 from app.services.teacher_service import TeacherService
 
 router = APIRouter()
@@ -31,6 +39,9 @@ async def list_teachers(
     lesson_type: str | None = None,
     min_experience: Annotated[int | None, Query(ge=0)] = None,
     has_verified_certificate: bool | None = None,
+    # spec teacher_registration.md §4.2 — feeRange 필터.
+    fee_min: Annotated[int | None, Query(ge=0)] = None,
+    fee_max: Annotated[int | None, Query(ge=0)] = None,
 ) -> PaginatedResponse[TeacherResponse]:
     """Search / list teacher profiles."""
     service = TeacherService(db)
@@ -44,6 +55,8 @@ async def list_teachers(
         lesson_type=lesson_type,
         min_experience=min_experience,
         has_verified_certificate=has_verified_certificate,
+        fee_min=fee_min,
+        fee_max=fee_max,
     )
 
 
@@ -140,6 +153,74 @@ async def update_my_profile(
     """Update the authenticated teacher's profile."""
     service = TeacherService(db)
     return await service.upsert_for_user(current_user.id, body, current_user)
+
+
+# ---------------------------------------------------------------------------
+# Certificate CRUD — teacher_registration.md §3 (자격증 업로드 → 검토 → 승인/반려)
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/me/certificates",
+    response_model=list[TeacherCertificateResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List my certificates (teacher only)",
+)
+async def list_my_certificates(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> list[TeacherCertificateResponse]:
+    """Return certificates owned by the authenticated teacher (any status)."""
+    service = TeacherService(db)
+    return await service.list_my_certificates(current_user.id)
+
+
+@router.post(
+    "/me/certificates",
+    response_model=TeacherCertificateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit certificate for review (teacher only)",
+)
+async def create_my_certificate(
+    body: TeacherCertificateCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherCertificateResponse:
+    """Submit a new certificate. status = ``pending`` until reviewed (별도 admin endpoint)."""
+    service = TeacherService(db)
+    return await service.create_my_certificate(current_user.id, body.model_dump(exclude_unset=True))
+
+
+@router.patch(
+    "/me/certificates/{certificate_id}",
+    response_model=TeacherCertificateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update / re-submit certificate (teacher only)",
+)
+async def update_my_certificate(
+    certificate_id: str,
+    body: TeacherCertificateUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherCertificateResponse:
+    """Re-submit certificate. approved 상태는 차단 (409). status reset → ``pending``."""
+    service = TeacherService(db)
+    return await service.update_my_certificate(current_user.id, certificate_id, body.model_dump(exclude_unset=True))
+
+
+@router.delete(
+    "/me/certificates/{certificate_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete certificate (teacher only)",
+)
+async def delete_my_certificate(
+    certificate_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    """Delete own certificate. approved 상태도 삭제 허용 — 본인 self-revoke."""
+    service = TeacherService(db)
+    await service.delete_my_certificate(current_user.id, certificate_id)
 
 
 @router.get(

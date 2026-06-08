@@ -125,6 +125,8 @@ async def get_available_slots(
     date: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
+    # TODO(spec): teacher_availability_spec.md (L13-15) 는 50분 기본값 통일 명시. frontend 가
+    # 명시적으로 50 을 보내도록 마이그레이션된 후 변경 — 본 PR 에서는 BC 유지.
     duration: int = 60,
     limit: int | None = None,
     available_only: bool = False,
