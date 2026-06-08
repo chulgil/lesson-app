@@ -103,7 +103,7 @@ class AppBillingService:
         user_id: str,
         platform: str,
         raw_receipt: str,
-        transaction_id: str,
+        transaction_id: str | None,
         product_id: str,
     ) -> tuple[bool, AppBillingPlan]:
         """Persist an IAP receipt and (by default) refuse to upgrade the plan.
@@ -117,16 +117,34 @@ class AppBillingService:
         non-production environments to keep local mocking convenient; production
         and beta always default-deny.
 
+        transaction_id 가 None / 빈 문자열 / 자명한 placeholder (product_id 값 그대로)
+        이면 raw_receipt 의 sha256 으로 합성한다 — 실제 receipt parser 가 도입되기 전
+        ``(platform, transaction_id)`` UNIQUE 제약을 우회하기 위해 router 가 ``product_id``
+        를 그대로 ``transaction_id`` 로 넘기던 P0 (#405 후속) 를 차단한다. 같은 SKU 의
+        두 번째 사용자 결제부터 모든 후속 호출이 IntegrityError 로 영구 차단되던 결함.
+
+        idempotency: 같은 user 가 같은 raw_receipt 를 재제출하면 동일 hash → 동일
+        transaction_id → ``IntegrityError`` 로 자연스럽게 중복 거부 (audit log 1건만 유지).
+
         Returns:
             Tuple of (granted, plan). ``granted`` is True only when the plan was
             upgraded as a result of this receipt; otherwise the user keeps their
             existing plan.
         """
+        import hashlib
+
+        canonical_transaction_id = transaction_id
+        if not canonical_transaction_id or canonical_transaction_id == product_id:
+            # raw_receipt 에 user 식별자 + SKU 가 포함되어 있어 user 별로 충돌하지 않는다.
+            # raw_receipt 가 같은 값으로 재제출되면 같은 hash → idempotent.
+            digest = hashlib.sha256(f"{user_id}:{platform}:{raw_receipt}".encode()).hexdigest()
+            canonical_transaction_id = f"placeholder:{digest[:32]}"
+
         receipt = IapReceipt(
             user_id=user_id,
             platform=IapPlatform(platform),
             raw_receipt=raw_receipt,
-            transaction_id=transaction_id,
+            transaction_id=canonical_transaction_id,
             product_id=product_id,
             status=IapReceiptStatus.pending_verification,
         )
