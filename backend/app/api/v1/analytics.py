@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import (  # noqa: F401  ruff `from __future__ import annotations` 에서 Annotated[..., Query(...)] 사용 미감지.
+    APIRouter,
+    Depends,
+    Query,
+    status,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_db
@@ -40,7 +45,7 @@ async def get_student_progress(
     student_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
-    period_days: int = 30,
+    period_days: Annotated[int, Query(ge=1, le=365)] = 30,
 ) -> StudentProgressResponse:
     """Return attendance rate, practice stats, and calendar for a student.
 

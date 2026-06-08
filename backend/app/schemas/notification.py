@@ -1,6 +1,5 @@
 """Notification schemas."""
 
-
 import datetime as _dt
 from typing import Literal
 
@@ -59,10 +58,11 @@ class BroadcastNotificationRequest(BaseModel):
     """Bulk teacher announcement payload."""
 
     teacher_id: str
-    student_ids: list[str] = Field(min_length=1)
+    # max_length 가드 — 단일 요청에 무한 fan-out 가능성 차단 (P0).
+    student_ids: list[str] = Field(min_length=1, max_length=500)
     target_filter: Literal["active_subscription", "all"]
-    title: str
-    body: str
+    title: str = Field(..., min_length=1, max_length=200)
+    body: str = Field(..., min_length=1, max_length=2000)
 
 
 class BroadcastNotificationResponse(BaseModel):

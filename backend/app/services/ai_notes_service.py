@@ -106,12 +106,14 @@ class AiNotesService:
     async def _transcribe(self, audio_content: bytes) -> str:
         """Transcribe audio using OpenAI Whisper API."""
         try:
+            import io
+
             import openai
 
-            client = openai.AsyncOpenAI()
+            # timeout 미지정 시 네트워크/모델 지연이 워커를 무한 점유 → 동시 요청이 풀 고갈.
+            client = openai.AsyncOpenAI(timeout=120.0)
 
             # Create a temporary file-like object for the API
-            import io
 
             audio_file = io.BytesIO(audio_content)
             audio_file.name = "lesson_recording.m4a"
@@ -167,7 +169,8 @@ JSON 형식으로 응답하세요.
         try:
             import openai
 
-            client = openai.AsyncOpenAI()
+            # timeout 미지정 시 모델 지연이 워커 무한 점유 → 동시 요청 풀 고갈.
+            client = openai.AsyncOpenAI(timeout=120.0)
             response = await client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],

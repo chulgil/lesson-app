@@ -7,7 +7,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_user, get_db, get_pagination
+from app.core.deps import (  # noqa: F401  ruff `from __future__ import annotations` 환경에서 `dependencies=[Depends(...)]` 의 callable 만 사용 감지 못함.
+    get_current_user,
+    get_db,
+    get_pagination,
+    require_internal_api_key,
+)
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.lesson_request import (
@@ -91,13 +96,17 @@ async def get_lesson_request_calendar(
     "/expire",
     response_model=SuccessResponse,
     status_code=status.HTTP_200_OK,
-    summary="Expire stale lesson requests",
+    summary="Expire stale lesson requests (cron only)",
+    dependencies=[Depends(require_internal_api_key)],
 )
 async def expire_lesson_requests(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
 ) -> SuccessResponse:
-    """Mark expired lesson requests using the spec-defined route."""
+    """Mark expired lesson requests using the spec-defined route.
+
+    cron 호출 전용 — actor 검증 없이 모든 pending/negotiating 요청을 일괄 expire 하므로
+    일반 사용자가 호출 가능하면 데이터 손실 + 서비스 거부 가능. internal API key 게이트.
+    """
     service = LessonRequestService(db)
     count = await service.process_expired()
     return SuccessResponse(message=f"Processed {count} expired requests")
@@ -273,13 +282,13 @@ async def delete_lesson_request(
     "/process-expired",
     response_model=SuccessResponse,
     status_code=status.HTTP_200_OK,
-    summary="Process expired requests",
+    summary="Process expired requests (cron only)",
+    dependencies=[Depends(require_internal_api_key)],
 )
 async def process_expired_requests(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
 ) -> SuccessResponse:
-    """Mark expired lesson requests."""
+    """Mark expired lesson requests. cron 호출 전용 — `/expire` 와 동일 동작."""
     service = LessonRequestService(db)
     count = await service.process_expired()
     return SuccessResponse(message=f"Processed {count} expired requests")

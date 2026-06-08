@@ -18,19 +18,24 @@ class LessonPolicyService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def get_teacher_policy(self, teacher_id: str) -> LessonPolicyResponse:
+    async def get_teacher_policy(self, teacher_id: str, current_user: Any) -> LessonPolicyResponse:
+        await self._assert_can_view_teacher_policy(teacher_id, current_user)
         policy = await self._get_by_teacher(teacher_id)
         if policy is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson policy not found")
         return self._to_response(policy)
 
-    async def get_class_policy(self, lesson_class_id: str) -> LessonPolicyResponse:
+    async def get_class_policy(self, lesson_class_id: str, current_user: Any) -> LessonPolicyResponse:
         policy = await self._get_by_class(lesson_class_id)
         if policy is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Class lesson policy not found")
+        await self._assert_can_view_teacher_policy(policy.teacher_id, current_user)
         return self._to_response(policy)
 
-    async def get_effective_policy(self, teacher_id: str, lesson_class_id: str | None = None) -> LessonPolicyResponse:
+    async def get_effective_policy(
+        self, teacher_id: str, current_user: Any, lesson_class_id: str | None = None
+    ) -> LessonPolicyResponse:
+        await self._assert_can_view_teacher_policy(teacher_id, current_user)
         policy = await self._get_by_class(lesson_class_id) if lesson_class_id else None
         if policy is not None:
             if policy.teacher_id != teacher_id:
@@ -41,6 +46,48 @@ class LessonPolicyService:
         if policy is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson policy not found")
         return self._to_response(policy)
+
+    async def _assert_can_view_teacher_policy(self, teacher_id: str, current_user: Any) -> None:
+        """학생/학부모는 활성 관계 있는 강사 정책만, 강사는 본인 정책만 열람 가능.
+
+        IDOR 차단 — 인증된 임의 사용자가 다른 강사의 환불·취소 비즈니스 정책을 조회하지 못하도록 한다.
+        """
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+        from app.services.student_id_resolver import resolve_student_id
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        # 강사 본인은 본인 정책만.
+        my_teacher_id = await try_resolve_teacher_id(self.db, current_user.id)
+        if my_teacher_id is not None:
+            if my_teacher_id == teacher_id:
+                return
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Cannot view another teacher's policy",
+            )
+        # 학생/학부모는 활성 관계가 있어야 열람 가능. resolve_student_id 는 학부모도 자녀 student_id 로 매핑.
+        try:
+            student_id = await resolve_student_id(self.db, current_user.id)
+        except HTTPException:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No student profile to view policy",
+            ) from None
+        relation = await self.db.scalar(
+            select(TeacherStudentRelation)
+            .where(TeacherStudentRelation.teacher_id == teacher_id)
+            .where(TeacherStudentRelation.student_id == student_id)
+            .where(
+                TeacherStudentRelation.status.in_(
+                    [RelationStatus.active, RelationStatus.trialBooked, RelationStatus.pending]
+                )
+            )
+        )
+        if relation is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No active relationship with this teacher",
+            )
 
     async def create_policy(self, payload: LessonPolicyPayload, current_user: Any) -> LessonPolicyResponse:
         from app.models.policy import LessonPolicy

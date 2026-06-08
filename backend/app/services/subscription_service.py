@@ -377,12 +377,44 @@ class SubscriptionService:
         return await self._subscription_response(sub)
 
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
-        """Update subscription status."""
+        """Update subscription status.
+
+        expired 는 terminal state — 임의 backward 전이 차단. 차감·결제 게이트 우회를 방지.
+        """
         from app.models.subscription import SubscriptionStatus
 
         sub = await self.access.require_teacher_subscription(subscription_id, current_user)
 
-        sub.status = SubscriptionStatus(new_status)
+        try:
+            target = SubscriptionStatus(new_status)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown subscription status: {new_status}",
+            ) from exc
+        valid_transitions: dict[SubscriptionStatus, set[SubscriptionStatus]] = {
+            SubscriptionStatus.active: {
+                SubscriptionStatus.expiringSoon,
+                SubscriptionStatus.expired,
+                SubscriptionStatus.paused,
+            },
+            SubscriptionStatus.expiringSoon: {
+                SubscriptionStatus.active,
+                SubscriptionStatus.expired,
+                SubscriptionStatus.paused,
+            },
+            SubscriptionStatus.paused: {
+                SubscriptionStatus.active,
+                SubscriptionStatus.expired,
+            },
+            SubscriptionStatus.expired: set(),  # terminal — 어떤 상태로도 복귀 불가.
+        }
+        if target != sub.status and target not in valid_transitions.get(sub.status, set()):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Invalid status transition: {sub.status.value} → {target.value}",
+            )
+        sub.status = target
         await self.db.flush()
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
@@ -1513,13 +1545,18 @@ class SubscriptionService:
         if request_student is not None and request_student.id != proposal_student_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
-    async def expire_old_proposals(self) -> int:
-        """Mark expired pending proposals as expired."""
+    async def expire_old_proposals(self, teacher_id: str) -> int:
+        """Mark expired pending proposals as expired — 해당 강사 본인의 제안서만.
+
+        teacher_id 가 없으면 전 시스템 sweep 이 되어 임의 강사가 다른 강사의 제안서
+        상태를 바꿀 수 있다 (#468 1d).
+        """
         from app.models.subscription import ProposalStatus, SubscriptionProposal
 
         now = datetime.now(UTC)
         result = await self.db.scalars(
             select(SubscriptionProposal).where(
+                SubscriptionProposal.teacher_id == teacher_id,
                 SubscriptionProposal.status.in_([ProposalStatus.pending, ProposalStatus.paymentNotified]),
                 SubscriptionProposal.expires_at < now,
             )

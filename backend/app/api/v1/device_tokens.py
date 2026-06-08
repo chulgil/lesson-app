@@ -43,7 +43,7 @@ async def unregister_device_token(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> SuccessResponse:
-    """Remove an FCM device token (e.g., on logout)."""
+    """Remove an FCM device token (e.g., on logout). 본인 token 만 삭제."""
     service = DeviceTokenService(db)
-    await service.unregister(token)
+    await service.unregister(token, current_user.id)
     return SuccessResponse(message="Device token removed")
