@@ -67,25 +67,71 @@ void main() {
   });
 
   test(
-    'unsupported remote analytics sections return empty aggregates',
+    'unsupported remote analytics sections return empty aggregates without HTTP',
     () async {
+      // §589 — getRetentionAnalytics / getStudentSummaryList 는 BE 미지원이므로
+      // 빈 집계 스텁만 반환해야 한다 (네트워크 호출 없음).
+      // getStudentProgress 는 BE 지원 (/analytics/students/{id}/progress) — 별도 테스트.
       final requests = <RequestOptions>[];
       final repository = repositoryWithMonthlyStats(requests: requests);
+
+      final retention = await repository.getRetentionAnalytics();
+      final summary = await repository.getStudentSummaryList(DateTime(2026, 5));
+
+      expect(retention.atRiskStudents, isEmpty);
+      expect(retention.renewalTrend, isEmpty);
+      expect(summary, isEmpty);
+      expect(requests, isEmpty);
+    },
+  );
+
+  test(
+    'getStudentProgress calls /analytics/students/{id}/progress and maps response',
+    () async {
+      // §589 — BE 지원 (analytics.py:38 get_student_progress).
+      // FE 가 실 API 응답을 StudentProgressData 에 매핑하는지 검증.
+      final requests = <RequestOptions>[];
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requests.add(options);
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                statusCode: 200,
+                data: {
+                  'student_name': '김학생',
+                  'attendance_rate': 87.5,
+                  'attended_lessons': 7,
+                  'total_lessons': 8,
+                  'practice_achievement_rate': 75.0,
+                  'total_practice_minutes': 420,
+                  'practice_streak_days': 12,
+                },
+              ),
+            );
+          },
+        ),
+      );
+      final repository = RemoteAnalyticsRepository(ApiClient(dio));
 
       final student = await repository.getStudentProgress(
         'student-1',
         period: AnalyticsPeriod.threeMonths,
       );
-      final retention = await repository.getRetentionAnalytics();
-      final summary = await repository.getStudentSummaryList(DateTime(2026, 5));
 
+      expect(requests, hasLength(1));
+      expect(requests.single.path, '/analytics/students/student-1/progress');
+      expect(requests.single.queryParameters['period_days'], 90);
       expect(student.studentId, 'student-1');
-      expect(student.studentName, '학생');
-      expect(student.weeklyPractice, isEmpty);
-      expect(retention.atRiskStudents, isEmpty);
-      expect(retention.renewalTrend, isEmpty);
-      expect(summary, isEmpty);
-      expect(requests, isEmpty);
+      expect(student.studentName, '김학생');
+      expect(student.attendanceRate, 87.5);
+      expect(student.attendedLessons, 7);
+      expect(student.totalLessons, 8);
+      expect(student.practiceAchievementRate, 75.0);
+      expect(student.totalPracticeMinutes, 420);
+      expect(student.practiceStreakDays, 12);
     },
   );
 }
