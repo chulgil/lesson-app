@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/router/app_router.dart';
@@ -217,12 +218,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.onboardingProfileSetup),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.roleSelect),
-        ),
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.onboardingProfileSetup,
+        onLeadingTap: () => context.go(AppRoutes.roleSelect),
       ),
       body: SafeArea(
         child: Column(

@@ -156,7 +156,7 @@ class _FirstAvailabilitySetupScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.inkQuaternary.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.zero,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,20 +184,19 @@ class _FirstAvailabilitySetupScreenState
         onPressed: _isSubmitting ? null : _submit,
         style: FilledButton.styleFrom(
           minimumSize: const Size(0, AppSpacing.buttonHeight),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         ),
-        child: _isSubmitting
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppColors.paper,
-                ),
-              )
-            : const Text(AppStrings.firstAvailabilityApplyAction),
+        child:
+            _isSubmitting
+                ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.paper,
+                  ),
+                )
+                : const Text(AppStrings.firstAvailabilityApplyAction),
       ),
     );
   }
@@ -329,13 +328,13 @@ class _DayChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         width: 44,
         height: 44,
         decoration: BoxDecoration(
           color: isSelected ? AppColors.ink : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(
             color: isSelected ? AppColors.ink : AppColors.inkTertiary,
             width: 1.5,
@@ -370,14 +369,14 @@ class _TimeField extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkTertiary, width: 1),
         ),
         child: Row(

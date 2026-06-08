@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../students/students_facade.dart';
 
 /// Radio list for selecting a membership (lesson class)
@@ -23,85 +24,82 @@ class MembershipSelectorWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return RadioGroup<String>(
-      groupValue: selectedMembershipId,
-      onChanged: onChanged,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
-          // 로 통일 (§7.17).
-          Text(
-            AppStrings.issueFormMembershipSectionTitle,
-            style: NotebookTypography.sectionTitle,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          ...memberships.map((membership) {
-            final isSelected = selectedMembershipId == membership.id;
-            final lessonClassAsync = ref.watch(
-              lessonClassProvider(membership.lessonClassId),
-            );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
+        // 로 통일 (§7.17).
+        Text(
+          AppStrings.issueFormMembershipSectionTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        ...memberships.map((membership) {
+          final isSelected = selectedMembershipId == membership.id;
+          final lessonClassAsync = ref.watch(
+            lessonClassProvider(membership.lessonClassId),
+          );
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: GestureDetector(
-                onTap: () => onChanged(membership.id),
-                child: Container(
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+            child: GestureDetector(
+              onTap: () => onChanged(membership.id),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected ? AppColors.paperAccentSoft : AppColors.paper,
+                  border: Border.all(
                     color:
                         isSelected
-                            ? AppColors.paperAccentSoft
-                            : AppColors.paper,
-                    border: Border.all(
-                      color:
-                          isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.inkQuaternary,
-                      width: isSelected ? 2 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Radio<String>(value: membership.id),
-                      const SizedBox(width: AppSpacing.space2),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            lessonClassAsync.when(
-                              data:
-                                  (lessonClass) => Text(
-                                    lessonClass?.name ??
-                                        AppStrings
-                                            .issueFormMembershipDefaultName,
-                                    style: AppTypography.bodyMedium.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                              loading: () => const Text('...'),
-                              error:
-                                  (_, __) => const Text(
-                                    AppStrings.issueFormMembershipFallback,
-                                  ),
-                            ),
-                            Text(
-                              membership.instrument,
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.inkSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
+                    width: isSelected ? 2 : 1,
                   ),
                 ),
+                child: Row(
+                  children: [
+                    NotebookRadio<String>(
+                      value: membership.id,
+                      groupValue: selectedMembershipId,
+                      onChanged: onChanged,
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          lessonClassAsync.when(
+                            data:
+                                (lessonClass) => Text(
+                                  lessonClass?.name ??
+                                      AppStrings.issueFormMembershipDefaultName,
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                            loading: () => const Text('...'),
+                            error:
+                                (_, __) => const Text(
+                                  AppStrings.issueFormMembershipFallback,
+                                ),
+                          ),
+                          Text(
+                            membership.instrument,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.inkSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          }),
-        ],
-      ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

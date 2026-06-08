@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -150,7 +151,9 @@ class _PhoneVerificationScreenState
     if (success) {
       if (mounted) {
         // Phone verified → complete onboarding → home
-        ref.read(teacherOnboardingNotifierProvider.notifier).completeOnboarding();
+        ref
+            .read(teacherOnboardingNotifierProvider.notifier)
+            .completeOnboarding();
         await ref.read(authNotifierProvider.notifier).completeOnboarding();
         // Re-check mounted after the async gap before touching context.
         if (!mounted) return;
@@ -181,12 +184,9 @@ class _PhoneVerificationScreenState
         }
       },
       child: NotebookScreenScaffold(
-        appBar: AppBar(
-          title: const Text(AppStrings.onboardingPhoneVerification),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: _handleBack,
-          ),
+        appBar: NotebookDetailAppBar(
+          title: AppStrings.onboardingPhoneVerification,
+          onLeadingTap: _handleBack,
         ),
         body: SafeArea(
           child: Padding(

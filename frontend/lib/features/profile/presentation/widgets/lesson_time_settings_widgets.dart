@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_radio.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
@@ -70,7 +71,11 @@ class DurationOptionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Radio<int>(value: duration, activeColor: AppColors.paperAccent),
+      leading: NotebookRadio<int>(
+        value: duration,
+        groupValue: isDefault ? duration : null,
+        onChanged: onTap == null ? null : (_) => onTap!(),
+      ),
       title: Text(
         LessonDurations.format(duration),
         style: AppTypography.bodyLarge.copyWith(

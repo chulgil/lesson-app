@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 
 class ScheduleSlotChoice {
   const ScheduleSlotChoice({
@@ -179,13 +180,10 @@ class ScheduleSlotChoiceTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
-              Icon(
-                selected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
-                color:
-                    selected ? AppColors.paperAccent : AppColors.inkQuaternary,
-                size: 20,
+              NotebookRadio<bool>(
+                value: true,
+                groupValue: selected ? true : null,
+                onChanged: (_) => onTap(),
               ),
             ],
           ),

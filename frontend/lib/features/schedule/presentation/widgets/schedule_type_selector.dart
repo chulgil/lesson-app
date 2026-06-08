@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 
 /// Widget for selecting schedule type (fixed/flexible)
 class ScheduleTypeSelector extends StatelessWidget {
@@ -19,29 +20,23 @@ class ScheduleTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioGroup<ScheduleType>(
-      groupValue: selectedType,
-      onChanged: (value) {
-        if (value != null) onTypeSelected(value);
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _ScheduleTypeCard(
-            type: ScheduleType.fixed,
-            isSelected: selectedType == ScheduleType.fixed,
-            isRecommended: true,
-            onTap: () => onTypeSelected(ScheduleType.fixed),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          _ScheduleTypeCard(
-            type: ScheduleType.flexible,
-            isSelected: selectedType == ScheduleType.flexible,
-            isRecommended: false,
-            onTap: () => onTypeSelected(ScheduleType.flexible),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _ScheduleTypeCard(
+          type: ScheduleType.fixed,
+          isSelected: selectedType == ScheduleType.fixed,
+          isRecommended: true,
+          onTap: () => onTypeSelected(ScheduleType.fixed),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        _ScheduleTypeCard(
+          type: ScheduleType.flexible,
+          isSelected: selectedType == ScheduleType.flexible,
+          isRecommended: false,
+          onTap: () => onTypeSelected(ScheduleType.flexible),
+        ),
+      ],
     );
   }
 }
@@ -143,9 +138,10 @@ class _ScheduleTypeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Radio<ScheduleType>(
+              NotebookRadio<ScheduleType>(
                 value: type,
-                activeColor: AppColors.paperAccent,
+                groupValue: isSelected ? type : null,
+                onChanged: (_) => onTap(),
               ),
             ],
           ),

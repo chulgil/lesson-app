@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
@@ -136,70 +137,61 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         // Duration list with switches
         Container(
           decoration: BoxDecoration(color: AppColors.paperDark),
-          child: RadioGroup<int>(
-            groupValue: settings.defaultLessonDuration,
-            onChanged: (value) {
-              if (value != null) _updateDefaultDuration(ref, value);
-            },
-            child: Column(
-              children:
-                  allDurations.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final duration = entry.value;
-                    final isDefault =
-                        settings.defaultLessonDuration == duration;
-                    final isDisabled = settings.isDurationDisabled(duration);
-                    final isCustom = settings.customLessonDurations.contains(
-                      duration,
-                    );
-                    final isOnlyActive =
-                        settings.allLessonDurations.length == 1 && !isDisabled;
+          child: Column(
+            children:
+                allDurations.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final duration = entry.value;
+                  final isDefault = settings.defaultLessonDuration == duration;
+                  final isDisabled = settings.isDurationDisabled(duration);
+                  final isCustom = settings.customLessonDurations.contains(
+                    duration,
+                  );
+                  final isOnlyActive =
+                      settings.allLessonDurations.length == 1 && !isDisabled;
 
-                    return Column(
-                      children: [
-                        DurationOptionItem(
-                          duration: duration,
-                          isDefault: isDefault,
-                          isDisabled: isDisabled,
-                          isCustom: isCustom,
-                          isOnlyActive: isOnlyActive,
-                          onTap: () => _updateDefaultDuration(ref, duration),
-                          onDelete:
-                              isCustom
-                                  ? () => showDeleteDurationDialog(
-                                    context: context,
-                                    duration: duration,
-                                    onConfirm: () {
-                                      ref
-                                          .read(
-                                            teacherSettingsNotifierProvider
-                                                .notifier,
-                                          )
-                                          .removeCustomDuration(duration);
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            '${LessonDurations.format(duration)} 삭제됨',
-                                          ),
+                  return Column(
+                    children: [
+                      DurationOptionItem(
+                        duration: duration,
+                        isDefault: isDefault,
+                        isDisabled: isDisabled,
+                        isCustom: isCustom,
+                        isOnlyActive: isOnlyActive,
+                        onTap: () => _updateDefaultDuration(ref, duration),
+                        onDelete:
+                            isCustom
+                                ? () => showDeleteDurationDialog(
+                                  context: context,
+                                  duration: duration,
+                                  onConfirm: () {
+                                    ref
+                                        .read(
+                                          teacherSettingsNotifierProvider
+                                              .notifier,
+                                        )
+                                        .removeCustomDuration(duration);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '${LessonDurations.format(duration)} 삭제됨',
                                         ),
-                                      );
-                                    },
-                                  )
-                                  : null,
-                          onToggle:
-                              (value) => _toggleDuration(ref, duration, value),
+                                      ),
+                                    );
+                                  },
+                                )
+                                : null,
+                        onToggle:
+                            (value) => _toggleDuration(ref, duration, value),
+                      ),
+                      if (index < allDurations.length - 1)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16, right: 16),
+                          child: const ThinRule(),
                         ),
-                        if (index < allDurations.length - 1)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16, right: 16),
-                            child: const ThinRule(),
-                          ),
-                      ],
-                    );
-                  }).toList(),
-            ),
+                    ],
+                  );
+                }).toList(),
           ),
         ),
 
@@ -292,14 +284,15 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 ...options.map(
                   (minutes) => ListTile(
-                    leading: Icon(
-                      current == minutes
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
-                      color:
-                          current == minutes
-                              ? AppColors.paperAccent
-                              : AppColors.inkTertiary,
+                    leading: NotebookRadio<int>(
+                      value: minutes,
+                      groupValue: current == minutes ? minutes : null,
+                      onChanged: (_) {
+                        ref
+                            .read(teacherSettingsNotifierProvider.notifier)
+                            .updateBreakTime(minutes);
+                        Navigator.pop(context);
+                      },
                     ),
                     title: Text(
                       minutes == 0
@@ -348,14 +341,15 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 ...options.map(
                   (hours) => ListTile(
-                    leading: Icon(
-                      current == hours
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
-                      color:
-                          current == hours
-                              ? AppColors.paperAccent
-                              : AppColors.inkTertiary,
+                    leading: NotebookRadio<int>(
+                      value: hours,
+                      groupValue: current == hours ? hours : null,
+                      onChanged: (_) {
+                        ref
+                            .read(teacherSettingsNotifierProvider.notifier)
+                            .updateMinBookingHours(hours);
+                        Navigator.pop(context);
+                      },
                     ),
                     title: Text(_formatHours(hours)),
                     onTap: () {
