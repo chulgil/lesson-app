@@ -9,16 +9,15 @@ from pathlib import Path
 # Ensure the backend root is on sys.path so `app` package is importable
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.core.config import settings
-from app.models.base import Base
-
 # Import all models so Base.metadata is fully populated
 import app.models  # noqa: F401
+from alembic import context
+from app.core.config import settings
+from app.models.base import Base
 
 # Alembic Config object (provides access to alembic.ini values)
 config = context.config
@@ -54,8 +53,18 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    """Execute migrations within a database connection context."""
-    context.configure(connection=connection, target_metadata=target_metadata)
+    """Execute migrations within a database connection context.
+
+    SQLite 는 ALTER TABLE 지원이 제한적이라 ``render_as_batch=True`` 로 batch 모드 활성화 —
+    alembic 이 새 테이블 생성·데이터 복사·rename 패턴으로 자동 변환한다.
+    naming_convention (Base.metadata) 과 결합해 모든 constraint 이름이 결정적이어야 batch 가 성공.
+    """
+    dialect_name = connection.dialect.name
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        render_as_batch=(dialect_name == "sqlite"),
+    )
 
     with context.begin_transaction():
         context.run_migrations()

@@ -96,7 +96,8 @@ def upgrade() -> None:
         sa.Column("body_markdown", sa.Text(), nullable=False),
         sa.Column("audience", audience, nullable=False),
         sa.Column("audience_filter", sa.JSON(), nullable=True),
-        sa.Column("channels", sa.JSON(), nullable=False, server_default=sa.text("'[]'::json")),
+        # NOTE: PostgreSQL 전용 ``::json`` cast 제거 — SQLite 호환 (PR #600 패턴 적용).
+        sa.Column("channels", sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
         sa.Column("kakao_template_id", sa.String(100), nullable=True),
         sa.Column("scheduled_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("sent_at", sa.DateTime(timezone=True), nullable=True),
