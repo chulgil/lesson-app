@@ -26,6 +26,20 @@ class RecordingService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
+    # 업로드 가드 — MIME / 사이즈 / 확장자 화이트리스트.
+    _ALLOWED_AUDIO_TYPES = {
+        "audio/m4a",
+        "audio/mp4",
+        "audio/x-m4a",
+        "audio/wav",
+        "audio/x-wav",
+        "audio/wave",
+        "audio/mpeg",
+        "audio/mp3",
+    }
+    _ALLOWED_EXTENSIONS = {"m4a", "mp4", "wav", "mp3", "mpeg", "mpga"}
+    _MAX_RECORDING_BYTES = 100 * 1024 * 1024  # 100 MiB — 충분히 긴 레슨 녹음 허용, OOM 차단.
+
     async def upload(
         self,
         *,
@@ -35,11 +49,34 @@ class RecordingService:
         bpm: int | None,
         user: Any,
     ) -> RecordingUploadResponse:
-        """Upload a recording file to Vultr Object Storage and save metadata."""
+        """Upload a recording file to Vultr Object Storage and save metadata.
+
+        보안 가드:
+        - MIME / 확장자 화이트리스트 — 임의 바이너리 / 실행 가능 컨텐츠 차단.
+        - Content-Length 기반 사전 사이즈 체크 — OOM 차단.
+        - 확장자는 화이트리스트 정규화 후 S3 key 에 삽입 — `..` 또는 비ASCII 등 우회 차단.
+        """
         from app.models.practice import PracticeRecording
 
-        # Generate unique file key
-        file_ext = file.filename.rsplit(".", 1)[-1] if file.filename else "m4a"
+        # MIME 화이트리스트.
+        content_type = (file.content_type or "").lower().strip()
+        if content_type and content_type not in self._ALLOWED_AUDIO_TYPES:
+            raise HTTPException(
+                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                detail=f"Unsupported audio content type: {content_type}",
+            )
+
+        # 사이즈 가드 — Content-Length 헤더가 있다면 사전 체크.
+        size_header = getattr(file, "size", None)
+        if size_header is not None and size_header > self._MAX_RECORDING_BYTES:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail="Recording exceeds maximum allowed size",
+            )
+
+        # 확장자 정규화 — 파일명 입력을 화이트리스트로 강제, 없으면 m4a 기본값.
+        raw_ext = (file.filename or "").rsplit(".", 1)[-1].lower() if file.filename else ""
+        file_ext = raw_ext if raw_ext in self._ALLOWED_EXTENSIONS else "m4a"
         file_key = f"recordings/{uuid.uuid4()}.{file_ext}"
 
         # Upload to object storage
@@ -350,7 +387,11 @@ class RecordingService:
     # ------------------------------------------------------------------
 
     async def _upload_to_storage(self, file_key: str, file: UploadFile) -> str:
-        """Upload file to Vultr Object Storage and return the URL."""
+        """Upload file to Vultr Object Storage and return the URL.
+
+        chunked read 로 누적 사이즈를 검사하여, Content-Length 헤더를 신뢰하지 못하는
+        악성 스트림이 GB 급 데이터로 워커 메모리를 점유하는 것을 방지한다.
+        """
         from app.core.config import settings
 
         try:
@@ -363,7 +404,21 @@ class RecordingService:
                 aws_access_key_id=settings.VULTR_STORAGE_ACCESS_KEY,
                 aws_secret_access_key=settings.VULTR_STORAGE_SECRET_KEY,
             ) as s3:
-                content = await file.read()
+                # 64 KiB 청크로 누적, MAX 초과시 중단.
+                chunks: list[bytes] = []
+                total = 0
+                while True:
+                    chunk = await file.read(64 * 1024)
+                    if not chunk:
+                        break
+                    total += len(chunk)
+                    if total > self._MAX_RECORDING_BYTES:
+                        raise HTTPException(
+                            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                            detail="Recording exceeds maximum allowed size",
+                        )
+                    chunks.append(chunk)
+                content = b"".join(chunks)
                 await s3.put_object(
                     Bucket=settings.VULTR_STORAGE_BUCKET,
                     Key=file_key,

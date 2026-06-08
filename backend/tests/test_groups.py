@@ -2,24 +2,73 @@
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-async def _create_group_class(client: AsyncClient, headers: dict) -> str:
-    """Helper: create a group class via lessons endpoint and return its ID."""
-    # Group classes are created via the groups router indirectly;
-    # we need to insert directly since there's no dedicated create endpoint on /groups
-    # Instead, we'll create a schedule first which requires a group_class_id
-    # For testing, we create via DB or use an existing endpoint
-    # Since GroupClass is under lessons router, let's use that
-    from app.models.schedule_ext import GroupClassSchedule
-    # Actually, let's just create a schedule with a fake group_class_id
-    return "test-group-class-id"
+async def _ensure_group_class(
+    db_session: AsyncSession, teacher_user_id: str = "test-user-id", class_id: str = "gc-1"
+) -> str:
+    """Helper: 테스트용 LessonClass 를 직접 DB 에 삽입하고 ID 를 반환.
+
+    Group class ownership 검증이 추가된 이후, 테스트는 실제 LessonClass row 가 필요하다.
+    teacher_user_id 의 Teacher.id 와 매핑하여 그 강사 소유 클래스로 만든다.
+    """
+    from sqlalchemy import select
+
+    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.teacher import Teacher
+
+    teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == teacher_user_id))
+    if teacher_profile_id is None:
+        teacher_profile_id = teacher_user_id
+    existing = await db_session.scalar(select(LessonClass).where(LessonClass.id == class_id))
+    if existing is not None:
+        return class_id
+    lesson_class = LessonClass(
+        id=class_id,
+        teacher_id=teacher_profile_id,
+        name="Test Group Class",
+        type=LessonClassType.private,
+    )
+    db_session.add(lesson_class)
+    await db_session.flush()
+    return class_id
+
+
+async def _ensure_student(
+    db_session: AsyncSession, student_id: str, teacher_user_id: str = "test-user-id", name: str = "테스트 학생"
+) -> str:
+    """Helper: 테스트용 Student row 생성 (teacher 소속).
+
+    no-show 등 student ownership 검증이 추가된 이후 student 가 실제 DB 에 존재해야 한다.
+    """
+    from sqlalchemy import select
+
+    from app.models.student import Student
+    from app.models.teacher import Teacher
+
+    teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == teacher_user_id))
+    if teacher_profile_id is None:
+        teacher_profile_id = teacher_user_id
+    existing = await db_session.scalar(select(Student).where(Student.id == student_id))
+    if existing is not None:
+        return student_id
+    student = Student(
+        id=student_id,
+        teacher_id=teacher_profile_id,
+        name=name,
+        instrument="piano",
+    )
+    db_session.add(student)
+    await db_session.flush()
+    return student_id
 
 
 @pytest.mark.asyncio
-async def test_create_group_schedule(client: AsyncClient, auth_headers, create_test_user):
+async def test_create_group_schedule(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """POST /groups/schedules should create a group class schedule."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     response = await client.post(
         "/api/v1/groups/schedules",
@@ -41,9 +90,10 @@ async def test_create_group_schedule(client: AsyncClient, auth_headers, create_t
 
 
 @pytest.mark.asyncio
-async def test_list_group_schedules(client: AsyncClient, auth_headers, create_test_user):
+async def test_list_group_schedules(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """GET /groups/{group_class_id}/schedules should list schedules."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     await client.post(
         "/api/v1/groups/schedules",
@@ -62,9 +112,10 @@ async def test_list_group_schedules(client: AsyncClient, auth_headers, create_te
 
 
 @pytest.mark.asyncio
-async def test_cancel_group_schedule(client: AsyncClient, auth_headers, create_test_user):
+async def test_cancel_group_schedule(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """PATCH /groups/schedules/{id}/cancel should set status cancelled."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -88,9 +139,10 @@ async def test_cancel_group_schedule(client: AsyncClient, auth_headers, create_t
 
 
 @pytest.mark.asyncio
-async def test_create_group_booking(client: AsyncClient, auth_headers, create_test_user):
+async def test_create_group_booking(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """POST /groups/bookings should book a student into a schedule."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -116,9 +168,12 @@ async def test_create_group_booking(client: AsyncClient, auth_headers, create_te
 
 
 @pytest.mark.asyncio
-async def test_group_booking_waitlist_when_full(client: AsyncClient, auth_headers, create_test_user):
+async def test_group_booking_waitlist_when_full(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """Booking when at capacity should go to waitlist."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -152,9 +207,12 @@ async def test_group_booking_waitlist_when_full(client: AsyncClient, auth_header
 
 
 @pytest.mark.asyncio
-async def test_group_booking_full_no_waitlist(client: AsyncClient, auth_headers, create_test_user):
+async def test_group_booking_full_no_waitlist(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """Booking when full with no waitlist should return 400."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -183,9 +241,12 @@ async def test_group_booking_full_no_waitlist(client: AsyncClient, auth_headers,
 
 
 @pytest.mark.asyncio
-async def test_cancel_group_booking_promotes_waitlist(client: AsyncClient, auth_headers, create_test_user):
+async def test_cancel_group_booking_promotes_waitlist(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
     """Cancelling a confirmed booking should auto-promote first waitlister."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -229,9 +290,10 @@ async def test_cancel_group_booking_promotes_waitlist(client: AsyncClient, auth_
 
 
 @pytest.mark.asyncio
-async def test_mark_attendance(client: AsyncClient, auth_headers, create_test_user):
+async def test_mark_attendance(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """PATCH /groups/bookings/{id}/attendance should mark attended."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -259,9 +321,10 @@ async def test_mark_attendance(client: AsyncClient, auth_headers, create_test_us
 
 
 @pytest.mark.asyncio
-async def test_mark_no_show(client: AsyncClient, auth_headers, create_test_user):
+async def test_mark_no_show(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """PATCH attendance with attended=false should mark noShow."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_group_class(db_session)
 
     cr = await client.post(
         "/api/v1/groups/schedules",
@@ -294,9 +357,10 @@ async def test_mark_no_show(client: AsyncClient, auth_headers, create_test_user)
 
 
 @pytest.mark.asyncio
-async def test_create_no_show_record(client: AsyncClient, auth_headers, create_test_user):
+async def test_create_no_show_record(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """POST /groups/no-shows should create a record."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_student(db_session, "student-1")
 
     response = await client.post(
         "/api/v1/groups/no-shows",
@@ -316,9 +380,10 @@ async def test_create_no_show_record(client: AsyncClient, auth_headers, create_t
 
 
 @pytest.mark.asyncio
-async def test_list_no_shows(client: AsyncClient, auth_headers, create_test_user):
+async def test_list_no_shows(client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession):
     """GET /groups/no-shows should list records for teacher."""
     await create_test_user(user_id="test-user-id", role="teacher")
+    await _ensure_student(db_session, "s1")
 
     await client.post(
         "/api/v1/groups/no-shows",

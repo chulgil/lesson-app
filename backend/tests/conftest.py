@@ -192,7 +192,7 @@ async def teacher(
     from tests.scenarios.helpers import TeacherActions
 
     await create_test_user(user_id="test-user-id", role="teacher", name="Test Teacher")
-    return TeacherActions(client, auth_headers)
+    return TeacherActions(client, auth_headers, db_session=db_session, user_id="test-user-id")
 
 
 @pytest.fixture

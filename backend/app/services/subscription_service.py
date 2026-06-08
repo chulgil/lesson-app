@@ -285,8 +285,19 @@ class SubscriptionService:
     async def deduct_lesson(
         self, subscription_id: str, data: UseLessonRequest, current_user: Any
     ) -> SubscriptionResponse:
-        """Deduct a lesson usage from a subscription."""
-        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
+        """Deduct a lesson usage from a subscription.
+
+        동시 두 호출이 모두 ``remaining > 0`` 체크를 통과해 ``used_lessons`` 가
+        ``total_lessons`` 를 초과하는 race 를 막기 위해 row lock 을 잡고 재확인한다.
+        """
+        from app.models.subscription import Subscription
+
+        # 1) ownership 검증.
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        # 2) row lock 후 재조회 — 잔여 검증과 increment 가 한 트랜잭션에서 직렬화.
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
 
         if not sub.payment_confirmed:
             raise HTTPException(
@@ -354,10 +365,16 @@ class SubscriptionService:
         return True
 
     async def use_reschedule(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
-        """Use a reschedule credit from a subscription."""
-        from app.models.subscription import SubscriptionUsage
+        """Use a reschedule credit from a subscription.
 
-        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
+        잔여 검증과 increment 사이 race 차단 — row lock 후 재확인.
+        """
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
 
         remaining = (sub.total_reschedule_allowance or 0) - (sub.used_reschedule_count or 0)
         if remaining <= 0:
@@ -817,11 +834,18 @@ class SubscriptionService:
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any
     ) -> SubscriptionResponse:
-        """Confirm a manual tuition deposit."""
-        from app.models.subscription import PaymentMethod
+        """Confirm a manual tuition deposit.
+
+        동시 두 호출이 모두 ``payment_confirmed=False`` 체크를 통과해 알림톡·푸시·
+        relation status 가 두 번 처리되는 race 를 막기 위해 row lock 후 재확인.
+        """
+        from app.models.subscription import PaymentMethod, Subscription
         from app.services.notification_service import NotificationService
 
-        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
+        await self.access.require_teacher_subscription(subscription_id, current_user)
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
         if sub.payment_confirmed:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

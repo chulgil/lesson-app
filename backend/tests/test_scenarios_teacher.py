@@ -273,9 +273,25 @@ async def test_scenario_invite_connect_booking(
 
 
 @pytest.mark.asyncio
-async def test_scenario_group_class_full_lifecycle(client: AsyncClient, auth_headers, create_test_user):
+async def test_scenario_group_class_full_lifecycle(client: AsyncClient, auth_headers, create_test_user, db_session):
     """Full group class lifecycle: schedule, fill, waitlist, cancel, promote, attend."""
+    from sqlalchemy import select
+
+    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.teacher import Teacher
+
     await create_test_user(user_id="test-user-id", role="teacher")
+    # Group class ownership 검증 — 실제 LessonClass row 가 필요하다.
+    teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == "test-user-id"))
+    db_session.add(
+        LessonClass(
+            id="gc-ensemble",
+            teacher_id=teacher_profile_id or "test-user-id",
+            name="Test Ensemble",
+            type=LessonClassType.private,
+        )
+    )
+    await db_session.flush()
 
     # Step 1: Create group schedule (capacity 2, waitlist 1)
     sched = await client.post(
@@ -637,6 +653,7 @@ async def test_scenario_proposal_to_subscription(
 ):
     """Teacher proposes subscription → student accepts → subscription issued."""
     from tests.scenarios.helpers import link_student_to_user
+
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(
         user_id="test-student-id",

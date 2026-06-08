@@ -14,9 +14,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-async def link_student_to_user(
-    db_session: AsyncSession, student_id: str, user_id: str
-) -> None:
+async def link_student_to_user(db_session: AsyncSession, student_id: str, user_id: str) -> None:
     """Set Student.user_id so the given user legitimately OWNS the profile.
 
     Production flow: when a student connects to a teacher,
@@ -37,9 +35,13 @@ async def link_student_to_user(
 class TeacherActions:
     """High-level actions a teacher performs in the app."""
 
-    def __init__(self, client: AsyncClient, headers: dict[str, str]) -> None:
+    def __init__(
+        self, client: AsyncClient, headers: dict[str, str], db_session=None, user_id: str = "test-user-id"
+    ) -> None:  # noqa: ANN001
         self.client = client
         self.headers = headers
+        self.db_session = db_session
+        self.user_id = user_id
         self._base = "/api/v1"
 
     # -- Profile & Settings --------------------------------------------------
@@ -74,43 +76,31 @@ class TeacherActions:
         return r.json()
 
     async def update_settings(self, **kwargs) -> dict:
-        r = await self.client.put(
-            f"{self._base}/settings/teacher", headers=self.headers, json=kwargs
-        )
+        r = await self.client.put(f"{self._base}/settings/teacher", headers=self.headers, json=kwargs)
         assert r.status_code == 200
         return r.json()
 
     async def get_dashboard(self, teacher_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/teachers/{teacher_id}/dashboard", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/teachers/{teacher_id}/dashboard", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
     # -- Students -------------------------------------------------------------
 
-    async def create_student(
-        self, name: str, *, instrument: str = "violin", level: str = "beginner", **kwargs
-    ) -> str:
+    async def create_student(self, name: str, *, instrument: str = "violin", level: str = "beginner", **kwargs) -> str:
         """Create a student and return the student ID."""
         payload = {"name": name, "instrument": instrument, "level": level, **kwargs}
-        r = await self.client.post(
-            f"{self._base}/students", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/students", headers=self.headers, json=payload)
         assert r.status_code == 201, f"create_student failed: {r.status_code} {r.text}"
         return r.json()["id"]
 
     async def list_students(self, **params) -> dict:
-        r = await self.client.get(
-            f"{self._base}/students", headers=self.headers, params=params
-        )
+        r = await self.client.get(f"{self._base}/students", headers=self.headers, params=params)
         assert r.status_code == 200
         return r.json()
 
     async def get_student(self, student_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/students/{student_id}", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/students/{student_id}", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -140,16 +130,12 @@ class TeacherActions:
             payload["pieces"] = pieces
         if location_name:
             payload["location_name"] = location_name
-        r = await self.client.post(
-            f"{self._base}/lessons", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/lessons", headers=self.headers, json=payload)
         assert r.status_code == 201, f"create_lesson failed: {r.status_code} {r.text}"
         return r.json()["id"]
 
     async def get_lesson(self, lesson_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/lessons/{lesson_id}", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/lessons/{lesson_id}", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -202,16 +188,12 @@ class TeacherActions:
         return r.json()
 
     async def list_upcoming_lessons(self) -> list:
-        r = await self.client.get(
-            f"{self._base}/lessons/upcoming", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/lessons/upcoming", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
     async def list_recent_lessons(self) -> list:
-        r = await self.client.get(
-            f"{self._base}/lessons/recent", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/lessons/recent", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -221,15 +203,11 @@ class TeacherActions:
         self, name: str, *, lessons_count: int, amount: int, type: str = "package", **kwargs
     ) -> str:
         payload = {"name": name, "type": type, "lessons_count": lessons_count, "amount": amount, **kwargs}
-        r = await self.client.post(
-            f"{self._base}/subscriptions-templates", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/subscriptions-templates", headers=self.headers, json=payload)
         assert r.status_code == 201
         return r.json()["id"]
 
-    async def create_subscription(
-        self, student_id: str, *, total_lessons: int, amount: int, **kwargs
-    ) -> str:
+    async def create_subscription(self, student_id: str, *, total_lessons: int, amount: int, **kwargs) -> str:
         payload = {
             "student_id": student_id,
             "type": "package",
@@ -237,16 +215,12 @@ class TeacherActions:
             "amount": amount,
             **kwargs,
         }
-        r = await self.client.post(
-            f"{self._base}/subscriptions", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/subscriptions", headers=self.headers, json=payload)
         assert r.status_code == 201
         return r.json()["id"]
 
     async def get_subscription(self, sub_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/subscriptions/{sub_id}", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/subscriptions/{sub_id}", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -276,9 +250,7 @@ class TeacherActions:
             "recommended_template_id": template_id,
             **kwargs,
         }
-        r = await self.client.post(
-            f"{self._base}/subscriptions-proposals", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/subscriptions-proposals", headers=self.headers, json=payload)
         assert r.status_code == 201
         return r.json()["id"]
 
@@ -294,16 +266,12 @@ class TeacherActions:
     # -- Invites & Connections ------------------------------------------------
 
     async def create_invite(self, **kwargs) -> dict:
-        r = await self.client.post(
-            f"{self._base}/invites/", headers=self.headers, json=kwargs
-        )
+        r = await self.client.post(f"{self._base}/invites/", headers=self.headers, json=kwargs)
         assert r.status_code == 201
         return r.json()
 
     async def list_pending_requests(self) -> dict:
-        r = await self.client.get(
-            f"{self._base}/invites/connection-requests/pending", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/invites/connection-requests/pending", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -326,18 +294,14 @@ class TeacherActions:
         return r.json()
 
     async def list_connections(self) -> dict:
-        r = await self.client.get(
-            f"{self._base}/invites/connections", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/invites/connections", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
     # -- Bookings -------------------------------------------------------------
 
     async def approve_booking(self, booking_id: str) -> dict:
-        r = await self.client.patch(
-            f"{self._base}/bookings/{booking_id}/approve", headers=self.headers
-        )
+        r = await self.client.patch(f"{self._base}/bookings/{booking_id}/approve", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -362,9 +326,7 @@ class TeacherActions:
         return r.json()
 
     async def get_availability(self) -> dict:
-        r = await self.client.get(
-            f"{self._base}/schedule/availability", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/schedule/availability", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -372,15 +334,11 @@ class TeacherActions:
         params = {}
         if week_start:
             params["week_start"] = week_start
-        r = await self.client.get(
-            f"{self._base}/schedule/weekly", headers=self.headers, params=params
-        )
+        r = await self.client.get(f"{self._base}/schedule/weekly", headers=self.headers, params=params)
         assert r.status_code == 200
         return r.json()
 
-    async def create_schedule_exception(
-        self, date: str, exception_type: str = "holiday", reason: str = ""
-    ) -> dict:
+    async def create_schedule_exception(self, date: str, exception_type: str = "holiday", reason: str = "") -> dict:
         r = await self.client.post(
             f"{self._base}/schedule/exceptions",
             headers=self.headers,
@@ -552,6 +510,29 @@ class TeacherActions:
         max_capacity: int,
         waitlist_capacity: int | None = None,
     ) -> str:
+        # Group class ownership 검증이 도입되어 LessonClass row 가 실제로 존재해야 한다.
+        # db_session 이 주어진 경우 (대부분의 fixture 가 전달) 헬퍼 안에서 자동 생성.
+        if self.db_session is not None:
+            from sqlalchemy import select
+
+            from app.models.lesson import LessonClass, LessonClassType
+            from app.models.teacher import Teacher
+
+            existing = await self.db_session.scalar(select(LessonClass).where(LessonClass.id == group_class_id))
+            if existing is None:
+                teacher_profile_id = await self.db_session.scalar(
+                    select(Teacher.id).where(Teacher.user_id == self.user_id)
+                )
+                self.db_session.add(
+                    LessonClass(
+                        id=group_class_id,
+                        teacher_id=teacher_profile_id or self.user_id,
+                        name="Scenario Group Class",
+                        type=LessonClassType.private,
+                    )
+                )
+                await self.db_session.flush()
+
         payload: dict = {
             "group_class_id": group_class_id,
             "start_time": start_time,
@@ -560,9 +541,7 @@ class TeacherActions:
         }
         if waitlist_capacity is not None:
             payload["waitlist_capacity"] = waitlist_capacity
-        r = await self.client.post(
-            f"{self._base}/groups/schedules", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/groups/schedules", headers=self.headers, json=payload)
         assert r.status_code == 201
         return r.json()["id"]
 
@@ -596,15 +575,11 @@ class TeacherActions:
 
     async def create_repertoire(self, student_id: str, name: str, **kwargs) -> str:
         payload = {"student_id": student_id, "name": name, "start_date": "2026-03-01", **kwargs}
-        r = await self.client.post(
-            f"{self._base}/practice/repertoires", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/practice/repertoires", headers=self.headers, json=payload)
         assert r.status_code == 201
         return r.json()["id"]
 
-    async def create_practice_log(
-        self, student_id: str, date: str, total_minutes: int, **kwargs
-    ) -> str:
+    async def create_practice_log(self, student_id: str, date: str, total_minutes: int, **kwargs) -> str:
         payload = {"date": date, "total_minutes": total_minutes, **kwargs}
         r = await self.client.post(
             f"{self._base}/practice-logs/",
@@ -626,9 +601,7 @@ class TeacherActions:
 
     # -- Gamification ---------------------------------------------------------
 
-    async def award_points(
-        self, student_id: str, points: int, point_type: str, description: str
-    ) -> dict:
+    async def award_points(self, student_id: str, points: int, point_type: str, description: str) -> dict:
         r = await self.client.post(
             f"{self._base}/gamification/points",
             headers=self.headers,
@@ -643,9 +616,7 @@ class TeacherActions:
         return r.json()
 
     async def get_gamification(self, student_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/gamification/{student_id}", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/gamification/{student_id}", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -692,16 +663,12 @@ class TeacherActions:
     # -- Reviews --------------------------------------------------------------
 
     async def get_review_summary(self, teacher_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/reviews/{teacher_id}/summary", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/reviews/{teacher_id}/summary", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
     async def list_reviews(self, teacher_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/reviews/{teacher_id}", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/reviews/{teacher_id}", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -719,9 +686,7 @@ class StudentActions:
         assert r.status_code == 200
         return r.json()
 
-    async def send_connection_request(
-        self, target_id: str, method: str = "inAppSearch", **kwargs
-    ) -> str:
+    async def send_connection_request(self, target_id: str, method: str = "inAppSearch", **kwargs) -> str:
         payload = {"target_id": target_id, "method": method, **kwargs}
         r = await self.client.post(
             f"{self._base}/invites/connection-requests",
@@ -773,13 +738,9 @@ class StudentActions:
         assert r.status_code == 200
         return r.json()
 
-    async def write_review(
-        self, teacher_id: str, rating: int, content: str = "", **kwargs
-    ) -> str:
+    async def write_review(self, teacher_id: str, rating: int, content: str = "", **kwargs) -> str:
         payload = {"teacher_id": teacher_id, "rating": rating, "content": content, **kwargs}
-        r = await self.client.post(
-            f"{self._base}/reviews/", headers=self.headers, json=payload
-        )
+        r = await self.client.post(f"{self._base}/reviews/", headers=self.headers, json=payload)
         assert r.status_code == 201
         return r.json()["id"]
 
@@ -793,9 +754,7 @@ class StudentActions:
         return r.json()
 
     async def get_gamification(self, student_id: str) -> dict:
-        r = await self.client.get(
-            f"{self._base}/gamification/{student_id}", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/gamification/{student_id}", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
@@ -898,9 +857,7 @@ class StudentActions:
 
     # -- Schedule (slots, bookings) --------------------------------------------
 
-    async def get_available_slots(
-        self, teacher_id: str, date: str, duration: int = 60
-    ) -> dict:
+    async def get_available_slots(self, teacher_id: str, date: str, duration: int = 60) -> dict:
         r = await self.client.get(
             f"{self._base}/schedule/slots",
             headers=self.headers,
@@ -944,9 +901,7 @@ class StudentActions:
         return r.json()
 
     async def list_bookings(self) -> dict:
-        r = await self.client.get(
-            f"{self._base}/bookings", headers=self.headers
-        )
+        r = await self.client.get(f"{self._base}/bookings", headers=self.headers)
         assert r.status_code == 200
         return r.json()
 
