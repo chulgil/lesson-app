@@ -752,7 +752,7 @@ class ScheduleService:
         total = await self.db.scalar(count_query) or 0
 
         result = await self.db.scalars(query.offset(offset).limit(size))
-        items = [BookingResponse.model_validate(b) for b in result.all()]
+        items = [await self._to_booking_response(b) for b in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
     async def _check_booking_overlap(
@@ -823,7 +823,7 @@ class ScheduleService:
                 credit_id=data.credit_id,
             )
 
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def create_slot_booking(self, data: BookingCreate, current_user: Any) -> dict[str, Any]:
         """Create a booking from a frontend availability slot payload."""
@@ -841,6 +841,31 @@ class ScheduleService:
             "lesson_id": None,
             "is_recommended": False,
         }
+
+    async def _to_booking_response(self, booking: Any) -> BookingResponse:
+        """spec — BookingResponse 의 teacher_name / student_name 을 join 으로 채움.
+
+        FE 가 빈 칸으로 떨어지지 않도록 단일 진입점에서 enrich.
+        """
+        from app.models.user import User
+
+        response = BookingResponse.model_validate(booking)
+        # teacher.id 가 User.id 인 케이스가 일반적 (resolve_teacher_id 결과 == Teacher.id !=
+        # User.id 인 코드도 있으나 LessonBooking.teacher_id 는 Teacher.id 또는 User.id 양쪽
+        # 사용 — 두 경로 모두 시도해서 가장 먼저 찾은 이름 채움).
+        if booking.teacher_id:
+            from app.models.teacher import Teacher
+
+            teacher_row = await self.db.scalar(select(Teacher).where(Teacher.id == booking.teacher_id))
+            target_user_id = teacher_row.user_id if teacher_row is not None else booking.teacher_id
+            teacher_user = await self.db.scalar(select(User).where(User.id == target_user_id))
+            if teacher_user is not None and teacher_user.name:
+                response.teacher_name = teacher_user.name
+        if booking.student_id:
+            student_user = await self.db.scalar(select(User).where(User.id == booking.student_id))
+            if student_user is not None and student_user.name:
+                response.student_name = student_user.name
+        return response
 
     async def _consume_makeup_credit_for_booking(
         self,
@@ -893,10 +918,15 @@ class ScheduleService:
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         await self._assert_booking_owner(booking, current_user)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def update_booking(self, booking_id: str, data: BookingUpdate, current_user: Any) -> BookingResponse:
-        """Update a booking."""
+        """Update a booking.
+
+        FE 가 PUT /bookings/{id} 로 date/time 만 바꾸는 경우 — 정책 적용 누락 방지를 위해
+        change_booking 흐름 (status=changeRequested) 으로 위임. 변경권 차감/알림 자체는
+        별도 PR 범위 (BookingChangeRequest 통합 시 wiring).
+        """
         from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
@@ -907,14 +937,22 @@ class ScheduleService:
         update_data = data.model_dump(exclude_unset=True)
         update_data.pop("lesson_date", None)
         update_data.pop("start_time", None)
+
+        # FE 호환 — 실제 date 또는 time 이 바뀌면 변경 의도. status=changeRequested 일관 처리.
+        date_changed = "scheduled_date" in update_data and update_data["scheduled_date"] != booking.scheduled_date
+        time_changed = "scheduled_time" in update_data and update_data["scheduled_time"] != booking.scheduled_time
+        is_change_intent = (date_changed or time_changed) and "status" not in update_data
+
         for key, value in update_data.items():
             if key == "status" and value is not None:
                 setattr(booking, key, BookingStatus(value))
             elif value is not None:
                 setattr(booking, key, value)
+        if is_change_intent:
+            booking.status = BookingStatus.changeRequested
         await self.db.flush()
         await self.db.refresh(booking)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def delete_booking(self, booking_id: str, current_user: Any) -> None:
         """Delete a booking."""
@@ -938,7 +976,7 @@ class ScheduleService:
         booking.status = BookingStatus.confirmed
         await self.db.flush()
         await self.db.refresh(booking)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def reject_booking(self, booking_id: str, reason: str | None, current_user: Any) -> BookingResponse:
         """Reject a pending booking — Plan B (#238): rejected 제거, cancelled + decline_reason 사유."""
@@ -952,7 +990,7 @@ class ScheduleService:
         booking.notes = reason
         await self.db.flush()
         await self.db.refresh(booking)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def cancel_booking(self, booking_id: str, reason: str | None, current_user: Any) -> BookingResponse:
         """Cancel a booking."""
@@ -966,7 +1004,7 @@ class ScheduleService:
         booking.notes = reason
         await self.db.flush()
         await self.db.refresh(booking)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def change_booking(self, booking_id: str, data: BookingChangeRequest, current_user: Any) -> BookingResponse:
         """Request a change to booking date/time."""
@@ -982,7 +1020,7 @@ class ScheduleService:
         booking.notes = data.reason
         await self.db.flush()
         await self.db.refresh(booking)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)
 
     async def get_makeup_bookings(self, current_user: Any) -> list[BookingResponse]:
         """Return makeup lesson bookings."""
@@ -994,7 +1032,7 @@ class ScheduleService:
                 LessonBooking.teacher_id == current_user.id,
             )
         )
-        return [BookingResponse.model_validate(b) for b in result.all()]
+        return [await self._to_booking_response(b) for b in result.all()]
 
     async def create_makeup_booking(self, data: MakeupBookingCreate, current_user: Any) -> BookingResponse:
         """Create a makeup lesson booking."""
@@ -1019,4 +1057,4 @@ class ScheduleService:
         self.db.add(booking)
         await self.db.flush()
         await self.db.refresh(booking)
-        return BookingResponse.model_validate(booking)
+        return await self._to_booking_response(booking)

@@ -1,6 +1,5 @@
 """Authentication-related schemas."""
 
-
 from pydantic import BaseModel, ConfigDict
 
 from app.schemas.user import UserResponse
@@ -28,7 +27,7 @@ class TokenResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     access_token: str
-    refresh_token: str | None = None
+    refresh_token: str
     token_type: str = "bearer"
     user: UserResponse
 
@@ -43,7 +42,7 @@ class RefreshTokenResponse(BaseModel):
     """Response for a token refresh — includes both tokens for frontend compatibility."""
 
     access_token: str
-    refresh_token: str | None = None
+    refresh_token: str
     token_type: str = "bearer"
 
 
