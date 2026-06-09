@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
-from app.schemas.schedule import (
+from app.schemas.schedule import (  # noqa: F401  BookingApproveRequest 는 string annotation 으로 사용.
+    BookingApproveRequest,
     BookingCancelRequest,
     BookingChangeRequest,
     BookingCreate,
@@ -163,10 +164,20 @@ async def approve_booking(
     booking_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
+    body: BookingApproveRequest | None = None,
 ) -> BookingResponse:
-    """Approve a pending booking."""
+    """Approve a pending booking.
+
+    FE 호환 — body 에 status='completed' 또는 selected_option_id 옵션.
+    body 가 없으면 기존 동작 (confirmed).
+    """
     service = ScheduleService(db)
-    return await service.approve_booking(booking_id, current_user)
+    return await service.approve_booking(
+        booking_id,
+        current_user,
+        selected_option_id=body.selected_option_id if body else None,
+        target_status=body.status if body else None,
+    )
 
 
 @router.patch(

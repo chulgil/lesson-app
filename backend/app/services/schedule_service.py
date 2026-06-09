@@ -1029,15 +1029,32 @@ class ScheduleService:
         await self.db.delete(booking)
         await self.db.flush()
 
-    async def approve_booking(self, booking_id: str, current_user: Any) -> BookingResponse:
-        """Approve a pending booking."""
+    async def approve_booking(
+        self,
+        booking_id: str,
+        current_user: Any,
+        *,
+        selected_option_id: str | None = None,
+        target_status: str | None = None,
+    ) -> BookingResponse:
+        """Approve a pending booking.
+
+        FE 호환 — body 의 status='completed' 면 BookingStatus.completed,
+        그 외엔 confirmed. selected_option_id 가 있으면 notes 에 기록 (trial 옵션).
+        """
         from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         await self._assert_booking_owner(booking, current_user)
-        booking.status = BookingStatus.confirmed
+        if target_status == "completed":
+            booking.status = BookingStatus.completed
+        else:
+            booking.status = BookingStatus.confirmed
+        if selected_option_id:
+            prefix = f"[selected_option_id: {selected_option_id}]"
+            booking.notes = f"{prefix}\n{booking.notes}" if booking.notes else prefix
         await self.db.flush()
         await self.db.refresh(booking)
         return await self._to_booking_response(booking)

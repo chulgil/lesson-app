@@ -2,7 +2,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from app.schemas.lesson import LessonResponse
 from app.schemas.user import UserResponse
@@ -137,6 +137,21 @@ class TeacherResponse(BaseModel):
 
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
+
+    # FE 호환 — BankAccount.id / createdAt 를 Teacher.id / created_at 으로 mirror.
+    @computed_field
+    @property
+    def bank_account_id(self) -> str | None:
+        if self.bank_name or self.account_number:
+            return self.id
+        return None
+
+    @computed_field
+    @property
+    def bank_account_created_at(self) -> _dt.datetime | None:
+        if self.bank_name or self.account_number:
+            return self.created_at
+        return None
 
 
 class TeacherUpdate(BaseModel):
