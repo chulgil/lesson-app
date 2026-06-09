@@ -4405,6 +4405,15 @@ class AppStrings {
   /// 이번 제안을 스킵했습니다 (거절 SnackBar)
   static const proposalDetailSkippedSnackbar = '이번 제안을 스킵했습니다';
 
+  // ── Proposal Issued — 수강권 발급 완료 후 첫 레슨 CTA (audit C2-F02) ──
+
+  /// 수강권 발급 완료 후 학생용 CTA — subscription detail 로 이동
+  /// (proposal_detail_screen.dart 의 confirmed status 액션바)
+  static const proposalDetailViewSubscriptionAction = '내 수강권 보고 첫 레슨 잡기';
+
+  /// 수강권 발급 완료 상단 안내 (confirmed 액션바 위 hint)
+  static const proposalDetailIssuedHint = '수강권이 발급되었어요. 이제 첫 레슨 일정을 잡아볼까요?';
+
   /// 선생님 정보를 찾을 수 없습니다 (teacher profile null)
   static const teacherProfileNotFound = '선생님 정보를 찾을 수 없습니다';
 
@@ -6136,8 +6145,8 @@ class AppStrings {
 
   /// 학생 직접 가입 차단 화면 본문.
   static const studentSignupBlockedBody =
-      '안전한 가입을 위해 본인 인증 시스템을 준비하고 있어요.\n'
-      '만 14세 미만이라면 부모님 계정의 자녀 프로필로 활동할 수 있어요.';
+      '본인 인증 도입 전까지 학생 직접 가입은 잠시 닫혀 있어요.\n'
+      '아래 두 가지 방법으로 시작할 수 있어요.';
 
   /// CTA — 학부모 가입으로 이동.
   static const studentSignupBlockedParentCta = '부모님 계정으로 시작하기';
@@ -6145,9 +6154,10 @@ class AppStrings {
   /// CTA — 선생님이 보낸 초대코드 입력.
   static const studentSignupBlockedInviteCta = '선생님이 보낸 초대코드가 있어요';
 
-  /// 안내 — 학부모 도움 안내 (부가 설명).
+  /// 안내 — 다음 액션 분기 (만 14세 이상 + 선생님 미보유 케이스).
   static const studentSignupBlockedHelper =
-      '본인 인증 통합 후에는 학생 직접 가입이 가능해질 예정이에요.';
+      '아직 선생님이 없다면 가까운 선생님께 초대를 부탁해 주세요.\n'
+      '본인 인증이 열리면 직접 가입도 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
   static const authParentLoginNotReady = '학부모 로그인은 준비 중입니다.';
   static const academyInviteAcceptFailed = '학원 초대 수락에 실패했습니다. 다시 시도해주세요.';
