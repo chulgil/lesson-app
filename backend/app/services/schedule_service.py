@@ -867,6 +867,66 @@ class ScheduleService:
                 response.student_name = student_user.name
         return response
 
+    async def _consume_reschedule_credit_or_raise(self, booking: Any, actor: Any) -> None:
+        """spec subscription_edit_spec.md §2.1 / §7.1 — booking 변경 시 sub 변경권 차감.
+
+        booking.subscription_id 가 없으면 (정규권 외 booking) 무차감. 잔여 없으면 422.
+        차감 성공 시 SubscriptionUsage(type='reschedule') 적립 + 알림 발송.
+        """
+        if not booking.subscription_id:
+            return
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        sub = await self.db.scalar(
+            select(Subscription).where(Subscription.id == booking.subscription_id).with_for_update()
+        )
+        if sub is None:
+            return
+        effective = (sub.total_reschedule_allowance or 0) + (sub.bonus_reschedule_count or 0)
+        used = sub.used_reschedule_count or 0
+        remaining = effective - used
+        if remaining <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="No remaining reschedule credits",
+            )
+        usage = SubscriptionUsage(subscription_id=sub.id, type="reschedule")
+        self.db.add(usage)
+        sub.used_reschedule_count = used + 1
+        await self.db.flush()
+        await self._notify_booking_change(booking, actor, remaining_after=remaining - 1)
+
+    async def _notify_booking_change(self, booking: Any, actor: Any, *, remaining_after: int) -> None:
+        """spec notification_master.md — booking 변경 시 상대편 + 본인 알림.
+
+        actor 가 학생이면 선생님(쪽 user_id), actor 가 선생님이면 학생에게 알림.
+        teacher_id 가 Teacher.id 인 경우 user_id 로 resolve.
+        """
+        from app.models.teacher import Teacher
+        from app.services.notification_service import NotificationService
+
+        teacher_user_id = booking.teacher_id
+        teacher_row = await self.db.scalar(select(Teacher).where(Teacher.id == booking.teacher_id))
+        if teacher_row is not None:
+            teacher_user_id = teacher_row.user_id
+        student_user_id = booking.student_id
+
+        actor_role = getattr(getattr(actor, "role", None), "value", None) or "student"
+        recipient_id = teacher_user_id if actor_role == "student" else student_user_id
+        if not recipient_id:
+            return
+        notif = NotificationService(self.db)
+        await notif.create_and_send(
+            user_id=recipient_id,
+            notification_type="scheduleChangeRequested",
+            title="레슨 일정 변경 요청",
+            body=f"{booking.scheduled_date} {booking.scheduled_time} 로 변경 요청되었습니다.",
+            data={
+                "booking_id": booking.id,
+                "remaining_reschedule": remaining_after,
+            },
+        )
+
     async def _consume_makeup_credit_for_booking(
         self,
         *,
@@ -943,6 +1003,10 @@ class ScheduleService:
         time_changed = "scheduled_time" in update_data and update_data["scheduled_time"] != booking.scheduled_time
         is_change_intent = (date_changed or time_changed) and "status" not in update_data
 
+        # 변경 의도라면 차감 검증 먼저 (잔여 0 이면 422 — 실제 mutate 전 차단).
+        if is_change_intent:
+            await self._consume_reschedule_credit_or_raise(booking, current_user)
+
         for key, value in update_data.items():
             if key == "status" and value is not None:
                 setattr(booking, key, BookingStatus(value))
@@ -1007,13 +1071,20 @@ class ScheduleService:
         return await self._to_booking_response(booking)
 
     async def change_booking(self, booking_id: str, data: BookingChangeRequest, current_user: Any) -> BookingResponse:
-        """Request a change to booking date/time."""
+        """Request a change to booking date/time.
+
+        spec subscription_edit_spec.md §2.1 / §7.1 — 변경권 차감 + 잔여 0 시 422.
+        notification_master.md — 상대편에 scheduleChangeRequested 알림.
+        """
         from app.models.schedule import BookingStatus, LessonBooking
 
         booking = await self.db.get(LessonBooking, booking_id)
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         await self._assert_booking_owner(booking, current_user)
+        actually_changes = data.new_date != booking.scheduled_date or data.new_time != booking.scheduled_time
+        if actually_changes:
+            await self._consume_reschedule_credit_or_raise(booking, current_user)
         booking.scheduled_date = data.new_date
         booking.scheduled_time = data.new_time
         booking.status = BookingStatus.changeRequested
