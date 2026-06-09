@@ -434,6 +434,17 @@ class BookingUpdate(BaseModel):
         return self
 
 
+class BookingApproveRequest(BaseModel):
+    """FE 호환 — trial 옵션 선택 + 레슨 완료 처리 한 endpoint 공용.
+
+    selected_option_id: trial booking 의 선택 옵션 (notes 에 기록).
+    status: 'completed' 명시 시 BookingStatus.completed, 그 외엔 confirmed.
+    """
+
+    selected_option_id: str | None = None
+    status: str | None = None
+
+
 class BookingRejectRequest(BaseModel):
     """Reject a booking."""
 
