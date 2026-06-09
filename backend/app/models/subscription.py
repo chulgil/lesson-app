@@ -201,7 +201,8 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
             name="ck_subscriptions_lesson_counter_capacity",
         ),
         CheckConstraint(
-            "used_reschedule_count <= total_reschedule_allowance",
+            # spec subscription_edit_spec.md §7.1 — effective allowance = total + bonus.
+            "used_reschedule_count <= total_reschedule_allowance + bonus_reschedule_count",
             name="ck_subscriptions_reschedule_counter_capacity",
         ),
         Index("idx_sub_student", "student_id"),
