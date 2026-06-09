@@ -3,7 +3,7 @@
 import datetime as _dt
 from datetime import time
 
-from pydantic import BaseModel, ConfigDict, computed_field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 
 
 def _slot_minutes(value: str) -> int:
@@ -273,9 +273,10 @@ class BookingResponse(BaseModel):
     teacher_id: str
     student_id: str | None = None
     lesson_type: str | None = None
-    scheduled_date: _dt.date | None = None
-    scheduled_time: str | None = None
-    duration: int | None = None
+    # DB NOT NULL — FE 가 non-null 가정해도 안전.
+    scheduled_date: _dt.date
+    scheduled_time: str
+    duration: int = 60
     instrument: str | None = None
     location_id: str | None = None
     notes: str | None = None
@@ -284,6 +285,9 @@ class BookingResponse(BaseModel):
     reason: str | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
+    # FE UI 빈칸 방지 — service 가 join 으로 채움.
+    teacher_name: str | None = None
+    student_name: str | None = None
 
     # Frontend-compatible aliases (computed from backend fields)
     @computed_field
@@ -402,13 +406,19 @@ def _parse_frontend_slot_id(slot_id: str) -> tuple[str, _dt.date, str]:
 
 
 class BookingUpdate(BaseModel):
-    """Update booking fields from the frontend booking repository."""
+    """Update booking fields from the frontend booking repository.
+
+    FE 호환 — duration_minutes / lesson_date / start_time 별칭 동시 수용.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     scheduled_date: _dt.date | None = None
     scheduled_time: str | None = None
     lesson_date: _dt.date | None = None
     start_time: str | None = None
-    duration: int | None = None
+    # spec — FE 가 duration_minutes 키로 보내는 경우도 수용.
+    duration: int | None = Field(default=None, validation_alias=AliasChoices("duration", "duration_minutes"))
     instrument: str | None = None
     location_id: str | None = None
     notes: str | None = None
