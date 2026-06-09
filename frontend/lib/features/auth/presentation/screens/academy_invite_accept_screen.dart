@@ -42,6 +42,15 @@ class _AcademyInviteAcceptScreenState
 
   Future<void> _handleAccept() async {
     setState(() => _isAccepting = true);
+    // audit C3-F08: 수락 직후 학원명을 살린 환영 SnackBar 를 보여주기 위해
+    // preview 캐시를 미리 읽어둔다 (성공 후엔 화면이 home 으로 떠나므로
+    // preview provider 가 invalidate 될 수 있음).
+    final academyName =
+        ref
+            .read(academyInvitePreviewProvider(widget.token))
+            .valueOrNull
+            ?.academy
+            .name;
     try {
       final repository = ref.read(academyInviteRepositoryProvider);
       await repository.acceptInvite(
@@ -52,13 +61,22 @@ class _AcademyInviteAcceptScreenState
       // newly joined academy without requiring a manual reload.
       ref.invalidate(teacherAcademiesProvider);
       if (mounted) {
+        // audit C3-F08: 멤버십 형성 사실 + 다음 안내를 명시. /home 직진에서
+        // "무슨 일이 일어난 거지?" 단절을 막는다.
+        if (academyName != null && academyName.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppStrings.academyInviteAcceptedFormat(academyName),
+              ),
+            ),
+          );
+        }
         context.go(AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text(AppStrings.academyInviteAcceptFailed)),
         );
       }
