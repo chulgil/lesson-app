@@ -666,13 +666,32 @@ class ScheduleService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     async def _resolve_student_id_scope(self, user_id: str) -> list[str]:
-        """Return both user and student-profile IDs for a student identifier."""
+        """Return user/student-profile IDs for a student identifier.
+
+        spec parent_system.md — caller 가 parent 인 경우 자녀의 student_id 도 포함해
+        booking/practice 조회가 가능하도록 scope 확장. (IDOR guard 유지 — parent 가
+        자기 자녀가 아닌 학생의 데이터는 읽지 못함.)
+        """
         from app.models.student import Student
 
         student_ids = [user_id]
         profile_id = await self.db.scalar(select(Student.id).where(Student.user_id == user_id))
         if profile_id is not None and profile_id not in student_ids:
             student_ids.append(profile_id)
+
+        # parent → 자녀 student_id 들 union.
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+
+        parent_id = await self.db.scalar(select(Parent.id).where(Parent.user_id == user_id))
+        if parent_id is not None:
+            child_rows = await self.db.scalars(
+                select(ParentChildRelation.student_id)
+                .where(ParentChildRelation.parent_id == parent_id)
+                .where(ParentChildRelation.status == ParentChildRelationStatus.active)
+            )
+            for sid in child_rows.all():
+                if sid and sid not in student_ids:
+                    student_ids.append(sid)
         return student_ids
 
     async def _assert_booking_owner(self, booking: Any, current_user: Any | None) -> None:
