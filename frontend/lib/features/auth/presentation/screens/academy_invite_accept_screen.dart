@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../features/academy/academy_facade.dart';
+import '../../../../features/academy/domain/exceptions/academy_invite_exceptions.dart';
 import '../providers/academy_invite_provider.dart';
 import 'academy_invite_expired_screen.dart';
 
@@ -131,13 +132,18 @@ class _AcademyInviteAcceptScreenState
     );
   }
 
-  /// Classifies a preview load error code for the expired screen.
+  /// audit C3-F03: 명시적 타입 기반 에러 분류 (toString() 문자열 매칭 제거).
+  ///
+  /// repository 가 `AcademyInviteException` 서브타입을 throw 하므로 화면은
+  /// 타입으로 분기한다. BE detail 카피가 변경되어도 분기가 깨지지 않는다.
+  /// type-check 가 실패하면 unknown 으로 폴백 (network 에러 등).
   String _errorCodeFor(Object error) {
-    final text = error.toString();
-    if (text.contains('expired')) return 'expired';
-    if (text.contains('not found')) return 'not_found';
-    if (text.contains('invalid')) return 'already_used';
-    return 'unknown';
+    return switch (error) {
+      AcademyInviteExpiredException() => 'expired',
+      AcademyInviteAlreadyUsedException() => 'already_used',
+      AcademyInviteNotFoundException() => 'not_found',
+      _ => 'unknown',
+    };
   }
 
   @override

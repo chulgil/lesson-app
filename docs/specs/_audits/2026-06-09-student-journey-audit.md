@@ -149,14 +149,21 @@
 | **C2-F03** | 학부모 대시보드 수강권 카드 Mock → 실제 API 연결 (BE 모델 + endpoint 필요) |
 | **C4-F04** | 학부모 측 "입금 확인 알림" 액션 (BE endpoint 의존) |
 
-### 4.4 같은 PR 시리즈 (P1 — 패턴 C 에지케이스 + 권한, 4건)
+### 4.4 PR3 실제 작업 (정찰 후 1건만 surgical fix)
+
+> 정찰 결과 3건 false positive — 실제 작업 1건.
 
 | 순서 | 발견 ID | 작업 |
 |---|---|---|
-| 10 | **C3-F03** | G9 에러 분류 문자열 매칭 → 명시적 error code/enum 또는 BE response code 기반으로 |
-| 11 | **C3-F04** | 거절 사유 `reason` 저장 — repository에 persistence 추가 |
-| 12 | **C3-F05** | 학원 초대 수락 전 3자 관계 충돌 가드 + 사용자 안내 |
-| 13 | **C1-F09** | 학생 역할 진입 시 `role == student` 가드 추가 |
+| 10 | **C3-F03** | `AcademyInviteException` sealed class + 3 서브타입(`Expired`/`AlreadyUsed`/`NotFound`) 도입. Remote/Mock repository 가 명시적 타입 throw. `_errorCodeFor` 가 `switch` 패턴 매칭으로 분기 → BE detail 카피 변경에도 견고 |
+
+**PR3 정찰 후 false positive (3건)**:
+
+| ID | sub-agent 보고 | 실제 코드 상태 |
+|---|---|---|
+| C3-F04 | rejectInvite reason 저장 안 됨 | Remote repo (`remote_academy_invite_repository.dart:60`) 가 이미 `data: {if (reason != null && reason.isNotEmpty) 'reason': reason}` 로 BE 전송 중. Mock 미저장은 테스트 fixture 의 제한 — 실제 흐름 정상 |
+| C3-F05 | 3자 관계 충돌 가드 부재 | `user_master.md §1.4` 다중 소속 모델 = 학생이 여러 선생님(개인+학원) 동시 소속 OK. 충돌 자체가 존재하지 않음 (의도된 모델) |
+| C1-F09 | 학생 role 가드 부재 | `app_router.dart:49 resolveAuthRedirect` 가드 wired. `AuthAuthenticated && (isPublic\|\|isRoleSelect)` → `role.homeRoute` 자동 분기. `refreshListenable` 로 auth state 변경 시 redirect 재평가. 별도 가드 불필요 |
 
 ### 4.5 별도 BE 이슈로 분리 (다음 턴)
 

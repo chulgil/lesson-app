@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:lessonaza/core/router/app_routes.dart';
+import 'package:lessonaza/features/academy/domain/exceptions/academy_invite_exceptions.dart';
 import 'package:lessonaza/features/academy/domain/repositories/academy_invite_repository.dart';
 import 'package:lessonaza/features/auth/presentation/providers/academy_invite_provider.dart';
 import 'package:lessonaza/features/auth/presentation/screens/academy_invite_accept_screen.dart';
@@ -103,7 +104,9 @@ void main() {
 
   group('AcademyInviteAcceptScreen error branch', () {
     testWidgets('expired token surfaces expired screen', (tester) async {
-      final repo = _ThrowingInviteRepository(Exception('Invite token expired'));
+      final repo = _ThrowingInviteRepository(
+        const AcademyInviteExpiredException(),
+      );
 
       final router = GoRouter(
         initialLocation: '/academy/accept?token=tok',
@@ -134,7 +137,7 @@ void main() {
       tester,
     ) async {
       final repo = _ThrowingInviteRepository(
-        Exception('Invite token not found'),
+        const AcademyInviteNotFoundException(),
       );
 
       final router = GoRouter(
