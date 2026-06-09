@@ -28,6 +28,8 @@ from app.schemas.subscription import (  # noqa: F401  RescheduleCreditsPatchRequ
     ProposalConfirmRequest,
     ProposalRespondRequest,
     RescheduleCreditsPatchRequest,
+    SubscriptionBulkChangeRequest,
+    SubscriptionBulkChangeResponse,
     SubscriptionCreate,
     SubscriptionDepositSummaryResponse,
     SubscriptionProposalCreate,
@@ -764,3 +766,32 @@ async def patch_cancel_deadline(
         body.override_cancel_deadline_hours,
         current_user,
     )
+
+
+# spec makeup_credit_spec.md §8.2 — 일괄변경.
+
+
+@router.post(
+    "/{subscription_id}/bulk-change",
+    response_model=SubscriptionBulkChangeResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Bulk-change scheduled lessons of subscription (teacher)",
+)
+async def bulk_change_subscription(
+    subscription_id: str,
+    body: SubscriptionBulkChangeRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionBulkChangeResponse:
+    """수강권 일괄변경 — 미래 미체결 레슨을 새 요일/시간으로 재배치.
+
+    충돌·중복 슬롯은 cancel + bulkChangeLoss 크레딧 적립 (spec §7).
+    """
+    service = SubscriptionService(db)
+    result = await service.bulk_change(
+        subscription_id,
+        body.new_day_of_week,
+        body.new_time,
+        current_user,
+    )
+    return SubscriptionBulkChangeResponse(**result)

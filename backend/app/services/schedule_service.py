@@ -814,6 +814,15 @@ class ScheduleService:
         self.db.add(booking)
         await self.db.flush()
         await self.db.refresh(booking)
+
+        # spec makeup_credit_spec.md §8.1 — useCredit=true 면 보강 크레딧 소비.
+        if data.use_credit:
+            await self._consume_makeup_credit_for_booking(
+                booking_id=booking.id,
+                student_id=booking.student_id,
+                credit_id=data.credit_id,
+            )
+
         return BookingResponse.model_validate(booking)
 
     async def create_slot_booking(self, data: BookingCreate, current_user: Any) -> dict[str, Any]:
@@ -832,6 +841,49 @@ class ScheduleService:
             "lesson_id": None,
             "is_recommended": False,
         }
+
+    async def _consume_makeup_credit_for_booking(
+        self,
+        *,
+        booking_id: str,
+        student_id: str,
+        credit_id: str | None,
+    ) -> None:
+        """spec makeup_credit_spec.md §5.3 — use_credit=true 시 보강 크레딧 1건 소비.
+
+        credit_id 명시 시 그것을, 미명시 시 가장 임박한 active 크레딧을 자동 선택.
+        없으면 422 (사용 가능한 크레딧 없음).
+        """
+        from sqlalchemy import select as _select
+
+        from app.models.makeup_credit import MakeupCredit
+        from app.services.makeup_credit_service import MakeupCreditService
+
+        target_id = credit_id
+        if target_id is None:
+            now = _dt.datetime.now(UTC)
+            credit_row = await self.db.scalar(
+                _select(MakeupCredit)
+                .where(MakeupCredit.student_id == student_id)
+                .where(MakeupCredit.used_at.is_(None))
+                .where(MakeupCredit.expires_at > now)
+                .order_by(MakeupCredit.expires_at.asc())
+            )
+            if credit_row is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="No active makeup credit available",
+                )
+            target_id = credit_row.id
+
+        service = MakeupCreditService(self.db)
+        try:
+            await service.use_credit(credit_id=target_id, lesson_id=booking_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=str(exc),
+            ) from exc
 
     async def get_booking_by_id(self, booking_id: str, current_user: Any) -> BookingResponse:
         """Return a single booking."""

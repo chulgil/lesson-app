@@ -264,6 +264,23 @@ class UseRescheduleRequest(BaseModel):
     lesson_id: str | None = None
 
 
+# spec makeup_credit_spec.md §8.2 — 일괄변경 요청/응답.
+class SubscriptionBulkChangeRequest(BaseModel):
+    """새 요일/시간으로 미래 미체결 레슨 모두 재배치."""
+
+    new_day_of_week: int  # 0=Mon ... 6=Sun
+    new_time: str  # HH:MM
+
+
+class SubscriptionBulkChangeResponse(BaseModel):
+    """spec §8.2 응답 — 처리 결과 요약."""
+
+    rescheduled_count: int
+    lost_count: int
+    credits_accrued: int
+    new_expires_at: _dt.date | None = None
+
+
 # spec subscription_edit_spec.md §6.1 — 4 가지 PATCH endpoint 요청 스키마.
 class RescheduleCreditsPatchRequest(BaseModel):
     """수강권 변경권 추가."""

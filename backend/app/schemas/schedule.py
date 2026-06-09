@@ -239,7 +239,6 @@ class ScheduleExceptionUpdate(BaseModel):
     reason: str | None = None
 
 
-
 class ScheduleExceptionResponse(BaseModel):
     """Schedule exception record."""
 
@@ -341,6 +340,10 @@ class BookingCreate(BaseModel):
     location_id: str | None = None
     subscription_id: str | None = None
     notes: str | None = None
+    # spec makeup_credit_spec.md §8.1 — 학생이 보강 크레딧으로 예약 시 명시.
+    # credit_id 지정 시 해당 크레딧 소비, true 만 주면 가장 임박한 active 크레딧 자동 선택.
+    use_credit: bool = False
+    credit_id: str | None = None
 
     # Frontend-specific fields (stored in notes or ignored)
     student_name: str | None = None
