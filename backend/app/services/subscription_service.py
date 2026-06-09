@@ -488,6 +488,108 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
+    async def bulk_change(
+        self,
+        subscription_id: str,
+        new_day_of_week: int,
+        new_time: str,
+        current_user: Any,
+    ) -> dict[str, Any]:
+        """spec makeup_credit_spec.md §7 / §8.2 — 일괄변경.
+
+        scheduled / pending / confirmed 미래 booking 을 새 요일/시간으로 옮김.
+        같은 요일/시간 슬롯에 충돌 booking 이 이미 있는 경우 해당 건은 cancelled
+        + bulkChangeLoss 크레딧 적립. 응답에 4 필드 (rescheduled, lost, credits, newExpiresAt).
+        """
+        from app.models.schedule import BookingStatus, LessonBooking
+        from app.models.subscription import Subscription
+        from app.services.makeup_credit_service import MakeupCreditService
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        if not (0 <= new_day_of_week <= 6):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="new_day_of_week must be 0..6",
+            )
+        sub = await self.access.require_teacher_subscription(subscription_id, current_user)
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+
+        today = date.today()
+        result = await self.db.scalars(
+            select(LessonBooking)
+            .where(LessonBooking.subscription_id == subscription_id)
+            .where(LessonBooking.scheduled_date >= today)
+            .where(
+                LessonBooking.status.in_(
+                    [
+                        BookingStatus.pending,
+                        BookingStatus.confirmed,
+                        BookingStatus.changeRequested,
+                    ]
+                )
+            )
+            .order_by(LessonBooking.scheduled_date.asc())
+        )
+        targets = list(result.all())
+
+        rescheduled = 0
+        lost: list[LessonBooking] = []
+        seen_dates: set[date] = set()
+        for booking in targets:
+            shift = (new_day_of_week - booking.scheduled_date.weekday()) % 7
+            new_date = booking.scheduled_date + timedelta(days=shift)
+            # 같은 새 일정에 이미 옮긴 booking 이 있거나 conflict — 손실 처리.
+            conflict = await self.db.scalar(
+                select(LessonBooking.id)
+                .where(LessonBooking.teacher_id == booking.teacher_id)
+                .where(LessonBooking.scheduled_date == new_date)
+                .where(LessonBooking.scheduled_time == new_time)
+                .where(LessonBooking.id != booking.id)
+                .where(
+                    LessonBooking.status.in_(
+                        [
+                            BookingStatus.pending,
+                            BookingStatus.confirmed,
+                            BookingStatus.changeRequested,
+                        ]
+                    )
+                )
+            )
+            if conflict is not None or new_date in seen_dates:
+                booking.status = BookingStatus.cancelled
+                lost.append(booking)
+                continue
+            booking.scheduled_date = new_date
+            booking.scheduled_time = new_time
+            seen_dates.add(new_date)
+            rescheduled += 1
+
+        await self.db.flush()
+
+        # MakeupCredit 적립 (각 손실 booking 당 1건).
+        credits_accrued = 0
+        if lost:
+            teacher_id = await resolve_teacher_id(self.db, current_user.id)
+            makeup = MakeupCreditService(self.db)
+            for booking in lost:
+                await makeup.accrue_for_bulk_change_loss(
+                    student_id=booking.student_id,
+                    teacher_id=teacher_id,
+                    subscription_id=subscription_id,
+                    schedule_change_id=subscription_id,  # spec: schedule_change event id 미보유 시 sub id 로 대체.
+                    lost_lesson_id=booking.id,
+                )
+                credits_accrued += 1
+
+        sub_row = await self.db.get(Subscription, subscription_id)
+        return {
+            "rescheduled_count": rescheduled,
+            "lost_count": len(lost),
+            "credits_accrued": credits_accrued,
+            "new_expires_at": sub_row.end_date if sub_row is not None else None,
+        }
+
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status.
 
