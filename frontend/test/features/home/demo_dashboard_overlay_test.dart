@@ -157,6 +157,7 @@ class CompletedOnboardingProgressStorageFake extends OnboardingProgressStorage {
       teacherOnboardingCompleted: true,
       demoOverlayDismissed: false,
       coachMarkCompleted: true,
+      questUnlockShown: false,
     );
   }
 
@@ -167,6 +168,7 @@ class CompletedOnboardingProgressStorageFake extends OnboardingProgressStorage {
         teacherOnboardingCompleted: true,
         demoOverlayDismissed: true,
         coachMarkCompleted: true,
+        questUnlockShown: false,
       ),
     );
   }
@@ -179,6 +181,7 @@ class DismissedOnboardingProgressStorageFake extends OnboardingProgressStorage {
       teacherOnboardingCompleted: true,
       demoOverlayDismissed: true,
       coachMarkCompleted: true,
+      questUnlockShown: false,
     );
   }
 }
