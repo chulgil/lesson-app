@@ -415,6 +415,24 @@ async def notify_payment(
     return await service.notify_payment(subscription_id, body, current_user)
 
 
+# Issue #635 — 학부모가 자녀 수강권 입금을 선생님에게 알림.
+@router.post(
+    "/{subscription_id}/parent-payment-notified",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Parent notifies tuition deposit on behalf of child",
+)
+async def parent_payment_notified(
+    subscription_id: str,
+    body: NotifyPaymentRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> SubscriptionResponse:
+    """spec parent_system.md §6 — 학부모가 자녀 sub 입금을 알림. 선생님에 paid_by_parent 명시."""
+    service = SubscriptionService(db)
+    return await service.notify_payment_as_parent(subscription_id, body, current_user)
+
+
 # ---------------------------------------------------------------------------
 # Templates
 # ---------------------------------------------------------------------------

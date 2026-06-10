@@ -1332,8 +1332,57 @@ class SubscriptionService:
             return incoming == current
         return self._enum_value(incoming) == self._enum_value(current)
 
-    async def _notify_deposit_received(self, subscription: Any, notification_service: Any) -> None:
-        """Notify the teacher that a student-side external deposit was reported."""
+    async def notify_payment_as_parent(
+        self,
+        subscription_id: str,
+        data: NotifyPaymentRequest,
+        current_user: Any,
+    ) -> SubscriptionResponse:
+        """Issue #635 — 학부모가 자녀 수강권 입금을 선생님에게 알림.
+
+        spec parent_system.md §6.
+        - parent role 전용 (teacher/student 403)
+        - ParentChildRelation 검증은 access.get_subscription_for_user 통과로 충족
+        - 알림 body 에 'paid by parent' 명시
+        - 기존 notify_payment 로직 (paid_at + payment_method) 재사용
+        """
+        from app.models.subscription import PaymentMethod
+        from app.services.notification_service import NotificationService
+
+        if self.access.actor_type(current_user) != "parent":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Parent role required",
+            )
+        sub = await self.access.get_subscription_for_user(subscription_id, current_user)
+        if sub.payment_confirmed:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Payment already confirmed",
+            )
+        if data.payment_method:
+            sub.payment_method = PaymentMethod(data.payment_method)
+        sub.paid_at = datetime.now(UTC)
+        await self._notify_deposit_received(
+            sub,
+            NotificationService(self.db),
+            paid_by_parent=True,
+        )
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return await self._subscription_response(sub)
+
+    async def _notify_deposit_received(
+        self,
+        subscription: Any,
+        notification_service: Any,
+        *,
+        paid_by_parent: bool = False,
+    ) -> None:
+        """Notify the teacher that a student-side external deposit was reported.
+
+        Issue #635 — paid_by_parent=True 시 알림 body 에 학부모 결제 명시.
+        """
         from app.models.lesson import ClassMembership, LessonClass
         from app.models.notification import NotificationPriority
         from app.models.student import Student
@@ -1351,16 +1400,22 @@ class SubscriptionService:
             return
 
         teacher_user_id, student_name = row
+        body = (
+            f"{student_name}님 학부모가 입금 완료를 알렸습니다."
+            if paid_by_parent
+            else f"{student_name}님이 입금 완료를 알렸습니다."
+        )
         await notification_service.create_and_send(
             user_id=teacher_user_id,
             notification_type="paymentReceived",
             title="입금 완료 알림",
-            body=f"{student_name}님이 입금 완료를 알렸습니다.",
+            body=body,
             priority=NotificationPriority.high,
             data={
                 "subscriptionId": subscription.id,
                 "studentId": subscription.student_id,
                 "source": "subscription_deposit",
+                "paidByParent": paid_by_parent,
             },
             action_url=f"/subscriptions/{subscription.id}",
             action_label="입금 확인",
