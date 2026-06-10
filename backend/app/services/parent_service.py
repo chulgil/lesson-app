@@ -328,6 +328,71 @@ class ParentService:
         await self.db.refresh(relation)
         return await self._child_profile_response(student, relation)
 
+    async def convert_child_to_student_account(
+        self,
+        child_id: str,
+        email: str,
+        current_user: Any,
+    ) -> ChildProfileResponse:
+        """Issue #638 — 만 14세 도달 자녀 → 학생 계정 승격.
+
+        spec parent_system.md §2.3.4.
+        - 학부모만 호출 가능 (자기 자녀 한정)
+        - 만 14세 미만 → 422
+        - 이미 user_id 연결됨 → 409
+        - User row 생성 (role=student, email/name 채움) + Student.user_id 링크
+        - ParentChildRelation 그대로 유지 — 학부모 대시보드 계속 모니터링
+        - PASS 통합은 별도 작업 — 본 endpoint 는 만 14세 검증만 enforce
+        """
+        from datetime import date as _date
+
+        from app.models.user import User, UserRole
+
+        student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        if student.user_id is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Child already converted to student account",
+            )
+        if student.birth_date is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="birth_date missing — cannot verify age",
+            )
+        today = _date.today()
+        # 만 나이 = 올해 - 출생연도 - (생일 안 지났으면 1).
+        age = today.year - student.birth_date.year
+        if (today.month, today.day) < (student.birth_date.month, student.birth_date.day):
+            age -= 1
+        if age < 14:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Child must be at least 14 years old",
+            )
+
+        # 이메일 중복 검사 — 이미 등록된 user 면 충돌.
+        existing = await self.db.scalar(select(User).where(User.email == email))
+        if existing is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already registered",
+            )
+
+        new_user = User(
+            email=email,
+            name=student.name,
+            role=UserRole.student,
+            is_active=True,
+            onboarding_completed=False,
+        )
+        self.db.add(new_user)
+        await self.db.flush()
+        student.user_id = new_user.id
+        await self.db.flush()
+        await self.db.refresh(student)
+        await self.db.refresh(relation)
+        return await self._child_profile_response(student, relation)
+
     async def update_child_profile(
         self,
         child_id: str,

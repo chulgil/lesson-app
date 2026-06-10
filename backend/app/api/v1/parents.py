@@ -12,6 +12,7 @@ from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import LessonResponse
 from app.schemas.parent import (
+    ChildConvertToAccountRequest,
     ChildProfileCreate,
     ChildProfileResponse,
     ChildProfileUpdate,
@@ -223,6 +224,28 @@ async def delete_child_profile(
     """Soft-delete a parent-owned child profile."""
     service = ParentService(db)
     await service.delete_child_profile(child_id, current_user)
+
+
+# Issue #638 — 만 14세 도달 자녀 학생 계정 전환.
+@router.post(
+    "/child-profiles/{child_id}/convert-to-account",
+    response_model=ChildProfileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Convert child profile to a student account (age >= 14)",
+)
+async def convert_child_to_account(
+    child_id: str,
+    body: ChildConvertToAccountRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> ChildProfileResponse:
+    """spec parent_system.md §2.3.4 — 자녀 프로필을 학생 계정으로 승격.
+
+    만 14세 미만 → 422. 이미 변환됨 → 409. 이메일 중복 → 409.
+    PASS 통합 (휴대폰 본인인증) 은 별도 작업 — 본 endpoint 는 만 14세만 검증.
+    """
+    service = ParentService(db)
+    return await service.convert_child_to_student_account(child_id, body.email, current_user)
 
 
 @router.post(
