@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../schedule/data/services/teacher_availability_onboarding_api.dart';
 import '../../../settings/settings_facade.dart';
 import '../widgets/first_availability_celebration_sheet.dart';
 
@@ -274,8 +275,6 @@ class _FirstAvailabilitySetupScreenState
       _errorMessage = null;
     });
 
-    final notifier = ref.read(teacherSettingsNotifierProvider.notifier);
-
     try {
       // Resolve current settings from the warm read-side FutureProvider that
       // home/quest already watch. The notifier is lazy and may be cold (never
@@ -296,9 +295,13 @@ class _FirstAvailabilitySetupScreenState
           ),
       ];
 
-      // Persist via the existing settings notifier — reuses the
-      // updateAvailableSlots repository path (mock + remote both wired).
-      await notifier.replaceAvailableSlots(newSlots);
+      // #607 Job 2 — dual-write through the BE endpoint introduced in
+      // #606 (4f0bd3f0). BE owns the simultaneous write to
+      // TeacherAvailability (SSOT) + TeacherSettings.available_slots
+      // (legacy mirror). FE makes a single call instead of relying on
+      // the FE-side replaceAvailableSlots path which only touched the
+      // legacy mirror. Reader unification (Job 3) is a follow-up PR.
+      await ref.read(teacherAvailabilityApiProvider).postOnboarding(newSlots);
       if (!mounted) return;
       // Celebration sheet — modal sheet, no skip.
       await showFirstAvailabilityCelebrationSheet(context);

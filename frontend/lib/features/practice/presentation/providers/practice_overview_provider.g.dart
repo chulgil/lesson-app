@@ -7,7 +7,7 @@ part of 'practice_overview_provider.dart';
 // **************************************************************************
 
 String _$studentPracticeOverviewHash() =>
-    r'2b56d09662842892c7528248cad6b24c49ce0381';
+    r'9d2c86d595ff00304897d4a68268c89c65a213c8';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -529,7 +529,7 @@ final inviteRevokerProvider =
 
 typedef _$InviteRevoker = AutoDisposeNotifier<AsyncValue<void>>;
 String _$connectionRequesterHash() =>
-    r'3d5433880ff986b6016ebf264095cdbe83cc4987';
+    r'a21ceecfe78ab395858bb03aaf860c7dc9aa795c';
 
 /// Create connection request from invite code
 ///

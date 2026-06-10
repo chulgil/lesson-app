@@ -40,7 +40,7 @@ final subscriptionRenewalServiceProvider =
 
 typedef SubscriptionRenewalServiceRef = ProviderRef<SubscriptionRenewalService>;
 String _$subscriptionExpiryMonitorHash() =>
-    r'a08a63bf125df0ef1d0e8d608bf032b6d6519499';
+    r'9638cd8f5f83a473cb76a593166f95399eecca66';
 
 /// See also [subscriptionExpiryMonitor].
 @ProviderFor(subscriptionExpiryMonitor)

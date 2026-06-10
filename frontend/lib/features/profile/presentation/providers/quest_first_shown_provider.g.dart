@@ -6,7 +6,7 @@ part of 'quest_first_shown_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$questFirstShownHash() => r'438f43f7b1a2de4ca4f2687f9c6653ded6746251';
+String _$questFirstShownHash() => r'88f94047237ad016b44674df8a2ba6afb6f30891';
 
 /// 가입 직후 첫 도착 시점을 Hive 에 영속화하는 provider.
 ///
