@@ -25,6 +25,9 @@ class TeacherSettings(UUIDMixin, TimestampMixin, Base):
     # Trial lesson free toggle
     trial_lesson_free: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     booking_guidance_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Issue #606 — 가용시간 SSOT 마이그레이션 단계 1 (dual-write 역호환).
+    # [{day_of_week, start_time, end_time}, ...] — TeacherAvailability 와 동일 데이터.
+    available_slots: Mapped[list | None] = mapped_column(JSON, nullable=True, default=list)
 
     __table_args__ = (Index("uk_teacher_settings", "teacher_id", unique=True),)
 

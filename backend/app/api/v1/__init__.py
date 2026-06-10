@@ -52,6 +52,7 @@ from app.api.v1 import (
     students,
     subscription_settings,
     subscriptions,
+    teacher_availability,
     teachers,
     users,
     vacations,
@@ -100,6 +101,8 @@ api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 api_router.include_router(teachers.router, prefix="/teachers", tags=["teachers"])
+# Issue #606 — dual-write 가용시간 onboarding.
+api_router.include_router(teacher_availability.router, prefix="/teacher", tags=["teacher-availability"])
 api_router.include_router(students.router, prefix="/students", tags=["students"])
 api_router.include_router(lessons.router, prefix="/lessons", tags=["lessons"])
 api_router.include_router(lesson_summaries.router, prefix="/lesson-summaries", tags=["lesson-summaries"])
