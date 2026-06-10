@@ -236,7 +236,7 @@ final teacherNotificationSettingsNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$TeacherNotificationSettingsNotifier
     = AutoDisposeNotifier<TeacherNotificationSettings>;
 String _$notificationActionsHash() =>
-    r'5595b2a89351d392ac7601b96db4ba3aa0ccb272';
+    r'897115ea0277df7ca86bd6d5841720bce4ae1a98';
 
 /// Notifier for notification actions (mark as read, delete, etc.)
 ///

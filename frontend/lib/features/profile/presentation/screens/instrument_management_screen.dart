@@ -44,27 +44,30 @@ class _InstrumentManagementScreenState
       body: settingsAsync.when(
         data: (settings) => _buildContent(settings),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                size: 48,
-                color: AppColors.paperAccent,
+        error:
+            (_, __) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.paperAccent,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  const Text(AppStrings.profileInstrumentError),
+                  const SizedBox(height: AppSpacing.space4),
+                  FilledButton(
+                    onPressed:
+                        () =>
+                            ref
+                                .read(teacherSettingsNotifierProvider.notifier)
+                                .refresh(),
+                    child: const Text(AppStrings.retry),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.space4),
-              const Text(AppStrings.profileInstrumentError),
-              const SizedBox(height: AppSpacing.space4),
-              FilledButton(
-                onPressed: () => ref
-                    .read(teacherSettingsNotifierProvider.notifier)
-                    .refresh(),
-                child: const Text(AppStrings.retry),
-              ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -94,20 +97,22 @@ class _InstrumentManagementScreenState
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (sheetContext) => ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.82,
-        ),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.space4,
-            AppSpacing.space4,
-            AppSpacing.space4,
-            AppSpacing.space4 + MediaQuery.of(sheetContext).viewInsets.bottom,
+      builder:
+          (sheetContext) => ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.82,
+            ),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.space4,
+                AppSpacing.space4,
+                AppSpacing.space4,
+                AppSpacing.space4 +
+                    MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: _buildAddInstrumentSection(currentInstruments),
+            ),
           ),
-          child: _buildAddInstrumentSection(currentInstruments),
-        ),
-      ),
     );
   }
 
@@ -195,9 +200,10 @@ class _InstrumentManagementScreenState
 
   Widget _buildAddInstrumentSection(List<String> currentInstruments) {
     // Filter out already added instruments
-    final availableInstruments = InstrumentList.all
-        .where((i) => !currentInstruments.contains(i))
-        .toList();
+    final availableInstruments =
+        InstrumentList.all
+            .where((i) => !currentInstruments.contains(i))
+            .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,17 +227,18 @@ class _InstrumentManagementScreenState
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children: availableInstruments.map((instrument) {
-              return ActionChip(
-                avatar: Icon(
-                  _getInstrumentIcon(instrument),
-                  size: 18,
-                  color: AppColors.paperAccent,
-                ),
-                label: Text(instrument),
-                onPressed: () => _addInstrument(instrument),
-              );
-            }).toList(),
+            children:
+                availableInstruments.map((instrument) {
+                  return ActionChip(
+                    avatar: Icon(
+                      _getInstrumentIcon(instrument),
+                      size: 18,
+                      color: AppColors.paperAccent,
+                    ),
+                    label: Text(instrument),
+                    onPressed: () => _addInstrument(instrument),
+                  );
+                }).toList(),
           ),
           const SizedBox(height: AppSpacing.space4),
         ],
@@ -264,6 +271,11 @@ class _InstrumentManagementScreenState
             ),
             const SizedBox(width: AppSpacing.space2),
             FilledButton(
+              // 2026-06-10 fix — Row 내부 컴팩트 배치 시 테마 minimumSize=Size(∞,h)
+              // 가 적용되어 BoxConstraints(w=∞) 크래시. minimumSize override 필수.
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, AppSpacing.buttonHeight),
+              ),
               onPressed: _addCustomInstrument,
               child: const Text(AppStrings.add),
             ),
