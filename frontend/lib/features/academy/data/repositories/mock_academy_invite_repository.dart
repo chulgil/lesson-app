@@ -1,3 +1,4 @@
+import '../../domain/exceptions/academy_invite_exceptions.dart';
 import '../../domain/repositories/academy_invite_repository.dart';
 
 /// Mock implementation of AcademyInviteRepository
@@ -11,16 +12,16 @@ class MockAcademyInviteRepository implements AcademyInviteRepository {
     await Future.delayed(const Duration(milliseconds: 150));
 
     if (_expiredTokens.contains(token)) {
-      throw Exception('Invite token expired');
+      throw const AcademyInviteExpiredException();
     }
 
     if (_rejectedTokens.contains(token)) {
-      throw Exception('Invite token invalid');
+      throw const AcademyInviteAlreadyUsedException();
     }
 
     final preview = _previews[token];
     if (preview == null) {
-      throw Exception('Invite token not found');
+      throw const AcademyInviteNotFoundException();
     }
 
     return preview;
@@ -34,16 +35,16 @@ class MockAcademyInviteRepository implements AcademyInviteRepository {
     await Future.delayed(const Duration(milliseconds: 200));
 
     if (_expiredTokens.contains(token)) {
-      throw Exception('Invite token expired');
+      throw const AcademyInviteExpiredException();
     }
 
     if (_rejectedTokens.contains(token)) {
-      throw Exception('Invite token invalid');
+      throw const AcademyInviteAlreadyUsedException();
     }
 
     final preview = _previews[token];
     if (preview == null) {
-      throw Exception('Invite token not found');
+      throw const AcademyInviteNotFoundException();
     }
 
     // Simulate acceptance by removing token
@@ -55,12 +56,12 @@ class MockAcademyInviteRepository implements AcademyInviteRepository {
     await Future.delayed(const Duration(milliseconds: 150));
 
     if (_expiredTokens.contains(token)) {
-      throw Exception('Invite token expired');
+      throw const AcademyInviteExpiredException();
     }
 
     final preview = _previews[token];
     if (preview == null) {
-      throw Exception('Invite token not found');
+      throw const AcademyInviteNotFoundException();
     }
 
     // Mark as rejected

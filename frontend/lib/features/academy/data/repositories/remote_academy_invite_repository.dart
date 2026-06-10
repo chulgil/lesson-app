@@ -1,6 +1,7 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../domain/entities/academy.dart';
+import '../../domain/exceptions/academy_invite_exceptions.dart';
 import '../../domain/repositories/academy_invite_repository.dart';
 
 /// REST client for academy invite accept flow — issue #554 영역 1.
@@ -21,13 +22,14 @@ class RemoteAcademyInviteRepository implements AcademyInviteRepository {
   @override
   Future<AcademyInvitePreview> getInvitePreview(String token) async {
     try {
-      final response =
-          await _apiClient.get('/public/academies/invites/$token/preview');
+      final response = await _apiClient.get(
+        '/public/academies/invites/$token/preview',
+      );
       final json = response.data as Map<String, dynamic>;
       // BE 는 만료/사용된 토큰도 200 + is_expired:true 로 반환한다.
       // mock 과 동일하게 만료는 예외로 변환해 화면의 expired 분기를 태운다.
       if (json['is_expired'] as bool? ?? false) {
-        throw Exception('Invite token expired');
+        throw const AcademyInviteExpiredException();
       }
       return _previewFromJson(json);
     } on ApiException catch (e) {
@@ -98,15 +100,15 @@ class RemoteAcademyInviteRepository implements AcademyInviteRepository {
   static Exception _mapInviteError(ApiException e) {
     // 404 → invite/academy not found.
     if (e.statusCode == 404) {
-      return Exception('Invite token not found');
+      return const AcademyInviteNotFoundException();
     }
     // 409 → invite no longer pending. BE detail: "Invite is expired" /
     // "Invite is accepted" / "Invite is declined" / "Invite is revoked".
     if (e.statusCode == 409) {
       if (e.message.contains('expired')) {
-        return Exception('Invite token expired');
+        return const AcademyInviteExpiredException();
       }
-      return Exception('Invite token invalid');
+      return const AcademyInviteAlreadyUsedException();
     }
     return e;
   }
