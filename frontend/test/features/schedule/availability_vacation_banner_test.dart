@@ -78,9 +78,12 @@ Future<void> _pump(WidgetTester tester, List<VacationPeriod> periods) async {
 
 void main() {
   group('AvailabilityVacationBanner', () {
-    testWidgets('shows banner with active vacation range', (tester) async {
+    testWidgets('shows banner with active vacation range (방학 중 label)', (
+      tester,
+    ) async {
       // Must span today: a vacation that already started and has not ended
       // (#fix2 — future-start vacations are "scheduled", not active).
+      // C4 (audit §4.10): multi-day vacation uses 방학 중 suffix.
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final start = today.subtract(const Duration(days: 2));
@@ -91,9 +94,54 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.text(AppStrings.vacationBannerTitle), findsOneWidget);
-      expect(find.text('${start.month}/${start.day} ~ ${end.month}/${end.day}'),
-          findsOneWidget);
+      final range = '${start.month}/${start.day} ~ ${end.month}/${end.day}';
+      expect(
+        find.text(AppStrings.vacationBannerRangeLabel(range)),
+        findsOneWidget,
+      );
       expect(find.text('여름방학'), findsOneWidget);
+    });
+
+    // C2 (audit §4.8) — trailing close icon offers the cancel action.
+    testWidgets('shows cancel close icon for active vacation', (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      await _pump(tester, [
+        _period(
+          startDate: today.subtract(const Duration(days: 1)),
+          endDate: today.add(const Duration(days: 3)),
+        ),
+      ]);
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.close), findsOneWidget);
+    });
+
+    // C4 (audit §4.10) — 1-day vacation uses 휴무 label + event_busy icon.
+    testWidgets('1-day vacation uses 휴무 label and event_busy icon', (
+      tester,
+    ) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      await _pump(tester, [_period(startDate: today, endDate: today)]);
+      expect(tester.takeException(), isNull);
+      expect(
+        find.text(
+          AppStrings.vacationBannerOneDayLabel('${today.month}/${today.day}'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.byIcon(Icons.event_busy), findsOneWidget);
+    });
+
+    // C4 (audit §4.10) — multi-day vacation uses beach_access icon.
+    testWidgets('multi-day vacation uses beach_access icon', (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      await _pump(tester, [
+        _period(startDate: today, endDate: today.add(const Duration(days: 4))),
+      ]);
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.beach_access), findsOneWidget);
     });
 
     // Regression (#fix2): a vacation that starts in the future is "scheduled",

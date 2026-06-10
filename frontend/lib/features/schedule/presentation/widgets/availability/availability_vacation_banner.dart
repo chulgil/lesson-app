@@ -5,6 +5,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../domain/entities/vacation_period.dart';
 import '../../providers/vacation_providers.dart';
 
@@ -67,35 +68,104 @@ class AvailabilityVacationBanner extends ConsumerWidget {
   }
 }
 
-class _VacationRow extends StatelessWidget {
+/// Row inside [AvailabilityVacationBanner].
+///
+/// C4 (audit §4.10) — distinguish multi-day vacation (방학) vs 1-day 휴무
+/// by icon + accent color so the teacher can tell them apart at a glance.
+/// C2 (audit §4.8) — adds a trailing close icon so the teacher can cancel
+/// without navigating to the vacation management screen.
+class _VacationRow extends ConsumerWidget {
   final VacationPeriod period;
   const _VacationRow({required this.period});
 
   @override
-  Widget build(BuildContext context) {
-    final range = AppStrings.vacationCardDateRange(
-      _formatShortDate(period.startDate),
-      _formatShortDate(period.endDate),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isOneDay = period.vacationDays <= 1;
+    final icon = isOneDay ? Icons.event_busy : Icons.beach_access;
+    final accent = isOneDay ? AppColors.inkSecondary : AppColors.paperAccent;
+
+    final startLabel = _formatShortDate(period.startDate);
+    final mainLabel =
+        isOneDay
+            ? AppStrings.vacationBannerOneDayLabel(startLabel)
+            : AppStrings.vacationBannerRangeLabel(
+              AppStrings.vacationCardDateRange(
+                startLabel,
+                _formatShortDate(period.endDate),
+              ),
+            );
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Icon(icon, size: 16, color: accent),
+        const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
-            range,
+            mainLabel,
             style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           ),
         ),
         if (period.reason != null && period.reason!.isNotEmpty)
-          Text(
-            period.reason!,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkSecondary,
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.space2),
+            child: Text(
+              period.reason!,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
+        IconButton(
+          icon: const Icon(Icons.close, size: 18),
+          color: AppColors.inkSecondary,
+          tooltip: AppStrings.vacationBannerCancelTooltip,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+          onPressed: () => _confirmCancel(context, ref),
+        ),
       ],
     );
+  }
+
+  Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => NotebookAlertDialog(
+            title: AppStrings.vacationCancelConfirmTitle,
+            content: const Text(AppStrings.vacationCancelConfirmBody),
+            confirmLabel: AppStrings.vacationCancelLabel,
+            cancelLabel: AppStrings.cancel,
+            isDestructive: true,
+            onConfirm: () => Navigator.pop(ctx, true),
+            onCancel: () => Navigator.pop(ctx, false),
+          ),
+    );
+    if (result != true || !context.mounted) return;
+    try {
+      await ref.read(vacationActionsProvider).cancel(period.id);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.vacationCancelSuccess)),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      final message = e.toString();
+      final friendly =
+          message.contains('이미 시작')
+              ? AppStrings.vacationCancelAlreadyStarted
+              : message.contains('24')
+              ? AppStrings.vacationCancelWindowExpired
+              : message.contains('이미 취소')
+              ? AppStrings.vacationCancelAlreadyCancelled
+              : AppStrings.vacationCancelFailed;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(friendly)));
+    }
   }
 
   static String _formatShortDate(DateTime d) => '${d.month}/${d.day}';

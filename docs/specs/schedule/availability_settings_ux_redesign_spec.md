@@ -110,6 +110,22 @@ After:  레슨 운영 시간 설정
 - 같은 요일에 복수 시간대 지원 (예: 오전 10-12, 오후 14-18)
 - "+ 시간대 추가" 버튼으로 복수 시간대 추가
 
+#### 3.5 시간대 추가/삭제 UX (2026-06-10 — audit C1 C3)
+
+> 출처: `docs/specs/_audits/2026-06-10-teacher-flow-ux-audit.md` §4.7 / §4.9.
+> 마스터 정의: `teacher_availability_spec.md` §3.7.
+
+요일 카드 안의 시간대 행은 **`SwipeActionTile`** 로 감싸 좌측 스와이프 → "삭제" 액션을 노출한다. 기존 Wrap chip 가로 배치 + 행 단위 삭제 경로 0개 문제 (audit C1) 해결.
+
+| 인터랙션 | UX |
+|---|---|
+| 시간대 편집 | 행 본체 탭 또는 trailing ✏ → `ScheduleEditBottomSheet` |
+| 시간대 삭제 | 행 좌측 스와이프 → "삭제" 탭 |
+| 삭제 전 가드 | `affectedBookingsForWeeklyScheduleProvider` 영향 카운트 → 0건 일반 / 1+건 강조 다이얼로그 |
+| 시간대 추가 | 카드 하단 "+ 시간대 추가" |
+
+trailing 위치에 별도 "삭제" 아이콘 버튼은 두지 않는다. (ux-rules: SwipeActionTile 적용 행은 trailing 아이콘 중복 배치 금지.)
+
 ### 섹션 2: 레슨 설정
 
 **헤더**: "레슨 기본 설정"

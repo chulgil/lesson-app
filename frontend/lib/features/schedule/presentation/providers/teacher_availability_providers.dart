@@ -46,6 +46,52 @@ Future<TeacherAvailability?> teacherAvailability(
 }
 
 // ============================================================
+// Affected bookings for a weekly schedule (#C3)
+// ============================================================
+//
+// Spec: docs/specs/_audits/2026-06-10-teacher-flow-ux-audit.md §4.9.
+// Returns the count of upcoming active bookings (pending/confirmed) whose
+// (dayOfWeek, startTime, endTime) overlap with the weekly recurring slot
+// the teacher is about to delete.
+//
+// LessonBooking.dayOfWeek uses 1=Mon..7=Sun, while WeeklySchedule.dayOfWeek
+// uses 0=Mon..6=Sun — we normalize before comparing.
+@riverpod
+Future<int> affectedBookingsForWeeklySchedule(
+  AffectedBookingsForWeeklyScheduleRef ref, {
+  required String teacherId,
+  required int weeklyDayOfWeek,
+  required String weeklyStartTime,
+  required String weeklyEndTime,
+}) async {
+  final repository = ref.watch(bookingRepositoryProvider);
+  final bookings = await repository.getBookingsByTeacher(teacherId);
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final start = _parseHHmm(weeklyStartTime);
+  final end = _parseHHmm(weeklyEndTime);
+  return bookings.where((b) {
+    if (!b.status.isActive) return false;
+    if (b.lessonDate.isBefore(today)) return false;
+    // LessonBooking.dayOfWeek is 1..7 (Mon=1). WeeklySchedule is 0..6 (Mon=0).
+    final bookingDow0 = ((b.lessonDate.weekday) - 1) % 7;
+    if (bookingDow0 != weeklyDayOfWeek) return false;
+    final bookingStart = b.startTime.hour * 60 + b.startTime.minute;
+    final bookingEnd = b.endTime.hour * 60 + b.endTime.minute;
+    // Overlap when [bookingStart, bookingEnd) intersects [start, end).
+    return bookingStart < end && bookingEnd > start;
+  }).length;
+}
+
+int _parseHHmm(String hhmm) {
+  final parts = hhmm.split(':');
+  if (parts.length != 2) return 0;
+  final h = int.tryParse(parts[0]) ?? 0;
+  final m = int.tryParse(parts[1]) ?? 0;
+  return h * 60 + m;
+}
+
+// ============================================================
 // Available Slots for Date
 // ============================================================
 
