@@ -17,9 +17,7 @@ Widget _wrap(Widget child) {
   return MaterialApp(
     home: MediaQuery(
       data: const MediaQueryData(size: Size(390, 844)),
-      child: Scaffold(
-        body: SizedBox(width: 390, height: 844, child: child),
-      ),
+      child: Scaffold(body: SizedBox(width: 390, height: 844, child: child)),
     ),
   );
 }
@@ -108,10 +106,7 @@ void main() {
       var dismissCalled = false;
 
       await tester.pumpWidget(
-        _overlayWithTarget(
-          key: key,
-          onDismiss: () => dismissCalled = true,
-        ),
+        _overlayWithTarget(key: key, onDismiss: () => dismissCalled = true),
       );
       await pumpOverlay(tester);
 
@@ -127,10 +122,7 @@ void main() {
       var dismissCalled = false;
 
       await tester.pumpWidget(
-        _overlayWithTarget(
-          key: key,
-          onDismiss: () => dismissCalled = true,
-        ),
+        _overlayWithTarget(key: key, onDismiss: () => dismissCalled = true),
       );
       await pumpOverlay(tester);
 
@@ -141,8 +133,9 @@ void main() {
       expect(dismissCalled, isTrue);
     });
 
-    testWidgets('smoke test: no layout errors on default viewport',
-        (tester) async {
+    testWidgets('smoke test: no layout errors on default viewport', (
+      tester,
+    ) async {
       final key = GlobalKey();
       await tester.pumpWidget(
         _overlayWithTarget(
@@ -161,7 +154,7 @@ void main() {
   // ── CoachMarkController ───────────────────────────────────────────────────
 
   group('CoachMarkController', () {
-    CoachMarkStep _step(String id) => CoachMarkStep(
+    CoachMarkStep step(String id) => CoachMarkStep(
       id: id,
       targetKey: GlobalKey(),
       title: 'Step $id',
@@ -170,9 +163,7 @@ void main() {
     );
 
     test('starts at index 0 and exposes currentStep', () {
-      final controller = CoachMarkController(
-        steps: [_step('a'), _step('b')],
-      );
+      final controller = CoachMarkController(steps: [step('a'), step('b')]);
 
       expect(controller.isActive, isFalse);
       expect(controller.currentStep, isNull);
@@ -186,7 +177,7 @@ void main() {
 
     test('advances through steps with next()', () {
       final controller = CoachMarkController(
-        steps: [_step('a'), _step('b'), _step('c')],
+        steps: [step('a'), step('b'), step('c')],
       );
 
       controller.start();
@@ -200,9 +191,7 @@ void main() {
     });
 
     test('dismiss() stops the sequence and resets index', () {
-      final controller = CoachMarkController(
-        steps: [_step('a'), _step('b')],
-      );
+      final controller = CoachMarkController(steps: [step('a'), step('b')]);
 
       controller.start();
       controller.next();
@@ -216,7 +205,7 @@ void main() {
     });
 
     test('next() past the last step calls dismiss automatically', () {
-      final controller = CoachMarkController(steps: [_step('only')]);
+      final controller = CoachMarkController(steps: [step('only')]);
 
       controller.start();
       controller.next(); // past last step → dismiss
@@ -225,9 +214,7 @@ void main() {
     });
 
     test('notifyListeners is called on start, next, and dismiss', () {
-      final controller = CoachMarkController(
-        steps: [_step('a'), _step('b')],
-      );
+      final controller = CoachMarkController(steps: [step('a'), step('b')]);
 
       var notifyCount = 0;
       controller.addListener(() => notifyCount++);
@@ -316,10 +303,7 @@ void main() {
               child: SizedBox(
                 width: 390,
                 height: 844,
-                child: Container(
-                  key: targetKey,
-                  color: Colors.red,
-                ),
+                child: Container(key: targetKey, color: Colors.red),
               ),
             ),
           ),

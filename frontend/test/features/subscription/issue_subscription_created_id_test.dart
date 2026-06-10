@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
-import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/schedule/domain/repositories/unified_lesson_request_repository.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/unified_lesson_request_providers.dart';
@@ -33,13 +32,11 @@ class _RecordingSubscriptionRepository extends MockSubscriptionRepository {
 }
 
 /// Lightweight in-memory lesson-request repo — only the methods the issue flow
-/// touches (`getById`, `update`) are real. `update` can be made to throw to
-/// simulate a post-create wiring failure. Avoids the heavy mock's seed data,
+/// touches (`getById`, `update`) are real. Avoids the heavy mock's seed data,
 /// which keeps pumpAndSettle from hanging.
 class _FakeLessonRequestRepository implements UnifiedLessonRequestRepository {
-  _FakeLessonRequestRepository({this.failOnUpdate = false});
+  _FakeLessonRequestRepository();
 
-  final bool failOnUpdate;
   final Map<String, UnifiedLessonRequest> store = {};
 
   void seed(UnifiedLessonRequest request) => store[request.id] = request;
@@ -49,7 +46,6 @@ class _FakeLessonRequestRepository implements UnifiedLessonRequestRepository {
 
   @override
   Future<UnifiedLessonRequest> update(UnifiedLessonRequest request) async {
-    if (failOnUpdate) throw Exception('lesson request update failed');
     store[request.id] = request;
     return request;
   }
@@ -60,15 +56,15 @@ class _FakeLessonRequestRepository implements UnifiedLessonRequestRepository {
 }
 
 UnifiedLessonRequest _seedRequest(String id) => UnifiedLessonRequest(
-      id: id,
-      studentId: 'student-1',
-      teacherId: 'teacher-1',
-      type: LessonRequestType.regular,
-      instrument: 'piano',
-      goal: UnifiedLessonGoal.hobby,
-      experience: UnifiedExperienceLevel.beginner,
-      createdAt: DateTime(2026, 1, 1),
-    );
+  id: id,
+  studentId: 'student-1',
+  teacherId: 'teacher-1',
+  type: LessonRequestType.regular,
+  instrument: 'piano',
+  goal: UnifiedLessonGoal.hobby,
+  experience: UnifiedExperienceLevel.beginner,
+  createdAt: DateTime(2026, 1, 1),
+);
 
 Future<void> _pumpBatchAndIssue(
   WidgetTester tester, {
@@ -105,7 +101,8 @@ Future<void> _pumpBatchAndIssue(
   }
   final amountField = find.byWidgetPredicate(
     (w) =>
-        w is TextField && w.decoration?.hintText == AppStrings.issueFormAmountHint,
+        w is TextField &&
+        w.decoration?.hintText == AppStrings.issueFormAmountHint,
   );
   expect(amountField, findsOneWidget);
   await tester.enterText(amountField, '100000');
@@ -124,7 +121,8 @@ void main() {
     'batch issue links the lesson request to the persisted subscription id',
     (tester) async {
       final subRepo = _RecordingSubscriptionRepository();
-      final requestRepo = _FakeLessonRequestRepository()..seed(_seedRequest('req-1'));
+      final requestRepo = _FakeLessonRequestRepository()
+        ..seed(_seedRequest('req-1'));
 
       await _pumpBatchAndIssue(
         tester,
@@ -137,33 +135,41 @@ void main() {
 
       final linked = requestRepo.store['req-1'];
       final linkedId = linked?.proposalId;
-      expect(linkedId, isNotNull,
-          reason: 'lesson request must be linked to a subscription');
+      expect(
+        linkedId,
+        isNotNull,
+        reason: 'lesson request must be linked to a subscription',
+      );
 
       // The link must point at a subscription that was actually persisted (one
       // of the returned create() ids), never the discarded local UUID.
-      expect(subRepo.createdIds, contains(linkedId),
-          reason: 'linked id must be one of the persisted create() ids');
+      expect(
+        subRepo.createdIds,
+        contains(linkedId),
+        reason: 'linked id must be one of the persisted create() ids',
+      );
       expect(linked?.status, UnifiedRequestStatus.subscriptionIssued);
     },
   );
 
-  testWidgets(
-    'batch issue happy path links cleanly and orphans nothing',
-    (tester) async {
-      final subRepo = _RecordingSubscriptionRepository();
-      final requestRepo = _FakeLessonRequestRepository();
+  testWidgets('batch issue happy path links cleanly and orphans nothing', (
+    tester,
+  ) async {
+    final subRepo = _RecordingSubscriptionRepository();
+    final requestRepo = _FakeLessonRequestRepository();
 
-      await _pumpBatchAndIssue(
-        tester,
-        subRepo: subRepo,
-        requestRepo: requestRepo,
-        lessonRequestIds: const [],
-      );
+    await _pumpBatchAndIssue(
+      tester,
+      subRepo: subRepo,
+      requestRepo: requestRepo,
+      lessonRequestIds: const [],
+    );
 
-      expect(subRepo.createdIds.length, 2);
-      expect(subRepo.expiredIds, isEmpty,
-          reason: 'no subscription should be deactivated on success');
-    },
-  );
+    expect(subRepo.createdIds.length, 2);
+    expect(
+      subRepo.expiredIds,
+      isEmpty,
+      reason: 'no subscription should be deactivated on success',
+    );
+  });
 }

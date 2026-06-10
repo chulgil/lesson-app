@@ -16,7 +16,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/network/api_exceptions.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
-import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/invite/presentation/screens/invite_confirm_screen.dart';
 import 'package:lessonaza/features/profile/domain/entities/invite.dart';
 import 'package:lessonaza/features/profile/presentation/providers/invite_provider.dart';
@@ -122,10 +121,7 @@ Invite _fakeInvite() => Invite(
   createdAt: DateTime(2026),
 );
 
-Future<void> _pumpScreen(
-  WidgetTester tester,
-  List<Override> overrides,
-) async {
+Future<void> _pumpScreen(WidgetTester tester, List<Override> overrides) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: overrides,
