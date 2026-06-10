@@ -85,6 +85,26 @@ class ParentConnectChildRequest(BaseModel):
     invite_code: str
 
 
+class ChildSubscriptionItem(BaseModel):
+    """Issue #630 — 학부모 대시보드 자녀별 수강권 카드 데이터."""
+
+    student_id: str
+    student_name: str
+    subscription_id: str | None = None
+    type: str | None = None
+    status: str | None = None
+    payment_status: str | None = None
+    payment_confirmed: bool = False
+    paid_at: _dt.datetime | None = None
+    payment_confirmed_at: _dt.datetime | None = None
+    start_date: _dt.date | None = None
+    end_date: _dt.date | None = None
+    lessons_per_month: int | None = None
+    total_lessons: int | None = None
+    used_lessons: int | None = None
+    amount: int | None = None
+
+
 class ChildProfileResponse(BaseModel):
     """Child profile response matching the Flutter ChildProfile contract."""
 

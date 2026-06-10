@@ -143,6 +143,71 @@ class ParentService:
 
         return [self._relation_response(relation) for relation in relations.all()]
 
+    async def list_children_subscriptions(self, current_user: Any) -> list[Any]:
+        """Issue #630 — 학부모 대시보드용 자녀별 active subscription 목록.
+
+        active/expiringSoon/exhausted/pending 인 subscription 우선 (1건/자녀).
+        없으면 student row 만 — subscription_id=None 으로 반환.
+        spec user_master.md §5.2, subscription_master.md §3.
+        """
+        from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus
+        from app.models.student import Student
+        from app.models.subscription import Subscription, SubscriptionStatus
+        from app.schemas.parent import ChildSubscriptionItem
+
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == current_user.id))
+        if parent is None:
+            return []
+
+        child_ids = (
+            await self.db.scalars(
+                select(ParentChildRelation.student_id)
+                .where(ParentChildRelation.parent_id == parent.id)
+                .where(ParentChildRelation.status == ParentChildRelationStatus.active)
+            )
+        ).all()
+        if not child_ids:
+            return []
+
+        active_statuses = [
+            SubscriptionStatus.active,
+            SubscriptionStatus.expiringSoon,
+            SubscriptionStatus.exhausted,
+            SubscriptionStatus.pending,
+        ]
+
+        items: list[ChildSubscriptionItem] = []
+        for child_id in child_ids:
+            student = await self.db.get(Student, child_id)
+            if student is None:
+                continue
+            sub = await self.db.scalar(
+                select(Subscription)
+                .where(Subscription.student_id == child_id)
+                .where(Subscription.status.in_(active_statuses))
+                .order_by(Subscription.created_at.desc())
+            )
+            items.append(
+                ChildSubscriptionItem(
+                    student_id=child_id,
+                    student_name=student.name,
+                    subscription_id=sub.id if sub else None,
+                    type=getattr(sub.type, "value", sub.type) if sub else None,
+                    status=getattr(sub.status, "value", sub.status) if sub else None,
+                    payment_status=getattr(sub.payment_status, "value", sub.payment_status) if sub else None,
+                    payment_confirmed=sub.payment_confirmed if sub else False,
+                    paid_at=sub.paid_at if sub else None,
+                    payment_confirmed_at=sub.payment_confirmed_at if sub else None,
+                    start_date=sub.start_date if sub else None,
+                    end_date=sub.end_date if sub else None,
+                    lessons_per_month=sub.lessons_per_month if sub else None,
+                    total_lessons=sub.total_lessons if sub else None,
+                    used_lessons=sub.used_lessons if sub else None,
+                    amount=sub.amount if sub else None,
+                )
+            )
+        return items
+
     async def connect_child(self, invite_code: str, current_user: Any) -> ParentChildRelationResponse:
         """Link a child via invite code."""
         from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus, ParentInvitation
