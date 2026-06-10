@@ -13,6 +13,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../providers/repertoire_archive_provider.dart';
 
@@ -117,174 +118,152 @@ class _RepertoireCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return NotebookCard(
-      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccentSoft,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppSpacing.radiusMedium),
-                topRight: Radius.circular(AppSpacing.radiusMedium),
+    // Swipe consistency (audit 2026-06-10 §2 — practice v2 D2):
+    // - 원칙 1: swipe = destructive 단일 ([보관]) — destructive tone
+    // - 원칙 2: 편집은 상세 화면 진입 흐름에서 처리
+    // - 원칙 3: 보관은 확인 다이얼로그 (_showArchiveConfirmation)
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionArchive,
+          icon: Icons.inventory_2_outlined,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _showArchiveConfirmation(context, ref),
+        ),
+      ],
+      child: NotebookCard(
+        margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              decoration: BoxDecoration(
+                color: AppColors.paperAccentSoft,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(AppSpacing.radiusMedium),
+                  topRight: Radius.circular(AppSpacing.radiusMedium),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.library_music, color: AppColors.paperAccent),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Notebook × Score: 레퍼토리/곡 이름은 Playfair pieceTitle 로 통일 (§7.30 pieceTitle 패턴).
+                        Text(
+                          repertoire.name,
+                          style: NotebookTypography.pieceTitle,
+                        ),
+                        if (repertoire.description != null)
+                          Text(
+                            repertoire.description!,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.inkSecondary,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  // Add section button
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    color: AppColors.paperAccent,
+                    onPressed:
+                        () => context.push(
+                          '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
+                        ),
+                    tooltip: '섹션 추가',
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                const Icon(Icons.library_music, color: AppColors.paperAccent),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
+
+            // Sections
+            if (repertoire.sections.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Notebook × Score: 레퍼토리/곡 이름은 Playfair pieceTitle 로 통일 (§7.30 pieceTitle 패턴).
-                      Text(
-                        repertoire.name,
-                        style: NotebookTypography.pieceTitle,
+                      Icon(
+                        Icons.queue_music,
+                        size: 40,
+                        color: AppColors.inkTertiary,
                       ),
-                      if (repertoire.description != null)
-                        Text(
-                          repertoire.description!,
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
+                      const SizedBox(height: AppSpacing.space2),
+                      Text(
+                        '섹션을 추가해주세요',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.inkSecondary,
                         ),
+                      ),
+                      const SizedBox(height: AppSpacing.space2),
+                      TextButton.icon(
+                        onPressed:
+                            () => context.push(
+                              '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
+                            ),
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text(AppStrings.practiceSectionAddLabel),
+                      ),
                     ],
                   ),
                 ),
-                // Add section button
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  color: AppColors.paperAccent,
-                  onPressed:
-                      () => context.push(
-                        '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
-                      ),
-                  tooltip: '섹션 추가',
-                ),
-                // More options
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      context.push(
-                        '${AppRoutes.editRepertoire.replaceFirst(':id', repertoire.id)}'
-                        '?studentId=$studentId',
-                      );
-                    } else if (value == 'archive') {
-                      _showArchiveConfirmation(context, ref);
-                    }
-                  },
-                  itemBuilder:
-                      (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 20),
-                              SizedBox(width: AppSpacing.space2),
-                              Text(AppStrings.modify),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'archive',
-                          child: Row(
-                            children: [
-                              Icon(Icons.inventory_2_outlined, size: 20),
-                              SizedBox(width: AppSpacing.space2),
-                              Text(AppStrings.practiceArchiveTitle),
-                            ],
-                          ),
-                        ),
-                      ],
-                ),
-              ],
-            ),
-          ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: repertoire.sections.length,
+                separatorBuilder: (context, index) => const ThinRule(),
+                itemBuilder: (context, index) {
+                  final section = repertoire.sections[index];
+                  return _SectionListItem(
+                    section: section,
+                    repertoireId: repertoire.id,
+                    studentId: studentId,
+                  );
+                },
+              ),
 
-          // Sections
-          if (repertoire.sections.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.queue_music,
-                      size: 40,
-                      color: AppColors.inkTertiary,
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    Text(
-                      '섹션을 추가해주세요',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    TextButton.icon(
-                      onPressed:
-                          () => context.push(
-                            '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
-                          ),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text(AppStrings.practiceSectionAddLabel),
-                    ),
-                  ],
+            // Footer with stats
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space4,
+                vertical: AppSpacing.space2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.paperDark,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(AppSpacing.radiusMedium),
+                  bottomRight: Radius.circular(AppSpacing.radiusMedium),
                 ),
               ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: repertoire.sections.length,
-              separatorBuilder: (context, index) => const ThinRule(),
-              itemBuilder: (context, index) {
-                final section = repertoire.sections[index];
-                return _SectionListItem(
-                  section: section,
-                  repertoireId: repertoire.id,
-                  studentId: studentId,
-                );
-              },
-            ),
-
-          // Footer with stats
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space4,
-              vertical: AppSpacing.space2,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.paperDark,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(AppSpacing.radiusMedium),
-                bottomRight: Radius.circular(AppSpacing.radiusMedium),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '완료: ${repertoire.completedSectionCount}/${repertoire.sections.length}',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  Text(
+                    '총 연습: ${repertoire.formattedTotalTime}',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '완료: ${repertoire.completedSectionCount}/${repertoire.sections.length}',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                Text(
-                  '총 연습: ${repertoire.formattedTotalTime}',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -292,9 +271,9 @@ class _RepertoireCard extends ConsumerWidget {
   void _showArchiveConfirmation(BuildContext context, WidgetRef ref) {
     showNotebookDialog(
       context: context,
-      titleWidget: const Text(AppStrings.practiceArchiveTitle),
+      titleWidget: const Text(AppStrings.swipeActionArchiveConfirmTitle),
       content: Text(
-        '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.',
+        '"${repertoire.name}" — ${AppStrings.swipeActionArchiveConfirmBody}',
       ),
       actions: [
         TextButton(
@@ -314,7 +293,7 @@ class _RepertoireCard extends ConsumerWidget {
               );
             }
           },
-          child: const Text(AppStrings.practiceArchiveTitle),
+          child: const Text(AppStrings.swipeActionArchive),
         ),
       ],
     );

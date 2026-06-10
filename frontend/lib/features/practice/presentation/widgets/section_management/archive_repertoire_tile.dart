@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../core/utils/date_format_utils.dart';
+import '../../../../../core/widgets/swipe_action_tile.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/repertoire_archive_provider.dart';
 
@@ -18,113 +19,86 @@ class ArchiveRepertoireTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return NotebookCard(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.space4,
-        vertical: AppSpacing.space2,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    // Swipe consistency (audit 2026-06-10 §2 — practice v2 D3):
+    // - 원칙 1: swipe = destructive 단일 ([영구 삭제])
+    // - 원칙 2: 행 탭 = [복원] 단일 액션 (다이얼로그 confirm)
+    // - 원칙 3: 영구 삭제는 강화 확인 다이얼로그 (복구 불가 강조)
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionPermanentDelete,
+          icon: Icons.delete_forever,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _showPermanentDeleteDialog(context, ref),
+        ),
+      ],
+      child: NotebookCard(
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space2,
+        ),
+        child: InkWell(
+          onTap: () => _showRestoreDialog(context, ref),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.inventory_2_outlined,
-                  color: AppColors.inkSecondary,
-                  size: 20,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.inventory_2_outlined,
+                      color: AppColors.inkSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    // Notebook × Score: 레퍼토리/곡 이름은 Playfair pieceTitle 로 통일 (§7.30 pieceTitle 패턴).
+                    Expanded(
+                      child: Text(
+                        repertoire.name,
+                        style: NotebookTypography.pieceTitle,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.space2),
-                // Notebook × Score: 레퍼토리/곡 이름은 Playfair pieceTitle 로 통일 (§7.30 pieceTitle 패턴).
-                Expanded(
-                  child: Text(
-                    repertoire.name,
-                    style: NotebookTypography.pieceTitle,
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '아카이브: ${repertoire.archivedAt != null ? formatDateDashPadded(repertoire.archivedAt!) : '-'}',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
                   ),
                 ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: AppColors.inkSecondary),
-                  onSelected: (value) => _handleMenuAction(context, ref, value),
-                  itemBuilder:
-                      (context) => [
-                        PopupMenuItem(
-                          value: 'restore',
-                          child: Row(
-                            children: [
-                              Icon(Icons.restore, color: AppColors.paperAccent),
-                              const SizedBox(width: AppSpacing.space2),
-                              const Text(AppStrings.practiceRestore),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.delete_forever,
-                                color: AppColors.paperAccent,
-                              ),
-                              const SizedBox(width: AppSpacing.space2),
-                              Text(
-                                '영구 삭제',
-                                style: TextStyle(color: AppColors.paperAccent),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                if (repertoire.description != null) ...[
+                  const SizedBox(height: AppSpacing.space1),
+                  Text(
+                    repertoire.description!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.space2),
+                Row(
+                  children: [
+                    _InfoChip(
+                      icon: Icons.library_music,
+                      label: '${repertoire.sections.length}개 섹션',
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    _InfoChip(
+                      icon: Icons.timer_outlined,
+                      label: repertoire.formattedTotalTime,
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '아카이브: ${repertoire.archivedAt != null ? formatDateDashPadded(repertoire.archivedAt!) : '-'}',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            if (repertoire.description != null) ...[
-              const SizedBox(height: AppSpacing.space1),
-              Text(
-                repertoire.description!,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            const SizedBox(height: AppSpacing.space2),
-            Row(
-              children: [
-                _InfoChip(
-                  icon: Icons.library_music,
-                  label: '${repertoire.sections.length}개 섹션',
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                _InfoChip(
-                  icon: Icons.timer_outlined,
-                  label: repertoire.formattedTotalTime,
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
-  }
-
-  void _handleMenuAction(BuildContext context, WidgetRef ref, String action) {
-    switch (action) {
-      case 'restore':
-        _showRestoreDialog(context, ref);
-        break;
-      case 'delete':
-        _showPermanentDeleteDialog(context, ref);
-        break;
-    }
   }
 
   void _showRestoreDialog(BuildContext context, WidgetRef ref) {
@@ -164,7 +138,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
         children: [
           Icon(Icons.warning, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
-          const Text(AppStrings.practiceRepertoirePermanentDeleteTitle),
+          const Text(AppStrings.swipeActionPermanentDeleteConfirmTitle),
         ],
       ),
       content: Column(
@@ -186,7 +160,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    '이 작업은 되돌릴 수 없습니다.\n모든 섹션, 녹음, 연습 기록이 함께 삭제됩니다.',
+                    '${AppStrings.swipeActionPermanentDeleteConfirmBody}\n모든 섹션, 녹음, 연습 기록이 함께 삭제됩니다.',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.paperAccent,
                     ),
@@ -203,9 +177,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
           child: const Text(AppStrings.cancel),
         ),
         FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
           onPressed: () async {
             Navigator.of(context).pop();
             await ref
