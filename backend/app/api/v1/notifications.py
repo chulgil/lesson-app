@@ -151,3 +151,18 @@ async def unread_count(
     service = NotificationService(db)
     count = await service.get_unread_count(current_user.id, current_user.role)
     return UnreadCountResponse(count=count)
+
+
+@router.delete(
+    "/{notification_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a notification",
+)
+async def delete_notification(
+    notification_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """Delete a single notification owned by the caller."""
+    service = NotificationService(db)
+    await service.delete(notification_id, current_user.id)
