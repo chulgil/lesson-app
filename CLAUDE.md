@@ -127,4 +127,3 @@ Oracle Problem (같은 AI 가 코드+테스트 작성 시 정확도 ~6%) 완화�
 | `market-researcher.md` | 시장 조사 | 신규 기능 기획 |
 | `test-critic.md` | 테스트가 spec 을 검증하는지 vs 구현 복사인지 판별 | 테스트 작성 후 |
 | `security-reviewer.md` | Flutter 보안 12-항목 (시크릿/Hive/딥링크/플랫폼 채널) | 보안/결제/인증 변경 |
-| `codex-reviewer.md` | OpenAI Codex 외부 모델 교차 검증 | ultra 모드 (보안/결제/마이그레이션) |
