@@ -311,11 +311,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleGoogleLogin(BuildContext context) async {
     if (_isLoading) return;
 
+    // ignore: avoid_print
+    print(
+      '[GoogleLogin] serverIdLen=${_googleServerClientId.length} '
+      'iosIdLen=${_googleIosClientId.length}',
+    );
     if (_googleServerClientId.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Google 로그인이 아직 설정되지 않았습니다. 테스트 계정을 사용해주세요.'),
+          SnackBar(
+            content: Text(
+              'Google 로그인이 아직 설정되지 않았습니다. '
+              '(serverIdLen=${_googleServerClientId.length}, '
+              'iosIdLen=${_googleIosClientId.length})',
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
