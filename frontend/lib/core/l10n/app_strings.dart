@@ -5352,6 +5352,22 @@ class AppStrings {
   /// 녹음이 삭제되었습니다 (delete success SnackBar)
   static const allRecordingsDeletedSnack = '녹음이 삭제되었습니다';
 
+  /// swipe destructive 확인 다이얼로그 — 녹음 삭제 title
+  static const swipeActionDeleteRecordingConfirmTitle = '녹음 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 녹음 삭제 body
+  static const swipeActionDeleteRecordingConfirmBody =
+      '이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.';
+
+  /// 녹음 행 BottomSheet — 재생 액션 라벨
+  static const recordingActionsPlay = '재생';
+
+  /// 녹음 행 BottomSheet — 공유 액션 라벨 (시스템 공유)
+  static const recordingActionsShare = '공유';
+
+  /// 녹음 행 BottomSheet — 섹션 링크 변경/연결 액션 라벨
+  static const recordingActionsCopyLink = '링크 변경';
+
   /// 연결되지 않음 (orphaned 인라인 카드 라벨)
   static const allRecordingsOrphanedInline = '연결되지 않음';
 
@@ -6995,6 +7011,13 @@ class AppStrings {
   static const profileBankAccountAddLabel = '계좌 추가';
   static const profileBankAccountSetDefault = '기본 계좌로 설정';
   static const profileBankAccountDeleteTitle = '계좌 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 계좌 삭제 title
+  static const swipeActionDeleteBankAccountConfirmTitle = '계좌 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 계좌 삭제 body (학생 영향 강화 메시지)
+  static const swipeActionDeleteBankAccountConfirmBody =
+      '이 계좌를 삭제하면 학생에게 표시되는 결제 정보(수강권 제안)에서 사라집니다. 진행할까요?';
   static const profileBankAccountAddFormTitle = '계좌 추가';
   static const profileBankAccountBankNameLabel = '은행명 *';
   static const profileBankAccountHintBankSelect = '은행 선택';
@@ -7011,6 +7034,12 @@ class AppStrings {
   static const profileInstrumentAddSection = '악기 추가';
   static const profileInstrumentHintCustom = '악기 이름 입력';
   static const profileInstrumentDeleteTitle = '악기 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 악기 삭제 title
+  static const swipeActionDeleteInstrumentConfirmTitle = '악기 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 악기 삭제 body
+  static const swipeActionDeleteInstrumentConfirmBody = '이 악기를 목록에서 삭제할까요?';
 
   // ── Lesson Time Settings ──
   static const profileLessonTimeTitle = '레슨 시간 설정';

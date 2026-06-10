@@ -7,17 +7,21 @@
 // - Play recordings using the shared RecordingPlayerSheet
 // - Import recordings from device files
 
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
@@ -57,38 +61,33 @@ class AllRecordingsScreen extends ConsumerWidget {
           ref.invalidate(allRecordingsWithSectionInfoProvider);
         },
         child: recordingsAsync.when(
-          data:
-              (recordings) =>
-                  recordings.isEmpty
-                      ? _buildEmptyState()
-                      : _RecordingsList(recordings: recordings),
+          data: (recordings) => recordings.isEmpty
+              ? _buildEmptyState()
+              : _RecordingsList(recordings: recordings),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error:
-              (_, __) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.paperAccent,
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    const Text(
-                      AppStrings.allRecordingsErrorState,
-                      style: TextStyle(color: AppColors.paperAccent),
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    ElevatedButton(
-                      onPressed:
-                          () => ref.invalidate(
-                            allRecordingsWithSectionInfoProvider,
-                          ),
-                      child: const Text(AppStrings.retry),
-                    ),
-                  ],
+          error: (_, __) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.paperAccent,
                 ),
-              ),
+                const SizedBox(height: AppSpacing.space4),
+                const Text(
+                  AppStrings.allRecordingsErrorState,
+                  style: TextStyle(color: AppColors.paperAccent),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                ElevatedButton(
+                  onPressed: () =>
+                      ref.invalidate(allRecordingsWithSectionInfoProvider),
+                  child: const Text(AppStrings.retry),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -377,11 +376,10 @@ class _RecordingCard extends ConsumerWidget {
     final result = await Navigator.push<SectionPickerResult>(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => SectionPickerScreen(
-              title: AppStrings.allRecordingsSectionPickerTitle,
-              recording: recording,
-            ),
+        builder: (context) => SectionPickerScreen(
+          title: AppStrings.allRecordingsSectionPickerTitle,
+          recording: recording,
+        ),
       ),
     );
 
@@ -412,8 +410,8 @@ class _RecordingCard extends ConsumerWidget {
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: AppStrings.allRecordingsDeleteDialogTitle,
-      content: const Text(AppStrings.allRecordingsDeleteDialogContent),
+      title: AppStrings.swipeActionDeleteRecordingConfirmTitle,
+      content: const Text(AppStrings.swipeActionDeleteRecordingConfirmBody),
       confirmLabel: AppStrings.delete,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
@@ -434,11 +432,46 @@ class _RecordingCard extends ConsumerWidget {
     }
   }
 
+  Future<void> _shareRecording(BuildContext context) async {
+    if (!File(recording.filePath).existsSync()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.allRecordingsFileReadError)),
+      );
+      return;
+    }
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(recording.filePath)]),
+    );
+  }
+
+  Future<void> _showActionsBottomSheet(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    await showNotebookModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SettingsRecordingActionsBottomSheet(
+        onPlay: () {
+          Navigator.pop(sheetContext);
+          _playRecording(context, ref);
+        },
+        onShare: () {
+          Navigator.pop(sheetContext);
+          _shareRecording(context);
+        },
+        onChangeLink: () {
+          Navigator.pop(sheetContext);
+          _showSectionPicker(context, ref);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isOrphaned = section == null;
 
-    return Container(
+    final row = Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
@@ -446,124 +479,166 @@ class _RecordingCard extends ConsumerWidget {
           color: isOrphaned ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space2,
-          vertical: AppSpacing.space1,
-        ),
-        child: Row(
-          children: [
-            // Play button
-            IconButton(
-              onPressed: () => _playRecording(context, ref),
-              icon: const Icon(
+      child: InkWell(
+        onTap: () => _showActionsBottomSheet(context, ref),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space2,
+            vertical: AppSpacing.space2,
+          ),
+          child: Row(
+            children: [
+              // Play indicator (visual affordance — tap row to open actions)
+              const Icon(
                 Icons.play_circle_filled,
                 size: 32,
                 color: AppColors.paperAccent,
               ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            // Date and section info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Repertoire > Section name (or "연결되지 않음")
-                  if (repertoire != null && section != null) ...[
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.folder_outlined,
-                          size: 12,
-                          color: AppColors.paperAccent,
-                        ),
-                        const SizedBox(width: AppSpacing.space1),
-                        Expanded(
-                          child: Text(
-                            '${repertoire!.name} > ${section!.pieceName}',
+              const SizedBox(width: AppSpacing.space2),
+              // Date and section info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Repertoire > Section name (or "연결되지 않음")
+                    if (repertoire != null && section != null) ...[
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.folder_outlined,
+                            size: 12,
+                            color: AppColors.paperAccent,
+                          ),
+                          const SizedBox(width: AppSpacing.space1),
+                          Expanded(
+                            child: Text(
+                              '${repertoire!.name} > ${section!.pieceName}',
+                              style: AppTypography.bodySmall.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.paperAccent,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                    ] else ...[
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.link_off,
+                            size: 12,
+                            color: AppColors.paperAccent,
+                          ),
+                          const SizedBox(width: AppSpacing.space1),
+                          Text(
+                            AppStrings.allRecordingsOrphanedInline,
                             style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.w500,
                               color: AppColors.paperAccent,
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                  ] else ...[
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                    ],
+                    // Date and duration
                     Row(
                       children: [
-                        Icon(
-                          Icons.link_off,
-                          size: 12,
-                          color: AppColors.paperAccent,
-                        ),
-                        const SizedBox(width: AppSpacing.space1),
                         Text(
-                          AppStrings.allRecordingsOrphanedInline,
-                          style: AppTypography.bodySmall.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.paperAccent,
+                          formatDateTimeDotPadded(recording.createdAt),
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.inkSecondary,
                           ),
                         ),
+                        const SizedBox(width: AppSpacing.space2),
+                        Text(
+                          _formatDuration(recording.durationSeconds),
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.inkSecondary,
+                          ),
+                        ),
+                        if (recording.bpm != null) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            '${recording.bpm}bpm',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.paperAccent,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
-                    const SizedBox(height: 2),
                   ],
-                  // Date and duration
-                  Row(
-                    children: [
-                      Text(
-                        formatDateTimeDotPadded(recording.createdAt),
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Text(
-                        _formatDuration(recording.durationSeconds),
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                      if (recording.bpm != null) ...[
-                        const SizedBox(width: 6),
-                        Text(
-                          '${recording.bpm}bpm',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.paperAccent,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
+                ),
               ),
+              Icon(Icons.chevron_right, size: 20, color: AppColors.inkTertiary),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _confirmDelete(context, ref),
+        ),
+      ],
+      child: row,
+    );
+  }
+}
+
+/// Bottom sheet for recording row actions (재생 / 공유 / 링크 변경).
+///
+/// Replaces the previous trailing IconButton row (play / link / delete).
+/// Delete moves to swipe action (destructive 단일 원칙).
+class SettingsRecordingActionsBottomSheet extends StatelessWidget {
+  const SettingsRecordingActionsBottomSheet({
+    super.key,
+    required this.onPlay,
+    required this.onShare,
+    required this.onChangeLink,
+  });
+
+  final VoidCallback onPlay;
+  final VoidCallback onShare;
+  final VoidCallback onChangeLink;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.play_circle_outline,
+                color: AppColors.paperAccent,
+              ),
+              title: const Text(AppStrings.recordingActionsPlay),
+              onTap: onPlay,
             ),
-            // Link button (link icon for connected, link_off for orphaned)
-            IconButton(
-              onPressed: () => _showSectionPicker(context, ref),
-              icon: Icon(isOrphaned ? Icons.link_off : Icons.link),
-              color: isOrphaned ? AppColors.paperAccent : AppColors.paperAccent,
-              tooltip:
-                  isOrphaned
-                      ? AppStrings.allRecordingsLinkSectionTooltip
-                      : AppStrings.allRecordingsChangeSectionTooltip,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            ListTile(
+              leading: const Icon(
+                Icons.ios_share,
+                color: AppColors.paperAccent,
+              ),
+              title: const Text(AppStrings.recordingActionsShare),
+              onTap: onShare,
             ),
-            // Delete button
-            IconButton(
-              onPressed: () => _confirmDelete(context, ref),
-              icon: const Icon(Icons.delete_outline),
-              color: AppColors.paperAccent,
-              tooltip: AppStrings.delete,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            ListTile(
+              leading: const Icon(Icons.link, color: AppColors.paperAccent),
+              title: const Text(AppStrings.recordingActionsCopyLink),
+              onTap: onChangeLink,
             ),
           ],
         ),
