@@ -111,6 +111,46 @@ class StudentService:
         await self.db.refresh(student)
         return StudentResponse.model_validate(student)
 
+    async def update_payment_request_target(
+        self,
+        student_id: str,
+        new_target: str,
+        current_user: Any,
+    ) -> StudentResponse:
+        """Issue #636 — 선생님이 학생별 입금 안내 대상 설정.
+
+        target='parent' 인 경우 활성 ParentChildRelation 필수.
+        """
+        from app.models.parent import ParentChildRelation, ParentChildRelationStatus
+        from app.models.student import PaymentRequestTarget
+
+        try:
+            target = PaymentRequestTarget(new_target)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid payment_request_target: {new_target}",
+            ) from exc
+
+        student = await self._get_accessible_student(student_id, current_user, require_teacher=True)
+
+        if target == PaymentRequestTarget.parent:
+            linked = await self.db.scalar(
+                select(ParentChildRelation.id)
+                .where(ParentChildRelation.student_id == student_id)
+                .where(ParentChildRelation.status == ParentChildRelationStatus.active)
+            )
+            if linked is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Cannot set target='parent' — no active parent linked",
+                )
+
+        student.payment_request_target = target
+        await self.db.flush()
+        await self.db.refresh(student)
+        return StudentResponse.model_validate(student)
+
     async def delete(self, student_id: str, current_user: Any) -> None:
         """Soft-delete a student."""
         from app.models.student import StudentStatus
@@ -144,15 +184,16 @@ class StudentService:
         from app.models.lesson import Lesson
 
         await self._get_accessible_student(student_id, current_user)
-        total_lessons = await self.db.scalar(
-            select(func.count()).where(Lesson.student_id == student_id)
-        ) or 0
-        completed_lessons = await self.db.scalar(
-            select(func.count()).where(
-                Lesson.student_id == student_id,
-                Lesson.status == "completed",
+        total_lessons = await self.db.scalar(select(func.count()).where(Lesson.student_id == student_id)) or 0
+        completed_lessons = (
+            await self.db.scalar(
+                select(func.count()).where(
+                    Lesson.student_id == student_id,
+                    Lesson.status == "completed",
+                )
             )
-        ) or 0
+            or 0
+        )
 
         attendance_rate = (completed_lessons / total_lessons * 100) if total_lessons > 0 else 0.0
 
@@ -223,9 +264,7 @@ class StudentService:
         from app.models.student import Student
 
         # Check if profile already exists
-        existing = await self.db.scalar(
-            select(Student).where(Student.user_id == current_user.id)
-        )
+        existing = await self.db.scalar(select(Student).where(Student.user_id == current_user.id))
         if existing:
             existing.name = data.name
             existing.instrument = data.instrument
@@ -252,9 +291,7 @@ class StudentService:
         """Get student profile by user_id."""
         from app.models.student import Student
 
-        student = await self.db.scalar(
-            select(Student).where(Student.user_id == user_id)
-        )
+        student = await self.db.scalar(select(Student).where(Student.user_id == user_id))
         if student is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -266,9 +303,7 @@ class StudentService:
         """Update student's own profile."""
         from app.models.student import Student
 
-        student = await self.db.scalar(
-            select(Student).where(Student.user_id == current_user.id)
-        )
+        student = await self.db.scalar(select(Student).where(Student.user_id == current_user.id))
         if student is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
