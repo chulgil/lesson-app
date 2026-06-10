@@ -420,9 +420,13 @@ class AcademyService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
         await self.assert_owner(invite.academy_id, by_user_id)
         if invite.state != AcademyInviteState.pending:
+            # Issue #631 — detail dict 로 error_code 명시 (FE 분기 안정화).
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Invite is {invite.state.value}, cannot revoke",
+                detail={
+                    "message": f"Invite is {invite.state.value}, cannot revoke",
+                    "error_code": invite.state.value,
+                },
             )
         invite.state = AcademyInviteState.revoked
         invite.revoked_at = _utcnow()
@@ -453,9 +457,14 @@ class AcademyService:
             invite.state = AcademyInviteState.expired
             await self.db.flush()
         if invite.state != AcademyInviteState.pending:
+            # Issue #631 — detail dict 로 error_code 명시. FE 는 expired/accepted/
+            # declined/revoked 분기를 detail.error_code 로 안정 매칭 (string contains 의존 제거).
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Invite is {invite.state.value}",
+                detail={
+                    "message": f"Invite is {invite.state.value}",
+                    "error_code": invite.state.value,
+                },
             )
         return invite
 
