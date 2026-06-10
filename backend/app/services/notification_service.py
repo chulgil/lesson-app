@@ -86,9 +86,7 @@ BOTH_ROLE_NOTIFICATION_TYPES = frozenset(
         "generalAnnouncement",
     }
 )
-KNOWN_ROLE_TARGETED_TYPES = (
-    TEACHER_NOTIFICATION_TYPES | STUDENT_NOTIFICATION_TYPES | BOTH_ROLE_NOTIFICATION_TYPES
-)
+KNOWN_ROLE_TARGETED_TYPES = TEACHER_NOTIFICATION_TYPES | STUDENT_NOTIFICATION_TYPES | BOTH_ROLE_NOTIFICATION_TYPES
 
 
 class NotificationService:
@@ -146,9 +144,7 @@ class NotificationService:
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
 
-        result = await self.db.scalars(
-            query.order_by(Notification.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(Notification.created_at.desc()).offset(offset).limit(size))
         items = [NotificationResponse.model_validate(n) for n in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -212,6 +208,18 @@ class NotificationService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your notification")
         if notif.read_at is None:
             notif.read_at = datetime.now(UTC)
+        await self.db.flush()
+
+    async def delete(self, notification_id: str, user_id: str) -> None:
+        """Delete a single notification (ownership 검증)."""
+        from app.models.notification import Notification
+
+        notif = await self.db.get(Notification, notification_id)
+        if notif is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
+        if notif.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your notification")
+        await self.db.delete(notif)
         await self.db.flush()
 
     async def mark_all_read(self, user_id: str, user_role: Any = None) -> None:
