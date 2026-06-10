@@ -137,7 +137,6 @@ class _RepertoireManagementScreenState
         final piece = filteredPieces[index];
         return PieceCard(
           piece: piece,
-          onTap: () => _showPieceDetails(piece),
           onEdit: () => _showEditPieceDialog(piece),
           onDelete: () => _showDeleteConfirmation(piece),
           onAssign: () => _showAssignToStudentDialog(piece),
@@ -174,15 +173,6 @@ class _RepertoireManagementScreenState
       onSelected: (composer) {
         setState(() => _selectedComposer = composer);
       },
-    );
-  }
-
-  void _showPieceDetails(Piece piece) {
-    showPieceDetails(
-      context: context,
-      piece: piece,
-      onEdit: () => _showEditPieceDialog(piece),
-      onAssign: () => _showAssignToStudentDialog(piece),
     );
   }
 

@@ -9,7 +9,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/domain/entities/piece.dart';
+import 'piece_actions_bottom_sheet.dart';
 
 /// Get color for difficulty level
 Color getDifficultyColor(String? difficulty) {
@@ -155,10 +157,12 @@ class RepertoireEmptyState extends StatelessWidget {
   }
 }
 
-/// Card widget for displaying a piece
+/// Card widget for displaying a piece.
+///
+/// Swipe consistency audit #668 D4 — row tap opens [PieceActionsBottomSheet]
+/// with [편집][배정][삭제]; swipe reveals the destructive [삭제] shortcut.
 class PieceCard extends StatelessWidget {
   final Piece piece;
-  final VoidCallback onTap;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onAssign;
@@ -166,18 +170,55 @@ class PieceCard extends StatelessWidget {
   const PieceCard({
     super.key,
     required this.piece,
-    required this.onTap,
     required this.onEdit,
     required this.onDelete,
     required this.onAssign,
   });
 
+  /// Confirm + perform delete via [showNotebookDialog].
+  ///
+  /// Swipe consistency audit #668 D4 — destructive always wraps in a
+  /// confirmation dialog before invoking [onDelete].
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.swipeActionDeletePieceConfirmTitle,
+      content: const Text(AppStrings.swipeActionDeletePieceConfirmBody),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
+    );
+    if (confirmed == true) {
+      onDelete();
+    }
+  }
+
+  Future<void> _openActions(BuildContext context) async {
+    final result = await PieceActionsBottomSheet.show(context);
+    if (result == null) return;
+    switch (result) {
+      case PieceActionResult.edit:
+        onEdit();
+        break;
+      case PieceActionResult.assign:
+        onAssign();
+        break;
+      case PieceActionResult.delete:
+        if (context.mounted) {
+          await _confirmDelete(context);
+        }
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return NotebookCard(
+    final card = NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       child: InkWell(
-        onTap: onTap,
+        onTap: () => _openActions(context),
         borderRadius: BorderRadius.zero,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -254,65 +295,22 @@ class PieceCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-              const SizedBox(width: AppSpacing.space2),
-
-              // Actions
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  switch (value) {
-                    case 'edit':
-                      onEdit();
-                      break;
-                    case 'delete':
-                      onDelete();
-                      break;
-                    case 'assign':
-                      onAssign();
-                      break;
-                  }
-                },
-                itemBuilder:
-                    (context) => [
-                      const PopupMenuItem(
-                        value: 'assign',
-                        child: Row(
-                          children: [
-                            Icon(Icons.person_add),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(AppStrings.profileRepertoireAssignStudent),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(AppStrings.modify),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, color: AppColors.paperAccent),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(
-                              '삭제',
-                              style: TextStyle(color: AppColors.paperAccent),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-              ),
             ],
           ),
         ),
       ),
+    );
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _confirmDelete(context),
+        ),
+      ],
+      child: card,
     );
   }
 }
@@ -803,9 +801,7 @@ void showAssignToStudentDialog({
               final student = students[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppColors.paperAccent.withValues(
-                    alpha: 0.1,
-                  ),
+                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
                   child: Text(
                     student.name[0],
                     style: TextStyle(color: AppColors.paperAccent),

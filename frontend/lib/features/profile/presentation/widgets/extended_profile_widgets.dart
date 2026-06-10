@@ -5,15 +5,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/profile_facade.dart';
-import 'extended_profile_dialogs.dart';
+
+/// Confirm swipe-destructive delete via [showNotebookDialog].
+///
+/// Swipe consistency audit #668 D5 — Education/Career/Certificate cards
+/// share the same destructive confirmation pattern.
+Future<bool> _confirmDeleteDialog(
+  BuildContext context, {
+  required String title,
+  required String body,
+}) async {
+  final confirmed = await showNotebookDialog<bool>(
+    context: context,
+    title: title,
+    content: Text(body),
+    confirmLabel: AppStrings.delete,
+    cancelLabel: AppStrings.cancel,
+    isDestructive: true,
+    onConfirm: () => Navigator.pop(context, true),
+    onCancel: () => Navigator.pop(context, false),
+  );
+  return confirmed == true;
+}
 
 /// Profile completion card with gradient background.
 class ProfileCompletionCard extends StatelessWidget {
@@ -179,6 +202,9 @@ class ProfileInfoCard extends StatelessWidget {
 }
 
 /// Education card with edit/delete actions.
+///
+/// Swipe consistency audit #668 D5 — row tap routes to the existing edit
+/// screen; swipe reveals the destructive [삭제] action with confirmation.
 class EducationCard extends ConsumerWidget {
   final Education education;
   final int index;
@@ -191,76 +217,78 @@ class EducationCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border.all(color: AppColors.inkQuaternary),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperOk.withValues(alpha: 0.1),
+    final card = InkWell(
+      onTap: () => context.push('${AppRoutes.educationEdit}?index=$index'),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.paperOk.withValues(alpha: 0.1),
+              ),
+              child: Icon(Icons.school, color: AppColors.paperOk, size: 24),
             ),
-            child: Icon(Icons.school, color: AppColors.paperOk, size: 24),
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  education.school,
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    education.school,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${education.major} · ${education.degree}${education.graduationYear != null ? ' · ${education.graduationYear}년 졸업' : ''}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppColors.inkTertiary),
-            onSelected: (value) {
-              if (value == 'edit') {
-                context.push('${AppRoutes.educationEdit}?index=$index');
-              } else if (value == 'delete') {
-                showDeleteConfirmDialog(
-                  context,
-                  '학력',
-                  () => ref
-                      .read(teacherExtendedProfileProvider.notifier)
-                      .removeEducation(index),
-                );
-              }
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text(AppStrings.modify),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Text(AppStrings.delete),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${education.major} · ${education.degree}${education.graduationYear != null ? ' · ${education.graduationYear}년 졸업' : ''}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
                   ),
                 ],
-          ),
-        ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () async {
+            final ok = await _confirmDeleteDialog(
+              context,
+              title: AppStrings.swipeActionDeleteEducationConfirmTitle,
+              body: AppStrings.swipeActionDeleteEducationConfirmBody,
+            );
+            if (ok) {
+              ref
+                  .read(teacherExtendedProfileProvider.notifier)
+                  .removeEducation(index);
+            }
+          },
+        ),
+      ],
+      child: card,
     );
   }
 }
 
 /// Career card with edit/delete actions.
+///
+/// Swipe consistency audit #668 D5 — row tap routes to the existing edit
+/// screen; swipe reveals the destructive [삭제] action with confirmation.
 class CareerCard extends ConsumerWidget {
   final Career career;
   final int index;
@@ -269,110 +297,112 @@ class CareerCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border.all(color: AppColors.inkQuaternary),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
-            child: Icon(Icons.work, color: AppColors.paperAccent, size: 24),
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        career.organization,
-                        style: AppTypography.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    if (career.isCurrent)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.paperOk.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.zero,
-                        ),
+    final card = InkWell(
+      onTap: () => context.push('${AppRoutes.careerEdit}?index=$index'),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+              child: Icon(Icons.work, color: AppColors.paperAccent, size: 24),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
                         child: Text(
-                          '재직중',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.paperOk,
+                          career.organization,
+                          style: AppTypography.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${career.position} · ${career.period}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
+                      if (career.isCurrent)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.paperOk.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.zero,
+                          ),
+                          child: Text(
+                            '재직중',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.paperOk,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-                if (career.description != null &&
-                    career.description!.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.space1),
+                  const SizedBox(height: 2),
                   Text(
-                    career.description!,
+                    '${career.position} · ${career.period}',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
+                  if (career.description != null &&
+                      career.description!.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      career.description!,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppColors.inkTertiary),
-            onSelected: (value) {
-              if (value == 'edit') {
-                context.push('${AppRoutes.careerEdit}?index=$index');
-              } else if (value == 'delete') {
-                showDeleteConfirmDialog(
-                  context,
-                  '경력',
-                  () => ref
-                      .read(teacherExtendedProfileProvider.notifier)
-                      .removeCareer(index),
-                );
-              }
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text(AppStrings.modify),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Text(AppStrings.delete),
-                  ),
-                ],
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () async {
+            final ok = await _confirmDeleteDialog(
+              context,
+              title: AppStrings.swipeActionDeleteCareerConfirmTitle,
+              body: AppStrings.swipeActionDeleteCareerConfirmBody,
+            );
+            if (ok) {
+              ref
+                  .read(teacherExtendedProfileProvider.notifier)
+                  .removeCareer(index);
+            }
+          },
+        ),
+      ],
+      child: card,
     );
   }
 }
 
 /// Certificate card with status indicator and edit/delete actions.
+///
+/// Swipe consistency audit #668 D5 — row tap routes to the existing edit
+/// screen; swipe reveals the destructive [삭제] action with confirmation.
 class CertificateCard extends ConsumerWidget {
   final Certificate certificate;
 
@@ -382,117 +412,116 @@ class CertificateCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statusColor = getCertificateStatusColor(certificate.status);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
+    final card = InkWell(
+      onTap:
+          () =>
+              context.push('${AppRoutes.certificateEdit}?id=${certificate.id}'),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.1),
+              ),
+              child: Icon(
+                getCertificateStatusIcon(certificate.status),
+                color: statusColor,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              getCertificateStatusIcon(certificate.status),
-              color: statusColor,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        certificate.name,
-                        style: AppTypography.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          certificate.name,
+                          style: AppTypography.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        child: Text(
+                          getCertificateStatusLabel(certificate.status),
+                          style: AppTypography.caption.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${getCertificateTypeLabel(certificate.type)} · ${certificate.issuingBody}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.zero,
-                      ),
-                      child: Text(
-                        getCertificateStatusLabel(certificate.status),
-                        style: AppTypography.caption.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${certificate.issueDate.year}년 ${certificate.issueDate.month}월 발급',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
+                  ),
+                  if (certificate.isRejected &&
+                      certificate.rejectionReason != null) ...[
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      '반려 사유: ${certificate.rejectionReason}',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${getCertificateTypeLabel(certificate.type)} · ${certificate.issuingBody}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${certificate.issueDate.year}년 ${certificate.issueDate.month}월 발급',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                ),
-                if (certificate.isRejected &&
-                    certificate.rejectionReason != null) ...[
-                  const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    '반려 사유: ${certificate.rejectionReason}',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.paperAccent,
-                    ),
-                  ),
                 ],
-              ],
+              ),
             ),
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppColors.inkTertiary),
-            onSelected: (value) {
-              if (value == 'edit') {
-                context.push(
-                  '${AppRoutes.certificateEdit}?id=${certificate.id}',
-                );
-              } else if (value == 'delete') {
-                showDeleteConfirmDialog(
-                  context,
-                  '자격증',
-                  () => ref
-                      .read(teacherExtendedProfileProvider.notifier)
-                      .removeCertificate(certificate.id),
-                );
-              }
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text(AppStrings.modify),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Text(AppStrings.delete),
-                  ),
-                ],
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () async {
+            final ok = await _confirmDeleteDialog(
+              context,
+              title: AppStrings.swipeActionDeleteCertificateConfirmTitle,
+              body: AppStrings.swipeActionDeleteCertificateConfirmBody,
+            );
+            if (ok) {
+              ref
+                  .read(teacherExtendedProfileProvider.notifier)
+                  .removeCertificate(certificate.id);
+            }
+          },
+        ),
+      ],
+      child: card,
     );
   }
 }

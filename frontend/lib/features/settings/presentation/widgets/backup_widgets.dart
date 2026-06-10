@@ -13,11 +13,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../data/services/backup_service.dart';
 import '../../domain/entities/backup_state.dart';
 import '../providers/backup_provider.dart';
 import '../providers/orphan_recording_provider.dart';
 import '../screens/all_recordings_screen.dart';
+import 'backup_item_actions_bottom_sheet.dart';
 
 /// Status card showing backup summary information.
 class StatusCard extends StatelessWidget {
@@ -540,14 +542,34 @@ class BackupListSection extends ConsumerWidget {
 }
 
 /// Single backup item in the backup list.
+///
+/// Swipe consistency audit #668 D6 — row tap opens
+/// [BackupItemActionsBottomSheet] with [복원][공유][삭제]; swipe reveals the
+/// destructive [삭제] shortcut.
 class BackupItem extends ConsumerWidget {
   final BackupFileInfo backup;
 
   const BackupItem({super.key, required this.backup});
 
+  Future<void> _openActions(BuildContext context, WidgetRef ref) async {
+    final result = await BackupItemActionsBottomSheet.show(context);
+    if (result == null) return;
+    switch (result) {
+      case BackupItemActionResult.restore:
+        if (context.mounted) await _restoreFromBackup(context, ref);
+        break;
+      case BackupItemActionResult.share:
+        if (context.mounted) await _shareBackup(context);
+        break;
+      case BackupItemActionResult.delete:
+        if (context.mounted) await _deleteBackup(context, ref);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+    final card = Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.paper,
@@ -574,59 +596,20 @@ class BackupItem extends ConsumerWidget {
           backup.formattedSize,
           style: const TextStyle(color: AppColors.inkSecondary),
         ),
-        trailing: PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert, color: AppColors.inkSecondary),
-          onSelected: (value) async {
-            if (value == 'restore') {
-              await _restoreFromBackup(context, ref);
-            } else if (value == 'share') {
-              await _shareBackup(context);
-            } else if (value == 'delete') {
-              await _deleteBackup(context, ref);
-            }
-          },
-          itemBuilder:
-              (context) => [
-                const PopupMenuItem(
-                  value: 'restore',
-                  child: Row(
-                    children: [
-                      Icon(Icons.restore, size: 20),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(AppStrings.settingsRestore),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'share',
-                  child: Row(
-                    children: [
-                      Icon(Icons.share, size: 20),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(AppStrings.settingsShare),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        size: 20,
-                        color: AppColors.paperAccent,
-                      ),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(
-                        AppStrings.delete,
-                        style: TextStyle(color: AppColors.paperAccent),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-        ),
+        onTap: () => _openActions(context, ref),
       ),
+    );
+
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _deleteBackup(context, ref),
+        ),
+      ],
+      child: card,
     );
   }
 
@@ -686,8 +669,8 @@ class BackupItem extends ConsumerWidget {
   Future<void> _deleteBackup(BuildContext context, WidgetRef ref) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: '백업 삭제',
-      content: const Text(AppStrings.settingsBackupDeleteConfirm),
+      title: AppStrings.swipeActionDeleteBackupConfirmTitle,
+      content: const Text(AppStrings.swipeActionDeleteBackupConfirmBody),
       confirmLabel: AppStrings.delete,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
