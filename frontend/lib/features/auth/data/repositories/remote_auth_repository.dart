@@ -72,6 +72,12 @@ class RemoteAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AuthUser> markQuestCelebrated() async {
+    final response = await _apiClient.patch('/users/me/quest-celebrated');
+    return AuthUser.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
   Future<void> logout() async {
     final refreshToken = await _tokenStorage.getRefreshToken();
     await _apiClient.post(

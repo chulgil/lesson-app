@@ -24,6 +24,8 @@ class UserResponse(BaseModel):
     # #430 G1 B2 — phone_verification_policy.md §5.2
     terms_accepted_at: _dt.datetime | None = None
     marketing_consent_at: _dt.datetime | None = None
+    # #608 Job 7 — §13 퀘스트 시스템: 11/11 완료 축하 카드 1회 표시 보장
+    quest_celebrated_at: _dt.datetime | None = None
     created_at: _dt.datetime | None = None
 
 

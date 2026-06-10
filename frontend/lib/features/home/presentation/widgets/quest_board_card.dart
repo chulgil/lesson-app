@@ -145,8 +145,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         hasPracticeAssigned;
 
     if (allMandatoryDone) {
-      // §8.3 전체 완료 — 축하 카드 1회 표시 (Hive local fallback, BE 미구현).
-      // TODO(#608): BE PATCH 완료 후 authUser.questCelebratedAt 조건 추가.
+      // §8.3 전체 완료 — 축하 카드 1회 표시 (#608 Job 7).
+      // BE PATCH /users/me/quest-celebrated 가 1회성 보장 SSOT.
+      // Hive local 은 같은 세션 내 BE 호출 실패 시 재표시 방지용 fallback.
       final celebrationDismissed = ref
           .watch(questCelebrationProvider)
           .valueOrNull;

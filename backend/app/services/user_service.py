@@ -156,6 +156,20 @@ class UserService:
         await self.db.refresh(user)
         return user
 
+    async def mark_quest_celebrated(self, user_id: str) -> Any:
+        """#608 Job 7 — Mark the 11/11 quest celebration card as shown.
+
+        Idempotent: only sets ``quest_celebrated_at`` on the first call. Subsequent
+        calls return the user without touching the column so repeated taps from the
+        client remain safe.
+        """
+        user = await self.get_by_id(user_id)
+        if user.quest_celebrated_at is None:
+            user.quest_celebrated_at = datetime.now(UTC)
+            await self.db.flush()
+            await self.db.refresh(user)
+        return user
+
     async def _assert_onboarding_requirements_met(self, user: Any) -> None:
         role = user.role.value if hasattr(user.role, "value") else user.role
         if role != "student":
@@ -237,9 +251,7 @@ class UserService:
     async def _get_or_create_progress(self, user_id: str) -> Any:
         from app.models.onboarding import UserOnboardingProgress
 
-        progress = await self.db.scalar(
-            select(UserOnboardingProgress).where(UserOnboardingProgress.user_id == user_id)
-        )
+        progress = await self.db.scalar(select(UserOnboardingProgress).where(UserOnboardingProgress.user_id == user_id))
         if progress is None:
             progress = UserOnboardingProgress(user_id=user_id)
             self.db.add(progress)
