@@ -8138,6 +8138,39 @@ class AppStrings {
   /// 휴가 배너 안내 — 해당 기간 예약 불가.
   static const vacationBannerHint = '이 기간에는 학생 예약이 잡히지 않아요.';
 
+  /// 배너 행: 다중일 휴가 라벨 (예: "8/1 ~ 8/5 방학 중").
+  static String vacationBannerRangeLabel(String range) => '$range 방학 중';
+
+  /// 배너 행: 1일 휴무 라벨 (예: "8/1 휴무").
+  static String vacationBannerOneDayLabel(String date) => '$date 휴무';
+
+  /// 배너 행: 휴가 취소 아이콘 버튼의 시맨틱 라벨.
+  static const vacationBannerCancelTooltip = '휴가 취소';
+
+  // ── 가용시간 — 시간대 삭제/변경 영향 경고 (C3) ──────────────────────
+
+  /// 시간대 삭제 확인 다이얼로그 — 기본 (영향 0건).
+  static const weeklyScheduleDeleteConfirmTitle = '이 시간대를 삭제할까요?';
+
+  /// 시간대 삭제 확인 다이얼로그 — 기본 본문 (영향 0건).
+  static const weeklyScheduleDeleteConfirmBody =
+      '학생이 새로 예약할 수 있는 시간대에서 제외됩니다. 이미 잡힌 예약에는 영향이 없어요.';
+
+  /// 시간대 삭제 확인 다이얼로그 — 영향 받는 예약이 있을 때 본문.
+  static String weeklyScheduleDeleteImpactWarning(int count) =>
+      '이 시간대를 삭제하면 $count개 예약이 영향을 받습니다. 학생에게 자동 취소 알림이 전송됩니다.';
+
+  /// 시간대 삭제 확인 다이얼로그 — 영향이 있을 때 제목.
+  static const weeklyScheduleDeleteImpactTitle = '이 시간대를 삭제하면 예약이 영향을 받아요';
+
+  // ── 가용시간 — 풀 / 간소 화면 흐름 (C5 명문화) ──────────────────────
+
+  /// 풀 화면에서 시간대 행에 노출되는 swipe 안내.
+  static const weeklyScheduleSwipeHint = '옆으로 밀어 삭제할 수 있어요.';
+
+  /// 요일에 시간대를 처음 추가하는 행동을 설명하는 라벨 (CTA).
+  static const weeklyScheduleAddSlotAction = '시간대 추가';
+
   // ── 보강 크레딧 / Makeup Credit (#432) ──────────────────────────────
   // Spec: docs/specs/subscription/makeup_credit_spec.md
 

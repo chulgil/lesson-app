@@ -179,6 +179,193 @@ class _TeacherAvailabilityProviderElement
   String get teacherId => (origin as TeacherAvailabilityProvider).teacherId;
 }
 
+String _$affectedBookingsForWeeklyScheduleHash() =>
+    r'976d2b1e1235150d1d609640a72a6a74fadfbb58';
+
+/// See also [affectedBookingsForWeeklySchedule].
+@ProviderFor(affectedBookingsForWeeklySchedule)
+const affectedBookingsForWeeklyScheduleProvider =
+    AffectedBookingsForWeeklyScheduleFamily();
+
+/// See also [affectedBookingsForWeeklySchedule].
+class AffectedBookingsForWeeklyScheduleFamily extends Family<AsyncValue<int>> {
+  /// See also [affectedBookingsForWeeklySchedule].
+  const AffectedBookingsForWeeklyScheduleFamily();
+
+  /// See also [affectedBookingsForWeeklySchedule].
+  AffectedBookingsForWeeklyScheduleProvider call({
+    required String teacherId,
+    required int weeklyDayOfWeek,
+    required String weeklyStartTime,
+    required String weeklyEndTime,
+  }) {
+    return AffectedBookingsForWeeklyScheduleProvider(
+      teacherId: teacherId,
+      weeklyDayOfWeek: weeklyDayOfWeek,
+      weeklyStartTime: weeklyStartTime,
+      weeklyEndTime: weeklyEndTime,
+    );
+  }
+
+  @override
+  AffectedBookingsForWeeklyScheduleProvider getProviderOverride(
+    covariant AffectedBookingsForWeeklyScheduleProvider provider,
+  ) {
+    return call(
+      teacherId: provider.teacherId,
+      weeklyDayOfWeek: provider.weeklyDayOfWeek,
+      weeklyStartTime: provider.weeklyStartTime,
+      weeklyEndTime: provider.weeklyEndTime,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'affectedBookingsForWeeklyScheduleProvider';
+}
+
+/// See also [affectedBookingsForWeeklySchedule].
+class AffectedBookingsForWeeklyScheduleProvider
+    extends AutoDisposeFutureProvider<int> {
+  /// See also [affectedBookingsForWeeklySchedule].
+  AffectedBookingsForWeeklyScheduleProvider({
+    required String teacherId,
+    required int weeklyDayOfWeek,
+    required String weeklyStartTime,
+    required String weeklyEndTime,
+  }) : this._internal(
+          (ref) => affectedBookingsForWeeklySchedule(
+            ref as AffectedBookingsForWeeklyScheduleRef,
+            teacherId: teacherId,
+            weeklyDayOfWeek: weeklyDayOfWeek,
+            weeklyStartTime: weeklyStartTime,
+            weeklyEndTime: weeklyEndTime,
+          ),
+          from: affectedBookingsForWeeklyScheduleProvider,
+          name: r'affectedBookingsForWeeklyScheduleProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$affectedBookingsForWeeklyScheduleHash,
+          dependencies: AffectedBookingsForWeeklyScheduleFamily._dependencies,
+          allTransitiveDependencies: AffectedBookingsForWeeklyScheduleFamily
+              ._allTransitiveDependencies,
+          teacherId: teacherId,
+          weeklyDayOfWeek: weeklyDayOfWeek,
+          weeklyStartTime: weeklyStartTime,
+          weeklyEndTime: weeklyEndTime,
+        );
+
+  AffectedBookingsForWeeklyScheduleProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+    required this.weeklyDayOfWeek,
+    required this.weeklyStartTime,
+    required this.weeklyEndTime,
+  }) : super.internal();
+
+  final String teacherId;
+  final int weeklyDayOfWeek;
+  final String weeklyStartTime;
+  final String weeklyEndTime;
+
+  @override
+  Override overrideWith(
+    FutureOr<int> Function(AffectedBookingsForWeeklyScheduleRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AffectedBookingsForWeeklyScheduleProvider._internal(
+        (ref) => create(ref as AffectedBookingsForWeeklyScheduleRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+        weeklyDayOfWeek: weeklyDayOfWeek,
+        weeklyStartTime: weeklyStartTime,
+        weeklyEndTime: weeklyEndTime,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<int> createElement() {
+    return _AffectedBookingsForWeeklyScheduleProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AffectedBookingsForWeeklyScheduleProvider &&
+        other.teacherId == teacherId &&
+        other.weeklyDayOfWeek == weeklyDayOfWeek &&
+        other.weeklyStartTime == weeklyStartTime &&
+        other.weeklyEndTime == weeklyEndTime;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+    hash = _SystemHash.combine(hash, weeklyDayOfWeek.hashCode);
+    hash = _SystemHash.combine(hash, weeklyStartTime.hashCode);
+    hash = _SystemHash.combine(hash, weeklyEndTime.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin AffectedBookingsForWeeklyScheduleRef
+    on AutoDisposeFutureProviderRef<int> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+
+  /// The parameter `weeklyDayOfWeek` of this provider.
+  int get weeklyDayOfWeek;
+
+  /// The parameter `weeklyStartTime` of this provider.
+  String get weeklyStartTime;
+
+  /// The parameter `weeklyEndTime` of this provider.
+  String get weeklyEndTime;
+}
+
+class _AffectedBookingsForWeeklyScheduleProviderElement
+    extends AutoDisposeFutureProviderElement<int>
+    with AffectedBookingsForWeeklyScheduleRef {
+  _AffectedBookingsForWeeklyScheduleProviderElement(super.provider);
+
+  @override
+  String get teacherId =>
+      (origin as AffectedBookingsForWeeklyScheduleProvider).teacherId;
+  @override
+  int get weeklyDayOfWeek =>
+      (origin as AffectedBookingsForWeeklyScheduleProvider).weeklyDayOfWeek;
+  @override
+  String get weeklyStartTime =>
+      (origin as AffectedBookingsForWeeklyScheduleProvider).weeklyStartTime;
+  @override
+  String get weeklyEndTime =>
+      (origin as AffectedBookingsForWeeklyScheduleProvider).weeklyEndTime;
+}
+
 String _$availableSlotsForDateHash() =>
     r'2a8b5a78926f3f87370ed8f2a5adddf6ed8bb2a1';
 

@@ -222,4 +222,69 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text(AppStrings.previewEmptyHint), findsOneWidget);
   });
+
+  // ── C1 (audit §4.7) — Wrap chip → card + SwipeActionTile layout ─────
+  testWidgets(
+    'C1: weekly slot renders as a card row with edit/delete affordances',
+    (tester) async {
+      final availability = TeacherAvailability(
+        id: 't',
+        teacherId: 'teacher_test',
+        weeklySchedules: [
+          WeeklySchedule(
+            id: 'w1',
+            dayOfWeek: 1, // 화요일
+            startTime: '14:00',
+            endTime: '16:00',
+            createdAt: DateTime(2026, 1, 1),
+          ),
+          WeeklySchedule(
+            id: 'w2',
+            dayOfWeek: 1,
+            startTime: '17:00',
+            endTime: '19:00',
+            createdAt: DateTime(2026, 1, 1),
+          ),
+        ],
+        createdAt: DateTime(2026, 1, 1),
+      );
+
+      await pumpSplitPage(
+        tester,
+        availability: availability,
+        viewportSize: const Size(390, 900),
+      );
+
+      // Two time-slot rows visible.
+      expect(tester.takeException(), isNull);
+      expect(find.text('14:00 - 16:00'), findsOneWidget);
+      expect(find.text('17:00 - 19:00'), findsOneWidget);
+
+      // Add CTA visible per day card.
+      expect(find.text(AppStrings.weeklyScheduleAddSlotAction), findsWidgets);
+    },
+  );
+
+  testWidgets('C1: empty day shows 쉬는날 label and still offers + 시간대 추가 CTA', (
+    tester,
+  ) async {
+    final availability = TeacherAvailability(
+      id: 't',
+      teacherId: 'teacher_test',
+      weeklySchedules: const [],
+      createdAt: DateTime(2026, 1, 1),
+    );
+
+    await pumpSplitPage(
+      tester,
+      availability: availability,
+      viewportSize: const Size(390, 900),
+    );
+
+    expect(tester.takeException(), isNull);
+    // Each empty day shows the 쉬는날 label.
+    expect(find.text(AppStrings.dayOff), findsWidgets);
+    // Each day card has its own + 시간대 추가 CTA.
+    expect(find.text(AppStrings.weeklyScheduleAddSlotAction), findsWidgets);
+  });
 }

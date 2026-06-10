@@ -10,6 +10,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../../../settings/settings_facade.dart';
@@ -51,9 +52,11 @@ class TeacherAvailabilitySplitPage extends ConsumerWidget {
           return _SplitLayout(teacherId: teacherId, availability: effective);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _ErrorState(
-          onRetry: () => ref.invalidate(teacherAvailabilityProvider(teacherId)),
-        ),
+        error:
+            (_, __) => _ErrorState(
+              onRetry:
+                  () => ref.invalidate(teacherAvailabilityProvider(teacherId)),
+            ),
       ),
     );
   }
@@ -227,16 +230,20 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     return Column(
       children: List.generate(7, (dayIndex) {
         final schedules = grouped[dayIndex] ?? const <WeeklySchedule>[];
-        return _DayRow(
+        return _DayCard(
           dayIndex: dayIndex,
           dayLabel: _dayLabels[dayIndex],
           schedules: schedules,
-          onAddOrEdit: (existing) => _openEditSheet(
-            context,
-            ref,
-            preselectedDay: dayIndex,
-            existing: existing,
-          ),
+          teacherId: teacherId,
+          onAddOrEdit:
+              (existing) => _openEditSheet(
+                context,
+                ref,
+                preselectedDay: dayIndex,
+                existing: existing,
+              ),
+          onDeleteRequest:
+              (schedule) => _confirmAndDelete(context, ref, schedule: schedule),
         );
       }),
     );
@@ -251,10 +258,11 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     final result = await showNotebookBottomSheet<WeeklySchedule>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => ScheduleEditBottomSheet(
-        preselectedDay: preselectedDay,
-        existingSchedule: existing,
-      ),
+      builder:
+          (context) => ScheduleEditBottomSheet(
+            preselectedDay: preselectedDay,
+            existingSchedule: existing,
+          ),
     );
     if (result == null) return;
     final notifier = ref.read(
@@ -268,107 +276,262 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     ref.invalidate(teacherAvailabilityProvider(teacherId));
     ref.invalidate(teacherSettingsProvider);
   }
+
+  Future<void> _confirmAndDelete(
+    BuildContext context,
+    WidgetRef ref, {
+    required WeeklySchedule schedule,
+  }) async {
+    // Look up affected upcoming bookings before showing the confirmation.
+    // (C3 §4.9 — strengthen wording when impact > 0.)
+    int affected = 0;
+    try {
+      affected = await ref.read(
+        affectedBookingsForWeeklyScheduleProvider(
+          teacherId: teacherId,
+          weeklyDayOfWeek: schedule.dayOfWeek,
+          weeklyStartTime: schedule.startTime,
+          weeklyEndTime: schedule.endTime,
+        ).future,
+      );
+    } catch (_) {
+      // If the lookup fails, default to the safe (impact-aware) message.
+      affected = 0;
+    }
+    if (!context.mounted) return;
+
+    final hasImpact = affected > 0;
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title:
+          hasImpact
+              ? AppStrings.weeklyScheduleDeleteImpactTitle
+              : AppStrings.weeklyScheduleDeleteConfirmTitle,
+      content: Text(
+        hasImpact
+            ? AppStrings.weeklyScheduleDeleteImpactWarning(affected)
+            : AppStrings.weeklyScheduleDeleteConfirmBody,
+      ),
+      confirmLabel: AppStrings.delete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final notifier = ref.read(
+      teacherAvailabilityNotifierProvider(teacherId).notifier,
+    );
+    await notifier.removeWeeklySchedule(schedule.id);
+    ref.invalidate(teacherAvailabilityProvider(teacherId));
+    ref.invalidate(teacherSettingsProvider);
+  }
 }
 
-class _DayRow extends StatelessWidget {
+/// Day card containing time-slot rows + add CTA.
+///
+/// Layout (C1, audit §4.7 ASCII sketch):
+/// ┌── 화 ──────────────────────────────────┐
+/// │ ⇆  14:00 - 16:00         [✏]          │
+/// │ ⇆  17:00 - 19:00         [✏]          │
+/// │                              [+ 추가]   │
+/// └────────────────────────────────────────┘
+///
+/// Each time-slot row is wrapped in [SwipeActionTile] so the teacher can
+/// swipe-left to reveal the destructive "삭제" action. Tapping the row
+/// (or the trailing pencil) opens the edit bottom sheet.
+class _DayCard extends StatelessWidget {
   final int dayIndex;
   final String dayLabel;
   final List<WeeklySchedule> schedules;
+  final String teacherId;
   final void Function(WeeklySchedule? existing) onAddOrEdit;
+  final void Function(WeeklySchedule schedule) onDeleteRequest;
 
-  const _DayRow({
+  const _DayCard({
     required this.dayIndex,
     required this.dayLabel,
     required this.schedules,
+    required this.teacherId,
     required this.onAddOrEdit,
+    required this.onDeleteRequest,
   });
 
   @override
   Widget build(BuildContext context) {
     final hasSchedules = schedules.isNotEmpty;
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: ListTile(
-        leading: Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: hasSchedules ? AppColors.paperAccentSoft : AppColors.paper,
-          ),
-          child: Center(
-            child: Text(
-              dayLabel,
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-                color: hasSchedules
-                    ? AppColors.paperAccent
-                    : AppColors.inkSecondary,
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Card header: 요일 라벨 (leading badge + 라벨)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space3,
+              AppSpacing.space3,
+              AppSpacing.space3,
+              AppSpacing.space2,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color:
+                        hasSchedules
+                            ? AppColors.paperAccentSoft
+                            : AppColors.paper,
+                    border: Border.all(
+                      color:
+                          hasSchedules
+                              ? AppColors.paperAccent
+                              : AppColors.inkQuaternary,
+                    ),
+                  ),
+                  child: Text(
+                    dayLabel,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color:
+                          hasSchedules
+                              ? AppColors.paperAccent
+                              : AppColors.inkSecondary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  hasSchedules
+                      ? '$dayLabel요일'
+                      : '$dayLabel요일 · ${AppStrings.dayOff}',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: hasSchedules ? AppColors.ink : AppColors.inkTertiary,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        title: hasSchedules
-            ? Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space1,
-                children: schedules
-                    .map(
-                      (s) =>
-                          _TimeChip(schedule: s, onTap: () => onAddOrEdit(s)),
-                    )
-                    .toList(),
+
+          // 시간대 행 — SwipeActionTile 로 감싼 ListTile 들
+          if (hasSchedules)
+            for (final s in schedules)
+              _TimeSlotRow(
+                schedule: s,
+                onEdit: () => onAddOrEdit(s),
+                onDelete: () => onDeleteRequest(s),
               )
-            : Text(
+          else
+            // 비어 있는 요일: 행 자리표시자 (스와이프 안내 없이)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.space3,
+                0,
+                AppSpacing.space3,
+                AppSpacing.space2,
+              ),
+              child: Text(
                 AppStrings.dayOff,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkTertiary,
                   fontStyle: FontStyle.italic,
                 ),
               ),
-        trailing: IconButton(
-          icon: Icon(
-            hasSchedules ? Icons.edit_outlined : Icons.add,
-            size: 20,
-            color: AppColors.paperAccent,
+            ),
+
+          // + 시간대 추가 CTA
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space3,
+              AppSpacing.space1,
+              AppSpacing.space3,
+              AppSpacing.space2,
+            ),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => onAddOrEdit(null),
+                icon: const Icon(Icons.add, size: 16),
+                label: const Text(AppStrings.weeklyScheduleAddSlotAction),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                  ),
+                  foregroundColor: AppColors.paperAccent,
+                ),
+              ),
+            ),
           ),
-          onPressed: () => onAddOrEdit(null),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: 0,
-        ),
+        ],
       ),
     );
   }
 }
 
-class _TimeChip extends StatelessWidget {
+/// Single time-slot row inside [_DayCard].
+///
+/// Wrapped in [SwipeActionTile] so the user reveals a destructive "삭제"
+/// button by swiping left. Tapping the row (or the trailing edit icon)
+/// opens the edit bottom sheet.
+class _TimeSlotRow extends StatelessWidget {
   final WeeklySchedule schedule;
-  final VoidCallback onTap;
-  const _TimeChip({required this.schedule, required this.onTap});
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  const _TimeSlotRow({
+    required this.schedule,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space2,
-          vertical: 4,
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: onDelete,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.paperOk.withValues(alpha: 0.1),
-          border: Border.all(color: AppColors.paperOk.withValues(alpha: 0.3)),
-        ),
-        child: Text(
-          '${schedule.startTime} - ${schedule.endTime}',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.paperOk,
-            fontWeight: FontWeight.w500,
+      ],
+      child: Material(
+        color: AppColors.paper,
+        child: InkWell(
+          onTap: onEdit,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space3,
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.access_time, size: 16, color: AppColors.paperOk),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: Text(
+                    '${schedule.startTime} - ${schedule.endTime}',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.edit_outlined,
+                  size: 18,
+                  color: AppColors.inkSecondary,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -408,11 +571,12 @@ class _LessonSettingsPanel extends ConsumerWidget {
             options: _durationOptions,
             selected: availability.slotDurationMinutes,
             buildLabel: AppStrings.lessonDurationOptionLabel,
-            onSelected: (value) => _updateSettings(
-              ref,
-              slotDurationMinutes: value,
-              breakTimeBetweenLessons: availability.breakTimeBetweenLessons,
-            ),
+            onSelected:
+                (value) => _updateSettings(
+                  ref,
+                  slotDurationMinutes: value,
+                  breakTimeBetweenLessons: availability.breakTimeBetweenLessons,
+                ),
           ),
           const SizedBox(height: AppSpacing.space3),
           const ThinRule(),
@@ -423,11 +587,12 @@ class _LessonSettingsPanel extends ConsumerWidget {
             options: _breakOptions,
             selected: availability.breakTimeBetweenLessons,
             buildLabel: (m) => m == 0 ? AppStrings.breakTimeNoneOption : '$m분',
-            onSelected: (value) => _updateSettings(
-              ref,
-              slotDurationMinutes: availability.slotDurationMinutes,
-              breakTimeBetweenLessons: value,
-            ),
+            onSelected:
+                (value) => _updateSettings(
+                  ref,
+                  slotDurationMinutes: availability.slotDurationMinutes,
+                  breakTimeBetweenLessons: value,
+                ),
           ),
         ],
       ),
@@ -488,35 +653,42 @@ class _OptionRow extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space1,
-          children: options.map((value) {
-            final isActive = value == selected;
-            return GestureDetector(
-              onTap: () => onSelected(value),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: isActive ? AppColors.paperAccentSoft : AppColors.paper,
-                  border: Border.all(
-                    color: isActive
-                        ? AppColors.paperAccent
-                        : AppColors.inkQuaternary,
+          children:
+              options.map((value) {
+                final isActive = value == selected;
+                return GestureDetector(
+                  onTap: () => onSelected(value),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space3,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          isActive
+                              ? AppColors.paperAccentSoft
+                              : AppColors.paper,
+                      border: Border.all(
+                        color:
+                            isActive
+                                ? AppColors.paperAccent
+                                : AppColors.inkQuaternary,
+                      ),
+                    ),
+                    child: Text(
+                      buildLabel(value),
+                      style: AppTypography.bodySmall.copyWith(
+                        color:
+                            isActive
+                                ? AppColors.paperAccent
+                                : AppColors.inkSecondary,
+                        fontWeight:
+                            isActive ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
                   ),
-                ),
-                child: Text(
-                  buildLabel(value),
-                  style: AppTypography.bodySmall.copyWith(
-                    color: isActive
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -536,11 +708,12 @@ class _ExceptionsPanel extends StatelessWidget {
     final upcoming =
         availability.exceptions
             .where(
-              (e) => !DateTime(
-                e.endDate.year,
-                e.endDate.month,
-                e.endDate.day,
-              ).isBefore(today),
+              (e) =>
+                  !DateTime(
+                    e.endDate.year,
+                    e.endDate.month,
+                    e.endDate.day,
+                  ).isBefore(today),
             )
             .toList()
           ..sort((a, b) => a.startDate.compareTo(b.startDate));
@@ -567,9 +740,10 @@ class _ExceptionsPanel extends StatelessWidget {
           ...upcoming.map((exc) => _ExceptionTile(exception: exc)),
         const SizedBox(height: AppSpacing.space2),
         OutlinedButton.icon(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const TimeExceptionScreen()),
-          ),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TimeExceptionScreen()),
+              ),
           icon: const Icon(Icons.add, size: 18),
           label: const Text(AppStrings.manageSpecialSchedules),
           style: OutlinedButton.styleFrom(
@@ -593,10 +767,11 @@ class _ExceptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isHoliday = exception.type != ExceptionType.additionalSlot;
-    final dateText = exception.startDate == exception.endDate
-        ? formatDateYMD(exception.startDate)
-        : '${formatDateYMD(exception.startDate)} ~ '
-              '${formatDateYMD(exception.endDate)}';
+    final dateText =
+        exception.startDate == exception.endDate
+            ? formatDateYMD(exception.startDate)
+            : '${formatDateYMD(exception.startDate)} ~ '
+                '${formatDateYMD(exception.endDate)}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),

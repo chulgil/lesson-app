@@ -61,7 +61,7 @@ class _FirstAvailabilitySetupScreenState
                   _errorMessage!,
                   style: NotebookTypography.handSmall.copyWith(
                     color: AppColors.paperAccent,
-),
+                  ),
                 ),
               ],
               const SizedBox(height: AppSpacing.space6),
@@ -205,10 +205,14 @@ class _FirstAvailabilitySetupScreenState
       child: TextButton(
         onPressed: () {
           // Skip to full settings — recorded as opt-out per spec §5.3.
+          // C5 (audit §4.11): the "더 자세히 설정" link should land on the full
+          // split page (`teacher_availability_split_page.dart`) — not the
+          // legacy lesson-time settings screen. Both edit `TeacherAvailability`
+          // so weekly schedules entered in the simple flow remain visible.
           // pushReplacement (not go) so the simple setup is replaced but the
           // back button still returns to home instead of dead-ending. (bug:
           // go() reset the whole nav stack → back did nothing)
-          context.pushReplacement(AppRoutes.lessonTimeSettings);
+          context.pushReplacement(AppRoutes.teacherAvailability);
         },
         child: const Text(AppStrings.firstAvailabilityAdvancedAction),
       ),
@@ -344,7 +348,7 @@ class _DayChip extends StatelessWidget {
           label,
           style: NotebookTypography.handLarge.copyWith(
             color: isSelected ? AppColors.paper : AppColors.ink,
-fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -391,7 +395,7 @@ class _TimeField extends StatelessWidget {
               value.format24Hour(),
               style: NotebookTypography.handLarge.copyWith(
                 color: AppColors.ink,
-fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -413,7 +417,7 @@ class _DefaultLine extends StatelessWidget {
         '· $text',
         style: NotebookTypography.handSmall.copyWith(
           color: AppColors.inkSecondary,
-),
+        ),
       ),
     );
   }
