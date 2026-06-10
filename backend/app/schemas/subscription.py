@@ -601,6 +601,10 @@ class ProposalRespondRequest(BaseModel):
 
 
 class ProposalConfirmRequest(BaseModel):
-    """Teacher confirms the proposal after payment."""
+    """Teacher confirms the proposal after payment.
 
-    pass
+    FE 가 특정 기존 subscription 에 link 하려는 경우 subscription_id 명시.
+    명시되면 BE 가 ownership 검증 후 proposal 에 link (새로 mint 하지 않음).
+    """
+
+    subscription_id: str | None = None

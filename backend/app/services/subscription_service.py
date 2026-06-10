@@ -1856,11 +1856,20 @@ class SubscriptionService:
         await self.db.refresh(proposal)
         return SubscriptionProposalResponse.model_validate(proposal)
 
-    async def confirm_proposal(self, proposal_id: str, current_user: Any) -> SubscriptionProposalResponse:
+    async def confirm_proposal(
+        self,
+        proposal_id: str,
+        current_user: Any,
+        *,
+        subscription_id_hint: str | None = None,
+    ) -> SubscriptionProposalResponse:
         """Confirm a manual deposit and issue the subscription.
 
         Handles GAP-2 (membership), GAP-3 (relationship), GAP-4 (confirmation card),
         GAP-6 (request status transition) in addition to subscription creation.
+
+        FE 가 subscription_id_hint 를 보내면 (renewal/manual-link 케이스) ownership
+        검증 후 proposal 에 link. 새로 mint 하지 않음.
         """
         from app.models.subscription import (
             PaymentMethod,
@@ -1896,6 +1905,13 @@ class SubscriptionService:
             )
 
         now = datetime.now(UTC)
+
+        # FE 명시 hint — ownership 검증 후 proposal 에 link (새로 mint 하지 않음).
+        if subscription_id_hint and not proposal.subscription_id:
+            existing_sub = await self.access.require_teacher_subscription(subscription_id_hint, current_user)
+            if existing_sub is not None:
+                proposal.subscription_id = existing_sub.id
+
         if not proposal.subscription_id:
             # Resolve instrument from LessonRequest if linked
             instrument = None

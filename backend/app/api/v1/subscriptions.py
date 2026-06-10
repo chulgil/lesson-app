@@ -348,14 +348,19 @@ async def create_subscription_event(
     "/{subscription_id}/renew",
     response_model=SubscriptionProposalResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create renewal proposal (teacher only)",
+    summary="Create renewal proposal (teacher only) — deprecated",
+    deprecated=True,
 )
 async def create_renewal_proposal(
     subscription_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> SubscriptionProposalResponse:
-    """Create a renewal proposal linked to the expiring/expired subscription."""
+    """Create a renewal proposal linked to the expiring/expired subscription.
+
+    DEPRECATED — FE 가 POST /subscriptions-proposals 에 previous_subscription_id
+    + is_renewal=true 로 통일. 외부 consumer 호환을 위해 함수는 유지.
+    """
     service = SubscriptionService(db)
     return await service.create_renewal_proposal(subscription_id, current_user)
 
@@ -675,7 +680,11 @@ async def confirm_proposal(
     re-checks defensively so programmatic callers cannot bypass the gate.
     """
     service = SubscriptionService(db)
-    return await service.confirm_proposal(proposal_id, current_user)
+    return await service.confirm_proposal(
+        proposal_id,
+        current_user,
+        subscription_id_hint=body.subscription_id,
+    )
 
 
 # spec subscription_edit_spec.md §6.1 — 4 PATCH endpoint (수강권 수정).
