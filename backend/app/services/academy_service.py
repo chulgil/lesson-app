@@ -403,15 +403,44 @@ class AcademyService:
         by_user_id: str,
         reason: str | None = None,
     ) -> AcademyInvite:
+        """Issue #632 — decline + reason DB 저장 + 학원 owner 알림.
+
+        - declined_reason 컬럼에 사용자 입력 reason 영구 저장
+        - note 에는 audit (by_user_id) 만 prefix
+        - 학원 owner_user_id 에 academyInviteDeclined 알림 발송 (reason 포함)
+        """
+        from app.services.notification_service import NotificationService
+
         invite = await self._load_active_invite(raw_token)
         invite.state = AcademyInviteState.declined
         invite.declined_at = _utcnow()
-        # by_user_id 를 note 에 audit 으로 기록 — 누가 거절했는지 추적.
-        decline_note = f"\n[declined] by={by_user_id}"
-        if reason:
-            decline_note += f" reason={reason}"
-        invite.note = (invite.note or "") + decline_note
+        invite.note = (invite.note or "") + f"\n[declined] by={by_user_id}"
+        # 사용자 입력 reason 은 별도 컬럼에. 빈 문자열 → None 정규화.
+        cleaned_reason = (reason or "").strip()
+        invite.declined_reason = cleaned_reason or None
         await self.db.flush()
+
+        # 학원 owner 알림 발송.
+        academy = await self.db.get(Academy, invite.academy_id)
+        if academy is not None:
+            notif = NotificationService(self.db)
+            body = (
+                f"강사 초대가 거절되었습니다. 사유: {cleaned_reason}"
+                if cleaned_reason
+                else "강사 초대가 거절되었습니다."
+            )
+            await notif.create_and_send(
+                user_id=academy.owner_user_id,
+                notification_type="academyInviteDeclined",
+                title="강사 초대 거절",
+                body=body,
+                data={
+                    "academy_id": invite.academy_id,
+                    "invite_id": invite.id,
+                    "declined_by_user_id": by_user_id,
+                    "reason": cleaned_reason or None,
+                },
+            )
         return invite
 
     async def revoke_invite(self, *, invite_id: str, by_user_id: str) -> AcademyInvite:

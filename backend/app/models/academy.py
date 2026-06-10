@@ -239,6 +239,8 @@ class AcademyInvite(UUIDMixin, TimestampMixin, Base):
     )
     # 학원장 메모 (선택).
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Issue #632 — 거절 사유 (declined 상태일 때 사용자가 입력).
+    declined_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
         Index("idx_academy_invites_academy_state", "academy_id", "state"),
