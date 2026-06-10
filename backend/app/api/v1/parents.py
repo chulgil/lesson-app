@@ -15,6 +15,7 @@ from app.schemas.parent import (
     ChildProfileCreate,
     ChildProfileResponse,
     ChildProfileUpdate,
+    ChildSubscriptionItem,
     ChildTeacherConnectRequest,
     ParentChildRelationResponse,
     ParentChildRelationUpdate,
@@ -110,6 +111,22 @@ async def list_children(
     """Return a list of the parent's linked children."""
     service = ParentService(db)
     return await service.get_children(current_user)
+
+
+# Issue #630 — 학부모 대시보드 자녀별 수강권 카드.
+@router.get(
+    "/me/children-subscriptions",
+    response_model=list[ChildSubscriptionItem],
+    status_code=status.HTTP_200_OK,
+    summary="List active subscriptions of all linked children",
+)
+async def list_children_subscriptions(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_parent)],
+) -> list[ChildSubscriptionItem]:
+    """spec user_master.md §5.2 — 학부모 대시보드 자녀별 active subscription fan-out."""
+    service = ParentService(db)
+    return await service.list_children_subscriptions(current_user)
 
 
 @router.post(
@@ -272,13 +289,13 @@ async def get_or_list_invitations(
 ) -> ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse]:
     """Return one invitation by code, or a filtered invitation list."""
     service = ParentService(db)
-    result: ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse] = (
-        await service.get_or_list_invitations(
-            current_user,
-            code=code,
-            student_id=student_id,
-            status_filter=status_filter or status,
-        )
+    result: (
+        ParentInvitationResponse | PaginatedResponse[ParentInvitationResponse]
+    ) = await service.get_or_list_invitations(
+        current_user,
+        code=code,
+        student_id=student_id,
+        status_filter=status_filter or status,
     )
     return result
 
