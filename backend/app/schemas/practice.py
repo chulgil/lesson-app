@@ -1,6 +1,5 @@
 """Practice-related schemas: repertoires, sections, goals, stats."""
 
-
 import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
@@ -145,9 +144,11 @@ class PracticeItemResponse(BaseModel):
     created_at: _dt.datetime
     updated_at: _dt.datetime | None = None
 
+
 # ---------------------------------------------------------------------------
 # Practice section
 # ---------------------------------------------------------------------------
+
 
 class SectionResponse(BaseModel):
     """A practice section within a repertoire."""
@@ -281,6 +282,7 @@ class RecordingReassignUpdate(BaseModel):
 # Repertoire
 # ---------------------------------------------------------------------------
 
+
 class RepertoireResponse(BaseModel):
     """Full repertoire representation with sections."""
 
@@ -319,6 +321,7 @@ class RepertoireUpdate(BaseModel):
 # Recording (associated with sections)
 # ---------------------------------------------------------------------------
 
+
 class RecordingResponse(BaseModel):
     """Recording metadata."""
 
@@ -328,9 +331,12 @@ class RecordingResponse(BaseModel):
     section_id: str | None = None
     student_id: str | None = None
     file_url: str | None = None
+    # P1 fix (2026-06-10 audit) — FE 가 녹음 제목 / 공유 시각 표시.
+    title: str | None = None
     duration_seconds: int | None = None
     bpm: int | None = None
     is_representative: bool = False
+    shared_at: _dt.datetime | None = None
     created_at: _dt.datetime | None = None
 
     @computed_field
@@ -398,6 +404,7 @@ class RecordingFeedbackResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Practice goals & stats
 # ---------------------------------------------------------------------------
+
 
 class PracticeGoalResponse(BaseModel):
     """Practice goal settings for a student."""

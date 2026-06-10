@@ -160,9 +160,13 @@ class PracticeRecording(UUIDMixin, Base):
     file_path: Mapped[str] = mapped_column(Text, nullable=False)
     file_key: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # P1 fix (2026-06-10 audit) — FE 가 녹음 제목 표시 가능하도록.
+    title: Mapped[str | None] = mapped_column(String(200), nullable=True)
     duration_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     bpm: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_representative: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # P1 fix (2026-06-10 audit) — 공유 시각 영구 저장 (FE 새로고침 후에도 표시).
+    shared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -206,9 +210,7 @@ class PracticeNote(UUIDMixin, TimestampMixin, Base):
     section_id: Mapped[str] = mapped_column(String(36), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
-    __table_args__ = (
-        Index("idx_note_section", "section_id"),
-    )
+    __table_args__ = (Index("idx_note_section", "section_id"),)
 
 
 class PracticeGoal(UUIDMixin, TimestampMixin, Base):
@@ -222,9 +224,7 @@ class PracticeGoal(UUIDMixin, TimestampMixin, Base):
     weekly_time_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=150)
     weekly_day_count: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
 
-    __table_args__ = (
-        Index("uk_goal_student", "student_id", unique=True),
-    )
+    __table_args__ = (Index("uk_goal_student", "student_id", unique=True),)
 
 
 class PracticeStreak(UUIDMixin, TimestampMixin, Base):
@@ -238,9 +238,7 @@ class PracticeStreak(UUIDMixin, TimestampMixin, Base):
     last_practice_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     total_practice_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    __table_args__ = (
-        Index("uk_streak_student", "student_id", unique=True),
-    )
+    __table_args__ = (Index("uk_streak_student", "student_id", unique=True),)
 
 
 class PracticeItem(UUIDMixin, TimestampMixin, Base):
