@@ -241,6 +241,11 @@ class AcademyInvite(UUIDMixin, TimestampMixin, Base):
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Issue #632 — 거절 사유 (declined 상태일 때 사용자가 입력).
     declined_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Issue #633 — 만료 임박(D-1) 알림 발송 시각 (dedupe). NULL 이면 미발송.
+    expiring_soon_notified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     __table_args__ = (
         Index("idx_academy_invites_academy_state", "academy_id", "state"),
