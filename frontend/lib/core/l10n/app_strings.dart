@@ -3349,8 +3349,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5831,9 +5831,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5970,11 +5971,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -7597,6 +7599,19 @@ class AppStrings {
   static const announcementDeleteTitle = '공지 삭제';
   static const announcementDeleteConfirm =
       '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.';
+
+  /// swipe destructive 확인 다이얼로그 — 공지 삭제 title
+  static const swipeActionDeleteAnnouncementConfirmTitle = '공지 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 공지 삭제 body
+  static const swipeActionDeleteAnnouncementConfirmBody =
+      '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.';
+
+  /// swipe destructive 확인 다이얼로그 — 알림 삭제 title
+  static const swipeActionDeleteNotificationConfirmTitle = '이 알림을 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 알림 삭제 body
+  static const swipeActionDeleteNotificationConfirmBody = '복구할 수 없습니다.';
 
   // ── Add student method screen ──
   static const studentAddMethodBadgeRecommended = '권장';

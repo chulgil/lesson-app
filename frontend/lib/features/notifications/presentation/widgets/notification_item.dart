@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../domain/entities/notification.dart';
 
 /// 개별 알림 항목 — Notebook × Score.
@@ -19,13 +22,40 @@ class NotificationItem extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback? onTap;
 
-  const NotificationItem({super.key, required this.notification, this.onTap});
+  /// 행 단위 destructive 액션 (swipe-to-dismiss). null 이면 swipe 비활성.
+  ///
+  /// 호출자는 #629 DELETE /notifications/{id} 와 로컬 상태 invalidate 를
+  /// 묶어서 전달한다 (notification_list_screen 참조).
+  final Future<void> Function()? onDelete;
+
+  const NotificationItem({
+    super.key,
+    required this.notification,
+    this.onTap,
+    this.onDelete,
+  });
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.swipeActionDeleteNotificationConfirmTitle,
+      content: const Text(AppStrings.swipeActionDeleteNotificationConfirmBody),
+      confirmLabel: AppStrings.delete,
+      onConfirm: () => Navigator.pop(context, true),
+      cancelLabel: AppStrings.cancel,
+      onCancel: () => Navigator.pop(context, false),
+      isDestructive: true,
+    );
+    if (confirmed == true) {
+      await onDelete?.call();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isUnread = !notification.isRead;
 
-    return Column(
+    final row = Column(
       children: [
         InkWell(
           onTap: onTap,
@@ -121,6 +151,23 @@ class NotificationItem extends StatelessWidget {
         // §7.131: 0.5px BoxDecoration → 1px ThinRule (separate component)
         const ThinRule(),
       ],
+    );
+
+    if (onDelete == null) {
+      return row;
+    }
+
+    // swipe 3원칙: destructive 단일 [삭제] + 확인 다이얼로그.
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _confirmDelete(context),
+        ),
+      ],
+      child: row,
     );
   }
 

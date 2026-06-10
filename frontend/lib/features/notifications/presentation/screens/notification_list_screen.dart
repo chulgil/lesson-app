@@ -105,6 +105,7 @@ class NotificationListScreen extends ConsumerWidget {
           (notification) => NotificationItem(
             notification: notification,
             onTap: () => _handleNotificationTap(context, ref, notification),
+            onDelete: () => _handleNotificationDelete(ref, notification),
           ),
         ),
       ],
@@ -195,5 +196,15 @@ class NotificationListScreen extends ConsumerWidget {
 
   void _markAllAsRead(WidgetRef ref) {
     ref.read(notificationActionsProvider.notifier).markAllAsRead();
+  }
+
+  /// swipe-to-dismiss 삭제 — #629 DELETE /notifications/{id} 호출 후 목록 갱신.
+  Future<void> _handleNotificationDelete(
+    WidgetRef ref,
+    AppNotification notification,
+  ) async {
+    await ref
+        .read(notificationActionsProvider.notifier)
+        .deleteNotification(notification.id);
   }
 }
