@@ -3331,8 +3331,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5685,6 +5685,17 @@ class AppStrings {
   /// 축하 카드 dismiss 라벨 (semantics + IconButton tooltip).
   static const questCelebrationDismiss = '닫기';
 
+  // §B3 잠금 해제 축하 시트 (감사 §4.5) — Q6 (첫 학생 초대) 완료 직후 1회 표시.
+  /// 잠금 해제 시트 제목.
+  static const questUnlockCelebrationTitle = '잠금 해제!';
+
+  /// 잠금 해제 시트 본문.
+  static const questUnlockCelebrationMessage =
+      '학생 초대, 수강권 발급, 레슨 등록, 메모, 연습 과제 퀘스트가 열렸어요.';
+
+  /// 잠금 해제 시트 CTA.
+  static const questUnlockCelebrationAction = '계속하기';
+
   /// Quest I — 이름 + 악기 설정 타이틀.
   static const questTitleNameInstrument = '이름 + 악기 설정';
 
@@ -5786,10 +5797,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5926,12 +5936,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -7175,6 +7184,17 @@ class AppStrings {
   static const coachMarkTimeTitle = '레슨 시간을 설정하세요';
   static const coachMarkTimeDescription = '학생이 이 시간에 레슨을 예약할 수 있어요';
   static const coachMarkTimeAction = '설정하러 가기';
+  // Phase B step 2 — first_student_invite (감사 §4.4 B2).
+  static const coachMarkFirstStudentInviteTitle = '첫 학생을 초대해보세요';
+  static const coachMarkFirstStudentInviteDescription =
+      '학생 탭에서 초대 코드를 만들어 학생과 연결할 수 있어요';
+  static const coachMarkFirstStudentInviteAction = '학생 초대하기';
+  // Phase B step 3 — first_lesson_register (감사 §4.4 B2).
+  static const coachMarkFirstLessonRegisterTitle = '첫 레슨을 등록해보세요';
+  static const coachMarkFirstLessonRegisterDescription =
+      '레슨 탭에서 학생 · 날짜 · 시간을 선택하면 첫 레슨이 등록돼요';
+  static const coachMarkFirstLessonRegisterAction = '레슨 등록하기';
+  // Legacy keys — 호환성 유지 (기존 코드 미사용 시 향후 제거).
   static const coachMarkStudentTitle = '첫 학생을 초대하세요';
   static const coachMarkStudentDescription = '초대 코드를 공유하여 학생과 연결하세요';
   static const coachMarkStudentAction = '학생 추가하기';

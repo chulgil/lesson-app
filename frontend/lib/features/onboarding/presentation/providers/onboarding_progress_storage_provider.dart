@@ -12,27 +12,35 @@ class OnboardingProgressStorageState {
   final bool demoOverlayDismissed;
   final bool coachMarkCompleted;
 
+  /// Q7~Q10 잠금 해제 축하 시트 1회 노출 여부 (감사 §4.5 B3).
+  /// Q6 (첫 학생 초대) 완료 직후 1회 표시, 이후 영구 true.
+  final bool questUnlockShown;
+
   const OnboardingProgressStorageState({
     required this.teacherOnboardingCompleted,
     required this.demoOverlayDismissed,
     required this.coachMarkCompleted,
+    required this.questUnlockShown,
   });
 
   const OnboardingProgressStorageState.defaults()
     : teacherOnboardingCompleted = false,
       demoOverlayDismissed = false,
-      coachMarkCompleted = false;
+      coachMarkCompleted = false,
+      questUnlockShown = false;
 
   OnboardingProgressStorageState copyWith({
     bool? teacherOnboardingCompleted,
     bool? demoOverlayDismissed,
     bool? coachMarkCompleted,
+    bool? questUnlockShown,
   }) {
     return OnboardingProgressStorageState(
       teacherOnboardingCompleted:
           teacherOnboardingCompleted ?? this.teacherOnboardingCompleted,
       demoOverlayDismissed: demoOverlayDismissed ?? this.demoOverlayDismissed,
       coachMarkCompleted: coachMarkCompleted ?? this.coachMarkCompleted,
+      questUnlockShown: questUnlockShown ?? this.questUnlockShown,
     );
   }
 }
@@ -57,6 +65,9 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
       coachMarkCompleted:
           box.get(_coachMarkCompletedKey(teacherId), defaultValue: false) ??
           false,
+      questUnlockShown:
+          box.get(_questUnlockShownKey(teacherId), defaultValue: false) ??
+          false,
     );
   }
 
@@ -77,6 +88,7 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
       _coachMarkCompletedKey(teacherId),
       newState.coachMarkCompleted,
     );
+    await box.put(_questUnlockShownKey(teacherId), newState.questUnlockShown);
   }
 
   String _teacherPrefix(String teacherId) => 'teacher:$teacherId';
@@ -89,6 +101,9 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
 
   String _coachMarkCompletedKey(String teacherId) =>
       '${_teacherPrefix(teacherId)}:coachMarkCompleted';
+
+  String _questUnlockShownKey(String teacherId) =>
+      '${_teacherPrefix(teacherId)}:questUnlockShown';
 
   Future<void> setTeacherOnboardingCompleted(bool value) async {
     final teacherId = ref.read(currentUserIdProvider);
@@ -120,4 +135,15 @@ class OnboardingProgressStorage extends _$OnboardingProgressStorage {
   }
 
   Future<void> markCoachMarkCompleted() => setCoachMarkCompleted(true);
+
+  /// Q7~Q10 잠금 해제 축하 시트를 표시한 사실을 기록 (감사 §4.5 B3).
+  Future<void> setQuestUnlockShown(bool value) async {
+    final teacherId = ref.read(currentUserIdProvider);
+    final current = state.valueOrNull ?? await _loadState(teacherId);
+    final updated = current.copyWith(questUnlockShown: value);
+    await _persist(teacherId, updated);
+    state = AsyncData(updated);
+  }
+
+  Future<void> markQuestUnlockShown() => setQuestUnlockShown(true);
 }
