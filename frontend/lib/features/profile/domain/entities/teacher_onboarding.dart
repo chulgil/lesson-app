@@ -105,8 +105,9 @@ class TutorialProgress {
     if (isCompleted) return 100;
     // Exclude 'completed' step from calculation
     final totalSteps = TutorialStep.values.length - 1;
-    final completedCount =
-        completedSteps.where((s) => s != TutorialStep.completed).length;
+    final completedCount = completedSteps
+        .where((s) => s != TutorialStep.completed)
+        .length;
     return ((completedCount / totalSteps) * 100).round();
   }
 
@@ -222,11 +223,12 @@ class TeacherOnboardingProfile {
     required this.introduction,
   });
 
-  /// Validate profile completeness
+  /// Validate profile completeness.
+  ///
+  /// v3 §3.2 Phase A: 이름 + 악기 only. introduction 은 Phase C 보상 퀘스트
+  /// (`profileIntroduction`) 로 이관됨. 검증 대상에서 제외.
   bool get isValid {
-    return name.isNotEmpty &&
-        instruments.isNotEmpty &&
-        introduction.length >= 20;
+    return name.isNotEmpty && instruments.isNotEmpty;
   }
 
   /// Get list of missing fields
@@ -234,7 +236,6 @@ class TeacherOnboardingProfile {
     final missing = <String>[];
     if (name.isEmpty) missing.add('이름');
     if (instruments.isEmpty) missing.add('악기');
-    if (introduction.length < 20) missing.add('소개글 (20자 이상)');
     return missing;
   }
 

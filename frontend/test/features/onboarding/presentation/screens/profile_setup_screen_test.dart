@@ -77,11 +77,10 @@ void main() {
   testWidgets('선생님 프로필 사진은 선택 항목이며 사진 없이 다음 버튼이 활성화된다', (tester) async {
     await pumpProfileSetup(tester);
 
+    // A1: 이름 필드 1개만 존재 (소개글 입력 제거됨).
+    expect(find.byType(TextField), findsOneWidget);
+
     await tester.enterText(find.byType(TextField).at(0), '김선생');
-    await tester.enterText(
-      find.byType(TextField).at(1),
-      '학생의 음악적 성장을 차분하게 돕는 선생님입니다.',
-    );
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
     await tester.ensureVisible(

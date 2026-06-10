@@ -50,9 +50,7 @@ class ProfileSetupScreen extends ConsumerStatefulWidget {
 
 class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _nameController = TextEditingController();
-  final _introController = TextEditingController();
   final _nameFocus = FocusNode();
-  final _introFocus = FocusNode();
 
   String? _profileImage;
   List<String> _selectedInstruments = [];
@@ -61,9 +59,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _introController.dispose();
     _nameFocus.dispose();
-    _introFocus.dispose();
     super.dispose();
   }
 
@@ -88,11 +84,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // v3 §3.2 Phase A: 이름 + 악기 only. introduction 은 Phase C 보상 퀘스트로
+      // 이관 (profileIntroduction). 빈 문자열은 backend 호환을 위해 유지.
       final profile = TeacherOnboardingProfile(
         name: _nameController.text,
         profileImage: _profileImage,
         instruments: _selectedInstruments,
-        introduction: _introController.text,
+        introduction: '',
       );
 
       ref
@@ -258,11 +256,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
                     // Instrument selector
                     _buildInstrumentSection(),
-
-                    const SizedBox(height: AppSpacing.space5),
-
-                    // Introduction
-                    _buildIntroductionInput(),
 
                     const SizedBox(height: AppSpacing.space4),
 
@@ -536,54 +529,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       );
                     }).toList(),
                   ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIntroductionInput() {
-    final charCount = _introController.text.length;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '소개 (선택)',
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '$charCount / 500자',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        TextField(
-          controller: _introController,
-          focusNode: _introFocus,
-          maxLines: 4,
-          maxLength: 500,
-          onChanged: (_) => setState(() {}),
-          decoration: InputDecoration(
-            hintText: AppStrings.onboardingIntroOptionalHint,
-            counterText: '',
-            border: OutlineInputBorder(borderRadius: BorderRadius.zero),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(color: AppColors.paperAccent, width: 2),
-            ),
           ),
         ),
       ],

@@ -11,8 +11,11 @@ import 'package:go_router/go_router.dart';
 
 import '../auth/auth_state.dart';
 import '../widgets/notebook/notebook_surfaces.dart';
+import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/extensions/user_role_visuals.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/onboarding/onboarding_facade.dart';
+import '../../features/schedule/presentation/providers/teacher_availability_providers.dart';
 import 'app_routes.dart';
 import 'routes/auth_routes.dart';
 import 'routes/home_routes.dart';
@@ -41,12 +44,32 @@ const _publicPathPrefixes = ['/student/summary/'];
 
 const _roleSelectPath = AppRoutes.roleSelect;
 
+/// Teacher onboarding phase used to subdivide the [AuthNeedsOnboarding] gate
+/// (_audits/2026-06-10-teacher-flow-ux-audit.md §4.2 A2).
+///
+/// - [profileA]: 이름/악기 미입력 → `teacherProfileSetup`
+/// - [firstAvailability]: 프로필 완료, 활성 `WeeklySchedule` 0개 → `teacherFirstAvailability`
+/// - [complete]: 위 두 단계 모두 완료 (역할 기반 home 으로 진입 허용)
+///
+/// 학생/학부모 역할에는 의미가 없으므로 [complete] 로 간주한다 (기존 동작 유지).
+enum OnboardingPhase { profileA, firstAvailability, complete }
+
 /// Pure auth-aware redirect decision (remote mode).
 ///
 /// Extracted from the [GoRouter.redirect] closure so the guard rules are unit
 /// testable without a router/widget tree. Returns the path to redirect to, or
 /// ``null`` to allow [currentPath].
-String? resolveAuthRedirect(AuthState authState, String currentPath) {
+///
+/// [teacherPhase] (default [OnboardingPhase.complete]) subdivides the
+/// [AuthNeedsOnboarding] state when the user is a teacher so partially-
+/// completed onboarding lands on the correct step instead of always bouncing
+/// to `roleSelect`. The phase is computed once per redirect from Riverpod at
+/// the [GoRouter.redirect] closure; tests can pass it explicitly.
+String? resolveAuthRedirect(
+  AuthState authState,
+  String currentPath, {
+  OnboardingPhase teacherPhase = OnboardingPhase.complete,
+}) {
   final isPublic =
       _publicPaths.contains(currentPath) ||
       _publicPathPrefixes.any(currentPath.startsWith);
@@ -76,6 +99,21 @@ String? resolveAuthRedirect(AuthState authState, String currentPath) {
         // Code submission pushes to inviteConfirm carrying the Invite extra;
         // a redirect here would drop the extra and break the connection flow.
         currentPath == AppRoutes.inviteConfirm;
+
+    // Teacher 만 phase 세분화. 학생/학부모는 기존 동작 (roleSelect 폴백) 유지.
+    final isTeacher = authState.role == UserRole.teacher;
+    if (isTeacher && !isOnboarding && !isRoleSelect) {
+      switch (teacherPhase) {
+        case OnboardingPhase.profileA:
+          return AppRoutes.teacherProfileSetup;
+        case OnboardingPhase.firstAvailability:
+          return AppRoutes.teacherFirstAvailability;
+        case OnboardingPhase.complete:
+          // Phase 미상(데이터 로딩 중) — 기존 폴백 유지.
+          return AppRoutes.roleSelect;
+      }
+    }
+
     if (!isOnboarding && !isRoleSelect) {
       return AppRoutes.roleSelect;
     }
@@ -86,6 +124,44 @@ String? resolveAuthRedirect(AuthState authState, String currentPath) {
   }
 
   return null;
+}
+
+/// Compute the current teacher onboarding phase from Riverpod state.
+///
+/// Async providers are read snapshot-only (no `await`). When data is not yet
+/// loaded the function returns [OnboardingPhase.complete] so the existing
+/// fallback in [resolveAuthRedirect] (roleSelect) keeps applying — avoiding
+/// race conditions where the router flickers to a wrong screen before data
+/// arrives.
+OnboardingPhase resolveTeacherOnboardingPhase(WidgetRef ref) {
+  // 1) profile (name + instruments) 존재 여부
+  final profileSnap = ref.read(currentTeacherProfileProvider);
+  final profile = profileSnap.valueOrNull;
+  final hasProfileA =
+      profile != null &&
+      profile.name.isNotEmpty &&
+      profile.instruments.isNotEmpty;
+  if (!hasProfileA) {
+    // 데이터 로딩 중이면 phase 를 단정하지 않는다.
+    return profileSnap.hasValue
+        ? OnboardingPhase.profileA
+        : OnboardingPhase.complete;
+  }
+
+  // 2) 활성 WeeklySchedule 1개 이상 여부
+  final userId = profile.userId;
+  final availSnap = ref.read(teacherAvailabilityProvider(userId));
+  final availability = availSnap.valueOrNull;
+  final hasActiveSchedule =
+      availability != null &&
+      availability.weeklySchedules.any((s) => s.isActive);
+  if (!hasActiveSchedule) {
+    return availSnap.hasValue
+        ? OnboardingPhase.firstAvailability
+        : OnboardingPhase.complete;
+  }
+
+  return OnboardingPhase.complete;
 }
 
 /// Bridges a Riverpod auth state stream to GoRouter's [refreshListenable].
@@ -133,11 +209,11 @@ class AppRouter {
       initialLocation: AppRoutes.login,
       debugLogDiagnostics: true,
       refreshListenable: refreshListenable,
-      redirect:
-          (context, state) => resolveAuthRedirect(
-            ref.read(authNotifierProvider),
-            state.matchedLocation,
-          ),
+      redirect: (context, state) => resolveAuthRedirect(
+        ref.read(authNotifierProvider),
+        state.matchedLocation,
+        teacherPhase: resolveTeacherOnboardingPhase(ref),
+      ),
       routes: [
         // Combine all domain-specific routes
         ...authRoutes,
@@ -156,10 +232,9 @@ class AppRouter {
         ...subscriptionRoutes,
         ...academyRoutes,
       ],
-      errorBuilder:
-          (context, state) => NotebookScreenScaffold(
-            body: Center(child: Text('Page not found: ${state.uri}')),
-          ),
+      errorBuilder: (context, state) => NotebookScreenScaffold(
+        body: Center(child: Text('Page not found: ${state.uri}')),
+      ),
     );
   }
 }
