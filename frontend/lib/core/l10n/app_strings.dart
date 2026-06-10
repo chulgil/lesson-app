@@ -163,6 +163,24 @@ class AppStrings {
   /// 스와이프 연결 해제 확인 다이얼로그 — 본문
   static const swipeActionDisconnectConfirmBody = '이 학생과의 연결이 해제됩니다.';
 
+  /// 스와이프 보관 액션 라벨 (레퍼토리 보관 destructive 톤 — practice v2 D2).
+  static const swipeActionArchive = '보관';
+
+  /// 스와이프 보관 확인 다이얼로그 — 제목 (레퍼토리 보관)
+  static const swipeActionArchiveConfirmTitle = '이 레퍼토리를 보관할까요?';
+
+  /// 스와이프 보관 확인 다이얼로그 — 본문 (복원 가능 안내)
+  static const swipeActionArchiveConfirmBody = '보관함에서 복원할 수 있습니다.';
+
+  /// 스와이프 영구 삭제 액션 라벨 (아카이브 영구 삭제 — practice v2 D3).
+  static const swipeActionPermanentDelete = '영구 삭제';
+
+  /// 스와이프 영구 삭제 확인 다이얼로그 — 제목 (강화 확인)
+  static const swipeActionPermanentDeleteConfirmTitle = '영구 삭제할까요?';
+
+  /// 스와이프 영구 삭제 확인 다이얼로그 — 본문 (복구 불가 강조)
+  static const swipeActionPermanentDeleteConfirmBody = '복구할 수 없습니다.';
+
   /// 자녀 카드 액션 시트 — 학생 계정 전환
   static const childProfileActionsSwitchAccount = '학생 계정 전환';
 
@@ -3349,8 +3367,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5831,9 +5849,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5970,11 +5989,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'

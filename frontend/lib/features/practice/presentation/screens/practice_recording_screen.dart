@@ -10,11 +10,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../domain/services/quick_recording_service.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
+import '../widgets/section_detail/recording_actions_bottom_sheet.dart';
 import '../widgets/youtube/practice_youtube_mini_player.dart';
 import '../providers/practice_youtube_pause_signal.dart';
 
@@ -741,118 +743,101 @@ class _RecordingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NotebookCard(
-      elevation: recording.isRepresentative ? 2 : 0,
-      color:
-          recording.isRepresentative
-              ? AppColors.paperAccentSoft
-              : AppColors.paper,
-      child: ListTile(
-        leading: IconButton.filled(
-          onPressed: onPlay,
-          icon: const Icon(Icons.play_arrow),
-          style: IconButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-            foregroundColor: AppColors.paper,
+    // Swipe consistency (audit 2026-06-10 §2 — practice v2 D1):
+    // - 원칙 1: swipe = destructive 단일 ([삭제])
+    // - 원칙 2: 다중 액션 = 행 탭 → RecordingActionsBottomSheet (1차 audit C2 재사용)
+    // - 원칙 3: destructive 는 확인 다이얼로그 (onDelete handler 내부)
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: onDelete,
+        ),
+      ],
+      child: NotebookCard(
+        elevation: recording.isRepresentative ? 2 : 0,
+        color:
+            recording.isRepresentative
+                ? AppColors.paperAccentSoft
+                : AppColors.paper,
+        child: ListTile(
+          leading: IconButton.filled(
+            onPressed: onPlay,
+            icon: const Icon(Icons.play_arrow),
+            style: IconButton.styleFrom(
+              backgroundColor: AppColors.paperAccent,
+              foregroundColor: AppColors.paper,
+            ),
           ),
-        ),
-        title: Row(
-          children: [
-            if (recording.isRepresentative)
-              Container(
-                margin: EdgeInsets.only(right: AppSpacing.space2),
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space2,
-                  vertical: 2,
-                ),
-                decoration: const BoxDecoration(color: AppColors.paperAccent),
-                child: Text(
-                  '대표',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.paper,
-                    fontWeight: FontWeight.bold,
+          title: Row(
+            children: [
+              if (recording.isRepresentative)
+                Container(
+                  margin: EdgeInsets.only(right: AppSpacing.space2),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                    vertical: 2,
                   ),
-                ),
-              ),
-            Text(
-              _formatDate(recording.recordedAt),
-              style: AppTypography.bodyMedium,
-            ),
-          ],
-        ),
-        subtitle: Row(
-          children: [
-            Text(
-              recording.formattedDuration,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            if (recording.isShared) ...[
-              SizedBox(width: AppSpacing.space2),
-              Icon(Icons.check_circle, size: 14, color: AppColors.paperOk),
-              SizedBox(width: AppSpacing.space1),
-              Text(
-                '공유됨',
-                style: AppTypography.caption.copyWith(color: AppColors.paperOk),
-              ),
-            ],
-          ],
-        ),
-        trailing: PopupMenuButton<String>(
-          onSelected: (value) {
-            switch (value) {
-              case 'representative':
-                onSetRepresentative();
-                break;
-              case 'share_external':
-                _shareToExternal(context, recording.localPath);
-                break;
-              case 'delete':
-                onDelete();
-                break;
-            }
-          },
-          itemBuilder:
-              (context) => [
-                if (!recording.isRepresentative)
-                  const PopupMenuItem(
-                    value: 'representative',
-                    child: Row(
-                      children: [
-                        Icon(Icons.star_outline),
-                        SizedBox(width: AppSpacing.space2),
-                        Text(AppStrings.practiceSelectAsRepresentative),
-                      ],
+                  decoration: const BoxDecoration(color: AppColors.paperAccent),
+                  child: Text(
+                    '대표',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.paper,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                const PopupMenuItem(
-                  value: 'share_external',
-                  child: Row(
-                    children: [
-                      Icon(Icons.share),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(AppStrings.practiceShareExternal),
-                    ],
-                  ),
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_outline, color: AppColors.paperAccent),
-                      SizedBox(width: AppSpacing.space2),
-                      Text(
-                        '삭제',
-                        style: TextStyle(color: AppColors.paperAccent),
-                      ),
-                    ],
+              Text(
+                _formatDate(recording.recordedAt),
+                style: AppTypography.bodyMedium,
+              ),
+            ],
+          ),
+          subtitle: Row(
+            children: [
+              Text(
+                recording.formattedDuration,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              if (recording.isShared) ...[
+                SizedBox(width: AppSpacing.space2),
+                Icon(Icons.check_circle, size: 14, color: AppColors.paperOk),
+                SizedBox(width: AppSpacing.space1),
+                Text(
+                  '공유됨',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.paperOk,
                   ),
                 ),
               ],
+            ],
+          ),
+          onTap: () => _openActionsSheet(context),
         ),
       ),
     );
+  }
+
+  Future<void> _openActionsSheet(BuildContext context) async {
+    final result = await RecordingActionsBottomSheet.show(
+      context,
+      canSetRepresentative: !recording.isRepresentative,
+    );
+    if (!context.mounted) return;
+    switch (result) {
+      case RecordingActionResult.setRepresentative:
+        onSetRepresentative();
+      case RecordingActionResult.share:
+        await _shareToExternal(context, recording.localPath);
+      case RecordingActionResult.delete:
+        onDelete();
+      case null:
+        break;
+    }
   }
 }
 
