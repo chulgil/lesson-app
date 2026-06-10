@@ -332,6 +332,38 @@ class AcademyService:
         await self.db.flush()
         return invite, raw_token
 
+    async def resend_invite(
+        self,
+        *,
+        invite_id: str,
+        by_user_id: str,
+        expires_in_hours: int = 168,
+    ) -> tuple[AcademyInvite, str]:
+        """Issue #634 — pending invite 의 token 재발급 + 만료 갱신.
+
+        - owner only (assert_owner)
+        - 기존 invite state 가 pending 이 아니면 409 (재발급은 미수락 토큰만)
+        - 새 raw_token 발급 + token_hash 교체 + expires_at 갱신
+        - 반환: (갱신된 invite, raw_token)
+        """
+        invite = await self.db.get(AcademyInvite, invite_id)
+        if invite is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
+        await self.assert_owner(invite.academy_id, by_user_id)
+        if invite.state != AcademyInviteState.pending:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "message": f"Invite is {invite.state.value}, cannot resend",
+                    "error_code": invite.state.value,
+                },
+            )
+        raw_token = _generate_token()
+        invite.token_hash = _hash_token(raw_token)
+        invite.expires_at = _utcnow() + timedelta(hours=expires_in_hours)
+        await self.db.flush()
+        return invite, raw_token
+
     async def get_preview_by_token(self, raw_token: str) -> AcademyInvitePreview:
         """공개 endpoint — 인증 X. 만료/사용 토큰도 안내용으로 응답."""
         invite = await self.db.scalar(select(AcademyInvite).where(AcademyInvite.token_hash == _hash_token(raw_token)))

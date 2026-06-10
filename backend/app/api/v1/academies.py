@@ -377,6 +377,33 @@ async def revoke_invite(
     return AcademyInviteResponse.model_validate(invite)
 
 
+# Issue #634 — pending invite 토큰 재발급.
+@router.post(
+    "/invites/{invite_id}/resend",
+    response_model=AcademyInviteCreatedResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Resend an invite — issue a new token (owner only)",
+    dependencies=[Depends(require_owner_context)],
+)
+async def resend_invite(
+    invite_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> AcademyInviteCreatedResponse:
+    """spec user_master.md §3.2 — 동일 invite 의 token + expires_at 갱신.
+
+    이미 accepted/declined/revoked/expired 인 invite → 409 (error_code 명시).
+    """
+    service = AcademyService(db)
+    invite, raw_token = await service.resend_invite(invite_id=invite_id, by_user_id=current_user.id)
+    base = AcademyInviteResponse.model_validate(invite).model_dump()
+    return AcademyInviteCreatedResponse(
+        **base,
+        token=raw_token,
+        share_url=f"/academy/accept?token={raw_token}",
+    )
+
+
 @router.post(
     "/invites/accept",
     response_model=AcademyMemberResponse,
