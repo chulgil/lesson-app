@@ -11,6 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -63,18 +64,12 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     // Separate upcoming and past
     final now = DateTime.now();
-    final upcoming =
-        sortedExceptions
-            .where(
-              (e) => e.endDate.isAfter(now.subtract(const Duration(days: 1))),
-            )
-            .toList();
-    final past =
-        sortedExceptions
-            .where(
-              (e) => e.endDate.isBefore(now.subtract(const Duration(days: 1))),
-            )
-            .toList();
+    final upcoming = sortedExceptions
+        .where((e) => e.endDate.isAfter(now.subtract(const Duration(days: 1))))
+        .toList();
+    final past = sortedExceptions
+        .where((e) => e.endDate.isBefore(now.subtract(const Duration(days: 1))))
+        .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -153,11 +148,15 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
   Widget _buildExceptionCard(TimeException exception, {bool isPast = false}) {
     final icon = _getExceptionIcon(exception.type);
-    final color =
-        isPast ? AppColors.inkTertiary : _getExceptionColor(exception.type);
+    final color = isPast
+        ? AppColors.inkTertiary
+        : _getExceptionColor(exception.type);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.space3),
+    // Swipe consistency (audit 2026-06-10 §2 원칙 1):
+    // - 행 단위 destructive 액션은 SwipeActionTile 로 통일
+    // - trailing IconButton 과 중복 배치 금지 (ux-rules.md)
+    // - 과거 항목은 액션이 없으므로 swipe 없이 카드만 렌더링
+    final card = Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
@@ -194,19 +193,28 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
               ),
           ],
         ),
-        trailing:
-            isPast
-                ? null
-                : IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  color: AppColors.inkSecondary,
-                  onPressed: () => _confirmDelete(exception),
-                ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space2,
         ),
       ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+      child: isPast
+          ? card
+          : SwipeActionTile(
+              actions: [
+                SwipeAction(
+                  label: AppStrings.swipeActionDelete,
+                  icon: Icons.delete_outline,
+                  tone: SwipeActionTone.destructive,
+                  onPressed: () => _confirmDelete(exception),
+                ),
+              ],
+              child: card,
+            ),
     );
   }
 
@@ -500,31 +508,28 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
   Widget _buildTypeSelector() {
     return Wrap(
       spacing: AppSpacing.space2,
-      children:
-          ExceptionType.values
-              .where((t) => t != ExceptionType.additionalSlot)
-              .map((type) {
-                final isSelected = _selectedType == type;
-                return ChoiceChip(
-                  label: Text(type.displayName),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      setState(() => _selectedType = type);
-                    }
-                  },
-                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
-                  labelStyle: AppTypography.bodySmall.copyWith(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.inkSecondary,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                );
-              })
-              .toList(),
+      children: ExceptionType.values
+          .where((t) => t != ExceptionType.additionalSlot)
+          .map((type) {
+            final isSelected = _selectedType == type;
+            return ChoiceChip(
+              label: Text(type.displayName),
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() => _selectedType = type);
+                }
+              },
+              selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+              labelStyle: AppTypography.bodySmall.copyWith(
+                color: isSelected
+                    ? AppColors.paperAccent
+                    : AppColors.inkSecondary,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            );
+          })
+          .toList(),
     );
   }
 

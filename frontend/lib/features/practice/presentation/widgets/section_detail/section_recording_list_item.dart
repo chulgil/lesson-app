@@ -10,7 +10,9 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
+import 'recording_actions_bottom_sheet.dart';
 
 /// Recording list item for section detail screen
 class SectionRecordingListItem extends StatefulWidget {
@@ -209,9 +211,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
             Navigator.of(context).pop();
             widget.onDelete();
           },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.paperAccent,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
           child: const Text(AppStrings.delete),
         ),
       ],
@@ -219,140 +219,147 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
   }
 
   Widget _buildNormalState(BuildContext context) {
-    return NotebookCard(
-      child: InkWell(
-        onTap: widget.onPlay,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space3),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
-                child: const Icon(
-                  Icons.play_arrow,
-                  color: AppColors.paperAccent,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          widget.recording.formattedDuration,
-                          style: AppTypography.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        if (widget.recording.bpm != null) ...[
-                          const SizedBox(width: AppSpacing.space2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.paperAccentSoft,
-                            ),
-                            child: Text(
-                              '${widget.recording.bpm} BPM',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.paperAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (widget.recording.isRepresentative) ...[
-                          const SizedBox(width: AppSpacing.space2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(color: AppColors.paperOk),
-                            child: Text(
-                              '대표',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.paper,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _formatDate(widget.recording.createdAt),
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
+    // Swipe consistency (audit 2026-06-10 §2):
+    // - 원칙 1: swipe 는 destructive 단일 액션 ([삭제])
+    // - 원칙 2: 다중 액션은 행 탭 → BottomSheet 로 분리
+    // - 원칙 3: destructive 는 확인 다이얼로그 강제
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.swipeActionDelete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _confirmRecordingDelete(context),
+        ),
+      ],
+      child: NotebookCard(
+        child: InkWell(
+          onTap: () => _openActionsSheet(context),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            child: Row(
+              children: [
+                // 재생은 별도 컨트롤로 유지 (기존 onPlay) — 행 탭은 액션 시트로 변경.
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: widget.onPlay,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.paperAccentSoft,
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow,
+                        color: AppColors.paperAccent,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'representative') {
-                    widget.onSetRepresentative();
-                  } else if (value == 'share_external') {
-                    _shareToExternal(context, widget.recording.filePath);
-                  } else if (value == 'delete') {
-                    widget.onDelete();
-                  }
-                },
-                itemBuilder:
-                    (context) => [
-                      if (!widget.recording.isRepresentative)
-                        const PopupMenuItem(
-                          value: 'representative',
-                          child: Row(
-                            children: [
-                              Icon(Icons.star_outline, size: 20),
-                              SizedBox(width: AppSpacing.space2),
-                              Text(AppStrings.practiceSetRepresentative),
-                            ],
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            widget.recording.formattedDuration,
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      const PopupMenuItem(
-                        value: 'share_external',
-                        child: Row(
-                          children: [
-                            Icon(Icons.share, size: 20),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(AppStrings.practiceShareExternal),
+                          if (widget.recording.bpm != null) ...[
+                            const SizedBox(width: AppSpacing.space2),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.paperAccentSoft,
+                              ),
+                              child: Text(
+                                '${widget.recording.bpm} BPM',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.paperAccent,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ],
-                        ),
+                          if (widget.recording.isRepresentative) ...[
+                            const SizedBox(width: AppSpacing.space2),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.paperOk,
+                              ),
+                              child: Text(
+                                '대표',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.paper,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.delete,
-                              size: 20,
-                              color: AppColors.paperAccent,
-                            ),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(
-                              '삭제',
-                              style: TextStyle(color: AppColors.paperAccent),
-                            ),
-                          ],
+                      const SizedBox(height: 2),
+                      Text(
+                        _formatDate(widget.recording.createdAt),
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],
-              ),
-            ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _openActionsSheet(BuildContext context) async {
+    final result = await RecordingActionsBottomSheet.show(
+      context,
+      canSetRepresentative: !widget.recording.isRepresentative,
+    );
+    if (!context.mounted) return;
+    switch (result) {
+      case RecordingActionResult.setRepresentative:
+        widget.onSetRepresentative();
+      case RecordingActionResult.share:
+        await _shareToExternal(context, widget.recording.filePath);
+      case RecordingActionResult.delete:
+        await _confirmRecordingDelete(context);
+      case null:
+        break;
+    }
+  }
+
+  Future<void> _confirmRecordingDelete(BuildContext context) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.practiceRecordingDeleteTitle,
+      content: const Text(AppStrings.practiceRecordingDeleteConfirm),
+      confirmLabel: AppStrings.swipeActionDelete,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed == true) {
+      widget.onDelete();
+    }
   }
 
   Future<void> _shareToExternal(BuildContext context, String filePath) async {
