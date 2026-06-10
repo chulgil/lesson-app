@@ -148,6 +148,9 @@ class AppStrings {
   /// 스와이프 편집 액션
   static const swipeActionEdit = '편집';
 
+  /// 스와이프 삭제 액션 (destructive 단일 액션 통일 라벨 — swipe_action_consistency_audit §2 원칙 1).
+  static const swipeActionDelete = '삭제';
+
   /// 스와이프 액션 접근성 힌트
   static const swipeActionHint = '스와이프 액션';
 
@@ -6664,6 +6667,9 @@ class AppStrings {
   static const practiceRecordingRecordDeleteTitle = '녹음 기록 삭제';
   static const practiceSetRepresentative = '대표 녹음으로 설정';
   static const practiceShareExternal = '외부 앱 공유';
+
+  /// 녹음 행 탭 시 표시되는 BottomSheet 헤더 제목 (swipe consistency 통일 — 다중 액션은 BottomSheet 분리).
+  static const recordingActionsSheetTitle = '녹음 옵션';
   static const practiceRecordingSaved = '녹음 저장됨';
   static const practiceRestoreOriginal = '원본 복구';
   static const practiceRecordingDeleteTitle = '녹음 삭제';
