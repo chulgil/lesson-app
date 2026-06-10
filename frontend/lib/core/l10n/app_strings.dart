@@ -3349,8 +3349,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5831,9 +5831,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5970,11 +5971,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -7061,6 +7063,54 @@ class AppStrings {
 
   /// swipe destructive 확인 다이얼로그 — 악기 삭제 body
   static const swipeActionDeleteInstrumentConfirmBody = '이 악기를 목록에서 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 곡 삭제 title (Repertoire #668 D4)
+  static const swipeActionDeletePieceConfirmTitle = '곡 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 곡 삭제 body
+  static const swipeActionDeletePieceConfirmBody = '이 곡을 레퍼토리에서 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 학력 삭제 title (#668 D5)
+  static const swipeActionDeleteEducationConfirmTitle = '학력 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 학력 삭제 body
+  static const swipeActionDeleteEducationConfirmBody = '이 학력 정보를 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 경력 삭제 title (#668 D5)
+  static const swipeActionDeleteCareerConfirmTitle = '경력 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 경력 삭제 body
+  static const swipeActionDeleteCareerConfirmBody = '이 경력 정보를 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 자격증 삭제 title (#668 D5)
+  static const swipeActionDeleteCertificateConfirmTitle = '자격증 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 자격증 삭제 body
+  static const swipeActionDeleteCertificateConfirmBody = '이 자격증 정보를 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 백업 삭제 title (#668 D6)
+  static const swipeActionDeleteBackupConfirmTitle = '백업 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 백업 삭제 body
+  static const swipeActionDeleteBackupConfirmBody = '이 백업을 삭제할까요? 복구할 수 없습니다.';
+
+  /// PieceActions BottomSheet 타이틀 (#668 D4)
+  static const pieceActionsSheetTitle = '곡 액션';
+
+  /// PieceActions BottomSheet — 편집 라벨 (#668 D4)
+  static const pieceActionsEdit = '편집';
+
+  /// PieceActions BottomSheet — 배정 라벨 (#668 D4)
+  static const pieceActionsAssign = '학생에게 할당';
+
+  /// BackupItemActions BottomSheet 타이틀 (#668 D6)
+  static const backupActionsSheetTitle = '백업 액션';
+
+  /// BackupItemActions BottomSheet — 복원 라벨 (#668 D6)
+  static const backupActionsRestore = '복원';
+
+  /// BackupItemActions BottomSheet — 공유 라벨 (#668 D6)
+  static const backupActionsShare = '공유';
 
   // ── Lesson Time Settings ──
   static const profileLessonTimeTitle = '레슨 시간 설정';
