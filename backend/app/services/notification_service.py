@@ -36,6 +36,8 @@ TEACHER_NOTIFICATION_TYPES = frozenset(
         "renewalReminderSentNotice",
         # Issue #632 — 학원 강사 초대 거절 알림 (학원 owner).
         "academyInviteDeclined",
+        # Issue #633 — 학원 강사 초대 만료 임박 알림 (학원 owner, D-1).
+        "academyInviteExpiringSoon",
     }
 )
 STUDENT_NOTIFICATION_TYPES = frozenset(
