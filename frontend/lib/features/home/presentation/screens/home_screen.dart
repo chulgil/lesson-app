@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/coach_mark/coach_mark_controller.dart';
@@ -68,7 +70,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           description: AppStrings.coachMarkFirstStudentInviteDescription,
           actionLabel: AppStrings.coachMarkFirstStudentInviteAction,
           position: CoachMarkPosition.above,
-          onAction: () => setState(() => _currentIndex = 2),
+          onAction: () {
+            setState(() => _currentIndex = 2);
+            // Deep wiring (#652): 학생 탭 전환 후 초대 화면까지 안내.
+            context.push(AppRoutes.invite);
+          },
         ),
         CoachMarkStep(
           id: 'first_lesson_register',
@@ -77,7 +83,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           description: AppStrings.coachMarkFirstLessonRegisterDescription,
           actionLabel: AppStrings.coachMarkFirstLessonRegisterAction,
           position: CoachMarkPosition.above,
-          onAction: () => setState(() => _currentIndex = 1),
+          onAction: () {
+            setState(() => _currentIndex = 1);
+            // Deep wiring (#652): 레슨 탭 전환 후 레슨 추가 화면까지 안내.
+            context.push(AppRoutes.addLesson);
+          },
         ),
       ],
     );
