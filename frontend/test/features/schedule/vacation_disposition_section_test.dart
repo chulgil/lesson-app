@@ -49,7 +49,7 @@ class _StubRepo implements VacationRepository {
 
 void main() {
   group('Disposition section smoke — H-001 §4.1 step 3', () {
-    Widget _wrap() => ProviderScope(
+    Widget wrap() => ProviderScope(
       overrides: [
         vacationRepositoryProvider.overrideWithValue(_StubRepo()),
         vacationListProvider.overrideWith((_) async => <VacationPeriod>[]),
@@ -60,7 +60,7 @@ void main() {
     testWidgets('renders three options with the recommended badge', (
       tester,
     ) async {
-      await tester.pumpWidget(_wrap());
+      await tester.pumpWidget(wrap());
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       expect(find.text('어떻게 처리할까요?'), findsOneWidget);

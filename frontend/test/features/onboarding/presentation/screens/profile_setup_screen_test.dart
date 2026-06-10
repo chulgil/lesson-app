@@ -7,7 +7,6 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/auth/presentation/providers/auth_provider.dart';
-import 'package:lessonaza/features/onboarding/onboarding_facade.dart';
 import 'package:lessonaza/features/onboarding/presentation/providers/onboarding_providers.dart';
 import 'package:lessonaza/features/onboarding/presentation/screens/profile_setup_screen.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_onboarding.dart';
@@ -145,8 +144,9 @@ void main() {
     await pumpProfileSetup(
       tester,
       overrides: [
-        currentTeacherProfileNotifierProvider
-            .overrideWith(() => profileNotifier),
+        currentTeacherProfileNotifierProvider.overrideWith(
+          () => profileNotifier,
+        ),
         authNotifierProvider.overrideWith(() => authNotifier),
       ],
     );
