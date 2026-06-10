@@ -29,6 +29,17 @@ class AgeGroup(str, enum.Enum):
     adult = "adult"
 
 
+class PaymentRequestTarget(str, enum.Enum):
+    """Issue #636 — 입금 안내 받을 대상.
+
+    spec user_master.md §5.2 — 선생님이 학생별로 설정.
+    default = student (본인 입금).
+    """
+
+    student = "student"
+    parent = "parent"
+
+
 class PracticeLevel(str, enum.Enum):
     newStudent = "newStudent"
     excellent = "excellent"
@@ -76,6 +87,13 @@ class Student(UUIDMixin, TimestampMixin, Base):
     profile_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     background_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     profile_color: Mapped[str | None] = mapped_column(String(7), nullable=True, default="#6B5B95")
+    # Issue #636 — spec user_master.md §5.2 — 입금 안내 대상 (학생/학부모).
+    payment_request_target: Mapped[PaymentRequestTarget] = mapped_column(
+        Enum(PaymentRequestTarget, native_enum=True),
+        nullable=False,
+        default=PaymentRequestTarget.student,
+        server_default=PaymentRequestTarget.student.value,
+    )
 
     # Lesson defaults
     monthly_fee: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

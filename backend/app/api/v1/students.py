@@ -337,3 +337,36 @@ async def patch_parent_visibility(
         body.model_dump(exclude_unset=True),
         current_user,
     )
+
+
+# Issue #636 — 입금 안내 대상 (학생/학부모) 선생님이 설정.
+
+
+class PaymentRequestTargetPatch(BaseModel):
+    """spec user_master.md §5.2 — 'student' or 'parent'."""
+
+    payment_request_target: str  # 'student' | 'parent'
+
+
+@router.patch(
+    "/{student_id}/payment-request-target",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Set payment request target (teacher only)",
+)
+async def patch_payment_request_target(
+    student_id: str,
+    body: PaymentRequestTargetPatch,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> StudentResponse:
+    """spec user_master.md §5.2 — 선생님이 학생별 입금 안내 대상 설정.
+
+    target='parent' 명시 시 학생이 ParentChildRelation(active) 보유 필요.
+    """
+    service = StudentService(db)
+    return await service.update_payment_request_target(
+        student_id,
+        body.payment_request_target,
+        current_user,
+    )

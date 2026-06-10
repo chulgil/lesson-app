@@ -31,6 +31,8 @@ class StudentResponse(BaseModel):
     profile_image_url: str | None = None
     background_image_url: str | None = None
     profile_color: str | None = None
+    # Issue #636 — 입금 안내 대상 (학생/학부모).
+    payment_request_target: str | None = "student"
     birth_date: _dt.date | None = None
     age_group: str | None = None
     connected_at: _dt.datetime | None = None
