@@ -10,25 +10,18 @@ from app.core.security import create_access_token
 
 
 @pytest.mark.asyncio
-async def test_upload_recording(client: AsyncClient, auth_headers, create_test_user):
-    """POST /api/v1/recordings/upload fails gracefully without object storage."""
+async def test_upload_recording_teacher_role_rejected(client: AsyncClient, auth_headers, create_test_user):
+    """Phase 43 (2026-06-10 audit) — student role 외 업로드 403."""
     await create_test_user(user_id="test-user-id", role="teacher")
 
     fake_audio = io.BytesIO(b"\x00" * 1024)
-    fake_audio.name = "recording.m4a"
-
     response = await client.post(
         "/api/v1/recordings/upload",
         headers=auth_headers,
         files={"file": ("recording.m4a", fake_audio, "audio/mp4")},
-        data={
-            "section_id": "section-001",
-            "duration_seconds": "120",
-            "bpm": "80",
-        },
+        data={"duration_seconds": "120", "bpm": "80"},
     )
-    # Upload fails because object storage is not configured in test env
-    assert response.status_code == 500
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -490,7 +483,20 @@ async def test_upload_recording_saves_owner_and_storage_key(
     db_session,
 ):
     """Successful uploads persist the current user as owner and keep the object storage key."""
+    from datetime import date as _date
+
+    from app.models.practice import PracticeRepertoire, PracticeSection, RangeType
+
     await create_test_user(user_id="test-user-id", role="student")
+
+    # Phase 43 (2026-06-10 audit) — section ownership IDOR 검증 위해 본인 section 시드.
+    repertoire = PracticeRepertoire(student_id="test-user-id", name="레퍼토리", start_date=_date(2126, 7, 1))
+    db_session.add(repertoire)
+    await db_session.flush()
+    section = PracticeSection(repertoire_id=repertoire.id, piece_name="피스", range_type=RangeType.full)
+    db_session.add(section)
+    await db_session.flush()
+    section_id = section.id
 
     async def fake_upload_to_storage(self, file_key, file):
         return f"https://storage.example/{file_key}"
@@ -506,7 +512,7 @@ async def test_upload_recording_saves_owner_and_storage_key(
         headers=auth_headers,
         files={"file": ("recording.m4a", fake_audio, "audio/mp4")},
         data={
-            "section_id": "section-001",
+            "section_id": section_id,
             "duration_seconds": "120",
             "bpm": "80",
         },
@@ -516,7 +522,7 @@ async def test_upload_recording_saves_owner_and_storage_key(
 
     from app.models.practice import PracticeRecording
 
-    recording = await db_session.scalar(select(PracticeRecording).where(PracticeRecording.section_id == "section-001"))
+    recording = await db_session.scalar(select(PracticeRecording).where(PracticeRecording.section_id == section_id))
     assert recording is not None
     assert recording.student_id == "test-user-id"
     assert recording.file_key.startswith("recordings/")

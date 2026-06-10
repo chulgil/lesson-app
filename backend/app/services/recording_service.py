@@ -55,8 +55,35 @@ class RecordingService:
         - MIME / 확장자 화이트리스트 — 임의 바이너리 / 실행 가능 컨텐츠 차단.
         - Content-Length 기반 사전 사이즈 체크 — OOM 차단.
         - 확장자는 화이트리스트 정규화 후 S3 key 에 삽입 — `..` 또는 비ASCII 등 우회 차단.
+        - 업로드는 student role 한정 — 학부모/선생님 차단 (P1 #1, 2026-06-10 audit).
+        - section_id 가 명시되면 호출자 본인 소유 PracticeSection 인지 검증 (IDOR).
         """
-        from app.models.practice import PracticeRecording
+        from app.models.practice import PracticeRecording, PracticeSection
+
+        # 업로드 role gate — student 만 자기 연습 녹음 업로드.
+        role = getattr(getattr(user, "role", None), "value", None)
+        if role != "student":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only students can upload recordings",
+            )
+
+        # section_id ownership 검증 — IDOR 차단.
+        # PracticeSection → repertoire_id → PracticeRepertoire.student_id.
+        if section_id is not None:
+            from app.models.practice import PracticeRepertoire
+
+            section = await self.db.get(PracticeSection, section_id)
+            if section is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found")
+            owner_id = await self.db.scalar(
+                select(PracticeRepertoire.student_id).where(PracticeRepertoire.id == section.repertoire_id)
+            )
+            if owner_id != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Section not owned by caller",
+                )
 
         # MIME 화이트리스트.
         content_type = (file.content_type or "").lower().strip()
@@ -151,8 +178,12 @@ class RecordingService:
         }
 
     async def delete(self, recording_id: str, current_user: Any) -> None:
-        """Delete recording (file + metadata)."""
+        """Delete recording (file + metadata).
+
+        P1 fix (2026-06-10 audit) — student-self 또는 teacher 만 삭제 가능 (학부모 차단).
+        """
         rec = await self._get_accessible_recording(recording_id, current_user)
+        self._assert_write_role(rec, current_user)
 
         # Delete from storage
         await self._delete_from_storage(rec.file_key)
@@ -160,11 +191,27 @@ class RecordingService:
         await self.db.delete(rec)
         await self.db.flush()
 
+    @staticmethod
+    def _assert_write_role(rec: Any, current_user: Any) -> None:
+        """녹음 write 액션 (delete/share/set_representative) role gate.
+
+        - teacher: 자기 학생 녹음 → OK
+        - student: 자기 녹음 → OK
+        - parent: 모두 차단 (read-only)
+        """
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        if role == "parent":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Parents have read-only access to recordings",
+            )
+
     async def set_representative(self, recording_id: str, current_user: Any) -> RecordingResponse:
         """Mark a recording as the representative for its section."""
         from app.models.practice import PracticeRecording
 
         rec = await self._get_accessible_recording(recording_id, current_user)
+        self._assert_write_role(rec, current_user)
 
         # Unset previous representative for the same section.
         # Scope by the target recording's student so a teacher-set rep is
@@ -186,15 +233,23 @@ class RecordingService:
         return RecordingResponse.model_validate(rec)
 
     async def create_share_link(self, recording_id: str, current_user: Any) -> dict:
-        """Generate a shareable link for a recording."""
-        await self._get_accessible_recording(recording_id, current_user)
+        """Generate a shareable link for a recording.
+
+        P1 fix (2026-06-10 audit) — student-self / teacher only (parent 차단).
+        shared_at 컬럼을 갱신하여 FE 가 새로고침 후에도 공유 시각 표시 가능.
+        """
+        rec = await self._get_accessible_recording(recording_id, current_user)
+        self._assert_write_role(rec, current_user)
 
         share_token = str(uuid.uuid4())
         expires_at = datetime.now(UTC) + timedelta(days=7)
+        rec.shared_at = datetime.now(UTC)
+        await self.db.flush()
 
         return {
             "share_url": f"https://api.lessonaza.app/shared/recordings/{share_token}",
             "expires_at": expires_at.isoformat(),
+            "shared_at": rec.shared_at.isoformat(),
         }
 
     async def list_feedback(self, recording_id: str, current_user: Any) -> list[RecordingFeedbackResponse]:
