@@ -105,6 +105,12 @@ class ChildSubscriptionItem(BaseModel):
     amount: int | None = None
 
 
+class ChildConvertToAccountRequest(BaseModel):
+    """Issue #638 — 자녀 → 학생 계정 전환 요청."""
+
+    email: str
+
+
 class ChildProfileResponse(BaseModel):
     """Child profile response matching the Flutter ChildProfile contract."""
 
