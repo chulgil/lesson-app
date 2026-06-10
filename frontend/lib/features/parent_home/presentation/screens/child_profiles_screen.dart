@@ -12,6 +12,7 @@ import '../../../auth/auth_facade.dart';
 import '../../domain/entities/child_profile.dart';
 import '../extensions/parent_home_domain_visuals.dart';
 import '../providers/child_profile_provider.dart';
+import '../widgets/child_profile_actions_bottom_sheet.dart';
 import 'child_profile_form_screen.dart';
 
 /// Screen for managing child profiles (under-14 students)
@@ -53,8 +54,7 @@ class ChildProfilesScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space2),
                   TextButton(
-                    onPressed:
-                        () => ref.invalidate(childProfilesProvider(pid)),
+                    onPressed: () => ref.invalidate(childProfilesProvider(pid)),
                     child: const Text(AppStrings.retry),
                   ),
                 ],
@@ -112,13 +112,31 @@ class ChildProfilesScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       itemCount: profiles.length,
       itemBuilder: (context, index) {
+        final profile = profiles[index];
         return _ChildProfileCard(
-          profile: profiles[index],
-          onTap: () => _navigateToEditChild(context, profiles[index], pid),
-          onSwitchToChild:
-              () => _switchToChildView(context, ref, profiles[index]),
+          profile: profile,
+          onTap: () => _showActionsSheet(context, ref, profile, pid),
         );
       },
+    );
+  }
+
+  /// 자녀 카드 탭 → 2 액션 BottomSheet (#660 C7).
+  /// SwipeAction destructive 메타포가 부적절해 swipe 패턴 대신 채택.
+  Future<void> _showActionsSheet(
+    BuildContext context,
+    WidgetRef ref,
+    ChildProfile profile,
+    String pid,
+  ) {
+    return showNotebookModalBottomSheet<void>(
+      context: context,
+      builder:
+          (sheetContext) => ChildProfileActionsBottomSheet(
+            profile: profile,
+            onSwitchToChild: () => _switchToChildView(context, ref, profile),
+            onEditProfile: () => _navigateToEditChild(context, profile, pid),
+          ),
     );
   }
 
@@ -140,10 +158,8 @@ class ChildProfilesScreen extends ConsumerWidget {
       context,
       MaterialPageRoute(
         builder:
-            (context) => ChildProfileFormScreen(
-              parentId: pid,
-              existingProfile: profile,
-            ),
+            (context) =>
+                ChildProfileFormScreen(parentId: pid, existingProfile: profile),
       ),
     );
   }
@@ -170,13 +186,8 @@ class ChildProfilesScreen extends ConsumerWidget {
 class _ChildProfileCard extends StatelessWidget {
   final ChildProfile profile;
   final VoidCallback onTap;
-  final VoidCallback onSwitchToChild;
 
-  const _ChildProfileCard({
-    required this.profile,
-    required this.onTap,
-    required this.onSwitchToChild,
-  });
+  const _ChildProfileCard({required this.profile, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -280,29 +291,9 @@ class _ChildProfileCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Actions
-              Column(
-                children: [
-                  // Switch to child view button
-                  IconButton(
-                    onPressed: onSwitchToChild,
-                    icon: Icon(
-                      Icons.switch_account,
-                      color: AppColors.paperAccent,
-                    ),
-                    tooltip: '학생 화면으로 전환',
-                  ),
-                  // Edit button
-                  IconButton(
-                    onPressed: onTap,
-                    icon: Icon(
-                      Icons.edit_outlined,
-                      color: AppColors.inkSecondary,
-                    ),
-                    tooltip: '정보 수정',
-                  ),
-                ],
-              ),
+              // Actions — Column 2 버튼 제거 (#660 C7).
+              // 행 탭 → ChildProfileActionsBottomSheet 으로 통합.
+              Icon(Icons.chevron_right, color: AppColors.inkTertiary),
             ],
           ),
         ),

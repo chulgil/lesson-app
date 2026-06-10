@@ -151,6 +151,21 @@ class AppStrings {
   /// 스와이프 액션 접근성 힌트
   static const swipeActionHint = '스와이프 액션';
 
+  /// 스와이프 연결 해제 액션 라벨 (관계/연결 카드용 destructive)
+  static const swipeActionDisconnect = '연결 해제';
+
+  /// 스와이프 연결 해제 확인 다이얼로그 — 제목
+  static const swipeActionDisconnectConfirmTitle = '연결을 해제할까요?';
+
+  /// 스와이프 연결 해제 확인 다이얼로그 — 본문
+  static const swipeActionDisconnectConfirmBody = '이 학생과의 연결이 해제됩니다.';
+
+  /// 자녀 카드 액션 시트 — 학생 계정 전환
+  static const childProfileActionsSwitchAccount = '학생 계정 전환';
+
+  /// 자녀 카드 액션 시트 — 프로필 편집
+  static const childProfileActionsEditProfile = '프로필 편집';
+
   /// 보관 버튼
   static const archive = '보관';
 

@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../profile/profile_facade.dart';
 
@@ -207,17 +208,33 @@ class MyConnectionsScreen extends ConsumerWidget {
             ...activeConnections.map(
               (connection) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                child: _ConnectionCard(
-                  connection: connection,
-                  userRole: userRole,
-                  isActive: true,
-                  onTap:
-                      () => _showConnectionDetails(
-                        context,
-                        ref,
-                        connection,
-                        userRole,
-                      ),
+                child: SwipeActionTile(
+                  actions: [
+                    SwipeAction(
+                      label: AppStrings.swipeActionDisconnect,
+                      icon: Icons.link_off,
+                      tone: SwipeActionTone.destructive,
+                      onPressed:
+                          () => _handleDisconnectFromSwipe(
+                            context,
+                            ref,
+                            connection,
+                            userRole,
+                          ),
+                    ),
+                  ],
+                  child: _ConnectionCard(
+                    connection: connection,
+                    userRole: userRole,
+                    isActive: true,
+                    onTap:
+                        () => _showConnectionDetails(
+                          context,
+                          ref,
+                          connection,
+                          userRole,
+                        ),
+                  ),
                 ),
               ),
             ),
@@ -386,6 +403,45 @@ class MyConnectionsScreen extends ConsumerWidget {
           context,
         ).showSnackBar(SnackBar(content: Text('$otherName님과의 연결이 해제되었습니다')));
       }
+    }
+  }
+
+  /// SwipeAction 의 [연결 해제] 진입점.
+  /// _handleDeactivate 와 달리 영향 안내를 본문에 포함한 강화 확인 다이얼로그를 띄운다 (#660).
+  Future<void> _handleDisconnectFromSwipe(
+    BuildContext context,
+    WidgetRef ref,
+    Connection connection,
+    InviteUserRole userRole,
+  ) async {
+    final otherName =
+        userRole == InviteUserRole.teacher
+            ? connection.studentName
+            : connection.teacherName;
+
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.swipeActionDisconnectConfirmTitle,
+      content: Text(
+        '$otherName님 — ${AppStrings.swipeActionDisconnectConfirmBody}',
+      ),
+      confirmLabel: AppStrings.swipeActionDisconnect,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.pop(context, true),
+      onCancel: () => Navigator.pop(context, false),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final success = await ref
+        .read(connectionManagerProvider.notifier)
+        .deactivateConnection(connection.id);
+
+    if (success && context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$otherName님과의 연결이 해제되었습니다')));
     }
   }
 
@@ -578,13 +634,9 @@ class _ConnectionCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Actions
-            if (isActive)
-              IconButton(
-                onPressed: onTap,
-                icon: Icon(Icons.more_vert, color: AppColors.inkSecondary),
-              )
-            else if (onReconnect != null)
+            // Actions — active 카드는 SwipeActionTile 의 좌측 swipe 로
+            // [연결 해제] 노출. trailing 버튼 중복 배치 금지 (#660).
+            if (!isActive && onReconnect != null)
               TextButton(
                 onPressed: onReconnect,
                 style: TextButton.styleFrom(
