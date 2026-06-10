@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -18,6 +19,7 @@ import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
 import '../widgets/proposal_card_widgets.dart';
+import '../widgets/proposal_issued_action_bar.dart';
 import '../widgets/skip_reason_dialog.dart';
 
 /// Screen for students to view and respond to a subscription proposal.
@@ -68,10 +70,19 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       // Fixed bottom action bar
       bottomNavigationBar: proposalAsync.whenOrNull(
         data: (proposal) {
-          if (proposal == null || !proposal.canRespond || _isProcessing) {
+          if (proposal == null || _isProcessing) {
             return null;
           }
-          return _buildBottomActionBar(proposal);
+          if (proposal.canRespond) {
+            return _buildBottomActionBar(proposal);
+          }
+          // audit C2-F02: confirmed 후 학생을 SubscriptionDetail 로 안내.
+          // 수강권 발급 직후 "다음에 뭘 할지" 단절을 막는다.
+          if (proposal.status == ProposalStatus.confirmed &&
+              proposal.subscriptionId != null) {
+            return _buildIssuedActionBar(proposal);
+          }
+          return null;
         },
       ),
     );
@@ -324,16 +335,26 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                     padding: EdgeInsets.all(AppSpacing.space4),
                     child: Center(child: CircularProgressIndicator()),
                   ),
-              error: (e, _) => Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Row(
-                  children: [
-                    Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
-                    const SizedBox(width: AppSpacing.space2),
-                    Text(AppStrings.loadDataFailed, style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary)),
-                  ],
-                ),
-              ),
+              error:
+                  (e, _) => Padding(
+                    padding: const EdgeInsets.all(AppSpacing.space4),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 16,
+                          color: AppColors.inkTertiary,
+                        ),
+                        const SizedBox(width: AppSpacing.space2),
+                        Text(
+                          AppStrings.loadDataFailed,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.inkSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               data: (template) {
                 if (template == null) return const SizedBox.shrink();
 
@@ -481,19 +502,26 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+      error:
+          (e, _) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDetailsCard(template: template);
@@ -510,19 +538,26 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+      error:
+          (e, _) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDiscountCard(proposal: proposal, template: template);
@@ -539,19 +574,26 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+      error:
+          (e, _) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return _buildPaymentCard(proposal, template);
@@ -685,6 +727,26 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         ),
       );
     }
+  }
+
+  /// audit C2-F02: confirmed 상태 학생용 액션바 — SubscriptionDetail 진입.
+  ///
+  /// 실제 렌더는 `ProposalIssuedActionBar` 위젯이 담당하고, 본 메서드는
+  /// router 의존만 주입한다 (위젯은 widget smoke test 로 격리 검증).
+  /// student_direct_booking_spec §8 "수강권 발급 완료" 진입점에 해당.
+  Widget _buildIssuedActionBar(SubscriptionProposal proposal) {
+    final subscriptionId = proposal.subscriptionId;
+    if (subscriptionId == null) {
+      return const SizedBox.shrink();
+    }
+    return ProposalIssuedActionBar(
+      subscriptionId: subscriptionId,
+      onTap:
+          () => context.go(
+            AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
+            extra: const {'viewerRole': 'student'},
+          ),
+    );
   }
 
   /// Fixed bottom action bar for proposal response

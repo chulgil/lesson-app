@@ -127,7 +127,7 @@ LessonBookingParams {
 | 진입 | 위치 | 비고 |
 |------|------|------|
 | 선생님 상세 | `TeacherDetailScreen` 하단 CTA | 기존 "레슨 신청"과 별개 또는 통합 — 수강권 보유 시 직접 예약 우선 |
-| 수강권 발급 완료 | 수강권 발급 성공 직후 | 첫 레슨 예약 유도 |
+| 수강권 발급 완료 | `ProposalDetailScreen` 의 `ProposalStatus.confirmed` 상태 하단 액션바 | audit C2-F02. `ProposalIssuedActionBar` 가 "내 수강권 보고 첫 레슨 잡기" CTA 노출 → `/subscriptions/:id` (SubscriptionDetail) 로 이동. 거기서 학생이 선생님과 일정 협의 |
 | (옵션) 학생 GettingStarted Step3 | 첫 레슨 예약 퀘스트 | subscription 보유 학생 한정 |
 
 라우트: `AppRoutes.lessonDirectBooking = '/schedule/booking/direct'`, extra=`LessonBookingParams`.
@@ -152,4 +152,6 @@ LessonBookingParams {
 | `presentation/widgets/availability/empty_slots_suggestion.dart` | 재사용 — 빈 슬롯 제안 |
 | `presentation/providers/teacher_availability_providers.dart` | 조회/예약 provider |
 | `core/router/routes/schedule_routes.dart` | 라우트 등록 |
+| `features/subscription/presentation/widgets/proposal_issued_action_bar.dart` | audit C2-F02 — 발급 완료 CTA (진입점 §8) |
+| `features/subscription/presentation/screens/proposal_detail_screen.dart` | `_buildIssuedActionBar` 가 confirmed 상태에서 위 위젯 렌더 |
 | `features/search/.../teacher_detail_screen.dart` | 진입 CTA |
