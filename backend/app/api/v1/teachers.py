@@ -34,6 +34,8 @@ async def list_teachers(
     current_user: Annotated[User, Depends(get_current_user)],
     pagination: Annotated[dict, Depends(get_pagination)],
     instrument: str | None = None,
+    # Phase 44 (2026-06-10 audit) — 다중 instruments 필터 지원.
+    instruments: Annotated[list[str] | None, Query()] = None,
     area: str | None = None,
     q: str | None = None,
     lesson_type: str | None = None,
@@ -45,11 +47,14 @@ async def list_teachers(
 ) -> PaginatedResponse[TeacherResponse]:
     """Search / list teacher profiles."""
     service = TeacherService(db)
+    # 단수 instrument backward-compat — 다중 instruments 가 우선.
+    effective_instruments = instruments or ([instrument] if instrument else None)
     return await service.get_all(
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
         instrument=instrument,
+        instruments=effective_instruments,
         area=area,
         q=q,
         lesson_type=lesson_type,
@@ -316,3 +321,47 @@ async def get_teacher_dashboard(
     """Return aggregated dashboard data for the teacher."""
     service = TeacherService(db)
     return await service.get_dashboard(teacher_id, current_user)
+
+
+# Phase 44 (2026-06-10 audit) — RESTful alias for /reviews/{teacher_id}.
+@router.get(
+    "/{teacher_id}/reviews",
+    response_model=PaginatedResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List reviews for a teacher (RESTful alias)",
+)
+async def list_teacher_reviews_alias(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+):
+    """spec discovery audit (2026-06-10) — /reviews/{id} alias."""
+    from app.services.review_service import ReviewService
+
+    service = ReviewService(db)
+    return await service.get_reviews(
+        teacher_id,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+    )
+
+
+@router.get(
+    "/{teacher_id}/reviews/summary",
+    status_code=status.HTTP_200_OK,
+    summary="Get review summary for a teacher (RESTful alias)",
+)
+async def get_teacher_review_summary_alias(
+    teacher_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """spec discovery audit (2026-06-10) — /reviews/{id}/summary alias."""
+    from app.schemas.review import TeacherReviewSummary
+    from app.services.review_service import ReviewService
+
+    service = ReviewService(db)
+    data = await service.get_review_summary(teacher_id)
+    return TeacherReviewSummary.model_validate(data)

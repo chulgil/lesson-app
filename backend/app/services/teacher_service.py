@@ -63,6 +63,7 @@ class TeacherService:
         size: int,
         offset: int,
         instrument: str | None = None,
+        instruments: list[str] | None = None,
         area: str | None = None,
         q: str | None = None,
         lesson_type: str | None = None,
@@ -71,13 +72,21 @@ class TeacherService:
         fee_min: int | None = None,
         fee_max: int | None = None,
     ) -> PaginatedResponse[TeacherResponse]:
-        """List / search teachers with pagination."""
+        """List / search teachers with pagination.
+
+        Phase 44 (2026-06-10 audit) — instruments 다중 + visibility_settings.is_public=false 차단.
+        """
         from app.models.teacher import CertificateStatus, Teacher, TeacherCertificate
         from app.models.user import User
 
         query = select(Teacher)
 
-        if instrument:
+        # Phase 44 — 다중 instruments OR 매칭. 명시되면 단수 instrument 무시.
+        if instruments:
+            from sqlalchemy import or_ as _or
+
+            query = query.where(_or(*[Teacher.instruments.cast(String).ilike(f"%{inst}%") for inst in instruments]))
+        elif instrument:
             # JSON array contains check (SQLite: use LIKE, PostgreSQL: use @>)
             query = query.where(Teacher.instruments.cast(String).ilike(f"%{instrument}%"))
         if area:
@@ -111,6 +120,15 @@ class TeacherService:
                     Teacher.lesson_areas.cast(String).ilike(f"%{q}%"),
                 )
             )
+
+        # Phase 44 (2026-06-10 audit) — visibility_settings.is_public=false 차단.
+        # NULL (미설정) 또는 is_public!=false 인 선생님만 검색 결과 노출.
+        query = query.where(
+            or_(
+                Teacher.visibility_settings.is_(None),
+                Teacher.visibility_settings.cast(String).not_ilike('%"is_public": false%'),
+            )
+        )
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
@@ -311,9 +329,7 @@ class TeacherService:
         teacher = await self.db.scalar(select(Teacher).where(Teacher.user_id == user_id))
         if teacher is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
-        result = await self.db.scalars(
-            select(TeacherCertificate).where(TeacherCertificate.teacher_id == teacher.id)
-        )
+        result = await self.db.scalars(select(TeacherCertificate).where(TeacherCertificate.teacher_id == teacher.id))
         return [TeacherCertificateResponse.model_validate(c) for c in result.all()]
 
     async def create_my_certificate(self, user_id: str, data: dict) -> TeacherCertificateResponse:
@@ -348,9 +364,7 @@ class TeacherService:
         await self.db.refresh(certificate)
         return TeacherCertificateResponse.model_validate(certificate)
 
-    async def update_my_certificate(
-        self, user_id: str, certificate_id: str, data: dict
-    ) -> TeacherCertificateResponse:
+    async def update_my_certificate(self, user_id: str, certificate_id: str, data: dict) -> TeacherCertificateResponse:
         """Re-submit a certificate. status 가 approved 면 갱신 차단."""
         from app.models.teacher import CertificateStatus, CertificateType, Teacher, TeacherCertificate
 
