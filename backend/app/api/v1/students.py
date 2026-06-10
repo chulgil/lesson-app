@@ -41,6 +41,7 @@ class StudentProfileUpdate(BaseModel):
     phone: str | None = None
     profile_image_url: str | None = None
 
+
 router = APIRouter()
 
 
@@ -278,3 +279,61 @@ async def update_my_profile(
     """Update the authenticated student's own profile."""
     service = StudentService(db)
     return await service.update_student_profile(body, current_user)
+
+
+# Issue #637 — 학부모 열람 권한 CRUD (spec parent_system.md §6.1).
+# RESTful path — student id 가 자원 식별자, parent-visibility 가 서브 자원.
+
+
+class ParentVisibilityPatch(BaseModel):
+    """Issue #637 — 7 카테고리 부분 업데이트."""
+
+    can_view_schedule: bool | None = None
+    can_view_assignments: bool | None = None
+    can_view_practice: bool | None = None
+    can_view_lesson_notes: bool | None = None
+    can_view_recordings: bool | None = None
+    can_view_detailed_feedback: bool | None = None
+    can_view_chat: bool | None = None
+
+
+@router.get(
+    "/{student_id}/parent-visibility",
+    status_code=status.HTTP_200_OK,
+    summary="Get parent visibility settings for a student",
+)
+async def get_parent_visibility(
+    student_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """선생님 또는 학부모(자녀의 경우) 가 student 별 권한 조회.
+
+    teacher_id 는 student 의 현재 활성 teacher 로 자동 resolve.
+    """
+    from app.services.parent_service import ParentService
+
+    service = ParentService(db)
+    return await service.get_visibility_settings_by_student(student_id, current_user)
+
+
+@router.patch(
+    "/{student_id}/parent-visibility",
+    status_code=status.HTTP_200_OK,
+    summary="Patch parent visibility settings (teacher only)",
+)
+async def patch_parent_visibility(
+    student_id: str,
+    body: ParentVisibilityPatch,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """선생님이 자기 학생의 학부모 열람 권한 7 카테고리 부분 업데이트."""
+    from app.services.parent_service import ParentService
+
+    service = ParentService(db)
+    return await service.save_visibility_settings_by_student(
+        student_id,
+        body.model_dump(exclude_unset=True),
+        current_user,
+    )

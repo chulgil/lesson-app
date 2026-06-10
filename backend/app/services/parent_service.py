@@ -849,6 +849,78 @@ class ParentService:
         await self.db.refresh(settings)
         return ParentVisibilitySettingsResponse.model_validate(settings)
 
+    async def get_visibility_settings_by_student(
+        self,
+        student_id: str,
+        current_user: Any,
+    ) -> ParentVisibilitySettingsResponse:
+        """Issue #637 — student id 만으로 teacher_id 자동 resolve 후 조회.
+
+        teacher 는 자기 학생의 active relation 으로 자동 매칭.
+        parent 는 자녀의 활성 teacher 관계로 자동 매칭.
+        """
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        teacher_id = student.teacher_id
+        if teacher_id is None:
+            # Student.teacher_id 가 비어있으면 active relation 으로 찾음.
+            teacher_id = await self.db.scalar(
+                select(TeacherStudentRelation.teacher_id)
+                .where(TeacherStudentRelation.student_id == student_id)
+                .where(TeacherStudentRelation.status == RelationStatus.active)
+                .order_by(TeacherStudentRelation.created_at.desc())
+            )
+        if teacher_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No active teacher for student",
+            )
+        return await self.get_visibility_settings(teacher_id, student_id, current_user)
+
+    async def save_visibility_settings_by_student(
+        self,
+        student_id: str,
+        partial: dict,
+        current_user: Any,
+    ) -> ParentVisibilitySettingsResponse:
+        """Issue #637 — student id path 기반 PATCH. teacher 만 호출 가능."""
+        from app.models.relationship import RelationStatus, TeacherStudentRelation
+        from app.models.student import Student
+
+        role = getattr(getattr(current_user, "role", None), "value", None)
+        if role != "teacher":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Teacher role required")
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        teacher_id = student.teacher_id or await self.db.scalar(
+            select(TeacherStudentRelation.teacher_id)
+            .where(TeacherStudentRelation.student_id == student_id)
+            .where(TeacherStudentRelation.status == RelationStatus.active)
+            .order_by(TeacherStudentRelation.created_at.desc())
+        )
+        if teacher_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No active teacher for student",
+            )
+
+        await self._assert_teacher_owns_visibility_settings(teacher_id, current_user.id)
+        settings = await self._get_or_create_visibility_settings(teacher_id, student_id)
+        for key, value in partial.items():
+            if value is None:
+                continue
+            if hasattr(settings, key):
+                setattr(settings, key, value)
+        await self.db.flush()
+        await self.db.refresh(settings)
+        return ParentVisibilitySettingsResponse.model_validate(settings)
+
     async def _get_or_create_visibility_settings(self, teacher_id: str, student_id: str) -> Any:
         from app.models.parent import ParentVisibilitySettings
 
