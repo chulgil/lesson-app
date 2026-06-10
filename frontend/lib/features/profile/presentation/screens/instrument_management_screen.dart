@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -43,30 +44,27 @@ class _InstrumentManagementScreenState
       body: settingsAsync.when(
         data: (settings) => _buildContent(settings),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  const Text(AppStrings.profileInstrumentError),
-                  const SizedBox(height: AppSpacing.space4),
-                  FilledButton(
-                    onPressed:
-                        () =>
-                            ref
-                                .read(teacherSettingsNotifierProvider.notifier)
-                                .refresh(),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
+        error: (_, __) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: AppColors.paperAccent,
               ),
-            ),
+              const SizedBox(height: AppSpacing.space4),
+              const Text(AppStrings.profileInstrumentError),
+              const SizedBox(height: AppSpacing.space4),
+              FilledButton(
+                onPressed: () => ref
+                    .read(teacherSettingsNotifierProvider.notifier)
+                    .refresh(),
+                child: const Text(AppStrings.retry),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -96,22 +94,20 @@ class _InstrumentManagementScreenState
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder:
-          (sheetContext) => ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.82,
-            ),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.space4,
-                AppSpacing.space4,
-                AppSpacing.space4,
-                AppSpacing.space4 +
-                    MediaQuery.of(sheetContext).viewInsets.bottom,
-              ),
-              child: _buildAddInstrumentSection(currentInstruments),
-            ),
+      builder: (sheetContext) => ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.82,
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.space4,
+            AppSpacing.space4,
+            AppSpacing.space4,
+            AppSpacing.space4 + MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
+          child: _buildAddInstrumentSection(currentInstruments),
+        ),
+      ),
     );
   }
 
@@ -126,7 +122,7 @@ class _InstrumentManagementScreenState
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
-          '악기를 탭하면 삭제할 수 있습니다',
+          '오른쪽으로 스와이프해 악기를 삭제할 수 있습니다',
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -172,23 +168,26 @@ class _InstrumentManagementScreenState
     required String instrument,
     int index = 0,
   }) {
-    return NotebookCard(
+    return SwipeActionTile(
       key: key,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppColors.paperAccentSoft,
-          child: Icon(
-            _getInstrumentIcon(instrument),
-            color: AppColors.paperAccent,
-          ),
-        ),
-        title: Text(instrument, style: AppTypography.bodyLarge),
-        trailing: IconButton(
-          icon: const Icon(
-            Icons.delete_outline,
-            color: AppColors.paperAccent,
-          ),
+      actions: [
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
           onPressed: () => _showDeleteConfirmation(instrument),
+        ),
+      ],
+      child: NotebookCard(
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: AppColors.paperAccentSoft,
+            child: Icon(
+              _getInstrumentIcon(instrument),
+              color: AppColors.paperAccent,
+            ),
+          ),
+          title: Text(instrument, style: AppTypography.bodyLarge),
         ),
       ),
     );
@@ -196,10 +195,9 @@ class _InstrumentManagementScreenState
 
   Widget _buildAddInstrumentSection(List<String> currentInstruments) {
     // Filter out already added instruments
-    final availableInstruments =
-        InstrumentList.all
-            .where((i) => !currentInstruments.contains(i))
-            .toList();
+    final availableInstruments = InstrumentList.all
+        .where((i) => !currentInstruments.contains(i))
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,18 +221,17 @@ class _InstrumentManagementScreenState
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children:
-                availableInstruments.map((instrument) {
-                  return ActionChip(
-                    avatar: Icon(
-                      _getInstrumentIcon(instrument),
-                      size: 18,
-                      color: AppColors.paperAccent,
-                    ),
-                    label: Text(instrument),
-                    onPressed: () => _addInstrument(instrument),
-                  );
-                }).toList(),
+            children: availableInstruments.map((instrument) {
+              return ActionChip(
+                avatar: Icon(
+                  _getInstrumentIcon(instrument),
+                  size: 18,
+                  color: AppColors.paperAccent,
+                ),
+                label: Text(instrument),
+                onPressed: () => _addInstrument(instrument),
+              );
+            }).toList(),
           ),
           const SizedBox(height: AppSpacing.space4),
         ],
@@ -349,8 +346,10 @@ class _InstrumentManagementScreenState
   void _showDeleteConfirmation(String instrument) {
     showNotebookDialog(
       context: context,
-      title: AppStrings.profileInstrumentDeleteTitle,
-      content: Text('$instrument을(를) 목록에서 삭제하시겠습니까?'),
+      title: AppStrings.swipeActionDeleteInstrumentConfirmTitle,
+      content: Text(
+        '$instrument — ${AppStrings.swipeActionDeleteInstrumentConfirmBody}',
+      ),
       confirmLabel: AppStrings.delete,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
@@ -371,5 +370,4 @@ class _InstrumentManagementScreenState
       ).showSnackBar(SnackBar(content: Text('$instrument이(가) 삭제되었습니다')));
     }
   }
-
 }
