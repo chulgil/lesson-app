@@ -38,7 +38,13 @@
 
 - **얕은 뎁스** — 모든 기능 2탭 이내 도달
 - **원클릭** — 핵심 작업은 한 번 탭으로 완료
-- **스와이프 액션 우선** — 반복 리스트의 행 단위 편집/삭제/보관은 `SwipeActionTile`을 우선 검토. trailing 아이콘 버튼과 중복 배치 금지. 스펙: `docs/_components/swipe_action.md`
+- **스와이프 액션 3원칙 (HARD-GATE, audit 2026-06-10)** — 반복 리스트의 행 단위 액션은 다음 3원칙을 따른다. trailing 아이콘 버튼/PopupMenuButton 과 중복 배치 금지.
+  1. **swipe = destructive 단일** — 한 swipe 안에 destructive 액션 1개만 (`SwipeActionTone.destructive`). 보통 [삭제] / [연결 해제] 등.
+  2. **다중 액션 = 행 탭 → BottomSheet** — 수정/공유/대표설정/전환 등은 `showModalBottomSheet` 안에 `ListTile` 로 나열. swipe 안에 2+ 액션 금지 (좁은 화면 가독성 저하 + 멘탈 모델 분산).
+  3. **모든 destructive 는 확인 다이얼로그** — `showDialog<AlertDialog>` 로 확인 받기. 영향도가 있으면 강화 메시지 ("계좌 삭제 시 학생 결제 표시에서 사라집니다" + 영향 카운트). Undo SnackBar 단독 금지.
+  - **예외**: 자녀/관계 같은 메타포상 destructive 부적절한 카드는 swipe 적용하지 않음 — BottomSheet 다중 액션만.
+  - 스펙: `docs/_components/swipe_action.md` (3원칙 본문 + 코드 예시 + 적용 사례 7곳)
+  - audit: `docs/specs/_audits/2026-06-10-swipe-action-consistency-audit.md`
 - **Hick's Law** — 하루 10회+ 반복 인터랙션은 선택지 1개. 뉘앙스 필요 시 텍스트 입력 (#22)
 - **플레이스홀더 UI 금지** — 미구현 기능의 UI 요소는 코드에서 제거. "Phase N에서 구현 예정"은 스펙에만 명시 (#15)
 - **NO-OP 버튼 금지** — 탭해도 아무 일도 안 일어나는 버튼은 앱 신뢰 하락 (#4, #15)
