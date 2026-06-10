@@ -7,7 +7,7 @@ part of 'onboarding_progress_storage_provider.dart';
 // **************************************************************************
 
 String _$onboardingProgressStorageHash() =>
-    r'cbdbe4ee6a03f1e8e2066d13efa5271c91fcaff8';
+    r'f1822e12777a7deab164aca82a30b1b372470ba4';
 
 /// See also [OnboardingProgressStorage].
 @ProviderFor(OnboardingProgressStorage)

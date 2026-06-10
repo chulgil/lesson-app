@@ -84,7 +84,7 @@ final practiceAudioMixServiceProvider =
 
 typedef PracticeAudioMixServiceRef = ProviderRef<PracticeAudioMixService>;
 String _$practiceLoopOverrideNotifierHash() =>
-    r'c09d5bf7d5cf43bb23e631e2244884c8499e512a';
+    r'3658467de28dec30e754c98aaa9537efd9fb7941';
 
 /// Copied from Dart SDK
 class _SystemHash {
