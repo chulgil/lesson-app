@@ -31,6 +31,11 @@ abstract class AuthRepository {
   /// 기록된다.
   Future<AuthUser> acceptTerms({required bool marketingConsent});
 
+  /// #608 §13 — 11/11 퀘스트 완료 축하 카드 1회 표시 보장.
+  ///
+  /// Idempotent: 첫 호출 시만 `quest_celebrated_at` 설정. 이후 호출은 기존 값 보존.
+  Future<AuthUser> markQuestCelebrated();
+
   /// Logout (revoke tokens on server).
   Future<void> logout();
 }

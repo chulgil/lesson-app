@@ -104,6 +104,26 @@ async def complete_onboarding(
     return UserResponse.model_validate(user)
 
 
+@router.patch(
+    "/me/quest-celebrated",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Mark 11/11 quest celebration card shown",
+)
+async def mark_quest_celebrated(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> UserResponse:
+    """#608 Job 7 — Idempotently flip ``quest_celebrated_at`` on first dismiss/action.
+
+    Subsequent calls (e.g. duplicate taps) do not modify the column so the
+    celebration card remains a one-shot UI surface.
+    """
+    service = UserService(db)
+    user = await service.mark_quest_celebrated(current_user.id)
+    return UserResponse.model_validate(user)
+
+
 @router.get(
     "/me/onboarding-progress",
     response_model=OnboardingProgressResponse,

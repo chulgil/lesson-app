@@ -112,3 +112,61 @@ async def test_student_onboarding_complete_succeeds_after_student_profile(
 
     assert response.status_code == 200, response.text
     assert response.json()["onboarding_completed"] is True
+
+
+@pytest.mark.asyncio
+async def test_mark_quest_celebrated_first_call_sets_timestamp(client: AsyncClient, auth_headers, create_test_user):
+    """#608 Job 7 — 첫 호출 시 ``quest_celebrated_at`` 가 설정된다."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.patch("/api/v1/users/me/quest-celebrated", headers=auth_headers)
+
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["quest_celebrated_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_mark_quest_celebrated_is_idempotent(client: AsyncClient, auth_headers, create_test_user):
+    """#608 Job 7 — 두 번째 호출은 첫 번째 값을 보존한다 (idempotent)."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    first = await client.patch("/api/v1/users/me/quest-celebrated", headers=auth_headers)
+    assert first.status_code == 200
+    first_ts = first.json()["quest_celebrated_at"]
+    assert first_ts is not None
+
+    second = await client.patch("/api/v1/users/me/quest-celebrated", headers=auth_headers)
+    assert second.status_code == 200
+    assert second.json()["quest_celebrated_at"] == first_ts
+
+
+@pytest.mark.asyncio
+async def test_mark_quest_celebrated_only_affects_current_user(client: AsyncClient, auth_headers, create_test_user):
+    """#608 Job 7 — 다른 사용자의 ``quest_celebrated_at`` 은 영향을 받지 않는다."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-user-id",
+        role="teacher",
+        name="Other Teacher",
+        email="other@test.com",
+    )
+
+    response = await client.patch("/api/v1/users/me/quest-celebrated", headers=auth_headers)
+    assert response.status_code == 200
+    assert response.json()["id"] == "test-user-id"
+
+    other_token = create_access_token(data={"sub": "other-user-id", "role": "teacher"})
+    other_profile = await client.get(
+        "/api/v1/users/me",
+        headers={"Authorization": f"Bearer {other_token}"},
+    )
+    assert other_profile.status_code == 200
+    assert other_profile.json()["quest_celebrated_at"] is None
+
+
+@pytest.mark.asyncio
+async def test_mark_quest_celebrated_requires_auth(client: AsyncClient):
+    """#608 Job 7 — 인증 없이는 401."""
+    response = await client.patch("/api/v1/users/me/quest-celebrated")
+    assert response.status_code == 401
