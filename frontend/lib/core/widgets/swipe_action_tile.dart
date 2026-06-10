@@ -10,6 +10,14 @@ import '../theme/app_typography.dart';
 
 enum SwipeActionTone { normal, destructive }
 
+/// Swipe-to-reveal action tile.
+///
+/// 사용 정책 (3원칙):
+/// 1. swipe = destructive 단일 (`SwipeActionTone.destructive`)
+/// 2. 다중 액션 = 행 탭 → BottomSheet (`showModalBottomSheet`)
+/// 3. 모든 destructive 는 확인 다이얼로그 (`showDialog<AlertDialog>`)
+///
+/// SSOT: docs/_components/swipe_action.md, .claude/rules/ux-rules.md
 class SwipeAction {
   const SwipeAction({
     required this.label,
@@ -24,6 +32,14 @@ class SwipeAction {
   final SwipeActionTone tone;
 }
 
+/// Swipe-to-reveal 행 단위 액션 타일.
+///
+/// 사용 정책 (3원칙) — 상세는 [SwipeAction] dartdoc 및 SSOT 참조:
+/// 1. swipe = destructive 단일 (`SwipeActionTone.destructive`)
+/// 2. 다중 액션 = 행 탭 → BottomSheet (`showModalBottomSheet`)
+/// 3. 모든 destructive 는 확인 다이얼로그 (`showDialog<AlertDialog>`)
+///
+/// SSOT: docs/_components/swipe_action.md, .claude/rules/ux-rules.md
 class SwipeActionTile extends StatefulWidget {
   const SwipeActionTile({
     super.key,
@@ -71,19 +87,18 @@ class _SwipeActionTileState extends State<SwipeActionTile> {
                 alignment: Alignment.centerLeft,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children:
-                      widget.actions
-                          .map(
-                            (action) => _SwipeActionButton(
-                              action: action,
-                              width: widget.actionWidth,
-                              onPressed: () {
-                                setState(() => _revealed = false);
-                                action.onPressed();
-                              },
-                            ),
-                          )
-                          .toList(),
+                  children: widget.actions
+                      .map(
+                        (action) => _SwipeActionButton(
+                          action: action,
+                          width: widget.actionWidth,
+                          onPressed: () {
+                            setState(() => _revealed = false);
+                            action.onPressed();
+                          },
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ),

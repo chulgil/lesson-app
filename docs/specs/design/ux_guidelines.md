@@ -89,8 +89,14 @@ Q: 이 색상은 무엇을 의미하나?
 
 > 공통 컴포넌트: `docs/_components/swipe_action.md`
 > Flutter 구현: `frontend/lib/core/widgets/swipe_action_tile.dart`
+> 정비 audit: `docs/specs/_audits/2026-06-10-swipe-action-consistency-audit.md`
 
 반복 리스트에서 편집/삭제 같은 관리 액션은 가능한 스와이프 액션으로 제공한다. 화면에 항상 보이는 trailing 아이콘 버튼을 줄여 정보 스캔 비용을 낮추고, 사용자가 행 단위로 관리 작업을 처리할 수 있게 한다.
+
+**3원칙 (HARD-GATE)**:
+1. **swipe = destructive 단일** — `SwipeActionTone.destructive` 액션 1개만 (삭제 / 연결 해제 등).
+2. **다중 액션 = 행 탭 → BottomSheet** — 수정/공유/대표설정 등 2개 이상이면 `showModalBottomSheet` 로 분리. swipe 안에 2+ 액션 금지.
+3. **모든 destructive 는 확인 다이얼로그** — `showDialog<AlertDialog>` 경유. 영향도 있으면 강화 메시지 (영향 카운트 / 학생 노출 등).
 
 **적용 우선순위**:
 - 같은 형태의 행이 3개 이상 반복되는 관리 리스트
@@ -100,12 +106,13 @@ Q: 이 색상은 무엇을 의미하나?
 **금지**:
 - 스와이프 액션과 동일한 trailing 아이콘 버튼을 같은 행에 중복 배치
 - 삭제 후 그룹 전체를 없애서 현재 요일/카테고리 맥락이 사라지는 처리
-- 3개 이상의 액션을 한 행에 노출
+- swipe 안에 2개 이상의 액션 노출 (원칙 2 위반 — BottomSheet 로 분리)
+- destructive swipe 액션이 확인 다이얼로그 없이 즉시 삭제 실행 (원칙 3 위반)
 
 **권장 액션 구성**:
-- 오른쪽 스와이프 → 왼쪽에 네모 버튼 1~2개 노출
-- 일반 액션: `AppColors.ink` 배경
-- 파괴적 액션: `AppColors.paperAccent` 배경
+- 오른쪽 스와이프 → 왼쪽에 destructive 버튼 1개 노출
+- destructive 액션: `AppColors.paperAccent` 배경 + `SwipeActionTone.destructive`
+- 다중 액션: 행 탭 → BottomSheet 안 `ListTile` 나열
 - 라벨: `AppStrings` 상수
 
 ### 1.2 타이포그래피 (AppTypography)
