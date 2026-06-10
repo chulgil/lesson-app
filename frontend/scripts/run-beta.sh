@@ -15,9 +15,6 @@ if [ -n "$DEVICE" ]; then
   DEVICE_FLAG="-d $DEVICE"
 fi
 
-echo "[run-beta] device='$DEVICE' flag='$DEVICE_FLAG'"
-echo "[run-beta] flutter run command:"
-set -x
 flutter run $DEVICE_FLAG \
   --dart-define=USE_MOCK=false \
   --dart-define=API_BASE_URL=https://api-beta.lessonaza.app/api/v1 \
