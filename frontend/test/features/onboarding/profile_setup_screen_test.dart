@@ -31,7 +31,8 @@ void main() {
   );
 
   testWidgets(
-    'ProfileSetupScreen allows moving forward without a profile photo',
+    'ProfileSetupScreen allows moving forward without a profile photo or '
+    'introduction (A1: 소개글은 Phase A 에서 제거)',
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -43,6 +44,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // A1: 이름 필드 1개만 존재 (소개글 입력 섹션 제거됨).
+      expect(find.byType(TextField), findsOneWidget);
+
       await tester.enterText(find.byType(TextField).at(0), '테스트 선생님');
 
       await tester.ensureVisible(
@@ -51,12 +55,6 @@ void main() {
       await tester.tap(find.byKey(ProfileSetupScreen.instrumentSelectorKey));
       await tester.pumpAndSettle();
       await tester.tap(find.text('바이올린'));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(
-        find.byType(TextField).at(1),
-        '학생들에게 보여질 소개글입니다. 20자 이상이어야 합니다.',
-      );
       await tester.pumpAndSettle();
 
       final submitButton = tester.widget<ElevatedButton>(
@@ -72,6 +70,8 @@ void main() {
         find.text(AppStrings.onboardingProfilePhotoTrustHint),
         findsOneWidget,
       );
+      // A1: 소개 (선택) 라벨이 더 이상 화면에 존재하지 않는다.
+      expect(find.text('소개 (선택)'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

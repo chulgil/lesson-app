@@ -101,6 +101,10 @@
 - 소개글, 전화인증, 프로필 사진 → Phase C로 이동
 - "시작하기" 탭 → 홈 화면 즉시 진입
 
+> **코드 반영 노트 (2026-06-10 — _audits/2026-06-10-teacher-flow-ux-audit.md §4.1 A1)**:
+> Phase A 에서 소개글 입력 섹션을 완전 제거함 (이전 코드는 화면=선택, 검증=필수 20자 충돌 → 가입 차단 가능). `TeacherOnboardingProfile.isValid` 도 `name.isNotEmpty && instruments.isNotEmpty` 로 정렬.
+> 소개글은 Phase C 보상 퀘스트(`profileIntroduction`, §3.4) 로 이관됨.
+
 ### 3.3 Phase B: 핵심 설정 (코치마크 가이드)
 
 홈 화면 진입 직후, **코치마크 오버레이**가 순차적으로 표시됩니다.

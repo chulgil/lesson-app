@@ -40,10 +40,7 @@ void main() {
   group('resolveAuthRedirect — needs role', () {
     test('redirects to roleSelect when role missing', () {
       const state = AuthNeedsRole(userId: 'u', name: 'n', email: 'e');
-      expect(
-        resolveAuthRedirect(state, '/teacher/home'),
-        AppRoutes.roleSelect,
-      );
+      expect(resolveAuthRedirect(state, '/teacher/home'), AppRoutes.roleSelect);
     });
 
     test('allows roleSelect path itself', () {
@@ -116,19 +113,78 @@ void main() {
       );
     });
 
-    test('authenticated parent reaches parentHome (post-onboarding) (#582)', () {
-      const authedParent = AuthAuthenticated(
+    // A2 — teacher phase subdivision (_audits/2026-06-10 §4.2)
+    const teacherOnboarding = AuthNeedsOnboarding(
+      userId: 'u',
+      name: 'n',
+      email: 'e',
+      role: UserRole.teacher,
+    );
+
+    test('teacher phase=profileA → teacherProfileSetup (A2)', () {
+      expect(
+        resolveAuthRedirect(
+          teacherOnboarding,
+          '/teacher/home',
+          teacherPhase: OnboardingPhase.profileA,
+        ),
+        AppRoutes.teacherProfileSetup,
+      );
+    });
+
+    test('teacher phase=firstAvailability → teacherFirstAvailability (A2)', () {
+      expect(
+        resolveAuthRedirect(
+          teacherOnboarding,
+          '/teacher/home',
+          teacherPhase: OnboardingPhase.firstAvailability,
+        ),
+        AppRoutes.teacherFirstAvailability,
+      );
+    });
+
+    test('teacher phase=complete (unknown) falls back to roleSelect (A2)', () {
+      // 데이터 로딩 중이면 phase 를 단정하지 않고 기존 폴백 유지.
+      expect(
+        resolveAuthRedirect(
+          teacherOnboarding,
+          '/teacher/home',
+          teacherPhase: OnboardingPhase.complete,
+        ),
+        AppRoutes.roleSelect,
+      );
+    });
+
+    test('parent role ignores teacherPhase param (A2: 학생/학부모 영향 없음)', () {
+      const parentOnboarding = AuthNeedsOnboarding(
         userId: 'u',
         name: 'n',
         email: 'e',
         role: UserRole.parent,
       );
-      // Once onboarding is complete, the gate lets parentHome through.
       expect(
-        resolveAuthRedirect(authedParent, AppRoutes.parentHome),
-        isNull,
+        resolveAuthRedirect(
+          parentOnboarding,
+          '/parent-home',
+          teacherPhase: OnboardingPhase.profileA,
+        ),
+        AppRoutes.roleSelect,
       );
     });
+
+    test(
+      'authenticated parent reaches parentHome (post-onboarding) (#582)',
+      () {
+        const authedParent = AuthAuthenticated(
+          userId: 'u',
+          name: 'n',
+          email: 'e',
+          role: UserRole.parent,
+        );
+        // Once onboarding is complete, the gate lets parentHome through.
+        expect(resolveAuthRedirect(authedParent, AppRoutes.parentHome), isNull);
+      },
+    );
   });
 
   group('resolveAuthRedirect — authenticated', () {
@@ -152,10 +208,7 @@ void main() {
 
   group('resolveAuthRedirect — loading', () {
     test('never redirects while loading', () {
-      expect(
-        resolveAuthRedirect(const AuthLoading(), '/teacher/home'),
-        isNull,
-      );
+      expect(resolveAuthRedirect(const AuthLoading(), '/teacher/home'), isNull);
     });
   });
 }
