@@ -36,6 +36,11 @@ class RemoteNotificationRepository implements NotificationRepository {
     return data['count'] as int;
   }
 
+  @override
+  Future<void> delete(String id) async {
+    await _apiClient.delete('/notifications/$id');
+  }
+
   // --- Manual JSON helpers (AppNotification doesn't have @JsonSerializable) ---
 
   AppNotification _notificationFromJson(Map<String, dynamic> json) {

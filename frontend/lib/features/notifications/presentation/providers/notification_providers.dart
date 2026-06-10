@@ -498,9 +498,16 @@ class NotificationActions extends _$NotificationActions {
     ref.invalidate(userNotificationsProvider);
   }
 
-  /// Delete a notification
+  /// Delete a notification — wired to DELETE /notifications/{id} (#629).
   Future<void> deleteNotification(String notificationId) async {
-    // Server-side delete not yet supported; just refresh
+    final apiRepo = ref.read(notificationApiRepositoryProvider);
+    if (apiRepo != null) {
+      try {
+        await apiRepo.delete(notificationId);
+      } catch (_) {
+        // Best-effort: server error must not prevent local list refresh.
+      }
+    }
     ref.invalidate(userNotificationsProvider);
   }
 }

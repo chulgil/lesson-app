@@ -7618,6 +7618,19 @@ class AppStrings {
   static const announcementDeleteConfirm =
       '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.';
 
+  /// swipe destructive 확인 다이얼로그 — 공지 삭제 title
+  static const swipeActionDeleteAnnouncementConfirmTitle = '공지 삭제';
+
+  /// swipe destructive 확인 다이얼로그 — 공지 삭제 body
+  static const swipeActionDeleteAnnouncementConfirmBody =
+      '이 공지를 삭제하시겠습니까?\n이미 발송된 알림은 취소되지 않습니다.';
+
+  /// swipe destructive 확인 다이얼로그 — 알림 삭제 title
+  static const swipeActionDeleteNotificationConfirmTitle = '이 알림을 삭제할까요?';
+
+  /// swipe destructive 확인 다이얼로그 — 알림 삭제 body
+  static const swipeActionDeleteNotificationConfirmBody = '복구할 수 없습니다.';
+
   // ── Add student method screen ──
   static const studentAddMethodBadgeRecommended = '권장';
   static const studentAddMethodInviteDescription =

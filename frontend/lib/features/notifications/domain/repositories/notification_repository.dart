@@ -13,4 +13,7 @@ abstract class NotificationRepository {
 
   /// Get unread notification count.
   Future<int> getUnreadCount();
+
+  /// Delete a notification (DELETE /notifications/{id}).
+  Future<void> delete(String id);
 }
