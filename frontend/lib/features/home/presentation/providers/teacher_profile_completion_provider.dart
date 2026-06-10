@@ -48,6 +48,15 @@ bool hasIntroduction(HasIntroductionRef ref) {
   return (profile?.introduction.length ?? 0) >= 20;
 }
 
+/// 2026-06-10 UX fix — 악기 설정 quest. 가격 설정의 prerequisite.
+/// FE 가입 흐름에서 onboarding profile setup 단계 A 에 악기를 입력하나,
+/// 빠뜨리거나 추후 추가하려는 경우 진입점이 모호했음 → quest 카드 명시.
+@Riverpod(keepAlive: true)
+bool hasInstruments(HasInstrumentsRef ref) {
+  final profile = ref.watch(currentTeacherProfileProvider).valueOrNull;
+  return (profile?.instruments.isNotEmpty ?? false);
+}
+
 /// Whether the teacher has set a lesson price table.
 @Riverpod(keepAlive: true)
 bool hasPriceTable(HasPriceTableRef ref) {

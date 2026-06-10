@@ -43,6 +43,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(experienceYears: years),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -59,6 +60,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(lessonAreas: areas),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -75,6 +77,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(lessonTypes: types),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -91,6 +94,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(feeRange: feeRange),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -109,6 +113,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(education: newList),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -127,6 +132,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(education: newList),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -145,6 +151,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(education: newList),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -163,6 +170,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(career: newList),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -181,6 +189,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(career: newList),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -199,6 +208,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(career: newList),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -220,6 +230,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(verification: newVerification),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -243,6 +254,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(verification: newVerification),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -264,6 +276,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(verification: newVerification),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -294,6 +307,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(visibilitySettings: settings),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -331,6 +345,10 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         ),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
+      // 2026-06-10 fix — quest 보드의 hasIntroductionProvider 는 currentTeacherProfile
+      // 을 watch. extended 만 갱신하면 stale → quest 미완료 표시. 동기화 필요.
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -351,6 +369,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         ),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -367,6 +386,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(teachingStyle: style),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -383,6 +403,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(specialties: specialties),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -399,6 +420,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(bankAccount: bankAccount),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -420,6 +442,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
         current.copyWith(bankAccounts: accounts, bankAccount: defaultAccount),
       );
       state = AsyncValue.data(updated);
+      ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;

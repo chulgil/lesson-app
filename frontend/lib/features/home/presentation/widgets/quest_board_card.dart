@@ -121,6 +121,8 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
     final hasStudents = studentsAsync.valueOrNull?.isNotEmpty ?? false;
     final hasPhoto = ref.watch(hasProfileImageProvider);
     final hasIntro = ref.watch(hasIntroductionProvider);
+    // 2026-06-10 UX fix — 악기 설정 quest. 가격 prerequisite.
+    final hasInstruments = ref.watch(hasInstrumentsProvider);
     final hasPrice = ref.watch(hasPriceTableProvider);
     final hasBankAcc = ref.watch(hasBankAccountProvider);
     final hasSubscription = ref.watch(hasIssuedSubscriptionProvider);
@@ -136,6 +138,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         hasSlots &&
         hasPhoto &&
         hasIntro &&
+        hasInstruments &&
         hasPrice &&
         hasBankAcc &&
         hasStudents &&
@@ -148,9 +151,8 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
       // §8.3 전체 완료 — 축하 카드 1회 표시 (#608 Job 7).
       // BE PATCH /users/me/quest-celebrated 가 1회성 보장 SSOT.
       // Hive local 은 같은 세션 내 BE 호출 실패 시 재표시 방지용 fallback.
-      final celebrationDismissed = ref
-          .watch(questCelebrationProvider)
-          .valueOrNull;
+      final celebrationDismissed =
+          ref.watch(questCelebrationProvider).valueOrNull;
       if (celebrationDismissed != null) return const SizedBox.shrink();
       return const QuestCelebrationCard();
     }
@@ -161,6 +163,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
       hasStudents: hasStudents,
       hasPhoto: hasPhoto,
       hasIntro: hasIntro,
+      hasInstruments: hasInstruments,
       hasPrice: hasPrice,
       hasBankAcc: hasBankAcc,
       hasSubscription: hasSubscription,
@@ -178,9 +181,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
     };
     final byGroupVisible = <QuestGroup, List<_Quest>>{
       for (final g in QuestGroup.values)
-        g: byGroupAll[g]!
-            .where((q) => _revealCompleted || !q.isCompleted)
-            .toList(),
+        g:
+            byGroupAll[g]!
+                .where((q) => _revealCompleted || !q.isCompleted)
+                .toList(),
     };
 
     return Padding(
@@ -218,9 +222,8 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
                   group: group,
                   quests: byGroupVisible[group]!,
                   totalInGroup: byGroupAll[group]!.length,
-                  completedInGroup: byGroupAll[group]!
-                      .where((q) => q.isCompleted)
-                      .length,
+                  completedInGroup:
+                      byGroupAll[group]!.where((q) => q.isCompleted).length,
                   // §B4 자동 reveal 윈도우 안의 완료 카드에만 애니메이션 적용.
                   revealScale: _revealCompleted ? _revealScale : null,
                   revealFade: _revealCompleted ? _revealFade : null,
@@ -241,6 +244,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
     required bool hasStudents,
     required bool hasPhoto,
     required bool hasIntro,
+    required bool hasInstruments,
     required bool hasPrice,
     required bool hasBankAcc,
     required bool hasSubscription,
@@ -290,6 +294,15 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         thresholdHint: AppStrings.questThresholdIntroHint,
         onTap: () => context.push(AppRoutes.basicInfoEdit),
       ),
+      // 2026-06-10 UX fix — 악기 설정 quest. 가격 prerequisite 명시.
+      _Quest(
+        id: 'q3b',
+        group: QuestGroup.profile,
+        title: '레슨 가능 악기 설정',
+        reward: '내 전문 악기 노출',
+        isCompleted: hasInstruments,
+        onTap: () => context.push(AppRoutes.instrumentManagement),
+      ),
       _Quest(
         id: 'q4',
         group: QuestGroup.profile,
@@ -323,9 +336,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardSubscription,
         isCompleted: hasSubscription,
         isLocked: !hasStudents,
-        onTap: hasStudents
-            ? () => context.push(AppRoutes.issueSubscription)
-            : onLockedTap(),
+        onTap:
+            hasStudents
+                ? () => context.push(AppRoutes.issueSubscription)
+                : onLockedTap(),
       ),
       _Quest(
         id: 'q8',
@@ -334,9 +348,8 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
         isLocked: !hasStudents,
-        onTap: hasStudents
-            ? () => context.push(AppRoutes.lessons)
-            : onLockedTap(),
+        onTap:
+            hasStudents ? () => context.push(AppRoutes.lessons) : onLockedTap(),
       ),
       _Quest(
         id: 'q9',
@@ -345,9 +358,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardLessonNote,
         isCompleted: hasLessonNote,
         isLocked: !hasStudents,
-        onTap: hasStudents
-            ? () => context.push(AppRoutes.quickFeedbackList)
-            : onLockedTap(),
+        onTap:
+            hasStudents
+                ? () => context.push(AppRoutes.quickFeedbackList)
+                : onLockedTap(),
       ),
       _Quest(
         id: 'q10',
@@ -357,9 +371,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         isCompleted: hasPracticeAssigned,
         isLocked: !hasStudents,
         thresholdHint: AppStrings.questThresholdPracticeHint,
-        onTap: hasStudents
-            ? () => context.push(AppRoutes.assignmentDashboard)
-            : onLockedTap(),
+        onTap:
+            hasStudents
+                ? () => context.push(AppRoutes.assignmentDashboard)
+                : onLockedTap(),
       ),
       // ── ✨ 선택 보너스 그룹 (Q11) ──
       _Quest(
@@ -563,11 +578,12 @@ class _QuestItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = quest.onTap != null;
-    final accentColor = quest.isCompleted
-        ? AppColors.paperOk
-        : isEnabled
-        ? AppColors.ink
-        : AppColors.inkTertiary;
+    final accentColor =
+        quest.isCompleted
+            ? AppColors.paperOk
+            : isEnabled
+            ? AppColors.ink
+            : AppColors.inkTertiary;
 
     final content = InkWell(
       onTap: quest.onTap,
@@ -578,25 +594,26 @@ class _QuestItem extends StatelessWidget {
           children: [
             SizedBox(
               width: 28,
-              child: quest.isCompleted
-                  ? const Padding(
-                      padding: EdgeInsets.only(top: 2),
-                      child: NotebookGlyph(
-                        NotebookGlyph.check,
-                        size: 16,
-                        color: AppColors.paperOk,
-                      ),
-                    )
-                  : quest.isLocked
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(
-                        Icons.lock_outline,
-                        size: 14,
-                        color: accentColor,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+              child:
+                  quest.isCompleted
+                      ? const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: NotebookGlyph(
+                          NotebookGlyph.check,
+                          size: 16,
+                          color: AppColors.paperOk,
+                        ),
+                      )
+                      : quest.isLocked
+                      ? Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(
+                          Icons.lock_outline,
+                          size: 14,
+                          color: accentColor,
+                        ),
+                      )
+                      : const SizedBox.shrink(),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -607,12 +624,12 @@ class _QuestItem extends StatelessWidget {
                     quest.title,
                     style: NotebookTypography.pieceTitle.copyWith(
                       fontSize: 15,
-                      color: quest.isCompleted
-                          ? AppColors.inkTertiary
-                          : AppColors.ink,
-                      decoration: quest.isCompleted
-                          ? TextDecoration.lineThrough
-                          : null,
+                      color:
+                          quest.isCompleted
+                              ? AppColors.inkTertiary
+                              : AppColors.ink,
+                      decoration:
+                          quest.isCompleted ? TextDecoration.lineThrough : null,
                     ),
                   ),
                   if (quest.reward != null && !quest.isCompleted) ...[
@@ -698,10 +715,11 @@ class _DottedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 1
+          ..style = PaintingStyle.stroke;
 
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final path = Path()..addRect(rect);

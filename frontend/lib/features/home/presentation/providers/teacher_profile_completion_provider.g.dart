@@ -57,6 +57,25 @@ final hasIntroductionProvider = Provider<bool>.internal(
 );
 
 typedef HasIntroductionRef = ProviderRef<bool>;
+String _$hasInstrumentsHash() => r'7993c4eb48b9a28b9271f68f73e7441a55e874c2';
+
+/// 2026-06-10 UX fix — 악기 설정 quest. 가격 설정의 prerequisite.
+/// FE 가입 흐름에서 onboarding profile setup 단계 A 에 악기를 입력하나,
+/// 빠뜨리거나 추후 추가하려는 경우 진입점이 모호했음 → quest 카드 명시.
+///
+/// Copied from [hasInstruments].
+@ProviderFor(hasInstruments)
+final hasInstrumentsProvider = Provider<bool>.internal(
+  hasInstruments,
+  name: r'hasInstrumentsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$hasInstrumentsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef HasInstrumentsRef = ProviderRef<bool>;
 String _$hasPriceTableHash() => r'68b50ac005bbf33344daf58b8ac2ea682915d71a';
 
 /// Whether the teacher has set a lesson price table.
