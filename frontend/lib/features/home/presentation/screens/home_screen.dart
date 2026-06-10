@@ -10,11 +10,13 @@ import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/onboarding_facade.dart';
+import '../../../onboarding/presentation/widgets/quest_unlock_celebration_sheet.dart';
 import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
 import '../../../profile/profile_ui_facade.dart';
 import '../../../settings/settings_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_ui_facade.dart';
+import '../providers/home_lesson_summary_provider.dart';
 import '../providers/teacher_profile_completion_provider.dart';
 import '../widgets/dashboard_tab.dart';
 
@@ -32,6 +34,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final _settingsNavKey = GlobalKey();
   final _studentsNavKey = GlobalKey();
+  // Phase B step 3 target — 레슨 탭 (감사 §4.4 B2).
+  final _scheduleNavKey = GlobalKey();
 
   late final CoachMarkController _coachMarkController;
 
@@ -40,9 +44,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Coach mark: only guide to lesson time settings on first entry.
-    // Student invite requires phone verification + full setup first,
-    // so it's handled via QuestBoard, not coach mark.
+    // Phase B 3-step 코치마크 시퀀스 (감사 §4.4 B2) —
+    // SSOT: docs/specs/onboarding/teacher_onboarding_v3_spec.md §3.3.
+    //   1) lesson_time_settings → 설정 탭 → 가용시간 등록
+    //   2) first_student_invite → 학생 탭 → 첫 학생 초대
+    //   3) first_lesson_register → 레슨 탭 → 첫 레슨 등록
+    // 시퀀스 종료 후 QuestBoardCard 가 다음 진입점을 안내한다.
     _coachMarkController = CoachMarkController(
       steps: [
         CoachMarkStep(
@@ -53,6 +60,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           actionLabel: AppStrings.coachMarkTimeAction,
           position: CoachMarkPosition.above,
           onAction: () => setState(() => _currentIndex = 3),
+        ),
+        CoachMarkStep(
+          id: 'first_student_invite',
+          targetKey: _studentsNavKey,
+          title: AppStrings.coachMarkFirstStudentInviteTitle,
+          description: AppStrings.coachMarkFirstStudentInviteDescription,
+          actionLabel: AppStrings.coachMarkFirstStudentInviteAction,
+          position: CoachMarkPosition.above,
+          onAction: () => setState(() => _currentIndex = 2),
+        ),
+        CoachMarkStep(
+          id: 'first_lesson_register',
+          targetKey: _scheduleNavKey,
+          title: AppStrings.coachMarkFirstLessonRegisterTitle,
+          description: AppStrings.coachMarkFirstLessonRegisterDescription,
+          actionLabel: AppStrings.coachMarkFirstLessonRegisterAction,
+          position: CoachMarkPosition.above,
+          onAction: () => setState(() => _currentIndex = 1),
         ),
       ],
     );
@@ -142,6 +167,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // §B3 Q6 (첫 학생 초대) 완료 직후 잠금 해제 축하 시트 1회 표시.
+    // empty → non-empty 전이를 감지. Hive 영속화 (`questUnlockShown`) 로 1회 보장.
+    ref.listen(homeStudentsProvider, (previous, next) {
+      final prevEmpty = (previous?.valueOrNull?.isEmpty ?? true);
+      final nextHas = (next.valueOrNull?.isNotEmpty ?? false);
+      if (!prevEmpty || !nextHas) return;
+      _maybeShowQuestUnlockSheet();
+    });
+
     return DebugWrapper(
       child: NotebookScreenScaffold(
         body: SafeArea(
@@ -165,6 +199,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Future<void> _maybeShowQuestUnlockSheet() async {
+    final storageAsync = ref.read(onboardingProgressStorageProvider);
+    final storage = storageAsync.valueOrNull;
+    if (storage == null) return;
+    if (storage.questUnlockShown) return;
+    if (!mounted) return;
+    // 영속화 먼저 — 빌드 race 로 중복 호출돼도 1회만 표시.
+    await ref
+        .read(onboardingProgressStorageProvider.notifier)
+        .markQuestUnlockShown();
+    if (!mounted) return;
+    await showQuestUnlockCelebrationSheet(context);
+  }
+
   Widget _buildBottomNavigation() {
     return Container(
       decoration: const BoxDecoration(
@@ -179,7 +227,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(0, 'I', AppStrings.homeTabLabel),
-              _buildNavItem(1, 'II', AppStrings.scheduleTabTitle),
+              _buildNavItem(
+                1,
+                'II',
+                AppStrings.scheduleTabTitle,
+                key: _scheduleNavKey,
+              ),
               _buildNavItem(
                 2,
                 'III',
@@ -201,8 +254,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
     final isSelected = _currentIndex == index;
-    final accentColor =
-        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
+    final accentColor = isSelected
+        ? AppColors.paperAccent
+        : AppColors.inkTertiary;
 
     return InkWell(
       key: key,

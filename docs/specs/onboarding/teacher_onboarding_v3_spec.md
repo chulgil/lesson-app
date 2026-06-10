@@ -112,6 +112,9 @@
 > **보강 스펙 (2026-06-01 — E2E 감사 #1 AB-C1)**:
 > 첫 가용시간 설정의 간소 UI·블로커 정책·기본값은 [teacher_first_availability_setup.md](teacher_first_availability_setup.md) 참조.
 > 가용시간 0개 상태로 다른 퀘스트 잠금 + 인터스티셜 강제.
+>
+> **보강 스펙 (2026-06-10 — UX 감사 §4.3 B1)**:
+> 인터스티셜 모달 정책 폐기. 가입 흐름 내 `first_availability_setup_screen` 이 슬롯 1개 이상을 강제하므로 홈 진입 시 별도 모달은 중복이다. dead code (`first_availability_interstitial.dart`, `showFirstAvailabilityInterstitial`) 제거됨. SSOT: [teacher_first_availability_setup.md §2/§3](teacher_first_availability_setup.md).
 
 #### 코치마크 1: 레슨 가능 시간 설정
 
@@ -437,7 +440,7 @@ class CoachMarkState {
 | `ProfileSetupScreen` | `presentation/screens/profile_setup_screen.dart` | Phase B 프로필 입력 |
 | `StudentProfileSetupScreen` | `presentation/screens/student_profile_setup_screen.dart` | 학생 프로필 설정 |
 | `FirstAvailabilityCelebrationSheet` | `presentation/widgets/first_availability_celebration_sheet.dart` | 첫 가용시간 설정 완료 축하 시트 |
-| `FirstAvailabilityInterstitial` | `presentation/widgets/first_availability_interstitial.dart` | 가용시간 0개 강제 안내 모달 — [teacher_first_availability_setup.md §4.1](teacher_first_availability_setup.md) |
+| ~~`FirstAvailabilityInterstitial`~~ | ~~`presentation/widgets/first_availability_interstitial.dart`~~ | 폐기됨 (2026-06-10) — 가입 흐름 내 강제로 대체, dead code 제거 |
 | `PhoneVerificationScreen` / `StudentSignupBlockedScreen` | `presentation/screens/` | [phone_verification_policy.md §3](../user/phone_verification_policy.md) |
 
 ## 9. 관련 스펙
@@ -453,5 +456,6 @@ class CoachMarkState {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-06-10 | §3.3 보강 인용 갱신 — 인터스티셜 모달 정책 폐기, 가입 흐름 강제 게이트로 일원화. FirstAvailabilityInterstitial dead code 제거. (감사 §4.3 B1) |
 | 2026-06-03 | 코드 반영 — OnboardingQuest/OnboardingProgress 엔티티, provider/저장, Phase B 화면 및 첫 가용시간 위젯 추가 |
 | 2026-05-31 | v3 초안 — 게임형 튜토리얼 + 프로필 보상 시스템 설계 |

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,14 +48,39 @@ class QuestBoardCard extends ConsumerStatefulWidget {
   ConsumerState<QuestBoardCard> createState() => _QuestBoardCardState();
 }
 
-class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
+class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
+    with TickerProviderStateMixin {
   /// 가입 직후 첫 도착 윈도우 안이면 true — 2초 후 false 로 전환.
   bool _revealCompleted = false;
   Timer? _revealTimer;
 
+  /// §B4 자동 완료 카드 애니메이션 (감사 §4.6).
+  /// ScaleTransition(0.9 → 1.0, 300ms) + sustain 1s + FadeOut(500ms).
+  late final AnimationController _revealScaleController;
+  late final AnimationController _revealFadeController;
+  late final Animation<double> _revealScale;
+  late final Animation<double> _revealFade;
+  Timer? _revealFadeTimer;
+
   @override
   void initState() {
     super.initState();
+    _revealScaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _revealFadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+      value: 1.0,
+    );
+    _revealScale = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _revealScaleController, curve: Curves.easeOut),
+    );
+    _revealFade = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _revealFadeController, curve: Curves.easeIn),
+    );
+
     // build() async — 첫 frame 직후 future 완료를 await 한 뒤 reveal 판정.
     // `ref.read(provider).value` 는 sync 라 AsyncLoading 시점에 null 반환 — race 회피.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -63,6 +89,13 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
       if (!mounted) return;
       if (QuestFirstShown.isWithin(value)) {
         setState(() => _revealCompleted = true);
+        // §B4 사운드 1회 + scale-up.
+        unawaited(SystemSound.play(SystemSoundType.click));
+        _revealScaleController.forward(from: 0);
+        // 300ms scale + 1s sustain → 1.3s 후 fade-out (500ms).
+        _revealFadeTimer = Timer(const Duration(milliseconds: 1300), () {
+          if (mounted) _revealFadeController.forward(from: 0);
+        });
         _revealTimer = Timer(_kFirstArrivalRevealDuration, () {
           if (mounted) setState(() => _revealCompleted = false);
         });
@@ -73,6 +106,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
   @override
   void dispose() {
     _revealTimer?.cancel();
+    _revealFadeTimer?.cancel();
+    _revealScaleController.dispose();
+    _revealFadeController.dispose();
     super.dispose();
   }
 
@@ -184,6 +220,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard> {
                   completedInGroup: byGroupAll[group]!
                       .where((q) => q.isCompleted)
                       .length,
+                  // §B4 자동 reveal 윈도우 안의 완료 카드에만 애니메이션 적용.
+                  revealScale: _revealCompleted ? _revealScale : null,
+                  revealFade: _revealCompleted ? _revealFade : null,
                 ),
                 if (group != QuestGroup.bonus)
                   const SizedBox(height: AppSpacing.space3),
@@ -379,11 +418,20 @@ class _QuestGroupSection extends StatelessWidget {
   /// 그룹 내 완료된 quest 수 (counter 표시용).
   final int completedInGroup;
 
+  /// §B4 자동 reveal 윈도우 동안 완료 카드에 적용할 scale 애니메이션.
+  /// null = 적용 안 함 (일반 진입 또는 윈도우 밖).
+  final Animation<double>? revealScale;
+
+  /// §B4 자동 reveal 윈도우 종료 직전 완료 카드에 적용할 fade-out.
+  final Animation<double>? revealFade;
+
   const _QuestGroupSection({
     required this.group,
     required this.quests,
     required this.totalInGroup,
     required this.completedInGroup,
+    this.revealScale,
+    this.revealFade,
   });
 
   String get _label {
@@ -395,6 +443,18 @@ class _QuestGroupSection extends StatelessWidget {
       case QuestGroup.bonus:
         return AppStrings.questGroupBonusLabel;
     }
+  }
+
+  /// §B4 — 완료 카드에만 scale + fade-out 애니메이션 적용.
+  /// 미완료 카드는 평소 그대로 렌더.
+  Widget _maybeAnimate({required _Quest quest, required Widget child}) {
+    if (!quest.isCompleted || revealScale == null || revealFade == null) {
+      return child;
+    }
+    return FadeTransition(
+      opacity: revealFade!,
+      child: ScaleTransition(scale: revealScale!, child: child),
+    );
   }
 
   @override
@@ -435,7 +495,13 @@ class _QuestGroupSection extends StatelessWidget {
           ),
         ),
         for (int i = 0; i < quests.length; i++) ...[
-          _QuestItem(quest: quests[i], isBonus: group == QuestGroup.bonus),
+          _maybeAnimate(
+            quest: quests[i],
+            child: _QuestItem(
+              quest: quests[i],
+              isBonus: group == QuestGroup.bonus,
+            ),
+          ),
           if (i < quests.length - 1) const SizedBox(height: AppSpacing.space2),
         ],
       ],

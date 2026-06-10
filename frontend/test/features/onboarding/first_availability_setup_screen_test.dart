@@ -12,7 +12,6 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/onboarding/presentation/screens/first_availability_setup_screen.dart';
 import 'package:lessonaza/features/onboarding/presentation/widgets/first_availability_celebration_sheet.dart';
-import 'package:lessonaza/features/onboarding/presentation/widgets/first_availability_interstitial.dart';
 
 void main() {
   testWidgets(
@@ -63,56 +62,8 @@ void main() {
     },
   );
 
-  testWidgets(
-    'FirstAvailabilityInterstitialDialog renders title + CTA without skip',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light,
-          home: Scaffold(
-            body: Builder(
-              builder:
-                  (context) => Center(
-                    child: ElevatedButton(
-                      onPressed:
-                          () => showDialog<void>(
-                            context: context,
-                            barrierDismissible: false,
-                            builder:
-                                (_) => const PopScope(
-                                  canPop: false,
-                                  child: FirstAvailabilityInterstitialDialog(),
-                                ),
-                          ),
-                      child: const Text('open'),
-                    ),
-                  ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
-
-      expect(tester.takeException(), isNull);
-
-      // Title + description from the spec are present.
-      expect(
-        find.text(AppStrings.firstAvailabilityInterstitialTitle),
-        findsOneWidget,
-      );
-      expect(
-        find.text(AppStrings.firstAvailabilityInterstitialDescription),
-        findsOneWidget,
-      );
-      // CTA is the only action — spec §4.1 says no close button.
-      expect(
-        find.text(AppStrings.firstAvailabilityInterstitialAction),
-        findsOneWidget,
-      );
-    },
-  );
+  // FirstAvailabilityInterstitialDialog test removed (2026-06-10) —
+  // interstitial widget deprecated, see spec §4.1.
 
   testWidgets('FirstAvailabilityCelebrationSheet renders title + next CTA', (
     tester,
