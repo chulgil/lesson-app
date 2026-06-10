@@ -64,21 +64,29 @@
 | **C3-F01** | G1 미구현 | 학원 대표/매니저가 초대 발행하는 화면이 전무. academy 도메인에 BulkClosureDetailScreen, AcademyActivityTimelineScreen 2개 화면만 존재. 전체 C3 루프가 막힘 | `frontend/lib/features/academy/presentation/screens/` |
 | **C2-F02** | 발급 후 단절 | 수강권 발급 후 "첫 레슨 일정 잡기" CTA 없음. 학생이 수강권 받고 무엇을 해야 할지 모름. `student_direct_booking_spec.md §8` "수강권 발급 완료" 진입점 미구현 | `frontend/lib/features/subscription/presentation/screens/proposal_detail_screen.dart` |
 
-### 3.2 P1 — 이탈 유발 (12건)
+### 3.2 P1 — 이탈 유발 (12건 — PR2 정찰 후 4건 false positive 확인)
+
+> **PR2 정찰 (2026-06-09 후속)** — sub-agent 보고 중 다음 4건은 코드 재확인 결과 이미 구현되어 있거나 의도된 동작:
+> - **C1-F02 ❌ false positive**: `selectTeacher = '/schedule/teachers'` 라우트는 wired 상태. `student_lessons_tab.dart:129`, `student_getting_started_card.dart:94`, `routes/schedule_routes.dart:34` 모두 정상.
+> - **C1-F03 ❌ false positive**: Getting Started 카드는 `hasConnections=false` 면 항상 표시 (line 44-46 의 `SizedBox.shrink()` 는 *모든 단계 완료* 시 = 더 이상 빈 홈 아님). 의도된 동작.
+> - **C2-F01 ❌ false positive**: `ProposalWaitingCard` 가 `paymentNotified` 상태에서 정확히 표시됨 (proposal_detail_screen.dart:148, 220). 카피("입금 확인 중" + 본문 + "선생님께 문의하기" CTA) 충분히 명료.
+> - **C4-F03 ❌ false positive**: `parent_dashboard_tab.dart:270 _buildEmptyState` 가 아이콘 + 헤드라인 + 본문 + `addChildProfile` CTA 모두 제공.
+>
+> ⇒ 실제 PR2 작업 1건 (C3-F08), PR3 작업 4건 (C1-F09, C3-F03/F04/F05) 으로 축소.
 
 | ID | 카테고리 | 발견 | 위치 |
 |---|---|---|---|
-| **C1-F02** | 미와이어드 진입점 | `selectTeacher` 라우트 — Getting Started 카드의 "선생님과 연결하기" 탭 시 화면 구현 미확인 | `student_dashboard_tab.dart:94`, `student_getting_started_card.dart:94` |
-| **C1-F03** | 빈 상태 가이드 | Getting Started 카드가 완료 시 자동 숨김(`SizedBox.shrink()`). 이후 빈 홈에서 다음 액션 가이드 없음. `home_master.md §2.1`은 QuestBoardCard가 담당이라 했으나 QuestBoard는 온보딩 Phase B-C 진행 시만 표시 | `student_getting_started_card.dart:44-45` |
+| **C1-F02** ❌ | 미와이어드 진입점 | (정찰 결과 false positive — 라우트 wired) | — |
+| **C1-F03** ❌ | 빈 상태 가이드 | (정찰 결과 false positive — Getting Started 카드 항상 표시) | — |
 | **C1-F09** | 권한 검증 | 학생 역할 진입 후 `authState is AuthAuthenticated` 조건에 `role == student` 체크 없음. 역할 전환 후 라우팅 의존성에 race 가능성 | `features/auth/` route guard |
-| **C2-F01** | 상태 가시성 | 입금 확인 전 구간(`paymentConfirmed=false && paidAt!=null`)에서 학생에게 "선생님이 아직 확인 안 함" 상태 피드백 없음. proposal_detail_screen에서 제안 상태 표시만 있고 입금 중간 상태 별도 UI 없음 | `features/subscription/presentation/screens/proposal_detail_screen.dart:99-100` |
+| **C2-F01** ❌ | 상태 가시성 | (정찰 결과 false positive — ProposalWaitingCard 이미 paymentNotified 상태에서 표시) | — |
 | **C2-F03** | 학부모 동기 | 자녀의 선생님이 수강권 제안했을 때 학부모 화면에서 그 제안/입금 상태가 표시되지 않음. 학부모 대시보드 "수강권 입금 상태 카드" Mock 상태 | `features/parent_home/.../parent_dashboard_tab.dart`, `user_master.md §5.2:1198` |
 | **C3-F02** | G9 정합성 | (참고) 만료/거절 화면 wiring 완료 + smoke test 통과. 라우트 `/academy/expired` 등록됨 ✅ 이 항목은 **이미 닫힌 상태 확인용**으로만 기록 | `academy_invite_expired_screen.dart`, `academy_invite_accept_screen_test.dart:105-163` |
 | **C3-F03** | 에러 분류 | G9 에러 분류가 `error.toString().contains()` 문자열 매칭. BE 메시지 변경 시 깨질 위험 | `AcademyInviteAcceptScreen._errorCodeFor():117-123` |
 | **C3-F04** | 거절 사유 | `rejectInvite(token, {reason?})` 시그니처는 reason 받는데 mock/remote 모두 저장 안 함 (단순 log) | `RemoteAcademyInviteRepository:60`, mock:67 |
 | **C3-F05** | 3자 관계 충돌 | 학생이 이미 개인 선생님 소속인데 학원 초대 수락 시 충돌 처리/안내 없음. 단순 `acceptInvite()` 호출만 | `AcademyInviteAcceptScreen:46-50` |
 | **C3-F08** | 발급 후 단절 | G7 학원 수강권 발급 후 화면 전환이 `context.go(home)` 직진. 학원 수강권을 보여주는 화면 없음 | `AcademyInviteAcceptScreen._handleAccept():55` |
-| **C4-F03** | 빈 홈 유도 | 학부모가 "코드 없어도 괜찮아요" 클릭 시 빈 홈만 표시. 자녀 추가 진입점이 프로필 탭 → 자녀 관리 메뉴에 숨겨짐 (발견성 낮음). `ChildProfileFormScreen` 존재함 | `child_profile_form_screen.dart:17` |
+| **C4-F03** ❌ | 빈 홈 유도 | (정찰 결과 false positive — `_buildEmptyState` 가 자녀 추가 CTA 이미 제공) | — |
 | **C4-F04** | 입금 액션 | 학부모 결제 화면에 "입금 확인 알림" 액션 버튼 코드 미발견. 열람만 가능 | `parent_payments_tab.dart:100-104` |
 
 ### 3.3 P1 — 스펙 Drift (3건)
@@ -126,21 +134,20 @@
 | 2 | **C1-F01** | "학생 직접 가입 차단" 화면에 명확한 우회 경로(=초대코드 입력) 강조 + "선생님께 코드 요청하기" 안내. 차단 자체는 정책이므로 유지하되 다음 액션을 명확히 | C1 가입자 이탈 ↓ |
 | 3 | **C3-F01** | G1 학원 초대 발행 화면 — 학원 대표/매니저 권한 가드 + 초대 발행 UI + 토큰 생성 API 호출. 라우트 `/academy/:id/invites/new` 신설 | C3 채널 진입 자체 가능해짐 |
 
-### 4.2 같은 PR 시리즈 (P1 — 패턴 A 묶음, 3건)
+### 4.2 PR2 실제 작업 (정찰 후 1건만 surgical fix)
+
+> 정찰 결과 4건 false positive (위 §3.2 표 참조). C2-F03, C4-F04 는 BE 의존 → 다음 턴 분리.
 
 | 순서 | 발견 ID | 작업 |
 |---|---|---|
-| 4 | **C1-F02** | `selectTeacher` 라우트의 화면 존재 확인. 없으면 빈 학생홈 "선생님 검색하기" CTA 추가 |
-| 5 | **C3-F08** | G7 수락 후 학원 수강권 확인 화면으로 라우팅 (직진 `/home` 대신) |
-| 6 | **C4-F03** | 학부모 빈 홈에 "자녀 등록하기" 배너 + `ChildProfileFormScreen` 바로가기 |
+| 4 | **C3-F08** | 학원 초대 수락 직후 환영 SnackBar(`"<academy> 학원에 가입되었어요. 곧 강사·수강권 안내가 도착합니다."`) → `/home` 이동 흐름은 유지. 멤버십 형성 사실 + 다음 안내를 가시화 |
 
-### 4.3 같은 PR 시리즈 (P1 — 패턴 B 상태 가시성, 3건)
+### 4.3 별도 BE 이슈로 분리 (다음 턴)
 
-| 순서 | 발견 ID | 작업 |
-|---|---|---|
-| 7 | **C2-F01** | 입금 확인 대기 구간 상태 표시 위젯 추가 (paymentConfirmed=false && paidAt!=null) |
-| 8 | **C2-F03** | 학부모 대시보드 수강권 카드 Mock → 실제 API 연결 |
-| 9 | **C4-F04** | 학부모 측 "입금 확인 알림" 액션 추가 (BE 의존 — 가능 범위만) |
+| 발견 ID | 작업 |
+|---|---|
+| **C2-F03** | 학부모 대시보드 수강권 카드 Mock → 실제 API 연결 (BE 모델 + endpoint 필요) |
+| **C4-F04** | 학부모 측 "입금 확인 알림" 액션 (BE endpoint 의존) |
 
 ### 4.4 같은 PR 시리즈 (P1 — 패턴 C 에지케이스 + 권한, 4건)
 

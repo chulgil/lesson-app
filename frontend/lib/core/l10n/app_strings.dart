@@ -3331,8 +3331,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5786,9 +5786,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5925,11 +5926,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6161,6 +6163,12 @@ class AppStrings {
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
   static const authParentLoginNotReady = '학부모 로그인은 준비 중입니다.';
   static const academyInviteAcceptFailed = '학원 초대 수락에 실패했습니다. 다시 시도해주세요.';
+
+  /// 학원 초대 수락 성공 환영 메시지 (audit C3-F08)
+  /// `_handleAccept` 성공 후 SnackBar 로 표시 — 멤버십 형성을 명시.
+  /// 학원명 placeholder `{0}` 는 academy.name 로 치환.
+  static String academyInviteAcceptedFormat(String academyName) =>
+      '$academyName 학원에 가입되었어요. 곧 강사·수강권 안내가 도착합니다.';
   static const authTermsAgreement = '서비스 이용 동의';
   static const authTermsOfService = '서비스 이용약관 동의';
   static const authPrivacyPolicy = '개인정보 수집·이용 동의';
