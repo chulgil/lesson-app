@@ -277,15 +277,26 @@ void main() {
   });
 
   group('CategoryStatus sealed type', () {
-    test('partial label getter — N/M 항목 포맷', () {
+    test('partial — filled/total 값 보존', () {
       const partial = CategoryStatusPartial(filled: 2, total: 3);
-      expect(partial.label, '2/3 항목');
+      expect(partial.filled, 2);
+      expect(partial.total, 3);
+      expect(partial.hintKey, isNull);
     });
 
-    test('neutral default label is 기본값', () {
+    test('partial — hintKey 가 있으면 보존', () {
+      const partial = CategoryStatusPartial(
+        filled: 1,
+        total: 2,
+        hintKey: categoryHintKeyBreakTimeMissing,
+      );
+      expect(partial.hintKey, categoryHintKeyBreakTimeMissing);
+    });
+
+    test('neutral — labelKey 기본 null (extension 이 기본값 매핑)', () {
       final status = CategoryStatusCalculator.policyNotifications();
       final neutral = status as CategoryStatusNeutral;
-      expect(neutral.label, '기본값');
+      expect(neutral.labelKey, isNull);
     });
   });
 }

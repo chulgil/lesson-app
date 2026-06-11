@@ -8858,4 +8858,33 @@ class AppStrings {
 
   /// 단위 — 반복 횟수.
   static const teacherStatsRepeatsUnit = '회';
+
+  // ── Profile 5묶음 카테고리 (W2 Task 2.3) ──────────────────────────
+  // spec §11.1 카테고리 카드 라벨 규칙
+  // 사용처: features/profile/presentation/extensions/category_status_visuals.dart
+
+  /// 설정완료 (Complete 상태 라벨).
+  static const categoryStatusComplete = '설정완료';
+
+  /// 미설정 (Empty 상태 라벨).
+  static const categoryStatusEmpty = '미설정';
+
+  /// 기본값 (Neutral 상태 라벨 — 정책·알림 등 선택적 설정).
+  static const categoryStatusNeutralDefault = '기본값';
+
+  /// 쉬는시간 미설정 (운영시간 묶음 partial hint).
+  static const categoryHintBreakTimeMissing = '쉬는시간 미설정';
+
+  /// 계좌 미설정 (수강권·정산 묶음 partial hint).
+  static const categoryHintBankAccountMissing = '계좌 미설정';
+
+  /// 가격표 미설정 (수강권·정산 묶음 partial hint).
+  static const categoryHintPriceTableMissing = '가격표 미설정';
+
+  /// N/M 항목 (Partial 상태 — 부분 입력 라벨).
+  static String categoryStatusPartialNOfM(int filled, int total) =>
+      '$filled/$total 항목';
+
+  /// NEW (W6 신규 메뉴 배지).
+  static const categoryNewBadge = 'NEW';
 }

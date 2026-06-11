@@ -19,6 +19,12 @@ import '../../domain/entities/teacher_settings.dart';
 
 part 'category_status_provider.g.dart';
 
+// Hint key constants — extension 이 AppStrings 로 매핑한다.
+// flutter-architecture: domain/data 에서 AppStrings 직접 의존 금지.
+const String categoryHintKeyBreakTimeMissing = 'breakTimeMissing';
+const String categoryHintKeyBankAccountMissing = 'bankAccountMissing';
+const String categoryHintKeyPriceTableMissing = 'priceTableMissing';
+
 /// 5묶음 카테고리 진행 상태 (sealed).
 ///
 /// - [CategoryStatusComplete]: 설정완료 ✓
@@ -34,7 +40,9 @@ class CategoryStatusComplete extends CategoryStatus {
   const CategoryStatusComplete();
 }
 
-/// 부분 입력. [filled]/[total] 항목 또는 단일 [hint] 라벨.
+/// 부분 입력. [filled]/[total] 항목 또는 단일 [hintKey] 라벨.
+///
+/// Display label 매핑은 `CategoryStatusVisuals` (presentation extension) 에서 수행.
 class CategoryStatusPartial extends CategoryStatus {
   /// Number of filled items (for "N/M 항목" label).
   final int filled;
@@ -42,32 +50,34 @@ class CategoryStatusPartial extends CategoryStatus {
   /// Total number of items (for "N/M 항목" label).
   final int total;
 
-  /// Optional override hint shown instead of the "N/M 항목" label.
-  final String? hint;
+  /// Optional hint key — extension 이 AppStrings 로 매핑.
+  ///
+  /// 사용 가능 key: `'breakTimeMissing'`, `'bankAccountMissing'`,
+  /// `'priceTableMissing'`. null 이면 "N/M 항목" 라벨로 표시.
+  final String? hintKey;
 
   const CategoryStatusPartial({
     required this.filled,
     required this.total,
-    this.hint,
+    this.hintKey,
   });
-
-  /// Display label per spec §11.1: "N/M 항목" or [hint] when provided.
-  String get label => hint ?? '$filled/$total 항목';
 }
 
 /// 미설정.
 class CategoryStatusEmpty extends CategoryStatus {
-  /// Optional hint shown next to the warning dot.
-  final String? hint;
+  /// Optional hint key — extension 이 AppStrings 로 매핑.
+  final String? hintKey;
 
-  const CategoryStatusEmpty({this.hint});
+  const CategoryStatusEmpty({this.hintKey});
 }
 
 /// 중립 상태 — "기본값" 같은 선택적 설정용. 노란 점/체크 표시 없음.
+///
+/// [labelKey] 는 미래 확장 용도 — 현재는 null 만 사용 (extension 이 "기본값" 매핑).
 class CategoryStatusNeutral extends CategoryStatus {
-  final String label;
+  final String? labelKey;
 
-  const CategoryStatusNeutral({this.label = '기본값'});
+  const CategoryStatusNeutral({this.labelKey});
 }
 
 /// Pure calculator — clock 의존 없음, Riverpod 의존 없음.
@@ -93,7 +103,11 @@ class CategoryStatusCalculator {
       return const CategoryStatusEmpty();
     }
     if (availability.breakTimeBetweenLessons <= 0) {
-      return const CategoryStatusPartial(filled: 1, total: 2, hint: '쉬는시간 미설정');
+      return const CategoryStatusPartial(
+        filled: 1,
+        total: 2,
+        hintKey: categoryHintKeyBreakTimeMissing,
+      );
     }
     return const CategoryStatusComplete();
   }
@@ -141,10 +155,18 @@ class CategoryStatusCalculator {
       return const CategoryStatusComplete();
     }
     if (hasPriceTable && !hasBankAccount) {
-      return const CategoryStatusPartial(filled: 1, total: 2, hint: '계좌 미설정');
+      return const CategoryStatusPartial(
+        filled: 1,
+        total: 2,
+        hintKey: categoryHintKeyBankAccountMissing,
+      );
     }
     if (!hasPriceTable && hasBankAccount) {
-      return const CategoryStatusPartial(filled: 1, total: 2, hint: '가격표 미설정');
+      return const CategoryStatusPartial(
+        filled: 1,
+        total: 2,
+        hintKey: categoryHintKeyPriceTableMissing,
+      );
     }
     return const CategoryStatusEmpty();
   }
