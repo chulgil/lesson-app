@@ -8887,4 +8887,32 @@ class AppStrings {
 
   /// NEW (W6 신규 메뉴 배지).
   static const categoryNewBadge = 'NEW';
+
+  // ── Profile 5묶음 카테고리 라벨 (W2 Task 2.4) ─────────────────────
+  // spec §3 (IA) + §7.2 (메인 홈) + §11.1 (카드 라벨 규칙)
+  // 사용처: features/profile/presentation/screens/profile_tab.dart
+
+  /// 🕐 운영시간 묶음 카드 제목.
+  static const categoryOperatingHours = '운영시간';
+
+  /// 🎓 수업방식 묶음 카드 제목.
+  static const categoryLessonStyle = '수업방식';
+
+  /// 💰 수강권·정산 묶음 카드 제목.
+  static const categorySubscriptionBilling = '수강권·정산';
+
+  /// 👤 내 프로필 묶음 카드 제목.
+  static const categoryMyProfile = '내 프로필';
+
+  /// ⚙️ 정책·알림·지원 묶음 카드 제목.
+  static const categoryPolicyNotifications = '정책·알림·지원';
+
+  /// 메인 홈 5묶음 메뉴 영역 섹션 헤더.
+  static const categorySectionTitle = '설정';
+
+  /// 💰 수강권·정산 BottomSheet 제목.
+  static const categorySheetSubscriptionBillingTitle = '수강권·정산';
+
+  /// ⚙️ 정책·알림·지원 BottomSheet 제목.
+  static const categorySheetPolicyNotificationsTitle = '정책·알림·지원';
 }

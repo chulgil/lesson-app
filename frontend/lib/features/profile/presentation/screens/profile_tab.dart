@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 
 import '../../../../core/auth/auth_state.dart';
-import '../../../../core/config/environment.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -12,7 +10,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
-import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../billing/billing_facade.dart';
 import '../../../lessons/lessons_facade.dart';
@@ -20,16 +17,19 @@ import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_extended_profile_provider.dart';
+import '../widgets/category_menu_grid.dart';
+import '../widgets/profile_category_sheets.dart';
 
-/// Profile tab with user info and settings — redesigned for 1-tap access.
+/// Profile tab with user info and 5묶음 카테고리 메뉴 그리드.
 ///
-/// Menu groups:
-/// 1. 내 소개 — profile editing, instruments, credentials, preview
-/// 2. 레슨 운영 — time, availability, policy, repertoire, templates
-/// 3. 수강권·입금 — subscription templates, deposit status, bank account
-/// 4. 설정 — notifications, recordings, visibility
-/// 5. 지원 — help, app info
-/// 6. 계정 — terms, privacy, logout
+/// W2 Task 2.4 — spec §3 (IA) + §7.2 (메인 홈) + §11.1 (카드 라벨 규칙).
+///
+/// 5묶음 카테고리:
+/// - 🕐 운영시간 → TeacherAvailability split page (직접 라우트)
+/// - 🎓 수업방식 → LessonStyleSettingsScreen (W3 신규 — W2 에서는 placeholder)
+/// - 💰 수강권·정산 → BottomSheet (수강권 템플릿/입금대기/입금 계좌)
+/// - 👤 내 프로필 → BasicInfoEdit (직접 라우트)
+/// - ⚙️ 정책·알림·지원 → BottomSheet (정책/템플릿/알림/녹음/공개/지원/계정)
 class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
 
@@ -115,221 +115,8 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space5),
 
-          // 💳 수강권·입금 (상단 이동 — 자주 쓰는 것 먼저)
-          _buildMenuSection(
-            title: AppStrings.profileSectionSubscriptionPayment,
-            items: [
-              _MenuItem(
-                icon: Icons.card_membership,
-                label: AppStrings.profileSubscriptionTemplateLabel,
-                subtitle: AppStrings.profileSubscriptionTemplateSubtitle,
-                onTap: () => context.push(AppRoutes.subscriptionTemplates),
-              ),
-              _MenuItem(
-                icon: Icons.warning_amber_outlined,
-                label: AppStrings.profileOutstandingPaymentsLabel,
-                subtitle: AppStrings.profileOutstandingPaymentsSubtitle,
-                onTap: () => context.push(AppRoutes.outstandingPayments),
-              ),
-              _MenuItem(
-                icon: Icons.account_balance_outlined,
-                label: AppStrings.profileBankAccountLabel,
-                subtitle: AppStrings.profileBankAccountSubtitle,
-                onTap: () => context.push(AppRoutes.bankAccountEdit),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // 내 소개
-          _buildMenuSection(
-            title: AppStrings.profileSectionAboutMe,
-            items: [
-              _MenuItem(
-                icon: Icons.person_outline,
-                label: AppStrings.profileBasicInfoEditLabel,
-                subtitle: AppStrings.profileBasicInfoEditSubtitle,
-                onTap: () => context.push(AppRoutes.basicInfoEdit),
-              ),
-              _MenuItem(
-                icon: Icons.music_note,
-                label: AppStrings.profileInstrumentManagementLabel,
-                subtitle: AppStrings.profileInstrumentManagementSubtitle,
-                onTap: () => context.push(AppRoutes.instrumentManagement),
-              ),
-              _MenuItem(
-                icon: Icons.school_outlined,
-                label: AppStrings.profileCredentialsLabel,
-                subtitle: AppStrings.profileCredentialsSubtitle,
-                onTap: () => context.push(AppRoutes.extendedProfile),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // 레슨 운영
-          _buildMenuSection(
-            title: AppStrings.profileSectionLessonOperation,
-            items: [
-              _MenuItem(
-                icon: Icons.assignment,
-                label: AppStrings.lessonRequestManagement,
-                subtitle: AppStrings.lessonRequestManagementDesc,
-                onTap:
-                    () => context.push(
-                      '${AppRoutes.lessonRequests}?teacherId=$teacherId',
-                    ),
-              ),
-              _MenuItem(
-                icon: Icons.access_time,
-                label: AppStrings.profileLessonTimeSettingsLabel,
-                subtitle: AppStrings.profileLessonTimeSettingsSubtitle,
-                onTap: () => context.push(AppRoutes.lessonTimeSettings),
-              ),
-              _MenuItem(
-                icon: Icons.calendar_month,
-                label: AppStrings.profileAvailabilityLabel,
-                subtitle: AppStrings.profileAvailabilitySubtitle,
-                onTap: () => context.push(AppRoutes.teacherAvailability),
-              ),
-              _MenuItem(
-                icon: Icons.shield_outlined,
-                label: AppStrings.profileCancelPolicyLabel,
-                subtitle: AppStrings.profileCancelPolicySubtitle,
-                onTap:
-                    () => context.push(
-                      '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
-                    ),
-              ),
-              _MenuItem(
-                icon: Icons.event_busy_outlined,
-                label: AppStrings.profileCancellationDefaultsLabel,
-                subtitle: AppStrings.profileCancellationDefaultsSubtitle,
-                onTap: () => context.push(AppRoutes.cancellationDefaults),
-              ),
-              _MenuItem(
-                icon: Icons.library_music,
-                label: AppStrings.profileRepertoireLabel,
-                subtitle: AppStrings.profileRepertoireSubtitle,
-                onTap: () => context.push(AppRoutes.repertoireManagement),
-              ),
-              _MenuItem(
-                icon: Icons.chat_outlined,
-                label: AppStrings.feedbackTemplateMenuTitle,
-                subtitle: AppStrings.feedbackTemplateMenuSubtitle,
-                onTap: () => context.push(AppRoutes.feedbackTemplateManagement),
-              ),
-              _MenuItem(
-                icon: Icons.tips_and_updates_outlined,
-                label: AppStrings.profileTipTemplateLabel,
-                subtitle: AppStrings.profileTipTemplateSubtitle,
-                onTap: () => context.push(AppRoutes.tipTemplateManagement),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // 소셜
-          _buildMenuSection(
-            title: AppStrings.profileSectionSocial,
-            items: [
-              _MenuItem(
-                icon: Icons.people_outline,
-                label: AppStrings.profileFollowingLabel,
-                subtitle: AppStrings.profileFollowingSubtitle,
-                onTap: () => context.push(AppRoutes.followList),
-              ),
-              _MenuItem(
-                icon: Icons.article_outlined,
-                label: AppStrings.profileNewsLabel,
-                subtitle: AppStrings.profileNewsSubtitle,
-                onTap: () => context.push(AppRoutes.followFeed),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // 설정
-          _buildMenuSection(
-            title: AppStrings.profileSectionSettings,
-            items: [
-              _MenuItem(
-                icon: Icons.notifications_outlined,
-                label: AppStrings.profileNotificationLabel,
-                onTap: () => context.push(AppRoutes.notificationSettings),
-              ),
-              _MenuItem(
-                icon: Icons.mic_outlined,
-                label: AppStrings.profileRecordingLabel,
-                onTap: () => context.push(AppRoutes.allRecordings),
-              ),
-              _MenuItem(
-                icon: Icons.lock_outlined,
-                label: AppStrings.profileVisibilityLabel,
-                subtitle: AppStrings.profileVisibilitySubtitleLabel,
-                onTap: () => context.push(AppRoutes.profileVisibility),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // 지원
-          _buildMenuSection(
-            title: AppStrings.profileSectionSupport,
-            items: [
-              _MenuItem(
-                icon: Icons.campaign_outlined,
-                label: AppStrings.newsRoadmapTitle,
-                onTap: () => context.push(AppRoutes.newsRoadmap),
-              ),
-              _MenuItem(
-                icon: Icons.help_outline,
-                label: AppStrings.profileHelpLabel,
-                onTap: () => context.push(AppRoutes.help),
-              ),
-              _MenuItem(
-                icon: Icons.info_outline,
-                label: AppStrings.profileAppInfoLabel,
-                trailing: Text(
-                  'v${EnvironmentConfig.appVersion}',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                onTap: () => context.push(AppRoutes.appInfo),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // 계정
-          _buildMenuSection(
-            title: AppStrings.profileSectionAccount,
-            items: [
-              _MenuItem(
-                icon: Icons.description_outlined,
-                label: AppStrings.profileTermsLabel,
-                onTap: () => context.push(AppRoutes.termsOfService),
-              ),
-              _MenuItem(
-                icon: Icons.privacy_tip_outlined,
-                label: AppStrings.profilePrivacyPolicyLabel,
-                onTap: () => context.push(AppRoutes.privacyPolicy),
-              ),
-              _MenuItem(
-                icon: Icons.logout,
-                label: AppStrings.profileLogoutLabel,
-                labelColor: AppColors.paperAccent,
-                onTap: () => _showLogoutDialog(context, ref),
-              ),
-            ],
-          ),
+          // 5묶음 카테고리 메뉴 그리드 (W2 Task 2.4 — spec §3 + §7.2 + §11.1)
+          _buildCategoryGrid(context, ref, teacherId),
 
           SizedBox(
             height:
@@ -712,131 +499,33 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildMenuSection({
-    required String title,
-    required List<_MenuItem> items,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Container(
-            decoration: const BoxDecoration(color: AppColors.paper),
-            child: Column(
-              children:
-                  items.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final item = entry.value;
-                    final isLast = index == items.length - 1;
-
-                    return Column(
-                      children: [
-                        _buildMenuItem(item),
-                        if (!isLast)
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: AppSpacing.space4 + 24 + AppSpacing.space3,
-                            ),
-                            child: const ThinRule(),
-                          ),
-                      ],
-                    );
-                  }).toList(),
-            ),
-          ),
-        ],
-      ),
+  /// 5묶음 카테고리 카드 그리드 — spec §7.2.
+  ///
+  /// 단일 묶음 (운영시간/수업방식/내 프로필) → 직접 라우트 push.
+  /// 복합 묶음 (수강권·정산/정책·알림) → 행 탭 → BottomSheet 세부 메뉴.
+  Widget _buildCategoryGrid(
+    BuildContext context,
+    WidgetRef ref,
+    String teacherId,
+  ) {
+    return CategoryMenuGrid(
+      onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
+      onLessonStyleTap: () => _showLessonStylePlaceholder(context),
+      onSubscriptionBillingTap:
+          () => showSubscriptionBillingSheet(context, teacherId),
+      onMyProfileTap: () => context.push(AppRoutes.basicInfoEdit),
+      onPolicyNotificationsTap:
+          () => showPolicyNotificationsSheet(context, ref),
     );
   }
 
-  Widget _buildMenuItem(_MenuItem item) {
-    return InkWell(
-      onTap: item.onTap,
-      borderRadius: BorderRadius.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: Row(
-          children: [
-            Icon(
-              item.icon,
-              size: 24,
-              color: item.labelColor ?? AppColors.inkSecondary,
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.label,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: item.labelColor ?? AppColors.ink,
-                    ),
-                  ),
-                  if (item.subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      item.subtitle!,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkTertiary,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (item.trailing != null) item.trailing!,
-            if (item.trailing == null)
-              Icon(Icons.chevron_right, color: AppColors.inkTertiary),
-          ],
-        ),
-      ),
+  /// 🎓 수업방식 — W3 신규 화면 (`LessonStyleSettingsScreen`) 대기.
+  /// W2 범위에서는 placeholder Snackbar.
+  void _showLessonStylePlaceholder(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppStrings.paywallComingSoonHint)),
     );
   }
-
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showNotebookDialog(
-      context: context,
-      title: AppStrings.profileLogoutLabel,
-      content: const Text(AppStrings.profileLogoutConfirm),
-      confirmLabel: AppStrings.profileLogoutLabel,
-      cancelLabel: AppStrings.cancel,
-      isDestructive: true,
-      onConfirm: () async {
-        Navigator.pop(context);
-        await ref.read(authNotifierProvider.notifier).logout();
-        // Explicit nav after logout (redirect is a secondary safety net).
-        if (context.mounted) context.go(AppRoutes.login);
-      },
-    );
-  }
-}
-
-class _MenuItem {
-  final IconData icon;
-  final String label;
-  final String? subtitle;
-  final Color? labelColor;
-  final Widget? trailing;
-  final VoidCallback onTap;
-
-  _MenuItem({
-    required this.icon,
-    required this.label,
-    this.subtitle,
-    this.labelColor,
-    this.trailing,
-    required this.onTap,
-  });
 }
 
 /// 프로필 탭 자주 쓰는 설정 바로가기 카드.
