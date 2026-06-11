@@ -75,6 +75,13 @@ class AppRoutes {
   static const profile = '/profile';
   static const instrumentManagement = '/profile/instruments';
   static const repertoireManagement = '/profile/repertoire';
+
+  /// 5묶음 IA 로 흩어진 legacy 라우트.
+  /// W2 (2026-06-11) 에서 ProfileTab 메뉴 진입로는 제거됨.
+  /// 라우트 자체는 redirect 로 유지하여 외부 진입(quest 카드/정책 화면 등)을
+  /// 5묶음 메인(/profile) 으로 흘려보낸다. 화면 파일 해체는 W3 에서.
+  /// spec: .harness/spec/2026-06-11-teacher-settings-redesign.md §6.1
+  @Deprecated('W2 2026-06-11 — 5묶음으로 흩어짐. 화면 해체는 W3.')
   static const lessonTimeSettings = '/profile/lesson-time';
   static const tipTemplateManagement = '/profile/templates';
   static const feedbackTemplateManagement = '/profile/feedback-templates';
