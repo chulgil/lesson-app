@@ -6,9 +6,14 @@ part of 'teacher_settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$teacherSettingsHash() => r'8280ea81365790eb469fa84e531b91724f29aa37';
+String _$teacherSettingsHash() => r'402d67f7566d48a276a04f849bd343e7e504901f';
 
-/// Teacher settings provider (for current logged-in teacher)
+/// Teacher settings provider (for current logged-in teacher).
+///
+/// Awaits [teacherSettingsBootMigrationProvider] before reading so the
+/// 1-shot W1 SSOT migration (spec §5.4) has finished. The boot migration
+/// reports `false` only on a hard failure — we keep going either way so a
+/// transient Hive/repository error does not block the entire settings UI.
 ///
 /// Copied from [teacherSettings].
 @ProviderFor(teacherSettings)

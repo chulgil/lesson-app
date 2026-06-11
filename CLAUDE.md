@@ -62,6 +62,7 @@ flutter analyze                                              # 분석
 |------|------|
 | **워크플로우** | |
 | `workflow.md` | 7-Phase 작업 순서, 스펙 우선 개발, 완료 체크리스트 |
+| `worktree-parallel-workflow.md` | **tmux + git worktree 병렬 개발 강제** (main 직접 작업 금지, 검증 통과 후만 merge) |
 | `doc-sync.md` | 코드 변경 시 스펙 문서 동기화 매핑 (훅 + 규칙 이중 안전장치) |
 | `glossary-sync.md` | 유비쿼터스 언어 강제 (glossary SSOT + FE-BE 명칭 일치) |
 | `issue-workflow.md` | 이슈 생성·라벨·브랜치·커밋 워크플로우 |

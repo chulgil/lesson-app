@@ -2,50 +2,63 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
 import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
-import 'package:lessonaza/features/home/presentation/providers/teacher_profile_completion_provider.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/settings/domain/repositories/settings_repository.dart';
 import 'package:lessonaza/features/settings/presentation/providers/settings_repository_provider.dart';
+import 'package:lessonaza/features/settings/presentation/providers/teacher_settings_boot_migration_provider.dart';
 import 'package:lessonaza/features/settings/presentation/providers/teacher_settings_provider.dart';
+
+/// Stub override that bypasses the Hive-backed boot migration in unit tests.
+/// The migration semantics are covered by
+/// `teacher_settings_boot_migration_provider_test.dart`; this file focuses on
+/// the notifier mirror + invalidation invariants.
+final _skipBootMigration = teacherSettingsBootMigrationProvider.overrideWith(
+  (ref) async => true,
+);
 
 /// Regression: the [TeacherSettingsNotifier] mutations and the read-side
 /// [teacherSettingsProvider] are separate instances. Without invalidation,
-/// home/quest screens that derive from [teacherSettingsProvider] (e.g.
-/// [hasAvailableSlotsProvider]) keep a stale value after a save. (#5 D-G3)
+/// screens that derive from [teacherSettingsProvider] keep a stale value
+/// after a save. (#5 D-G3)
+///
+/// W1 2026-06-11 (Task 1.5a) — [hasAvailableSlotsProvider] now derives from
+/// `TeacherAvailability.weeklySchedules` SSOT (spec §5.4), so the deprecated
+/// settings-side `replaceAvailableSlots` no longer flips that derived flag.
+/// These tests now guard the settings mirror persistence + invalidation
+/// invariant only. Availability-side invariants live in
+/// `data/repositories/availability_consumer_migration_test.dart`.
 void main() {
-  test(
-    'replaceAvailableSlots refreshes the read-side hasAvailableSlots',
-    () async {
-      final repo = _MutableSettingsRepository();
-      final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
-      );
-      addTearDown(container.dispose);
+  test('replaceAvailableSlots persists into the settings mirror', () async {
+    final repo = _MutableSettingsRepository();
+    final container = ProviderContainer(
+      overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
+    );
+    addTearDown(container.dispose);
 
-      // Keep derived providers alive and prime both the read-side provider
-      // and the notifier (the notifier returns early when its state is null).
-      container.listen(hasAvailableSlotsProvider, (_, __) {});
-      await container.read(teacherSettingsProvider.future);
-      await container.read(teacherSettingsNotifierProvider.future);
-      expect(container.read(hasAvailableSlotsProvider), isFalse);
+    // Prime both the read-side provider and the notifier (the notifier returns
+    // early when its state is null).
+    await container.read(teacherSettingsProvider.future);
+    await container.read(teacherSettingsNotifierProvider.future);
 
-      // Save the first availability slot via the notifier.
-      await container
-          .read(teacherSettingsNotifierProvider.notifier)
-          .replaceAvailableSlots([
-            const TimeSlot(
-              id: 'slot-1',
-              dayOfWeek: 1,
-              startTime: ClockTime(hour: 9, minute: 0),
-              endTime: ClockTime(hour: 10, minute: 0),
-            ),
-          ]);
+    // Save the first availability slot via the notifier (deprecated mirror).
+    await container
+        .read(teacherSettingsNotifierProvider.notifier)
+        .replaceAvailableSlots([
+          const TimeSlot(
+            id: 'slot-1',
+            dayOfWeek: 1,
+            startTime: ClockTime(hour: 9, minute: 0),
+            endTime: ClockTime(hour: 10, minute: 0),
+          ),
+        ]);
 
-      // The read-side derived provider must reflect the saved slot.
-      await container.read(teacherSettingsProvider.future);
-      expect(container.read(hasAvailableSlotsProvider), isTrue);
-    },
-  );
+    // The settings mirror must reflect the saved slot.
+    final saved = await repo.getTeacherSettings();
+    // ignore: deprecated_member_use_from_same_package
+    expect(saved.availableSlots, hasLength(1));
+    // ignore: deprecated_member_use_from_same_package
+    expect(saved.availableSlots.single.id, 'slot-1');
+  });
 
   test(
     'replaceAvailableSlots persists when the notifier is cold (first tap)',
@@ -57,7 +70,7 @@ void main() {
       // here — that is exactly the cold path that used to fail.
       final repo = _MutableSettingsRepository();
       final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+        overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
       );
       addTearDown(container.dispose);
 
@@ -77,12 +90,10 @@ void main() {
 
       // The slot must have reached the repository (no silent drop).
       final saved = await repo.getTeacherSettings();
+      // ignore: deprecated_member_use_from_same_package
       expect(saved.availableSlots, hasLength(1));
+      // ignore: deprecated_member_use_from_same_package
       expect(saved.availableSlots.single.id, 'first-slot');
-
-      // And the read-side derived provider reflects it.
-      await container.read(teacherSettingsProvider.future);
-      expect(container.read(hasAvailableSlotsProvider), isTrue);
     },
   );
 
@@ -97,7 +108,7 @@ void main() {
       // errors (matching the production best-effort mirror).
       final repo = _MutableSettingsRepository();
       final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+        overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
       );
       addTearDown(container.dispose);
 
@@ -124,11 +135,13 @@ void main() {
       // Now a failure rolls back to the last known-good value instead.
       final repo = _ThrowingBreakTimeRepository();
       final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+        overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
       );
       addTearDown(container.dispose);
 
-      final initial = await container.read(teacherSettingsNotifierProvider.future);
+      final initial = await container.read(
+        teacherSettingsNotifierProvider.future,
+      );
 
       await container
           .read(teacherSettingsNotifierProvider.notifier)
@@ -148,7 +161,7 @@ void main() {
   test('updateTrialLessonFree refreshes the read-side settings', () async {
     final repo = _MutableSettingsRepository();
     final container = ProviderContainer(
-      overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+      overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
     );
     addTearDown(container.dispose);
 
@@ -186,6 +199,7 @@ class _MutableSettingsRepository implements SettingsRepository {
 
   @override
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots) async {
+    // ignore: deprecated_member_use_from_same_package
     _settings = _settings.copyWith(availableSlots: slots);
     return _settings;
   }
@@ -219,6 +233,7 @@ class _MutableSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> updateBreakTime(int minutes) async {
     // Primary write succeeds; secondary availability mirror is best-effort and
     // is intentionally not modeled here (it never throws in production). (#7)
+    // ignore: deprecated_member_use_from_same_package
     _settings = _settings.copyWith(breakTimeBetweenLessons: minutes);
     return _settings;
   }
