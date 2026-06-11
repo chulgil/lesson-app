@@ -23,12 +23,22 @@ class TeacherSettings {
   final List<int> customLessonDurations; // custom durations added by teacher
   final List<int>
   disabledDurations; // disabled durations (both default and custom)
+  /// @deprecated — use [TeacherAvailability.weeklySchedules] (schedule 도메인 SSOT).
+  /// Field kept for BE JSON compat (W1 2026-06-11 spec §5.2).
+  @Deprecated(
+    'Use TeacherAvailability.weeklySchedules — schedule 도메인 SSOT (W1 2026-06-11 spec §5.2)',
+  )
   @JsonKey(includeFromJson: false, includeToJson: false)
   final List<TimeSlot> availableSlots;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
   /// Break time between lessons in minutes (0, 5, 10, 15, 20, 30)
+  /// @deprecated — use [TeacherAvailability.breakTimeBetweenLessons] (운영시간 묶음 SSOT).
+  /// Field kept for BE JSON compat (W1 2026-06-11 spec §5.2).
+  @Deprecated(
+    'Use TeacherAvailability.breakTimeBetweenLessons — 운영시간 묶음 SSOT (W1 2026-06-11 spec §5.2)',
+  )
   final int breakTimeBetweenLessons;
 
   /// Minimum hours before booking (e.g., 24 = must book at least 24 hours ahead)
@@ -63,9 +73,15 @@ class TeacherSettings {
     int? lessonDurationMinutes,
     this.customLessonDurations = const [],
     this.disabledDurations = const [],
+    @Deprecated(
+      'Use TeacherAvailability.weeklySchedules — schedule 도메인 SSOT (W1 2026-06-11 spec §5.2)',
+    )
     this.availableSlots = const [],
     required this.createdAt,
     this.updatedAt,
+    @Deprecated(
+      'Use TeacherAvailability.breakTimeBetweenLessons — 운영시간 묶음 SSOT (W1 2026-06-11 spec §5.2)',
+    )
     this.breakTimeBetweenLessons = 0,
     this.minBookingHours = 24,
     this.lessonPriceTable,
@@ -145,9 +161,15 @@ class TeacherSettings {
     int? lessonDurationMinutes,
     List<int>? customLessonDurations,
     List<int>? disabledDurations,
+    @Deprecated(
+      'Use TeacherAvailability.weeklySchedules — schedule 도메인 SSOT (W1 2026-06-11 spec §5.2)',
+    )
     List<TimeSlot>? availableSlots,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @Deprecated(
+      'Use TeacherAvailability.breakTimeBetweenLessons — 운영시간 묶음 SSOT (W1 2026-06-11 spec §5.2)',
+    )
     int? breakTimeBetweenLessons,
     int? minBookingHours,
     Map<String, Map<String, int>>? lessonPriceTable,
