@@ -13,9 +13,16 @@ part 'teacher_settings.g.dart';
 class TeacherSettings {
   final String id;
   final List<String> instruments;
+
+  /// @deprecated — use [lessonDurationMinutes].
+  /// Field kept for BE JSON compat (W1 2026-06-11 spec §5.2).
+  @Deprecated(
+    'Use lessonDurationMinutes — TeacherSettings 단일 SSOT (W1 2026-06-11)',
+  )
   final int defaultLessonDuration; // in minutes
   final List<int> customLessonDurations; // custom durations added by teacher
-  final List<int> disabledDurations; // disabled durations (both default and custom)
+  final List<int>
+  disabledDurations; // disabled durations (both default and custom)
   @JsonKey(includeFromJson: false, includeToJson: false)
   final List<TimeSlot> availableSlots;
   final DateTime createdAt;
@@ -49,7 +56,11 @@ class TeacherSettings {
   const TeacherSettings({
     required this.id,
     required this.instruments,
-    this.defaultLessonDuration = 60,
+    @Deprecated(
+      'Use lessonDurationMinutes — TeacherSettings 단일 SSOT (W1 2026-06-11)',
+    )
+    int? defaultLessonDuration,
+    int? lessonDurationMinutes,
     this.customLessonDurations = const [],
     this.disabledDurations = const [],
     this.availableSlots = const [],
@@ -60,7 +71,14 @@ class TeacherSettings {
     this.lessonPriceTable,
     this.trialLessonFree = false,
     this.bookingGuidanceMessage,
-  });
+  }) : defaultLessonDuration =
+           lessonDurationMinutes ?? defaultLessonDuration ?? 50;
+
+  /// Lesson duration in minutes — SSOT (W1 2026-06-11 spec §5.2).
+  /// Default 50 (Korean music lesson standard).
+  /// Replaces deprecated [defaultLessonDuration] / `slotDurationMinutes` (schedule).
+  // ignore: deprecated_member_use_from_same_package
+  int get lessonDurationMinutes => defaultLessonDuration;
 
   factory TeacherSettings.fromJson(Map<String, dynamic> json) =>
       _$TeacherSettingsFromJson(json);
@@ -69,7 +87,8 @@ class TeacherSettings {
 
   /// Get all configured durations (default + custom, sorted) - includes disabled
   List<int> get allConfiguredDurations {
-    final all = {...LessonDurations.defaults, ...customLessonDurations}.toList();
+    final all =
+        {...LessonDurations.defaults, ...customLessonDurations}.toList();
     all.sort();
     return all;
   }
@@ -84,17 +103,18 @@ class TeacherSettings {
   /// Check if a duration is disabled
   bool isDurationDisabled(int duration) => disabledDurations.contains(duration);
 
-  /// Get default lesson duration as formatted string
+  /// Get lesson duration as formatted string (uses [lessonDurationMinutes] SSOT).
   String get formattedDuration {
-    if (defaultLessonDuration >= 60) {
-      final hours = defaultLessonDuration ~/ 60;
-      final minutes = defaultLessonDuration % 60;
+    final m = lessonDurationMinutes;
+    if (m >= 60) {
+      final hours = m ~/ 60;
+      final minutes = m % 60;
       if (minutes == 0) {
         return '$hours시간';
       }
       return '$hours시간 $minutes분';
     }
-    return '$defaultLessonDuration분';
+    return '$m분';
   }
 
   /// Get active slots only
@@ -118,7 +138,11 @@ class TeacherSettings {
   TeacherSettings copyWith({
     String? id,
     List<String>? instruments,
+    @Deprecated(
+      'Use lessonDurationMinutes — TeacherSettings 단일 SSOT (W1 2026-06-11)',
+    )
     int? defaultLessonDuration,
+    int? lessonDurationMinutes,
     List<int>? customLessonDurations,
     List<int>? disabledDurations,
     List<TimeSlot>? availableSlots,
@@ -133,17 +157,23 @@ class TeacherSettings {
     return TeacherSettings(
       id: id ?? this.id,
       instruments: instruments ?? this.instruments,
-      defaultLessonDuration: defaultLessonDuration ?? this.defaultLessonDuration,
-      customLessonDurations: customLessonDurations ?? this.customLessonDurations,
+      lessonDurationMinutes:
+          lessonDurationMinutes ??
+          defaultLessonDuration ??
+          this.lessonDurationMinutes,
+      customLessonDurations:
+          customLessonDurations ?? this.customLessonDurations,
       disabledDurations: disabledDurations ?? this.disabledDurations,
       availableSlots: availableSlots ?? this.availableSlots,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      breakTimeBetweenLessons: breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
+      breakTimeBetweenLessons:
+          breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
       minBookingHours: minBookingHours ?? this.minBookingHours,
       lessonPriceTable: lessonPriceTable ?? this.lessonPriceTable,
       trialLessonFree: trialLessonFree ?? this.trialLessonFree,
-      bookingGuidanceMessage: bookingGuidanceMessage ?? this.bookingGuidanceMessage,
+      bookingGuidanceMessage:
+          bookingGuidanceMessage ?? this.bookingGuidanceMessage,
     );
   }
 }

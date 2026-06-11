@@ -12,8 +12,8 @@ TeacherSettings _$TeacherSettingsFromJson(Map<String, dynamic> json) =>
       instruments: (json['instruments'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
-      defaultLessonDuration:
-          (json['default_lesson_duration'] as num?)?.toInt() ?? 60,
+      defaultLessonDuration: (json['default_lesson_duration'] as num?)?.toInt(),
+      lessonDurationMinutes: (json['lesson_duration_minutes'] as num?)?.toInt(),
       customLessonDurations: (json['custom_lesson_durations'] as List<dynamic>?)
               ?.map((e) => (e as num).toInt())
               .toList() ??
@@ -51,4 +51,5 @@ Map<String, dynamic> _$TeacherSettingsToJson(TeacherSettings instance) =>
       'lesson_price_table': instance.lessonPriceTable,
       'trial_lesson_free': instance.trialLessonFree,
       'booking_guidance_message': instance.bookingGuidanceMessage,
+      'lesson_duration_minutes': instance.lessonDurationMinutes,
     };
