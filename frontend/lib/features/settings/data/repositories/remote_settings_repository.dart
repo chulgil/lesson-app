@@ -18,6 +18,7 @@ class RemoteSettingsRepository implements SettingsRepository {
     final response = await _apiClient.get('/settings/teacher');
     final data = response.data as Map<String, dynamic>;
     final settings = TeacherSettings.fromJson(data);
+    // ignore: deprecated_member_use_from_same_package
     return settings.copyWith(availableSlots: await _getAvailabilitySlots());
   }
 
@@ -29,6 +30,7 @@ class RemoteSettingsRepository implements SettingsRepository {
     final data = response.data as Map<String, dynamic>;
     final settings = TeacherSettings.fromJson(data);
     return settings.copyWith(
+      // ignore: deprecated_member_use_from_same_package
       availableSlots: await _getAvailabilitySlots(teacherId: teacherId),
     );
   }
@@ -37,6 +39,7 @@ class RemoteSettingsRepository implements SettingsRepository {
     final response = await _apiClient.put('/settings/teacher', data: updates);
     final data = response.data as Map<String, dynamic>;
     final settings = TeacherSettings.fromJson(data);
+    // ignore: deprecated_member_use_from_same_package
     return settings.copyWith(availableSlots: await _getAvailabilitySlots());
   }
 
@@ -97,17 +100,21 @@ class RemoteSettingsRepository implements SettingsRepository {
       '/schedule/availability',
       data: {
         'availabilities': _availabilityPayloadFromSlots(slots),
+        // ignore: deprecated_member_use_from_same_package
         'slot_duration_minutes': current.defaultLessonDuration,
+        // ignore: deprecated_member_use_from_same_package
         'break_time_between_lessons': current.breakTimeBetweenLessons,
         'min_booking_hours': current.minBookingHours,
       },
     );
+    // ignore: deprecated_member_use_from_same_package
     return current.copyWith(availableSlots: slots);
   }
 
   @override
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot) async {
     final current = await getTeacherSettings();
+    // ignore: deprecated_member_use_from_same_package
     final slots = [...current.availableSlots];
     final index = slots.indexWhere((existing) => existing.id == slot.id);
     if (index == -1) {
@@ -122,6 +129,7 @@ class RemoteSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> toggleTimeSlot(String slotId, bool isActive) async {
     final current = await getTeacherSettings();
     final slots =
+        // ignore: deprecated_member_use_from_same_package
         current.availableSlots
             .map(
               (slot) =>
@@ -165,9 +173,13 @@ class RemoteSettingsRepository implements SettingsRepository {
       await _apiClient.put(
         '/schedule/availability',
         data: {
-          'availabilities':
-              _availabilityPayloadFromSlots(settings.availableSlots),
+          'availabilities': _availabilityPayloadFromSlots(
+            // ignore: deprecated_member_use_from_same_package
+            settings.availableSlots,
+          ),
+          // ignore: deprecated_member_use_from_same_package
           'slot_duration_minutes': settings.defaultLessonDuration,
+          // ignore: deprecated_member_use_from_same_package
           'break_time_between_lessons': settings.breakTimeBetweenLessons,
           'min_booking_hours': settings.minBookingHours,
         },

@@ -7,7 +7,7 @@ part of 'teacher_settings_boot_migration_provider.dart';
 // **************************************************************************
 
 String _$teacherSettingsBootMigrationHash() =>
-    r'768dedcbc3fec8c02ac0080ac95d4d5d8c1b90ea';
+    r'a5fc0a044ec3ac58dd7fe13956f72a6314382e58';
 
 /// Resolves to `true` once the W1 migration has run (or was already done).
 ///
