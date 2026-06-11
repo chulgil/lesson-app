@@ -26,7 +26,7 @@ import '../widgets/profile_category_sheets.dart';
 ///
 /// 5묶음 카테고리:
 /// - 🕐 운영시간 → TeacherAvailability split page (직접 라우트)
-/// - 🎓 수업방식 → LessonStyleSettingsScreen (W3 신규 — W2 에서는 placeholder)
+/// - 🎓 수업방식 → LessonStyleSettingsScreen (직접 라우트, W3 Task 3.2)
 /// - 💰 수강권·정산 → BottomSheet (수강권 템플릿/입금대기/입금 계좌)
 /// - 👤 내 프로필 → BasicInfoEdit (직접 라우트)
 /// - ⚙️ 정책·알림·지원 → BottomSheet (정책/템플릿/알림/녹음/공개/지원/계정)
@@ -63,8 +63,8 @@ class ProfileTab extends ConsumerWidget {
                   meta:
                       'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
                   trailing: IconButton(
-                    onPressed:
-                        () => context.push(AppRoutes.notificationSettings),
+                    onPressed: () =>
+                        context.push(AppRoutes.notificationSettings),
                     icon: const Icon(
                       Icons.settings_outlined,
                       color: AppColors.ink,
@@ -176,27 +176,25 @@ class ProfileTab extends ConsumerWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space1,
-              children:
-                  instruments
-                      .map(
-                        (inst) => Chip(
-                          label: Text(
-                            inst,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.paperAccent,
-                            ),
-                          ),
-                          backgroundColor: AppColors.paperAccent.withValues(
-                            alpha: 0.08,
-                          ),
-                          side: BorderSide.none,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
+              children: instruments
+                  .map(
+                    (inst) => Chip(
+                      label: Text(
+                        inst,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.paperAccent,
                         ),
-                      )
-                      .toList(),
+                      ),
+                      backgroundColor: AppColors.paperAccent.withValues(
+                        alpha: 0.08,
+                      ),
+                      side: BorderSide.none,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                    ),
+                  )
+                  .toList(),
             ),
           ],
           // Introduction
@@ -510,20 +508,12 @@ class ProfileTab extends ConsumerWidget {
   ) {
     return CategoryMenuGrid(
       onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
-      onLessonStyleTap: () => _showLessonStylePlaceholder(context),
-      onSubscriptionBillingTap:
-          () => showSubscriptionBillingSheet(context, teacherId),
+      onLessonStyleTap: () => context.push(AppRoutes.lessonStyleSettings),
+      onSubscriptionBillingTap: () =>
+          showSubscriptionBillingSheet(context, teacherId),
       onMyProfileTap: () => showMyProfileSheet(context),
-      onPolicyNotificationsTap:
-          () => showPolicyNotificationsSheet(context, ref),
-    );
-  }
-
-  /// 🎓 수업방식 — W3 신규 화면 (`LessonStyleSettingsScreen`) 대기.
-  /// W2 범위에서는 placeholder Snackbar.
-  void _showLessonStylePlaceholder(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppStrings.paywallComingSoonHint)),
+      onPolicyNotificationsTap: () =>
+          showPolicyNotificationsSheet(context, ref),
     );
   }
 }

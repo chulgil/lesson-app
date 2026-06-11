@@ -83,6 +83,11 @@ class AppRoutes {
   /// spec: .harness/spec/2026-06-11-teacher-settings-redesign.md §6.1
   @Deprecated('W2 2026-06-11 — 5묶음으로 흩어짐. 화면 해체는 W3.')
   static const lessonTimeSettings = '/profile/lesson-time';
+
+  /// 🎓 수업방식 묶음 화면 (W3 Task 3.2).
+  /// spec §6.2 — `LessonStyleSettingsScreen` 진입로.
+  /// 3 항목: 레슨 1회 시간 + 최소 사전예약 + 학생 안내 메시지.
+  static const lessonStyleSettings = '/profile/lesson-style';
   static const tipTemplateManagement = '/profile/templates';
   static const feedbackTemplateManagement = '/profile/feedback-templates';
   static const extendedProfile = '/profile/extended';

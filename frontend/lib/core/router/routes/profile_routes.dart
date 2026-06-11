@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../features/profile/presentation/screens/instrument_management_screen.dart';
 // W2 Task 2.5: lesson_time_settings_screen import 제거됨.
 // 라우트는 redirect 로 대체 (W3 에서 화면 파일 자체 해체).
+import '../../../features/profile/presentation/screens/lesson_style_settings_screen.dart';
 import '../../../features/profile/presentation/screens/repertoire_management_screen.dart';
 import '../../../features/profile/presentation/screens/feedback_template_management_screen.dart';
 import '../../../features/profile/presentation/screens/tip_template_management_screen.dart';
@@ -47,6 +48,14 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.lessonTimeSettings,
     name: 'lessonTimeSettings',
     redirect: (context, state) => AppRoutes.profile,
+  ),
+
+  // Lesson Style Settings — W3 Task 3.2 (수업방식 묶음)
+  // spec §6.2 — 3 항목 단일 화면 (레슨 1회 시간 + 사전예약 + 학생 안내).
+  GoRoute(
+    path: AppRoutes.lessonStyleSettings,
+    name: 'lessonStyleSettings',
+    builder: (context, state) => const LessonStyleSettingsScreen(),
   ),
 
   // Tip Template Management
