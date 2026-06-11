@@ -1,6 +1,6 @@
 {
-  "updated_at": 1781166132,
-  "updated_at_iso": "2026-06-11T08:22:12Z",
+  "updated_at": 1781167962,
+  "updated_at_iso": "2026-06-11T08:52:42Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -13,19 +13,15 @@
     "spec/2026-06-11-student-gamification.md": "b57b2b6ebc1a6d95bc22bdf6911409369155349b",
     "spec/2026-06-11-teacher-settings-redesign.md": "c2539217dd4e56cf835e316420cd60c2bf23f0e2"
   },
-  "changed": [
-    "spec/2026-06-11-student-gamification.md"
-  ],
+  "changed": [],
   "added": [],
   "removed": [],
   "summary": {
-    "changed_total": 1,
+    "changed_total": 0,
     "added": 0,
     "removed": 0,
     "domains_touched": [],
     "domain_counts": {},
-    "warnings": [
-      "changes_without_domain: 변경 파일이 도메인 폴더 아래가 아님"
-    ]
+    "warnings": []
   }
 }
