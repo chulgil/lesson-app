@@ -10,7 +10,9 @@
 
 **Architecture:** PracticeService 단일 진입점이 모든 evidence 를 받아 GrowthHeatmap 갱신 + StudentQuest 진척 체크 → UI는 1.5초 축하만. 4-Phase 점진 출시 중 첫 단계로 P1 만으로 베타 출시 가능.
 
-**Tech Stack:** Flutter 3.29.0 / Riverpod (codegen) / Hive / freezed / json_serializable / youtube_player_iframe / flutter_test
+**Tech Stack:** Flutter 3.29.0 / Riverpod (codegen) / Hive / json_serializable (프로젝트 컨벤션, freezed 미사용) / youtube_player_iframe / flutter_test
+
+**진입 게이트**: PR #680 (스펙) **머지 완료** 후 본 플랜 시작. Job 0 Step 1 의 commit hash 고정은 머지된 commit 기록.
 
 ---
 
@@ -217,12 +219,13 @@ git add lib/features/gamification/domain/entities/quest_origin.dart \
 git commit -m "feat(gamification): QuestOrigin enum (6종)"
 ```
 
-### Task 1.2: StudentQuest entity (freezed + json_serializable)
+### Task 1.2: StudentQuest entity (json_serializable, 프로젝트 컨벤션)
 
 **Files:**
 - Create: `frontend/lib/features/gamification/domain/entities/student_quest.dart`
 - Test: `frontend/test/features/gamification/domain/entities/student_quest_test.dart`
 - 코드 생성: `student_quest.g.dart`
+- **외부 의존**: 기존 `frontend/lib/features/gamification/domain/entities/challenge.dart` 의 `ChallengeType` enum 재사용 (스펙 §5.1.b). 신규 파일 X.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -515,14 +518,35 @@ test('recordPractice updates heatmap and checks quest progress', () async {
 - [ ] **Step 4: Verify pass + 기존 메트로놈 테스트 모두 통과**
 - [ ] **Step 5: Commit `feat(practice): metronome_provider PracticeService wiring`**
 
-### Task 3.4: tuner / YouTube / 수동 wiring
+### Task 3.4: 튜너 wiring
 
-같은 패턴 3개 추가 Task. P1 범위에서는 다음만:
-- 튜너: stop 시 minutes 전달
-- YouTube: `onEnded` 트리거 시 1회만 (정밀 polling 은 P3)
-- 수동: "오늘 N분 했어요" 수동 입력 폼
+**Files:**
+- Modify: `frontend/lib/features/practice/presentation/providers/tuner_provider.dart`
+- Test: `frontend/test/features/practice/presentation/providers/tuner_provider_test.dart`
 
-- [ ] 각 Task 5 step TDD.
+튜너 stop 시 누적 시간을 PracticeService 에 전달.
+
+- [ ] **Step 1-5: TDD 5단계** (메트로놈 패턴과 동일)
+
+### Task 3.5: YouTube wiring (P1 = onEnded 만)
+
+**Files:**
+- Modify: `frontend/lib/features/lessons/presentation/widgets/youtube_player_widget.dart` (또는 사용처)
+- Test: 위젯/통합 테스트
+
+P1 범위: `onEnded` 콜백 1회 → PracticeService.recordPractice (영상 길이 분 단위). 정밀 polling 은 P3.
+
+- [ ] **Step 1-5: TDD 5단계**
+
+### Task 3.6: 수동 입력 폼 + wiring
+
+**Files:**
+- Create: `frontend/lib/features/practice/presentation/widgets/manual_practice_entry_dialog.dart`
+- Test: 위젯 smoke test
+
+"오늘 N분 연습했어요" 수동 입력 폼 (시간 선택 picker + 메모 옵션).
+
+- [ ] **Step 1-5: TDD 5단계** + Hick's Law (선택지 5분/15분/30분/직접입력 4개)
 
 ---
 
@@ -686,7 +710,14 @@ Future<List<StudentQuest>> activeQuests(ActiveQuestsRef ref, String studentId) {
 
 - [ ] **Step 1: SC-1 검증** — 홈 첫 탭 후 5초 안에 연습 시작 가능 (e2e 측정)
 - [ ] **Step 2: SC-3 검증** — PracticeService 단일 진입점, 4 경로 모두 통합 (코드 review + grep "PracticeRecordingService" 사용처 검증)
-- [ ] **Step 3: SC-4 검증** — 학생 UI 에 origin 라벨 0개 (grep "origin" widget 코드, detail view 제외)
+- [ ] **Step 3: SC-4 검증** — 학생 UI 에 origin 라벨 0개. 정밀 grep:
+  ```bash
+  # widget 안에서 origin 값을 텍스트로 노출하는 패턴 검색 (단순 enum 사용은 제외)
+  grep -rn -E "Text\(.*origin\.|Text\(.*Origin\.|Text\(.*selfCreated|Text\(.*teacherRec|Text\(.*ambient" \
+    frontend/lib/features/gamification/presentation/widgets/ \
+    frontend/lib/features/gamification/presentation/screens/
+  # 결과 0건이어야 함 (detail view 제외 — 디버그·테스트 화면은 허용)
+  ```
 - [ ] **Step 4: 회귀 테스트 전체 통과** (`flutter test`)
 - [ ] **Step 5: PR 생성 + 사용자 검토 요청**
 
@@ -702,13 +733,14 @@ gh pr create \
 
 | Job | 차단 조건 |
 |---|---|
-| Job 1 | Job 0 글로서리 등록 완료 |
+| Job 0 | PR #680 (스펙) 머지 완료 |
+| Job 1 | Job 0 글로서리 등록 + 스펙 commit hash 고정 완료 |
 | Job 2 | Job 1 entities 완료 (typed interface) |
-| Job 3 | Job 2 Mock repositories 완료 (의존성 주입) |
+| Job 3 | Job 2 Mock repositories 완료 (의존성 주입) + Job 1 PracticeEvidence value object |
 | Job 4 | Job 2~3 도메인 완료 |
-| Job 5 | Job 4 providers + Job 3 service |
-| Job 6 | Job 4 + Job 5 (기존 학생 home 통합) |
-| Job 7 | Job 1~6 모두 완료 |
+| Job 5 | Job 3 (모든 Task 3.x 완료) + Job 4 providers (회귀 위험 회피) |
+| Job 6 | Job 4 + Job 5 완료 (기존 학생 home 통합 충돌 방지) |
+| Job 7 | Job 1~6 모두 완료 + **법무 review 게이트** (14세 미만 P1 자동 처리 합법성 확인) |
 
 ---
 
@@ -720,7 +752,7 @@ gh pr create \
 | Hive box 신규 추가 시 첫 진입 크래시 | Hive 초기화 wrapper 에 newBox try/catch + 마이그레이션 안내 메모리 |
 | `youtube_player_iframe` polling 미구현 (P1) → 시청 시간 정확도 ↓ | onEnded 만 카운트 → P3 SpotlightPrompt 와 함께 정밀 polling 도입 |
 | StudentQuest 0개 신규 학생 빈 상태 처리 | Onboarding 자동 트리거 (Job 6) — Job 6 미완료 시 P1 출시 불가 |
-| 14세 미만 학생 — P1 에서 부모 동의 분기 없음 | P1 = 자가 연습만 — 부모 동의 흐름은 P4 와 함께. P1 출시 시 14세 미만 자동 (자가 연습 + 진척만, 비교 보기 모두 hidden) — 위반 가능성 0 |
+| 14세 미만 학생 — P1 에서 부모 동의 분기 없음 | P1 = 자가 연습만 (외부 데이터 수집·공유 0) — 비교 보기·글로벌 익명·디바이스 식별자 trakcing 모두 P4 와 함께. **법무 review 게이트** (Job 7 진입 전) 필수: 자가 연습 + 시각 진척만 표시하는 P1 범위가 KISA + 정보통신망법 §50의5 + COPPA-K 의 "개인정보 수집·처리" 정의에 해당하는지 1회 검토. 결과 따라 P4 까지 부모 동의 차단 OR P1 도 부모 동의 흐름 fast-track 결정. |
 | `Student.nickname` 추가 후 기존 student 직렬화 깨짐 | nullable + json_serializable default 활용 + 마이그레이션 테스트 (Task 1.5 Step 4) |
 
 ---
@@ -749,9 +781,9 @@ P1 만으로 베타 출시 가능 (스펙 §18.2).
 | SC-1 | 5초 안에 연습 시작 가능 | Task 7.2 Step 1 e2e |
 | SC-3 | PracticeService 4 경로 통합 | Task 7.2 Step 2 grep |
 | SC-4 | 학생 UI origin 라벨 0 | Task 7.2 Step 3 grep |
-| SC-12 | 신규 엔티티 5개 | Job 1 entities (단, StreakFreeze, SpotlightPrompt, LeaderboardPreferences 는 P2~P4) |
+| SC-12 | 신규 엔티티 5개 (스펙 §6 정의) | Job 1 entities — P1=3 (StudentQuest, GrowthHeatmap, Student 확장). PracticeEvidence 와 QuestOrigin enum 은 보조 value object/enum, SC-12 의 "5 엔티티" 카운트 외. SpotlightPrompt, StreakFreeze, LeaderboardPreferences 는 P2~P4. |
 
-P1 SC 비율: 12/12 중 **3 완전 충족 + SC-12 부분 (5 엔티티 중 3 신규)**.
+P1 SC 비율: 12/12 중 **3 완전 충족 (SC-1, SC-3, SC-4) + SC-12 부분 (5 도메인 엔티티 중 3 신규 = 60%)**. SC-2 / SC-5~SC-11 은 P2~P4.
 
 ---
 
