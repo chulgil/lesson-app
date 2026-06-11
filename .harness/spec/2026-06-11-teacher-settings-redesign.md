@@ -196,6 +196,17 @@ if TeacherSettings.availableSlots 비어있지 않음:
 - 기존 선생님 (둘 다 있음) → schedule 유지
 - 기존 선생님 (profile 만 채워짐, schedule 비어있음) → schedule 로 복사
 
+### 5.5 1회 보장 영속 매체 (W1 Task 1.5 구현 결정)
+
+마이그레이션 1회 보장 flag 의 영속 매체는 **Hive box `teacher_settings_state` / key `migration_v1_done`** (boolean) 채택.
+
+근거 (Task 1.5 구현 시 결정 — 초기 plan 의 `SharedPreferences` 표기는 매체 무관 placeholder):
+- 본 프로젝트 다른 boot-time provider (예: `quest_first_shown_provider`) 가 Hive 기반 — 일관성
+- Hive box 가 production app init 흐름에서 이미 초기화됨 — 부팅 직후 즉시 read 가능
+- 테스트는 `Directory.systemTemp` + `Hive.init` per setUp/tearDown 으로 결정성 확보
+
+영속성·1회성 효과는 SharedPreferences 와 동등. 추후 매체 통일 (예: 모든 boot flag 를 SharedPreferences 로 통합) 결정 시 follow-up issue.
+
 ---
 
 ## 6. 카테고리별 화면 구조

@@ -224,9 +224,9 @@ git commit -m "feat(profile): availableSlots/breakTimeBetweenLessons deprecated 
 
 ### Task 1.4: 마이그레이션 로직 — `teacher_settings_migration.dart`
 
-**Files:**
-- Create: `frontend/lib/features/profile/data/migrations/teacher_settings_migration.dart`
-- Create: `frontend/test/features/profile/data/migrations/teacher_settings_migration_test.dart`
+**Files** (W1 Task 1.4 구현 결과: `settings/` 도메인 채택 — provider 위치와 일관):
+- Create: `frontend/lib/features/settings/data/migrations/teacher_settings_migration.dart`
+- Create: `frontend/test/features/settings/data/migrations/teacher_settings_migration_test.dart`
 
 - [ ] **Step 1: 실패하는 테스트 작성** (3 시나리오)
 
