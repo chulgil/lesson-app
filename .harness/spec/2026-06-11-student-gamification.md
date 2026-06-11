@@ -172,9 +172,10 @@
 │                                       │
 │  나 ▮▮▮▮▮▮▯  {N}일 / {M}분          │
 │                                       │
-│  ─ 선생님 친구들 ▮▮▮▮▯▯▯           │
-│  ─ 학원 친구들   ▮▮▮▮▮▯▯           │
-│  ─ 세계 익명     ▮▮▮▯▯▯▯           │
+│  ─ 선생님 친구들 ▮▮▮▮▯▯▯  (L4a)    │
+│  ─ 학원 친구들   ▮▮▮▮▮▯▯  (L4b)    │
+│  ─ 친구 그룹     ▮▮▮▮▯▯▯  (L4c)    │
+│  ─ 세계 익명     ▮▮▮▯▯▯▯  (L4d)    │
 │                                       │
 │  너의 티어: 🥇 Gold                   │
 │                                       │
@@ -182,9 +183,12 @@
 └─────────────────────────────────────┘
 ```
 
+- 4 레이어 모두 UI 노출 (L4a~L4d), 각각 독립 opt-in
+- 학생이 비활성 한 레이어 = 회색·hidden 표시
 - 일일 비교 X, **주간 1회** — 매일 자극 회피
 - 숫자 순위 X, 티어만 (Tonara 학습)
 - 14세 미만 자동 hide, "비교 보기" 토글도 자동 OFF
+- L4c 친구 그룹 미사용 (친구 추가 X) 학생 → 행 자동 hide
 
 ### 4.6 Onboarding (1 화면)
 
@@ -220,6 +224,24 @@
 
 학생 UI 에 "이 quest 진행중" 표시 X. 진척 자체가 ambient.
 
+### 5.1.b Quest Origin × Type 매트릭스
+
+기존 `ChallengeType` (6종: practiceDays, practiceMinutes, recordings, lessons, streak, pointsEarned) 를 재사용하되, origin 별로 가능한 type 만 허용:
+
+| Origin | 가능한 ChallengeType | 누가 작성 |
+|---|---|---|
+| `ambient` | practiceDays, practiceMinutes, streak (자동 누적) | 시스템 (학생 의식 X) |
+| `selfCreated` | practiceMinutes, recordings, custom title | 학생 직접 |
+| `systemRoutine` | practiceMinutes, practiceDays | 시스템 추천 (학생 채택) |
+| `lessonDerived` | recordings, lessons, pointsEarned | 학생이 레슨 노트에서 변환 |
+| `teacherRec` | practiceMinutes, recordings, lessons | 선생님이 발급 |
+| `seasonEvent` | practiceDays, pointsEarned | 시즌 큐레이션 |
+
+**금칙 조합**:
+- `selfCreated` × `streak`: streak 은 시스템만 계산 (학생 작성 의미 없음)
+- `teacherRec` × `pointsEarned`: 외부 보상 의존 회피 (선생님이 P 목표 부여 X)
+- `ambient` × `recordings`: 녹음 횟수는 학생 의식 액션 필요
+
 ### 5.2 Spotlight (10%) — 의식적 결정 1회
 
 | Spotlight 종류 | 출처 | 노출 위치 |
@@ -236,14 +258,48 @@
 - 페널티·재시도 강요 0
 
 **선생님 "필수" 플래그** (rare):
-- 선생님이 "이건 꼭 부탁드려요" 토글 → 학생도 거절 가능, 단 거절 시 선생님에게 알림 (대화 유도)
-- 시스템 강제 X
+- 선생님 UI 에서만 토글 → BE 상 priority +10 부여 (Spotlight 큐 우선순위 §7.2 1번 진입)
+- **학생 UI 에는 "필수" 라벨 미노출** (SC-4 origin 라벨 0 유지)
+- 학생이 보는 것: 동일한 "선생님이 추천했어요" prompt — 단, 노출 빈도가 다른 추천보다 자주
+- 거절 시 BE 가 자동으로 선생님 알림 발송 (학생 UI 에는 알림 발송 사실 미표시 — 스트레스 방지)
+- 시스템 강제 X (거절 가능)
 
 ---
 
 ## 6. 데이터 모델 — 신규 엔티티 5개
 
 기존 인프라 (WeeklyRanking, Challenge, point_award_service, badge_award_provider, practice_streak_provider) 는 변경 없이 재사용.
+
+### 6.0 의존성 그래프 (단방향 보장)
+
+```
+[Practice 활동 발생] (메트로놈/튜너/YouTube/녹음/수동)
+       ↓
+PracticeService.record(studentId, type, minutes, metadata)
+       ↓
+       ├──────────────────────────────────────┐
+       │                                       │
+       ▼                                       ▼
+GrowthHeatmap.upsert(date, evidence)    StudentQuest.checkProgress(studentId)
+       │                                       │
+       ▼                                       ▼
+StreakFreeze.checkAutoApply(studentId)    SpotlightPrompt.enqueue(if eligible)
+       │                                       │
+       ▼                                       ▼
+(스트릭 갱신)                            축하 화면에 prompt 슬롯
+       │                                       │
+       └──────────────┬────────────────────────┘
+                      ▼
+       LeaderboardUpdater (if opt-in + 일요일 batch)
+                      ↓
+                WeeklyRanking
+```
+
+**규칙**:
+- PracticeService = 단일 진입점 (SC-3)
+- StudentQuest, SpotlightPrompt, LeaderboardPreferences 는 GrowthHeatmap·Practice 직접 참조 금지 — PracticeService 결과만 받음
+- LeaderboardUpdater 는 학생이 명시적 opt-in 한 경우에만 호출 (일요일 일괄 batch)
+- 순환 의존 없음 (Quest ↛ Spotlight, Spotlight ↛ Quest)
 
 ### 6.1 StudentQuest (자가 quest + 채택된 Spotlight)
 
@@ -418,16 +474,41 @@ if (현재 - birthDate < 14년):
        ↓
 앱 진입 시 모달 — "부모님께 동의 받기" (학생에게 보임)
        ↓
-부모 이메일 입력
+부모 이메일 입력 또는 부모 휴대전화 입력 (학원 등록 시 이미 있으면 자동 채움)
        ↓
-부모에게 링크 이메일 (혹은 학원 등록 후 부모 앱 가입 후 자동)
+parentConsentToken 발급 (UUID v4, BE 저장, 만료 7일)
        ↓
-부모가 동의 → Student.parentConsentAt 기록
+부모에게 동의 링크 (이메일 또는 SMS) — https://app/parent-consent?token=...
+       ↓
+부모가 OAuth 로그인 후 동의 → 매핑 키 검증:
+  - student.parentName + student.parentPhone (또는 학원 등록 부모) 와 비교
+  - Mismatch 시 거절 + 학원/선생님 알림
+       ↓
+승인 → Student.parentConsentAt 기록 + parentConsentRevokedAt = null
        ↓
 경쟁 레이어 활성 가능 (단, 디폴트는 여전히 OFF)
 ```
 
-KISA + COPPA-K 준수.
+**토큰 만료**: 7일. 만료 시 학생 모달 재진입 → 재발급 가능. 발급 후 매주 일요일 미사용 토큰 자동 만료.
+
+**Grace Period (동의 대기 중)**:
+- 14일 동안 학생은 자가 연습 + 시각 진척 (히트맵·스트릭·트로피) 사용 가능 — 비교 보기·글로벌 익명 강제 hide
+- 14일 경과 후 동의 미완료 → 추가 14일 grace 1회 연장 가능 (총 28일)
+- 28일 후 미동의 → 앱 진입 시 부모 동의 모달이 routine 안내로 변경 (페널티 없음)
+
+**동의 철회 (Revocation)**:
+- 부모가 별도 url 접근하여 철회 가능 → `parentConsentRevokedAt` 기록
+- 철회 즉시: 경쟁 레이어 강제 hide + 닉네임 hide (글로벌 익명 포함) + Spotlight prompt 일시 정지
+- 자가 연습 + 시각 진척은 계속 사용 가능 (학생 동기 보호)
+- 학생에게는 "비교 보기가 잠시 꺼졌어요" 한 줄 안내 (이유 미공개)
+- 부모가 다시 동의 → 즉시 복구
+
+**매핑 키 (parent-child)**:
+- 우선순위 ① 학원 등록 부모 (academy 도메인) ② Student.parentPhone ③ Student.parentName + Student 자기보고 이메일
+- 동의 url 의 token + 부모 OAuth identity 검증 (부모도 본인 가입)
+- 매핑 불일치 시 자동 거절 + 학원 관리자에게 alert
+
+**KISA + COPPA-K + 정보통신망법 §50의5** 준수. 법무 review (P4 시점).
 
 ### 9.3 글로벌 익명 (말해보카 모델)
 
@@ -542,12 +623,39 @@ KISA + COPPA-K 준수.
 - 티어 분포: Gold 30%, Silver 30%, Bronze 40%
 - 본인 티어 + 위/아래 5명 (닉네임만)
 
-### 13.2 어뷰징 방지
+### 13.2 어뷰징 방지 (위협 모델)
 
-- 메트로놈 클릭 봇: BPM 변동 패턴 분석 (정규 패턴 외 거절)
-- 클라이언트 시간 조작: 서버 시간 사용
-- 다중 계정: 동일 디바이스 1계정 (학원/가족 예외 케이스 화이트리스트)
-- 의심 계정: 14일 검토 모드 (리더보드 자동 hide)
+**위협 종류 + 대응**:
+
+| 위협 | 탐지 | 대응 |
+|---|---|---|
+| 메트로놈 클릭 봇 (자동 tap) | BPM 변동 1초 분석: 동일 BPM 30분+ 지속 + 시작/종료 패턴 균일 | 의심 카운터 +1, 5회+ 시 14일 검토 모드 |
+| 클라이언트 시간 조작 | 모든 timestamp = 서버 시간 (NTP 동기화 BE). 클라이언트 시간 비교 불일치 시 알람 | 즉시 검토 모드 + 의심 카운터 +3 |
+| 다중 계정 | 디바이스 식별 = IDFV (iOS) + Android Advertising ID (Android, opt-out 시 SSAID fallback) + 앱 설치 UUID 조합 hash | 동일 hash 2계정 이상 시 검토. 학원·가족 예외 case 화이트리스트 (학원 관리자가 명시 신청) |
+| 디바이스 ID 변경 (앱 재설치) | 동일 닉네임 + 동일 IP + 비슷한 BPM 패턴 결합 분석 | 14일 그레이리스트 (점수 50% reduced) 후 정상 |
+| 의심 패턴 누적 | 의심 카운터 ≥ 5 또는 즉시 트리거 (시간 조작) | 14일 검토 모드 진입 |
+
+**14일 검토 모드 SLA**:
+- 진입: 의심 카운터 ≥ 5 또는 즉시 트리거 → BE flag `reviewModeUntil` 자동 설정 (now + 14일)
+- 효과: 리더보드 자동 hide (학생 본인은 정상 사용 + 자기 진척 가시 — 격리식 처벌)
+- 학생에게 메시지: "잠시 리더보드가 꺼졌어요" (사유 비공개)
+- 출구: ① 14일 자동 만료 (의심 카운터 reset) 또는 ② 관리자 수동 해제 (false positive 확인)
+- false positive 대응: 학생 또는 학원 관리자가 "appeal" 버튼 → 관리자 검토 SLA 48시간
+
+**False Positive 처리**:
+- 메트로놈 봇 탐지 false positive: 시각장애 학생·자동 tap 보조 도구 사용자 → 학원 관리자 수동 화이트리스트
+- 다중 계정 false positive: 가족 공용 디바이스 → 학원 등록 시 가족 그룹 사전 등록
+- 모든 false positive 케이스는 14일 검토 모드 진입 전 1회 학원/선생님 알림 + 학생에게는 알리지 않음 (스트레스 방지)
+
+**화이트리스트 운영 주체**:
+- 학원 등록 사용자: 학원 관리자 (academy 도메인) 신청 → 운영팀 승인 (SLA 48시간)
+- 개인 사용자: 운영팀 직접 검토 (운영 contact 채널 별도)
+- 자동 화이트리스트 X — 모두 수동 승인
+
+**모니터링 메트릭**:
+- 14일 검토 모드 진입율: 전체 학생 대비 < 0.5% 유지 (5% 초과 시 알고리즘 false-positive 의심)
+- 자동 해제율: > 95% (관리자 수동 해제 < 5%)
+- Appeal 처리 SLA: 48시간 이내 95%
 
 ### 13.3 노출 정책
 
@@ -627,7 +735,7 @@ KISA + COPPA-K 준수.
 |---|---|
 | 연습 화면 응답 | 메트로놈 시작 < 200ms (기존 기준) |
 | 축하 화면 fade-in | < 100ms |
-| 히트맵 로딩 (1년) | < 500ms |
+| 히트맵 로딩 (1년) | P95 < 500ms, P99 < 1000ms (캐시 hit). Hive 로컬 캐시 + 30일 단위 메모리 chunk 직렬화 |
 | 비교 보기 갱신 | 일요일 00:00 KST 배치 (사용자 트리거 X) |
 | 오프라인 연습 기록 | 로컬 저장 → 온라인 시 동기화 |
 | 접근성 | VoiceOver/TalkBack 호환, 색맹 친화 (Gold/Silver/Bronze 패턴 추가) |
@@ -654,10 +762,31 @@ KISA + COPPA-K 준수.
 
 ### 18.3 데이터 마이그레이션
 
-- 기존 Student 에 nickname 등 nullable 필드만 추가 → 데이터 손실 X
-- 기존 `point_award_service` 적립 데이터 그대로 사용
-- 기존 `practice_streak_provider` 의 스트릭 데이터 그대로 사용
-- 기존 `WeeklyRanking` 데이터 → L4a 첫 노출 시점 그대로 표시
+**Student 엔티티 확장**:
+- nickname, parentConsentAt, parentConsentRevokedAt, parentConsentToken, comparisonViewEnabled 모두 nullable 추가
+- 기존 데이터 마이그레이션 영향 0 (forward-compatible)
+
+**기존 적립 데이터**:
+- `point_award_service` 누적 데이터 그대로 사용 (변경 0)
+- `WeeklyRanking` 기존 데이터 → L4a 첫 노출 시 그대로 표시
+
+**Streak 정렬 (P0 — 정합 위험 핵심)**:
+- 기존 `practice_streak_provider` 의 스트릭은 **학생 디바이스 로컬 timezone 기반 자정** 으로 계산
+- 신규 freeze 시스템 적용 시점 = 본 spec 배포일 (D-day) → **D-day 이전 누락일은 freeze 적용 X** (retroactive 없음)
+- D-day 이후만 freeze 자동 적용 → 학생에게 "freeze 시스템 시작" 1회 안내 토스트
+- timezone 정렬: 신규 freeze 시스템은 모든 학생 = **KST (Asia/Seoul)** 자정 기준 (글로벌 익명 리더보드 동기화 위해)
+- 기존 학생의 로컬 timezone 다른 경우 → D-day 1회 정렬 (학생에게 안내 X — 자정 차이 < 24h)
+- D-day 마이그레이션 스크립트: `practice_streak_provider` → `StreakFreeze.balance = 2` (Sunday 자동 발급 첫 분량) + `usedAt = []`
+
+**롤백 정책**:
+- P3/P4 롤백 시 SpotlightPrompt, LeaderboardPreferences 데이터 → 90일 보존 후 자동 폐기
+- StreakFreeze 데이터 → 영구 보존 (기존 streak 데이터와 동등)
+- 학생 nickname → 영구 보존 (L4d 글로벌 익명 옵트인 학생만)
+
+**테스트 시나리오**:
+- 가입 1년 학생 (streak 30일 보유) → 마이그레이션 후 streak 동일 + freeze balance = 2
+- 가입 1주 학생 (streak 5일) → 동일
+- 신규 가입 학생 (streak 0) → freeze balance = 2 (즉시 사용 가능)
 
 ---
 
