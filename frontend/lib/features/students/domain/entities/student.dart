@@ -122,6 +122,13 @@ class Student {
   final bool isArchived; // Whether the student is archived
   final DateTime? archivedAt; // When the student was archived
 
+  // Student gamification P1 (2026-06-11, plan Job 1 Task 1.5)
+  final String? nickname; // 글로벌 익명 리더보드 옵트인 시 표시명 (스펙 §16)
+  final DateTime? parentConsentAt; // 14세 미만 부모 동의 timestamp (null = 자가 연습 전용)
+  final DateTime? parentConsentRevokedAt; // 부모 동의 철회 시각
+  final String? parentConsentToken; // 부모 동의 인증 토큰 (이메일/SMS 흐름)
+  final bool comparisonViewEnabled; // 비교 보기 활성 (14세+ 또는 부모 동의 시 가능)
+
   Student({
     required this.id,
     required this.name,
@@ -159,6 +166,11 @@ class Student {
     this.district,
     this.isArchived = false,
     this.archivedAt,
+    this.nickname,
+    this.parentConsentAt,
+    this.parentConsentRevokedAt,
+    this.parentConsentToken,
+    this.comparisonViewEnabled = false,
   }) : profileColorKey = profileColorKey ?? _profileColorKeyFromName(name);
 
   /// Create from JSON (profileColor is auto-generated from name).
@@ -315,6 +327,11 @@ class Student {
     String? district,
     bool? isArchived,
     DateTime? archivedAt,
+    String? nickname,
+    DateTime? parentConsentAt,
+    DateTime? parentConsentRevokedAt,
+    String? parentConsentToken,
+    bool? comparisonViewEnabled,
   }) {
     return Student(
       id: id ?? this.id,
@@ -353,6 +370,13 @@ class Student {
       district: district ?? this.district,
       isArchived: isArchived ?? this.isArchived,
       archivedAt: archivedAt ?? this.archivedAt,
+      nickname: nickname ?? this.nickname,
+      parentConsentAt: parentConsentAt ?? this.parentConsentAt,
+      parentConsentRevokedAt:
+          parentConsentRevokedAt ?? this.parentConsentRevokedAt,
+      parentConsentToken: parentConsentToken ?? this.parentConsentToken,
+      comparisonViewEnabled:
+          comparisonViewEnabled ?? this.comparisonViewEnabled,
     );
   }
 

@@ -61,6 +61,15 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
       archivedAt: json['archived_at'] == null
           ? null
           : DateTime.parse(json['archived_at'] as String),
+      nickname: json['nickname'] as String?,
+      parentConsentAt: json['parent_consent_at'] == null
+          ? null
+          : DateTime.parse(json['parent_consent_at'] as String),
+      parentConsentRevokedAt: json['parent_consent_revoked_at'] == null
+          ? null
+          : DateTime.parse(json['parent_consent_revoked_at'] as String),
+      parentConsentToken: json['parent_consent_token'] as String?,
+      comparisonViewEnabled: json['comparison_view_enabled'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
@@ -99,6 +108,12 @@ Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
       'district': instance.district,
       'is_archived': instance.isArchived,
       'archived_at': instance.archivedAt?.toIso8601String(),
+      'nickname': instance.nickname,
+      'parent_consent_at': instance.parentConsentAt?.toIso8601String(),
+      'parent_consent_revoked_at':
+          instance.parentConsentRevokedAt?.toIso8601String(),
+      'parent_consent_token': instance.parentConsentToken,
+      'comparison_view_enabled': instance.comparisonViewEnabled,
     };
 
 const _$StudentLevelEnumMap = {
