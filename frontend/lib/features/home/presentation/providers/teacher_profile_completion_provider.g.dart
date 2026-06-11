@@ -6,9 +6,13 @@ part of 'teacher_profile_completion_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$hasAvailableSlotsHash() => r'4e17ab5ec32f2999fceedd055e5dffce7a04a9d9';
+String _$hasAvailableSlotsHash() => r'de6cde7f8e05d557f217db9bd8f5309cbdb78a75';
 
-/// Whether the teacher has at least one active available time slot.
+/// Whether the teacher has at least one active weekly schedule (운영시간).
+///
+/// W1 2026-06-11 — Source changed from `TeacherSettings.availableSlots`
+/// (deprecated) to `TeacherAvailability.weeklySchedules` (SSOT per spec §5.4).
+/// architect P0 #1 directive — schedule 도메인 단일 진실 소스.
 ///
 /// Copied from [hasAvailableSlots].
 @ProviderFor(hasAvailableSlots)

@@ -5,9 +5,11 @@ import '../../domain/repositories/settings_repository.dart';
 
 /// Mock implementation of SettingsRepository
 class MockSettingsRepository implements SettingsRepository {
+  // ignore: deprecated_member_use_from_same_package
   TeacherSettings _settings = TeacherSettings(
     id: 'teacher_1',
     instruments: ['바이올린', '비올라', '피아노'],
+    // ignore: deprecated_member_use_from_same_package
     defaultLessonDuration: 60,
     availableSlots: [
       TimeSlot(
@@ -74,9 +76,11 @@ class MockSettingsRepository implements SettingsRepository {
     await Future.delayed(const Duration(milliseconds: 300));
     // Return mock settings for any teacher
     // In production, this would fetch from the backend
+    // ignore: deprecated_member_use_from_same_package
     return TeacherSettings(
       id: teacherId,
       instruments: ['바이올린', '피아노'],
+      // ignore: deprecated_member_use_from_same_package
       defaultLessonDuration: 60,
       customLessonDurations: [50], // Example: teacher added 50 min option
       disabledDurations: [120], // Example: teacher disabled 2 hour option
@@ -142,6 +146,7 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> updateDefaultDuration(int duration) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _settings = _settings.copyWith(
+      // ignore: deprecated_member_use_from_same_package
       defaultLessonDuration: duration,
       updatedAt: DateTime.now(),
     );
@@ -208,6 +213,7 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _settings = _settings.copyWith(
+      // ignore: deprecated_member_use_from_same_package
       availableSlots: slots,
       updatedAt: DateTime.now(),
     );
@@ -218,6 +224,7 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final updatedSlots =
+        // ignore: deprecated_member_use_from_same_package
         _settings.availableSlots.map((s) {
           if (s.id == slot.id) {
             return slot;
@@ -226,6 +233,7 @@ class MockSettingsRepository implements SettingsRepository {
         }).toList();
 
     _settings = _settings.copyWith(
+      // ignore: deprecated_member_use_from_same_package
       availableSlots: updatedSlots,
       updatedAt: DateTime.now(),
     );
@@ -236,6 +244,7 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> toggleTimeSlot(String slotId, bool isActive) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final updatedSlots =
+        // ignore: deprecated_member_use_from_same_package
         _settings.availableSlots.map((s) {
           if (s.id == slotId) {
             return s.copyWith(isActive: isActive);
@@ -244,6 +253,7 @@ class MockSettingsRepository implements SettingsRepository {
         }).toList();
 
     _settings = _settings.copyWith(
+      // ignore: deprecated_member_use_from_same_package
       availableSlots: updatedSlots,
       updatedAt: DateTime.now(),
     );
@@ -254,6 +264,7 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> updateBreakTime(int minutes) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _settings = _settings.copyWith(
+      // ignore: deprecated_member_use_from_same_package
       breakTimeBetweenLessons: minutes,
       updatedAt: DateTime.now(),
     );

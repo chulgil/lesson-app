@@ -4,12 +4,19 @@ import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../domain/repositories/settings_repository.dart';
 import 'settings_repository_provider.dart';
+import 'teacher_settings_boot_migration_provider.dart';
 
 part 'teacher_settings_provider.g.dart';
 
-/// Teacher settings provider (for current logged-in teacher)
+/// Teacher settings provider (for current logged-in teacher).
+///
+/// Awaits [teacherSettingsBootMigrationProvider] before reading so the
+/// 1-shot W1 SSOT migration (spec §5.4) has finished. The boot migration
+/// reports `false` only on a hard failure — we keep going either way so a
+/// transient Hive/repository error does not block the entire settings UI.
 @Riverpod(keepAlive: true)
 Future<TeacherSettings> teacherSettings(TeacherSettingsRef ref) async {
+  await ref.watch(teacherSettingsBootMigrationProvider.future);
   final repository = ref.watch(settingsRepositoryProvider);
   return repository.getTeacherSettings();
 }
@@ -117,9 +124,8 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final instruments = current.instruments
-        .where((i) => i != instrument)
-        .toList();
+    final instruments =
+        current.instruments.where((i) => i != instrument).toList();
     state = AsyncValue.data(current.copyWith(instruments: instruments));
     try {
       final updated = await _repository.updateInstruments(instruments);
@@ -226,9 +232,8 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final slots = current.availableSlots
-        .where((slot) => slot.id != slotId)
-        .toList();
+    final slots =
+        current.availableSlots.where((slot) => slot.id != slotId).toList();
     state = AsyncValue.data(current.copyWith(availableSlots: slots));
     try {
       final updated = await _repository.updateAvailableSlots(slots);
@@ -298,9 +303,8 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final effectiveMessage = (message != null && message.isEmpty)
-        ? null
-        : message;
+    final effectiveMessage =
+        (message != null && message.isEmpty) ? null : message;
     state = AsyncValue.data(
       current.copyWith(bookingGuidanceMessage: effectiveMessage),
     );

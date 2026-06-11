@@ -58,6 +58,7 @@ List<Override> _allMandatoryDone({required bool phoneVerified}) => [
   hasAvailableSlotsProvider.overrideWithValue(true),
   hasProfileImageProvider.overrideWithValue(true),
   hasIntroductionProvider.overrideWithValue(true),
+  hasInstrumentsProvider.overrideWithValue(true),
   hasPriceTableProvider.overrideWithValue(true),
   hasBankAccountProvider.overrideWithValue(true),
   hasIssuedSubscriptionProvider.overrideWithValue(true),
@@ -147,7 +148,7 @@ void main() {
     final overrides = _allMandatoryDone(phoneVerified: false);
     // 각 그룹마다 1개씩 미완료 → 모든 그룹 헤더가 표시되어야 함.
     overrides[0] = hasAvailableSlotsProvider.overrideWithValue(false); // Q1
-    overrides[5] = hasIssuedSubscriptionProvider.overrideWithValue(false); // Q7
+    overrides[6] = hasIssuedSubscriptionProvider.overrideWithValue(false); // Q7
 
     await _pump(tester, overrides);
 
@@ -172,8 +173,8 @@ void main() {
   ) async {
     final overrides = _allMandatoryDone(phoneVerified: true);
     // hasSlots 는 true, 다른 mandatory 만 한 개 미완료 (학생 없음).
-    overrides[5] = hasIssuedSubscriptionProvider.overrideWithValue(false);
-    overrides[10] = homeStudentsProvider.overrideWith((ref) async => []);
+    overrides[6] = hasIssuedSubscriptionProvider.overrideWithValue(false);
+    overrides[11] = homeStudentsProvider.overrideWith((ref) async => []);
 
     await _pump(tester, overrides);
 
@@ -213,8 +214,8 @@ void main() {
     // Q2 (완료) 는 화면에서 사라짐.
     expect(find.text(AppStrings.questTitlePhoto), findsNothing);
     expect(find.text(AppStrings.questTitleStudent), findsNothing);
-    // 그룹 헤더의 카운터는 전체 (4/5) 유지 — profile 그룹: Q2~Q5 완료.
-    expect(find.textContaining('(4/5)'), findsOneWidget);
+    // 그룹 헤더의 카운터: profile 그룹 Q1 미완료 → 5/6 완료 (Q2,Q3,Q3b,Q4,Q5).
+    expect(find.textContaining('(5/6)'), findsOneWidget);
   });
 
   testWidgets('가입 직후 첫 도착 윈도우 — 완료 quest 도 표시 (Reveal 윈도우)', (tester) async {
@@ -237,7 +238,7 @@ void main() {
 
   testWidgets('Q3 소개글 카드에 임계값 hint "최소 20자" 노출', (tester) async {
     final overrides = _allMandatoryDone(phoneVerified: false);
-    overrides[2] = hasIntroductionProvider.overrideWithValue(false);
+    overrides[2] = hasIntroductionProvider.overrideWithValue(false); // Q3
 
     await _pump(tester, overrides);
 
@@ -250,7 +251,7 @@ void main() {
 
   testWidgets('Q4 레슨비 카드에 임계값 hint "최소 1개 가격 항목" 노출', (tester) async {
     final overrides = _allMandatoryDone(phoneVerified: false);
-    overrides[3] = hasPriceTableProvider.overrideWithValue(false);
+    overrides[4] = hasPriceTableProvider.overrideWithValue(false); // Q4
 
     await _pump(tester, overrides);
 
@@ -265,7 +266,7 @@ void main() {
     tester,
   ) async {
     final overrides = _allMandatoryDone(phoneVerified: false);
-    overrides[7] = hasAssignedPracticeProvider.overrideWithValue(false);
+    overrides[8] = hasAssignedPracticeProvider.overrideWithValue(false); // Q10
 
     await _pump(tester, overrides);
 
@@ -278,8 +279,8 @@ void main() {
 
   testWidgets('Q7 lock 상태 — 임계값 hint 대신 lock hint 우선', (tester) async {
     final overrides = _allMandatoryDone(phoneVerified: true);
-    overrides[5] = hasIssuedSubscriptionProvider.overrideWithValue(false);
-    overrides[10] = homeStudentsProvider.overrideWith((ref) async => []);
+    overrides[6] = hasIssuedSubscriptionProvider.overrideWithValue(false); // Q7
+    overrides[11] = homeStudentsProvider.overrideWith((ref) async => []);
 
     await _pump(tester, overrides);
 

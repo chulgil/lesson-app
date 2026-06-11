@@ -1,18 +1,25 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../onboarding/onboarding_facade.dart';
+import '../../../schedule/presentation/providers/teacher_availability_providers.dart';
 import '../../../settings/settings_facade.dart';
 import 'assignment_summary_provider.dart';
 import 'home_lesson_summary_provider.dart';
 
 part 'teacher_profile_completion_provider.g.dart';
 
-/// Whether the teacher has at least one active available time slot.
+/// Whether the teacher has at least one active weekly schedule (운영시간).
+///
+/// W1 2026-06-11 — Source changed from `TeacherSettings.availableSlots`
+/// (deprecated) to `TeacherAvailability.weeklySchedules` (SSOT per spec §5.4).
+/// architect P0 #1 directive — schedule 도메인 단일 진실 소스.
 @Riverpod(keepAlive: true)
 bool hasAvailableSlots(HasAvailableSlotsRef ref) {
-  final settingsAsync = ref.watch(teacherSettingsProvider);
-  return settingsAsync.valueOrNull?.availableSlots.any(
-        (slot) => slot.isActive,
+  final teacherId = ref.watch(currentUserIdProvider);
+  final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
+  return availabilityAsync.valueOrNull?.weeklySchedules.any(
+        (schedule) => schedule.isActive,
       ) ??
       false;
 }
