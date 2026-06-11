@@ -513,7 +513,7 @@ class ProfileTab extends ConsumerWidget {
       onLessonStyleTap: () => _showLessonStylePlaceholder(context),
       onSubscriptionBillingTap:
           () => showSubscriptionBillingSheet(context, teacherId),
-      onMyProfileTap: () => context.push(AppRoutes.basicInfoEdit),
+      onMyProfileTap: () => showMyProfileSheet(context),
       onPolicyNotificationsTap:
           () => showPolicyNotificationsSheet(context, ref),
     );

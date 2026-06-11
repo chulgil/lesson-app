@@ -8913,6 +8913,14 @@ class AppStrings {
   /// 💰 수강권·정산 BottomSheet 제목.
   static const categorySheetSubscriptionBillingTitle = '수강권·정산';
 
+  /// 👤 내 프로필 BottomSheet 제목.
+  static const categorySheetMyProfileTitle = '내 프로필';
+
   /// ⚙️ 정책·알림·지원 BottomSheet 제목.
   static const categorySheetPolicyNotificationsTitle = '정책·알림·지원';
+
+  /// "가이드 다시 보기" 메뉴 (정책·알림·지원 묶음 — W5 졸업 후 활성).
+  static const categoryGuideReplayLabel = '가이드 다시 보기';
+  static const categoryGuideReplaySubtitle = '퀘스트 졸업 후 다시 볼 수 있습니다';
+  static const categoryGuideReplayComingSoon = '가이드 다시 보기는 곧 지원될 예정입니다';
 }

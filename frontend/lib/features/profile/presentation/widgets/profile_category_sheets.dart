@@ -23,73 +23,156 @@ import '../../../auth/auth_facade.dart';
 void showSubscriptionBillingSheet(BuildContext context, String teacherId) {
   showNotebookModalBottomSheet<void>(
     context: context,
+    isScrollControlled: true,
     builder: (sheetContext) {
       return SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const _SheetHeader(
-              title: AppStrings.categorySheetSubscriptionBillingTitle,
-            ),
-            ListTile(
-              leading: const Icon(Icons.card_membership),
-              title: const Text(AppStrings.profileSubscriptionTemplateLabel),
-              subtitle: const Text(
-                AppStrings.profileSubscriptionTemplateSubtitle,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const _SheetHeader(
+                title: AppStrings.categorySheetSubscriptionBillingTitle,
               ),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                context.push(AppRoutes.subscriptionTemplates);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.warning_amber_outlined),
-              title: const Text(AppStrings.profileOutstandingPaymentsLabel),
-              subtitle: const Text(
-                AppStrings.profileOutstandingPaymentsSubtitle,
+              ListTile(
+                leading: const Icon(Icons.card_membership),
+                title: const Text(AppStrings.profileSubscriptionTemplateLabel),
+                subtitle: const Text(
+                  AppStrings.profileSubscriptionTemplateSubtitle,
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.subscriptionTemplates);
+                },
               ),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                context.push(AppRoutes.outstandingPayments);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_balance_outlined),
-              title: const Text(AppStrings.profileBankAccountLabel),
-              subtitle: const Text(AppStrings.profileBankAccountSubtitle),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                context.push(AppRoutes.bankAccountEdit);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.shield_outlined),
-              title: const Text(AppStrings.profileCancelPolicyLabel),
-              subtitle: const Text(AppStrings.profileCancelPolicySubtitle),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                context.push('${AppRoutes.lessonPolicy}?teacherId=$teacherId');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.event_busy_outlined),
-              title: const Text(AppStrings.profileCancellationDefaultsLabel),
-              subtitle: const Text(
-                AppStrings.profileCancellationDefaultsSubtitle,
+              ListTile(
+                leading: const Icon(Icons.warning_amber_outlined),
+                title: const Text(AppStrings.profileOutstandingPaymentsLabel),
+                subtitle: const Text(
+                  AppStrings.profileOutstandingPaymentsSubtitle,
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.outstandingPayments);
+                },
               ),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                context.push(AppRoutes.cancellationDefaults);
-              },
-            ),
-          ],
+              ListTile(
+                leading: const Icon(Icons.account_balance_outlined),
+                title: const Text(AppStrings.profileBankAccountLabel),
+                subtitle: const Text(AppStrings.profileBankAccountSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.bankAccountEdit);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.shield_outlined),
+                title: const Text(AppStrings.profileCancelPolicyLabel),
+                subtitle: const Text(AppStrings.profileCancelPolicySubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(
+                    '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.event_busy_outlined),
+                title: const Text(AppStrings.profileCancellationDefaultsLabel),
+                subtitle: const Text(
+                  AppStrings.profileCancellationDefaultsSubtitle,
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.cancellationDefaults);
+                },
+              ),
+            ],
+          ),
         ),
       );
     },
   );
 }
 
-/// ⚙️ 정책·알림·지원 BottomSheet — 템플릿/알림/녹음/공개/지원/계정/로그아웃.
+/// 👤 내 프로필 BottomSheet — 기본정보/악기/자격증/레퍼토리/공개 미리보기 + 공개 항목 제어.
+///
+/// spec §3 line 108-113 — 내 프로필 5 sub-항목.
+void showMyProfileSheet(BuildContext context) {
+  showNotebookModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (sheetContext) {
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const _SheetHeader(title: AppStrings.categorySheetMyProfileTitle),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text(AppStrings.profileBasicInfoEditLabel),
+                subtitle: const Text(AppStrings.profileBasicInfoEditSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.basicInfoEdit);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.music_note),
+                title: const Text(AppStrings.profileInstrumentManagementLabel),
+                subtitle: const Text(
+                  AppStrings.profileInstrumentManagementSubtitle,
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.instrumentManagement);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.school_outlined),
+                title: const Text(AppStrings.profileCredentialsLabel),
+                subtitle: const Text(AppStrings.profileCredentialsSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.extendedProfile);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.library_music),
+                title: const Text(AppStrings.profileRepertoireLabel),
+                subtitle: const Text(AppStrings.profileRepertoireSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.repertoireManagement);
+                },
+              ),
+              // 공개 프로필 미리보기 + 공개 항목 제어 — spec §3 line 113.
+              ListTile(
+                leading: const Icon(Icons.lock_outlined),
+                title: const Text(AppStrings.profileVisibilityLabel),
+                subtitle: const Text(AppStrings.profileVisibilitySubtitleLabel),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.profileVisibility);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.visibility_outlined),
+                title: const Text(AppStrings.profilePreviewCta),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.profilePreview);
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// ⚙️ 정책·알림·지원 BottomSheet — 템플릿/알림/녹음/가이드/팔로우/뉴스/지원/계정/로그아웃.
 void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
   showNotebookModalBottomSheet<void>(
     context: context,
@@ -137,13 +220,36 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
                   context.push(AppRoutes.allRecordings);
                 },
               ),
+              // 가이드 다시 보기 — W5 졸업 후 활성. W2 에서는 placeholder Snackbar.
               ListTile(
-                leading: const Icon(Icons.lock_outlined),
-                title: const Text(AppStrings.profileVisibilityLabel),
-                subtitle: const Text(AppStrings.profileVisibilitySubtitleLabel),
+                leading: const Icon(Icons.menu_book_outlined),
+                title: const Text(AppStrings.categoryGuideReplayLabel),
+                subtitle: const Text(AppStrings.categoryGuideReplaySubtitle),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  context.push(AppRoutes.profileVisibility);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(AppStrings.categoryGuideReplayComingSoon),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.people_outline),
+                title: const Text(AppStrings.profileFollowingLabel),
+                subtitle: const Text(AppStrings.profileFollowingSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.followList);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.article_outlined),
+                title: const Text(AppStrings.profileNewsLabel),
+                subtitle: const Text(AppStrings.profileNewsSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.followFeed);
                 },
               ),
               ListTile(
