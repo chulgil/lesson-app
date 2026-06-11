@@ -391,10 +391,66 @@
 
 ---
 
+## 15. 학생 게이미피케이션 (자가 연습) — 2026-06-11
+
+> 스펙: `.harness/spec/2026-06-11-student-gamification.md` (locked at commit 6262f03d)
+> 플랜: `.harness/decomposition/2026-06-11-student-gamification-p1-foundation.md`
+> 범위: P1 Foundation (StudentQuest + GrowthHeatmap + PracticeRecordingService). P2~P4 별도.
+
+학생 자가 연습 80% 비중을 가시화하는 1년 retention 시스템. **선생님 quest(§13)와는 별 시스템** — 학생용은 자가 결정 목표 추적, 선생님용은 학습 가이드.
+
+### 핵심 엔티티 (BE ↔ FE 동일 클래스명)
+
+| 한글 | 영문 (FE/BE) | 정의 |
+|---|---|---|
+| 학생 자가 quest | `StudentQuest` | 학생이 작성/채택한 연습 목표. 6 origin 중 하나로 분류 |
+| 성장 히트맵 | `GrowthHeatmap` | 1년(365일) 캘린더. 일별 연습 evidence 통합. Hive 30일 chunk × 13 box (스펙 §17 P95<500ms) |
+
+### Value Object / Service
+
+| 한글 | 영문 (FE) | 정의 |
+|---|---|---|
+| 일일 연습 evidence | `DailyPractice` | 메트로놈/튜너/YouTube/녹음/수동 5경로 분 단위 통합. GrowthHeatmap 단일 cell 의 페이로드 |
+| 연습 기록 서비스 | `PracticeRecordingService` | 모든 연습 evidence 단일 진입점. 위치: `features/practice/domain/services/`. 4 경로 wiring 의 hub |
+| 연습 evidence (입력) | `PracticeEvidence` | PracticeRecordingService 입력 value object (source/durationMinutes/timestamp) |
+
+### Enum
+
+| 한글 | 영문 (FE) | 값 (6종) |
+|---|---|---|
+| Quest 출처 | `QuestOrigin` | `ambient` (주변/배경에서 자연 발생) / `selfCreated` (학생 직접 작성) / `systemRoutine` (스케일·웜업 등 시스템 추천) / `lessonDerived` (레슨 메모에서 추출) / `teacherRec` (선생님 추천) / `seasonEvent` (시즌 이벤트) |
+
+### 정책 용어 (P1 범위)
+
+| 용어 | 정의 |
+|---|---|
+| [연습 시작] 1버튼 | 학생 홈 `StudentDashboardTab` GamificationHeader 자리의 단일 진입점 (스펙 §6 / 플랜 O6). PracticeStartCard 위젯 |
+| 1.5초 축하 | 연습 종료 후 CelebrationOverlay — 즉시성·비방해 원칙 (스펙 §9) |
+| 4 경로 wiring | 메트로놈/튜너/YouTube/녹음/수동 → 모두 PracticeRecordingService 단일 진입 (스펙 §11) |
+| 자동 트리거 | 학생 첫 로그인 + StudentQuest 0개 시 onboarding 1화면 자동 진입 (플랜 O7) |
+| Hive 30일 chunk × 13 box | GrowthHeatmap 1년 캐시 전략 (플랜 O2). 메모리 효율 + P95<500ms 달성 |
+
+### 14세 미만 처리 (스펙 §16)
+
+| 한글 | 영문 (FE) | 정의 |
+|---|---|---|
+| 부모 동의 시각 | `Student.parentConsentAt` (nullable) | 14세 미만 학생의 부모 동의 timestamp. null 이면 자가 연습만 허용 (비교 보기·리더보드 차단) |
+| 자가 연습 전용 모드 | self-only mode | 14세 미만 + parentConsentAt=null 학생의 P1 기본 모드 — 비교 보기 없음, 부모 동의 불필요 |
+
+### Deprecated 표현 (사용 금지)
+
+| 폐기 표현 | 대신 사용 |
+|---|---|
+| "학생 quest" (선생님 quest 와 혼동) | "학생 자가 quest" 또는 `StudentQuest` (선생님 quest 는 §13 `Quest`) |
+| "연습 evidence" (혼란스러운 약칭) | `DailyPractice` (저장 단위) 또는 `PracticeEvidence` (입력 value object) |
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-11 | §15 학생 게이미피케이션 (자가 연습) 신설 — P1 Foundation 5종 핵심 용어 (`StudentQuest` / `QuestOrigin` / `GrowthHeatmap` / `DailyPractice` / `PracticeRecordingService`) + 정책 용어 5종 ([연습 시작] 1버튼 / 1.5초 축하 / 4 경로 wiring / 자동 트리거 / Hive 30일 chunk × 13 box) + 14세 미만 처리 2종 (`parentConsentAt` / 자가 연습 전용 모드) + Deprecated 표현 2건. 본 변경은 `.harness/spec/2026-06-11-student-gamification.md` |
 | 2026-06-11 | (architect 검토 반영) §13 `quest_celebrated_at` 의미 재정의 — "11/11 완료" → "Q1~Q10 졸업 시점" + Q11 보너스 분리 (`quest_bonus_shown_provider` FE Hive flag, BE 컬럼 신설 없음) / §14 `minBookingHours` 매핑 반대 방향 명확화 (schedule → profile SSOT, `breakTimeBetweenLessons` 와 반대) |
 | 2026-06-11 | §14 선생님 설정 IA (5묶음) 신설 — 5묶음 카테고리 + 카테고리 미리보기/카드/퀘스트 졸업/가이드 다시 보기/메뉴 NEW 배지/다음 미션 spotlight 신규 용어 + Deprecated 표현 매핑 (availableSlots/defaultLessonDuration/slotDurationMinutes/breakTimeBetweenLessons 폐기, lessonDurationMinutes 통일). 본 변경은 `.harness/spec/2026-06-11-teacher-settings-redesign.md` |
 | 2026-06-08 | §13 퀘스트 시스템 신설 — 11 항목 / 3 그룹 (profile/operation/bonus) / Lock 매트릭스 단순화 (Q6→{Q7~Q10}) / 자동 완료 트리거 / 가입 직후 첫 도착 + 축하 카드 (1회성) / dual-write 마이그레이션 4 단계. 본 §13 은 `.harness/spec/2026-06-08-teacher-quest-system.md` O4 결정 |
