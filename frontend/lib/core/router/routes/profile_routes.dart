@@ -3,7 +3,8 @@
 import 'package:go_router/go_router.dart';
 
 import '../../../features/profile/presentation/screens/instrument_management_screen.dart';
-import '../../../features/profile/presentation/screens/lesson_time_settings_screen.dart';
+// W2 Task 2.5: lesson_time_settings_screen import 제거됨.
+// 라우트는 redirect 로 대체 (W3 에서 화면 파일 자체 해체).
 import '../../../features/profile/presentation/screens/repertoire_management_screen.dart';
 import '../../../features/profile/presentation/screens/feedback_template_management_screen.dart';
 import '../../../features/profile/presentation/screens/tip_template_management_screen.dart';
@@ -39,11 +40,13 @@ List<GoRoute> profileRoutes = [
     builder: (context, state) => const RepertoireManagementScreen(),
   ),
 
-  // Lesson Time Settings
+  // Lesson Time Settings — deprecated W2 Task 2.5
+  // 5묶음으로 흩어짐 (spec §6.1). 화면 해체는 W3.
+  // Legacy URL 진입 시 5묶음 메인(ProfileTab)으로 무음 redirect.
   GoRoute(
     path: AppRoutes.lessonTimeSettings,
     name: 'lessonTimeSettings',
-    builder: (context, state) => const LessonTimeSettingsScreen(),
+    redirect: (context, state) => AppRoutes.profile,
   ),
 
   // Tip Template Management
