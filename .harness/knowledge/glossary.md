@@ -335,12 +335,59 @@
 | 운영 시작 그룹 | Operation Group | `QuestGroup.operation` | — | Q6~Q10 (학생/수강권/레슨/노트/숙제) |
 | 선택 보너스 그룹 | Bonus Group | `QuestGroup.bonus` | — | Q11 (전화인증) — `[선택]` 라벨 + 점선 카드 |
 | 자동 완료 트리거 | Auto-Complete Trigger | (reactive provider) | — | 입력 즉시 퀘스트 완료 감지 + 카드 즉시 소거 |
-| 퀘스트 축하 카드 | Quest Celebration Card | `QuestCelebrationCard` | — | 11/11 완료 시 1회 표시 (`User.questCelebratedAt` 으로 1회성 보장) |
+| 퀘스트 축하 카드 | Quest Celebration Card | `QuestCelebrationCard` | — | **Q1~Q10 (필수) 100% 완료 = 졸업 시점** 1회 표시 (`User.questCelebratedAt` 으로 1회성 보장). 2026-06-11 의미 재정의 — 기존 "11/11 완료" → "10/10 졸업" + Q11 보너스 분리 (`quest_bonus_shown_provider` FE Hive flag) |
 | 가입 직후 첫 도착 | Signup First Arrival | `questFirstShownProvider` | — | SharedPreferences 기반 — 가입 직후 1회만 카드 2초 표시 (5분 윈도우) |
 | Lock 매트릭스 | Lock Matrix | `_QuestLockMatrix` | — | Q6(학생) → {Q7, Q8, Q9, Q10} 잠금 해제 트리거 (학생 등록 전 운영 행동 불가) |
+| Q11 보너스 표시 | Quest Bonus Shown | `quest_bonus_shown_provider` (FE Hive) | — | Q11 (전화인증) 완료 시 1회 보너스 배지 표시. **BE 컬럼 신설 없음** — 게이지 100% 미포함 (Q1~Q10 별도 졸업 트리거와 분리). 2026-06-11 architect 검토 반영 |
 | dual-write 마이그레이션 | Dual-Write Migration | — | `teacher_availability_diff.py` | 단계 1~4: dual-write → reader 교체 → deprecate → 필드 제거 (in-flight 데이터 손실 방지) |
 
 **SSOT 정렬**: 가용시간은 `TeacherAvailability` (schedule 도메인) 단일 — `TeacherSettings.availableSlots` 는 dual-write 단계 후 deprecate.
+
+---
+
+## 14. 선생님 설정 정보 아키텍처 (5묶음) — 2026-06-11
+
+> 선생님 설정의 1차 분류는 다음 5묶음으로 고정. 코드·스펙·UI·대화에서 동일 사용.
+> 입력 자료: `.harness/spec/2026-06-11-teacher-settings-redesign.md`
+> 기존 "레슨 시간 설정" 메뉴 폐기 — 카테고리 어긋남 해소.
+
+### 5묶음 카테고리
+
+| 한글 | 영문 | 주요 엔티티/필드 | 의미 |
+|------|------|------------------|------|
+| 운영시간 묶음 | Operating Hours Group | `TeacherAvailability` (schedule) | "언제 가르치는가" — 주간 운영시간 + 쉬는시간 + 휴무 + 휴가 |
+| 수업방식 묶음 | Lesson Style Group | `TeacherSettings.lessonDurationMinutes` / `minBookingHours` / `studentGuideMessage` (profile) | "어떻게 가르치는가" — 레슨 1회 시간 + 최소 사전예약 + 학생 안내 메시지 |
+| 수강권·정산 묶음 | Subscription & Billing Group | `TeacherSettings.priceTable` + `trialLessonPolicy` + `cancellationDefaults` + `SubscriptionTemplate` + `BankAccount` + `OutstandingPayment` | "어떻게 받는가" |
+| 내 프로필 묶음 | My Profile Group | `TeacherProfile` / `Instrument` / `Credential` / `Repertoire` | "나는 누구인가" |
+| 정책·알림·지원 묶음 | Policy/Notification/Support Group | `CancellationPolicy` / `NotificationSettings` / `FeedbackTemplate` 등 | 가끔 보는 것 |
+
+### 신규 용어
+
+| 한글 | 영문 | FE 클래스/필드 | 설명 |
+|------|------|----------------|------|
+| 카테고리 미리보기 | Category Preview | `OnboardingCategoryPreviewScreen` + `onboardingCategoryShownProvider` | 가입 직후 Step 2.5 5묶음 인지 화면. 1회 노출, 스킵 가능 |
+| 카테고리 카드 | Category Card | (DashboardTab 5묶음 카드 그리드) | 미설정 시 노란 점 affordance + 진행 상태 라벨 |
+| 퀘스트 졸업 | Quest Graduation | `questCelebrationProvider` + 7일 dismiss | Q1~Q10 100% 완료 후 메인에서 자동 hide. 졸업 카드 1주일 노출 후 dismiss |
+| 가이드 다시 보기 | Guide Re-show | (정책·알림·지원 메뉴) | 졸업 후 퀘스트 보드 + 카테고리 미리보기 재실행 fallback |
+| 메뉴 NEW 배지 | NEW Badge | (5묶음 카테고리 카드) | 새 카테고리 7일간 NEW 점 표시. 한 번 진입 시 해당 카드만 dismiss |
+| 다음 미션 spotlight | Next Mission Spotlight | (메인 첫 진입 오버레이) | 메인 첫 진입 1회 — 화면 어둡게 + 다음 quest 카드 1개만 highlight |
+
+### Deprecated 표현 (사용 금지)
+
+| 폐기 표현 | 대신 사용 |
+|---|---|
+| "레슨 시간 설정" (메뉴) | 5묶음으로 흩어짐 — 1:1 매핑 없음 |
+| "가용 요일/시간" (메뉴 라벨) | "운영시간" (단일 라벨) |
+| "가용시간" (사용자 노출 표현) | "운영시간" — 코드의 `TeacherAvailability` 클래스명은 SSOT 유지 |
+| `TeacherSettings.availableSlots` | `TeacherAvailability.weeklySchedules` (SSOT) |
+| `TeacherSettings.breakTimeBetweenLessons` | `TeacherAvailability.breakTimeBetweenLessons` (운영시간 묶음) |
+| `defaultLessonDuration` (profile) | `lessonDurationMinutes` (TeacherSettings) |
+| `slotDurationMinutes` (schedule, 필드명) | `lessonDurationMinutes` (TeacherSettings, 수업방식 묶음 SSOT) |
+| `TeacherAvailability.minBookingHours` (schedule 중복본) | `TeacherSettings.minBookingHours` (profile 단일 — 수업방식 묶음 SSOT). **반대 방향 주의** — `breakTimeBetweenLessons` 는 schedule SSOT 이고 `minBookingHours` 는 profile SSOT (마이그레이션 충돌 시 우선 방향 다름) |
+
+### 마이그레이션 (앱 부팅 시 1회)
+
+`.harness/spec/2026-06-11-teacher-settings-redesign.md` §5.4 참조 — `availableSlots` → `weeklySchedules` 복사 + 충돌 시 schedule 우선. `breakTimeBetweenLessons` / `minBookingHours` 도 동일 정책.
 
 ---
 
@@ -348,6 +395,8 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-11 | (architect 검토 반영) §13 `quest_celebrated_at` 의미 재정의 — "11/11 완료" → "Q1~Q10 졸업 시점" + Q11 보너스 분리 (`quest_bonus_shown_provider` FE Hive flag, BE 컬럼 신설 없음) / §14 `minBookingHours` 매핑 반대 방향 명확화 (schedule → profile SSOT, `breakTimeBetweenLessons` 와 반대) |
+| 2026-06-11 | §14 선생님 설정 IA (5묶음) 신설 — 5묶음 카테고리 + 카테고리 미리보기/카드/퀘스트 졸업/가이드 다시 보기/메뉴 NEW 배지/다음 미션 spotlight 신규 용어 + Deprecated 표현 매핑 (availableSlots/defaultLessonDuration/slotDurationMinutes/breakTimeBetweenLessons 폐기, lessonDurationMinutes 통일). 본 변경은 `.harness/spec/2026-06-11-teacher-settings-redesign.md` |
 | 2026-06-08 | §13 퀘스트 시스템 신설 — 11 항목 / 3 그룹 (profile/operation/bonus) / Lock 매트릭스 단순화 (Q6→{Q7~Q10}) / 자동 완료 트리거 / 가입 직후 첫 도착 + 축하 카드 (1회성) / dual-write 마이그레이션 4 단계. 본 §13 은 `.harness/spec/2026-06-08-teacher-quest-system.md` O4 결정 |
 | 2026-06-04 | AC-M2 Context Toggle API — POST /auth/context/switch + GET /auth/context. JWT 페이로드 확장 (active_context/academy_id/teacher_id). ContextSwitchLog 자동 기록 + 학원장 자동 복귀 시 활성 위임 auto_end. billing_settlement_spec §1 결제 원칙 명확화 (PG/카드 외부 단말기/자동 송금 X). PaymentMethod.card docstring 보강 |
 | 2026-06-04 | §12 학원(Academy) 수강권/청구/정산 (AC-M1 그룹 C) — BillingRule/Invoice/Payment/Settlement/Subscription/TeacherPayoutOverride 6 엔티티 + 8 enum + subscriptions.academy_id + lessons.academy_id/visibility 컬럼 + AcademyInvitePreview FE 호환. FE 갭 #513 |
