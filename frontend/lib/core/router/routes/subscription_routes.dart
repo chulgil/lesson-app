@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/widgets.dart';
 
 import '../app_routes.dart';
+import '../route_params.dart';
 import '../../../features/auth/presentation/providers/user_role_provider.dart';
 import '../../../features/subscription/presentation/screens/expiring_subscriptions_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_list_screen.dart';
@@ -26,7 +27,9 @@ List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.proposalSettings,
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      // 2026-06-12 — 하드코딩 'teacher_1' 폴백 제거 (schedule_routes 의
+      // teacherAvailability 회귀와 동일 패턴). 폴백은 현재 로그인 사용자.
+      final teacherId = teacherIdParamOrCurrent(context, state);
       return _TeacherOnlySubscriptionRoute(
         child: ProposalSettingsScreen(teacherId: teacherId),
       );
@@ -35,7 +38,7 @@ List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.subscriptionTemplates,
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = teacherIdParamOrCurrent(context, state);
       return _TeacherOnlySubscriptionRoute(
         child: SubscriptionTemplateListScreen(teacherId: teacherId),
       );
@@ -68,7 +71,7 @@ List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.scheduleChangeRequests,
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = teacherIdParamOrCurrent(context, state);
       return _TeacherOnlySubscriptionRoute(
         child: ScheduleChangeRequestListScreen(teacherId: teacherId),
       );
@@ -135,7 +138,7 @@ List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.lessonPolicy,
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = teacherIdParamOrCurrent(context, state);
       final lessonClassId = state.uri.queryParameters['lessonClassId'];
       return LessonPolicyScreen(
         teacherId: teacherId,
@@ -147,7 +150,7 @@ List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.proposalConfirm,
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = teacherIdParamOrCurrent(context, state);
       return ProposalConfirmScreen(teacherId: teacherId);
     },
   ),

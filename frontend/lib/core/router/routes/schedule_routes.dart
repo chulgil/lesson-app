@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_strings.dart';
 import '../../widgets/notebook/notebook_surfaces.dart';
+import '../route_params.dart';
 import '../../../features/schedule/domain/entities/unified_lesson_request.dart';
 import '../../../features/schedule/domain/entities/group_class.dart';
 import '../../../features/schedule/domain/entities/group_class_schedule.dart';
@@ -188,7 +189,11 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.teacherAvailability,
     name: 'teacherAvailability',
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      // 2026-06-12 — 하드코딩 'teacher_1' 폴백 제거. remote(베타)에서
+      // 조회는 teacher_1 / 저장은 본인 계정으로 갈라져 "추가해도 무반응"
+      // 버그의 근본 원인이었다 (mock 은 currentUserId==teacher_1 이라
+      // 우연히 일치해 재현 불가).
+      final teacherId = teacherIdParamOrCurrent(context, state);
       return TeacherAvailabilitySplitPage(teacherId: teacherId);
     },
   ),
@@ -205,7 +210,7 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.pendingBookings,
     name: 'pendingBookings',
     builder: (context, state) {
-      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = teacherIdParamOrCurrent(context, state);
       return PendingBookingsScreen(teacherId: teacherId);
     },
   ),
@@ -217,7 +222,7 @@ List<GoRoute> scheduleRoutes = [
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
       return RegisterRegularLessonScreen(
-        teacherId: extra?['teacherId'] ?? 'teacher_1',
+        teacherId: teacherIdExtraOrCurrent(context, extra),
         teacherName: extra?['teacherName'] ?? '선생님',
         studentId: extra?['studentId'],
         studentName: extra?['studentName'],
