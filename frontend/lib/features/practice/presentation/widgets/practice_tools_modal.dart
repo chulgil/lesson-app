@@ -35,8 +35,9 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
     return showNotebookModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
-      builder: (context) =>
-          PracticeToolsModal(initialTab: initialTab, studentId: studentId),
+      builder:
+          (context) =>
+              PracticeToolsModal(initialTab: initialTab, studentId: studentId),
     );
   }
 
@@ -74,12 +75,20 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
   }
 
   @override
+  void deactivate() {
+    // Stop tuner completely when modal closes (including stream).
+    // dispose 가 아닌 deactivate 에 두는 이유: riverpod 3.x 환경에서
+    // ConsumerStatefulElement.dispose 가 호출되는 시점에는 ref 가 이미 무효 —
+    // 위젯이 element tree 에서 제거되는 deactivate 시점에는 아직 유효.
+    ref.read(tunerProvider.notifier).stopCompletely();
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
-    // Stop tuner completely when modal closes (including stream)
-    ref.read(tunerProvider.notifier).stopCompletely();
     super.dispose();
   }
 
@@ -177,10 +186,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                     unselectedLabelStyle: AppTypography.headingSmall.copyWith(
                       fontWeight: FontWeight.normal,
                     ),
-                    tabs: const [
-                      Tab(text: '메트로놈'),
-                      Tab(text: '튜너'),
-                    ],
+                    tabs: const [Tab(text: '메트로놈'), Tab(text: '튜너')],
                   ),
                 ),
                 // Settings button for tuner
@@ -189,14 +195,14 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                   builder: (context, child) {
                     return _tabController.index == 1
                         ? IconButton(
-                            icon: const Icon(Icons.settings_outlined),
-                            onPressed: () => TunerSettingsSheet.show(context),
-                            constraints: const BoxConstraints(
-                              minWidth: 40,
-                              minHeight: 40,
-                            ),
-                            padding: EdgeInsets.zero,
-                          )
+                          icon: const Icon(Icons.settings_outlined),
+                          onPressed: () => TunerSettingsSheet.show(context),
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40,
+                          ),
+                          padding: EdgeInsets.zero,
+                        )
                         : const SizedBox(width: AppSpacing.space10);
                   },
                 ),
