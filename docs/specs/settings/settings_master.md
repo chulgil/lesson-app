@@ -1,7 +1,7 @@
 # 설정 시스템 Master Spec
 
 > 구현 상태: ⚠️ 부분 구현 — 백업/녹음만 구현, 교사 설정 UI 미구현
-> Last updated: 2026-03-07
+> Last updated: 2026-06-12
 
 ## 1. 개요
 
@@ -256,7 +256,7 @@ OrphanRecordingsDiagnostic
 |------|:----:|
 | `settings/presentation/providers/teacher_settings_provider.dart` | 완료 |
 | `settings/presentation/providers/settings_repository_provider.dart` | 완료 |
-| 선생님 설정 전용 화면 | 미구현 (다른 화면에서 사용) |
+| 선생님 설정 전용 화면 (구 `LessonTimeSettingsScreen`) | 해체 완료 (W2 Task 2.5) — 편집 기능은 5묶음(ProfileTab)과 `LessonStyleSettingsScreen`(§6.2)으로 분산. `/profile/lesson-time` 경로는 `ProfileTab`으로 redirect (SSOT: 단일 편집 진입점 없음, 5묶음이 각 항목의 SSOT). |
 
 ### 녹음 백업
 

@@ -1,6 +1,6 @@
 # 프로필 마스터 스펙
 
-> 마지막 업데이트: 2026-04-16
+> 마지막 업데이트: 2026-06-12
 > 구현 상태: ✅ 구현 완료 (10x Vision 진행 중)
 > 관련 코드: `features/profile/`
 
@@ -195,21 +195,34 @@
 | 저장 위치 | BE — `PUT /teachers/me/visibility` (mock 동일 인터페이스) |
 | Optimistic update | 미적용 — BE 응답 대기 후 state 반영 (실패 시 토글 원복) |
 
-### G. LessonTimeSettingsScreen 화면 구조 (2026-06-04 명시)
+### G. LessonTimeSettingsScreen — 해체 완료 (W2 Task 2.5, 2026-06-12 갱신)
 
-`LessonTimeSettingsScreen` 은 settings 도메인의 `teacherSettingsProvider` 를 cross-domain 으로 소비한다. 화면 구조:
+> **진입점 현황**: `LessonTimeSettingsScreen` 클래스 및 파일은 W2 Task 2.5에서 해체됨. 화면 파일 없음.
 
-| 섹션 | 필드 | 기본값 |
-|------|------|--------|
-| 기본 레슨 시간 | `defaultDurationMinutes` | 60 |
-| 휴식 시간 | `breakMinutes` | 10 |
-| 최소 예약 시간 | `minBookingHours` | 24 (시간 단위) |
-| 시간대 | `timezone` | 시스템 로케일 기본 |
-| 가이드 메시지 | `guideMessage`?, 학생에게 표시 | null |
-| 시범 레슨 정책 | `trialPolicy` (`free`/`paid`/`disabled`) | `free` |
-| 가격표 | `pricingNote`?, 자유 텍스트 | null |
+| 항목 | 현황 |
+|------|------|
+| 클래스 파일 | 삭제됨 (`lesson_time_settings_screen.dart` 미존재) |
+| 라우트 `/profile/lesson-time` | `redirect → AppRoutes.profile` (ProfileTab으로 무음 redirect) |
+| 편집 진입점 | 5묶음 ProfileTab (각 항목별 SSOT) + `LessonStyleSettingsScreen`(§6.2) |
+| 기존 push 호출처 | `quest_board_card.dart`, `lesson_policy_screen.dart` — 모두 redirect 경유 ProfileTab 도달 |
 
-**저장 흐름:** `teacherSettingsNotifierProvider.update*()` 호출 → `RemoteSettingsRepository` 가 BE 호출 + availability mirror best-effort (`/schedule/availability` 동기화 실패 무시). 성공 시 `teacherSettingsProvider` invalidate.
+**SSOT 결정 (P1 #5)**: 레슨 시간 관련 설정의 편집 UI 는 단일 화면에 집중되지 않는다.
+각 설정 항목은 5묶음 ProfileTab 내 해당 섹션이 **항목별 SSOT** 이며, 동일 편집 UI 를 별도 화면에 중복 배치하는 것은 금지 패턴 #19 (SSOT 위반) 에 해당한다.
+`/profile/lesson-time` 경로로 진입하는 모든 호출은 redirect 를 통해 ProfileTab 으로 이동하며, 독립적인 레슨 시간 편집 전용 화면은 존재하지 않는다.
+
+**구 화면 필드 분산 위치** (참고):
+
+| 구 필드 | 현재 편집 위치 |
+|---------|--------------|
+| `defaultDurationMinutes` | `LessonStyleSettingsScreen` (§6.2, `/profile/lesson-style`) |
+| `breakMinutes` | `LessonStyleSettingsScreen` (§6.2) |
+| `minBookingHours` | `LessonStyleSettingsScreen` (§6.2) |
+| `timezone` | `LessonStyleSettingsScreen` (§6.2) |
+| `guideMessage` | `LessonStyleSettingsScreen` (§6.2) |
+| `trialPolicy` | `LessonStyleSettingsScreen` (§6.2) |
+| `pricingNote` | `PriceTableScreen` (§6.3, `/profile/price-table`) |
+
+**저장 흐름 (불변):** `teacherSettingsNotifierProvider.update*()` 호출 → `RemoteSettingsRepository` 가 BE 호출 + availability mirror best-effort. 성공 시 `teacherSettingsProvider` invalidate.
 
 ---
 
@@ -225,6 +238,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-12 | §G LessonTimeSettingsScreen 해체 확정 (P1 #5 SSOT 감사) — 진입점 현황 갱신, 5묶음 항목별 SSOT 결정 명시, 구 필드 분산 위치 표 추가 |
 | 2026-06-04 | §E CancellationDefaults Hive 영속성 정책 명시 (LocalCancellationDefaultsRepository, BE 마이그레이션 시점 sync 규칙). §F ProfileVisibilitySettings 저장 메커니즘 (필드별 기본값, optimistic update 미적용). §G LessonTimeSettingsScreen 화면 구조 (7개 필드, cross-domain teacherSettings 소비) |
 | 2026-06-03 | 코드 반영 — 누락 화면 6종, 엔티티 3종(CancellationDefaults/PendingInvite/VerificationBadge), VerificationBadgeChip 위젯, Provider 5종 추가 |
 | 2026-04-16 | 10x Vision UX 개선 — 완성도 게이지, 바로가기 카드, 통계 재정의, 섹션 순서 변경 |
