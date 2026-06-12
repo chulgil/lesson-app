@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
-import '../../../profile/presentation/providers/quest_celebration_provider.dart';
+import '../../../profile/profile_facade.dart' show questCelebrationProvider;
 
 /// 11/11 퀘스트 모두 완료 시 1회 표시되는 축하 카드 (§8.3).
 ///

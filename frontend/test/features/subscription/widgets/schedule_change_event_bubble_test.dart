@@ -335,4 +335,31 @@ void main() {
     );
     expect(find.text('사유: 컨디션이 좋지 않아 취소 요청드립니다'), findsOneWidget);
   });
+
+  // ── #692 Schedule Change Expiry smoke tests ───────────────────────────────
+
+  testWidgets('scheduleChangeExpired bubble renders without exception', (
+    tester,
+  ) async {
+    final event = scheduleEvent(
+      RequestEventType.scheduleChangeExpired,
+      actorType: ProposerRole.student,
+    );
+    await pumpBubble(tester, event, viewerRole: 'student');
+    expect(tester.takeException(), isNull);
+    expect(find.text('이 변경 요청은 응답 없이 만료되었어요'), findsOneWidget);
+  });
+
+  testWidgets(
+    'scheduleChangeExpired bubble renders requester action for proposer',
+    (tester) async {
+      // Student proposed and is viewing → should see "다시 요청하기"
+      final event = scheduleEvent(
+        RequestEventType.scheduleChangeExpired,
+        actorType: ProposerRole.student,
+      );
+      await pumpBubble(tester, event, viewerRole: 'student');
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

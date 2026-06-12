@@ -7,8 +7,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../auth/auth_facade.dart';
 import '../../domain/entities/notification_preferences.dart';
 import '../providers/notification_preferences_provider.dart';
+import '../providers/subscription_expiry_providers.dart';
 
 // ignore: widget-smoke-test
 /// Notification settings screen: master toggle + per-category toggles + DND.
@@ -22,6 +24,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(notificationPreferencesNotifierProvider);
     final notifier = ref.read(notificationPreferencesNotifierProvider.notifier);
+    final isTeacher = ref.watch(currentUserRoleProvider) == UserRole.teacher;
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(
@@ -43,6 +46,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
             onChanged:
                 (v) => notifier.toggleCategory(NotificationCategory.lesson, v),
           ),
+          // Spec §2.2: lessonStarting/lessonCancelled bypass all toggles.
+          const _BypassHint(AppStrings.notifCategoryLessonBypassHint),
           _CategoryTile(
             title: AppStrings.notificationSchedule,
             subtitle: AppStrings.notificationScheduleDesc,
@@ -92,6 +97,15 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 (v) =>
                     notifier.toggleCategory(NotificationCategory.marketing, v),
           ),
+          // Teacher-only: subscription expiry auto reminders (D-14/D-7/D-1/D-0)
+          // Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
+          if (isTeacher) ...[
+            const SizedBox(height: AppSpacing.space2),
+            _SectionHeader(
+              AppStrings.notificationSettingsExpiryAutoSectionTeacher,
+            ),
+            _TeacherExpirySection(masterEnabled: prefs.masterEnabled),
+          ],
           const SizedBox(height: AppSpacing.space2),
           _SectionHeader(AppStrings.quietHoursTitle),
           _QuietHoursSection(
@@ -101,6 +115,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 ({required int? startHour, required int? endHour}) => notifier
                     .setQuietHours(startHour: startHour, endHour: endHour),
           ),
+          // Spec §2.2: urgent lesson notifications bypass quiet hours.
+          const _BypassHint(AppStrings.notifQuietHoursBypassHint),
           const SizedBox(height: AppSpacing.space8),
         ],
       ),
@@ -207,6 +223,105 @@ class _CategoryTile extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// DND bypass hint
+// ---------------------------------------------------------------------------
+
+class _BypassHint extends StatelessWidget {
+  const _BypassHint(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        0,
+        AppSpacing.screenPadding,
+        AppSpacing.space2,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 14, color: AppColors.inkTertiary),
+          const SizedBox(width: AppSpacing.space1),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Teacher-only: subscription expiry auto reminder toggles
+// ---------------------------------------------------------------------------
+
+class _TeacherExpirySection extends ConsumerWidget {
+  const _TeacherExpirySection({required this.masterEnabled});
+
+  /// Global push master switch — gates the whole section.
+  final bool masterEnabled;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final expiry = ref.watch(
+      subscriptionExpiryReminderSettingsNotifierProvider,
+    );
+    final notifier = ref.read(
+      subscriptionExpiryReminderSettingsNotifierProvider.notifier,
+    );
+    final sectionOn = masterEnabled && expiry.enabled;
+
+    return Column(
+      children: [
+        _CategoryTile(
+          title: AppStrings.notificationExpiryAutoMasterTitle,
+          subtitle: AppStrings.notificationExpiryAutoMasterSubtitle,
+          enabled: expiry.enabled,
+          masterEnabled: masterEnabled,
+          onChanged: notifier.toggleEnabled,
+        ),
+        _CategoryTile(
+          title: AppStrings.notificationExpiryD14Title,
+          subtitle: AppStrings.notificationExpiryD14Subtitle,
+          enabled: expiry.remindAtD14,
+          masterEnabled: sectionOn,
+          onChanged: notifier.toggleD14,
+        ),
+        _CategoryTile(
+          title: AppStrings.notificationExpiryD7Title,
+          subtitle: AppStrings.notificationExpiryD7Subtitle,
+          enabled: expiry.remindAtD7,
+          masterEnabled: sectionOn,
+          onChanged: notifier.toggleD7,
+        ),
+        _CategoryTile(
+          title: AppStrings.notificationExpiryD1Title,
+          subtitle: AppStrings.notificationExpiryD1Subtitle,
+          enabled: expiry.remindAtD1,
+          masterEnabled: sectionOn,
+          onChanged: notifier.toggleD1,
+        ),
+        _CategoryTile(
+          title: AppStrings.notificationExpiryD0Title,
+          subtitle: AppStrings.notificationExpiryD0Subtitle,
+          enabled: expiry.remindAtD0,
+          masterEnabled: sectionOn,
+          onChanged: notifier.toggleD0,
+        ),
+      ],
     );
   }
 }

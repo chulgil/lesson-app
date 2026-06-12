@@ -16,6 +16,9 @@ from typing import Any, Protocol
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore[import-untyped]
 from apscheduler.triggers.cron import CronTrigger  # type: ignore[import-untyped]
+from apscheduler.triggers.interval import (
+    IntervalTrigger,  # type: ignore[import-untyped]  # noqa: F401 — used in register_interval_job
+)
 from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
@@ -105,6 +108,33 @@ def register_daily_kst_job(
         misfire_grace_time=300,  # 5min — 인스턴스 시작 직후 catch-up 허용
     )
     logger.info("scheduler: registered job id=%s at %02d:%02d KST", job_id, hour, minute)
+
+
+def register_interval_job(
+    func: Callable[[], Awaitable[Any]],
+    *,
+    job_id: str,
+    hours: int = 0,
+    minutes: int = 0,
+) -> None:
+    """Register a repeating interval job. Idempotent (replace_existing=True).
+
+    72h 정밀도 만료 처리처럼 매 N시간마다 실행이 필요한 job 에 사용한다.
+    """
+    sched = get_scheduler()
+    sched.add_job(
+        func,
+        trigger=IntervalTrigger(hours=hours, minutes=minutes),
+        id=job_id,
+        replace_existing=True,
+        misfire_grace_time=300,
+    )
+    logger.info(
+        "scheduler: registered interval job id=%s every %dh%dm",
+        job_id,
+        hours,
+        minutes,
+    )
 
 
 def start_scheduler() -> None:

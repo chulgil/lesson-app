@@ -25,7 +25,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Plan C Phase 6a/6c — start APScheduler. Disabled when TESTING flag is set
     # so pytest doesn't spawn a background event loop.
     from app.core.config import settings as _settings
-    from app.core.scheduler import register_daily_kst_job, shutdown_scheduler, start_scheduler
+    from app.core.scheduler import (
+        register_daily_kst_job,
+        register_interval_job,
+        shutdown_scheduler,
+        start_scheduler,
+    )
     from app.jobs.subscription_expiry_job import JOB_ID, run_subscription_expiry_job
 
     scheduler_enabled = not getattr(_settings, "TESTING", False)
@@ -64,6 +69,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             hour=8,
             minute=5,
         )
+
+        # Hourly — schedule-change 72h expiry + 24h reminder + 60h approaching (#692).
+        from app.jobs.schedule_change_expiry_jobs import (
+            JOB_ID_EXPIRY,
+            run_schedule_change_expiry_job,
+        )
+
+        register_interval_job(
+            run_schedule_change_expiry_job,
+            job_id=JOB_ID_EXPIRY,
+            hours=1,
+        )
+
         start_scheduler()
 
     yield

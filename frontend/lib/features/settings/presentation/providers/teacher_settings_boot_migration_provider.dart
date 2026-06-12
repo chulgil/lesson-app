@@ -19,7 +19,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../schedule/domain/entities/teacher_availability.dart';
-import '../../../schedule/presentation/providers/teacher_availability_providers.dart';
+import '../../../schedule/schedule_facade.dart'
+    show teacherAvailabilityRepositoryProvider;
 import '../../data/migrations/teacher_settings_migration.dart';
 import 'settings_repository_provider.dart';
 

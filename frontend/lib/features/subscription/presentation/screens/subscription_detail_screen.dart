@@ -22,6 +22,8 @@ import '../../../students/students_ui_facade.dart';
 import '../extensions/subscription_visuals.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
+import '../utils/expiry_streak_detector.dart';
+import '../widgets/expiry_streak_banner.dart';
 import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
 import '../widgets/subscription_bottom_input_bar.dart';
@@ -410,6 +412,13 @@ class _SubscriptionDetailBodyState
 
               // §7.119 v2.2: 휴강 상단 배너 (선생님+학생 모두 표시)
               _TeacherCancelBanner(subscriptionId: subscription.id),
+
+              // #692 §8.1: 동일 회차 3회 연속 만료 안내 배너
+              if (hasConsecutiveExpiryStreak(
+                events: sessionEvents,
+                sessionNumber: _selectedSession,
+              ))
+                const ExpiryStreakBanner(),
 
               // Scrollable chat area (schedule change events only)
               Expanded(

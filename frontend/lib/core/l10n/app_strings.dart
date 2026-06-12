@@ -624,6 +624,15 @@ class AppStrings {
   static const chatScheduleChangeRejected = '시간 변경을 거절했습니다';
   static const chatScheduleChangeCountered = '다른 시간을 역제안했습니다';
 
+  // ── Schedule Change Expiry (#692) ─────────────────────────────
+  static const chatScheduleChangeExpired = '이 변경 요청은 응답 없이 만료되었어요';
+  static const eventScheduleChangeExpired = '일정 변경 만료';
+  static const scheduleChangeExpiredRequesterAction = '다시 요청하기';
+  static const scheduleChangeExpiredBannerTitle = '직접 연락을 권장해요';
+  static const scheduleChangeExpiredBannerBody =
+      '같은 회차에서 일정 변경 요청이 3회 연속 만료되었습니다. '
+      '선생님께 직접 연락해 일정을 조율해 보세요.';
+
   // ── Schedule Change Event Labels ─────────────────────────────
   static const eventScheduleChangeProposed = '시간 변경 제안';
   static const eventScheduleChangeAccepted = '시간 변경 수락';
@@ -3698,6 +3707,32 @@ class AppStrings {
 
   /// 선생님께 문의하기 (대기 카드 CTA)
   static const proposalWaitingContactCta = '선생님께 문의하기';
+
+  // -- Payment Pending Visibility (#693) --
+
+  /// 입금 완료 알림 전송 직후 SnackBar — "선생님에게 전달되었어요"
+  static const paymentNotifiedSnackbar = '선생님에게 전달되었어요';
+
+  /// paymentNotified 상태 버튼 라벨 (비활성)
+  static const paymentNotifiedButtonLabel = '입금 확인 대기 중';
+
+  /// 제안 상세 paymentNotified 배너 — 수강권 발급 안내
+  static const proposalPaymentPendingBannerBody = '선생님이 입금을 확인하면 수강권이 발급돼요';
+
+  /// 3단계 프로그레스 — 1단계 라벨
+  static const paymentProgressStep1 = '입금 알림';
+
+  /// 3단계 프로그레스 — 2단계 라벨
+  static const paymentProgressStep2 = '확인 대기';
+
+  /// 3단계 프로그레스 — 3단계 라벨
+  static const paymentProgressStep3 = '수강권 발급';
+
+  /// 학부모 홈 결제 섹션 — paymentNotified 제안 섹션 헤더
+  static const parentHomePaymentPendingSection = '입금 확인 대기 중';
+
+  /// 학부모 홈 결제 섹션 — paymentNotified 제안 카드 본문
+  static const parentHomePaymentPendingBody = '선생님의 입금 확인을 기다리고 있어요';
 
   // -- Subscription Domain Services (자동 제안/갱신 메시지 5-3b-8) --
 
@@ -7666,6 +7701,13 @@ class AppStrings {
   /// 방해금지 종료 시간 라벨
   static const quietHoursEndLabel = '끝';
 
+  // Notification Settings — DND bypass hints
+  /// 레슨 카테고리 DND 우회 안내 (spec §6.2)
+  static const notifCategoryLessonBypassHint = '레슨 시작/취소 알림은 항상 수신됩니다';
+
+  /// 방해금지 시간대 DND 우회 안내 (spec §6.2)
+  static const notifQuietHoursBypassHint = '레슨 시작, 취소 알림은 방해금지 시간에도 수신됩니다';
+
   // ── App Rating Prompt (앱 평가 유도) ────────────────────────────────────
 
   // ── 마일스톤 축하 카드 (팝업 다이얼로그 폐기 → 인라인 카드) ──
@@ -8335,6 +8377,9 @@ class AppStrings {
   /// 요일에 시간대를 처음 추가하는 행동을 설명하는 라벨 (CTA).
   static const weeklyScheduleAddSlotAction = '시간대 추가';
 
+  /// 시간대 저장/삭제 실패 피드백 (2026-06-12 — silent fail 방지).
+  static const weeklyScheduleSaveError = '시간대 저장에 실패했어요. 잠시 후 다시 시도해주세요';
+
   // ── 보강 크레딧 / Makeup Credit (#432) ──────────────────────────────
   // Spec: docs/specs/subscription/makeup_credit_spec.md
 
@@ -8953,12 +8998,14 @@ class AppStrings {
   static const categorySheetPolicyNotificationsTitle = '정책·알림·지원';
 
   /// "가이드 다시 보기" 메뉴 (정책·알림·지원 묶음 — W5 졸업 후 활성).
+  ///
+  /// UX 카피 원칙 (2026-06-12): 내부 용어 (퀘스트 졸업/5묶음) 대신 사용자
+  /// 가치 언어. "완료한 설정 가이드" = 사용자가 이해하는 대상.
   static const categoryGuideReplayLabel = '가이드 다시 보기';
-  static const categoryGuideReplaySubtitle = '퀘스트 졸업 후 다시 볼 수 있습니다';
-  static const categoryGuideReplayComingSoon = '가이드 다시 보기는 곧 지원될 예정입니다';
+  static const categoryGuideReplaySubtitle = '완료한 설정 가이드를 언제든 다시 확인할 수 있어요';
 
   /// "가이드 다시 보기" 화면 — Step 2.5 카테고리 미리보기 재실행 버튼 (W5 Task 5.6).
-  static const guideReshowCategoryPreviewButton = '5묶음 카테고리 미리보기 다시 보기';
+  static const guideReshowCategoryPreviewButton = '설정 안내 다시 보기';
 
   // ── LessonStyleSettingsScreen (W3 Task 3.2) ─────────────────────
   // spec §6.2 — 수업방식 묶음 (3 항목: 레슨 1회 시간 + 사전예약 + 학생 안내)
@@ -9015,12 +9062,25 @@ class AppStrings {
   // ── OnboardingCategoryPreviewScreen (W4 Task 4.2) ────────────────
   // spec §9.2 — Step 2.5 5묶음 카테고리 미리보기 1회 화면.
   // 사용처: features/onboarding/presentation/screens/onboarding_category_preview_screen.dart
+  //
+  // UX 카피 원칙 (2026-06-12): "5가지 묶음/퀘스트" 같은 내부 설계 용어 대신
+  // 사용자 가치 언어 ("레슨 운영 설정", "차근차근 안내"). 같은 화면이 두
+  // 청중에게 노출되므로 신규/기존 문구 분리 — 기존 사용자(W6 마이그레이션
+  // overlay)는 migrationCategoryPreview* 사용.
 
-  /// 화면 상단 환영 타이틀.
-  static const onboardingCategoryPreviewTitle = '환영합니다! 5가지 묶음으로 정리해뒀어요';
+  /// 화면 상단 환영 타이틀 (신규 가입 Step 2.5).
+  static const onboardingCategoryPreviewTitle = '환영합니다! 레슨 운영 설정을 한눈에 정리했어요';
 
-  /// 카테고리 그리드 아래 보조 안내 (퀘스트 안내 예고).
-  static const onboardingCategoryPreviewSubtitle = '나머지는 퀘스트가 안내해드려요';
+  /// 카테고리 그리드 아래 보조 안내 (신규 가입 Step 2.5).
+  static const onboardingCategoryPreviewSubtitle =
+      '지금 다 하지 않아도 괜찮아요. 하나씩 차근차근 안내해드릴게요';
+
+  /// 화면 상단 타이틀 (기존 사용자 — W6 마이그레이션 overlay 변경 공지).
+  static const migrationCategoryPreviewTitle = '설정 메뉴가 새로워졌어요';
+
+  /// 보조 안내 (기존 사용자 — 기능 보존 안심 메시지).
+  static const migrationCategoryPreviewSubtitle =
+      '자주 쓰는 설정을 다섯 가지로 정리했어요. 쓰시던 기능은 모두 그대로예요';
 
   /// [시작하기] CTA — markShown() + 메인 진입.
   static const onboardingCategoryPreviewStart = '시작하기';

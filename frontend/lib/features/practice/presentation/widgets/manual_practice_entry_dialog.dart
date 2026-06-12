@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 
 /// 학생 게이미피케이션 P1 — "오늘 N분 연습했어요" 수동 입력 다이얼로그.
 ///
@@ -56,8 +57,8 @@ class _ManualPracticeEntryDialogState extends State<ManualPracticeEntryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('오늘 연습 기록', style: AppTypography.headingSmall),
+    return NotebookAlertDialog(
+      titleWidget: Text('오늘 연습 기록', style: AppTypography.headingSmall),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

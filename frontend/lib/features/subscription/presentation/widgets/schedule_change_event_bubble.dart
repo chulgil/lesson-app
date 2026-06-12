@@ -55,8 +55,9 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
       child: Row(
-        mainAxisAlignment:
-            isMyMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMyMessage
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Left: opponent avatar
@@ -81,10 +82,9 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           // Bubble content
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isMyMessage
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
+              crossAxisAlignment: isMyMessage
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.only(
@@ -105,10 +105,9 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 260),
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color:
-                        isMyMessage
-                            ? AppColors.paperAccentSoft
-                            : AppColors.paperDark,
+                    color: isMyMessage
+                        ? AppColors.paperAccentSoft
+                        : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
                       topRight: const Radius.circular(AppSpacing.radiusLarge),
@@ -139,8 +138,9 @@ class ScheduleChangeEventBubble extends StatelessWidget {
 
   /// Whether this event's actor matches the viewer role.
   bool _isMyMessage() {
-    final actorRole =
-        event.actorType == ProposerRole.teacher ? 'teacher' : 'student';
+    final actorRole = event.actorType == ProposerRole.teacher
+        ? 'teacher'
+        : 'student';
     return actorRole == viewerRole;
   }
 
@@ -161,6 +161,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       RequestEventType.scheduleChangeCountered => _buildProposedContent(),
       RequestEventType.scheduleChangeAccepted => _buildAcceptedContent(),
       RequestEventType.scheduleChangeRejected => _buildRejectedContent(),
+      RequestEventType.scheduleChangeExpired => _buildExpiredContent(),
       // scheduleChanged is used as "requested" in this context
       RequestEventType.scheduleChanged => _buildRequestedContent(),
       RequestEventType.lessonCancelled => _buildCancelledContent(),
@@ -317,9 +318,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
         const SizedBox(height: AppSpacing.space2),
         Text(
           AppStrings.bulkCancelRescheduleCta,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.paperAccent,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
         ),
       ],
     );
@@ -329,10 +328,12 @@ class ScheduleChangeEventBubble extends StatelessWidget {
   Widget _buildAnnouncementContent() {
     final fullMessage = event.message ?? '';
     final newlineIndex = fullMessage.indexOf('\n');
-    final title =
-        newlineIndex > 0 ? fullMessage.substring(0, newlineIndex) : fullMessage;
-    final body =
-        newlineIndex > 0 ? fullMessage.substring(newlineIndex + 1).trim() : '';
+    final title = newlineIndex > 0
+        ? fullMessage.substring(0, newlineIndex)
+        : fullMessage;
+    final body = newlineIndex > 0
+        ? fullMessage.substring(newlineIndex + 1).trim()
+        : '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -518,6 +519,40 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     );
   }
 
+  /// scheduleChangeExpired: 72h 무응답 자동 만료 — #692.
+  ///
+  /// 요청자(viewerRole 이 proposer 와 일치) 에게는 "다시 요청하기" action 버튼,
+  /// 응답자에게는 wait(grey) 상태 텍스트만 표시.
+  Widget _buildExpiredContent() {
+    final isRequester = event.actorType == ProposerRole.system
+        ? false // 시스템 이벤트 — 발신자 불명 → 기본 wait
+        : (event.actorType == ProposerRole.teacher) ==
+              (viewerRole == 'teacher');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppStrings.chatScheduleChangeExpired,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.inkSecondary,
+          ),
+        ),
+        if (isRequester) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            AppStrings.scheduleChangeExpiredRequesterAction,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.paperAccent,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   /// Fallback for unhandled event types.
   Widget _buildGenericContent() {
     return Text(
@@ -553,18 +588,16 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        i == 0
-                            ? AppColors.paperAccentSoft
-                            : AppColors.scheduleMutedBackground,
+                    color: i == 0
+                        ? AppColors.paperAccentSoft
+                        : AppColors.scheduleMutedBackground,
                   ),
                   child: Text(
                     AppStrings.slotPriority(i + 1),
                     style: AppTypography.caption.copyWith(
-                      color:
-                          i == 0
-                              ? AppColors.paperAccent
-                              : AppColors.inkSecondary,
+                      color: i == 0
+                          ? AppColors.paperAccent
+                          : AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

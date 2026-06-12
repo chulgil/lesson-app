@@ -422,6 +422,59 @@ void main() {
   );
 
   testWidgets(
+    'expired event after a proposal resets the bottom bar to Default (#692)',
+    (tester) async {
+      final proposedEvent = RequestEvent(
+        id: 'event_proposed',
+        requestId: '',
+        actorType: ProposerRole.student,
+        actorId: 'student_1',
+        eventType: RequestEventType.scheduleChangeProposed,
+        suggestedSlots: [
+          TimeSlotOption(
+            id: 'slot_1',
+            dayOfWeek: 1,
+            startTime: '18:00',
+            endTime: '19:00',
+          ),
+        ],
+        createdAt: DateTime(2026, 5, 4, 18),
+        sessionNumber: 4,
+      );
+      final expiredEvent = RequestEvent(
+        id: 'event_expired',
+        requestId: '',
+        actorType: ProposerRole.system,
+        actorId: 'system',
+        eventType: RequestEventType.scheduleChangeExpired,
+        createdAt: DateTime(2026, 5, 7, 18),
+        sessionNumber: 4,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SubscriptionBottomInputBar(
+              subscription: _activeSubscription(),
+              viewerRole: 'student',
+              messageController: TextEditingController(),
+              events: [proposedEvent, expiredEvent],
+              opponentName: '김선아',
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Expired terminal event resets to Default: no waiting banner, the
+      // schedule-change CTA is available again (spec §8.2).
+      expect(find.text('김선아님의 응답을 기다리고 있습니다'), findsNothing);
+      expect(find.text('결정 변경'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'withdraw schedule event shows changed decision with strikethrough slot',
     (tester) async {
       await tester.pumpWidget(

@@ -12,8 +12,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
-import '../../../profile/presentation/providers/quest_celebration_provider.dart';
-import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
+import '../../../profile/profile_facade.dart'
+    show QuestFirstShown, questCelebrationProvider, questFirstShownProvider;
 import '../providers/home_lesson_summary_provider.dart';
 import '../providers/teacher_profile_completion_provider.dart';
 import 'quest_celebration_card.dart';

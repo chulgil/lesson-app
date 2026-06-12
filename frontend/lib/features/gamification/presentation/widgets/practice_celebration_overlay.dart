@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 
@@ -69,7 +70,7 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
           (context, _) => Opacity(
             opacity: _opacity.value,
             child: ColoredBox(
-              color: Colors.black54,
+              color: AppColors.inkScrim,
               child: Center(
                 child: Column(
                   key: const ValueKey('celebration_content'),
@@ -81,7 +82,7 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
                       '${widget.practiceMinutes}분 했어요!',
                       key: const ValueKey('celebration_minutes'),
                       style: AppTypography.headingLarge.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space2),
@@ -89,7 +90,7 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
                       '🔥 ${widget.streakDays}일 연속',
                       key: const ValueKey('celebration_streak'),
                       style: AppTypography.headingMedium.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                       ),
                     ),
                   ],

@@ -16,6 +16,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../providers/onboarding_category_shown_provider.dart';
 
 class OnboardingCategoryPreviewScreen extends ConsumerWidget {
@@ -25,7 +26,21 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
   /// markCategoryIntroduced(5개) + markShown 을 처리하고 자체 rebuild 한다.
   final Future<void> Function()? onProceed;
 
-  const OnboardingCategoryPreviewScreen({super.key, this.onProceed});
+  /// 화면 타이틀 — null 이면 신규 가입 문구 (환영합니다!).
+  ///
+  /// W6 마이그레이션 overlay 는 기존 사용자용 변경 공지 문구
+  /// (`AppStrings.migrationCategoryPreviewTitle`) 를 주입한다.
+  final String? title;
+
+  /// 보조 안내 — null 이면 신규 가입 문구.
+  final String? subtitle;
+
+  const OnboardingCategoryPreviewScreen({
+    super.key,
+    this.onProceed,
+    this.title,
+    this.subtitle,
+  });
 
   static const _categories = <_CategoryPreview>[
     _CategoryPreview(
@@ -52,8 +67,7 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: AppColors.paper,
+    return NotebookScreenScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -62,7 +76,7 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: AppSpacing.space4),
               Text(
-                AppStrings.onboardingCategoryPreviewTitle,
+                title ?? AppStrings.onboardingCategoryPreviewTitle,
                 style: AppTypography.headingMedium.copyWith(
                   color: AppColors.ink,
                 ),
@@ -72,7 +86,7 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
               _CategoryGrid(items: _categories),
               const SizedBox(height: AppSpacing.space4),
               Text(
-                AppStrings.onboardingCategoryPreviewSubtitle,
+                subtitle ?? AppStrings.onboardingCategoryPreviewSubtitle,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),

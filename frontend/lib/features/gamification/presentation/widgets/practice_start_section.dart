@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../practice/presentation/widgets/practice_tools_modal.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../practice/practice_ui_facade.dart' show PracticeToolsModal;
+import '../../../students/students_facade.dart' show studentProvider;
 import '../providers/growth_heatmap_provider.dart';
 import 'practice_celebration_overlay.dart';
 import 'practice_start_card.dart';

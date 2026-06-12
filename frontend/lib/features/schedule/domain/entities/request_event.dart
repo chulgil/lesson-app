@@ -72,6 +72,12 @@ enum RequestEventType {
 
   scheduleChangeCountered,
 
+  /// 72h 무응답 자동 만료 — #692
+  scheduleChangeExpired,
+
+  /// 24h 무응답 리마인드 알림 — #692 (시스템 이벤트, UI 표시 없음)
+  scheduleChangeReminder,
+
   /// General text message (subscription detail chat)
   message,
 

@@ -265,10 +265,16 @@ class MockTeacherAvailabilityRepository
   ) async {
     await Future.delayed(const Duration(milliseconds: 100));
 
-    final current = _availabilities[teacherId];
-    if (current == null) {
-      throw Exception('Availability not found for teacher: $teacherId');
-    }
+    // 2026-06-12 — remote 와 동일 계약: 첫 설정 (레코드 없음) 이면 기본값
+    // (50/10/60) 으로 신규 생성. throw 시 notifier 가 silent fail 하던
+    // "시간대 추가 미적용" 회귀의 mock 측 정합.
+    final current =
+        _availabilities[teacherId] ??
+        TeacherAvailability(
+          id: _uuid.v4(),
+          teacherId: teacherId,
+          createdAt: DateTime.now(),
+        );
 
     final updated = current.copyWith(
       weeklySchedules: [...current.weeklySchedules, schedule],

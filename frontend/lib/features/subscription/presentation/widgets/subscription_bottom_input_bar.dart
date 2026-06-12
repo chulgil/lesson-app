@@ -135,7 +135,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: onCancelLesson,
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.inkQuaternary),
+                          side: const BorderSide(
+                            color: AppColors.inkQuaternary,
+                          ),
                           shape: RoundedRectangleBorder(),
                         ),
                         child: Text(
@@ -194,19 +196,35 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     );
   }
 
+  /// Returns the latest unresolved schedule decision event.
+  ///
+  /// The list is scanned newest-first: a terminal event resets the bar to
+  /// Default, while the first source event found drives the bar state.
+  /// Note: [RequestEventType.scheduleChangeAccepted] stays a SOURCE — the
+  /// acceptor keeps seeing Waiting + "결정 변경" (withdraw) until the thread
+  /// moves on (spec §3.3 결정 변경 흐름).
   RequestEvent? _latestScheduleDecisionEvent() {
-    final candidates =
-        events
-            .where(
-              (event) =>
-                  event.eventType == RequestEventType.scheduleChanged ||
-                  event.eventType == RequestEventType.scheduleChangeProposed ||
-                  event.eventType == RequestEventType.scheduleChangeCountered ||
-                  event.eventType == RequestEventType.scheduleChangeAccepted,
-            )
-            .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return candidates.isEmpty ? null : candidates.first;
+    // Terminal events: once one appears after a proposal/counter, the thread
+    // is resolved and the bar reverts to Default.
+    const terminalTypes = {
+      // #692: 72h 만료는 양측 Default 복귀
+      RequestEventType.scheduleChangeExpired,
+    };
+    const sourceTypes = {
+      RequestEventType.scheduleChanged,
+      RequestEventType.scheduleChangeProposed,
+      RequestEventType.scheduleChangeCountered,
+      RequestEventType.scheduleChangeAccepted,
+    };
+
+    final sorted =
+        events.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    for (final event in sorted) {
+      if (terminalTypes.contains(event.eventType)) return null;
+      if (sourceTypes.contains(event.eventType)) return event;
+    }
+    return null;
   }
 
   /// Latest cancellation-related event for the current session.

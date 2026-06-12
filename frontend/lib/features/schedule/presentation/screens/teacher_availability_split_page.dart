@@ -273,8 +273,28 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     } else {
       await notifier.addWeeklySchedule(result);
     }
+    // 2026-06-12 — notifier 가 에러를 state 로만 들고 있으면 사용자는 아무
+    // 피드백 없이 "적용 안 됨" 으로 인지한다 (silent fail). 실패 시 명시
+    // SnackBar 를 띄우고 read provider invalidate 는 건너뛴다.
+    if (!context.mounted) return;
+    if (_notifyIfFailed(context, ref)) return;
     ref.invalidate(teacherAvailabilityProvider(teacherId));
     ref.invalidate(teacherSettingsProvider);
+  }
+
+  /// notifier 의 마지막 작업이 실패면 SnackBar 노출 후 true 반환.
+  ///
+  /// 호출부가 async gap 직후 `context.mounted` 를 확인한 뒤 호출한다.
+  bool _notifyIfFailed(BuildContext context, WidgetRef ref) {
+    final state = ref.read(teacherAvailabilityNotifierProvider(teacherId));
+    if (!state.hasError) return false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(AppStrings.weeklyScheduleSaveError),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    return true;
   }
 
   Future<void> _confirmAndDelete(
@@ -324,6 +344,8 @@ class _WeeklySchedulePanel extends ConsumerWidget {
       teacherAvailabilityNotifierProvider(teacherId).notifier,
     );
     await notifier.removeWeeklySchedule(schedule.id);
+    if (!context.mounted) return;
+    if (_notifyIfFailed(context, ref)) return;
     ref.invalidate(teacherAvailabilityProvider(teacherId));
     ref.invalidate(teacherSettingsProvider);
   }

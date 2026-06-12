@@ -54,6 +54,8 @@ class RequestEventType(str, enum.Enum):
     scheduleChangeAccepted = "scheduleChangeAccepted"
     scheduleChangeRejected = "scheduleChangeRejected"
     scheduleChangeCountered = "scheduleChangeCountered"
+    scheduleChangeExpired = "scheduleChangeExpired"
+    scheduleChangeReminder = "scheduleChangeReminder"
 
     # General
     message = "message"
