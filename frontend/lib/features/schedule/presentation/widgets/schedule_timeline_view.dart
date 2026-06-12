@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../lessons/lessons_facade.dart' hide teacherAvailabilityProvider;
 import 'lesson_action_sheet.dart';
 import '../../domain/entities/teacher_availability.dart';
@@ -108,9 +109,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
   @override
   Widget build(BuildContext context) {
-    final availabilityAsync = ref.watch(
-      teacherAvailabilityProvider('teacher_1'),
-    );
+    // 2026-06-12 — 하드코딩 'teacher_1' 제거 (#703 동일 패턴). remote 에서
+    // 타임라인 쉬는날 판정이 가짜 계정 기준으로 동작하던 잠재 결함.
+    final teacherId = ref.watch(currentUserIdProvider);
+    final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
     final availability = availabilityAsync.valueOrNull;
     final isRestDay = isTeacherRestDay(
       availability: availability,
@@ -123,10 +125,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         // Timeline body — §7.121: rest day muted tint matches weekly grid.
         Expanded(
           child: ColoredBox(
-            color:
-                isRestDay
-                    ? AppColors.scheduleMutedBackground.withValues(alpha: 0.5)
-                    : Colors.transparent,
+            color: isRestDay
+                ? AppColors.scheduleMutedBackground.withValues(alpha: 0.5)
+                : Colors.transparent,
             child: _buildTimeline(availability),
           ),
         ),
@@ -486,8 +487,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     );
     final hours = totalMinutes ~/ 60;
     final mins = totalMinutes % 60;
-    final timeStr =
-        hours > 0 ? (mins > 0 ? '$hours시간 $mins분' : '$hours시간') : '$mins분';
+    final timeStr = hours > 0
+        ? (mins > 0 ? '$hours시간 $mins분' : '$hours시간')
+        : '$mins분';
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -560,7 +562,6 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     // All lessons done
     return '오늘 레슨 완료 🎵';
   }
-
 }
 
 /// Travel time block displayed before a lesson in the timeline.
@@ -595,4 +596,3 @@ class _TravelTimeBlock extends StatelessWidget {
     );
   }
 }
-

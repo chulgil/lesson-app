@@ -24,8 +24,11 @@ import '../widgets/alternative_time_grid.dart';
 /// - slots not empty + acceptedSlotIndex == null → propose alternatives
 /// - slots empty + acceptedSlotIndex == null → reject
 /// - acceptedSlotIndex != null → accept student's preferred slot directly
-typedef SuggestAlternativeResult =
-    ({String message, List<TimeSlot> slots, int? acceptedSlotIndex});
+typedef SuggestAlternativeResult = ({
+  String message,
+  List<TimeSlot> slots,
+  int? acceptedSlotIndex,
+});
 
 /// Screen for suggesting alternative time slots via a weekly schedule grid.
 ///
@@ -144,8 +147,10 @@ class _SuggestAlternativeScreenState
     );
   }
 
+  // 2026-06-12 — `?? 'teacher_1'` 데드코드 제거 (currentUserIdProvider 는
+  // 비-nullable String 이라 도달 불가였음).
   String get _effectiveTeacherId =>
-      widget.teacherId ?? ref.read(currentUserIdProvider) ?? 'teacher_1';
+      widget.teacherId ?? ref.read(currentUserIdProvider);
 
   @override
   Widget build(BuildContext context) {
@@ -160,9 +165,7 @@ class _SuggestAlternativeScreenState
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       resizeToAvoidBottomInset: true,
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.counterPropose,
-      ),
+      appBar: const NotebookDetailAppBar(title: AppStrings.counterPropose),
       body: Column(
         children: [
           // Student's preferred slots (if any)
@@ -175,22 +178,21 @@ class _SuggestAlternativeScreenState
           // Grid
           Expanded(
             child: weekLessonsAsync.when(
-              data:
-                  (lessons) => AlternativeTimeGrid(
-                    weekStart: _weekStart,
-                    lessons: lessons,
-                    suggestedSlots: _suggestedSlots,
-                    hideStudentNames: widget.isStudentView,
-                    highlightedSlot: _selectedHighlight,
-                    onEmptyCellTap: (cell) {
-                      if (!_isAcceptMode) {
-                        _addSlotFromGrid(cell.date, cell.hour, cell.minute);
-                      }
-                    },
-                  ),
+              data: (lessons) => AlternativeTimeGrid(
+                weekStart: _weekStart,
+                lessons: lessons,
+                suggestedSlots: _suggestedSlots,
+                hideStudentNames: widget.isStudentView,
+                highlightedSlot: _selectedHighlight,
+                onEmptyCellTap: (cell) {
+                  if (!_isAcceptMode) {
+                    _addSlotFromGrid(cell.date, cell.hour, cell.minute);
+                  }
+                },
+              ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (e, _) => Center(child: Text('${AppStrings.loadFailed}: $e')),
+              error: (e, _) =>
+                  Center(child: Text('${AppStrings.loadFailed}: $e')),
             ),
           ),
 
@@ -274,15 +276,13 @@ class _SuggestAlternativeScreenState
                     vertical: AppSpacing.space2,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        isSelected
-                            ? AppColors.paperOk.withValues(alpha: 0.08)
-                            : AppColors.paper,
+                    color: isSelected
+                        ? AppColors.paperOk.withValues(alpha: 0.08)
+                        : AppColors.paper,
                     border: Border.all(
-                      color:
-                          isSelected
-                              ? AppColors.paperOk
-                              : AppColors.inkQuaternary,
+                      color: isSelected
+                          ? AppColors.paperOk
+                          : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -292,26 +292,24 @@ class _SuggestAlternativeScreenState
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? AppColors.paperOk
-                                  : AppColors.ink.withValues(alpha: 0.12),
+                          color: isSelected
+                              ? AppColors.paperOk
+                              : AppColors.ink.withValues(alpha: 0.12),
                         ),
                         child: Center(
-                          child:
-                              isSelected
-                                  ? const Icon(
-                                    Icons.check,
-                                    size: 14,
-                                    color: AppColors.paper,
-                                  )
-                                  : Text(
-                                    '${index + 1}',
-                                    style: AppTypography.caption.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.ink,
-                                    ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: AppColors.paper,
+                                )
+                              : Text(
+                                  '${index + 1}',
+                                  style: AppTypography.caption.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.ink,
                                   ),
+                                ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -319,12 +317,12 @@ class _SuggestAlternativeScreenState
                         child: Text(
                           slot.displayLabel,
                           style: AppTypography.bodySmall.copyWith(
-                            fontWeight:
-                                isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                            color:
-                                isSelected ? AppColors.paperOk : AppColors.ink,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? AppColors.paperOk
+                                : AppColors.ink,
                           ),
                         ),
                       ),
@@ -396,10 +394,9 @@ class _SuggestAlternativeScreenState
               maxLength: 200,
               style: AppTypography.bodySmall,
               decoration: InputDecoration(
-                hintText:
-                    _isAcceptMode
-                        ? AppStrings.acceptMessageHint
-                        : AppStrings.messageHint,
+                hintText: _isAcceptMode
+                    ? AppStrings.acceptMessageHint
+                    : AppStrings.messageHint,
                 hintStyle: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkTertiary,
                 ),
@@ -427,16 +424,16 @@ class _SuggestAlternativeScreenState
             // Action buttons
             _isAcceptMode
                 ? _buildAcceptButton(
-                  ref
-                          .watch(
-                            weekLessonsWithPreviewProvider((
-                              weekStart: _weekStart,
-                              teacherId: _effectiveTeacherId,
-                            )),
-                          )
-                          .valueOrNull ??
-                      [],
-                )
+                    ref
+                            .watch(
+                              weekLessonsWithPreviewProvider((
+                                weekStart: _weekStart,
+                                teacherId: _effectiveTeacherId,
+                              )),
+                            )
+                            .valueOrNull ??
+                        [],
+                  )
                 : _buildProposeButtons(),
           ],
         ),
@@ -569,10 +566,9 @@ class _SuggestAlternativeScreenState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            onPressed:
-                () => setState(() {
-                  _weekStart = _weekStart.subtract(const Duration(days: 7));
-                }),
+            onPressed: () => setState(() {
+              _weekStart = _weekStart.subtract(const Duration(days: 7));
+            }),
             icon: const Icon(Icons.chevron_left),
             iconSize: 20,
           ),
@@ -583,10 +579,9 @@ class _SuggestAlternativeScreenState
             ),
           ),
           IconButton(
-            onPressed:
-                () => setState(() {
-                  _weekStart = _weekStart.add(const Duration(days: 7));
-                }),
+            onPressed: () => setState(() {
+              _weekStart = _weekStart.add(const Duration(days: 7));
+            }),
             icon: const Icon(Icons.chevron_right),
             iconSize: 20,
           ),
@@ -635,11 +630,10 @@ class _SuggestAlternativeScreenState
           id: 'suggest_${DateTime.now().millisecondsSinceEpoch}',
           dayOfWeek: date.weekday,
           startTime: TimeOfDay(hour: hour, minute: minute).toClockTime(),
-          endTime:
-              TimeOfDay(
-                hour: endMinutes ~/ 60,
-                minute: endMinutes % 60,
-              ).toClockTime(),
+          endTime: TimeOfDay(
+            hour: endMinutes ~/ 60,
+            minute: endMinutes % 60,
+          ).toClockTime(),
           isActive: true,
           specificDate: date,
         ),
@@ -702,13 +696,12 @@ class _SuggestAlternativeScreenState
                       visualDensity: VisualDensity.compact,
                     ),
                     IconButton(
-                      onPressed:
-                          () => setState(() {
-                            _suggestedSlots = [
-                              ..._suggestedSlots.sublist(0, index),
-                              ..._suggestedSlots.sublist(index + 1),
-                            ];
-                          }),
+                      onPressed: () => setState(() {
+                        _suggestedSlots = [
+                          ..._suggestedSlots.sublist(0, index),
+                          ..._suggestedSlots.sublist(index + 1),
+                        ];
+                      }),
                       icon: const Icon(Icons.close, size: 18),
                       color: AppColors.paperAccent,
                       visualDensity: VisualDensity.compact,
@@ -782,11 +775,10 @@ class _SuggestAlternativeScreenState
           id: slot.id,
           dayOfWeek: newDate.weekday,
           startTime: newStartTime.toClockTime(),
-          endTime:
-              TimeOfDay(
-                hour: endMinutes ~/ 60,
-                minute: endMinutes % 60,
-              ).toClockTime(),
+          endTime: TimeOfDay(
+            hour: endMinutes ~/ 60,
+            minute: endMinutes % 60,
+          ).toClockTime(),
           isActive: true,
           specificDate: newDate,
         ),

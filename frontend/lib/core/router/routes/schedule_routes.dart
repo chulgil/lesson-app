@@ -110,12 +110,14 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.lessonRequests,
     name: 'lessonRequests',
     builder: (context, state) {
+      // 2026-06-12 — #703 잔존 (개행 분리 폴백이라 grep 누락). teacher
+      // 본인 화면이므로 폴백은 현재 로그인 사용자.
       final extra = state.extra as Map<String, dynamic>?;
+      final fromExtra = extra?['teacherId'] as String?;
       return AllLessonRequestsScreen(
-        teacherId:
-            extra?['teacherId'] ??
-            state.uri.queryParameters['teacherId'] ??
-            'teacher_1',
+        teacherId: (fromExtra != null && fromExtra.isNotEmpty)
+            ? fromExtra
+            : teacherIdParamOrCurrent(context, state),
       );
     },
   ),
