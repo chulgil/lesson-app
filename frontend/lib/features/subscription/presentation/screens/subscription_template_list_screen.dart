@@ -12,6 +12,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/selectors/selectors.dart';
+import '../../../profile/domain/entities/teacher_settings.dart';
+import '../../../settings/settings_facade.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_template_providers.dart';
@@ -34,16 +36,24 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
           if (action == DetailAppBarAction.add) {
             _showAddTemplateDialog(context, ref);
           } else if (action == DetailAppBarAction.settings) {
-            context.push(
-              '${AppRoutes.proposalSettings}?teacherId=$teacherId',
-            );
+            context.push('${AppRoutes.proposalSettings}?teacherId=$teacherId');
           }
         },
       ),
-      body: templatesAsync.when(
-        data: (templates) => _buildContent(context, ref, templates),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildErrorState(context, error),
+      body: Column(
+        children: [
+          // W3 Task 3.4 — 체험 레슨 정책 섹션 (spec §6.3 PLAN O1).
+          // LessonTimeSettingsScreen §5 에서 이동. 위치 안정성 — 빈/로딩/에러
+          // 상태와 무관하게 항상 최상단 노출.
+          const _TrialLessonSection(),
+          Expanded(
+            child: templatesAsync.when(
+              data: (templates) => _buildContent(context, ref, templates),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => _buildErrorState(context, error),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -193,9 +203,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     showNotebookDialog(
       context: context,
       title: AppStrings.templateDeleteDialogTitle,
-      content: Text(
-        AppStrings.templateDeleteConfirmFormat(template.name),
-      ),
+      content: Text(AppStrings.templateDeleteConfirmFormat(template.name)),
       cancelLabel: AppStrings.cancel,
       confirmLabel: AppStrings.delete,
       isDestructive: true,
@@ -893,5 +901,74 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         setState(() => _isSaving = false);
       }
     }
+  }
+}
+
+/// 체험 레슨 정책 섹션 — W3 Task 3.4 (spec §6.3 PLAN O1).
+///
+/// `TeacherSettings.trialLessonFree` SSOT 사용. LessonTimeSettingsScreen §5
+/// 에서 이동된 토글. 별도 화면을 만들지 않고 SubscriptionTemplateListScreen
+/// 의 최상단에 고정.
+class _TrialLessonSection extends ConsumerWidget {
+  const _TrialLessonSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
+
+    return settingsAsync.when(
+      data: (settings) => _TrialLessonBody(settings: settings),
+      // 로딩/에러 단계에서는 빈 자리 — 템플릿 리스트 위에 placeholder 노출 안 함.
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _TrialLessonBody extends ConsumerWidget {
+  final TeacherSettings settings;
+
+  const _TrialLessonBody({required this.settings});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        AppSpacing.space4,
+        AppSpacing.space4,
+        AppSpacing.space2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.profileTrialLessonSection,
+            style: NotebookTypography.sectionTitle,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Container(
+            decoration: const BoxDecoration(color: AppColors.paperDark),
+            child: SwitchListTile(
+              title: const Text(AppStrings.profileTrialLessonFree),
+              subtitle: Text(
+                settings.trialLessonFree
+                    ? AppStrings.profileTrialLessonFreeOn
+                    : AppStrings.profileTrialLessonFreeOff,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              value: settings.trialLessonFree,
+              onChanged: (value) {
+                ref
+                    .read(teacherSettingsNotifierProvider.notifier)
+                    .updateTrialLessonFree(value);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
