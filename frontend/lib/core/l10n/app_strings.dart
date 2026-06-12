@@ -6322,6 +6322,34 @@ class AppStrings {
   static const gamificationEarnedBadges = '획득한 뱃지';
   static const gamificationPointHistory = '포인트 히스토리';
 
+  // ── Growth Heatmap Day Detail (P2 Visual Growth — Job 6 Task 6.2 / AC-6.2) ──
+  static const heatmapDayDetailMetronome = '메트로놈';
+  static const heatmapDayDetailTuner = '튜너';
+  static const heatmapDayDetailYoutube = 'YouTube';
+  static const heatmapDayDetailManual = '수동';
+  static const heatmapDayDetailRecording = '녹음';
+  static const heatmapDayDetailTotalLabel = '총';
+  static const heatmapDayDetailEmptyMessage = '이날은 연습 기록이 없어요';
+  static String heatmapDayDetailMinutes(int minutes) => '$minutes분';
+  static String heatmapDayDetailCount(int count) => '$count회';
+
+  // ── Trophy Collection (P2 Visual Growth — Job 7 Task 7.1 / AC-6.3) ──
+  static const trophyCollectionTitle = '내 트로피';
+  static const trophyCollectionEmptyMessage = '곧 첫 트로피!';
+  static const trophyCollectionMoreLabel = '더 보기';
+  static String trophyCollectionCountLabel(int count) => '($count)';
+
+  // ── Rest Recommendation (P2 Visual Growth — Job 8 / AC-7) ──
+  static const restRecommendationSessionMessage = '잠깐 쉬는 게 어때요?';
+  static const restRecommendationDailyMessage = '오늘은 충분히 했어요';
+  static const restRecommendationDismissLabel = '계속하기';
+
+  // ── Growth Detail Screen (P2 Visual Growth — Job 9 / AC-6.4) ──
+  static const growthDetailScreenTitle = '내 성장';
+  static const growthDetailYearLabel = '1년 동안';
+  static const growthDetailSpotlightPlaceholder = '추천은 곧 추가됩니다';
+  static const growthDetailComparisonPlaceholder = '비교 보기는 곧 추가됩니다';
+
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
   static const practiceBadgeUnlockedSection = '획득한 뱃지';

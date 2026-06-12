@@ -211,6 +211,7 @@ class AppRoutes {
 
   // Gamification routes
   static const badgeCollection = '/gamification/badges';
+  static const studentGrowthDetail = '/student/growth-detail';
 
   // Assignment routes
   static const assignmentDashboard = '/assignments';

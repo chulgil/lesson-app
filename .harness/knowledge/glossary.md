@@ -444,12 +444,51 @@
 | "학생 quest" (선생님 quest 와 혼동) | "학생 자가 quest" 또는 `StudentQuest` (선생님 quest 는 §13 `Quest`) |
 | "연습 evidence" (혼란스러운 약칭) | `DailyPractice` (저장 단위) 또는 `PracticeEvidence` (입력 value object) |
 
+### P2 Visual Growth 추가 용어 (2026-06-12)
+
+> 플랜: `.harness/decomposition/2026-06-11-student-gamification-p2-visual-growth.md`
+> 범위: 1년 히트맵 UI + StreakFreeze 시스템 + 휴식 권고. SC-10, SC-11.
+
+#### 핵심 엔티티 (BE ↔ FE 동일 클래스명)
+
+| 한글 | 영문 (FE/BE) | 정의 |
+|---|---|---|
+| 스트릭 동결 | `StreakFreeze` | 결석일에 자동 적용되어 streak 유지하는 학생별 record. 4 필드: studentId / balance (0-4) / usedAt / examModeUntil |
+
+#### 정책 용어 (P2 범위)
+
+| 용어 | 정의 |
+|---|---|
+| 동결 잔액 | `StreakFreeze.balance` 의 별칭. Sunday 00:00 KST 자동 +2, max 4 (스펙 §6.5 / §14.1) |
+| 시험 모드 | `StreakFreeze.examModeUntil` 활성 동안 freeze 차감 0. 학부모/선생님 발급 (스펙 §14.3) |
+| 복귀 보너스 | 7일+ 미사용 후 복귀 시 첫 세션 보너스 P + "다시 만나서 반가워요" 환영. FOMO 메시지 X (스펙 §14.4) |
+| 1년 히트맵 | `YearHeatmap` UI — GitHub contribution graph 스타일 7×52 그리드. 5단계 색 농도 (0/1-15/16-30/31-60/61+ 분) + 색맹 친화 패턴 |
+| 트로피 모음 | `TrophyCollection` UI — 기존 `badge_award_provider` 재사용. 카테고리 분류 노출 X — 단일 "모음" 카드 (스펙 §16) |
+| 30일 chunk | `HeatmapChunk` — Hive 13 box × 30일 = 390일 분량 캐시 단위. key=`heatmap_chunk_{studentId}_{chunkIndex}`. 단일 chunk 만 invalidate (플랜 O2) |
+| D-day 마이그레이션 | P2 배포 시점 1회 — 기존 `practice_streak_provider` → `StreakFreeze.balance = 2` + KST timezone 정렬 + 학생에게 "스트릭 동결 시스템 시작" 안내 토스트 1회 (스펙 §18.3 / 플랜 O7) |
+| 휴식 권고 | `RestRecommendationToast` — 단일 세션 30분 / 일일 누적 3시간 / 14세 미만 15분 도달 시 푸시 X 토스트 1회 (스펙 §9.4 SC-11) |
+
+#### 데이터 단위
+
+| 한글 | 영문 (FE) | 정의 |
+|---|---|---|
+| 자동 발급 | `StreakFreezeService.weeklyGrantIfDue()` | KST `Asia/Seoul` 고정 — 학생 디바이스 timezone 무관. Sunday 00:00 이후 마지막 grant 가 이번 주 외이면 balance +2 (clamp 4) |
+| 자동 적용 | `StreakFreezeService.applyOnAbsence()` | 학생 결석일 발생 시 balance -1 + usedAt 추가. examMode 활성 시 no-op. balance=0 시 no-op (streak 끊김은 `practice_streak_provider` 책임) |
+
+#### Deprecated 표현 (P2 추가)
+
+| 폐기 표현 | 대신 사용 |
+|---|---|
+| "freeze 보상" / "스트릭 보호" | "스트릭 동결" 또는 `StreakFreeze` — "보상" 단어는 외부 보상 의존 메시징 회피 (스펙 §3) |
+| "트로피 카테고리" / "트로피 분류" | "트로피 모음" 또는 `TrophyCollection` — 단일 카드, 카테고리 노출 X (스펙 §16) |
+
 ---
 
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-12 | §15 P2 Visual Growth 용어 추가 — `StreakFreeze` 엔티티 + 정책 용어 7종 (동결 잔액 / 시험 모드 / 복귀 보너스 / 1년 히트맵 / 트로피 모음 / 30일 chunk / D-day 마이그레이션 / 휴식 권고) + 서비스 메서드 2종 (자동 발급 / 자동 적용) + Deprecated 표현 2건 ("freeze 보상" → "스트릭 동결", "트로피 카테고리" → "트로피 모음"). 본 변경은 `.harness/decomposition/2026-06-11-student-gamification-p2-visual-growth.md` Job 0 Step 2 |
 | 2026-06-11 | §15 학생 게이미피케이션 (자가 연습) 신설 — P1 Foundation 5종 핵심 용어 (`StudentQuest` / `QuestOrigin` / `GrowthHeatmap` / `DailyPractice` / `PracticeRecordingService`) + 정책 용어 5종 ([연습 시작] 1버튼 / 1.5초 축하 / 4 경로 wiring / 자동 트리거 / Hive 30일 chunk × 13 box) + 14세 미만 처리 2종 (`parentConsentAt` / 자가 연습 전용 모드) + Deprecated 표현 2건. 본 변경은 `.harness/spec/2026-06-11-student-gamification.md` |
 | 2026-06-11 | (architect 검토 반영) §13 `quest_celebrated_at` 의미 재정의 — "11/11 완료" → "Q1~Q10 졸업 시점" + Q11 보너스 분리 (`quest_bonus_shown_provider` FE Hive flag, BE 컬럼 신설 없음) / §14 `minBookingHours` 매핑 반대 방향 명확화 (schedule → profile SSOT, `breakTimeBetweenLessons` 와 반대) |
 | 2026-06-11 | §14 선생님 설정 IA (5묶음) 신설 — 5묶음 카테고리 + 카테고리 미리보기/카드/퀘스트 졸업/가이드 다시 보기/메뉴 NEW 배지/다음 미션 spotlight 신규 용어 + Deprecated 표현 매핑 (availableSlots/defaultLessonDuration/slotDurationMinutes/breakTimeBetweenLessons 폐기, lessonDurationMinutes 통일). 본 변경은 `.harness/spec/2026-06-11-teacher-settings-redesign.md` |

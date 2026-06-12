@@ -412,8 +412,14 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | [연습 시작] 1버튼 | Practice Start | 학생 홈의 단일 진입점 — 1탭으로 연습 모드 진입 |
 | 1.5초 축하 | Celebration Overlay | 연습 종료 후 비방해 축하 피드백 |
 | 자가 연습 전용 모드 | Self-Only Mode | 14세 미만 부모 동의 미수신 학생 — 비교 보기·리더보드 차단 |
+| 스트릭 동결 | StreakFreeze | 결석일에 자동 적용되어 streak 유지. Sunday 00:00 KST 자동 +2 (max 4). 시험 모드 활성 시 차감 0 |
+| 1년 히트맵 | Year Heatmap | GitHub contribution graph 스타일 7×52 그리드. 5단계 색 농도 + 색맹 친화 패턴 |
+| 트로피 모음 | Trophy Collection | 학생 성장 마커 단일 카드 (badge 재사용). 카테고리 분류 노출 X |
+| 휴식 권고 | Rest Recommendation | 단일 세션 30분 / 일일 누적 3시간 / 14세 미만 15분 도달 시 푸시 X 토스트 1회 (SC-11) |
+| 시험 모드 | Exam Mode | 학부모·선생님 발급. 모드 활성 동안 freeze 차감 0 + 스트릭 동결 |
+| 복귀 보너스 | Comeback Bonus | 7일+ 미사용 후 복귀 시 첫 세션 보너스 P. FOMO 메시지 X |
 
-> 상세: [학생 게이미피케이션 P1 스펙](../../.harness/spec/2026-06-11-student-gamification.md)
+> 상세: [학생 게이미피케이션 스펙](../../.harness/spec/2026-06-11-student-gamification.md) (P1 머지 + P2 진행)
 
 ---
 
@@ -440,6 +446,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-12 | — | §13 학생 게이미피케이션 P2 — 스트릭 동결 / 1년 히트맵 / 트로피 모음 / 휴식 권고 / 시험 모드 / 복귀 보너스 | P2 Visual Growth 진입 — SC-10/SC-11 충족 + GrowthHeatmap 1년 캐시 (.harness/knowledge/glossary.md §15 P2 동기화) |
 | 2026-06-12 | 가용시간 (메뉴 라벨), 레슨 시간 설정 (메뉴 라벨) | §14 프로필 5묶음 IA — 운영시간 / 수업방식 / 수강권·정산 / lessonDurationMinutes / 카테고리 미리보기 / 퀘스트 졸업 | teacher-settings-redesign 머지 — 11개 메뉴 → 5묶음 IA 통합 + 졸업 메커니즘 (.harness glossary §14 동기화) |
 | 2026-06-11 | — | §13 학생 게이미피케이션 — StudentQuest / QuestOrigin / GrowthHeatmap / DailyPractice + [연습 시작] 1버튼 / 1.5초 축하 / 자가 연습 전용 모드 (14세 미만) | 학생 자가 연습 80% 가시화 (.harness/knowledge/glossary.md §15 동기화) |
 | 2026-06-08 | — | §12 퀘스트 시스템 — 3 그룹 (profile/operation/bonus) + Lock 매트릭스 + 자동 완료 + 축하 카드 (1회성) + 가입 직후 첫 도착 | 선생님 퀘스트 재정의 (.harness/knowledge/glossary.md §13 동기화) |

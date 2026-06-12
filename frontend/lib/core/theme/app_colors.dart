@@ -151,4 +151,16 @@ class AppColors {
   static const paperTrial = Color(0xFFC4923A); // 체험레슨 (세피아 앰버 — 빈티지 잉크 톤)
   static const paperTrialSoft = Color(0x1FC4923A); // 12% alpha
   static const paperHighlight = Color(0xFFF7D755); // 형광펜
+
+  // ─────────────────────────────────────────────────────────────
+  // Growth Heatmap (P2 Visual Growth — Job 6 / AC-6.1)
+  // 5단계 명도 (단일 컬러 hue — ux-rules 3색 이하 통과). 색맹 친화는
+  // 위젯에서 셀 inset dot 마커로 보조.
+  // 매핑: L0=0분 / L1=1-15분 / L2=16-30분 / L3=31-60분 / L4=61+분
+  // ─────────────────────────────────────────────────────────────
+  static const heatmapL0 = Color(0x1414161C); // 8% alpha 잉크 그림자 (빈칸)
+  static const heatmapL1 = Color(0x403F5D2F); // 25% paperOk
+  static const heatmapL2 = Color(0x803F5D2F); // 50% paperOk
+  static const heatmapL3 = Color(0xBF3F5D2F); // 75% paperOk
+  static const heatmapL4 = Color(0xFF3F5D2F); // 100% paperOk
 }

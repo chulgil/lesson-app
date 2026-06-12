@@ -6,6 +6,7 @@ import '../../../features/students/presentation/screens/add_student_screen.dart'
 import '../../../features/students/presentation/screens/add_student_method_screen.dart';
 import '../../../features/lessons/presentation/screens/lesson_note_history_screen.dart';
 import '../../../features/gamification/presentation/screens/badge_collection_screen.dart';
+import '../../../features/gamification/presentation/screens/student_growth_detail_screen.dart';
 import '../../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../../features/students/presentation/screens/student_detail_screen.dart';
 import '../../../features/students/presentation/screens/announcement_history_screen.dart';
@@ -74,5 +75,15 @@ List<GoRoute> studentRoutes = [
     path: AppRoutes.announcementHistory,
     name: 'announcementHistory',
     builder: (context, state) => const AnnouncementHistoryScreen(),
+  ),
+
+  // Student Growth Detail (P2 — Job 9)
+  GoRoute(
+    path: AppRoutes.studentGrowthDetail,
+    name: 'studentGrowthDetail',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return StudentGrowthDetailScreen(studentId: studentId);
+    },
   ),
 ];

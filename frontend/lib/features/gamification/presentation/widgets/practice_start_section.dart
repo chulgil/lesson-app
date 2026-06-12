@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../practice/practice_ui_facade.dart' show PracticeToolsModal;
 import '../../../students/students_facade.dart' show studentProvider;
 import '../providers/growth_heatmap_provider.dart';
@@ -37,7 +39,12 @@ class PracticeStartSection extends ConsumerWidget {
       streakDays: streakDays,
       yesterdayMinutes: yesterdayMinutes,
       onStartTap: () => _onStartTap(context, ref),
+      onMoreTap: () => _onMoreTap(context),
     );
+  }
+
+  void _onMoreTap(BuildContext context) {
+    context.go('${AppRoutes.studentGrowthDetail}?studentId=$studentId');
   }
 
   Future<void> _onStartTap(BuildContext context, WidgetRef ref) async {
