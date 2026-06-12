@@ -1,6 +1,6 @@
 {
-  "updated_at": 1781225540,
-  "updated_at_iso": "2026-06-12T00:52:20Z",
+  "updated_at": 1781246343,
+  "updated_at_iso": "2026-06-12T06:39:03Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -11,17 +11,21 @@
     "spec/2026-05-10-r6-trust-building.md": "c33a5cbf63336178cf45fb5ee11172cbfcdca2a8",
     "spec/2026-06-08-teacher-quest-system.md": "d547db15a7646981fef42cfecf8e982d9bdfd49c",
     "spec/2026-06-11-student-gamification.md": "b57b2b6ebc1a6d95bc22bdf6911409369155349b",
-    "spec/2026-06-11-teacher-settings-redesign.md": "c2539217dd4e56cf835e316420cd60c2bf23f0e2"
+    "spec/2026-06-11-teacher-settings-redesign.md": "c0b9d0ed03924d0c71e529c46981cba11ed7f4c8"
   },
-  "changed": [],
+  "changed": [
+    "spec/2026-06-11-teacher-settings-redesign.md"
+  ],
   "added": [],
   "removed": [],
   "summary": {
-    "changed_total": 0,
+    "changed_total": 1,
     "added": 0,
     "removed": 0,
     "domains_touched": [],
     "domain_counts": {},
-    "warnings": []
+    "warnings": [
+      "changes_without_domain: 변경 파일이 도메인 폴더 아래가 아님"
+    ]
   }
 }
