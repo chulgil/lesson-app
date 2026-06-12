@@ -8,13 +8,18 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../analytics/domain/services/analytics_event_logger.dart';
+import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/domain/entities/lesson_location.dart';
+import '../../data/repositories/proposal_draft_storage.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../extensions/lesson_policy_visuals.dart';
+import '../providers/proposal_draft_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_template_providers.dart';
 import '../widgets/issue_form_discount_bonus.dart';
@@ -23,6 +28,7 @@ import '../widgets/issue_form_sections.dart';
 import '../widgets/issue_form_summary_widgets.dart';
 import '../widgets/issue_form_type_options.dart';
 import '../widgets/location_travel_selector.dart';
+import '../widgets/proposal_draft_banner.dart';
 import 'issue_subscription_actions.dart';
 
 /// Screen for teachers to issue subscriptions to students.
@@ -146,6 +152,8 @@ class _IssueSubscriptionScreenState
   String? get selectedLocationId => _selectedLocationId;
   @override
   int get travelTimeMinutes => _travelTimeMinutes;
+  @override
+  String? get appliedTemplateId => _appliedTemplateId;
 
   @override
   String? get effectiveBonusReason {
@@ -238,9 +246,12 @@ class _IssueSubscriptionScreenState
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: widget.isBatchMode
-            ? AppStrings.batchSubscriptionAppBarTitle(widget.studentIds.length)
-            : AppStrings.proposalTitle,
+        title:
+            widget.isBatchMode
+                ? AppStrings.batchSubscriptionAppBarTitle(
+                  widget.studentIds.length,
+                )
+                : AppStrings.proposalTitle,
       ),
       body:
           widget.isBatchMode
@@ -310,12 +321,59 @@ class _IssueSubscriptionScreenState
     });
   }
 
+  /// #695 §4.5 — "이어서 발급하기": fill the form from the saved draft, record
+  /// the `draft_recovered` event, and consume (delete) the draft.
+  Future<void> _restoreDraft(ProposalDraft draft) async {
+    setState(() {
+      _selectedType = SubscriptionType.package;
+      if (draft.totalLessons > 0) {
+        _totalLessons = draft.totalLessons;
+        _lessonsController.text = draft.totalLessons.toString();
+      }
+      if (draft.validityDays > 0) {
+        _validityDays = draft.validityDays;
+        _validityController.text = draft.validityDays.toString();
+      }
+      if (draft.amount > 0) {
+        _originalAmount = draft.amount;
+        _amountController.text = draft.amount.toString();
+        _hasPrefilledAmount = true;
+      }
+      if (draft.membershipId != null) {
+        _selectedMembershipId = draft.membershipId;
+      }
+      _appliedTemplateId = draft.templateId;
+    });
+
+    final userId = ref.read(currentUserIdProvider);
+    ref.read(analyticsEventLoggerProvider).log(AnalyticsEvents.draftRecovered, {
+      'userId': userId,
+      'subscriptionDraftId': widget.primaryStudentId,
+      'draftAgeDays': draft.ageDays,
+    });
+
+    // Consumed — remove so the banner disappears. If the gate fires again,
+    // a fresh draft is saved with the latest form values.
+    await ref
+        .read(proposalDraftStorageProvider)
+        .delete(userId, widget.primaryStudentId);
+    ref.invalidate(proposalDraftProvider(userId, widget.primaryStudentId));
+  }
+
   Widget _buildForm(List<ClassMembership> memberships) {
     return Form(
       key: _formKey,
       child: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
+          // #695 §4.5 — draft recovery banner (single-student mode only).
+          ProposalDraftBanner(
+            userId: ref.watch(currentUserIdProvider),
+            studentId: widget.primaryStudentId,
+            onResume: _restoreDraft,
+            onDiscard: () {},
+          ),
+
           // Membership selector (if multiple)
           if (memberships.length > 1) ...[
             MembershipSelectorWidget(
@@ -795,19 +853,20 @@ class _IssueSubscriptionScreenState
         child: FilledButton(
           onPressed: _submitting ? null : _handleSubmit,
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-          child: _submitting
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(
-                  widget.isBatchMode
-                      ? AppStrings.batchIssueButtonLabel(
+          child:
+              _submitting
+                  ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                  : Text(
+                    widget.isBatchMode
+                        ? AppStrings.batchIssueButtonLabel(
                           widget.studentIds.length,
                         )
-                      : AppStrings.proposalTitle,
-                ),
+                        : AppStrings.proposalTitle,
+                  ),
         ),
       ),
     );

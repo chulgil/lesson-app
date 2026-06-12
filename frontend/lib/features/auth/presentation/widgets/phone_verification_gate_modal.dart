@@ -81,7 +81,9 @@ class _PhoneVerificationGateDialog extends StatelessWidget {
                 // element. We navigate via the captured router instead.
                 final router = GoRouter.of(context);
                 Navigator.of(context).pop(true);
-                router.go(AppRoutes.teacherPhoneVerification);
+                // #695 §5.5 — `trigger=gate` lets the verification screen
+                // attribute `phone_verification_completed` to the E3 gate.
+                router.go('${AppRoutes.teacherPhoneVerification}?trigger=gate');
               },
               child: const Text(AppStrings.phoneVerificationGateCtaVerifyNow),
             ),

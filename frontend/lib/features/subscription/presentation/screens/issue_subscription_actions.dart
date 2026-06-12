@@ -7,11 +7,14 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../analytics/domain/services/analytics_event_logger.dart';
+import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/repositories/subscription_repository.dart';
+import '../providers/proposal_draft_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_providers.dart';
 
@@ -70,6 +73,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   String? get selectedLocationId;
   int get travelTimeMinutes;
 
+  /// #695 — template applied to the form (saved into the proposal draft).
+  String? get appliedTemplateId;
+
   Future<void> issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
     if (selectedMembershipId == null) {
@@ -127,12 +133,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       paymentMethod: isPaymentConfirmed ? selectedPaymentMethod : null,
       paymentConfirmedAt: isPaymentConfirmed ? now : null,
       originalAmount: discountPercent > 0 ? originalAmount : null,
-      discountAmount: discountPercent > 0
-          ? (originalAmount - finalAmount)
-          : null,
-      discountReason: discountPercent > 0
-          ? AppStrings.discountPercentReason(discountPercent)
-          : null,
+      discountAmount:
+          discountPercent > 0 ? (originalAmount - finalAmount) : null,
+      discountReason:
+          discountPercent > 0
+              ? AppStrings.discountPercentReason(discountPercent)
+              : null,
       totalRescheduleAllowance: rescheduleAllowance,
       rescheduleDeadlineHours: rescheduleDeadlineHours,
     );
@@ -230,8 +236,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       await _deactivateOrphanSubscription(repository, createdSubscriptionId);
       // #430 G1 §4.3 — E3 게이트. 백엔드가 미인증 선생님에게 발급 차단 시
       // 안내 다이얼로그 + 인증 화면 진입 옵션을 제공한다.
+      // #695 §4.4 — "나중에" 선택 시 입력값을 draft 로 저장하여 복구 경로 제공.
       if (mounted) {
-        await PhoneVerificationGate.show(context);
+        await _showGateWithDraftSave();
       }
     } catch (e) {
       // A post-create step failed after the subscription was created —
@@ -246,6 +253,48 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         );
       }
     }
+  }
+
+  /// #695 — show the E3 gate with instrumentation and draft save on "나중에".
+  ///
+  /// Events (spec §5.5): `gate_shown` on display, `gate_later_selected`
+  /// (with `draftSaved`) when the teacher defers verification.
+  Future<void> _showGateWithDraftSave() async {
+    final logger = ref.read(analyticsEventLoggerProvider);
+    final userId = ref.read(currentUserIdProvider);
+    logger.log(AnalyticsEvents.phoneVerificationGateShown, {
+      'userId': userId,
+      'subscriptionDraftId': primaryStudentId,
+    });
+
+    final chosen = await PhoneVerificationGate.show(context);
+    if (chosen == true) return;
+
+    // "나중에" — persist the in-progress form so the recovery banner appears
+    // on re-entry. The form itself stays as-is (spec §4.4: screen retained).
+    var draftSaved = false;
+    try {
+      await ref
+          .read(proposalDraftStorageProvider)
+          .save(
+            userId: userId,
+            studentId: primaryStudentId,
+            templateId: appliedTemplateId,
+            amount: originalAmount,
+            totalLessons: totalLessons,
+            validityDays: validityDays,
+            membershipId: selectedMembershipId,
+          );
+      ref.invalidate(proposalDraftProvider(userId, primaryStudentId));
+      draftSaved = true;
+    } catch (e) {
+      debugPrint('Failed to save proposal draft: $e');
+    }
+    logger.log(AnalyticsEvents.gateLaterSelected, {
+      'userId': userId,
+      'subscriptionDraftId': primaryStudentId,
+      'draftSaved': draftSaved,
+    });
   }
 
   /// Deactivate a subscription that was created but whose post-create wiring
@@ -313,9 +362,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     final cardType = await _detectScheduleCardType(subscription, membership);
 
-    final suggestedDay = membership.primarySlot != null
-        ? membership.primarySlot!.dayOfWeek + 1
-        : null;
+    final suggestedDay =
+        membership.primarySlot != null
+            ? membership.primarySlot!.dayOfWeek + 1
+            : null;
     final suggestedTime = membership.primarySlot?.startTime;
     final lessonDuration = membership.lessonDuration;
 
@@ -357,19 +407,22 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           .read(subscriptionIssueFlowControllerProvider)
           .studentSubscriptions(primaryStudentId);
 
-      final sameMembershipSubs = allSubscriptions
-          .where(
-            (s) => s.membershipId == membership.id && s.id != subscription.id,
-          )
-          .toList();
+      final sameMembershipSubs =
+          allSubscriptions
+              .where(
+                (s) =>
+                    s.membershipId == membership.id && s.id != subscription.id,
+              )
+              .toList();
 
       if (sameMembershipSubs.isNotEmpty) {
         return ScheduleCardType.reEnrollment;
       }
 
-      final otherMembershipSubs = allSubscriptions
-          .where((s) => s.membershipId != membership.id)
-          .toList();
+      final otherMembershipSubs =
+          allSubscriptions
+              .where((s) => s.membershipId != membership.id)
+              .toList();
 
       if (otherMembershipSubs.isNotEmpty) {
         return ScheduleCardType.additionalInstrument;
@@ -449,12 +502,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           // lists / unpaid summary (getByTeacherId filters by membership).
           final membership = await flow.firstMembershipForStudent(studentId);
           final membershipId = membership?.id ?? '';
-          final teacherId = membershipId.isEmpty
-              ? null
-              : await flow.teacherIdForMembership(
-                  studentId: studentId,
-                  membershipId: membershipId,
-                );
+          final teacherId =
+              membershipId.isEmpty
+                  ? null
+                  : await flow.teacherIdForMembership(
+                    studentId: studentId,
+                    membershipId: membershipId,
+                  );
 
           final subscription = Subscription(
             id: const Uuid().v4(),
@@ -475,12 +529,12 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             paymentMethod: isPaymentConfirmed ? selectedPaymentMethod : null,
             paymentConfirmedAt: isPaymentConfirmed ? now : null,
             originalAmount: discountPercent > 0 ? originalAmount : null,
-            discountAmount: discountPercent > 0
-                ? (originalAmount - finalAmount)
-                : null,
-            discountReason: discountPercent > 0
-                ? AppStrings.discountPercentReason(discountPercent)
-                : null,
+            discountAmount:
+                discountPercent > 0 ? (originalAmount - finalAmount) : null,
+            discountReason:
+                discountPercent > 0
+                    ? AppStrings.discountPercentReason(discountPercent)
+                    : null,
             totalRescheduleAllowance: rescheduleAllowance,
             rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
@@ -536,9 +590,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
                   failCount,
                 ),
               ),
-              backgroundColor: failCount == allStudentIds.length
-                  ? AppColors.paperAccent
-                  : AppColors.paperAccent,
+              backgroundColor:
+                  failCount == allStudentIds.length
+                      ? AppColors.paperAccent
+                      : AppColors.paperAccent,
             ),
           );
         }

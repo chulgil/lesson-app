@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../analytics/domain/services/analytics_event_logger.dart';
+import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -18,7 +20,11 @@ import '../../../../features/onboarding/onboarding_facade.dart';
 
 /// Phone verification screen for teacher onboarding
 class PhoneVerificationScreen extends ConsumerStatefulWidget {
-  const PhoneVerificationScreen({super.key});
+  const PhoneVerificationScreen({super.key, this.trigger = 'quest'});
+
+  /// #695 §5.5 — entry attribution for `phone_verification_completed`
+  /// ('gate' = E3 gate modal, 'quest' = Phase C quest).
+  final String trigger;
 
   @override
   ConsumerState<PhoneVerificationScreen> createState() =>
@@ -150,6 +156,14 @@ class _PhoneVerificationScreenState
 
     if (success) {
       if (mounted) {
+        // #695 §5.5 — verification completed (gate/quest attribution).
+        ref.read(analyticsEventLoggerProvider).log(
+          AnalyticsEvents.phoneVerificationCompleted,
+          {
+            'userId': ref.read(currentUserIdProvider),
+            'trigger': widget.trigger,
+          },
+        );
         // Phone verified → complete onboarding → home
         ref
             .read(teacherOnboardingNotifierProvider.notifier)

@@ -57,7 +57,11 @@ List<GoRoute> authRoutes = [
   GoRoute(
     path: AppRoutes.teacherPhoneVerification,
     name: 'teacherPhoneVerification',
-    builder: (context, state) => const PhoneVerificationScreen(),
+    builder:
+        (context, state) => PhoneVerificationScreen(
+          // #695 §5.5 — 'gate' when routed from the E3 gate modal; quest otherwise.
+          trigger: state.uri.queryParameters['trigger'] ?? 'quest',
+        ),
   ),
 
   // Teacher Onboarding - Profile Setup

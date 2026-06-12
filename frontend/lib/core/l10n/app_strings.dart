@@ -9103,4 +9103,26 @@ class AppStrings {
 
   /// [나중에] CTA — markShown() + spotlight 종료만.
   static const nextMissionSpotlightLater = '나중에';
+
+  // ── Proposal Draft (#695) ──────────────────────────────────────────────────
+  // 사용처: features/subscription/presentation/widgets/proposal_draft_banner.dart
+  //        features/auth/presentation/widgets/phone_verification_gate_modal.dart
+
+  /// 복구 배너 본문 (spec §4.5).
+  static const proposalDraftBannerTitle = '작성 중이던 제안이 있어요';
+
+  /// 복구 배너 액션 CTA (spec §4.5).
+  static const proposalDraftBannerResume = '이어서 발급하기';
+
+  /// 드래프트 삭제 확인 다이얼로그 제목.
+  static const proposalDraftDiscardTitle = '작성 중이던 제안을 삭제할까요?';
+
+  /// 드래프트 삭제 확인 다이얼로그 본문.
+  static const proposalDraftDiscardBody = '삭제하면 되돌릴 수 없어요.';
+
+  /// 드래프트 삭제 확인 버튼.
+  static const proposalDraftDiscardConfirm = '삭제';
+
+  /// 드래프트 삭제 취소 버튼.
+  static const proposalDraftDiscardCancel = '취소';
 }

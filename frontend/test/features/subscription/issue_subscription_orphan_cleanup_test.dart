@@ -10,10 +10,34 @@ import 'package:lessonaza/features/students/domain/entities/lesson_class.dart';
 import 'package:lessonaza/features/students/domain/entities/student.dart';
 import 'package:lessonaza/features/students/presentation/providers/lesson_class_providers.dart';
 import 'package:lessonaza/features/subscription/data/repositories/mock_subscription_repository.dart';
+import 'package:lessonaza/features/subscription/data/repositories/proposal_draft_storage.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
+import 'package:lessonaza/features/subscription/presentation/providers/proposal_draft_provider.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_issue_flow_provider.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 import 'package:lessonaza/features/subscription/presentation/screens/issue_subscription_screen.dart';
+
+/// Hive-free draft storage — real Hive file I/O deadlocks/errors inside the
+/// testWidgets FakeAsync zone (#694 precedent), so persistence is skipped.
+class _NoopDraftStorage extends ProposalDraftStorage {
+  @override
+  Future<ProposalDraftLoadResult> load(String userId, String studentId) async =>
+      const ProposalDraftLoadResult(draft: null);
+
+  @override
+  Future<void> save({
+    required String userId,
+    required String studentId,
+    required String? templateId,
+    required int amount,
+    required int totalLessons,
+    required int validityDays,
+    required String? membershipId,
+  }) async {}
+
+  @override
+  Future<void> delete(String userId, String studentId) async {}
+}
 
 /// Records ids handed back by create() and any id that gets expired, so a test
 /// can assert orphan cleanup runs on a post-create failure.
@@ -49,30 +73,30 @@ class _ThrowingRelationRepository extends MockTeacherStudentRelationRepository {
 }
 
 Student _student() => Student(
-      id: 'student-1',
-      name: 'Test Student',
-      instrument: 'piano',
-      createdAt: DateTime(2026, 1, 1),
-    );
+  id: 'student-1',
+  name: 'Test Student',
+  instrument: 'piano',
+  createdAt: DateTime(2026, 1, 1),
+);
 
 ClassMembership _membership() => ClassMembership(
-      id: 'membership-1',
-      lessonClassId: 'class-1',
-      studentId: 'student-1',
-      instrument: 'piano',
-      status: MembershipStatus.active,
-      monthlyFee: 100000,
-      createdAt: DateTime(2026, 1, 1),
-    );
+  id: 'membership-1',
+  lessonClassId: 'class-1',
+  studentId: 'student-1',
+  instrument: 'piano',
+  status: MembershipStatus.active,
+  monthlyFee: 100000,
+  createdAt: DateTime(2026, 1, 1),
+);
 
 LessonClass _lessonClass() => LessonClass(
-      id: 'class-1',
-      teacherId: 'teacher-1',
-      name: 'Private',
-      type: LessonClassType.private,
-      paymentType: PaymentType.parent,
-      createdAt: DateTime(2026, 1, 1),
-    );
+  id: 'class-1',
+  teacherId: 'teacher-1',
+  name: 'Private',
+  type: LessonClassType.private,
+  paymentType: PaymentType.parent,
+  createdAt: DateTime(2026, 1, 1),
+);
 
 void main() {
   testWidgets(
@@ -85,14 +109,19 @@ void main() {
         ProviderScope(
           overrides: [
             subscriptionRepositoryProvider.overrideWithValue(subRepo),
-            teacherStudentRelationRepositoryProvider
-                .overrideWithValue(relationRepo),
-            subscriptionIssueStudentProvider('student-1')
-                .overrideWith((ref) async => _student()),
-            subscriptionIssueMembershipsProvider('student-1')
-                .overrideWith((ref) async => [_membership()]),
-            lessonClassProvider('class-1')
-                .overrideWith((ref) async => _lessonClass()),
+            proposalDraftStorageProvider.overrideWithValue(_NoopDraftStorage()),
+            teacherStudentRelationRepositoryProvider.overrideWithValue(
+              relationRepo,
+            ),
+            subscriptionIssueStudentProvider(
+              'student-1',
+            ).overrideWith((ref) async => _student()),
+            subscriptionIssueMembershipsProvider(
+              'student-1',
+            ).overrideWith((ref) async => [_membership()]),
+            lessonClassProvider(
+              'class-1',
+            ).overrideWith((ref) async => _lessonClass()),
           ],
           child: const MaterialApp(
             home: IssueSubscriptionScreen(
@@ -129,8 +158,11 @@ void main() {
       // The subscription was created, the relation step threw, so the created
       // subscription must be expired (orphan cleanup), not left dangling active.
       expect(subRepo.createdIds.length, 1);
-      expect(subRepo.expiredIds, subRepo.createdIds,
-          reason: 'the created subscription must be deactivated on failure');
+      expect(
+        subRepo.expiredIds,
+        subRepo.createdIds,
+        reason: 'the created subscription must be deactivated on failure',
+      );
     },
   );
 }
