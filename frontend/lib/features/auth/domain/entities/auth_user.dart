@@ -28,7 +28,12 @@ class TokenPair {
 @JsonSerializable()
 class AuthUser {
   final String id;
+
+  // #706 — BE UserResponse 는 email/name 이 `str | None = None`. strict
+  // `as String` 캐스트가 OAuth 신규 가입 등 null 응답에서 throw 하므로 방어.
+  @JsonKey(defaultValue: '')
   final String email;
+  @JsonKey(defaultValue: '')
   final String name;
   @JsonKey(name: 'profile_image_url')
   final String? profileImageUrl;

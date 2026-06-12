@@ -22,7 +22,7 @@ LessonLocation _$LessonLocationFromJson(Map<String, dynamic> json) =>
       notes: json['notes'] as String?,
       isDefault: json['is_default'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: dateTimeFromJsonOrNow(json['created_at']),
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),

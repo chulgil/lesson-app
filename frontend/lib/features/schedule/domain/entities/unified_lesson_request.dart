@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/utils/json_converters.dart';
+
 part 'unified_lesson_request.g.dart';
 
 /// Type of lesson being requested
@@ -214,6 +216,9 @@ class UnifiedLessonRequest {
   // Status
   final UnifiedRequestStatus status;
 
+  // #706 — BE UnifiedLessonRequestResponse 는 created_at 이
+  // `datetime | None = None`. strict DateTime.parse throw 방지.
+  @JsonKey(fromJson: dateTimeFromJsonOrNow)
   final DateTime createdAt;
 
   final DateTime? confirmedAt;

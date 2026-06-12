@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/utils/json_converters.dart';
+
 part 'lesson_location.g.dart';
 
 /// Lesson location type.
@@ -50,6 +52,8 @@ class LessonLocation {
 
   final bool isActive; // Active status
 
+  // #706 — BE created_at 이 None 가능 (strict DateTime.parse 방지).
+  @JsonKey(fromJson: dateTimeFromJsonOrNow)
   final DateTime createdAt;
 
   final DateTime? updatedAt;

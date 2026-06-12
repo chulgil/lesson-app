@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 // Import shared enums from core layer
 import '../../../../core/models/shared_enums.dart';
+import '../../../../core/utils/json_converters.dart';
 import 'lesson_slot.dart';
 
 // Re-export shared enums for convenience
@@ -92,6 +93,8 @@ class Student {
   final PracticeStatus practiceStatus;
   final int practiceRate; // days per week
   final String? notes;
+  // #706 — BE created_at 이 None 가능 (strict DateTime.parse 방지).
+  @JsonKey(fromJson: dateTimeFromJsonOrNow)
   final DateTime createdAt;
   final DateTime? updatedAt;
   final bool isActive;
