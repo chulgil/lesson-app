@@ -6309,6 +6309,12 @@ class AppStrings {
   static const restRecommendationDailyMessage = '오늘은 충분히 했어요';
   static const restRecommendationDismissLabel = '계속하기';
 
+  // ── Growth Detail Screen (P2 Visual Growth — Job 9 / AC-6.4) ──
+  static const growthDetailScreenTitle = '내 성장';
+  static const growthDetailYearLabel = '1년 동안';
+  static const growthDetailSpotlightPlaceholder = '추천은 곧 추가됩니다';
+  static const growthDetailComparisonPlaceholder = '비교 보기는 곧 추가됩니다';
+
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
   static const practiceBadgeUnlockedSection = '획득한 뱃지';
