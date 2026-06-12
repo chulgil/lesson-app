@@ -1,22 +1,73 @@
 // W2 Task 2.4 — CategoryMenuGrid 회귀 + smoke 테스트.
+// W6 Task 6.4 — NEW 배지 wiring 회귀 추가.
 // HARD-GATE: design-principles.md (widget-smoke-test).
-// spec §3 (IA) + §7.2 (메인 홈) + §11.1 (카드 라벨 규칙).
+// spec §3 (IA) + §7.2 (메인 홈) + §11.1 (카드 라벨 규칙) + §10.2 (NEW 배지).
 //
 // Verifies:
 // - 5 카드 노출 (운영시간/수업방식/수강권·정산/내 프로필/정책·알림·지원)
 // - 기존 "레슨 시간 설정" / "가용 요일/시간" 메뉴 부재 (5묶음으로 흡수)
 // - 각 카드 탭 → 해당 콜백 호출
 // - 좁은 폭 layout 안전
+// - NEW 배지: introducedAt 있고 7일 윈도우 내 + entered==false 일 때 노출
+// - 카드 tap → markEntered → 다음 build 에서 NEW 사라짐
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/features/profile/presentation/providers/category_new_badge_provider.dart';
 import 'package:lessonaza/features/profile/presentation/providers/category_status_provider.dart';
 import 'package:lessonaza/features/profile/presentation/widgets/category_menu_grid.dart';
 
+/// Hive 의존성 우회용 fake — initial entries 를 in-memory state 로 노출.
+class _FakeCategoryNewBadge extends CategoryNewBadge {
+  _FakeCategoryNewBadge(this._initial);
+  final Map<ProfileCategoryId, CategoryNewBadgeEntry> _initial;
+
+  @override
+  Future<CategoryNewBadgeState> build() async {
+    return CategoryNewBadgeState(entries: Map.of(_initial));
+  }
+
+  @override
+  Future<void> markCategoryIntroduced(
+    ProfileCategoryId id,
+    DateTime now,
+  ) async {
+    final current = state.requireValue;
+    if (current.entries[id]?.introducedAt != null) return;
+    final next = Map<ProfileCategoryId, CategoryNewBadgeEntry>.from(
+      current.entries,
+    );
+    final previous = next[id];
+    next[id] = CategoryNewBadgeEntry(
+      introducedAt: now,
+      entered: previous?.entered ?? false,
+    );
+    state = AsyncValue.data(CategoryNewBadgeState(entries: next));
+  }
+
+  @override
+  Future<void> markEntered(ProfileCategoryId id) async {
+    final current = state.requireValue;
+    final next = Map<ProfileCategoryId, CategoryNewBadgeEntry>.from(
+      current.entries,
+    );
+    final previous = next[id];
+    next[id] = CategoryNewBadgeEntry(
+      introducedAt: previous?.introducedAt,
+      entered: true,
+    );
+    state = AsyncValue.data(CategoryNewBadgeState(entries: next));
+  }
+}
+
 void main() {
-  Widget wrap(Widget child, {double? width}) {
+  Widget wrap(
+    Widget child, {
+    double? width,
+    Map<ProfileCategoryId, CategoryNewBadgeEntry> newBadgeEntries = const {},
+  }) {
     return ProviderScope(
       overrides: [
         operatingHoursStatusProvider.overrideWith(
@@ -33,6 +84,9 @@ void main() {
         ),
         policyNotificationsStatusProvider.overrideWith(
           (ref) => const CategoryStatusNeutral(),
+        ),
+        categoryNewBadgeProvider.overrideWith(
+          () => _FakeCategoryNewBadge(newBadgeEntries),
         ),
       ],
       child: MaterialApp(
@@ -179,6 +233,62 @@ void main() {
       await tester.pumpWidget(wrap(buildGrid(), width: 280));
       await tester.pumpAndSettle();
 
+      expect(tester.takeException(), isNull);
+    });
+
+    // ---- W6 Task 6.4 — NEW 배지 wiring 회귀 ----
+
+    testWidgets('초기 상태 (markCategoryIntroduced 미호출) → NEW 배지 0개', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap(buildGrid()));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('category_card_badge_new')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('markCategoryIntroduced(운영시간) → 운영시간 카드에만 NEW 점 노출', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap(buildGrid()));
+      await tester.pumpAndSettle();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(CategoryMenuGrid)),
+      );
+      await container.read(categoryNewBadgeProvider.future);
+      await container
+          .read(categoryNewBadgeProvider.notifier)
+          .markCategoryIntroduced(
+            ProfileCategoryId.operatingHours,
+            DateTime.now(),
+          );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('category_card_badge_new')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('markAllIntroduced → 5묶음 모두 NEW 배지 노출 (overlay 진행 후 시나리오)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap(buildGrid()));
+      await tester.pumpAndSettle();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(CategoryMenuGrid)),
+      );
+      await container.read(categoryNewBadgeProvider.future);
+      await container
+          .read(categoryNewBadgeProvider.notifier)
+          .markAllIntroduced(DateTime.now());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('category_card_badge_new')),
+        findsNWidgets(5),
+      );
       expect(tester.takeException(), isNull);
     });
   });

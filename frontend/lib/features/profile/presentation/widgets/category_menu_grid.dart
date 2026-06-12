@@ -11,6 +11,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../providers/category_new_badge_provider.dart';
 import '../providers/category_status_provider.dart';
 import 'category_card.dart';
 
@@ -53,6 +54,23 @@ class CategoryMenuGrid extends ConsumerWidget {
     final myProfile = ref.watch(myProfileStatusProvider);
     final policyNotifications = ref.watch(policyNotificationsStatusProvider);
 
+    // W6 §10.2 — NEW 배지 상태. AsyncValue.value 가 null 이면 표시 안 함
+    // (배지 loading 보다 미표시 가 안전).
+    final newBadgeState = ref.watch(categoryNewBadgeProvider).valueOrNull;
+    final now = DateTime.now();
+    bool showNew(ProfileCategoryId id) {
+      return newBadgeState?.shouldShowNew(id, now) ?? false;
+    }
+
+    VoidCallback wrapTap(ProfileCategoryId id, VoidCallback delegate) {
+      return () {
+        if (showNew(id)) {
+          ref.read(categoryNewBadgeProvider.notifier).markEntered(id);
+        }
+        delegate();
+      };
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Column(
@@ -70,35 +88,49 @@ class CategoryMenuGrid extends ConsumerWidget {
             title: AppStrings.categoryOperatingHours,
             icon: Icons.access_time,
             status: operatingHours,
-            onTap: onOperatingHoursTap,
+            onTap: wrapTap(
+              ProfileCategoryId.operatingHours,
+              onOperatingHoursTap,
+            ),
+            showNewBadge: showNew(ProfileCategoryId.operatingHours),
           ),
           const SizedBox(height: AppSpacing.space2),
           CategoryCard(
             title: AppStrings.categoryLessonStyle,
             icon: Icons.school_outlined,
             status: lessonStyle,
-            onTap: onLessonStyleTap,
+            onTap: wrapTap(ProfileCategoryId.lessonStyle, onLessonStyleTap),
+            showNewBadge: showNew(ProfileCategoryId.lessonStyle),
           ),
           const SizedBox(height: AppSpacing.space2),
           CategoryCard(
             title: AppStrings.categorySubscriptionBilling,
             icon: Icons.payments_outlined,
             status: subscriptionBilling,
-            onTap: onSubscriptionBillingTap,
+            onTap: wrapTap(
+              ProfileCategoryId.subscriptionBilling,
+              onSubscriptionBillingTap,
+            ),
+            showNewBadge: showNew(ProfileCategoryId.subscriptionBilling),
           ),
           const SizedBox(height: AppSpacing.space2),
           CategoryCard(
             title: AppStrings.categoryMyProfile,
             icon: Icons.person_outline,
             status: myProfile,
-            onTap: onMyProfileTap,
+            onTap: wrapTap(ProfileCategoryId.myProfile, onMyProfileTap),
+            showNewBadge: showNew(ProfileCategoryId.myProfile),
           ),
           const SizedBox(height: AppSpacing.space2),
           CategoryCard(
             title: AppStrings.categoryPolicyNotifications,
             icon: Icons.settings_outlined,
             status: policyNotifications,
-            onTap: onPolicyNotificationsTap,
+            onTap: wrapTap(
+              ProfileCategoryId.policyNotifications,
+              onPolicyNotificationsTap,
+            ),
+            showNewBadge: showNew(ProfileCategoryId.policyNotifications),
           ),
         ],
       ),
