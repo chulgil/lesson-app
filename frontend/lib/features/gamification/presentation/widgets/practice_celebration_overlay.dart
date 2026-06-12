@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../domain/entities/spotlight_prompt.dart';
+import 'spotlight_slot.dart';
 
 /// 학생 게이미피케이션 P1 — 연습 종료 후 1.5초 비방해 축하 오버레이.
 ///
@@ -11,11 +13,25 @@ import '../../../../core/theme/app_typography.dart';
 ///
 /// `AnimationController` 기반 — `Future.delayed` 회피
 /// (feedback_spy_mock_for_router_tests.md: pending timer / 라우터 race).
+///
+/// P3 (Job 7 Task 7.2): [spotlightPrompt] 가 주어지면 1.5초 축하 후 자동
+/// 으로 [SpotlightSlot] 표시 phase 진입. 사용자가 "지금 볼래" / "다음에"
+/// 선택 후에 [onDismiss] 호출. [spotlightPrompt] 가 null 이면 기존 1.5초
+/// 동작 회귀 0 (SC-1).
 class PracticeCelebrationOverlay extends StatefulWidget {
   final int practiceMinutes;
   final int streakDays;
   final VoidCallback onDismiss;
   final Duration totalDuration;
+
+  /// P3: 1.5초 축하 후 노출할 Spotlight prompt. null 이면 기존 1.5초 종료.
+  final SpotlightPrompt? spotlightPrompt;
+
+  /// "지금 볼래" tap 콜백 (overlay 종료 직전 호출).
+  final ValueChanged<SpotlightPrompt>? onSpotlightAccept;
+
+  /// "다음에" tap 콜백 (overlay 종료 직전 호출).
+  final ValueChanged<SpotlightPrompt>? onSpotlightDecline;
 
   const PracticeCelebrationOverlay({
     super.key,
@@ -23,6 +39,9 @@ class PracticeCelebrationOverlay extends StatefulWidget {
     required this.streakDays,
     required this.onDismiss,
     this.totalDuration = const Duration(milliseconds: 1500),
+    this.spotlightPrompt,
+    this.onSpotlightAccept,
+    this.onSpotlightDecline,
   });
 
   @override
@@ -35,6 +54,7 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
   late final AnimationController _controller;
   late final Animation<double> _opacity;
   bool _dismissed = false;
+  bool _showSpotlight = false;
 
   @override
   void initState() {
@@ -51,9 +71,22 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
     ]).animate(_controller);
     _controller.forward().whenComplete(() {
       if (_dismissed || !mounted) return;
+      if (widget.spotlightPrompt != null) {
+        // P3 Job 7 Task 7.2 — 1.5초 축하 후 SpotlightSlot 표시 phase.
+        setState(() => _showSpotlight = true);
+        return;
+      }
       _dismissed = true;
       widget.onDismiss();
     });
+  }
+
+  void _completeWithSpotlight(void Function(SpotlightPrompt prompt) action) {
+    if (_dismissed || !mounted) return;
+    final prompt = widget.spotlightPrompt;
+    if (prompt != null) action(prompt);
+    _dismissed = true;
+    widget.onDismiss();
   }
 
   @override
@@ -64,6 +97,31 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
 
   @override
   Widget build(BuildContext context) {
+    if (_showSpotlight && widget.spotlightPrompt != null) {
+      return ColoredBox(
+        color: AppColors.inkScrim,
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space6,
+              ),
+              child: SpotlightSlot(
+                prompt: widget.spotlightPrompt!,
+                onAccept:
+                    () => _completeWithSpotlight(
+                      (p) => widget.onSpotlightAccept?.call(p),
+                    ),
+                onDecline:
+                    () => _completeWithSpotlight(
+                      (p) => widget.onSpotlightDecline?.call(p),
+                    ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return AnimatedBuilder(
       animation: _opacity,
       builder:
