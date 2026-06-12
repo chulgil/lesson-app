@@ -3,7 +3,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/mock_student_quest_repository.dart';
-import '../../domain/entities/quest_origin.dart';
 import '../../domain/entities/student_quest.dart';
 import '../../domain/repositories/student_quest_repository.dart';
 
@@ -21,14 +20,4 @@ Future<List<StudentQuest>> activeQuests(
 ) async {
   final repo = ref.watch(studentQuestRepositoryProvider);
   return repo.getActiveQuests(studentId);
-}
-
-@riverpod
-Future<List<StudentQuest>> questsByOrigin(
-  QuestsByOriginRef ref,
-  String studentId,
-  QuestOrigin origin,
-) async {
-  final repo = ref.watch(studentQuestRepositoryProvider);
-  return repo.getQuestsByOrigin(studentId, origin);
 }
