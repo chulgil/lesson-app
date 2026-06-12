@@ -6298,6 +6298,12 @@ class AppStrings {
   static String heatmapDayDetailMinutes(int minutes) => '$minutes분';
   static String heatmapDayDetailCount(int count) => '$count회';
 
+  // ── Trophy Collection (P2 Visual Growth — Job 7 Task 7.1 / AC-6.3) ──
+  static const trophyCollectionTitle = '내 트로피';
+  static const trophyCollectionEmptyMessage = '곧 첫 트로피!';
+  static const trophyCollectionMoreLabel = '더 보기';
+  static String trophyCollectionCountLabel(int count) => '($count)';
+
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
   static const practiceBadgeUnlockedSection = '획득한 뱃지';
