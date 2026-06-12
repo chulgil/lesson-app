@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/domain/value_objects/clock_time.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
@@ -25,8 +26,17 @@ class RemoteTeacherAvailabilityRepository
       );
       if (response.data == null) return null;
       return _availabilityFromJson(response.data as Map<String, dynamic>);
+    } on ApiException catch (e) {
+      // ApiClient converts DioException → ApiException, so the 404→null
+      // branch must match ApiException (2026-06-12 — the previous
+      // `on DioException` catch was dead code; first-time teachers got an
+      // error instead of the empty-state defaults).
+      if (e.statusCode == 404 || e.statusCode == 405) {
+        return null;
+      }
+      rethrow;
     } on DioException catch (e) {
-      // Return null (empty state) for 404 or unimplemented endpoints
+      // Defensive: raw Dio paths that bypass ApiClient's conversion.
       if (e.response?.statusCode == 404 || e.response?.statusCode == 405) {
         return null;
       }
@@ -42,7 +52,11 @@ class RemoteTeacherAvailabilityRepository
       '/schedule/availability',
       data: availability.toJson(),
     );
-    return TeacherAvailability.fromJson(response.data as Map<String, dynamic>);
+    // 2026-06-12 — BE 응답은 GET 과 동일한 요약 포맷 (id 등 일부 필드
+    // 없음) 일 수 있으므로 strict fromJson 대신 GET 과 같은 관대 파서를
+    // 사용한다. strict 파싱 throw → notifier silent fail → "저장했는데
+    // 적용 안 됨" 으로 보이는 회귀의 한 축.
+    return _availabilityFromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -59,11 +73,21 @@ class RemoteTeacherAvailabilityRepository
     String teacherId,
     WeeklySchedule schedule,
   ) async {
-    // Update availability with new schedule added
-    final current = await getAvailability(teacherId);
-    if (current == null) {
-      throw Exception('Availability not found for teacher: $teacherId');
-    }
+    // Update availability with new schedule added.
+    //
+    // 2026-06-12 — 첫 설정 사용자 (BE 레코드 없음 → null) 는 throw 대신
+    // 기본값 (50/10/60 — TeacherAvailability constructor defaults) 으로 새
+    // availability 를 구성해 저장한다. BE PUT /schedule/availability 가
+    // replace/upsert 이므로 신규 생성이 안전하다. split page 의
+    // _ensureDefaults 가 기본값 화면을 보여주므로 첫 "시간대 추가" 가 곧
+    // 첫 저장이 된다.
+    final current =
+        await getAvailability(teacherId) ??
+        TeacherAvailability(
+          id: '',
+          teacherId: teacherId,
+          createdAt: DateTime.now(),
+        );
     final updated = current.copyWith(
       weeklySchedules: [...current.weeklySchedules, schedule],
       updatedAt: DateTime.now(),
