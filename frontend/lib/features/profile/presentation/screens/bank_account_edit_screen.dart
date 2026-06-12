@@ -106,7 +106,7 @@ class BankAccountEditScreen extends ConsumerWidget {
             account: account,
             onSetDefault: account.isDefault
                 ? null
-                : () => _setDefault(ref, accounts, account),
+                : () => _setDefault(context, ref, accounts, account),
             onDelete: accounts.length > 1 && !account.isDefault
                 ? () => _deleteAccount(context, ref, accounts, account)
                 : null,
@@ -119,7 +119,32 @@ class BankAccountEditScreen extends ConsumerWidget {
     );
   }
 
+  /// 계좌 목록 저장 — 실패 시 SnackBar (2026-06-12 silent fail 방지).
+  ///
+  /// notifier 가 rethrow 하는 예외를 화면에서 잡지 않으면 uncaught 로
+  /// 사라져 사용자에겐 "무반응" 으로 보인다 (#701 운영시간과 동일 패턴).
+  Future<void> _saveAccounts(
+    BuildContext context,
+    WidgetRef ref,
+    List<BankAccount> updated,
+  ) async {
+    try {
+      await ref
+          .read(teacherExtendedProfileProvider.notifier)
+          .updateBankAccounts(updated);
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.profileBankAccountSaveError),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   Future<void> _setDefault(
+    BuildContext context,
     WidgetRef ref,
     List<BankAccount> accounts,
     BankAccount target,
@@ -128,9 +153,7 @@ class BankAccountEditScreen extends ConsumerWidget {
       return a.copyWith(isDefault: a.id == target.id);
     }).toList();
 
-    await ref
-        .read(teacherExtendedProfileProvider.notifier)
-        .updateBankAccounts(updated);
+    await _saveAccounts(context, ref, updated);
   }
 
   Future<void> _deleteAccount(
@@ -154,9 +177,8 @@ class BankAccountEditScreen extends ConsumerWidget {
 
     if (confirmed == true) {
       final updated = accounts.where((a) => a.id != target.id).toList();
-      await ref
-          .read(teacherExtendedProfileProvider.notifier)
-          .updateBankAccounts(updated);
+      if (!context.mounted) return;
+      await _saveAccounts(context, ref, updated);
     }
   }
 
@@ -182,9 +204,8 @@ class BankAccountEditScreen extends ConsumerWidget {
         }),
         result,
       ];
-      await ref
-          .read(teacherExtendedProfileProvider.notifier)
-          .updateBankAccounts(updated);
+      if (!context.mounted) return;
+      await _saveAccounts(context, ref, updated);
     }
   }
 }
