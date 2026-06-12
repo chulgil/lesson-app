@@ -19,6 +19,7 @@ import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_extended_profile_provider.dart';
 import '../widgets/category_menu_grid.dart';
 import '../widgets/profile_category_sheets.dart';
+import '../widgets/teacher_migration_overlay_gate.dart';
 
 /// Profile tab with user info and 5묶음 카테고리 메뉴 그리드.
 ///
@@ -47,82 +48,89 @@ class ProfileTab extends ConsumerWidget {
     final introduction = profile?.introduction;
     final instruments = profile?.instruments ?? [];
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Notebook masthead
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenPadding,
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: AppSpacing.space2),
-                NotebookMasthead(
-                  eyebrow: 'PROFILE',
-                  meta:
-                      'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
-                  trailing: IconButton(
-                    onPressed: () =>
-                        context.push(AppRoutes.notificationSettings),
-                    icon: const Icon(
-                      Icons.settings_outlined,
-                      color: AppColors.ink,
-                      size: 22,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
+    // W6 §10.1 — 기존 가입자 첫 진입 마이그레이션 overlay 게이트.
+    // shown==false 일 때만 OnboardingCategoryPreviewScreen 노출,
+    // 진행/스킵 후 5묶음 NEW 윈도우 시작 + shown flag 영속.
+    return TeacherMigrationOverlayGate(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Notebook masthead
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: AppSpacing.space2),
+                  NotebookMasthead(
+                    eyebrow: 'PROFILE',
+                    meta:
+                        'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
+                    trailing: IconButton(
+                      onPressed:
+                          () => context.push(AppRoutes.notificationSettings),
+                      icon: const Icon(
+                        Icons.settings_outlined,
+                        color: AppColors.ink,
+                        size: 22,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space4),
 
-          // Profile header with key info
-          _buildProfileHeader(name, email, introduction, instruments),
+            // Profile header with key info
+            _buildProfileHeader(name, email, introduction, instruments),
 
-          const SizedBox(height: AppSpacing.space3),
+            const SizedBox(height: AppSpacing.space3),
 
-          // ⭐ 프로필 미리보기 CTA (profile_master.md §2.1 #2)
-          _buildPreviewCta(context),
+            // ⭐ 프로필 미리보기 CTA (profile_master.md §2.1 #2)
+            _buildPreviewCta(context),
 
-          const SizedBox(height: AppSpacing.space5),
+            const SizedBox(height: AppSpacing.space5),
 
-          // Stats section (팔로워 → 입금대기(후불))
-          _buildStatsSection(ref, teacherId),
+            // Stats section (팔로워 → 입금대기(후불))
+            _buildStatsSection(ref, teacherId),
 
-          const SizedBox(height: AppSpacing.space5),
+            const SizedBox(height: AppSpacing.space5),
 
-          // ⏳ Lifetime 얼리어답터 프로모 배너 (paywall_spec.md §1, §6.2)
-          //    snapshot.lifetimeOfferActive 일 때만 노출. 백엔드가 종료시각을
-          //    채우기 전까지는 SizedBox.shrink (자동 graceful degradation).
-          _buildLifetimePromoBanner(context, ref),
+            // ⏳ Lifetime 얼리어답터 프로모 배너 (paywall_spec.md §1, §6.2)
+            //    snapshot.lifetimeOfferActive 일 때만 노출. 백엔드가 종료시각을
+            //    채우기 전까지는 SizedBox.shrink (자동 graceful degradation).
+            _buildLifetimePromoBanner(context, ref),
 
-          // 💳 구독 상태 카드 (paywall_spec.md §6.2 — #415 R4 Phase C2)
-          _buildSubscriptionStatusCard(context, ref),
+            // 💳 구독 상태 카드 (paywall_spec.md §6.2 — #415 R4 Phase C2)
+            _buildSubscriptionStatusCard(context, ref),
 
-          const SizedBox(height: AppSpacing.space5),
+            const SizedBox(height: AppSpacing.space5),
 
-          // ⭐ 프로필 완성도 게이지 (profile_master.md §2.2)
-          _buildCompletionGauge(context, ref, profile, teacherId),
+            // ⭐ 프로필 완성도 게이지 (profile_master.md §2.2)
+            _buildCompletionGauge(context, ref, profile, teacherId),
 
-          // ⭐ 자주 쓰는 설정 (profile_master.md §2.3)
-          _buildQuickShortcuts(context, teacherId),
+            // ⭐ 자주 쓰는 설정 (profile_master.md §2.3)
+            _buildQuickShortcuts(context, teacherId),
 
-          const SizedBox(height: AppSpacing.space5),
+            const SizedBox(height: AppSpacing.space5),
 
-          // 5묶음 카테고리 메뉴 그리드 (W2 Task 2.4 — spec §3 + §7.2 + §11.1)
-          _buildCategoryGrid(context, ref, teacherId),
+            // 5묶음 카테고리 메뉴 그리드 (W2 Task 2.4 — spec §3 + §7.2 + §11.1)
+            _buildCategoryGrid(context, ref, teacherId),
 
-          SizedBox(
-            height:
-                AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32,
-          ),
-        ],
+            SizedBox(
+              height:
+                  AppSpacing.space8 +
+                  MediaQuery.of(context).padding.bottom +
+                  32,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -176,25 +184,27 @@ class ProfileTab extends ConsumerWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space1,
-              children: instruments
-                  .map(
-                    (inst) => Chip(
-                      label: Text(
-                        inst,
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.paperAccent,
+              children:
+                  instruments
+                      .map(
+                        (inst) => Chip(
+                          label: Text(
+                            inst,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.paperAccent,
+                            ),
+                          ),
+                          backgroundColor: AppColors.paperAccent.withValues(
+                            alpha: 0.08,
+                          ),
+                          side: BorderSide.none,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
                         ),
-                      ),
-                      backgroundColor: AppColors.paperAccent.withValues(
-                        alpha: 0.08,
-                      ),
-                      side: BorderSide.none,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                    ),
-                  )
-                  .toList(),
+                      )
+                      .toList(),
             ),
           ],
           // Introduction
@@ -509,11 +519,11 @@ class ProfileTab extends ConsumerWidget {
     return CategoryMenuGrid(
       onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
       onLessonStyleTap: () => context.push(AppRoutes.lessonStyleSettings),
-      onSubscriptionBillingTap: () =>
-          showSubscriptionBillingSheet(context, teacherId),
+      onSubscriptionBillingTap:
+          () => showSubscriptionBillingSheet(context, teacherId),
       onMyProfileTap: () => showMyProfileSheet(context),
-      onPolicyNotificationsTap: () =>
-          showPolicyNotificationsSheet(context, ref),
+      onPolicyNotificationsTap:
+          () => showPolicyNotificationsSheet(context, ref),
     );
   }
 }
