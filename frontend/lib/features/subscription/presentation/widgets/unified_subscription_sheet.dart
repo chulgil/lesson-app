@@ -16,6 +16,7 @@ import '../../domain/entities/subscription_template.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
+import 'duplicate_proposal_dialog.dart';
 
 /// Unified bottom sheet for subscription proposal creation and direct issuance.
 ///
@@ -609,6 +610,20 @@ class _UnifiedSubscriptionSheetState
 
   Future<void> _onSendProposal() async {
     if (_selectedTemplateIds.isEmpty) return;
+
+    // #696 §3.1.5 — single-student send: block while a pending/paymentNotified
+    // proposal already exists for this student. Batch sends rely on the BE
+    // 409 constraint (the per-student dialog UX does not fit batch flow).
+    if (widget.studentIds.length == 1) {
+      final canProceed = await ensureNoDuplicateProposal(
+        context: context,
+        ref: ref,
+        teacherId: widget.teacherId,
+        studentId: widget.studentIds.first,
+        studentName: widget.studentName ?? AppStrings.student,
+      );
+      if (!canProceed || !mounted) return;
+    }
 
     setState(() {
       _isSubmitting = true;

@@ -17,6 +17,7 @@ import '../../domain/repositories/subscription_repository.dart';
 import '../providers/proposal_draft_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_providers.dart';
+import '../widgets/duplicate_proposal_dialog.dart';
 
 UnifiedRequestStatus lessonRequestStatusForIssuedSubscription() =>
     UnifiedRequestStatus.subscriptionIssued;
@@ -97,6 +98,19 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       );
       return;
     }
+
+    // #696 §3.1.5 — block issuance while the student already has a
+    // pending/paymentNotified proposal from this teacher (double-payment risk).
+    final studentNameForGuard = await _getStudentName();
+    if (!mounted) return;
+    final canProceed = await ensureNoDuplicateProposal(
+      context: context,
+      ref: ref,
+      teacherId: ref.read(currentUserIdProvider),
+      studentId: primaryStudentId,
+      studentName: studentNameForGuard,
+    );
+    if (!canProceed || !mounted) return;
 
     DateTime? endDate;
     int? computedTotalLessons;

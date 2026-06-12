@@ -1693,6 +1693,10 @@ class SubscriptionService:
         tid = await resolve_teacher_id(self.db, current_user.id)
         teacher_ids = await self.access.teacher_identifiers(current_user)
         await self._assert_proposal_create_resources(data, teacher_ids)
+
+        # #696 — §3.1.5 single active proposal constraint: raise 409 if a
+        # pending/paymentNotified proposal already exists for (teacher, student).
+        await self._assert_no_active_proposal(tid, data.student_id)
         proposal = SubscriptionProposal(
             teacher_id=tid,
             student_id=data.student_id,
@@ -1772,6 +1776,30 @@ class SubscriptionService:
             teacher_ids,
             data.student_id,
         )
+
+    async def _assert_no_active_proposal(self, teacher_id: str, student_id: str) -> None:
+        """#696 §3.1.5 — ensure at most one pending/paymentNotified proposal per (teacher, student).
+
+        Raises 409 with ``active_proposal_exists`` + the conflicting proposalId so
+        FE can offer [기존 제안 보기] / [기존 제안 취소 후 재제안] dialog.
+        """
+        from app.models.subscription import ProposalStatus, SubscriptionProposal
+
+        existing = await self.db.scalar(
+            select(SubscriptionProposal).where(
+                SubscriptionProposal.teacher_id == teacher_id,
+                SubscriptionProposal.student_id == student_id,
+                SubscriptionProposal.status.in_([ProposalStatus.pending, ProposalStatus.paymentNotified]),
+            )
+        )
+        if existing is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": "active_proposal_exists",
+                    "proposalId": existing.id,
+                },
+            )
 
     async def _assert_proposal_student_owner(self, student_id: str, teacher_ids: list[str]) -> None:
         from app.models.student import Student

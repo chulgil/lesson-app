@@ -9125,4 +9125,21 @@ class AppStrings {
 
   /// 드래프트 삭제 취소 버튼.
   static const proposalDraftDiscardCancel = '취소';
+
+  // ── Duplicate Proposal Guard (#696) ────────────────────────────────────────
+  // 사용처: features/subscription/presentation/screens/issue_subscription_actions.dart
+
+  /// 중복 제안 다이얼로그 제목 (spec §3.1.5).
+  static const duplicateProposalDialogTitle = '대기 중인 제안이 있어요';
+
+  /// 중복 제안 다이얼로그 본문 포맷.
+  static String duplicateProposalDialogBody(String studentName) =>
+      '$studentName 님에게 아직 확정되지 않은 제안이 있어요. '
+      '기존 제안을 취소하고 새로 보내거나, 기존 제안을 확인하세요.';
+
+  /// [기존 제안 보기] 버튼.
+  static const duplicateProposalViewExisting = '기존 제안 보기';
+
+  /// [기존 제안 취소 후 재제안] 버튼.
+  static const duplicateProposalCancelAndResend = '기존 제안 취소 후 재제안';
 }

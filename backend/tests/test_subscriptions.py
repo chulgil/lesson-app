@@ -1274,9 +1274,7 @@ async def test_subscription_template_actions_reject_other_teacher(
     )
     assert create_response.status_code == 201
     template_id = create_response.json()["id"]
-    other_headers = {
-        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
-    }
+    other_headers = {"Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"}
 
     assert (
         await client.get(f"/api/v1/subscriptions-templates/{template_id}", headers=other_headers)
@@ -1340,9 +1338,7 @@ async def test_subscription_proposals_are_scoped_to_current_teacher(
         name="Other Teacher",
         email="other-proposal@test.com",
     )
-    other_headers = {
-        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
-    }
+    other_headers = {"Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"}
 
     owned = await client.post(
         "/api/v1/subscriptions-proposals",
@@ -1425,9 +1421,7 @@ async def test_create_subscription_proposal_rejects_foreign_templates(
         name="Other Teacher",
         email="other-proposal-template@test.com",
     )
-    other_headers = {
-        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
-    }
+    other_headers = {"Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"}
 
     template_response = await client.post(
         "/api/v1/subscriptions-templates",
@@ -1693,26 +1687,9 @@ async def test_subscription_proposal_frontend_contract_action_aliases(
         email="student-proposal-alias@test.com",
     )
 
-    select_response = await client.post(
-        "/api/v1/subscriptions-proposals",
-        headers=auth_headers,
-        json={
-            "student_id": "test-student-id",
-            "template_ids": ["template-a", "template-b"],
-            "recommended_template_id": "template-a",
-            "message": "수강권을 선택해주세요.",
-        },
-    )
-    select_proposal_id = select_response.json()["id"]
-    selected = await client.patch(
-        f"/api/v1/subscriptions-proposals/{select_proposal_id}/respond",
-        headers=student_auth_headers,
-        json={"action": "select_template", "template_id": "template-b"},
-    )
-    assert selected.status_code == 200
-    assert selected.json()["status"] == "paymentNotified"
-    assert selected.json()["selected_template_id"] == "template-b"
-
+    # #696 §3.1.5 — only one active (pending/paymentNotified) proposal per
+    # (teacher, student). Terminal-state segments (reject, cancel) run first;
+    # the select_template segment ends in paymentNotified (active) so it last.
     reject_response = await client.post(
         "/api/v1/subscriptions-proposals",
         headers=auth_headers,
@@ -1741,6 +1718,26 @@ async def test_subscription_proposal_frontend_contract_action_aliases(
     )
     assert cancelled.status_code == 200
     assert cancelled.json()["status"] == "cancelled"
+
+    select_response = await client.post(
+        "/api/v1/subscriptions-proposals",
+        headers=auth_headers,
+        json={
+            "student_id": "test-student-id",
+            "template_ids": ["template-a", "template-b"],
+            "recommended_template_id": "template-a",
+            "message": "수강권을 선택해주세요.",
+        },
+    )
+    select_proposal_id = select_response.json()["id"]
+    selected = await client.patch(
+        f"/api/v1/subscriptions-proposals/{select_proposal_id}/respond",
+        headers=student_auth_headers,
+        json={"action": "select_template", "template_id": "template-b"},
+    )
+    assert selected.status_code == 200
+    assert selected.json()["status"] == "paymentNotified"
+    assert selected.json()["selected_template_id"] == "template-b"
 
 
 @pytest.mark.asyncio
@@ -1822,9 +1819,7 @@ async def test_subscription_detail_and_mutations_reject_other_teacher(
     )
     assert created.status_code == 201
     sub_id = created.json()["id"]
-    other_headers = {
-        "Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"
-    }
+    other_headers = {"Authorization": f"Bearer {create_access_token(data={'sub': 'other-teacher', 'role': 'teacher'})}"}
 
     assert (await client.get(f"/api/v1/subscriptions/{sub_id}", headers=other_headers)).status_code == 403
     assert (
@@ -1841,9 +1836,7 @@ async def test_subscription_detail_and_mutations_reject_other_teacher(
             json={"payment_method": "cash"},
         )
     ).status_code == 403
-    assert (
-        await client.post(f"/api/v1/subscriptions/{sub_id}/renew", headers=other_headers)
-    ).status_code == 403
+    assert (await client.post(f"/api/v1/subscriptions/{sub_id}/renew", headers=other_headers)).status_code == 403
 
 
 @pytest.mark.asyncio
