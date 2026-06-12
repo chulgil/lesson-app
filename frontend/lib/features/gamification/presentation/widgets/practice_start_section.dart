@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../practice/presentation/widgets/practice_tools_modal.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../providers/growth_heatmap_provider.dart';
@@ -37,7 +39,12 @@ class PracticeStartSection extends ConsumerWidget {
       streakDays: streakDays,
       yesterdayMinutes: yesterdayMinutes,
       onStartTap: () => _onStartTap(context, ref),
+      onMoreTap: () => _onMoreTap(context),
     );
+  }
+
+  void _onMoreTap(BuildContext context) {
+    context.go('${AppRoutes.studentGrowthDetail}?studentId=$studentId');
   }
 
   Future<void> _onStartTap(BuildContext context, WidgetRef ref) async {
@@ -72,13 +79,14 @@ class PracticeStartSection extends ConsumerWidget {
       context: context,
       barrierColor: Colors.transparent,
       barrierDismissible: false,
-      builder: (ctx) => PracticeCelebrationOverlay(
-        practiceMinutes: practiceMinutes,
-        streakDays: streakDays,
-        onDismiss: () {
-          if (ctx.mounted) Navigator.of(ctx).pop();
-        },
-      ),
+      builder:
+          (ctx) => PracticeCelebrationOverlay(
+            practiceMinutes: practiceMinutes,
+            streakDays: streakDays,
+            onDismiss: () {
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+          ),
     );
   }
 }
