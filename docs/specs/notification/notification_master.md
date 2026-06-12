@@ -1,7 +1,7 @@
 # 알림 시스템 Master Spec
 
 > 구현 상태: ⚠️ 부분 구현 (95%) — FCM 인프라 구현, Firebase 설정 대기, 핵심 비즈니스 알림 4종 백엔드 발송 완료
-> Last updated: 2026-06-01 (E2E 감사 #3 E2-C1 보강 — 선생님 측 입금 미확인 푸시 3종 추가)
+> Last updated: 2026-06-12 (출시 준비도 감사 P1-1 — 알림 설정 화면 Phase 1.5 승격)
 > 기존 스펙: [notification_system.md](notification_system.md), [kakao_alimtalk_spec.md](kakao_alimtalk_spec.md)
 > 관련 이슈: #424
 
@@ -294,6 +294,8 @@
 | **선생님** | **15** | 한도 초과 분은 **다음 날 다이제스트로 묶어 발송** (1건 요약 알림) |
 
 선생님 한도가 높은 이유: 학생 수가 많을수록 알림 양이 늘어남.
+
+> 카테고리별 기본값(기본 ON/OFF 여부) → [push_notification_settings_spec.md §3.2 카테고리 기본값](push_notification_settings_spec.md) 참조.
 
 #### 2.5.3 배치 윈도우 (batchWindowMinutes)
 
@@ -719,14 +721,16 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 
 ### 미구현 (예정)
 
-| 항목 | 우선순위 |
-|------|---------|
-| ~~FCM 푸시 알림 인프라~~ | ✅ 완료 (코드 구현, Firebase 설정 대기) |
-| 알림 설정 화면 (학생/선생님) | Phase 2 |
-| 알림 설정 Hive 영속화 | Phase 2 |
-| 알림 빈도 관리 / 개인화 | Phase 3 |
-| 서버 기반 알림 스케줄링 | Phase 3 |
-| 알림 통계/분석 | Phase 3 |
+| 항목 | 우선순위 | 비고 |
+|------|---------|------|
+| ~~FCM 푸시 알림 인프라~~ | ✅ 완료 (코드 구현, Firebase 설정 대기) | |
+| 알림 설정 화면 — 마스터 토글 + 6 카테고리 토글 | **Phase 1.5 (출시 전 필수)** | 설정 메뉴 진입점이 이미 존재하나 화면이 없어 "기능 없는 메뉴" 상태(#15 플레이스홀더 위반). 알림 폭주 시 사용자가 끌 수단이 푸시 전체 차단뿐이므로 채널 보호 원칙(§1 설계 원칙 #3)에도 위배. 상세 범위: [push_notification_settings_spec.md](push_notification_settings_spec.md) §10 참조 |
+| 알림 설정 Hive 영속화 | Phase 1.5 | 설정 화면과 함께 구현 |
+| DND/방해금지 시간대 설정 (시간대 직접 지정) | Phase 2 | 마스터+카테고리 토글과 분리하여 후속 구현 |
+| 알림 빈도 조절 (단계별 슬라이더) | Phase 2 | |
+| 알림 빈도 관리 / 개인화 | Phase 3 | |
+| 서버 기반 알림 스케줄링 | Phase 3 | |
+| 알림 통계/분석 | Phase 3 | |
 
 ---
 
@@ -753,3 +757,4 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 2026-03-30 | FCM 푸시 알림 인프라 구현 (FcmService, DeviceToken 모델/API, Firebase 설정 가이드) |
 | 2026-05-31 | 백엔드 알림 발송 구현: lessonBooked, lessonNoteShared, subscriptionIssued, scheduleConfirmationRequired. 백엔드 발송 구현 상태 테이블 추가. 프로필 리마인더 3종(profileReminder24h/3d/7d) 추가. LocalNotificationService.\_onNotificationTapped payload 파싱 역할 명시 |
 | 2026-06-04 | FE `NotificationType` enum 에 7종 추가 — BE 가 발송하지만 FE 가 매핑/렌더링하지 못한 갭 해소: 결제 미확인 3종(paymentPendingD1/D3/D7Final), 스케줄 확정 1종(scheduleConfirmationRequired), 프로필 리마인더 3종(profileReminder24h/3d/7d). targetRole 매핑(학생/선생/both) + 우선순위(D3/D7Final/scheduleConfirm/profile7d=high) 분기 추가 |
+| 2026-06-12 | 출시 준비도 감사 P1-1 — 알림 설정 화면(마스터+6카테고리 토글)을 Phase 2 → Phase 1.5(출시 전 필수)로 승격. 사유: 설정 메뉴 진입점 존재 + 화면 미구현 = #15 플레이스홀더 위반, 채널 보호 원칙 위배. DND/빈도조절은 Phase 2 유지. §2.5.2에 push_notification_settings_spec.md §3.2 상호 참조 추가 |

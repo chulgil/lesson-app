@@ -1,7 +1,8 @@
 # 세밀한 푸시 알림 설정 (Granular Push Notification Settings) Spec
 
-> 버전: 1.0
+> 버전: 1.1
 > 작성일: 2026-05-07
+> 최종 수정: 2026-06-12 (출시 준비도 감사 P1-1 — Phase 1.5 승격 반영)
 > 상태: Draft
 > 관련 스펙: [notification_master.md](notification_master.md)
 
@@ -99,6 +100,8 @@ class NotificationPreferences(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
 ```
+
+> 일일 발송 한도(역할별 최대 알림 수)는 [notification_master.md §2.5.2 일일 한도](notification_master.md)를 따른다.
 
 ### 3.2 NotificationPreferencesSchema (Pydantic)
 
@@ -700,9 +703,19 @@ static const notifCategoryMarketingDesc = '새 기능 안내, 이벤트';
 
 ---
 
-## 10. 구현 단계
+## 10. 구현 Phase
 
-### Phase 1 — 백엔드 (1-2일)
+### Phase 결정 (2026-06-12 출시 준비도 감사 P1-1)
+
+| 범위 | Phase | 사유 |
+|------|-------|------|
+| 마스터 토글 + 6 카테고리 토글 화면 | **Phase 1.5 (출시 전 필수)** | 설정 메뉴 진입점이 이미 앱에 노출되어 있으나 화면이 없어 #15 플레이스홀더 위반. 알림 폭주 시 사용자가 끌 수단이 푸시 전체 차단뿐이므로 채널 보호 원칙 위배 |
+| 알림 설정 Hive 영속화 | Phase 1.5 | 설정 화면과 함께 구현 |
+| DND/방해금지 시간대 직접 지정 | Phase 2 | 마스터+카테고리 토글과 분리하여 후속 구현 |
+| 알림 빈도 조절 (단계별 슬라이더) | Phase 2 | |
+| 카테고리별 리마인더 시간 세부 조정 | Phase 2 | |
+
+### Phase 1.5 구현 단계 — 백엔드 (1-2일)
 
 - [ ] `notification_preferences` DB 테이블 마이그레이션
 - [ ] `NotificationPreferences` SQLAlchemy 모델
@@ -713,7 +726,7 @@ static const notifCategoryMarketingDesc = '새 기능 안내, 이벤트';
 - [ ] 신규 사용자 기본값 자동 생성 로직
 - [ ] 단위 테스트: GET/PUT API, DND 우회 로직, 방해금지 시간대 필터
 
-### Phase 2 — Flutter 엔티티 및 Repository (1일)
+### Phase 1.5 구현 단계 — Flutter 엔티티 및 Repository (1일)
 
 - [ ] `NotificationPreferences` freezed 엔티티
 - [ ] `NotificationCategory` 열거형
@@ -723,24 +736,24 @@ static const notifCategoryMarketingDesc = '새 기능 안내, 이벤트';
 - [ ] `RemoteNotificationPreferencesRepository` (API 연동)
 - [ ] `build_runner` 코드 생성
 
-### Phase 3 — Provider 및 FCM 토픽 (1일)
+### Phase 1.5 구현 단계 — Provider 및 FCM 토픽 (1일)
 
 - [ ] `notificationPreferencesProvider`
 - [ ] `NotificationPreferencesNotifier`
 - [ ] `FcmTopicManager.syncTopics()`
 - [ ] 앱 최초 로그인 시 기본 토픽 구독 로직 연결
 
-### Phase 4 — UI (1-2일)
+### Phase 1.5 구현 단계 — UI (1-2일)
 
 - [ ] `NotificationSettingsScreen` 화면 생성
 - [ ] 마스터 스위치 위젯 (비활성 시 카테고리 섹션 회색 처리)
 - [ ] `NotificationCategoryTile` 재사용 위젯 (SwitchListTile + 설명 + DND 우회 안내)
-- [ ] 방해금지 시간대 섹션 (시간 선택 타임피커)
+- [ ] 방해금지 시간대 섹션은 Phase 2로 이월 — Phase 1.5 UI 범위에서 제외
 - [ ] 라우터 `/settings/notifications` 경로 등록
 - [ ] 프로필 탭 → 설정 메뉴에 '알림 설정' 항목 추가
 - [ ] widget smoke test
 
-### Phase 5 — 검증 (0.5일)
+### Phase 1.5 구현 단계 — 검증 (0.5일)
 
 - [ ] 카테고리 OFF → 해당 FCM 토픽 구독 해제 확인
 - [ ] 마스터 OFF → 모든 토픽 구독 해제 확인
