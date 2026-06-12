@@ -1,6 +1,6 @@
 # 수강권 일정 변경 — 턴 기반 잠금 흐름 스펙
 
-> 최종 업데이트: 2026-06-01 (E2E 감사 #7 H-002 보강)
+> 최종 업데이트: 2026-06-12 (launch-readiness audit — §8 요청 만료 정책 추가)
 > 관련 이슈: #427
 > **일괄변경 후 5주차·보강 재계산 로직 + Make-up Bank**: [../subscription/makeup_credit_spec.md](../subscription/makeup_credit_spec.md) (`Subscription.scheduledLessons` 별도 트랙, MakeupCredit 적립 트리거)
 
@@ -220,7 +220,52 @@ sequenceDiagram
 | CanRespond | 상대방 일정 변경 수신 | 이 문서 §4.3 |
 | CancellationConfirmed | 학생 취소 자동 확정 | [lesson_cancellation_flow_spec.md](lesson_cancellation_flow_spec.md) §5 |
 
-## 8. 관련 파일
+## 8. 요청 만료 정책
+
+> 추가: 2026-06-12 launch-readiness audit.
+> 배경: 기존 스펙은 Waiting/CanRespond 상태의 **시간 제한이 없어** 상대방이
+> 응답하지 않으면 영구 대기가 가능했다. 초대(`invite_lifecycle_spec.md`)와
+> 수강권 제안(`expired` 7일)은 만료를 정의했으나 일정 변경 요청만 누락.
+> 출시 후 "요청했는데 3일째 무응답 → 앱 먹통 의심" 이탈 리스크 차단 목적.
+
+### 8.1 만료 규칙
+
+| 항목 | 값 | 근거 |
+|------|-----|------|
+| 요청 유효기간 | 생성 시점부터 **72시간** | 수강권 제안 리마인더(24h/48h/72h) 주기와 일관 |
+| 리마인드 알림 | 24h 무응답 시 응답자에게 1회 (`scheduleChangeReminder`) | 알림 피로 최소화 — 1회만 |
+| 만료 임박 알림 | 60h 경과 시 **요청자에게** 1회 ("12시간 후 자동 만료") | 요청자가 철회/직접 연락 판단 기회 |
+| 만료 처리 | 72h 도달 시 자동 `expired` — 양측 Default 복귀 | 서버 배치 (초대 만료 cron 과 동일 인프라) |
+| 변경권 복원 | 요청 시점에 차감된 경우 만료 시 **자동 복원** | 무응답 페널티를 요청자가 지지 않음 |
+| 만료 후 재요청 | 즉시 가능 (쿨다운 없음) | 단, 동일 회차 3회 연속 만료 시 안내 배너 ("직접 연락을 권장해요") |
+
+### 8.2 상태 다이어그램 보강
+
+§2 다이어그램에 다음 전이가 추가된다:
+
+```
+Waiting --> Default: 72h 경과 자동 만료 (expired)
+CanRespond --> Default: 72h 경과 자동 만료 (expired)
+```
+
+### 8.3 만료 시 채팅 가이드 표시
+
+| 시점 | 표시 ([chat_guide_message_spec.md](chat_guide_message_spec.md) 패턴) |
+|------|------|
+| 만료 직후 | 시스템 말풍선 "이 변경 요청은 응답 없이 만료되었어요" (양측) |
+| 요청자 가이드 | action(primary): "다시 요청하기" 버튼 노출 |
+| 응답자 가이드 | wait(grey): 별도 액션 없음 — 히스토리 기록만 |
+
+### 8.4 이벤트 타입 추가 (§5 보강)
+
+| 이벤트 | 트리거 | 결과 상태 |
+|--------|--------|----------|
+| `scheduleChangeExpired` | 72h 무응답 배치 처리 | 양쪽 → Default, 변경권 복원 |
+| `scheduleChangeReminder` | 24h 무응답 | 상태 변화 없음 (알림만) |
+
+> 알림 카테고리: `schedule` ([push_notification_settings_spec.md](../notification/push_notification_settings_spec.md) §3.2 기본 ON) 에 포함.
+
+## 9. 관련 파일
 
 | 파일 | 역할 |
 |------|------|
