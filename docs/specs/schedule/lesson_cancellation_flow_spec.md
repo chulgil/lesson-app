@@ -97,6 +97,10 @@ sequenceDiagram
 
 ### 3.3 마감 전 취소 (크레딧 미사용)
 
+> 아래 다이어그램의 "24h" 는 **예시 값**이다. 실제 마감 기준은 수강권별
+> `effectiveCancelDeadlineHours` (기본 12h, 6~48h 설정 가능) —
+> [reschedule_credit_spec.md §3](../subscription/reschedule_credit_spec.md) 의 동적 고지 결정 참조.
+
 ```mermaid
 sequenceDiagram
     participant S as 학생

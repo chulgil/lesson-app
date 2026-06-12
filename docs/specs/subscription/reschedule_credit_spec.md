@@ -45,9 +45,18 @@
 | 선생님 | 레슨 취소 | — | X | 학생 귀책 없음 |
 | 상호 합의 | 취소 | — | X | `mutual` 사유 |
 
-**마감 기준**: 레슨 당일 기준. 정확한 시각 커트라인(`rescheduleDeadlineHours`)은 수강권별로 설정 ([subscription_edit_spec.md §5.2](./subscription_edit_spec.md)). 학생에게 노출되는 표현: "마감 24시간 전 취소는 무료" (실제 값은 수강권 정책에 따라 다를 수 있음 — 모순 주의 아래 참조).
+**마감 기준**: 수강권별 설정값 `Subscription.effectiveCancelDeadlineHours = overrideCancelDeadlineHours ?? rescheduleDeadlineHours` 가 유일한 기준이다 (기본 12h, 발급 시 6/12/24/48h 선택 + 수강권별 override — [subscription_edit_spec.md §5.2](./subscription_edit_spec.md)).
 
-> **모순 — 결정 필요**: `lesson_cancellation_flow_spec.md §3.3` 시퀀스 다이어그램은 "마감 24h 전"을 예시로 사용하고, `subscription_edit_spec.md §5.2`에는 `rescheduleDeadlineHours` 를 수강권별로 재정의할 수 있다고 명시한다. UI 고지 문구("마감 24시간 전 취소는 무료")가 수강권별 설정과 다를 경우 혼동 발생 가능 — 고지 문구를 수강권 정책에서 동적으로 읽어올지 결정 필요.
+> **결정 (2026-06-12, 모순 해소)**: 마감 고지는 **동적 고지** 로 통일한다. 24h 고정 표기는 채택하지 않음.
+>
+> | 컨텍스트 | 고지 방식 | 구현 |
+> |---------|----------|------|
+> | 수강권 존재 (상세/정책 시트/취소 흐름) | `effectiveCancelDeadlineHours` 동적 바인딩 — "N시간 전까지 · 월 M회" | 구현 완료 (`policyChangeSummary`, subscription_policy_sheet, subscription_detail_screen) |
+> | 수강권 발급 전 (레슨 요청 화면) | 구체 시간 미표기 — "마감 시간 전 취소·변경은 무료입니다. 마감 기준은 수강권 발급 시 확정돼요." | `AppStrings.cancellationPolicy` (고정 24h 문구 제거됨) |
+>
+> 사유: 발급 전 단계에서는 선생님 마감 기본값(`CancellationDefaults`)이 본인 전용 provider 라 학생에게 노출 불가 + 실제 값은 발급 시점에 확정되므로, 특정 시간을 약속하면 허위 고지가 된다.
+> `lesson_cancellation_flow_spec.md §3.3` 시퀀스 다이어그램의 "24h" 는 예시 값이며 규범이 아니다.
+> Rejected: 24h 고정 통일 — 이미 구현된 수강권별 유연성(6~48h) 폐기 + 기존 수강권 마이그레이션 필요.
 
 ---
 
