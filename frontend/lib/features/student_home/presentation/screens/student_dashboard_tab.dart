@@ -10,10 +10,11 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
+import '../../../gamification/gamification_ui_facade.dart';
+import '../../../gamification/presentation/widgets/practice_start_section.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/practice_ui_facade.dart';
-import '../../../gamification/gamification_ui_facade.dart';
 import '../providers/student_home_practice_provider.dart';
 import '../providers/student_home_session_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
@@ -55,7 +56,12 @@ class StudentDashboardTab extends ConsumerWidget {
           // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
           const NoteAccessActiveBanner(),
 
-          // Gamification header
+          // ── Student gamification P1: [연습 시작] 단일 진입점 (스펙 §4.1) ──
+          PracticeStartSection(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // Gamification header (선생님 quest / badge — P1 무변)
           GamificationHeader(
             studentId: currentStudentId,
             onTap:
