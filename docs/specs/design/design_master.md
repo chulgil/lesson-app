@@ -1370,6 +1370,8 @@ TabBar 구성: 노트 | 녹음 | 과제
 
 #### 변경권 시스템
 
+> **변경권 차감/복원 규칙 SSOT**: [reschedule_credit_spec.md](../subscription/reschedule_credit_spec.md) — 아래 표는 초기 설계 요약이며, 정책 판단은 SSOT를 우선한다. (이 문서는 DEPRECATED)
+
 수강권에 변경권 횟수 포함, 학생이 레슨 일정 변경 시 차감
 
 **변경권 사용 규칙**:

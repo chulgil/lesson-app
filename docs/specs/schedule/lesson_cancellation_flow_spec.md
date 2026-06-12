@@ -1,6 +1,7 @@
 # 레슨 취소 흐름 스펙
 
 > 최종 업데이트: 2026-05-05
+> **변경권 차감/복원 규칙 SSOT**: [reschedule_credit_spec.md](../subscription/reschedule_credit_spec.md) — 이 문서의 §7 크레딧 상태 전이표와 §6 이벤트 타입은 해당 SSOT를 보조하는 상세 시퀀스 기록이며, 정책 판단은 SSOT를 우선한다.
 
 ## 1. 개요
 
