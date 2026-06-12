@@ -88,6 +88,33 @@ void main() {
       expect(find.text('profile-tab-content'), findsNothing);
     });
 
+    testWidgets('overlay 는 기존 사용자 문구 — 변경 공지 + 기능 보존 (신규 환영 문구 X)', (
+      tester,
+    ) async {
+      // UX 카피 원칙 (2026-06-12): 같은 화면, 다른 청중 → 문구 분리.
+      // 기존 가입 선생님에게 "환영합니다!" 는 컨텍스트 오류.
+      await tester.pumpWidget(
+        buildHarness(
+          initialShown: false,
+          child: const Text('profile-tab-content'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.migrationCategoryPreviewTitle),
+        findsOneWidget,
+      );
+      expect(
+        find.text(AppStrings.migrationCategoryPreviewSubtitle),
+        findsOneWidget,
+      );
+      expect(
+        find.text(AppStrings.onboardingCategoryPreviewTitle),
+        findsNothing,
+      );
+    });
+
     testWidgets('shown==true → child 즉시 노출, overlay 없음', (tester) async {
       await tester.pumpWidget(
         buildHarness(

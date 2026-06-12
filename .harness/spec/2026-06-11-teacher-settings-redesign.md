@@ -339,21 +339,28 @@ Step 3: 메인 DashboardTab 첫 진입
 
 ### 9.2 Step 2.5 화면 시안
 
+> **2026-06-12 UX 카피 개정** — "5가지 묶음/퀘스트" 같은 내부 설계 용어가
+> 사용자(선생님)에게 노출되던 초안 문구를 사용자 가치 언어로 교체.
+> 같은 화면이 두 청중(신규 가입 Step 2.5 / 기존 사용자 W6 overlay)에게
+> 노출되므로 문구를 분리한다 (§10.1 참조).
+
 ```
-┌─ 환영합니다! 5가지 묶음으로 정리해뒀어요 ─┐
-│                                          │
-│  🕐 운영시간      🎓 수업방식             │
-│  💰 수강권·정산   👤 내 프로필            │
-│  ⚙️ 정책·알림                            │
-│                                          │
-│  나머지는 퀘스트가 안내해드려요            │
-│                                          │
-│           [시작하기]   [건너뛰기]          │
-└──────────────────────────────────────────┘
+┌─ 환영합니다! 레슨 운영 설정을 한눈에 정리했어요 ─┐
+│                                                │
+│  🕐 운영시간      🎓 수업방식                   │
+│  💰 수강권·정산   👤 내 프로필                  │
+│  ⚙️ 정책·알림                                  │
+│                                                │
+│  지금 다 하지 않아도 괜찮아요.                   │
+│  하나씩 차근차근 안내해드릴게요                   │
+│                                                │
+│           [시작하기]   [건너뛰기]                │
+└────────────────────────────────────────────────┘
 ```
 
 신규 화면: `OnboardingCategoryPreviewScreen`
 위치: `frontend/lib/features/onboarding/presentation/screens/onboarding_category_preview_screen.dart`
+문구: `AppStrings.onboardingCategoryPreview*` (신규 가입) / `AppStrings.migrationCategoryPreview*` (기존 사용자 — title/subtitle 파라미터 주입)
 
 ### 9.3 진행 추적 정합성 (SC-6)
 
@@ -392,6 +399,17 @@ Step 3: 메인 DashboardTab 첫 진입
 - Step 2.5 화면을 1회 overlay 로 재활용
 - 스킵 가능
 - `onboardingCategoryShownProvider` 영속 → 1회만 노출
+
+**문구 (2026-06-12 UX 카피 개정)** — 기존 사용자는 신규 가입자가 아니므로
+"환영합니다" 환영 인사가 아닌 **변경 공지 + 기능 보존 안심** 메시지:
+
+```
+제목: 설정 메뉴가 새로워졌어요
+부제: 자주 쓰는 설정을 다섯 가지로 정리했어요. 쓰시던 기능은 모두 그대로예요
+```
+
+`TeacherMigrationOverlayGate` 가 `AppStrings.migrationCategoryPreviewTitle/Subtitle`
+을 `OnboardingCategoryPreviewScreen` 의 title/subtitle 파라미터로 주입.
 
 ### 10.2 메뉴 NEW 배지
 

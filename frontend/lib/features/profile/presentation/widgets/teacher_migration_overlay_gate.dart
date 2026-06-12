@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../onboarding/onboarding_facade.dart'
     show OnboardingCategoryPreviewScreen, onboardingCategoryShownProvider;
 import '../providers/category_new_badge_provider.dart';
@@ -35,7 +36,11 @@ class TeacherMigrationOverlayGate extends ConsumerWidget {
     final shownAsync = ref.watch(onboardingCategoryShownProvider);
     final shown = shownAsync.valueOrNull;
     if (shown == false) {
+      // 기존 사용자 청중 — "환영합니다" 대신 변경 공지 + 기능 보존 안심 문구.
+      // UX 카피 원칙 (2026-06-12): 같은 화면, 다른 청중 → 문구 분리.
       return OnboardingCategoryPreviewScreen(
+        title: AppStrings.migrationCategoryPreviewTitle,
+        subtitle: AppStrings.migrationCategoryPreviewSubtitle,
         onProceed: () => _completeMigration(ref),
       );
     }

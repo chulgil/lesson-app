@@ -8965,12 +8965,14 @@ class AppStrings {
   static const categorySheetPolicyNotificationsTitle = '정책·알림·지원';
 
   /// "가이드 다시 보기" 메뉴 (정책·알림·지원 묶음 — W5 졸업 후 활성).
+  ///
+  /// UX 카피 원칙 (2026-06-12): 내부 용어 (퀘스트 졸업/5묶음) 대신 사용자
+  /// 가치 언어. "완료한 설정 가이드" = 사용자가 이해하는 대상.
   static const categoryGuideReplayLabel = '가이드 다시 보기';
-  static const categoryGuideReplaySubtitle = '퀘스트 졸업 후 다시 볼 수 있습니다';
-  static const categoryGuideReplayComingSoon = '가이드 다시 보기는 곧 지원될 예정입니다';
+  static const categoryGuideReplaySubtitle = '완료한 설정 가이드를 언제든 다시 확인할 수 있어요';
 
   /// "가이드 다시 보기" 화면 — Step 2.5 카테고리 미리보기 재실행 버튼 (W5 Task 5.6).
-  static const guideReshowCategoryPreviewButton = '5묶음 카테고리 미리보기 다시 보기';
+  static const guideReshowCategoryPreviewButton = '설정 안내 다시 보기';
 
   // ── LessonStyleSettingsScreen (W3 Task 3.2) ─────────────────────
   // spec §6.2 — 수업방식 묶음 (3 항목: 레슨 1회 시간 + 사전예약 + 학생 안내)
@@ -9027,12 +9029,25 @@ class AppStrings {
   // ── OnboardingCategoryPreviewScreen (W4 Task 4.2) ────────────────
   // spec §9.2 — Step 2.5 5묶음 카테고리 미리보기 1회 화면.
   // 사용처: features/onboarding/presentation/screens/onboarding_category_preview_screen.dart
+  //
+  // UX 카피 원칙 (2026-06-12): "5가지 묶음/퀘스트" 같은 내부 설계 용어 대신
+  // 사용자 가치 언어 ("레슨 운영 설정", "차근차근 안내"). 같은 화면이 두
+  // 청중에게 노출되므로 신규/기존 문구 분리 — 기존 사용자(W6 마이그레이션
+  // overlay)는 migrationCategoryPreview* 사용.
 
-  /// 화면 상단 환영 타이틀.
-  static const onboardingCategoryPreviewTitle = '환영합니다! 5가지 묶음으로 정리해뒀어요';
+  /// 화면 상단 환영 타이틀 (신규 가입 Step 2.5).
+  static const onboardingCategoryPreviewTitle = '환영합니다! 레슨 운영 설정을 한눈에 정리했어요';
 
-  /// 카테고리 그리드 아래 보조 안내 (퀘스트 안내 예고).
-  static const onboardingCategoryPreviewSubtitle = '나머지는 퀘스트가 안내해드려요';
+  /// 카테고리 그리드 아래 보조 안내 (신규 가입 Step 2.5).
+  static const onboardingCategoryPreviewSubtitle =
+      '지금 다 하지 않아도 괜찮아요. 하나씩 차근차근 안내해드릴게요';
+
+  /// 화면 상단 타이틀 (기존 사용자 — W6 마이그레이션 overlay 변경 공지).
+  static const migrationCategoryPreviewTitle = '설정 메뉴가 새로워졌어요';
+
+  /// 보조 안내 (기존 사용자 — 기능 보존 안심 메시지).
+  static const migrationCategoryPreviewSubtitle =
+      '자주 쓰는 설정을 다섯 가지로 정리했어요. 쓰시던 기능은 모두 그대로예요';
 
   /// [시작하기] CTA — markShown() + 메인 진입.
   static const onboardingCategoryPreviewStart = '시작하기';
