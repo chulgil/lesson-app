@@ -4,12 +4,34 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/lesson_booking.dart';
 import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 import 'package:lessonaza/features/auth/presentation/providers/user_role_provider.dart';
+import 'package:lessonaza/features/gamification/domain/entities/challenge.dart';
+import 'package:lessonaza/features/gamification/domain/entities/quest_origin.dart';
+import 'package:lessonaza/features/gamification/domain/entities/student_quest.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/student_quest_provider.dart';
 import 'package:lessonaza/features/lessons/presentation/providers/booking_providers.dart';
 import 'package:lessonaza/features/student_home/domain/entities/student_lesson_progress_item.dart';
 import 'package:lessonaza/features/student_home/presentation/providers/student_lesson_progress_provider.dart';
 import 'package:lessonaza/features/student_home/presentation/screens/student_dashboard_tab.dart';
 import 'package:lessonaza/features/student_home/presentation/widgets/dashboard/next_lesson_card.dart';
 import 'package:lessonaza/features/student_home/presentation/widgets/student_lesson_progress_section.dart';
+
+/// dashboard 본문 레이아웃 검증용 — onboarding trigger 가 가로채지 않도록
+/// active quest 1개를 주입한다 (trigger takeover 경로는
+/// student_gamification_onboarding_trigger_test 가 담당).
+StudentQuest _activeQuest(String studentId) {
+  final today = DateTime(2026, 6, 12);
+  return StudentQuest(
+    id: 'q1',
+    studentId: studentId,
+    origin: QuestOrigin.systemRoutine,
+    title: '스케일 5분',
+    type: ChallengeType.practiceMinutes,
+    targetValue: 5,
+    currentValue: 0,
+    startDate: today,
+    endDate: today.add(const Duration(days: 7)),
+  );
+}
 
 void main() {
   testWidgets(
@@ -25,6 +47,9 @@ void main() {
             studentLessonProgressProvider(
               'student_1',
             ).overrideWith((ref) async => const []),
+            activeQuestsProvider(
+              'student_1',
+            ).overrideWith((ref) async => [_activeQuest('student_1')]),
           ],
           child: const MaterialApp(home: Scaffold(body: StudentDashboardTab())),
         ),
@@ -99,6 +124,9 @@ void main() {
           studentLessonProgressProvider(
             studentId,
           ).overrideWith((ref) async => [item]),
+          activeQuestsProvider(
+            studentId,
+          ).overrideWith((ref) async => [_activeQuest(studentId)]),
         ],
         child: const MaterialApp(home: Scaffold(body: StudentDashboardTab())),
       ),
