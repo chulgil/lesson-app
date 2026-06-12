@@ -135,7 +135,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: onCancelLesson,
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.inkQuaternary),
+                          side: const BorderSide(
+                            color: AppColors.inkQuaternary,
+                          ),
                           shape: RoundedRectangleBorder(),
                         ),
                         child: Text(
@@ -194,19 +196,34 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     );
   }
 
+  /// Returns the latest unresolved schedule decision event.
+  ///
+  /// Excluded terminal types (Accepted/Rejected/Expired) reset the bar to
+  /// Default — the list is scanned newest-first and the first non-terminal
+  /// source event drives the bar state.
   RequestEvent? _latestScheduleDecisionEvent() {
-    final candidates =
-        events
-            .where(
-              (event) =>
-                  event.eventType == RequestEventType.scheduleChanged ||
-                  event.eventType == RequestEventType.scheduleChangeProposed ||
-                  event.eventType == RequestEventType.scheduleChangeCountered ||
-                  event.eventType == RequestEventType.scheduleChangeAccepted,
-            )
-            .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return candidates.isEmpty ? null : candidates.first;
+    // Terminal events: once one appears after a proposal/counter, the thread
+    // is resolved and the bar reverts to Default.
+    const terminalTypes = {
+      RequestEventType.scheduleChangeAccepted,
+      RequestEventType.scheduleChangeRejected,
+      // #692: 72h 만료도 양측 Default 복귀
+      RequestEventType.scheduleChangeExpired,
+    };
+    const sourceTypes = {
+      RequestEventType.scheduleChanged,
+      RequestEventType.scheduleChangeProposed,
+      RequestEventType.scheduleChangeCountered,
+    };
+
+    final sorted = events.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    for (final event in sorted) {
+      if (terminalTypes.contains(event.eventType)) return null;
+      if (sourceTypes.contains(event.eventType)) return event;
+    }
+    return null;
   }
 
   /// Latest cancellation-related event for the current session.
@@ -232,8 +249,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   }
 
   bool _isMyEvent(RequestEvent event) {
-    final actorRole =
-        event.actorType == ProposerRole.teacher ? 'teacher' : 'student';
+    final actorRole = event.actorType == ProposerRole.teacher
+        ? 'teacher'
+        : 'student';
     return actorRole == viewerRole;
   }
 }
@@ -321,17 +339,16 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
   @override
   Widget build(BuildContext context) {
     final slots = widget.event.suggestedSlots.take(3).toList();
-    final choices =
-        slots
-            .asMap()
-            .entries
-            .map(
-              (entry) => ScheduleSlotChoice(
-                priority: entry.key + 1,
-                label: entry.value.displayLabel,
-              ),
-            )
-            .toList();
+    final choices = slots
+        .asMap()
+        .entries
+        .map(
+          (entry) => ScheduleSlotChoice(
+            priority: entry.key + 1,
+            label: entry.value.displayLabel,
+          ),
+        )
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -367,10 +384,9 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
               child: SizedBox(
                 height: AppSpacing.buttonHeightSmall,
                 child: OutlinedButton(
-                  onPressed:
-                      widget.onCompare == null
-                          ? null
-                          : () => widget.onCompare!(widget.event),
+                  onPressed: widget.onCompare == null
+                      ? null
+                      : () => widget.onCompare!(widget.event),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.inkQuaternary),
                     shape: RoundedRectangleBorder(),
@@ -391,12 +407,12 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
                 child: ElevatedButton(
                   onPressed:
                       _selectedSlotIndex == null || widget.onAccept == null
-                          ? null
-                          : () => widget.onAccept!(
-                            widget.event,
-                            _selectedSlotIndex!,
-                            _messageController.text,
-                          ),
+                      ? null
+                      : () => widget.onAccept!(
+                          widget.event,
+                          _selectedSlotIndex!,
+                          _messageController.text,
+                        ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.paperAccent,
                     shape: RoundedRectangleBorder(),
@@ -455,10 +471,10 @@ class _CancellationConfirmedBar extends StatelessWidget {
         Text(
           _creditWasUsed
               ? AppStrings.cancellationCreditUsed(
-                event.changeCreditUsed ?? 1,
-                event.changeCreditRemainingAfter ??
-                    subscription.remainingReschedule,
-              )
+                  event.changeCreditUsed ?? 1,
+                  event.changeCreditRemainingAfter ??
+                      subscription.remainingReschedule,
+                )
               : AppStrings.cancellationNoCreditUsed,
           style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
         ),
@@ -470,10 +486,9 @@ class _CancellationConfirmedBar extends StatelessWidget {
                 child: SizedBox(
                   height: AppSpacing.buttonHeightSmall,
                   child: OutlinedButton(
-                    onPressed:
-                        onFreeProcess == null
-                            ? null
-                            : () => onFreeProcess!(event),
+                    onPressed: onFreeProcess == null
+                        ? null
+                        : () => onFreeProcess!(event),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.inkQuaternary),
                       shape: RoundedRectangleBorder(),
@@ -492,10 +507,9 @@ class _CancellationConfirmedBar extends StatelessWidget {
                 child: SizedBox(
                   height: AppSpacing.buttonHeightSmall,
                   child: ElevatedButton(
-                    onPressed:
-                        onAcknowledge == null
-                            ? null
-                            : () => onAcknowledge!(event),
+                    onPressed: onAcknowledge == null
+                        ? null
+                        : () => onAcknowledge!(event),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       shape: RoundedRectangleBorder(),
@@ -516,8 +530,9 @@ class _CancellationConfirmedBar extends StatelessWidget {
             width: double.infinity,
             height: AppSpacing.buttonHeightSmall,
             child: ElevatedButton(
-              onPressed:
-                  onAcknowledge == null ? null : () => onAcknowledge!(event),
+              onPressed: onAcknowledge == null
+                  ? null
+                  : () => onAcknowledge!(event),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
                 shape: RoundedRectangleBorder(),

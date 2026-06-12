@@ -624,6 +624,15 @@ class AppStrings {
   static const chatScheduleChangeRejected = '시간 변경을 거절했습니다';
   static const chatScheduleChangeCountered = '다른 시간을 역제안했습니다';
 
+  // ── Schedule Change Expiry (#692) ─────────────────────────────
+  static const chatScheduleChangeExpired = '이 변경 요청은 응답 없이 만료되었어요';
+  static const eventScheduleChangeExpired = '일정 변경 만료';
+  static const scheduleChangeExpiredRequesterAction = '다시 요청하기';
+  static const scheduleChangeExpiredBannerTitle = '직접 연락을 권장해요';
+  static const scheduleChangeExpiredBannerBody =
+      '같은 회차에서 일정 변경 요청이 3회 연속 만료되었습니다. '
+      '선생님께 직접 연락해 일정을 조율해 보세요.';
+
   // ── Schedule Change Event Labels ─────────────────────────────
   static const eventScheduleChangeProposed = '시간 변경 제안';
   static const eventScheduleChangeAccepted = '시간 변경 수락';

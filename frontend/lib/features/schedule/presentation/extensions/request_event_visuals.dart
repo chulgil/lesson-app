@@ -55,6 +55,10 @@ extension RequestEventTypeVisualX on RequestEventType {
         return AppStrings.eventScheduleChangeRejected;
       case RequestEventType.scheduleChangeCountered:
         return AppStrings.eventScheduleChangeCountered;
+      case RequestEventType.scheduleChangeExpired:
+        return AppStrings.eventScheduleChangeExpired;
+      case RequestEventType.scheduleChangeReminder:
+        return '';
       case RequestEventType.message:
         return '';
       case RequestEventType.lessonCancellationConfirmed:
@@ -123,6 +127,10 @@ extension RequestEventVisualX on RequestEvent {
         return AppStrings.chatScheduleChangeRejected;
       case RequestEventType.scheduleChangeCountered:
         return AppStrings.chatScheduleChangeCountered;
+      case RequestEventType.scheduleChangeExpired:
+        return AppStrings.chatScheduleChangeExpired;
+      case RequestEventType.scheduleChangeReminder:
+        return '';
       case RequestEventType.message:
         return message ?? '';
       case RequestEventType.lessonCancellationConfirmed:

@@ -60,8 +60,9 @@ enum RequestPhase {
   terminal, // 거절/취소/만료
 }
 
-/// Who proposed the time slot
-enum ProposerRole { student, teacher }
+/// Who proposed the time slot.
+/// [system] is used for batch-generated events (e.g. scheduleChangeExpired — #692).
+enum ProposerRole { student, teacher, system }
 
 /// Action type in a time proposal
 enum ProposalAction { propose, accept, reject, counterPropose }
@@ -235,7 +236,8 @@ class UnifiedLessonRequest {
   final String? academyId;
 
   // v5.0: 학생 희망 레슨 장소 (수강권 발급 시 디폴트로 전달)
-  final String? preferredLocationType; // "studentHome" | "academyRoom" | "teacherStudio" | "externalPlace" | "online"
+  final String?
+  preferredLocationType; // "studentHome" | "academyRoom" | "teacherStudio" | "externalPlace" | "online"
 
   UnifiedLessonRequest({
     required this.id,

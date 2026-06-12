@@ -540,6 +540,8 @@ const _pendingScheduleChangeSourceTypes = {
 const _pendingScheduleChangeTerminalTypes = {
   RequestEventType.scheduleChangeAccepted,
   RequestEventType.scheduleChangeRejected,
+  // #692: 72h 만료 시 양측 Default 복귀
+  RequestEventType.scheduleChangeExpired,
 };
 
 String _scheduleChangeThreadKey(RequestEvent event) {
