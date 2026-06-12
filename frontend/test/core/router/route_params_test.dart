@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/core/router/routes/schedule_routes.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
@@ -15,6 +16,7 @@ import 'package:lessonaza/features/auth/auth_facade.dart'
     show currentUserIdProvider;
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/teacher_availability_split_page.dart';
+import 'package:lessonaza/features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 
 void main() {
   const realUserId = 'uuid-real-teacher-42';
@@ -75,4 +77,46 @@ void main() {
     );
     expect(page.teacherId, 'explicit-teacher');
   });
+
+  // #708 — lessonBooking (UnifiedLessonRequest) 은 학생→대상 선생님 (타인)
+  // 컨텍스트라 #703 식 currentUser 자동 치환이 부적절. teacherId 누락 시
+  // 'teacher_1' 폴백/자동 치환 모두 금지 — 안내 화면으로 silent fail 차단.
+  testWidgets('lessonBooking — Map push 시 teacherId 누락이면 안내 화면 (#708)', (
+    tester,
+  ) async {
+    final router = await pumpRouter(tester);
+
+    router.push(
+      AppRoutes.lessonBooking,
+      extra: <String, dynamic>{'teacherName': '선생님'},
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(AppStrings.cannotLoadData),
+      findsOneWidget,
+      reason: "타인 대상 컨텍스트라 currentUser 자동 치환은 학생 본인 ID 가 수신자 자리에 들어가는 더 나쁜 버그",
+    );
+    expect(find.byType(UnifiedLessonRequestScreen), findsNothing);
+  });
+
+  testWidgets(
+    'lessonBooking — UnifiedLessonRequestParams.teacherId 가 빈 문자열이면 안내 화면 (#708)',
+    (tester) async {
+      final router = await pumpRouter(tester);
+
+      router.push(
+        AppRoutes.lessonBooking,
+        extra: const UnifiedLessonRequestParams(
+          teacherId: '',
+          teacherName: '',
+          teacherInstruments: [],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.cannotLoadData), findsOneWidget);
+      expect(find.byType(UnifiedLessonRequestScreen), findsNothing);
+    },
+  );
 }

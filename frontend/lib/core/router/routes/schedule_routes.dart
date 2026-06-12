@@ -38,32 +38,49 @@ List<GoRoute> scheduleRoutes = [
   ),
 
   // Unified Lesson Request (replaces LessonBookingScreen + LessonRequestScreen)
+  //
+  // 2026-06-12 #708 — teacherId 'teacher_1' 폴백 제거.
+  // 이 라우트는 학생→대상 선생님 (타인) 컨텍스트라 #703 식 currentUser
+  // 자동 치환이 부적절하다 (학생 본인 ID 가 수신자 자리에 들어가는 더
+  // 나쁜 버그). 호출처 6곳 전수 확인 결과 모두 teacherId 를 명시 push
+  // 하므로, 누락 시에는 안내 화면을 노출해 silent fail 을 막는다.
   GoRoute(
     path: AppRoutes.lessonBooking,
     name: 'lessonBooking',
     builder: (context, state) {
       final extra = state.extra;
       if (extra is UnifiedLessonRequestParams) {
+        if (extra.teacherId.isEmpty) {
+          return const NotebookScreenScaffold(
+            body: Center(child: Text(AppStrings.cannotLoadData)),
+          );
+        }
         return UnifiedLessonRequestScreen(params: extra);
       }
-      // Fallback: construct params from map (backward compatibility)
+      // Backward compatibility: Map → Params 변환 (teacherId 필수)
       final map = extra as Map<String, dynamic>?;
+      final teacherId =
+          (map?['teacherId'] as String?) ??
+          state.uri.queryParameters['teacherId'] ??
+          '';
+      if (teacherId.isEmpty) {
+        return const NotebookScreenScaffold(
+          body: Center(child: Text(AppStrings.cannotLoadData)),
+        );
+      }
       return UnifiedLessonRequestScreen(
         params: UnifiedLessonRequestParams(
-          teacherId:
-              map?['teacherId'] ??
-              state.uri.queryParameters['teacherId'] ??
-              'teacher_1',
+          teacherId: teacherId,
           teacherName:
-              map?['teacherName'] ??
+              (map?['teacherName'] as String?) ??
               state.uri.queryParameters['teacherName'] ??
-              '선생님',
+              '',
           teacherInstruments:
-              (map?['teacherInstruments'] as List<String>?) ?? ['바이올린'],
-          isReturningStudent: map?['isReturningStudent'] ?? false,
-          previousInstrument: map?['previousInstrument'],
-          previousDay: map?['previousDay'],
-          previousTime: map?['previousTime'],
+              (map?['teacherInstruments'] as List<String>?) ?? const [],
+          isReturningStudent: (map?['isReturningStudent'] as bool?) ?? false,
+          previousInstrument: map?['previousInstrument'] as String?,
+          previousDay: map?['previousDay'] as int?,
+          previousTime: map?['previousTime'] as String?,
         ),
       );
     },
