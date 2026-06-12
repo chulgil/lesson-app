@@ -417,10 +417,30 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 ---
 
+## 14. 프로필 5묶음 IA (Teacher Settings Redesign) — 2026-06-12
+
+선생님 프로필 탭 11개 메뉴를 5묶음 카테고리 IA 로 통합. **`profile_master.md §2.1` 채택**.
+
+| 한글 | 영문 | 정의 | 사용 금지 표현 |
+|------|------|------|---------------|
+| 운영시간 | Operating Hours | 선생님이 가르치는 요일별 시간대 + 쉬는시간 + 휴무 + 휴가. `TeacherAvailability` 엔티티 단일 SSOT | 가용시간, 가용 슬롯, available slot, 레슨 시간 설정 |
+| 수업방식 | Lesson Style | 레슨 1회 시간 + 사전예약 규칙 + 학생 안내 메시지. `TeacherSettings.lesson*` 필드 | 수업설정, 레슨방식, 수업 옵션 |
+| 수강권·정산 | Subscription & Billing | 수강권 템플릿 + 가격표 + 시험레슨 정책 + 계좌. 5묶음 §8 BottomSheet 진입 | 결제 (개별 용어는 OK), 빌링 |
+| lessonDurationMinutes | — | 레슨 1회 시간 (분). 기본값 50. `TeacherSettings` 필드 | defaultLessonDuration, slotDurationMinutes |
+| 카테고리 미리보기 | Category Preview | 가입 직후 Step 2.5 (`OnboardingCategoryPreviewScreen`) — 5묶음 인지 1회 화면. W6 에서 기존 가입자 마이그레이션 overlay 로 재활용 | 카테고리 가이드, 5묶음 가이드 |
+| 퀘스트 졸업 | Quest Graduation | Q1~Q10 100% 완료 시점 (`User.quest_celebrated_at`) + 7일 grace (`kQuestGraduationGrace`) 후 메인에서 hide. "⚙️ 정책·알림·지원 → 가이드 다시 보기" 로 재노출 | 퀘스트 완료 (개별 quest 완료와 구분), 퀘스트 dismiss |
+
+**관련 스펙**: [profile_master.md §2.1](profile/profile_master.md), [availability_settings_ux_redesign_spec.md](schedule/availability_settings_ux_redesign_spec.md), [teacher_quest_audit_2026-06-08.md §6~§7](design/teacher_quest_audit_2026-06-08.md), [teacher_first_availability_setup.md §3.3](onboarding/teacher_first_availability_setup.md).
+
+> 상세 (FE 클래스 매핑 포함): `.harness/knowledge/glossary.md §14`.
+
+---
+
 ## 용어 변경 이력
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-12 | 가용시간 (메뉴 라벨), 레슨 시간 설정 (메뉴 라벨) | §14 프로필 5묶음 IA — 운영시간 / 수업방식 / 수강권·정산 / lessonDurationMinutes / 카테고리 미리보기 / 퀘스트 졸업 | teacher-settings-redesign 머지 — 11개 메뉴 → 5묶음 IA 통합 + 졸업 메커니즘 (.harness glossary §14 동기화) |
 | 2026-06-11 | — | §13 학생 게이미피케이션 — StudentQuest / QuestOrigin / GrowthHeatmap / DailyPractice + [연습 시작] 1버튼 / 1.5초 축하 / 자가 연습 전용 모드 (14세 미만) | 학생 자가 연습 80% 가시화 (.harness/knowledge/glossary.md §15 동기화) |
 | 2026-06-08 | — | §12 퀘스트 시스템 — 3 그룹 (profile/operation/bonus) + Lock 매트릭스 + 자동 완료 + 축하 카드 (1회성) + 가입 직후 첫 도착 | 선생님 퀘스트 재정의 (.harness/knowledge/glossary.md §13 동기화) |
 | 2026-06-04 | — | ContextSwitchLog / AcademyDelegation / AcademyDelegationAction / AcademyActivityLog + 5 enum + 권한 계층 정책 5종 | AC-M1 그룹 B BE 권한 계층 (.harness glossary §12 동기화) |

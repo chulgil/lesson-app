@@ -1,9 +1,15 @@
 # 설정 정보 아키텍처 (IA) 스펙
 
-> 작성일: 2026-05-18
+> 작성일: 2026-05-18 (2026-06-12 — 5묶음 IA 상위 매핑 명시)
 > 상태: 활성 (마스터 SSOT)
 > 우선: 🟠 HIGH (출시 후 1개월)
-> 관련: [event_tracking_spec.md](../analytics/event_tracking_spec.md), [crashlytics_spec.md](../architecture/crashlytics_spec.md), [account_lifecycle_spec.md](../user/account_lifecycle_spec.md), [account_recovery_spec.md](../user/account_recovery_spec.md)
+> 관련: [profile_master.md §2.1](../profile/profile_master.md) (5묶음 IA 상위 진입), [event_tracking_spec.md](../analytics/event_tracking_spec.md), [crashlytics_spec.md](../architecture/crashlytics_spec.md), [account_lifecycle_spec.md](../user/account_lifecycle_spec.md), [account_recovery_spec.md](../user/account_recovery_spec.md)
+
+> **2026-06-12 — 5묶음 IA 상위 매핑** (teacher-settings-redesign 머지)
+>
+> 본 IA 는 **ProfileTab 5묶음 카테고리 IA** (`profile_master.md §2.1`) 의 **§10 ⚙️ 정책·알림·지원 BottomSheet** 진입 후 세부 IA 다.
+> 즉 1단계 가시 옵션 7개 (§3) 는 모두 5묶음의 §10 항목 안에서 노출되며, ProfileTab 메인에는 단일 카드 ("⚙️ 정책·알림·지원 — 기본값") 로 흡수.
+> 다른 5묶음 카테고리 (운영시간/수업방식/수강권·정산/내 프로필) 는 본 IA 와 별개의 독립 화면 또는 BottomSheet 로 처리.
 
 ---
 
@@ -11,7 +17,7 @@
 
 설정 화면 정보 아키텍처 통합 SSOT. 13+ 옵트아웃/프라이버시 토글이 설정 화면 곳곳에 흩어진 문제를 해결한다.
 
-**핵심 변경**: "내 데이터 · 프라이버시" 단일 허브 도입 + 토글 통합 + 그룹 재정렬.
+**핵심 변경**: "내 데이터 · 프라이버시" 단일 허브 도입 + 토글 통합 + 그룹 재정렬. (2026-06-12 보강: 5묶음 IA §10 BottomSheet 진입)
 
 ---
 

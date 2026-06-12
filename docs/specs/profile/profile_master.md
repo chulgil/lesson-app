@@ -21,7 +21,10 @@
 
 ## 2. 화면 구조
 
-### 2.1 선생님 프로필 탭 (TO-BE)
+### 2.1 선생님 프로필 탭 (TO-BE — 5묶음 IA, 2026-06-12 채택)
+
+teacher-settings-redesign 머지 결과 — 11개 메뉴를 5묶음 카테고리 IA 로 통합.
+근거: `.harness/spec/2026-06-11-teacher-settings-redesign.md` §3 + §7.2.
 
 **순서**:
 
@@ -30,14 +33,25 @@
 | 1 | 프로필 헤더 | 이름, 악기, 소개 |
 | 2 | **⭐ 프로필 미리보기 CTA** | [🎭 내 프로필 미리보기 →] 버튼 (최상단) |
 | 3 | **⭐ 통계 (학생·레슨·입금대기(후불))** | 팔로워 → 입금대기(후불)로 교체 |
-| 4 | **⭐ 프로필 완성도 게이지** | 0~100%, 다음 단계 안내 |
+| 4 | **⭐ 프로필 완성도 게이지** | 0~100% (퀘스트 100% = 게이지 100% — `teacher_quest_audit_2026-06-08.md` §9.3) |
 | 5 | **⭐ 자주 쓰는 설정 (3개 카드)** | 가용시간 · 입금대기(후불) · 수강권 템플릿 |
-| 6 | 💳 수강권·입금 | (상단 이동) |
-| 7 | 🎵 레슨 운영 | |
-| 8 | 📝 내 소개 | |
-| 9 | 👥 소셜 | |
-| 10 | ⚙️ 설정 | |
-| 11 | 🛟 지원·계정 | |
+| 6 | **🕐 운영시간** | `TeacherAvailabilitySplitPage` 직접 라우트 (`features/schedule/`) |
+| 7 | **🎓 수업방식** | `LessonStyleSettingsScreen` 직접 라우트 (W3) |
+| 8 | **💰 수강권·정산** | 행 탭 → BottomSheet (수강권 템플릿 · 입금대기 · 입금 계좌) |
+| 9 | **👤 내 프로필** | `BasicInfoEditScreen` 직접 라우트 |
+| 10 | **⚙️ 정책·알림·지원** | 행 탭 → BottomSheet (정책 · 템플릿 · 알림 · 녹음 · 공개 · 지원 · 계정) |
+
+**카드 상태 라벨** (§11.1):
+- 운영시간: 슬롯+쉬는시간 → "설정완료" / 부분 → "미설정" 노란 점
+- 수업방식: 3 항목 (`lessonDurationMinutes` · `minBookingHours` · `bookingGuidanceMessage`) → "N/3 항목"
+- 수강권·정산: 가격표+계좌 → "설정완료" / 부분 → 노란 점
+- 내 프로필: 이름·사진·악기 → "N/M 항목"
+- 정책·알림·지원: 항상 "기본값" (선택적 설정)
+
+**마이그레이션 (기존 가입자)** — `teacher-settings-redesign.md` §10:
+- ProfileTab 첫 진입 시 `OnboardingCategoryPreviewScreen` 1회 overlay 재활용
+- 새 5묶음 카드에 NEW 점 7일 표시 (`category_new_badge_provider`, `kCategoryNewBadgeWindow = 7d`)
+- 한 번 카드 진입 시 즉시 dismiss
 
 ### 2.2 프로필 완성도 게이지 (신규)
 
@@ -87,13 +101,18 @@
 ## 3. 기존 화면 (유지)
 
 - **ProfilePreviewScreen**: 공개 프로필 미리보기 (학생 뷰)
-- **BasicInfoEditScreen**: 기본 정보 편집
+- **BasicInfoEditScreen**: 기본 정보 편집 (5묶음 §9 진입점)
 - **ExtendedProfileScreen**: 확장 프로필 (경력·자격·학력)
-- **BankAccountEditScreen**: 계좌 관리
+- **BankAccountEditScreen**: 계좌 관리 (5묶음 §8 BottomSheet 진입점)
 - **Subscription status views**: 수강권 입금 상태 확인 (독립 결제 기능 아님)
 - **TipTemplateManagementScreen**: 피드백 템플릿
-- **LessonTimeSettingsScreen**: 레슨 시간 설정
-- **TeacherAvailabilityScreen**: 가용시간 관리
+- **TeacherAvailabilitySplitPage**: 운영시간 (5묶음 §6 진입점, `features/schedule/`)
+- **LessonStyleSettingsScreen** (신규, W3): 수업방식 — `lessonDurationMinutes` + `minBookingHours` + `bookingGuidanceMessage` (5묶음 §7)
+- **PriceTableScreen** (신규, W3): 가격표 — `LessonTimeSettingsScreen §6` 에서 분리 (5묶음 §8 BottomSheet 진입)
+- **OnboardingCategoryPreviewScreen** (신규, W4): Step 2.5 5묶음 미리보기 (가입 직후 1회) + W6 마이그레이션 overlay 재활용
+
+**Deprecated**:
+- ~~LessonTimeSettingsScreen~~ — 2026-06 5묶음 IA 채택으로 라우트 deprecated. 가격표는 PriceTableScreen, 수업방식은 LessonStyleSettingsScreen 으로 분리.
 
 ---
 

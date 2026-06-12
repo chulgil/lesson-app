@@ -217,3 +217,79 @@ role_select → profile_setup (이름·악기·사진·소개) → first_availab
 ---
 
 **평가 의견**: 현재 시스템은 11개 퀘스트가 모두 "구현"은 됐지만 시스템 차원에서 **정신 모델 충돌(목적 모호) + SSOT 위반(Q1) + 가입 흐름 비연계(자동 완료 미작동)** 3대 문제를 안고 있음. 코드 라인 단위 수정으로 해결 불가 — 기획 차원의 재정의가 선행되어야 함.
+
+---
+
+## 6. 졸업 메커니즘 (2026-06-12 — W5 구현 결과)
+
+teacher-settings-redesign W5 머지로 Q1~Q10 100% 완료 시 자동 hide + 7일 grace + 재노출 메뉴 구현.
+
+### 6.1 졸업 판정
+
+`quest_celebrated_at` 컬럼의 의미를 재정의:
+- **이전**: 축하 카드 dismiss 시각
+- **현재 (W5)**: **Q1~Q10 전체 100% 완료 시각** (졸업 시각 SSOT)
+
+판정 시 `QuestNotifier` 가 모든 퀘스트의 status==completed 를 확인하고 `quest_celebrated_at` 을 PATCH.
+`questBonusShownProvider` (FE 영속) — 축하 카드 1회 노출 여부 별도 관리 (졸업과 분리).
+
+### 6.2 7일 Grace + Hide
+
+`kQuestGraduationGrace = Duration(days: 7)` (`frontend/lib/core/constants/durations.dart`).
+
+```
+quest_celebrated_at 기준:
+  - 0 ~ 7일 → QuestBoardCard "졸업했어요 🎉" 모드 (graduated 라벨 + 게이지 100%)
+  - 7일+ → 메인에서 완전 hide (QuestCelebrationState.graduated)
+```
+
+`QuestCelebrationState` enum 두 분기 (`visible` / `graduated`) — W5 Task 5.3.
+
+### 6.3 재노출
+
+"⚙️ 정책·알림·지원 → 가이드 다시 보기" 메뉴 (`GuideReshowScreen`, W5 Task 5.6) 로 졸업한 보드를 사용자 임의 재노출.
+
+---
+
+## 7. 게이지 1:1 정합성 (2026-06-12 — W5 Task 5.5)
+
+프로필 완성도 게이지 (`profile_master.md §2.2`) 와 퀘스트 완료율을 **1:1 매핑**.
+
+### 7.1 수식
+
+```
+computeProfileCompletionPercent = Σ(완료 퀘스트 가중치)
+  Q1 가용시간:        15%
+  Q2 수강권 템플릿:    10%
+  Q3a 프로필 사진:    20%
+  Q3b 자기소개:        6%  (W5 Task 5.5 신규 추가)
+  Q4 악기:            15%
+  Q5 입금 계좌:        10%
+  Q6 경력·학력:        10%
+  Q7~Q10 (탐색):      14%
+  ───────────────────
+  합계:              100%
+```
+
+가중치 합 100 보장 (`teacher_profile_completion_provider_test`).
+
+### 7.2 1:1 정합성
+
+```
+퀘스트 10개 100% 완료 ⇔ 게이지 100% ⇔ quest_celebrated_at 기록 ⇔ 7일 grace 시작
+```
+
+회귀 테스트: `teacher_profile_completion_provider_test` + `quest_board_card_test`.
+SC-6 검증 통과 (teacher-settings-redesign §2 SC-6).
+
+---
+
+## 8. 관련 구현 산출물
+
+- `core/constants/durations.dart` — `kQuestGraduationGrace`
+- `features/profile/presentation/providers/teacher_profile_completion_provider.dart` — Q3b 6% 추가
+- `features/home/presentation/widgets/quest_board_card.dart` — graduated 모드
+- `features/profile/presentation/screens/guide_reshow_screen.dart` — 재노출 진입점
+- `features/profile/presentation/providers/quest_bonus_shown_provider.dart` — 축하 카드 1회 노출 영속
+
+PR: [#686](https://github.com/chulgil/lesson-app/pull/686) (W5).

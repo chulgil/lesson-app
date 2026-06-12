@@ -1,7 +1,14 @@
 # 레슨 정책 설정 시스템
 
-> 작성일: 2026-01-25
+> 작성일: 2026-01-25 (2026-06-12 — 시험 레슨 정책 위치 명시)
 > 상태: 📋 설계 중
+
+> **2026-06-12 — 시험 레슨 정책 위치** (teacher-settings-redesign O1)
+>
+> `TrialLessonPolicy` (시험 레슨 정책 — `TeacherSettings.trialLessonFree` 등) 는 **`SubscriptionTemplatesScreen` 의 §6.3 가격표 섹션** 안에 배치.
+> 이전 위치 `LessonTimeSettingsScreen §5` 는 5묶음 IA (`profile_master.md §2.1`) 채택과 함께 라우트 deprecated.
+> 진입점: ProfileTab §8 (💰 수강권·정산) BottomSheet → "수강권 템플릿" → 가격표 섹션 (§6.3).
+> SSOT 필드: `TeacherSettings.trialLessonFree` (boolean). 가격표와 함께 표시되어 시험 레슨 = 수강권 결제 흐름의 일부임을 명확히 함.
 
 ---
 

@@ -1,10 +1,17 @@
 # 가용시간 설정 UX 재설계 스펙
 
-> 작성일: 2026-03-12 (2026-06-01 — E2E 감사 #9 C-G2 보강)
+> 작성일: 2026-03-12 (2026-06-01 — E2E 감사 #9 C-G2 보강 / 2026-06-12 — 5묶음 IA 라벨 통일)
 > 도메인: schedule
 > 상태: ✅ 구현 완료 (TeacherAvailabilitySplitPage — Split 레이아웃 + 실시간 미리보기, 2026-06-06)
 > 관련 이슈: #429
-> 관련 문서: [schedule_master.md §2](schedule_master.md), [teacher_first_availability_setup.md](../onboarding/teacher_first_availability_setup.md) (간소 진입)
+> 관련 문서: [schedule_master.md §2](schedule_master.md), [teacher_first_availability_setup.md](../onboarding/teacher_first_availability_setup.md) (간소 진입), [profile_master.md §2.1](../profile/profile_master.md) (5묶음 IA §6 진입점)
+
+> **2026-06-12 — 라벨/SSOT 통일** (teacher-settings-redesign 머지)
+>
+> - **화면 제목**: "가용시간" → **"운영시간"** 으로 통일. `AppStrings.categoryOperatingHours = '운영시간'` 단일 i18n key.
+> - **SSOT**: `TeacherAvailability` 엔티티 (요일별 시간대 + 쉬는시간 + 임시 휴무/휴가). profile 의 `TeacherSettings.availableSlots` 는 `@Deprecated` — W1 마이그레이션 (`teacher_settings_migration.dart`) 이 부팅 시 1회 schedule 로 옮기고 SSOT 우선.
+> - **5묶음 IA 진입점**: ProfileTab §6 카드 ("🕐 운영시간") → 본 화면 직접 라우트.
+> - **카드 상태 라벨**: 슬롯 1개+ AND `breakTimeBetweenLessons > 0` → "설정완료" / 슬롯만 → "쉬는시간 미설정" / 슬롯 0 → "미설정" (`category_status_provider.dart::operatingHours`).
 
 ## 문제점
 
