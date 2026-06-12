@@ -6,6 +6,7 @@ import '../../../features/profile/presentation/screens/instrument_management_scr
 // W2 Task 2.5: lesson_time_settings_screen import 제거됨.
 // 라우트는 redirect 로 대체 (W3 에서 화면 파일 자체 해체).
 import '../../../features/profile/presentation/screens/lesson_style_settings_screen.dart';
+import '../../../features/profile/presentation/screens/price_table_screen.dart';
 import '../../../features/profile/presentation/screens/repertoire_management_screen.dart';
 import '../../../features/profile/presentation/screens/feedback_template_management_screen.dart';
 import '../../../features/profile/presentation/screens/tip_template_management_screen.dart';
@@ -56,6 +57,14 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.lessonStyleSettings,
     name: 'lessonStyleSettings',
     builder: (context, state) => const LessonStyleSettingsScreen(),
+  ),
+
+  // Price Table — W3 Task 3.3 (수강권·정산 묶음, 가격표)
+  // spec §6.3 — LessonTimeSettingsScreen §6 가격표 섹션 분리.
+  GoRoute(
+    path: AppRoutes.priceTable,
+    name: 'priceTable',
+    builder: (context, state) => const PriceTableScreen(),
   ),
 
   // Tip Template Management

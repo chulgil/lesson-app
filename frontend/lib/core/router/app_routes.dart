@@ -88,6 +88,11 @@ class AppRoutes {
   /// spec §6.2 — `LessonStyleSettingsScreen` 진입로.
   /// 3 항목: 레슨 1회 시간 + 최소 사전예약 + 학생 안내 메시지.
   static const lessonStyleSettings = '/profile/lesson-style';
+
+  /// 💰 가격표 화면 (W3 Task 3.3).
+  /// spec §6.3 — `PriceTableScreen` 진입로.
+  /// `LessonTimeSettingsScreen` §6 가격표 섹션을 분리.
+  static const priceTable = '/profile/price-table';
   static const tipTemplateManagement = '/profile/templates';
   static const feedbackTemplateManagement = '/profile/feedback-templates';
   static const extendedProfile = '/profile/extended';

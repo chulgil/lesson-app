@@ -3367,8 +3367,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5849,9 +5849,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5988,11 +5989,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -8947,4 +8949,30 @@ class AppStrings {
   /// 학생 안내 메시지 섹션 보조 설명 (빈 입력 → 기본 메시지 fallback 안내).
   static const lessonStyleGuidanceHint =
       '예약 시 학생에게 보내는 안내입니다. 비우면 기본 메시지가 사용됩니다';
+
+  // ── PriceTableScreen (W3 Task 3.3) ───────────────────────────────
+  // spec §6.3 — 악기·레벨별 가격표 (LessonTimeSettingsScreen §6 에서 분리).
+  // 사용처: features/profile/presentation/screens/price_table_screen.dart
+
+  /// AppBar 제목.
+  static const priceTableScreenTitle = '가격표';
+
+  /// 섹션 헤더 (수강권·정산 BottomSheet ListTile 라벨과 동일).
+  static const priceTableSection = '레슨 가격표';
+
+  /// 섹션 보조 설명 (가격 입력 안내).
+  static const priceTableDescription = '악기별 레벨에 따른 1회 레슨 가격을 설정하세요.';
+
+  /// 악기 미등록 시 empty 안내 (선등록 유도).
+  static const priceTableEmptyInstruments = '악기를 먼저 설정하면 가격표를 입력할 수 있습니다.';
+
+  /// 가격 입력 다이얼로그 필드 라벨.
+  static const priceTableDialogFieldLabel = '1회 레슨 가격 (원)';
+
+  /// 가격 입력 다이얼로그 제목 — "$instrument $levelLabel 가격".
+  static String priceTableDialogTitle(String instrument, String levelLabel) =>
+      '$instrument $levelLabel 가격';
+
+  /// BottomSheet 내 가격표 진입 ListTile 부제목.
+  static const priceTableMenuSubtitle = '악기별 레벨에 따른 1회 레슨 가격';
 }

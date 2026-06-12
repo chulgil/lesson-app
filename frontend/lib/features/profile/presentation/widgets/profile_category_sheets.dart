@@ -64,6 +64,17 @@ void showSubscriptionBillingSheet(BuildContext context, String teacherId) {
                   context.push(AppRoutes.bankAccountEdit);
                 },
               ),
+              // W3 Task 3.3 — 가격표 분리 화면 진입.
+              // spec §6.3 — LessonTimeSettingsScreen §6 가격표 분리.
+              ListTile(
+                leading: const Icon(Icons.attach_money_outlined),
+                title: const Text(AppStrings.priceTableSection),
+                subtitle: const Text(AppStrings.priceTableMenuSubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.priceTable);
+                },
+              ),
               ListTile(
                 leading: const Icon(Icons.shield_outlined),
                 title: const Text(AppStrings.profileCancelPolicyLabel),
