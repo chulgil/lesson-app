@@ -104,7 +104,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Drag the announcement card to reveal swipe action.
-      await tester.drag(find.text('6월 둘째 주 일정 안내드립니다.'), const Offset(200, 0));
+      // 2026-06-12 방향 정책 — 관리(삭제) 액션은 우→좌 스와이프.
+      await tester.drag(find.text('6월 둘째 주 일정 안내드립니다.'), const Offset(-200, 0));
       await tester.pumpAndSettle();
 
       expect(find.text(AppStrings.swipeActionDelete), findsOneWidget);
