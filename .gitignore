@@ -138,6 +138,8 @@ frontend/logs/
 **/.claude/settings.local.json
 **/.claude/harness-signals/
 .claude/worktrees/
+.claude/hooks/archive/
+.claude/rules/archive/
 .worktrees/
 backend/test.db
 .serena/project.yml
