@@ -1,8 +1,8 @@
 # 전화인증 정책 스펙 (Phone Verification Policy)
 
 > 작성일: 2026-06-01
-> 개정: 2026-06-02 — 역할별 차등 정책 추가 (만 14세 검증 갭 보완)
-> 상태: 스펙 v1.1
+> 개정: 2026-06-12 — E3 게이트 "나중에" 복구 경로 명세 (launch-readiness audit P1-2)
+> 상태: 스펙 v1.2
 > 출처: E2E 감사 Top 10 #10 A-C2 — `docs/specs/review/2026-06-01-teacher-e2e/30-gap-catalog.md`
 > 관련 이슈: #430
 > 관련 스펙: [user_master.md §2 가입 흐름](user_master.md), [teacher_onboarding_v3_spec.md §3 Phase C](../onboarding/teacher_onboarding_v3_spec.md), [subscription/subscription_master.md](../subscription/subscription_master.md)
@@ -232,6 +232,64 @@ E3 진입 직전 미인증 시:
 
 "나중에" 선택 시 수강권 제안은 `paymentRequested` 상태로 유지되나 발급 단계 불가.
 
+### 4.4 "나중에" 선택 시 제안 임시저장 (draft 보관)
+
+> launch-readiness audit P1-2 대응 — 제안 유실 방지
+
+선생님 동기 최고점(학생이 기다리는 중)에 수강권 제안을 입력하다가 E3 게이트에서 "나중에"를 선택하면, 입력 중이던 제안 내용이 유실되어 전환율이 하락한다. 이를 방지하기 위해 draft를 로컬 저장하고 복구 경로를 제공한다.
+
+#### 임시저장 대상
+
+| 항목 | 설명 |
+|---|---|
+| 선택한 템플릿 | 수강권 템플릿 ID 또는 커스텀 구분 |
+| 금액 | 입력 중이던 금액 (원) |
+| 횟수 | 입력 중이던 레슨 횟수 |
+| 대상 학생 | 선택된 학생 ID |
+| 저장 시각 | draft 생성 타임스탬프 |
+
+#### 저장 방식 및 유효기간
+
+- 저장 위치: 기기 로컬 저장소 (SharedPreferences / SecureStorage — 서버 저장 불필요)
+- 유효기간: **7일** (수강권 제안 만료 주기와 일관)
+- 유효기간 초과 시 draft 자동 폐기. 복구 배너 미노출.
+
+#### 게이트 모달 동작 변경
+
+| 선택 | 기존 동작 | 변경 후 동작 |
+|---|---|---|
+| "지금 인증하기" | 전화인증 흐름 진입 | 변경 없음 |
+| "나중에 — 수강권 발급 보류" | 발급 화면 이탈 | draft 저장 → 발급 화면 입력값 유지 (화면 유지 시) 또는 발급 화면 이탈 (이탈 선택 시) + draft 보관 |
+
+"나중에"를 선택한 직후에는 발급 화면을 유지하여 선생님이 이어서 작업하거나 앱을 나갈 수 있도록 한다. 앱에서 이탈하더라도 draft는 로컬에 보관된다.
+
+### 4.5 draft 복구 경로
+
+전화인증 완료 후 또는 수강권 발급 화면 재진입 시, 유효한 draft가 있으면 복구 배너를 표시한다.
+
+#### 복구 배너 (action/primary 톤)
+
+```
+┌────────────────────────────────────────────────┐
+│  작성 중이던 제안이 있어요                        │
+│  [이어서 발급하기]                               │
+└────────────────────────────────────────────────┘
+```
+
+- 배너 위치: 수강권 발급 화면 상단
+- 노출 조건: 유효한 draft 존재 + 전화인증 완료 상태
+- "이어서 발급하기" 탭: draft 내용을 발급 폼에 자동 채워넣기
+- 배너 닫기(X): draft 폐기 확인 다이얼로그 → 확인 시 draft 삭제
+
+#### 복구 진입점
+
+| 상황 | 복구 배너 노출 여부 |
+|---|---|
+| 전화인증 완료 직후 발급 화면 복귀 | 노출 |
+| 발급 화면 재진입 (탭 이동 후 복귀 등) | 노출 (draft 유효기간 내) |
+| draft 유효기간(7일) 초과 | 미노출, draft 자동 폐기 |
+| draft 없음 | 미노출 |
+
 ---
 
 ## 5. 백엔드 영향
@@ -302,8 +360,19 @@ if (teacher.phoneVerifiedAt != null) {
 |---|---|---|
 | `auth.sso_completed` | SSO 콜백 완료 | `userId`, `provider`, `timestamp` |
 | `auth.home_entered` | 홈 첫 진입 | `userId`, `timeSinceSSO` |
-| `auth.phone_verification_gate_shown` | E3 진입 시 게이트 노출 | `userId`, `subscriptionId` |
+| `auth.phone_verification_gate_shown` | E3 게이트 모달 노출 | `userId`, `subscriptionDraftId` |
 | `auth.phone_verification_completed` | 전화인증 완료 | `userId`, `trigger`(quest/gate) |
+| `subscription.gate_later_selected` | E3 게이트 "나중에" 선택 | `userId`, `subscriptionDraftId`, `draftSaved`(bool) |
+| `subscription.draft_recovered` | draft 복구 배너 "이어서 발급하기" 탭 | `userId`, `subscriptionDraftId`, `draftAgeDays` |
+| `subscription.draft_expired` | draft 유효기간 7일 초과 후 자동 폐기 | `userId`, `subscriptionDraftId` |
+
+위 5개 이벤트(`gate_shown`, `phone_verification_completed`, `gate_later_selected`, `draft_recovered`, `draft_expired`)로 인증 완료율과 복구율을 다음 지표로 측정한다:
+
+| 지표 | 계산식 |
+|---|---|
+| E3 게이트 즉시 인증 완료율 | `phone_verification_completed(trigger=gate)` / `gate_shown` |
+| "나중에" 선택 후 복구율 | `draft_recovered` / `gate_later_selected` |
+| draft 만료 유실율 | `draft_expired` / `gate_later_selected` |
 
 ---
 
@@ -368,3 +437,4 @@ if (teacher.phoneVerifiedAt != null) {
 | 1.1 | 2026-06-02 | 역할별 차등 정책 추가. 학생 직접 가입은 만 14세 검증을 위해 SSO 직후 전화인증 유지(정보통신망법 제31조). 약관 통합은 별도 페이지 분리 제거 의미로 한정 — 마케팅 동의는 법(정보통신망법 제50조)상 별도 체크박스 필수 |
 | 1.2 | 2026-06-02 | §3.4 PASS 통합 전 학생 직접 가입 임시 안전망 추가. PASS 본인인증 통합 완료까지 학생 직접 가입은 `StudentSignupBlockedScreen` 으로 안내 (정책 갭 보장) |
 | 1.3 | 2026-06-02 | B2 — `User.terms_accepted_at` / `marketing_consent_at` 필드 + Alembic + `POST /auth/consent` 엔드포인트 + FE wiring. 마케팅 동의 영속 저장으로 정보통신망법 §50 별도 동의 기록 의무 충족 |
+| 1.4 | 2026-06-12 | launch-readiness audit P1-2 대응 — E3 게이트 "나중에" 선택 시 제안 draft 임시저장(로컬, 7일 유효) + 복구 배너 명세(§4.4, §4.5). 계측 이벤트 3개 추가(`gate_later_selected`, `draft_recovered`, `draft_expired`) — 인증 완료율·복구율 측정 가능 (§5.5) |
