@@ -170,23 +170,12 @@ final hasAssignedPracticeProvider = Provider<bool>.internal(
 
 typedef HasAssignedPracticeRef = ProviderRef<bool>;
 String _$profileCompletionPercentHash() =>
-    r'ee330208f625ea8bcb670aabe3e33be15deb7392';
+    r'fa24a3d612767ab39043f18390f18e57edca18e8';
 
 /// Quest board completion percentage (0–100).
 ///
-/// 10 quests total (phone verification is mandatory at signup):
-///   === Setup Phase (40%) ===
-///   I.   Available slots          : 10
-///   II.  Profile image            : 8
-///   III. Introduction             : 8
-///   IV.  Lesson price table       : 7
-///   V.   Bank account             : 7
-///   === Action Phase (60%) ===
-///   VI.  First student invite     : 12
-///   VII. First subscription       : 15
-///   VIII.First lesson completed   : 13
-///   IX.  First lesson note        : 10
-///   X.   First practice assigned  : 10
+/// W5 SC-6 (spec §9.3) — 11개 mandatory quest (Q1~Q10 + Q3b 악기) 모두 완료 시 100%.
+/// Q11 (전화인증) 은 보너스 — percent 에 영향 없음 (가중치 0).
 ///
 /// Copied from [profileCompletionPercent].
 @ProviderFor(profileCompletionPercent)
@@ -201,5 +190,25 @@ final profileCompletionPercentProvider = Provider<int>.internal(
 );
 
 typedef ProfileCompletionPercentRef = ProviderRef<int>;
+String _$allMandatoryQuestsCompletedHash() =>
+    r'6bd739c692392160d58aee8d4da92357ffe80af8';
+
+/// Q1~Q10 + Q3b 11개 mandatory quest 모두 완료 여부.
+///
+/// 졸업 트리거 신호 — `profileCompletionPercent == 100` 과 동치 (SC-6).
+///
+/// Copied from [allMandatoryQuestsCompleted].
+@ProviderFor(allMandatoryQuestsCompleted)
+final allMandatoryQuestsCompletedProvider = Provider<bool>.internal(
+  allMandatoryQuestsCompleted,
+  name: r'allMandatoryQuestsCompletedProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$allMandatoryQuestsCompletedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef AllMandatoryQuestsCompletedRef = ProviderRef<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

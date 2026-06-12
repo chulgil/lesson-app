@@ -101,40 +101,142 @@ bool hasAssignedPractice(HasAssignedPracticeRef ref) {
   return (summary?.totalItems ?? 0) > 0;
 }
 
-/// Quest board completion percentage (0–100).
+/// 게이지 산정의 입력 — 11개 mandatory quest (Q1~Q10 + Q3b) + Q11 (보너스).
 ///
-/// 10 quests total (phone verification is mandatory at signup):
-///   === Setup Phase (40%) ===
-///   I.   Available slots          : 10
-///   II.  Profile image            : 8
-///   III. Introduction             : 8
-///   IV.  Lesson price table       : 7
-///   V.   Bank account             : 7
-///   === Action Phase (60%) ===
-///   VI.  First student invite     : 12
-///   VII. First subscription       : 15
-///   VIII.First lesson completed   : 13
-///   IX.  First lesson note        : 10
-///   X.   First practice assigned  : 10
-@Riverpod(keepAlive: true)
-int profileCompletionPercent(ProfileCompletionPercentRef ref) {
+/// 순수 데이터 클래스 — provider 의존성과 분리되어 단위 테스트 가능.
+class QuestCompletionInput {
+  final bool hasSlots;
+  final bool hasPhoto;
+  final bool hasIntro;
+  final bool hasInstruments;
+  final bool hasPrice;
+  final bool hasBankAccount;
+  final bool hasStudents;
+  final bool hasSubscription;
+  final bool hasCompletedLesson;
+  final bool hasLessonNote;
+  final bool hasPracticeAssigned;
+
+  /// Q11 — 게이지 가중치 0 (보너스 표시만).
+  final bool isPhoneVerified;
+
+  const QuestCompletionInput({
+    required this.hasSlots,
+    required this.hasPhoto,
+    required this.hasIntro,
+    required this.hasInstruments,
+    required this.hasPrice,
+    required this.hasBankAccount,
+    required this.hasStudents,
+    required this.hasSubscription,
+    required this.hasCompletedLesson,
+    required this.hasLessonNote,
+    required this.hasPracticeAssigned,
+    required this.isPhoneVerified,
+  });
+}
+
+/// Q1~Q10 + Q3b 모두 완료 시 true — 게이지 100% 와 동치 (SC-6).
+///
+/// Q11 (보너스) 은 영향 없음.
+bool isAllMandatoryQuestsCompleted(QuestCompletionInput input) {
+  return input.hasSlots &&
+      input.hasPhoto &&
+      input.hasIntro &&
+      input.hasInstruments &&
+      input.hasPrice &&
+      input.hasBankAccount &&
+      input.hasStudents &&
+      input.hasSubscription &&
+      input.hasCompletedLesson &&
+      input.hasLessonNote &&
+      input.hasPracticeAssigned;
+}
+
+/// 게이지 산정 순수 함수 — SC-6 1:1 정합성 검증용.
+///
+/// 가중치 합 100 분배:
+///   === Setup Phase (40%) — 6 quests ===
+///   Q1.  Available slots          : 8
+///   Q2.  Profile image            : 7
+///   Q3.  Introduction             : 7
+///   Q3b. Instruments              : 6   (W5 신규 weight)
+///   Q4.  Lesson price table       : 6
+///   Q5.  Bank account             : 6
+///   === Action Phase (60%) — 5 quests ===
+///   Q6.  First student invite     : 12
+///   Q7.  First subscription       : 15
+///   Q8.  First lesson completed   : 13
+///   Q9.  First lesson note        : 10
+///   Q10. First practice assigned  : 10
+///   === Bonus (0%) ===
+///   Q11. Phone verification       : 0   (보너스 — 게이지 미반영)
+int computeProfileCompletionPercent(QuestCompletionInput input) {
   var total = 0;
 
   // Setup Phase (40%)
-  if (ref.watch(hasAvailableSlotsProvider)) total += 10;
-  if (ref.watch(hasProfileImageProvider)) total += 8;
-  if (ref.watch(hasIntroductionProvider)) total += 8;
-  if (ref.watch(hasPriceTableProvider)) total += 7;
-  if (ref.watch(hasBankAccountProvider)) total += 7;
+  if (input.hasSlots) total += 8;
+  if (input.hasPhoto) total += 7;
+  if (input.hasIntro) total += 7;
+  if (input.hasInstruments) total += 6;
+  if (input.hasPrice) total += 6;
+  if (input.hasBankAccount) total += 6;
 
   // Action Phase (60%)
-  if (ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true) {
-    total += 12;
-  }
-  if (ref.watch(hasIssuedSubscriptionProvider)) total += 15;
-  if (ref.watch(homeHasCompletedLessonProvider)) total += 13;
-  if (ref.watch(hasWrittenLessonNoteProvider)) total += 10;
-  if (ref.watch(hasAssignedPracticeProvider)) total += 10;
+  if (input.hasStudents) total += 12;
+  if (input.hasSubscription) total += 15;
+  if (input.hasCompletedLesson) total += 13;
+  if (input.hasLessonNote) total += 10;
+  if (input.hasPracticeAssigned) total += 10;
+
+  // Q11 (전화인증) 보너스 — 가중치 0.
 
   return total.clamp(0, 100);
+}
+
+/// Quest board completion percentage (0–100).
+///
+/// W5 SC-6 (spec §9.3) — 11개 mandatory quest (Q1~Q10 + Q3b 악기) 모두 완료 시 100%.
+/// Q11 (전화인증) 은 보너스 — percent 에 영향 없음 (가중치 0).
+@Riverpod(keepAlive: true)
+int profileCompletionPercent(ProfileCompletionPercentRef ref) {
+  final input = QuestCompletionInput(
+    hasSlots: ref.watch(hasAvailableSlotsProvider),
+    hasPhoto: ref.watch(hasProfileImageProvider),
+    hasIntro: ref.watch(hasIntroductionProvider),
+    hasInstruments: ref.watch(hasInstrumentsProvider),
+    hasPrice: ref.watch(hasPriceTableProvider),
+    hasBankAccount: ref.watch(hasBankAccountProvider),
+    hasStudents:
+        ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true,
+    hasSubscription: ref.watch(hasIssuedSubscriptionProvider),
+    hasCompletedLesson: ref.watch(homeHasCompletedLessonProvider),
+    hasLessonNote: ref.watch(hasWrittenLessonNoteProvider),
+    hasPracticeAssigned: ref.watch(hasAssignedPracticeProvider),
+    isPhoneVerified: ref.watch(homeTeacherPhoneVerifiedProvider),
+  );
+  return computeProfileCompletionPercent(input);
+}
+
+/// Q1~Q10 + Q3b 11개 mandatory quest 모두 완료 여부.
+///
+/// 졸업 트리거 신호 — `profileCompletionPercent == 100` 과 동치 (SC-6).
+@Riverpod(keepAlive: true)
+bool allMandatoryQuestsCompleted(AllMandatoryQuestsCompletedRef ref) {
+  final input = QuestCompletionInput(
+    hasSlots: ref.watch(hasAvailableSlotsProvider),
+    hasPhoto: ref.watch(hasProfileImageProvider),
+    hasIntro: ref.watch(hasIntroductionProvider),
+    hasInstruments: ref.watch(hasInstrumentsProvider),
+    hasPrice: ref.watch(hasPriceTableProvider),
+    hasBankAccount: ref.watch(hasBankAccountProvider),
+    hasStudents:
+        ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty == true,
+    hasSubscription: ref.watch(hasIssuedSubscriptionProvider),
+    hasCompletedLesson: ref.watch(homeHasCompletedLessonProvider),
+    hasLessonNote: ref.watch(hasWrittenLessonNoteProvider),
+    hasPracticeAssigned: ref.watch(hasAssignedPracticeProvider),
+    isPhoneVerified: ref.watch(homeTeacherPhoneVerifiedProvider),
+  );
+  return isAllMandatoryQuestsCompleted(input);
 }
