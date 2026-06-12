@@ -3372,8 +3372,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5854,9 +5854,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -5993,11 +5994,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6284,6 +6286,17 @@ class AppStrings {
   static const gamificationDataLoadFailed = '데이터를 불러올 수 없습니다';
   static const gamificationEarnedBadges = '획득한 뱃지';
   static const gamificationPointHistory = '포인트 히스토리';
+
+  // ── Growth Heatmap Day Detail (P2 Visual Growth — Job 6 Task 6.2 / AC-6.2) ──
+  static const heatmapDayDetailMetronome = '메트로놈';
+  static const heatmapDayDetailTuner = '튜너';
+  static const heatmapDayDetailYoutube = 'YouTube';
+  static const heatmapDayDetailManual = '수동';
+  static const heatmapDayDetailRecording = '녹음';
+  static const heatmapDayDetailTotalLabel = '총';
+  static const heatmapDayDetailEmptyMessage = '이날은 연습 기록이 없어요';
+  static String heatmapDayDetailMinutes(int minutes) => '$minutes분';
+  static String heatmapDayDetailCount(int count) => '$count회';
 
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
