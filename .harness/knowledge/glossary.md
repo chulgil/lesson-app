@@ -482,12 +482,52 @@
 | "freeze 보상" / "스트릭 보호" | "스트릭 동결" 또는 `StreakFreeze` — "보상" 단어는 외부 보상 의존 메시징 회피 (스펙 §3) |
 | "트로피 카테고리" / "트로피 분류" | "트로피 모음" 또는 `TrophyCollection` — 단일 카드, 카테고리 노출 X (스펙 §16) |
 
+### P3 Spotlight 추가 용어 (2026-06-12)
+
+> 플랜: `.harness/decomposition/2026-06-12-student-gamification-p3-spotlight.md`
+> 범위: SpotlightPrompt 큐 + 거절 학습 + 축하 후 1슬롯 prompt. SC-9.
+
+#### 핵심 엔티티 (BE ↔ FE 동일 클래스명)
+
+| 한글 | 영문 (FE/BE) | 정의 |
+|---|---|---|
+| 스포트라이트 프롬프트 | `SpotlightPrompt` | 학생에게 가끔 보여지는 권유 1슬롯. 11 필드: id / studentId / type / title / videoId / ctaRoute / queuedAt / declineCount / hideUntil / permanentlyHidden / lastShownAt (스펙 §6.2) |
+| 스포트라이트 종류 | `SpotlightType` | 3종 enum — `teacherRec` (선생님 추천 영상·곡) / `seasonEvent` (시즌·명절 큐레이션) / `routineSuggestion` (자가 routine 30일+ 추천) (스펙 §5.2) |
+
+#### 정책 용어 (P3 범위)
+
+| 용어 | 정의 |
+|---|---|
+| 스포트라이트 슬롯 | `SpotlightSlot` UI 위젯 — 축하 overlay 내부 1슬롯. "지금 볼래" / "다음에" 동일 비중 (스펙 §7.4) |
+| 노출 조건 | `SpotlightEligibilityService.evaluate(ctx)` — 6 조건 (5분 세션 + 오늘 첫 prompt + 주간 ≤ 2 + 큐 promptable + 14세 미만 동의) 모두 통과 시 eligible (스펙 §7.1) |
+| 큐 우선순위 | `SpotlightQueueService.nextPromptableFor()` — 4단계 (teacherRec 필수 → teacherRec 일반 → seasonEvent → routineSuggestion). 같은 type oldest queuedAt 우선 (스펙 §7.2) |
+| 거절 cooldown | "다음에" tap 1회 → 7일 hide. type별 독립 카운터 (스펙 §7.3) |
+| 8주 hide | 같은 type 5회 거절 → 56일 hide (스펙 §7.3 / SC-9) |
+| 영구 hide | 8주 hide 후 1회 재시도 → 또 거절 → `permanentlyHidden=true`. 학생이 옵션에서 명시적 재활성 (P4) (스펙 §7.3) |
+| 스포트라이트 시드 | `SpotlightSeedingService` 3 generator — `seedTeacherRecommendation` / `seedSeasonEvent` / `seedRoutineSuggestion` (중복 차단 + 큐잉) |
+
+#### 데이터 단위
+
+| 한글 | 영문 (FE) | 정의 |
+|---|---|---|
+| 노출 조건 평가 | `SpotlightEligibilityService.evaluate()` | 순수 함수 — `SpotlightEligibilityContext` (sessionDuration / now / promptsShownToday / promptsShownThisWeek / studentIsUnder14 / studentHasParentConsent) → `SpotlightEligibilityResult` (eligible / reason) |
+| 큐 우선순위 평가 | `SpotlightQueueService.nextPromptableFor()` | repo.listForStudent → §7.2 우선순위 정렬 → hideUntil/permanentlyHidden 필터 → 1개 반환 (또는 null) |
+| 거절 학습 적용 | `SpotlightDeclineLearningService.decline()` | declineCount +1 + type별 누적 계산 → cooldown 7d / 8주 hide / 영구 hide 분기 적용 |
+
+#### Deprecated 표현 (P3 추가)
+
+| 폐기 표현 | 대신 사용 |
+|---|---|
+| "필수 알림" / "강제 푸시" | "스포트라이트 권유" 또는 `SpotlightPrompt` — 푸시 알림 0건 (KPI §8) + "필수" 메시징 금지 (§7.4) |
+| "추천 거절 패널티" / "거절 페널티" | "거절 학습" 또는 `SpotlightDeclineLearningService` — 페널티 메시징 0 (§7.4 동일 비중) |
+
 ---
 
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-12 | §15 P3 Spotlight 용어 추가 — `SpotlightPrompt` 엔티티 + `SpotlightType` enum (3종) + 정책 용어 7종 (스포트라이트 슬롯 / 노출 조건 / 큐 우선순위 / 거절 cooldown / 8주 hide / 영구 hide / 스포트라이트 시드) + 서비스 메서드 3종 (Eligibility / Queue / DeclineLearning) + Deprecated 표현 2건 ("필수 알림" → "스포트라이트 권유", "거절 패널티" → "거절 학습"). 본 변경은 `.harness/decomposition/2026-06-12-student-gamification-p3-spotlight.md` Job 0 Step 2 |
 | 2026-06-12 | §15 P2 Visual Growth 용어 추가 — `StreakFreeze` 엔티티 + 정책 용어 7종 (동결 잔액 / 시험 모드 / 복귀 보너스 / 1년 히트맵 / 트로피 모음 / 30일 chunk / D-day 마이그레이션 / 휴식 권고) + 서비스 메서드 2종 (자동 발급 / 자동 적용) + Deprecated 표현 2건 ("freeze 보상" → "스트릭 동결", "트로피 카테고리" → "트로피 모음"). 본 변경은 `.harness/decomposition/2026-06-11-student-gamification-p2-visual-growth.md` Job 0 Step 2 |
 | 2026-06-11 | §15 학생 게이미피케이션 (자가 연습) 신설 — P1 Foundation 5종 핵심 용어 (`StudentQuest` / `QuestOrigin` / `GrowthHeatmap` / `DailyPractice` / `PracticeRecordingService`) + 정책 용어 5종 ([연습 시작] 1버튼 / 1.5초 축하 / 4 경로 wiring / 자동 트리거 / Hive 30일 chunk × 13 box) + 14세 미만 처리 2종 (`parentConsentAt` / 자가 연습 전용 모드) + Deprecated 표현 2건. 본 변경은 `.harness/spec/2026-06-11-student-gamification.md` |
 | 2026-06-11 | (architect 검토 반영) §13 `quest_celebrated_at` 의미 재정의 — "11/11 완료" → "Q1~Q10 졸업 시점" + Q11 보너스 분리 (`quest_bonus_shown_provider` FE Hive flag, BE 컬럼 신설 없음) / §14 `minBookingHours` 매핑 반대 방향 명확화 (schedule → profile SSOT, `breakTimeBetweenLessons` 와 반대) |

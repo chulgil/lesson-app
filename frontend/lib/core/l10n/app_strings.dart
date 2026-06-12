@@ -3381,8 +3381,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5889,9 +5889,10 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount = totalAmount >= 10000
-        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-        : '$totalAmount원';
+    final formattedAmount =
+        totalAmount >= 10000
+            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+            : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -6028,11 +6029,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -9180,4 +9182,24 @@ class AppStrings {
 
   /// 네트워크/기타 오류.
   static const phoneOtpNetworkError = '네트워크 연결을 확인해주세요. 잠시 후 다시 시도해주세요.';
+
+  // ========================================================================
+  // 학생 게이미피케이션 P3 — Spotlight prompt (스펙 §7.4)
+  // ========================================================================
+  // 사용처: features/gamification/presentation/widgets/spotlight_slot.dart
+
+  /// teacherRec 타입 헤더 (§7.4 — 권유형, "꼭 해야" 금지).
+  static const spotlightHeaderTeacherRec = '선생님이 추천했어요';
+
+  /// seasonEvent 타입 헤더.
+  static const spotlightHeaderSeasonEvent = '이번 달 추천';
+
+  /// routineSuggestion 타입 헤더.
+  static const spotlightHeaderRoutineSuggestion = '이거 어때요?';
+
+  /// 수락 버튼 — "지금 볼래" / "다음에" 와 동등 비중 (§7.4).
+  static const spotlightAcceptButton = '지금 볼래';
+
+  /// 거절 버튼 — 페널티 메시징 0.
+  static const spotlightDeclineButton = '다음에';
 }

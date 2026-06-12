@@ -4,6 +4,8 @@
 > 스펙: locked at commit 6262f03d (PR #680 merged 2026-06-11)
 > P1 머지: PR #683 (85584f0a), #687 (b8582df6), #689 (50a709f2), #690 (1a74efc7)
 > P2 진입: main @ 7069665f (2026-06-12) — `.harness/decomposition/2026-06-11-student-gamification-p2-visual-growth.md`
+> P2 머지: PR #702 (6f7acf3c, 2026-06-12)
+> P3 진입: main @ de6aaf1e (2026-06-12) — `.harness/decomposition/2026-06-12-student-gamification-p3-spotlight.md`
 > 단계: cg-harness Phase 2 — 스펙 초안 (Phase 6 통과 후 마스터 스펙으로 머지)
 > 입력 자료:
 > - [`docs/specs/gamification/gamification_master.md`](../../docs/specs/gamification/gamification_master.md) (2026-04-17 Phase 1~3 완료, 기존 인프라)

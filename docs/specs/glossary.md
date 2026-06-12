@@ -418,8 +418,14 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 휴식 권고 | Rest Recommendation | 단일 세션 30분 / 일일 누적 3시간 / 14세 미만 15분 도달 시 푸시 X 토스트 1회 (SC-11) |
 | 시험 모드 | Exam Mode | 학부모·선생님 발급. 모드 활성 동안 freeze 차감 0 + 스트릭 동결 |
 | 복귀 보너스 | Comeback Bonus | 7일+ 미사용 후 복귀 시 첫 세션 보너스 P. FOMO 메시지 X |
+| 스포트라이트 프롬프트 | SpotlightPrompt | 학생에게 가끔 보여지는 권유 1슬롯. 축하 overlay 안 1슬롯 (스펙 §6.2) |
+| 스포트라이트 종류 | SpotlightType | 3종 — 선생님 추천(teacherRec) / 시즌·명절(seasonEvent) / 자가 routine 30일+(routineSuggestion) |
+| 스포트라이트 슬롯 | SpotlightSlot | 축하 overlay 내부 1슬롯 UI. "지금 볼래" / "다음에" 동일 비중 (스펙 §7.4) |
+| 노출 조건 | Spotlight Eligibility | 6 조건 (5분 세션 + 오늘 첫 prompt + 주간 ≤ 2 + 큐 promptable + 14세 미만 동의) 모두 통과 시 노출 (스펙 §7.1) |
+| 큐 우선순위 | Spotlight Queue Priority | 4단계 — 선생님 필수 → 일반 추천 → 시즌 → routine. 같은 type oldest queuedAt 우선 (스펙 §7.2) |
+| 거절 학습 | Decline Learning | "다음에" 1회 → 7일 cooldown. 5회 누적 → 8주 hide. 8주 후 1회 재시도 또 거절 → 영구 hide (스펙 §7.3 / SC-9) |
 
-> 상세: [학생 게이미피케이션 스펙](../../.harness/spec/2026-06-11-student-gamification.md) (P1 머지 + P2 진행)
+> 상세: [학생 게이미피케이션 스펙](../../.harness/spec/2026-06-11-student-gamification.md) (P1+P2 머지 + P3 진행)
 
 ---
 
@@ -446,6 +452,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-12 | — | §13 학생 게이미피케이션 P3 — 스포트라이트 프롬프트 / 스포트라이트 종류 (3) / 스포트라이트 슬롯 / 노출 조건 / 큐 우선순위 / 거절 학습 | P3 Spotlight 진입 — SC-9 거절 5회 → 8주 hide 충족 + SpotlightPrompt 신규 엔티티 (.harness/knowledge/glossary.md §15 P3 동기화) |
 | 2026-06-12 | — | §13 학생 게이미피케이션 P2 — 스트릭 동결 / 1년 히트맵 / 트로피 모음 / 휴식 권고 / 시험 모드 / 복귀 보너스 | P2 Visual Growth 진입 — SC-10/SC-11 충족 + GrowthHeatmap 1년 캐시 (.harness/knowledge/glossary.md §15 P2 동기화) |
 | 2026-06-12 | 가용시간 (메뉴 라벨), 레슨 시간 설정 (메뉴 라벨) | §14 프로필 5묶음 IA — 운영시간 / 수업방식 / 수강권·정산 / lessonDurationMinutes / 카테고리 미리보기 / 퀘스트 졸업 | teacher-settings-redesign 머지 — 11개 메뉴 → 5묶음 IA 통합 + 졸업 메커니즘 (.harness glossary §14 동기화) |
 | 2026-06-11 | — | §13 학생 게이미피케이션 — StudentQuest / QuestOrigin / GrowthHeatmap / DailyPractice + [연습 시작] 1버튼 / 1.5초 축하 / 자가 연습 전용 모드 (14세 미만) | 학생 자가 연습 80% 가시화 (.harness/knowledge/glossary.md §15 동기화) |
