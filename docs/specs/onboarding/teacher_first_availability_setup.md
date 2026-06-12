@@ -58,6 +58,12 @@ v3 spec §1 자체에서 "레슨 시간/가용 시간 설정이 온보딩에 없
   셀레브레이션 시트 "첫 가용시간 등록 완료!"
     │
     ▼
+[Step 2.5 — OnboardingCategoryPreviewScreen (W4, 2026-06-12)]
+  새 5묶음 카테고리 미리보기 (운영시간/수업방식/수강권·정산/내 프로필/정책·알림·지원)
+  [시작하기] / [건너뛰기] 둘 다 markShown + /home 라우트
+  onboardingCategoryShownProvider (Hive) 영속 — 1회만 노출
+    │
+    ▼
 [홈 진입] — 가용시간 1개 이상 보장됨
   퀘스트 보드 표시
   · 필수 퀘스트: 첫 학생 초대 (가용시간 보장 후 활성)
@@ -65,6 +71,19 @@ v3 spec §1 자체에서 "레슨 시간/가용 시간 설정이 온보딩에 없
 ```
 
 가입 흐름 내 게이트가 슬롯 1개 이상을 강제하므로 홈 진입 시점에는 별도 인터스티셜 모달이 필요 없다. 가입 흐름 후 슬롯이 0개가 되는 경로(예: 모든 슬롯 비활성화)는 §4.1 폐기 노트 참조.
+
+### 3.3 Step 2.5 — 카테고리 미리보기 (2026-06-12 신규)
+
+teacher-settings-redesign W4 머지 — 가입 직후 신규 5묶음 IA (`profile_master.md §2.1`) 를 1회 인지.
+
+| 항목 | 내용 |
+|---|---|
+| 화면 | `OnboardingCategoryPreviewScreen` (`features/onboarding/presentation/screens/`) |
+| 노출 시점 | first_availability_setup 완료 후 1회 (스킵 가능, 영속 후 재노출 X) |
+| 콘텐츠 | 5묶음 카테고리 카드 (🕐 운영시간 / 🎓 수업방식 / 💰 수강권·정산 / 👤 내 프로필 / ⚙️ 정책·알림·지원) 미리보기 그리드 + 한 줄 안내 |
+| 액션 | [시작하기] / [건너뛰기] 두 버튼 모두 `markShown()` + `context.go(/home)` |
+| 영속 | `onboardingCategoryShownProvider` (Hive box `onboarding_state` / key `category_preview_shown`) |
+| 마이그레이션 재활용 | W6 의 `TeacherMigrationOverlayGate` 가 기존 가입자 ProfileTab 첫 진입 시 동일 화면을 overlay 로 1회 재활용 (W6 §10.1) |
 
 ### 3.1 종착 조건
 
