@@ -15,16 +15,25 @@ import 'tuner/tuner_settings_sheet.dart';
 
 /// Practice tools modal with tab-based navigation between Metronome and Tuner.
 class PracticeToolsModal extends ConsumerStatefulWidget {
-  const PracticeToolsModal({super.key, this.initialTab = 0});
+  const PracticeToolsModal({super.key, this.initialTab = 0, this.studentId});
 
   /// Initial tab index (0 = Metronome, 1 = Tuner)
   final int initialTab;
 
-  static Future<void> show(BuildContext context, {int initialTab = 0}) {
+  /// 학생 컨텍스트. null 이면 메트로놈 stop 시 [PracticeSourceLoggers] 트리거 안 함.
+  /// 학생 게이미피케이션 P1 — Job 7 라우팅 진입점에서 주입.
+  final String? studentId;
+
+  static Future<void> show(
+    BuildContext context, {
+    int initialTab = 0,
+    String? studentId,
+  }) {
     return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => PracticeToolsModal(initialTab: initialTab),
+      builder: (context) =>
+          PracticeToolsModal(initialTab: initialTab, studentId: studentId),
     );
   }
 
@@ -165,7 +174,10 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                     unselectedLabelStyle: AppTypography.headingSmall.copyWith(
                       fontWeight: FontWeight.normal,
                     ),
-                    tabs: const [Tab(text: '메트로놈'), Tab(text: '튜너')],
+                    tabs: const [
+                      Tab(text: '메트로놈'),
+                      Tab(text: '튜너'),
+                    ],
                   ),
                 ),
                 // Settings button for tuner
@@ -174,14 +186,14 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                   builder: (context, child) {
                     return _tabController.index == 1
                         ? IconButton(
-                          icon: const Icon(Icons.settings_outlined),
-                          onPressed: () => TunerSettingsSheet.show(context),
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
-                          padding: EdgeInsets.zero,
-                        )
+                            icon: const Icon(Icons.settings_outlined),
+                            onPressed: () => TunerSettingsSheet.show(context),
+                            constraints: const BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 40,
+                            ),
+                            padding: EdgeInsets.zero,
+                          )
                         : const SizedBox(width: AppSpacing.space10);
                   },
                 ),
@@ -194,7 +206,10 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
             child: TabBarView(
               controller: _tabController,
               physics: const NeverScrollableScrollPhysics(),
-              children: const [MetronomePanel(), TunerPanel()],
+              children: [
+                MetronomePanel(studentId: widget.studentId),
+                const TunerPanel(),
+              ],
             ),
           ),
         ],
