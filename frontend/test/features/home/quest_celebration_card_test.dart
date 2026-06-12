@@ -7,12 +7,16 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/home/presentation/widgets/quest_celebration_card.dart';
 import 'package:lessonaza/features/profile/presentation/providers/quest_celebration_provider.dart';
 
-/// Hive 미초기화 환경 fake — Job 7 §8.3 (1회성 보장).
+/// Hive 미초기화 환경 fake — Job 7 §8.3 / W5 §8.2 (1회성 보장).
 class _FakeQuestCelebration extends QuestCelebration {
   bool markCelebratedCalled = false;
 
   @override
-  Future<DateTime?> build() async => null;
+  Future<QuestCelebrationState> build() async => QuestCelebrationState(
+    // 갓 졸업한 상태 — visible == true, 카드 렌더 가능.
+    celebratedAt: DateTime.now(),
+    dismissedAt: null,
+  );
 
   @override
   Future<void> markCelebrated() async {
