@@ -243,10 +243,9 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
 
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
-      final newList =
-          current.verification.certificates.map((c) {
-            return c.id == id ? certificate : c;
-          }).toList();
+      final newList = current.verification.certificates.map((c) {
+        return c.id == id ? certificate : c;
+      }).toList();
       final newVerification = current.verification.copyWith(
         certificates: newList,
       );
@@ -267,8 +266,9 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
 
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
-      final newList =
-          current.verification.certificates.where((c) => c.id != id).toList();
+      final newList = current.verification.certificates
+          .where((c) => c.id != id)
+          .toList();
       final newVerification = current.verification.copyWith(
         certificates: newList,
       );
@@ -428,9 +428,18 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
   }
 
   /// Update multiple bank accounts
+  ///
+  /// 2026-06-12 — `current == null` 일 때 조용히 return 하던 silent fail 제거
+  /// (베타 "계좌 추가 무반응" 의 한 축). 프로필 행이 아직 없는 계정
+  /// (BE GET 404 → null) 도 BE PUT 이 upsert 이므로 최소 프로필로
+  /// create-on-first-write 한다 (#701 운영시간 패턴 준용).
   Future<void> updateBankAccounts(List<BankAccount> accounts) async {
-    final current = state.valueOrNull;
-    if (current == null) return;
+    var current = state.valueOrNull;
+    if (current == null) {
+      // 일시적 로드 실패였을 수 있으므로 1회 재시도 후 결정.
+      await _loadProfile();
+      current = state.valueOrNull;
+    }
 
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
@@ -438,8 +447,18 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
       final defaultAccount =
           accounts.where((a) => a.isDefault).firstOrNull ??
           accounts.firstOrNull;
+      final base =
+          current ??
+          TeacherProfile(
+            id: '',
+            userId: ref.read(currentUserIdProvider),
+            name: '',
+            instruments: const [],
+            introduction: '',
+            createdAt: DateTime.now(),
+          );
       final updated = await repo.updateProfile(
-        current.copyWith(bankAccounts: accounts, bankAccount: defaultAccount),
+        base.copyWith(bankAccounts: accounts, bankAccount: defaultAccount),
       );
       state = AsyncValue.data(updated);
       ref.invalidate(currentTeacherProfileProvider);
