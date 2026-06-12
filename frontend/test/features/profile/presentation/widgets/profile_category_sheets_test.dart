@@ -84,20 +84,17 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('가이드 다시 보기 탭 → placeholder Snackbar (W5 후 활성)', (tester) async {
+    testWidgets('가이드 다시 보기 탭 → guideReshow 라우트 이동 (W5 활성)', (tester) async {
       await tester.pumpWidget(const _PolicySheetHost());
       await tester.pumpAndSettle();
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text(AppStrings.categoryGuideReplayLabel));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
 
-      expect(
-        find.text(AppStrings.categoryGuideReplayComingSoon),
-        findsOneWidget,
-      );
+      // 시트가 닫히고 catch-all stub 라우트로 push 됨 — 시트 항목 사라짐.
+      expect(find.text(AppStrings.categoryGuideReplayLabel), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
