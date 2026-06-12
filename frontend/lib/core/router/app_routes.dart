@@ -78,10 +78,11 @@ class AppRoutes {
 
   /// 5묶음 IA 로 흩어진 legacy 라우트.
   /// W2 (2026-06-11) 에서 ProfileTab 메뉴 진입로는 제거됨.
-  /// 라우트 자체는 redirect 로 유지하여 외부 진입(quest 카드/정책 화면 등)을
-  /// 5묶음 메인(/profile) 으로 흘려보낸다. 화면 파일 해체는 W3 에서.
+  /// W3 Task 3.5 (2026-06-11) 에서 화면 파일도 해체. 라우트 자체는 redirect 로
+  /// 유지하여 외부 진입(quest 카드/정책 화면 등)을 5묶음 메인(/profile) 으로
+  /// 흘려보낸다.
   /// spec: .harness/spec/2026-06-11-teacher-settings-redesign.md §6.1
-  @Deprecated('W2 2026-06-11 — 5묶음으로 흩어짐. 화면 해체는 W3.')
+  @Deprecated('W3 2026-06-11 — 5묶음으로 흩어지고 화면 해체됨. redirect 만 유지.')
   static const lessonTimeSettings = '/profile/lesson-time';
 
   /// 🎓 수업방식 묶음 화면 (W3 Task 3.2).
