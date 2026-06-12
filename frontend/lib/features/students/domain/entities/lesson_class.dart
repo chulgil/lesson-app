@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/utils/json_converters.dart';
+
 part 'lesson_class.g.dart';
 
 /// Class type - academy or private lessons.
@@ -26,8 +28,18 @@ class LessonClass {
   // Basic info
   final String name; // "ABC Music Academy", "Private Lessons", etc.
 
+  // #706 — BE 응답이 type/payment_type 을 None 으로 보낼 수 있어 strict
+  // $enumDecode throw 방지. private/parent 는 1:1 레슨 기본 모델.
+  @JsonKey(
+    defaultValue: LessonClassType.private,
+    unknownEnumValue: LessonClassType.private,
+  )
   final LessonClassType type; // academy | private
 
+  @JsonKey(
+    defaultValue: PaymentType.parent,
+    unknownEnumValue: PaymentType.parent,
+  )
   final PaymentType paymentType; // organization | parent
 
   // Academy info (only when type == academy)
@@ -42,7 +54,8 @@ class LessonClass {
 
   final bool isArchived; // Archive status
 
-  // Meta
+  // Meta — #706: BE created_at 이 None 가능 (strict DateTime.parse 방지).
+  @JsonKey(fromJson: dateTimeFromJsonOrNow)
   final DateTime createdAt;
 
   final DateTime? updatedAt;

@@ -29,7 +29,7 @@ final proposalDraftStorageProvider = Provider<ProposalDraftStorage>.internal(
 );
 
 typedef ProposalDraftStorageRef = ProviderRef<ProposalDraftStorage>;
-String _$proposalDraftHash() => r'90012c205a44521a884166b417448687f62b66cb';
+String _$proposalDraftHash() => r'3e89d7571a3e81a31723d7f02ee5d46b42fac13a';
 
 /// Copied from Dart SDK
 class _SystemHash {

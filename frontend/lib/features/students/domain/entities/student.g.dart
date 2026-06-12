@@ -34,7 +34,7 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
           PracticeStatus.normal,
       practiceRate: (json['practice_rate'] as num?)?.toInt() ?? 0,
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: dateTimeFromJsonOrNow(json['created_at']),
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),

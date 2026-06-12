@@ -20,8 +20,8 @@ Map<String, dynamic> _$TokenPairToJson(TokenPair instance) => <String, dynamic>{
 
 AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(
       id: json['id'] as String,
-      email: json['email'] as String,
-      name: json['name'] as String,
+      email: json['email'] as String? ?? '',
+      name: json['name'] as String? ?? '',
       profileImageUrl: json['profile_image_url'] as String?,
       role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
       onboardingCompleted: json['onboarding_completed'] as bool? ?? false,
