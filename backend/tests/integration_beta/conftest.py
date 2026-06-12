@@ -21,7 +21,12 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     reason = "INTERNAL_API_KEY is required for beta integration tests"
     skip_marker = pytest.mark.skip(reason=reason)
     for item in items:
-        item.add_marker(skip_marker)
+        # Only skip tests inside the integration_beta directory.
+        # Without this guard, all collected items (including ordinary unit tests)
+        # would be skipped when this hook fires from a top-level `pytest tests/` run.
+        node_path = str(item.fspath)
+        if "integration_beta" in node_path:
+            item.add_marker(skip_marker)
 
 
 @pytest.fixture(scope="session")
@@ -30,6 +35,24 @@ def beta_teacher_account() -> BetaAccount:
         email="minyeon@example.com",
         role="teacher",
         expected_user_id="seed-teacher-0001",
+    )
+
+
+@pytest.fixture(scope="session")
+def beta_student1_account() -> BetaAccount:
+    return BetaAccount(
+        email="soyeon@example.com",
+        role="student",
+        expected_user_id="seed-student-user-0001",
+    )
+
+
+@pytest.fixture(scope="session")
+def beta_student2_account() -> BetaAccount:
+    return BetaAccount(
+        email="junho@example.com",
+        role="student",
+        expected_user_id="seed-student-user-0002",
     )
 
 

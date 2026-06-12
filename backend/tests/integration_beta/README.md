@@ -2,27 +2,66 @@
 
 GitHub issue #418의 원격 beta API 종단 시나리오 스캐폴드입니다.
 
+## 필요 환경변수
+
+| 변수 | 필수 | 설명 |
+|------|------|------|
+| `INTERNAL_API_KEY` | 필수 | beta 게이트 키 (없으면 이 디렉토리 테스트만 skip) |
+| `BETA_BASE_URL` | 선택 | 기본값: `https://api-beta.lessonaza.app` |
+
+`INTERNAL_API_KEY`가 없으면 `tests/integration_beta/` 안의 테스트만 skip됩니다.
+일반 단위 테스트(`tests/test_*.py`)는 영향받지 않습니다.
+
 ## 실행
 
 ```bash
 cd backend
-INTERNAL_API_KEY=... uv run pytest tests/integration_beta -q
+
+# 전체 실행
+INTERNAL_API_KEY=... make beta-integration
+
+# 시나리오 키워드 필터
+INTERNAL_API_KEY=... make beta-integration ONLY=signup
+
+# 시드 리셋 안내 포함 실행
+INTERNAL_API_KEY=... BETA_RESET=1 make beta-integration
+
+# pytest 직접 실행
+INTERNAL_API_KEY=... uv run pytest tests/integration_beta -v
 ```
 
-기본 대상은 `https://api-beta.lessonaza.app`입니다. 다른 환경을 확인하려면 `BETA_BASE_URL`을 지정합니다.
+## 시드 전제 (Seed Pool)
 
+`backend/scripts/seeds/ids.py`에 정의된 시드 계정을 재사용합니다.
+
+| 계정 | 이메일 | 역할 |
+|------|--------|------|
+| seed-teacher-0001 | minyeon@example.com | teacher |
+| seed-student-user-0001 | soyeon@example.com | student |
+| seed-student-user-0002 | junho@example.com | student |
+
+시드 계정 자체는 수정하지 않습니다. 각 테스트에서 생성하는 임시 계정
+(`beta-*-{suffix}@example.com`)은 beta 서버에 누적됩니다.
+
+시드 리셋이 필요한 경우 beta 서버 SSH 접속 후:
 ```bash
-BETA_BASE_URL=https://api-beta.lessonaza.app INTERNAL_API_KEY=... uv run pytest tests/integration_beta -q
+docker compose exec api uv run python scripts/seeds/seed_beta.py --reset
 ```
+또는 `BETA_RESET=1 make beta-integration` 실행 시 안내 메시지가 출력됩니다.
 
-`INTERNAL_API_KEY`가 없으면 테스트는 skip됩니다. 시크릿을 커밋하지 않습니다.
+## 시나리오 파일
 
-## 현재 범위
+| 파일 | 시나리오 |
+|------|----------|
+| `test_signup.py` | Phase 1: 가입 → 역할 선택 → `/me` 검증, 학생 등록, 초대코드 연결 |
+| `test_lesson_request.py` | Phase 2: 학생 신청 → 선생님 슬롯 제안 → 학생 확정 / 거절 |
+| `test_schedule_edit.py` | Phase 2: 일정 변경 신청 / 승인 / 거절 / 노쇼 정책 |
+| `test_lesson_close.py` | Phase 2: 레슨 완료 → 수강권 잔여 회차 -1 → 진행률 갱신 |
+| `test_boundaries.py` | Phase 2: 만료 JWT 401, 권한 위반 403/404, KST 자정 경계 |
 
-- `GET /health`로 beta 서버 가용성을 확인합니다.
-- `POST /api/v1/auth/dev-login`에 `X-Internal-API-Key`를 붙여 시드 선생님 로그인을 검증합니다.
-- 발급된 access token으로 `GET /api/v1/auth/me`를 호출해 인증 왕복을 검증합니다.
-- 신규 선생님 로그인 → `POST /api/v1/students` 학생 등록 → `GET /api/v1/students` 목록 반영 → `POST /api/v1/lessons-classes/{id}/memberships` 수업 멤버십 생성 → `GET /api/v1/memberships?student_id=...` 조회를 검증합니다.
-- 선생님 초대코드 생성 → 학생 초대코드 연결 요청 → 학생 sent 목록 → 선생님 pending 목록 → 선생님 수락 → 양쪽 connections 목록 반영을 검증합니다.
+## 새 API 추가 시
 
-이후 #418의 Phase 2에 따라 레슨 신청, 일정 변경, 레슨 종료, 권한/토큰/KST 경계 시나리오를 같은 디렉터리에 추가합니다.
+1. `helpers.py`의 `BetaClient`에 해당 엔드포인트 메서드 추가
+2. 시나리오에 맞는 파일(`test_*.py`)에 `@pytest.mark.asyncio` 테스트 추가
+3. 시드 풀 재사용 원칙 유지 — 시드 계정 직접 수정 금지
+4. teardown에서 생성한 리소스 정리 (best-effort `try/except`)
