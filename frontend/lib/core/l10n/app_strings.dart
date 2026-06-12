@@ -8924,6 +8924,9 @@ class AppStrings {
   static const categoryGuideReplaySubtitle = '퀘스트 졸업 후 다시 볼 수 있습니다';
   static const categoryGuideReplayComingSoon = '가이드 다시 보기는 곧 지원될 예정입니다';
 
+  /// "가이드 다시 보기" 화면 — Step 2.5 카테고리 미리보기 재실행 버튼 (W5 Task 5.6).
+  static const guideReshowCategoryPreviewButton = '5묶음 카테고리 미리보기 다시 보기';
+
   // ── LessonStyleSettingsScreen (W3 Task 3.2) ─────────────────────
   // spec §6.2 — 수업방식 묶음 (3 항목: 레슨 1회 시간 + 사전예약 + 학생 안내)
   // 사용처: features/profile/presentation/screens/lesson_style_settings_screen.dart

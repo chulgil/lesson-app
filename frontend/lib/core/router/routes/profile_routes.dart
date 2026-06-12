@@ -17,6 +17,7 @@ import '../../../features/profile/presentation/screens/basic_info_edit_screen.da
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/profile/presentation/screens/bank_account_edit_screen.dart';
 import '../../../features/profile/presentation/screens/cancellation_defaults_screen.dart';
+import '../../../features/profile/presentation/screens/guide_reshow_screen.dart';
 import '../../../features/analytics/presentation/screens/analytics_dashboard_screen.dart';
 import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
 import '../../../features/profile/presentation/screens/invite_pending_list_screen.dart';
@@ -65,6 +66,14 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.priceTable,
     name: 'priceTable',
     builder: (context, state) => const PriceTableScreen(),
+  ),
+
+  // Guide Reshow — W5 Task 5.6 (정책·알림·지원 묶음, 졸업 후 fallback)
+  // spec §8.4 — ⚙️ 정책·알림·지원 → "가이드 다시 보기" 메뉴 진입점.
+  GoRoute(
+    path: AppRoutes.guideReshow,
+    name: 'guideReshow',
+    builder: (context, state) => const GuideReshowScreen(),
   ),
 
   // Tip Template Management
