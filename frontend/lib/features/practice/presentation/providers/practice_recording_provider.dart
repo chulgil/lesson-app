@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../gamification/presentation/providers/growth_heatmap_provider.dart';
 import '../../../gamification/presentation/providers/student_quest_provider.dart';
 import '../../domain/services/practice_recording_service.dart';
+import '../../domain/services/practice_source_loggers.dart';
 
 part 'practice_recording_provider.g.dart';
 
@@ -20,4 +21,10 @@ PracticeRecordingService practiceRecordingService(
     heatmapRepository: ref.watch(growthHeatmapRepositoryProvider),
     questRepository: ref.watch(studentQuestRepositoryProvider),
   );
+}
+
+/// 4 경로 wiring 의 thin helper.
+@Riverpod(keepAlive: true)
+PracticeSourceLoggers practiceSourceLoggers(PracticeSourceLoggersRef ref) {
+  return PracticeSourceLoggers(ref.watch(practiceRecordingServiceProvider));
 }

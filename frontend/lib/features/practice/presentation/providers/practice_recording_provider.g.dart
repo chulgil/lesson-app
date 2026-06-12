@@ -28,5 +28,23 @@ final practiceRecordingServiceProvider =
 );
 
 typedef PracticeRecordingServiceRef = ProviderRef<PracticeRecordingService>;
+String _$practiceSourceLoggersHash() =>
+    r'faf463095fb01ce199b339086adb20031c56adb1';
+
+/// 4 경로 wiring 의 thin helper.
+///
+/// Copied from [practiceSourceLoggers].
+@ProviderFor(practiceSourceLoggers)
+final practiceSourceLoggersProvider = Provider<PracticeSourceLoggers>.internal(
+  practiceSourceLoggers,
+  name: r'practiceSourceLoggersProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$practiceSourceLoggersHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef PracticeSourceLoggersRef = ProviderRef<PracticeSourceLoggers>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
