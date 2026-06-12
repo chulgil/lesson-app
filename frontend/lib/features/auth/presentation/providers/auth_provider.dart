@@ -24,6 +24,17 @@ AuthRepository authRepository(AuthRepositoryRef ref) {
   return RemoteAuthRepository(apiClient, tokenStorage);
 }
 
+/// Retry policy contract for [AuthNotifier.loginWithOAuth].
+///
+/// 일시적 장애(네트워크 끊김, 서버 5xx)는 재시도하고 클라이언트 오류는 즉시 종료한다.
+/// "구글 로그인 후 잠깐의 네트워크 끊김으로 SnackBar만 뜨고 화면이 그대로 멈추는"
+/// 회귀(#676 후속)를 방지한다.
+bool isRetryableApiError(ApiException error) {
+  final status = error.statusCode;
+  if (status == null) return true;
+  return status >= 500 && status < 600;
+}
+
 /// Auth state notifier that manages authentication lifecycle.
 ///
 /// On app start: checks stored tokens → tries auto-login.
@@ -162,6 +173,10 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   /// Login with OAuth provider (google, kakao, apple).
+  ///
+  /// 토큰 교환 단계만 일시 장애(네트워크 끊김, 서버 5xx)에 대해 최대 3회 재시도
+  /// (지수 백오프 500ms → 1000ms). 클라이언트 오류(4xx)는 즉시 종료.
+  /// [isRetryableApiError] 가 정책을 결정한다.
   Future<void> loginWithOAuth({
     required String provider,
     required String idToken,
@@ -169,7 +184,7 @@ class AuthNotifier extends _$AuthNotifier {
     state = const AuthLoading();
 
     try {
-      final tokenPair = await _authRepository.loginWithOAuth(
+      final tokenPair = await _exchangeOAuthTokenWithRetry(
         provider: provider,
         idToken: idToken,
       );
@@ -185,6 +200,27 @@ class AuthNotifier extends _$AuthNotifier {
       state = const AuthUnauthenticated();
       rethrow;
     }
+  }
+
+  Future<TokenPair> _exchangeOAuthTokenWithRetry({
+    required String provider,
+    required String idToken,
+  }) async {
+    const maxAttempts = 3;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        return await _authRepository.loginWithOAuth(
+          provider: provider,
+          idToken: idToken,
+        );
+      } on ApiException catch (error) {
+        if (!isRetryableApiError(error) || attempt == maxAttempts) {
+          rethrow;
+        }
+        await Future<void>.delayed(Duration(milliseconds: 500 * attempt));
+      }
+    }
+    throw StateError('unreachable');
   }
 
   /// Set role for a newly registered OAuth user.
