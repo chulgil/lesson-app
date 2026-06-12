@@ -231,18 +231,14 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
                   context.push(AppRoutes.allRecordings);
                 },
               ),
-              // 가이드 다시 보기 — W5 졸업 후 활성. W2 에서는 placeholder Snackbar.
+              // 가이드 다시 보기 — W5 Task 5.6 (spec §8.4).
               ListTile(
                 leading: const Icon(Icons.menu_book_outlined),
                 title: const Text(AppStrings.categoryGuideReplayLabel),
                 subtitle: const Text(AppStrings.categoryGuideReplaySubtitle),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(AppStrings.categoryGuideReplayComingSoon),
-                    ),
-                  );
+                  context.push(AppRoutes.guideReshow);
                 },
               ),
               ListTile(

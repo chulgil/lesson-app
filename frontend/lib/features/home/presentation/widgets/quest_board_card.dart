@@ -132,28 +132,30 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
     // Phase C 보상 — phone_verification_policy.md §2.
     final isPhoneVerified = ref.watch(homeTeacherPhoneVerifiedProvider);
 
-    // Board dismissal aligns with profileCompletionPercent SSOT
-    // (10 mandatory quests sum to 100%, Q11 is bonus weight 0).
-    final allMandatoryDone =
-        hasSlots &&
-        hasPhoto &&
-        hasIntro &&
-        hasInstruments &&
-        hasPrice &&
-        hasBankAcc &&
-        hasStudents &&
-        hasSubscription &&
-        hasCompletedLesson &&
-        hasLessonNote &&
-        hasPracticeAssigned;
+    // Board dismissal aligns with profileCompletionPercent SSOT (SC-6).
+    // 11개 mandatory quest (Q1~Q10 + Q3b) sum to 100%, Q11 is bonus weight 0.
+    final allMandatoryDone = ref.watch(allMandatoryQuestsCompletedProvider);
 
     if (allMandatoryDone) {
-      // §8.3 전체 완료 — 축하 카드 1회 표시 (#608 Job 7).
+      // W5 §8.2 — 졸업 메커니즘.
+      // celebratedAt 자동 영속 (onRequiredCompleted) 후 7일 grace 동안 카드 노출,
+      // 이후 graduated == true → 메인에서 완전 hide.
       // BE PATCH /users/me/quest-celebrated 가 1회성 보장 SSOT.
-      // Hive local 은 같은 세션 내 BE 호출 실패 시 재표시 방지용 fallback.
-      final celebrationDismissed =
-          ref.watch(questCelebrationProvider).valueOrNull;
-      if (celebrationDismissed != null) return const SizedBox.shrink();
+      final celebrationAsync = ref.watch(questCelebrationProvider);
+      final state = celebrationAsync.valueOrNull;
+
+      // 첫 진입: celebratedAt 미기록 → 자동 트리거 (post-frame callback).
+      if (state != null && state.celebratedAt == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          // ignore: discarded_futures — fire-and-forget. BE 실패도 Hive 캐시.
+          ref.read(questCelebrationProvider.notifier).onRequiredCompleted();
+        });
+      }
+
+      if (state == null) return const SizedBox.shrink(); // loading
+      if (state.graduated) return const SizedBox.shrink(); // 7일+ or dismiss
+      if (!state.visible) return const SizedBox.shrink(); // celebratedAt null
       return const QuestCelebrationCard();
     }
 

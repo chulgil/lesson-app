@@ -30,26 +30,81 @@ class _FakeQuestFirstShown extends QuestFirstShown {
   Future<void> markShown() async {}
 }
 
-/// 축하 카드 이미 dismiss 된 상태 — 기본값 (기존 "board hides" 테스트 의도 유지).
+/// 졸업 후 7일 grace 만료 또는 사용자 명시 dismiss 상태 — 보드/카드 모두 hidden.
+/// W5 의미: `graduated == true`.
 class _DismissedCelebration extends QuestCelebration {
   @override
-  Future<DateTime?> build() async => DateTime.utc(2026, 1, 1);
+  Future<QuestCelebrationState> build() async => QuestCelebrationState(
+    celebratedAt: DateTime.utc(2026, 1, 1),
+    dismissedAt: DateTime.utc(2026, 1, 1, 1),
+  );
 
   @override
   Future<void> markCelebrated() async {}
+  @override
+  Future<void> onRequiredCompleted() async {}
+  @override
+  Future<void> resetDismissal() async {}
 }
 
-/// 축하 카드 아직 dismiss 안 된 상태 — 11/11 완료 + 카드 표시 테스트용.
+/// 갓 졸업한 상태 — 11/11 완료 + 졸업 카드 표시 테스트용.
+/// W5 의미: `celebratedAt == 방금`, `dismissedAt == null` → visible == true.
 class _PendingCelebration extends QuestCelebration {
   bool markCelebratedCalled = false;
+  bool onRequiredCompletedCalled = false;
 
   @override
-  Future<DateTime?> build() async => null;
+  Future<QuestCelebrationState> build() async =>
+      QuestCelebrationState(celebratedAt: DateTime.now(), dismissedAt: null);
 
   @override
   Future<void> markCelebrated() async {
     markCelebratedCalled = true;
   }
+
+  @override
+  Future<void> onRequiredCompleted() async {
+    onRequiredCompletedCalled = true;
+  }
+
+  @override
+  Future<void> resetDismissal() async {}
+}
+
+/// 아직 졸업 트리거 전 — celebratedAt == null. 자동 트리거 회귀 테스트용.
+class _NotYetCelebrated extends QuestCelebration {
+  bool onRequiredCompletedCalled = false;
+
+  @override
+  Future<QuestCelebrationState> build() async =>
+      QuestCelebrationState(celebratedAt: null, dismissedAt: null);
+
+  @override
+  Future<void> markCelebrated() async {}
+
+  @override
+  Future<void> onRequiredCompleted() async {
+    onRequiredCompletedCalled = true;
+  }
+
+  @override
+  Future<void> resetDismissal() async {}
+}
+
+/// 졸업 후 7일 경과 (grace 만료) — graduated == true. 명시 dismiss 없음.
+class _GracePeriodExpired extends QuestCelebration {
+  @override
+  Future<QuestCelebrationState> build() async => QuestCelebrationState(
+    celebratedAt: DateTime.now().subtract(const Duration(days: 8)),
+    dismissedAt: null,
+  );
+
+  @override
+  Future<void> markCelebrated() async {}
+  @override
+  Future<void> onRequiredCompleted() async {}
+  @override
+  Future<void> resetDismissal() async {}
 }
 
 /// Overrides that complete all 10 mandatory quests. Phone verification is
@@ -339,6 +394,59 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text(AppStrings.questCelebrationTitle), findsNothing);
     expect(find.text(AppStrings.questBoardTitle), findsOneWidget);
+  });
+
+  // ── W5 §8.2 졸업 메커니즘 — 7일 grace + 자동 hide ──
+
+  testWidgets('W5: 11/11 완료 + 졸업 후 7일 경과 (grace 만료) → 보드/카드 모두 hidden', (
+    tester,
+  ) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+      _GracePeriodExpired.new,
+    );
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questCelebrationTitle), findsNothing);
+    expect(find.text(AppStrings.questBoardTitle), findsNothing);
+  });
+
+  testWidgets(
+    'W5: 11/11 완료 + celebratedAt == null → 자동 트리거 (onRequiredCompleted)',
+    (tester) async {
+      final fake = _NotYetCelebrated();
+      final overrides = _allMandatoryDone(phoneVerified: false);
+      overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+        () => fake,
+      );
+
+      await _pump(tester, overrides);
+      // post-frame callback 처리.
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      // 자동 트리거 호출 확인.
+      expect(fake.onRequiredCompletedCalled, isTrue);
+      // celebratedAt 미설정 → 카드/보드 모두 hidden (다음 build 에서 표시).
+      expect(find.text(AppStrings.questCelebrationTitle), findsNothing);
+      expect(find.text(AppStrings.questBoardTitle), findsNothing);
+    },
+  );
+
+  testWidgets('W5: 11/11 완료 + 갓 졸업 (visible) → 졸업 카드 표시', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+      _PendingCelebration.new,
+    );
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questCelebrationTitle), findsOneWidget);
+    // 보드 자체는 hidden.
+    expect(find.text(AppStrings.questBoardTitle), findsNothing);
   });
 }
 

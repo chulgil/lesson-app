@@ -23,6 +23,10 @@ class AppRoutes {
   /// spec §9.2 — FirstAvailability 완료 후 1회 노출.
   static const onboardingCategoryPreview = '/onboarding/category-preview';
 
+  /// "가이드 다시 보기" — 졸업 후 fallback 진입점 (W5 Task 5.6).
+  /// spec §8.4 — ⚙️ 정책·알림·지원 → 메뉴에서만 접근.
+  static const guideReshow = '/profile/guide-reshow';
+
   // Student onboarding routes
   static const studentProfileSetup = '/student/onboarding/profile-setup';
   static const studentTutorial = '/student/onboarding/tutorial';
