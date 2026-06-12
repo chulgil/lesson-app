@@ -17,6 +17,7 @@ import '../../../domain/services/youtube_ad_detector.dart';
 import '../../../domain/value_objects/practice_loop_speeds.dart';
 import '../../providers/practice_loop_provider.dart';
 import '../../providers/practice_loop_stats_provider.dart';
+import '../../providers/practice_recording_provider.dart';
 import '../../providers/practice_youtube_pause_signal.dart';
 import 'ad_notice_overlay.dart';
 import 'count_in_overlay.dart';
@@ -36,12 +37,18 @@ class PracticeYoutubePlayer extends ConsumerStatefulWidget {
   final int? teacherStartSeconds;
   final int? teacherEndSeconds;
 
+  /// Student gamification P1 (Job 3 Task 3.5). When non-null, the player
+  /// records a practice evidence via [PracticeSourceLoggers.logYoutubeEnded]
+  /// once per widget lifecycle on the first [PlayerState.ended].
+  final String? studentId;
+
   const PracticeYoutubePlayer({
     super.key,
     required this.videoId,
     required this.sectionId,
     this.teacherStartSeconds,
     this.teacherEndSeconds,
+    this.studentId,
   });
 
   @override
@@ -64,15 +71,19 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   bool _showAdNotice = false;
   bool _adAutoPausedOnce = false;
 
+  /// Job 3 Task 3.5 — fire `logYoutubeEnded` only once per widget lifecycle.
+  bool _practiceEndedLogged = false;
+
   @override
   void initState() {
     super.initState();
     if (!_supportsIframe) return;
     _controller = YoutubePlayerController.fromVideoId(
       videoId: widget.videoId,
-      startSeconds: (widget.teacherStartSeconds ?? 0) > 0
-          ? widget.teacherStartSeconds!.toDouble()
-          : null,
+      startSeconds:
+          (widget.teacherStartSeconds ?? 0) > 0
+              ? widget.teacherStartSeconds!.toDouble()
+              : null,
       params: const YoutubePlayerParams(
         showControls: true,
         showFullscreenButton: false,
@@ -101,6 +112,25 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
     // a non-buffering reason (paused, ended, cued). Buffering can occur
     // mid-ad so we leave the flag alone there.
     final st = value.playerState;
+    // Job 3 Task 3.5 — record practice on first ended event (P1 = onEnded only).
+    if (st == PlayerState.ended &&
+        !_practiceEndedLogged &&
+        widget.studentId != null &&
+        _totalDuration > 0) {
+      _practiceEndedLogged = true;
+      final minutes = (_totalDuration / 60).round();
+      if (minutes > 0) {
+        unawaited(
+          ref
+              .read(practiceSourceLoggersProvider)
+              .logYoutubeEnded(
+                studentId: widget.studentId!,
+                durationMinutes: minutes,
+                videoId: widget.videoId,
+              ),
+        );
+      }
+    }
     if (st == PlayerState.paused ||
         st == PlayerState.ended ||
         st == PlayerState.cued) {
@@ -221,9 +251,10 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
   Future<void> _onCountInCompleted() async {
     if (!mounted) return;
     setState(() => _showCountIn = false);
-    final override = ref
-        .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
-        .valueOrNull;
+    final override =
+        ref
+            .read(practiceLoopOverrideNotifierProvider(widget.sectionId))
+            .valueOrNull;
     final start =
         override?.effectiveStartSeconds(widget.teacherStartSeconds) ??
         widget.teacherStartSeconds ??
@@ -272,10 +303,11 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
 
     return overrideAsync.when(
       data: (override) => _buildContent(override),
-      loading: () => const SizedBox(
-        height: 240,
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading:
+          () => const SizedBox(
+            height: 240,
+            child: Center(child: CircularProgressIndicator()),
+          ),
       error: (_, __) => _buildError(),
     );
   }
@@ -307,12 +339,14 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
                   child: LoopMemoOverlay(
                     memos: override.studentMemos,
                     currentPositionSeconds: _currentPosition.round(),
-                    onAdd: (text) => notifier.addMemo(
-                      atSeconds: _currentPosition.round(),
-                      text: text,
-                    ),
-                    onEdit: (memo, text) =>
-                        notifier.updateMemo(id: memo.id, text: text),
+                    onAdd:
+                        (text) => notifier.addMemo(
+                          atSeconds: _currentPosition.round(),
+                          text: text,
+                        ),
+                    onEdit:
+                        (memo, text) =>
+                            notifier.updateMemo(id: memo.id, text: text),
                     onDelete: (memo) => notifier.deleteMemo(memo.id),
                   ),
                 ),
@@ -338,12 +372,16 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
           startSeconds: start.toDouble(),
           endSeconds: end,
           memoSeconds: override.studentMemos.map((m) => m.atSeconds).toList(),
-          onStartChanged: (v) => notifier.setSegment(
-            startSeconds: v.round(),
-            endSeconds: end.round(),
-          ),
-          onEndChanged: (v) =>
-              notifier.setSegment(startSeconds: start, endSeconds: v.round()),
+          onStartChanged:
+              (v) => notifier.setSegment(
+                startSeconds: v.round(),
+                endSeconds: end.round(),
+              ),
+          onEndChanged:
+              (v) => notifier.setSegment(
+                startSeconds: start,
+                endSeconds: v.round(),
+              ),
         ),
         const SizedBox(height: AppSpacing.space2),
         LoopControls(

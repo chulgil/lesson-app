@@ -399,10 +399,29 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 ---
 
+## 13. 학생 게이미피케이션 (자가 연습) — 2026-06-11
+
+학생 자가 연습 80% 비중을 가시화. **선생님 퀘스트(§12)와 별 시스템** — 학생용은 자가 결정 목표 추적.
+
+| 한글 | 영문 | 설명 |
+|------|------|------|
+| 학생 자가 quest | StudentQuest | 학생이 작성/채택한 연습 목표 (선생님 quest 와 별도) |
+| Quest 출처 | QuestOrigin | 자가 quest 출처 6종 — 자작/시스템 루틴/레슨 추출/선생님 추천/시즌 이벤트/주변 |
+| 성장 히트맵 | GrowthHeatmap | 1년 캘린더 연습 시각화 (Strava 모델) |
+| 일일 연습 기록 | DailyPractice | 메트로놈/튜너/YouTube/녹음/수동 5경로 통합 분 단위 |
+| [연습 시작] 1버튼 | Practice Start | 학생 홈의 단일 진입점 — 1탭으로 연습 모드 진입 |
+| 1.5초 축하 | Celebration Overlay | 연습 종료 후 비방해 축하 피드백 |
+| 자가 연습 전용 모드 | Self-Only Mode | 14세 미만 부모 동의 미수신 학생 — 비교 보기·리더보드 차단 |
+
+> 상세: [학생 게이미피케이션 P1 스펙](../../.harness/spec/2026-06-11-student-gamification.md)
+
+---
+
 ## 용어 변경 이력
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-11 | — | §13 학생 게이미피케이션 — StudentQuest / QuestOrigin / GrowthHeatmap / DailyPractice + [연습 시작] 1버튼 / 1.5초 축하 / 자가 연습 전용 모드 (14세 미만) | 학생 자가 연습 80% 가시화 (.harness/knowledge/glossary.md §15 동기화) |
 | 2026-06-08 | — | §12 퀘스트 시스템 — 3 그룹 (profile/operation/bonus) + Lock 매트릭스 + 자동 완료 + 축하 카드 (1회성) + 가입 직후 첫 도착 | 선생님 퀘스트 재정의 (.harness/knowledge/glossary.md §13 동기화) |
 | 2026-06-04 | — | ContextSwitchLog / AcademyDelegation / AcademyDelegationAction / AcademyActivityLog + 5 enum + 권한 계층 정책 5종 | AC-M1 그룹 B BE 권한 계층 (.harness glossary §12 동기화) |
 | 2026-06-04 | — | Academy / AcademyMember / AcademyStudent / AcademyInvite + 3 enum + 정책 용어 | AC-M1 그룹 A BE 도메인 모델링 (.harness glossary §12 동기화) |

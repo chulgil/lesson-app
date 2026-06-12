@@ -1,6 +1,7 @@
 # 학생 게이미피케이션 — 1년 retention 자가 연습 시스템 스펙
 
 > 작성일: 2026-06-11
+> 스펙: locked at commit 6262f03d (PR #680 merged 2026-06-11)
 > 단계: cg-harness Phase 2 — 스펙 초안 (Phase 6 통과 후 마스터 스펙으로 머지)
 > 입력 자료:
 > - [`docs/specs/gamification/gamification_master.md`](../../docs/specs/gamification/gamification_master.md) (2026-04-17 Phase 1~3 완료, 기존 인프라)

@@ -1,13 +1,15 @@
+import 'dart:async' show unawaited;
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/audio/audio_session_manager.dart';
 import '../../../../core/audio/metronome_engine_interface.dart';
+import '../../../../core/audio/metronome_storage_service.dart';
 import '../../../../core/audio/native_metronome_engine.dart';
 import '../../../../core/audio/soloud_metronome_engine.dart';
 import '../../../../features/practice/domain/entities/metronome_settings.dart';
-import '../../../../core/audio/metronome_storage_service.dart';
+import 'practice_recording_provider.dart';
 
 part 'metronome_provider.g.dart';
 
@@ -120,9 +122,8 @@ class Metronome extends _$Metronome {
     _engineReady = true;
 
     // Check if audio is currently interrupted
-    final initialError = AudioSessionManager.isInterrupted
-        ? '다른 앱이 오디오를 사용중'
-        : null;
+    final initialError =
+        AudioSessionManager.isInterrupted ? '다른 앱이 오디오를 사용중' : null;
 
     state = state.copyWith(
       settings: savedSettings,
@@ -152,10 +153,7 @@ class Metronome extends _$Metronome {
   }
 
   void _onBeat(int beatNumber, bool isAccent) {
-    state = state.copyWith(
-      currentBeat: beatNumber,
-      isAccent: isAccent,
-    );
+    state = state.copyWith(currentBeat: beatNumber, isAccent: isAccent);
   }
 
   void _onSubdivision(int subdivisionIndex, bool isMainBeat) {
@@ -197,17 +195,33 @@ class Metronome extends _$Metronome {
   }
 
   /// Stop the metronome - immediate response, no waiting.
-  void stop() {
+  /// Stop the metronome - immediate response, no waiting.
+  ///
+  /// When [studentId] and [practiceMinutesElapsed] are both provided,
+  /// the session is recorded via [PracticeSourceLoggers.logMetronome]
+  /// (Job 3 Task 3.3 — 학생 게이미피케이션 P1). Existing callers without
+  /// student context can keep calling `stop()` with no arguments.
+  void stop({String? studentId, int? practiceMinutesElapsed}) {
     if (!state.isPlaying) return; // Already stopped
 
-    state = state.copyWith(
-      isPlaying: false,
-      currentBeat: 0,
-      isAccent: false,
-    );
+    state = state.copyWith(isPlaying: false, currentBeat: 0, isAccent: false);
 
     // Stop engine without blocking
     _engine?.stop();
+
+    if (studentId != null &&
+        practiceMinutesElapsed != null &&
+        practiceMinutesElapsed > 0) {
+      unawaited(
+        ref
+            .read(practiceSourceLoggersProvider)
+            .logMetronome(
+              studentId: studentId,
+              durationMinutes: practiceMinutesElapsed,
+              bpm: state.settings.bpm,
+            ),
+      );
+    }
   }
 
   /// Toggle play/stop - immediate response.
@@ -224,9 +238,7 @@ class Metronome extends _$Metronome {
     final clampedBpm = MetronomeSettings.clampBpm(bpm);
 
     // Update state first to ensure UI responds immediately
-    state = state.copyWith(
-      settings: state.settings.copyWith(bpm: clampedBpm),
-    );
+    state = state.copyWith(settings: state.settings.copyWith(bpm: clampedBpm));
 
     // Then update engine (non-blocking for UI)
     try {
@@ -295,9 +307,7 @@ class Metronome extends _$Metronome {
   /// Toggle vibration.
   void toggleVibration() {
     state = state.copyWith(
-      settings: state.settings.copyWith(
-        vibration: !state.settings.vibration,
-      ),
+      settings: state.settings.copyWith(vibration: !state.settings.vibration),
     );
     _saveSettings();
   }

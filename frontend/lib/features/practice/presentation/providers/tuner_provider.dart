@@ -12,6 +12,7 @@ import '../../../../core/audio/tuner_storage_service.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_display_note.dart';
 import '../../domain/entities/tuner_types.dart';
+import 'practice_recording_provider.dart';
 import 'recording_provider.dart';
 
 part 'tuner_provider.g.dart';
@@ -274,7 +275,12 @@ class Tuner extends _$Tuner {
   }
 
   /// Stop listening.
-  Future<void> stop() async {
+  ///
+  /// When [studentId] and [practiceMinutesElapsed] are both provided,
+  /// the session is recorded via [PracticeSourceLoggers.logTuner]
+  /// (Job 3 Task 3.4 — 학생 게이미피케이션 P1). Existing callers without
+  /// student context can keep calling `stop()` with no arguments.
+  Future<void> stop({String? studentId, int? practiceMinutesElapsed}) async {
     if (!state.isListening) return;
 
     state = state.copyWith(
@@ -287,6 +293,19 @@ class Tuner extends _$Tuner {
 
     // Switch back to playback mode (removes "in call" indicator)
     await AudioSessionManager.disableRecordingMode();
+
+    if (studentId != null &&
+        practiceMinutesElapsed != null &&
+        practiceMinutesElapsed > 0) {
+      unawaited(
+        ref
+            .read(practiceSourceLoggersProvider)
+            .logTuner(
+              studentId: studentId,
+              durationMinutes: practiceMinutesElapsed,
+            ),
+      );
+    }
   }
 
   /// Toggle listening state.
