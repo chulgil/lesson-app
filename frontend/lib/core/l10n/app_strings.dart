@@ -8991,4 +8991,20 @@ class AppStrings {
 
   /// [건너뛰기] CTA — markShown() + 메인 진입 (1회 노출 정책 동일).
   static const onboardingCategoryPreviewSkip = '건너뛰기';
+
+  // ── NextMissionSpotlight (W4 Task 4.4) ───────────────────────────
+  // spec §9.1 Step 3 — 가입 후 메인 첫 진입 1회 spotlight.
+  // 사용처: features/home/presentation/widgets/next_mission_spotlight.dart
+
+  /// 카드 타이틀.
+  static const nextMissionSpotlightTitle = '여기부터 시작하시면 끝나요';
+
+  /// 보조 안내.
+  static const nextMissionSpotlightHint = '다음 미션 카드를 따라가면 설정이 완료됩니다';
+
+  /// [시작] CTA — markShown() + 미션 화면 push.
+  static const nextMissionSpotlightStart = '시작';
+
+  /// [나중에] CTA — markShown() + spotlight 종료만.
+  static const nextMissionSpotlightLater = '나중에';
 }
