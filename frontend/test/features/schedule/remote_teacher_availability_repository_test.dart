@@ -101,6 +101,74 @@ void main() {
     },
   );
 
+  test('getAvailability — BE 실응답 (id+created_at 채움, 요소 created_at 없음) 파싱 성공 '
+      '(2026-06-12 "데이터를 불러올 수 없다" 회귀)', () async {
+    // BE get_availability_by_teacher_id 는 항상 id="availability-{uuid}" 와
+    // created_at 을 채운다. 기존 파서의 strict 분기 (id+created_at → raw
+    // fromJson) 가 weekly_schedules 요소의 created_at 부재로 throw →
+    // read provider error → split page 에러 화면.
+    final dio = Dio();
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: {
+                'id': 'availability-uuid-teacher-42',
+                'teacher_id': 'uuid-teacher-42',
+                'created_at': '2026-06-12T00:00:00Z',
+                'slot_duration_minutes': 50,
+                'break_time_between_lessons': 10,
+                'weekly_schedules': [
+                  {
+                    // BE 합성 id + created_at 없음 + is_active 포함.
+                    'id': '2-14:00-18:00',
+                    'day_of_week': 2,
+                    'start_time': '14:00',
+                    'end_time': '18:00',
+                    'is_active': true,
+                  },
+                  {
+                    'id': '4-10:00-12:00',
+                    'day_of_week': 4,
+                    'start_time': '10:00',
+                    'end_time': '12:00',
+                    'is_active': false,
+                  },
+                ],
+                'exceptions': [
+                  {
+                    'id': 'exc-1',
+                    'type': 'holiday',
+                    'start_date': '2026-06-19T00:00:00Z',
+                    'end_date': '2026-06-19T00:00:00Z',
+                    'reason': '개인 사정',
+                    'created_at': '2026-06-12T00:00:00Z',
+                  },
+                ],
+              },
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+
+    final repository = RemoteTeacherAvailabilityRepository(ApiClient(dio));
+
+    final availability = await repository.getAvailability('uuid-teacher-42');
+
+    expect(availability, isNotNull);
+    expect(availability!.teacherId, 'uuid-teacher-42');
+    expect(availability.weeklySchedules, hasLength(2));
+    expect(availability.weeklySchedules.first.dayOfWeek, 2);
+    // is_active 가 관대 파서에서도 보존되어야 한다.
+    expect(availability.weeklySchedules.last.isActive, isFalse);
+    // exceptions 는 best-effort 파싱 (필드 호환 시 보존).
+    expect(availability.exceptions, hasLength(1));
+  });
+
   test(
     'addWeeklySchedule — 첫 설정 (GET 404) 이면 기본값으로 생성 후 PUT (2026-06-12 회귀)',
     () async {

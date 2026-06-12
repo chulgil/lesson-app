@@ -377,10 +377,11 @@ class RemoteTeacherAvailabilityRepository
   }
 
   static TeacherAvailability _availabilityFromJson(Map<String, dynamic> json) {
-    if (json['id'] != null && json['created_at'] != null) {
-      return TeacherAvailability.fromJson(json);
-    }
-
+    // 2026-06-12 — strict 분기 (id+created_at → raw fromJson) 제거.
+    // BE get_availability 는 항상 id="availability-{uuid}" 와 created_at 을
+    // 채우는데, weekly_schedules 요소에는 created_at 이 없어 strict
+    // WeeklySchedule.fromJson 이 throw → "데이터를 불러올 수 없다" 에러
+    // 화면. 항상 아래 관대 파서를 사용한다 (per-field 기본값).
     final teacherId = json['teacher_id'] as String? ?? '';
     final createdAt =
         json['created_at'] == null
@@ -400,6 +401,7 @@ class RemoteTeacherAvailabilityRepository
             dayOfWeek: (schedule['day_of_week'] as num).toInt(),
             startTime: schedule['start_time'] as String,
             endTime: schedule['end_time'] as String,
+            isActive: schedule['is_active'] as bool? ?? true,
             createdAt:
                 schedule['created_at'] == null
                     ? createdAt
@@ -429,13 +431,25 @@ class RemoteTeacherAvailabilityRepository
       }
     }
 
+    // exceptions — best-effort: 요소 단위로 시도하고 비호환 요소는 skip
+    // (운영시간 화면이 멈추는 것보다 일부 예외 누락이 안전).
+    final exceptions = <TimeException>[];
+    final rawExceptions = json['exceptions'] as List<dynamic>? ?? const [];
+    for (final raw in rawExceptions) {
+      try {
+        exceptions.add(TimeException.fromJson(raw as Map<String, dynamic>));
+      } catch (_) {
+        // skip incompatible exception payloads
+      }
+    }
+
     return TeacherAvailability(
       id: json['id'] as String? ?? 'availability_$teacherId',
       teacherId: teacherId,
       slotDurationMinutes:
           (json['slot_duration_minutes'] as num?)?.toInt() ?? 60,
       weeklySchedules: schedules,
-      exceptions: const [],
+      exceptions: exceptions,
       autoGenerateWeeks: (json['auto_generate_weeks'] as num?)?.toInt() ?? 4,
       createdAt: createdAt,
       updatedAt:
