@@ -9144,4 +9144,40 @@ class AppStrings {
 
   /// [기존 제안 취소 후 재제안] 버튼.
   static const duplicateProposalCancelAndResend = '기존 제안 취소 후 재제안';
+
+  // ── Phone Verification (#709) ──────────────────────────────────────────────
+  // 사용처: features/onboarding/presentation/screens/phone_verification_screen.dart
+  // 서버측 SMS OTP 검증 실패 사유별 메시지 (쿨다운/시도초과/만료 구분).
+
+  /// 쿨다운 중 재요청 — 남은 초 포함.
+  static String phoneOtpCooldownFormat(int seconds) =>
+      '인증번호를 이미 발송했어요. $seconds초 후 다시 시도해주세요.';
+
+  /// 쿨다운 중 재요청 — 남은 초 정보가 없을 때.
+  static const phoneOtpCooldown = '인증번호를 이미 발송했어요. 잠시 후 다시 시도해주세요.';
+
+  /// 번호당 일일 발송 한도(5회) 초과.
+  static const phoneOtpDailyLimit = '오늘 인증 시도 횟수를 초과했어요. 내일 다시 시도해주세요.';
+
+  /// 인증번호 TTL(3분) 만료.
+  static const phoneOtpExpired = '인증번호가 만료됐어요. 다시 요청해주세요.';
+
+  /// 검증 시도 5회 초과.
+  static const phoneOtpAttemptsExceeded = '시도 횟수를 초과했어요. 인증번호를 다시 요청해주세요.';
+
+  /// 잘못된 코드 — 남은 시도 횟수 포함.
+  static String phoneOtpInvalidFormat(int attemptsRemaining) =>
+      '인증번호가 일치하지 않아요. (남은 시도 $attemptsRemaining회)';
+
+  /// 잘못된 코드 — 남은 시도 정보가 없을 때.
+  static const phoneOtpInvalid = '인증번호가 일치하지 않아요.';
+
+  /// 발송된 코드 없음 (요청 전 검증 시도).
+  static const phoneOtpNotFound = '인증번호를 먼저 요청해주세요.';
+
+  /// SMS 벤더 발송 실패.
+  static const phoneOtpSendFailed = 'SMS 발송에 실패했어요. 잠시 후 다시 시도해주세요.';
+
+  /// 네트워크/기타 오류.
+  static const phoneOtpNetworkError = '네트워크 연결을 확인해주세요. 잠시 후 다시 시도해주세요.';
 }

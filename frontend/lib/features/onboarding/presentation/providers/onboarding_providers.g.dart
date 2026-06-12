@@ -467,7 +467,7 @@ final onboardingProfileFromFormProvider =
 
 typedef OnboardingProfileFromFormRef = ProviderRef<TeacherOnboardingProfile?>;
 String _$teacherOnboardingNotifierHash() =>
-    r'ff4c5b55ca3db15dd70921e8032a4d7c81d01723';
+    r'd3e87f3ea06c46ef5010cc1da008efa4802c0b55';
 
 /// Teacher onboarding state notifier
 ///

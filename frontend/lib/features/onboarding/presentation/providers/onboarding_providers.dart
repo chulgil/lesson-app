@@ -6,6 +6,8 @@ import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../profile/domain/repositories/teacher_profile_repository.dart';
 import '../../../auth/auth_facade.dart';
+import '../../domain/repositories/phone_verification_repository.dart';
+import 'phone_verification_repository_provider.dart';
 import 'teacher_profile_repository_provider.dart';
 
 part 'onboarding_providers.g.dart';
@@ -28,7 +30,9 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
     state = state.copyWith(currentStep: step);
   }
 
-  /// Start phone verification
+  /// Start phone verification (mock/local state only).
+  ///
+  /// #709: remote 모드에서는 [requestCode] 를 사용한다 — 코드 생성은 서버 책임.
   void startPhoneVerification(String phoneNumber) {
     final verification = PhoneVerification(
       phoneNumber: phoneNumber,
@@ -41,47 +45,94 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
     );
   }
 
-  /// Resend verification code
-  bool resendVerificationCode() {
-    final current = state.phoneVerification;
-    if (current == null) return false;
-    if (!current.canRequestNewCode) return false;
+  /// Request a server-generated OTP code — #709.
+  ///
+  /// mock 모드: 기존 로컬 시뮬레이션 유지 (개발 편의).
+  /// remote 모드: 서버에 발송 요청. 쿨다운/일일 한도는 서버가 강제한다.
+  Future<PhoneVerificationResult> requestCode(String phoneNumber) async {
+    if (ref.read(mockDataModeProvider)) {
+      startPhoneVerification(phoneNumber);
+      return const PhoneVerificationResult.success();
+    }
 
-    final newVerification = current.copyWith(
-      verificationCode: _generateVerificationCode(),
-      codeSentAt: DateTime.now(),
-    );
-    state = state.copyWith(phoneVerification: newVerification);
-    return true;
+    final repository = ref.read(phoneVerificationRepositoryProvider);
+    final result = await repository.requestCode(phoneNumber);
+    if (result.success) {
+      state = state.copyWith(
+        phoneVerification: PhoneVerification(
+          phoneNumber: phoneNumber,
+          codeSentAt: DateTime.now(),
+        ),
+        currentStep: OnboardingStep.phoneVerification,
+      );
+    }
+    return result;
   }
 
-  /// Verify code
-  bool verifyCode(String code) {
+  /// Resend verification code — #709 remote-aware.
+  ///
+  /// mock 모드: 기존 로컬 재발급. remote 모드: 서버 재요청 (쿨다운 서버 강제).
+  Future<PhoneVerificationResult> resendVerificationCode() async {
+    final current = state.phoneVerification;
+    if (current == null) {
+      return const PhoneVerificationResult.failed(
+        PhoneVerificationFailure.codeNotFound,
+      );
+    }
+
+    if (ref.read(mockDataModeProvider)) {
+      if (!current.canRequestNewCode) {
+        return const PhoneVerificationResult.failed(
+          PhoneVerificationFailure.cooldown,
+        );
+      }
+      final newVerification = current.copyWith(
+        verificationCode: _generateVerificationCode(),
+        codeSentAt: DateTime.now(),
+      );
+      state = state.copyWith(phoneVerification: newVerification);
+      return const PhoneVerificationResult.success();
+    }
+
+    return requestCode(current.phoneNumber);
+  }
+
+  /// Verify code — #709.
+  ///
+  /// mock 모드: 6자리면 통과 (기존 동작 유지).
+  /// remote 모드: 서버 검증 결과만 신뢰 — 로컬 코드 비교 제거.
+  /// 성공 시 서버가 teacher.is_phone_verified=true 를 세팅한다.
+  Future<PhoneVerificationResult> verifyCode(String code) async {
     final current = state.phoneVerification;
 
-    // Mock/dev only: accept any 6-digit code (no real SMS/OTP backend wired).
-    // In real mode this falls through to actual code verification below.
+    // Mock/dev only: accept any 6-digit code.
     if (ref.read(mockDataModeProvider) && code.length == 6) {
-      final verified = (current ??
-              PhoneVerification(
-                phoneNumber: '',
-                verificationCode: code,
-                codeSentAt: DateTime.now(),
-              ))
-          .copyWith(isVerified: true, verifiedAt: DateTime.now());
+      final verified =
+          (current ??
+                  PhoneVerification(
+                    phoneNumber: '',
+                    verificationCode: code,
+                    codeSentAt: DateTime.now(),
+                  ))
+              .copyWith(isVerified: true, verifiedAt: DateTime.now());
       state = state.copyWith(
         phoneVerification: verified,
         currentStep: OnboardingStep.profileSetup,
       );
-      return true;
+      return const PhoneVerificationResult.success();
     }
 
-    if (current == null) return false;
-    if (!current.isCodeValid) return false;
-    if (current.isMaxAttemptsReached) return false;
+    if (current == null) {
+      return const PhoneVerificationResult.failed(
+        PhoneVerificationFailure.codeNotFound,
+      );
+    }
 
-    // Check code match
-    if (current.verificationCode == code) {
+    // Remote: 서버 검증 결과만 신뢰. 시도 횟수/TTL 도 서버가 SOR.
+    final repository = ref.read(phoneVerificationRepositoryProvider);
+    final result = await repository.verifyCode(current.phoneNumber, code);
+
+    if (result.success) {
       final verified = current.copyWith(
         isVerified: true,
         verifiedAt: DateTime.now(),
@@ -90,13 +141,13 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
         phoneVerification: verified,
         currentStep: OnboardingStep.profileSetup,
       );
-      return true;
+      return result;
     }
 
-    // Increment attempt count
+    // 실패: UI 표시용 로컬 attemptCount 만 증가 (판정 자체는 서버 결과).
     final updated = current.copyWith(attemptCount: current.attemptCount + 1);
     state = state.copyWith(phoneVerification: updated);
-    return false;
+    return result;
   }
 
   /// Update profile data
@@ -204,7 +255,9 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
     final onboardingProfile = onboardingState.profile!;
     final profile = TeacherProfile(
       id: 'profile_${DateTime.now().millisecondsSinceEpoch}',
-      userId: onboardingState.userId ?? (throw Exception('userId is required for onboarding')),
+      userId:
+          onboardingState.userId ??
+          (throw Exception('userId is required for onboarding')),
       name: onboardingProfile.name,
       profileImage: onboardingProfile.profileImage,
       instruments: onboardingProfile.instruments,

@@ -177,7 +177,9 @@ class TeacherUpdate(BaseModel):
     bank_accounts: list[dict] | None = None
 
     # Phone verification
-    is_phone_verified: bool | None = None
+    # NOTE: is_phone_verified is intentionally excluded — it may only be set by
+    # PhoneVerificationService.verify_code() on the server side (#709 security gap fix).
+    # Clients that send this field will have it silently ignored by model_dump(exclude_unset=True).
     phone_number: str | None = None
 
     # Visibility settings

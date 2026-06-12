@@ -123,10 +123,11 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
 
     final data = response.data as Map<String, dynamic>;
     final items = data['items'] as List<dynamic>? ?? [];
-    final profiles = items
-        .map((json) => _profileFromJson(json as Map<String, dynamic>))
-        .where((p) => filter.matches(p))
-        .toList();
+    final profiles =
+        items
+            .map((json) => _profileFromJson(json as Map<String, dynamic>))
+            .where((p) => filter.matches(p))
+            .toList();
 
     return profiles;
   }
@@ -236,13 +237,15 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
             ),
             name: m['name'] as String? ?? '',
             issuingBody: m['issuing_body'] as String? ?? '',
-            issueDate: issueDateStr != null
-                ? DateTime.tryParse(issueDateStr) ?? DateTime.now()
-                : DateTime.now(),
+            issueDate:
+                issueDateStr != null
+                    ? DateTime.tryParse(issueDateStr) ?? DateTime.now()
+                    : DateTime.now(),
             imageUrl: m['image_url'] as String? ?? '',
-            submittedAt: submittedAtStr != null
-                ? DateTime.tryParse(submittedAtStr) ?? DateTime.now()
-                : DateTime.now(),
+            submittedAt:
+                submittedAtStr != null
+                    ? DateTime.tryParse(submittedAtStr) ?? DateTime.now()
+                    : DateTime.now(),
             status: CertificateStatus.values.firstWhere(
               (s) => s.name == (m['status'] as String?),
               orElse: () => CertificateStatus.pending,
@@ -253,33 +256,40 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
 
     // Parse visibility settings
     final visJson = json['visibility_settings'] as Map<String, dynamic>?;
-    final visibility = visJson != null
-        ? ProfileVisibilitySettings(
-            isSearchable: visJson['is_searchable'] as bool? ?? true,
-            contactVisibility: _parseVisibility(visJson['contact_visibility']),
-            feeVisibility: _parseVisibility(visJson['fee_visibility']),
-            careerVisibility: _parseVisibility(visJson['career_visibility']),
-            certificateVisibility: _parseVisibility(
-              visJson['certificate_visibility'],
-            ),
-          )
-        : const ProfileVisibilitySettings();
+    final visibility =
+        visJson != null
+            ? ProfileVisibilitySettings(
+              isSearchable: visJson['is_searchable'] as bool? ?? true,
+              contactVisibility: _parseVisibility(
+                visJson['contact_visibility'],
+              ),
+              feeVisibility: _parseVisibility(visJson['fee_visibility']),
+              careerVisibility: _parseVisibility(visJson['career_visibility']),
+              certificateVisibility: _parseVisibility(
+                visJson['certificate_visibility'],
+              ),
+            )
+            : const ProfileVisibilitySettings();
 
     // Parse bank account (legacy single — flat fields)
     final bankName = json['bank_name'] as String?;
     final accountNumber = json['account_number'] as String?;
     final accountHolder = json['account_holder'] as String?;
-    final bankAccount = (bankName != null || accountNumber != null)
-        ? BankAccount(
-            id: json['bank_account_id'] as String? ?? '',
-            bankName: bankName ?? '',
-            accountNumber: accountNumber ?? '',
-            accountHolder: accountHolder ?? '',
-            createdAt: json['bank_account_created_at'] != null
-                ? DateTime.parse(json['bank_account_created_at'] as String)
-                : DateTime.now(),
-          )
-        : null;
+    final bankAccount =
+        (bankName != null || accountNumber != null)
+            ? BankAccount(
+              id: json['bank_account_id'] as String? ?? '',
+              bankName: bankName ?? '',
+              accountNumber: accountNumber ?? '',
+              accountHolder: accountHolder ?? '',
+              createdAt:
+                  json['bank_account_created_at'] != null
+                      ? DateTime.parse(
+                        json['bank_account_created_at'] as String,
+                      )
+                      : DateTime.now(),
+            )
+            : null;
 
     // 2026-06-12 — 복수 계좌 (bank_accounts) 역파싱. 이전엔 왕복 직렬화가
     // 모두 누락되어 베타에서 "계좌 추가 무반응" (저장도 조회도 안 됨).
@@ -311,13 +321,14 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       experienceYears: json['experience_years'] as int?,
       lessonAreas: lessonAreas,
       lessonTypes: lessonTypes,
-      feeRange: (feeMin != null || feeMax != null)
-          ? FeeRange(
-              minFee: feeMin ?? 0,
-              maxFee: feeMax ?? 0,
-              duration: feeDuration,
-            )
-          : null,
+      feeRange:
+          (feeMin != null || feeMax != null)
+              ? FeeRange(
+                minFee: feeMin ?? 0,
+                maxFee: feeMax ?? 0,
+                duration: feeDuration,
+              )
+              : null,
       teachingStyle: json['teaching_style'] as String?,
       education: educationList,
       career: careerList,
@@ -325,9 +336,10 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       visibilitySettings: visibility,
       bankAccount: bankAccount,
       bankAccounts: bankAccounts,
-      createdAt: createdAtStr != null
-          ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
-          : DateTime.now(),
+      createdAt:
+          createdAtStr != null
+              ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+              : DateTime.now(),
       updatedAt: updatedAtStr != null ? DateTime.tryParse(updatedAtStr) : null,
     );
   }
@@ -340,16 +352,17 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       'experience_years': profile.experienceYears,
       'specialties': profile.specialties,
       'lesson_areas': profile.lessonAreas,
-      'lesson_types': profile.lessonTypes?.map((t) {
-        switch (t) {
-          case LessonTypeOption.inPerson:
-            return 'in_person';
-          case LessonTypeOption.online:
-            return 'online';
-          case LessonTypeOption.visit:
-            return 'visit';
-        }
-      }).toList(),
+      'lesson_types':
+          profile.lessonTypes?.map((t) {
+            switch (t) {
+              case LessonTypeOption.inPerson:
+                return 'in_person';
+              case LessonTypeOption.online:
+                return 'online';
+              case LessonTypeOption.visit:
+                return 'visit';
+            }
+          }).toList(),
       if (profile.feeRange != null) 'fee_min': profile.feeRange!.minFee,
       if (profile.feeRange != null) 'fee_max': profile.feeRange!.maxFee,
       if (profile.feeRange != null) 'fee_duration': profile.feeRange!.duration,
@@ -364,10 +377,10 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       // 2026-06-12 — 복수 계좌 직렬화 (이전 누락 → 베타 저장 무반응 원인).
       // BE TeacherUpdate.bank_accounts: list[dict] | None.
       'bank_accounts': profile.bankAccounts.map((a) => a.toJson()).toList(),
-      if (profile.verification.isPhoneVerified) ...{
-        'is_phone_verified': true,
+      // #709: is_phone_verified 는 전송하지 않는다 — 서버가 OTP 검증 성공 시에만
+      // 세팅 (TeacherUpdate 스키마에서 제거됨). 번호는 표시용으로만 전송.
+      if (profile.verification.isPhoneVerified)
         'phone_number': profile.verification.phoneNumber,
-      },
       'visibility_settings': {
         'is_searchable': profile.visibilitySettings.isSearchable,
         'contact_visibility': profile.visibilitySettings.contactVisibility.name,

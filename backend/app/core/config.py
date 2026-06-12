@@ -112,6 +112,15 @@ class Settings(BaseSettings):
     ALIMTALK_API_KEY: str = ""
     ALIMTALK_SENDER_PROFILE: str = ""
 
+    # SMS OTP (#709). Default mock=True so dev + CI never hit the vendor API.
+    # Production must set SMS_USE_MOCK=false AND populate the Solapi credentials below;
+    # otherwise sends silently no-op via the mock client.
+    SMS_USE_MOCK: bool = True
+    SMS_API_BASE_URL: str = "https://api.solapi.com"
+    SMS_API_KEY: str = ""
+    SMS_API_SECRET: str = ""
+    SMS_SENDER_NUMBER: str = ""
+
     # CSP report-only mode (Phase 17). 빈 문자열이면 위반 신고 endpoint 명시 없이 정책만 전송 —
     # 브라우저 콘솔에서만 위반 가시. URL 설정 시 신고 페이로드가 그 endpoint 로 POST 된다.
     CSP_REPORT_URI: str = ""

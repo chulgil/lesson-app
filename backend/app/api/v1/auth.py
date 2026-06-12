@@ -5,13 +5,19 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Header, status  # noqa: F401  (Header used in string Annotated below)
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_user, get_db
+from app.core.deps import (  # noqa: F401  get_current_teacher used in Depends()
+    get_current_teacher,
+    get_current_user,
+    get_db,
+)
 from app.core.rate_limit import (  # noqa: F401  사용되는 곳이 데코레이터 `dependencies=` 리스트라 ruff 가 detect 못함.
     auth_dev_login_rate_limit,
     auth_oauth_rate_limit,
     auth_refresh_rate_limit,
+    rate_limit,
 )
 from app.models.user import User
 from app.schemas.auth import (
@@ -25,6 +31,22 @@ from app.schemas.auth import (
 from app.schemas.common import SuccessResponse
 from app.schemas.user import RoleUpdate, TermsConsentRequest, UserResponse
 from app.services.auth_service import AuthService
+
+# ── Phone OTP schemas (#709) ─────────────────────────────────────────────────
+
+
+class PhoneOtpRequestBody(BaseModel):
+    """SMS OTP 발송 요청."""
+
+    phone_number: str = Field(..., min_length=10, max_length=15, description="수신 전화번호 (숫자만)")
+
+
+class PhoneOtpVerifyBody(BaseModel):
+    """SMS OTP 검증 요청."""
+
+    phone_number: str = Field(..., min_length=10, max_length=15)
+    code: str = Field(..., min_length=6, max_length=6, description="6자리 인증번호")
+
 
 router = APIRouter()
 
@@ -165,3 +187,46 @@ async def accept_terms(
     service = AuthService(db)
     user = await service.accept_terms(current_user, body.marketing_consent)
     return UserResponse.model_validate(user)
+
+
+# ── Phone OTP endpoints (#709) ────────────────────────────────────────────────
+# 인증된 선생님 계정에만 귀속. 본인 teacher 행에만 코드를 발급/검증한다.
+
+_phone_otp_request_rate_limit = Depends(rate_limit("phone_otp_request", max_requests=10, window_seconds=60))
+_phone_otp_verify_rate_limit = Depends(rate_limit("phone_otp_verify", max_requests=20, window_seconds=60))
+
+
+@router.post(
+    "/phone/request-code",
+    status_code=status.HTTP_200_OK,
+    summary="SMS OTP 발송 요청 (#709)",
+    dependencies=[_phone_otp_request_rate_limit],
+)
+async def phone_request_code(
+    body: PhoneOtpRequestBody,
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    """6자리 OTP를 생성해 SMS로 발송한다. TTL 3분, 쿨다운 60초, 일일 5회 한도."""
+    from app.services.phone_verification_service import PhoneVerificationService
+
+    service = PhoneVerificationService(db)
+    return await service.request_code_for_user(current_user.id, body.phone_number)
+
+
+@router.post(
+    "/phone/verify-code",
+    status_code=status.HTTP_200_OK,
+    summary="SMS OTP 검증 (#709)",
+    dependencies=[_phone_otp_verify_rate_limit],
+)
+async def phone_verify_code(
+    body: PhoneOtpVerifyBody,
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    """OTP 코드를 검증하고 성공 시 teacher.is_phone_verified=True로 세팅한다."""
+    from app.services.phone_verification_service import PhoneVerificationService
+
+    service = PhoneVerificationService(db)
+    return await service.verify_code_for_user(current_user.id, body.phone_number, body.code)

@@ -34,7 +34,10 @@ class ErrorInterceptor extends Interceptor {
     // HTTP status errors
     final statusCode = err.response?.statusCode;
     final data = err.response?.data;
-    final detail = data is Map ? data['detail'] as String? : null;
+    // #709: detail 이 String 이 아닌 dict 인 응답(OTP 쿨다운/시도초과 등)에서
+    // `as String?` 캐스트가 TypeError 로 크래시하지 않도록 타입 가드.
+    final detailRaw = data is Map ? data['detail'] : null;
+    final detail = detailRaw is String ? detailRaw : null;
     // #430: backend AppException handler wraps payload as
     // ``{"error": {"code": ..., "detail": ...}}`` — read both shapes.
     final errorBlock = data is Map ? data['error'] : null;

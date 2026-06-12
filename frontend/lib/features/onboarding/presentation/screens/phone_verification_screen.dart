@@ -17,6 +17,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';
+import '../../domain/repositories/phone_verification_repository.dart';
 
 /// Phone verification screen for teacher onboarding
 class PhoneVerificationScreen extends ConsumerStatefulWidget {
@@ -84,6 +85,35 @@ class _PhoneVerificationScreenState
     return '${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7, 11)}';
   }
 
+  /// #709: 검증 실패 사유 → 사용자 메시지 매핑 (쿨다운/시도초과/만료 구분).
+  String _failureMessage(PhoneVerificationResult result) {
+    switch (result.failure) {
+      case PhoneVerificationFailure.cooldown:
+        final seconds = result.cooldownSecondsRemaining;
+        return seconds != null
+            ? AppStrings.phoneOtpCooldownFormat(seconds)
+            : AppStrings.phoneOtpCooldown;
+      case PhoneVerificationFailure.dailyLimit:
+        return AppStrings.phoneOtpDailyLimit;
+      case PhoneVerificationFailure.expired:
+        return AppStrings.phoneOtpExpired;
+      case PhoneVerificationFailure.attemptsExceeded:
+        return AppStrings.phoneOtpAttemptsExceeded;
+      case PhoneVerificationFailure.invalidCode:
+        final remaining = result.attemptsRemaining;
+        return remaining != null
+            ? AppStrings.phoneOtpInvalidFormat(remaining)
+            : AppStrings.phoneOtpInvalid;
+      case PhoneVerificationFailure.codeNotFound:
+        return AppStrings.phoneOtpNotFound;
+      case PhoneVerificationFailure.sendFailed:
+        return AppStrings.phoneOtpSendFailed;
+      case PhoneVerificationFailure.network:
+      case null:
+        return AppStrings.phoneOtpNetworkError;
+    }
+  }
+
   Future<void> _sendCode() async {
     final phone = _phoneController.text.replaceAll('-', '').replaceAll(' ', '');
     if (phone.length < 10) {
@@ -96,40 +126,44 @@ class _PhoneVerificationScreenState
       _errorMessage = null;
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-
-    ref
+    // #709: mock 모드는 notifier 내부에서 로컬 시뮬레이션, remote 는 실 API.
+    final result = await ref
         .read(teacherOnboardingNotifierProvider.notifier)
-        .startPhoneVerification(phone);
+        .requestCode(phone);
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
-      _codeSent = true;
+      if (result.success) {
+        _codeSent = true;
+      } else {
+        _errorMessage = _failureMessage(result);
+      }
     });
 
-    _startTimer();
-    _codeFocus.requestFocus();
+    if (result.success) {
+      _startTimer();
+      _codeFocus.requestFocus();
+    }
   }
 
   Future<void> _resendCode() async {
     if (_remainingSeconds > 120) return; // Can resend after 1 minute
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
 
-    final success =
-        ref
-            .read(teacherOnboardingNotifierProvider.notifier)
-            .resendVerificationCode();
+    final result = await ref
+        .read(teacherOnboardingNotifierProvider.notifier)
+        .resendVerificationCode();
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
-      if (success) {
+      if (result.success) {
         _startTimer();
         _codeController.clear();
       } else {
-        _errorMessage = '인증번호 재발송에 실패했습니다';
+        _errorMessage = _failureMessage(result);
       }
     });
   }
@@ -146,15 +180,15 @@ class _PhoneVerificationScreenState
       _errorMessage = null;
     });
 
-    await Future.delayed(const Duration(seconds: 1));
-
-    final success = ref
+    // #709: remote 모드는 서버 검증 결과만 신뢰 (로컬 코드 비교 없음).
+    final result = await ref
         .read(teacherOnboardingNotifierProvider.notifier)
         .verifyCode(code);
 
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
-    if (success) {
+    if (result.success) {
       if (mounted) {
         // #695 §5.5 — verification completed (gate/quest attribution).
         ref.read(analyticsEventLoggerProvider).log(
@@ -174,12 +208,7 @@ class _PhoneVerificationScreenState
         context.go(AppRoutes.home);
       }
     } else {
-      final onboarding = ref.read(teacherOnboardingNotifierProvider);
-      if (onboarding.phoneVerification?.isMaxAttemptsReached ?? false) {
-        setState(() => _errorMessage = '인증 시도 횟수를 초과했습니다');
-      } else {
-        setState(() => _errorMessage = '인증번호가 일치하지 않습니다');
-      }
+      setState(() => _errorMessage = _failureMessage(result));
     }
   }
 
@@ -252,29 +281,27 @@ class _PhoneVerificationScreenState
                   width: double.infinity,
                   height: AppSpacing.buttonHeight,
                   child: ElevatedButton(
-                    onPressed:
-                        _isLoading
-                            ? null
-                            : (_codeSent ? _verifyCode : _sendCode),
+                    onPressed: _isLoading
+                        ? null
+                        : (_codeSent ? _verifyCode : _sendCode),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       foregroundColor: AppColors.paper,
                       shape: RoundedRectangleBorder(),
                     ),
-                    child:
-                        _isLoading
-                            ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.paper,
-                              ),
-                            )
-                            : Text(
-                              _codeSent ? '인증 완료' : '인증번호 받기',
-                              style: AppTypography.button,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.paper,
                             ),
+                          )
+                        : Text(
+                            _codeSent ? '인증 완료' : '인증번호 받기',
+                            style: AppTypography.button,
+                          ),
                   ),
                 ),
 
@@ -370,10 +397,9 @@ class _PhoneVerificationScreenState
               Text(
                 _formatTime(_remainingSeconds),
                 style: AppTypography.bodyMedium.copyWith(
-                  color:
-                      _remainingSeconds <= 30
-                          ? AppColors.paperAccent
-                          : AppColors.paperAccent,
+                  color: _remainingSeconds <= 30
+                      ? AppColors.paperAccent
+                      : AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -405,15 +431,15 @@ class _PhoneVerificationScreenState
         // Resend button
         Center(
           child: TextButton(
-            onPressed:
-                _remainingSeconds <= 120 && !_isLoading ? _resendCode : null,
+            onPressed: _remainingSeconds <= 120 && !_isLoading
+                ? _resendCode
+                : null,
             child: Text(
               '인증번호 다시 받기',
               style: AppTypography.bodyMedium.copyWith(
-                color:
-                    _remainingSeconds <= 120
-                        ? AppColors.paperAccent
-                        : AppColors.inkTertiary,
+                color: _remainingSeconds <= 120
+                    ? AppColors.paperAccent
+                    : AppColors.inkTertiary,
               ),
             ),
           ),

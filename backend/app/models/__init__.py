@@ -69,6 +69,10 @@ from app.models.parent import (  # noqa: F401
     ParentVisibilitySettings,
 )
 from app.models.payment import Payment, TuitionSettings  # noqa: F401
+from app.models.phone_verification_code import (  # noqa: F401
+    PhoneVerificationCode,
+    PhoneVerificationDailyCount,
+)
 from app.models.policy import LessonPolicy, MakeupLesson, ScheduleConfirmationCard  # noqa: F401
 from app.models.post import TeacherPost  # noqa: F401
 from app.models.practice import (  # noqa: F401
