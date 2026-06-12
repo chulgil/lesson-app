@@ -197,21 +197,24 @@ class StreakFreeze {
 git commit -m "feat(gamification): StreakFreeze entity (TDD)"
 ```
 
-### Task 1.2: Hive TypeAdapter 등록
+### Task 1.2: Hive 직렬화 전략 결정 — Box<String> + JSON
+
+> **결정 변경 (Job 1 진입 시)**: TypeAdapter 패턴 → Box<String> + json_serializable JSON 직렬화 채택.
+> **이유**: (a) Task 2.1 (GrowthHeatmapChunkCache) 도 JSON bytes 패턴 채택 — 일관성 (b) 학생당 1 record ≈ <100 bytes → 직렬화 비용 무시 가능 (c) typeId 관리 부담 0 (d) 데이터 마이그레이션 단순 (스키마 변경 시 JSON 필드 추가만)
 
 **Files:**
-- Modify: `frontend/lib/features/gamification/domain/entities/streak_freeze.dart` (Hive annotation 추가)
-- Modify: `frontend/lib/core/storage/hive_initializer.dart` (또는 main.dart) — adapter 등록 + typeId 할당
+- 코드 변경 0 (이 Task 자체는 정책 결정 + 본 decomposition 갱신만)
 
-- [ ] **Step 1: typeId 충돌 검증 grep**
-```bash
-grep -rn "@HiveType(typeId:" frontend/lib --include="*.dart" | sort -u
-```
-다음 가용 typeId 선택 (예: 60+ range).
-- [ ] **Step 2: Hive annotation 추가 + build_runner**
-- [ ] **Step 3: 등록 코드 추가 (`Hive.registerAdapter(StreakFreezeAdapter())`)**
-- [ ] **Step 4: 첫 진입 크래시 회귀 테스트** — fresh app 시 Hive 빈 box 정상 init
-- [ ] **Step 5: Commit `feat(gamification): StreakFreeze Hive adapter 등록`**
+- [ ] **Step 1: Box 키 정책 정의 (본 문서)**
+  - Box name: `streak_freeze_v1` (`Box<String>`)
+  - Key: `studentId`
+  - Value: `jsonEncode(StreakFreeze.toJson())`
+- [ ] **Step 2: 실제 Box 작업은 Job 3 Task 3.3 (HiveStreakFreezeRepository) 로 위임**
+  - 구현 시 `Hive.openBox<String>('streak_freeze_v1')` + `jsonEncode`/`jsonDecode`
+  - 빈 box (첫 진입) → `StreakFreeze.empty(studentId)` 반환
+- [ ] **Step 3: 신규 TypeAdapter 등록 0 — `app_bootstrap.dart` 수정 0**
+
+**근거**: Hive TypeAdapter 패턴은 (a) DateTime list 직렬화 boilerplate (b) typeId 충돌 위험 (c) 스키마 진화 시 마이그레이션 어댑터 추가 부담. P2 에서는 StreakFreeze 1종만 추가하므로 JSON 단순 직렬화가 trade-off 우위.
 
 ---
 

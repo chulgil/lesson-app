@@ -21,10 +21,11 @@
   - **담당 job**: Job 1 Task 1.1
   - **관련 테스트**: `test/features/gamification/domain/entities/streak_freeze_test.dart`
 
-  #### AC-1.2 [Hive] TypeAdapter 등록 + typeId 충돌 0 (pending)
-  - **만족 조건**: `Hive.registerAdapter(StreakFreezeAdapter())` + fresh init 무크래시
-  - **담당 job**: Job 1 Task 1.2
-  - **관련 테스트**: Hive 초기화 회귀 테스트
+  #### AC-1.2 [Hive 직렬화 전략] Box<String> + JSON 채택 — TypeAdapter 0 (passed)
+  - **만족 조건**: Box name `streak_freeze_v1` 정책 명시 + 신규 TypeAdapter 등록 0 + Job 3 Task 3.3 에서 빈 box 첫 진입 정상 처리
+  - **담당 job**: Job 1 Task 1.2 (정책 결정 완료) + Job 3 Task 3.3 (실제 구현)
+  - **관련 테스트**: `test/features/gamification/data/repositories/hive_streak_freeze_repository_test.dart::test_emptyBoxFirstEntry` (Job 3 에서 작성)
+  - **결정 trail**: Job 1 Task 1.2 정책 변경 (2026-06-12) — Task 2.1 GrowthHeatmapChunkCache 와 JSON 직렬화 일관성
 
   #### AC-1.3 [글로서리] StreakFreeze/FreezeBalance/ExamMode/ComebackBonus 등록 (pending)
   - **만족 조건**: `.harness/knowledge/glossary.md` + `docs/specs/glossary.md` 동기화
