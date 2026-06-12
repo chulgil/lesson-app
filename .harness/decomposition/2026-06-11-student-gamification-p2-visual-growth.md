@@ -372,9 +372,22 @@ class StreakFreezeNotifier extends _$StreakFreezeNotifier {
   - "어제 결석 + freeze balance=0 → streak 끊김"
   - "어제 결석 + examMode 활성 → freeze 차감 X, streak 유지 (시험 모드 동결)"
 - [ ] **Step 2: Verify fail**
-- [ ] **Step 3: 구현** — provider 에 `streakFreezeServiceProvider` 의존 추가
+- [ ] **Step 3: 구현** — **방식 변경 (사전 결정 보강)**: 기존 `practice_streak_provider` 변경 0. surgical 원칙. 신규 추가:
+  - 순수 함수 `StreakWithFreezeCalculator.compute({raw, freeze, now})` — 4 시나리오 분기
+  - 신규 provider `effectiveStreakProvider(studentId)` — raw + freeze 조회 + compute 호출 (side-effect 0)
+  - 자동 freeze 적용 trigger (`recordPractice` 진입 시 어제 결석이면 `service.applyOnAbsence` 호출) 는 **별도 Task 5.3** 으로 분리 (Job 5 Task 5.1 의 4 시나리오는 calculator 단위 테스트로 검증)
 - [ ] **Step 4: Verify pass + 기존 streak 테스트 모두 회귀 통과**
-- [ ] **Step 5: Commit `feat(practice): practice_streak_provider StreakFreeze 통합 (TDD)`**
+- [ ] **Step 5: Commit `feat(gamification): StreakWithFreezeCalculator + effectiveStreakProvider (TDD)`**
+
+### Task 5.1.b: 자동 freeze 적용 trigger (recordPractice 진입 시)
+
+**Files:**
+- Modify: `frontend/lib/features/practice/domain/services/practice_recording_service.dart` (또는 그 호출처)
+- Test: 신규 통합 테스트 1개
+
+흐름: 학생이 연습 기록 시점에 (a) 어제 결석 + (b) freeze 적용 가능 → `applyOnAbsence` 자동 호출.
+
+- [ ] **Step 1-5: TDD + provider override 패턴**
 
 ### Task 5.2: D-day 마이그레이션 1회 실행
 
