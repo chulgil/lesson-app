@@ -15,7 +15,12 @@ import 'bpm_controls.dart';
 
 /// Metronome panel content with tap tempo support.
 class MetronomePanel extends ConsumerStatefulWidget {
-  const MetronomePanel({super.key});
+  const MetronomePanel({super.key, this.studentId});
+
+  /// 학생 컨텍스트. 주어지면 메트로놈 stop 시 시작-종료 차이를 분 단위로
+  /// 계산해 [PracticeSourceLoggers.logMetronome] 으로 자동 기록한다.
+  /// 학생 게이미피케이션 P1 — Job 7.
+  final String? studentId;
 
   @override
   ConsumerState<MetronomePanel> createState() => _MetronomePanelState();
@@ -52,6 +57,11 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
 
   /// Timer for hiding tempo explanation after 3 seconds.
   Timer? _tempoExplanationTimer;
+
+  /// 메트로놈 start 시점. stop 시점과의 차이로 [practiceMinutesElapsed] 를
+  /// 계산해 [MetronomeNotifier.stop] 에 전달한다. null 이면 미시작 또는
+  /// 학생 컨텍스트 없음 — logger 트리거 생략.
+  DateTime? _metronomeStartedAt;
 
   @override
   void initState() {
@@ -133,6 +143,40 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
     super.dispose();
   }
 
+  /// 메트로놈 시작 + 시작 시점 기록 (학생 컨텍스트 logger 트리거용).
+  void _startMetronome() {
+    _metronomeStartedAt = DateTime.now();
+    ref.read(metronomeProvider.notifier).start();
+  }
+
+  /// 메트로놈 정지. [studentId] + [_metronomeStartedAt] 가 모두 있으면
+  /// 경과 시간(분)을 [MetronomeNotifier.stop] 에 전달해 자동 logger 호출.
+  /// 학생 컨텍스트 없으면 기존 시그니처대로 stop().
+  void _stopMetronome() {
+    final notifier = ref.read(metronomeProvider.notifier);
+    final startedAt = _metronomeStartedAt;
+    final studentId = widget.studentId;
+    if (studentId != null && startedAt != null) {
+      final minutes = DateTime.now().difference(startedAt).inMinutes;
+      notifier.stop(studentId: studentId, practiceMinutesElapsed: minutes);
+    } else {
+      notifier.stop();
+    }
+    _metronomeStartedAt = null;
+  }
+
+  /// Play/Stop 토글 — isPlaying 상태에 따라 [_startMetronome] / [_stopMetronome]
+  /// 분기. 직접 `notifier.toggle()` 호출 시 stop hook 의 학생 컨텍스트가
+  /// 누락되므로 본 헬퍼만 사용.
+  void _toggleMetronome() {
+    final state = ref.read(metronomeProvider);
+    if (state.isPlaying) {
+      _stopMetronome();
+    } else {
+      _startMetronome();
+    }
+  }
+
   /// Handle tap on cat for tap tempo.
   void _onCatTap() {
     final state = ref.read(metronomeProvider);
@@ -189,7 +233,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
         _autoStartTimer = Timer(const Duration(milliseconds: 1500), () {
           if (mounted) {
             // Start metronome automatically
-            ref.read(metronomeProvider.notifier).start();
+            _startMetronome();
 
             setState(() {
               _isBubbleHidden = true;
@@ -309,7 +353,8 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
             width: 80,
             height: 80,
             child: OutlinedButton(
-              onPressed: () => ref.read(metronomeProvider.notifier).toggle(),
+              key: const ValueKey('metronome_play_pause_button'),
+              onPressed: _toggleMetronome,
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.paperAccent,
                 side: const BorderSide(color: AppColors.paperAccent, width: 3),
