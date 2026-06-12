@@ -19,6 +19,10 @@ class AppRoutes {
   // docs/specs/onboarding/teacher_first_availability_setup.md
   static const teacherFirstAvailability = '/onboarding/first-availability';
 
+  /// Step 2.5 카테고리 미리보기 (W4 Task 4.2).
+  /// spec §9.2 — FirstAvailability 완료 후 1회 노출.
+  static const onboardingCategoryPreview = '/onboarding/category-preview';
+
   // Student onboarding routes
   static const studentProfileSetup = '/student/onboarding/profile-setup';
   static const studentTutorial = '/student/onboarding/tutorial';

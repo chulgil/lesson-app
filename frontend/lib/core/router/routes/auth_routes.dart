@@ -11,6 +11,7 @@ import '../../../features/auth/presentation/screens/parent_invite_code_screen.da
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
 import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
 import '../../../features/onboarding/presentation/screens/first_availability_setup_screen.dart';
+import '../../../features/onboarding/presentation/screens/onboarding_category_preview_screen.dart';
 import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
 import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/student_profile_setup_screen.dart';
@@ -78,6 +79,14 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.teacherFirstAvailability,
     name: 'teacherFirstAvailability',
     builder: (context, state) => const FirstAvailabilitySetupScreen(),
+  ),
+
+  // Teacher Onboarding - Step 2.5 Category Preview (W4 Task 4.2)
+  // spec §9.2 — 5묶음 카테고리 한 화면 미리보기 1회 노출.
+  GoRoute(
+    path: AppRoutes.onboardingCategoryPreview,
+    name: 'onboardingCategoryPreview',
+    builder: (context, state) => const OnboardingCategoryPreviewScreen(),
   ),
 
   // Student Onboarding - Profile Setup
