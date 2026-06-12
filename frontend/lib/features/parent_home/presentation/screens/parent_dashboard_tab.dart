@@ -75,15 +75,11 @@ class ParentDashboardTab extends ConsumerWidget {
                 if (linkedStudentId != null) {
                   ref.invalidate(lessonsByStudentProvider(linkedStudentId));
                   ref.invalidate(practiceStreakProvider(linkedStudentId));
-                  ref.invalidate(
-                    weeklyPracticeItemsProvider(linkedStudentId),
-                  );
+                  ref.invalidate(weeklyPracticeItemsProvider(linkedStudentId));
                   ref.invalidate(
                     practiceItemsByStudentProvider(linkedStudentId),
                   );
-                  ref.invalidate(
-                    studentSubscriptionsProvider(linkedStudentId),
-                  );
+                  ref.invalidate(studentSubscriptionsProvider(linkedStudentId));
                   ref.invalidate(
                     activeStudentMembershipsProvider(linkedStudentId),
                   );
@@ -324,122 +320,106 @@ class ParentDashboardTab extends ConsumerWidget {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (sheetContext) => Consumer(
-            builder: (context, sheetRef, _) {
-              final profilesAsync = sheetRef.watch(
-                childProfilesProvider(parentId),
-              );
+      builder: (sheetContext) => Consumer(
+        builder: (context, sheetRef, _) {
+          final profilesAsync = sheetRef.watch(childProfilesProvider(parentId));
 
-              return Container(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Handle indicator
-                    const BottomSheetHandle(
-                      margin: EdgeInsets.only(bottom: AppSpacing.space4),
-                    ),
-                    // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
-                    Text(
-                      AppStrings.parentHomeChildSelect,
-                      style: NotebookTypography.sectionTitle,
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    // Child list from provider
-                    profilesAsync.when(
-                      loading:
-                          () => const Padding(
-                            padding: EdgeInsets.all(AppSpacing.space4),
-                            child: CircularProgressIndicator(),
-                          ),
-                      error:
-                          (_, __) => const Padding(
-                            padding: EdgeInsets.all(AppSpacing.space4),
-                            child: Text(AppStrings.errorOccurred),
-                          ),
-                      data: (profiles) {
-                        if (profiles.isEmpty) {
-                          return Padding(
-                            padding: const EdgeInsets.all(AppSpacing.space4),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.child_care_outlined,
-                                  size: 48,
-                                  color: AppColors.inkTertiary,
-                                ),
-                                const SizedBox(height: AppSpacing.space2),
-                                Text(
-                                  AppStrings.parentHomeNoChildren,
-                                  style: AppTypography.bodyMedium.copyWith(
-                                    color: AppColors.inkSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children:
-                              profiles.map((profile) {
-                                final isSelected =
-                                    selectedChildId == profile.id;
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: profile.profileColor,
-                                    child: Text(
-                                      profile.initial,
-                                      style: const TextStyle(
-                                        color: AppColors.paper,
-                                      ),
-                                    ),
-                                  ),
-                                  title: Text(profile.name),
-                                  subtitle: Text(profile.instrumentLabel),
-                                  trailing:
-                                      isSelected
-                                          ? Icon(
-                                            Icons.check,
-                                            color: AppColors.paperAccent,
-                                          )
-                                          : null,
-                                  onTap: () {
-                                    ref
-                                        .read(selectedChildIdProvider.notifier)
-                                        .state = profile.id;
-                                    ref
-                                        .read(
-                                          selectedChildProfileProvider.notifier,
-                                        )
-                                        .select(profile);
-                                    Navigator.pop(sheetContext);
-                                  },
-                                );
-                              }).toList(),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    // Add child button
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(sheetContext);
-                        context.push(
-                          '${AppRoutes.addChildProfile}?parentId=$parentId',
-                        );
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text(AppStrings.parentHomeAddChildShort),
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                  ],
+          return Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle indicator
+                const BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
-              );
-            },
-          ),
+                // Notebook × Score: 바텀시트 헤더 (§7.27) — Playfair sectionTitle.
+                Text(
+                  AppStrings.parentHomeChildSelect,
+                  style: NotebookTypography.sectionTitle,
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                // Child list from provider
+                profilesAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: CircularProgressIndicator(),
+                  ),
+                  error: (_, __) => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: Text(AppStrings.errorOccurred),
+                  ),
+                  data: (profiles) {
+                    if (profiles.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(AppSpacing.space4),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.child_care_outlined,
+                              size: 48,
+                              color: AppColors.inkTertiary,
+                            ),
+                            const SizedBox(height: AppSpacing.space2),
+                            Text(
+                              AppStrings.parentHomeNoChildren,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.inkSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: profiles.map((profile) {
+                        final isSelected = selectedChildId == profile.id;
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: profile.profileColor,
+                            child: Text(
+                              profile.initial,
+                              style: const TextStyle(color: AppColors.paper),
+                            ),
+                          ),
+                          title: Text(profile.name),
+                          subtitle: Text(profile.instrumentLabel),
+                          trailing: isSelected
+                              ? Icon(Icons.check, color: AppColors.paperAccent)
+                              : null,
+                          onTap: () {
+                            ref.read(selectedChildIdProvider.notifier).state =
+                                profile.id;
+                            ref
+                                .read(selectedChildProfileProvider.notifier)
+                                .select(profile);
+                            Navigator.pop(sheetContext);
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                // Add child button
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    context.push(
+                      '${AppRoutes.addChildProfile}?parentId=$parentId',
+                    );
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text(AppStrings.parentHomeAddChildShort),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -561,7 +541,6 @@ class ParentDashboardTab extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 /// Returns the nearest future scheduled lesson, or null.
@@ -635,9 +614,7 @@ class _QuickStatsSection extends ConsumerWidget {
             .where(
               (l) =>
                   !l.isArchived &&
-                  l.date.isAfter(
-                    monday.subtract(const Duration(seconds: 1)),
-                  ) &&
+                  l.date.isAfter(monday.subtract(const Duration(seconds: 1))) &&
                   l.date.isBefore(sunday),
             )
             .length;
@@ -717,14 +694,12 @@ class _UpcomingLessonSection extends ConsumerWidget {
       title: AppStrings.parentHomeNextLesson,
       icon: Icons.event,
       child: lessonsAsync.when(
-        loading:
-            () => const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-        error:
-            (_, __) =>
-                const _SectionEmpty(message: AppStrings.errorOccurred),
+        loading: () => const Padding(
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (_, __) =>
+            const _SectionEmpty(message: AppStrings.errorOccurred),
         data: (lessons) {
           final next = _nextScheduledLesson(lessons);
           if (next == null) {
@@ -732,12 +707,8 @@ class _UpcomingLessonSection extends ConsumerWidget {
               message: AppStrings.parentHomeNoUpcomingLesson,
             );
           }
-          final dDay =
-              DateTime(
-                next.date.year,
-                next.date.month,
-                next.date.day,
-              ).difference(
+          final dDay = DateTime(next.date.year, next.date.month, next.date.day)
+              .difference(
                 DateTime.now().copyWith(
                   hour: 0,
                   minute: 0,
@@ -745,7 +716,8 @@ class _UpcomingLessonSection extends ConsumerWidget {
                   millisecond: 0,
                   microsecond: 0,
                 ),
-              ).inDays;
+              )
+              .inDays;
           final teacherName = next.teacherName ?? profile.teacherName;
           return ListTile(
             contentPadding: EdgeInsets.zero,
@@ -835,34 +807,28 @@ class _PracticeStreakSection extends ConsumerWidget {
     ).subtract(Duration(days: today.weekday - 1));
 
     return streakAsync.when(
-      loading:
-          () => SectionCard(
-            romanIndex: 1,
-            title: AppStrings.parentHomeThisWeekPractice,
-            icon: Icons.local_fire_department,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          ),
-      error:
-          (_, __) => SectionCard(
-            romanIndex: 1,
-            title: AppStrings.parentHomeThisWeekPractice,
-            icon: Icons.local_fire_department,
-            child: const _SectionEmpty(message: AppStrings.errorOccurred),
-          ),
+      loading: () => SectionCard(
+        romanIndex: 1,
+        title: AppStrings.parentHomeThisWeekPractice,
+        icon: Icons.local_fire_department,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (_, __) => SectionCard(
+        romanIndex: 1,
+        title: AppStrings.parentHomeThisWeekPractice,
+        icon: Icons.local_fire_department,
+        child: const _SectionEmpty(message: AppStrings.errorOccurred),
+      ),
       data: (streak) {
         // Derive which weekdays were practiced from streak window.
         // currentStreak counts consecutive days ending at lastPracticeDate.
         final lastDate = streak.lastPracticeDate;
         final practicedDays = <int>{}; // 0=Mon ... 6=Sun
         if (lastDate != null && streak.currentStreak > 0) {
-          final lastDay = DateTime(
-            lastDate.year,
-            lastDate.month,
-            lastDate.day,
-          );
+          final lastDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
           for (var i = 0; i < streak.currentStreak; i++) {
             final d = lastDay.subtract(Duration(days: i));
             if (!d.isBefore(monday) &&
@@ -906,39 +872,32 @@ class _PracticeStreakSection extends ConsumerWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color:
-                          practiced
-                              ? AppColors.paperOk
-                              : isToday
-                              ? AppColors.paperAccentSoft
-                              : isPast
-                              ? AppColors.paperAccentSoft
-                              : AppColors.paperDark,
-                      border:
-                          isToday
-                              ? Border.all(
-                                color: AppColors.paperAccent,
-                                width: 2,
-                              )
-                              : null,
+                      color: practiced
+                          ? AppColors.paperOk
+                          : isToday
+                          ? AppColors.paperAccentSoft
+                          : isPast
+                          ? AppColors.paperAccentSoft
+                          : AppColors.paperDark,
+                      border: isToday
+                          ? Border.all(color: AppColors.paperAccent, width: 2)
+                          : null,
                     ),
                     child: Center(
-                      child:
-                          practiced
-                              ? const Icon(
-                                Icons.check,
-                                size: 18,
-                                color: AppColors.paper,
-                              )
-                              : Text(
-                                '${day.day}',
-                                style: AppTypography.bodySmall.copyWith(
-                                  color:
-                                      isToday
-                                          ? AppColors.paperAccent
-                                          : AppColors.inkSecondary,
-                                ),
+                      child: practiced
+                          ? const Icon(
+                              Icons.check,
+                              size: 18,
+                              color: AppColors.paper,
+                            )
+                          : Text(
+                              '${day.day}',
+                              style: AppTypography.bodySmall.copyWith(
+                                color: isToday
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkSecondary,
                               ),
+                            ),
                     ),
                   ),
                 ],
@@ -976,14 +935,12 @@ class _RecentAssignmentsSection extends ConsumerWidget {
       title: AppStrings.parentHomeAssignmentStatus,
       icon: Icons.assignment,
       child: itemsAsync.when(
-        loading:
-            () => const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-        error:
-            (_, __) =>
-                const _SectionEmpty(message: AppStrings.errorOccurred),
+        loading: () => const Padding(
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (_, __) =>
+            const _SectionEmpty(message: AppStrings.errorOccurred),
         data: (items) {
           if (items.isEmpty) {
             return const _SectionEmpty(
@@ -1001,10 +958,9 @@ class _RecentAssignmentsSection extends ConsumerWidget {
             children.add(
               AssignmentItem(
                 title: item.title,
-                dueDate:
-                    item.isCompleted
-                        ? AppStrings.parentHomeCompletedLabel
-                        : _priorityLabel(item.priority),
+                dueDate: item.isCompleted
+                    ? AppStrings.parentHomeCompletedLabel
+                    : _priorityLabel(item.priority),
                 isCompleted: item.isCompleted,
                 priority: item.priority.name,
               ),
@@ -1050,47 +1006,145 @@ class _PaymentStatusSection extends ConsumerWidget {
     final subscriptionsAsync = ref.watch(
       studentSubscriptionsProvider(studentId),
     );
+    // §3.2.4: 학부모 — 자녀의 paymentNotified 제안 표시
+    final proposalsAsync = ref.watch(activeStudentProposalsProvider(studentId));
 
     return SectionCard(
       romanIndex: 3,
       title: AppStrings.parentHomeRemainingLesson,
       icon: Icons.confirmation_number_outlined,
-      child: subscriptionsAsync.when(
-        loading:
-            () => const Padding(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Remaining lessons row
+          subscriptionsAsync.when(
+            loading: () => const Padding(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
               child: Center(child: CircularProgressIndicator()),
             ),
-        error:
-            (_, __) =>
+            error: (_, __) =>
                 const _SectionEmpty(message: AppStrings.errorOccurred),
-        data: (subscriptions) {
-          final active = _activeSubscriptions(subscriptions);
-          if (active.isEmpty) {
-            return const _SectionEmpty(
-              message: AppStrings.noSubscriptionsRegisteredTitle,
-            );
-          }
-          final totalRemaining = active.fold<int>(
-            0,
-            (sum, s) => sum + (s.remainingLessons ?? 0),
-          );
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppStrings.parentHomeRemainingLesson,
-                style: AppTypography.bodyMedium,
-              ),
-              Text(
-                '$totalRemaining회',
-                style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.paperAccent,
+            data: (subscriptions) {
+              final active = _activeSubscriptions(subscriptions);
+              if (active.isEmpty) {
+                return const _SectionEmpty(
+                  message: AppStrings.noSubscriptionsRegisteredTitle,
+                );
+              }
+              final totalRemaining = active.fold<int>(
+                0,
+                (sum, s) => sum + (s.remainingLessons ?? 0),
+              );
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppStrings.parentHomeRemainingLesson,
+                    style: AppTypography.bodyMedium,
+                  ),
+                  Text(
+                    '$totalRemaining회',
+                    style: AppTypography.headingSmall.copyWith(
+                      color: AppColors.paperAccent,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          // §3.2.4: paymentNotified 대기 제안 — 학부모 가시성
+          proposalsAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (proposals) {
+              final waiting = proposals
+                  .where((p) => p.status == ProposalStatus.paymentNotified)
+                  .toList();
+              if (waiting.isEmpty) return const SizedBox.shrink();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppSpacing.space3),
+                  const ThinRule(),
+                  const SizedBox(height: AppSpacing.space3),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        size: 14,
+                        color: AppColors.inkSecondary,
+                      ),
+                      const SizedBox(width: AppSpacing.space1),
+                      Text(
+                        AppStrings.parentHomePaymentPendingSection,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.inkSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.space2),
+                  ...waiting.map(
+                    (p) => _PaymentNotifiedProposalRow(
+                      proposal: p,
+                      onTap: () => context.push(
+                        AppRoutes.proposalDetail.replaceFirst(':id', p.id),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// §3.2.4: Single paymentNotified proposal row for parent dashboard.
+class _PaymentNotifiedProposalRow extends StatelessWidget {
+  const _PaymentNotifiedProposalRow({
+    required this.proposal,
+    required this.onTap,
+  });
+
+  final SubscriptionProposal proposal;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space2,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.ink.withValues(alpha: 0.04),
+          border: Border.all(color: AppColors.ink.withValues(alpha: 0.12)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.hourglass_empty,
+              size: 16,
+              color: AppColors.inkSecondary,
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                AppStrings.parentHomePaymentPendingBody,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
                 ),
               ),
-            ],
-          );
-        },
+            ),
+            Icon(Icons.chevron_right, size: 16, color: AppColors.inkTertiary),
+          ],
+        ),
       ),
     );
   }

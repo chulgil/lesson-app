@@ -49,24 +49,22 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         title: AppStrings.proposalCreateAppBarTitle,
       ),
       // 처리 중일 때는 provider 상태 변화로 인한 UI 깜빡임 방지
-      body:
-          _isProcessing
-              ? const Center(child: CircularProgressIndicator())
-              : proposalAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (_, __) =>
-                        Center(child: Text('${AppStrings.errorOccurred}.')),
-                data: (proposal) {
-                  if (proposal == null) {
-                    return const Center(
-                      child: Text(AppStrings.proposalNotFoundEmpty),
-                    );
-                  }
+      body: _isProcessing
+          ? const Center(child: CircularProgressIndicator())
+          : proposalAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) =>
+                  Center(child: Text('${AppStrings.errorOccurred}.')),
+              data: (proposal) {
+                if (proposal == null) {
+                  return const Center(
+                    child: Text(AppStrings.proposalNotFoundEmpty),
+                  );
+                }
 
-                  return _buildContent(proposal);
-                },
-              ),
+                return _buildContent(proposal);
+              },
+            ),
       // Fixed bottom action bar
       bottomNavigationBar: proposalAsync.whenOrNull(
         data: (proposal) {
@@ -75,6 +73,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           }
           if (proposal.canRespond) {
             return _buildBottomActionBar(proposal);
+          }
+          // §3.2.4: paymentNotified — 비활성 버튼 + "입금 확인 대기 중" 라벨.
+          // 중복 전송 방지 FE 가드.
+          if (proposal.status == ProposalStatus.paymentNotified) {
+            return _buildPaymentNotifiedBar();
           }
           // audit C2-F02: confirmed 후 학생을 SubscriptionDetail 로 안내.
           // 수강권 발급 직후 "다음에 뭘 할지" 단절을 막는다.
@@ -298,10 +301,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   Text(
                     proposal.formattedExpiration,
                     style: AppTypography.bodySmall.copyWith(
-                      color:
-                          proposal.timeUntilExpiration.inDays < 2
-                              ? AppColors.paperAccent
-                              : AppColors.inkSecondary,
+                      color: proposal.timeUntilExpiration.inDays < 2
+                          ? AppColors.paperAccent
+                          : AppColors.inkSecondary,
                     ),
                   )
                 else if (!proposal.isAutoProposal)
@@ -321,175 +323,164 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
   Widget _buildTemplateSelection(SubscriptionProposal proposal) {
     return Column(
-      children:
-          proposal.allTemplateIds.map((templateId) {
-            final templateAsync = ref.watch(
-              subscriptionTemplateProvider(templateId),
-            );
-            final isSelected = _selectedTemplateId == templateId;
-            final isRecommended = proposal.isRecommended(templateId);
+      children: proposal.allTemplateIds.map((templateId) {
+        final templateAsync = ref.watch(
+          subscriptionTemplateProvider(templateId),
+        );
+        final isSelected = _selectedTemplateId == templateId;
+        final isRecommended = proposal.isRecommended(templateId);
 
-            return templateAsync.when(
-              loading:
-                  () => const Padding(
-                    padding: EdgeInsets.all(AppSpacing.space4),
-                    child: Center(child: CircularProgressIndicator()),
+        return templateAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.all(AppSpacing.space4),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (e, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
                   ),
-              error:
-                  (e, _) => Padding(
-                    padding: const EdgeInsets.all(AppSpacing.space4),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 16,
-                          color: AppColors.inkTertiary,
-                        ),
-                        const SizedBox(width: AppSpacing.space2),
-                        Text(
-                          AppStrings.loadDataFailed,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
-                        ),
-                      ],
+                ),
+              ],
+            ),
+          ),
+          data: (template) {
+            if (template == null) return const SizedBox.shrink();
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedTemplateId = templateId;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(AppSpacing.space4),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.paperAccentSoft
+                        : AppColors.paper,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
+                      width: isSelected ? 2 : 1,
                     ),
                   ),
-              data: (template) {
-                if (template == null) return const SizedBox.shrink();
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _selectedTemplateId = templateId;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.space4),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected
-                                ? AppColors.paperAccentSoft
-                                : AppColors.paper,
-                        border: Border.all(
-                          color:
-                              isSelected
-                                  ? AppColors.paperAccent
-                                  : AppColors.inkQuaternary,
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Radio indicator
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color:
-                                    isSelected
-                                        ? AppColors.paperAccent
-                                        : AppColors.inkQuaternary,
-                                width: 2,
-                              ),
-                            ),
-                            child:
-                                isSelected
-                                    ? Center(
-                                      child: Container(
-                                        width: 12,
-                                        height: 12,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.paperAccent,
-                                        ),
-                                      ),
-                                    )
-                                    : null,
+                  child: Row(
+                    children: [
+                      // Radio indicator
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.paperAccent
+                                : AppColors.inkQuaternary,
+                            width: 2,
                           ),
-                          const SizedBox(width: AppSpacing.space3),
-
-                          // Template info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        template.name,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: AppTypography.bodyLarge.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    if (isRecommended) ...[
-                                      const SizedBox(width: AppSpacing.space1),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.paperAccent
-                                              .withValues(alpha: 0.2),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              '⭐',
-                                              style: AppTypography.caption,
-                                            ),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              AppStrings
-                                                  .proposalDetailRecommendedBadge,
-                                              style: AppTypography.caption
-                                                  .copyWith(
-                                                    color:
-                                                        AppColors.paperAccent,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                const SizedBox(height: AppSpacing.space1),
-                                Text(
-                                  template.summaryText,
-                                  style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.inkSecondary,
+                        ),
+                        child: isSelected
+                            ? Center(
+                                child: Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.paperAccent,
                                   ),
                                 ),
+                              )
+                            : null,
+                      ),
+                      const SizedBox(width: AppSpacing.space3),
+
+                      // Template info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    template.name,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.bodyLarge.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                if (isRecommended) ...[
+                                  const SizedBox(width: AppSpacing.space1),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.paperAccent.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('⭐', style: AppTypography.caption),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          AppStrings
+                                              .proposalDetailRecommendedBadge,
+                                          style: AppTypography.caption.copyWith(
+                                            color: AppColors.paperAccent,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
-                          ),
-
-                          // Price
-                          Text(
-                            template.formattedPrice,
-                            style: AppTypography.headingSmall.copyWith(
-                              color: AppColors.paperAccent,
-                              fontWeight: FontWeight.w700,
+                            const SizedBox(height: AppSpacing.space1),
+                            Text(
+                              template.summaryText,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.inkSecondary,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+
+                      // Price
+                      Text(
+                        template.formattedPrice,
+                        style: AppTypography.headingSmall.copyWith(
+                          color: AppColors.paperAccent,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+              ),
             );
-          }).toList(),
+          },
+        );
+      }).toList(),
     );
   }
 
@@ -502,26 +493,21 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error:
-          (e, _) => Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.inkTertiary,
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                Text(
-                  AppStrings.loadDataFailed,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
+      error: (e, _) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.loadDataFailed,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDetailsCard(template: template);
@@ -538,26 +524,21 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
-      error:
-          (e, _) => Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.inkTertiary,
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                Text(
-                  AppStrings.loadDataFailed,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
+      error: (e, _) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.loadDataFailed,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDiscountCard(proposal: proposal, template: template);
@@ -574,26 +555,21 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
-      error:
-          (e, _) => Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.inkTertiary,
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                Text(
-                  AppStrings.loadDataFailed,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
+      error: (e, _) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.loadDataFailed,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return _buildPaymentCard(proposal, template);
@@ -613,11 +589,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     return teacherProfileAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => const ProposalPaymentInfoCard(),
-      data:
-          (profile) => ProposalPaymentInfoCard(
-            bankAccount: profile?.defaultBankAccount,
-            bankAccounts: profile?.bankAccounts ?? [],
-          ),
+      data: (profile) => ProposalPaymentInfoCard(
+        bankAccount: profile?.defaultBankAccount,
+        bankAccounts: profile?.bankAccounts ?? [],
+      ),
     );
   }
 
@@ -649,46 +624,45 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
         showNotebookBottomSheet<void>(
           context: context,
-          builder:
-              (context) => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Notebook × Score: 모달 시트 상단 제목 블록은
-                  // Playfair appBarTitle 로 통일 (§7.27). profile.name 은
-                  // 동적이지만 구조적 역할은 동일.
-                  Text(
-                    AppStrings.teacherContactSheetTitleFormat(profile.name),
-                    style: NotebookTypography.appBarTitle,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: AppColors.paperOk,
-                      child: Icon(Icons.call, color: AppColors.paper),
-                    ),
-                    title: const Text(AppStrings.callTeacherAction),
-                    subtitle: Text(phoneNumber),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchPhone(phoneNumber);
-                    },
-                  ),
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppColors.ink,
-                      child: const Icon(Icons.message, color: AppColors.paper),
-                    ),
-                    title: const Text(AppStrings.messageTeacherAction),
-                    subtitle: Text(phoneNumber),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchSms(phoneNumber);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                ],
+          builder: (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Notebook × Score: 모달 시트 상단 제목 블록은
+              // Playfair appBarTitle 로 통일 (§7.27). profile.name 은
+              // 동적이지만 구조적 역할은 동일.
+              Text(
+                AppStrings.teacherContactSheetTitleFormat(profile.name),
+                style: NotebookTypography.appBarTitle,
               ),
+              const SizedBox(height: AppSpacing.space4),
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: AppColors.paperOk,
+                  child: Icon(Icons.call, color: AppColors.paper),
+                ),
+                title: const Text(AppStrings.callTeacherAction),
+                subtitle: Text(phoneNumber),
+                onTap: () {
+                  Navigator.pop(context);
+                  _launchPhone(phoneNumber);
+                },
+              ),
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.ink,
+                  child: const Icon(Icons.message, color: AppColors.paper),
+                ),
+                title: const Text(AppStrings.messageTeacherAction),
+                subtitle: Text(phoneNumber),
+                onTap: () {
+                  Navigator.pop(context);
+                  _launchSms(phoneNumber);
+                },
+              ),
+              const SizedBox(height: AppSpacing.space4),
+            ],
+          ),
         );
       },
     );
@@ -741,11 +715,36 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     }
     return ProposalIssuedActionBar(
       subscriptionId: subscriptionId,
-      onTap:
-          () => context.go(
-            AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
-            extra: const {'viewerRole': 'student'},
+      onTap: () => context.go(
+        AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
+        extra: const {'viewerRole': 'student'},
+      ),
+    );
+  }
+
+  /// §3.2.4: paymentNotified 상태 전용 비활성 버튼 바.
+  /// 중복 전송 방지 FE 가드 — onPressed = null (비활성).
+  Widget _buildPaymentNotifiedBar() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: null,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
+              shape: const RoundedRectangleBorder(),
+            ),
+            icon: const Icon(Icons.schedule),
+            label: const Text(AppStrings.paymentNotifiedButtonLabel),
           ),
+        ),
+      ),
     );
   }
 
@@ -798,24 +797,22 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed:
-                    (_isProcessing || !canProceed)
-                        ? null
-                        : () => _notifyPayment(proposal),
+                onPressed: (_isProcessing || !canProceed)
+                    ? null
+                    : () => _notifyPayment(proposal),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.space4,
                   ),
                   shape: const RoundedRectangleBorder(),
                 ),
-                icon:
-                    _isProcessing
-                        ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.payment),
+                icon: _isProcessing
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.payment),
                 label: const Text(AppStrings.proposalDetailPaymentDoneAction),
               ),
             ),
@@ -824,8 +821,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
             // Reject button
             TextButton(
-              onPressed:
-                  _isProcessing ? null : () => _showRejectDialog(proposal),
+              onPressed: _isProcessing
+                  ? null
+                  : () => _showRejectDialog(proposal),
               child: Text(
                 AppStrings.proposalDetailSkipAction,
                 style: AppTypography.bodyMedium.copyWith(
@@ -855,13 +853,20 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       await notifier.notifyPayment(proposal.id);
 
       if (mounted) {
+        // §3.2.4: 클릭 직후 체크마크 + "선생님에게 전달되었어요" 피드백
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(AppStrings.paymentReminderSent),
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: AppColors.paper, size: 18),
+                SizedBox(width: 8),
+                Text(AppStrings.paymentNotifiedSnackbar),
+              ],
+            ),
             backgroundColor: AppColors.paperOk,
           ),
         );
-        // Refresh the page
+        // Refresh the page to show paymentNotified state
         ref.invalidate(subscriptionProposalProvider(proposal.id));
       }
     } catch (e) {

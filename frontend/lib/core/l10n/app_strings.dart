@@ -3708,6 +3708,32 @@ class AppStrings {
   /// 선생님께 문의하기 (대기 카드 CTA)
   static const proposalWaitingContactCta = '선생님께 문의하기';
 
+  // -- Payment Pending Visibility (#693) --
+
+  /// 입금 완료 알림 전송 직후 SnackBar — "선생님에게 전달되었어요"
+  static const paymentNotifiedSnackbar = '선생님에게 전달되었어요';
+
+  /// paymentNotified 상태 버튼 라벨 (비활성)
+  static const paymentNotifiedButtonLabel = '입금 확인 대기 중';
+
+  /// 제안 상세 paymentNotified 배너 — 수강권 발급 안내
+  static const proposalPaymentPendingBannerBody = '선생님이 입금을 확인하면 수강권이 발급돼요';
+
+  /// 3단계 프로그레스 — 1단계 라벨
+  static const paymentProgressStep1 = '입금 알림';
+
+  /// 3단계 프로그레스 — 2단계 라벨
+  static const paymentProgressStep2 = '확인 대기';
+
+  /// 3단계 프로그레스 — 3단계 라벨
+  static const paymentProgressStep3 = '수강권 발급';
+
+  /// 학부모 홈 결제 섹션 — paymentNotified 제안 섹션 헤더
+  static const parentHomePaymentPendingSection = '입금 확인 대기 중';
+
+  /// 학부모 홈 결제 섹션 — paymentNotified 제안 카드 본문
+  static const parentHomePaymentPendingBody = '선생님의 입금 확인을 기다리고 있어요';
+
   // -- Subscription Domain Services (자동 제안/갱신 메시지 5-3b-8) --
 
   /// 골든타임 할인 사유 (자동 제안)

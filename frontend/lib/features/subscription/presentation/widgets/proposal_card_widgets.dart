@@ -12,6 +12,7 @@ import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../extensions/subscription_proposal_visuals.dart';
 import '../extensions/subscription_template_visuals.dart';
+import 'payment_pending_progress_bar.dart';
 
 /// Status banner showing proposal status (paymentNotified, confirmed, rejected, expired, cancelled)
 class ProposalStatusBanner extends StatelessWidget {
@@ -31,7 +32,7 @@ class ProposalStatusBanner extends StatelessWidget {
         backgroundColor = AppColors.ink.withValues(alpha: 0.1);
         textColor = AppColors.ink;
         icon = Icons.schedule;
-        message = AppStrings.proposalBannerPaymentNotified;
+        message = AppStrings.proposalPaymentPendingBannerBody;
         break;
       case ProposalStatus.confirmed:
         backgroundColor = AppColors.paperOk.withValues(alpha: 0.1);
@@ -134,10 +135,9 @@ class ProposalHeaderCard extends StatelessWidget {
             Text(
               proposal.formattedExpiration,
               style: AppTypography.caption.copyWith(
-                color:
-                    proposal.timeUntilExpiration.inDays < 2
-                        ? AppColors.paperAccent
-                        : AppColors.inkTertiary,
+                color: proposal.timeUntilExpiration.inDays < 2
+                    ? AppColors.paperAccent
+                    : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -503,35 +503,29 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
   Widget _buildAccountSelector() {
     return PopupMenuButton<BankAccount>(
       onSelected: (account) => setState(() => _selectedAccount = account),
-      itemBuilder:
-          (context) =>
-              widget.bankAccounts
-                  .map(
-                    (account) => PopupMenuItem<BankAccount>(
-                      value: account,
-                      child: Row(
-                        children: [
-                          if (account.id == _selectedAccount?.id)
-                            Icon(
-                              Icons.check,
-                              size: 16,
-                              color: AppColors.paperAccent,
-                            )
-                          else
-                            const SizedBox(width: AppSpacing.space4),
-                          const SizedBox(width: AppSpacing.space2),
-                          Expanded(
-                            child: Text(
-                              '${account.bankName} ${account.accountNumber}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
+      itemBuilder: (context) => widget.bankAccounts
+          .map(
+            (account) => PopupMenuItem<BankAccount>(
+              value: account,
+              child: Row(
+                children: [
+                  if (account.id == _selectedAccount?.id)
+                    Icon(Icons.check, size: 16, color: AppColors.paperAccent)
+                  else
+                    const SizedBox(width: AppSpacing.space4),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      '${account.bankName} ${account.accountNumber}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  )
-                  .toList(),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space2,
@@ -668,6 +662,9 @@ class ProposalWaitingCard extends StatelessWidget {
               color: AppColors.inkSecondary,
             ),
           ),
+          // §3.2.4: 3단계 프로그레스 — 입금 알림 (v) → 확인 대기 (현재) → 수강권 발급
+          const SizedBox(height: AppSpacing.space4),
+          const PaymentPendingProgressBar(),
           const SizedBox(height: AppSpacing.space4),
           OutlinedButton.icon(
             onPressed: onContactTapped,
