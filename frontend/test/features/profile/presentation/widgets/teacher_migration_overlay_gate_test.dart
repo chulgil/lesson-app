@@ -16,7 +16,6 @@ import 'package:lessonaza/features/onboarding/onboarding_facade.dart'
         OnboardingCategoryPreviewScreen,
         OnboardingCategoryShown,
         onboardingCategoryShownProvider;
-import 'package:lessonaza/features/profile/presentation/providers/category_new_badge_provider.dart';
 import 'package:lessonaza/features/profile/presentation/widgets/teacher_migration_overlay_gate.dart';
 
 /// onboardingCategoryShownProvider override — Hive 없이 동작.
