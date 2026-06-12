@@ -7,7 +7,8 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../home/presentation/widgets/quest_board_card.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
+import '../../../home/home_ui_facade.dart' show QuestBoardCard;
 import '../providers/quest_celebration_provider.dart';
 
 /// "가이드 다시 보기" 화면 — 졸업 후 fallback (W5 Task 5.6).
@@ -44,8 +45,7 @@ class _GuideReshowScreenState extends ConsumerState<GuideReshowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.paper,
+    return NotebookScreenScaffold(
       appBar: AppBar(
         backgroundColor: AppColors.paper,
         elevation: 0,

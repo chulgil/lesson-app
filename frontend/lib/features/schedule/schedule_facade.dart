@@ -22,3 +22,6 @@ export 'presentation/providers/unified_lesson_request_providers.dart'
         todayRequestsProvider,
         UnifiedLessonRequestActions,
         unifiedLessonRequestRepositoryProvider;
+// 운영시간 SSOT — profile 5묶음 상태/home 게이지/settings 부팅 마이그레이션이 소비.
+export 'presentation/providers/teacher_availability_providers.dart'
+    show teacherAvailabilityProvider, teacherAvailabilityRepositoryProvider;

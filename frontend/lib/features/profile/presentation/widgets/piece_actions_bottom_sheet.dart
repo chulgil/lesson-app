@@ -26,11 +26,12 @@ class PieceActionsBottomSheet extends StatelessWidget {
   const PieceActionsBottomSheet({super.key});
 
   /// Shows the sheet and returns the picked action, or `null` if dismissed.
+  ///
+  /// build() 가 [NotebookBottomSheet] surface 를 직접 소유하므로
+  /// [showNotebookModalBottomSheet] (custom-body 변형) 로 라우트한다.
   static Future<PieceActionResult?> show(BuildContext context) {
-    return showModalBottomSheet<PieceActionResult>(
+    return showNotebookModalBottomSheet<PieceActionResult>(
       context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: AppColors.ink.withValues(alpha: 0.45),
       builder: (ctx) => const PieceActionsBottomSheet(),
     );
   }

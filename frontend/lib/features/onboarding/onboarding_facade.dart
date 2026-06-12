@@ -16,3 +16,6 @@ export 'presentation/providers/onboarding_category_shown_provider.dart'
     show OnboardingCategoryShown, onboardingCategoryShownProvider;
 export 'presentation/screens/onboarding_category_preview_screen.dart'
     show OnboardingCategoryPreviewScreen;
+// 퀘스트 unlock 축하 시트 — home 화면이 Q6 완료 시 호출.
+export 'presentation/widgets/quest_unlock_celebration_sheet.dart'
+    show showQuestUnlockCelebrationSheet;

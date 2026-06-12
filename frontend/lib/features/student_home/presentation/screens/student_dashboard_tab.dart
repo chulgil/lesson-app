@@ -11,8 +11,6 @@ import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
 import '../../../gamification/gamification_ui_facade.dart';
-import '../../../gamification/presentation/widgets/practice_start_section.dart';
-import '../../../gamification/presentation/widgets/student_gamification_onboarding_trigger.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/practice_ui_facade.dart';

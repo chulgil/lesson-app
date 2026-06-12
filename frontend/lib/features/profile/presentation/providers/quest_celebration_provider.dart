@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/constants/durations.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/auth_facade.dart' show authRepositoryProvider;
 
 part 'quest_celebration_provider.g.dart';
 

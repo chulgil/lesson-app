@@ -2,8 +2,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../gamification/presentation/providers/growth_heatmap_provider.dart';
-import '../../../gamification/presentation/providers/student_quest_provider.dart';
+import '../../../gamification/gamification_facade.dart'
+    show growthHeatmapRepositoryProvider, studentQuestRepositoryProvider;
 import '../../domain/services/practice_recording_service.dart';
 import '../../domain/services/practice_source_loggers.dart';
 

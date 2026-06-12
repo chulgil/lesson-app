@@ -12,8 +12,7 @@ import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/onboarding_facade.dart';
-import '../../../onboarding/presentation/widgets/quest_unlock_celebration_sheet.dart';
-import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
+import '../../../profile/profile_facade.dart' show questFirstShownProvider;
 import '../../../profile/profile_ui_facade.dart';
 import '../../../settings/settings_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
@@ -264,9 +263,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
     final isSelected = _currentIndex == index;
-    final accentColor = isSelected
-        ? AppColors.paperAccent
-        : AppColors.inkTertiary;
+    final accentColor =
+        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
 
     return InkWell(
       key: key,

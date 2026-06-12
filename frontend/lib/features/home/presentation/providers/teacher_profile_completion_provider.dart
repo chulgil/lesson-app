@@ -2,7 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../onboarding/onboarding_facade.dart';
-import '../../../schedule/presentation/providers/teacher_availability_providers.dart';
+import '../../../schedule/schedule_facade.dart'
+    show teacherAvailabilityProvider;
 import '../../../settings/settings_facade.dart';
 import 'assignment_summary_provider.dart';
 import 'home_lesson_summary_provider.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../practice/presentation/widgets/practice_tools_modal.dart';
-import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../practice/practice_ui_facade.dart' show PracticeToolsModal;
+import '../../../students/students_facade.dart' show studentProvider;
 import '../providers/growth_heatmap_provider.dart';
 import 'practice_celebration_overlay.dart';
 import 'practice_start_card.dart';
@@ -72,13 +72,14 @@ class PracticeStartSection extends ConsumerWidget {
       context: context,
       barrierColor: Colors.transparent,
       barrierDismissible: false,
-      builder: (ctx) => PracticeCelebrationOverlay(
-        practiceMinutes: practiceMinutes,
-        streakDays: streakDays,
-        onDismiss: () {
-          if (ctx.mounted) Navigator.of(ctx).pop();
-        },
-      ),
+      builder:
+          (ctx) => PracticeCelebrationOverlay(
+            practiceMinutes: practiceMinutes,
+            streakDays: streakDays,
+            onDismiss: () {
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+          ),
     );
   }
 }
