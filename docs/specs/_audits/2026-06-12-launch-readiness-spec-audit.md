@@ -32,15 +32,17 @@
 
 ## 미반영 발견 — 후속 이슈 권장 (우선순위순)
 
-### P1 — 출시 전 결정 필요
+### P1 — 출시 전 결정 필요 (2026-06-12 전건 스펙 반영 완료)
 
-| # | 이슈 | 위치 | 권고 |
-|---|------|------|------|
-| 1 | **알림 설정 화면 미구현** — 설정 메뉴는 존재하나 기능 없음 (#15 플레이스홀더 위반 가능) | notification_master.md §6 (Phase 2 분류) | 카테고리별 토글만이라도 Phase 1.5 승격, 또는 메뉴 진입점 숨김 |
-| 2 | **전화인증 E3 게이트 마찰** — 첫 수강권 발급 직전 인증 모달. "나중에" 선택 시 제안 중단 후 복구 경로 미명세 | phone_verification_policy.md §3.1, §4.2 | "나중에" 선택 시 제안 임시저장 + 재진입 시 복구 명시. 인증 완료율 계측 추가 |
-| 3 | **변경권 정책 3개 문서 산재** — 차감/복원 규칙이 design_master, schedule 스펙, cancellation_flow 에 분산 | schedule/ + subscription/ | 단일 `reschedule_credit_spec.md` 로 통합. UI 에 차감 조건 사전 고지 ("마감 24h 전 취소는 무료") |
-| 4 | **수강권 중복 제안 차단 미명세** — 같은 학생에게 pending/paymentNotified 제안 존재 시 재제안 경고 없음 | subscription_master.md §2.2.2 | 제안 생성 시 중복 감지 + 경고 다이얼로그 명세 추가 |
-| 5 | **설정 진입점 이중화** — 레슨 시간 설정이 "프로필 → 설정" 과 "LessonTimeSettingsScreen" 양쪽 노출 가능성 | settings_master.md §6 + profile_master.md §G | 단일 진입점 확정 (SSOT #19 원칙) |
+> 4개 병렬 worktree 로 분담 처리 후 main 병합. 구현은 별도 (스펙만 확정).
+
+| # | 이슈 | 반영 결과 |
+|---|------|----------|
+| 1 | **알림 설정 화면 미구현** — 설정 메뉴는 존재하나 기능 없음 (#15 플레이스홀더 위반 가능) | 반영 완료 — 마스터+6카테고리 토글 Phase 1.5 승격 (notification_master.md §6, push_notification_settings_spec.md §10) |
+| 2 | **전화인증 E3 게이트 마찰** — "나중에" 선택 시 제안 중단 후 복구 경로 미명세 | 반영 완료 — 제안 draft 임시저장(7일) + 복구 배너 + 계측 이벤트 5종 (phone_verification_policy.md v1.2) |
+| 3 | **변경권 정책 3개 문서 산재** — 차감/복원 규칙 분산 | 반영 완료 — SSOT 신설 [reschedule_credit_spec.md](../subscription/reschedule_credit_spec.md), 기존 문서는 포인터. 단 **모순 1건 결정 필요**: 마감 24h 고정 vs `rescheduleDeadlineHours` 수강권별 재정의 (SSOT §3 표시) |
+| 4 | **수강권 중복 제안 차단 미명세** | 반영 완료 — 동일 학생 활성 제안 1개 제약 + 경고 다이얼로그 (subscription_master.md §3.1.5) |
+| 5 | **설정 진입점 이중화** — 레슨 시간 설정 양쪽 노출 가능성 | 반영 완료 — 조사 결과 LessonTimeSettingsScreen 은 이미 해체됨(W2 Task 2.5), 스펙 서술만 어긋남 → 현황 정정 (profile_master.md §G, settings_master.md §6) |
 
 ### P2 — 출시 후 개선
 
