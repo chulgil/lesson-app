@@ -11,8 +11,13 @@ abstract class StreakFreezeRepository {
   /// 주간 자동 발급 — balance + [amount], clamp [StreakFreeze.maxBalance].
   ///
   /// 호출 빈도/타이밍 (Sunday 00:00 KST 정렬) 결정은 서비스 레이어 책임 (Job 4
-  /// `StreakFreezeService.weeklyGrantIfDue`).
-  Future<StreakFreeze> grantWeekly(String studentId, {int amount = 2});
+  /// `StreakFreezeService.weeklyGrantIfDue`). [asOf] 가 주어지면
+  /// [StreakFreeze.lastGrantedAt] 도 갱신.
+  Future<StreakFreeze> grantWeekly(
+    String studentId, {
+    int amount = 2,
+    DateTime? asOf,
+  });
 
   /// 결석일 [date] 에 freeze 1개 차감 + usedAt 추가.
   ///

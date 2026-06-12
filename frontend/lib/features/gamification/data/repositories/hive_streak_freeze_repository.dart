@@ -42,9 +42,13 @@ class HiveStreakFreezeRepository implements StreakFreezeRepository {
   }
 
   @override
-  Future<StreakFreeze> grantWeekly(String studentId, {int amount = 2}) async {
+  Future<StreakFreeze> grantWeekly(
+    String studentId, {
+    int amount = 2,
+    DateTime? asOf,
+  }) async {
     final current = await getOrCreate(studentId);
-    return _save(current.grantWeekly(amount: amount));
+    return _save(current.grantWeekly(amount: amount, asOf: asOf));
   }
 
   @override

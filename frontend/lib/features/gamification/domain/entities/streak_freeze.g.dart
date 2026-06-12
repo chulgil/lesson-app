@@ -15,6 +15,9 @@ StreakFreeze _$StreakFreezeFromJson(Map<String, dynamic> json) => StreakFreeze(
       examModeUntil: json['exam_mode_until'] == null
           ? null
           : DateTime.parse(json['exam_mode_until'] as String),
+      lastGrantedAt: json['last_granted_at'] == null
+          ? null
+          : DateTime.parse(json['last_granted_at'] as String),
     );
 
 Map<String, dynamic> _$StreakFreezeToJson(StreakFreeze instance) =>
@@ -23,4 +26,5 @@ Map<String, dynamic> _$StreakFreezeToJson(StreakFreeze instance) =>
       'balance': instance.balance,
       'used_at': instance.usedAt.map((e) => e.toIso8601String()).toList(),
       'exam_mode_until': instance.examModeUntil?.toIso8601String(),
+      'last_granted_at': instance.lastGrantedAt?.toIso8601String(),
     };

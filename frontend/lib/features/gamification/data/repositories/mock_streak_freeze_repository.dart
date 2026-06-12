@@ -16,9 +16,13 @@ class MockStreakFreezeRepository implements StreakFreezeRepository {
   }
 
   @override
-  Future<StreakFreeze> grantWeekly(String studentId, {int amount = 2}) async {
+  Future<StreakFreeze> grantWeekly(
+    String studentId, {
+    int amount = 2,
+    DateTime? asOf,
+  }) async {
     final current = await getOrCreate(studentId);
-    final granted = current.grantWeekly(amount: amount);
+    final granted = current.grantWeekly(amount: amount, asOf: asOf);
     _store[studentId] = granted;
     return granted;
   }
