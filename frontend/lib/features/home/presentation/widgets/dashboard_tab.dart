@@ -26,6 +26,7 @@ import '../../../subscription/subscription_ui_facade.dart';
 import 'quest_board_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
+import 'next_mission_spotlight.dart';
 import 'schedule_change_request_section.dart';
 import 'time_context_banner.dart';
 import 'urgent_alert_zone.dart';
@@ -45,123 +46,136 @@ class DashboardTab extends ConsumerWidget {
     final today = DateTime(now.year, now.month, now.day);
     final todayLessons = dashboard.lessons.whenData((lessons) {
       return lessons.where((lesson) {
-        final lessonDate = lesson.date;
-        return lessonDate.year == today.year &&
-            lessonDate.month == today.month &&
-            lessonDate.day == today.day;
-      }).toList()..sort((a, b) => a.startTime.compareTo(b.startTime));
+          final lessonDate = lesson.date;
+          return lessonDate.year == today.year &&
+              lessonDate.month == today.month &&
+              lessonDate.day == today.day;
+        }).toList()
+        ..sort((a, b) => a.startTime.compareTo(b.startTime));
     });
 
-    return PaperScaffold(
-      child: RefreshIndicator(
-        onRefresh: () async {
-          await ref
-              .read(homeDashboardRefreshProvider)
-              .refresh(dashboard.teacherId);
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.space2,
-            AppSpacing.screenPadding,
-            AppSpacing.space8,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Masthead: Playfair eyebrow + IBM Plex Mono 메타 ──
-              _buildMasthead(context),
-
-              // ── Programme Title: 페이지 타이틀 ──
-              _buildProgrammeTitle(context, todayLessons),
-
-              const SizedBox(height: AppSpacing.space5),
-
-              const DemoDashboardOverlay(),
-
-              const SizedBox(height: AppSpacing.space4),
-
-              // ── Sync failure banner ────
-              _buildSyncFailureBanner(ref),
-
-              // ── 0순위: 선생님이 즉시 처리해야 하는 학생 연결 요청 ────
-              _buildPendingConnectionRequests(context, ref),
-
-              const SizedBox(height: AppSpacing.space4),
-
-              // ── 0순위: 시간대 인식 컨텍스트 배너 (다음 레슨) ────
-              // (home_master.md §3.5)
-              todayLessons.maybeWhen(
-                data: (lessons) => TimeContextBanner(todayLessons: lessons),
-                orElse: () => const SizedBox.shrink(),
+    return Stack(
+      children: [
+        PaperScaffold(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await ref
+                  .read(homeDashboardRefreshProvider)
+                  .refresh(dashboard.teacherId);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenPadding,
+                AppSpacing.space2,
+                AppSpacing.screenPadding,
+                AppSpacing.space8,
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Masthead: Playfair eyebrow + IBM Plex Mono 메타 ──
+                  _buildMasthead(context),
 
-              // ── Today's Lessons Section (다음 레슨 바로 아래) ──
-              _buildTodayLessonsHeader(context, todayLessons),
-              const SizedBox(height: AppSpacing.space3),
+                  // ── Programme Title: 페이지 타이틀 ──
+                  _buildProgrammeTitle(context, todayLessons),
 
-              todayLessons.when(
-                data: (lessons) => _buildLessonsList(context, lessons),
-                loading: () => const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(AppSpacing.space4),
-                    child: CircularProgressIndicator(),
+                  const SizedBox(height: AppSpacing.space5),
+
+                  const DemoDashboardOverlay(),
+
+                  const SizedBox(height: AppSpacing.space4),
+
+                  // ── Sync failure banner ────
+                  _buildSyncFailureBanner(ref),
+
+                  // ── 0순위: 선생님이 즉시 처리해야 하는 학생 연결 요청 ────
+                  _buildPendingConnectionRequests(context, ref),
+
+                  const SizedBox(height: AppSpacing.space4),
+
+                  // ── 0순위: 시간대 인식 컨텍스트 배너 (다음 레슨) ────
+                  // (home_master.md §3.5)
+                  todayLessons.maybeWhen(
+                    data: (lessons) => TimeContextBanner(todayLessons: lessons),
+                    orElse: () => const SizedBox.shrink(),
                   ),
-                ),
-                error: (error, _) =>
-                    _buildErrorCard(AppStrings.dashboardLessonsLoadError),
+
+                  // ── Today's Lessons Section (다음 레슨 바로 아래) ──
+                  _buildTodayLessonsHeader(context, todayLessons),
+                  const SizedBox(height: AppSpacing.space3),
+
+                  todayLessons.when(
+                    data: (lessons) => _buildLessonsList(context, lessons),
+                    loading:
+                        () => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(AppSpacing.space4),
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                    error:
+                        (error, _) => _buildErrorCard(
+                          AppStrings.dashboardLessonsLoadError,
+                        ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.space6),
+
+                  // Payment-pending dashboard card — #424. Hides itself when count=0.
+                  const PaymentPendingCard(),
+                  const SizedBox(height: AppSpacing.space3),
+
+                  // Invite-pending dashboard card — #5 D-G3 Phase 2. Hides when count=0.
+                  const InvitePendingCard(),
+                  const SizedBox(height: AppSpacing.space3),
+
+                  // Quest Board — profile completion gamification
+                  const QuestBoardCard(),
+
+                  // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
+                  _buildStatsRow(context, todayLessons, dashboard.lessonStats),
+
+                  const SizedBox(height: AppSpacing.space3),
+
+                  // ── 긴급 알림 존 (입금대기 등 — 통계 바로 아래) ────
+                  UrgentAlertZone(
+                    teacherId: dashboard.teacherId,
+                    unpaidSummary: dashboard.unpaidSummary,
+                    needsConfirmation: dashboard.needsConfirmation,
+                  ),
+
+                  const SizedBox(height: AppSpacing.space6),
+
+                  // ── 이벤트: 대응 필요 ──────────────────────────
+                  _buildEventsGroup(context, ref, dashboard.teacherId),
+
+                  const SizedBox(height: AppSpacing.space6),
+
+                  const AssignmentSummarySection(),
+
+                  const SizedBox(height: AppSpacing.space6),
+
+                  // ── Loop Stats Entry (#512) — 영상 반복 통계 진입점 ──
+                  _LoopStatsEntryCard(),
+
+                  const SizedBox(height: AppSpacing.space6),
+
+                  // ── Fine. 통계 링크 ──
+                  _buildAnalyticsLink(context),
+
+                  const SizedBox(height: AppSpacing.space8),
+                ],
               ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // Payment-pending dashboard card — #424. Hides itself when count=0.
-              const PaymentPendingCard(),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Invite-pending dashboard card — #5 D-G3 Phase 2. Hides when count=0.
-              const InvitePendingCard(),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Quest Board — profile completion gamification
-              const QuestBoardCard(),
-
-              // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
-              _buildStatsRow(context, todayLessons, dashboard.lessonStats),
-
-              const SizedBox(height: AppSpacing.space3),
-
-              // ── 긴급 알림 존 (입금대기 등 — 통계 바로 아래) ────
-              UrgentAlertZone(
-                teacherId: dashboard.teacherId,
-                unpaidSummary: dashboard.unpaidSummary,
-                needsConfirmation: dashboard.needsConfirmation,
-              ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // ── 이벤트: 대응 필요 ──────────────────────────
-              _buildEventsGroup(context, ref, dashboard.teacherId),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              const AssignmentSummarySection(),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // ── Loop Stats Entry (#512) — 영상 반복 통계 진입점 ──
-              _LoopStatsEntryCard(),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // ── Fine. 통계 링크 ──
-              _buildAnalyticsLink(context),
-
-              const SizedBox(height: AppSpacing.space8),
-            ],
+            ),
           ),
         ),
-      ),
+        // W4 Task 4.4 — 가입 후 메인 첫 진입 1회 spotlight.
+        // questFirstShownProvider 재사용 (architect P1 #4).
+        NextMissionSpotlight(
+          onStart: () => context.push(AppRoutes.teacherFirstAvailability),
+        ),
+      ],
     );
   }
 
@@ -250,45 +264,51 @@ class DashboardTab extends ConsumerWidget {
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
     final todayCard = todayLessons.when(
-      data: (lessons) => StatCard(
-        title: AppStrings.todayLessons,
-        value: AppStrings.usageCountShort(lessons.length),
-        color: AppColors.ink,
-        icon: Icons.today,
-        onTap: onViewAllLessons,
-      ),
-      loading: () => StatCard(
-        title: AppStrings.todayLessons,
-        value: '-',
-        color: AppColors.ink,
-        icon: Icons.today,
-      ),
-      error: (_, __) => StatCard(
-        title: AppStrings.todayLessons,
-        value: '-',
-        color: AppColors.ink,
-      ),
+      data:
+          (lessons) => StatCard(
+            title: AppStrings.todayLessons,
+            value: AppStrings.usageCountShort(lessons.length),
+            color: AppColors.ink,
+            icon: Icons.today,
+            onTap: onViewAllLessons,
+          ),
+      loading:
+          () => StatCard(
+            title: AppStrings.todayLessons,
+            value: '-',
+            color: AppColors.ink,
+            icon: Icons.today,
+          ),
+      error:
+          (_, __) => StatCard(
+            title: AppStrings.todayLessons,
+            value: '-',
+            color: AppColors.ink,
+          ),
     );
 
     final monthCard = lessonStatsAsync.when(
-      data: (stats) => StatCard(
-        title: AppStrings.dashboardThisMonth,
-        value: AppStrings.usageCountShort(stats['completed'] ?? 0),
-        color: AppColors.ink,
-        icon: Icons.check_circle_outline,
-        onTap: () => context.push(AppRoutes.analytics),
-      ),
-      loading: () => StatCard(
-        title: AppStrings.dashboardThisMonth,
-        value: '-',
-        color: AppColors.ink,
-        icon: Icons.check_circle_outline,
-      ),
-      error: (_, __) => StatCard(
-        title: AppStrings.dashboardThisMonth,
-        value: '-',
-        color: AppColors.ink,
-      ),
+      data:
+          (stats) => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: AppStrings.usageCountShort(stats['completed'] ?? 0),
+            color: AppColors.ink,
+            icon: Icons.check_circle_outline,
+            onTap: () => context.push(AppRoutes.analytics),
+          ),
+      loading:
+          () => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: '-',
+            color: AppColors.ink,
+            icon: Icons.check_circle_outline,
+          ),
+      error:
+          (_, __) => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: '-',
+            color: AppColors.ink,
+          ),
     );
 
     return StatCardRow(cards: [todayCard, monthCard]);
@@ -464,9 +484,10 @@ class DashboardTab extends ConsumerWidget {
                 Expanded(
                   child: LessonCard(
                     lesson: lesson,
-                    onTap: () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
-                    ),
+                    onTap:
+                        () => context.push(
+                          AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                        ),
                   ),
                 ),
               ],

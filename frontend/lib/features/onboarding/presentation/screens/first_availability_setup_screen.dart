@@ -306,7 +306,9 @@ class _FirstAvailabilitySetupScreenState
       // Celebration sheet — modal sheet, no skip.
       await showFirstAvailabilityCelebrationSheet(context);
       if (!mounted) return;
-      context.go(AppRoutes.home);
+      // W4 Task 4.3 — Step 2.5 카테고리 미리보기 (spec §9.1).
+      // 미리보기 [시작하기]/[건너뛰기] 양쪽 모두 markShown → /home.
+      context.go(AppRoutes.onboardingCategoryPreview);
     } catch (_) {
       if (!mounted) return;
       setState(() {

@@ -8975,4 +8975,36 @@ class AppStrings {
 
   /// BottomSheet 내 가격표 진입 ListTile 부제목.
   static const priceTableMenuSubtitle = '악기별 레벨에 따른 1회 레슨 가격';
+
+  // ── OnboardingCategoryPreviewScreen (W4 Task 4.2) ────────────────
+  // spec §9.2 — Step 2.5 5묶음 카테고리 미리보기 1회 화면.
+  // 사용처: features/onboarding/presentation/screens/onboarding_category_preview_screen.dart
+
+  /// 화면 상단 환영 타이틀.
+  static const onboardingCategoryPreviewTitle = '환영합니다! 5가지 묶음으로 정리해뒀어요';
+
+  /// 카테고리 그리드 아래 보조 안내 (퀘스트 안내 예고).
+  static const onboardingCategoryPreviewSubtitle = '나머지는 퀘스트가 안내해드려요';
+
+  /// [시작하기] CTA — markShown() + 메인 진입.
+  static const onboardingCategoryPreviewStart = '시작하기';
+
+  /// [건너뛰기] CTA — markShown() + 메인 진입 (1회 노출 정책 동일).
+  static const onboardingCategoryPreviewSkip = '건너뛰기';
+
+  // ── NextMissionSpotlight (W4 Task 4.4) ───────────────────────────
+  // spec §9.1 Step 3 — 가입 후 메인 첫 진입 1회 spotlight.
+  // 사용처: features/home/presentation/widgets/next_mission_spotlight.dart
+
+  /// 카드 타이틀.
+  static const nextMissionSpotlightTitle = '여기부터 시작하시면 끝나요';
+
+  /// 보조 안내.
+  static const nextMissionSpotlightHint = '다음 미션 카드를 따라가면 설정이 완료됩니다';
+
+  /// [시작] CTA — markShown() + 미션 화면 push.
+  static const nextMissionSpotlightStart = '시작';
+
+  /// [나중에] CTA — markShown() + spotlight 종료만.
+  static const nextMissionSpotlightLater = '나중에';
 }
