@@ -19,7 +19,13 @@ import '../../../../core/theme/app_typography.dart';
 import '../providers/onboarding_category_shown_provider.dart';
 
 class OnboardingCategoryPreviewScreen extends ConsumerWidget {
-  const OnboardingCategoryPreviewScreen({super.key});
+  /// 진행/스킵 콜백 — null 이면 신규 가입 onboarding 흐름 (markShown + home 라우트).
+  ///
+  /// W6 마이그레이션 overlay 모드에서는 콜백을 주입하여 ProfileTab 안에서
+  /// markCategoryIntroduced(5개) + markShown 을 처리하고 자체 rebuild 한다.
+  final Future<void> Function()? onProceed;
+
+  const OnboardingCategoryPreviewScreen({super.key, this.onProceed});
 
   static const _categories = <_CategoryPreview>[
     _CategoryPreview(
@@ -102,6 +108,10 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
   }
 
   Future<void> _proceed(BuildContext context, WidgetRef ref) async {
+    if (onProceed != null) {
+      await onProceed!();
+      return;
+    }
     await ref.read(onboardingCategoryShownProvider.notifier).markShown();
     if (!context.mounted) return;
     context.go(AppRoutes.home);

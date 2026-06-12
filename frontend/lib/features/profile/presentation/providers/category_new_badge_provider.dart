@@ -97,7 +97,8 @@ class CategoryNewBadge extends _$CategoryNewBadge {
 
   /// 카테고리 최초 노출 시점 기록 — 이미 기록되어 있으면 noop (멱등).
   ///
-  /// ProfileTab 빌드 시점에 5개 카테고리에 대해 1회씩 호출 — 첫 호출만 영속.
+  /// 호출 측은 `await container.read(categoryNewBadgeProvider.future)` 등으로
+  /// build() 완료를 보장한 뒤 호출한다. 그래야 `state.requireValue` 가 안전.
   Future<void> markCategoryIntroduced(
     ProfileCategoryId id,
     DateTime now,
@@ -106,8 +107,18 @@ class CategoryNewBadge extends _$CategoryNewBadge {
     final key = '${id.name}$_kIntroducedSuffix';
     if (box.get(key) != null) return;
     await box.put(key, now.toIso8601String());
-    ref.invalidateSelf();
-    await future;
+    _updateEntry(id, introducedAt: now);
+  }
+
+  /// 5묶음 카테고리 전체에 markCategoryIntroduced(now) 일괄 호출.
+  ///
+  /// W6 마이그레이션 overlay 진행/스킵 시 사용 — TeacherMigrationOverlayGate 가
+  /// 한 번에 5개 카테고리의 NEW 윈도우를 시작한다. 이미 기록된 카테고리는
+  /// markCategoryIntroduced 의 멱등 보장으로 건너뜀.
+  Future<void> markAllIntroduced(DateTime now) async {
+    for (final id in ProfileCategoryId.values) {
+      await markCategoryIntroduced(id, now);
+    }
   }
 
   /// 카테고리 카드 진입 — 즉시 dismiss.
@@ -116,7 +127,26 @@ class CategoryNewBadge extends _$CategoryNewBadge {
   Future<void> markEntered(ProfileCategoryId id) async {
     final box = await _openBox();
     await box.put('${id.name}$_kEnteredSuffix', true);
-    ref.invalidateSelf();
-    await future;
+    _updateEntry(id, entered: true);
+  }
+
+  /// State 직접 갱신 — invalidateSelf 회피로 notifier 재생성/캐시 box 손실 방지.
+  ///
+  /// `state.requireValue` 가 호출 가능한 시점에만 호출 (build 완료 후).
+  void _updateEntry(
+    ProfileCategoryId id, {
+    DateTime? introducedAt,
+    bool? entered,
+  }) {
+    final current = state.requireValue;
+    final next = Map<ProfileCategoryId, CategoryNewBadgeEntry>.from(
+      current.entries,
+    );
+    final previous = next[id];
+    next[id] = CategoryNewBadgeEntry(
+      introducedAt: introducedAt ?? previous?.introducedAt,
+      entered: entered ?? previous?.entered ?? false,
+    );
+    state = AsyncValue.data(CategoryNewBadgeState(entries: next));
   }
 }

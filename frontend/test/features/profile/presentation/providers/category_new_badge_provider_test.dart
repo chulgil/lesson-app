@@ -152,6 +152,24 @@ void main() {
       );
     });
 
+    test('markAllIntroduced — 5묶음 모두 introducedAt 일괄 기록', () async {
+      final container = makeContainer();
+      final notifier = container.read(categoryNewBadgeProvider.notifier);
+      await container.read(categoryNewBadgeProvider.future);
+
+      final now = DateTime(2026, 6, 12);
+      await notifier.markAllIntroduced(now);
+
+      final state = container.read(categoryNewBadgeProvider).requireValue;
+      for (final id in ProfileCategoryId.values) {
+        expect(
+          state.entries[id]?.introducedAt,
+          isNotNull,
+          reason: 'introducedAt missing for ${id.name}',
+        );
+      }
+    });
+
     test('Hive 영속 — 재오픈 후에도 introducedAt/entered 유지', () async {
       // 1st container
       {
