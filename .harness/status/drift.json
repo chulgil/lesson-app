@@ -1,6 +1,6 @@
 {
-  "updated_at": 1781225540,
-  "updated_at_iso": "2026-06-12T00:52:20Z",
+  "updated_at": 1781247800,
+  "updated_at_iso": "2026-06-12T07:03:20Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -10,18 +10,26 @@
     "spec/2026-05-09-offline-sync-verification.md": "98414e8bb19052bd181603cee36a889eec03e86f",
     "spec/2026-05-10-r6-trust-building.md": "c33a5cbf63336178cf45fb5ee11172cbfcdca2a8",
     "spec/2026-06-08-teacher-quest-system.md": "d547db15a7646981fef42cfecf8e982d9bdfd49c",
-    "spec/2026-06-11-student-gamification.md": "b57b2b6ebc1a6d95bc22bdf6911409369155349b",
-    "spec/2026-06-11-teacher-settings-redesign.md": "c2539217dd4e56cf835e316420cd60c2bf23f0e2"
+    "spec/2026-06-11-student-gamification.md": "f818766aa7dfecda225cb78b3e1f0e978cefe372",
+    "spec/2026-06-11-teacher-settings-redesign.md": "c2539217dd4e56cf835e316420cd60c2bf23f0e2",
+    "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md": "b163a2262d679d86141efeb402468c9e63bc861b"
   },
-  "changed": [],
-  "added": [],
+  "changed": [
+    "spec/2026-06-11-student-gamification.md",
+    "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md"
+  ],
+  "added": [
+    "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md"
+  ],
   "removed": [],
   "summary": {
-    "changed_total": 0,
-    "added": 0,
+    "changed_total": 2,
+    "added": 1,
     "removed": 0,
     "domains_touched": [],
     "domain_counts": {},
-    "warnings": []
+    "warnings": [
+      "changes_without_domain: 변경 파일이 도메인 폴더 아래가 아님"
+    ]
   }
 }
