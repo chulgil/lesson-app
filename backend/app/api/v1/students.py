@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_student, get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
+from app.schemas.parent import ParentVisibilitySettingsResponse
 from app.schemas.student import (
     StudentCreate,
     StudentResponse,
@@ -299,6 +300,7 @@ class ParentVisibilityPatch(BaseModel):
 
 @router.get(
     "/{student_id}/parent-visibility",
+    response_model=ParentVisibilitySettingsResponse,
     status_code=status.HTTP_200_OK,
     summary="Get parent visibility settings for a student",
 )
@@ -306,7 +308,7 @@ async def get_parent_visibility(
     student_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> ParentVisibilitySettingsResponse:
     """선생님 또는 학부모(자녀의 경우) 가 student 별 권한 조회.
 
     teacher_id 는 student 의 현재 활성 teacher 로 자동 resolve.
@@ -319,6 +321,7 @@ async def get_parent_visibility(
 
 @router.patch(
     "/{student_id}/parent-visibility",
+    response_model=ParentVisibilitySettingsResponse,
     status_code=status.HTTP_200_OK,
     summary="Patch parent visibility settings (teacher only)",
 )
@@ -327,7 +330,7 @@ async def patch_parent_visibility(
     body: ParentVisibilityPatch,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> ParentVisibilitySettingsResponse:
     """선생님이 자기 학생의 학부모 열람 권한 7 카테고리 부분 업데이트."""
     from app.services.parent_service import ParentService
 

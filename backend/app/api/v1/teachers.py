@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
+from app.schemas.review import TeacherReviewSummary
 from app.schemas.student import StudentCreate, StudentResponse
 from app.schemas.teacher import (  # noqa: F401  Certificate * 는 endpoint decorator response_model 에서 사용 — ruff 가 일부 detect 못함.
     TeacherCertificateCreate,
@@ -350,6 +351,7 @@ async def list_teacher_reviews_alias(
 
 @router.get(
     "/{teacher_id}/reviews/summary",
+    response_model=TeacherReviewSummary,
     status_code=status.HTTP_200_OK,
     summary="Get review summary for a teacher (RESTful alias)",
 )
@@ -357,9 +359,8 @@ async def get_teacher_review_summary_alias(
     teacher_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> TeacherReviewSummary:
     """spec discovery audit (2026-06-10) — /reviews/{id}/summary alias."""
-    from app.schemas.review import TeacherReviewSummary
     from app.services.review_service import ReviewService
 
     service = ReviewService(db)

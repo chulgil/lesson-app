@@ -349,3 +349,69 @@ class AvailabilityService:
         if availability.vacation_start_date is None or availability.vacation_end_date is None:
             return False
         return availability.vacation_start_date <= slot_date <= availability.vacation_end_date
+
+    # ------------------------------------------------------------------
+    # Onboarding dual-write (#606)
+    # ------------------------------------------------------------------
+
+    async def onboarding_dual_write(
+        self,
+        teacher_id: str,
+        slots: list[Any],
+    ) -> tuple[int, int]:
+        """Dual-write onboarding availability to SSOT + legacy settings.
+
+        Args:
+            teacher_id: Resolved teacher profile ID.
+            slots: List of objects with .day_of_week / .start_time / .end_time.
+
+        Returns:
+            Tuple of (schedule_slot_count, settings_slot_count).
+        """
+        from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
+        from app.models.settings import TeacherSettings
+
+        # 1. SSOT — replace all existing availability for this teacher.
+        existing = await self.db.scalars(
+            select(TeacherAvailability).where(TeacherAvailability.teacher_id == teacher_id)
+        )
+        for avail in existing.all():
+            child_slots = await self.db.scalars(
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
+            )
+            for slot in child_slots.all():
+                await self.db.delete(slot)
+            await self.db.delete(avail)
+        await self.db.flush()
+
+        schedule_slot_count = 0
+        by_dow: dict[int, list[Any]] = {}
+        for s in slots:
+            by_dow.setdefault(s.day_of_week, []).append(s)
+
+        for dow, day_slots in by_dow.items():
+            avail = TeacherAvailability(teacher_id=teacher_id, day_of_week=dow)
+            self.db.add(avail)
+            await self.db.flush()
+            for s in day_slots:
+                self.db.add(
+                    AvailabilityTimeSlot(
+                        availability_id=avail.id,
+                        start_time=s.start_time,
+                        end_time=s.end_time,
+                    )
+                )
+                schedule_slot_count += 1
+        await self.db.flush()
+
+        # 2. Legacy — TeacherSettings.available_slots JSON.
+        settings = await self.db.scalar(select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id))
+        if settings is None:
+            settings = TeacherSettings(teacher_id=teacher_id)
+            self.db.add(settings)
+            await self.db.flush()
+        flat = [{"day_of_week": s.day_of_week, "start_time": s.start_time, "end_time": s.end_time} for s in slots]
+        settings.available_slots = flat
+        await self.db.flush()
+
+        return schedule_slot_count, len(flat)
