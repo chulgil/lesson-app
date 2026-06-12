@@ -8923,4 +8923,56 @@ class AppStrings {
   static const categoryGuideReplayLabel = '가이드 다시 보기';
   static const categoryGuideReplaySubtitle = '퀘스트 졸업 후 다시 볼 수 있습니다';
   static const categoryGuideReplayComingSoon = '가이드 다시 보기는 곧 지원될 예정입니다';
+
+  // ── LessonStyleSettingsScreen (W3 Task 3.2) ─────────────────────
+  // spec §6.2 — 수업방식 묶음 (3 항목: 레슨 1회 시간 + 사전예약 + 학생 안내)
+  // 사용처: features/profile/presentation/screens/lesson_style_settings_screen.dart
+
+  /// AppBar 제목 (5묶음 카테고리 카드 라벨과 동일).
+  static const lessonStyleScreenTitle = '수업방식';
+
+  /// 레슨 1회 시간 섹션 헤더.
+  static const lessonStyleDurationSection = '레슨 1회 시간';
+
+  /// 레슨 1회 시간 섹션 보조 설명 (한국 음악 레슨 표준 50분 컨벤션 안내).
+  static const lessonStyleDurationHint = '한국 음악 레슨 표준은 50분입니다';
+
+  /// 최소 사전 예약 시간 섹션 헤더.
+  static const lessonStyleBookingSection = '최소 사전 예약 시간';
+
+  /// 최소 사전 예약 시간 섹션 보조 설명.
+  static const lessonStyleBookingHint = '학생이 이 시간 이전에는 예약할 수 없습니다';
+
+  /// 학생 안내 메시지 섹션 헤더.
+  static const lessonStyleGuidanceSection = '학생 안내 메시지';
+
+  /// 학생 안내 메시지 섹션 보조 설명 (빈 입력 → 기본 메시지 fallback 안내).
+  static const lessonStyleGuidanceHint =
+      '예약 시 학생에게 보내는 안내입니다. 비우면 기본 메시지가 사용됩니다';
+
+  // ── PriceTableScreen (W3 Task 3.3) ───────────────────────────────
+  // spec §6.3 — 악기·레벨별 가격표 (LessonTimeSettingsScreen §6 에서 분리).
+  // 사용처: features/profile/presentation/screens/price_table_screen.dart
+
+  /// AppBar 제목.
+  static const priceTableScreenTitle = '가격표';
+
+  /// 섹션 헤더 (수강권·정산 BottomSheet ListTile 라벨과 동일).
+  static const priceTableSection = '레슨 가격표';
+
+  /// 섹션 보조 설명 (가격 입력 안내).
+  static const priceTableDescription = '악기별 레벨에 따른 1회 레슨 가격을 설정하세요.';
+
+  /// 악기 미등록 시 empty 안내 (선등록 유도).
+  static const priceTableEmptyInstruments = '악기를 먼저 설정하면 가격표를 입력할 수 있습니다.';
+
+  /// 가격 입력 다이얼로그 필드 라벨.
+  static const priceTableDialogFieldLabel = '1회 레슨 가격 (원)';
+
+  /// 가격 입력 다이얼로그 제목 — "$instrument $levelLabel 가격".
+  static String priceTableDialogTitle(String instrument, String levelLabel) =>
+      '$instrument $levelLabel 가격';
+
+  /// BottomSheet 내 가격표 진입 ListTile 부제목.
+  static const priceTableMenuSubtitle = '악기별 레벨에 따른 1회 레슨 가격';
 }
