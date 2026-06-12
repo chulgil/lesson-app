@@ -6304,6 +6304,11 @@ class AppStrings {
   static const trophyCollectionMoreLabel = '더 보기';
   static String trophyCollectionCountLabel(int count) => '($count)';
 
+  // ── Rest Recommendation (P2 Visual Growth — Job 8 / AC-7) ──
+  static const restRecommendationSessionMessage = '잠깐 쉬는 게 어때요?';
+  static const restRecommendationDailyMessage = '오늘은 충분히 했어요';
+  static const restRecommendationDismissLabel = '계속하기';
+
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
   static const practiceBadgeUnlockedSection = '획득한 뱃지';
