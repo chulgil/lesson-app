@@ -64,7 +64,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Drag the row to reveal the destructive [삭제] swipe button.
-      await tester.drag(find.text('레슨 알림'), const Offset(200, 0));
+      // 2026-06-12 방향 정책 — 관리(삭제) 액션은 우→좌 스와이프.
+      await tester.drag(find.text('레슨 알림'), const Offset(-200, 0));
       await tester.pumpAndSettle();
 
       expect(find.text(AppStrings.swipeActionDelete), findsOneWidget);
@@ -111,7 +112,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.drag(find.text('레슨 알림'), const Offset(200, 0));
+      await tester.drag(find.text('레슨 알림'), const Offset(-200, 0));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text(AppStrings.swipeActionDelete));
