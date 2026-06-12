@@ -13,7 +13,7 @@ import '../../../features/student_home/presentation/screens/legal_document_scree
 import '../../../features/student_home/presentation/screens/add_manual_teacher_screen.dart';
 import '../../../features/student_home/presentation/screens/my_teachers_screen.dart';
 import '../../../features/student_home/domain/entities/manual_teacher.dart';
-import '../../../features/student_home/presentation/screens/notification_settings_screen.dart';
+import '../../../features/notifications/presentation/screens/notification_settings_screen.dart';
 import '../../../features/student_home/presentation/screens/student_profile_edit_screen.dart';
 import '../app_routes.dart';
 
@@ -79,21 +79,19 @@ List<GoRoute> settingsRoutes = [
   GoRoute(
     path: AppRoutes.termsOfService,
     name: 'termsOfService',
-    builder:
-        (context, state) => const LegalDocumentScreen(
-          title: '이용약관',
-          content: termsOfServiceContent,
-        ),
+    builder: (context, state) => const LegalDocumentScreen(
+      title: '이용약관',
+      content: termsOfServiceContent,
+    ),
   ),
   // Privacy Policy
   GoRoute(
     path: AppRoutes.privacyPolicy,
     name: 'privacyPolicy',
-    builder:
-        (context, state) => const LegalDocumentScreen(
-          title: '개인정보처리방침',
-          content: privacyPolicyContent,
-        ),
+    builder: (context, state) => const LegalDocumentScreen(
+      title: '개인정보처리방침',
+      content: privacyPolicyContent,
+    ),
   ),
   // Follow List
   GoRoute(

@@ -7671,6 +7671,13 @@ class AppStrings {
   /// 방해금지 종료 시간 라벨
   static const quietHoursEndLabel = '끝';
 
+  // Notification Settings — DND bypass hints
+  /// 레슨 카테고리 DND 우회 안내 (spec §6.2)
+  static const notifCategoryLessonBypassHint = '레슨 시작/취소 알림은 항상 수신됩니다';
+
+  /// 방해금지 시간대 DND 우회 안내 (spec §6.2)
+  static const notifQuietHoursBypassHint = '레슨 시작, 취소 알림은 방해금지 시간에도 수신됩니다';
+
   // ── App Rating Prompt (앱 평가 유도) ────────────────────────────────────
 
   // ── 마일스톤 축하 카드 (팝업 다이얼로그 폐기 → 인라인 카드) ──
