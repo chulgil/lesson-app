@@ -12,7 +12,8 @@ import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../onboarding/onboarding_facade.dart'
     show currentTeacherProfileProvider;
 import '../../../schedule/domain/entities/teacher_availability.dart';
-import '../../../schedule/presentation/providers/teacher_availability_providers.dart';
+import '../../../schedule/schedule_facade.dart'
+    show teacherAvailabilityProvider;
 import '../../../settings/settings_facade.dart' show teacherSettingsProvider;
 import '../../domain/entities/teacher_profile.dart';
 import '../../domain/entities/teacher_settings.dart';

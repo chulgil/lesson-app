@@ -31,17 +31,19 @@ class RecordingActionsBottomSheet extends StatelessWidget {
   final bool canSetRepresentative;
 
   /// Shows the sheet and returns the picked action, or `null` if dismissed.
+  ///
+  /// build() 가 [NotebookBottomSheet] surface 를 직접 소유하므로
+  /// [showNotebookModalBottomSheet] (custom-body 변형) 로 라우트한다.
   static Future<RecordingActionResult?> show(
     BuildContext context, {
     required bool canSetRepresentative,
   }) {
-    return showModalBottomSheet<RecordingActionResult>(
+    return showNotebookModalBottomSheet<RecordingActionResult>(
       context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: AppColors.ink.withValues(alpha: 0.45),
-      builder: (ctx) => RecordingActionsBottomSheet(
-        canSetRepresentative: canSetRepresentative,
-      ),
+      builder:
+          (ctx) => RecordingActionsBottomSheet(
+            canSetRepresentative: canSetRepresentative,
+          ),
     );
   }
 
@@ -75,22 +77,23 @@ class RecordingActionsBottomSheet extends StatelessWidget {
               _ActionTile(
                 icon: Icons.star_outline,
                 label: AppStrings.practiceSetRepresentative,
-                onTap: () => Navigator.of(
-                  context,
-                ).pop(RecordingActionResult.setRepresentative),
+                onTap:
+                    () => Navigator.of(
+                      context,
+                    ).pop(RecordingActionResult.setRepresentative),
               ),
             _ActionTile(
               icon: Icons.share,
               label: AppStrings.practiceShareExternal,
-              onTap: () =>
-                  Navigator.of(context).pop(RecordingActionResult.share),
+              onTap:
+                  () => Navigator.of(context).pop(RecordingActionResult.share),
             ),
             _ActionTile(
               icon: Icons.delete_outline,
               label: AppStrings.swipeActionDelete,
               isDestructive: true,
-              onTap: () =>
-                  Navigator.of(context).pop(RecordingActionResult.delete),
+              onTap:
+                  () => Navigator.of(context).pop(RecordingActionResult.delete),
             ),
             const SizedBox(height: AppSpacing.space2),
           ],

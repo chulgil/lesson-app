@@ -16,6 +16,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../providers/onboarding_category_shown_provider.dart';
 
 class OnboardingCategoryPreviewScreen extends ConsumerWidget {
@@ -52,8 +53,7 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: AppColors.paper,
+    return NotebookScreenScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),

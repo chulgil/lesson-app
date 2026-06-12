@@ -12,7 +12,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../profile/presentation/providers/quest_first_shown_provider.dart';
+import '../../../profile/profile_facade.dart' show questFirstShownProvider;
 
 /// 메인 첫 진입 1회 spotlight overlay.
 ///
@@ -58,7 +58,7 @@ class _SpotlightOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: Material(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: AppColors.inkScrim,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
