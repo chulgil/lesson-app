@@ -70,12 +70,16 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
-    ]).animate(
-      CurvedAnimation(parent: _tapAnimationController, curve: Curves.easeOut),
-    );
+    _scaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
+          TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
+        ]).animate(
+          CurvedAnimation(
+            parent: _tapAnimationController,
+            curve: Curves.easeOut,
+          ),
+        );
 
     _tapAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -159,9 +163,16 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
     if (studentId != null && startedAt != null) {
       final minutes = DateTime.now().difference(startedAt).inMinutes;
       notifier.stop(studentId: studentId, practiceMinutesElapsed: minutes);
-    } else {
-      notifier.stop();
+      _metronomeStartedAt = null;
+      // 1분 이상 연습한 경우 modal 을 자동으로 닫고 minutes 반환 — 호출처가
+      // PracticeCelebrationOverlay 를 표시할 수 있도록. PracticeToolsModal.show
+      // 의 Future<int?> 계약.
+      if (minutes >= 1 && mounted) {
+        Navigator.of(context).maybePop<int>(minutes);
+      }
+      return;
     }
+    notifier.stop();
     _metronomeStartedAt = null;
   }
 
@@ -295,10 +306,9 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     top: 0,
                     child: TapTempoSpeechBubble(
                       tapCount: _tapTimestamps.length,
-                      tempoExplanation:
-                          _showTempoExplanation
-                              ? _getTempoExplanation(state.settings.bpm)
-                              : null,
+                      tempoExplanation: _showTempoExplanation
+                          ? _getTempoExplanation(state.settings.bpm)
+                          : null,
                       audioError: state.audioError,
                     ),
                   ),
@@ -361,21 +371,20 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                 shape: const CircleBorder(),
                 padding: EdgeInsets.zero,
               ),
-              child:
-                  state.isPlaying && state.currentBeat > 0
-                      ? Text(
-                        '${state.currentBeat}',
-                        style: AppTypography.displayLarge.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.paperAccent,
-                          fontSize: 36,
-                        ),
-                      )
-                      : Icon(
-                        state.isPlaying ? Icons.pause : Icons.play_arrow,
-                        size: 48,
+              child: state.isPlaying && state.currentBeat > 0
+                  ? Text(
+                      '${state.currentBeat}',
+                      style: AppTypography.displayLarge.copyWith(
+                        fontWeight: FontWeight.bold,
                         color: AppColors.paperAccent,
+                        fontSize: 36,
                       ),
+                    )
+                  : Icon(
+                      state.isPlaying ? Icons.pause : Icons.play_arrow,
+                      size: 48,
+                      color: AppColors.paperAccent,
+                    ),
             ),
           ),
           SizedBox(height: AppSpacing.space8),

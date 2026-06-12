@@ -24,12 +24,15 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
   /// 학생 게이미피케이션 P1 — Job 7 라우팅 진입점에서 주입.
   final String? studentId;
 
-  static Future<void> show(
+  /// 메트로놈 stop 시 [studentId] 가 주어졌고 측정된 분이 1 이상이면
+  /// modal 이 자동으로 닫히면서 그 분 수를 반환한다. 그 외 경우 (튜너 사용,
+  /// 0분 stop, 사용자 수동 닫기) 는 `null` 반환.
+  static Future<int?> show(
     BuildContext context, {
     int initialTab = 0,
     String? studentId,
   }) {
-    return showNotebookModalBottomSheet<void>(
+    return showNotebookModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
       builder: (context) =>
