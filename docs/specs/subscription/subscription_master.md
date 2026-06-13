@@ -1,6 +1,6 @@
 # Subscription & Tuition Deposit Policy Master Spec
 
-> 구현 상태: ✅ 구현 완료 (Phase 1) — §3.2.4 (입금 확인 대기 가시성) 는 미구현 스펙
+> 구현 상태: ✅ 구현 완료 (Phase 1) — §3.2.4 (입금 확인 대기 가시성) 포함 (d5b8d350, 2026-06-12)
 > Last updated: 2026-06-12 (launch-readiness audit — §3.2.4 추가)
 > 상태: 통합 스펙 (기존 9개 문서 통합)
 > 관련 엔티티: [subscription.md](../../schema/entities/subscription.md)
