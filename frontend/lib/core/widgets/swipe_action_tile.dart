@@ -13,10 +13,10 @@ enum SwipeActionTone { normal, destructive, convenience }
 /// Swipe-to-reveal action tile.
 ///
 /// 사용 정책 (4원칙):
-/// 1. 우→좌 관리 액션은 맥락별 1개 — 삭제(`destructive`) 또는 편집(`normal`).
-///    한 방향에 2개 이상 금지.
-/// 2. 양방향 합쳐 최대 2개(관리 1 + 편의 1). 3개 이상 또는 양쪽에 안
-///    떨어지는 액션 = 행 탭 → BottomSheet (`showModalBottomSheet`).
+/// 1. 우→좌 = 관리 액션 — 삭제(`destructive`)·편집(`normal`). 편집+삭제 둘 다
+///    필요하면 둘 다 우→좌 (최대 2개).
+/// 2. 좌→우 = 기타/편의(공유·대표설정 등, `convenience`). 관리 외 3번째
+///    액션부터 좌→우. 기타가 많아 한눈에 안 들어오면 행 탭 → BottomSheet.
 /// 3. 모든 destructive 는 확인 다이얼로그 (`showDialog<AlertDialog>`).
 /// 4. 방향: 오른쪽→왼쪽 = 관리(삭제·편집, [SwipeActionTile.actions], 오른쪽
 ///    노출). 왼쪽→오른쪽 = 편의([SwipeActionTile.startActions], 왼쪽 노출 —
@@ -125,16 +125,15 @@ class _SwipeActionTileState extends State<SwipeActionTile> {
         alignment: alignment,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children:
-              actions
-                  .map(
-                    (action) => _SwipeActionButton(
-                      action: action,
-                      width: widget.actionWidth,
-                      onPressed: () => _closeAndRun(action.onPressed),
-                    ),
-                  )
-                  .toList(),
+          children: actions
+              .map(
+                (action) => _SwipeActionButton(
+                  action: action,
+                  width: widget.actionWidth,
+                  onPressed: () => _closeAndRun(action.onPressed),
+                ),
+              )
+              .toList(),
         ),
       ),
     );

@@ -51,7 +51,7 @@ flutter analyze                                              # 분석
 | Provider | `@riverpod` 어노테이션, `features/[domain]/` 아래만 |
 | 위젯 크기 | 500줄 이상 → 별도 파일 분리 |
 | UI 텍스트 | `AppStrings` 상수 사용 (하드코딩 금지, 다국어 대비) |
-| 스와이프 액션 (4원칙) | 1) 우→좌 관리 맥락별 1개 (삭제 `destructive` / 편집 `normal`) / 2) 양방향 최대 2개, 초과 시 BottomSheet / 3) 모든 destructive=확인 다이얼로그 / 4) 좌→우=편의 (`convenience` 녹색). 스펙: `docs/_components/swipe_action.md`, 룰: `.claude/rules/ux-rules.md` |
+| 스와이프 액션 (4원칙) | 1) 우→좌=관리 (편집·삭제, 최대 2개) / 2) 좌→우=기타·편의 (`convenience` 녹색, 3번째 액션부터, 과다 시 BottomSheet) / 3) 모든 destructive=확인 다이얼로그 / 4) 방향 의미 전 화면 공통. 스펙: `docs/_components/swipe_action.md`, 룰: `.claude/rules/ux-rules.md` |
 
 **Ask First**: 아키텍처 변경, 새 패키지 추가, 데이터 스키마 변경
 **Never**: `Color(0x...)`, 레거시 위치에 새 코드, 사용자 확인 전 이슈 닫기
@@ -85,8 +85,8 @@ flutter analyze                                              # 분석
 
 - 행 단위 관리 액션은 `docs/_components/swipe_action.md`와 `frontend/lib/core/widgets/swipe_action_tile.dart`를 우선 사용한다.
 - **swipe 4원칙 (2026-06-13 방향+tone — HARD-GATE)**:
-  1. 우→좌 관리 액션은 맥락별 1개 — 삭제(`SwipeActionTone.destructive`) 또는 편집(`normal`). 한 방향 2개 이상 금지.
-  2. 양방향 최대 2개(관리 1 + 편의 1). 3개 이상은 행 탭 → `showModalBottomSheet` 안에 `ListTile` 로 나열.
+  1. 우→좌 = 관리 액션 (편집·삭제). 편집+삭제 둘 다 필요하면 둘 다 우→좌 (최대 2개).
+  2. 좌→우 = 기타·편의(공유·대표설정 등 `convenience`). 관리 외 3번째 액션부터 좌→우. 기타가 많으면 행 탭 → `showModalBottomSheet`.
   3. 모든 destructive 는 `showDialog<AlertDialog>` 로 확인. 영향도 있으면 강화 메시지 (영향 카운트 포함). 편의·편집은 즉시 실행.
   4. 좌→우=편의(`convenience` 녹색 `paperOk`), 왼쪽 노출 — 없으면 단방향. 방향 의미는 전 화면 공통.
 - 스와이프 액션을 도입한 행에는 동일 기능의 trailing 아이콘 버튼/PopupMenuButton 을 중복 배치하지 않는다.
