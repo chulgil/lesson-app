@@ -254,10 +254,7 @@ class _BadgeRow extends StatelessWidget {
             horizontal: AppSpacing.space2,
             vertical: 2,
           ),
-          decoration: BoxDecoration(
-            color: _badgeBg,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          decoration: BoxDecoration(color: _badgeBg),
           child: Text(
             _label,
             style: AppTypography.caption.copyWith(
@@ -357,9 +354,7 @@ class _PrimaryButton extends StatelessWidget {
           backgroundColor: AppColors.paperAccent,
           foregroundColor: AppColors.paper,
           minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
+          shape: const RoundedRectangleBorder(),
         ),
         child: Text(label),
       ),
@@ -385,9 +380,7 @@ class _SecondaryButton extends StatelessWidget {
         foregroundColor: AppColors.ink,
         side: const BorderSide(color: AppColors.inkTertiary),
         minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+        shape: const RoundedRectangleBorder(),
       ),
       child: Text(label),
     );

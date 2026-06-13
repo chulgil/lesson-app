@@ -37,15 +37,13 @@ class FreeLimitSheet extends StatelessWidget {
 
   bool get _isExpired => reason == LimitReason.planExpired;
 
-  String get _title =>
-      _isExpired
-          ? AppStrings.paywallPlanExpiredTitle
-          : AppStrings.paywallFreeLimitTitle;
+  String get _title => _isExpired
+      ? AppStrings.paywallPlanExpiredTitle
+      : AppStrings.paywallFreeLimitTitle;
 
-  String get _subtitle =>
-      _isExpired
-          ? AppStrings.paywallPlanExpiredSubtitle
-          : AppStrings.paywallFreeLimitSubtitle;
+  String get _subtitle => _isExpired
+      ? AppStrings.paywallPlanExpiredSubtitle
+      : AppStrings.paywallFreeLimitSubtitle;
 
   /// 만료 케이스는 trial 카드를 숨긴다 (이미 trial/active 종료).
   bool get _showTrial => trialAvailable && !_isExpired;
@@ -133,7 +131,6 @@ class _PlanCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: emphasized ? AppColors.paperAccentSoft : AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,44 +151,29 @@ class _PlanCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
           Align(
             alignment: Alignment.centerRight,
-            child:
-                emphasized
-                    ? FilledButton(
-                      key: ctaKey,
-                      onPressed: onPressed,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.paperAccent,
-                        foregroundColor: AppColors.paper,
-                        minimumSize: const Size(
-                          0,
-                          AppSpacing.buttonHeightSmall,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
-                        ),
-                      ),
-                      child: Text(ctaLabel),
-                    )
-                    : OutlinedButton(
-                      key: ctaKey,
-                      onPressed: onPressed,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.ink,
-                        side: const BorderSide(color: AppColors.inkTertiary),
-                        minimumSize: const Size(
-                          0,
-                          AppSpacing.buttonHeightSmall,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium,
-                          ),
-                        ),
-                      ),
-                      child: Text(ctaLabel),
+            child: emphasized
+                ? FilledButton(
+                    key: ctaKey,
+                    onPressed: onPressed,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.paperAccent,
+                      foregroundColor: AppColors.paper,
+                      minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                      shape: const RoundedRectangleBorder(),
                     ),
+                    child: Text(ctaLabel),
+                  )
+                : OutlinedButton(
+                    key: ctaKey,
+                    onPressed: onPressed,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.ink,
+                      side: const BorderSide(color: AppColors.inkTertiary),
+                      minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                      shape: const RoundedRectangleBorder(),
+                    ),
+                    child: Text(ctaLabel),
+                  ),
           ),
         ],
       ),
@@ -212,20 +194,19 @@ Future<bool> showFreeLimitSheet({
 }) async {
   final result = await showNotebookBottomSheet<bool>(
     context: context,
-    builder:
-        (ctx) => FreeLimitSheet(
-          reason: reason,
-          trialAvailable: trialAvailable,
-          onBuyPro: () {
-            Navigator.of(ctx).pop(true);
-            onBuyPro();
-          },
-          onStartTrial: () {
-            Navigator.of(ctx).pop(true);
-            onStartTrial();
-          },
-          onLater: () => Navigator.of(ctx).pop(false),
-        ),
+    builder: (ctx) => FreeLimitSheet(
+      reason: reason,
+      trialAvailable: trialAvailable,
+      onBuyPro: () {
+        Navigator.of(ctx).pop(true);
+        onBuyPro();
+      },
+      onStartTrial: () {
+        Navigator.of(ctx).pop(true);
+        onStartTrial();
+      },
+      onLater: () => Navigator.of(ctx).pop(false),
+    ),
   );
   return result ?? false;
 }

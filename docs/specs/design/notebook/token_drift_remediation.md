@@ -27,11 +27,14 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | P0 — 계약 red 2건 → green | `51da3df9` | gamification Scaffold/sheet + proposal_draft_banner AlertDialog. 27/27 green |
 | stat_card 포크 통합 | `8396cf44` | parent_home 독자 StatCard 삭제 → core 통합 |
 | `NotebookBanner` foundation | `80123d3b` | 공통 위젯 + smoke 4/4 + 스펙 + `time_context_banner` 마이그레이션 (① 마지널리아 스트립 원형 증명). 잔여: `availability_vacation_banner` 등 ① 후보 + ③ refit |
-| **circular 게이트 + inbox sweep** | (본 커밋) | 계약 테스트에 `BorderRadius.zero` 게이트 추가 (자기 축소 baseline 41 + 영구예외 4, Red-Green 검증) + inbox 3파일 7건 → 각진. 게이트 28/28 green |
+| **circular 게이트 + inbox sweep** | `7ad4622e` | 계약 테스트에 `BorderRadius.zero` 게이트 추가 (자기 축소 baseline 41 + 영구예외 4, Red-Green 검증) + inbox 3파일 7건 → 각진. 게이트 28/28 green |
+| **billing sweep** | (본 커밋) | billing 4파일 10건 → 각진 (배지 borderRadius 제거 + 버튼 `const RoundedRectangleBorder()`). baseline 41→37. billing 위젯 테스트 19/19 |
 
-## 4. 잔여 BorderRadius.circular 인벤토리 (~60 실위반, inbox 정비 완료)
+## 4. 잔여 BorderRadius.circular 인벤토리 (baseline 37, inbox·billing 정비 완료)
 
-> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 41 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
+> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 37 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
+>
+> 잔여 ③ refit: `lifetime_promo_banner` 는 각진 처리됐으나 `color: paperAccent` fill 배경은 유지 — ① 마지널리아 스트립/② NotebookCard 로 refit 은 별도 슬라이스.
 
 정당 예외 5건 (정비 대상 아님): `tuner_cat_widgets.dart`(캐릭터), `youtube_player_widget.dart`·`practice/.../youtube/`(미디어), `bottom_sheet_handle.dart`(드래그 pill), `coach_mark_overlay.dart`(오버레이 cue).
 
@@ -40,7 +43,7 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | 도메인 | 건수 | 대표 위반 패턴 |
 |--------|------|---------------|
 | profile | 10 | `category_card.dart`, `context_toggle_dialog.dart` |
-| billing | 10 | `BorderRadius.circular(AppSpacing.radiusMedium)` — §1.3.1 명시 금지 (subscription_status_card·lifetime_promo·free_limit_sheet) |
+| ~~billing~~ | ~~10~~ | **정비 완료** (본 커밋) — 배지 borderRadius 제거 + 버튼 `const RoundedRectangleBorder()`. lifetime_promo fill 배경 refit 만 잔여(③) |
 | schedule | 9 | `teacher_vacation_mode_screen.dart`, `cancel_lesson_bottom_sheet.dart` |
 | practice | 7 | (youtube 미디어 제외 후 잔여) |
 | ~~inbox~~ | ~~7~~ | **정비 완료** (본 커밋) — 배지 borderRadius 제거 + 입력 border `BorderRadius.zero` |

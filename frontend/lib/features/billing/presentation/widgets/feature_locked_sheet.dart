@@ -83,9 +83,7 @@ class FeatureLockedSheet extends StatelessWidget {
               backgroundColor: AppColors.paperAccent,
               foregroundColor: AppColors.paper,
               minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
+              shape: const RoundedRectangleBorder(),
             ),
             child: Text(_ctaLabel),
           ),
@@ -119,16 +117,15 @@ Future<bool> showFeatureLockedSheet({
 }) async {
   final result = await showNotebookBottomSheet<bool>(
     context: context,
-    builder:
-        (ctx) => FeatureLockedSheet(
-          tier: tier,
-          featureName: featureName,
-          onUpgrade: () {
-            Navigator.of(ctx).pop(true);
-            onUpgrade();
-          },
-          onLater: () => Navigator.of(ctx).pop(false),
-        ),
+    builder: (ctx) => FeatureLockedSheet(
+      tier: tier,
+      featureName: featureName,
+      onUpgrade: () {
+        Navigator.of(ctx).pop(true);
+        onUpgrade();
+      },
+      onLater: () => Navigator.of(ctx).pop(false),
+    ),
   );
   return result ?? false;
 }

@@ -55,10 +55,7 @@ class LifetimePromoBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.paperAccent,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
+        decoration: const BoxDecoration(color: AppColors.paperAccent),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -126,11 +123,7 @@ class LifetimePromoBanner extends StatelessWidget {
                   backgroundColor: AppColors.paper,
                   foregroundColor: AppColors.paperAccent,
                   minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium,
-                    ),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 child: const Text(
                   AppStrings.paywallLifetimeBuyCta,
@@ -157,10 +150,7 @@ class _EyebrowChip extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: 2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: Text(
         label,
         style: const TextStyle(
