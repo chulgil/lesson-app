@@ -232,6 +232,15 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
           onPressed: () => _confirmRecordingDelete(context),
         ),
       ],
+      startActions: [
+        if (!widget.recording.isRepresentative)
+          SwipeAction(
+            label: AppStrings.swipeActionSetRepresentative,
+            icon: Icons.star_outline,
+            tone: SwipeActionTone.convenience,
+            onPressed: () => widget.onSetRepresentative(),
+          ),
+      ],
       child: NotebookCard(
         child: InkWell(
           onTap: () => _openActionsSheet(context),

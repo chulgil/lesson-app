@@ -61,33 +61,38 @@ class AllRecordingsScreen extends ConsumerWidget {
           ref.invalidate(allRecordingsWithSectionInfoProvider);
         },
         child: recordingsAsync.when(
-          data: (recordings) => recordings.isEmpty
-              ? _buildEmptyState()
-              : _RecordingsList(recordings: recordings),
+          data:
+              (recordings) =>
+                  recordings.isEmpty
+                      ? _buildEmptyState()
+                      : _RecordingsList(recordings: recordings),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.paperAccent,
+          error:
+              (_, __) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.paperAccent,
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    const Text(
+                      AppStrings.allRecordingsErrorState,
+                      style: TextStyle(color: AppColors.paperAccent),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    ElevatedButton(
+                      onPressed:
+                          () => ref.invalidate(
+                            allRecordingsWithSectionInfoProvider,
+                          ),
+                      child: const Text(AppStrings.retry),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.space4),
-                const Text(
-                  AppStrings.allRecordingsErrorState,
-                  style: TextStyle(color: AppColors.paperAccent),
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                ElevatedButton(
-                  onPressed: () =>
-                      ref.invalidate(allRecordingsWithSectionInfoProvider),
-                  child: const Text(AppStrings.retry),
-                ),
-              ],
-            ),
-          ),
+              ),
         ),
       ),
     );
@@ -376,10 +381,11 @@ class _RecordingCard extends ConsumerWidget {
     final result = await Navigator.push<SectionPickerResult>(
       context,
       MaterialPageRoute(
-        builder: (context) => SectionPickerScreen(
-          title: AppStrings.allRecordingsSectionPickerTitle,
-          recording: recording,
-        ),
+        builder:
+            (context) => SectionPickerScreen(
+              title: AppStrings.allRecordingsSectionPickerTitle,
+              recording: recording,
+            ),
       ),
     );
 
@@ -458,20 +464,21 @@ class _RecordingCard extends ConsumerWidget {
   ) async {
     await showNotebookModalBottomSheet<void>(
       context: context,
-      builder: (sheetContext) => SettingsRecordingActionsBottomSheet(
-        onPlay: () {
-          Navigator.pop(sheetContext);
-          _playRecording(context, ref);
-        },
-        onShare: () {
-          Navigator.pop(sheetContext);
-          _shareRecording(context);
-        },
-        onChangeLink: () {
-          Navigator.pop(sheetContext);
-          _showSectionPicker(context, ref);
-        },
-      ),
+      builder:
+          (sheetContext) => SettingsRecordingActionsBottomSheet(
+            onPlay: () {
+              Navigator.pop(sheetContext);
+              _playRecording(context, ref);
+            },
+            onShare: () {
+              Navigator.pop(sheetContext);
+              _shareRecording(context);
+            },
+            onChangeLink: () {
+              Navigator.pop(sheetContext);
+              _showSectionPicker(context, ref);
+            },
+          ),
     );
   }
 
@@ -596,6 +603,14 @@ class _RecordingCard extends ConsumerWidget {
           icon: Icons.delete_outline,
           tone: SwipeActionTone.destructive,
           onPressed: () => _confirmDelete(context, ref),
+        ),
+      ],
+      startActions: [
+        SwipeAction(
+          label: AppStrings.swipeActionShare,
+          icon: Icons.share_outlined,
+          tone: SwipeActionTone.convenience,
+          onPressed: () => _shareRecording(context),
         ),
       ],
       child: row,

@@ -34,9 +34,10 @@ class BankAccountEditScreen extends ConsumerWidget {
           }
         },
       ),
-      body: accounts.isEmpty
-          ? _buildEmptyState(context, ref)
-          : _buildAccountList(context, ref, accounts),
+      body:
+          accounts.isEmpty
+              ? _buildEmptyState(context, ref)
+              : _buildAccountList(context, ref, accounts),
     );
   }
 
@@ -104,12 +105,14 @@ class BankAccountEditScreen extends ConsumerWidget {
         ...accounts.map(
           (account) => _BankAccountCard(
             account: account,
-            onSetDefault: account.isDefault
-                ? null
-                : () => _setDefault(context, ref, accounts, account),
-            onDelete: accounts.length > 1 && !account.isDefault
-                ? () => _deleteAccount(context, ref, accounts, account)
-                : null,
+            onSetDefault:
+                account.isDefault
+                    ? null
+                    : () => _setDefault(context, ref, accounts, account),
+            onDelete:
+                accounts.length > 1 && !account.isDefault
+                    ? () => _deleteAccount(context, ref, accounts, account)
+                    : null,
           ),
         ),
 
@@ -149,9 +152,10 @@ class BankAccountEditScreen extends ConsumerWidget {
     List<BankAccount> accounts,
     BankAccount target,
   ) async {
-    final updated = accounts.map((a) {
-      return a.copyWith(isDefault: a.id == target.id);
-    }).toList();
+    final updated =
+        accounts.map((a) {
+          return a.copyWith(isDefault: a.id == target.id);
+        }).toList();
 
     await _saveAccounts(context, ref, updated);
   }
@@ -191,8 +195,9 @@ class BankAccountEditScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) =>
-          _AddBankAccountSheet(isFirstAccount: existingAccounts.isEmpty),
+      builder:
+          (context) =>
+              _AddBankAccountSheet(isFirstAccount: existingAccounts.isEmpty),
     );
 
     if (result != null) {
@@ -226,9 +231,10 @@ class _BankAccountCard extends StatelessWidget {
     final card = NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
-        side: account.isDefault
-            ? BorderSide(color: AppColors.paperAccent, width: 1.5)
-            : BorderSide(color: AppColors.inkQuaternary),
+        side:
+            account.isDefault
+                ? BorderSide(color: AppColors.paperAccent, width: 1.5)
+                : BorderSide(color: AppColors.inkQuaternary),
       ),
       elevation: 0,
       child: Padding(
@@ -241,9 +247,10 @@ class _BankAccountCard extends StatelessWidget {
                 Icon(
                   Icons.account_balance,
                   size: 20,
-                  color: account.isDefault
-                      ? AppColors.paperAccent
-                      : AppColors.inkSecondary,
+                  color:
+                      account.isDefault
+                          ? AppColors.paperAccent
+                          : AppColors.inkSecondary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
@@ -318,6 +325,15 @@ class _BankAccountCard extends StatelessWidget {
           tone: SwipeActionTone.destructive,
           onPressed: onDelete!,
         ),
+      ],
+      startActions: [
+        if (onSetDefault != null)
+          SwipeAction(
+            label: AppStrings.swipeActionSetDefault,
+            icon: Icons.star_outline,
+            tone: SwipeActionTone.convenience,
+            onPressed: onSetDefault!,
+          ),
       ],
       child: card,
     );
@@ -436,38 +452,40 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        maxChildSize: 0.8,
-        minChildSize: 0.3,
-        expand: false,
-        builder: (context, scrollController) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
-              child: Text(
-                '개인정보 수집·이용 동의',
-                style: NotebookTypography.sectionTitle,
-              ),
-            ),
-            const ThinRule(),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text(
-                  _consentContent,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
-                    height: 1.6,
-                  ),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.5,
+            maxChildSize: 0.8,
+            minChildSize: 0.3,
+            expand: false,
+            builder:
+                (context, scrollController) => Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.space4),
+                      // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
+                      child: Text(
+                        '개인정보 수집·이용 동의',
+                        style: NotebookTypography.sectionTitle,
+                      ),
+                    ),
+                    const ThinRule(),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.all(AppSpacing.space4),
+                        child: Text(
+                          _consentContent,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.inkSecondary,
+                            height: 1.6,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -514,9 +532,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 color: AppColors.paper,
                 borderRadius: BorderRadius.zero,
                 border: Border.all(
-                  color: _consentChecked
-                      ? AppColors.paperAccent
-                      : AppColors.inkQuaternary,
+                  color:
+                      _consentChecked
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
               ),
               child: Row(
@@ -527,8 +546,8 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     height: 24,
                     child: Checkbox(
                       value: _consentChecked,
-                      onChanged: (v) =>
-                          setState(() => _consentChecked = v ?? false),
+                      onChanged:
+                          (v) => setState(() => _consentChecked = v ?? false),
                       activeColor: AppColors.paperAccent,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -536,8 +555,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _consentChecked = !_consentChecked),
+                      onTap:
+                          () => setState(
+                            () => _consentChecked = !_consentChecked,
+                          ),
                       child: Text(
                         '개인정보(계좌정보) 수집·이용 동의',
                         style: AppTypography.bodySmall.copyWith(
