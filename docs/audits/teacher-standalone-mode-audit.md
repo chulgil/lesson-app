@@ -9,12 +9,12 @@
 
 | 판정 | 수 | 도메인 |
 |------|----|--------|
-| PASS | 18 | lessons, schedule, practice, students, subscription, billing, relationship, invite, share, notifications, auth, onboarding, profile, settings, home, search, analytics, tuner, metronome |
-| PARTIAL | 4 | academy, inbox, follow, gamification |
+| PASS | 22 | lessons, schedule, practice, students, subscription, billing, relationship, invite, share, notifications, auth, onboarding, profile, settings, home, search, analytics, tuner, metronome, inbox, follow, gamification |
+| PARTIAL | 1 | academy |
 | N/A (학생/학부모 전용) | 2 | student_home, parent_home |
 | FAIL | 0 | — |
 
-PARTIAL 4건은 모두 **academy/학생앱 연동을 전제한 기능이 단독 강사에게 "노출되지만 비어있는" UX 명확성** 문제로, 기능 차단이나 크래시가 아니다. 우선순위 low~medium.
+> 정정 (2026-06-13, 후속 검증): 1차 PARTIAL 4건 중 inbox·follow·gamification 3건은 직접 검증으로 PASS 해소 (아래 "후속 검증" 절). 남은 PARTIAL 1건(academy)은 결함이 아니라 "미소속 선생님에게 academy 기능을 노출할지"라는 제품 결정 사안.
 
 ## 감사 정의
 
@@ -59,8 +59,8 @@ PARTIAL 4건은 모두 **academy/학생앱 연동을 전제한 기능이 단독 
 | invite | PASS | `invite_provider.dart:35-43` | 선생님 초대 코드/QR 생성, 학생 미설치 무관 |
 | share | PASS | `student_summary_screen.dart:127-145` | 토큰 기반 공개 읽기 전용 공유 (#318 R2 핵심) |
 | notifications | PASS | `notifications_facade.dart:4-13` | 선생님 관련 알림만 표시, 학부모/학생 연동 미전제 |
-| follow | PARTIAL | `follow_repository.dart:44-50` | 학생/학부모용 teacher-follow 기능. 선생님 앱 진입 경로 불명확 — 노출 시 빈 상태 (hands-on 확인 권장) |
-| gamification | PARTIAL | `gamification_facade.dart:7-11` | 학생 연습 데이터 기반. 단독 모드(학생 데이터 없음)에서 선생님 화면 빈 위젯 노출 여부 (hands-on 확인 권장) |
+| follow | PASS | `follow_list_screen.dart:69-78`, `follow_feed_screen.dart:42-56` | 진입은 profile 설정 BottomSheet(`profile_category_sheets.dart:250,259`)에만 — follower stat은 이미 "입금대기"로 교체됨. 두 화면 모두 `EmptyStateWidget` 으로 빈 상태 우아 처리 |
+| gamification | PASS | `teacher_profile_completion_provider.dart`, `practice/.../badge_point_bridge.dart` | 선생님측 게이미피케이션 = 프로필 완성 quest(학생 없이 단독 동작). 학생 연습 게이미는 `practice/` provider 내부에서만 소비 — 선생님 화면에 빈 위젯 없음 |
 
 ### 계정 / 유틸 / 도구
 
@@ -72,32 +72,31 @@ PARTIAL 4건은 모두 **academy/학생앱 연동을 전제한 기능이 단독 
 | settings | PASS | `features/settings/` | 앱 설정/알림/계정, 학원 구조 무시 |
 | home | PASS | `home_screen.dart:196-202` | 학생 빈 상태 우아한 처리 |
 | search | PASS | `teacher_search_screen.dart` | 타 선생님 검색은 선택 |
-| inbox | PARTIAL | `inbox/presentation/screens/academy_inquiry_*.dart` | inbox 전체가 academy 문의 전용. 비소속 선생님에게 빈 섹션 — 진입점 gating 확인 필요 |
+| inbox | PASS | `notification_routes.dart:50-56` (`academyId` 필수), `academy_inquiry_screen.dart:53` | inbox 전체가 academy 문의 전용이나 라우트가 `academyId` 필수 + settings/home/profile/notifications 어디에도 진입 메뉴 없음(grep 공집합) → 비소속 선생님 도달 불가 = 이미 gated |
 | analytics | PASS | `analytics_dashboard_screen.dart:24-79` | 레슨/학생/수입 모두 선생님 단독 데이터, 빈 차트 우아 |
 | tuner | PASS | `practice/.../tuner_screen.dart:16-44` | 순수 음향 도구, 미의존 |
 | metronome | PASS | `practice/.../` (metronome widget) | 순수 박자 도구, 미의존 |
 
-## PARTIAL 상세 + 후속 sub-issue 초안
+## PARTIAL 후속 — sub-issue 처리
 
-아래는 보고서 단계의 **초안**이며, 실제 GitHub 이슈 생성은 사용자 승인 후 진행한다.
+1차 PARTIAL 4건에 대해 sub-issue #720·#721·#722 를 생성한 뒤, 보고서가 권고한 hands-on 검증을 수행하여 3건을 해소했다.
 
-### A. academy 미소속 선생님 UX 명확성 (priority: low)
+### A. academy 미소속 선생님 UX 명확성 — #720 (열림, priority: low)
 
-미소속 시 academy 데이터가 빈 배열로 graceful degrade 하나, academy 진입점/기능이 안내 없이 숨겨져 단독 강사가 "학원 연동" 기능의 존재 자체를 인지하지 못한다.
-- 제안: 미소속 = 명시적 상태로 표기 (예: 설정에 "학원 미연동 — 학원 소속 시 단체 기능 사용 가능" 안내 1줄)
+미소속 시 academy 데이터가 빈 배열로 graceful degrade 하나, academy 진입점/기능이 안내 없이 숨겨져 단독 강사가 "학원 연동" 기능의 존재를 인지하지 못한다.
+- 성격: 결함 아님 — "미소속 선생님에게 academy 기능을 advertise 할지"라는 **제품 결정 사안**. 대부분의 단독 강사에게 학원 기능 숨김은 정당.
+- 제안(채택 시): 설정에 "학원 미연동 — 학원 소속 시 단체 기능 사용 가능" 안내 1줄.
 - 근거: `academy_visibility_provider.dart:22-28`
 
-### B. inbox(academy 문의) 진입점 gating (priority: low~medium)
+### B. inbox(academy 문의) 진입점 — #721 (검증 후 close, 비결함)
 
-inbox feature 전체가 `academy_inquiry_*` 로만 구성. 비소속 선생님에게 빈 문의함이 노출되면 "기능이 비었다" 인상.
-- 제안: academy 미소속 시 inbox 진입점 숨김 또는 빈 상태 안내 문구
-- 확인 필요: notification_routes 경유 진입이 비소속 선생님에게 실제 노출되는지 (hands-on)
-- 근거: `inbox/presentation/screens/academy_inquiry_screen.dart`, `notification_routes.dart:9-10`
+inbox feature 전체가 `academy_inquiry_*` 이나, 라우트가 `academyId` 경로 파라미터 필수 + settings/home/profile/notifications 어디에도 진입 메뉴 없음(grep 공집합). 비소속 선생님은 academyId 도 진입 UI 도 없어 **도달 불가 = 이미 gated**. 결함 아님.
+- 근거: `notification_routes.dart:50-56`, 진입점 grep 공집합
 
-### C. follow / gamification 단독 모드 빈 상태 (priority: low)
+### C. follow / gamification 단독 모드 빈 상태 — #722 (검증 후 close, 비결함)
 
-둘 다 학생 앱 연동/학생 수행 데이터를 전제. 선생님 단독 화면에 빈 위젯이 노출되는지 hands-on 확인 후, 노출된다면 빈 상태 안내로 정리.
-- 근거: `follow_repository.dart:44-50`, `gamification_facade.dart:7-11`
+- follow: 진입은 profile 설정 BottomSheet 에만(`profile_category_sheets.dart:250,259`), 두 화면 모두 `EmptyStateWidget` 으로 빈 상태 처리(`follow_list_screen.dart:69`, `follow_feed_screen.dart:42`). follower stat 은 이미 "입금대기"로 교체. 무맥락 빈 위젯 없음.
+- gamification: 선생님측은 프로필 완성 quest(학생 무관 단독 동작), 학생 연습 게이미는 `practice/` provider 내부 소비 — 선생님 화면 빈 위젯 없음.
 
 ## 검증 노트 (에이전트 교차검증)
 
@@ -108,11 +107,15 @@ inbox feature 전체가 `academy_inquiry_*` 로만 구성. 비소속 선생님�
 | lessons | Agent A: PASS / Agent D: **FAIL(P0)** | `add_lesson_screen.dart:513` 학생 필수는 정상 규칙. 단독 모드=학생앱 미설치≠학생 0명 | **PASS** — Agent D 과대평가(학생앱 없음과 학생 레코드 없음 혼동). 맹신 시 허위 P0 sub-issue 발생 |
 | students | Agent A: PARTIAL | 학부모 초대 opt-in + 후속 다이얼로그 명시(`:537`) | **PASS** |
 | practice | Agent A: PARTIAL | `EmptyNoteAccessRepository` fallback(`:17`) graceful | **PASS** (note-access는 academy-mediated, 미소속 empty) |
-| inbox | Agent D: PARTIAL | inbox 전체가 academy_inquiry 전용 확인 | **PARTIAL 확정** |
+| inbox | Agent D: PARTIAL | 라우트 `academyId` 필수 + 진입 메뉴 grep 공집합 → 도달 불가 | **PASS** — Agent D 과대 추정. 이미 gated |
+| follow | Agent C: PARTIAL("확인 필요") | 진입 BottomSheet only + 두 화면 `EmptyStateWidget` 처리 | **PASS** |
+| gamification | Agent C: PARTIAL("확인 필요") | 선생님 quest 단독 동작, 학생 게이미는 practice 내부 소비 | **PASS** |
+
+교훈: 에이전트의 "확인 필요"/단정 PARTIAL 5건 중 4건이 직접 검증으로 PASS 해소. 에이전트 결론(과대·과소 양방향)을 수용 전 file:line 으로 재검증해야 허위 sub-issue 를 막는다.
 
 ## 한계 (confidence)
 
-- 직접 코드 재검증: lessons, students, practice(note-access), inbox, subscription(#693 연계)
-- 단일 패스 에이전트 보고(중간 신뢰): 그 외 PASS 도메인
-- hands-on(실기) 확인 권장: follow, gamification 빈 위젯 노출 여부, inbox 진입점 gating
+- 직접 코드 재검증: lessons, students, practice(note-access), inbox, follow, gamification, subscription(#693 연계)
+- 단일 패스 에이전트 보고(중간 신뢰): 그 외 PASS 도메인 (auth/onboarding/profile/settings/home/search/analytics/invite/share/notifications/schedule/billing/relationship)
+- 미해소 제품 결정: academy 미소속 가시성(#720)
 - 본 감사는 코드 정적 분석 기준. 실기 시나리오(신규 가입 선생님이 학생 0명 → 첫 학생 추가 → 첫 레슨 기록) 순서 흐름은 별도 실기 검증 권장
