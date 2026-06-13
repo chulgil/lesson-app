@@ -8,6 +8,7 @@ from app.api.v1 import (
     academy_billing,
     academy_context,
     academy_governance,
+    academy_payment_matching,
     address,
     ai_notes,
     analytics,
@@ -87,6 +88,11 @@ api_router.include_router(
     academy_announcements.router,
     prefix="/academies",
     tags=["academies-announcements"],
+)
+api_router.include_router(
+    academy_payment_matching.router,
+    prefix="/academies",
+    tags=["academies-payment-matching"],
 )
 api_router.include_router(
     academy_context.router,
