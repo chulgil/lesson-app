@@ -38,12 +38,13 @@
 
 - **얕은 뎁스** — 모든 기능 2탭 이내 도달
 - **원클릭** — 핵심 작업은 한 번 탭으로 완료
-- **스와이프 액션 3원칙 (HARD-GATE, audit 2026-06-10)** — 반복 리스트의 행 단위 액션은 다음 3원칙을 따른다. trailing 아이콘 버튼/PopupMenuButton 과 중복 배치 금지.
-  1. **swipe = destructive 단일** — 한 swipe 안에 destructive 액션 1개만 (`SwipeActionTone.destructive`). 보통 [삭제] / [연결 해제] 등.
-  2. **다중 액션 = 행 탭 → BottomSheet** — 수정/공유/대표설정/전환 등은 `showModalBottomSheet` 안에 `ListTile` 로 나열. swipe 안에 2+ 액션 금지 (좁은 화면 가독성 저하 + 멘탈 모델 분산).
-  3. **모든 destructive 는 확인 다이얼로그** — `showDialog<AlertDialog>` 로 확인 받기. 영향도가 있으면 강화 메시지 ("계좌 삭제 시 학생 결제 표시에서 사라집니다" + 영향 카운트). Undo SnackBar 단독 금지.
+- **스와이프 액션 4원칙 (HARD-GATE, 2026-06-13 방향+tone)** — 반복 리스트의 행 단위 액션은 다음 4원칙을 따른다. trailing 아이콘 버튼/PopupMenuButton 과 중복 배치 금지.
+  1. **우→좌 관리 액션은 맥락별 1개** — 행 성격에 맞춰 삭제(`SwipeActionTone.destructive`) **또는** 편집(`normal`) 중 하나. 한 방향에 2개 이상 금지.
+  2. **양방향 최대 2개, 초과 시 BottomSheet** — 우→좌 관리 1 + 좌→우 편의 1 까지만 swipe. 3개 이상이거나 양쪽으로 안 떨어지는 묶음은 행 탭 → `showModalBottomSheet` 안에 `ListTile` 로 나열.
+  3. **모든 destructive 는 확인 다이얼로그** — `showDialog<AlertDialog>` 로 확인 받기. 영향도가 있으면 강화 메시지 ("계좌 삭제 시 학생 결제 표시에서 사라집니다" + 영향 카운트). Undo SnackBar 단독 금지. 편의·편집은 즉시 실행.
+  4. **방향 + tone (3색 잉크)** — 우→좌=관리(삭제 `destructive` 버밀리온 / 편집 `normal` ink), 오른쪽 노출. 좌→우=편의(`convenience` 녹색 `paperOk`), 왼쪽 노출 — 없으면 단방향. 두 방향 의미는 전 화면 공통.
   - **예외**: 자녀/관계 같은 메타포상 destructive 부적절한 카드는 swipe 적용하지 않음 — BottomSheet 다중 액션만.
-  - 스펙: `docs/_components/swipe_action.md` (3원칙 본문 + 코드 예시 + 적용 사례 7곳)
+  - 스펙: `docs/_components/swipe_action.md` (4원칙 + tone 3종 + 코드 예시 + 도메인별 편의 매핑)
   - audit: `docs/specs/_audits/2026-06-10-swipe-action-consistency-audit.md`
 - **Hick's Law** — 하루 10회+ 반복 인터랙션은 선택지 1개. 뉘앙스 필요 시 텍스트 입력 (#22)
 - **플레이스홀더 UI 금지** — 미구현 기능의 UI 요소는 코드에서 제거. "Phase N에서 구현 예정"은 스펙에만 명시 (#15)
