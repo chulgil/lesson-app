@@ -214,6 +214,9 @@ class AcademyPaymentMatchingService:
     async def revert_match(self, *, academy_id: str, tx_id: str) -> AcademyBankTransaction:
         """매칭 취소 (§7.6). AcademyPayment 삭제 + tx state='unmatched' + invoice 상태 회귀.
 
+        분할 매칭(§7.1)도 동일 경로 — bank_tx_ref=tx.id 인 모든 payment 의 distinct
+        invoice 들을 회수해 각각 paid→sent/draft 재계산.
+
         Note: §7.6 의 "7일 이내" 시간 제약은 추후 라운드에서 추가 (현재는 항상 허용).
         """
         tx = await self.get_transaction(tx_id)
@@ -225,31 +228,162 @@ class AcademyPaymentMatchingService:
                 detail="only matched tx can be reverted",
             )
 
-        invoice_id = tx.matched_invoice_id
-        # AcademyPayment 삭제 (bank_tx_ref=tx.id 인 행만).
+        # 1. 영향 받는 invoice 수집 (분할 매칭 대응 — payments 의 distinct invoice_id).
+        affected_invoice_ids = list(
+            (
+                await self.db.scalars(
+                    select(AcademyPayment.invoice_id).where(AcademyPayment.bank_tx_ref == tx.id).distinct()
+                )
+            ).all()
+        )
+
+        # 2. AcademyPayment 삭제 (bank_tx_ref=tx.id 인 행만).
         await self.db.execute(delete(AcademyPayment).where(AcademyPayment.bank_tx_ref == tx.id))
         await self.db.flush()
 
-        # invoice 상태 회귀 — 잔여 수금 합산으로 재계산.
-        if invoice_id is not None:
+        # 3. 각 invoice 상태 회귀 — 잔여 수금 합산으로 재계산.
+        for invoice_id in affected_invoice_ids:
             invoice = await self.db.get(AcademyInvoice, invoice_id)
-            if invoice is not None and invoice.status == InvoiceStatus.paid:
-                total_paid = await self.db.scalar(
-                    select(func.coalesce(func.sum(AcademyPayment.paid_amount), 0)).where(
-                        AcademyPayment.invoice_id == invoice_id
-                    )
+            if invoice is None or invoice.status != InvoiceStatus.paid:
+                continue
+            total_paid = await self.db.scalar(
+                select(func.coalesce(func.sum(AcademyPayment.paid_amount), 0)).where(
+                    AcademyPayment.invoice_id == invoice_id
                 )
-                if int(total_paid or 0) < invoice.total_amount:
-                    # 발송 이력이 있으면 sent 로, 없으면 draft 로 회귀.
-                    invoice.status = InvoiceStatus.sent if invoice.sent_at is not None else InvoiceStatus.draft
+            )
+            if int(total_paid or 0) < invoice.total_amount:
+                # 발송 이력이 있으면 sent 로, 없으면 draft 로 회귀.
+                invoice.status = InvoiceStatus.sent if invoice.sent_at is not None else InvoiceStatus.draft
 
-        # tx 회귀.
+        # 4. tx 회귀.
         tx.state = AcademyBankTransactionState.unmatched
         tx.matched_invoice_id = None
         tx.matched_by_user_id = None
         tx.matched_at = None
         await self.db.flush()
         return tx
+
+    # ------------------------------------------------------------------
+    # §7.1 형제 합산 분할 매칭
+    # ------------------------------------------------------------------
+
+    async def split_match(
+        self,
+        *,
+        academy_id: str,
+        tx_id: str,
+        splits: list[tuple[str, int]],
+        by_user_id: str,
+    ) -> tuple[AcademyBankTransaction, list[AcademyPayment]]:
+        """§7.1 형제 합산 분할 매칭 — 한 통장 입금을 N개 invoice 에 분할.
+
+        처리:
+        1. 각 invoice 별 AcademyPayment 행 생성 (모두 bank_tx_ref=tx.id, depositor_raw 보존)
+        2. 각 invoice status 갱신 — 누적 paid >= total 이면 paid
+        3. tx.state='matched', matched_invoice_id = NULL (분할 — 단일 FK 의미 없음)
+        4. tx 의 pending suggestion 처리: splits 에 포함된 invoice → accepted,
+           나머지 → rejected (분쟁 audit)
+
+        에러:
+        - tx 가 다른 학원 → 400
+        - tx 가 이미 matched/ignored → 409
+        - 같은 invoice_id 중복 → 400
+        - invoice 가 다른 학원 → 400
+        - invoice 취소됨 → 409
+        """
+        if not splits:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="splits must contain at least one item",
+            )
+        invoice_ids_in_request = [inv_id for inv_id, _ in splits]
+        if len(set(invoice_ids_in_request)) != len(invoice_ids_in_request):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="duplicate invoice_id in splits",
+            )
+
+        tx = await self.get_transaction(tx_id)
+        if tx.academy_id != academy_id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="tx not in this academy")
+        if tx.state in {AcademyBankTransactionState.matched, AcademyBankTransactionState.ignored}:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"tx already {tx.state.value}",
+            )
+
+        # 1. invoice 전체 검증 (모두 같은 학원 + 취소 아님).
+        invoices_by_id: dict[str, AcademyInvoice] = {}
+        for invoice_id in invoice_ids_in_request:
+            invoice = await self.db.get(AcademyInvoice, invoice_id)
+            if invoice is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"invoice not found: {invoice_id}",
+                )
+            if invoice.academy_id != academy_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"invoice not in this academy: {invoice_id}",
+                )
+            if invoice.status == InvoiceStatus.cancelled:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"Cannot match cancelled invoice: {invoice_id}",
+                )
+            invoices_by_id[invoice_id] = invoice
+
+        # 2. 각 invoice 별 AcademyPayment 생성 + 상태 갱신.
+        payments: list[AcademyPayment] = []
+        for invoice_id, paid_amount in splits:
+            payment = AcademyPayment(
+                academy_id=academy_id,
+                invoice_id=invoice_id,
+                paid_amount=paid_amount,
+                paid_at=tx.tx_at,
+                method=PaymentMethod.transfer,
+                confirmed_by_user_id=by_user_id,
+                source=PaymentSource.manual,
+                bank_tx_ref=tx.id,
+                depositor_raw=tx.depositor_raw,
+            )
+            self.db.add(payment)
+            payments.append(payment)
+        await self.db.flush()
+
+        for invoice_id, invoice in invoices_by_id.items():
+            total_paid = await self.db.scalar(
+                select(func.coalesce(func.sum(AcademyPayment.paid_amount), 0)).where(
+                    AcademyPayment.invoice_id == invoice_id
+                )
+            )
+            if int(total_paid or 0) >= invoice.total_amount:
+                invoice.status = InvoiceStatus.paid
+
+        # 3. tx 상태 갱신 — 분할이므로 matched_invoice_id 는 NULL 유지.
+        now = _utcnow()
+        tx.state = AcademyBankTransactionState.matched
+        tx.matched_invoice_id = None
+        tx.matched_by_user_id = by_user_id
+        tx.matched_at = now
+
+        # 4. suggestion audit — splits 에 포함된 invoice 는 accepted, 나머지 rejected.
+        pending_suggestions = await self.db.scalars(
+            select(AcademyPaymentMatchSuggestion)
+            .where(AcademyPaymentMatchSuggestion.bank_transaction_id == tx.id)
+            .where(AcademyPaymentMatchSuggestion.user_decision == AcademyPaymentMatchSuggestionDecision.pending)
+        )
+        accepted_set = set(invoice_ids_in_request)
+        for sugg in pending_suggestions.all():
+            sugg.user_decision = (
+                AcademyPaymentMatchSuggestionDecision.accepted
+                if sugg.invoice_id in accepted_set
+                else AcademyPaymentMatchSuggestionDecision.rejected
+            )
+            sugg.decided_at = now
+
+        await self.db.flush()
+        return tx, payments
 
     # ------------------------------------------------------------------
     # §3 fuzzy 매칭 알고리즘
@@ -457,6 +591,71 @@ class AcademyPaymentMatchingService:
             inv, st = inv_student_map.get(top.invoice_id, (None, None)) if top else (None, None)
             rows.append((tx, top, inv, st))
         return rows, suggested_count, unmatched_count
+
+    # ------------------------------------------------------------------
+    # §5.1 CSV 일괄 임포트
+    # ------------------------------------------------------------------
+
+    async def import_csv(
+        self,
+        *,
+        academy_id: str,
+        csv_content: str,
+        auto_suggest: bool = True,
+    ) -> tuple[int, int, int, list[dict]]:
+        """학원장 통장 CSV 일괄 업로드.
+
+        흐름:
+        1. ``parse_csv`` 로 정상 행/에러 행 분리
+        2. 정상 행 → ``AcademyBankTransaction`` 일괄 INSERT (source=csv)
+        3. 각 신규 tx 에 fuzzy 자동 실행 → state 갱신
+        4. 집계 반환
+
+        Returns:
+            (created_count, suggested_count, unmatched_count, error_rows)
+
+        헤더 누락 등 전체 파싱 실패 (row_number=0) 는 HTTPException(422) 로 변환.
+        행 단위 실패는 graceful — 정상 행은 처리하고 error_rows 로 보고.
+        """
+        from app.services.academy_payment_matching_csv import parse_csv
+
+        valid_rows, error_rows = parse_csv(csv_content)
+
+        # 헤더 자체가 잘못된 경우 — row_number=0 인 에러만 있고 정상 0건.
+        if not valid_rows and any(e["row_number"] == 0 for e in error_rows):
+            reason = next(e["reason"] for e in error_rows if e["row_number"] == 0)
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=reason)
+
+        created_txs: list[AcademyBankTransaction] = []
+        for row in valid_rows:
+            tx = AcademyBankTransaction(
+                academy_id=academy_id,
+                source=AcademyBankTransactionSource.csv,
+                source_ref=row.get("source_ref"),
+                bank_name=row.get("bank_name"),
+                tx_at=row["tx_at"],
+                amount=row["amount"],
+                depositor_raw=row["depositor_raw"],
+                memo_raw=row.get("memo_raw"),
+                state=AcademyBankTransactionState.unmatched,
+            )
+            self.db.add(tx)
+            created_txs.append(tx)
+        await self.db.flush()
+
+        suggested_count = 0
+        unmatched_count = 0
+        if auto_suggest:
+            for tx in created_txs:
+                suggestions = await self.suggest_matches(academy_id=academy_id, tx_id=tx.id)
+                if suggestions:
+                    suggested_count += 1
+                else:
+                    unmatched_count += 1
+        else:
+            unmatched_count = len(created_txs)
+
+        return len(created_txs), suggested_count, unmatched_count, list(error_rows)
 
 
 __all__ = ["AcademyPaymentMatchingService"]

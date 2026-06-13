@@ -121,16 +121,64 @@ class MatchingInboxResponse(BaseModel):
     unmatched_count: int
 
 
+class AcademyMatchSplitItem(BaseModel):
+    """§7.1 분할 매칭 1건 — 형제 invoice 별 분할 금액."""
+
+    invoice_id: str = Field(..., description="매칭할 invoice id")
+    paid_amount: int = Field(..., gt=0, description="이 invoice 에 분할 매칭할 금액")
+
+
+class AcademyMatchSplitRequest(BaseModel):
+    """§7.1 형제 합산 분할 매칭 (한 통장 입금 → 여러 invoice).
+
+    학원장이 한 학부모의 형제 2~N명 동시 입금을 각 invoice 별로 분할.
+    모든 결과 payment 는 같은 bank_tx_ref 공유 (분쟁 시 원천 추적).
+    """
+
+    splits: list[AcademyMatchSplitItem] = Field(..., min_length=1, description="분할 매칭 (invoice + 금액 1+ 건)")
+
+
+class AcademyMatchSplitResponse(BaseModel):
+    """§7.1 분할 매칭 결과 — 갱신된 tx + 생성된 payment 들."""
+
+    bank_transaction: AcademyBankTransactionResponse
+    payments: list[AcademyPaymentResponse]
+
+
+class CsvImportErrorRow(BaseModel):
+    """§5.1 CSV 임포트 시 파싱 실패한 1행."""
+
+    row_number: int = Field(..., description="원본 CSV 행 번호 (헤더=1, 첫 데이터=2)")
+    reason: str
+
+
+class CsvImportResponse(BaseModel):
+    """§5.1 CSV 일괄 임포트 결과 — 생성/매칭 카운트 + 실패 행 보고."""
+
+    created_count: int = Field(..., description="새로 만들어진 AcademyBankTransaction 수")
+    suggested_count: int = Field(..., description="fuzzy 알고리즘이 후보를 찾은 행 수 (state=suggested)")
+    unmatched_count: int = Field(..., description="후보 0건으로 학원장 수동 매칭 대기 행 수 (state=unmatched)")
+    error_rows: list[CsvImportErrorRow] = Field(
+        default_factory=list,
+        description="파싱 실패 행 — graceful: 정상 행은 계속 처리됨",
+    )
+
+
 __all__ = [
     "AcademyBankTransactionCreate",
     "AcademyBankTransactionListResponse",
     "AcademyBankTransactionResponse",
     "AcademyMatchConfirmRequest",
     "AcademyMatchConfirmResponse",
+    "AcademyMatchSplitItem",
+    "AcademyMatchSplitRequest",
+    "AcademyMatchSplitResponse",
     "AcademyPaymentMatchSuggestionListResponse",
     "AcademyPaymentMatchSuggestionResponse",
     "BankTransactionSource",
     "BankTransactionState",
+    "CsvImportErrorRow",
+    "CsvImportResponse",
     "MatchingInboxResponse",
     "MatchingInboxRowResponse",
     "SuggestionDecision",

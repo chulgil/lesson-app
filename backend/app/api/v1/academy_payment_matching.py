@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.context_deps import require_owner_context
@@ -27,9 +27,13 @@ from app.schemas.academy_payment_matching import (
     AcademyBankTransactionResponse,
     AcademyMatchConfirmRequest,
     AcademyMatchConfirmResponse,
+    AcademyMatchSplitRequest,
+    AcademyMatchSplitResponse,
     AcademyPaymentMatchSuggestionListResponse,
     AcademyPaymentMatchSuggestionResponse,
     BankTransactionState,
+    CsvImportErrorRow,
+    CsvImportResponse,
     MatchingInboxResponse,
     MatchingInboxRowResponse,
 )
@@ -101,6 +105,32 @@ async def match_bank_transaction(
     return AcademyMatchConfirmResponse(
         bank_transaction=AcademyBankTransactionResponse.model_validate(tx),
         payment=AcademyPaymentResponse.model_validate(payment),
+    )
+
+
+@router.post(
+    "/{academy_id}/billing/bank-transactions/{tx_id}/split-match",
+    response_model=AcademyMatchSplitResponse,
+    status_code=status.HTTP_200_OK,
+    summary="§7.1 형제 합산 분할 매칭 — 1 통장 → N invoice (owner only)",
+)
+async def split_match_bank_transaction(
+    academy_id: str,
+    tx_id: str,
+    body: AcademyMatchSplitRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> AcademyMatchSplitResponse:
+    await AcademyService(db).assert_owner(academy_id, current_user.id)
+    tx, payments = await AcademyPaymentMatchingService(db).split_match(
+        academy_id=academy_id,
+        tx_id=tx_id,
+        splits=[(s.invoice_id, s.paid_amount) for s in body.splits],
+        by_user_id=current_user.id,
+    )
+    return AcademyMatchSplitResponse(
+        bank_transaction=AcademyBankTransactionResponse.model_validate(tx),
+        payments=[AcademyPaymentResponse.model_validate(p) for p in payments],
     )
 
 
@@ -208,6 +238,39 @@ async def matching_inbox(
         total_count=len(rows),
         suggested_count=suggested_count,
         unmatched_count=unmatched_count,
+    )
+
+
+@router.post(
+    "/{academy_id}/billing/payments/matching/csv-import",
+    response_model=CsvImportResponse,
+    status_code=status.HTTP_200_OK,
+    summary="§5.1 통장 CSV 일괄 임포트 — 행별 AcademyBankTransaction 생성 + 자동 fuzzy (owner only)",
+)
+async def csv_import(
+    academy_id: str,
+    file: UploadFile,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> CsvImportResponse:
+    await AcademyService(db).assert_owner(academy_id, current_user.id)
+    raw = await file.read()
+    # UTF-8 BOM 처리 — Excel 저장 CSV 대응.
+    try:
+        content = raw.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"CSV 인코딩 오류 (UTF-8 필요): {exc}",
+        ) from exc
+    created, suggested, unmatched, error_rows = await AcademyPaymentMatchingService(db).import_csv(
+        academy_id=academy_id, csv_content=content
+    )
+    return CsvImportResponse(
+        created_count=created,
+        suggested_count=suggested,
+        unmatched_count=unmatched,
+        error_rows=[CsvImportErrorRow(**e) for e in error_rows],
     )
 
 
