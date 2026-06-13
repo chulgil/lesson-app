@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../data/repositories/proposal_draft_storage.dart';
 import '../providers/proposal_draft_provider.dart';
 
@@ -67,35 +68,13 @@ class _DraftBannerContent extends ConsumerWidget {
   final VoidCallback onDiscard;
 
   Future<void> _confirmDiscard(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showNotebookDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            backgroundColor: AppColors.paper,
-            title: Text(
-              AppStrings.proposalDraftDiscardTitle,
-              style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
-            ),
-            content: Text(
-              AppStrings.proposalDraftDiscardBody,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text(AppStrings.proposalDraftDiscardCancel),
-              ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.paperAccent,
-                ),
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text(AppStrings.proposalDraftDiscardConfirm),
-              ),
-            ],
-          ),
+      title: AppStrings.proposalDraftDiscardTitle,
+      message: AppStrings.proposalDraftDiscardBody,
+      cancelLabel: AppStrings.proposalDraftDiscardCancel,
+      confirmLabel: AppStrings.proposalDraftDiscardConfirm,
+      isDestructive: true,
     );
     if (confirmed != true) return;
     await ref.read(proposalDraftStorageProvider).delete(userId, studentId);
@@ -114,7 +93,6 @@ class _DraftBannerContent extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.paperAccentSoft,
         border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         children: [

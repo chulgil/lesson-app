@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/daily_practice.dart';
 import '../../domain/entities/gamification.dart';
 import '../providers/growth_heatmap_provider.dart';
@@ -32,13 +33,8 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final heatmapAsync = ref.watch(growthHeatmapProvider(studentId));
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      appBar: AppBar(
-        title: Text(AppStrings.growthDetailScreenTitle),
-        backgroundColor: AppColors.paper,
-        elevation: 0,
-      ),
+    return NotebookScreenScaffold(
+      appBarTitle: AppStrings.growthDetailScreenTitle,
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppSpacing.space4),
         child: Column(
@@ -51,22 +47,20 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
             ),
             SizedBox(height: AppSpacing.space3),
             heatmapAsync.when(
-              data:
-                  (heatmap) => YearHeatmapGrid(
-                    heatmap: heatmap,
-                    asOf: DateTime.now().toUtc(),
-                    onDayTap: (date) {
-                      final daily = heatmap.days[date];
-                      showModalBottomSheet<void>(
-                        context: context,
-                        builder:
-                            (_) => HeatmapDayDetailSheet(
-                              date: date,
-                              daily: daily ?? const DailyPractice(),
-                            ),
-                      );
-                    },
-                  ),
+              data: (heatmap) => YearHeatmapGrid(
+                heatmap: heatmap,
+                asOf: DateTime.now().toUtc(),
+                onDayTap: (date) {
+                  final daily = heatmap.days[date];
+                  showNotebookBottomSheet<void>(
+                    context: context,
+                    builder: (_) => HeatmapDayDetailSheet(
+                      date: date,
+                      daily: daily ?? const DailyPractice(),
+                    ),
+                  );
+                },
+              ),
               loading: () => const _LoadingPlaceholder(),
               error: (_, __) => const SizedBox.shrink(),
             ),
@@ -97,10 +91,7 @@ class _SpotlightPlaceholder extends StatelessWidget {
     return Container(
       key: const ValueKey('spotlight_placeholder'),
       padding: EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.space2),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       child: Text(
         AppStrings.growthDetailSpotlightPlaceholder,
         style: AppTypography.bodyMedium.copyWith(color: AppColors.inkTertiary),
@@ -117,10 +108,7 @@ class _ComparisonPlaceholder extends StatelessWidget {
     return Container(
       key: const ValueKey('comparison_placeholder'),
       padding: EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.space2),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
       child: Text(
         AppStrings.growthDetailComparisonPlaceholder,
         style: AppTypography.bodyMedium.copyWith(color: AppColors.inkTertiary),
