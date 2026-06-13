@@ -3381,8 +3381,8 @@ class AppStrings {
   /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -5428,6 +5428,9 @@ class AppStrings {
   /// 녹음이 삭제되었습니다 (delete success SnackBar)
   static const allRecordingsDeletedSnack = '녹음이 삭제되었습니다';
 
+  /// 녹음 삭제 실패 피드백 (#707 — silent fail 방지).
+  static const allRecordingsDeleteError = '녹음 삭제에 실패했어요. 잠시 후 다시 시도해주세요';
+
   /// swipe destructive 확인 다이얼로그 — 녹음 삭제 title
   static const swipeActionDeleteRecordingConfirmTitle = '녹음 삭제';
 
@@ -5889,10 +5892,9 @@ class AppStrings {
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
+    final formattedAmount = totalAmount >= 10000
+        ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
+        : '$totalAmount원';
     return '입금대기(후불) $formattedAmount ($studentCount명)';
   }
 
@@ -6029,12 +6031,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -8419,6 +8420,15 @@ class AppStrings {
 
   /// 시간대 저장/삭제 실패 피드백 (2026-06-12 — silent fail 방지).
   static const weeklyScheduleSaveError = '시간대 저장에 실패했어요. 잠시 후 다시 시도해주세요';
+
+  /// 수업 시간 설정 저장 실패 피드백 (#707 — silent fail 방지).
+  static const lessonSettingsSaveError = '수업 시간 설정 저장에 실패했어요. 잠시 후 다시 시도해주세요';
+
+  /// 예외 일정 추가 실패 피드백 (#707 — silent fail 방지).
+  static const exceptionSaveError = '예외 일정 저장에 실패했어요. 잠시 후 다시 시도해주세요';
+
+  /// 예외 일정 삭제 실패 피드백 (#707 — silent fail 방지).
+  static const exceptionDeleteError = '예외 일정 삭제에 실패했어요. 잠시 후 다시 시도해주세요';
 
   // ── 보강 크레딧 / Makeup Credit (#432) ──────────────────────────────
   // Spec: docs/specs/subscription/makeup_credit_spec.md
