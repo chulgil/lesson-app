@@ -62,9 +62,8 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.bubbleWarningBackground,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 AppStrings.studentCancelDeductNotice,
@@ -86,10 +85,9 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed:
-                    _selected == null
-                        ? null
-                        : () => Navigator.of(context).pop(_selected),
+                onPressed: _selected == null
+                    ? null
+                    : () => Navigator.of(context).pop(_selected),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
                   backgroundColor: AppColors.paperAccent,
@@ -125,7 +123,6 @@ class _ReasonTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
@@ -133,11 +130,9 @@ class _ReasonTile extends StatelessWidget {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? AppColors.paperAccentSoft
-                  : AppColors.inkQuaternary,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          color: isSelected
+              ? AppColors.paperAccentSoft
+              : AppColors.inkQuaternary,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : Colors.transparent,
             width: 1.5,
@@ -157,10 +152,8 @@ class _ReasonTile extends StatelessWidget {
               child: Text(
                 label,
                 style: AppTypography.bodyMedium.copyWith(
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.ink,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
             ),

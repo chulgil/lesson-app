@@ -32,7 +32,6 @@ class AvailabilityVacationBanner extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.scheduleMutedBackground,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.scheduleMutedAccent),
           ),
           child: Column(
@@ -85,15 +84,14 @@ class _VacationRow extends ConsumerWidget {
     final accent = isOneDay ? AppColors.inkSecondary : AppColors.paperAccent;
 
     final startLabel = _formatShortDate(period.startDate);
-    final mainLabel =
-        isOneDay
-            ? AppStrings.vacationBannerOneDayLabel(startLabel)
-            : AppStrings.vacationBannerRangeLabel(
-              AppStrings.vacationCardDateRange(
-                startLabel,
-                _formatShortDate(period.endDate),
-              ),
-            );
+    final mainLabel = isOneDay
+        ? AppStrings.vacationBannerOneDayLabel(startLabel)
+        : AppStrings.vacationBannerRangeLabel(
+            AppStrings.vacationCardDateRange(
+              startLabel,
+              _formatShortDate(period.endDate),
+            ),
+          );
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -133,16 +131,15 @@ class _VacationRow extends ConsumerWidget {
   Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
     final result = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => NotebookAlertDialog(
-            title: AppStrings.vacationCancelConfirmTitle,
-            content: const Text(AppStrings.vacationCancelConfirmBody),
-            confirmLabel: AppStrings.vacationCancelLabel,
-            cancelLabel: AppStrings.cancel,
-            isDestructive: true,
-            onConfirm: () => Navigator.pop(ctx, true),
-            onCancel: () => Navigator.pop(ctx, false),
-          ),
+      builder: (ctx) => NotebookAlertDialog(
+        title: AppStrings.vacationCancelConfirmTitle,
+        content: const Text(AppStrings.vacationCancelConfirmBody),
+        confirmLabel: AppStrings.vacationCancelLabel,
+        cancelLabel: AppStrings.cancel,
+        isDestructive: true,
+        onConfirm: () => Navigator.pop(ctx, true),
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
     );
     if (result != true || !context.mounted) return;
     try {
@@ -154,14 +151,13 @@ class _VacationRow extends ConsumerWidget {
     } catch (e) {
       if (!context.mounted) return;
       final message = e.toString();
-      final friendly =
-          message.contains('이미 시작')
-              ? AppStrings.vacationCancelAlreadyStarted
-              : message.contains('24')
-              ? AppStrings.vacationCancelWindowExpired
-              : message.contains('이미 취소')
-              ? AppStrings.vacationCancelAlreadyCancelled
-              : AppStrings.vacationCancelFailed;
+      final friendly = message.contains('이미 시작')
+          ? AppStrings.vacationCancelAlreadyStarted
+          : message.contains('24')
+          ? AppStrings.vacationCancelWindowExpired
+          : message.contains('이미 취소')
+          ? AppStrings.vacationCancelAlreadyCancelled
+          : AppStrings.vacationCancelFailed;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(friendly)));

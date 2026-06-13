@@ -230,10 +230,9 @@ class _ImpactSection extends StatelessWidget {
             const _SectionHeader(text: AppStrings.vacationImpactSection),
             const Spacer(),
             TextButton(
-              onPressed:
-                  state.hasValidRange && !state.isLoadingImpact
-                      ? onRefresh
-                      : null,
+              onPressed: state.hasValidRange && !state.isLoadingImpact
+                  ? onRefresh
+                  : null,
               child: const Text(AppStrings.vacationImpactRefresh),
             ),
           ],
@@ -294,13 +293,12 @@ class _ImpactSummary extends ConsumerWidget {
           _ImpactStudentRow(
             student: student,
             dispositionOverride: overrides[student.studentId],
-            onLongPress:
-                () => _openPerStudentSheet(
-                  context,
-                  ref,
-                  studentId: student.studentId,
-                  studentLabel: student.studentName ?? student.studentId,
-                ),
+            onLongPress: () => _openPerStudentSheet(
+              context,
+              ref,
+              studentId: student.studentId,
+              studentLabel: student.studentName ?? student.studentId,
+            ),
           ),
       ],
     );
@@ -404,20 +402,18 @@ Future<void> _openPerStudentSheet(
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(_dispositionLabel(option)),
-              trailing:
-                  current == option
-                      ? const Icon(Icons.check, color: AppColors.paperAccent)
-                      : null,
+              trailing: current == option
+                  ? const Icon(Icons.check, color: AppColors.paperAccent)
+                  : null,
               onTap: () => Navigator.pop(sheetCtx, option),
             ),
           const Divider(height: 1),
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text(AppStrings.vacationPerStudentUseDefault),
-            trailing:
-                current == null
-                    ? const Icon(Icons.check, color: AppColors.paperAccent)
-                    : null,
+            trailing: current == null
+                ? const Icon(Icons.check, color: AppColors.paperAccent)
+                : null,
             onTap: () => Navigator.pop(sheetCtx, null),
           ),
         ],
@@ -448,14 +444,13 @@ class _SubmitButton extends StatelessWidget {
     return FilledButton(
       onPressed: canSubmit ? onSubmit : null,
       style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
-      child:
-          state.isSubmitting
-              ? const SizedBox(
-                height: 18,
-                width: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-              : const Text(AppStrings.vacationRegisterButton),
+      child: state.isSubmitting
+          ? const SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Text(AppStrings.vacationRegisterButton),
     );
   }
 }
@@ -552,15 +547,14 @@ class _DispositionOption extends StatelessWidget {
       padding: EdgeInsets.only(bottom: AppSpacing.space2),
       child: InkWell(
         onTap: () => onChange(value),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color: isSelected
+                  ? AppColors.paperAccent
+                  : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -576,26 +570,24 @@ class _DispositionOption extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.inkTertiary,
+                    color: isSelected
+                        ? AppColors.paperAccent
+                        : AppColors.inkTertiary,
                     width: 2,
                   ),
                 ),
-                child:
-                    isSelected
-                        ? Center(
-                          child: Container(
-                            width: 10,
-                            height: 10,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.paperAccent,
-                            ),
+                child: isSelected
+                    ? Center(
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.paperAccent,
                           ),
-                        )
-                        : null,
+                        ),
+                      )
+                    : null,
               ),
               SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -618,11 +610,8 @@ class _DispositionOption extends StatelessWidget {
                               horizontal: AppSpacing.space2,
                               vertical: 2,
                             ),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: AppColors.paperAccent,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusSmall,
-                              ),
                             ),
                             child: Text(
                               AppStrings.vacationDispositionRecommended,
@@ -697,7 +686,6 @@ class _ActiveVacationCard extends ConsumerWidget {
       padding: EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -748,16 +736,15 @@ class _ActiveVacationCard extends ConsumerWidget {
   Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
     final result = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => NotebookAlertDialog(
-            title: AppStrings.vacationCancelConfirmTitle,
-            content: const Text(AppStrings.vacationCancelConfirmBody),
-            confirmLabel: AppStrings.vacationCancelLabel,
-            cancelLabel: AppStrings.cancel,
-            isDestructive: true,
-            onConfirm: () => Navigator.pop(ctx, true),
-            onCancel: () => Navigator.pop(ctx, false),
-          ),
+      builder: (ctx) => NotebookAlertDialog(
+        title: AppStrings.vacationCancelConfirmTitle,
+        content: const Text(AppStrings.vacationCancelConfirmBody),
+        confirmLabel: AppStrings.vacationCancelLabel,
+        cancelLabel: AppStrings.cancel,
+        isDestructive: true,
+        onConfirm: () => Navigator.pop(ctx, true),
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
     );
     if (result != true || !context.mounted) return;
     try {
@@ -770,14 +757,13 @@ class _ActiveVacationCard extends ConsumerWidget {
       if (!context.mounted) return;
       final message = e.toString();
       // Map server error semantics to friendly text (spec §7.2).
-      final friendly =
-          message.contains('이미 시작')
-              ? AppStrings.vacationCancelAlreadyStarted
-              : message.contains('24')
-              ? AppStrings.vacationCancelWindowExpired
-              : message.contains('이미 취소')
-              ? AppStrings.vacationCancelAlreadyCancelled
-              : AppStrings.vacationCancelFailed;
+      final friendly = message.contains('이미 시작')
+          ? AppStrings.vacationCancelAlreadyStarted
+          : message.contains('24')
+          ? AppStrings.vacationCancelWindowExpired
+          : message.contains('이미 취소')
+          ? AppStrings.vacationCancelAlreadyCancelled
+          : AppStrings.vacationCancelFailed;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(friendly)));
