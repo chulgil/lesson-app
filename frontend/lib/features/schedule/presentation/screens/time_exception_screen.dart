@@ -320,7 +320,20 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       await ref
           .read(teacherAvailabilityNotifierProvider(teacherId).notifier)
           .addException(result);
+      // #707 — body 는 read-only teacherAvailabilityProvider 를 watch 하므로
+      // notifier 실패가 silent 하지 않도록 호출부에서 확인.
+      _notifyIfExceptionFailed(teacherId, AppStrings.exceptionSaveError);
     }
+  }
+
+  /// #707 — 예외 일정 작업 실패를 가시 피드백으로 알림 (silent fail 방지).
+  void _notifyIfExceptionFailed(String teacherId, String message) {
+    if (!mounted) return;
+    final state = ref.read(teacherAvailabilityNotifierProvider(teacherId));
+    if (!state.hasError) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
   }
 
   Future<void> _confirmDelete(TimeException exception) async {
@@ -344,6 +357,8 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       await ref
           .read(teacherAvailabilityNotifierProvider(teacherId).notifier)
           .removeException(exception.id);
+      // #707 — 삭제 실패가 silent 하지 않도록 호출부에서 확인.
+      _notifyIfExceptionFailed(teacherId, AppStrings.exceptionDeleteError);
     }
   }
 }

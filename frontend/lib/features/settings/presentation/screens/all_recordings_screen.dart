@@ -428,6 +428,14 @@ class _RecordingCard extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text(AppStrings.allRecordingsDeletedSnack)),
         );
+      } else if (context.mounted) {
+        // #707 — 삭제 실패가 silent 하지 않도록 가시 피드백.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.allRecordingsDeleteError),
+            backgroundColor: AppColors.paperAccent,
+          ),
+        );
       }
     }
   }

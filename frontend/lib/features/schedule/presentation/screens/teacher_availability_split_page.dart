@@ -52,11 +52,9 @@ class TeacherAvailabilitySplitPage extends ConsumerWidget {
           return _SplitLayout(teacherId: teacherId, availability: effective);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => _ErrorState(
-              onRetry:
-                  () => ref.invalidate(teacherAvailabilityProvider(teacherId)),
-            ),
+        error: (_, __) => _ErrorState(
+          onRetry: () => ref.invalidate(teacherAvailabilityProvider(teacherId)),
+        ),
       ),
     );
   }
@@ -235,15 +233,14 @@ class _WeeklySchedulePanel extends ConsumerWidget {
           dayLabel: _dayLabels[dayIndex],
           schedules: schedules,
           teacherId: teacherId,
-          onAddOrEdit:
-              (existing) => _openEditSheet(
-                context,
-                ref,
-                preselectedDay: dayIndex,
-                existing: existing,
-              ),
-          onDeleteRequest:
-              (schedule) => _confirmAndDelete(context, ref, schedule: schedule),
+          onAddOrEdit: (existing) => _openEditSheet(
+            context,
+            ref,
+            preselectedDay: dayIndex,
+            existing: existing,
+          ),
+          onDeleteRequest: (schedule) =>
+              _confirmAndDelete(context, ref, schedule: schedule),
         );
       }),
     );
@@ -258,11 +255,10 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     final result = await showNotebookBottomSheet<WeeklySchedule>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => ScheduleEditBottomSheet(
-            preselectedDay: preselectedDay,
-            existingSchedule: existing,
-          ),
+      builder: (context) => ScheduleEditBottomSheet(
+        preselectedDay: preselectedDay,
+        existingSchedule: existing,
+      ),
     );
     if (result == null) return;
     final notifier = ref.read(
@@ -323,10 +319,9 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     final hasImpact = affected > 0;
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title:
-          hasImpact
-              ? AppStrings.weeklyScheduleDeleteImpactTitle
-              : AppStrings.weeklyScheduleDeleteConfirmTitle,
+      title: hasImpact
+          ? AppStrings.weeklyScheduleDeleteImpactTitle
+          : AppStrings.weeklyScheduleDeleteConfirmTitle,
       content: Text(
         hasImpact
             ? AppStrings.weeklyScheduleDeleteImpactWarning(affected)
@@ -407,25 +402,22 @@ class _DayCard extends StatelessWidget {
                   height: 28,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color:
-                        hasSchedules
-                            ? AppColors.paperAccentSoft
-                            : AppColors.paper,
+                    color: hasSchedules
+                        ? AppColors.paperAccentSoft
+                        : AppColors.paper,
                     border: Border.all(
-                      color:
-                          hasSchedules
-                              ? AppColors.paperAccent
-                              : AppColors.inkQuaternary,
+                      color: hasSchedules
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                     ),
                   ),
                   child: Text(
                     dayLabel,
                     style: AppTypography.bodySmall.copyWith(
                       fontWeight: FontWeight.w700,
-                      color:
-                          hasSchedules
-                              ? AppColors.paperAccent
-                              : AppColors.inkSecondary,
+                      color: hasSchedules
+                          ? AppColors.paperAccent
+                          : AppColors.inkSecondary,
                     ),
                   ),
                 ),
@@ -593,12 +585,12 @@ class _LessonSettingsPanel extends ConsumerWidget {
             options: _durationOptions,
             selected: availability.slotDurationMinutes,
             buildLabel: AppStrings.lessonDurationOptionLabel,
-            onSelected:
-                (value) => _updateSettings(
-                  ref,
-                  slotDurationMinutes: value,
-                  breakTimeBetweenLessons: availability.breakTimeBetweenLessons,
-                ),
+            onSelected: (value) => _updateSettings(
+              context,
+              ref,
+              slotDurationMinutes: value,
+              breakTimeBetweenLessons: availability.breakTimeBetweenLessons,
+            ),
           ),
           const SizedBox(height: AppSpacing.space3),
           const ThinRule(),
@@ -609,12 +601,12 @@ class _LessonSettingsPanel extends ConsumerWidget {
             options: _breakOptions,
             selected: availability.breakTimeBetweenLessons,
             buildLabel: (m) => m == 0 ? AppStrings.breakTimeNoneOption : '$m분',
-            onSelected:
-                (value) => _updateSettings(
-                  ref,
-                  slotDurationMinutes: availability.slotDurationMinutes,
-                  breakTimeBetweenLessons: value,
-                ),
+            onSelected: (value) => _updateSettings(
+              context,
+              ref,
+              slotDurationMinutes: availability.slotDurationMinutes,
+              breakTimeBetweenLessons: value,
+            ),
           ),
         ],
       ),
@@ -622,6 +614,7 @@ class _LessonSettingsPanel extends ConsumerWidget {
   }
 
   Future<void> _updateSettings(
+    BuildContext context,
     WidgetRef ref, {
     required int slotDurationMinutes,
     required int breakTimeBetweenLessons,
@@ -635,6 +628,20 @@ class _LessonSettingsPanel extends ConsumerWidget {
           slotStartInterval: interval,
           breakTimeBetweenLessons: breakTimeBetweenLessons,
         );
+    // #707 — updateLessonSettings 는 실패를 notifier state 로만 보관하고
+    // body 는 read-only teacherAvailabilityProvider 를 watch 하므로, 실패가
+    // silent 하지 않도록 호출부에서 명시적으로 확인 (weekly 메서드의 _notifyIfFailed 패턴).
+    if (ref.read(teacherAvailabilityNotifierProvider(teacherId)).hasError) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.lessonSettingsSaveError),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
     ref.invalidate(teacherAvailabilityProvider(teacherId));
     ref.invalidate(teacherSettingsProvider);
   }
@@ -675,42 +682,35 @@ class _OptionRow extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space1,
-          children:
-              options.map((value) {
-                final isActive = value == selected;
-                return GestureDetector(
-                  onTap: () => onSelected(value),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          isActive
-                              ? AppColors.paperAccentSoft
-                              : AppColors.paper,
-                      border: Border.all(
-                        color:
-                            isActive
-                                ? AppColors.paperAccent
-                                : AppColors.inkQuaternary,
-                      ),
-                    ),
-                    child: Text(
-                      buildLabel(value),
-                      style: AppTypography.bodySmall.copyWith(
-                        color:
-                            isActive
-                                ? AppColors.paperAccent
-                                : AppColors.inkSecondary,
-                        fontWeight:
-                            isActive ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                    ),
+          children: options.map((value) {
+            final isActive = value == selected;
+            return GestureDetector(
+              onTap: () => onSelected(value),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isActive ? AppColors.paperAccentSoft : AppColors.paper,
+                  border: Border.all(
+                    color: isActive
+                        ? AppColors.paperAccent
+                        : AppColors.inkQuaternary,
                   ),
-                );
-              }).toList(),
+                ),
+                child: Text(
+                  buildLabel(value),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: isActive
+                        ? AppColors.paperAccent
+                        : AppColors.inkSecondary,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -730,12 +730,11 @@ class _ExceptionsPanel extends StatelessWidget {
     final upcoming =
         availability.exceptions
             .where(
-              (e) =>
-                  !DateTime(
-                    e.endDate.year,
-                    e.endDate.month,
-                    e.endDate.day,
-                  ).isBefore(today),
+              (e) => !DateTime(
+                e.endDate.year,
+                e.endDate.month,
+                e.endDate.day,
+              ).isBefore(today),
             )
             .toList()
           ..sort((a, b) => a.startDate.compareTo(b.startDate));
@@ -762,10 +761,9 @@ class _ExceptionsPanel extends StatelessWidget {
           ...upcoming.map((exc) => _ExceptionTile(exception: exc)),
         const SizedBox(height: AppSpacing.space2),
         OutlinedButton.icon(
-          onPressed:
-              () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const TimeExceptionScreen()),
-              ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const TimeExceptionScreen()),
+          ),
           icon: const Icon(Icons.add, size: 18),
           label: const Text(AppStrings.manageSpecialSchedules),
           style: OutlinedButton.styleFrom(
@@ -789,11 +787,10 @@ class _ExceptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isHoliday = exception.type != ExceptionType.additionalSlot;
-    final dateText =
-        exception.startDate == exception.endDate
-            ? formatDateYMD(exception.startDate)
-            : '${formatDateYMD(exception.startDate)} ~ '
-                '${formatDateYMD(exception.endDate)}';
+    final dateText = exception.startDate == exception.endDate
+        ? formatDateYMD(exception.startDate)
+        : '${formatDateYMD(exception.startDate)} ~ '
+              '${formatDateYMD(exception.endDate)}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),

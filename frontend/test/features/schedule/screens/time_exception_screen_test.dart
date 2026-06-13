@@ -6,9 +6,24 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/core/widgets/swipe_action_tile.dart';
 import 'package:lessonaza/features/auth/auth_facade.dart';
+import 'package:lessonaza/features/schedule/data/repositories/mock_teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
+import 'package:lessonaza/features/schedule/domain/repositories/teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/time_exception_screen.dart';
+
+/// #707 — removeException 이 실패하도록 강제하는 repository.
+/// getAvailability 등 나머지는 mock 동작을 그대로 사용.
+class _RemoveExceptionThrowsRepository
+    extends MockTeacherAvailabilityRepository {
+  @override
+  Future<TeacherAvailability> removeException(
+    String teacherId,
+    String exceptionId,
+  ) async {
+    throw Exception('forced remove failure');
+  }
+}
 
 /// Widget smoke + behavior tests for TimeExceptionScreen.
 ///
@@ -23,6 +38,7 @@ void main() {
   Future<void> pumpScreen(
     WidgetTester tester, {
     required TeacherAvailability availability,
+    TeacherAvailabilityRepository? repository,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -31,6 +47,8 @@ void main() {
           teacherAvailabilityProvider(
             teacherId,
           ).overrideWith((ref) async => availability),
+          if (repository != null)
+            teacherAvailabilityRepositoryProvider.overrideWithValue(repository),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -86,6 +104,37 @@ void main() {
       findsNothing,
       reason: '카드 본문에 휴지통 아이콘 잔재 없음 (swipe reveal 로만 노출).',
     );
+  });
+
+  testWidgets('#707 — removeException 실패 시 silent 하지 않고 실패 SnackBar 노출', (
+    tester,
+  ) async {
+    final upcoming = TimeException(
+      id: 'ex_upcoming',
+      type: ExceptionType.vacation,
+      startDate: referenceDay.add(const Duration(days: 7)),
+      endDate: referenceDay.add(const Duration(days: 10)),
+      createdAt: referenceDay,
+    );
+    await pumpScreen(
+      tester,
+      availability: buildAvailability([upcoming]),
+      repository: _RemoveExceptionThrowsRepository(),
+    );
+
+    // swipe 로 destructive 삭제 노출 → tap.
+    await tester.drag(find.byType(SwipeActionTile), const Offset(-250, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.swipeActionDelete));
+    await tester.pumpAndSettle();
+
+    // 확인 다이얼로그 → 삭제 확정.
+    expect(find.text(AppStrings.deleteExceptionTitle), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, AppStrings.delete));
+    await tester.pumpAndSettle();
+
+    // 실패가 silent 하지 않고 가시 피드백.
+    expect(find.text(AppStrings.exceptionDeleteError), findsOneWidget);
   });
 
   testWidgets('past exception 은 SwipeActionTile 없이 렌더링', (tester) async {
