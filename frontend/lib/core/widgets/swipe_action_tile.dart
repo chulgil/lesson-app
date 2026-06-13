@@ -8,18 +8,21 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
-enum SwipeActionTone { normal, destructive }
+enum SwipeActionTone { normal, destructive, convenience }
 
 /// Swipe-to-reveal action tile.
 ///
-/// 사용 정책 (3원칙 + 방향 정책):
-/// 1. swipe = destructive 단일 (`SwipeActionTone.destructive`)
-/// 2. 다중 액션 = 행 탭 → BottomSheet (`showModalBottomSheet`)
-/// 3. 모든 destructive 는 확인 다이얼로그 (`showDialog<AlertDialog>`)
-/// 4. **방향 (2026-06-12)**: 오른쪽→왼쪽 스와이프 = 삭제·편집 등 관리
-///    액션 ([SwipeActionTile.actions], 오른쪽에서 노출). 왼쪽→오른쪽 =
-///    편의 기능 ([SwipeActionTile.startActions], 왼쪽에서 노출 — 선택적).
-///    iOS/Android trailing 삭제 관행과 일치.
+/// 사용 정책 (4원칙):
+/// 1. 우→좌 관리 액션은 맥락별 1개 — 삭제(`destructive`) 또는 편집(`normal`).
+///    한 방향에 2개 이상 금지.
+/// 2. 양방향 합쳐 최대 2개(관리 1 + 편의 1). 3개 이상 또는 양쪽에 안
+///    떨어지는 액션 = 행 탭 → BottomSheet (`showModalBottomSheet`).
+/// 3. 모든 destructive 는 확인 다이얼로그 (`showDialog<AlertDialog>`).
+/// 4. 방향: 오른쪽→왼쪽 = 관리(삭제·편집, [SwipeActionTile.actions], 오른쪽
+///    노출). 왼쪽→오른쪽 = 편의([SwipeActionTile.startActions], 왼쪽 노출 —
+///    선택, `convenience` tone). iOS/Android trailing 관행과 일치.
+///
+/// tone: normal(편집·ink) / destructive(삭제·버밀리온) / convenience(편의·녹색).
 ///
 /// SSOT: docs/_components/swipe_action.md, .claude/rules/ux-rules.md
 class SwipeAction {
@@ -122,15 +125,16 @@ class _SwipeActionTileState extends State<SwipeActionTile> {
         alignment: alignment,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: actions
-              .map(
-                (action) => _SwipeActionButton(
-                  action: action,
-                  width: widget.actionWidth,
-                  onPressed: () => _closeAndRun(action.onPressed),
-                ),
-              )
-              .toList(),
+          children:
+              actions
+                  .map(
+                    (action) => _SwipeActionButton(
+                      action: action,
+                      width: widget.actionWidth,
+                      onPressed: () => _closeAndRun(action.onPressed),
+                    ),
+                  )
+                  .toList(),
         ),
       ),
     );
@@ -192,8 +196,11 @@ class _SwipeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDestructive = action.tone == SwipeActionTone.destructive;
-    final color = isDestructive ? AppColors.paperAccent : AppColors.ink;
+    final color = switch (action.tone) {
+      SwipeActionTone.destructive => AppColors.paperAccent,
+      SwipeActionTone.convenience => AppColors.paperOk,
+      SwipeActionTone.normal => AppColors.ink,
+    };
 
     return SizedBox(
       width: width,
