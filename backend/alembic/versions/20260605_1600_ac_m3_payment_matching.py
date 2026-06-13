@@ -20,7 +20,7 @@ Policy:
 - UNIQUE (bank_transaction_id, invoice_id) — 같은 후보 중복 제안 방지
 
 Revision ID: ac_m3_payment_matching
-Revises: ac_m3_academy_announcements
+Revises: phone_verification_codes
 Create Date: 2026-06-05 16:00:00.000000
 """
 
@@ -31,7 +31,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "ac_m3_payment_matching"
-down_revision: str | None = "ac_m3_academy_announcements"
+down_revision: str | None = "phone_verification_codes"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
