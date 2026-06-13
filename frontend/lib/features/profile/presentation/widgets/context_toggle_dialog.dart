@@ -102,10 +102,7 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
         // Current context
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            color: AppColors.paperAccentSoft,
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: const BoxDecoration(color: AppColors.paperAccentSoft),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -141,7 +138,6 @@ class _ContextToggleDialogState extends ConsumerState<ContextToggleDialog> {
           decoration: BoxDecoration(
             color: AppColors.paper,
             border: Border.all(color: AppColors.paperAccentSoft),
-            borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

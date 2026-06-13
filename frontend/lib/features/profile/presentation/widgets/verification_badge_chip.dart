@@ -26,10 +26,7 @@ class VerificationBadgeChip extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: background),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

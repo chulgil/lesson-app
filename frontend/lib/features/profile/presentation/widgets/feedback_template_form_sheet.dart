@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../lessons/lessons_facade.dart';
@@ -73,24 +74,14 @@ class _FeedbackTemplateFormSheetState
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusLarge),
-            ),
-          ),
+          decoration: const BoxDecoration(color: AppColors.paper),
           padding: EdgeInsets.only(bottom: viewInsets),
           child: Column(
             children: [
               // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: AppSpacing.space2),
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.inkTertiary,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+              const BottomSheetHandle(
+                margin: EdgeInsets.only(top: AppSpacing.space2),
+                color: AppColors.inkTertiary,
               ),
               const SizedBox(height: AppSpacing.space3),
               // Title
@@ -147,17 +138,16 @@ class _FeedbackTemplateFormSheetState
                     Wrap(
                       spacing: AppSpacing.space2,
                       runSpacing: AppSpacing.space2,
-                      children:
-                          FeedbackCategory.values.map((c) {
-                            final selected = _category == c;
-                            return ChoiceChip(
-                              label: Text(c.label),
-                              selected: selected,
-                              onSelected: (v) {
-                                if (v) setState(() => _category = c);
-                              },
-                            );
-                          }).toList(),
+                      children: FeedbackCategory.values.map((c) {
+                        final selected = _category == c;
+                        return ChoiceChip(
+                          label: Text(c.label),
+                          selected: selected,
+                          onSelected: (v) {
+                            if (v) setState(() => _category = c);
+                          },
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     _label(AppStrings.feedbackTemplateTagsLabel),
@@ -217,12 +207,11 @@ class _FeedbackTemplateFormSheetState
       return;
     }
 
-    final tags =
-        _tagsController.text
-            .split(',')
-            .map((s) => s.trim())
-            .where((s) => s.isNotEmpty)
-            .toList();
+    final tags = _tagsController.text
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
 
     setState(() => _saving = true);
     final notifier = ref.read(feedbackTemplatesNotifierProvider.notifier);

@@ -51,10 +51,8 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.paperDark,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
@@ -140,10 +138,7 @@ class _NewBadge extends StatelessWidget {
         horizontal: AppSpacing.space2,
         vertical: 2,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperAccent),
       child: Text(
         AppStrings.categoryNewBadge,
         style: AppTypography.captionSmall.copyWith(

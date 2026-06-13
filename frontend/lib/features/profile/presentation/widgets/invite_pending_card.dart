@@ -36,7 +36,6 @@ class InvitePendingCard extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(

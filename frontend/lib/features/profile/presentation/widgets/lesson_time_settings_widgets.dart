@@ -84,15 +84,14 @@ class DurationOptionItem extends StatelessWidget {
           fontWeight: isDefault ? FontWeight.bold : FontWeight.normal,
         ),
       ),
-      subtitle:
-          isCustom
-              ? Text(
-                '커스텀',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-              )
-              : null,
+      subtitle: isCustom
+          ? Text(
+              '커스텀',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+            )
+          : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -120,7 +119,7 @@ class DurationOptionItem extends StatelessWidget {
   }
 }
 
-/// Rounded visual select/deselect box used as the lesson-duration toggle.
+/// Angular visual select/deselect box used as the lesson-duration toggle.
 /// Active = vermillion filled with check; inactive = outlined muted.
 class _DurationToggleBox extends StatelessWidget {
   final bool isActive;
@@ -141,7 +140,6 @@ class _DurationToggleBox extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isActive ? AppColors.paperAccent : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: 1.5,
@@ -161,12 +159,11 @@ class _DurationToggleBox extends StatelessWidget {
                   ? AppStrings.profileDurationInUse
                   : AppStrings.profileDurationOff,
               style: AppTypography.bodySmall.copyWith(
-                color:
-                    isActive
-                        ? AppColors.paper
-                        : (disabledLook
-                            ? AppColors.inkQuaternary
-                            : AppColors.inkSecondary),
+                color: isActive
+                    ? AppColors.paper
+                    : (disabledLook
+                          ? AppColors.inkQuaternary
+                          : AppColors.inkSecondary),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -619,20 +616,18 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
               vertical: AppSpacing.space4,
             ),
             decoration: BoxDecoration(
-              color:
-                  _isDuplicate
-                      ? AppColors.paperAccentSoft
-                      : AppColors.paperAccentSoft,
+              color: _isDuplicate
+                  ? AppColors.paperAccentSoft
+                  : AppColors.paperAccentSoft,
             ),
             child: Column(
               children: [
                 Text(
                   LessonDurations.format(_currentDuration),
                   style: AppTypography.headingLarge.copyWith(
-                    color:
-                        _isDuplicate
-                            ? AppColors.paperAccent
-                            : AppColors.paperAccent,
+                    color: _isDuplicate
+                        ? AppColors.paperAccent
+                        : AppColors.paperAccent,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -703,43 +698,37 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space2,
               alignment: WrapAlignment.center,
-              children:
-                  [35, 50, 75, 100, 150, 180].map((duration) {
-                    final isSelected = _currentDuration == duration;
-                    final exists = widget.existingDurations.contains(duration);
-                    return FilterChip(
-                      label: Text(
-                        LessonDurations.format(duration),
-                        style: AppTypography.bodySmall.copyWith(
-                          color:
-                              exists
-                                  ? AppColors.inkTertiary
-                                  : isSelected
-                                  ? AppColors.paperAccent
-                                  : AppColors.ink,
-                          decoration:
-                              exists ? TextDecoration.lineThrough : null,
-                        ),
-                      ),
-                      selected: isSelected && !exists,
-                      onSelected:
-                          exists
-                              ? null
-                              : (_) {
-                                setState(() {
-                                  _sliderValue = duration.toDouble();
-                                });
-                              },
-                      selectedColor: AppColors.paperAccent.withValues(
-                        alpha: 0.2,
-                      ),
-                      showCheckmark: false,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space1,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    );
-                  }).toList(),
+              children: [35, 50, 75, 100, 150, 180].map((duration) {
+                final isSelected = _currentDuration == duration;
+                final exists = widget.existingDurations.contains(duration);
+                return FilterChip(
+                  label: Text(
+                    LessonDurations.format(duration),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: exists
+                          ? AppColors.inkTertiary
+                          : isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.ink,
+                      decoration: exists ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  selected: isSelected && !exists,
+                  onSelected: exists
+                      ? null
+                      : (_) {
+                          setState(() {
+                            _sliderValue = duration.toDouble();
+                          });
+                        },
+                  selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                  showCheckmark: false,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space1,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                );
+              }).toList(),
             ),
 
             const SizedBox(height: AppSpacing.space3),
@@ -801,13 +790,12 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
           child: const Text(AppStrings.cancel),
         ),
         FilledButton(
-          onPressed:
-              _isDuplicate
-                  ? null
-                  : () {
-                    Navigator.pop(context);
-                    widget.onSave(_currentDuration);
-                  },
+          onPressed: _isDuplicate
+              ? null
+              : () {
+                  Navigator.pop(context);
+                  widget.onSave(_currentDuration);
+                },
           child: const Text(AppStrings.add),
         ),
       ],
@@ -824,20 +812,17 @@ void showAddCustomDurationDialog({
 }) {
   showDialog(
     context: context,
-    builder:
-        (dialogContext) => DurationPickerDialog(
-          onSave: (duration) async {
-            await onSave(duration);
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${LessonDurations.format(duration)} 추가됨'),
-                ),
-              );
-            }
-          },
-          existingDurations: existingDurations,
-        ),
+    builder: (dialogContext) => DurationPickerDialog(
+      onSave: (duration) async {
+        await onSave(duration);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${LessonDurations.format(duration)} 추가됨')),
+          );
+        }
+      },
+      existingDurations: existingDurations,
+    ),
   );
 }
 
@@ -883,12 +868,11 @@ void showTimeSlotDialog({
 }) {
   showDialog(
     context: context,
-    builder:
-        (context) => TimeSlotDialog(
-          preselectedDay: preselectedDay,
-          existingSlot: existingSlot,
-          onSave: onSave,
-        ),
+    builder: (context) => TimeSlotDialog(
+      preselectedDay: preselectedDay,
+      existingSlot: existingSlot,
+      onSave: onSave,
+    ),
   );
 }
 

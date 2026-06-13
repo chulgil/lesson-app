@@ -28,8 +28,8 @@ class InvitePendingListScreen extends ConsumerWidget {
           return _Sections(items: items);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => const Center(child: Text(AppStrings.invitePendingEmpty)),
+        error: (_, __) =>
+            const Center(child: Text(AppStrings.invitePendingEmpty)),
       ),
     );
   }
@@ -109,7 +109,6 @@ class _Row extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
@@ -132,12 +131,11 @@ class _Row extends ConsumerWidget {
                           ? '방금'
                           : 'D+${item.daysSinceSent}',
                       style: NotebookTypography.eyebrow.copyWith(
-                        color:
-                            item.isImminent
-                                ? AppColors.paperAccent
-                                : item.isUrgent
-                                ? AppColors.paperTrial
-                                : AppColors.inkTertiary,
+                        color: item.isImminent
+                            ? AppColors.paperAccent
+                            : item.isUrgent
+                            ? AppColors.paperTrial
+                            : AppColors.inkTertiary,
                       ),
                     ),
                   ],
@@ -188,10 +186,9 @@ class _Row extends ConsumerWidget {
     } catch (e) {
       if (!context.mounted) return;
       final message = e.toString();
-      final friendly =
-          message.contains('cooldown') || message.contains('10')
-              ? AppStrings.invitePendingResendCooldown
-              : AppStrings.invitePendingResendFailed;
+      final friendly = message.contains('cooldown') || message.contains('10')
+          ? AppStrings.invitePendingResendCooldown
+          : AppStrings.invitePendingResendFailed;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(friendly)));
