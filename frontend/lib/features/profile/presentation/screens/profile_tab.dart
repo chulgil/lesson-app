@@ -1,6 +1,9 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
@@ -68,8 +71,8 @@ class ProfileTab extends ConsumerWidget {
                     meta:
                         'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
                     trailing: IconButton(
-                      onPressed:
-                          () => context.push(AppRoutes.notificationSettings),
+                      onPressed: () =>
+                          context.push(AppRoutes.notificationSettings),
                       icon: const Icon(
                         Icons.settings_outlined,
                         color: AppColors.ink,
@@ -184,27 +187,25 @@ class ProfileTab extends ConsumerWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space1,
-              children:
-                  instruments
-                      .map(
-                        (inst) => Chip(
-                          label: Text(
-                            inst,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.paperAccent,
-                            ),
-                          ),
-                          backgroundColor: AppColors.paperAccent.withValues(
-                            alpha: 0.08,
-                          ),
-                          side: BorderSide.none,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
+              children: instruments
+                  .map(
+                    (inst) => Chip(
+                      label: Text(
+                        inst,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.paperAccent,
                         ),
-                      )
-                      .toList(),
+                      ),
+                      backgroundColor: AppColors.paperAccent.withValues(
+                        alpha: 0.08,
+                      ),
+                      side: BorderSide.none,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                    ),
+                  )
+                  .toList(),
             ),
           ],
           // Introduction
@@ -390,7 +391,10 @@ class ProfileTab extends ConsumerWidget {
 
   Widget _buildLifetimePromoBanner(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(appBillingSnapshotProvider).valueOrNull;
-    if (snapshot == null || !snapshot.lifetimeOfferActive) {
+    // #415 Phase B2: 세션 dismiss state 체크. 닫혀 있으면 banner 미노출
+    // (다음 부팅 시 lifetime 윈도우 활성이면 다시 노출 — promo blindness 완화).
+    final dismissed = ref.watch(lifetimePromoDismissedProvider);
+    if (snapshot == null || !snapshot.lifetimeOfferActive || dismissed) {
       return const SizedBox.shrink();
     }
     return Padding(
@@ -398,6 +402,9 @@ class ProfileTab extends ConsumerWidget {
       child: LifetimePromoBanner(
         endsAt: snapshot.lifetimeOfferEndsAt!,
         onBuy: () => handleBuyLifetime(context: context, ref: ref),
+        onDismiss:
+            () =>
+                ref.read(lifetimePromoDismissedProvider.notifier).state = true,
       ),
     );
   }
@@ -419,15 +426,45 @@ class ProfileTab extends ConsumerWidget {
       snapshot: snapshot,
       studentCount: studentCount,
       onUpgrade: () => handleBuyPro(context: context, ref: ref),
-      onManage: () => _showBillingComingSoon(context),
-      onReceipts: () => _showBillingComingSoon(context),
+      onManage: () => _openStoreSubscriptionManagement(
+        context,
+        AppStrings.billingManageStoreOpening,
+      ),
+      onReceipts: () => _openStoreSubscriptionManagement(
+        context,
+        AppStrings.billingReceiptStoreOpening,
+      ),
     );
   }
 
-  void _showBillingComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppStrings.paywallComingSoonHint)),
-    );
+  /// #415 Phase A2 — "플랜 관리" / "영수증" CTA 를 native store 구독 페이지로 라우팅.
+  ///
+  /// Apple/Google 구독 모두 native store 가 구독 관리 + 영수증 이력을 한 페이지에서
+  /// 제공한다 (자체 billing_management_screen 보다 권한·취소·환불 진실성 우위).
+  /// deep-link 실패 시 `billingManageStoreFailed` 폴백 안내.
+  Future<void> _openStoreSubscriptionManagement(
+    BuildContext context,
+    String openingHint,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(SnackBar(content: Text(openingHint)));
+
+    final url = Platform.isIOS
+        ? Uri.parse('https://apps.apple.com/account/subscriptions')
+        : Uri.parse('https://play.google.com/store/account/subscriptions');
+
+    try {
+      final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (!ok) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text(AppStrings.billingManageStoreFailed)),
+        );
+      }
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text(AppStrings.billingManageStoreFailed)),
+      );
+    }
   }
 
   Widget _buildStatsSection(WidgetRef ref, String teacherId) {
@@ -519,11 +556,11 @@ class ProfileTab extends ConsumerWidget {
     return CategoryMenuGrid(
       onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
       onLessonStyleTap: () => context.push(AppRoutes.lessonStyleSettings),
-      onSubscriptionBillingTap:
-          () => showSubscriptionBillingSheet(context, teacherId),
+      onSubscriptionBillingTap: () =>
+          showSubscriptionBillingSheet(context, teacherId),
       onMyProfileTap: () => showMyProfileSheet(context),
-      onPolicyNotificationsTap:
-          () => showPolicyNotificationsSheet(context, ref),
+      onPolicyNotificationsTap: () =>
+          showPolicyNotificationsSheet(context, ref),
     );
   }
 }

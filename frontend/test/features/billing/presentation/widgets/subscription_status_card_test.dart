@@ -125,7 +125,87 @@ void main() {
     expect(find.text(AppStrings.billingBadgeTrial), findsOneWidget);
     expect(find.textContaining('D-7'), findsOneWidget);
     expect(find.text(AppStrings.billingTrialConvertCta), findsOneWidget);
+    // D-7 (urgency=none) → urgent 문구 미노출.
+    expect(find.text(AppStrings.billingStatusTrialUrgent), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Trial D-3 (warning): badge 격상되지만 urgent 문구는 아직 없음', (
+    tester,
+  ) async {
+    final now = DateTime.utc(2026, 5, 1);
+    final expires = now.add(const Duration(days: 3));
+
+    await tester.pumpWidget(
+      wrap(
+        SubscriptionStatusCard(
+          snapshot: snapshot(
+            plan: BillingPlan.pro,
+            status: BillingStatus.trial,
+            expiresAt: expires,
+          ),
+          studentCount: 4,
+          onUpgrade: () {},
+          onManage: () {},
+          onReceipts: () {},
+          now: now,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('D-3'), findsOneWidget);
+    expect(find.text(AppStrings.billingStatusTrialUrgent), findsNothing);
+  });
+
+  testWidgets('Trial D-1 (critical): urgent 문구 노출', (tester) async {
+    final now = DateTime.utc(2026, 5, 1);
+    final expires = now.add(const Duration(days: 1));
+
+    await tester.pumpWidget(
+      wrap(
+        SubscriptionStatusCard(
+          snapshot: snapshot(
+            plan: BillingPlan.pro,
+            status: BillingStatus.trial,
+            expiresAt: expires,
+          ),
+          studentCount: 4,
+          onUpgrade: () {},
+          onManage: () {},
+          onReceipts: () {},
+          now: now,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('D-1'), findsOneWidget);
+    expect(find.text(AppStrings.billingStatusTrialUrgent), findsOneWidget);
+  });
+
+  testWidgets('Trial D-0 (만료 직전, critical): urgent 문구 노출', (tester) async {
+    final now = DateTime.utc(2026, 5, 1);
+    // expires now → days=0 (음수 보정 안 됨).
+    await tester.pumpWidget(
+      wrap(
+        SubscriptionStatusCard(
+          snapshot: snapshot(
+            plan: BillingPlan.pro,
+            status: BillingStatus.trial,
+            expiresAt: now,
+          ),
+          studentCount: 4,
+          onUpgrade: () {},
+          onManage: () {},
+          onReceipts: () {},
+          now: now,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.billingStatusTrialUrgent), findsOneWidget);
   });
 
   testWidgets('Expired 변형: EXPIRED 배지 + 7일 유예 안내 + 재결제 CTA', (tester) async {

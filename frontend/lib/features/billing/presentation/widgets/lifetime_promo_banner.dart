@@ -21,16 +21,22 @@ class LifetimePromoBanner extends StatelessWidget {
     super.key,
     required this.endsAt,
     required this.onBuy,
+    this.onDismiss,
     DateTime? now,
   }) : _nowOverride = now;
 
   static const buyButtonKey = Key('lifetime_promo_banner_buy');
+  static const dismissButtonKey = Key('lifetime_promo_banner_dismiss');
 
   /// Lifetime 얼리어답터 오퍼 종료 시각.
   final DateTime endsAt;
 
   /// 구매하기 탭 콜백.
   final VoidCallback onBuy;
+
+  /// 닫기(X) 콜백 — 호출 시 부모가 [lifetimePromoDismissedProvider] 를 갱신해
+  /// banner 를 숨기는 책임을 진다. null 이면 X 버튼 미노출 (테스트/임시 사용).
+  final VoidCallback? onDismiss;
 
   /// 테스트용 시계 주입. 운영 코드는 항상 [DateTime.now].
   final DateTime? _nowOverride;
@@ -72,6 +78,24 @@ class LifetimePromoBanner extends StatelessWidget {
                     letterSpacing: 0.5,
                   ),
                 ),
+                const Spacer(),
+                if (onDismiss != null)
+                  GestureDetector(
+                    key: dismissButtonKey,
+                    onTap: onDismiss,
+                    behavior: HitTestBehavior.opaque,
+                    child: const Padding(
+                      // 터치 면적 확보 — paperAccent 위 X 아이콘 단독은 작아서 padding 필수.
+                      padding: EdgeInsets.all(AppSpacing.space1),
+                      child: Icon(
+                        Icons.close,
+                        size: 18,
+                        color: AppColors.paper,
+                        semanticLabel:
+                            AppStrings.paywallLifetimePromoDismissLabel,
+                      ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.space3),

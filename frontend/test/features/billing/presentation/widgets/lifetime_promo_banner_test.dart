@@ -53,4 +53,39 @@ void main() {
     expect(find.text('D-0 종료'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('onDismiss null → X 버튼 미노출 (기본 동작 호환)', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        LifetimePromoBanner(
+          endsAt: DateTime(2026, 8, 1),
+          now: DateTime(2026, 5, 24),
+          onBuy: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(LifetimePromoBanner.dismissButtonKey), findsNothing);
+  });
+
+  testWidgets('onDismiss 제공 시 X 버튼 노출 + tap → 콜백 실행', (tester) async {
+    var dismissed = 0;
+    await tester.pumpWidget(
+      wrap(
+        LifetimePromoBanner(
+          endsAt: DateTime(2026, 8, 1),
+          now: DateTime(2026, 5, 24),
+          onBuy: () {},
+          onDismiss: () => dismissed++,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(LifetimePromoBanner.dismissButtonKey), findsOneWidget);
+    await tester.tap(find.byKey(LifetimePromoBanner.dismissButtonKey));
+    await tester.pump();
+    expect(dismissed, 1);
+  });
 }

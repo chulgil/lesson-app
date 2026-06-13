@@ -17,15 +17,26 @@ export 'domain/entities/billing_status.dart';
 export 'domain/entities/iap_validation_result.dart';
 export 'domain/entities/trial_activation_result.dart';
 export 'domain/repositories/app_billing_repository.dart';
-export 'domain/services/billing_guard.dart';
+export 'domain/services/billing_guard.dart'
+    show
+        BillingGuard,
+        FeatureGateDecision,
+        FeatureGateReason,
+        LimitReason,
+        StudentLimitDecision,
+        TierRequirement,
+        freeStudentLimit;
 export 'presentation/providers/app_billing_provider.dart'
     show
         appBillingRepositoryProvider,
         appBillingSnapshotProvider,
         iapServiceProvider;
+export 'presentation/providers/lifetime_promo_dismissed_provider.dart'
+    show lifetimePromoDismissedProvider;
 export 'presentation/utils/billing_guard_actions.dart'
     show
         guardAddStudentNavigation,
+        guardProFeatureNavigation,
         handleBuyLifetime,
         handleBuyPro,
         handleStartTrial;

@@ -73,6 +73,20 @@ class SubscriptionStatusCard extends StatelessWidget {
     return diff < 0 ? 0 : diff;
   }
 
+  /// Trial 만료 임박도 — Phase B1.
+  ///
+  /// - critical (D ≤ 1): badge 적색 강조 + 본문에 urgent 한 줄 추가
+  /// - warning (D ≤ 3): badge 적색 강조 (본문은 기본)
+  /// - none: 기존 paperAccentSoft + 기본 본문
+  _TrialUrgency get _trialUrgency {
+    if (snapshot.status != BillingStatus.trial) return _TrialUrgency.none;
+    final days = _daysToExpiry;
+    if (days == null) return _TrialUrgency.none;
+    if (days <= 1) return _TrialUrgency.critical;
+    if (days <= 3) return _TrialUrgency.warning;
+    return _TrialUrgency.none;
+  }
+
   @override
   Widget build(BuildContext context) {
     final variant = _variant;
@@ -87,7 +101,11 @@ class SubscriptionStatusCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _BadgeRow(variant: variant, statusLine: _statusLine(variant)),
+            _BadgeRow(
+              variant: variant,
+              statusLine: _statusLine(variant),
+              trialUrgency: _trialUrgency,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               _detailLine(variant),
@@ -95,6 +113,16 @@ class SubscriptionStatusCard extends StatelessWidget {
                 color: AppColors.inkSecondary,
               ),
             ),
+            if (_trialUrgency == _TrialUrgency.critical) ...[
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                AppStrings.billingStatusTrialUrgent,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.paperAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.space3),
             _ActionRow(variant: variant, parent: this),
           ],
@@ -152,11 +180,19 @@ class SubscriptionStatusCard extends StatelessWidget {
 
 enum _Variant { free, pro, studio, lifetime, trial, expired }
 
+/// Trial 만료 임박도. SubscriptionStatusCard._trialUrgency.
+enum _TrialUrgency { none, warning, critical }
+
 class _BadgeRow extends StatelessWidget {
-  const _BadgeRow({required this.variant, required this.statusLine});
+  const _BadgeRow({
+    required this.variant,
+    required this.statusLine,
+    this.trialUrgency = _TrialUrgency.none,
+  });
 
   final _Variant variant;
   final String statusLine;
+  final _TrialUrgency trialUrgency;
 
   String get _label {
     switch (variant) {
@@ -182,7 +218,10 @@ class _BadgeRow extends StatelessWidget {
       case _Variant.lifetime:
         return AppColors.paperAccent;
       case _Variant.trial:
-        return AppColors.paperAccentSoft;
+        // Phase B1: 만료 3일 이내(warning/critical) 부터 적색 강조로 격상.
+        return trialUrgency == _TrialUrgency.none
+            ? AppColors.paperAccentSoft
+            : AppColors.paperAccent;
       case _Variant.expired:
       case _Variant.free:
         return AppColors.inkQuaternary;
@@ -196,7 +235,10 @@ class _BadgeRow extends StatelessWidget {
       case _Variant.lifetime:
         return AppColors.paper;
       case _Variant.trial:
-        return AppColors.paperAccent;
+        // 격상 시 배지 BG=paperAccent → FG 는 paper(흰계열) 로 대비 확보.
+        return trialUrgency == _TrialUrgency.none
+            ? AppColors.paperAccent
+            : AppColors.paper;
       case _Variant.expired:
       case _Variant.free:
         return AppColors.inkSecondary;
