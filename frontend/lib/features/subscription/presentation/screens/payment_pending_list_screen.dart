@@ -115,6 +115,15 @@ class _Row extends ConsumerWidget {
           onPressed: () => _confirmRevoke(context, ref),
         ),
       ],
+      startActions: [
+        if (item.canResend)
+          SwipeAction(
+            label: AppStrings.swipeActionResend,
+            icon: Icons.send_outlined,
+            tone: SwipeActionTone.convenience,
+            onPressed: () => _resend(context, ref),
+          ),
+      ],
       child: Container(
         margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,

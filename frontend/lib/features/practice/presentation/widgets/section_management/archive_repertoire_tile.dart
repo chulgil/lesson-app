@@ -32,6 +32,14 @@ class ArchiveRepertoireTile extends ConsumerWidget {
           onPressed: () => _showPermanentDeleteDialog(context, ref),
         ),
       ],
+      startActions: [
+        SwipeAction(
+          label: AppStrings.swipeActionRestore,
+          icon: Icons.unarchive_outlined,
+          tone: SwipeActionTone.convenience,
+          onPressed: () => _showRestoreDialog(context, ref),
+        ),
+      ],
       child: NotebookCard(
         margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,

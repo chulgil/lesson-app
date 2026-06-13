@@ -310,6 +310,14 @@ class PieceCard extends StatelessWidget {
           onPressed: () => _confirmDelete(context),
         ),
       ],
+      startActions: [
+        SwipeAction(
+          label: AppStrings.swipeActionAssign,
+          icon: Icons.assignment_outlined,
+          tone: SwipeActionTone.convenience,
+          onPressed: onAssign,
+        ),
+      ],
       child: card,
     );
   }
