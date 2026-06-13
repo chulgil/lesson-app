@@ -2,7 +2,7 @@
 
 > Last updated: 2026-05-05
 > 컨셉: **괘선 종이의 아날로그 손맛 + 클래식 악보의 엄격한 타이포그래피**
-> 상태: 전 도메인 Notebook × Score 적용 완료 (Phase 1~9). 테마 레이어 전역 통일 + BoxShadow 전수 제거 + BorderRadius 포화
+> 상태: 전 도메인 Notebook × Score 적용 (Phase 1~9) + 표면 래퍼 강제(계약 테스트). **단, 토큰 각진·평면 원칙은 2026-06-13 drift 재측정에서 circular 67·BoxShadow 5건 잔존 확인 — [token_drift_remediation.md](./token_drift_remediation.md) 정비 중**
 > 레퍼런스: `design-plan/hybrid/`
 
 ---
@@ -162,16 +162,20 @@ trailing은 `IconButton(Icons.add)` 단일 아이콘 또는 `Row` 조합 가능.
 
 시그니처가 "이 앱이 Notebook × Score 인가" 의 정체성 측정이라면, 메타 원칙은 **인지 부하 절제**의 측정. 두 원칙은 신규 화면 추가 시 시그니처와 동등하게 강제.
 
-#### 1.3.1 각진 (BorderRadius.zero) — §7.118 포화 (2026-05-04 확인)
+#### 1.3.1 각진 (BorderRadius.zero) — 원칙 (drift 잔존, 2026-06-13 재측정)
 
-`app_theme.dart` 테마 레이어 + 인라인 override 모두 `BorderRadius.zero`. 전체 코드베이스에서 `BorderRadius.circular` 잔여 **2건만** (포화 상태):
+`app_theme.dart` 테마 레이어 + 인라인 override 의 **원칙**은 `BorderRadius.zero`.
+
+> [!] **정정 (2026-06-13)**: 2026-05-04 "circular 2건만 포화" 선언은 사실이 아니었다. 재측정 결과 `BorderRadius.circular` **72건**(정당 예외 5 제외 = **67 실위반**)이 "포화" 선언 이후 추가된 도메인(billing·inbox·profile·schedule·practice 등)에 누적됐다. 근본 원인: 계약 테스트(`notebook_design_contract_test.dart`)가 표면 래퍼만 검사하고 토큰 각진 원칙을 검사하지 않아 멱등성 게이트가 비어 있었다. 정비 추적: [token_drift_remediation.md](./token_drift_remediation.md).
+
+**정당 예외** (정비 대상 아님):
 
 | 예외 | 파일 | 사유 |
 |------|------|------|
 | 튜너 고양이 캐릭터 | `tuner_cat_widgets.dart` | 곡률은 감정 표현 (캐릭터 예외) |
 | 드래그 핸들 pill (`height / 2`) | `bottom_sheet_handle.dart` | "끌어올리기" 어포던스 |
-
-> 이전 3 예외 중 "변수 표현식 기반 원형 오브젝트" 는 정리 완료. `like_stamp.dart`·`feedback_template_form_sheet.dart` 에 미세 잔류(stamp pill·indicator 2px)가 있으나 시그니처 영역 외 미미한 수준.
+| YouTube 플레이어 | `youtube_player_widget.dart` · `practice/.../youtube/` | 외부 미디어 표면 |
+| 코치마크 오버레이 | `coach_mark_overlay.dart` | elevation cue |
 
 신규 위젯에 `BorderRadius.circular(radiusMedium)` 등 정적 상수 사용 = 위반.
 
@@ -388,8 +392,8 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 | 학생/학부모 홈 | Notebook × Score 적용 | Phase 4 — **완료** |
 | 전 화면 확산 | 설정/프로필/수강권/스케줄 | Phase 5 — **완료** |
 | 전 화면 scaffoldBackgroundColor 통일 | `app_theme.dart` `scaffoldBackgroundColor: AppColors.paper` 전역 적용 | Phase 7~9 — **완료** |
-| BoxShadow 전수 제거 | 126+건 → 0건 (`BoxShadow` 잔재 없음) | Phase 7~9 — **완료** |
-| BorderRadius.circular 포화 | 38건 → 2건 예외(tuner_cat + drag handle)만 잔류 | Phase 7~9 — **완료** |
+| BoxShadow 전수 제거 | 126+건 → **5건 잔존** (2026-06-13 재측정) | **drift** — [token_drift_remediation.md](./token_drift_remediation.md) |
+| BorderRadius.circular 포화 | 38건 → **72건 재증가** (67 실위반, 2026-06-13) | **drift** — [token_drift_remediation.md](./token_drift_remediation.md) |
 | fontSize/EdgeInsets 토큰 통일 | `AppTypography`·`AppSpacing` 토큰으로 전수 치환 | Phase 7~9 — **완료** |
 
 ---
@@ -640,6 +644,7 @@ Text(
 | **2026-05-04** | **전 화면 scaffoldBackgroundColor 통일** — `app_theme.dart` `scaffoldBackgroundColor: AppColors.paper` 전역 적용 | — |
 | **2026-05-04** | **BoxShadow 전수 제거** — 126+건 → 0건. 종이 평면 잉크 원칙 완성 | — |
 | **2026-05-04** | **BorderRadius.circular 포화** — 38건 → 2건 예외(tuner_cat + drag handle)만 잔류 | §1.3.1 |
+| **2026-06-13** | **[!] 위 두 "완성/포화" 선언 정정** — 재측정 결과 circular **72건**(67 실위반)·BoxShadow **5건** 잔존. "포화" 선언 후 추가 도메인이 토큰 게이트 부재로 drift. 정비 추적: [token_drift_remediation.md](./token_drift_remediation.md) | §1.3.1 |
 | **2026-05-04** | **fontSize/EdgeInsets 토큰 통일** — `AppTypography`·`AppSpacing` 전수 치환 | — |
 | **2026-05-04** | **SubscriptionCard 통합 재설계** — `SubscriptionTicketCard` 삭제, `SubscriptionCard(compact)` 로 통합. 3색 잉크 체계 도입 (trial=`paperTrial` 세피아, monthly=`paperOk` 녹색, package=`paperAccent` 버밀리온). §2.1 참조 | — |
 | **2026-05-04** | **"Fine." 종지부 상세 화면 확산** — 대시보드 3종 + 상세 화면 8개 포함 11개 화면 파일 적용 | §1.2 #6 |
