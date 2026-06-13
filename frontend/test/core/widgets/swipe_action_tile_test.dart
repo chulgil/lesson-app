@@ -8,6 +8,7 @@
 // SSOT: docs/_components/swipe_action.md §방향 정책
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/widgets/swipe_action_tile.dart';
 
 void main() {
@@ -110,6 +111,32 @@ void main() {
 
       expect(deleted, 1);
       expect(find.text('삭제'), findsNothing);
+    });
+
+    testWidgets('convenience tone 버튼 배경 = paperOk(녹색)', (tester) async {
+      await tester.pumpWidget(
+        harness(
+          actions: [deleteAction(() {})],
+          startActions: [
+            SwipeAction(
+              label: '완료',
+              icon: Icons.check,
+              tone: SwipeActionTone.convenience,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      );
+
+      await tester.drag(find.text('row-content'), const Offset(200, 0));
+      await tester.pumpAndSettle();
+
+      final material = tester.widget<Material>(
+        find
+            .ancestor(of: find.text('완료'), matching: find.byType(Material))
+            .first,
+      );
+      expect(material.color, AppColors.paperOk);
     });
   });
 }
