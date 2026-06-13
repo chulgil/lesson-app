@@ -39,8 +39,8 @@
 - **얕은 뎁스** — 모든 기능 2탭 이내 도달
 - **원클릭** — 핵심 작업은 한 번 탭으로 완료
 - **스와이프 액션 4원칙 (HARD-GATE, 2026-06-13 방향+tone)** — 반복 리스트의 행 단위 액션은 다음 4원칙을 따른다. trailing 아이콘 버튼/PopupMenuButton 과 중복 배치 금지.
-  1. **우→좌 관리 액션은 맥락별 1개** — 행 성격에 맞춰 삭제(`SwipeActionTone.destructive`) **또는** 편집(`normal`) 중 하나. 한 방향에 2개 이상 금지.
-  2. **양방향 최대 2개, 초과 시 BottomSheet** — 우→좌 관리 1 + 좌→우 편의 1 까지만 swipe. 3개 이상이거나 양쪽으로 안 떨어지는 묶음은 행 탭 → `showModalBottomSheet` 안에 `ListTile` 로 나열.
+  1. **우→좌 = 관리 액션 (편집·삭제)** — 삭제(`SwipeActionTone.destructive`)·편집(`normal`). 편집+삭제 둘 다 필요하면 둘 다 우→좌 (관리 묶음, 최대 2개).
+  2. **좌→우 = 기타/편의 (3번째 액션부터)** — 공유·대표설정·복원·재발송·완료 등 관리 외 기능은 좌→우(`convenience`). 우→좌에 편집·삭제를 채운 뒤 3번째 액션부터 좌→우로. 기타가 많아 한눈에 안 들어오면 행 탭 → `showModalBottomSheet`.
   3. **모든 destructive 는 확인 다이얼로그** — `showDialog<AlertDialog>` 로 확인 받기. 영향도가 있으면 강화 메시지 ("계좌 삭제 시 학생 결제 표시에서 사라집니다" + 영향 카운트). Undo SnackBar 단독 금지. 편의·편집은 즉시 실행.
   4. **방향 + tone (3색 잉크)** — 우→좌=관리(삭제 `destructive` 버밀리온 / 편집 `normal` ink), 오른쪽 노출. 좌→우=편의(`convenience` 녹색 `paperOk`), 왼쪽 노출 — 없으면 단방향. 두 방향 의미는 전 화면 공통.
   - **예외**: 자녀/관계 같은 메타포상 destructive 부적절한 카드는 swipe 적용하지 않음 — BottomSheet 다중 액션만.
