@@ -42,6 +42,13 @@ from app.models.academy_governance import (  # noqa: F401
     DelegationRevokeReason,
     DelegationState,
 )
+from app.models.academy_payment_matching import (  # noqa: F401
+    AcademyBankTransaction,
+    AcademyBankTransactionSource,
+    AcademyBankTransactionState,
+    AcademyPaymentMatchSuggestion,
+    AcademyPaymentMatchSuggestionDecision,
+)
 from app.models.app_billing import AppBillingPlan, IapReceipt  # noqa: F401
 from app.models.app_version import AppNews, AppRoadmap, AppVersion  # noqa: F401
 from app.models.base import Base  # noqa: F401
