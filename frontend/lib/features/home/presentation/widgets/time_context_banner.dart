@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_banner.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 
 /// Viewer role for time-aware banner messages.
@@ -37,38 +37,14 @@ class TimeContextBanner extends StatelessWidget {
     if (message == null) return const SizedBox.shrink();
 
     // Notebook × Score: 크림 종이 위의 "마지널리아" 메타포.
-    // - 배경: 투명 (paper 직접)
-    // - 좌측: 3px paperAccent(vermillion) 세로선 — 4대 시그니처
-    // - 메시지: Gaegu 손글씨 — 시간 인식 멘트
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.space3,
-        AppSpacing.space3,
-        AppSpacing.space3,
-        AppSpacing.space3,
-      ),
-      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-      decoration: const BoxDecoration(
-        border: Border(
-          left: BorderSide(color: AppColors.paperAccent, width: 3),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(_iconForHour(hour), size: 20, color: AppColors.ink),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Text(
-              message,
-              style: NotebookTypography.hand.copyWith(
-                fontSize: 18,
-                color: AppColors.ink,
-              ),
-            ),
-          ),
-        ],
+    // 시각 셸은 공통 NotebookBanner(좌측 3px vermillion + Gaegu) 사용.
+    // 이 위젯은 시간대 메시지 로직만 소유.
+    return NotebookBanner(
+      leadingIcon: _iconForHour(hour),
+      message: message,
+      messageStyle: NotebookTypography.hand.copyWith(
+        fontSize: 18,
+        color: AppColors.ink,
       ),
     );
   }

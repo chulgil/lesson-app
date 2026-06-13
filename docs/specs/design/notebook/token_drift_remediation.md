@@ -26,6 +26,7 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 |------|------|------|
 | P0 — 계약 red 2건 → green | `51da3df9` | gamification Scaffold/sheet + proposal_draft_banner AlertDialog. 27/27 green |
 | stat_card 포크 통합 | `8396cf44` | parent_home 독자 StatCard 삭제 → core 통합 |
+| `NotebookBanner` foundation | (본 커밋) | 공통 위젯 + smoke 4/4 + 스펙 + `time_context_banner` 마이그레이션 (① 마지널리아 스트립 원형 증명). 잔여: `availability_vacation_banner` 등 ① 후보 + ③ refit |
 
 ## 4. 잔여 BorderRadius.circular 인벤토리 (67 실위반)
 
