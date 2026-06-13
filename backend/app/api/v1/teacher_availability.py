@@ -10,11 +10,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_db
 from app.models.user import User
+from app.services.availability_service import AvailabilityService
+from app.services.teacher_id_resolver import resolve_teacher_id
 
 router = APIRouter()
 
@@ -54,55 +55,13 @@ async def onboarding_availability(
     - TeacherAvailability + AvailabilityTimeSlot (SSOT)
     - TeacherSettings.available_slots (역호환 — JSON 평면 list)
     """
-    from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
-    from app.models.settings import TeacherSettings
-    from app.services.teacher_id_resolver import resolve_teacher_id
-
     teacher_id = await resolve_teacher_id(db, current_user.id)
-
-    # 1. SSOT — 기존 availability 전체 교체.
-    existing = await db.scalars(select(TeacherAvailability).where(TeacherAvailability.teacher_id == teacher_id))
-    for avail in existing.all():
-        child_slots = await db.scalars(
-            select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
-        )
-        for slot in child_slots.all():
-            await db.delete(slot)
-        await db.delete(avail)
-    await db.flush()
-
-    schedule_slot_count = 0
-    # 요일별 그룹 — 한 day_of_week 당 한 row, 그 안에 여러 time slot.
-    by_dow: dict[int, list[OnboardingSlot]] = {}
-    for s in body.slots:
-        by_dow.setdefault(s.day_of_week, []).append(s)
-
-    for dow, slots in by_dow.items():
-        avail = TeacherAvailability(teacher_id=teacher_id, day_of_week=dow)
-        db.add(avail)
-        await db.flush()
-        for s in slots:
-            db.add(
-                AvailabilityTimeSlot(
-                    availability_id=avail.id,
-                    start_time=s.start_time,
-                    end_time=s.end_time,
-                )
-            )
-            schedule_slot_count += 1
-    await db.flush()
-
-    # 2. 역호환 — TeacherSettings.available_slots JSON.
-    settings = await db.scalar(select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id))
-    if settings is None:
-        settings = TeacherSettings(teacher_id=teacher_id)
-        db.add(settings)
-        await db.flush()
-    flat = [{"day_of_week": s.day_of_week, "start_time": s.start_time, "end_time": s.end_time} for s in body.slots]
-    settings.available_slots = flat
-    await db.flush()
-
+    svc = AvailabilityService(db)
+    schedule_slot_count, settings_slot_count = await svc.onboarding_dual_write(
+        teacher_id=teacher_id,
+        slots=body.slots,
+    )
     return OnboardingAvailabilityResponse(
         schedule_slot_count=schedule_slot_count,
-        settings_slot_count=len(flat),
+        settings_slot_count=settings_slot_count,
     )
