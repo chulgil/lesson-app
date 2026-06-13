@@ -100,7 +100,6 @@ class _InquiryCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       _senderRoleLabel(),
@@ -127,7 +126,6 @@ class _InquiryCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       hasReply ? '답변완료' : '대기중',

@@ -26,9 +26,12 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 |------|------|------|
 | P0 — 계약 red 2건 → green | `51da3df9` | gamification Scaffold/sheet + proposal_draft_banner AlertDialog. 27/27 green |
 | stat_card 포크 통합 | `8396cf44` | parent_home 독자 StatCard 삭제 → core 통합 |
-| `NotebookBanner` foundation | (본 커밋) | 공통 위젯 + smoke 4/4 + 스펙 + `time_context_banner` 마이그레이션 (① 마지널리아 스트립 원형 증명). 잔여: `availability_vacation_banner` 등 ① 후보 + ③ refit |
+| `NotebookBanner` foundation | `80123d3b` | 공통 위젯 + smoke 4/4 + 스펙 + `time_context_banner` 마이그레이션 (① 마지널리아 스트립 원형 증명). 잔여: `availability_vacation_banner` 등 ① 후보 + ③ refit |
+| **circular 게이트 + inbox sweep** | (본 커밋) | 계약 테스트에 `BorderRadius.zero` 게이트 추가 (자기 축소 baseline 41 + 영구예외 4, Red-Green 검증) + inbox 3파일 7건 → 각진. 게이트 28/28 green |
 
-## 4. 잔여 BorderRadius.circular 인벤토리 (67 실위반)
+## 4. 잔여 BorderRadius.circular 인벤토리 (~60 실위반, inbox 정비 완료)
+
+> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 41 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
 
 정당 예외 5건 (정비 대상 아님): `tuner_cat_widgets.dart`(캐릭터), `youtube_player_widget.dart`·`practice/.../youtube/`(미디어), `bottom_sheet_handle.dart`(드래그 pill), `coach_mark_overlay.dart`(오버레이 cue).
 
@@ -40,7 +43,7 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | billing | 10 | `BorderRadius.circular(AppSpacing.radiusMedium)` — §1.3.1 명시 금지 (subscription_status_card·lifetime_promo·free_limit_sheet) |
 | schedule | 9 | `teacher_vacation_mode_screen.dart`, `cancel_lesson_bottom_sheet.dart` |
 | practice | 7 | (youtube 미디어 제외 후 잔여) |
-| inbox | 7 | `BorderRadius.circular(8/4)` 생 매직넘버 (academy_inquiry_*) |
+| ~~inbox~~ | ~~7~~ | **정비 완료** (본 커밋) — 배지 borderRadius 제거 + 입력 border `BorderRadius.zero` |
 | subscription | 5 | makeup_credit / payment_pending |
 | lessons | 4 | (youtube 제외 후 잔여) |
 | onboarding/gamification/auth/academy | 3 each | — |
@@ -62,11 +65,11 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 
 `notebook_design_contract_test.dart` 에 **토큰 게이트 3종 추가** (baseline allowlist 패턴 — 현재 위반을 고정하고 신규 위반만 차단, allowlist 를 점진 축소):
 
-1. `BorderRadius.circular` 금지 (정당 예외 5 + 정비 대기 allowlist)
-2. `BoxShadow` 금지 (미디어/오버레이 예외 allowlist)
-3. (선택) signature 영역 raw `fontSize:` 금지
+1. `BorderRadius.circular` 금지 (영구예외 4 + 정비 baseline 41) — **완료 (본 커밋)**. test: "BorderRadius.zero — 각진 원칙"
+2. `BoxShadow` 금지 (미디어/오버레이 예외 allowlist) — 대기
+3. (선택) signature 영역 raw `fontSize:` 금지 — 대기
 
-> 패턴: 기존 `allowedFiles`/`allowedPrefixes` 와 동일. 정비 1건마다 allowlist 1줄 삭제 → 테스트가 회귀 방지.
+> 패턴: 기존 `allowedFiles`/`allowedPrefixes` 와 동일. 정비 1건마다 baseline set 에서 경로 1줄 삭제 → stale 검사가 누락 방지, unexpected 검사가 신규 도입 방지 (양방향 자기 축소).
 
 ## 7. 공통 UI 추출 — NotebookBanner (중복 12종)
 

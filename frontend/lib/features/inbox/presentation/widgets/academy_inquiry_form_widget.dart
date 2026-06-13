@@ -99,9 +99,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
         children: [
           Text(
             AppStrings.inquiryTabAsk,
-            style: AppTypography.headingSmall.copyWith(
-              color: AppColors.ink,
-            ),
+            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
           ),
           SizedBox(height: AppSpacing.space3),
           // Role selection
@@ -141,9 +139,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             decoration: InputDecoration(
               labelText: AppStrings.inquiryFormNameLabel,
               hintText: AppStrings.inquiryFormNameHint,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.zero),
               contentPadding: EdgeInsets.all(AppSpacing.space3),
             ),
             validator: (value) {
@@ -160,9 +156,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             decoration: InputDecoration(
               labelText: AppStrings.inquiryFormPhoneLabel,
               hintText: AppStrings.inquiryFormPhoneHint,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.zero),
               contentPadding: EdgeInsets.all(AppSpacing.space3),
             ),
             keyboardType: TextInputType.phone,
@@ -180,9 +174,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             decoration: InputDecoration(
               labelText: AppStrings.inquiryFormMessageLabel,
               hintText: AppStrings.inquiryFormMessageHint,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.zero),
               contentPadding: EdgeInsets.all(AppSpacing.space3),
             ),
             maxLines: 5,
@@ -203,19 +195,18 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submitForm,
-              child:
-                  _isSubmitting
-                      ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.paper,
-                          ),
+              child: _isSubmitting
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.paper,
                         ),
-                      )
-                      : Text(AppStrings.inquiryFormSubmit),
+                      ),
+                    )
+                  : Text(AppStrings.inquiryFormSubmit),
             ),
           ),
         ],

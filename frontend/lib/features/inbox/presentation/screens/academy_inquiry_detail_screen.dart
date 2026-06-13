@@ -124,9 +124,7 @@ class _AcademyInquiryDetailScreenState
                   controller: _replyController,
                   decoration: InputDecoration(
                     hintText: AppStrings.inquiryReplyPlaceholder,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.zero),
                     contentPadding: EdgeInsets.all(AppSpacing.space3),
                   ),
                   maxLines: 3,
@@ -138,14 +136,13 @@ class _AcademyInquiryDetailScreenState
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _isReplying ? null : _submitReply,
-                    child:
-                        _isReplying
-                            ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                            : Text(AppStrings.inquiryReplySend),
+                    child: _isReplying
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(AppStrings.inquiryReplySend),
                   ),
                 ),
               ],
@@ -179,7 +176,6 @@ class _AcademyInquiryDetailScreenState
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     inquiry.senderRole == InquirySenderRole.student
