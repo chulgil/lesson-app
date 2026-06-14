@@ -46,9 +46,7 @@ class QuickRecordButton extends StatelessWidget {
               horizontal: AppSpacing.space5,
               vertical: AppSpacing.space2,
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
+            shape: const RoundedRectangleBorder(),
           ),
         ),
       ),

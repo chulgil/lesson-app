@@ -40,10 +40,9 @@ class RestRecommendationToast extends StatelessWidget {
     return Container(
       key: const ValueKey('rest_recommendation_toast'),
       padding: EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.space2),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: AppColors.inkQuaternary,
             blurRadius: 12,

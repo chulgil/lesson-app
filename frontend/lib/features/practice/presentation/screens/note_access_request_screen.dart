@@ -32,20 +32,18 @@ class _NoteAccessRequestScreenState
         .watch(noteAccessRequestProvider(widget.requestId))
         .when(
           data: (request) => _buildContent(context, request),
-          loading:
-              () => const NotebookScreenScaffold(
-                appBar: NotebookDetailAppBar(
-                  title: AppStrings.noteAccessRequestTitle,
-                ),
-                body: Center(child: CircularProgressIndicator()),
-              ),
-          error:
-              (error, stackTrace) => NotebookScreenScaffold(
-                appBar: const NotebookDetailAppBar(
-                  title: AppStrings.noteAccessRequestTitle,
-                ),
-                body: Center(child: Text('Error: $error')),
-              ),
+          loading: () => const NotebookScreenScaffold(
+            appBar: NotebookDetailAppBar(
+              title: AppStrings.noteAccessRequestTitle,
+            ),
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stackTrace) => NotebookScreenScaffold(
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.noteAccessRequestTitle,
+            ),
+            body: Center(child: Text('Error: $error')),
+          ),
         );
   }
 
@@ -153,14 +151,11 @@ class _NoteAccessRequestScreenState
                   onPressed: _isProcessing ? null : () => _consent(context),
                   child: Text(
                     AppStrings.consentButton,
-                    style:
-                        _isProcessing
-                            ? AppTypography.button.copyWith(
-                              color: AppColors.inkTertiary,
-                            )
-                            : AppTypography.button.copyWith(
-                              color: AppColors.paper,
-                            ),
+                    style: _isProcessing
+                        ? AppTypography.button.copyWith(
+                            color: AppColors.inkTertiary,
+                          )
+                        : AppTypography.button.copyWith(color: AppColors.paper),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space3),
@@ -168,12 +163,11 @@ class _NoteAccessRequestScreenState
                   onPressed: _isProcessing ? null : () => _reject(context),
                   child: Text(
                     AppStrings.rejectButton,
-                    style:
-                        _isProcessing
-                            ? AppTypography.button.copyWith(
-                              color: AppColors.inkTertiary,
-                            )
-                            : AppTypography.button,
+                    style: _isProcessing
+                        ? AppTypography.button.copyWith(
+                            color: AppColors.inkTertiary,
+                          )
+                        : AppTypography.button,
                   ),
                 ),
               ],
@@ -211,10 +205,7 @@ class _NoteAccessRequestScreenState
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: badgeColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: BoxDecoration(color: badgeColor),
       child: Text(
         statusText,
         style: AppTypography.caption.copyWith(color: textColor),

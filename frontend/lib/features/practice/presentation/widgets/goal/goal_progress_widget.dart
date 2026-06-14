@@ -346,7 +346,7 @@ class _GoalMetricBar extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space1),
         ClipRRect(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          borderRadius: BorderRadius.zero,
           child: Stack(
             children: [
               Container(height: 6, color: AppColors.inkQuaternary),

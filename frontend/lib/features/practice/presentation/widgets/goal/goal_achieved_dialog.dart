@@ -90,9 +90,7 @@ class GoalAchievedDialog extends StatelessWidget {
                   backgroundColor: AppColors.paperAccent,
                   foregroundColor: AppColors.paper,
                   minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
+                  shape: const RoundedRectangleBorder(),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text(AppStrings.goalAchievedConfirm),

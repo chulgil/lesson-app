@@ -53,10 +53,9 @@ class _NoteAccessActiveBannerState
 
   Widget _buildBanner(BuildContext context, NoteAccessRequest access) {
     final daysRemaining = access.remainingDays;
-    final descriptionText =
-        daysRemaining == 0
-            ? AppStrings.noteAccessActiveBannerLastDay
-            : AppStrings.noteAccessActiveBannerDays(daysRemaining);
+    final descriptionText = daysRemaining == 0
+        ? AppStrings.noteAccessActiveBannerLastDay
+        : AppStrings.noteAccessActiveBannerDays(daysRemaining);
 
     return Container(
       margin: const EdgeInsets.symmetric(
@@ -64,10 +63,7 @@ class _NoteAccessActiveBannerState
         vertical: AppSpacing.space2,
       ),
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: AppColors.bubbleSuccessBackground,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
+      decoration: const BoxDecoration(color: AppColors.bubbleSuccessBackground),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -101,24 +97,23 @@ class _NoteAccessActiveBannerState
               SizedBox(
                 height: AppSpacing.buttonHeightSmall,
                 child: OutlinedButton(
-                  onPressed:
-                      _isRevoking ? null : () => _revoke(context, access),
+                  onPressed: _isRevoking
+                      ? null
+                      : () => _revoke(context, access),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
                     side: BorderSide(
-                      color:
-                          _isRevoking
-                              ? Colors.grey[400]!
-                              : AppColors.bubbleSuccessText,
+                      color: _isRevoking
+                          ? Colors.grey[400]!
+                          : AppColors.bubbleSuccessText,
                     ),
                   ),
                   child: Text(
                     AppStrings.revokeButton,
                     style: AppTypography.button.copyWith(
-                      color:
-                          _isRevoking
-                              ? Colors.grey[400]
-                              : AppColors.bubbleSuccessText,
+                      color: _isRevoking
+                          ? Colors.grey[400]
+                          : AppColors.bubbleSuccessText,
                     ),
                   ),
                 ),
