@@ -12,11 +12,10 @@ import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 Future<void> showFirstAvailabilityCelebrationSheet(BuildContext context) {
   return showNotebookModalBottomSheet<void>(
     context: context,
-    builder:
-        (sheetContext) => const PopScope(
-          canPop: false,
-          child: FirstAvailabilityCelebrationSheet(),
-        ),
+    builder: (sheetContext) => const PopScope(
+      canPop: false,
+      child: FirstAvailabilityCelebrationSheet(),
+    ),
   );
 }
 
@@ -45,7 +44,7 @@ class FirstAvailabilityCelebrationSheet extends StatelessWidget {
             Text(
               AppStrings.firstAvailabilityCelebrationDescription,
               style: NotebookTypography.handMedium.copyWith(
-color: AppColors.inkSecondary,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -63,9 +62,7 @@ color: AppColors.inkSecondary,
               onPressed: () => Navigator.of(context).pop(),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(0, AppSpacing.buttonHeight),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
+                shape: const RoundedRectangleBorder(),
               ),
               child: const Text(AppStrings.firstAvailabilityCelebrationAction),
             ),

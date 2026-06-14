@@ -104,11 +104,7 @@ class _QuestUnlockCelebrationSheetState
                   onPressed: () => Navigator.of(context).pop(),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(0, AppSpacing.buttonHeight),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusMedium,
-                      ),
-                    ),
+                    shape: const RoundedRectangleBorder(),
                   ),
                   child: const Text(AppStrings.questUnlockCelebrationAction),
                 ),

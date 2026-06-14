@@ -891,9 +891,6 @@ void main() {
       'lib/features/gamification/presentation/widgets/year_heatmap_grid.dart',
       'lib/features/home/presentation/widgets/quest_board_card.dart',
       'lib/features/notifications/presentation/widgets/context_switch_toast.dart',
-      'lib/features/onboarding/presentation/widgets/first_availability_celebration_sheet.dart',
-      'lib/features/onboarding/presentation/widgets/quest_unlock_celebration_sheet.dart',
-      'lib/features/onboarding/presentation/widgets/student_tutorial/recording_step.dart',
     };
 
     final violators = <String>{};

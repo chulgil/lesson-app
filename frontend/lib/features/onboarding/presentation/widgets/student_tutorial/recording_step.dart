@@ -101,15 +101,13 @@ class _RecordingStepState extends State<RecordingStep> {
                       width: 96,
                       height: 96,
                       decoration: BoxDecoration(
-                        color:
-                            isRecording
-                                ? AppColors.paperAccent
-                                : AppColors.paper,
+                        color: isRecording
+                            ? AppColors.paperAccent
+                            : AppColors.paper,
                         border: Border.all(
-                          color:
-                              isRecording
-                                  ? AppColors.paperAccent
-                                  : AppColors.inkQuaternary,
+                          color: isRecording
+                              ? AppColors.paperAccent
+                              : AppColors.inkQuaternary,
                           width: 2.0,
                         ),
                         borderRadius: BorderRadius.zero,
@@ -117,10 +115,9 @@ class _RecordingStepState extends State<RecordingStep> {
                       child: Icon(
                         Icons.mic_rounded,
                         size: 48,
-                        color:
-                            isRecording
-                                ? AppColors.paper
-                                : AppColors.inkTertiary,
+                        color: isRecording
+                            ? AppColors.paper
+                            : AppColors.inkTertiary,
                       ),
                     ),
                   ),
@@ -176,7 +173,6 @@ class _RecordingStepState extends State<RecordingStep> {
                 decoration: BoxDecoration(
                   color: AppColors.paperAccentSoft,
                   border: Border.all(color: AppColors.paperAccent, width: 1.5),
-                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Row(
                   children: [
