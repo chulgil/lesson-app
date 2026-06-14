@@ -917,4 +917,50 @@ void main() {
           'baseline 정비 완료 파일은 목록에서 삭제 — token_drift_remediation.md §4 와 동기화.',
     );
   });
+
+  test('production UI keeps flat ink — no BoxShadow (§7.115 / §1.3)', () {
+    // 영구 예외: 외부 미디어(유튜브 마커) · 오버레이 elevation cue · 바텀 nav 중앙 FAB.
+    const permanentExceptionMarkers = [
+      'youtube',
+      'coach_mark_overlay',
+      'practice_center_button',
+    ];
+
+    // 정비 baseline — docs/specs/design/notebook/token_drift_remediation.md §5.
+    // 한 파일을 평면(그림자 제거)으로 정비할 때마다 이 목록에서 삭제한다 (자기 축소 게이트).
+    final baselineToFix = <String>{};
+
+    final violators = <String>{};
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => !file.path.endsWith('.g.dart'))) {
+      final normalizedPath = file.path.replaceAll('\\', '/');
+      if (permanentExceptionMarkers.any(normalizedPath.contains)) continue;
+      final hasBoxShadow = file.readAsLinesSync().any(
+        (line) =>
+            line.contains('BoxShadow') && !line.trimLeft().startsWith('//'),
+      );
+      if (hasBoxShadow) violators.add(normalizedPath);
+    }
+
+    final unexpected = violators.difference(baselineToFix);
+    expect(
+      unexpected,
+      isEmpty,
+      reason:
+          '신규 BoxShadow 도입 금지 (§7.115 평면 잉크 — 종이는 떠있는 material 이 아님). '
+          'boxShadow 제거. 미디어/오버레이/nav 예외는 permanentExceptionMarkers 에 등록.',
+    );
+
+    final stale = baselineToFix.difference(violators);
+    expect(
+      stale,
+      isEmpty,
+      reason:
+          'baseline 정비 완료 파일은 목록에서 삭제 — token_drift_remediation.md §5 와 동기화.',
+    );
+  });
 }

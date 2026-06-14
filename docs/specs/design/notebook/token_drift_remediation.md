@@ -68,22 +68,24 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 
 정비 규칙: `BorderRadius.circular(...)` → `BorderRadius.zero`(=각진) 또는 decoration 에서 borderRadius 제거. §1.3.1.
 
-## 5. 잔여 BoxShadow 인벤토리 (5건)
+## 5. BoxShadow 인벤토리 (drift 0 — 정비 완료, 예외 4)
+
+> **게이트 활성 (2026-06-14, baseline 0)**: `notebook_design_contract_test.dart` "flat ink — no BoxShadow" 테스트가 BoxShadow 를 금지하고 4 예외(permanentExceptionMarkers: `youtube`·`coach_mark_overlay`·`practice_center_button`)만 허용. **신규 BoxShadow 도입은 어디서든 즉시 FAIL**.
 
 | 파일 | 판정 |
 |------|------|
-| `lessons/.../youtube_player_widget.dart` | 미디어 — 예외 후보 |
-| `practice/.../youtube/loop_timeline.dart` | 미디어 — 예외 후보 |
-| `practice/.../rest_recommendation_toast.dart` | **drift** — 종이 평면 잉크 위반 |
+| ~~`practice/.../rest_recommendation_toast.dart`~~ | **정비 완료** (본 커밋) — boxShadow 제거 → 평면 + 잉크 테두리(`Border.all(ink)`) 로 변별성 유지 |
+| `lessons/.../youtube_player_widget.dart` | 예외 — 외부 미디어(유튜브 루프 마커) |
+| `practice/.../youtube/loop_timeline.dart` | 예외 — 외부 미디어(유튜브 루프 타임라인) |
 | `core/widgets/practice_center_button.dart` | 예외 — 바텀 nav 중앙 FAB(시스템 affordance), `// ignore: notebook-boxshadow` 기보유 |
-| `core/widgets/coach_mark/coach_mark_overlay.dart` | 오버레이 elevation cue — 예외 후보 |
+| `core/widgets/coach_mark/coach_mark_overlay.dart` | 예외 — 오버레이 elevation cue |
 
 ## 6. 멱등성 게이트 확장 (근본 원인 차단)
 
 `notebook_design_contract_test.dart` 에 **토큰 게이트 3종 추가** (baseline allowlist 패턴 — 현재 위반을 고정하고 신규 위반만 차단, allowlist 를 점진 축소):
 
 1. `BorderRadius.circular` 금지 (영구예외 6 + 정비 baseline 41→**0**) — **전 도메인 완료**. test: "BorderRadius.zero — 각진 원칙" (baseline 빈 set, 신규 circular 즉시 FAIL)
-2. `BoxShadow` 금지 (미디어/오버레이 예외 allowlist) — 대기
+2. `BoxShadow` 금지 (영구예외 4: 미디어 2·오버레이 1·nav FAB 1) — **완료 (본 커밋)**. test: "flat ink — no BoxShadow" (baseline 빈 set, drift `rest_recommendation_toast` 정비 후 신규 BoxShadow 즉시 FAIL)
 3. (선택) signature 영역 raw `fontSize:` 금지 — 대기
 
 > 패턴: 기존 `allowedFiles`/`allowedPrefixes` 와 동일. 정비 1건마다 baseline set 에서 경로 1줄 삭제 → stale 검사가 누락 방지, unexpected 검사가 신규 도입 방지 (양방향 자기 축소).
