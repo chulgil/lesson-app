@@ -90,15 +90,17 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 
 > 패턴: 기존 `allowedFiles`/`allowedPrefixes` 와 동일. 정비 1건마다 baseline set 에서 경로 1줄 삭제 → stale 검사가 누락 방지, unexpected 검사가 신규 도입 방지 (양방향 자기 축소).
 
-## 7. 공통 UI 추출 — NotebookBanner (중복 12종)
+## 7. 공통 UI 추출 — NotebookBanner
 
-배너 12개(1,698 LOC)가 3개 원형으로 분산:
+> **실측 상태 (2026-06-14)**: `NotebookBanner` 공통 위젯 추출 완료(`core/widgets/notebook/notebook_banner.dart`). 인라인 마지널리아 스트립(`Border(left: BorderSide)`) 패턴은 현재 **정본 위젯에만** 존재 — `time_context_banner` 가 채택해 이전 완료. 나머지 배너는 ② NotebookCard 행 또는 인라인 아이콘+accent 등 **별개 패턴**이라 "12종 일괄 마이그레이션" 은 과장이었음. 잔여는 선택적 refit(③ lifetime_promo, availability_vacation_banner)뿐.
+
+배너 12개가 3개 원형으로 분산:
 
 | 원형 | 대표 | 패턴 | 정비 |
 |------|------|------|------|
-| ① 마지널리아 스트립 | `time_context_banner`(SSOT 레퍼런스) | 좌측 3px accent bar + leading icon + Gaegu 메시지 | **공통 `NotebookBanner` 추출 대상** |
+| ① 마지널리아 스트립 | `time_context_banner`(SSOT 레퍼런스) | 좌측 3px accent bar + leading icon + Gaegu 메시지 | **추출 완료** — `NotebookBanner` 채택 |
 | ② NotebookCard 행 | `app_update_banner` | NotebookCard + 아이콘 뱃지 + 제목/부제 + action | 이미 모범 — 유지 |
-| ③ 채워진 프로모 카드 | `lifetime_promo_banner` | `color: paperAccent` fill + eyebrow + CTA + dismiss | **drift** — ①/② 로 refit |
+| ③ 채워진 프로모 카드 | `lifetime_promo_banner` | `color: paperAccent` fill + eyebrow + CTA + dismiss | 선택적 refit — ①/② 후보(설계 판단) |
 
 `NotebookBanner` 설계 (① 원형, 시각 셸만 — 메시지 로직은 도메인 잔류):
 
@@ -112,16 +114,21 @@ NotebookBanner({
 })
 ```
 
-대상(① 원형): `time_context_banner`, `availability_vacation_banner` + ③ refit 후보. `*_test.dart` smoke 동반 필수(HARD-GATE).
+refit 시 대상: `availability_vacation_banner`(인라인 아이콘+accent — ① 패턴 아님, 마이그레이션 시 시각 변경) + ③ `lifetime_promo`. `*_test.dart` smoke 동반 필수(HARD-GATE).
 
-## 8. 실행 순서 (후속 세션)
+## 8. 실행 순서 — 진행 상태 (2026-06-14)
 
-1. 토큰 게이트 3종 추가 (§6) — baseline 으로 red 회피, 신규 drift 차단
-2. `NotebookBanner` 추출 + 스펙(`docs/_components/notebook_banner.md`) + smoke (§7)
-3. 도메인별 circular sweep — billing·inbox(생 매직넘버) 우선, allowlist 동시 축소 (§4)
-4. BoxShadow 2건(core 우선) 정비 (§5)
-5. subscription badge 2종 통합 (`subscription_badge` + `student_subscription_badge`)
-6. 완료 시 README §1.3.1·§5.3·§7 수치 갱신 + 본 문서 archived
+| # | 항목 | 상태 |
+|---|------|------|
+| 1 | 토큰 게이트 (§6): circular · BoxShadow | **완료** (2종). fontSize 게이트(③)는 선택, 미착수 |
+| 2 | `NotebookBanner` 추출 + smoke (§7) | **완료** — `time_context_banner` 채택 |
+| 3 | 도메인별 circular sweep (§4) | **완료** — 14도메인 baseline 0 |
+| 4 | BoxShadow 정비 (§5) | **완료** — drift 0, 예외 4 |
+| 5 | subscription badge 통합 | **잔여** — `subscription_badge`(subscription) ↔ `StudentClassBadge`/`StudentSubscriptionMiniBadge`(students) 는 **독립 위젯**(별개 surface). lesson_card·students_tab·provider 다중 호출처 → 설계 판단 + smoke 필요 |
+| 6 | ③ lifetime_promo refit · availability_vacation_banner | **잔여 (선택)** — 시각 디자인 변경, 사용자 판단 필요 |
+| 7 | 완료 시 README 수치 갱신 + 본 문서 archived | 5·6 완료 후 |
+
+> 핵심: **근본 원인(토큰 게이트 부재)은 1~4 로 해소됨**. 잔여 5·6 은 token drift 가 아니라 위젯 dedup/시각 리팩토링이라 게이트 자기축소와 무관. fresh 세션 + 설계 입력 권장.
 
 ## 9. 참조
 
