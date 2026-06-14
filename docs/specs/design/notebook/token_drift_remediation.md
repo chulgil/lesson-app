@@ -124,11 +124,11 @@ refit 시 대상: `availability_vacation_banner`(인라인 아이콘+accent — 
 | 2 | `NotebookBanner` 추출 + smoke (§7) | **완료** — `time_context_banner` 채택 |
 | 3 | 도메인별 circular sweep (§4) | **완료** — 14도메인 baseline 0 |
 | 4 | BoxShadow 정비 (§5) | **완료** — drift 0, 예외 4 |
-| 5 | subscription badge 통합 | **잔여** — `subscription_badge`(subscription) ↔ `StudentClassBadge`/`StudentSubscriptionMiniBadge`(students) 는 **독립 위젯**(별개 surface). lesson_card·students_tab·provider 다중 호출처 → 설계 판단 + smoke 필요 |
-| 6 | ③ lifetime_promo refit · availability_vacation_banner | **잔여 (선택)** — 시각 디자인 변경, 사용자 판단 필요 |
-| 7 | 완료 시 README 수치 갱신 + 본 문서 archived | 5·6 완료 후 |
+| 5 | subscription badge 통합 | **재진단 완료 (2026-06-14)** — 실측 결과 "다중 호출처 독립 위젯"이 아니라 **cross-view 일관성 결함 + 죽은 코드**였음. `SubscriptionBadge`(홈 1곳)와 `StudentSubscriptionMiniBadge`(학생탭 1곳)가 같은 수강권을 모순된 숫자·색·형태로 표시. `StudentClassBadge`·`SubscriptionProgressMini`·`SubscriptionSummaryText`는 0 production refs(죽은/미연결). → **4슬라이스로 분해**, S1 설계 확정: [subscription_badge_unification.md](./subscription_badge_unification.md) |
+| 6 | lifetime_promo refit · vacation banner | **S3·S4로 분리** — [subscription_badge_unification.md](./subscription_badge_unification.md) §9 후속 이슈. S2(AcademyOwnershipBadge #391 wiring) 포함 |
+| 7 | 완료 시 README 수치 갱신 + 본 문서 archived | S1~S4 완료 후 |
 
-> 핵심: **근본 원인(토큰 게이트 부재)은 1~4 로 해소됨**. 잔여 5·6 은 token drift 가 아니라 위젯 dedup/시각 리팩토링이라 게이트 자기축소와 무관. fresh 세션 + 설계 입력 권장.
+> 핵심: **근본 원인(토큰 게이트 부재)은 1~4 로 해소됨**. 잔여 5·6 은 token drift 가 아니라 위젯 dedup/시각 리팩토링이라 게이트 자기축소와 무관. 2026-06-14 재진단으로 S1(배지 통일)·S2(학원 배지 wiring)·S3(lifetime refit)·S4(vacation 정합) 4슬라이스로 분해 — S1 설계 확정, S2~S4는 후속 이슈.
 
 ## 9. 참조
 
