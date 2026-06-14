@@ -56,7 +56,6 @@ class AcademyInviteExpiredScreen extends StatelessWidget {
                     padding: EdgeInsets.all(AppSpacing.space2),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.red),
-                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       errorMessage!,

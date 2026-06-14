@@ -183,10 +183,7 @@ class _AcademyInviteAcceptScreenState
           SizedBox(height: AppSpacing.space3),
           Container(
             padding: EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(border: Border.all()),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -202,10 +199,7 @@ class _AcademyInviteAcceptScreenState
           SizedBox(height: AppSpacing.space4),
           Container(
             padding: EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(border: Border.all()),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

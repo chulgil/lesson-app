@@ -884,8 +884,6 @@ void main() {
       'lib/core/widgets/notebook/like_stamp.dart',
       'lib/core/widgets/practice_center_button.dart',
       'lib/features/academy/presentation/screens/academy_activity_timeline_screen.dart',
-      'lib/features/auth/presentation/screens/academy_invite_accept_screen.dart',
-      'lib/features/auth/presentation/screens/academy_invite_expired_screen.dart',
       'lib/features/home/presentation/widgets/quest_board_card.dart',
       'lib/features/notifications/presentation/widgets/context_switch_toast.dart',
     };
