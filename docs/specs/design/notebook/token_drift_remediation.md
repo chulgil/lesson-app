@@ -31,11 +31,12 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | **billing sweep** | `fc4a428a` | billing 4파일 10건 → 각진 (배지 borderRadius 제거 + 버튼 `const RoundedRectangleBorder()`). baseline 41→37. billing 위젯 테스트 19/19 |
 | **profile sweep** | `34643ccb` | profile 7파일 10건 → 각진 (BoxDecoration borderRadius 제거 + 인라인 드래그 핸들 → 공유 `BottomSheetHandle` + 시트 top 각진). baseline 37→30. profile 테스트 163/163 |
 | **schedule sweep** | `a0a03dcb` | schedule 4파일 9건 → 각진 (BoxDecoration/InkWell borderRadius 제거 + 인라인 드래그 핸들 → 공유 `BottomSheetHandle`). baseline 30→26. 게이트 28/28, schedule 테스트 362/362 |
-| **practice sweep** | (본 커밋) | practice 6파일 6건 → 각진 (버튼 `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 3 + 진행바 ClipRRect `BorderRadius.zero` 1). baseline 26→20. 게이트 28/28, practice 테스트 336/336 |
+| **practice sweep** | `707e2dad` | practice 6파일 6건 → 각진 (버튼 `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 3 + 진행바 ClipRRect `BorderRadius.zero` 1). baseline 26→20. 게이트 28/28, practice 테스트 336/336 |
+| **subscription sweep** | (본 커밋) | subscription 4파일 5건 → 각진 (BoxDecoration borderRadius 제거 4 + InkWell borderRadius 제거 1). baseline 20→16. 게이트 28/28, subscription 테스트 165/165 |
 
-## 4. 잔여 BorderRadius.circular 인벤토리 (baseline 20, inbox·billing·profile·schedule·practice 정비 완료)
+## 4. 잔여 BorderRadius.circular 인벤토리 (baseline 16, inbox·billing·profile·schedule·practice·subscription 정비 완료)
 
-> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 20 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
+> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 16 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
 >
 > 잔여 ③ refit: `lifetime_promo_banner` 는 각진 처리됐으나 `color: paperAccent` fill 배경은 유지 — ① 마지널리아 스트립/② NotebookCard 로 refit 은 별도 슬라이스.
 
@@ -50,7 +51,7 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | ~~schedule~~ | ~~9~~ | **정비 완료** (본 커밋) — 4파일 BoxDecoration/InkWell borderRadius 제거 + `request_detail` 인라인 드래그 핸들 → 공유 `BottomSheetHandle`. `request_history_chat` 채팅버블 `Radius.circular` 4건은 별도 메타포 — 스코프 외 |
 | ~~practice~~ | ~~6~~ | **정비 완료** (본 커밋) — 버튼 shape `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 3 + 진행바 ClipRRect `BorderRadius.zero` 1. `tuner_cat_widgets` 캐릭터 곡률은 영구예외 |
 | ~~inbox~~ | ~~7~~ | **정비 완료** (본 커밋) — 배지 borderRadius 제거 + 입력 border `BorderRadius.zero` |
-| subscription | 5 | makeup_credit / payment_pending |
+| ~~subscription~~ | ~~5~~ | **정비 완료** (본 커밋) — 4파일 BoxDecoration borderRadius 제거 4 + `makeup_credit_use_selector` InkWell borderRadius 제거 1 |
 | lessons | 4 | (youtube 제외 후 잔여) |
 | onboarding/gamification/auth/academy | 3 each | — |
 | notifications/home | 1 each | — |

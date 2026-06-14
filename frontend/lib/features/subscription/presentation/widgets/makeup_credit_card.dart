@@ -29,7 +29,6 @@ class MakeupCreditCard extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.paperDark,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
@@ -37,7 +36,9 @@ class MakeupCreditCard extends ConsumerWidget {
             children: [
               Text(
                 AppStrings.makeupCreditTitle,
-                style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
+                style: AppTypography.headingSmall.copyWith(
+                  color: AppColors.ink,
+                ),
               ),
               const SizedBox(height: AppSpacing.space2),
               Text(

@@ -62,8 +62,9 @@ class _MakeupCreditUseSelectorState extends State<MakeupCreditUseSelector> {
     // notify the parent once after this frame so its state stays valid.
     final isStale =
         !hasCredit && widget.selected == BookingPaymentSource.makeupCredit;
-    final effectiveSelected =
-        isStale ? BookingPaymentSource.regularSubscription : widget.selected;
+    final effectiveSelected = isStale
+        ? BookingPaymentSource.regularSubscription
+        : widget.selected;
     if (isStale && !_notifiedStale) {
       _notifiedStale = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -129,12 +130,10 @@ class _Option extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,

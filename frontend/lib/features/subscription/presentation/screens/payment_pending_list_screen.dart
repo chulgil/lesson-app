@@ -32,9 +32,8 @@ class PaymentPendingListScreen extends ConsumerWidget {
           return _Sections(items: items);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) =>
-                const Center(child: Text(AppStrings.paymentPendingEmpty)),
+        error: (_, __) =>
+            const Center(child: Text(AppStrings.paymentPendingEmpty)),
       ),
     );
   }
@@ -132,7 +131,6 @@ class _Row extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
@@ -155,12 +153,11 @@ class _Row extends ConsumerWidget {
                             ? '방금'
                             : 'D+${item.daysSinceSent}',
                         style: NotebookTypography.eyebrow.copyWith(
-                          color:
-                              item.isImminent
-                                  ? AppColors.paperAccent
-                                  : item.isUrgent
-                                  ? AppColors.paperTrial
-                                  : AppColors.inkTertiary,
+                          color: item.isImminent
+                              ? AppColors.paperAccent
+                              : item.isUrgent
+                              ? AppColors.paperTrial
+                              : AppColors.inkTertiary,
                         ),
                       ),
                     ],
@@ -199,10 +196,9 @@ class _Row extends ConsumerWidget {
     } catch (e) {
       if (!context.mounted) return;
       final message = e.toString();
-      final friendly =
-          message.contains('cooldown') || message.contains('30')
-              ? AppStrings.paymentPendingResendCooldown
-              : AppStrings.paymentPendingResendFailed;
+      final friendly = message.contains('cooldown') || message.contains('30')
+          ? AppStrings.paymentPendingResendCooldown
+          : AppStrings.paymentPendingResendFailed;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(friendly)));
@@ -212,16 +208,15 @@ class _Row extends ConsumerWidget {
   Future<void> _confirmRevoke(BuildContext context, WidgetRef ref) async {
     final result = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => NotebookAlertDialog(
-            title: AppStrings.paymentPendingRevokeConfirmTitle,
-            content: const Text(AppStrings.paymentPendingRevokeConfirmBody),
-            confirmLabel: AppStrings.paymentPendingRevokeLabel,
-            cancelLabel: AppStrings.cancel,
-            isDestructive: true,
-            onConfirm: () => Navigator.pop(ctx, true),
-            onCancel: () => Navigator.pop(ctx, false),
-          ),
+      builder: (ctx) => NotebookAlertDialog(
+        title: AppStrings.paymentPendingRevokeConfirmTitle,
+        content: const Text(AppStrings.paymentPendingRevokeConfirmBody),
+        confirmLabel: AppStrings.paymentPendingRevokeLabel,
+        cancelLabel: AppStrings.cancel,
+        isDestructive: true,
+        onConfirm: () => Navigator.pop(ctx, true),
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
     );
     if (result != true || !context.mounted) return;
     try {

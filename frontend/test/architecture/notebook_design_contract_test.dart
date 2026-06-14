@@ -896,10 +896,6 @@ void main() {
       'lib/features/onboarding/presentation/widgets/first_availability_celebration_sheet.dart',
       'lib/features/onboarding/presentation/widgets/quest_unlock_celebration_sheet.dart',
       'lib/features/onboarding/presentation/widgets/student_tutorial/recording_step.dart',
-      'lib/features/subscription/presentation/screens/payment_pending_list_screen.dart',
-      'lib/features/subscription/presentation/widgets/makeup_credit_card.dart',
-      'lib/features/subscription/presentation/widgets/makeup_credit_use_selector.dart',
-      'lib/features/subscription/presentation/widgets/payment_pending_card.dart',
     };
 
     final violators = <String>{};
