@@ -54,12 +54,7 @@ class _FeedbackTemplatePickerSheetState
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.paper,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusLarge),
-            ),
-          ),
+          decoration: const BoxDecoration(color: AppColors.paper),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -99,16 +94,15 @@ class _FeedbackTemplatePickerSheetState
           hintText: AppStrings.feedbackTemplatePickerSearchHint,
           isDense: true,
           border: const OutlineInputBorder(),
-          suffixIcon:
-              _query.isEmpty
-                  ? null
-                  : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => _query = '');
-                    },
-                  ),
+          suffixIcon: _query.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() => _query = '');
+                  },
+                ),
         ),
       ),
     );
@@ -153,17 +147,16 @@ class _FeedbackTemplatePickerSheetState
     final asyncResults = ref.watch(feedbackTemplateSearchProvider(_query));
     return asyncResults.when(
       data: (list) {
-        final filtered =
-            _category == null
-                ? list
-                : list.where((t) => t.category == _category).toList();
+        final filtered = _category == null
+            ? list
+            : list.where((t) => t.category == _category).toList();
         if (filtered.isEmpty) return _buildEmpty();
         return ListView.separated(
           controller: scrollController,
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           itemCount: filtered.length,
-          separatorBuilder:
-              (_, __) => const SizedBox(height: AppSpacing.space2),
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppSpacing.space2),
           itemBuilder: (_, i) => _buildTemplateTile(filtered[i]),
         );
       },
@@ -173,10 +166,9 @@ class _FeedbackTemplatePickerSheetState
   }
 
   Widget _buildBrowseList(ScrollController scrollController) {
-    final allAsync =
-        _category == null
-            ? ref.watch(feedbackTemplatesProvider)
-            : ref.watch(feedbackTemplatesByCategoryProvider(_category!));
+    final allAsync = _category == null
+        ? ref.watch(feedbackTemplatesProvider)
+        : ref.watch(feedbackTemplatesByCategoryProvider(_category!));
     final frequentAsync = ref.watch(frequentFeedbackTemplatesProvider);
 
     return allAsync.when(

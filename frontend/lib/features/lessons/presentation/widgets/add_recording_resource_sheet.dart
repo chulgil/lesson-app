@@ -199,10 +199,7 @@ class _AddRecordingResourceSheetState
         _selectedFileName = file.name;
         _durationSeconds = dur;
         if (_titleController.text.isEmpty) {
-          _titleController.text = file.name.replaceAll(
-            RegExp(r'\.[^.]+$'),
-            '',
-          );
+          _titleController.text = file.name.replaceAll(RegExp(r'\.[^.]+$'), '');
         }
       });
     } catch (_) {
@@ -266,10 +263,9 @@ class _AddRecordingResourceSheetState
           .createResource(
             type: TeachingResourceType.teacherRecording,
             title: _titleController.text.trim(),
-            description:
-                _memoController.text.trim().isNotEmpty
-                    ? _memoController.text.trim()
-                    : null,
+            description: _memoController.text.trim().isNotEmpty
+                ? _memoController.text.trim()
+                : null,
             // Mock: use local path. Real upload (Phase D) replaces this.
             audioUrl: _selectedFilePath,
             audioDurationSeconds: _durationSeconds,
@@ -328,13 +324,9 @@ class _AddRecordingResourceSheetState
 
               // Source buttons (hidden while recording or file selected)
               if (!_hasAudio && !_isRecording) ...[
-                _RecordNewButton(
-                  onTap: _startRecording,
-                ),
+                _RecordNewButton(onTap: _startRecording),
                 const SizedBox(height: AppSpacing.space3),
-                _SelectFileButton(
-                  onTap: _pickFile,
-                ),
+                _SelectFileButton(onTap: _pickFile),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   AppStrings.maxFileSize,
@@ -410,17 +402,16 @@ class _AddRecordingResourceSheetState
                         AppSpacing.buttonHeight,
                       ),
                     ),
-                    child:
-                        _isSubmitting
-                            ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.paper,
-                              ),
-                            )
-                            : const Text(AppStrings.add),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.paper,
+                            ),
+                          )
+                        : const Text(AppStrings.add),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -462,9 +453,7 @@ class _RecordNewButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.ink,
           side: BorderSide(color: AppColors.inkQuaternary),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
         ),
       ),
@@ -489,9 +478,7 @@ class _SelectFileButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.ink,
           side: BorderSide(color: AppColors.inkQuaternary),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           minimumSize: const Size(double.infinity, AppSpacing.buttonHeight),
         ),
       ),
@@ -554,7 +541,6 @@ class _RecordingIndicator extends StatelessWidget {
           // Stop button
           InkWell(
             onTap: onStop,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.space1),
               child: Icon(
@@ -636,10 +622,7 @@ class _AudioPreviewRow extends StatelessWidget {
               color: AppColors.ink,
             ),
             iconSize: 24,
-            constraints: const BoxConstraints(
-              minWidth: 36,
-              minHeight: 36,
-            ),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             padding: EdgeInsets.zero,
           ),
           // Delete button
@@ -647,10 +630,7 @@ class _AudioPreviewRow extends StatelessWidget {
             onPressed: onDelete,
             icon: const Icon(Icons.close, color: AppColors.inkTertiary),
             iconSize: 20,
-            constraints: const BoxConstraints(
-              minWidth: 36,
-              minHeight: 36,
-            ),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             padding: EdgeInsets.zero,
           ),
         ],

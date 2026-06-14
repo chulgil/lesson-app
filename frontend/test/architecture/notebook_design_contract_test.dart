@@ -890,8 +890,6 @@ void main() {
       'lib/features/gamification/presentation/widgets/trophy_collection_card.dart',
       'lib/features/gamification/presentation/widgets/year_heatmap_grid.dart',
       'lib/features/home/presentation/widgets/quest_board_card.dart',
-      'lib/features/lessons/presentation/widgets/add_recording_resource_sheet.dart',
-      'lib/features/lessons/presentation/widgets/lesson_export_sheet.dart',
       'lib/features/notifications/presentation/widgets/context_switch_toast.dart',
       'lib/features/onboarding/presentation/widgets/first_availability_celebration_sheet.dart',
       'lib/features/onboarding/presentation/widgets/quest_unlock_celebration_sheet.dart',

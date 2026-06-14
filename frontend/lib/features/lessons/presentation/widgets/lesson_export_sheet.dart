@@ -56,12 +56,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: SafeArea(
         top: false,
         child: Column(
@@ -189,7 +184,7 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
           ),
           const SizedBox(height: AppSpacing.space5),
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
               value: _progress,
               minHeight: 8,
@@ -292,16 +287,15 @@ class _LessonExportSheetState extends State<LessonExportSheet> {
       initialDate: initial,
       firstDate: first,
       lastDate: last,
-      builder:
-          (context, child) => Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: AppColors.paperAccent,
-                surface: AppColors.paper,
-              ),
-            ),
-            child: child!,
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(
+            primary: AppColors.paperAccent,
+            surface: AppColors.paper,
           ),
+        ),
+        child: child!,
+      ),
     );
 
     if (picked != null) {
@@ -474,18 +468,18 @@ class _FormatCard extends StatelessWidget {
                 Icon(
                   icon,
                   size: 18,
-                  color:
-                      isSelected
-                          ? AppColors.paperAccent
-                          : AppColors.inkTertiary,
+                  color: isSelected
+                      ? AppColors.paperAccent
+                      : AppColors.inkTertiary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   label,
                   style: AppTypography.buttonSmall.copyWith(
                     color: isSelected ? AppColors.paperAccent : AppColors.ink,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                 ),
               ],
