@@ -135,25 +135,21 @@ class _HeatmapCell extends StatelessWidget {
         width: size,
         height: size,
         margin: EdgeInsets.only(right: gap),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(2),
-        ),
+        decoration: BoxDecoration(color: color),
         // L3+ inset dot 마커 (색맹 친화)
-        child:
-            level >= 3
-                ? Center(
-                  child: Container(
-                    key: ValueKey('heatmap_dot_$isoKey'),
-                    width: size * 0.25,
-                    height: size * 0.25,
-                    decoration: const BoxDecoration(
-                      color: AppColors.paper,
-                      shape: BoxShape.circle,
-                    ),
+        child: level >= 3
+            ? Center(
+                child: Container(
+                  key: ValueKey('heatmap_dot_$isoKey'),
+                  width: size * 0.25,
+                  height: size * 0.25,
+                  decoration: const BoxDecoration(
+                    color: AppColors.paper,
+                    shape: BoxShape.circle,
                   ),
-                )
-                : null,
+                ),
+              )
+            : null,
       ),
     );
   }

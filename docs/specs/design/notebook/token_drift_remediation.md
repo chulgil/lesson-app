@@ -34,11 +34,12 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | **practice sweep** | `707e2dad` | practice 6파일 6건 → 각진 (버튼 `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 3 + 진행바 ClipRRect `BorderRadius.zero` 1). baseline 26→20. 게이트 28/28, practice 테스트 336/336 |
 | **subscription sweep** | `70d61682` | subscription 4파일 5건 → 각진 (BoxDecoration borderRadius 제거 4 + InkWell borderRadius 제거 1). baseline 20→16. 게이트 28/28, subscription 테스트 165/165 |
 | **lessons sweep** | `cf9458f5` | lessons 3파일 4건 → 각진 (시트 top BoxDecoration borderRadius 제거 2 + InkWell borderRadius 제거 1 + 진행바 ClipRRect `BorderRadius.zero` 1). baseline 16→14. 게이트 28/28, lessons 테스트 57/57 |
-| **onboarding sweep** | (본 커밋) | onboarding 3파일 3건 → 각진 (버튼 shape `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 1). baseline 14→11. 게이트 28/28, onboarding 테스트 34/34 |
+| **onboarding sweep** | `c638d12f` | onboarding 3파일 3건 → 각진 (버튼 shape `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 1). baseline 14→11. 게이트 28/28, onboarding 테스트 34/34 |
+| **gamification sweep** | (본 커밋) | gamification 3파일 3건 → 각진 (BoxDecoration borderRadius 제거 3). baseline 11→8. 게이트 28/28, gamification 테스트 316/316 |
 
-## 4. 잔여 BorderRadius.circular 인벤토리 (baseline 11, inbox·billing·profile·schedule·practice·subscription·lessons·onboarding 정비 완료)
+## 4. 잔여 BorderRadius.circular 인벤토리 (baseline 8, inbox·billing·profile·schedule·practice·subscription·lessons·onboarding·gamification 정비 완료)
 
-> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 11 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
+> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 8 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
 >
 > 잔여 ③ refit: `lifetime_promo_banner` 는 각진 처리됐으나 `color: paperAccent` fill 배경은 유지 — ① 마지널리아 스트립/② NotebookCard 로 refit 은 별도 슬라이스.
 
@@ -56,7 +57,8 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | ~~subscription~~ | ~~5~~ | **정비 완료** (본 커밋) — 4파일 BoxDecoration borderRadius 제거 4 + `makeup_credit_use_selector` InkWell borderRadius 제거 1 |
 | ~~lessons~~ | ~~4~~ | **정비 완료** (본 커밋) — 3파일: 시트 top BoxDecoration borderRadius 제거 2 + `add_recording` InkWell borderRadius 제거 1 + 진행바 ClipRRect `BorderRadius.zero` 1. `feedback_template_picker` 는 `Radius.circular`(게이트 비대상)였으나 동일 각진 정비 |
 | ~~onboarding~~ | ~~3~~ | **정비 완료** (본 커밋) — 3파일: 버튼 shape `const RoundedRectangleBorder()` 2 (`first_availability`·`quest_unlock` celebration) + `recording_step` BoxDecoration borderRadius 제거 1 (raw `8.0` 매직넘버였음) |
-| gamification/auth/academy | 3 each | — |
+| ~~gamification~~ | ~~3~~ | **정비 완료** (본 커밋) — 3파일 BoxDecoration borderRadius 제거 (`spotlight_slot`·`trophy_collection_card`·`year_heatmap_grid`, year_heatmap 은 raw `2` 히트맵 셀). L3+ 색맹 마커 `BoxShape.circle` 은 접근성 cue — 스코프 외 |
+| auth/academy | 3 each | — |
 | notifications/home | 1 each | — |
 
 정비 규칙: `BorderRadius.circular(...)` → `BorderRadius.zero`(=각진) 또는 decoration 에서 borderRadius 제거. §1.3.1.

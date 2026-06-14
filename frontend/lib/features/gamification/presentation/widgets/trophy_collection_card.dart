@@ -31,16 +31,14 @@ class TrophyCollectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final count = badges.length;
     final hasOverflow = count > previewLimit;
-    final visibleBadges =
-        hasOverflow ? badges.take(previewLimit).toList() : badges;
+    final visibleBadges = hasOverflow
+        ? badges.take(previewLimit).toList()
+        : badges;
 
     return Container(
       key: const ValueKey('trophy_collection_card'),
       padding: EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.circular(AppSpacing.space2),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paper),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

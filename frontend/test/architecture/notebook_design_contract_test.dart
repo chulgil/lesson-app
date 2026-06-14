@@ -886,9 +886,6 @@ void main() {
       'lib/features/academy/presentation/screens/academy_activity_timeline_screen.dart',
       'lib/features/auth/presentation/screens/academy_invite_accept_screen.dart',
       'lib/features/auth/presentation/screens/academy_invite_expired_screen.dart',
-      'lib/features/gamification/presentation/widgets/spotlight_slot.dart',
-      'lib/features/gamification/presentation/widgets/trophy_collection_card.dart',
-      'lib/features/gamification/presentation/widgets/year_heatmap_grid.dart',
       'lib/features/home/presentation/widgets/quest_board_card.dart',
       'lib/features/notifications/presentation/widgets/context_switch_toast.dart',
     };
