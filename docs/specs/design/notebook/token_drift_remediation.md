@@ -36,15 +36,16 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | **lessons sweep** | `cf9458f5` | lessons 3파일 4건 → 각진 (시트 top BoxDecoration borderRadius 제거 2 + InkWell borderRadius 제거 1 + 진행바 ClipRRect `BorderRadius.zero` 1). baseline 16→14. 게이트 28/28, lessons 테스트 57/57 |
 | **onboarding sweep** | `c638d12f` | onboarding 3파일 3건 → 각진 (버튼 shape `const RoundedRectangleBorder()` 2 + BoxDecoration borderRadius 제거 1). baseline 14→11. 게이트 28/28, onboarding 테스트 34/34 |
 | **gamification sweep** | `7466f6ac` | gamification 3파일 3건 → 각진 (BoxDecoration borderRadius 제거 3). baseline 11→8. 게이트 28/28, gamification 테스트 316/316 |
-| **auth sweep** | (본 커밋) | auth 2파일 3건 → 각진 (BoxDecoration borderRadius 제거 3: `academy_invite_accept` 2 + `academy_invite_expired` 1). baseline 8→6. 게이트 28/28, auth 테스트 49/49 |
+| **auth sweep** | `d2b28643` | auth 2파일 3건 → 각진 (BoxDecoration borderRadius 제거 3: `academy_invite_accept` 2 + `academy_invite_expired` 1). baseline 8→6. 게이트 28/28, auth 테스트 49/49 |
+| **academy·core·home·notifications sweep (circular 완결)** | (본 커밋) | 5파일 각진 + nav FAB 1 영구예외 → **baseline 6→0 (circular sweep 전 도메인 완료)**. academy 3(외곽 카드 var+배지 2) + `address_search_field` 인라인 핸들→`BottomSheetHandle` + `like_stamp` ON 도장 각진 + `quest_board_card` 진행바 `BorderRadius.zero` + `context_switch_toast` 토스트 각진. `practice_center_button`(nav FAB)은 permanentExceptionMarkers 로 이동(원형 유지). 게이트 28/28, 위젯 테스트 63/63 |
 
-## 4. 잔여 BorderRadius.circular 인벤토리 (baseline 6, inbox·billing·profile·schedule·practice·subscription·lessons·onboarding·gamification·auth 정비 완료)
+## 4. BorderRadius.circular 인벤토리 (baseline 0 — circular sweep 전 도메인 완료, inbox·billing·profile·schedule·practice·subscription·lessons·onboarding·gamification·auth·academy·core·home·notifications)
 
-> **게이트 활성 (2026-06-13)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트가 baseline 6 파일을 고정. **신규 circular 도입은 즉시 FAIL**. 한 파일을 각진으로 정비하면 baseline set 에서 해당 경로를 삭제해야 stale 검사를 통과한다 (자기 축소).
+> **게이트 활성 (2026-06-13, baseline 0 도달)**: `notebook_design_contract_test.dart` 의 "BorderRadius.zero — 각진 원칙" 테스트의 baseline 이 **빈 set** 이 됨 → **신규 circular 도입은 어디서든 즉시 FAIL**. 영구예외(permanentExceptionMarkers)만 허용.
 >
 > 잔여 ③ refit: `lifetime_promo_banner` 는 각진 처리됐으나 `color: paperAccent` fill 배경은 유지 — ① 마지널리아 스트립/② NotebookCard 로 refit 은 별도 슬라이스.
 
-정당 예외 5건 (정비 대상 아님): `tuner_cat_widgets.dart`(캐릭터), `youtube_player_widget.dart`·`practice/.../youtube/`(미디어), `bottom_sheet_handle.dart`(드래그 pill), `coach_mark_overlay.dart`(오버레이 cue).
+정당 예외 6건 (정비 대상 아님): `tuner_cat_widgets.dart`(캐릭터), `youtube_player_widget.dart`·`practice/.../youtube/`(미디어), `bottom_sheet_handle.dart`(드래그 pill), `coach_mark_overlay.dart`(오버레이 cue), `practice_center_button.dart`(바텀 nav 중앙 FAB — 시스템 affordance, 원형 유지).
 
 도메인별 실위반 (정비 우선순위 = 사용자 노출 빈도 순):
 
@@ -59,9 +60,11 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | ~~lessons~~ | ~~4~~ | **정비 완료** (본 커밋) — 3파일: 시트 top BoxDecoration borderRadius 제거 2 + `add_recording` InkWell borderRadius 제거 1 + 진행바 ClipRRect `BorderRadius.zero` 1. `feedback_template_picker` 는 `Radius.circular`(게이트 비대상)였으나 동일 각진 정비 |
 | ~~onboarding~~ | ~~3~~ | **정비 완료** (본 커밋) — 3파일: 버튼 shape `const RoundedRectangleBorder()` 2 (`first_availability`·`quest_unlock` celebration) + `recording_step` BoxDecoration borderRadius 제거 1 (raw `8.0` 매직넘버였음) |
 | ~~gamification~~ | ~~3~~ | **정비 완료** (본 커밋) — 3파일 BoxDecoration borderRadius 제거 (`spotlight_slot`·`trophy_collection_card`·`year_heatmap_grid`, year_heatmap 은 raw `2` 히트맵 셀). L3+ 색맹 마커 `BoxShape.circle` 은 접근성 cue — 스코프 외 |
-| ~~auth~~ | ~~3~~ | **정비 완료** (본 커밋) — 2파일 BoxDecoration borderRadius 제거 3 (`academy_invite_accept_screen` 2 + `academy_invite_expired_screen` 1) |
-| academy | 1 | — (`academy_activity_timeline_screen`) |
-| notifications/home | 1 each | — |
+| ~~auth~~ | ~~3~~ | **정비 완료** — 2파일 BoxDecoration borderRadius 제거 3 (`academy_invite_accept_screen` 2 + `academy_invite_expired_screen` 1) |
+| ~~academy~~ | ~~3~~ | **정비 완료** (본 커밋) — `academy_activity_timeline_screen` 외곽 카드 `cardBorderRadius` var 삭제 + 배지 2 borderRadius 제거 |
+| ~~core~~ | ~~3~~ | **정비 완료** (본 커밋) — `address_search_field` 인라인 핸들 → 공유 `BottomSheetHandle` · `like_stamp` ON 도장 각진(사각 stamp) · `practice_center_button`(nav FAB)은 영구예외(원형 유지) |
+| ~~home~~ | ~~1~~ | **정비 완료** (본 커밋) — `quest_board_card` 진행바 ClipRRect `BorderRadius.zero` |
+| ~~notifications~~ | ~~1~~ | **정비 완료** (본 커밋) — `context_switch_toast` 토스트 컨테이너 borderRadius 제거 |
 
 정비 규칙: `BorderRadius.circular(...)` → `BorderRadius.zero`(=각진) 또는 decoration 에서 borderRadius 제거. §1.3.1.
 
@@ -72,14 +75,14 @@ README 가 "BorderRadius.circular 2건 포화 / BoxShadow 0건 / 전 도메인 �
 | `lessons/.../youtube_player_widget.dart` | 미디어 — 예외 후보 |
 | `practice/.../youtube/loop_timeline.dart` | 미디어 — 예외 후보 |
 | `practice/.../rest_recommendation_toast.dart` | **drift** — 종이 평면 잉크 위반 |
-| `core/widgets/practice_center_button.dart` | **drift** — core 위젯, 우선 정비 |
+| `core/widgets/practice_center_button.dart` | 예외 — 바텀 nav 중앙 FAB(시스템 affordance), `// ignore: notebook-boxshadow` 기보유 |
 | `core/widgets/coach_mark/coach_mark_overlay.dart` | 오버레이 elevation cue — 예외 후보 |
 
 ## 6. 멱등성 게이트 확장 (근본 원인 차단)
 
 `notebook_design_contract_test.dart` 에 **토큰 게이트 3종 추가** (baseline allowlist 패턴 — 현재 위반을 고정하고 신규 위반만 차단, allowlist 를 점진 축소):
 
-1. `BorderRadius.circular` 금지 (영구예외 4 + 정비 baseline 41) — **완료 (본 커밋)**. test: "BorderRadius.zero — 각진 원칙"
+1. `BorderRadius.circular` 금지 (영구예외 6 + 정비 baseline 41→**0**) — **전 도메인 완료**. test: "BorderRadius.zero — 각진 원칙" (baseline 빈 set, 신규 circular 즉시 FAIL)
 2. `BoxShadow` 금지 (미디어/오버레이 예외 allowlist) — 대기
 3. (선택) signature 영역 raw `fontSize:` 금지 — 대기
 

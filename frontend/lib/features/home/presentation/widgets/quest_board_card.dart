@@ -546,7 +546,7 @@ class _ProgressGauge extends StatelessWidget {
           width: gaugeWidth,
           height: gaugeHeight,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.zero,
             child: LinearProgressIndicator(
               value: percent / 100,
               backgroundColor: AppColors.inkQuaternary,

@@ -53,10 +53,7 @@ class _ContextSwitchToastState extends State<ContextSwitchToast> {
       elevation: 0,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
-        decoration: BoxDecoration(
-          color: AppColors.ink,
-          borderRadius: BorderRadius.circular(8),
-        ),
+        decoration: const BoxDecoration(color: AppColors.ink),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

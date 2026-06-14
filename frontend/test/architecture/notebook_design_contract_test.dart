@@ -875,17 +875,12 @@ void main() {
       'youtube',
       'bottom_sheet_handle',
       'coach_mark_overlay',
+      'practice_center_button', // 시스템 nav FAB affordance — 원형 유지
     ];
 
     // 정비 baseline — docs/specs/design/notebook/token_drift_remediation.md §4.
     // 한 파일을 각진으로 정비할 때마다 이 목록에서 삭제한다 (자기 축소 게이트).
     final baselineToFix = <String>{
-      'lib/core/widgets/address_search_field.dart',
-      'lib/core/widgets/notebook/like_stamp.dart',
-      'lib/core/widgets/practice_center_button.dart',
-      'lib/features/academy/presentation/screens/academy_activity_timeline_screen.dart',
-      'lib/features/home/presentation/widgets/quest_board_card.dart',
-      'lib/features/notifications/presentation/widgets/context_switch_toast.dart',
     };
 
     final violators = <String>{};

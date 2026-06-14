@@ -11,8 +11,8 @@ import 'notebook_glyph.dart';
 /// **OFF/ON 비대칭** — 인지 카테고리 자체를 분리한다.
 /// - OFF (verb, 행동 초대): outline icon + 회색 라벨, **container/border 없음** —
 ///   "빈 종이" 처럼 보이게 하여 "아직 도장 찍히지 않음" 을 명확화.
-/// - ON  (noun, 기록된 결과): filled icon + paper 라벨 + paperAccent solid pill —
-///   "잉크 도장 찍힘" 메타포.
+/// - ON  (noun, 기록된 결과): filled icon + paper 라벨 + paperAccent solid 각진 stamp —
+///   "잉크 도장 찍힘" 메타포 (§1.3.1 각진 — 사각 도장).
 ///
 /// `onTap == null` 이면 read-only (학생 측 read-only 표시 또는 선생님 OFF 비표시).
 class LikeStamp extends StatelessWidget {
@@ -39,17 +39,14 @@ class LikeStamp extends StatelessWidget {
     );
   }
 
-  /// ON 상태: solid stamp pill (잉크 도장 찍힘).
+  /// ON 상태: solid 각진 stamp (잉크 도장 찍힘).
   Widget _buildOnStamp() {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,
         vertical: 3,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
+      decoration: const BoxDecoration(color: AppColors.paperAccent),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

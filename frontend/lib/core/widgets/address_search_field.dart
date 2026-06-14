@@ -4,6 +4,7 @@ import '../l10n/app_strings.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import 'bottom_sheet_handle.dart';
 import 'notebook/notebook_bottom_sheet.dart';
 
 /// Result of an address search selection.
@@ -106,7 +107,6 @@ class _AddressSearchFieldState extends State<AddressSearchField> {
       ),
     );
   }
-
 
   Future<void> _openSearchSheet() async {
     final result = await showNotebookModalBottomSheet<_MockAddress>(
@@ -303,15 +303,8 @@ class _AddressSearchSheetState extends State<_AddressSearchSheet> {
             Container(
               color: AppColors.paper,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              child: Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.inkQuaternary,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+              child: const Center(
+                child: BottomSheetHandle(margin: EdgeInsets.zero),
               ),
             ),
 

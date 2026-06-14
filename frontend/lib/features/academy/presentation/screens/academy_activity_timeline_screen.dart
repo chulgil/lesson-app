@@ -114,7 +114,6 @@ class AcademyActivityTimelineItem extends StatelessWidget {
     final typeColor = _getActionTypeColor();
     const dotSize = 12.0;
     const lineHeight = 40.0;
-    const cardBorderRadius = 8.0;
 
     return Padding(
       padding: EdgeInsets.only(bottom: AppSpacing.space4),
@@ -179,7 +178,6 @@ class AcademyActivityTimelineItem extends StatelessWidget {
                               ),
                       width: 1.5,
                     ),
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +194,6 @@ class AcademyActivityTimelineItem extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: typeColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               _getActionTypeLabel(),
@@ -247,7 +244,6 @@ class AcademyActivityTimelineItem extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.amber.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               AppStrings.recentlyChanged,
