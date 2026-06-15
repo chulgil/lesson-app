@@ -2,6 +2,9 @@ import '../../../gamification/domain/entities/challenge.dart';
 import '../../../gamification/domain/entities/daily_practice.dart';
 import '../../../gamification/domain/repositories/growth_heatmap_repository.dart';
 import '../../../gamification/domain/repositories/student_quest_repository.dart';
+import '../../../practice_journal/domain/entities/practice_mark.dart';
+import '../../../practice_journal/domain/journal_thresholds.dart';
+import '../../../practice_journal/domain/repositories/practice_journal_repository.dart';
 import '../entities/practice_evidence.dart';
 
 /// 모든 연습 evidence 의 단일 진입점 서비스.
@@ -20,9 +23,13 @@ class PracticeRecordingService {
   final GrowthHeatmapRepository heatmapRepository;
   final StudentQuestRepository questRepository;
 
+  /// 연습장(practice_journal) 도장 파생용. 미연결 시 null — 회귀 안전.
+  final PracticeJournalRepository? journalRepository;
+
   const PracticeRecordingService({
     required this.heatmapRepository,
     required this.questRepository,
+    this.journalRepository,
   });
 
   Future<void> recordPractice(
@@ -39,6 +46,12 @@ class PracticeRecordingService {
       date,
       _toDailyPractice(evidence),
     );
+    // *** practice_journal 훅: 연습 → 연습 도장 파생(이중 기록 0) ***
+    final journalIntensity =
+        evidence.durationMinutes >= JournalThresholds.fullMinutes
+            ? MarkIntensity.full
+            : MarkIntensity.short;
+    await journalRepository?.upsertMark(studentId, date, journalIntensity);
     if (evidence.source != PracticeSource.recording) {
       await _bumpPracticeMinutesQuests(studentId, evidence.durationMinutes);
     }
