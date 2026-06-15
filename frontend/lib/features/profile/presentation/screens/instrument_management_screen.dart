@@ -93,6 +93,10 @@ class _InstrumentManagementScreenState
         onAction: _handleHeaderAction,
       ),
       body: profileAsync.when(
+        // Keep the current list visible while the provider refetches after a
+        // save (updateProfile invalidates currentTeacherProfileProvider) so the
+        // list doesn't flash a spinner on every add/remove.
+        skipLoadingOnReload: true,
         data: (profile) => _buildContent(profile?.instruments ?? const []),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:

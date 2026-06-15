@@ -244,6 +244,16 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
     return repository.getProfileByUserId(userId);
   }
 
+  /// Keep [currentTeacherProfileProvider] — the FutureProvider read by the
+  /// profile screens, instrument management, search and home quest — in sync
+  /// with writes made through this notifier. Without this a write persists to
+  /// the repository and this notifier's own state, but the FutureProvider keeps
+  /// serving its stale cached value (#732 follow-up: instrument edits were
+  /// invisible despite a success snackbar).
+  void _syncReadProvider() {
+    ref.invalidate(currentTeacherProfileProvider);
+  }
+
   /// Create initial profile from onboarding data
   Future<TeacherProfile> createFromOnboarding(
     TeacherOnboardingState onboardingState,
@@ -273,6 +283,7 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
     final repository = ref.read(teacherProfileRepositoryProvider);
     final created = await repository.createProfile(profile);
     state = AsyncData(created);
+    _syncReadProvider();
     return created;
   }
 
@@ -281,6 +292,7 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
     final repository = ref.read(teacherProfileRepositoryProvider);
     final updated = await repository.updateProfile(profile);
     state = AsyncData(updated);
+    _syncReadProvider();
     return updated;
   }
 
@@ -292,6 +304,7 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
     final repository = ref.read(teacherProfileRepositoryProvider);
     final updated = await repository.addCertificate(current.id, cert);
     state = AsyncData(updated);
+    _syncReadProvider();
     return updated;
   }
 
@@ -308,6 +321,7 @@ class CurrentTeacherProfileNotifier extends _$CurrentTeacherProfileNotifier {
       settings,
     );
     state = AsyncData(updated);
+    _syncReadProvider();
     return updated;
   }
 }
