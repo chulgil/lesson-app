@@ -12,10 +12,12 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_student, get_current_teacher, get_db
 from app.models.makeup_credit import MakeupCreditReason as ModelReason
+from app.models.student import Student
 from app.models.user import User
 from app.schemas.makeup_credit import (
     MakeupCreditGrantRequest,
@@ -93,6 +95,22 @@ async def grant_makeup_credit(
 ) -> MakeupCreditResponse:
     """Spec §4.4 — manual grant. Default 30-day expiry from service."""
     teacher_id = await resolve_teacher_id(db, current_user.id)
+
+    # Issue #741: verify the target student belongs to this teacher.
+    # Canonical relationship: Student.teacher_id == teacher_id (same pattern
+    # used by StudentService._get_accessible_student and student list queries).
+    owned = await db.scalar(
+        select(Student.id).where(
+            Student.id == body.student_id,
+            Student.teacher_id == teacher_id,
+        )
+    )
+    if owned is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Student does not belong to this teacher",
+        )
+
     service = MakeupCreditService(db)
     credit = await service.accrue(
         student_id=body.student_id,
