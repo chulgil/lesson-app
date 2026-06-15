@@ -312,7 +312,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardPrice,
         isCompleted: hasPrice,
         thresholdHint: AppStrings.questThresholdPriceHint,
-        onTap: () => context.push(AppRoutes.lessonTimeSettings),
+        onTap: () => context.push(AppRoutes.priceTable),
       ),
       _Quest(
         id: 'q5',
