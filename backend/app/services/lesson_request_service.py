@@ -24,6 +24,9 @@ from app.schemas.lesson_request import (
 )
 from app.schemas.request_event import RequestEventCreate
 
+# Statuses from which no further transitions are allowed.
+TERMINAL_STATUSES: frozenset[str] = frozenset({"cancelled", "expired", "completed"})
+
 
 class LessonRequestService:
     """Handle lesson request lifecycle."""
@@ -202,10 +205,14 @@ class LessonRequestService:
                     proposed_day_of_week = source.proposed_day_of_week
                 proposed_time = proposed_time or source.proposed_time
 
+        # Derive actor identity from the authenticated user — ignore client-supplied values.
+        server_actor_id = current_user.id
+        server_actor_type = self._actor_type(current_user)
+
         event = RequestEvent(
             request_id=request_id,
-            actor_type=data.actor_type,
-            actor_id=data.actor_id,
+            actor_type=server_actor_type,
+            actor_id=server_actor_id,
             event_type=event_type,
             suggested_slots=suggested_slots,
             selected_slot_index=selected_slot_index,
@@ -245,6 +252,14 @@ class LessonRequestService:
 
         now = datetime.now(UTC)
         canonical_status = self._canonical_request_status(data.status)
+
+        # Guard: terminal states (cancelled/expired/completed) are irreversible.
+        if request.status in TERMINAL_STATUSES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot transition from terminal status '{request.status}'",
+            )
+
         # Approval / proposal / subscription-issuing transitions are teacher-only.
         # Students may only cancel/withdraw or progress their own payment side.
         if canonical_status in self._TEACHER_ONLY_STATUSES:
