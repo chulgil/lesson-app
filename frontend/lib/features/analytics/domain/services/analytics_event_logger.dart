@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Metric event names — docs/specs/user/phone_verification_policy.md §5.5.
 ///
 /// #695 E3 gate / proposal-draft funnel instrumentation. The five events
@@ -34,6 +32,7 @@ class AnalyticsEventLogger {
   void log(String event, Map<String, Object?> properties) {
     // Local sink: debug log only. Replace with a remote sink when the
     // collection endpoint lands (tracked separately from #695).
-    debugPrint('[analytics] $event $properties');
+    // ignore: avoid_print
+    print('[analytics] $event $properties');
   }
 }
