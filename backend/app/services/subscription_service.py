@@ -333,15 +333,24 @@ class SubscriptionService:
         Skips and returns ``False`` if a usage row already exists for
         ``lesson_id`` (idempotent on re-run) or the subscription is missing /
         out of remaining lessons. Returns ``True`` when a deduction is recorded.
+
+        #742: Two concurrent calls for the same lesson_id are serialised by
+        (a) fetching the Subscription row with WITH FOR UPDATE, and (b) wrapping
+        the INSERT in a savepoint so an IntegrityError on the unique index
+        ``uq_subscription_usage_lesson_id`` is caught and the outer transaction
+        is not poisoned.  The second caller returns False (idempotent).
         """
+        from sqlalchemy.exc import IntegrityError
+
         from app.models.subscription import Subscription, SubscriptionUsage
 
-        # Idempotency: bail if this lesson already consumed a session.
+        # Idempotency fast-path: bail if this lesson already consumed a session.
         existing = await self.db.scalar(select(SubscriptionUsage.id).where(SubscriptionUsage.lesson_id == lesson_id))
         if existing is not None:
             return False
 
-        sub = await self.db.get(Subscription, subscription_id)
+        # #742: lock the subscription row so concurrent callers serialise here.
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
         if sub is None:
             return False
 
@@ -354,14 +363,23 @@ class SubscriptionService:
         if remaining is not None and remaining <= 0:
             return False
 
-        self._record_lesson_usage(
-            sub,
-            lesson_id=lesson_id,
-            type="lesson",
-            note="24시간 미확인 자동 완료 차감",
-            deducted=True,
-        )
-        await self.db.flush()
+        # #742: wrap INSERT in a savepoint so an IntegrityError from the unique
+        # index on lesson_id does not poison the outer transaction.  The second
+        # concurrent caller hits the unique constraint and returns False.
+        try:
+            async with self.db.begin_nested():
+                self._record_lesson_usage(
+                    sub,
+                    lesson_id=lesson_id,
+                    type="lesson",
+                    note="24시간 미확인 자동 완료 차감",
+                    deducted=True,
+                )
+                await self.db.flush()
+        except IntegrityError:
+            # Another caller already inserted a usage row for this lesson_id.
+            return False
+
         return True
 
     async def use_reschedule(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
