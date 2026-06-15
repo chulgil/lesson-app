@@ -10,24 +10,20 @@ import '../../domain/entities/subscription.dart';
 /// Compact badge — **Notebook × Score 스타일 수강권 티켓 라벨**.
 ///
 /// 티켓 스탬프 메타포: 사각형 1px 테두리 + IBM Plex Mono 카운트.
-/// - 정상: `ink` 테두리 + `inkSecondary` 텍스트
-/// - 만료 임박: `paperAccent` (vermillion) 테두리/텍스트 — 4대 시그니처
-/// - 만료: `inkTertiary` 점선 느낌 테두리 + 텍스트 (강한 경고 지양)
-///
-/// 8 callsite 일괄 적용.
+/// 긴급도 색 모델 (상태 우선순위 — 위에서 첫 일치):
+/// 1. 입금대기: paperAccent + 경고 아이콘
+/// 2. 만료: paperAccent + 경고 아이콘
+/// 3. 임박: paperAccent + 시계 아이콘
+/// 4. 정상: inkSecondary + 아이콘 없음
 class SubscriptionBadge extends StatelessWidget {
   final Subscription subscription;
-  final bool showIcon;
 
-  const SubscriptionBadge({
-    super.key,
-    required this.subscription,
-    this.showIcon = true,
-  });
+  const SubscriptionBadge({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
-    final color = _getAccentColor();
+    final color = _accentColor();
+    final icon = _stateIcon();
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,
@@ -37,12 +33,12 @@ class SubscriptionBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showIcon) ...[
-            Icon(_getIcon(), size: 11, color: color),
+          if (icon != null) ...[
+            Icon(icon, size: 11, color: color),
             const SizedBox(width: AppSpacing.space1),
           ],
           Text(
-            _getLabel(),
+            _label(),
             style: GoogleFonts.ibmPlexMono(
               fontSize: 10,
               fontWeight: FontWeight.w600,
@@ -55,40 +51,45 @@ class SubscriptionBadge extends StatelessWidget {
     );
   }
 
-  String _getLabel() {
-    if (subscription.type == SubscriptionType.package) {
-      return AppStrings.subscriptionPackageBadgeFormat(
-        subscription.remainingLessons ?? 0,
-        subscription.totalLessonsForDisplay ?? 0,
-      );
-    } else if (subscription.type == SubscriptionType.monthly) {
-      final days = subscription.daysUntilExpiration ?? 0;
-      return days > 0 ? 'D-$days' : AppStrings.statusExpired;
-    } else {
-      return AppStrings.subscriptionTypeTrial;
-    }
-  }
+  /// monthly 는 daysUntilExpiration 이 음수일 수 있어 status==expired 와 병합.
+  bool get _isExpired =>
+      subscription.status == SubscriptionStatus.expired ||
+      (subscription.type == SubscriptionType.monthly &&
+          (subscription.daysUntilExpiration ?? 0) <= 0);
 
-  IconData _getIcon() {
-    switch (subscription.type) {
-      case SubscriptionType.trial:
-        return Icons.star_outline;
-      case SubscriptionType.monthly:
-        return Icons.calendar_month_outlined;
-      case SubscriptionType.package:
-        return Icons.confirmation_number_outlined;
-    }
-  }
-
-  /// 한 색상으로 배경·테두리·텍스트를 묶는다 (Notebook 원칙 — 세미 3색 이하).
-  Color _getAccentColor() {
-    if (subscription.status == SubscriptionStatus.expired) {
-      return AppColors.inkTertiary;
-    }
-    if (subscription.isExpiringSoon) {
+  /// 긴급도 모델: 조치 필요(입금대기·만료·임박)=버밀리온, 정상=중립 잉크.
+  Color _accentColor() {
+    if (subscription.isUnpaid || _isExpired || subscription.isExpiringSoon) {
       return AppColors.paperAccent;
     }
     return AppColors.inkSecondary;
+  }
+
+  /// 색맹 안전: 조치 필요 상태에만 상태 아이콘. 정상은 아이콘 없음.
+  IconData? _stateIcon() {
+    if (subscription.isUnpaid || _isExpired) {
+      return Icons.warning_amber_rounded;
+    }
+    if (subscription.isExpiringSoon) return Icons.access_time;
+    return null;
+  }
+
+  String _label() {
+    if (subscription.isUnpaid) return AppStrings.subscriptionBadgeUnpaid;
+    if (_isExpired) return AppStrings.statusExpired;
+    switch (subscription.type) {
+      case SubscriptionType.package:
+        return AppStrings.subscriptionPackageBadgeFormat(
+          subscription.remainingLessons ?? 0,
+          subscription.totalLessonsForDisplay ?? 0,
+        );
+      case SubscriptionType.monthly:
+        return AppStrings.subscriptionBadgeDday(
+          subscription.daysUntilExpiration ?? 0,
+        );
+      case SubscriptionType.trial:
+        return AppStrings.subscriptionTypeTrial;
+    }
   }
 }
 

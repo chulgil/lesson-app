@@ -213,7 +213,7 @@ class LessonCard extends ConsumerWidget {
           if (contextBadge != null && subscription != null)
             const SizedBox(width: 6),
           if (subscription != null)
-            SubscriptionBadge(subscription: subscription, showIcon: false),
+            SubscriptionBadge(subscription: subscription),
         ],
       ),
     );
