@@ -12,20 +12,25 @@ void main() {
   ) async {
     const studentId = 'student_1';
     final now = DateTime.now();
+    // Anchor both logs to today so the test is deterministic regardless of
+    // which day of the week it runs.  Two logs on the same date give:
+    //   streak = 1일  (today has practice)
+    //   weekly total = 45분  (30 + 15, both within the current Mon–Sun window)
+    final today = DateTime(now.year, now.month, now.day);
     final logs = [
       PracticeLog(
-        id: 'log_today',
+        id: 'log_today_a',
         studentId: studentId,
-        date: now,
+        date: today,
         totalMinutes: 30,
-        createdAt: now,
+        createdAt: today,
       ),
       PracticeLog(
-        id: 'log_yesterday',
+        id: 'log_today_b',
         studentId: studentId,
-        date: now.subtract(const Duration(days: 1)),
+        date: today,
         totalMinutes: 15,
-        createdAt: now.subtract(const Duration(days: 1)),
+        createdAt: today,
       ),
     ];
 
@@ -57,7 +62,7 @@ void main() {
       find.text(AppStrings.studentHomePracticeGoalAchievement),
       findsOneWidget,
     );
-    expect(find.text('2일'), findsOneWidget);
+    expect(find.text('1일'), findsOneWidget);
     expect(find.text('45분'), findsOneWidget);
   });
 }
