@@ -4,6 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../gamification/gamification_facade.dart'
     show growthHeatmapRepositoryProvider, studentQuestRepositoryProvider;
+import '../../../practice_journal/practice_journal.dart'
+    show practiceJournalRepositoryProvider;
 import '../../domain/services/practice_recording_service.dart';
 import '../../domain/services/practice_source_loggers.dart';
 
@@ -20,6 +22,7 @@ PracticeRecordingService practiceRecordingService(
   return PracticeRecordingService(
     heatmapRepository: ref.watch(growthHeatmapRepositoryProvider),
     questRepository: ref.watch(studentQuestRepositoryProvider),
+    journalRepository: ref.watch(practiceJournalRepositoryProvider),
   );
 }
 
