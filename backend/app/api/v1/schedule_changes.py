@@ -78,5 +78,6 @@ async def respond_to_schedule_change(
         change_id=change_id,
         action=body.action,
         response_message=body.response_message,
+        current_user=current_user,
     )
     return result

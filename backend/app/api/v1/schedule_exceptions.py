@@ -50,7 +50,7 @@ async def create_exception(
 ) -> ScheduleExceptionResponse:
     service = ScheduleExtService(db)
     result: ScheduleExceptionResponse = await service.create_exception(
-        teacher_availability_id, body.model_dump()
+        teacher_availability_id, body.model_dump(), current_user=current_user
     )
     return result
 

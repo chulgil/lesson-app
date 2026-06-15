@@ -32,9 +32,16 @@ class ScheduleExtService:
         )
         return list(result.all())
 
-    async def create_exception(self, teacher_availability_id: str, data: dict) -> Any:
+    async def create_exception(self, teacher_availability_id: str, data: dict, current_user: Any) -> Any:
+        from app.models.schedule import TeacherAvailability
         from app.models.schedule_ext import ScheduleException
 
+        availability = await self.db.get(TeacherAvailability, teacher_availability_id)
+        if availability is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Availability not found")
+        current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if availability.teacher_id not in current_teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
         exc = ScheduleException(
             teacher_availability_id=teacher_availability_id,
             **data,
@@ -522,12 +529,17 @@ class ScheduleExtService:
         await self.db.refresh(change)
         return change
 
-    async def respond_to_schedule_change(self, change_id: str, action: str, response_message: str | None) -> Any:
+    async def respond_to_schedule_change(
+        self, change_id: str, action: str, response_message: str | None, current_user: Any
+    ) -> Any:
         from app.models.schedule_ext import LessonScheduleChange, ScheduleChangeStatus
 
         change = await self.db.get(LessonScheduleChange, change_id)
         if change is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Change not found")
+        current_teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if change.teacher_id not in current_teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
         change.status = ScheduleChangeStatus(action)
         change.response_message = response_message
         change.processed_at = datetime.now(UTC)
