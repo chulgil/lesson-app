@@ -13,6 +13,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/features/onboarding/onboarding_facade.dart'
+    show currentTeacherProfileProvider;
+import 'package:lessonaza/features/profile/domain/entities/teacher_profile.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/profile/presentation/screens/price_table_screen.dart';
 import 'package:lessonaza/features/settings/domain/repositories/settings_repository.dart';
@@ -20,11 +23,31 @@ import 'package:lessonaza/features/settings/presentation/providers/settings_repo
 import 'package:lessonaza/features/settings/presentation/providers/teacher_settings_boot_migration_provider.dart';
 
 void main() {
-  Widget wrap(Widget child, {required SettingsRepository repo, double? width}) {
+  // #732 — the instrument LIST now comes from currentTeacherProfile.instruments
+  // (SSOT); the settings repo only supplies price VALUES (lessonPriceTable).
+  TeacherProfile profileWith(List<String> instruments) => TeacherProfile(
+    id: 'p1',
+    userId: 'u1',
+    name: '테스트 선생님',
+    instruments: instruments,
+    introduction: '',
+    verification: const TeacherVerification(),
+    createdAt: DateTime(2026),
+  );
+
+  Widget wrap(
+    Widget child, {
+    required SettingsRepository repo,
+    List<String> instruments = const [],
+    double? width,
+  }) {
     return ProviderScope(
       overrides: [
         settingsRepositoryProvider.overrideWithValue(repo),
         teacherSettingsBootMigrationProvider.overrideWith((ref) async => true),
+        currentTeacherProfileProvider.overrideWith(
+          (_) async => profileWith(instruments),
+        ),
       ],
       child: MaterialApp(
         home:
@@ -48,7 +71,7 @@ void main() {
   group('PriceTableScreen (W3 Task 3.3)', () {
     testWidgets('AppBar 제목 + 섹션 헤더 노출', (tester) async {
       final repo = _FakeSettingsRepository(settings(instruments: ['피아노']));
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo));
+      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']));
       await tester.pumpAndSettle();
 
       expect(find.text(AppStrings.priceTableScreenTitle), findsOneWidget);
@@ -58,7 +81,7 @@ void main() {
 
     testWidgets('빈 instruments → empty 안내 노출 (헤더만, 표 없음)', (tester) async {
       final repo = _FakeSettingsRepository(settings(instruments: const []));
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo));
+      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: const []));
       await tester.pumpAndSettle();
 
       expect(find.text(AppStrings.priceTableEmptyInstruments), findsOneWidget);
@@ -71,7 +94,7 @@ void main() {
 
     testWidgets('instruments=[피아노] → 헤더 + 1행 + 가격 셀 "—"', (tester) async {
       final repo = _FakeSettingsRepository(settings(instruments: ['피아노']));
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo));
+      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']));
       await tester.pumpAndSettle();
 
       // Level 헤더 3개 (초급/중급/고급) — 가로 1행.
@@ -95,7 +118,7 @@ void main() {
           },
         ),
       );
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo));
+      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']));
       await tester.pumpAndSettle();
 
       // 5만 / 7만 만원 단위 표시.
@@ -111,7 +134,7 @@ void main() {
     ) async {
       final repo = _FakeSettingsRepository(settings(instruments: ['피아노']));
       await tester.pumpWidget(
-        wrap(const PriceTableScreen(), repo: repo, width: 200),
+        wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노'], width: 200),
       );
       await tester.pumpAndSettle();
 
