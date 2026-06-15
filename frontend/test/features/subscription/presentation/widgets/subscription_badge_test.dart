@@ -171,5 +171,43 @@ void main() {
       );
       expect(find.byType(Icon), findsNothing);
     });
+
+    testWidgets('회귀: 같은 수강권 → 홈 직접 / 학생탭 위임 동일 라벨', (tester) async {
+      final sub = createSubscription(
+        type: SubscriptionType.package,
+        totalLessons: 10,
+        usedLessons: 3,
+        endDate: DateTime.now().add(const Duration(days: 30)),
+      );
+      // 홈 경로: SubscriptionBadge 직접 렌더
+      await tester.pumpWidget(
+        buildTestWidget(SubscriptionBadge(subscription: sub)),
+      );
+      expect(find.text('7/10회'), findsOneWidget); // 잔여, 사용([3/10]) 아님
+      expect(find.text('[3/10]'), findsNothing);
+    });
+
+    testWidgets('smoke: 좁은 Row 제약에서 렌더 예외 없음', (tester) async {
+      final sub = createSubscription(
+        type: SubscriptionType.package,
+        totalLessons: 10,
+        usedLessons: 3,
+        endDate: DateTime.now().add(const Duration(days: 30)),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              children: [
+                const Expanded(child: SizedBox()),
+                SubscriptionBadge(subscription: sub),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
   });
 }
