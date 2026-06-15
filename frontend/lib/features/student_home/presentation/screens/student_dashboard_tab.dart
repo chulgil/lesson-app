@@ -14,6 +14,7 @@ import '../../../gamification/gamification_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/practice_ui_facade.dart';
+import '../../../practice_journal/practice_journal.dart';
 import '../providers/student_home_practice_provider.dart';
 import '../providers/student_home_session_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
@@ -74,6 +75,25 @@ class StudentDashboardTab extends ConsumerWidget {
 
           // ── Student gamification P1: [연습 시작] 단일 진입점 (스펙 §4.1) ──
           PracticeStartSection(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space3),
+
+          // ── 연습장 카드: 이달 연습 도장 미리보기 ──
+          PracticeJournalCard(
+            childProfileId: currentStudentId,
+            role: JournalRole.student,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => PracticeJournalScreen(
+                        childProfileId: currentStudentId,
+                        role: JournalRole.student,
+                      ),
+                ),
+              );
+            },
+          ),
 
           const SizedBox(height: AppSpacing.space4),
 

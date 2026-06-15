@@ -11,6 +11,7 @@ import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../auth/auth_facade.dart';
 import '../../../../practice/practice_facade.dart';
 import '../../../../practice/practice_ui_facade.dart';
+import '../../../../practice_journal/practice_journal.dart';
 
 /// Tab content showing practice progress and statistics
 class StudentPracticeTab extends ConsumerWidget {
@@ -44,22 +45,39 @@ class StudentPracticeTab extends ConsumerWidget {
           );
         }
         return ListView(
-            padding: const EdgeInsets.all(AppSpacing.screenPadding),
-            children: [
-              _WeeklySummaryCard(overview: overview),
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          children: [
+            _WeeklySummaryCard(overview: overview),
+            const SizedBox(height: AppSpacing.space4),
+            _WeeklyPracticeGrid(entries: overview.weeklyEntries),
+            if (overview.sharedRecordings.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.space4),
-              _WeeklyPracticeGrid(entries: overview.weeklyEntries),
-              if (overview.sharedRecordings.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.space4),
-                _SharedRecordingsSection(
-                  recordings: overview.sharedRecordings,
-                  studentId: studentId,
-                ),
-              ],
-              const SizedBox(height: AppSpacing.space4),
-              _DetailStatsButton(studentId: studentId),
-              const SizedBox(height: AppSpacing.space8),
+              _SharedRecordingsSection(
+                recordings: overview.sharedRecordings,
+                studentId: studentId,
+              ),
             ],
+            const SizedBox(height: AppSpacing.space4),
+            // ── 연습장: 선생님이 학생 연습 도장 현황 조회 ──
+            PracticeJournalCard(
+              childProfileId: studentId,
+              role: JournalRole.teacher,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder:
+                        (_) => PracticeJournalScreen(
+                          childProfileId: studentId,
+                          role: JournalRole.teacher,
+                        ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            _DetailStatsButton(studentId: studentId),
+            const SizedBox(height: AppSpacing.space8),
+          ],
         );
       },
     );
