@@ -213,7 +213,7 @@ class StudentDashboardTab extends ConsumerWidget {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
-                  onPressed: () => context.push(AppRoutes.practice),
+                  onPressed: () => context.push(AppRoutes.practiceStats),
                   icon: const Icon(
                     Icons.bar_chart,
                     size: 16,
