@@ -53,6 +53,24 @@ class MakeupCreditService:
         self.db = db
 
     # ------------------------------------------------------------------
+    # Authorization helpers
+    # ------------------------------------------------------------------
+
+    async def assert_student_belongs_to_teacher(self, student_id: str, teacher_id: str) -> None:
+        """#741: raise PermissionError if the student is not this teacher's.
+
+        Canonical relationship: ``Student.teacher_id == teacher_id`` (same pattern
+        StudentService uses for student-scoping).
+        """
+        from app.models.student import Student
+
+        owned = await self.db.scalar(
+            select(Student.id).where(Student.id == student_id, Student.teacher_id == teacher_id)
+        )
+        if owned is None:
+            raise PermissionError("Student does not belong to this teacher")
+
+    # ------------------------------------------------------------------
     # Accrual
     # ------------------------------------------------------------------
 

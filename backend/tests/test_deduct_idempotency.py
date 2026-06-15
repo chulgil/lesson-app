@@ -1,19 +1,18 @@
-"""#742 — deduct_for_completed_lesson double-deduction idempotency tests.
+"""#742 — deduct_for_completed_lesson idempotency tests.
 
-Red-Green structure:
-  RED  — test_double_deduction_red: proves that WITHOUT the unique-index+savepoint
-          guard a naive double INSERT would increment used_lessons twice.  We
-          bypass the service method entirely and issue two raw INSERTs to mimic the
-          race, then assert used_lessons == 2 (the bug).  This test is expected to
-          PASS (it documents the pre-fix behaviour).
+The race fix locks the Subscription row (WITH FOR UPDATE) before re-checking
+``SubscriptionUsage.lesson_id`` so a concurrent auto-complete caller observes
+the first caller's usage row. True concurrency is not reproducible on SQLite,
+so these tests guard the observable idempotency contract:
 
-  GREEN — test_same_lesson_idempotent: calls the fixed
-          deduct_for_completed_lesson twice for the same lesson_id and asserts
-          (a) first call returns True, (b) second call returns False, (c) used_lessons
-          incremented exactly once.
+  - test_same_lesson_idempotent: two sequential calls for the same lesson_id →
+    first True, second False, used_lessons incremented exactly once, one row.
+  - test_different_lessons_each_deduct_once: two distinct lesson_ids each deduct
+    once, used_lessons == 2.
 
-  EXTRA — test_different_lessons_each_deduct_once: two distinct lesson_ids each
-           produce one deduction, used_lessons == 2.
+Note: ``lesson_id`` is intentionally NOT globally unique — manual deduct and
+reschedule paths legitimately record multiple usage rows per lesson, so the fix
+relies on the row lock rather than a schema-wide unique constraint.
 """
 
 from __future__ import annotations
@@ -77,58 +76,7 @@ def _make_lesson(*, subscription_id: str, suffix: str = ""):
 
 
 # ---------------------------------------------------------------------------
-# RED: document the pre-fix double-deduction bug
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_double_deduction_red(db_session: AsyncSession, create_test_user):
-    """RED: without the unique-index guard two raw INSERTs double-count used_lessons.
-
-    This test does NOT call the service; it inserts two SubscriptionUsage rows
-    directly (bypassing the savepoint catch), simulating what two concurrent
-    callers would do if the unique index did not exist.  We assert used_lessons
-    becomes 2, documenting the bug that #742 fixes.
-    """
-    from app.models.subscription import Subscription, SubscriptionUsage
-
-    await create_test_user(user_id="test-user-id", role="teacher")
-    sub_id = await _make_active_subscription(db_session)
-
-    lesson = _make_lesson(subscription_id=sub_id)
-    db_session.add(lesson)
-    await db_session.flush()
-
-    sub = await db_session.get(Subscription, sub_id)
-    assert sub.used_lessons == 0
-
-    # Simulate two concurrent callers both passing the idempotency check and
-    # each inserting a usage row (the race that the fix prevents).
-    # We use two different fake lesson_ids to avoid hitting our new unique index.
-    usage1 = SubscriptionUsage(
-        subscription_id=sub_id,
-        lesson_id="fake-race-lesson-1",
-        type="lesson",
-        deducted=True,
-    )
-    usage2 = SubscriptionUsage(
-        subscription_id=sub_id,
-        lesson_id="fake-race-lesson-2",
-        type="lesson",
-        deducted=True,
-    )
-    db_session.add(usage1)
-    db_session.add(usage2)
-    sub.used_lessons = (sub.used_lessons or 0) + 2  # both callers incremented
-    await db_session.flush()
-
-    await db_session.refresh(sub)
-    # BUG: used_lessons is 2 because both inserts succeeded without a guard.
-    assert sub.used_lessons == 2, "RED: double-deduction bug confirmed — used_lessons is 2 after two concurrent inserts"
-
-
-# ---------------------------------------------------------------------------
-# GREEN: same lesson_id → first True, second False, used_lessons == 1
+# same lesson_id → first True, second False, used_lessons == 1
 # ---------------------------------------------------------------------------
 
 
@@ -138,7 +86,7 @@ async def test_same_lesson_idempotent(db_session: AsyncSession, create_test_user
 
     Expected:
     - first call  → True  (deduction recorded)
-    - second call → False (idempotent: unique index raises IntegrityError → caught)
+    - second call → False (idempotent: existing usage re-checked under row lock)
     - used_lessons incremented exactly once
     """
     from app.models.subscription import Subscription

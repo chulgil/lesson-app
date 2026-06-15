@@ -237,11 +237,6 @@ class SubscriptionUsage(UUIDMixin, Base):
     __table_args__ = (
         Index("idx_usage_subscription", "subscription_id"),
         Index("idx_usage_date", "used_at"),
-        # #742: unique index prevents double-deduction race on concurrent
-        # deduct_for_completed_lesson calls for the same lesson. SQLite and
-        # Postgres both permit multiple NULLs in a unique index, so non-lesson
-        # usages (lesson_id IS NULL) are unaffected.
-        Index("uq_subscription_usage_lesson_id", "lesson_id", unique=True),
     )
 
 
