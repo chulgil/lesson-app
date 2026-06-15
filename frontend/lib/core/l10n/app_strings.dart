@@ -9283,4 +9283,36 @@ class AppStrings {
 
   /// 거절 버튼 — 페널티 메시징 0.
   static const spotlightDeclineButton = '다음에';
+
+  // ========================================================================
+  // 연습장(Practice Journal) P1 — 연령 톤 라벨 (표준/어린이 2종)
+  // ========================================================================
+  // 사용처: features/practice_journal/presentation/extensions/journal_tone.dart
+
+  /// 표준 톤 제목.
+  static const journalTitleStandard = '연습장';
+
+  /// 어린이 톤 제목.
+  static const journalTitleChild = '도장판';
+
+  /// 연습 도장 — 표준 톤.
+  static const journalMarkStandard = '연습 도장';
+
+  /// 연습 도장 — 어린이 톤.
+  static const journalMarkChild = '연습 도장';
+
+  /// 자가 검인(부모 미연결 학생의 한 줄 회고).
+  static const journalSelfEndorse = '자가 검인';
+
+  /// 부모 주간 응원·확인 도장.
+  static const journalGuardianSeal = '확인 도장';
+
+  /// 선생님 검인(과제 한정).
+  static const journalTeacherEndorse = '선생님 도장';
+
+  /// 도장 찍기 보상 CTA.
+  static const journalStampPressCta = '도장 꾹!';
+
+  /// 빈 날(비처벌) 라벨.
+  static const journalRestLabel = '쉼표';
 }
