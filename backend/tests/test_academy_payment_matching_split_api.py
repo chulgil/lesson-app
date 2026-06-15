@@ -337,3 +337,41 @@ async def test_revert_split_match_resets_all_invoices(
     assert tx.state == AcademyBankTransactionState.unmatched
     assert tx.matched_invoice_id is None
     assert tx.matched_by_user_id is None
+
+
+# ---------------------------------------------------------------------------
+# M2 — 분할 합이 입금액 초과 방지
+# ---------------------------------------------------------------------------
+
+
+async def test_split_match_sum_exceeds_tx_returns_400(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """M2: split paid_amount 합이 통장 입금액(tx.amount)을 초과하면 400."""
+    academy_id, teacher_id = await _create_academy(client, db_session, create_test_user)
+    invoice_a = await _add_student_with_invoice(
+        client, academy_id=academy_id, teacher_member_id=teacher_id, name="김지민", base_amount=200000
+    )
+    invoice_b = await _add_student_with_invoice(
+        client, academy_id=academy_id, teacher_member_id=teacher_id, name="김지호", base_amount=180000
+    )
+    # 통장 입금액 300,000 < 분할 합 380,000.
+    tx_id = await _create_tx(client, academy_id, depositor="김 어머니", amount=300000)
+
+    resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/split-match",
+        headers=_owner_headers(),
+        json={
+            "splits": [
+                {"invoice_id": invoice_a, "paid_amount": 200000},
+                {"invoice_id": invoice_b, "paid_amount": 180000},
+            ]
+        },
+    )
+    assert resp.status_code == 400
+
+    # 매칭 미적용 — tx unmatched 유지, payment 미생성.
+    tx = await db_session.scalar(select(AcademyBankTransaction).where(AcademyBankTransaction.id == tx_id))
+    assert tx.state == AcademyBankTransactionState.unmatched
+    payments = (await db_session.scalars(select(AcademyPayment).where(AcademyPayment.bank_tx_ref == tx_id))).all()
+    assert len(payments) == 0

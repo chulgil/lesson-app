@@ -44,6 +44,7 @@ from app.services.academy_payment_matching_fuzzy import (
     WEAK_SUGGESTION_THRESHOLD,
     compute_match_score,
 )
+from app.services.notification_service import NotificationService
 
 
 def _utcnow() -> datetime:
@@ -53,6 +54,33 @@ def _utcnow() -> datetime:
 class AcademyPaymentMatchingService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    # ------------------------------------------------------------------
+    # 학부모 알림 (§6.3 step4, §7.6)
+    # ------------------------------------------------------------------
+
+    async def _notify_parent_payment(
+        self,
+        invoice: AcademyInvoice,
+        *,
+        notification_type: str,
+        title: str,
+        body: str,
+    ) -> None:
+        """매칭 확정/취소 시 연결된 학부모에게 알림.
+
+        학원만 등록한 학생(parent_user_id NULL)은 알림 대상이 없으므로 skip.
+        """
+        student = await self.db.get(AcademyStudent, invoice.academy_student_id)
+        if student is None or student.parent_user_id is None:
+            return
+        await NotificationService(self.db).create_and_send(
+            user_id=student.parent_user_id,
+            notification_type=notification_type,
+            title=title,
+            body=body,
+            data={"academy_id": invoice.academy_id, "invoice_id": invoice.id},
+        )
 
     # ------------------------------------------------------------------
     # 수기 입력 (§5.2)
@@ -132,6 +160,12 @@ class AcademyPaymentMatchingService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"tx already {tx.state.value}",
             )
+        if paid_amount > tx.amount:
+            # 통장 입금액보다 큰 금액을 매칭하면 정산이 왜곡된다 (§7.3 초과는 별도 흐름).
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="paid_amount exceeds transaction amount",
+            )
 
         invoice = await self.db.get(AcademyInvoice, invoice_id)
         if invoice is None:
@@ -191,6 +225,15 @@ class AcademyPaymentMatchingService:
             sugg.decided_at = now
 
         await self.db.flush()
+
+        # 5. 학부모 알림 (§6.3 step4) — 연결된 학부모에게 납부 확인.
+        await self._notify_parent_payment(
+            invoice,
+            notification_type="academyPaymentMatched",
+            title="납부 확인 완료",
+            body=f"{invoice.period_year}년 {invoice.period_month}월 수강료 납부가 확인되었습니다.",
+        )
+
         return tx, payment
 
     # ------------------------------------------------------------------
@@ -260,7 +303,31 @@ class AcademyPaymentMatchingService:
         tx.matched_invoice_id = None
         tx.matched_by_user_id = None
         tx.matched_at = None
+
+        # 5. suggestion 결정 reset — revert 는 "매칭 없던 상태로" 회귀이므로 이전
+        #    accepted/rejected 결정을 pending 으로 되돌린다. 이렇게 해야 이후
+        #    re-suggest 의 재계산이 decided 된 (tx, invoice) pair 를 재INSERT 하지
+        #    않아 uq_acad_match_sugg_per_pair UNIQUE 위반(IntegrityError)을 피한다.
+        decided_suggestions = await self.db.scalars(
+            select(AcademyPaymentMatchSuggestion).where(AcademyPaymentMatchSuggestion.bank_transaction_id == tx.id)
+        )
+        for sugg in decided_suggestions.all():
+            sugg.user_decision = AcademyPaymentMatchSuggestionDecision.pending
+            sugg.decided_at = None
+
         await self.db.flush()
+
+        # 6. 학부모 정정 알림 (§7.6) — 매칭이 취소된 각 invoice 학생의 학부모에게.
+        for invoice_id in affected_invoice_ids:
+            invoice = await self.db.get(AcademyInvoice, invoice_id)
+            if invoice is not None:
+                await self._notify_parent_payment(
+                    invoice,
+                    notification_type="academyPaymentReverted",
+                    title="납부 정정",
+                    body=f"{invoice.period_year}년 {invoice.period_month}월 수강료 납부 확인이 취소되었습니다.",
+                )
+
         return tx
 
     # ------------------------------------------------------------------
@@ -310,6 +377,12 @@ class AcademyPaymentMatchingService:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"tx already {tx.state.value}",
+            )
+        if sum(paid_amount for _, paid_amount in splits) > tx.amount:
+            # 분할 합이 통장 입금액을 초과하면 정산이 왜곡된다.
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="split amounts exceed transaction amount",
             )
 
         # 1. invoice 전체 검증 (모두 같은 학원 + 취소 아님).
@@ -383,6 +456,16 @@ class AcademyPaymentMatchingService:
             sugg.decided_at = now
 
         await self.db.flush()
+
+        # 5. 학부모 알림 (§6.3 step4) — 각 invoice 학생의 학부모에게 납부 확인.
+        for invoice in invoices_by_id.values():
+            await self._notify_parent_payment(
+                invoice,
+                notification_type="academyPaymentMatched",
+                title="납부 확인 완료",
+                body=f"{invoice.period_year}년 {invoice.period_month}월 수강료 납부가 확인되었습니다.",
+            )
+
         return tx, payments
 
     # ------------------------------------------------------------------
@@ -453,6 +536,7 @@ class AcademyPaymentMatchingService:
                 invoice_ref_at=invoice.sent_at or invoice.issued_at,
                 student_name=student.name,
                 deposit_code=student.deposit_code,
+                parent_name=student.parent_name,
             )
             if score < WEAK_SUGGESTION_THRESHOLD:
                 continue

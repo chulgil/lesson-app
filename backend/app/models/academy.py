@@ -188,6 +188,9 @@ class AcademyStudent(UUIDMixin, TimestampMixin, Base):
     intake_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     # 입금자 매칭 보조 메모 코드 (payment_matching_spec §3.5).
     deposit_code: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # 학부모 이름 — 입금자명 fuzzy 매칭용 (payment_matching_spec §3.4).
+    # 학부모가 본인 이름으로 무통장입금하는 한국 최빈 케이스를 매칭하기 위함.
+    parent_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     __table_args__ = (
         Index("idx_academy_students_academy_status", "academy_id", "status"),

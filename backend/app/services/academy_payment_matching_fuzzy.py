@@ -195,17 +195,36 @@ def compute_match_score(
     invoice_ref_at: datetime | None,
     student_name: str,
     deposit_code: str | None,
+    parent_name: str | None = None,
 ) -> tuple[float, dict[str, float]]:
     """6 신호 가중 합. 반환: (total_score, features dict).
 
     features 는 ``AcademyPaymentMatchSuggestion.features`` JSON 에 저장 — 학원장이
     매칭 근거를 시각화 (§6.1 ``"✓ 금액일치"``, ``"✓ 가족호칭"`` 등) 할 때 사용.
+
+    이름 기반 3 신호(name_levenshtein / student_name_token / family_title)는
+    학생 이름과 학부모 이름(parent_name) 각각에 대해 산출한 뒤 더 높은 값을
+    채택한다 (§3.1 "학생 **또는** 학부모 이름 토큰", §3.4 학부모 본인 입금).
+    한국 무통장입금은 학부모가 본인 이름으로 보내는 경우가 가장 흔하다.
     """
+    candidate_names = [n for n in (student_name, parent_name) if n]
+    name_levenshtein = max(
+        (score_name_levenshtein(depositor_raw, n) for n in candidate_names),
+        default=0.0,
+    )
+    student_name_token = max(
+        (score_student_name_token(depositor_raw, n) for n in candidate_names),
+        default=0.0,
+    )
+    family_title = max(
+        (score_family_title(depositor_raw, n) for n in candidate_names),
+        default=0.0,
+    )
     features = {
         "amount_exact": score_amount(tx_amount, invoice_total),
-        "name_levenshtein": score_name_levenshtein(depositor_raw, student_name),
-        "student_name_token": score_student_name_token(depositor_raw, student_name),
-        "family_title": score_family_title(depositor_raw, student_name),
+        "name_levenshtein": name_levenshtein,
+        "student_name_token": student_name_token,
+        "family_title": family_title,
         "memo_code": score_memo_code(memo_raw, deposit_code),
         "time_proximity": score_time_proximity(tx_at, invoice_ref_at),
     }
