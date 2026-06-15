@@ -72,12 +72,10 @@ class ConnectionNotificationService {
         title: '🔗 새 연결 요청',
         body: '$requesterName님이 연결을 요청했습니다',
         createdAt: DateTime.now(),
-        actionUrl: AppRoutes.profile, // Navigate to profile to see pending requests
+        actionUrl: AppRoutes
+            .pendingRequests, // Navigate to invite/requests — where teacher reviews incoming connection requests
         actionLabel: '요청 확인',
-        data: {
-          'requestId': requestId,
-          'requesterName': requesterName,
-        },
+        data: {'requestId': requestId, 'requesterName': requesterName},
       );
 
       await _notificationService.showNotification(notification);
@@ -101,10 +99,7 @@ class ConnectionNotificationService {
         title: '🎉 새 학생 연결',
         body: '$studentName님과 연결되었습니다',
         createdAt: DateTime.now(),
-        data: {
-          'connectionId': connectionId,
-          'studentName': studentName,
-        },
+        data: {'connectionId': connectionId, 'studentName': studentName},
       );
 
       await _notificationService.showNotification(notification);
