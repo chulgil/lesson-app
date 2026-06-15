@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../gamification/gamification_facade.dart'
     show growthHeatmapRepositoryProvider, studentQuestRepositoryProvider;
-import '../../../practice_journal/practice_journal.dart'
+import '../../../practice_journal/practice_journal_facade.dart'
     show practiceJournalRepositoryProvider;
 import '../../domain/services/practice_recording_service.dart';
 import '../../domain/services/practice_source_loggers.dart';

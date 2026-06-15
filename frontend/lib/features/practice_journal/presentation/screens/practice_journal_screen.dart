@@ -8,8 +8,9 @@ import 'package:lessonaza/features/practice_journal/domain/entities/endorsement.
 import 'package:lessonaza/features/practice_journal/domain/entities/guardian_seal.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/practice_ledger.dart';
 import 'package:lessonaza/features/practice_journal/presentation/extensions/journal_tone.dart';
-import 'package:lessonaza/features/practice_journal/presentation/providers/practice_journal_provider.dart';
 import 'package:lessonaza/features/practice_journal/presentation/widgets/journal_month_grid.dart';
+
+import '../providers/practice_journal_provider.dart';
 
 /// 3 역할(학생·보호자·선생님) x 2 톤 연습장 화면.
 ///

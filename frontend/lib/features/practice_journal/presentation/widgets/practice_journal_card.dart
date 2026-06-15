@@ -4,8 +4,9 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_glyph.dart';
-import 'package:lessonaza/features/practice_journal/presentation/providers/practice_journal_provider.dart';
 import 'package:lessonaza/features/practice_journal/presentation/screens/practice_journal_screen.dart';
+
+import '../providers/practice_journal_provider.dart';
 
 /// 홈/목록 화면에 삽입하는 이달 연습장 미리보기 카드.
 ///
@@ -39,11 +40,11 @@ class PracticeJournalCard extends ConsumerWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      borderRadius: BorderRadius.zero,
       child: Ink(
         decoration: BoxDecoration(
           color: AppColors.paperDark,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.zero,
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
