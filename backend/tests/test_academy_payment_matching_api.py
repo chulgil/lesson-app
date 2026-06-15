@@ -399,3 +399,34 @@ async def test_non_owner_cannot_create_bank_transaction(
         json={"depositor_raw": "임의", "amount": 100000, "tx_at": datetime.now(UTC).isoformat()},
     )
     assert response.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# M2 — 입금액 초과 매칭 방지
+# ---------------------------------------------------------------------------
+
+
+async def test_match_paid_amount_exceeds_tx_returns_400(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """M2: paid_amount 가 통장 입금액(tx.amount)을 초과하면 400 — 정산 왜곡 방지."""
+    academy_id, _, invoice_id = await _create_academy_with_invoice(client, db_session, create_test_user)
+    tx_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions",
+        headers=_owner_headers(),
+        json={"depositor_raw": "김지민 어머니", "amount": 100000, "tx_at": datetime.now(UTC).isoformat()},
+    )
+    tx_id = tx_resp.json()["id"]
+
+    resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/match",
+        headers=_owner_headers(),
+        json={"invoice_id": invoice_id, "paid_amount": 200000},
+    )
+    assert resp.status_code == 400
+
+    # 매칭 미적용 — tx unmatched 유지, payment 미생성.
+    tx = await db_session.scalar(select(AcademyBankTransaction).where(AcademyBankTransaction.id == tx_id))
+    assert tx.state == AcademyBankTransactionState.unmatched
+    payment = await db_session.scalar(select(AcademyPayment).where(AcademyPayment.bank_tx_ref == tx_id))
+    assert payment is None

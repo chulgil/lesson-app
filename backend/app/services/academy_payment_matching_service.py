@@ -132,6 +132,12 @@ class AcademyPaymentMatchingService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"tx already {tx.state.value}",
             )
+        if paid_amount > tx.amount:
+            # 통장 입금액보다 큰 금액을 매칭하면 정산이 왜곡된다 (§7.3 초과는 별도 흐름).
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="paid_amount exceeds transaction amount",
+            )
 
         invoice = await self.db.get(AcademyInvoice, invoice_id)
         if invoice is None:
@@ -322,6 +328,12 @@ class AcademyPaymentMatchingService:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"tx already {tx.state.value}",
+            )
+        if sum(paid_amount for _, paid_amount in splits) > tx.amount:
+            # 분할 합이 통장 입금액을 초과하면 정산이 왜곡된다.
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="split amounts exceed transaction amount",
             )
 
         # 1. invoice 전체 검증 (모두 같은 학원 + 취소 아님).
