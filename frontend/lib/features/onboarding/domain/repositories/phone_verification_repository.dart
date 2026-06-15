@@ -4,7 +4,7 @@
 /// FE 는 결과만 신뢰한다 — 로컬 코드 비교 없음.
 library;
 
-/// 서버 검증 실패 사유. UI 레이어가 AppStrings 메시지로 매핑한다.
+/// 서버 검증 실패 사유. UI 레이어가 사용자 메시지로 매핑한다.
 enum PhoneVerificationFailure {
   /// 60초 쿨다운 중 재요청 (서버 코드: otp_cooldown)
   cooldown,

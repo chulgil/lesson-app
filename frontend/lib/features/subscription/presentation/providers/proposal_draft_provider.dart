@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../analytics/domain/services/analytics_event_logger.dart';
-import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
+import '../../../analytics/analytics_facade.dart'
+    show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../data/repositories/proposal_draft_storage.dart';
 
 part 'proposal_draft_provider.g.dart';

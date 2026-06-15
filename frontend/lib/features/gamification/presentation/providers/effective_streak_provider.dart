@@ -3,7 +3,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../practice/presentation/providers/practice_streak_provider.dart';
+import '../../../practice/practice_facade.dart' show practiceStreakProvider;
 import '../../domain/services/streak_with_freeze_calculator.dart';
 import 'streak_freeze_provider.dart';
 

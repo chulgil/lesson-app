@@ -7,8 +7,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../analytics/domain/services/analytics_event_logger.dart';
-import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
+import '../../../analytics/analytics_facade.dart'
+    show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';

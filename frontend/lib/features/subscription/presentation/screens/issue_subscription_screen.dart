@@ -8,8 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../analytics/domain/services/analytics_event_logger.dart';
-import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
+import '../../../analytics/analytics_facade.dart'
+    show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/domain/entities/lesson_location.dart';

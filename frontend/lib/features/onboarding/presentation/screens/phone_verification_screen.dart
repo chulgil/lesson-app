@@ -9,8 +9,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../analytics/domain/services/analytics_event_logger.dart';
-import '../../../analytics/presentation/providers/analytics_event_logger_provider.dart';
+import '../../../analytics/analytics_facade.dart'
+    show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -152,9 +152,10 @@ class _PhoneVerificationScreenState
 
     setState(() => _isLoading = true);
 
-    final result = await ref
-        .read(teacherOnboardingNotifierProvider.notifier)
-        .resendVerificationCode();
+    final result =
+        await ref
+            .read(teacherOnboardingNotifierProvider.notifier)
+            .resendVerificationCode();
 
     if (!mounted) return;
     setState(() {
@@ -281,27 +282,29 @@ class _PhoneVerificationScreenState
                   width: double.infinity,
                   height: AppSpacing.buttonHeight,
                   child: ElevatedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : (_codeSent ? _verifyCode : _sendCode),
+                    onPressed:
+                        _isLoading
+                            ? null
+                            : (_codeSent ? _verifyCode : _sendCode),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       foregroundColor: AppColors.paper,
                       shape: RoundedRectangleBorder(),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
+                    child:
+                        _isLoading
+                            ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.paper,
+                              ),
+                            )
+                            : Text(
+                              _codeSent ? '인증 완료' : '인증번호 받기',
+                              style: AppTypography.button,
                             ),
-                          )
-                        : Text(
-                            _codeSent ? '인증 완료' : '인증번호 받기',
-                            style: AppTypography.button,
-                          ),
                   ),
                 ),
 
@@ -397,9 +400,10 @@ class _PhoneVerificationScreenState
               Text(
                 _formatTime(_remainingSeconds),
                 style: AppTypography.bodyMedium.copyWith(
-                  color: _remainingSeconds <= 30
-                      ? AppColors.paperAccent
-                      : AppColors.paperAccent,
+                  color:
+                      _remainingSeconds <= 30
+                          ? AppColors.paperAccent
+                          : AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -431,15 +435,15 @@ class _PhoneVerificationScreenState
         // Resend button
         Center(
           child: TextButton(
-            onPressed: _remainingSeconds <= 120 && !_isLoading
-                ? _resendCode
-                : null,
+            onPressed:
+                _remainingSeconds <= 120 && !_isLoading ? _resendCode : null,
             child: Text(
               '인증번호 다시 받기',
               style: AppTypography.bodyMedium.copyWith(
-                color: _remainingSeconds <= 120
-                    ? AppColors.paperAccent
-                    : AppColors.inkTertiary,
+                color:
+                    _remainingSeconds <= 120
+                        ? AppColors.paperAccent
+                        : AppColors.inkTertiary,
               ),
             ),
           ),
