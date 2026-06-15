@@ -255,56 +255,15 @@ class _PriceCell extends ConsumerWidget {
   }
 
   Future<void> _showEditDialog(BuildContext context, WidgetRef ref) async {
-    final controller = TextEditingController(
-      text: price != null ? price.toString() : '',
-    );
-
     final result = await showDialog<int?>(
       context: context,
       builder:
-          (context) => NotebookAlertDialog(
-            backgroundColor: AppColors.paper,
-            shape: const RoundedRectangleBorder(),
-            titleTextStyle: NotebookTypography.pieceTitle,
-            title: Text(
-              AppStrings.priceTableDialogTitle(instrument, levelLabel),
-            ),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: AppStrings.priceTableDialogFieldLabel,
-                hintText: AppStrings.profilePriceTableHint,
-              ),
-              autofocus: true,
-            ),
-            actions: [
-              if (price != null)
-                TextButton(
-                  onPressed: () => Navigator.pop(context, -1),
-                  child: Text(
-                    AppStrings.delete,
-                    style: const TextStyle(color: AppColors.paperAccent),
-                  ),
-                ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  final value = int.tryParse(controller.text);
-                  if (value != null && value > 0) {
-                    Navigator.pop(context, value);
-                  }
-                },
-                child: const Text(AppStrings.save),
-              ),
-            ],
+          (_) => _PriceEditDialog(
+            instrument: instrument,
+            levelLabel: levelLabel,
+            initialPrice: price,
           ),
     );
-    controller.dispose();
 
     if (!context.mounted || result == null) return;
 
@@ -330,3 +289,92 @@ class _PriceCell extends ConsumerWidget {
         .updatePriceTable(priceTable);
   }
 }
+
+/// 가격 편집 다이얼로그 — StatefulWidget 이 컨트롤러 생명주기를 소유한다.
+///
+/// 이전 구현은 컨트롤러를 `_showEditDialog` 로컬 변수로 생성하고
+/// `showDialog` 반환 직후 `dispose()` 를 호출했다. `Navigator.pop` 은
+/// 다이얼로그 종료 **애니메이션을 시작**할 뿐이고, 종료 애니메이션 중
+/// `updatePriceTable` 이 provider 리빌드를 유발하면 아직 마운트된 TextField
+/// 가 disposed 컨트롤러에 재접속 → "used after being disposed" 크래시.
+///
+/// State.dispose() 로 소유권을 이전하면 Flutter 가 위젯 언마운트 시점에
+/// 컨트롤러를 해제하므로 애니메이션 경쟁이 사라진다.
+class _PriceEditDialog extends StatefulWidget {
+  const _PriceEditDialog({
+    required this.instrument,
+    required this.levelLabel,
+    required this.initialPrice,
+  });
+
+  final String instrument;
+  final String levelLabel;
+  final int? initialPrice;
+
+  @override
+  State<_PriceEditDialog> createState() => _PriceEditDialogState();
+}
+
+class _PriceEditDialogState extends State<_PriceEditDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialPrice?.toString() ?? '',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotebookAlertDialog(
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(),
+      titleTextStyle: NotebookTypography.pieceTitle,
+      title: Text(
+        AppStrings.priceTableDialogTitle(widget.instrument, widget.levelLabel),
+      ),
+      content: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: AppStrings.priceTableDialogFieldLabel,
+          hintText: AppStrings.profilePriceTableHint,
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        if (widget.initialPrice != null)
+          TextButton(
+            onPressed: () => Navigator.pop(context, -1),
+            child: Text(
+              AppStrings.delete,
+              style: const TextStyle(color: AppColors.paperAccent),
+            ),
+          ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            final value = int.tryParse(_controller.text);
+            if (value != null && value > 0) {
+              Navigator.pop(context, value);
+            }
+          },
+          child: const Text(AppStrings.save),
+        ),
+      ],
+    );
+  }
+}
+
+/// Public alias for [_PriceEditDialog] — used only in widget tests.
+///
+/// Allows tests to pump the dialog directly without wiring the full
+/// [PriceTableScreen] provider graph.
+// ignore: library_private_types_in_public_api
+typedef PriceEditDialogForTest = _PriceEditDialog;
