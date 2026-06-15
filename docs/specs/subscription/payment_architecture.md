@@ -20,7 +20,7 @@ Lessonaza 의 입금/과금 정책은 흐름의 주체로 결정한다:
 | **A'. 학원 ↔ 학생/학부모** | 학원 | **무통장입금 / 현금 등 외부 입금** | 학원 수강권 입금 상태 기록 |
 | **B. 앱관리자 → 사용자** | Lessonaza | **✅ 구현됨 — 앱 내 결제(IAP), 2026-06-03 코드 검증** | 앱 사용료 과금, 유료 플랜(Pro/Studio/Lifetime), 프리미엄 기능 결제 |
 
-**흐름 A/A'(수강료)는 변함없이 무통장입금만이다.** 선생님이나 학원이 학생/학부모에게 받는 수강료에 대해 Lessonaza는 PG, 카드 결제, 간편결제, 정산, 영수증 발행, 에스크로를 **제공하지 않는다** (정책 유지, 2026-06-03 코드 검증 — `features/auth/.../terms_agreement_section.dart`에 "회사는 결제 대행 서비스를 제공하지 않습니다. 수강료 결제는 선생님과 학생/학부모 간에 직접" 명시).
+**흐름 A/A'(수강료)는 변함없이 무통장입금만이다.** 선생님이나 학원이 학생/학부모에게 받는 수강료에 대해 Lessonaza는 PG, 카드 결제, 간편결제, **인앱결제(IAP)**, 정산, 영수증 발행, 에스크로를 **제공하지 않는다** (정책 유지, 2026-06-03 코드 검증 — `features/auth/.../terms_agreement_section.dart`에 "회사는 결제 대행 서비스를 제공하지 않습니다. 수강료 결제는 선생님과 학생/학부모 간에 직접" 명시). **수강권은 IAP 로 구매 불가** — IAP(`in_app_purchase`)는 흐름 B(앱 사용료) 전용이며 `subscription/` 도메인에 IAP import 0 건으로 물리 분리 (2026-06-15 재검증).
 
 **흐름 B(앱 사용료)는 이제 구현되었다 (2026-06-03 갱신).** Apple StoreKit / Google Play Billing 기반 **인앱결제(IAP)** 로 구현되며, 이는 PG(결제대행)가 아니라 스토어 결제다. 수강료(A/A')와 데이터·로직상 절대 섞이지 않는다. 상세 SSOT는 [paywall_spec.md](./paywall_spec.md), 코드는 `features/billing/`(`iap_service.dart`, `domain/services/billing_guard.dart`, `app_billing_provider.dart`) 참조. (구 "흐름 B 미구현" 표기 정정 — §3.2 참고)
 
