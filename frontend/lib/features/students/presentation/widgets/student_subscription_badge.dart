@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../../subscription/subscription_ui_facade.dart';
 import '../providers/lesson_class_providers.dart';
 import '../providers/membership_providers.dart';
 
@@ -58,7 +60,9 @@ class StudentClassBadge extends ConsumerWidget {
   }
 }
 
-/// Mini badge showing subscription remaining count/days.
+/// Thin wrapper — subscribes to activeStudentSubscriptionsProvider,
+/// picks the most urgent subscription, and delegates rendering to
+/// [SubscriptionBadge]. Owns only: data retrieval + empty-state.
 class StudentSubscriptionMiniBadge extends ConsumerWidget {
   final String studentId;
 
@@ -72,102 +76,30 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
 
     return subscriptionsAsync.when(
       data: (subscriptions) {
-        if (subscriptions.isEmpty) {
-          return _buildNoSubscriptionBadge();
+        final urgent = _mostUrgent(subscriptions);
+        if (urgent == null) {
+          return Text(
+            AppStrings.subscriptionBadgeNone,
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+          );
         }
-
-        // Get the subscription with lowest remaining (most urgent)
-        final urgentSubscription = _getMostUrgentSubscription(subscriptions);
-        if (urgentSubscription == null) {
-          return _buildNoSubscriptionBadge();
-        }
-
-        return _buildSubscriptionBadge(urgentSubscription);
+        return SubscriptionBadge(subscription: urgent);
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 
-  Subscription? _getMostUrgentSubscription(List<Subscription> subscriptions) {
+  Subscription? _mostUrgent(List<Subscription> subscriptions) {
     if (subscriptions.isEmpty) return null;
-
-    // Sort by urgency (expiring soon first, then by remaining)
     final sorted = List<Subscription>.from(subscriptions)..sort((a, b) {
-      // Expiring soon first
       if (a.isExpiringSoon && !b.isExpiringSoon) return -1;
       if (!a.isExpiringSoon && b.isExpiringSoon) return 1;
-
-      // Then by remaining count/days
-      final aRemaining = a.remainingLessons ?? a.daysUntilExpiration ?? 999;
-      final bRemaining = b.remainingLessons ?? b.daysUntilExpiration ?? 999;
-      return aRemaining.compareTo(bRemaining);
+      final aR = a.remainingLessons ?? a.daysUntilExpiration ?? 999;
+      final bR = b.remainingLessons ?? b.daysUntilExpiration ?? 999;
+      return aR.compareTo(bR);
     });
-
     return sorted.first;
-  }
-
-  Widget _buildNoSubscriptionBadge() {
-    return Text(
-      '수강권 없음',
-      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
-    );
-  }
-
-  Widget _buildSubscriptionBadge(Subscription subscription) {
-    Color textColor;
-    String label;
-    IconData? icon;
-
-    // Deposit confirmation pending takes highest priority.
-    if (subscription.isUnpaid) {
-      textColor = AppColors.paperAccent;
-      label = '입금대기(후불)';
-      icon = Icons.warning_amber_rounded;
-    } else if (subscription.status == SubscriptionStatus.expired) {
-      textColor = AppColors.paperAccent;
-      label = '만료됨';
-      icon = Icons.warning_amber_rounded;
-    } else if (subscription.isExpiringSoon) {
-      textColor = AppColors.paperAccent;
-      label = _formatBadgeLabel(subscription);
-      icon = Icons.access_time;
-    } else {
-      textColor = AppColors.paperOk;
-      label = _formatBadgeLabel(subscription);
-    }
-
-    // Clean inline style - icon + text only, no background box
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (icon != null) ...[
-          Icon(icon, size: 12, color: textColor),
-          const SizedBox(width: 2),
-        ],
-        Text(
-          label,
-          style: AppTypography.caption.copyWith(
-            color: textColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Format badge label by subscription type.
-  /// Package: [used/total], Monthly: 월정액, Trial: 체험중
-  String _formatBadgeLabel(Subscription subscription) {
-    switch (subscription.type) {
-      case SubscriptionType.package:
-        final total = subscription.totalLessonsForDisplay ?? 0;
-        return '[${subscription.usedLessons}/$total]';
-      case SubscriptionType.monthly:
-        return '월정액';
-      case SubscriptionType.trial:
-        return '체험중';
-    }
   }
 }
 
