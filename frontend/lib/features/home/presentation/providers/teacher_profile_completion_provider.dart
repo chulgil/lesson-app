@@ -56,20 +56,17 @@ bool hasIntroduction(HasIntroductionRef ref) {
   return (profile?.introduction.length ?? 0) >= 20;
 }
 
-/// 2026-06-10 UX fix — 악기 설정 quest. 가격 설정의 prerequisite.
-/// FE 가입 흐름에서 onboarding profile setup 단계 A 에 악기를 입력하나,
-/// 빠뜨리거나 추후 추가하려는 경우 진입점이 모호했음 → quest 카드 명시.
+/// 악기 등록 완료 여부 — Q3b quest (#732 SSOT fix).
 ///
-/// Bug #726 fix — 악기 관리 화면은 teacherSettingsProvider 에 씀.
-/// currentTeacherProfileProvider 만 보면 관리 화면 저장 후 quest 가 완료되지 않음.
-/// 두 소스 중 하나라도 악기가 있으면 quest 완료로 판정.
+/// SSOT: [currentTeacherProfileProvider] (TeacherProfile.instruments).
+///
+/// #732 fix — 관리 화면이 이제 profile 에 직접 쓰므로 단일 소스로 단순화.
+/// #726 band-aid (settings ∪ profile OR 판정) 제거. migration 로직은
+/// InstrumentManagementScreen 초기화 시 settings → profile 일회성 시드.
 @Riverpod(keepAlive: true)
 bool hasInstruments(HasInstrumentsRef ref) {
   final profile = ref.watch(currentTeacherProfileProvider).valueOrNull;
-  final settings = ref.watch(teacherSettingsProvider).valueOrNull;
-  final fromProfile = profile?.instruments.isNotEmpty ?? false;
-  final fromSettings = settings?.instruments.isNotEmpty ?? false;
-  return fromProfile || fromSettings;
+  return profile?.instruments.isNotEmpty ?? false;
 }
 
 /// Whether the teacher has set a lesson price table.

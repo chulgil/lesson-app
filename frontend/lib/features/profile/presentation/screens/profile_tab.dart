@@ -71,8 +71,8 @@ class ProfileTab extends ConsumerWidget {
                     meta:
                         'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
                     trailing: IconButton(
-                      onPressed: () =>
-                          context.push(AppRoutes.notificationSettings),
+                      onPressed:
+                          () => context.push(AppRoutes.notificationSettings),
                       icon: const Icon(
                         Icons.settings_outlined,
                         color: AppColors.ink,
@@ -187,25 +187,27 @@ class ProfileTab extends ConsumerWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space1,
-              children: instruments
-                  .map(
-                    (inst) => Chip(
-                      label: Text(
-                        inst,
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.paperAccent,
+              children:
+                  instruments
+                      .map(
+                        (inst) => Chip(
+                          label: Text(
+                            inst,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.paperAccent,
+                            ),
+                          ),
+                          backgroundColor: AppColors.paperAccent.withValues(
+                            alpha: 0.08,
+                          ),
+                          side: BorderSide.none,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
                         ),
-                      ),
-                      backgroundColor: AppColors.paperAccent.withValues(
-                        alpha: 0.08,
-                      ),
-                      side: BorderSide.none,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                    ),
-                  )
-                  .toList(),
+                      )
+                      .toList(),
             ),
           ],
           // Introduction
@@ -346,7 +348,9 @@ class ProfileTab extends ConsumerWidget {
     if (profile == null) return null;
     if (profile.profileImage == null) return '프로필 사진을 등록해보세요';
     if (profile.introduction.length < 20) return '자기소개를 20자 이상 작성해보세요';
-    if (profile.instruments.isEmpty) return '가르치는 악기를 추가해보세요';
+    if (profile.instruments.isEmpty) {
+      return AppStrings.profileCompletionAddInstruments;
+    }
     final hasAny =
         (profile.career?.isNotEmpty ?? false) ||
         (profile.education?.isNotEmpty ?? false) ||
@@ -426,14 +430,16 @@ class ProfileTab extends ConsumerWidget {
       snapshot: snapshot,
       studentCount: studentCount,
       onUpgrade: () => handleBuyPro(context: context, ref: ref),
-      onManage: () => _openStoreSubscriptionManagement(
-        context,
-        AppStrings.billingManageStoreOpening,
-      ),
-      onReceipts: () => _openStoreSubscriptionManagement(
-        context,
-        AppStrings.billingReceiptStoreOpening,
-      ),
+      onManage:
+          () => _openStoreSubscriptionManagement(
+            context,
+            AppStrings.billingManageStoreOpening,
+          ),
+      onReceipts:
+          () => _openStoreSubscriptionManagement(
+            context,
+            AppStrings.billingReceiptStoreOpening,
+          ),
     );
   }
 
@@ -449,9 +455,10 @@ class ProfileTab extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(SnackBar(content: Text(openingHint)));
 
-    final url = Platform.isIOS
-        ? Uri.parse('https://apps.apple.com/account/subscriptions')
-        : Uri.parse('https://play.google.com/store/account/subscriptions');
+    final url =
+        Platform.isIOS
+            ? Uri.parse('https://apps.apple.com/account/subscriptions')
+            : Uri.parse('https://play.google.com/store/account/subscriptions');
 
     try {
       final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -556,11 +563,11 @@ class ProfileTab extends ConsumerWidget {
     return CategoryMenuGrid(
       onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
       onLessonStyleTap: () => context.push(AppRoutes.lessonStyleSettings),
-      onSubscriptionBillingTap: () =>
-          showSubscriptionBillingSheet(context, teacherId),
+      onSubscriptionBillingTap:
+          () => showSubscriptionBillingSheet(context, teacherId),
       onMyProfileTap: () => showMyProfileSheet(context),
-      onPolicyNotificationsTap: () =>
-          showPolicyNotificationsSheet(context, ref),
+      onPolicyNotificationsTap:
+          () => showPolicyNotificationsSheet(context, ref),
     );
   }
 }

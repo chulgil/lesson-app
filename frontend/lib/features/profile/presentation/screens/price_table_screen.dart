@@ -3,8 +3,9 @@
 //
 // 진입: 메인 5묶음 카테고리 → 💰 수강권·정산 BottomSheet → "레슨 가격표" ListTile.
 //
-// SSOT:
-//   - `TeacherSettings.lessonPriceTable: Map<instrument, Map<level, won>>`
+// SSOT (#732 fix):
+//   - 악기 목록: `TeacherProfile.instruments` (SSOT — profile 도메인)
+//   - 가격 값:   `TeacherSettings.lessonPriceTable: Map<instrument, Map<level, won>>`
 //   - 레벨: beginner / intermediate / advanced (초급/중급/고급 라벨)
 //   - 가격: 원 단위 저장, "만" 단위 표시 (10,000 으로 나눠 소수 1자리)
 
@@ -20,48 +21,81 @@ import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../onboarding/onboarding_facade.dart';
 import '../../../settings/settings_facade.dart';
 import '../../domain/entities/teacher_settings.dart';
 
 /// 가격표 전용 화면 (W3 Task 3.3).
 ///
 /// spec §6.3 — 수강권·정산 묶음의 신규 화면. 악기 등록 전에는 안내 라벨만 노출.
+///
+/// #732 dual-source: instrument 목록은 [currentTeacherProfileProvider] (SSOT),
+/// 가격 값은 [teacherSettingsNotifierProvider].lessonPriceTable.
 class PriceTableScreen extends ConsumerWidget {
   const PriceTableScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
+    final profileAsync = ref.watch(currentTeacherProfileProvider);
+
+    // Both must be loaded before showing content.
+    if (settingsAsync.isLoading || profileAsync.isLoading) {
+      return const NotebookScreenScaffold(
+        appBar: NotebookDetailAppBar(title: AppStrings.priceTableScreenTitle),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final settingsError = settingsAsync.error;
+    final profileError = profileAsync.error;
+    if (settingsError != null || profileError != null) {
+      return NotebookScreenScaffold(
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.priceTableScreenTitle,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Text(
+              'Error: ${settingsError ?? profileError}',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final settings = settingsAsync.valueOrNull;
+    final instruments =
+        profileAsync.valueOrNull?.instruments ?? const <String>[];
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(
         title: AppStrings.priceTableScreenTitle,
       ),
-      body: settingsAsync.when(
-        data: (settings) => _PriceTableContent(settings: settings),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (e, _) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text(
-                  'Error: $e',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
+      body:
+          settings == null
+              ? const Center(child: CircularProgressIndicator())
+              : _PriceTableContent(
+                instruments: instruments,
+                settings: settings,
               ),
-            ),
-      ),
     );
   }
 }
 
 /// 가격표 본문 — 악기 유무에 따라 empty / table 분기.
+///
+/// [instruments]: TeacherProfile.instruments (SSOT #732).
+/// [settings]: TeacherSettings (가격 값 전용).
 class _PriceTableContent extends ConsumerWidget {
+  final List<String> instruments;
   final TeacherSettings settings;
 
-  const _PriceTableContent({required this.settings});
+  const _PriceTableContent({required this.instruments, required this.settings});
 
   /// 레벨 키 — TeacherSettings.lessonPriceTable 의 2차 키와 일치해야 한다.
   static const _levels = <String>['beginner', 'intermediate', 'advanced'];
@@ -73,8 +107,6 @@ class _PriceTableContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final instruments = settings.instruments;
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(

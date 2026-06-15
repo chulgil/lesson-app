@@ -7178,6 +7178,9 @@ class AppStrings {
   static const profileInstrumentHintCustom = '악기 이름 입력';
   static const profileInstrumentDeleteTitle = '악기 삭제';
 
+  /// Profile completion next-step hint — instruments not yet set (#732 i18n fix).
+  static const profileCompletionAddInstruments = '가르치는 악기를 추가해보세요';
+
   /// swipe destructive 확인 다이얼로그 — 악기 삭제 title
   static const swipeActionDeleteInstrumentConfirmTitle = '악기 삭제';
 
