@@ -260,6 +260,18 @@ class AcademyPaymentMatchingService:
         tx.matched_invoice_id = None
         tx.matched_by_user_id = None
         tx.matched_at = None
+
+        # 5. suggestion 결정 reset — revert 는 "매칭 없던 상태로" 회귀이므로 이전
+        #    accepted/rejected 결정을 pending 으로 되돌린다. 이렇게 해야 이후
+        #    re-suggest 의 재계산이 decided 된 (tx, invoice) pair 를 재INSERT 하지
+        #    않아 uq_acad_match_sugg_per_pair UNIQUE 위반(IntegrityError)을 피한다.
+        decided_suggestions = await self.db.scalars(
+            select(AcademyPaymentMatchSuggestion).where(AcademyPaymentMatchSuggestion.bank_transaction_id == tx.id)
+        )
+        for sugg in decided_suggestions.all():
+            sugg.user_decision = AcademyPaymentMatchSuggestionDecision.pending
+            sugg.decided_at = None
+
         await self.db.flush()
         return tx
 

@@ -384,3 +384,56 @@ async def test_suggest_on_matched_tx_returns_409(
         headers=_owner_headers(),
     )
     assert resp.status_code == 409
+
+
+# ---------------------------------------------------------------------------
+# H1 회귀 — revert 후 re-suggest (uq_acad_match_sugg_per_pair UNIQUE 위반 방지)
+# ---------------------------------------------------------------------------
+
+
+async def test_revert_then_resuggest_succeeds(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """H1: suggest → confirm → revert 후 re-suggest 가 UNIQUE 위반 없이 200.
+
+    revert 가 suggestion 결정(accepted/rejected)을 pending 으로 reset 하지 않으면
+    re-suggest 의 재계산이 decided 된 (tx, invoice) pair 를 재INSERT 하여
+    uq_acad_match_sugg_per_pair UNIQUE 위반 (IntegrityError → 500) 이 발생한다.
+    """
+    academy_id, _, invoice_id = await _setup(client, db_session, create_test_user, student_name="김지민")
+    tx_id = await _create_tx(client, academy_id, depositor="김지민 어머니", amount=200_000)
+
+    first = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/suggest",
+        headers=_owner_headers(),
+    )
+    assert first.status_code == 200
+    assert first.json()["total_count"] >= 1
+
+    confirm = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/match",
+        headers=_owner_headers(),
+        json={"invoice_id": invoice_id, "paid_amount": 200_000},
+    )
+    assert confirm.status_code == 200
+
+    revert = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/revert",
+        headers=_owner_headers(),
+    )
+    assert revert.status_code == 200
+
+    # re-suggest — decided pair 재INSERT 로 UNIQUE 위반이 나면 안 됨.
+    resuggest = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/suggest",
+        headers=_owner_headers(),
+    )
+    assert resuggest.status_code == 200
+    assert resuggest.json()["total_count"] >= 1
+
+    # 재계산된 후보는 모두 pending (revert 가 이전 결정 reset).
+    suggestions = (
+        await db_session.scalars(
+            select(AcademyPaymentMatchSuggestion).where(AcademyPaymentMatchSuggestion.bank_transaction_id == tx_id)
+        )
+    ).all()
+    assert len(suggestions) >= 1
+    assert all(s.user_decision == AcademyPaymentMatchSuggestionDecision.pending for s in suggestions)
