@@ -1,7 +1,8 @@
 # academy/payment_matching_spec — 무통장입금 fuzzy 매칭 (수기 보조)
 
 > 기준일: 2026-06-04
-> 경로: `/billing/payments/matching`
+> **구현 컨테이너: `academy-console` (web, `console.lessonaza.app`) — 학원장 콘솔. lesson-app(Flutter) 아님.** Flutter 앱은 academy 데이터를 읽기 전용으로만 표시(입력/관리 UI 없음). academy-console 은 **아직 미착수**(스펙 only, AC-M1 신설 예정 — repo·형제 디렉토리에 코드 없음). 본 스펙의 모든 화면(§3.4/§3.5 학생 입력 필드, §5 입력 흐름, §6 매칭 UX)은 academy-console 소관 → Flutter 에 만들지 말 것.
+> 경로: `/billing/payments/matching` (web 라우트)
 > 마일스톤: AC-M3 (수기 입력) / AC-M6 (CSV 임포트) / AC-M9 (OCR — 후속)
 > 선행: [billing_settlement_spec.md §4](billing_settlement_spec.md), 옵시디언 `21-academy-요구사항.md` §3.1 R-AO-16
 > 시장조사 input: `.harness/research/academy_market_2026.md` §B P0 #1 (1인 학원장 매일 페인)

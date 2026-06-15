@@ -56,6 +56,10 @@ flutter analyze                                              # 분석
 **Ask First**: 아키텍처 변경, 새 패키지 추가, 데이터 스키마 변경
 **Never**: `Color(0x...)`, 레거시 위치에 새 코드, 사용자 확인 전 이슈 닫기
 
+### Academy 도메인 컨테이너 분담 (착오 주의 — HARD-GATE)
+
+학원(academy) 의 **입력·관리 UI**(학생/강사 등록·수정, 정산, 입금매칭, 대시보드)는 **`academy-console`(web, `console.lessonaza.app`) 소관**이며 **아직 미착수**(스펙 only, repo·형제 디렉토리에 코드 없음). **`lesson-app`(Flutter)에 academy 입력 폼/매칭 화면/정산 화면을 만들지 말 것.** Flutter 는 academy 데이터를 **읽기 전용**으로만 표시(`AcademyDetailScreen`, `academy_detail_provider.listStudents`) — academy repository 에 create/update 가 없는 것은 정상이다. BE(FastAPI)는 academy 전 기능 구현 완료. 스펙: `docs/specs/web/academy/README.md` 컨테이너 분담.
+
 ## 규칙 파일 (`.claude/rules/`)
 
 | 파일 | 내용 |

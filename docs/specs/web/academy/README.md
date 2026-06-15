@@ -5,6 +5,8 @@
 
 ## 컨테이너 분담
 
+> **구현 위치 원칙 (착오 주의)**: academy 의 모든 **입력·관리 UI**(학생/강사 등록·수정, 정산, 입금매칭, 대시보드)는 **`academy-console`(web) 소관**이며, 이 프로젝트는 **아직 미착수**(스펙 only, AC-M1 신설 예정 — repo·형제 디렉토리에 코드 없음). **`lesson-app`(Flutter)에는 academy 입력 폼/매칭 화면/정산 화면을 만들지 않는다** — Flutter 는 학원 데이터를 **읽기 전용**으로만 표시(`AcademyDetailScreen`, `academy_detail_provider.listStudents`; repository 에 create/update 가 없는 것은 정상). BE(FastAPI)는 academy 전 기능 구현 완료, web console 이 소비 예정.
+
 학원 데이터의 SoR(Source of Record) 는 백엔드. 두 컨테이너 + 모바일 앱은 같은 데이터를 다른 렌더링으로 표시한다.
 
 | 컨테이너 | 경로 | 사용자 | 목적 | 시점 |
