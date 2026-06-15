@@ -134,10 +134,29 @@ if [[ -n "$WARNINGS" ]]; then
         echo "│ • $W" >&2
     done <<< "$WARNINGS"
     echo "│" >&2
-    echo "│ 대응: testWidgets() smoke test 추가 (pumpWidget + pumpAndSettle + tester.takeException() isNull)" >&2
-    echo "│ 근거: .claude/rules/ux-rules.md HARD-GATE — flutter analyze 는 RenderBox/BoxConstraints 크래시 미감지" >&2
+    echo "│ 필수 smoke test 계약 (pump-only 는 불충분):" >&2
+    echo "│  1. pumpWidget(MaterialApp(home: Screen(...))) + ProviderScope 오버라이드" >&2
+    echo "│  2. await tester.pumpAndSettle() — 초기 렌더 완료 대기" >&2
+    echo "│  3. 화면의 주요 인터랙션 구동:" >&2
+    echo "│     - showDialog 를 여는 버튼/탭 → tester.tap(find.text('버튼라벨'))" >&2
+    echo "│     - showModalBottomSheet 를 여는 트리거" >&2
+    echo "│     - 다이얼로그/시트 내부 입력값 → tester.enterText()" >&2
+    echo "│     - 확인/취소 등 1차 액션 버튼 탭" >&2
+    echo "│  4. await tester.pumpAndSettle() — 종료 애니메이션 완전히 구동" >&2
+    echo "│  5. expect(tester.takeException(), isNull)" >&2
+    echo "│" >&2
+    echo "│ 왜 인터랙션 구동이 필요한가:" >&2
+    echo "│  - pump-only 는 'Navigator.pop 시작' 후 TextEditingController.dispose() 경쟁을" >&2
+    echo "│    잡지 못함 (#730 price-dialog controller-dispose 크래시 실제 사례)" >&2
+    echo "│  - pumpAndSettle() 이 종료 애니메이션을 완전히 구동해야 disposed 컨트롤러" >&2
+    echo "│    재접근 예외가 표면에 드러남" >&2
+    echo "│  - 다이얼로그를 열지 않으면 위젯 라이프사이클 크래시 클래스 전체가 비가시" >&2
+    echo "│" >&2
+    echo "│ 근거: .claude/rules/ux-rules.md HARD-GATE — flutter analyze 는" >&2
+    echo "│        RenderBox/BoxConstraints/controller-dispose 류 런타임 크래시 미감지" >&2
     echo "│ 의도적 예외: 클래스 정의 위 줄에 '// ignore: widget-smoke-test' 주석." >&2
     echo "│ 사례: §7.133 LikeStamp RenderMetaData 회귀 (2026-04-29)" >&2
+    echo "│       #730 PriceEditDialog controller-dispose 크래시 (2026-06-14)" >&2
     echo "└───────────────────────────────────────────────" >&2
 fi
 
