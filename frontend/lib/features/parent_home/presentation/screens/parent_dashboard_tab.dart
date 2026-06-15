@@ -17,6 +17,7 @@ import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
+import '../../../practice_journal/practice_journal.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/child_profile.dart';
@@ -141,6 +142,16 @@ class ParentDashboardTab extends ConsumerWidget {
                         horizontal: AppSpacing.screenPadding,
                       ),
                       child: _PracticeStreakSection(profile: profile),
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // ── 연습장 카드: 자녀 이달 연습 도장 미리보기 ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
+                      child: _PracticeJournalSection(profile: profile),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -1131,6 +1142,35 @@ class _PaymentStatusSection extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 연습장 카드 섹션 — 선택된 자녀의 이달 연습 도장 미리보기.
+///
+/// childProfileId 는 ChildProfile.id (앱 내부 프로필 ID). linkedStudentId 가
+/// 없어도 도장 카드는 렌더되고 내부적으로 빈 상태를 처리한다.
+class _PracticeJournalSection extends StatelessWidget {
+  const _PracticeJournalSection({required this.profile});
+
+  final ChildProfile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    return PracticeJournalCard(
+      childProfileId: profile.id,
+      role: JournalRole.guardian,
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder:
+                (_) => PracticeJournalScreen(
+                  childProfileId: profile.id,
+                  role: JournalRole.guardian,
+                ),
+          ),
+        );
+      },
     );
   }
 }
