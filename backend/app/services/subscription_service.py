@@ -259,13 +259,25 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
-    def _record_lesson_usage(self, sub: Any, *, lesson_id: str | None, **usage_fields: Any) -> None:
+    def _apply_deduction_counter(self, sub: Any) -> None:
+        """#426/#743: bump ``used_lessons`` and stamp first consumption.
+
+        Single place that mutates the deduction counter so every deducting path
+        (``deduct_lesson``, ``deduct_for_completed_lesson``, ``add_usage``) stays
+        consistent (SSOT).
+        """
+        sub.used_lessons = (sub.used_lessons or 0) + 1
+
+        # #426: stamp first lesson consumption — blocks Undo of payment confirmation.
+        if sub.first_lesson_consumed_at is None:
+            sub.first_lesson_consumed_at = datetime.now(UTC)
+
+    def _record_lesson_usage(self, sub: Any, *, lesson_id: str | None, **usage_fields: Any) -> Any:
         """Core deduction side-effects (no access checks).
 
-        Creates a ``SubscriptionUsage`` row, bumps ``used_lessons`` and stamps
-        ``first_lesson_consumed_at`` (#426). Shared by the teacher-facing
-        ``deduct_lesson`` and the scheduler-facing
-        ``deduct_for_completed_lesson``.
+        Creates a ``SubscriptionUsage`` row and bumps the deduction counter via
+        ``_apply_deduction_counter`` (#426). Shared by the teacher-facing
+        ``deduct_lesson`` and the scheduler-facing ``deduct_for_completed_lesson``.
         """
         from app.models.subscription import SubscriptionUsage
 
@@ -275,12 +287,8 @@ class SubscriptionService:
             **usage_fields,
         )
         self.db.add(usage)
-
-        sub.used_lessons = (sub.used_lessons or 0) + 1
-
-        # #426: stamp first lesson consumption — blocks Undo of payment confirmation.
-        if sub.first_lesson_consumed_at is None:
-            sub.first_lesson_consumed_at = datetime.now(UTC)
+        self._apply_deduction_counter(sub)
+        return usage
 
     async def deduct_lesson(
         self, subscription_id: str, data: UseLessonRequest, current_user: Any
@@ -684,8 +692,14 @@ class SubscriptionService:
         return list(result.all())
 
     async def add_usage(self, subscription_id: str, data: dict, current_user: Any) -> Any:
-        """Add a usage record to a subscription."""
-        from app.models.subscription import SubscriptionUsage
+        """Add a usage record to a subscription.
+
+        #743: when ``deducted`` is True this also bumps ``used_lessons`` so the
+        FE auto-deduct flows (lesson confirmation / add past lesson, which POST
+        here with deducted=True) actually decrement remaining. Non-deducted rows
+        are history-only and leave the counter untouched.
+        """
+        from app.models.subscription import Subscription, SubscriptionUsage
 
         await self.access.require_teacher_subscription(subscription_id, current_user)
 
@@ -699,6 +713,12 @@ class SubscriptionService:
             deducted=data.get("deducted", True),
         )
         self.db.add(usage)
+
+        if usage.deducted:
+            sub = await self.db.get(Subscription, subscription_id)
+            if sub is not None:
+                self._apply_deduction_counter(sub)
+
         await self.db.flush()
         await self.db.refresh(usage)
         return usage
