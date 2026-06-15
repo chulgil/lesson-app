@@ -37,11 +37,12 @@ class ProposalNotificationService {
         type: NotificationType.proposalReceived,
         priority: NotificationPriority.high,
         title: '🎫 수강권 제안',
-        body: isMultiChoice
-            ? '$teacherName 선생님이 수강권을 제안했습니다. 옵션을 선택해주세요!'
-            : '$teacherName 선생님이 $templateName 수강권을 제안했습니다.',
+        body:
+            isMultiChoice
+                ? '$teacherName 선생님이 수강권을 제안했습니다. 옵션을 선택해주세요!'
+                : '$teacherName 선생님이 $templateName 수강권을 제안했습니다.',
         createdAt: DateTime.now(),
-        actionUrl: '${AppRoutes.proposalDetail}?proposalId=$proposalId',
+        actionUrl: AppRoutes.proposalDetail.replaceFirst(':id', proposalId),
         actionLabel: '제안 보기',
         data: {
           'proposalId': proposalId,
@@ -169,16 +170,18 @@ class ProposalNotificationService {
       }
 
       final notification = AppNotification(
-        id: 'proposal_reminder_${hoursRemaining}h_${DateTime.now().millisecondsSinceEpoch}',
+        id:
+            'proposal_reminder_${hoursRemaining}h_${DateTime.now().millisecondsSinceEpoch}',
         userId: studentId,
         type: type,
-        priority: hoursRemaining == 72
-            ? NotificationPriority.high
-            : NotificationPriority.normal,
+        priority:
+            hoursRemaining == 72
+                ? NotificationPriority.high
+                : NotificationPriority.normal,
         title: title,
         body: body,
         createdAt: DateTime.now(),
-        actionUrl: '${AppRoutes.proposalDetail}?proposalId=$proposalId',
+        actionUrl: AppRoutes.proposalDetail.replaceFirst(':id', proposalId),
         actionLabel: '제안 확인',
         data: {
           'proposalId': proposalId,
@@ -215,9 +218,7 @@ class ProposalNotificationService {
         title: '⌛ 수강권 제안 만료',
         body: '$teacherName 선생님의 수강권 제안이 만료되었습니다.',
         createdAt: DateTime.now(),
-        data: {
-          'teacherName': teacherName,
-        },
+        data: {'teacherName': teacherName},
       );
 
       await _notificationService.showNotification(studentNotification);
@@ -231,9 +232,7 @@ class ProposalNotificationService {
         title: '⌛ 수강권 제안 만료',
         body: '$studentName 학생에게 보낸 수강권 제안이 만료되었습니다.',
         createdAt: DateTime.now(),
-        data: {
-          'studentName': studentName,
-        },
+        data: {'studentName': studentName},
       );
 
       await _notificationService.showNotification(teacherNotification);
