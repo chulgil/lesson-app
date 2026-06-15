@@ -172,43 +172,4 @@ void main() {
       expect(find.byType(Icon), findsNothing);
     });
   });
-
-  group('SubscriptionSummaryText', () {
-    testWidgets('8회권 + 1회 보너스, 3회 사용 → "6/9회 남음" 표시', (tester) async {
-      final sub = createSubscription(
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 3,
-        bonusCount: 1,
-      );
-
-      await tester.pumpWidget(
-        buildTestWidget(SubscriptionSummaryText(subscription: sub)),
-      );
-
-      // remaining = 8 + 1 - 3 = 6
-      // totalLessonsForDisplay = 8 + 1 = 9
-      expect(find.textContaining('6/9회 남음'), findsOneWidget);
-    });
-
-    testWidgets('4회권 + 4회 보너스 → "8/4회" 아닌 "8/8회" 표시 (버그 수정 확인)', (
-      tester,
-    ) async {
-      final sub = createSubscription(
-        type: SubscriptionType.package,
-        totalLessons: 4,
-        usedLessons: 0,
-        bonusCount: 4,
-      );
-
-      await tester.pumpWidget(
-        buildTestWidget(SubscriptionSummaryText(subscription: sub)),
-      );
-
-      // Bug: "8/4회" should NOT appear
-      expect(find.textContaining('8/4회'), findsNothing);
-      // Correct: "8/8회"
-      expect(find.textContaining('8/8회'), findsOneWidget);
-    });
-  });
 }

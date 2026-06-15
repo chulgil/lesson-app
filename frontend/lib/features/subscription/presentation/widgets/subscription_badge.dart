@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Compact badge — **Notebook × Score 스타일 수강권 티켓 라벨**.
@@ -90,96 +89,5 @@ class SubscriptionBadge extends StatelessWidget {
       case SubscriptionType.trial:
         return AppStrings.subscriptionTypeTrial;
     }
-  }
-}
-
-/// Mini progress indicator for subscription usage.
-///
-/// Notebook 스타일: ink 스트로크 + paperDark 배경 + Playfair 숫자.
-class SubscriptionProgressMini extends StatelessWidget {
-  final Subscription subscription;
-  final double size;
-
-  const SubscriptionProgressMini({
-    super.key,
-    required this.subscription,
-    this.size = 32,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (subscription.type != SubscriptionType.package) {
-      return const SizedBox.shrink();
-    }
-
-    final percentage = subscription.usagePercentage ?? 0;
-    final color =
-        subscription.isExpiringSoon ? AppColors.paperAccent : AppColors.ink;
-
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CircularProgressIndicator(
-            value: percentage / 100,
-            strokeWidth: 2,
-            backgroundColor: AppColors.inkQuaternary,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-          ),
-          Text(
-            '${subscription.remainingLessons}',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Summary text widget for subscription.
-///
-/// Notebook 스타일로 축약. 이모지 제거, IBM Plex Mono 카운트.
-class SubscriptionSummaryText extends StatelessWidget {
-  final Subscription subscription;
-  final TextStyle? style;
-
-  const SubscriptionSummaryText({
-    super.key,
-    required this.subscription,
-    this.style,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color =
-        subscription.isExpiringSoon
-            ? AppColors.paperAccent
-            : AppColors.inkSecondary;
-
-    final defaultStyle = AppTypography.bodySmall.copyWith(color: color);
-
-    String text;
-    if (subscription.type == SubscriptionType.package) {
-      text = AppStrings.subscriptionPackageRemainingFormat(
-        subscription.remainingLessons ?? 0,
-        subscription.totalLessonsForDisplay ?? 0,
-      );
-    } else if (subscription.type == SubscriptionType.monthly) {
-      final days = subscription.daysUntilExpiration ?? 0;
-      text =
-          days > 0
-              ? AppStrings.subscriptionDaysRemaining(days)
-              : AppStrings.statusExpired;
-    } else {
-      text = AppStrings.subscriptionTrialActive;
-    }
-
-    return Text(text, style: style ?? defaultStyle);
   }
 }
