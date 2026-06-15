@@ -240,6 +240,7 @@ class AcademyService:
             status_changed_at=now,
             intake_notes=body.intake_notes,
             deposit_code=body.deposit_code,
+            parent_name=body.parent_name,
         )
         self.db.add(student)
         await self.db.flush()

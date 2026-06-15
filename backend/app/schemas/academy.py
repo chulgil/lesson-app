@@ -133,6 +133,7 @@ class AcademyStudentCreate(BaseModel):
     parent_user_id: str | None = None
     intake_notes: str | None = None
     deposit_code: str | None = Field(default=None, max_length=30)
+    parent_name: str | None = Field(default=None, max_length=100)
 
 
 class AcademyStudentUpdate(BaseModel):
@@ -146,6 +147,7 @@ class AcademyStudentUpdate(BaseModel):
     status: AcademyStudentStatus | None = None
     intake_notes: str | None = None
     deposit_code: str | None = Field(default=None, max_length=30)
+    parent_name: str | None = Field(default=None, max_length=100)
 
 
 class AcademyStudentResponse(BaseModel):
@@ -164,6 +166,7 @@ class AcademyStudentResponse(BaseModel):
     status_changed_at: _dt.datetime | None = None
     intake_notes: str | None = None
     deposit_code: str | None = None
+    parent_name: str | None = None
     created_at: _dt.datetime
     updated_at: _dt.datetime
 

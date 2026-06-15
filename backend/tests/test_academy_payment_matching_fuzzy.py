@@ -206,3 +206,67 @@ def test_compute_memo_code_bonus() -> None:
         deposit_code="0418",
     )
     assert abs((score_with - score_without) - 0.05) < 0.001
+
+
+# ---------------------------------------------------------------------------
+# H2 — 학부모 이름 매칭 (§3.1 "학생 또는 학부모 이름 토큰", §3.4)
+# ---------------------------------------------------------------------------
+
+
+def test_compute_strong_suggestion_by_parent_name() -> None:
+    """§3.4 학부모 본인 이름 입금 → 학부모 이름 신호로 강한 제안.
+
+    학생명(김지민)과 무관한 학부모 이름(박영희)으로 입금해도 parent_name 이
+    설정되어 있으면 이름/토큰 신호가 학부모 기준으로 산출된다.
+    """
+    base = datetime(2026, 5, 3, 14, 30, tzinfo=UTC)
+    score, features = compute_match_score(
+        tx_amount=200_000,
+        tx_at=base,
+        depositor_raw="박영희",
+        memo_raw=None,
+        invoice_total=200_000,
+        invoice_ref_at=base - timedelta(days=2),
+        student_name="김지민",
+        deposit_code=None,
+        parent_name="박영희",
+    )
+    # 금액 1.0×0.40 + 이름(학부모) 1.0×0.25 + 토큰 1.0×0.15 + 시각 1.0×0.05 = 0.85.
+    assert score >= STRONG_SUGGESTION_THRESHOLD
+    assert features["name_levenshtein"] == 1.0
+    assert features["student_name_token"] == 1.0
+
+
+def test_compute_parent_name_with_family_title() -> None:
+    """§3.3 학부모 이름 + 가족 호칭 ("박영희 이모") → family_title 신호."""
+    base = datetime(2026, 5, 3, 14, 30, tzinfo=UTC)
+    _, features = compute_match_score(
+        tx_amount=200_000,
+        tx_at=base,
+        depositor_raw="박영희 이모",
+        memo_raw=None,
+        invoice_total=200_000,
+        invoice_ref_at=base - timedelta(days=2),
+        student_name="김지민",
+        deposit_code=None,
+        parent_name="박영희",
+    )
+    assert features["family_title"] == 1.0
+
+
+def test_compute_takes_max_of_student_and_parent_signals() -> None:
+    """학생/학부모 둘 다 설정 시 더 높은 신호 채택 — 입금자=학생명이면 학생 기준."""
+    base = datetime(2026, 5, 3, tzinfo=UTC)
+    _, features = compute_match_score(
+        tx_amount=200_000,
+        tx_at=base,
+        depositor_raw="김지민",
+        memo_raw=None,
+        invoice_total=200_000,
+        invoice_ref_at=base,
+        student_name="김지민",
+        deposit_code=None,
+        parent_name="박영희",  # 무관한 학부모 이름
+    )
+    assert features["student_name_token"] == 1.0
+    assert features["name_levenshtein"] == 1.0

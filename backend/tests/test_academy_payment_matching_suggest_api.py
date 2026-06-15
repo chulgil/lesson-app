@@ -46,6 +46,7 @@ async def _setup(
     create_test_user,
     *,
     student_name: str = "김지민",
+    parent_name: str | None = None,
     invoice_amount: int = 200000,
     send_invoice: bool = True,
 ) -> tuple[str, str, str]:
@@ -65,7 +66,12 @@ async def _setup(
     student_resp = await client.post(
         f"/api/v1/academies/{academy_id}/students",
         headers=_owner_headers(),
-        json={"name": student_name, "instrument": "피아노", "teacher_member_id": teacher_member.id},
+        json={
+            "name": student_name,
+            "instrument": "피아노",
+            "teacher_member_id": teacher_member.id,
+            **({"parent_name": parent_name} if parent_name else {}),
+        },
     )
     student_id = student_resp.json()["id"]
     invoice_resp = await client.post(
@@ -437,3 +443,33 @@ async def test_revert_then_resuggest_succeeds(client: AsyncClient, db_session: A
     ).all()
     assert len(suggestions) >= 1
     assert all(s.user_decision == AcademyPaymentMatchSuggestionDecision.pending for s in suggestions)
+
+
+# ---------------------------------------------------------------------------
+# H2 — 학부모 이름 입금 매칭 (§3.4, 한국 무통장 최빈 케이스)
+# ---------------------------------------------------------------------------
+
+
+async def test_suggest_strong_match_by_parent_name(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """학부모 본인 이름(학생명과 무관)으로 입금 → parent_name 매칭으로 강한 제안.
+
+    학생 '김지민' 의 학부모 '박영희' 가 본인 이름으로 입금. parent_name 신호가
+    없으면 이름 매칭 0 → 금액·시각만 0.45 → 미제안. parent_name 매칭 시 강한 제안.
+    """
+    academy_id, _, invoice_id = await _setup(
+        client, db_session, create_test_user, student_name="김지민", parent_name="박영희"
+    )
+    tx_id = await _create_tx(client, academy_id, depositor="박영희", amount=200_000)
+
+    resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/suggest",
+        headers=_owner_headers(),
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total_count"] >= 1
+    top = max(body["suggestions"], key=lambda s: s["score"])
+    assert top["invoice_id"] == invoice_id
+    assert top["score"] >= STRONG_SUGGESTION_THRESHOLD

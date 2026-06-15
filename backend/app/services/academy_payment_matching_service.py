@@ -477,6 +477,7 @@ class AcademyPaymentMatchingService:
                 invoice_ref_at=invoice.sent_at or invoice.issued_at,
                 student_name=student.name,
                 deposit_code=student.deposit_code,
+                parent_name=student.parent_name,
             )
             if score < WEAK_SUGGESTION_THRESHOLD:
                 continue
