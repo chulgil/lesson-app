@@ -185,7 +185,8 @@ UI 표기는 **한글**, 코드명은 **영문**으로 동일. UI 표기는 자�
 
 ## 8. 데이터 모델 (Mock-first)
 
-> 구현 순서(메모리 규칙): Entity(@HiveType) → MockRepository → @riverpod Provider → build_runner → UI.
+> 구현 순서: Entity(`@JsonSerializable` + copyWith — 본 코드베이스는 gamification/practice 도메인과 동일하게 json_annotation 사용, Hive 아님) → Repository 인터페이스 → MockRepository(메모리) → `@riverpod` Provider(`createRepository` 헬퍼) → build_runner → UI.
+> 연계: 연습 도장 파생 훅 = `features/practice/domain/services/practice_recording_service.dart`의 `PracticeRecordingService.recordPractice()`. 자녀 프로필 = `Student.parentConsentAt`(null=자가 연습 전용) + `profileColorKey`. 곡 완성(P2) = `PracticeRepertoireRepository.archiveRepertoire()`.
 
 ### 8.1 엔티티
 
