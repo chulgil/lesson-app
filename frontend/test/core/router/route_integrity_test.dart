@@ -748,14 +748,6 @@ const _runtimeAllowlistPrefixes = <String>[
   // Tracked as tech-debt: recordings detail screen not yet implemented.
   // TODO: Remove from allowlist when the /recordings/:id route is registered.
   '/recordings/',
-  // `/schedule/lesson-request` — AppRoutes.lessonRequest is a DEAD ROUTE.
-  // subscription_renewal_banner.dart:81 pushes this path but no GoRoute
-  // with path: AppRoutes.lessonRequest exists in schedule_routes.dart.
-  // This is a pre-existing bug on branch base 4deb8e3e, not introduced by
-  // this PR. The correct target is likely AppRoutes.lessonRequests
-  // (/schedule/lesson-requests) or a dedicated student lesson-request screen.
-  // TODO: Fix in subscription_renewal_banner.dart and remove this allowlist entry.
-  '/schedule/lesson-request',
   // Mock notification data uses literal IDs like `/proposals/proposal_auto_1`.
   // These resolve fine (/proposals/:id) — not allowlisted; matched by template.
 ];

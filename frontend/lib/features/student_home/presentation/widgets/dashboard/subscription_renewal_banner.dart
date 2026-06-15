@@ -15,6 +15,12 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
 
   const SubscriptionRenewalBanner({super.key, required this.studentId});
 
+  /// Opens the student's lesson-request list to start a renewal request.
+  /// Kept on a single line so the route-integrity scanner can resolve it.
+  void _openLessonRequests(BuildContext context) {
+    context.push('${AppRoutes.myLessonRequests}?studentId=$studentId');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final subscriptionsAsync = ref.watch(
@@ -78,7 +84,7 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
                   ),
                 );
               } else {
-                context.push('${AppRoutes.lessonRequest}?studentId=$studentId');
+                _openLessonRequests(context);
               }
             },
             child: Container(
