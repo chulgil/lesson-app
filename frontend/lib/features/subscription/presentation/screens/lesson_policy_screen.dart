@@ -107,9 +107,10 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: widget.lessonClassId != null
-            ? AppStrings.policyClassAppBarTitle
-            : AppStrings.policyLessonAppBarTitle,
+        title:
+            widget.lessonClassId != null
+                ? AppStrings.policyClassAppBarTitle
+                : AppStrings.policyLessonAppBarTitle,
       ),
       body:
           _isLoading
@@ -401,7 +402,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         _buildRelatedSettingItem(
           icon: Icons.schedule,
           label: AppStrings.lessonTimeSettings,
-          onTap: () => context.push(AppRoutes.lessonTimeSettings),
+          onTap: () => context.push(AppRoutes.lessonStyleSettings),
         ),
         _buildRelatedSettingItem(
           icon: Icons.payments_outlined,

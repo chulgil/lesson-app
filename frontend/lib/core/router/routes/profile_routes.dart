@@ -49,7 +49,7 @@ List<GoRoute> profileRoutes = [
   GoRoute(
     path: AppRoutes.lessonTimeSettings,
     name: 'lessonTimeSettings',
-    redirect: (context, state) => AppRoutes.profile,
+    redirect: (context, state) => AppRoutes.lessonStyleSettings,
   ),
 
   // Lesson Style Settings — W3 Task 3.2 (수업방식 묶음)
