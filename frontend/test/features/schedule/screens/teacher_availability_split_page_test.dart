@@ -287,4 +287,29 @@ void main() {
     // Each day card has its own + 시간대 추가 CTA.
     expect(find.text(AppStrings.weeklyScheduleAddSlotAction), findsWidgets);
   });
+
+  // ── #727 Item D — vacation mode CTA discoverable on availability page ─
+  testWidgets(
+    '#727-D: vacation mode CTA renders in special schedules section',
+    (tester) async {
+      // Use null availability (defaults) — the ExceptionsPanel renders
+      // regardless of whether exceptions exist; vacation CTA is always present.
+      await pumpSplitPage(
+        tester,
+        availability: null,
+        viewportSize: const Size(390, 900),
+      );
+
+      expect(tester.takeException(), isNull);
+
+      // The CTA button for vacation mode must be visible.
+      expect(
+        find.text(AppStrings.vacationModeEntry),
+        findsOneWidget,
+        reason:
+            '#727-D: teacherVacationMode GoRoute existed but had no '
+            'discoverable entry point — vacationModeEntry CTA must now render',
+      );
+    },
+  );
 }
