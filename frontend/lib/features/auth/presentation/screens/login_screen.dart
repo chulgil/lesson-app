@@ -42,6 +42,19 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
 
+  /// Reusable GoogleSignIn instance — constructed once, reused on re-taps.
+  /// Avoids stale native state that causes the picker to not reopen after
+  /// the user cancels/closes the OAuth popup (Bug #726 fix).
+  GoogleSignIn? _googleSignIn;
+
+  GoogleSignIn _getGoogleSignIn() {
+    return _googleSignIn ??= GoogleSignIn(
+      scopes: ['email', 'profile'],
+      clientId: _googleIosClientId.isNotEmpty ? _googleIosClientId : null,
+      serverClientId: _googleServerClientId,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // DEV accounts visibility follows the centralized runtime data mode.
@@ -329,11 +342,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // Switch to remote mode for real OAuth
       ref.read(dataModeProvider.notifier).setMockMode(false);
 
-      final googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
-        clientId: _googleIosClientId.isNotEmpty ? _googleIosClientId : null,
-        serverClientId: _googleServerClientId,
-      );
+      // Reuse the single GoogleSignIn instance. Clear any stale session first
+      // so that closing/cancelling the popup and re-tapping always reopens the
+      // account picker (Bug #726 fix).
+      final googleSignIn = _getGoogleSignIn();
+      await googleSignIn.signOut();
       final account = await googleSignIn.signIn();
       if (account == null) {
         if (mounted) setState(() => _isLoading = false);
