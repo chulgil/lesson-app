@@ -44,6 +44,7 @@ from app.services.academy_payment_matching_fuzzy import (
     WEAK_SUGGESTION_THRESHOLD,
     compute_match_score,
 )
+from app.services.notification_service import NotificationService
 
 
 def _utcnow() -> datetime:
@@ -53,6 +54,33 @@ def _utcnow() -> datetime:
 class AcademyPaymentMatchingService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    # ------------------------------------------------------------------
+    # 학부모 알림 (§6.3 step4, §7.6)
+    # ------------------------------------------------------------------
+
+    async def _notify_parent_payment(
+        self,
+        invoice: AcademyInvoice,
+        *,
+        notification_type: str,
+        title: str,
+        body: str,
+    ) -> None:
+        """매칭 확정/취소 시 연결된 학부모에게 알림.
+
+        학원만 등록한 학생(parent_user_id NULL)은 알림 대상이 없으므로 skip.
+        """
+        student = await self.db.get(AcademyStudent, invoice.academy_student_id)
+        if student is None or student.parent_user_id is None:
+            return
+        await NotificationService(self.db).create_and_send(
+            user_id=student.parent_user_id,
+            notification_type=notification_type,
+            title=title,
+            body=body,
+            data={"academy_id": invoice.academy_id, "invoice_id": invoice.id},
+        )
 
     # ------------------------------------------------------------------
     # 수기 입력 (§5.2)
@@ -197,6 +225,15 @@ class AcademyPaymentMatchingService:
             sugg.decided_at = now
 
         await self.db.flush()
+
+        # 5. 학부모 알림 (§6.3 step4) — 연결된 학부모에게 납부 확인.
+        await self._notify_parent_payment(
+            invoice,
+            notification_type="academyPaymentMatched",
+            title="납부 확인 완료",
+            body=f"{invoice.period_year}년 {invoice.period_month}월 수강료 납부가 확인되었습니다.",
+        )
+
         return tx, payment
 
     # ------------------------------------------------------------------
@@ -279,6 +316,18 @@ class AcademyPaymentMatchingService:
             sugg.decided_at = None
 
         await self.db.flush()
+
+        # 6. 학부모 정정 알림 (§7.6) — 매칭이 취소된 각 invoice 학생의 학부모에게.
+        for invoice_id in affected_invoice_ids:
+            invoice = await self.db.get(AcademyInvoice, invoice_id)
+            if invoice is not None:
+                await self._notify_parent_payment(
+                    invoice,
+                    notification_type="academyPaymentReverted",
+                    title="납부 정정",
+                    body=f"{invoice.period_year}년 {invoice.period_month}월 수강료 납부 확인이 취소되었습니다.",
+                )
+
         return tx
 
     # ------------------------------------------------------------------
@@ -407,6 +456,16 @@ class AcademyPaymentMatchingService:
             sugg.decided_at = now
 
         await self.db.flush()
+
+        # 5. 학부모 알림 (§6.3 step4) — 각 invoice 학생의 학부모에게 납부 확인.
+        for invoice in invoices_by_id.values():
+            await self._notify_parent_payment(
+                invoice,
+                notification_type="academyPaymentMatched",
+                title="납부 확인 완료",
+                body=f"{invoice.period_year}년 {invoice.period_month}월 수강료 납부가 확인되었습니다.",
+            )
+
         return tx, payments
 
     # ------------------------------------------------------------------

@@ -30,6 +30,7 @@ from app.models.academy_payment_matching import (
     AcademyBankTransaction,
     AcademyBankTransactionState,
 )
+from app.models.notification import Notification
 
 pytestmark = pytest.mark.asyncio
 
@@ -46,6 +47,7 @@ async def _create_academy_with_invoice(
     create_test_user,
     *,
     base_amount: int = 200000,
+    parent_user_id: str | None = None,
 ) -> tuple[str, str, str]:
     """학원 + 학생 + sent 상태 invoice 생성. Returns (academy_id, student_id, invoice_id)."""
     await create_test_user(user_id=OWNER_USER_ID, role="teacher", name="김원장")
@@ -63,7 +65,12 @@ async def _create_academy_with_invoice(
     student_resp = await client.post(
         f"/api/v1/academies/{academy_id}/students",
         headers=_owner_headers(),
-        json={"name": "김지민", "instrument": "피아노", "teacher_member_id": teacher_member.id},
+        json={
+            "name": "김지민",
+            "instrument": "피아노",
+            "teacher_member_id": teacher_member.id,
+            **({"parent_user_id": parent_user_id} if parent_user_id else {}),
+        },
     )
     student_id = student_resp.json()["id"]
     invoice_resp = await client.post(
@@ -430,3 +437,82 @@ async def test_match_paid_amount_exceeds_tx_returns_400(
     assert tx.state == AcademyBankTransactionState.unmatched
     payment = await db_session.scalar(select(AcademyPayment).where(AcademyPayment.bank_tx_ref == tx_id))
     assert payment is None
+
+
+# ---------------------------------------------------------------------------
+# M1 — 매칭 확정/취소 시 학부모 알림 (§6.3 step4, §7.6)
+# ---------------------------------------------------------------------------
+
+
+async def test_confirm_match_notifies_parent(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """매칭 확정 시 연결된 학부모에게 납부 확인 알림 (§6.3 step4)."""
+    parent_user_id = "parent-user-id"
+    await create_test_user(user_id=parent_user_id, role="parent", name="박영희", email="parent@test.com")
+    academy_id, _, invoice_id = await _create_academy_with_invoice(
+        client, db_session, create_test_user, parent_user_id=parent_user_id
+    )
+    tx_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions",
+        headers=_owner_headers(),
+        json={"depositor_raw": "박영희", "amount": 200000, "tx_at": datetime.now(UTC).isoformat()},
+    )
+    tx_id = tx_resp.json()["id"]
+
+    match_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/match",
+        headers=_owner_headers(),
+        json={"invoice_id": invoice_id, "paid_amount": 200000},
+    )
+    assert match_resp.status_code == 200
+
+    notif = await db_session.scalar(select(Notification).where(Notification.user_id == parent_user_id))
+    assert notif is not None
+    assert notif.type == "academyPaymentMatched"
+
+
+async def test_confirm_match_no_notification_when_parent_unlinked(
+    client: AsyncClient, db_session: AsyncSession, create_test_user
+) -> None:
+    """학원만 등록한 학생(parent_user_id NULL)은 알림 대상이 없으므로 알림 미생성."""
+    academy_id, _, invoice_id = await _create_academy_with_invoice(client, db_session, create_test_user)
+    tx_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions",
+        headers=_owner_headers(),
+        json={"depositor_raw": "김지민 어머니", "amount": 200000, "tx_at": datetime.now(UTC).isoformat()},
+    )
+    tx_id = tx_resp.json()["id"]
+    await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/match",
+        headers=_owner_headers(),
+        json={"invoice_id": invoice_id, "paid_amount": 200000},
+    )
+    notifs = (await db_session.scalars(select(Notification))).all()
+    assert all(n.type != "academyPaymentMatched" for n in notifs)
+
+
+async def test_revert_match_notifies_parent(client: AsyncClient, db_session: AsyncSession, create_test_user) -> None:
+    """매칭 취소 시 연결된 학부모에게 정정 알림 (§7.6)."""
+    parent_user_id = "parent-user-id"
+    await create_test_user(user_id=parent_user_id, role="parent", name="박영희", email="parent@test.com")
+    academy_id, _, invoice_id = await _create_academy_with_invoice(
+        client, db_session, create_test_user, parent_user_id=parent_user_id
+    )
+    tx_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions",
+        headers=_owner_headers(),
+        json={"depositor_raw": "박영희", "amount": 200000, "tx_at": datetime.now(UTC).isoformat()},
+    )
+    tx_id = tx_resp.json()["id"]
+    await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/match",
+        headers=_owner_headers(),
+        json={"invoice_id": invoice_id, "paid_amount": 200000},
+    )
+    revert_resp = await client.post(
+        f"/api/v1/academies/{academy_id}/billing/bank-transactions/{tx_id}/revert",
+        headers=_owner_headers(),
+    )
+    assert revert_resp.status_code == 200
+
+    notifs = (await db_session.scalars(select(Notification).where(Notification.user_id == parent_user_id))).all()
+    assert any(n.type == "academyPaymentReverted" for n in notifs)
