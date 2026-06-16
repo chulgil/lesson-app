@@ -29,6 +29,7 @@ Create Date: 2026-06-04 12:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql  # noqa: F401  (used in upgrade() enum defs)
 
 from alembic import op
 
@@ -40,9 +41,14 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     # Enums first (PG native enum).
-    academy_member_role = sa.Enum("owner", "teacher", name="academymemberrole")
-    academy_student_status = sa.Enum("waiting", "matched", "active", "paused", "alumni", name="academystudentstatus")
-    academy_invite_state = sa.Enum("pending", "accepted", "declined", "expired", "revoked", name="academyinvitestate")
+    # create_type=False: 명시적 .create() 한 번만 생성, create_table 재발행 방지.
+    academy_member_role = postgresql.ENUM("owner", "teacher", name="academymemberrole", create_type=False)
+    academy_student_status = postgresql.ENUM(
+        "waiting", "matched", "active", "paused", "alumni", name="academystudentstatus", create_type=False
+    )
+    academy_invite_state = postgresql.ENUM(
+        "pending", "accepted", "declined", "expired", "revoked", name="academyinvitestate", create_type=False
+    )
     bind = op.get_bind()
     academy_member_role.create(bind, checkfirst=True)
     academy_student_status.create(bind, checkfirst=True)

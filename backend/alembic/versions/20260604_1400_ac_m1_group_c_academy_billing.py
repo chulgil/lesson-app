@@ -16,7 +16,7 @@ Enums:
 - teacherdistributiontype: hourly / revenue_share / per_student
 - settlementbase: attendance / invoiced / completed_invoice
 - invoicestatus: draft / sent / paid / overdue / cancelled
-- paymentmethod: transfer / cash / card
+- academypaymentmethod: transfer / cash / card (구독 도메인 paymentmethod 와 충돌 방지)
 - paymentsource: manual / csv_import / fuzzy_match
 - settlementstatus: draft / confirmed / transferred
 
@@ -33,6 +33,7 @@ Create Date: 2026-06-04 14:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql  # noqa: F401  (used in upgrade() enum defs)
 
 from alembic import op
 
@@ -44,14 +45,22 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     # Enums.
-    teacher_distribution_type = sa.Enum("hourly", "revenue_share", "per_student", name="teacherdistributiontype")
-    settlement_base = sa.Enum("attendance", "invoiced", "completed_invoice", name="settlementbase")
-    invoice_status = sa.Enum("draft", "sent", "paid", "overdue", "cancelled", name="invoicestatus")
-    payment_method = sa.Enum("transfer", "cash", "card", name="paymentmethod")
-    payment_source = sa.Enum("manual", "csv_import", "fuzzy_match", name="paymentsource")
-    settlement_status = sa.Enum("draft", "confirmed", "transferred", name="settlementstatus")
-    subscription_ownership = sa.Enum("academy", "teacher", name="subscriptionownership")
-    lesson_visibility = sa.Enum("academyFull", "academyBusyOnly", name="lessonvisibility")
+    # create_type=False: 명시적 .create() 한 번만 생성하고 create_table 재발행 방지.
+    # paymentmethod 는 구독 도메인 enum 과 충돌하므로 academypaymentmethod 로 격리.
+    teacher_distribution_type = postgresql.ENUM(
+        "hourly", "revenue_share", "per_student", name="teacherdistributiontype", create_type=False
+    )
+    settlement_base = postgresql.ENUM(
+        "attendance", "invoiced", "completed_invoice", name="settlementbase", create_type=False
+    )
+    invoice_status = postgresql.ENUM(
+        "draft", "sent", "paid", "overdue", "cancelled", name="invoicestatus", create_type=False
+    )
+    payment_method = postgresql.ENUM("transfer", "cash", "card", name="academypaymentmethod", create_type=False)
+    payment_source = postgresql.ENUM("manual", "csv_import", "fuzzy_match", name="paymentsource", create_type=False)
+    settlement_status = postgresql.ENUM("draft", "confirmed", "transferred", name="settlementstatus", create_type=False)
+    subscription_ownership = postgresql.ENUM("academy", "teacher", name="subscriptionownership", create_type=False)
+    lesson_visibility = postgresql.ENUM("academyFull", "academyBusyOnly", name="lessonvisibility", create_type=False)
     bind = op.get_bind()
     for e in (
         teacher_distribution_type,
@@ -420,7 +429,7 @@ def downgrade() -> None:
         "subscriptionownership",
         "settlementstatus",
         "paymentsource",
-        "paymentmethod",
+        "academypaymentmethod",
         "invoicestatus",
         "settlementbase",
         "teacherdistributiontype",

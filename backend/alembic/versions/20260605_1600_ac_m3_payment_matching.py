@@ -27,6 +27,7 @@ Create Date: 2026-06-05 16:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql  # noqa: F401  (used in upgrade() enum defs)
 
 from alembic import op
 
@@ -38,19 +39,22 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     # Enums.
-    source_enum = sa.Enum("csv", "manual", "ocr", name="academybanktransactionsource")
-    state_enum = sa.Enum(
+    # create_type=False: 명시적 .create() 한 번만 생성, create_table 재발행 방지.
+    source_enum = postgresql.ENUM("csv", "manual", "ocr", name="academybanktransactionsource", create_type=False)
+    state_enum = postgresql.ENUM(
         "unmatched",
         "suggested",
         "matched",
         "ignored",
         name="academybanktransactionstate",
+        create_type=False,
     )
-    decision_enum = sa.Enum(
+    decision_enum = postgresql.ENUM(
         "pending",
         "accepted",
         "rejected",
         name="academypaymentmatchsuggestiondecision",
+        create_type=False,
     )
     bind = op.get_bind()
     source_enum.create(bind, checkfirst=True)

@@ -26,6 +26,7 @@ Create Date: 2026-06-05 14:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql  # noqa: F401  (used in upgrade() enum defs)
 
 from alembic import op
 
@@ -37,27 +38,31 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     # Enums.
-    audience = sa.Enum(
+    # create_type=False: 명시적 .create() 한 번만 생성, create_table 재발행 방지.
+    audience = postgresql.ENUM(
         "all",
         "teachers",
         "parents",
         "students",
         "teacher_students",
         name="academyannouncementaudience",
+        create_type=False,
     )
-    status = sa.Enum(
+    status = postgresql.ENUM(
         "draft",
         "scheduled",
         "sending",
         "sent",
         "cancelled",
         name="academyannouncementstatus",
+        create_type=False,
     )
-    recipient_role = sa.Enum(
+    recipient_role = postgresql.ENUM(
         "teacher",
         "parent",
         "student",
         name="academyannouncementrecipientrole",
+        create_type=False,
     )
     bind = op.get_bind()
     audience.create(bind, checkfirst=True)

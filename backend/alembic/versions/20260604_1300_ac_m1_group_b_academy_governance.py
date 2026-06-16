@@ -33,6 +33,7 @@ Create Date: 2026-06-04 13:00:00.000000
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql  # noqa: F401  (used in upgrade() enum defs)
 
 from alembic import op
 
@@ -44,16 +45,22 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     # Enums.
-    academy_context = sa.Enum("academy_owner", "teacher", name="academycontext")
-    context_switch_trigger = sa.Enum("user", "session_resume", name="contextswitchtrigger")
-    delegation_reason = sa.Enum("trip", "sick", "vacation", "event", "other", name="delegationreason")
-    delegation_state = sa.Enum("scheduled", "active", "expired", "revoked", "auto_ended", name="delegationstate")
-    delegation_revoke_reason = sa.Enum(
+    # create_type=False: 명시적 .create() 한 번만 생성, create_table 재발행 방지.
+    academy_context = postgresql.ENUM("academy_owner", "teacher", name="academycontext", create_type=False)
+    context_switch_trigger = postgresql.ENUM("user", "session_resume", name="contextswitchtrigger", create_type=False)
+    delegation_reason = postgresql.ENUM(
+        "trip", "sick", "vacation", "event", "other", name="delegationreason", create_type=False
+    )
+    delegation_state = postgresql.ENUM(
+        "scheduled", "active", "expired", "revoked", "auto_ended", name="delegationstate", create_type=False
+    )
+    delegation_revoke_reason = postgresql.ENUM(
         "owner_returned",
         "owner_manual",
         "expired",
         "delegatee_declined",
         name="delegationrevokereason",
+        create_type=False,
     )
     bind = op.get_bind()
     academy_context.create(bind, checkfirst=True)

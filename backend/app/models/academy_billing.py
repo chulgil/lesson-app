@@ -266,7 +266,9 @@ class AcademyPayment(UUIDMixin, TimestampMixin, Base):
     paid_amount: Mapped[int] = mapped_column(Integer, nullable=False)
     paid_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     method: Mapped[PaymentMethod] = mapped_column(
-        Enum(PaymentMethod, native_enum=True),
+        # name 명시: 자동 파생 "paymentmethod" 는 구독 도메인 enum 과 충돌하므로
+        # academy 전용 이름을 사용한다. (spec: academy enum namespace 격리)
+        Enum(PaymentMethod, name="academypaymentmethod", native_enum=True),
         nullable=False,
         default=PaymentMethod.transfer,
     )

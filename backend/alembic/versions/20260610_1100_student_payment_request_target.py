@@ -11,6 +11,7 @@ Create Date: 2026-06-10 11:00:00
 from __future__ import annotations
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql  # noqa: F401  (used in upgrade())
 
 from alembic import op
 
@@ -21,11 +22,15 @@ depends_on: str | None = None
 
 
 def upgrade() -> None:
+    # op.add_column 은 create_table 과 달리 enum 타입을 자동 생성하지 않으므로
+    # 명시적으로 먼저 생성한다. create_type=False 로 컬럼 재발행도 방지.
+    payment_request_target = postgresql.ENUM("student", "parent", name="paymentrequesttarget", create_type=False)
+    payment_request_target.create(op.get_bind(), checkfirst=True)
     op.add_column(
         "students",
         sa.Column(
             "payment_request_target",
-            sa.Enum("student", "parent", name="paymentrequesttarget", native_enum=True),
+            payment_request_target,
             nullable=False,
             server_default="student",
         ),
@@ -34,3 +39,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_column("students", "payment_request_target")
+    sa.Enum(name="paymentrequesttarget").drop(op.get_bind(), checkfirst=True)
