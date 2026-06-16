@@ -58,39 +58,52 @@ class ScheduleSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(7, (index) {
-              final isSelected = selectedDays.contains(index);
-              return GestureDetector(
-                onTap: () => onDayToggle(index),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.paperDark,
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  child: Center(
-                    child: Text(
-                      dayNames[index],
-                      style: AppTypography.bodySmall.copyWith(
-                        // Notebook × Score §7.50: Vermillion selected day foreground = paper.
-                        color:
-                            isSelected
-                                ? AppColors.paper
-                                : AppColors.inkSecondary,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
+          // Day cells fill the row evenly (width capped on wide screens) so the
+          // 7-day selector shrinks instead of overflowing on narrow phones (#750).
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 7 * (AppSpacing.space10 + AppSpacing.space1),
+            ),
+            child: Row(
+              children: List.generate(7, (index) {
+                final isSelected = selectedDays.contains(index);
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space1 / 2,
+                    ),
+                    child: GestureDetector(
+                      onTap: () => onDayToggle(index),
+                      child: Container(
+                        height: AppSpacing.space10,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color:
+                              isSelected
+                                  ? AppColors.paperAccent
+                                  : AppColors.paperDark,
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        child: Text(
+                          dayNames[index],
+                          style: AppTypography.bodySmall.copyWith(
+                            // Notebook × Score §7.50: Vermillion selected day foreground = paper.
+                            color:
+                                isSelected
+                                    ? AppColors.paper
+                                    : AppColors.inkSecondary,
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -176,34 +189,49 @@ class ScheduleSection extends StatelessWidget {
           const ThinRule(),
           const SizedBox(height: AppSpacing.space4),
 
-          // Lesson duration
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '레슨 시간 (분)',
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+          // Lesson duration. The selector (~255px) leaves no usable room for the
+          // label on narrow phones, so stack it below the label there (#750).
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final label = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '레슨 시간 (분)',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      '1회 레슨 시간',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.inkSecondary,
-                      ),
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  Text(
+                    '1회 레슨 시간',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
                     ),
-                  ],
-                ),
-              ),
-              DurationSelector(
+                  ),
+                ],
+              );
+              final selector = DurationSelector(
                 selectedDuration: lessonDuration,
                 onChanged: onDurationChanged,
-              ),
-            ],
+              );
+
+              // Below ~300px the side-by-side row cannot fit label + selector.
+              if (constraints.maxWidth < 300) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    label,
+                    const SizedBox(height: AppSpacing.space2),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: selector,
+                    ),
+                  ],
+                );
+              }
+              return Row(children: [Expanded(child: label), selector]);
+            },
           ),
         ],
       ),

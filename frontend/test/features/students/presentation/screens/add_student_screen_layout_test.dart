@@ -32,7 +32,44 @@ void main() {
       },
     );
 
-    // NOTE: mobile(375) 가로 오버플로우(address_fields Row 58px)는 별도 이슈 #750 으로 분리.
-    // #746 은 desktop RenderMetaData 크래시(사용자 실제 케이스) 해소만 머지한다.
+    testWidgets('should not overflow on common mobile(375) viewport', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(375, 667);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'should not overflow on narrow mobile(320) viewport — schedule row reflow (#750)',
+      (WidgetTester tester) async {
+        // Repro: smallest real device width (iPhone SE 1st-gen / split-view).
+        // The schedule day-selector (7 fixed cells) and duration row overflow
+        // here before reflow. Address row is already safe (>=151px) via #746.
+        tester.view.physicalSize = const Size(320, 640);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }
