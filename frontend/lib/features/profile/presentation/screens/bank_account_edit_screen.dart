@@ -13,6 +13,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/profile_facade.dart';
+import '../../domain/bank_account_defaults.dart';
 
 /// Screen for managing multiple bank accounts (list + add + default).
 class BankAccountEditScreen extends ConsumerWidget {
@@ -132,9 +133,10 @@ class BankAccountEditScreen extends ConsumerWidget {
     List<BankAccount> updated,
   ) async {
     try {
+      final normalized = normalizeBankAccountDefaults(updated);
       await ref
           .read(teacherExtendedProfileProvider.notifier)
-          .updateBankAccounts(updated);
+          .updateBankAccounts(normalized);
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
