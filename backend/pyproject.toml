@@ -35,6 +35,11 @@ dev = [
     "ruff>=0.8.0",
     "mypy>=1.13.0",
     "freezegun>=1.5.0",
+    # 마이그레이션 게이트: 실 Postgres 에 alembic upgrade head 를 돌려 enum
+    # double-create / 이름충돌 / add_column 미생성 류를 잡는다 (SQLite create_all
+    # 테스트가 못 잡는 영역). docker 없으면 테스트가 graceful skip.
+    "testcontainers[postgres]>=4.0.0",
+    "psycopg2-binary>=2.9.0",
 ]
 
 [tool.ruff]
@@ -72,4 +77,5 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 markers = [
     "sqlite_fk_on: enable SQLite PRAGMA foreign_keys=ON for cascade-delete regression tests",
+    "migration: runs alembic upgrade head against a real Postgres (testcontainers); skips if docker unavailable",
 ]
