@@ -8,22 +8,42 @@ ssh codenavi
 cd ~/lesson-app/backend
 ```
 
-### 최초 설정
+### 최초 설정 (시크릿)
+
+> `docker-compose.beta.yml` 은 `env_file: .env.beta` 를 읽는다. 실제 시크릿은
+> **`.env.beta`** 에 채운다 (`.env` 아님 — 과거 가이드 오류).
+> `.env.beta` 는 `.gitignore` 처리되어 **git 추적 대상이 아니다** -> `git pull` /
+> `git reset --hard` 가 절대 덮어쓰지 않는다. 템플릿은 `.env.beta.example`.
+
 ```bash
-cp .env.beta .env
-# .env에서 <REPLACE> 표시된 값을 실제 값으로 교체
+# 서버에서 1회만 — 템플릿 복사 후 실제 값 기입
+cp .env.beta.example .env.beta
+# .env.beta 에서 <REPLACE...> 값을 실제 값으로 교체
+#   GOOGLE_CLIENT_ID     = web client id (.apps.googleusercontent.com)
+#                          [!] 프론트 run-beta.sh 의 GOOGLE_SERVER_CLIENT_ID 와 동일해야 함
+#   GOOGLE_CLIENT_SECRET = 위 web client 의 secret (GOCSPX-...)
+#   JWT_SECRET_KEY / VULTR_STORAGE_* 등도 동일하게 기입
 ```
+
+> **일회성 마이그레이션 (기존 서버, `.env.beta` 가 아직 git 추적 중이던 경우)**:
+> 추적 해제 커밋을 pull 하기 전에 반드시 백업하고, pull 후 복원/재기입한다.
+> ```bash
+> cp .env.beta /tmp/.env.beta.bak   # 1) 백업
+> git pull origin main              # 2) 추적 해제 커밋 반영
+> [ -f .env.beta ] || cp /tmp/.env.beta.bak .env.beta   # 3) 삭제됐으면 복원
+> grep -q '<REPLACE' .env.beta && echo '[!] placeholder 남음 — 실제 값 재기입 필요'
+> ```
 
 ### 배포 순서
 ```bash
-# 1. 코드 업데이트
+# 1. 코드 업데이트 (.env.beta 는 gitignore 되어 영향 없음)
 git pull origin main
 
 # 2. DB 마이그레이션
-docker compose exec backend alembic upgrade head
+docker compose -f docker-compose.beta.yml exec app alembic upgrade head
 
-# 3. 서비스 재시작
-docker compose restart backend
+# 3. 서비스 재시작 (env_file 재로딩 위해 up -d 권장)
+docker compose -f docker-compose.beta.yml up -d
 ```
 
 ### 마이그레이션 현황

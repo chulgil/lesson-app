@@ -76,10 +76,16 @@ curl -s https://api-beta.lessonaza.app/health
 
 ## 에러 처리
 
+> **시크릿**: 실제 자격증명은 서버-로컬 `backend/.env.beta` 에만 존재한다 (gitignore,
+> 추적 안 됨). 템플릿은 `.env.beta.example`. `git pull` / `reset` 이 `.env.beta` 를
+> 덮어쓰지 않는다. `.env.beta` 가 없거나 `<REPLACE>` 가 남아 있으면 OAuth(구글 로그인)
+> 토큰 교환이 401 로 실패한다 — `.env.beta.example` 기준으로 실제 값 기입 후 `up -d`.
+
 | 에러 | 원인 | 해결 |
 |------|------|------|
 | SSH 접속 실패 | 키 경로 또는 권한 | `~/.ssh/codenavi_rsa` 확인 |
-| git pull 충돌 | 서버에서 직접 수정 | `git reset --hard origin/main` (사용자 확인 후) |
+| git pull 충돌 | 서버에서 추적 파일 직접 수정 | 충돌 파일 확인 후 `git stash` 또는 커밋. **`reset --hard` 는 추적된 로컬 변경을 파괴하므로 금지** (`.env.beta` 는 untracked 라 안전하나 다른 파일 손실 위험) |
+| 구글 로그인 401 | `.env.beta` 의 `GOOGLE_CLIENT_ID/SECRET` placeholder 또는 FE web client 불일치 | `.env.beta` 실제 값 확인 + `run-beta.sh` 의 `GOOGLE_SERVER_CLIENT_ID` 와 동일한지 확인 |
 | 빌드 실패 | 의존성 또는 Dockerfile | 서버 로그 확인: `docker-compose logs app` |
 | 마이그레이션 실패 | 스키마 충돌 | 로그 확인 후 사용자에게 보고 |
 | 헬스체크 실패 | 컨테이너 시작 실패 | `docker logs lessonaza-beta-api --tail 30` 확인 |

@@ -104,10 +104,14 @@ backend/*.egg-info/
 backend/dist/
 backend/build/
 
-# Environment files
+# Environment files (real secrets — server-local only).
+# Templates live in *.example and ARE tracked. Never commit filled env files:
+# git pull / reset --hard on the server must never overwrite real secrets.
 backend/.env
 backend/.env.local
 backend/.env.*.local
+backend/.env.beta
+backend/.env.prod
 
 # -----------------------------------------------------------------------------
 # IDE
