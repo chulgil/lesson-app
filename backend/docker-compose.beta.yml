@@ -25,7 +25,12 @@ services:
       - .env.beta
     environment:
       ENVIRONMENT: beta
-      DEBUG: "true"
+      # beta 는 production-like 환경(validate_runtime_configuration)이라 DEBUG=true /
+      # localhost·http CORS 를 거부한다. 앱 부팅을 위해 안전한 값으로 고정.
+      DEBUG: "false"
+      # .env.beta 에 CORS_ORIGINS 미설정 → 기본값 ["http://localhost:3000"] 이 검증에
+      # 걸리므로 명시. beta 전용 웹 프론트는 없으며 네이티브 앱은 CORS 미적용.
+      CORS_ORIGINS: '["https://lesson.chulgil.me"]'
     volumes:
       - beta-logs:/app/logs
       - ./keys:/app/keys:ro
