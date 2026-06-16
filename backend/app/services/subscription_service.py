@@ -1079,6 +1079,9 @@ class SubscriptionService:
             response.lesson_location_id = membership.lesson_location_id
         if response.travel_time_minutes is None:
             response.travel_time_minutes = membership.travel_time_minutes
+        # spec §2.5 — 수강권 1개 = 멤버십 1개 = 악기 1개. 멤버십 instrument 를 SSOT
+        # 로 노출하되, 레거시 default="" 는 null 로 내려 FE 가 학생값으로 폴백한다.
+        response.instrument = membership.instrument or None
         return response
 
     def _remaining_lessons(self, sub: Any) -> int | None:

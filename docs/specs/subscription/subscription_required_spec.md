@@ -1,6 +1,6 @@
 # 수강권 필수화 스펙 (Plan B)
 
-> 최종 업데이트: 2026-06-15
+> 최종 업데이트: 2026-06-16
 
 ## 1. 개요
 
@@ -102,7 +102,9 @@ else:
 
 ### 2.5 다수 활성 수강권 — 선택 UI + 필드 귀속 (2026-06-15 개정)
 
-> 배경: §2.1 의 "가장 최근 활성 수강권 자동 연결"은 학생이 활성 수강권을 **2개 이상** 보유할 때(예: 바이올린 + 피아노, 또는 만료 임박 구권 + 신규권) 선생님 의도와 다르게 귀속될 수 있다. 서로 다른 수강권은 **악기가 다를 수 있다**(멤버십별 악기).
+> 배경: §2.1 의 "가장 최근 활성 수강권 자동 연결"은 학생이 활성 수강권을 **2개 이상** 보유할 때(예: 바이올린 + 피아노, 또는 만료 임박 구권 + 신규권) 선생님 의도와 다르게 귀속될 수 있다.
+>
+> 악기 모델: **수강권 1개 = 멤버십 1개 = 악기 1개**(`Subscription.membership_id` 는 NOT NULL, `ClassMembership.instrument` 가 SSOT). 한 수강권은 악기 하나로 고정되며, 서로 다른 수강권은 (멤버십이 다르면) 악기가 다를 수 있다.
 
 #### 조건부 선택 (progressive disclosure)
 
@@ -149,7 +151,9 @@ else:
   -> POST /lessons { subscription_id }  (BE: §2.1 명시 id 우선 + _assert_subscription_matches_lesson)
 ```
 
-BE 변경 없음(이미 명시 subscription_id 우선 처리 + 학생 소유 검증). FE 변경: Subscription 엔티티에 instrument 매핑 추가(BE 스키마는 이미 제공), 활성 2+개 시 선택 시트, 악기 상속 고정.
+**BE 변경**: `SubscriptionResponse.instrument` 추가 — `_subscription_response` 에서 이미 조회 중인 멤버십의 `instrument` 를 매핑(추가 쿼리 0). 레거시 멤버십의 빈 문자열(`default=""`)은 **null 로 내려** FE 가 학생값으로 폴백하게 한다. instrument 컬럼은 `class_memberships` 에 이미 존재하므로 **DB 마이그레이션 없음**(코드 배포만). lesson 부착 자체는 §2.1 의 명시 subscription_id 우선 + 학생 소유 검증을 그대로 사용.
+
+**FE 변경**: `Subscription` 엔티티에 `instrument` 필드(BE 응답 매핑), 활성 2+개 시 선택 시트, 악기 상속 고정. `resolveLessonInstrument` 가 instrument 가 null/공백이면 학생값으로 폴백.
 
 ## 3. 취소 분기 로직
 
@@ -292,3 +296,4 @@ if new_status == 'cancelled' and lesson.subscription_id:
 |------|----------|
 | 2026-05-31 | 초안 작성 — Plan B (수강권 필수 + 자동 생성) 결정 |
 | 2026-06-15 | §2.5 추가 — 다수 활성 수강권 시 선택 UI(조건부, 2개+) + 멤버십 악기 상속 고정 + 0개 체험 자동생성 |
+| 2026-06-16 | §2.5 정정 — 악기는 BE `SubscriptionResponse.instrument`(membership 매핑, 빈문자열→null)로 제공. 직전 문구 "BE 스키마는 이미 제공"은 오류였음(실제 미제공). DB 마이그레이션 없음(코드 배포만) |

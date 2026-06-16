@@ -17,6 +17,10 @@ class SubscriptionResponse(BaseModel):
     id: str
     student_id: str
     membership_id: str | None = None
+    # Instrument inherited from the subscription's membership (SSOT for the
+    # lesson instrument). Empty membership instrument is mapped to null so the
+    # frontend falls back to the student value. spec §2.5.
+    instrument: str | None = None
     lesson_location_id: str | None = None
     travel_time_minutes: int | None = None
     type: str | None = None
