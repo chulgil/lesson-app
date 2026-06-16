@@ -28,8 +28,8 @@ class AddressFields extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 130,
+            Expanded(
+              flex: 1,
               child: TextFormField(
                 controller: postalCodeController,
                 decoration: studentInputDecoration(
@@ -63,6 +63,7 @@ class AddressFields extends StatelessWidget {
                     foregroundColor: AppColors.paperAccent,
                     side: const BorderSide(color: AppColors.paperAccent),
                     shape: const RoundedRectangleBorder(),
+                    minimumSize: Size(0, AppSpacing.buttonHeight),
                   ),
                 ),
               ),

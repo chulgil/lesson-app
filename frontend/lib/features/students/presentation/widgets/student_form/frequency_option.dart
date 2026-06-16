@@ -26,14 +26,13 @@ class FrequencyOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.paperAccentSoft
-              : AppColors.paperDark,
+          color: isSelected ? AppColors.paperAccentSoft : AppColors.paperDark,
           border: Border.all(
             color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
@@ -43,33 +42,31 @@ class FrequencyOption extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isSelected) ...[
-              Icon(
-                Icons.check_circle,
-                size: 20,
-                color: AppColors.paperAccent,
-              ),
+              Icon(Icons.check_circle, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
             ],
-            Column(
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color:
-                        isSelected ? AppColors.paperAccent : AppColors.ink,
+            Flexible(
+              child: Column(
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? AppColors.paperAccent : AppColors.ink,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: AppTypography.caption.copyWith(
-                    color: isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: AppTypography.caption.copyWith(
+                      color:
+                          isSelected
+                              ? AppColors.paperAccent
+                              : AppColors.inkSecondary,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

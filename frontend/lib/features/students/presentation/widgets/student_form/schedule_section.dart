@@ -255,16 +255,19 @@ class _DayTimeRow extends StatelessWidget {
               ),
             ),
           ),
-          TextButton.icon(
-            onPressed: onTimeTap,
-            icon: const Icon(Icons.access_time, size: 16),
-            label: const Text(AppStrings.studentScheduleChange),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space2,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: TextButton.icon(
+              onPressed: onTimeTap,
+              icon: const Icon(Icons.access_time, size: 16),
+              label: const Text(AppStrings.studentScheduleChange),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space2,
+                ),
+                minimumSize: Size(0, AppSpacing.buttonHeight),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
         ],
