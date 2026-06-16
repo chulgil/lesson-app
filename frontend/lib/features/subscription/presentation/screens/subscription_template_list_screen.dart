@@ -141,9 +141,14 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
   }
 
   void _showAddTemplateDialog(BuildContext context, WidgetRef ref) {
-    showNotebookBottomSheet<void>(
+    // _TemplateFormSheet 는 자체 surface(Container)+스크롤(SingleChildScrollView)+
+    // 핸들을 소유하므로 self-surfaced 용 showNotebookModalBottomSheet 를 쓴다.
+    // showNotebookBottomSheet 는 자식을 Column(min) 으로 감싸 unbounded 높이를
+    // 줘 SingleChildScrollView 가 스크롤되지 못하고 폼이 세로 overflow 한다.
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder:
           (context) => _TemplateFormSheet(
             teacherId: teacherId,
@@ -170,9 +175,11 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     WidgetRef ref,
     SubscriptionTemplate template,
   ) {
-    showNotebookBottomSheet<void>(
+    // self-surfaced 시트 → showNotebookModalBottomSheet (위 _showAddTemplateDialog 참조).
+    showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder:
           (context) => _TemplateFormSheet(
             teacherId: teacherId,
