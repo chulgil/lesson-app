@@ -72,6 +72,44 @@ void main() {
     );
   });
 
+  // #750 — 주소 행 mobile(375) 가로 오버플로우. 독립 버그가 아니라 #746
+  // RenderMetaData 크래시의 다운스트림 증상이었다: 크래시 cascade 가 폼에 비정상
+  // 93px 제약을 전파 → rigid 우편번호(SizedBox 130)가 넘쳐 58px 오버플로우.
+  // #746 수정(SizedBox→Expanded + 크래시 제거)이 함께 해소. takeException 만으로는
+  // Expanded 가 압축을 흡수해 통과할 수 있으므로, 본문이 93px 로 붕괴하지 않고
+  // full-width 로 렌더되는지까지 검증해 근본(비정상 제약) 회귀를 막는다.
+  testWidgets('#750 학생 직접 등록 — mobile(375) 주소 행 오버플로우 없음 + 폼 full-width', (
+    tester,
+  ) async {
+    await bootAsRole(tester, DevAccount.teacher);
+
+    tester.view.physicalSize = _mobile;
+    tester.view.devicePixelRatio = 1.0;
+    GoRouter.of(
+      tester.element(find.byType(Scaffold).first),
+    ).go(AppRoutes.addStudent);
+    await settle(tester);
+
+    expect(find.byType(AddStudentScreen), findsOneWidget);
+    // 주소 행 등 전 화면에 RenderFlex overflow / RenderMetaData 없음.
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: '학생 작성 화면 mobile(375) 렌더 크래시/오버플로우 없음 (#750)',
+    );
+    // 본문이 93px 로 압축되지 않고 full-width(≈375) 로 렌더되는지 — 93px 면 280px
+    // 요일 행이 먼저 오버플로우하고 본문 폭이 ~93px 로 붕괴. #750 근본 회귀 가드.
+    final body = find.byType(SingleChildScrollView);
+    expect(body, findsOneWidget);
+    final bodyWidth = tester.getSize(body).width;
+    expect(
+      bodyWidth,
+      greaterThan(300),
+      reason:
+          '폼 본문이 full-width 여야 함 (93px 압축 회귀 가드). 실제 ${bodyWidth.toInt()}px',
+    );
+  });
+
   testWidgets('교사 무파라미터 top-level 라우트 — 2 뷰포트 렌더 크래시 없음', (tester) async {
     await bootAsRole(tester, DevAccount.teacher);
     const routes = [
