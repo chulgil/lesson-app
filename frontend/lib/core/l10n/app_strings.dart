@@ -9342,4 +9342,22 @@ class AppStrings {
 
   /// 빈 날(비처벌) 라벨.
   static const journalRestLabel = '쉼표';
+
+  // 연습장(Practice Journal) P2 — 제본/완성본 책장.
+  // 사용처: features/practice_journal/presentation/screens/bound_shelf_screen.dart 등
+  /// 완성본 책장 화면 제목 + 진입 라벨.
+  static const boundShelfTitle = '완성본 책장';
+
+  /// 완성본 섹션 헤더.
+  static const boundShelfCompletedSection = '완성본';
+
+  /// 연습중(미완성) 섹션 헤더 + 책등 라벨.
+  static const boundShelfInProgress = '연습중';
+
+  /// 빈 책장 — 제목/부제.
+  static const boundShelfEmptyTitle = '아직 완성본이 없어요';
+  static const boundShelfEmptySubtitle = '곡을 끝내면 완성본 한 권으로 제본돼요';
+
+  /// 곡 완성(제본) 축하.
+  static const boundVolumeCelebration = '완성본으로 제본되었어요 · 책장에서 확인하세요';
 }

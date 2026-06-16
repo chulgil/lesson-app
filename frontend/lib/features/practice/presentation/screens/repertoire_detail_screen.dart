@@ -420,7 +420,11 @@ class _RepertoireDetailScreenState
 
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+              SnackBar(
+                content: Text(
+                  '"${repertoire.name}" — ${AppStrings.boundVolumeCelebration}',
+                ),
+              ),
             );
             context.pop(); // Go back to repertoire list
           },

@@ -11,6 +11,7 @@ import 'package:lessonaza/features/practice_journal/presentation/extensions/jour
 import 'package:lessonaza/features/practice_journal/presentation/widgets/journal_month_grid.dart';
 
 import '../providers/practice_journal_provider.dart';
+import 'bound_shelf_screen.dart';
 
 /// 3 역할(학생·보호자·선생님) x 2 톤 연습장 화면.
 ///
@@ -58,6 +59,19 @@ class PracticeJournalScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       appBarTitle: tone.title,
+      actions: [
+        IconButton(
+          tooltip: AppStrings.boundShelfTitle,
+          icon: const Icon(Icons.menu_book_outlined),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => BoundShelfScreen(childProfileId: childProfileId),
+                ),
+              ),
+        ),
+      ],
       body: body,
       bottomNavigationBar: _BottomAction(
         childProfileId: childProfileId,

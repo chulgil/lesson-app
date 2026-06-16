@@ -53,6 +53,8 @@ export 'presentation/providers/recording_provider.dart'
         microphonePermissionProvider,
         RecordingState,
         recordingNotifierProvider;
+export 'presentation/providers/repertoire_archive_provider.dart'
+    show activeRepertoiresProvider;
 export 'presentation/providers/repertoire_sort_provider.dart';
 export 'presentation/widgets/goal/goal_progress_widget.dart'
     show GoalProgressWidget;

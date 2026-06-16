@@ -523,10 +523,40 @@
 
 ---
 
+## 16. 연습장 제본 (Practice Journal — Binding) — 2026-06-16
+
+> 스펙: `docs/specs/practice_journal/practice_journal_master.md` §8.1 · §9.2 · §12 Phase 2
+> 범위: 곡(레퍼토리) 완성 → 완성본 제본 + 책장(완성본/연습중 구분).
+
+### 핵심 엔티티 (FE)
+
+| 한글 | 영문 (FE) | 정의 |
+|---|---|---|
+| 완성본 | `BoundVolume` | 완성한 곡 1권. 필드: `childProfileId` / `pieceId` / `pieceName` / `volumeNo: int` / `boundDate`. 책등은 로마숫자(VOL. I·II·III) — `volumeNo`는 자녀 프로필별 1부터 증가 |
+| 책등 | `BoundVolumeSpine` | 책장의 한 권 시각 단위 — 완성본=실선+로마숫자, 연습중=점선 |
+| 책장 | `BoundShelfScreen` | 완성본(실선)과 연습중(점선)을 구분해 보여주는 화면 |
+
+### 정책 용어
+
+| 용어 | 정의 |
+|---|---|
+| 제본 | 곡(레퍼토리) 완성(archive) 시 완성본 1권 생성. `PracticeJournalRepository.bindVolume(childProfileId, pieceId, pieceName)` — 멱등(같은 `pieceId` 중복 제본 시 권 수 불변) |
+| 곡 완성 트리거 | 이 앱에서 레퍼토리 archive = 곡 완성. `RepertoireArchiveNotifier.archive()` 성공 후 `practice_journal_facade` 경유로 제본 + `boundVolumesProvider` invalidate |
+| 연습중 | 아직 완성(archive)되지 않은 활성 레퍼토리(`activeRepertoiresProvider`). 책장에서 점선 책등으로 표시 |
+
+### 사용하지 않는 표현
+
+| 폐기 표현 | 대신 사용 |
+|---|---|
+| 출판 / 발매 | "제본"(완성본 생성). "출판"은 P3 발표회 연계에만 한정 |
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-16 | §16 연습장 제본(Practice Journal — Binding) 신설 — `BoundVolume` 엔티티(+`pieceName`) + `BoundVolumeSpine`/`BoundShelfScreen` + 정책 용어 3종(제본 / 곡 완성 트리거 / 연습중) + Deprecated 1건(출판→제본). 본 변경은 `.harness/spec/2026-06-16-practice-journal-p2-binding.md` |
 | 2026-06-12 | §15 P3 Spotlight 용어 추가 — `SpotlightPrompt` 엔티티 + `SpotlightType` enum (3종) + 정책 용어 7종 (스포트라이트 슬롯 / 노출 조건 / 큐 우선순위 / 거절 cooldown / 8주 hide / 영구 hide / 스포트라이트 시드) + 서비스 메서드 3종 (Eligibility / Queue / DeclineLearning) + Deprecated 표현 2건 ("필수 알림" → "스포트라이트 권유", "거절 패널티" → "거절 학습"). 본 변경은 `.harness/decomposition/2026-06-12-student-gamification-p3-spotlight.md` Job 0 Step 2 |
 | 2026-06-12 | §15 P2 Visual Growth 용어 추가 — `StreakFreeze` 엔티티 + 정책 용어 7종 (동결 잔액 / 시험 모드 / 복귀 보너스 / 1년 히트맵 / 트로피 모음 / 30일 chunk / D-day 마이그레이션 / 휴식 권고) + 서비스 메서드 2종 (자동 발급 / 자동 적용) + Deprecated 표현 2건 ("freeze 보상" → "스트릭 동결", "트로피 카테고리" → "트로피 모음"). 본 변경은 `.harness/decomposition/2026-06-11-student-gamification-p2-visual-growth.md` Job 0 Step 2 |
 | 2026-06-11 | §15 학생 게이미피케이션 (자가 연습) 신설 — P1 Foundation 5종 핵심 용어 (`StudentQuest` / `QuestOrigin` / `GrowthHeatmap` / `DailyPractice` / `PracticeRecordingService`) + 정책 용어 5종 ([연습 시작] 1버튼 / 1.5초 축하 / 4 경로 wiring / 자동 트리거 / Hive 30일 chunk × 13 box) + 14세 미만 처리 2종 (`parentConsentAt` / 자가 연습 전용 모드) + Deprecated 표현 2건. 본 변경은 `.harness/spec/2026-06-11-student-gamification.md` |

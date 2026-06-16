@@ -206,5 +206,148 @@ class _PracticeLedgerProviderElement
   @override
   int get month => (origin as PracticeLedgerProvider).month;
 }
+
+String _$boundVolumesHash() => r'075caeb5c0a69a5f2a225b6f83bef3c3d7c52a08';
+
+/// 자녀 프로필의 완성본 목록(책장). 곡 완성(제본) 후 invalidate 로 갱신.
+///
+/// Copied from [boundVolumes].
+@ProviderFor(boundVolumes)
+const boundVolumesProvider = BoundVolumesFamily();
+
+/// 자녀 프로필의 완성본 목록(책장). 곡 완성(제본) 후 invalidate 로 갱신.
+///
+/// Copied from [boundVolumes].
+class BoundVolumesFamily extends Family<AsyncValue<List<BoundVolume>>> {
+  /// 자녀 프로필의 완성본 목록(책장). 곡 완성(제본) 후 invalidate 로 갱신.
+  ///
+  /// Copied from [boundVolumes].
+  const BoundVolumesFamily();
+
+  /// 자녀 프로필의 완성본 목록(책장). 곡 완성(제본) 후 invalidate 로 갱신.
+  ///
+  /// Copied from [boundVolumes].
+  BoundVolumesProvider call(
+    String childProfileId,
+  ) {
+    return BoundVolumesProvider(
+      childProfileId,
+    );
+  }
+
+  @override
+  BoundVolumesProvider getProviderOverride(
+    covariant BoundVolumesProvider provider,
+  ) {
+    return call(
+      provider.childProfileId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'boundVolumesProvider';
+}
+
+/// 자녀 프로필의 완성본 목록(책장). 곡 완성(제본) 후 invalidate 로 갱신.
+///
+/// Copied from [boundVolumes].
+class BoundVolumesProvider
+    extends AutoDisposeFutureProvider<List<BoundVolume>> {
+  /// 자녀 프로필의 완성본 목록(책장). 곡 완성(제본) 후 invalidate 로 갱신.
+  ///
+  /// Copied from [boundVolumes].
+  BoundVolumesProvider(
+    String childProfileId,
+  ) : this._internal(
+          (ref) => boundVolumes(
+            ref as BoundVolumesRef,
+            childProfileId,
+          ),
+          from: boundVolumesProvider,
+          name: r'boundVolumesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$boundVolumesHash,
+          dependencies: BoundVolumesFamily._dependencies,
+          allTransitiveDependencies:
+              BoundVolumesFamily._allTransitiveDependencies,
+          childProfileId: childProfileId,
+        );
+
+  BoundVolumesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.childProfileId,
+  }) : super.internal();
+
+  final String childProfileId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<BoundVolume>> Function(BoundVolumesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: BoundVolumesProvider._internal(
+        (ref) => create(ref as BoundVolumesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        childProfileId: childProfileId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<BoundVolume>> createElement() {
+    return _BoundVolumesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is BoundVolumesProvider &&
+        other.childProfileId == childProfileId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, childProfileId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin BoundVolumesRef on AutoDisposeFutureProviderRef<List<BoundVolume>> {
+  /// The parameter `childProfileId` of this provider.
+  String get childProfileId;
+}
+
+class _BoundVolumesProviderElement
+    extends AutoDisposeFutureProviderElement<List<BoundVolume>>
+    with BoundVolumesRef {
+  _BoundVolumesProviderElement(super.provider);
+
+  @override
+  String get childProfileId => (origin as BoundVolumesProvider).childProfileId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

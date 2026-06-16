@@ -1,3 +1,4 @@
+import 'package:lessonaza/features/practice_journal/practice_journal_facade.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/entities.dart';
@@ -32,15 +33,28 @@ class RepertoireArchiveNotifier extends _$RepertoireArchiveNotifier {
   Future<void> build() async {}
 
   /// Archive a repertoire
+  ///
+  /// 이 앱에서 레퍼토리 archive = 곡 완성. 완성 시 연습장(practice_journal)에
+  /// 완성본 1권을 제본한다(멱등 — 중복 archive 시 권 수 불변).
   Future<void> archive(String id, String studentId) async {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
-      await repository.archiveRepertoire(id);
+      final archived = await repository.archiveRepertoire(id);
 
       // Invalidate related providers
       ref.invalidate(activeRepertoiresProvider(studentId));
       ref.invalidate(archivedRepertoiresProvider(studentId));
+
+      // 곡 완성 → 완성본 제본 + 책장 갱신 (practice_journal facade 경유).
+      await ref
+          .read(practiceJournalRepositoryProvider)
+          .bindVolume(
+            childProfileId: studentId,
+            pieceId: id,
+            pieceName: archived.name,
+          );
+      ref.invalidate(boundVolumesProvider(studentId));
 
       state = const AsyncData(null);
     } catch (e, st) {

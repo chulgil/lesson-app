@@ -4,5 +4,9 @@
 /// through this facade instead of importing presentation/providers directly.
 library;
 
+export 'domain/entities/bound_volume.dart' show BoundVolume;
 export 'presentation/providers/practice_journal_provider.dart'
-    show practiceJournalRepositoryProvider, practiceLedgerProvider;
+    show
+        boundVolumesProvider,
+        practiceJournalRepositoryProvider,
+        practiceLedgerProvider;

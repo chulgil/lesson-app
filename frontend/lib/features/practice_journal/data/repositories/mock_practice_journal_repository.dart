@@ -1,3 +1,4 @@
+import '../../domain/entities/bound_volume.dart';
 import '../../domain/entities/endorsement.dart';
 import '../../domain/entities/guardian_seal.dart';
 import '../../domain/entities/practice_ledger.dart';
@@ -7,7 +8,43 @@ import '../../domain/repositories/practice_journal_repository.dart';
 class MockPracticeJournalRepository implements PracticeJournalRepository {
   // key: "$childProfileId:$year-$month"
   final Map<String, PracticeLedger> _store = {};
+  // key: childProfileId → 완성본 목록(제본 순서 = volumeNo 순서).
+  final Map<String, List<BoundVolume>> _volumes = {};
   static const _latency = Duration(milliseconds: 60);
+
+  MockPracticeJournalRepository() {
+    _seedVolumes();
+  }
+
+  /// 데모용 완성본 시드(주요 데모 학생 프로필). pieceId 는 시드 전용으로
+  /// 실제 레퍼토리 id 와 충돌하지 않게 prefix 를 둔다.
+  void _seedVolumes() {
+    _volumes['student_1'] = [
+      BoundVolume(
+        childProfileId: 'student_1',
+        pieceId: 'seed-vol-bach-minuet',
+        pieceName: '바흐 미뉴에트',
+        volumeNo: 1,
+        boundDate: DateTime.utc(2026, 3, 12),
+      ),
+      BoundVolume(
+        childProfileId: 'student_1',
+        pieceId: 'seed-vol-twinkle',
+        pieceName: '작은 별 변주곡',
+        volumeNo: 2,
+        boundDate: DateTime.utc(2026, 5, 2),
+      ),
+    ];
+    _volumes['student_2'] = [
+      BoundVolume(
+        childProfileId: 'student_2',
+        pieceId: 'seed-vol-canon',
+        pieceName: '파헬벨 캐논',
+        volumeNo: 1,
+        boundDate: DateTime.utc(2026, 4, 20),
+      ),
+    ];
+  }
 
   String _key(String c, int y, int m) => '$c:$y-$m';
 
@@ -62,5 +99,36 @@ class MockPracticeJournalRepository implements PracticeJournalRepository {
     _store[_key(c, e.date.year, e.date.month)] = l.copyWith(
       endorsements: [...l.endorsements, e],
     );
+  }
+
+  @override
+  Future<List<BoundVolume>> getBoundVolumes(String childProfileId) async {
+    await Future.delayed(_latency);
+    final list = [...(_volumes[childProfileId] ?? const <BoundVolume>[])];
+    list.sort((a, b) => a.volumeNo.compareTo(b.volumeNo));
+    return list;
+  }
+
+  @override
+  Future<BoundVolume> bindVolume({
+    required String childProfileId,
+    required String pieceId,
+    required String pieceName,
+  }) async {
+    await Future.delayed(_latency);
+    final existing = _volumes.putIfAbsent(childProfileId, () => []);
+    // 멱등: 같은 곡은 한 번만 제본.
+    final already = existing.where((v) => v.pieceId == pieceId);
+    if (already.isNotEmpty) return already.first;
+
+    final volume = BoundVolume(
+      childProfileId: childProfileId,
+      pieceId: pieceId,
+      pieceName: pieceName,
+      volumeNo: existing.length + 1,
+      boundDate: DateTime.now(),
+    );
+    existing.add(volume);
+    return volume;
   }
 }

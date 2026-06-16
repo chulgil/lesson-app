@@ -1,7 +1,7 @@
 # 연습장(Practice Journal) 마스터 스펙
 
 > 마지막 업데이트: 2026-06-16
-> 구현 상태: P1(연습장) 구현 완료 · main 머지(130a6ce3) · 이슈 #733-736 CLOSED (전체 2348 PASS / analyze 0). P2(제본) 계획 확정·미착수 (`.harness/spec/2026-06-16-practice-journal-p2-binding.md`)
+> 구현 상태: P1(연습장) 구현 완료 · main 머지(130a6ce3) · 이슈 #733-736 CLOSED. P2(제본) 구현 완료 — 완성본 제본(`BoundVolume`) + 책장(완성본/연습중). P3(발표회 연계)·알림 연계(부모 주간 리마인드) 미착수
 > 확정 결정(2026-06-15): 인장색 기존 잉크 재사용 · birthdate 스키마 미변경(표준 톤+부모 override) · 출시 P1(연습장) 우선 · 평가는 연결상태 적응(선생님 과제한정/자가 검인)
 > 분류: 신규 도메인 `features/practice_journal/` · 리텐션/인게이지먼트
 > 디자인 컨셉: Notebook×Score 정합 (`docs/specs/design/notebook/README.md`)
@@ -196,7 +196,7 @@ UI 표기는 **한글**, 코드명은 **영문**으로 동일. UI 표기는 자�
 | `PracticeMark` | `date`, `intensity: MarkIntensity{full, short}` | 연습 활동 파생 |
 | `GuardianSeal` | `weekStart`, `guardianUserId`, `cheerNote: String?` | 부모 주간 액션 |
 | `Endorsement` | `by: EndorsedBy{self, teacher}`, `date`, `authorUserId`, `assignmentRef: String?`(teacher 한정), `note: String`(빨간펜/회고) | 선생님 검인(레슨 시) 또는 자가 검인(자가 평가 시) |
-| `BoundVolume` | `childProfileId`, `pieceId`, `volumeNo: int`(로마 렌더), `boundDate` | 곡 완성 이벤트 |
+| `BoundVolume` | `childProfileId`, `pieceId`, `pieceName`(책등/축하 표시), `volumeNo: int`(로마 렌더), `boundDate` | 곡 완성 이벤트 |
 
 ### 8.2 도메인 규칙
 - `PracticeMark`는 한 `(childProfileId, date)`당 **최대 1개**. 같은 날 여러 연습 → intensity만 갱신(full 우선).
@@ -312,9 +312,9 @@ repertoire 완료 이벤트(기존)
 - 알림 연계(부모 주간 확인 리마인드, 선생님 검인 프롬프트)
 
 **AC(P2)**
-- [ ] 곡(레퍼토리) 완성 시 완성본 1권 생성, volumeNo 1부터 증가(로마 렌더)
-- [ ] 책장에서 완성본/연습중(점선)이 구분됨
-- [ ] 부모 주간 리마인드가 기존 DND/한도 정책을 준수함
+- [x] 곡(레퍼토리) 완성 시 완성본 1권 생성, volumeNo 1부터 증가(로마 렌더) — 2026-06-16 (archive 트리거 + `bindVolume` 멱등, 단위/회귀 테스트)
+- [x] 책장에서 완성본/연습중(점선)이 구분됨 — 2026-06-16 (`BoundShelfScreen` + `BoundVolumeSpine` 실선/점선, widget 테스트)
+- [ ] 부모 주간 리마인드가 기존 DND/한도 정책을 준수함 — **이번 슬라이스 비포함**(알림 연계는 후속). 제본+책장+축하만 구현
 
 ### Phase 3 (선택)
 - 연령 톤 적응 정교화, 부모 한 줄 응원 확장, 완성본 발표회(출판) 연계
