@@ -1,6 +1,6 @@
 {
-  "updated_at": 1781252074,
-  "updated_at_iso": "2026-06-12T08:14:34Z",
+  "updated_at": 1781589274,
+  "updated_at_iso": "2026-06-16T05:54:34Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -12,25 +12,23 @@
     "spec/2026-06-08-teacher-quest-system.md": "d547db15a7646981fef42cfecf8e982d9bdfd49c",
     "spec/2026-06-11-student-gamification.md": "4c166ebe8f1660152dd7a882e0b1e63563a45321",
     "spec/2026-06-11-teacher-settings-redesign.md": "c0b9d0ed03924d0c71e529c46981cba11ed7f4c8",
+    "spec/2026-06-16-practice-journal-p2-binding.md": "58befd08b6f588e5bba3092fecb628d0adbd1fee",
     "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md": "b163a2262d679d86141efeb402468c9e63bc861b",
     "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md": "1b42fab61adc238205e27df6fb1ddbd206a899a8"
   },
   "changed": [
-    "spec/2026-06-11-student-gamification.md",
-    "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md"
+    "spec/2026-06-16-practice-journal-p2-binding.md"
   ],
   "added": [
-    "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md"
+    "spec/2026-06-16-practice-journal-p2-binding.md"
   ],
   "removed": [],
   "summary": {
-    "changed_total": 2,
+    "changed_total": 1,
     "added": 1,
     "removed": 0,
     "domains_touched": [],
     "domain_counts": {},
-    "warnings": [
-      "changes_without_domain: 변경 파일이 도메인 폴더 아래가 아님"
-    ]
+    "warnings": []
   }
 }
