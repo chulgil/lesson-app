@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/students/presentation/screens/add_student_screen.dart';
+import 'package:lessonaza/features/students/presentation/widgets/student_form/address_fields.dart';
 
 import '../e2e/helpers/e2e_harness.dart';
 
@@ -69,6 +70,40 @@ void main() {
       AppRoutes.addStudent,
       _mobile,
       expectScreen: find.byType(AddStudentScreen),
+    );
+  });
+
+  testWidgets('#750 학생 등록 주소행 — mobile(375) 스크롤 노출 시 RenderFlex overflow 없음', (
+    tester,
+  ) async {
+    await bootAsRole(tester, DevAccount.teacher);
+
+    tester.view.physicalSize = _mobile;
+    tester.view.devicePixelRatio = 1.0;
+    final ctx = tester.element(find.byType(Scaffold).first);
+    GoRouter.of(ctx).go(AppRoutes.addStudent);
+    await settle(tester);
+
+    // 주소행은 폼 하단(812 fold 아래)이라 fresh load 시 paint 되지 않는다.
+    // SingleChildScrollView 는 off-screen child 를 layout 만 하고 paint 하지 않으므로,
+    // paint 단계에서 발생하는 RenderFlex overflow 가 fresh-load 검사(#751)에서 미검출된다.
+    // → 주소행을 스크롤로 노출해 paint 를 강제한 뒤 overflow 를 검증한다(#750).
+    await tester.scrollUntilVisible(
+      find.byType(AddressFields),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester);
+
+    expect(
+      find.byType(AddressFields),
+      findsOneWidget,
+      reason: '주소행이 실제로 노출(paint)되었는가',
+    );
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: '#750 주소행 paint 시 RenderFlex overflow 없음 (@375)',
     );
   });
 
