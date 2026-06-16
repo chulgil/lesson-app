@@ -18,7 +18,6 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../../subscription/presentation/extensions/subscription_visuals.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
 import '../../../auth/domain/entities/user_role.dart';

@@ -116,6 +116,8 @@ export 'domain/entities/subscription_usage.dart';
 // =============================================================================
 export 'domain/services/auto_proposal_service.dart';
 export 'domain/services/subscription_renewal_service.dart';
+export 'domain/subscription_selection.dart'
+    show sortSubscriptionsForPicker, resolveLessonInstrument;
 
 // =============================================================================
 // QUERY PROVIDERS + MUTATION NOTIFIERS
@@ -127,3 +129,10 @@ export 'presentation/providers/subscription_lifecycle_service_providers.dart'
 export 'presentation/providers/subscription_proposal_providers.dart';
 export 'presentation/providers/subscription_providers.dart';
 export 'presentation/providers/subscription_template_providers.dart';
+
+// =============================================================================
+// PRESENTATION — display extensions + reusable picker (manual lesson §2.5)
+// =============================================================================
+export 'presentation/extensions/subscription_visuals.dart';
+export 'presentation/widgets/subscription_picker_sheet.dart'
+    show showSubscriptionPickerSheet;

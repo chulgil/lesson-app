@@ -15,6 +15,7 @@ import '../../lessons_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 import '../widgets/lesson_form/lesson_location_section.dart';
+import '../widgets/lesson_form/manual_lesson_subscription_section.dart';
 
 /// Screen for adding a new lesson
 class AddLessonScreen extends ConsumerStatefulWidget {
@@ -41,6 +42,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   final _notesController = TextEditingController();
 
   LessonStudentInfo? _selectedStudent;
+
+  /// Subscription this lesson is deducted from (spec §2.5).
+  /// null = 0개(체험 자동생성) 또는 2+개 미선택 상태.
+  Subscription? _selectedSubscription;
+
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = const TimeOfDay(hour: 14, minute: 0);
   int _lessonDuration = 60;
@@ -88,11 +94,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             (s) => s.id == widget.preselectedStudentId,
           );
           if (match.isNotEmpty) {
-            final student = match.first;
-            setState(() {
-              _selectedStudent = _studentToInfo(student);
-            });
-            _autoFillFromStudent(student);
+            _onStudentChosen(match.first);
           }
         }
       });
@@ -115,14 +117,16 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: NotebookDetailAppBar(
-        title: _isRecordMode
-            ? AppStrings.lessonRecordTitle
-            : AppStrings.lessonAddTitle,
-        onLeadingTap: () => showLessonExitConfirmation(
-          context: context,
-          hasData: _hasFormData(),
-          onExit: () => context.pop(),
-        ),
+        title:
+            _isRecordMode
+                ? AppStrings.lessonRecordTitle
+                : AppStrings.lessonAddTitle,
+        onLeadingTap:
+            () => showLessonExitConfirmation(
+              context: context,
+              hasData: _hasFormData(),
+              onExit: () => context.pop(),
+            ),
       ),
       body: Form(
         key: _formKey,
@@ -140,8 +144,15 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 onTap: _showStudentPicker,
               ),
 
-              // Subscription status banner
-              if (_selectedStudent != null) _buildSubscriptionBanner(),
+              // Subscription status + instrument inheritance (spec §2.5)
+              if (_selectedStudent != null)
+                ManualLessonSubscriptionSection(
+                  studentId: _selectedStudent!.id,
+                  studentInstrument: _selectedStudent!.instrument,
+                  selectedSubscription: _selectedSubscription,
+                  onPickRequested:
+                      () => _openSubscriptionPicker(_selectedStudent!.id),
+                ),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -292,12 +303,21 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       students: studentInfos,
       selectedStudent: _selectedStudent,
       onStudentSelected: (selected) {
-        setState(() => _selectedStudent = selected);
-        // Auto-fill from student's regular lesson pattern
         final student = students.firstWhere((s) => s.id == selected.id);
-        _autoFillFromStudent(student);
+        _onStudentChosen(student);
       },
     );
+  }
+
+  /// Unified student-selection flow: set student, reset subscription, auto-fill
+  /// the regular pattern, then resolve the subscription branch (spec §2.5).
+  void _onStudentChosen(Student student) {
+    setState(() {
+      _selectedStudent = _studentToInfo(student);
+      _selectedSubscription = null;
+    });
+    _autoFillFromStudent(student);
+    _resolveSubscriptionForStudent(student.id);
   }
 
   Future<void> _selectDate() async {
@@ -314,72 +334,47 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     }
   }
 
-  /// Build subscription status banner for the selected student.
-  Widget _buildSubscriptionBanner() {
-    final studentId = _selectedStudent!.id;
-    final subscriptionsAsync = ref.watch(
-      activeStudentSubscriptionsProvider(studentId),
-    );
+  /// Resolve which subscription this lesson is deducted from after a student is
+  /// chosen (spec §2.5): 0개 → null(체험 자동생성), 1개 → 자동 귀속,
+  /// 2+개 → 선택 시트.
+  Future<void> _resolveSubscriptionForStudent(String studentId) async {
+    try {
+      final actives = await ref.read(
+        activeStudentSubscriptionsProvider(studentId).future,
+      );
+      if (!mounted || _selectedStudent?.id != studentId) return;
+      final sorted = sortSubscriptionsForPicker(actives);
+      if (sorted.length == 1) {
+        setState(() => _selectedSubscription = sorted.first);
+      } else if (sorted.length >= 2) {
+        await _openSubscriptionPicker(studentId, presorted: sorted);
+      }
+      // 0개: subscription_id 미지정 — BE 가 체험 수강권 자동 생성
+    } catch (_) {
+      // 조회 실패는 배너(provider watch)가 자체 표시. 저장은 막지 않는다.
+    }
+  }
 
-    return subscriptionsAsync.when(
-      data: (subscriptions) {
-        final hasActive = subscriptions.isNotEmpty;
-        final activeSub = hasActive ? subscriptions.first : null;
-
-        final message = hasActive
-            ? AppStrings.activeSubscriptionBanner(
-                activeSub!.remainingLessons ?? 0,
-                activeSub.totalLessonsForDisplay ?? 0,
-              )
-            : AppStrings.noActiveSubscriptionBanner;
-        final icon = hasActive ? Icons.check_circle_outline : Icons.info_outline;
-        final bgColor = hasActive
-            ? AppColors.paperOk.withValues(alpha: 0.08)
-            : AppColors.paperDark;
-        final iconColor = hasActive ? AppColors.paperOk : AppColors.ink;
-
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.space2),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: bgColor,
-              border: Border.all(
-                color: hasActive
-                    ? AppColors.paperOk.withValues(alpha: 0.3)
-                    : AppColors.inkQuaternary,
-              ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, color: iconColor, size: 18),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.ink,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+  /// Open the subscription picker sheet (2+ active) and store the choice.
+  Future<void> _openSubscriptionPicker(
+    String studentId, {
+    List<Subscription>? presorted,
+  }) async {
+    final sorted =
+        presorted ??
+        sortSubscriptionsForPicker(
+          await ref.read(activeStudentSubscriptionsProvider(studentId).future),
         );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.space2),
-        child: Row(
-          children: [
-            Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
-            const SizedBox(width: AppSpacing.space2),
-            Text(AppStrings.loadDataFailed, style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary)),
-          ],
-        ),
-      ),
+    if (!mounted || _selectedStudent?.id != studentId || sorted.isEmpty) return;
+    final picked = await showSubscriptionPickerSheet(
+      context: context,
+      subscriptions: sorted,
+      recommendedId: sorted.first.id,
     );
+    if (!mounted || _selectedStudent?.id != studentId) return;
+    if (picked != null) {
+      setState(() => _selectedSubscription = picked);
+    }
   }
 
   /// Show confirmation dialog when saving a lesson with a past date/time.
@@ -603,6 +598,13 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             : LessonStatus.scheduled;
 
     // Create the lesson object
+    // Instrument: subscription (membership) is the SSOT; fall back to the
+    // student value only when no subscription is chosen (0개 trial path).
+    final lessonInstrument = resolveLessonInstrument(
+      subscription: _selectedSubscription,
+      studentInstrument: _selectedStudent!.instrument,
+    );
+
     final lesson = Lesson(
       id: '', // Will be set by repository
       studentId: _selectedStudent!.id,
@@ -610,7 +612,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       teacherName:
           ref.read(teacherExtendedProfileProvider).valueOrNull?.name ??
           AppStrings.teacher,
-      instrument: _selectedStudent!.instrument,
+      instrument: lessonInstrument,
+      subscriptionId: _selectedSubscription?.id,
       date: _selectedDate,
       startTime: formatLessonTime(_selectedTime),
       duration: _lessonDuration,
@@ -676,8 +679,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       } else {
         // Single lesson creation — capture the returned Lesson so its server-
         // assigned id is used for subscription usage (not the local empty id).
-        final savedLesson =
-            await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
+        final savedLesson = await ref
+            .read(lessonsNotifierProvider.notifier)
+            .addLesson(lesson);
 
         // If past lesson (record mode), auto-deduct subscription
         if (isPastLesson) {
@@ -718,15 +722,19 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   }
 
   /// Record subscription usage for a past lesson (auto-deduct).
-  /// Silently skips if no active subscription exists.
+  /// Uses the chosen subscription (spec §2.5); falls back to the resolved
+  /// active subscription. Silently skips if none exists (0개 — BE handles trial).
   Future<void> _recordSubscriptionUsage(Lesson lesson) async {
     try {
-      final subscriptions = await ref.read(
-        activeStudentSubscriptionsProvider(lesson.studentId).future,
-      );
-      if (subscriptions.isEmpty) return;
+      Subscription? subscription = _selectedSubscription;
+      if (subscription == null) {
+        final subscriptions = await ref.read(
+          activeStudentSubscriptionsProvider(lesson.studentId).future,
+        );
+        if (subscriptions.isEmpty) return;
+        subscription = sortSubscriptionsForPicker(subscriptions).first;
+      }
 
-      final subscription = subscriptions.first;
       final usage = SubscriptionUsage(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         subscriptionId: subscription.id,

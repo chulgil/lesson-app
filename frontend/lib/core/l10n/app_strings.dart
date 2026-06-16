@@ -2754,6 +2754,33 @@ class AppStrings {
   static String activeSubscriptionBanner(int remaining, int total) =>
       '수강권 $remaining/$total회 남음 · 이 레슨은 1회차로 차감됩니다.';
 
+  // === 다수 활성 수강권 선택 (spec §2.5) ===
+
+  /// 수강권 선택 (multi-subscription picker sheet title)
+  static const manualLessonPickerTitle = '수강권 선택';
+
+  /// 시트 부제 — 여러 활성 수강권 중 차감 대상 선택 안내
+  static const manualLessonPickerSubtitle =
+      '활성 수강권이 여러 개입니다. 이 레슨을 차감할 수강권을 선택하세요.';
+
+  /// 추천(권장 선택) 배지 — 만료 임박 우선
+  static const manualLessonPickerRecommendedBadge = '만료 임박';
+
+  /// 배너 CTA — 활성 N개, 선택 필요
+  static String manualLessonSelectSubscriptionPrompt(int count) =>
+      '활성 수강권 $count개 · 차감할 수강권을 선택하세요';
+
+  /// 악기 상속 칩 — 수강권(멤버십)에서 상속
+  static String manualLessonInstrumentInherited(String instrument) =>
+      '악기 $instrument · 수강권 상속';
+
+  /// 악기 칩 — 학생 정보 기준 (수강권 0개)
+  static String manualLessonInstrumentFromStudent(String instrument) =>
+      '악기 $instrument';
+
+  /// 변경 (reopen picker)
+  static const manualLessonChangeSubscription = '변경';
+
   /// 과거 레슨 기록 (past lesson record dialog title)
   static const pastLessonRecordTitle = '과거 레슨 기록';
 

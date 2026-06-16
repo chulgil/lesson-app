@@ -658,4 +658,34 @@ void main() {
       expect(sub.summaryText, contains('4회 미사용'));
     });
   });
+
+  group('instrument (membership SSOT)', () {
+    Subscription baseSub({String? instrument}) => Subscription(
+      id: 's1',
+      studentId: 'st1',
+      membershipId: 'm1',
+      instrument: instrument,
+      type: SubscriptionType.package,
+      totalLessons: 8,
+      amount: 100000,
+      status: SubscriptionStatus.active,
+      createdAt: DateTime(2026, 1, 1),
+    );
+
+    test('toJson은 instrument를 BE 키로 직렬화한다', () {
+      expect(baseSub(instrument: '피아노').toJson()['instrument'], '피아노');
+    });
+
+    test('toJson → fromJson round-trip에서 instrument가 보존된다', () {
+      final restored = Subscription.fromJson(
+        baseSub(instrument: '바이올린').toJson(),
+      );
+      expect(restored.instrument, '바이올린');
+    });
+
+    test('instrument가 null이면 round-trip 후에도 null이다 (레거시 호환)', () {
+      final restored = Subscription.fromJson(baseSub().toJson());
+      expect(restored.instrument, isNull);
+    });
+  });
 }

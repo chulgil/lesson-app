@@ -63,6 +63,10 @@ class Subscription {
 
   final String membershipId; // Membership ID (FK -> ClassMembership)
 
+  /// Instrument inherited from the membership (SSOT for the lesson instrument).
+  /// Provided by the backend; null for legacy rows without a mapped instrument.
+  final String? instrument;
+
   @Deprecated('Use paymentConfirmed instead. Will be removed in future.')
   final String? paymentId; // Legacy: connected payment ID
 
@@ -168,6 +172,7 @@ class Subscription {
     required this.id,
     required this.studentId,
     required this.membershipId,
+    this.instrument,
     this.paymentId,
     required this.type,
     this.totalLessons,
@@ -212,8 +217,9 @@ class Subscription {
 
   /// Total lessons for display (package: totalLessons, monthly: lessonsPerMonth + bonus).
   int? get totalLessonsForDisplay {
-    final base =
-        type == SubscriptionType.package ? totalLessons : lessonsPerMonth;
+    final base = type == SubscriptionType.package
+        ? totalLessons
+        : lessonsPerMonth;
     if (base == null) return null;
     return base + bonusCount;
   }
@@ -324,6 +330,7 @@ class Subscription {
     String? id,
     String? studentId,
     String? membershipId,
+    String? instrument,
     String? paymentId,
     SubscriptionType? type,
     int? totalLessons,
@@ -369,6 +376,7 @@ class Subscription {
       id: id ?? this.id,
       studentId: studentId ?? this.studentId,
       membershipId: membershipId ?? this.membershipId,
+      instrument: instrument ?? this.instrument,
       paymentId: paymentId ?? this.paymentId,
       type: type ?? this.type,
       totalLessons: totalLessons ?? this.totalLessons,
@@ -391,39 +399,36 @@ class Subscription {
       paymentConfirmed: paymentConfirmed ?? this.paymentConfirmed,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       paidAt: paidAt ?? this.paidAt,
-      paymentConfirmedAt:
-          clearPaymentConfirmedAt
-              ? null
-              : (paymentConfirmedAt ?? this.paymentConfirmedAt),
+      paymentConfirmedAt: clearPaymentConfirmedAt
+          ? null
+          : (paymentConfirmedAt ?? this.paymentConfirmedAt),
       discountAmount: discountAmount ?? this.discountAmount,
       discountReason: discountReason ?? this.discountReason,
       originalAmount: originalAmount ?? this.originalAmount,
       bonusRescheduleCount: bonusRescheduleCount ?? this.bonusRescheduleCount,
       cancellationCredits: cancellationCredits ?? this.cancellationCredits,
-      overrideCancelDeadlineHours:
-          clearOverrideCancelDeadlineHours
-              ? null
-              : overrideCancelDeadlineHours ?? this.overrideCancelDeadlineHours,
+      overrideCancelDeadlineHours: clearOverrideCancelDeadlineHours
+          ? null
+          : overrideCancelDeadlineHours ?? this.overrideCancelDeadlineHours,
       overrideStudentCompensationExtraMinutesEnabled:
           clearOverrideStudentCompensationExtraMinutesEnabled
-              ? null
-              : overrideStudentCompensationExtraMinutesEnabled ??
-                  this.overrideStudentCompensationExtraMinutesEnabled,
+          ? null
+          : overrideStudentCompensationExtraMinutesEnabled ??
+                this.overrideStudentCompensationExtraMinutesEnabled,
       overrideIncludeExtraMinutesTextOnLateCancel:
           clearOverrideIncludeExtraMinutesTextOnLateCancel
-              ? null
-              : overrideIncludeExtraMinutesTextOnLateCancel ??
-                  this.overrideIncludeExtraMinutesTextOnLateCancel,
+          ? null
+          : overrideIncludeExtraMinutesTextOnLateCancel ??
+                this.overrideIncludeExtraMinutesTextOnLateCancel,
       overrideStudentCompensationExtraMinutesMessage:
           clearOverrideStudentCompensationExtraMinutesMessage
-              ? null
-              : overrideStudentCompensationExtraMinutesMessage ??
-                  this.overrideStudentCompensationExtraMinutesMessage,
-      overrideNotifyOwnerOnLateCancel:
-          clearOverrideNotifyOwnerOnLateCancel
-              ? null
-              : overrideNotifyOwnerOnLateCancel ??
-                  this.overrideNotifyOwnerOnLateCancel,
+          ? null
+          : overrideStudentCompensationExtraMinutesMessage ??
+                this.overrideStudentCompensationExtraMinutesMessage,
+      overrideNotifyOwnerOnLateCancel: clearOverrideNotifyOwnerOnLateCancel
+          ? null
+          : overrideNotifyOwnerOnLateCancel ??
+                this.overrideNotifyOwnerOnLateCancel,
       ownership: ownership ?? this.ownership,
       academyId: academyId ?? this.academyId,
     );
