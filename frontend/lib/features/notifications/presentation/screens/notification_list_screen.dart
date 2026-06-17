@@ -20,24 +20,34 @@ import '../widgets/notification_item.dart';
 ///
 /// UX 패턴:
 /// - 상단 앱바에 '모두 읽음' 버튼
+/// - 앱바 하단 전체/안읽음 세그먼트 필터 + 미읽음 배지
 /// - 날짜별 그룹핑 (오늘, 어제, 이전)
 /// - 읽지 않은 알림 강조 표시
 /// - 알림 탭 시 actionUrl로 이동
-class NotificationListScreen extends ConsumerWidget {
+class NotificationListScreen extends ConsumerStatefulWidget {
   const NotificationListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notificationsAsync = ref.watch(userNotificationsProvider);
+  ConsumerState<NotificationListScreen> createState() =>
+      _NotificationListScreenState();
+}
 
-    // §7.131: AppBar 는 전역 테마(Playfair appBarTitle)를 따르고,
-    // 하단에 1px ThinRule 을 두어 매스트헤드 메타포 유지.
+class _NotificationListScreenState
+    extends ConsumerState<NotificationListScreen> {
+  // false = 전체, true = 안읽음
+  bool _showUnreadOnly = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final notificationsAsync = ref.watch(userNotificationsProvider);
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
+
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.notifications,
         customActions: [
           TextButton(
-            onPressed: () => _markAllAsRead(ref),
+            onPressed: () => _markAllAsRead(),
             // §7.131: 액션 라벨도 시스템 메타이므로 sectionLabel(uppercase) 톤.
             child: Text(
               '모두 읽음',
@@ -50,41 +60,48 @@ class NotificationListScreen extends ConsumerWidget {
         ],
       ),
       backgroundColor: AppColors.paperDark,
-      body: notificationsAsync.when(
-        data:
-            (notifications) =>
-                _buildNotificationList(context, ref, notifications),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildErrorState(context, error),
+      body: Column(
+        children: [
+          _NotifFilterBar(
+            showUnreadOnly: _showUnreadOnly,
+            unreadCount: unreadCount,
+            onChanged: (v) => setState(() => _showUnreadOnly = v),
+          ),
+          Expanded(
+            child: notificationsAsync.when(
+              data: (notifications) => _buildNotificationList(notifications),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => _buildErrorState(error),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildNotificationList(
-    BuildContext context,
-    WidgetRef ref,
-    List<AppNotification> notifications,
-  ) {
-    if (notifications.isEmpty) {
-      return _buildEmptyState();
+  Widget _buildNotificationList(List<AppNotification> notifications) {
+    final filtered =
+        _showUnreadOnly
+            ? notifications.where((n) => !n.isRead).toList()
+            : notifications;
+
+    if (filtered.isEmpty) {
+      return _showUnreadOnly ? _buildNoUnreadState() : _buildEmptyState();
     }
 
-    // Group notifications by date
-    final grouped = _groupByDate(notifications);
+    final grouped = _groupByDate(filtered);
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
       itemCount: grouped.length,
       itemBuilder: (context, index) {
         final entry = grouped.entries.elementAt(index);
-        return _buildDateSection(context, ref, entry.key, entry.value);
+        return _buildDateSection(entry.key, entry.value);
       },
     );
   }
 
   Widget _buildDateSection(
-    BuildContext context,
-    WidgetRef ref,
     String dateLabel,
     List<AppNotification> notifications,
   ) {
@@ -104,8 +121,8 @@ class NotificationListScreen extends ConsumerWidget {
         ...notifications.map(
           (notification) => NotificationItem(
             notification: notification,
-            onTap: () => _handleNotificationTap(context, ref, notification),
-            onDelete: () => _handleNotificationDelete(ref, notification),
+            onTap: () => _handleNotificationTap(notification),
+            onDelete: () => _handleNotificationDelete(notification),
           ),
         ),
       ],
@@ -155,7 +172,15 @@ class NotificationListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, Object error) {
+  Widget _buildNoUnreadState() {
+    return EmptyStateWidget(
+      icon: Icons.mark_email_read_outlined,
+      title: AppStrings.notifNoUnread,
+      subtitle: '${AppStrings.notifFilterAll} 탭에서 전체 알림을 확인하세요',
+    );
+  }
+
+  Widget _buildErrorState(Object error) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -177,11 +202,7 @@ class NotificationListScreen extends ConsumerWidget {
     );
   }
 
-  void _handleNotificationTap(
-    BuildContext context,
-    WidgetRef ref,
-    AppNotification notification,
-  ) {
+  void _handleNotificationTap(AppNotification notification) {
     // Mark as read
     ref.read(notificationActionsProvider.notifier).markAsRead(notification.id);
 
@@ -194,17 +215,120 @@ class NotificationListScreen extends ConsumerWidget {
     }
   }
 
-  void _markAllAsRead(WidgetRef ref) {
+  void _markAllAsRead() {
     ref.read(notificationActionsProvider.notifier).markAllAsRead();
   }
 
   /// swipe-to-dismiss 삭제 — #629 DELETE /notifications/{id} 호출 후 목록 갱신.
-  Future<void> _handleNotificationDelete(
-    WidgetRef ref,
-    AppNotification notification,
-  ) async {
+  Future<void> _handleNotificationDelete(AppNotification notification) async {
     await ref
         .read(notificationActionsProvider.notifier)
         .deleteNotification(notification.id);
+  }
+}
+
+/// 전체/안읽음 필터 바 + 미읽음 카운트 배지
+class _NotifFilterBar extends StatelessWidget {
+  const _NotifFilterBar({
+    required this.showUnreadOnly,
+    required this.unreadCount,
+    required this.onChanged,
+  });
+
+  final bool showUnreadOnly;
+  final int unreadCount;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.paperDark,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space4,
+        vertical: AppSpacing.space2,
+      ),
+      child: Row(
+        children: [
+          _FilterChip(
+            label: AppStrings.notifFilterAll,
+            selected: !showUnreadOnly,
+            onTap: () => onChanged(false),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          _FilterChip(
+            label: AppStrings.notifFilterUnread,
+            selected: showUnreadOnly,
+            badge: unreadCount > 0 ? unreadCount : null,
+            onTap: () => onChanged(true),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.badge,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final int? badge;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space1,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.ink : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppSpacing.space4),
+          border: Border.all(
+            color: selected ? AppColors.ink : AppColors.inkTertiary,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: AppTypography.bodySmall.copyWith(
+                color: selected ? AppColors.paper : AppColors.inkSecondary,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
+            if (badge != null) ...[
+              const SizedBox(width: AppSpacing.space1),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.paper : AppColors.ink,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$badge',
+                  style: AppTypography.caption.copyWith(
+                    color: selected ? AppColors.ink : AppColors.paper,
+                    fontWeight: FontWeight.w700,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }

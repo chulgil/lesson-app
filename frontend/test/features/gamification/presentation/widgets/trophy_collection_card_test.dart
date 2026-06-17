@@ -18,11 +18,16 @@ Future<void> _pump(
   WidgetTester tester, {
   required List<PracticeBadge> badges,
   VoidCallback? onMore,
+  bool viewerIsTeacher = false,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
-        body: TrophyCollectionCard(badges: badges, onMoreTap: onMore),
+        body: TrophyCollectionCard(
+          badges: badges,
+          onMoreTap: onMore,
+          viewerIsTeacher: viewerIsTeacher,
+        ),
       ),
     ),
   );
@@ -140,6 +145,46 @@ void main() {
         find.byKey(const ValueKey('trophy_group_legendary')),
         findsNothing,
       );
+    });
+
+    // ── #783 티어 한글 라벨 ──────────────────────────────────────────────────
+    testWidgets('#783 티어 한글 라벨 — 각 rarity 에 맞는 한글 표시', (tester) async {
+      final badges = [
+        _badge('b1', rarity: BadgeRarity.common),
+        _badge('b2', rarity: BadgeRarity.rare),
+        _badge('b3', rarity: BadgeRarity.epic),
+        _badge('b4', rarity: BadgeRarity.legendary),
+      ];
+      await _pump(tester, badges: badges);
+
+      expect(find.text('일반'), findsOneWidget);
+      expect(find.text('희귀'), findsOneWidget);
+      expect(find.text('특급'), findsOneWidget);
+      expect(find.text('전설'), findsOneWidget);
+    });
+
+    // ── #783 역할 조건부 제목 ────────────────────────────────────────────────
+    testWidgets('#783 viewerIsTeacher=false → "내 트로피" 제목', (tester) async {
+      final badges = [_badge('b1')];
+      await _pump(tester, badges: badges);
+
+      expect(find.text('내 트로피'), findsOneWidget);
+      expect(find.text('학생 트로피'), findsNothing);
+    });
+
+    testWidgets('#783 viewerIsTeacher=true → "학생 트로피" 제목', (tester) async {
+      final badges = [_badge('b1')];
+      await _pump(tester, badges: badges, viewerIsTeacher: true);
+
+      expect(find.text('학생 트로피'), findsOneWidget);
+      expect(find.text('내 트로피'), findsNothing);
+    });
+
+    testWidgets('#783 smoke test viewerIsTeacher=true — render exception 0', (
+      tester,
+    ) async {
+      await _pump(tester, badges: const [], viewerIsTeacher: true);
+      expect(tester.takeException(), isNull);
     });
   });
 }

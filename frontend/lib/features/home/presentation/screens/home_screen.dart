@@ -20,6 +20,7 @@ import '../../../students/students_ui_facade.dart';
 import '../providers/home_lesson_summary_provider.dart';
 import '../providers/teacher_profile_completion_provider.dart';
 import '../widgets/dashboard_tab.dart';
+import '../widgets/home_quick_action_fab.dart';
 
 /// Home screen (Teacher Dashboard)
 // ignore: widget-smoke-test — existing screen, smoke test already covers HomeScreen
@@ -203,6 +204,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
+        floatingActionButton: const HomeQuickActionFab(),
         bottomNavigationBar: _buildBottomNavigation(),
       ),
     );
@@ -263,8 +265,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
     final isSelected = _currentIndex == index;
-    final accentColor =
-        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
+    final accentColor = isSelected
+        ? AppColors.paperAccent
+        : AppColors.inkTertiary;
 
     return InkWell(
       key: key,

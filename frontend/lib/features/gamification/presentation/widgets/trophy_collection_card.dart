@@ -6,14 +6,16 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_glyph.dart';
 import '../../domain/entities/gamification.dart';
+import '../extensions/badge_rarity_visuals.dart';
 
 /// 트로피 모음 카드 — 학생 성장 시각화 (단일 모음, 카테고리 분류 노출 X).
 ///
-/// 스펙 §4.4 / §16 / 플랜 Job 7 Task 7.1 / AC-6.3.
+/// 스펙 §4.4 / §16 / 플랜 Job 7 Task 7.1 / AC-6.3 / #783.
 /// - badges 0개 → "곧 첫 트로피!" 빈 상태
-/// - badges 1-8개 → 인라인 표시
+/// - badges 1-8개 → 인라인 표시 (티어 한글 라벨 포함)
 /// - badges 9+ → 첫 8개 + 더보기 버튼 (TrophyGridScreen 진입)
-/// - rarity 라벨/그룹 노출 X (단일 "모음" 카드 정책)
+/// - rarity 라벨/그룹 노출 X (단일 "모음" 카드 정책) — 티어 라벨은 각 아이콘 아래 소형 표시
+/// - viewerIsTeacher=true 시 제목 → '학생 트로피' (#783)
 /// - 시그니처 영역 - NotebookGlyph.starFilled 사용 (Material Icons 금지)
 class TrophyCollectionCard extends StatelessWidget {
   const TrophyCollectionCard({
@@ -21,11 +23,15 @@ class TrophyCollectionCard extends StatelessWidget {
     required this.badges,
     this.onMoreTap,
     this.previewLimit = 8,
+    this.viewerIsTeacher = false,
   });
 
   final List<PracticeBadge> badges;
   final VoidCallback? onMoreTap;
   final int previewLimit;
+
+  /// 교사 뷰에서 true — 제목이 '학생 트로피'로 변경됨 (#783).
+  final bool viewerIsTeacher;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +40,10 @@ class TrophyCollectionCard extends StatelessWidget {
     final visibleBadges = hasOverflow
         ? badges.take(previewLimit).toList()
         : badges;
+
+    final title = viewerIsTeacher
+        ? AppStrings.trophyCollectionTitleTeacher
+        : AppStrings.trophyCollectionTitle;
 
     return Container(
       key: const ValueKey('trophy_collection_card'),
@@ -45,7 +55,7 @@ class TrophyCollectionCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                AppStrings.trophyCollectionTitle,
+                title,
                 style: AppTypography.headingSmall.copyWith(
                   color: AppColors.ink,
                 ),
@@ -98,11 +108,22 @@ class _TrophyItem extends StatelessWidget {
     return Tooltip(
       key: ValueKey('trophy_collection_item_${badge.id}'),
       message: badge.name,
-      child: Text(
-        NotebookGlyph.starFilled,
-        style: AppTypography.headingMedium.copyWith(
-          color: AppColors.paperAccent,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            NotebookGlyph.starFilled,
+            style: AppTypography.headingMedium.copyWith(
+              color: badge.rarity.tierColor,
+            ),
+          ),
+          Text(
+            badge.rarity.tierLabel,
+            style: AppTypography.caption.copyWith(
+              color: badge.rarity.tierColor,
+            ),
+          ),
+        ],
       ),
     );
   }

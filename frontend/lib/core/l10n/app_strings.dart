@@ -9395,6 +9395,26 @@ class AppStrings {
   /// 연습장 본문 부제 (용도 안내)
   static const practiceJournalSubtitle = '월별 연습 기록 확인용';
 
+  // ── UX 검토 wave4 (#780~#783) ──
+  /// 홈 고정 퀵액션 FAB 툴팁
+  static const homeQuickActionFabTooltip = '빠른 추가';
+  static const studentFilterSectionPractice = '연습 상태';
+  static const studentFilterSectionEnrollment = '수강·결제 상태';
+  static const sortByNextLesson = '다음 레슨순';
+  static const sortBySubscriptionExpiry = '수강권 만료순';
+  static const studentSearchExtended = '이름, 악기, 학부모명, 메모로 검색';
+  /// 알림 필터 — 전체
+  static const notifFilterAll = '전체';
+  /// 알림 필터 — 안읽음
+  static const notifFilterUnread = '안읽음';
+  /// 알림 없음 (안읽음 필터 적용 시)
+  static const notifNoUnread = '읽지 않은 알림이 없습니다';
+  static const trophyCollectionTitleTeacher = '학생 트로피';
+  static const badgeTierCommon = '일반';
+  static const badgeTierRare = '희귀';
+  static const badgeTierEpic = '특급';
+  static const badgeTierLegendary = '전설';
+
   /// 완성본 섹션 헤더.
   static const boundShelfCompletedSection = '완성본';
 
