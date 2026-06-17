@@ -1846,7 +1846,7 @@ class AppStrings {
   static const waitlistAutoRebook = '취소 발생 시 순서대로 예약됩니다';
 
   /// ℹ️ 취소 발생 시 순서대로 예약됩니다
-  static const waitlistAutoRebookInfo = 'ℹ️ 취소 발생 시 순서대로 예약됩니다';
+  static const waitlistAutoRebookInfo = '취소 발생 시 순서대로 예약됩니다';
 
   /// 대기 취소 (다이얼로그/버튼)
   static const waitlistCancelTitle = '대기 취소';
@@ -2647,7 +2647,7 @@ class AppStrings {
   static const practiceTipsHint = '연습할 때 주의할 점을 적어주세요...';
 
   /// ✅ 피드백이 저장되었습니다 (feedback saved snackbar)
-  static const feedbackSavedSnack = '✅ 피드백이 저장되었습니다';
+  static const feedbackSavedSnack = '피드백이 저장되었습니다';
 
   /// 피드백 저장 실패 (feedback save error snackbar)
   static const feedbackSaveFailed = '피드백 저장 실패';
@@ -3293,7 +3293,7 @@ class AppStrings {
   static const proposalReminder48hBody = '선생님의 수강권 제안을 아직 확인하지 않으셨어요.';
 
   /// 72h 리마인더 제목 (할인 종료 경고)
-  static const proposalReminder72hTitleDiscount = '⏰ 특별 할인이 곧 종료됩니다!';
+  static const proposalReminder72hTitleDiscount = '특별 할인이 곧 종료됩니다!';
 
   /// 72h 리마인더 제목 (일반)
   static const proposalReminder72hTitleNoDiscount = '수강권 제안 마지막 알림';
@@ -3346,7 +3346,7 @@ class AppStrings {
   static const templateChooseButton = '선택하기';
 
   /// ⭐ 추천 (selectable template card 배지 — 별 포함)
-  static const templateRecommendedBadgeStar = '⭐ 추천';
+  static const templateRecommendedBadgeStar = '추천';
 
   /// N회 · M분 · 유효기간 (selectable template card 요약 라인)
   static String templateSummaryLine({
@@ -3996,7 +3996,7 @@ class AppStrings {
   static const bonusDefault = '보너스';
 
   /// 🎁 +N회 (사유) — bonusText
-  static String bonusText(int count, String reason) => '🎁 +$count회 ($reason)';
+  static String bonusText(int count, String reason) => '+$count회 ($reason)';
 
   /// 체험 레슨 (금액)
   static String trialLessonWithAmount(String amount) => '체험 레슨 ($amount)';
@@ -4051,6 +4051,12 @@ class AppStrings {
     required int durationMinutes,
     required String priceLabel,
   }) => '$totalLessons회 · $durationMinutes분 · $priceLabel';
+
+  /// N회 · D분 (가격을 별도로 표시할 때 — 템플릿 카드 정가/할인 행)
+  static String subscriptionTemplateSummaryNoPrice({
+    required int totalLessons,
+    required int durationMinutes,
+  }) => '$totalLessons회 · $durationMinutes분';
 
   /// 회차 기준 입금 (BillingType.perPackage)
   static const billingTypePerPackage = '회차 기준 입금';
@@ -4249,7 +4255,7 @@ class AppStrings {
       '(기본 $base + 보너스 $bonus)';
 
   /// 📋 상세 (subscription_card.dart 상세 섹션 헤더)
-  static const subscriptionDetailHeader = '📋 상세';
+  static const subscriptionDetailHeader = '상세';
 
   /// • 기본 (subscription_card.dart 상세 행 라벨)
   static const subscriptionDetailRowBase = '• 기본';
@@ -4279,7 +4285,7 @@ class AppStrings {
   static const subscriptionBonusReasonFallback = '보너스';
 
   /// ⚠️ 미사용분 소멸 (이월 불가) (월정액 카드 경고)
-  static const subscriptionMonthlyCarryoverWarning = '⚠️ 미사용분 소멸 (이월 불가)';
+  static const subscriptionMonthlyCarryoverWarning = '미사용분 소멸 (이월 불가)';
 
   /// 유효기간 내 자유롭게 사용 (회차권 카드 안내)
   static const subscriptionPackageFreeUseInfo = '유효기간 내 자유롭게 사용';
@@ -4714,7 +4720,7 @@ class AppStrings {
   static const policyMonthsSuffix = '개월';
 
   /// 📋 정책 요약 (요약 섹션 헤더)
-  static const policySummaryHeader = '📋 정책 요약';
+  static const policySummaryHeader = '정책 요약';
 
   /// 취소 (요약 라벨)
   static const policyCancelLabel = '취소';
@@ -4932,10 +4938,10 @@ class AppStrings {
       '푸시 알림은 준비 중입니다.\n'
       '알림 설정은 저장되며, 기능이 활성화되면 자동 적용됩니다.';
 
-  // ── Subscription Template List Screen (수강권 관리 5-3b-24) ────────
+  // ── Subscription Template List Screen (수강권 템플릿 관리 5-3b-24) ────────
 
-  /// 수강권 관리 (AppBar)
-  static const templateListAppBarTitle = '수강권 관리';
+  /// 수강권 템플릿 관리 (AppBar)
+  static const templateListAppBarTitle = '수강권 템플릿 관리';
 
   /// 수강권 추가 (FAB / 빈상태 CTA보조)
   static const templateAddButton = '수강권 추가';
@@ -4965,11 +4971,11 @@ class AppStrings {
   /// 활성화 (popup menu — 비활성 카드의 toggle 액션)
   static const templateMenuActivate = '활성화';
 
-  /// 수강권 수정 (편집 바텀시트 헤더)
-  static const templateEditSheetTitle = '수강권 수정';
+  /// 수강권 템플릿 수정 (편집 바텀시트 헤더)
+  static const templateEditSheetTitle = '수강권 템플릿 수정';
 
-  /// 수강권 수강권 추가 (추가 바텀시트 헤더 — 원본 코드의 중복 단어 보존, 별도 수정 PR 권장)
-  static const templateAddSheetTitle = '수강권 수강권 추가';
+  /// 수강권 템플릿 추가 (추가 바텀시트 헤더)
+  static const templateAddSheetTitle = '수강권 템플릿 추가';
 
   /// 이름 * (이름 필드 라벨)
   static const templateNameLabel = '이름 *';
@@ -4980,17 +4986,35 @@ class AppStrings {
   /// 이름을 입력해주세요 (이름 validator)
   static const templateNameRequired = '이름을 입력해주세요';
 
-  /// 가격 (원) * (가격 필드 라벨)
-  static const templatePriceLabel = '가격 (원) *';
+  /// 판매가 (원) * (판매가 필드 라벨 — 실제 결제 금액)
+  static const templatePriceLabel = '판매가 (원) *';
 
-  /// 예: 400000 (가격 필드 hint)
+  /// 예: 400000 (판매가 필드 hint)
   static const templatePriceHint = '예: 400000';
 
-  /// 가격을 입력해주세요 (가격 validator — 빈값)
-  static const templatePriceRequired = '가격을 입력해주세요';
+  /// 판매가를 입력해주세요 (판매가 validator — 빈값)
+  static const templatePriceRequired = '판매가를 입력해주세요';
 
-  /// 숫자만 입력해주세요 (가격 validator — 비숫자)
+  /// 숫자만 입력해주세요 (판매가 validator — 비숫자)
   static const templatePriceNumbersOnly = '숫자만 입력해주세요';
+
+  /// 정가 (원) (정가 필드 라벨 — 할인 표시용, 선택)
+  static const templateRegularPriceLabel = '정가 (원)';
+
+  /// 예: 500000 (정가 필드 hint)
+  static const templateRegularPriceHint = '예: 500000';
+
+  /// 악기 (가격표 연동 드롭다운 라벨)
+  static const templateInstrumentLabel = '악기';
+
+  /// 악기·레벨 선택 시 정가 자동 입력 안내
+  static const templatePriceAutofillHint = '악기·레벨을 선택하면 정가가 자동 입력됩니다';
+
+  /// 정가 대비 N% 할인 (작성 시트 미리보기)
+  static String templateDiscountPreview(int percent) => '정가 대비 $percent% 할인';
+
+  /// N% 할인 (카드 할인율 배지)
+  static String templateDiscountRate(int percent) => '$percent% 할인';
 
   /// 예: 가장 인기 있는 패키지입니다 (설명 필드 hint)
   static const templateDescHint = '예: 가장 인기 있는 패키지입니다';

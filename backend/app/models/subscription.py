@@ -257,6 +257,9 @@ class SubscriptionTemplate(UUIDMixin, TimestampMixin, Base):
     lesson_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=60)
     validity_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
     amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # Regular (list) price for marketing strikethrough display (정가). Nullable —
+    # when set above `amount`, clients show 정가 struck through + sale price.
+    regular_price: Mapped[int | None] = mapped_column(Integer, nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     reschedule_allowance: Mapped[int] = mapped_column(Integer, nullable=False, default=2)

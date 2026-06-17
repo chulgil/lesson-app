@@ -16,8 +16,24 @@ extension SubscriptionTemplateVisualX on SubscriptionTemplate {
     }
   }
 
-  /// Formatted price (e.g., "40만원")
+  /// Formatted price (e.g., "40만원") — the sale price.
   String get formattedPrice => _formatWon(price);
+
+  /// Whether a regular (list) price is set above the sale price (정가 > 판매가).
+  bool get hasDiscount => regularPrice != null && regularPrice! > price;
+
+  /// Formatted regular price (정가). Falls back to [price] when not set.
+  String get formattedRegularPrice => _formatWon(regularPrice ?? price);
+
+  /// Discount percentage rounded to the nearest integer (0 when no discount).
+  int get discountPercent =>
+      hasDiscount
+          ? (((regularPrice! - price) / regularPrice!) * 100).round()
+          : 0;
+
+  /// Formatted discount rate (e.g., "20% 할인").
+  String get formattedDiscountRate =>
+      AppStrings.templateDiscountRate(discountPercent);
 
   /// Formatted price per lesson
   String get formattedPricePerLesson => _formatWon(pricePerLesson);
@@ -37,6 +53,14 @@ extension SubscriptionTemplateVisualX on SubscriptionTemplate {
     durationMinutes: lessonDurationMinutes,
     priceLabel: formattedPrice,
   );
+
+  /// Summary text without price (e.g., "8회 · 50분"), used where price is shown
+  /// separately (e.g. the template card's dedicated price row with discount).
+  String get summaryTextNoPrice =>
+      AppStrings.subscriptionTemplateSummaryNoPrice(
+        totalLessons: totalLessons,
+        durationMinutes: lessonDurationMinutes,
+      );
 
   String _formatWon(int amount) {
     if (amount >= 10000) {

@@ -881,7 +881,7 @@ class _SubscriptionTemplateProviderElement
 }
 
 String _$subscriptionTemplateNotifierHash() =>
-    r'b8069eff8e1d7ba6e85b5a14d31e78242f396901';
+    r'46c821692098b850b8d1bf81d3f59298eb756ff5';
 
 /// See also [SubscriptionTemplateNotifier].
 @ProviderFor(SubscriptionTemplateNotifier)

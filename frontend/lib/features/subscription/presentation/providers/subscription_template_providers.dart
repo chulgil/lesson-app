@@ -109,6 +109,7 @@ class SubscriptionTemplateNotifier extends _$SubscriptionTemplateNotifier {
     required int lessonDurationMinutes,
     required int validityDays,
     required int price,
+    int? regularPrice,
     String? description,
   }) async {
     state = const AsyncValue.loading();
@@ -125,6 +126,7 @@ class SubscriptionTemplateNotifier extends _$SubscriptionTemplateNotifier {
         lessonDurationMinutes: lessonDurationMinutes,
         validityDays: validityDays,
         price: price,
+        regularPrice: regularPrice,
         description: description,
         createdAt: DateTime.now(),
       );
