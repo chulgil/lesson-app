@@ -4,6 +4,7 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/theme/app_typography.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_glyph.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_screen_scaffold.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/endorsement.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/guardian_seal.dart';
@@ -113,6 +114,80 @@ class _JournalBody extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           JournalMonthGrid(ledger: ledger),
+          const SizedBox(height: AppSpacing.space4),
+          const _ActorLegend(),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/// 도장 actor 범례 — 3가지 의미를 한눈에 설명.
+class _ActorLegend extends StatelessWidget {
+  const _ActorLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          AppStrings.journalActorLegendTitle,
+          style: AppTypography.caption.copyWith(
+            color: AppColors.inkSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        _LegendRow(
+          glyph: NotebookGlyph.dotFilled,
+          color: AppColors.ink,
+          label: AppStrings.journalActorStudentDesc,
+        ),
+        _LegendRow(
+          glyph: NotebookGlyph.heartOutline,
+          color: AppColors.inkSecondary,
+          label: AppStrings.journalActorGuardianDesc,
+        ),
+        _LegendRow(
+          glyph: NotebookGlyph.check,
+          color: AppColors.inkSecondary,
+          label: AppStrings.journalActorTeacherDesc,
+        ),
+      ],
+    );
+  }
+}
+
+class _LegendRow extends StatelessWidget {
+  final String glyph;
+  final Color color;
+  final String label;
+
+  const _LegendRow({
+    required this.glyph,
+    required this.color,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          NotebookGlyph(glyph, size: 12, color: color),
+          const SizedBox(width: AppSpacing.space2),
+          Text(
+            label,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.inkTertiary,
+            ),
+          ),
         ],
       ),
     );

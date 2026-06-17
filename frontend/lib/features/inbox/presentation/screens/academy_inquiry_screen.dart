@@ -26,7 +26,8 @@ class AcademyInquiryScreen extends ConsumerWidget {
     final inquiryAsync = ref.watch(_inquiryListProvider(academyId));
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.inquiryTitle),
+      // Icons.forum distinguishes 1:1 inquiry from personal notifications (bell).
+      appBar: const NotebookDetailAppBar(titleWidget: _InquiryAppBarTitle()),
       body: inquiryAsync.when(
         data: (inquiries) {
           if (inquiries.isEmpty) {
@@ -61,6 +62,24 @@ class AcademyInquiryScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('오류: $error')),
       ),
+    );
+  }
+}
+
+/// Appbar title row: forum icon + "1:1 문의" text.
+/// Icons.forum visually separates 1:1 inquiry from personal notifications (bell).
+class _InquiryAppBarTitle extends StatelessWidget {
+  const _InquiryAppBarTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.forum_outlined, size: 18, color: AppColors.ink),
+        SizedBox(width: AppSpacing.space2),
+        Text(AppStrings.inquiryTitle),
+      ],
     );
   }
 }
@@ -128,7 +147,10 @@ class _InquiryCard extends StatelessWidget {
                       color: statusColor.withValues(alpha: 0.1),
                     ),
                     child: Text(
-                      hasReply ? '답변완료' : '대기중',
+                      // "미답변" = teacher has not yet replied (unambiguous vs "대기중").
+                      hasReply
+                          ? AppStrings.inquiryStatusAnswered
+                          : AppStrings.inquiryStatusUnanswered,
                       style: AppTypography.captionSmall.copyWith(
                         color: statusColor,
                       ),
@@ -155,12 +177,14 @@ class _InquiryCard extends StatelessWidget {
                       color: AppColors.inkTertiary,
                     ),
                   ),
-                  Text(
-                    AppStrings.inquirySLALabel,
-                    style: AppTypography.captionSmall.copyWith(
-                      color: AppColors.inkTertiary,
+                  // SLA hint shown only on unanswered inquiries.
+                  if (!hasReply)
+                    Text(
+                      AppStrings.inquiryReplySla,
+                      style: AppTypography.captionSmall.copyWith(
+                        color: AppColors.inkTertiary,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],

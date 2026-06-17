@@ -107,29 +107,27 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title:
-            widget.lessonClassId != null
-                ? AppStrings.policyClassAppBarTitle
-                : AppStrings.policyLessonAppBarTitle,
+        title: widget.lessonClassId != null
+            ? AppStrings.policyClassAppBarTitle
+            : AppStrings.policyLessonAppBarTitle,
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                children: [
-                  _buildCancelPolicy(),
-                  const SizedBox(height: AppSpacing.space6),
-                  _buildNoShowPolicy(),
-                  const SizedBox(height: AppSpacing.space6),
-                  _buildCarryoverPolicy(),
-                  const SizedBox(height: AppSpacing.space6),
-                  _buildPolicySummary(),
-                  const SizedBox(height: AppSpacing.space6),
-                  _buildRelatedSettings(),
-                  const SizedBox(height: AppSpacing.space8),
-                ],
-              ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+              children: [
+                _buildCancelPolicy(),
+                const SizedBox(height: AppSpacing.space6),
+                _buildNoShowPolicy(),
+                const SizedBox(height: AppSpacing.space6),
+                _buildCarryoverPolicy(),
+                const SizedBox(height: AppSpacing.space6),
+                _buildPolicySummary(),
+                const SizedBox(height: AppSpacing.space6),
+                _buildRelatedSettings(),
+                const SizedBox(height: AppSpacing.space8),
+              ],
+            ),
       bottomNavigationBar: _buildBottomBar(),
     );
   }
@@ -182,11 +180,9 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
             onChanged: (value) => setState(() => _maxChangesPerMonth = value),
             controller: _changesController,
             suffix: AppStrings.lessonsUnit,
-            labelFormatter:
-                (v) =>
-                    v >= 99
-                        ? AppStrings.policyUnlimited
-                        : AppStrings.policyTimesFormat(v),
+            labelFormatter: (v) => v >= 99
+                ? AppStrings.policyUnlimited
+                : AppStrings.policyTimesFormat(v),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -220,6 +216,37 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
             AppStrings.policyNoShowDeduct,
             _deductLessonOnNoShow,
             (value) => setState(() => _deductLessonOnNoShow = value),
+          ),
+
+          // Student-side preview: 학생 관점 결과 1줄
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space1),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.person_outline,
+                  size: 14,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                Text(
+                  AppStrings.noShowStudentPreviewLabel,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                Text(
+                  _deductLessonOnNoShow
+                      ? AppStrings.noShowStudentPreviewDeduct
+                      : AppStrings.noShowStudentPreviewNoDeduct,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -269,8 +296,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
               title: AppStrings.policyMaxCarryoverTitle,
               options: const [1, 2, 3],
               currentValue: _maxCarryoverLessons,
-              onChanged:
-                  (value) => setState(() => _maxCarryoverLessons = value),
+              onChanged: (value) =>
+                  setState(() => _maxCarryoverLessons = value),
               controller: _carryoverCountController,
               suffix: AppStrings.lessonsUnit,
             ),
@@ -282,8 +309,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
               title: AppStrings.policyCarryoverPeriodTitle,
               options: const [1, 2, 3],
               currentValue: _carryoverPeriodMonths,
-              onChanged:
-                  (value) => setState(() => _carryoverPeriodMonths = value),
+              onChanged: (value) =>
+                  setState(() => _carryoverPeriodMonths = value),
               controller: _carryoverMonthsController,
               suffix: AppStrings.policyMonthsSuffix,
             ),
@@ -356,9 +383,9 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
             AppStrings.policyCarryoverLabel,
             _allowCarryover
                 ? AppStrings.policyCarryoverFormat(
-                  _maxCarryoverLessons,
-                  _carryoverPeriodMonths,
-                )
+                    _maxCarryoverLessons,
+                    _carryoverPeriodMonths,
+                  )
                 : AppStrings.policyNotAllowed,
           ),
         ],

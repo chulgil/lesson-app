@@ -97,10 +97,12 @@ class _SubscriptionPolicyOverrideScreenState
         overrideIncludeExtraMinutesTextOnLateCancel: _includeExtraMinutesText,
         overrideStudentCompensationExtraMinutesMessage:
             _messageController.text.trim().isEmpty
-                ? null
-                : _messageController.text.trim(),
-        clearOverrideStudentCompensationExtraMinutesMessage:
-            _messageController.text.trim().isEmpty,
+            ? null
+            : _messageController.text.trim(),
+        clearOverrideStudentCompensationExtraMinutesMessage: _messageController
+            .text
+            .trim()
+            .isEmpty,
         overrideNotifyOwnerOnLateCancel: _notifyOwner,
       );
       await ref
@@ -124,15 +126,14 @@ class _SubscriptionPolicyOverrideScreenState
       ),
       body: defaultsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (e, _) => Center(
-              child: Text(
-                '$e',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.paperAccent,
-                ),
-              ),
+        error: (e, _) => Center(
+          child: Text(
+            '$e',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.paperAccent,
             ),
+          ),
+        ),
         data: (defaults) {
           _initFromDefaults(defaults);
           return _buildBody(defaults);
@@ -153,6 +154,10 @@ class _SubscriptionPolicyOverrideScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Priority info banner — always shown (teacher or academy)
+                  const _PolicyPriorityBanner(),
+                  const SizedBox(height: AppSpacing.space4),
+
                   if (readOnly)
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.space3),
@@ -196,8 +201,8 @@ class _SubscriptionPolicyOverrideScreenState
                     ),
                     value: _includeExtraMinutesText,
                     readOnly: readOnly,
-                    onChanged:
-                        (v) => setState(() => _includeExtraMinutesText = v),
+                    onChanged: (v) =>
+                        setState(() => _includeExtraMinutesText = v),
                   ),
                   const SizedBox(height: AppSpacing.space5),
 
@@ -248,17 +253,62 @@ class _SubscriptionPolicyOverrideScreenState
                     ),
                   ),
                   onPressed: _isSaving ? null : _save,
-                  child:
-                      _isSaving
-                          ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : Text(AppStrings.save),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(AppStrings.save),
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Banner shown at the top of the policy override screen.
+/// Informs the teacher that values originate from global defaults
+/// and that priority order is: individual > template > global.
+class _PolicyPriorityBanner extends StatelessWidget {
+  const _PolicyPriorityBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.paperAccent.withValues(alpha: 0.06),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 16, color: AppColors.paperAccent),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.policySourceNotice,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space1),
+                Text(
+                  AppStrings.policyPriorityNotice,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -320,19 +370,17 @@ class _DeadlineHoursFieldState extends State<_DeadlineHoursField> {
               (h) => ChoiceChip(
                 label: Text('$h${AppStrings.hourSuffix}'),
                 selected: !_isCustom && widget.selected == h,
-                onSelected:
-                    widget.readOnly
-                        ? null
-                        : (_) {
-                          setState(() => _isCustom = false);
-                          widget.onChanged(h);
-                        },
+                onSelected: widget.readOnly
+                    ? null
+                    : (_) {
+                        setState(() => _isCustom = false);
+                        widget.onChanged(h);
+                      },
                 selectedColor: AppColors.paperAccent,
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color:
-                      (!_isCustom && widget.selected == h)
-                          ? AppColors.paper
-                          : AppColors.ink,
+                  color: (!_isCustom && widget.selected == h)
+                      ? AppColors.paper
+                      : AppColors.ink,
                 ),
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.zero,
@@ -344,10 +392,9 @@ class _DeadlineHoursFieldState extends State<_DeadlineHoursField> {
                 AppStrings.unifiedSubscriptionDirectInputToggle,
               ),
               selected: _isCustom,
-              onSelected:
-                  widget.readOnly
-                      ? null
-                      : (_) => setState(() => _isCustom = true),
+              onSelected: widget.readOnly
+                  ? null
+                  : (_) => setState(() => _isCustom = true),
               selectedColor: AppColors.paperAccent,
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: _isCustom ? AppColors.paper : AppColors.ink,

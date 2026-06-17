@@ -138,6 +138,20 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
+
+    // #785 — 가격표 역할 구분 subtitle 노출 확인.
+    testWidgets('가격표 항목에 역할 구분 subtitle 노출', (tester) async {
+      await tester.pumpWidget(
+        hostApp((ctx) => showSubscriptionBillingSheet(ctx, 'teacher-1')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.priceTableSection), findsOneWidget);
+      expect(find.text(AppStrings.priceListRoleSubtitle), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }
 

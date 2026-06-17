@@ -61,5 +61,23 @@ void main() {
       expect(tapped, isTrue);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('renders without exception at narrow width (375px)', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(375, 200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(_buildCard(onTap: () {}));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('shows actor summary row with glyph chips', (tester) async {
+      await tester.pumpWidget(_buildCard(onTap: () {}));
+      await tester.pumpAndSettle();
+      // Actor chips are rendered via Semantics labels
+      expect(find.bySemanticsLabel(RegExp(r'학생 \d')), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp(r'보호자 \d')), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp(r'선생님 \d')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

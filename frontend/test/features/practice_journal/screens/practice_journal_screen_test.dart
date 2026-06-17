@@ -53,10 +53,19 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('teacher role shows 선생님 도장 button', (tester) async {
+    testWidgets('teacher role shows 선생님 인증 button', (tester) async {
       await tester.pumpWidget(_buildScreen(JournalRole.teacher));
       await tester.pumpAndSettle();
-      expect(find.text('선생님 도장'), findsOneWidget);
+      // '선생님 인증' appears as the bottom action label AND in the actor legend.
+      expect(find.text('선생님 인증'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('legend rendered in body — no exception', (tester) async {
+      await tester.pumpWidget(_buildScreen(JournalRole.student));
+      await tester.pumpAndSettle();
+      // Legend title is present
+      expect(find.text('도장 의미'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

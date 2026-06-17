@@ -70,6 +70,32 @@ void main() {
       expect(find.text('권장'), findsOneWidget);
     });
 
+    // #784 — student-perspective hints visible
+    testWidgets('student-perspective hints are rendered for each option', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('보강 1회를 적립해 나중에 사용해요 (환불 아님)'), findsOneWidget);
+      expect(find.text('수강권 차감 없이 휴강 처리해요 (환불 아님)'), findsOneWidget);
+      expect(find.text('다음 회차로 밀리고, 수강권 유효기간이 자동 연장돼요'), findsOneWidget);
+      // Recommended badge explanation.
+      expect(find.text('학생에게 유연성이 가장 높은 방식이에요'), findsOneWidget);
+    });
+
+    // #784 — narrow 320px layout regression
+    testWidgets('renders without overflow at 320px width', (tester) async {
+      tester.view.physicalSize = const Size(320, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(wrap());
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('tapping an option updates the form state', (tester) async {
       final container = ProviderContainer(
         overrides: [

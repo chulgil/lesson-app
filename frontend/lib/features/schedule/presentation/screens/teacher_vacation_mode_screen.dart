@@ -484,6 +484,7 @@ class _DispositionSection extends StatelessWidget {
           value: VacationDisposition.makeupCredit,
           label: AppStrings.vacationDispositionMakeupCreditLabel,
           description: AppStrings.vacationDispositionMakeupCreditDescription,
+          studentHint: AppStrings.vacationDispositionMakeupCreditHint,
           isRecommended: true,
           groupValue: selected,
           onChange: onChange,
@@ -492,6 +493,7 @@ class _DispositionSection extends StatelessWidget {
           value: VacationDisposition.freeCancel,
           label: AppStrings.vacationDispositionFreeCancelLabel,
           description: AppStrings.vacationDispositionFreeCancelDescription,
+          studentHint: AppStrings.vacationDispositionFreeCancelHint,
           groupValue: selected,
           onChange: onChange,
         ),
@@ -499,6 +501,7 @@ class _DispositionSection extends StatelessWidget {
           value: VacationDisposition.rollForward,
           label: AppStrings.vacationDispositionRollForwardLabel,
           description: AppStrings.vacationDispositionRollForwardDescription,
+          studentHint: AppStrings.vacationDispositionRollForwardHint,
           groupValue: selected,
           onChange: onChange,
         ),
@@ -528,6 +531,10 @@ class _DispositionOption extends StatelessWidget {
   final VacationDisposition groupValue;
   final String label;
   final String description;
+
+  /// One-line student-perspective explanation shown below [description].
+  final String studentHint;
+
   final bool isRecommended;
   final ValueChanged<VacationDisposition> onChange;
 
@@ -536,6 +543,7 @@ class _DispositionOption extends StatelessWidget {
     required this.groupValue,
     required this.label,
     required this.description,
+    required this.studentHint,
     required this.onChange,
     this.isRecommended = false,
   });
@@ -631,6 +639,36 @@ class _DispositionOption extends StatelessWidget {
                         color: AppColors.inkSecondary,
                       ),
                     ),
+                    SizedBox(height: AppSpacing.space1),
+                    // Student-perspective hint (#784).
+                    Text(
+                      studentHint,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.inkTertiary,
+                      ),
+                    ),
+                    if (isRecommended) ...[
+                      SizedBox(height: AppSpacing.space1),
+                      // Explain what "권장" means to the student (#784).
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 12,
+                            color: AppColors.inkTertiary,
+                          ),
+                          SizedBox(width: AppSpacing.space1),
+                          Expanded(
+                            child: Text(
+                              AppStrings.vacationDispositionRecommendedHint,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.inkTertiary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

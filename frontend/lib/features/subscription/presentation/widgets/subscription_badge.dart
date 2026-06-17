@@ -73,9 +73,37 @@ class SubscriptionBadge extends StatelessWidget {
     return null;
   }
 
+  /// Returns true when expiry is caused by session depletion (not date).
+  bool get _isDepleted => subscription.isDepleted;
+
   String _label() {
     if (subscription.isUnpaid) return AppStrings.subscriptionBadgeUnpaid;
-    if (_isExpired) return AppStrings.statusExpired;
+
+    // Expired: distinguish date-expiry from session depletion
+    if (_isExpired) {
+      if (_isDepleted) return AppStrings.statusDepleted; // 회차 소진
+      return AppStrings.statusPeriodExpired; // 기간 만료
+    }
+
+    // Trial always shows its type label regardless of remaining count.
+    if (subscription.type == SubscriptionType.trial) {
+      return AppStrings.subscriptionTypeTrial;
+    }
+
+    // Expiring soon: show numeric context inline (package / monthly only).
+    if (subscription.isExpiringSoon) {
+      final remaining = subscription.remainingLessons;
+      if (remaining != null && remaining <= 1) {
+        return AppStrings.statusExpiringSoonSessions(
+          remaining,
+        ); // 소진 임박 · 잔여 N회
+      }
+      final days = subscription.daysUntilExpiration;
+      if (days != null) {
+        return AppStrings.statusExpiringSoonDays(days); // D-N
+      }
+    }
+
     switch (subscription.type) {
       case SubscriptionType.package:
         return AppStrings.subscriptionPackageBadgeFormat(

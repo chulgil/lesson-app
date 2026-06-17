@@ -3575,7 +3575,7 @@ class AppStrings {
   static const issueFormZeroLabel = '없음';
 
   /// 보너스 (섹션 제목)
-  static const issueFormBonusTitle = '보너스';
+  static const issueFormBonusTitle = '추가 증정 회차';
 
   /// +N회 (보너스 라벨 포매터)
   static String issueFormBonusFormatter(int value) =>
@@ -7918,7 +7918,7 @@ class AppStrings {
   static const inquiryAskButton = '문의 보내기';
   static const inquiryReplyPlaceholder = '답글을 입력하세요';
   static const inquiryReplySend = '답글 전송';
-  static const inquirySLALabel = '48시간 이내 답변';
+  static const inquirySLALabel = '보통 1~2일 내 답변';
   static const inquiryNoInquiries = '문의 내역이 없습니다';
   static const inquiryCreated = '문의가 접수되었습니다';
   static const inquiryFormNameLabel = '이름';
@@ -9379,7 +9379,7 @@ class AppStrings {
   static const journalGuardianSeal = '확인 도장';
 
   /// 선생님 검인(과제 한정).
-  static const journalTeacherEndorse = '선생님 도장';
+  static const journalTeacherEndorse = '선생님 인증';
 
   /// 도장 찍기 보상 CTA.
   static const journalStampPressCta = '도장 꾹!';
@@ -9427,4 +9427,78 @@ class AppStrings {
 
   /// 곡 완성(제본) 축하.
   static const boundVolumeCelebration = '완성본으로 제본되었어요 · 책장에서 확인하세요';
+
+
+  // [검토 #19] UX wave5
+  static const String vacationDispositionMakeupCreditHint =
+      '보강 1회를 적립해 나중에 사용해요 (환불 아님)';
+  static const String vacationDispositionFreeCancelHint =
+      '수강권 차감 없이 휴강 처리해요 (환불 아님)';
+  static const String vacationDispositionRollForwardHint =
+      '다음 회차로 밀리고, 수강권 유효기간이 자동 연장돼요';
+  static const String vacationDispositionRecommendedHint =
+      '학생에게 유연성이 가장 높은 방식이에요';
+
+  // [검토 #41] UX wave5
+  static const String priceListRoleSubtitle = '악기·레벨별 단가 (수강권 상품과 별개)';
+
+  // [검토 #49] UX wave5
+  /// 기간 만료 (날짜 경과로 만료)
+  static const statusPeriodExpired = '기간 만료';
+
+  /// 회차 소진 (횟수 소진으로 만료)
+  static const statusDepleted = '회차 소진';
+
+  /// 소진 임박 — 잔여 N회 (회차 기반)
+  static String statusExpiringSoonSessions(int remaining) => '소진 임박 · 잔여 $remaining회';
+
+  /// 임박 — D-N일 (날짜 기반)
+  static String statusExpiringSoonDays(int days) => days <= 0 ? 'D-day' : 'D-$days';
+
+  // [검토 #51] UX wave5
+  /// 추가 증정 회차 (섹션 제목, #787 — 보너스 → 추가 증정 회차)
+  static const String bonusSessionLabel = '추가 증정 회차';
+
+  /// 총 N회 (정규 X + 증정 Y) — 보너스 미리보기
+  static String bonusTotalPreview(int regular, int bonus) =>
+      '총 ${regular + bonus}회 (정규 $regular + 증정 $bonus)';
+
+  /// 증정 회차 사유 선택 안내 (사유 칩 섹션 설명)
+  static const bonusReasonHint = '서비스 회차는 정규 회차와 동일하게 사용됩니다.';
+
+  // [검토 #52] UX wave5
+  /// 수강권 정책 우선순위 안내 배너 — 기본 정책에서 가져온 값임을 고지
+  static const String policySourceNotice = '기본 정책(전역)에서 가져온 값 · 이 수강권만 변경됩니다';
+
+  /// 수강권 정책 적용 우선순위 1줄 고지
+  static const String policyPriorityNotice = '개별 > 템플릿 > 전역 순으로 적용됩니다';
+
+  // [검토 #53] UX wave5
+  /// 노쇼 정책 선택 시 학생 측 결과 미리보기 레이블
+  static const noShowStudentPreviewLabel = '학생 측:';
+
+  /// 노쇼 정책 - 회차 차감 시 학생 미리보기
+  static const noShowStudentPreviewDeduct = '회차 1 차감';
+
+  /// 노쇼 정책 - 차감 없음 시 학생 미리보기
+  static const noShowStudentPreviewNoDeduct = '회차 차감 없음';
+
+  // [검토 #55] UX wave5
+  /// 연습장 도장 actor 범례 — 카드/화면 내 텍스트 설명.
+  static const journalLegendStudent = '학생';
+  static const journalLegendGuardian = '보호자';
+  static const journalLegendTeacher = '선생님';
+  /// 범례 제목 (연습장 상세 화면).
+  static const journalActorLegendTitle = '도장 의미';
+  /// 학생 자가기록 설명.
+  static const journalActorStudentDesc = '학생 자가기록';
+  /// 보호자 확인 설명.
+  static const journalActorGuardianDesc = '보호자 확인';
+  /// 선생님 인증 설명.
+  static const journalActorTeacherDesc = '선생님 인증';
+
+  // [검토 #60] UX wave5
+  static const String inquiryStatusUnanswered = '미답변';
+  static const String inquiryStatusAnswered = '답변완료';
+  static const String inquiryReplySla = '보통 1~2일 내 답변';
 }

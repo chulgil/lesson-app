@@ -94,4 +94,22 @@ void main() {
       expect(s.onChanged, isNull);
     }
   });
+  testWidgets('priority banner renders at 320px width without overflow', (
+    tester,
+  ) async {
+    final sub = makeSubscription(ownership: SubscriptionOwnership.teacher);
+    final defaults = makeDefaults();
+
+    tester.view.physicalSize = const Size(320, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(pumpScreen(sub: sub, defaults: defaults));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('기본 정책(전역)에서 가져온 값 · 이 수강권만 변경됩니다'), findsOneWidget);
+    expect(find.text('개별 > 템플릿 > 전역 순으로 적용됩니다'), findsOneWidget);
+  });
+
 }

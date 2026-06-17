@@ -66,10 +66,11 @@ void showSubscriptionBillingSheet(BuildContext context, String teacherId) {
               ),
               // W3 Task 3.3 — 가격표 분리 화면 진입.
               // spec §6.3 — LessonTimeSettingsScreen §6 가격표 분리.
+              // #785 — 역할 구분 subtitle (수강권 상품과 별개 명시).
               ListTile(
                 leading: const Icon(Icons.attach_money_outlined),
                 title: const Text(AppStrings.priceTableSection),
-                subtitle: const Text(AppStrings.priceTableMenuSubtitle),
+                subtitle: const Text(AppStrings.priceListRoleSubtitle),
                 onTap: () {
                   Navigator.pop(sheetContext);
                   context.push(AppRoutes.priceTable);

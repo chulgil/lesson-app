@@ -57,6 +57,7 @@ class DiscountSection extends StatelessWidget {
 
 class BonusSection extends StatelessWidget {
   final int bonusLessons;
+  final int totalLessons;
   final String? bonusReason;
   final String customBonusReason;
   final ValueChanged<int> onBonusLessonsChanged;
@@ -68,6 +69,7 @@ class BonusSection extends StatelessWidget {
   const BonusSection({
     super.key,
     required this.bonusLessons,
+    required this.totalLessons,
     required this.bonusReason,
     required this.customBonusReason,
     required this.onBonusLessonsChanged,
@@ -94,6 +96,14 @@ class BonusSection extends StatelessWidget {
           labelFormatter: AppStrings.issueFormBonusFormatter,
         ),
         if (bonusLessons > 0) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            AppStrings.bonusTotalPreview(totalLessons, bonusLessons),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.paperAccent,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           const SizedBox(height: AppSpacing.space3),
           Wrap(
             spacing: AppSpacing.space2,
@@ -105,6 +115,13 @@ class BonusSection extends StatelessWidget {
               _buildBonusReasonChip(AppStrings.issueFormBonusReasonRenewal),
               _buildBonusReasonChip(AppStrings.issueFormBonusReasonOther),
             ],
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            AppStrings.bonusReasonHint,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.inkTertiary,
+            ),
           ),
           if (bonusReason == AppStrings.issueFormBonusReasonOther) ...[
             const SizedBox(height: AppSpacing.space3),

@@ -468,6 +468,7 @@ class _IssueSubscriptionScreenState
           if (_selectedType != SubscriptionType.trial) ...[
             BonusSection(
               bonusLessons: _bonusLessons,
+              totalLessons: _totalLessons,
               bonusReason: _bonusReason,
               customBonusReason: _customBonusReason,
               onBonusLessonsChanged: (value) {
@@ -584,6 +585,7 @@ class _IssueSubscriptionScreenState
           if (_selectedType != SubscriptionType.trial) ...[
             BonusSection(
               bonusLessons: _bonusLessons,
+              totalLessons: _totalLessons,
               bonusReason: _bonusReason,
               customBonusReason: _customBonusReason,
               onBonusLessonsChanged: (value) {

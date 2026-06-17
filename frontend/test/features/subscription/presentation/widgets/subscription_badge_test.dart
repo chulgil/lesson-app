@@ -138,20 +138,73 @@ void main() {
       expect(text.style?.color, AppColors.paperAccent);
     });
 
-    testWidgets('만료 status → "만료" + 버밀리온', (tester) async {
+    testWidgets('기간 만료 (status=expired, 잔여 회차 있음) → "기간 만료" + 버밀리온', (
+      tester,
+    ) async {
       final sub = createSubscription(
         type: SubscriptionType.package,
         totalLessons: 8,
+        usedLessons:
+            4, // still has remaining lessons — date expiry, not depletion
         status: SubscriptionStatus.expired,
       );
       await tester.pumpWidget(
         buildTestWidget(SubscriptionBadge(subscription: sub)),
       );
-      expect(find.text('만료'), findsOneWidget);
+      expect(find.text('기간 만료'), findsOneWidget);
       expect(
-        tester.widget<Text>(find.text('만료')).style?.color,
+        tester.widget<Text>(find.text('기간 만료')).style?.color,
         AppColors.paperAccent,
       );
+    });
+
+    testWidgets('회차 소진 (status=expired + 0회 잔여) → "회차 소진" + 버밀리온', (
+      tester,
+    ) async {
+      final sub = createSubscription(
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 8, // all lessons used — depletion
+        status: SubscriptionStatus.expired,
+      );
+      await tester.pumpWidget(
+        buildTestWidget(SubscriptionBadge(subscription: sub)),
+      );
+      expect(find.text('회차 소진'), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.text('회차 소진')).style?.color,
+        AppColors.paperAccent,
+      );
+    });
+
+    testWidgets('소진 임박 (잔여 1회) → "소진 임박 · 잔여 1회" + 시계 아이콘', (tester) async {
+      final sub = createSubscription(
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 7, // 1 remaining
+        endDate: DateTime.now().add(const Duration(days: 30)),
+      );
+      await tester.pumpWidget(
+        buildTestWidget(SubscriptionBadge(subscription: sub)),
+      );
+      expect(find.text('소진 임박 · 잔여 1회'), findsOneWidget);
+      expect(find.byIcon(Icons.access_time), findsOneWidget);
+    });
+
+    testWidgets('날짜 임박 (D-N, 잔여 다수) → "D-N" 형식 + 시계 아이콘', (tester) async {
+      // Duration(days:3) truncates to inDays=2 depending on time-of-day;
+      // use days:4 to guarantee isExpiringSoon=true and daysUntilExpiration>=3.
+      final sub = createSubscription(
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 4,
+        endDate: DateTime.now().add(const Duration(days: 4)),
+      );
+      await tester.pumpWidget(
+        buildTestWidget(SubscriptionBadge(subscription: sub)),
+      );
+      // Exact day count varies by time-of-day; verify D-N format and icon.
+      expect(find.textContaining('D-'), findsOneWidget);
+      expect(find.byIcon(Icons.access_time), findsOneWidget);
     });
 
     testWidgets('정상 회차권 → 중립 잉크 + 아이콘 없음', (tester) async {
