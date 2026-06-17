@@ -398,6 +398,9 @@ class AppStrings {
   /// 시간을 선택하세요
   static const selectTimePrompt = '시간을 선택하세요';
 
+  /// 유연 일정 역할 안내 카드 문구
+  static const flexibleScheduleGuide = '유연한 일정은 매 레슨마다 학생과 시간을 조율해 잡습니다.';
+
   /// 제안하기 (N개)
   static String proposeAction(int count) => '제안하기 ($count개)';
 
@@ -9381,6 +9384,9 @@ class AppStrings {
   // 사용처: features/practice_journal/presentation/screens/bound_shelf_screen.dart 등
   /// 완성본 책장 화면 제목 + 진입 라벨.
   static const boundShelfTitle = '완성본 책장';
+
+  /// 연습장 본문 부제 (용도 안내)
+  static const practiceJournalSubtitle = '월별 연습 기록 확인용';
 
   /// 완성본 섹션 헤더.
   static const boundShelfCompletedSection = '완성본';

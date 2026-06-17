@@ -74,8 +74,6 @@ class StudentPracticeTab extends ConsumerWidget {
                 );
               },
             ),
-            const SizedBox(height: AppSpacing.space4),
-            _DetailStatsButton(studentId: studentId),
             const SizedBox(height: AppSpacing.space8),
           ],
         );
@@ -500,27 +498,3 @@ class _TileLeading extends StatelessWidget {
   }
 }
 
-/// Bottom button for navigating to detailed statistics
-class _DetailStatsButton extends StatelessWidget {
-  const _DetailStatsButton({required this.studentId});
-
-  final String studentId;
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: null,
-      icon: const Icon(Icons.bar_chart_outlined, size: 18),
-      label: const Text(AppStrings.studentDetailStatsButton),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.paperAccent,
-        side: const BorderSide(color: AppColors.inkQuaternary),
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.space3,
-          horizontal: AppSpacing.space4,
-        ),
-        shape: const RoundedRectangleBorder(),
-      ),
-    );
-  }
-}

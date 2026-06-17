@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
+import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_screen_scaffold.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/endorsement.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/guardian_seal.dart';
@@ -103,7 +104,17 @@ class _JournalBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      child: JournalMonthGrid(ledger: ledger),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.practiceJournalSubtitle,
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          JournalMonthGrid(ledger: ledger),
+        ],
+      ),
     );
   }
 }

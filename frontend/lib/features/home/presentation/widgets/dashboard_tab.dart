@@ -145,7 +145,7 @@ class DashboardTab extends ConsumerWidget {
                   const QuestBoardCard(),
 
                   // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
-                  _buildStatsRow(context, todayLessons, dashboard.lessonStats),
+                  _buildStatsRow(context, dashboard.lessonStats),
 
                   const SizedBox(height: AppSpacing.space3),
 
@@ -255,33 +255,8 @@ class DashboardTab extends ConsumerWidget {
 
   Widget _buildStatsRow(
     BuildContext context,
-    AsyncValue<List<Lesson>> todayLessons,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
-    final todayCard = todayLessons.when(
-      data:
-          (lessons) => StatCard(
-            title: AppStrings.todayLessons,
-            value: AppStrings.usageCountShort(lessons.length),
-            color: AppColors.ink,
-            icon: Icons.today,
-            onTap: onViewAllLessons,
-          ),
-      loading:
-          () => StatCard(
-            title: AppStrings.todayLessons,
-            value: '-',
-            color: AppColors.ink,
-            icon: Icons.today,
-          ),
-      error:
-          (_, __) => StatCard(
-            title: AppStrings.todayLessons,
-            value: '-',
-            color: AppColors.ink,
-          ),
-    );
-
     final monthCard = lessonStatsAsync.when(
       data:
           (stats) => StatCard(
@@ -306,7 +281,7 @@ class DashboardTab extends ConsumerWidget {
           ),
     );
 
-    return StatCardRow(cards: [todayCard, monthCard]);
+    return StatCardRow(cards: [monthCard]);
   }
 
   /// 이벤트 그룹: 레슨 요청 + 스케줄 변경을 시각적으로 묶음.

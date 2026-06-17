@@ -138,6 +138,24 @@ class _RegisterRegularLessonScreenState
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Flexible schedule guide card
+          if (_scheduleType == ScheduleType.flexible) ...[
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.scheduleMutedBackground,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Text(
+                AppStrings.flexibleScheduleGuide,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space6),
+          ],
+
           // Fixed time slot selection
           if (_scheduleType == ScheduleType.fixed) ...[
             // Lesson duration selection
