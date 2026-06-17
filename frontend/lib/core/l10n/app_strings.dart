@@ -7574,7 +7574,7 @@ class AppStrings {
   static const studentAddLesson = '레슨 추가';
   static const studentReregistrationProposal = '재등록 제안';
   static const studentStatusTrial = '체험';
-  static const studentStatusActive = '정규';
+  static const studentStatusActive = '수강중';
   static const studentStatusPaused = '휴강';
   static const studentStatusInactive = '종료';
   static const studentLevelBeginner = '입문';
@@ -7584,7 +7584,7 @@ class AppStrings {
   static const studentPracticeStatusGood = '우수';
   static const studentPracticeStatusNormal = '보통';
   static const studentPracticeStatusPoor = '부족';
-  static const studentPracticeStatusPaused = '휴강';
+  static const studentPracticeStatusPaused = '기록없음';
   static const studentTriageExpiring = '만료임박';
   static const studentTriageUnpaid = '입금대기(후불)';
   static const studentTriageTrial = '체험중';

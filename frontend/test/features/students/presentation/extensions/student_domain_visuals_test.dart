@@ -13,7 +13,7 @@ void main() {
   group('StudentStatusVisuals', () {
     test('maps labels and colors for presentation', () {
       expect(StudentStatus.trial.label, '체험');
-      expect(StudentStatus.active.label, '정규');
+      expect(StudentStatus.active.label, '수강중');
       expect(StudentStatus.paused.label, '휴강');
       expect(StudentStatus.inactive.label, '종료');
 
@@ -36,7 +36,7 @@ void main() {
       expect(PracticeStatus.good.label, '우수');
       expect(PracticeStatus.normal.label, '보통');
       expect(PracticeStatus.poor.label, '부족');
-      expect(PracticeStatus.paused.label, '휴강');
+      expect(PracticeStatus.paused.label, '기록없음');
 
       expect(PracticeStatus.good.color, AppColors.paperOk);
       expect(PracticeStatus.normal.color, AppColors.practiceNormal);

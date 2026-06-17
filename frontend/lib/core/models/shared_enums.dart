@@ -82,7 +82,7 @@ enum PracticeLevel {
       case PracticeLevel.poor:
         return '부족';
       case PracticeLevel.onBreak:
-        return '휴강';
+        return '기록없음';
     }
   }
 

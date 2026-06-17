@@ -471,6 +471,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-17 | 학생 정규 / 연습 휴강 | 학생 수강중 / 연습 기록없음 | 검토 #26 상태 어휘 SSOT — '휴강' overload(학생 paused vs 연습 무기록) 분리. 표시명만, enum 값·Membership/학생 휴강 불변 (.harness/knowledge/glossary.md 동기화) |
 | 2026-06-17 | 쉬는날 / 방학 중 / 휴가 모드 | 휴무 / 휴가 / 휴강 (3 SSOT) | 검토 #14 "안 하는 날" 6용어 혼용 해소 — 표시명·glossary만, 코드 식별자 불변 (.harness/knowledge/glossary.md SSOT 동기화) |
 | 2026-06-12 | — | §13 학생 게이미피케이션 P3 — 스포트라이트 프롬프트 / 스포트라이트 종류 (3) / 스포트라이트 슬롯 / 노출 조건 / 큐 우선순위 / 거절 학습 | P3 Spotlight 진입 — SC-9 거절 5회 → 8주 hide 충족 + SpotlightPrompt 신규 엔티티 (.harness/knowledge/glossary.md §15 P3 동기화) |
 | 2026-06-12 | — | §13 학생 게이미피케이션 P2 — 스트릭 동결 / 1년 히트맵 / 트로피 모음 / 휴식 권고 / 시험 모드 / 복귀 보너스 | P2 Visual Growth 진입 — SC-10/SC-11 충족 + GrowthHeatmap 1년 캐시 (.harness/knowledge/glossary.md §15 P2 동기화) |

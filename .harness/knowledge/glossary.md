@@ -577,6 +577,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-17 | 학생/연습 상태 어휘 정렬 (검토 #26) — StudentStatus.active 표시명 정규→수강중, 연습(PracticeLevel.onBreak/PracticeStatus.paused) 표시명 휴강→기록없음(무기록). 학생 라이프사이클 휴강(paused)·MembershipStatus는 유지(별 축). 표시명만, enum 값 불변. |
 | 2026-06-17 | 스케줄 휴무/휴가/휴강 SSOT 통일 (검토 #14) — 휴무(비근무일)·휴가(기간형, "휴가 모드"·"방학 중" 흡수)·휴강(레슨 취소+보상) 3 canonical. Deprecated: 쉬는날→휴무, 방학 중→휴가, 휴가 모드→휴가. 표시명·glossary만 정렬(코드 식별자 불변). |
 | 2026-06-16 | §16 연습장 제본(Practice Journal — Binding) 신설 — `BoundVolume` 엔티티(+`pieceName`) + `BoundVolumeSpine`/`BoundShelfScreen` + 정책 용어 3종(제본 / 곡 완성 트리거 / 연습중) + Deprecated 1건(출판→제본). 본 변경은 `.harness/spec/2026-06-16-practice-journal-p2-binding.md` |
 | 2026-06-12 | §15 P3 Spotlight 용어 추가 — `SpotlightPrompt` 엔티티 + `SpotlightType` enum (3종) + 정책 용어 7종 (스포트라이트 슬롯 / 노출 조건 / 큐 우선순위 / 거절 cooldown / 8주 hide / 영구 hide / 스포트라이트 시드) + 서비스 메서드 3종 (Eligibility / Queue / DeclineLearning) + Deprecated 표현 2건 ("필수 알림" → "스포트라이트 권유", "거절 패널티" → "거절 학습"). 본 변경은 `.harness/decomposition/2026-06-12-student-gamification-p3-spotlight.md` Job 0 Step 2 |
