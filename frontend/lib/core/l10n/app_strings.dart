@@ -2537,6 +2537,13 @@ class AppStrings {
   /// 학생 메모 입력 hint
   static const studentMemoHint = '오늘 배운 것, 어려웠던 점 등을 메모하세요...';
 
+  /// 연락처·메모 카드 (정보 탭 #24/#25)
+  static const studentContactSectionTitle = '연락처 · 메모';
+  static const studentContactStudentLabel = '학생';
+  static const studentContactParentLabel = '학부모';
+  static const studentContactAddressLabel = '주소';
+  static const studentContactMemoLabel = '학생 메모';
+
   // ── Edit Lesson (레슨 수정 화면 30차) ─────────────────────────
   /// 레슨 수정 (AppBar title)
   static const editLessonTitle = '레슨 수정';

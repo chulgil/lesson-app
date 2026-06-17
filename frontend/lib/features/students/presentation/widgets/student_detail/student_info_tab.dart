@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../students/domain/entities/student.dart';
+import 'student_contact_card.dart';
 import 'student_detail_widgets.dart';
 
 /// Tab content showing student profile info, stats, and subscription status
@@ -16,6 +17,11 @@ class StudentInfoTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       children: [
+        // Contact / memo card (#24/#25) — 연락처/메모 최상단
+        StudentContactCard(student: student),
+
+        const SizedBox(height: AppSpacing.space6),
+
         // Stats cards (neutral tone, no icons)
         StudentStatsCards(student: student),
 
