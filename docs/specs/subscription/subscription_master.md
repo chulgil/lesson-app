@@ -394,12 +394,15 @@ else → 이용중 (보라)
 | name | O | 템플릿 이름 | "바이올린 8회권" |
 | instrument | O | 악기 | "바이올린" |
 | totalLessons | O | 총 횟수 | 8 |
-| amount | O | 금액 (원) | 380000 |
+| amount (price=판매가) | O | 판매가 (원) — 실제 결제 금액 | 380000 |
+| regularPrice (정가) | - | 정가 (원). 판매가보다 크면 할인 표시 (`regular_price`, nullable) | 500000 |
 | lessonDuration | O | 레슨 시간 (분) | 60 |
 | validityDays | O | 유효 기간 (일) | 60 |
 | rescheduleLimit | O | 변경 가능 횟수 | 2 |
 | description | - | 설명 | "주 1회 권장" |
 | isActive | O | 활성화 여부 | true |
+
+**정가/할인가 표기:** `regularPrice`(정가)가 `price`(판매가)보다 크면 템플릿 카드/작성 시트에 정가 취소선 + 판매가 + 할인율(`(정가-판매가)/정가`, 반올림)을 표시한다. `regularPrice == null`이면 단일가(기존 동작). 정가는 작성 시 **악기·레벨을 선택하면 `TeacherSettings.lessonPriceTable`(악기×레벨 회당가) × 횟수**로 자동 산출되며, 가격표가 비어 있으면 정가/판매가를 직접 입력한다. (악기·레벨은 작성 편의용 — 템플릿에 저장하지 않음)
 
 **프로필 메뉴판 공개:** 템플릿이 선생님 프로필에 메뉴판처럼 공개되어 학생이 미리 확인 가능.
 

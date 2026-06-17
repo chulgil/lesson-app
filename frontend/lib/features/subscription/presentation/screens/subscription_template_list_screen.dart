@@ -10,14 +10,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/utils/price_input.dart';
-import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../core/widgets/selectors/selectors.dart';
 import '../../../profile/domain/entities/teacher_settings.dart';
 import '../../../settings/settings_facade.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_template_providers.dart';
+import 'subscription_template_form_sheet.dart';
 
 /// Screen for managing subscription templates (teacher app).
 class SubscriptionTemplateListScreen extends ConsumerWidget {
@@ -142,32 +140,33 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
   }
 
   void _showAddTemplateDialog(BuildContext context, WidgetRef ref) {
-    // _TemplateFormSheet 는 자체 surface(Container)+스크롤(SingleChildScrollView)+
-    // 핸들을 소유하므로 self-surfaced 용 showNotebookModalBottomSheet 를 쓴다.
+    // SubscriptionTemplateFormSheet 는 자체 surface(Container)+스크롤
+    // (SingleChildScrollView)+핸들을 소유하므로 self-surfaced 용
+    // showNotebookModalBottomSheet 를 쓴다.
     // showNotebookBottomSheet 는 자식을 Column(min) 으로 감싸 unbounded 높이를
     // 줘 SingleChildScrollView 가 스크롤되지 못하고 폼이 세로 overflow 한다.
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder:
-          (context) => _TemplateFormSheet(
-            teacherId: teacherId,
-            onSave: (template) async {
-              await ref
-                  .read(subscriptionTemplateNotifierProvider.notifier)
-                  .createTemplate(
-                    ownerId: template.ownerId,
-                    ownerType: template.ownerType,
-                    name: template.name,
-                    totalLessons: template.totalLessons,
-                    lessonDurationMinutes: template.lessonDurationMinutes,
-                    validityDays: template.validityDays,
-                    price: template.price,
-                    description: template.description,
-                  );
-            },
-          ),
+      builder: (context) => SubscriptionTemplateFormSheet(
+        teacherId: teacherId,
+        onSave: (template) async {
+          await ref
+              .read(subscriptionTemplateNotifierProvider.notifier)
+              .createTemplate(
+                ownerId: template.ownerId,
+                ownerType: template.ownerType,
+                name: template.name,
+                totalLessons: template.totalLessons,
+                lessonDurationMinutes: template.lessonDurationMinutes,
+                validityDays: template.validityDays,
+                price: template.price,
+                regularPrice: template.regularPrice,
+                description: template.description,
+              );
+        },
+      ),
     );
   }
 
@@ -181,16 +180,15 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder:
-          (context) => _TemplateFormSheet(
-            teacherId: teacherId,
-            template: template,
-            onSave: (updated) async {
-              await ref
-                  .read(subscriptionTemplateNotifierProvider.notifier)
-                  .updateTemplate(updated);
-            },
-          ),
+      builder: (context) => SubscriptionTemplateFormSheet(
+        teacherId: teacherId,
+        template: template,
+        onSave: (updated) async {
+          await ref
+              .read(subscriptionTemplateNotifierProvider.notifier)
+              .updateTemplate(updated);
+        },
+      ),
     );
   }
 
@@ -246,10 +244,9 @@ class _TemplateCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         side: BorderSide(
-          color:
-              template.isActive
-                  ? AppColors.inkQuaternary
-                  : AppColors.inkTertiary.withValues(alpha: 0.3),
+          color: template.isActive
+              ? AppColors.inkQuaternary
+              : AppColors.inkTertiary.withValues(alpha: 0.3),
         ),
       ),
       color: template.isActive ? AppColors.paper : AppColors.paperDark,
@@ -272,10 +269,9 @@ class _TemplateCard extends StatelessWidget {
                             Text(
                               template.name,
                               style: AppTypography.headingSmall.copyWith(
-                                color:
-                                    template.isActive
-                                        ? AppColors.ink
-                                        : AppColors.inkTertiary,
+                                color: template.isActive
+                                    ? AppColors.ink
+                                    : AppColors.inkTertiary,
                               ),
                             ),
                             if (!template.isActive) ...[
@@ -336,12 +332,11 @@ class _TemplateCard extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.space1),
                         Text(
-                          template.summaryText,
+                          template.summaryTextNoPrice,
                           style: AppTypography.bodyMedium.copyWith(
-                            color:
-                                template.isActive
-                                    ? AppColors.inkSecondary
-                                    : AppColors.inkTertiary,
+                            color: template.isActive
+                                ? AppColors.inkSecondary
+                                : AppColors.inkTertiary,
                           ),
                         ),
                       ],
@@ -362,58 +357,101 @@ class _TemplateCard extends StatelessWidget {
                           break;
                       }
                     },
-                    itemBuilder:
-                        (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_outlined, size: 20),
-                                SizedBox(width: AppSpacing.space2),
-                                Text(AppStrings.modify),
-                              ],
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined, size: 20),
+                            SizedBox(width: AppSpacing.space2),
+                            Text(AppStrings.modify),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'toggle',
+                        child: Row(
+                          children: [
+                            Icon(
+                              template.isActive
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              size: 20,
                             ),
-                          ),
-                          PopupMenuItem(
-                            value: 'toggle',
-                            child: Row(
-                              children: [
-                                Icon(
-                                  template.isActive
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: AppSpacing.space2),
-                                Text(
-                                  template.isActive
-                                      ? AppStrings.templateMenuDeactivate
-                                      : AppStrings.templateMenuActivate,
-                                ),
-                              ],
+                            const SizedBox(width: AppSpacing.space2),
+                            Text(
+                              template.isActive
+                                  ? AppStrings.templateMenuDeactivate
+                                  : AppStrings.templateMenuActivate,
                             ),
-                          ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.delete_outline,
-                                  size: 20,
-                                  color: AppColors.paperAccent,
-                                ),
-                                SizedBox(width: AppSpacing.space2),
-                                Text(
-                                  AppStrings.delete,
-                                  style: TextStyle(
-                                    color: AppColors.paperAccent,
-                                  ),
-                                ),
-                              ],
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete_outline,
+                              size: 20,
+                              color: AppColors.paperAccent,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: AppSpacing.space2),
+                            Text(
+                              AppStrings.delete,
+                              style: TextStyle(color: AppColors.paperAccent),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.space2),
+
+              // Price row — 정가 취소선 + 판매가 + 할인율 배지 (정가 미설정 시 단일가).
+              // Wrap 으로 narrow(375) 가로 오버플로우 방지.
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.space2,
+                runSpacing: AppSpacing.space1,
+                children: [
+                  if (template.hasDiscount)
+                    Text(
+                      template.formattedRegularPrice,
+                      style: AppTypography.bodySmall.copyWith(
+                        decoration: TextDecoration.lineThrough,
+                        color: AppColors.inkTertiary,
+                      ),
+                    ),
+                  Text(
+                    template.formattedPrice,
+                    style: AppTypography.headingSmall.copyWith(
+                      color: template.isActive
+                          ? AppColors.paperAccent
+                          : AppColors.inkTertiary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  if (template.hasDiscount)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.paperAccent.withValues(alpha: 0.1),
+                      ),
+                      child: Text(
+                        template.formattedDiscountRate,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.paperAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                 ],
               ),
 
@@ -485,10 +523,9 @@ class _DetailChip extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color:
-            isActive
-                ? AppColors.paperAccentSoft
-                : AppColors.inkTertiary.withValues(alpha: 0.1),
+        color: isActive
+            ? AppColors.paperAccentSoft
+            : AppColors.inkTertiary.withValues(alpha: 0.1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -508,408 +545,6 @@ class _DetailChip extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-/// Bottom sheet form for creating/editing templates.
-class _TemplateFormSheet extends ConsumerStatefulWidget {
-  final String teacherId;
-  final SubscriptionTemplate? template;
-  final Future<void> Function(SubscriptionTemplate template) onSave;
-
-  const _TemplateFormSheet({
-    required this.teacherId,
-    this.template,
-    required this.onSave,
-  });
-
-  @override
-  ConsumerState<_TemplateFormSheet> createState() => _TemplateFormSheetState();
-}
-
-class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _priceController;
-  late TextEditingController _customLessonsController;
-  late TextEditingController _customDurationController;
-  late TextEditingController _customValidityController;
-
-  int _totalLessons = 8;
-  int _lessonDuration = 50;
-  int _validityDays = 90;
-  bool _isCustomLessons = false;
-  bool _isCustomDuration = false;
-  bool _isCustomValidity = false;
-  bool _isSaving = false;
-  bool _isAutoProposalEnabled = true; // 🆕 기본값: 자동 제안 활성화
-
-  bool get isEditing => widget.template != null;
-
-  @override
-  void initState() {
-    super.initState();
-    final t = widget.template;
-    _nameController = TextEditingController(text: t?.name ?? '');
-    _descriptionController = TextEditingController(text: t?.description ?? '');
-    _priceController = TextEditingController(
-      text: t != null ? formatPriceWithCommas(t.price) : '',
-    );
-    _customLessonsController = TextEditingController();
-    _customDurationController = TextEditingController();
-    _customValidityController = TextEditingController();
-
-    if (t != null) {
-      _totalLessons = t.totalLessons;
-      _lessonDuration = t.lessonDurationMinutes;
-      _validityDays = t.validityDays;
-      _isAutoProposalEnabled = t.isAutoProposalEnabled; // 🆕
-
-      // Check if values are custom (not in presets)
-      if (![4, 8, 12, 16].contains(t.totalLessons)) {
-        _isCustomLessons = true;
-        _customLessonsController.text = t.totalLessons.toString();
-      }
-      if (![30, 45, 50, 60, 90].contains(t.lessonDurationMinutes)) {
-        _isCustomDuration = true;
-        _customDurationController.text = t.lessonDurationMinutes.toString();
-      }
-      if (![30, 60, 90, 120, 150].contains(t.validityDays)) {
-        _isCustomValidity = true;
-        _customValidityController.text = t.validityDays.toString();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _priceController.dispose();
-    _customLessonsController.dispose();
-    _customDurationController.dispose();
-    _customValidityController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-        borderRadius: BorderRadius.zero,
-      ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Title
-              // Notebook × Score: 바텀시트 헤더 Playfair 승격 (§7.27 + §7.87-h
-              // 2원 유한집합).
-              Text(
-                isEditing
-                    ? AppStrings.templateEditSheetTitle
-                    : AppStrings.templateAddSheetTitle,
-                style: NotebookTypography.sectionTitle,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Name field
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: AppStrings.templateNameLabel,
-                  hintText: AppStrings.templateNameHint,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return AppStrings.templateNameRequired;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Lessons count (using common widget)
-              LessonCountSelector(
-                selectedCount: _totalLessons,
-                isCustom: _isCustomLessons,
-                customController: _customLessonsController,
-                onCountChanged: (count, isCustom) {
-                  setState(() {
-                    _totalLessons = count;
-                    _isCustomLessons = isCustom;
-                  });
-                },
-                label: AppStrings.lessonCountLabel,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Lesson duration (using common widget)
-              LessonDurationSelector(
-                selectedDuration: _lessonDuration,
-                isCustom: _isCustomDuration,
-                customController: _customDurationController,
-                onDurationChanged: (duration, isCustom) {
-                  setState(() {
-                    _lessonDuration = duration;
-                    _isCustomDuration = isCustom;
-                  });
-                },
-                label: AppStrings.infoLabelDuration,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Validity period (using common widget)
-              ValidityPeriodSelector(
-                selectedDays: _validityDays,
-                isCustom: _isCustomValidity,
-                customController: _customValidityController,
-                onPeriodChanged: (days, isCustom) {
-                  setState(() {
-                    _validityDays = days;
-                    _isCustomValidity = isCustom;
-                  });
-                },
-                label: AppStrings.validityPeriod,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Price field
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: AppStrings.templatePriceLabel,
-                  hintText: AppStrings.templatePriceHint,
-                  prefixText: '₩ ',
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: const [ThousandsSeparatorInputFormatter()],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return AppStrings.templatePriceRequired;
-                  }
-                  if (parsePrice(value) == null) {
-                    return AppStrings.templatePriceNumbersOnly;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Description field
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: AppStrings.descriptionOptional,
-                  hintText: AppStrings.templateDescHint,
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // 🆕 자동 제안 설정
-              _buildAutoProposalSection(),
-              const SizedBox(height: AppSpacing.space6),
-
-              // Save button
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _isSaving ? null : _save,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.paperAccent,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.space3,
-                    ),
-                  ),
-                  child:
-                      _isSaving
-                          ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.paper,
-                              ),
-                            ),
-                          )
-                          : Text(
-                            isEditing
-                                ? AppStrings.templateSaveEdit
-                                : AppStrings.templateSaveAdd,
-                            style: AppTypography.bodyLarge.copyWith(
-                              color: AppColors.paper,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 🆕 자동 제안 설정 섹션
-  Widget _buildAutoProposalSection() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color:
-            _isAutoProposalEnabled
-                ? AppColors.paperOk.withValues(alpha: 0.05)
-                : AppColors.paper,
-        border: Border.all(
-          color:
-              _isAutoProposalEnabled
-                  ? AppColors.paperOk.withValues(alpha: 0.3)
-                  : AppColors.inkQuaternary,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 체크박스 + 라벨
-          Row(
-            children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: Checkbox(
-                  value: _isAutoProposalEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _isAutoProposalEnabled = value ?? true;
-                    });
-                  },
-                  activeColor: AppColors.paperOk,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isAutoProposalEnabled = !_isAutoProposalEnabled;
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.flash_on,
-                        size: 18,
-                        color:
-                            _isAutoProposalEnabled
-                                ? AppColors.paperOk
-                                : AppColors.inkTertiary,
-                      ),
-                      const SizedBox(width: AppSpacing.space1),
-                      Text(
-                        AppStrings.templateAutoProposalCheckbox,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color:
-                              _isAutoProposalEnabled
-                                  ? AppColors.ink
-                                  : AppColors.inkSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space2),
-
-          // 설명
-          Padding(
-            padding: const EdgeInsets.only(left: 32),
-            child: Text(
-              _isAutoProposalEnabled
-                  ? AppStrings.templateAutoProposalEnabledDesc
-                  : AppStrings.templateAutoProposalDisabledDesc,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkSecondary,
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSaving = true);
-
-    try {
-      final template = SubscriptionTemplate(
-        id: widget.template?.id ?? '',
-        ownerId: widget.teacherId,
-        ownerType: SubscriptionTemplateOwnerType.teacher,
-        name: _nameController.text.trim(),
-        totalLessons: _totalLessons,
-        lessonDurationMinutes: _lessonDuration,
-        validityDays: _validityDays,
-        price: parsePrice(_priceController.text) ?? 0,
-        description:
-            _descriptionController.text.trim().isNotEmpty
-                ? _descriptionController.text.trim()
-                : null,
-        isActive: widget.template?.isActive ?? true,
-        displayOrder: widget.template?.displayOrder ?? 0,
-        createdAt: widget.template?.createdAt ?? DateTime.now(),
-        isAutoProposalEnabled: _isAutoProposalEnabled, // 🆕
-      );
-
-      await widget.onSave(template);
-
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isEditing
-                  ? AppStrings.templateUpdatedSnackbar
-                  : AppStrings.templateAddedSnackbar,
-            ),
-            backgroundColor: AppColors.paperOk,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(AppStrings.errorTryAgain),
-            backgroundColor: AppColors.paperAccent,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
-    }
   }
 }
 

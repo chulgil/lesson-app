@@ -62,6 +62,8 @@
 | 수강권 | Subscription | `Subscription` | `Subscription` | 레슨 횟수/기간 권리 |
 | 수강권 제안 | Proposal | `SubscriptionProposal` | `SubscriptionProposal` | 선생님→학생 수강권 제안 |
 | 수강권 템플릿 | Template | `SubscriptionTemplate` | `SubscriptionTemplate` | 미리 설정한 수강권 상품 |
+| 판매가 | Sale Price | `SubscriptionTemplate.price` | `amount` | 실제 결제 금액 (proposal/instance 기준) |
+| 정가 | Regular Price | `SubscriptionTemplate.regularPrice` | `regular_price` | 할인 표시용 원가(선택). 판매가보다 크면 카드/시트에 취소선+할인율 표시. 작성 시 `TeacherSettings.lessonPriceTable`(악기×레벨 회당가)에서 자동 산출 |
 | 수강권 상태 | Subscription Status | `SubscriptionStatus` | `SubscriptionStatus` | active/expiringSoon/expired/paused |
 | 입금 상태 | Payment Status | `paymentConfirmed` | `payment_confirmed` | 외부 입금 확인 여부 (앱 내 결제 아님) |
 | 입금 대기 | Payment Pending | `PaymentPendingCard` | (집계) | 입금 확인 전 수강권 제안 상태 (`paymentRequested`) 집계. 선생님 홈 상단 카드로 노출 |

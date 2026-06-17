@@ -127,6 +127,25 @@ grep -rn "buttonHeightSmall" --include="*.dart" features/ | grep -i "bottom\|inp
 - **상태 라벨은 역할별** — 선생님: 행동 중심 (입금 대기), 학생: 상태 중심 (결제 필요) (#25)
 - **가이드 스펙**: `docs/specs/schedule/chat_guide_message_spec.md`
 
+## UI 이모지 금지 (HARD-GATE, 2026-06-17)
+
+> 앱 전체 UI 문자열에 이모지/유니코드 픽토그램을 쓰지 않는다. 아이콘이 필요하면 Material `Icons.*` 벡터 아이콘을 사용한다.
+
+- **금지**: UI 텍스트(`AppStrings` 값, `Text()`, `label`/`hint`, snackbar/dialog 메시지)에 이모지/픽토그램
+  - 예: `'📋 정책 요약'`, `'⭐ 추천'`, `'⚠️ 미사용분 소멸'`, `'🎵 곡'`, `'✅ 저장됨'` → 텍스트만 남기거나 Material 아이콘으로 분리
+- **허용**: Material `Icons.*` (벡터 아이콘 = 표준 affordance), 타이포그래피 화살표(`→ ← ‹ ›`), 통화기호(`₩`)
+- **예외**: NotebookGlyph 시그니처 글리프(`★ ♩ ♥ ♡ ✓ ✗ 𝄞` 등 text-presentation) — 시그니처 영역 전용. 아래 §Notebook 정책 참조
+- **감지 대상(훅)**: emoji-presentation 코드포인트만 — `U+1F000–1FAFF`, `U+FE0F`(ℹ️⚠️), 명시 BMP 이모지(`✅ ❌ ⭐ ⚠ ⏰ ⏳ ℹ ✨ ⭕ ❗ ❓`). NotebookGlyph BMP 글리프·화살표는 비대상
+- **의도적 예외**: 위반 라인 위/같은 라인에 `// ignore: ui-emoji` 주석 + 사유
+- **훅**: `.claude/hooks/check-ui-emoji.sh` (PostToolUse, advisory · stderr · exit 0)
+- **기존 잔재**: `features/schedule/.../group_class*` (🎻🎹🎉⏳ 등), gamification(`🔥`), proposal(`⭐`), `location_travel_selector`(`💡`) 는 점진 정리 대상 — 훅이 편집 시 surface
+
+```bash
+# UI 이모지 잔재 검출 (NotebookGlyph·화살표 제외)
+grep -rnP "[\x{1F000}-\x{1FAFF}\x{FE0F}\x{2705}\x{274C}\x{2B50}\x{26A0}\x{23F0}\x{23F3}\x{2139}]" \
+  frontend/lib --include="*.dart" | grep -v notebook_glyph
+```
+
 ## Notebook × Score 아이콘 정책 (HARD-GATE)
 
 > 스펙: `docs/specs/design/notebook/README.md` §9 (A2 — 선택적 강제)

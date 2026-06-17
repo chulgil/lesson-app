@@ -1200,6 +1200,47 @@ async def test_create_subscription_template(client: AsyncClient, auth_headers, c
 
 
 @pytest.mark.asyncio
+async def test_subscription_template_regular_price_round_trip(client: AsyncClient, auth_headers, create_test_user):
+    """regular_price (정가) is persisted on create and editable on update."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    # Create with regular_price > price (할인 상품).
+    create_response = await client.post(
+        "/api/v1/subscriptions-templates",
+        headers=auth_headers,
+        json={
+            "name": "8회권",
+            "total_lessons": 8,
+            "price": 400000,
+            "regular_price": 500000,
+        },
+    )
+    assert create_response.status_code == 201
+    created = create_response.json()
+    assert created["price"] == 400000
+    assert created["regular_price"] == 500000
+
+    template_id = created["id"]
+
+    # Update regular_price.
+    update_response = await client.put(
+        f"/api/v1/subscriptions-templates/{template_id}",
+        headers=auth_headers,
+        json={"regular_price": 550000},
+    )
+    assert update_response.status_code == 200
+    assert update_response.json()["regular_price"] == 550000
+
+    # Detail reflects the update.
+    detail = await client.get(
+        f"/api/v1/subscriptions-templates/{template_id}",
+        headers=auth_headers,
+    )
+    assert detail.status_code == 200
+    assert detail.json()["regular_price"] == 550000
+
+
+@pytest.mark.asyncio
 async def test_subscription_template_frontend_contract_aliases_and_actions(
     client: AsyncClient, auth_headers, create_test_user
 ):

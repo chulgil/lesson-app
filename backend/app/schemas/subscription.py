@@ -425,6 +425,7 @@ class SubscriptionTemplateResponse(BaseModel):
     validity_days: int | None = None
     amount: int | None = None
     price: int | None = None
+    regular_price: int | None = None
     description: str | None = None
     display_order: int = 0
     reschedule_allowance: int = 2
@@ -462,6 +463,7 @@ class SubscriptionTemplateCreate(BaseModel):
         default=None,
         validation_alias=AliasChoices("amount", "price"),
     )
+    regular_price: int | None = None
     description: str | None = None
     display_order: int = 0
     reschedule_allowance: int = 2
@@ -489,6 +491,7 @@ class SubscriptionTemplateUpdate(BaseModel):
         default=None,
         validation_alias=AliasChoices("amount", "price"),
     )
+    regular_price: int | None = None
     description: str | None = None
     display_order: int | None = None
     reschedule_allowance: int | None = None

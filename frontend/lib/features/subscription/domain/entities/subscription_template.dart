@@ -35,8 +35,16 @@ class SubscriptionTemplate {
   /// Validity period in days after activation (e.g., 90 days)
   final int validityDays;
 
-  /// Price in KRW
+  /// Sale price in KRW — the actual amount used downstream (proposal/instance).
   final int price;
+
+  /// Regular (list) price in KRW for marketing display (정가).
+  ///
+  /// When non-null and greater than [price], the card/sheet shows the regular
+  /// price with a strikethrough plus the discounted [price] and a discount
+  /// percentage. When null (default), behaves exactly as a single-price
+  /// template — fully backward compatible with existing templates.
+  final int? regularPrice;
 
   /// Whether this template is active and available for purchase
   final bool isActive;
@@ -70,6 +78,7 @@ class SubscriptionTemplate {
     required this.lessonDurationMinutes,
     required this.validityDays,
     required this.price,
+    this.regularPrice,
     this.isActive = true,
     this.displayOrder = 0,
     this.description,
@@ -96,6 +105,7 @@ class SubscriptionTemplate {
     int? lessonDurationMinutes,
     int? validityDays,
     int? price,
+    int? regularPrice,
     bool? isActive,
     int? displayOrder,
     String? description,
@@ -114,6 +124,7 @@ class SubscriptionTemplate {
           lessonDurationMinutes ?? this.lessonDurationMinutes,
       validityDays: validityDays ?? this.validityDays,
       price: price ?? this.price,
+      regularPrice: regularPrice ?? this.regularPrice,
       isActive: isActive ?? this.isActive,
       displayOrder: displayOrder ?? this.displayOrder,
       description: description ?? this.description,

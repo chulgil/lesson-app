@@ -1529,6 +1529,7 @@ class SubscriptionService:
             lesson_duration_minutes=data.lesson_duration_minutes,
             validity_days=data.validity_days,
             amount=data.amount,
+            regular_price=data.regular_price,
             description=data.description,
             display_order=data.display_order,
             reschedule_allowance=data.reschedule_allowance,
