@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/price_input.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/selectors/selectors.dart';
 import '../../../profile/domain/entities/teacher_settings.dart';
@@ -553,7 +554,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
     _nameController = TextEditingController(text: t?.name ?? '');
     _descriptionController = TextEditingController(text: t?.description ?? '');
     _priceController = TextEditingController(
-      text: t != null ? t.price.toString() : '',
+      text: t != null ? formatPriceWithCommas(t.price) : '',
     );
     _customLessonsController = TextEditingController();
     _customDurationController = TextEditingController();
@@ -695,11 +696,12 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                   prefixText: '₩ ',
                 ),
                 keyboardType: TextInputType.number,
+                inputFormatters: const [ThousandsSeparatorInputFormatter()],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return AppStrings.templatePriceRequired;
                   }
-                  if (int.tryParse(value) == null) {
+                  if (parsePrice(value) == null) {
                     return AppStrings.templatePriceNumbersOnly;
                   }
                   return null;
@@ -868,7 +870,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         totalLessons: _totalLessons,
         lessonDurationMinutes: _lessonDuration,
         validityDays: _validityDays,
-        price: int.parse(_priceController.text.trim()),
+        price: parsePrice(_priceController.text) ?? 0,
         description:
             _descriptionController.text.trim().isNotEmpty
                 ? _descriptionController.text.trim()

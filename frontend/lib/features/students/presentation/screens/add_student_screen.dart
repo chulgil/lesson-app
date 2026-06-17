@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/price_input.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/students/domain/entities/lesson_slot.dart';
@@ -50,7 +51,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   void initState() {
     super.initState();
     _monthlyFeeController = TextEditingController(
-      text: _selectedLevel.defaultMonthlyFee.toString(),
+      text: formatPriceWithCommas(_selectedLevel.defaultMonthlyFee),
     );
   }
 
@@ -74,11 +75,12 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.studentFormTitle,
-        onLeadingTap: () => showExitConfirmation(
-          context,
-          hasChanges: _hasFormData(),
-          onExit: () => context.pop(),
-        ),
+        onLeadingTap:
+            () => showExitConfirmation(
+              context,
+              hasChanges: _hasFormData(),
+              onExit: () => context.pop(),
+            ),
       ),
       body: Form(
         key: _formKey,
@@ -147,8 +149,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
                 onLevelChanged: (level) {
                   setState(() {
                     _selectedLevel = level;
-                    _monthlyFeeController.text =
-                        level.defaultMonthlyFee.toString();
+                    _monthlyFeeController.text = formatPriceWithCommas(
+                      level.defaultMonthlyFee,
+                    );
                   });
                 },
                 feeController: _monthlyFeeController,
@@ -265,7 +268,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     }
 
     final monthlyFee =
-        int.tryParse(_monthlyFeeController.text) ??
+        parsePrice(_monthlyFeeController.text) ??
         _selectedLevel.defaultMonthlyFee;
 
     final sortedDays = _selectedDays.toList()..sort();

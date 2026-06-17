@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/price_input.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
@@ -81,7 +82,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     _selectedInstrument = student.instrument;
     _selectedLevel = student.level;
     _lessonsPerWeek = student.lessonsPerWeek;
-    _monthlyFeeController.text = student.monthlyFee.toString();
+    _monthlyFeeController.text = formatPriceWithCommas(student.monthlyFee);
     _lessonDuration = student.lessonDuration;
     _notesController.text = student.notes ?? '';
     _postalCodeController.text = student.postalCode ?? '';
@@ -177,9 +178,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
           child: NotebookScreenScaffold(
             appBar: NotebookDetailAppBar(
               title: AppStrings.studentEditTitle,
-              onLeadingTap: _isSaving
-                  ? null
-                  : () => showExitConfirmation(
+              onLeadingTap:
+                  _isSaving
+                      ? null
+                      : () => showExitConfirmation(
                         context,
                         hasChanges: _hasChanges,
                         onExit: () => context.pop(),
@@ -211,7 +213,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
                     // Parent/Guardian info section
                     const FormSectionTitle(AppStrings.formSectionGuardianInfo),
-                    const FormSectionSubtitle(AppStrings.formSectionGuardianHint),
+                    const FormSectionSubtitle(
+                      AppStrings.formSectionGuardianHint,
+                    ),
                     const SizedBox(height: AppSpacing.space3),
                     ParentInfoFields(
                       parentNameController: _parentNameController,
@@ -259,8 +263,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                         setState(() {
                           _selectedLevel = level;
                           if (!isLinked) {
-                            _monthlyFeeController.text =
-                                level.defaultMonthlyFee.toString();
+                            _monthlyFeeController.text = formatPriceWithCommas(
+                              level.defaultMonthlyFee,
+                            );
                           }
                           _hasChanges = true;
                         });
@@ -539,7 +544,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
           return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
         }).toList();
     final monthlyFee =
-        int.tryParse(_monthlyFeeController.text) ?? original.monthlyFee;
+        parsePrice(_monthlyFeeController.text) ?? original.monthlyFee;
 
     final updated = original.copyWith(
       name: _nameController.text.trim(),

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/price_input.dart';
 import '../../../analytics/analytics_facade.dart'
     show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
@@ -233,7 +234,9 @@ class _IssueSubscriptionScreenState
             if (mounted) {
               setState(() {
                 _originalAmount = student.monthlyFee;
-                _amountController.text = student.monthlyFee.toString();
+                _amountController.text = formatPriceWithCommas(
+                  student.monthlyFee,
+                );
                 _hasPrefilledAmount = true;
               });
             }
@@ -315,7 +318,7 @@ class _IssueSubscriptionScreenState
       _rescheduleAllowance = template.rescheduleAllowance;
       _lessonsController.text = template.totalLessons.toString();
       _validityController.text = template.validityDays.toString();
-      _amountController.text = template.price.toString();
+      _amountController.text = formatPriceWithCommas(template.price);
       _hasPrefilledAmount = true;
       _appliedTemplateId = template.id;
     });
@@ -336,7 +339,7 @@ class _IssueSubscriptionScreenState
       }
       if (draft.amount > 0) {
         _originalAmount = draft.amount;
-        _amountController.text = draft.amount.toString();
+        _amountController.text = formatPriceWithCommas(draft.amount);
         _hasPrefilledAmount = true;
       }
       if (draft.membershipId != null) {
