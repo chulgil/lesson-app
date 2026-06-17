@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/utils/price_input.dart';
 import '../../../../../features/students/domain/entities/student.dart';
 import '../../extensions/student_domain_visuals.dart';
 import 'frequency_option.dart';
@@ -151,7 +151,9 @@ class LevelAndTuitionSection extends StatelessWidget {
                         ),
                       ),
                       keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: const [
+                        ThousandsSeparatorInputFormatter(),
+                      ],
                       textAlign: TextAlign.end,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
@@ -166,7 +168,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                       padding: const EdgeInsets.only(top: AppSpacing.space1),
                       child: Text(
                         formatCurrencyInMan(
-                          int.tryParse(feeController.text) ?? 0,
+                          parsePrice(feeController.text) ?? 0,
                         ),
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
