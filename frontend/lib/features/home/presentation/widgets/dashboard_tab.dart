@@ -47,11 +47,12 @@ class DashboardTab extends ConsumerWidget {
     final today = DateTime(now.year, now.month, now.day);
     final todayLessons = dashboard.lessons.whenData((lessons) {
       return lessons.where((lesson) {
-        final lessonDate = lesson.date;
-        return lessonDate.year == today.year &&
-            lessonDate.month == today.month &&
-            lessonDate.day == today.day;
-      }).toList()..sort((a, b) => a.startTime.compareTo(b.startTime));
+          final lessonDate = lesson.date;
+          return lessonDate.year == today.year &&
+              lessonDate.month == today.month &&
+              lessonDate.day == today.day;
+        }).toList()
+        ..sort((a, b) => a.startTime.compareTo(b.startTime));
     });
 
     return Stack(
@@ -107,14 +108,27 @@ class DashboardTab extends ConsumerWidget {
 
                   todayLessons.when(
                     data: (lessons) => _buildLessonsList(context, lessons),
-                    loading: () => const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(AppSpacing.space4),
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    error: (error, _) =>
-                        _buildErrorCard(AppStrings.dashboardLessonsLoadError),
+                    loading:
+                        () => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(AppSpacing.space4),
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                    // 로드 실패는 빨간 에러가 아니라 부드러운 재시도 상태로 표시.
+                    // (빈 데이터는 data 경로의 EmptyStateWidget 이 담당)
+                    error:
+                        (error, _) => EmptyStateWidget(
+                          icon: Icons.cloud_off_outlined,
+                          title: AppStrings.dashboardLessonsLoadErrorTitle,
+                          subtitle: AppStrings.dashboardLessonsLoadErrorHint,
+                          actionLabel: AppStrings.retry,
+                          actionIcon: Icons.refresh,
+                          onAction:
+                              () => ref
+                                  .read(homeDashboardRefreshProvider)
+                                  .refresh(dashboard.teacherId),
+                        ),
                   ),
 
                   const SizedBox(height: AppSpacing.space6),
@@ -261,45 +275,51 @@ class DashboardTab extends ConsumerWidget {
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
     final todayCard = todayLessons.when(
-      data: (lessons) => StatCard(
-        title: AppStrings.todayLessons,
-        value: AppStrings.usageCountShort(lessons.length),
-        color: AppColors.ink,
-        icon: Icons.today,
-        onTap: onViewAllLessons,
-      ),
-      loading: () => StatCard(
-        title: AppStrings.todayLessons,
-        value: '-',
-        color: AppColors.ink,
-        icon: Icons.today,
-      ),
-      error: (_, __) => StatCard(
-        title: AppStrings.todayLessons,
-        value: '-',
-        color: AppColors.ink,
-      ),
+      data:
+          (lessons) => StatCard(
+            title: AppStrings.todayLessons,
+            value: AppStrings.usageCountShort(lessons.length),
+            color: AppColors.ink,
+            icon: Icons.today,
+            onTap: onViewAllLessons,
+          ),
+      loading:
+          () => StatCard(
+            title: AppStrings.todayLessons,
+            value: '-',
+            color: AppColors.ink,
+            icon: Icons.today,
+          ),
+      error:
+          (_, __) => StatCard(
+            title: AppStrings.todayLessons,
+            value: '-',
+            color: AppColors.ink,
+          ),
     );
 
     final monthCard = lessonStatsAsync.when(
-      data: (stats) => StatCard(
-        title: AppStrings.dashboardThisMonth,
-        value: AppStrings.usageCountShort(stats['completed'] ?? 0),
-        color: AppColors.ink,
-        icon: Icons.check_circle_outline,
-        onTap: () => context.push(AppRoutes.analytics),
-      ),
-      loading: () => StatCard(
-        title: AppStrings.dashboardThisMonth,
-        value: '-',
-        color: AppColors.ink,
-        icon: Icons.check_circle_outline,
-      ),
-      error: (_, __) => StatCard(
-        title: AppStrings.dashboardThisMonth,
-        value: '-',
-        color: AppColors.ink,
-      ),
+      data:
+          (stats) => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: AppStrings.usageCountShort(stats['completed'] ?? 0),
+            color: AppColors.ink,
+            icon: Icons.check_circle_outline,
+            onTap: () => context.push(AppRoutes.analytics),
+          ),
+      loading:
+          () => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: '-',
+            color: AppColors.ink,
+            icon: Icons.check_circle_outline,
+          ),
+      error:
+          (_, __) => StatCard(
+            title: AppStrings.dashboardThisMonth,
+            value: '-',
+            color: AppColors.ink,
+          ),
     );
 
     return StatCardRow(cards: [todayCard, monthCard]);
@@ -475,9 +495,10 @@ class DashboardTab extends ConsumerWidget {
                 Expanded(
                   child: LessonCard(
                     lesson: lesson,
-                    onTap: () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
-                    ),
+                    onTap:
+                        () => context.push(
+                          AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                        ),
                   ),
                 ),
               ],
@@ -524,13 +545,14 @@ class DashboardTab extends ConsumerWidget {
             Text('Fine.', style: NotebookTypography.fine),
             const Spacer(),
             TextButton.icon(
-              onPressed: () => guardProFeatureNavigation(
-                context: context,
-                ref: ref,
-                required: TierRequirement.pro,
-                featureName: AppStrings.featureLockedMonthlyStats,
-                onPass: () => context.push(AppRoutes.analytics),
-              ),
+              onPressed:
+                  () => guardProFeatureNavigation(
+                    context: context,
+                    ref: ref,
+                    required: TierRequirement.pro,
+                    featureName: AppStrings.featureLockedMonthlyStats,
+                    onPass: () => context.push(AppRoutes.analytics),
+                  ),
               icon: const Icon(Icons.bar_chart, size: 16, color: AppColors.ink),
               label: Text(
                 AppStrings.dashboardAnalyticsMoreLink,
@@ -546,38 +568,6 @@ class DashboardTab extends ConsumerWidget {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildErrorCard(String message) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(
-          left: BorderSide(color: AppColors.paperAccent, width: 3),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space3),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.error_outline,
-              color: AppColors.paperAccent,
-              size: 18,
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Text(
-                message,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.ink,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
