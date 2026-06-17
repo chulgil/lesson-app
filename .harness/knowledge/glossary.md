@@ -554,6 +554,23 @@
 
 ---
 
+## 17. UX 용어 통일 — 2026/06/17 검토 반영 (#760~#764)
+
+> 사용자 UX 검토(00-검토.md) 기반 사용자-facing 라벨 통일. 도메인 클래스명/개념은 기존 유지, 표시 라벨만 정규화.
+
+| 개념 | 정규 라벨 (SSOT) | 사용하지 않는 표현 | AppStrings |
+|------|------------------|--------------------|------------|
+| 일정 협상 상태 | 시간 조율 중 / 시간 조율 중 (N회차) | 시간협상, 시간조율 | statusNegotiating, statusNegotiatingShort |
+| 다른 시간 제안 CTA | 다른 시간 제안하기 | 일정 비교, 다른 일정 제안, 다른 시간 제안 | counterPropose, eventProposeAlternative, scheduleChangeCounter |
+| 레슨 보관 액션 | 보관함으로 이동 | 보관, 레슨 보관 | archive, archiveLessonTitle |
+| 레슨 편집 라벨 | 전체 수정(수기) / 곡·메모 수정(수강권) | 편집 (수기), 내용 수정 | editManual, editContent |
+| 수업방식 카드 | 레슨·예약 규칙 | 수업방식 | categoryLessonStyle, lessonStyleScreenTitle |
+| 알림 카테고리(시간 변경) | 시간 변경 요청 | 스케줄 변경(알림 카테고리 한정) | notificationSchedule |
+| 운영시간 진입점 | 운영시간 | 레슨 운영 시간 | profileShortcutAvailability (§14 매핑 일치) |
+| 앱 공지 진입점 | 앱 업데이트 안내 | 새 소식과 로드맵 | newsRoadmapTitle |
+
+> 비고: ScheduleChange 도메인 개념(스케줄 변경)은 변경 없음 — 위 "시간 변경 요청"은 알림 설정 카테고리 라벨에 한정.
+
 ## 변경 이력
 
 | 날짜 | 변경 |

@@ -522,9 +522,7 @@ class _SuggestAlternativeScreenState
               shape: RoundedRectangleBorder(),
             ),
             child: Text(
-              _suggestedSlots.isEmpty
-                  ? AppStrings.selectTimePrompt
-                  : AppStrings.proposeAction(_suggestedSlots.length),
+              AppStrings.proposeAction(_suggestedSlots.length),
               style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
             ),
           ),

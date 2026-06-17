@@ -64,11 +64,11 @@ void main() {
     });
 
     test('label - 대안 시간 제안', () {
-      expect(RequestEventType.proposeAlternative.label, '다른 시간 제안');
+      expect(RequestEventType.proposeAlternative.label, '다른 시간 제안하기');
     });
 
     test('label - 역제안', () {
-      expect(RequestEventType.counterPropose.label, '다른 시간 제안');
+      expect(RequestEventType.counterPropose.label, '다른 시간 제안하기');
     });
 
     test('label - 대안 수락', () {

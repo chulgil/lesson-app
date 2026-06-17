@@ -229,11 +229,11 @@ void main() {
 
       expect(find.text('가능한 일정'), findsOneWidget);
       expect(find.text('가능한 일정 중 하나를 선택해 확정하세요'), findsOneWidget);
-      expect(find.text('다른 일정 제안'), findsOneWidget);
+      expect(find.text('다른 시간 제안하기'), findsOneWidget);
       expect(find.text('선택한 일정으로 확정'), findsOneWidget);
       expect(find.text('확정 메시지를 남겨주세요 (선택)'), findsOneWidget);
 
-      await tester.tap(find.text('다른 일정 제안'));
+      await tester.tap(find.text('다른 시간 제안하기'));
       expect(comparedEvent?.id, 'event_1');
 
       await tester.tap(find.text('2순위'));

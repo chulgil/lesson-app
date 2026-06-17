@@ -53,10 +53,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) {
-      final type =
-          _tabController.index == 0
-              ? TeacherSearchType.academy
-              : TeacherSearchType.individual;
+      final type = _tabController.index == 0
+          ? TeacherSearchType.academy
+          : TeacherSearchType.individual;
       ref.read(teacherSearchTabStateProvider.notifier).setTab(type);
     }
   }
@@ -121,27 +120,40 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
       ),
       body: Column(
         children: [
+          // Context hint
+          Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.screenPadding,
+              right: AppSpacing.screenPadding,
+              top: AppSpacing.screenPadding,
+              bottom: AppSpacing.space2,
+            ),
+            child: Text(
+              AppStrings.searchContextHint,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+          ),
           // Search bar
           Padding(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText:
-                    currentTab == TeacherSearchType.academy
-                        ? AppStrings.searchHintAcademy
-                        : AppStrings.searchHintTeacher,
+                hintText: currentTab == TeacherSearchType.academy
+                    ? AppStrings.searchHintAcademy
+                    : AppStrings.searchHintTeacher,
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon:
-                    _searchController.text.isNotEmpty
-                        ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            _onSearch('');
-                          },
-                        )
-                        : null,
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearch('');
+                        },
+                      )
+                    : null,
                 border: const OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: AppColors.inkQuaternary),
@@ -170,35 +182,30 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           Expanded(
             child: searchResult.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (e, _) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: AppColors.inkTertiary,
-                        ),
-                        const SizedBox(height: AppSpacing.space2),
-                        Text(
-                          AppStrings.searchErrorOccurred,
-                          style: AppTypography.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.space2),
-                        ElevatedButton(
-                          onPressed:
-                              () =>
-                                  ref
-                                      .read(
-                                        teacherSearchResultsProvider.notifier,
-                                      )
-                                      .refresh(),
-                          child: const Text(AppStrings.retry),
-                        ),
-                      ],
+              error: (e, _) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.inkTertiary,
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.space2),
+                    Text(
+                      AppStrings.searchErrorOccurred,
+                      style: AppTypography.bodyMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.space2),
+                    ElevatedButton(
+                      onPressed: () => ref
+                          .read(teacherSearchResultsProvider.notifier)
+                          .refresh(),
+                      child: const Text(AppStrings.retry),
+                    ),
+                  ],
+                ),
+              ),
               data: (result) => _buildResults(result),
             ),
           ),
@@ -215,24 +222,23 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: ListView(
         scrollDirection: Axis.horizontal,
-        children:
-            TeacherSortOption.values.map((option) {
-              final isSelected = sort == option;
-              return Padding(
-                padding: const EdgeInsets.only(right: AppSpacing.space2),
-                child: FilterChip(
-                  label: Text(_getSortLabel(option)),
-                  selected: isSelected,
-                  onSelected: (_) {
-                    ref
-                        .read(teacherSearchSortStateProvider.notifier)
-                        .updateSort(option);
-                  },
-                  selectedColor: AppColors.paperAccentSoft,
-                  checkmarkColor: AppColors.paperAccent,
-                ),
-              );
-            }).toList(),
+        children: TeacherSortOption.values.map((option) {
+          final isSelected = sort == option;
+          return Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.space2),
+            child: FilterChip(
+              label: Text(_getSortLabel(option)),
+              selected: isSelected,
+              onSelected: (_) {
+                ref
+                    .read(teacherSearchSortStateProvider.notifier)
+                    .updateSort(option);
+              },
+              selectedColor: AppColors.paperAccentSoft,
+              checkmarkColor: AppColors.paperAccent,
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -341,33 +347,43 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
     final currentTab = ref.watch(teacherSearchTabStateProvider);
     final isAcademyTab = currentTab == TeacherSearchType.academy;
     final previousTeacherIdsAsync = ref.watch(previousTeacherIdsProvider);
+    final filter = ref.watch(teacherSearchFilterStateProvider);
 
     if (result.teachers.isEmpty) {
-      return Center(
+      return SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isAcademyTab
-                  ? Icons.school_outlined
-                  : Icons.person_search_outlined,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              isAcademyTab
-                  ? AppStrings.searchNoAcademiesFound
-                  : AppStrings.searchNoTeachersFound,
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space1),
-            Text(
-              AppStrings.searchTrySuggestion,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkTertiary,
+            // Active filters in empty state
+            if (!filter.isEmpty) _buildActiveFilters(filter),
+            // Empty state message
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    isAcademyTab
+                        ? Icons.school_outlined
+                        : Icons.person_search_outlined,
+                    size: 64,
+                    color: AppColors.inkTertiary,
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text(
+                    isAcademyTab
+                        ? AppStrings.searchNoAcademiesFound
+                        : AppStrings.searchNoTeachersFound,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  Text(
+                    AppStrings.searchTrySuggestion,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

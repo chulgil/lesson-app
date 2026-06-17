@@ -74,7 +74,7 @@ class ProfileTab extends ConsumerWidget {
                       onPressed:
                           () => context.push(AppRoutes.notificationSettings),
                       icon: const Icon(
-                        Icons.settings_outlined,
+                        Icons.notifications_outlined,
                         color: AppColors.ink,
                         size: 22,
                       ),

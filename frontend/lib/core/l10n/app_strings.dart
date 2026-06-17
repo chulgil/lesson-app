@@ -21,7 +21,7 @@ class AppStrings {
   static const unavailable = '다음에';
 
   /// 선생님이 스케줄을 비교하여 시간을 제안하는 행위
-  static const counterPropose = '일정 비교';
+  static const counterPropose = '다른 시간 제안하기';
 
   /// 입금 확인
   static const paymentConfirm = '입금 확인';
@@ -211,7 +211,7 @@ class AppStrings {
   static const childProfileActionsEditProfile = '프로필 편집';
 
   /// 보관 버튼
-  static const archive = '보관';
+  static const archive = '보관함으로 이동';
 
   /// 저장 버튼
   static const save = '저장';
@@ -575,8 +575,8 @@ class AppStrings {
   static const statusTimeConfirmed = '시간확정';
 
   /// 시간협상 N
-  static String statusNegotiating(int round) => '시간협상 $round';
-  static const statusNegotiatingShort = '시간조율';
+  static String statusNegotiating(int round) => '시간 조율 중 ($round회차)';
+  static const statusNegotiatingShort = '시간 조율 중';
 
   // ── Phase 2, 3 Status Labels ──────────────────────────────
 
@@ -591,7 +591,7 @@ class AppStrings {
   static const eventLessonRequest = '레슨 요청';
   static const eventApprove = '수락';
   static const eventReject = '거절';
-  static const eventProposeAlternative = '다른 시간 제안';
+  static const eventProposeAlternative = '다른 시간 제안하기';
   static const eventAcceptAlternative = '시간 수락';
   static const eventCancel = '취소';
   static const eventExpire = '기간 만료';
@@ -686,7 +686,7 @@ class AppStrings {
   static const scheduleChangeAccept = '선택한 일정으로 확정';
   static const scheduleChangeAccepted = '선택한 일정으로 확정했습니다';
   static const scheduleChangeReject = '거절';
-  static const scheduleChangeCounter = '다른 일정 제안';
+  static const scheduleChangeCounter = '다른 시간 제안하기';
   static const scheduleChangeConfirmed = '시간이 변경되었습니다';
   static const scheduleChangeRecommended = '추천';
   static const scheduleChangeResponseNeeded = '일정 변경 응답이 필요합니다';
@@ -2501,7 +2501,7 @@ class AppStrings {
   static const recordingsEmpty = '녹음 파일이 없습니다';
 
   /// 레슨 취소 확인 다이얼로그 메시지
-  static const cancelLessonConfirm = '이 레슨을 취소하시겠습니까?';
+  static const cancelLessonConfirm = '이 레슨을 취소하시겠습니까?\n학생에게 취소 알림이 전송됩니다.';
 
   /// 레슨 삭제 다이얼로그 제목
   static const deleteLessonTitle = '레슨 삭제';
@@ -2510,7 +2510,7 @@ class AppStrings {
   static const deleteLessonConfirm = '이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.';
 
   /// 레슨 보관 다이얼로그 제목
-  static const archiveLessonTitle = '레슨 보관';
+  static const archiveLessonTitle = '보관함으로 이동';
 
   /// 레슨 보관 확인 다이얼로그 메시지
   static const archiveLessonConfirm =
@@ -2577,10 +2577,10 @@ class AppStrings {
   static const editLessonFailedRetry = '레슨 수정에 실패했습니다. 다시 시도해주세요.';
 
   /// 편집 (수기 레슨 action label) — 레거시
-  static const editManual = '편집 (수기)';
+  static const editManual = '전체 수정';
 
   /// 내용 수정 (수강권 레슨 content-only edit action label) — 레거시
-  static const editContent = '내용 수정';
+  static const editContent = '곡/메모 수정';
 
   /// 내용 수정 subtitle
   static const editContentSubtitle = '곡/메모 수정';
@@ -5755,8 +5755,11 @@ class AppStrings {
   /// 통계 더보기 — Fine. 푸터 링크.
   static const dashboardAnalyticsMoreLink = '통계 더보기';
 
+  /// 오늘의 레슨 섹션 제목.
+  static const dashboardTodayLessonsSection = '오늘의 레슨';
+
   /// Demo dashboard overlay eyebrow.
-  static const demoDashboardOverlayEyebrow = 'DEMO SCORE';
+  static const demoDashboardOverlayEyebrow = '둘러보기 예시';
 
   /// Demo dashboard overlay title.
   static const demoDashboardOverlayTitle = '샘플 대시보드 둘러보기';
@@ -6222,6 +6225,7 @@ class AppStrings {
   // Search — i18n (2026-05-06)
   static const searchTabAcademy = '학원';
   static const searchTabIndividual = '개인 선생님';
+  static const searchContextHint = '학원 또는 개인 선생님을 검색해 레슨을 신청하세요';
   static const searchHintAcademy = '학원 이름, 악기, 지역으로 검색';
   static const searchHintTeacher = '선생님 이름, 악기, 지역으로 검색';
   static const searchErrorOccurred = '검색 중 오류가 발생했습니다';
@@ -6544,7 +6548,7 @@ class AppStrings {
       '$count회 레슨 후 앱 리뷰로 더 나은 경험을 만들어주세요';
   static const reviewPromptAction = '지금 리뷰하기';
   static const reviewPromptThanks = '좋은 의견 감사합니다';
-  static const newsRoadmapTitle = '새 소식과 로드맵';
+  static const newsRoadmapTitle = '앱 업데이트 안내';
   static String newsRoadmapVersion(String current, String latest) =>
       '현재 $current · 최신 $latest';
   static const newsRoadmapReleaseSectionTitle = '최근 변경사항';
@@ -7113,7 +7117,7 @@ class AppStrings {
   static const profileLogoutConfirm = '정말 로그아웃 하시겠습니까?';
   static const profilePreviewCta = '내 프로필 미리보기';
   // G5 #9 C-G2 — 친숙 용어 매핑 (availability_settings_ux_redesign_spec.md §70)
-  static const profileShortcutAvailability = '레슨 운영 시간';
+  static const profileShortcutAvailability = '운영시간';
   static const profileShortcutOutstandingPayment = '입금대기(후불)';
   static const profileShortcutSubscription = '수강권';
 
@@ -7472,7 +7476,7 @@ class AppStrings {
   // Phase B step 3 — first_lesson_register (감사 §4.4 B2).
   static const coachMarkFirstLessonRegisterTitle = '첫 레슨을 등록해보세요';
   static const coachMarkFirstLessonRegisterDescription =
-      '레슨 탭에서 학생 · 날짜 · 시간을 선택하면 첫 레슨이 등록돼요';
+      '스케줄 탭에서 학생 · 날짜 · 시간을 선택하면 첫 레슨이 등록돼요';
   static const coachMarkFirstLessonRegisterAction = '레슨 등록하기';
   // Legacy keys — 호환성 유지 (기존 코드 미사용 시 향후 제거).
   static const coachMarkStudentTitle = '첫 학생을 초대하세요';
@@ -7753,11 +7757,11 @@ class AppStrings {
   /// 레슨 알림 카테고리 설명
   static const notificationLessonDesc = '레슨 시작, 완료 알림';
 
-  /// 스케줄 변경 카테고리 제목
-  static const notificationSchedule = '스케줄 변경';
+  /// 시간 변경 요청 카테고리 제목
+  static const notificationSchedule = '시간 변경 요청';
 
-  /// 스케줄 변경 카테고리 설명
-  static const notificationScheduleDesc = '시간 변경 요청, 승인/거절';
+  /// 시간 변경 요청 카테고리 설명
+  static const notificationScheduleDesc = '레슨 시간 변경 요청·승인/거절 알림';
 
   /// 수강권 카테고리 제목
   static const notificationSubscription = '수강권';
@@ -9116,7 +9120,7 @@ class AppStrings {
   static const categoryOperatingHours = '운영시간';
 
   /// 🎓 수업방식 묶음 카드 제목.
-  static const categoryLessonStyle = '수업방식';
+  static const categoryLessonStyle = '레슨·예약 규칙';
 
   /// 💰 수강권·정산 묶음 카드 제목.
   static const categorySubscriptionBilling = '수강권·정산';
@@ -9154,7 +9158,7 @@ class AppStrings {
   // 사용처: features/profile/presentation/screens/lesson_style_settings_screen.dart
 
   /// AppBar 제목 (5묶음 카테고리 카드 라벨과 동일).
-  static const lessonStyleScreenTitle = '수업방식';
+  static const lessonStyleScreenTitle = '레슨·예약 규칙';
 
   /// 레슨 1회 시간 섹션 헤더.
   static const lessonStyleDurationSection = '레슨 1회 시간';

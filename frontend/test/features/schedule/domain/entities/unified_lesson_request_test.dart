@@ -240,7 +240,7 @@ void main() {
       final request = createRequest(
         status: UnifiedRequestStatus.negotiating,
       ).copyWith(currentRound: 3);
-      expect(request.statusChipLabel, '시간협상 3');
+      expect(request.statusChipLabel, '시간 조율 중 (3회차)');
     });
 
     test('완료', () {

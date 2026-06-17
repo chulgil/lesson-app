@@ -219,7 +219,6 @@ class DashboardTab extends ConsumerWidget {
   ) {
     final now = DateTime.now();
     final lessonCount = todayLessons.valueOrNull?.length ?? 0;
-    final dayLabel = _englishWeekday(now.weekday);
 
     return Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 14),
@@ -227,7 +226,7 @@ class DashboardTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Programme for $dayLabel',
+            '${now.month}월 ${now.day}일 레슨',
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
@@ -245,21 +244,6 @@ class DashboardTab extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  static const _englishWeekdays = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
-
-  String _englishWeekday(int weekday) {
-    final idx = (weekday - 1).clamp(0, 6);
-    return _englishWeekdays[idx];
   }
 
   /// "VOL. IV · NO. 18 · APR MMXXVI" 형식 메타 생성.
@@ -412,7 +396,7 @@ class DashboardTab extends ConsumerWidget {
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
-            'Today\'s Programme',
+            AppStrings.dashboardTodayLessonsSection,
             style: NotebookTypography.sectionTitle,
           ),
         ),
