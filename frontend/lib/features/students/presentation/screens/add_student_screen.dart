@@ -37,7 +37,6 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   final _addressDetailController = TextEditingController();
 
   bool _isSaving = false;
-
   String? _selectedInstrument;
   StudentLevel _selectedLevel = StudentLevel.intermediate;
   late TextEditingController _monthlyFeeController;
@@ -75,12 +74,11 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.studentFormTitle,
-        onLeadingTap:
-            () => showExitConfirmation(
-              context,
-              hasChanges: _hasFormData(),
-              onExit: () => context.pop(),
-            ),
+        onLeadingTap: () => showExitConfirmation(
+          context,
+          hasChanges: _hasFormData(),
+          onExit: () => context.pop(),
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -94,6 +92,8 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
+              // --- Required fields (always visible) ---
+
               // Basic info section
               const FormSectionTitle(AppStrings.formSectionBasicInfo),
               const SizedBox(height: AppSpacing.space3),
@@ -101,29 +101,6 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
                 nameController: _nameController,
                 phoneController: _phoneController,
                 emailController: _emailController,
-              ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // Parent/Guardian info section
-              const FormSectionTitle(AppStrings.formSectionGuardianInfo),
-              const FormSectionSubtitle(AppStrings.formSectionGuardianHint),
-              const SizedBox(height: AppSpacing.space3),
-              ParentInfoFields(
-                parentNameController: _parentNameController,
-                parentPhoneController: _parentPhoneController,
-              ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // Address section
-              const FormSectionTitle(AppStrings.formSectionAddress),
-              const FormSectionSubtitle('레슨 장소가 학생 집인 경우 자동으로 사용됩니다'),
-              const SizedBox(height: AppSpacing.space3),
-              AddressFields(
-                postalCodeController: _postalCodeController,
-                addressController: _addressController,
-                addressDetailController: _addressDetailController,
               ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -199,11 +176,61 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Notes section
-              const FormSectionTitle(AppStrings.formSectionNotes),
-              const FormSectionSubtitle('레슨 시 참고할 내용을 입력해주세요'),
-              const SizedBox(height: AppSpacing.space3),
-              NotesField(controller: _notesController),
+              // --- Additional info (collapsible) ---
+              // Guardian, address, notes are supplementary — collapsed by default.
+              Theme(
+                data: Theme.of(context).copyWith(
+                  dividerColor: Colors.transparent,
+                ),
+                child: ExpansionTile(
+                  key: const Key('additionalInfoExpansionTile'),
+                  title: Text(
+                    AppStrings.studentFormAdditionalInfo,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: AppColors.inkSecondary,
+                        ),
+                  ),
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  initiallyExpanded: false,
+                  children: [
+                    const SizedBox(height: AppSpacing.space3),
+
+                    // Parent/Guardian info section
+                    const FormSectionTitle(AppStrings.formSectionGuardianInfo),
+                    const FormSectionSubtitle(AppStrings.formSectionGuardianHint),
+                    const SizedBox(height: AppSpacing.space3),
+                    ParentInfoFields(
+                      parentNameController: _parentNameController,
+                      parentPhoneController: _parentPhoneController,
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Address section
+                    const FormSectionTitle(AppStrings.formSectionAddress),
+                    const FormSectionSubtitle(
+                      '레슨 장소가 학생 집인 경우 자동으로 사용됩니다',
+                    ),
+                    const SizedBox(height: AppSpacing.space3),
+                    AddressFields(
+                      postalCodeController: _postalCodeController,
+                      addressController: _addressController,
+                      addressDetailController: _addressDetailController,
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Notes section
+                    const FormSectionTitle(AppStrings.formSectionNotes),
+                    const FormSectionSubtitle('레슨 시 참고할 내용을 입력해주세요'),
+                    const SizedBox(height: AppSpacing.space3),
+                    NotesField(controller: _notesController),
+
+                    const SizedBox(height: AppSpacing.space4),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: AppSpacing.space8),
 
@@ -272,12 +299,11 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
         _selectedLevel.defaultMonthlyFee;
 
     final sortedDays = _selectedDays.toList()..sort();
-    final lessonSlots =
-        sortedDays.map((d) {
-          final time = _dayTimeMap[d] ?? _lessonTime;
-          final startTime = formatTime(time);
-          return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
-        }).toList();
+    final lessonSlots = sortedDays.map((d) {
+      final time = _dayTimeMap[d] ?? _lessonTime;
+      final startTime = formatTime(time);
+      return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
+    }).toList();
 
     // Generate random semantic profile color.
     const profileColorKeys = [
@@ -300,45 +326,36 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       status: StudentStatus.trial,
       monthlyFee: monthlyFee,
       lessonsPerWeek: _lessonsPerWeek,
-      phone:
-          _phoneController.text.isNotEmpty
-              ? _phoneController.text.trim()
-              : null,
-      parentName:
-          _parentNameController.text.isNotEmpty
-              ? _parentNameController.text.trim()
-              : null,
-      parentPhone:
-          _parentPhoneController.text.isNotEmpty
-              ? _parentPhoneController.text.trim()
-              : null,
-      email:
-          _emailController.text.isNotEmpty
-              ? _emailController.text.trim()
-              : null,
+      phone: _phoneController.text.isNotEmpty
+          ? _phoneController.text.trim()
+          : null,
+      parentName: _parentNameController.text.isNotEmpty
+          ? _parentNameController.text.trim()
+          : null,
+      parentPhone: _parentPhoneController.text.isNotEmpty
+          ? _parentPhoneController.text.trim()
+          : null,
+      email: _emailController.text.isNotEmpty
+          ? _emailController.text.trim()
+          : null,
       profileColorKey: profileColorKey,
       lessonSlots: lessonSlots,
       lessonDuration: _lessonDuration,
-      notes:
-          _notesController.text.isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-      postalCode:
-          _postalCodeController.text.isNotEmpty
-              ? _postalCodeController.text.trim()
-              : null,
-      address:
-          _addressController.text.isNotEmpty
-              ? _addressController.text.trim()
-              : null,
-      addressDetail:
-          _addressDetailController.text.isNotEmpty
-              ? _addressDetailController.text.trim()
-              : null,
-      district:
-          _addressController.text.isNotEmpty
-              ? _extractDistrict(_addressController.text.trim())
-              : null,
+      notes: _notesController.text.isNotEmpty
+          ? _notesController.text.trim()
+          : null,
+      postalCode: _postalCodeController.text.isNotEmpty
+          ? _postalCodeController.text.trim()
+          : null,
+      address: _addressController.text.isNotEmpty
+          ? _addressController.text.trim()
+          : null,
+      addressDetail: _addressDetailController.text.isNotEmpty
+          ? _addressDetailController.text.trim()
+          : null,
+      district: _addressController.text.isNotEmpty
+          ? _extractDistrict(_addressController.text.trim())
+          : null,
       createdAt: DateTime.now(),
     );
 

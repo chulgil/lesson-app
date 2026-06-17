@@ -2,7 +2,8 @@
 // spec §3 line 108-122 5묶음 IA 정합.
 //
 // Verifies:
-// - 내 프로필 BottomSheet 5 sub-항목 (기본정보/악기/자격증/레퍼토리/공개+미리보기)
+// - 내 프로필 BottomSheet 5 sub-항목 (기본정보/악기/자격증/레퍼토리/공개+미리보기 통합)
+// - #803: 공개+미리보기가 단일 항목으로 통합됨 (별도 미리보기 항목 없음)
 // - 정책·알림·지원 BottomSheet: profileVisibility 제거됨, 가이드 다시 보기/팔로우/뉴스 추가됨
 // - 수강권·정산 BottomSheet 5 sub-항목 유지
 
@@ -39,7 +40,7 @@ void main() {
   }
 
   group('내 프로필 BottomSheet — spec §3 line 108-113', () {
-    testWidgets('5 sub-항목 노출 (기본정보/악기/자격증/레퍼토리/공개)', (tester) async {
+    testWidgets('5 sub-항목 노출 (기본정보/악기/자격증/레퍼토리/공개+미리보기 통합)', (tester) async {
       await tester.pumpWidget(hostApp((ctx) => showMyProfileSheet(ctx)));
       await tester.pumpAndSettle();
       await tester.tap(find.text('open'));
@@ -53,8 +54,38 @@ void main() {
       );
       expect(find.text(AppStrings.profileCredentialsLabel), findsOneWidget);
       expect(find.text(AppStrings.profileRepertoireLabel), findsOneWidget);
-      expect(find.text(AppStrings.profileVisibilityLabel), findsOneWidget);
-      expect(find.text(AppStrings.profilePreviewCta), findsOneWidget);
+      // #803: 공개+미리보기 통합 단일 항목 확인
+      expect(find.text(AppStrings.profilePreviewAndPublic), findsOneWidget);
+      // 별도 미리보기 항목 제거 확인 (상단 CTA가 SSOT)
+      expect(find.text(AppStrings.profilePreviewCta), findsNothing);
+      // 기존 독립 공개 설정 라벨도 없어야 함 (통합 라벨로 교체)
+      expect(find.text(AppStrings.profileVisibilityLabel), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('#803 공개+미리보기 통합 항목 탭 → profileVisibility 라우트', (tester) async {
+      await tester.pumpWidget(hostApp((ctx) => showMyProfileSheet(ctx)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(AppStrings.profilePreviewAndPublic));
+      await tester.pumpAndSettle();
+
+      // 시트가 닫히고 stub 라우트로 push 됨 — 통합 항목 사라짐
+      expect(find.text(AppStrings.profilePreviewAndPublic), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('#803 320px 제약 환경 레이아웃 예외 없음', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(hostApp((ctx) => showMyProfileSheet(ctx)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
       expect(tester.takeException(), isNull);
     });
   });

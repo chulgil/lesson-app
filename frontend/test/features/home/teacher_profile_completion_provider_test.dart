@@ -111,6 +111,30 @@ void main() {
     });
   });
 
+  // #42 정직화 검증 — 캡/정규화 없이 모두 완료 시 정확히 100%.
+  group('#42 정직화 — 완성도 게이지 정확성', () {
+    test('모든 항목 완료 → completion == 100 (no cap trick)', () {
+      expect(computeProfileCompletionPercent(_allMandatory()), 100);
+    });
+
+    test('아무것도 안 함 → 0%', () {
+      expect(computeProfileCompletionPercent(_input()), 0);
+    });
+
+    test('절반(Setup Phase 전부 + Action Phase 없음) → 40%', () {
+      // Setup: Q1(8)+Q2(7)+Q3(7)+Q3b(6)+Q4(6)+Q5(6) = 40
+      final input = _input(
+        hasSlots: true,
+        hasPhoto: true,
+        hasIntro: true,
+        hasInstruments: true,
+        hasPrice: true,
+        hasBankAccount: true,
+      );
+      expect(computeProfileCompletionPercent(input), 40);
+    });
+  });
+
   group('SC-6 isAllMandatoryQuestsCompleted — 졸업 트리거', () {
     test('Q1~Q10 + Q3b 모두 완료 → true (Q11 무관)', () {
       expect(isAllMandatoryQuestsCompleted(_allMandatory()), true);

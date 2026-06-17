@@ -17,9 +17,7 @@ class AddStudentMethodScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
-        title: AppStrings.studentAddLabel,
-      ),
+      appBar: NotebookDetailAppBar(title: AppStrings.studentAddLabel),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -34,30 +32,29 @@ class AddStudentMethodScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.space6),
 
-              // Invite card (recommended)
-              _MethodCard(
-                icon: Icons.mail_outline,
-                title: AppStrings.studentInviteTitle,
-                badge: AppStrings.studentAddMethodBadgeRecommended,
-                description: AppStrings.studentAddMethodInviteDescription,
-                buttonText: AppStrings.studentAddMethodInviteButton,
-                isPrimary: true,
-                onTap: () {
-                  context.push(AppRoutes.invite);
-                },
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-
-              // Direct registration card
+              // Direct registration card — primary CTA (#798 UX #29)
               _MethodCard(
                 icon: Icons.edit_note,
                 title: AppStrings.studentDirectRegister,
                 description: AppStrings.studentAddMethodDirectDescription,
                 buttonText: AppStrings.studentAddMethodDirectButton,
-                isPrimary: false,
+                isPrimary: true,
                 onTap: () {
                   context.push(AppRoutes.addStudent);
+                },
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Invite card — secondary option
+              _MethodCard(
+                icon: Icons.mail_outline,
+                title: AppStrings.studentInviteTitle,
+                description: AppStrings.studentAddMethodInviteDescription,
+                buttonText: AppStrings.studentAddMethodInviteButton,
+                isPrimary: false,
+                onTap: () {
+                  context.push(AppRoutes.invite);
                 },
               ),
             ],
@@ -71,7 +68,6 @@ class AddStudentMethodScreen extends StatelessWidget {
 class _MethodCard extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String? badge;
   final String description;
   final String buttonText;
   final bool isPrimary;
@@ -80,7 +76,6 @@ class _MethodCard extends StatelessWidget {
   const _MethodCard({
     required this.icon,
     required this.title,
-    this.badge,
     required this.description,
     required this.buttonText,
     required this.isPrimary,
@@ -134,26 +129,6 @@ class _MethodCard extends StatelessWidget {
                     color: isPrimary ? AppColors.paperAccent : AppColors.ink,
                   ),
                 ),
-                if (badge != null) ...[
-                  const SizedBox(width: AppSpacing.space2),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space2,
-                      vertical: 2,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: AppColors.paperAccent,
-                    ),
-                    child: Text(
-                      badge!,
-                      style: AppTypography.captionSmall.copyWith(
-                        // Notebook × Score §7.50: Vermillion badge foreground = paper.
-                        color: AppColors.paper,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
 

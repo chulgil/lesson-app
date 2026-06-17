@@ -9508,4 +9508,15 @@ class AppStrings {
 
   // [검토 #10] UX wave6
   static String unreadBadgeCount(int n) => n > 9 ? '9+' : '$n';
+
+
+  // [검토 #29] UX wave7
+  static const String registerDirectPrimary = '직접 등록';
+  static const String registerInviteSecondary = '초대로 등록';
+
+  // [검토 #32] UX wave7
+  static const String studentFormAdditionalInfo = '추가 정보';
+
+  // [검토 #40] UX wave7
+  static const String profilePreviewAndPublic = '미리보기 · 공개 설정';
 }

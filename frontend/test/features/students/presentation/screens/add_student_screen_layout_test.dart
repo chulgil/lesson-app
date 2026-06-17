@@ -71,5 +71,84 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets(
+      '[UX7-32] additional info ExpansionTile present and no crash on expand',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(375, 667);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+
+        // ExpansionTile with key 'additionalInfoExpansionTile' is present
+        expect(
+          find.byKey(const Key('additionalInfoExpansionTile')),
+          findsOneWidget,
+        );
+
+        // Tap the expansion tile header to expand it
+        await tester.tap(find.byKey(const Key('additionalInfoExpansionTile')));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      '[UX7-32] required sections always visible — basic info, instrument, schedule, save button',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(375, 667);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+
+        // Required sections present in widget tree
+        expect(find.text('기본 정보'), findsOneWidget);
+        expect(find.text('악기'), findsOneWidget);
+        expect(find.text('레벨 및 수강료'), findsOneWidget);
+        expect(find.text('레슨 일정'), findsOneWidget);
+        // Save button present
+        expect(find.text('학생 추가'), findsOneWidget);
+        // Additional info collapsible tile present
+        expect(find.text('추가 정보'), findsOneWidget);
+      },
+    );
+
+    testWidgets('[UX7-32] no crash on 320px with expansion tile expand', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      // Expand and verify no crash
+      await tester.tap(find.byKey(const Key('additionalInfoExpansionTile')));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
   });
 }

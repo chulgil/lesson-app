@@ -158,22 +158,17 @@ void showMyProfileSheet(BuildContext context) {
                   context.push(AppRoutes.repertoireManagement);
                 },
               ),
-              // 공개 프로필 미리보기 + 공개 항목 제어 — spec §3 line 113.
+              // 공개 설정 + 미리보기 통합 — spec §3 line 113.
+              // #803 미리보기 입구 중복 제거: 상단 CTA(profilePreview) 를 SSOT 로,
+              // 시트 내 별개 미리보기 항목 제거. 공개 설정 화면 안에
+              // profileVisibilityPreviewButton 이 내장돼 미리보기까지 한 흐름.
               ListTile(
                 leading: const Icon(Icons.lock_outlined),
-                title: const Text(AppStrings.profileVisibilityLabel),
+                title: const Text(AppStrings.profilePreviewAndPublic),
                 subtitle: const Text(AppStrings.profileVisibilitySubtitleLabel),
                 onTap: () {
                   Navigator.pop(sheetContext);
                   context.push(AppRoutes.profileVisibility);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.visibility_outlined),
-                title: const Text(AppStrings.profilePreviewCta),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  context.push(AppRoutes.profilePreview);
                 },
               ),
             ],
