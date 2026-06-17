@@ -211,7 +211,7 @@ class NotebookTypography {
 
   /// 시스템 자동 인디케이터 — Pretendard italic small caps.
   ///
-  /// 사용 대상: 앱이 자동 생성한 메타 라벨 — "오늘", "D-N", "입금대기(후불)", "필수",
+  /// 사용 대상: 앱이 자동 생성한 메타 라벨 — "오늘", "D-N", "미수금", "필수",
   /// "진행 중" 등. README §1.1 Tier 4 (사람 자필 아님) → Gaegu 회피.
   ///
   /// 색상 override: paperOk 등 의미별 변형은 `copyWith(color: ...)` 사용.

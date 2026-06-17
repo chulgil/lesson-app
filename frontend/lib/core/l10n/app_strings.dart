@@ -535,8 +535,8 @@ class AppStrings {
   /// 수락 대기 (학생 수락 대기)
   static const teacherWaitingAccept = '수락 대기';
 
-  /// 입금대기(후불)
-  static const teacherWaitingPayment = '입금대기(후불)';
+  /// 미수금
+  static const teacherWaitingPayment = '미수금';
 
   /// 입금 확인 (선생님이 입금 확인 필요)
   static const teacherVerifyPayment = '입금 확인';
@@ -3514,7 +3514,7 @@ class AppStrings {
 
   /// 후불 수강권 안내
   static const issueFormPaymentPostpaidNotice =
-      '후불 수강권은 먼저 발급하고 나중에 입금받습니다. 아직 입금 완료 기록이 없는 수강권은 입금대기(후불)로 관리됩니다.';
+      '후불 수강권은 먼저 발급하고 나중에 입금받습니다. 아직 입금 완료 기록이 없는 수강권은 미수금으로 관리됩니다.';
 
   /// 정가 (섹션 제목)
   static const issueFormAmountSectionTitle = '정가';
@@ -3622,8 +3622,8 @@ class AppStrings {
   /// 만료일 (요약 행 라벨)
   static const issueFormSummaryEndDateLabel = '만료일';
 
-  /// 입금대기(후불) (입금 미확인 시 표기)
-  static const issueFormSummaryUnpaidLabel = '입금대기(후불)';
+  /// 미수금 (입금 미확인 시 표기)
+  static const issueFormSummaryUnpaidLabel = '미수금';
 
   /// $method (확인됨) (입금 확인 시 표기)
   static String issueFormSummaryPaymentConfirmed(String method) =>
@@ -3949,8 +3949,8 @@ class AppStrings {
   /// 입금 확인 완료
   static const paymentStatusPaid = '입금 확인 완료';
 
-  /// 입금대기(후불)
-  static const paymentStatusUnpaid = '입금대기(후불)';
+  /// 미수금
+  static const paymentStatusUnpaid = '미수금';
 
   /// 입금 확인 필요
   static const paymentStatusNeedsConfirmation = '입금 확인 필요';
@@ -4214,8 +4214,8 @@ class AppStrings {
   static String subscriptionPackageBadgeFormat(int remain, int total) =>
       '$remain/$total회';
 
-  /// 입금대기 (badge — 후불 결제 미입금)
-  static const subscriptionBadgeUnpaid = '입금대기';
+  /// 미수금 (badge — 후불 결제 미입금)
+  static const subscriptionBadgeUnpaid = '미수금';
 
   /// 수강권 없음 (badge — 활성 수강권 0건, 학생탭 래퍼 전용)
   static const subscriptionBadgeNone = '수강권 없음';
@@ -4766,8 +4766,8 @@ class AppStrings {
   /// 관련 설정 (섹션 헤더)
   static const policyRelatedHeader = '관련 설정';
 
-  /// 입금대기(후불) 관리 (관련 설정 항목)
-  static const policyTuitionManagement = '입금대기(후불) 관리';
+  /// 미수금 관리 (관련 설정 항목)
+  static const policyTuitionManagement = '미수금 관리';
 
   /// 템플릿 관리 (관련 설정 항목)
   static const policyTemplateManagement = '템플릿 관리';
@@ -5983,17 +5983,21 @@ class AppStrings {
   static const profileTabLabel = '프로필';
 
   // ── Urgent Alert Zone (홈 긴급 메모 스트립 5-3d-7) ──────────────────────
-  /// 입금대기(후불) alert 텍스트 — 만원/원 단위 자동 선택 + 학생 수.
-  /// 예: '입금대기(후불) 5만원 (3명)' / '입금대기(후불) 5000원 (1명)'
+  /// 미수금 alert 텍스트 — 만/원 단위 정확 표기 + 학생 수.
+  /// 예: '미수금 5만 5000원 (3명)' / '미수금 5000원 (1명)'
   static String urgentAlertOutstandingFormat(
     int totalAmount,
     int studentCount,
   ) {
-    final formattedAmount =
-        totalAmount >= 10000
-            ? '${(totalAmount / 10000).toStringAsFixed(0)}만원'
-            : '$totalAmount원';
-    return '입금대기(후불) $formattedAmount ($studentCount명)';
+    final String formattedAmount;
+    if (totalAmount >= 10000) {
+      final man = totalAmount ~/ 10000;
+      final remainder = totalAmount % 10000;
+      formattedAmount = remainder == 0 ? '$man만원' : '$man만 $remainder원';
+    } else {
+      formattedAmount = '$totalAmount원';
+    }
+    return '미수금 $formattedAmount ($studentCount명)';
   }
 
   /// 접기 — expand toggle 축소 라벨.
@@ -7083,7 +7087,7 @@ class AppStrings {
   static const profileSectionSubscriptionPayment = '수강권·입금';
   static const profileSubscriptionTemplateLabel = '수강권 템플릿';
   static const profileSubscriptionTemplateSubtitle = '수강권 종류 및 가격 설정';
-  static const profileOutstandingPaymentsLabel = '입금대기(후불) 관리';
+  static const profileOutstandingPaymentsLabel = '미수금 관리';
   static const profileOutstandingPaymentsSubtitle = '아직 입금 완료 기록이 없는 후불 수강권';
   static const profileBankAccountLabel = '입금 계좌';
   static const profileBankAccountSubtitle = '수강료 입금받을 계좌 설정';
@@ -7128,7 +7132,7 @@ class AppStrings {
   static const profilePreviewCta = '내 프로필 미리보기';
   // G5 #9 C-G2 — 친숙 용어 매핑 (availability_settings_ux_redesign_spec.md §70)
   static const profileShortcutAvailability = '운영시간';
-  static const profileShortcutOutstandingPayment = '입금대기(후불)';
+  static const profileShortcutOutstandingPayment = '미수금';
   static const profileShortcutSubscription = '수강권';
 
   // ── Profile Preview ──
@@ -7400,10 +7404,10 @@ class AppStrings {
   static const profileRepertoireNoStudents = '등록된 학생이 없습니다';
 
   // ── Outstanding Payments ──
-  static const profileOutstandingTitle = '입금대기(후불) 관리';
+  static const profileOutstandingTitle = '미수금 관리';
   static const profileOutstandingError = '오류가 발생했습니다.';
-  static const profileOutstandingEmpty = '입금대기(후불) 항목이 없습니다';
-  static const profileOutstandingListTitle = '입금대기(후불) 목록';
+  static const profileOutstandingEmpty = '미수금 항목이 없습니다';
+  static const profileOutstandingListTitle = '미수금 목록';
   static const profileOutstandingSendReminder = '알림 보내기';
   static const profileOutstandingConfirmPayment = '입금 확인';
   static const profileOutstandingPaymentConfirmed = '입금이 확인되었습니다';
@@ -7416,9 +7420,9 @@ class AppStrings {
   static const paymentUndoBlockedByLesson = '첫 레슨이 진행되어 되돌릴 수 없습니다.';
 
   // #424 입금 미확인 대시보드
-  static const paymentPendingCardTitle = '입금 대기';
-  static const paymentPendingListTitle = '입금 대기';
-  static const paymentPendingEmpty = '입금 대기 항목이 없습니다.';
+  static const paymentPendingCardTitle = '입금 확인 대기';
+  static const paymentPendingListTitle = '입금 확인 대기';
+  static const paymentPendingEmpty = '입금 확인 대기 항목이 없습니다.';
   static const paymentPendingSectionImminent = '오늘 만료';
   static const paymentPendingSectionUrgent = 'D+3 이상';
   static const paymentPendingSectionRecent = 'D+0 ~ D+2';
@@ -7586,7 +7590,7 @@ class AppStrings {
   static const studentPracticeStatusPoor = '부족';
   static const studentPracticeStatusPaused = '기록없음';
   static const studentTriageExpiring = '만료임박';
-  static const studentTriageUnpaid = '입금대기(후불)';
+  static const studentTriageUnpaid = '미수금';
   static const studentTriageTrial = '체험중';
   static const studentBulkCancelConfirmTitle = '휴강 공지 발송';
   static const studentBulkCancelReasonHint = '선생님 개인 사정으로 휴강합니다.';

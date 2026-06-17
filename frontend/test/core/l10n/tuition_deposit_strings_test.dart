@@ -18,11 +18,11 @@ void main() {
       expect(AppStrings.paymentGuideTitle, '입금 안내 보내기');
 
       expect(AppStrings.issueFormPaymentSectionTitle, '입금 확인 방식');
-      expect(AppStrings.issueFormPaymentPostpaidNotice, contains('입금대기(후불)'));
+      expect(AppStrings.issueFormPaymentPostpaidNotice, contains('미수금'));
       expect(AppStrings.issueFormSummaryFinalAmountLabel, '입금 예정 금액');
       expect(AppStrings.issueFormSummaryPaymentLabel, '입금 상태');
-      expect(AppStrings.issueFormSummaryUnpaidLabel, '입금대기(후불)');
-      expect(AppStrings.paymentStatusUnpaid, '입금대기(후불)');
+      expect(AppStrings.issueFormSummaryUnpaidLabel, '미수금');
+      expect(AppStrings.paymentStatusUnpaid, '미수금');
       expect(AppStrings.paymentStatusNeedsConfirmation, '입금 확인 필요');
       expect(AppStrings.proposalWaitingTitle, '입금 확인 중');
       expect(AppStrings.proposalPaymentStatusPending, '입금 확인 필요');
@@ -44,11 +44,14 @@ void main() {
   );
 
   test(
-    'active student and profile surfaces use postpaid pending deposit wording',
+    'active student and profile surfaces use 미수금 (postpaid receivable) wording',
     () {
-      const deprecatedUnpaidWording =
-          '미'
-          '수금';
+      // #807: 후불 결제는 '미수금'으로 통일.
+      // - 이전 '입금대기(후불)' 토큰 잔재 금지.
+      // - 선불 전용 '입금 확인 대기' 가 후불 면에 새지 않도록 분리 유지.
+      const deprecatedPostpaidToken =
+          '입금'
+          '대기';
       final checkedFiles = [
         'lib/features/students/presentation/screens/students_tab.dart',
         'lib/features/students/presentation/widgets/student_subscription_badge.dart',
@@ -59,9 +62,10 @@ void main() {
 
       for (final relativePath in checkedFiles) {
         final contents = File(relativePath).readAsStringSync();
+        expect(contents, contains('미수금'), reason: relativePath);
         expect(
           contents,
-          isNot(contains(deprecatedUnpaidWording)),
+          isNot(contains(deprecatedPostpaidToken)),
           reason: relativePath,
         );
         expect(contents, isNot(contains('입금 확인 대기')), reason: relativePath);

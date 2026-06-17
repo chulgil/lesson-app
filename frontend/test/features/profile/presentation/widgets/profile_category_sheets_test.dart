@@ -145,7 +145,7 @@ void main() {
   });
 
   group('수강권·정산 BottomSheet — spec §3 line 100-106', () {
-    testWidgets('5 sub-항목 노출 (템플릿/입금대기/계좌/취소정책/취소디폴트)', (tester) async {
+    testWidgets('5 sub-항목 노출 (템플릿/미수금/계좌/취소정책/취소디폴트)', (tester) async {
       await tester.pumpWidget(
         hostApp((ctx) => showSubscriptionBillingSheet(ctx, 'teacher-1')),
       );

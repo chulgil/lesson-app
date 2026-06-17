@@ -73,10 +73,10 @@ void main() {
     expect(find.text('7/10회'), findsOneWidget);
   });
 
-  testWidgets('다중 수강권: 입금대기가 잔여 적은 정상보다 우선 선택됨', (tester) async {
+  testWidgets('다중 수강권: 미수금이 잔여 적은 정상보다 우선 선택됨', (tester) async {
     // 정상 수강권: 잔여 2/10 (미임박·미입금), 잔여 적음
     final normal = _makeSub(id: 'normal', totalLessons: 10, usedLessons: 8);
-    // 입금대기 수강권: 잔여 9/10 (미임박), isUnpaid=true
+    // 미수금 수강권: 잔여 9/10 (미임박), isUnpaid=true
     final unpaid = _makeSub(
       id: 'unpaid',
       totalLessons: 10,
@@ -97,7 +97,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    // 통일 우선순위(입금대기>만료>임박>정상)면 입금대기가 선택되어야 한다
-    expect(find.text('입금대기'), findsOneWidget);
+    // 통일 우선순위(미수금>만료>임박>정상)면 미수금이 선택되어야 한다
+    expect(find.text('미수금'), findsOneWidget);
   });
 }

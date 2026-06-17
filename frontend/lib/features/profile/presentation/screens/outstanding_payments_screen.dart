@@ -120,7 +120,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
         child: Column(
           children: [
             Text(
-              '입금대기(후불) 금액',
+              '미수금 금액',
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.paper.withValues(alpha: 0.8),
               ),

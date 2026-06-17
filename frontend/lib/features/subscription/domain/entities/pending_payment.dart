@@ -1,4 +1,4 @@
-/// 입금 대기 항목 — #424.
+/// 입금 확인 대기 항목 — #424.
 ///
 /// 백엔드 `/api/v1/subscriptions/payment-pending` 응답 항목을 1:1 매핑.
 class PendingPayment {

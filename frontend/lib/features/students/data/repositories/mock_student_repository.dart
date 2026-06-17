@@ -360,7 +360,7 @@ class MockStudentRepository implements StudentRepository {
             '두 악기 모두 중급 수준. 월 수강료 36만원 (18만 x 2).',
       ),
 
-      // student_12: 입금대기(후불) 수강권이 있는 학생
+      // student_12: 미수금 수강권이 있는 학생
       Student(
         id: 'student_12',
         name: '박준혁',
@@ -386,7 +386,7 @@ class MockStudentRepository implements StudentRepository {
         birthDate: DateTime(2015, 10, 7),
         practiceLevel: PracticeLevel.poor,
         notes:
-            '입금대기(후불) 있음 (2개월분 32만원). 학부모에게 입금 안내 2회 발송. '
+            '미수금 있음 (2개월분 32만원). 학부모에게 입금 안내 2회 발송. '
             '연습 참여율 저조. 동기부여 방법 논의 필요.',
       ),
     ]);

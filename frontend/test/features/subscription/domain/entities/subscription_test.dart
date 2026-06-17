@@ -222,12 +222,12 @@ void main() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   group('payment state', () {
-    test('후불 발급 후 아직 입금하지 않은 활성 수강권은 입금대기(후불)이다', () {
+    test('후불 발급 후 아직 입금하지 않은 활성 수강권은 미수금이다', () {
       final sub = createSubscription(paymentConfirmed: false, paidAt: null);
 
       expect(sub.isUnpaid, isTrue);
       expect(sub.needsPaymentConfirmation, isFalse);
-      expect(sub.paymentStatusLabel, '입금대기(후불)');
+      expect(sub.paymentStatusLabel, '미수금');
     });
 
     test('학생이 입금 완료를 알렸고 선생님이 확인 전이면 입금 확인 필요 상태다', () {
@@ -241,7 +241,7 @@ void main() {
       expect(sub.paymentStatusLabel, '입금 확인 필요');
     });
 
-    test('선생님이 입금을 확인한 수강권은 입금대기(후불)도 입금 확인 필요도 아니다', () {
+    test('선생님이 입금을 확인한 수강권은 미수금도 입금 확인 필요도 아니다', () {
       final sub = createSubscription(
         paymentConfirmed: true,
         paidAt: DateTime(2026, 5, 5, 10),

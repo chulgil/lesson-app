@@ -122,7 +122,7 @@ void main() {
       expect(find.text('체험'), findsOneWidget);
     });
 
-    testWidgets('입금대기 → "입금대기" + 버밀리온 + 경고 아이콘', (tester) async {
+    testWidgets('미수금 → "미수금" + 버밀리온 + 경고 아이콘', (tester) async {
       final sub = createSubscription(
         type: SubscriptionType.package,
         totalLessons: 8,
@@ -132,9 +132,9 @@ void main() {
       await tester.pumpWidget(
         buildTestWidget(SubscriptionBadge(subscription: sub)),
       );
-      expect(find.text('입금대기'), findsOneWidget);
+      expect(find.text('미수금'), findsOneWidget);
       expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
-      final text = tester.widget<Text>(find.text('입금대기'));
+      final text = tester.widget<Text>(find.text('미수금'));
       expect(text.style?.color, AppColors.paperAccent);
     });
 

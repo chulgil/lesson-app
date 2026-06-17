@@ -10,7 +10,7 @@ import '../../domain/entities/subscription.dart';
 ///
 /// 티켓 스탬프 메타포: 사각형 1px 테두리 + IBM Plex Mono 카운트.
 /// 긴급도 색 모델 (상태 우선순위 — 위에서 첫 일치):
-/// 1. 입금대기: paperAccent + 경고 아이콘
+/// 1. 미수금: paperAccent + 경고 아이콘
 /// 2. 만료: paperAccent + 경고 아이콘
 /// 3. 임박: paperAccent + 시계 아이콘
 /// 4. 정상: inkSecondary + 아이콘 없음
@@ -56,7 +56,7 @@ class SubscriptionBadge extends StatelessWidget {
       (subscription.type == SubscriptionType.monthly &&
           (subscription.daysUntilExpiration ?? 0) <= 0);
 
-  /// 긴급도 모델: 조치 필요(입금대기·만료·임박)=버밀리온, 정상=중립 잉크.
+  /// 긴급도 모델: 조치 필요(미수금·만료·임박)=버밀리온, 정상=중립 잉크.
   Color _accentColor() {
     if (subscription.isUnpaid || _isExpired || subscription.isExpiringSoon) {
       return AppColors.paperAccent;

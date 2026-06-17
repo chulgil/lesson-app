@@ -11,7 +11,7 @@ import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../domain/entities/pending_payment.dart';
 import '../providers/payment_tracking_provider.dart';
 
-/// 선생님 입금 대기 리스트 — #424.
+/// 선생님 입금 확인 대기 리스트 — #424.
 ///
 /// 그룹 3개 (오늘 만료 / D+3 이상 / D+0~2) + 각 행의 [재발송] + 스와이프 [회수].
 /// [입금 확인] 액션은 기존 outstanding flow를 활용 (후속 PR에서 직접 연결).

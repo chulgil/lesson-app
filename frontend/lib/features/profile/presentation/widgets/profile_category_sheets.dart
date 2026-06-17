@@ -19,7 +19,7 @@ import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
 
-/// 💰 수강권·정산 BottomSheet — 수강권 템플릿/입금대기/입금 계좌/취소 정책.
+/// 💰 수강권·정산 BottomSheet — 수강권 템플릿/미수금/입금 계좌/취소 정책.
 void showSubscriptionBillingSheet(BuildContext context, String teacherId) {
   showNotebookModalBottomSheet<void>(
     context: context,

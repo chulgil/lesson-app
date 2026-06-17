@@ -15,7 +15,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      expect(find.text('입금 대기'), findsNothing);
+      expect(find.text('입금 확인 대기'), findsNothing);
     });
 
     testWidgets('renders title and count when count > 0', (tester) async {
@@ -27,7 +27,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      expect(find.text('입금 대기'), findsOneWidget);
+      expect(find.text('입금 확인 대기'), findsOneWidget);
       expect(find.text('3건'), findsOneWidget);
     });
 
@@ -45,7 +45,7 @@ void main() {
       await tester.pumpAndSettle();
       // takeException returns the thrown error; we just verify the card stayed hidden.
       tester.takeException();
-      expect(find.text('입금 대기'), findsNothing);
+      expect(find.text('입금 확인 대기'), findsNothing);
     });
   });
 }

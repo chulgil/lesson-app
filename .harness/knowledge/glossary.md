@@ -68,7 +68,8 @@
 | 정가 | Regular Price | `SubscriptionTemplate.regularPrice` | `regular_price` | 할인 표시용 원가(선택). 판매가보다 크면 카드/시트에 취소선+할인율 표시. 작성 시 `TeacherSettings.lessonPriceTable`(악기×레벨 회당가)에서 자동 산출 |
 | 수강권 상태 | Subscription Status | `SubscriptionStatus` | `SubscriptionStatus` | active/expiringSoon/expired/paused |
 | 입금 상태 | Payment Status | `paymentConfirmed` | `payment_confirmed` | 외부 입금 확인 여부 (앱 내 결제 아님) |
-| 입금 대기 | Payment Pending | `PaymentPendingCard` | (집계) | 입금 확인 전 수강권 제안 상태 (`paymentRequested`) 집계. 선생님 홈 상단 카드로 노출 |
+| 미수금 | Outstanding Payment | `Subscription.isUnpaid` (표시명 `subscriptionBadgeUnpaid`) | `payment_confirmed = false` | **후불** 수강권 중 입금 완료 기록 없는 상태 = 선생님 미수 채권. 배지·정산·프로필 면 통일 표시명. 사용하지 않는 표현: 입금대기(후불), 입금대기 |
+| 입금 확인 대기 | Payment Confirmation Pending | `PaymentPendingCard` | (집계) | **선불**(입금 안내 후) 입금 확인 전 수강권 제안 상태 (`paymentRequested`) 집계. 선생님 홈 상단 카드로 노출. 사용하지 않는 표현: 입금 대기 |
 | 입금 추적 | Payment Tracking | `PaymentTrackingService` | `PaymentTrackingService` | D+1/3/7 자동 리마인드 시스템. 학생·선생님 양측 발송 |
 | 입금 확인 되돌리기 | Confirm Payment Undo | `undoConfirmPayment` | `undo_confirm_payment` | 입금 확인 후 24시간 내 취소 가능. 첫 레슨 차감 발생 시 불가 |
 | 수강권 자동 연장 | Auto-Extension | `Subscription.autoExtendedDays` | `auto_extended_days` | 선생님 휴가 등록 시 휴가 일수만큼 만료일 자동 연장 |
@@ -577,6 +578,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-17 | 입금 용어 분리 + 금액 정확 표기 (검토 #50) — 후불 **미수금**(입금대기(후불)·입금대기 흡수) vs 선불 **입금 확인 대기**(입금 대기 흡수) 분리. 미수금 긴급알림 금액 절사/반올림 제거 → 만/원 정확 표기(`formatKoreanWon` 동등 inline). 표시명·glossary만, enum/식별자 불변. |
 | 2026-06-17 | 학생/연습 상태 어휘 정렬 (검토 #26) — StudentStatus.active 표시명 정규→수강중, 연습(PracticeLevel.onBreak/PracticeStatus.paused) 표시명 휴강→기록없음(무기록). 학생 라이프사이클 휴강(paused)·MembershipStatus는 유지(별 축). 표시명만, enum 값 불변. |
 | 2026-06-17 | 스케줄 휴무/휴가/휴강 SSOT 통일 (검토 #14) — 휴무(비근무일)·휴가(기간형, "휴가 모드"·"방학 중" 흡수)·휴강(레슨 취소+보상) 3 canonical. Deprecated: 쉬는날→휴무, 방학 중→휴가, 휴가 모드→휴가. 표시명·glossary만 정렬(코드 식별자 불변). |
 | 2026-06-16 | §16 연습장 제본(Practice Journal — Binding) 신설 — `BoundVolume` 엔티티(+`pieceName`) + `BoundVolumeSpine`/`BoundShelfScreen` + 정책 용어 3종(제본 / 곡 완성 트리거 / 연습중) + Deprecated 1건(출판→제본). 본 변경은 `.harness/spec/2026-06-16-practice-journal-p2-binding.md` |

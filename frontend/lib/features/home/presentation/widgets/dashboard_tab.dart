@@ -150,7 +150,7 @@ class DashboardTab extends ConsumerWidget {
 
                   const SizedBox(height: AppSpacing.space3),
 
-                  // ── 긴급 알림 존 (입금대기 등 — 통계 바로 아래) ────
+                  // ── 긴급 알림 존 (미수금 등 — 통계 바로 아래) ────
                   UrgentAlertZone(
                     teacherId: dashboard.teacherId,
                     unpaidSummary: dashboard.unpaidSummary,

@@ -158,15 +158,23 @@ void main() {
       expect(result, isNotEmpty);
     });
 
-    test('urgentAlertOutstandingFormat uses deposit-only wording', () {
-      final result = AppStrings.urgentAlertOutstandingFormat(50000, 3);
-      const deprecatedUnpaidWording =
-          '미'
-          '수금';
+    test('urgentAlertOutstandingFormat uses 미수금 wording + exact amount', () {
+      // #807: 후불 미수금 용어 통일 + 금액 정확 표기(반올림 금지).
+      final rounded = AppStrings.urgentAlertOutstandingFormat(50000, 3);
+      expect(rounded, contains('미수금'));
+      expect(rounded, isNot(contains('입금대기')));
+      expect(rounded, isNot(contains('결제')));
+      expect(rounded, contains('5만원'));
+      expect(rounded, contains('(3명)'));
 
-      expect(result, contains('입금대기(후불)'));
-      expect(result, isNot(contains(deprecatedUnpaidWording)));
-      expect(result, isNot(contains('결제')));
+      // 비-만단위 금액은 절사/반올림 없이 정확히 표기 (55000 != "6만원").
+      final exact = AppStrings.urgentAlertOutstandingFormat(55000, 2);
+      expect(exact, contains('5만 5000원'));
+      expect(exact, isNot(contains('6만원')));
+
+      // 만원 미만은 원 단위 그대로.
+      final small = AppStrings.urgentAlertOutstandingFormat(5000, 1);
+      expect(small, contains('5000원'));
     });
   });
 

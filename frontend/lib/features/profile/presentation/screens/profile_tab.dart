@@ -31,7 +31,7 @@ import '../widgets/teacher_migration_overlay_gate.dart';
 /// 5묶음 카테고리:
 /// - 🕐 운영시간 → TeacherAvailability split page (직접 라우트)
 /// - 🎓 수업방식 → LessonStyleSettingsScreen (직접 라우트, W3 Task 3.2)
-/// - 💰 수강권·정산 → BottomSheet (수강권 템플릿/입금대기/입금 계좌)
+/// - 💰 수강권·정산 → BottomSheet (수강권 템플릿/미수금/입금 계좌)
 /// - 👤 내 프로필 → BasicInfoEdit (직접 라우트)
 /// - ⚙️ 정책·알림·지원 → BottomSheet (정책/템플릿/알림/녹음/공개/지원/계정)
 class ProfileTab extends ConsumerWidget {
@@ -100,7 +100,7 @@ class ProfileTab extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.space5),
 
-            // Stats section (팔로워 → 입금대기(후불))
+            // Stats section (팔로워 → 미수금)
             _buildStatsSection(context, ref, teacherId),
 
             const SizedBox(height: AppSpacing.space5),
@@ -359,7 +359,7 @@ class ProfileTab extends ConsumerWidget {
 
   /// 자주 쓰는 설정 2개 카드 (가용시간 · 수강권 템플릿).
   ///
-  /// #802 입금대기 진입점 일원화: 입금대기 단축카드 제거 → 통계 카드 탭으로 일원화.
+  /// #802 미수금 진입점 일원화: 미수금 단축카드 제거 → 통계 카드 탭으로 일원화.
   Widget _buildQuickShortcuts(BuildContext context, String teacherId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -469,7 +469,7 @@ class ProfileTab extends ConsumerWidget {
   ) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
-    // 팔로워 → 입금대기(후불)로 교체 (profile_master.md §2.4)
+    // 팔로워 → 미수금으로 교체 (profile_master.md §2.4)
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
 
     final studentCountValue =
@@ -508,9 +508,9 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            // #802 입금대기 진입점 일원화: 통계 숫자 탭 → 입금대기 화면 직접 이동.
+            // #802 미수금 진입점 일원화: 통계 숫자 탭 → 미수금 화면 직접 이동.
             _buildStatItem(
-              '입금대기(후불)',
+              '미수금',
               unpaidValue,
               onTap: () => context.push(AppRoutes.outstandingPayments),
             ),

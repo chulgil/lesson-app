@@ -40,7 +40,7 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
   Subscription? _mostUrgent(List<Subscription> subscriptions) {
     if (subscriptions.isEmpty) return null;
     final sorted = List<Subscription>.from(subscriptions)..sort((a, b) {
-      // Primary: SubscriptionBadge 문서 우선순위 (입금대기>만료>임박>정상).
+      // Primary: SubscriptionBadge 문서 우선순위 (미수금>만료>임박>정상).
       final rank = _urgencyRank(a).compareTo(_urgencyRank(b));
       if (rank != 0) return rank;
       // Secondary(동순위): 잔여 오름차순 (적을수록 긴급).

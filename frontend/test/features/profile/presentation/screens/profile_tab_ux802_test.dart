@@ -1,8 +1,8 @@
-// #802 입금대기 진입점 일원화 회귀 테스트.
+// #802 미수금 진입점 일원화 회귀 테스트.
 //
 // ProfileTab 전체 마운트는 provider 의존성이 과도해 단위테스트 부적합.
 // 변경된 두 동작을 독립 위젯으로 직접 검증:
-//   (A) 단축카드 제거: 입금대기 라벨 버튼이 없는 2-card Row.
+//   (A) 단축카드 제거: 미수금 라벨 버튼이 없는 2-card Row.
 //   (B) 통계 카드 탭: GestureDetector onTap 호출 → 라우트 상수 이동.
 // 320px 제약 환경 레이아웃 예외 없음.
 
@@ -21,7 +21,7 @@ import 'package:lessonaza/core/theme/app_typography.dart';
 // to the old shape will break these tests.
 // ---------------------------------------------------------------------------
 
-/// Replica of the 2-card quick-shortcuts Row (#802: 입금대기 카드 제거).
+/// Replica of the 2-card quick-shortcuts Row (#802: 미수금 카드 제거).
 class _QuickShortcutsRow extends StatelessWidget {
   final VoidCallback onAvailabilityTap;
   final VoidCallback onSubscriptionTap;
@@ -136,8 +136,8 @@ class _TappableStatItem extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 void main() {
-  group('#802 단축카드 — 입금대기 제거', () {
-    testWidgets('입금대기 단축카드 라벨 없음, 가용시간·수강권 2개만 존재', (tester) async {
+  group('#802 단축카드 — 미수금 제거', () {
+    testWidgets('미수금 단축카드 라벨 없음, 가용시간·수강권 2개만 존재', (tester) async {
       await tester.binding.setSurfaceSize(const Size(320, 200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -153,7 +153,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // 입금대기 단축카드 라벨 제거 확인
+      // 미수금 단축카드 라벨 제거 확인
       expect(
         find.text(AppStrings.profileShortcutOutstandingPayment),
         findsNothing,
@@ -165,8 +165,8 @@ void main() {
     });
   });
 
-  group('#802 통계 카드 — 입금대기 탭 wiring', () {
-    testWidgets('입금대기 통계 항목 탭 → onTap 호출됨', (tester) async {
+  group('#802 통계 카드 — 미수금 탭 wiring', () {
+    testWidgets('미수금 통계 항목 탭 → onTap 호출됨', (tester) async {
       var tapped = false;
 
       await tester.pumpWidget(
@@ -176,7 +176,7 @@ void main() {
               color: AppColors.paperAccent,
               padding: const EdgeInsets.all(AppSpacing.space4),
               child: _TappableStatItem(
-                label: '입금대기(후불)',
+                label: '미수금',
                 value: '3건',
                 onTap: () => tapped = true,
               ),
@@ -186,10 +186,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('입금대기(후불)'), findsOneWidget);
+      expect(find.text('미수금'), findsOneWidget);
       expect(find.text('3건'), findsOneWidget);
 
-      await tester.tap(find.text('입금대기(후불)'));
+      await tester.tap(find.text('미수금'));
       await tester.pumpAndSettle();
 
       expect(tapped, isTrue);
@@ -242,7 +242,7 @@ void main() {
               color: AppColors.paperAccent,
               padding: const EdgeInsets.all(AppSpacing.space4),
               child: _TappableStatItem(
-                label: '입금대기(후불)',
+                label: '미수금',
                 value: '-',
                 onTap: () {},
               ),

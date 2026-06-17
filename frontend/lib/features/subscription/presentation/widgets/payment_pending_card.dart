@@ -9,9 +9,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../providers/payment_tracking_provider.dart';
 
-/// 선생님 홈 [입금 대기] 카드 — #424.
+/// 선생님 홈 [입금 확인 대기] 카드 — #424.
 ///
-/// 입금 대기 건수가 0일 때는 표시되지 않습니다.
+/// 입금 확인 대기 건수가 0일 때는 표시되지 않습니다.
 /// 탭 시 [/profile/payment-pending] 리스트 화면으로 진입.
 class PaymentPendingCard extends ConsumerWidget {
   const PaymentPendingCard({super.key});
