@@ -119,6 +119,8 @@ void main() {
       );
 
       // Tap the "보강 크레딧 적립" row.
+      await tester.ensureVisible(find.text('보강 크레딧 적립'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('보강 크레딧 적립'));
       await tester.pumpAndSettle();
       expect(
@@ -127,6 +129,8 @@ void main() {
       );
 
       // Tap the "무료 처리" row.
+      await tester.ensureVisible(find.text('무료 처리'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('무료 처리'));
       await tester.pumpAndSettle();
       expect(

@@ -78,12 +78,12 @@ Future<void> _pump(WidgetTester tester, List<VacationPeriod> periods) async {
 
 void main() {
   group('AvailabilityVacationBanner', () {
-    testWidgets('shows banner with active vacation range (방학 중 label)', (
+    testWidgets('shows banner with active vacation range (휴가 label)', (
       tester,
     ) async {
       // Must span today: a vacation that already started and has not ended
       // (#fix2 — future-start vacations are "scheduled", not active).
-      // C4 (audit §4.10): multi-day vacation uses 방학 중 suffix.
+      // C4 (audit §4.10): multi-day vacation uses 휴가 suffix.
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final start = today.subtract(const Duration(days: 2));

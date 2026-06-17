@@ -77,6 +77,8 @@ void main() {
       expect(find.text(AppStrings.vacationModeTitle), findsOneWidget);
       expect(find.text(AppStrings.vacationStartDateLabel), findsOneWidget);
       expect(find.text(AppStrings.vacationEndDateLabel), findsOneWidget);
+      // 휴가 처리 안내 배너 (검토 #14).
+      expect(find.text(AppStrings.vacationModeGuide), findsOneWidget);
       // Scroll to the submit button — disposition section pushed it offscreen.
       await tester.scrollUntilVisible(
         find.text(AppStrings.vacationRegisterButton),
@@ -87,6 +89,13 @@ void main() {
       // Range not picked → submit must be disabled
       final submit = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(submit.onPressed, isNull);
+    });
+
+    test('용어 SSOT 가드 (검토 #14): dayOff=휴무 / vacationMode=휴가', () {
+      expect(AppStrings.dayOff, '휴무');
+      expect(AppStrings.vacationModeTitle, '휴가');
+      expect(AppStrings.vacationModeEntry, '휴가');
+      expect(AppStrings.vacationBannerRangeLabel('8/1 ~ 8/5'), '8/1 ~ 8/5 휴가');
     });
 
     testWidgets(

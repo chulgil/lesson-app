@@ -2090,8 +2090,8 @@ class AppStrings {
   /// 섹션 4 부제
   static const specialSchedulesSubtitle = '휴가, 공휴일, 추가 오픈 등을 관리합니다';
 
-  /// 쉬는날 (요일 행 빈 상태)
-  static const dayOff = '쉬는날';
+  /// 휴무 (요일 행 빈 상태)
+  static const dayOff = '휴무';
 
   /// 레슨 길이 (라벨)
   static const lessonLengthLabel = '레슨 길이';
@@ -8340,10 +8340,10 @@ class AppStrings {
   static const paywallLifetimePurchaseFailed =
       'Lifetime 구매를 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
 
-  // ── 휴가 모드 / Vacation Mode (#431) ─────────────────────────
+  // ── 휴가 / Vacation Mode (#431) ─────────────────────────
 
-  /// 휴가 모드 진입 화면 제목 — 선생님이 다중 기간 휴가를 등록.
-  static const vacationModeTitle = '휴가 모드';
+  /// 휴가 진입 화면 제목 — 선생님이 다중 기간 휴가를 등록.
+  static const vacationModeTitle = '휴가';
 
   /// 휴가 기간 섹션 제목.
   static const vacationPeriodSection = '휴가 기간';
@@ -8369,8 +8369,11 @@ class AppStrings {
   /// 영향 미리보기 빈 상태.
   static const vacationImpactEmpty = '해당 기간에 영향 받는 레슨이 없어요.';
 
-  /// 휴가 모드 진입 CTA — 가용성 화면 특수일정 섹션에서 휴가 등록 화면으로 이동.
-  static const vacationModeEntry = '휴가 모드';
+  /// 휴가 진입 CTA — 가용성 화면 특수일정 섹션에서 휴가 등록 화면으로 이동.
+  static const vacationModeEntry = '휴가';
+  /// 휴가 진입 안내 — 이 기간 레슨 처리 방식 고지 (검토 #14).
+  static const vacationModeGuide =
+      '이 기간의 레슨은 모두 휴강 처리되고, 선택한 보상 방식이 적용됩니다.';
 
   /// 휴가 등록 액션 버튼.
   static const vacationRegisterButton = '휴가 등록';
@@ -8491,8 +8494,8 @@ class AppStrings {
   /// 휴가 배너 안내 — 해당 기간 예약 불가.
   static const vacationBannerHint = '이 기간에는 학생 예약이 잡히지 않아요.';
 
-  /// 배너 행: 다중일 휴가 라벨 (예: "8/1 ~ 8/5 방학 중").
-  static String vacationBannerRangeLabel(String range) => '$range 방학 중';
+  /// 배너 행: 다중일 휴가 라벨 (예: "8/1 ~ 8/5 휴가").
+  static String vacationBannerRangeLabel(String range) => '$range 휴가';
 
   /// 배너 행: 1일 휴무 라벨 (예: "8/1 휴무").
   static String vacationBannerOneDayLabel(String date) => '$date 휴무';

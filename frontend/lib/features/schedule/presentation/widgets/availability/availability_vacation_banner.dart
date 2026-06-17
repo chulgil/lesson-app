@@ -69,7 +69,7 @@ class AvailabilityVacationBanner extends ConsumerWidget {
 
 /// Row inside [AvailabilityVacationBanner].
 ///
-/// C4 (audit §4.10) — distinguish multi-day vacation (방학) vs 1-day 휴무
+/// C4 (audit §4.10) — distinguish 다중일 휴가 vs 1일 휴무
 /// by icon + accent color so the teacher can tell them apart at a glance.
 /// C2 (audit §4.8) — adds a trailing close icon so the teacher can cancel
 /// without navigating to the vacation management screen.

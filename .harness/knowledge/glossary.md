@@ -49,7 +49,9 @@
 | 스케줄 예외 | Schedule Exception | `TimeException` | `ScheduleException` | ⚠️ FE-BE 불일치. 휴무/휴가/추가 슬롯 |
 | 스케줄 변경 | Schedule Change | `ScheduleChange` | `LessonScheduleChange` | 레슨 일정 변경 요청 |
 | 스케줄 확정 카드 | Confirmation Card | `ScheduleConfirmationCard` | `ScheduleConfirmationCard` | 수강권 발급 후 스케줄 확정 UI |
-| 휴가 모드 | Vacation Mode | `TeacherAvailability.vacationPeriods` | `vacation_periods` | 선생님 휴가 기간 일괄 등록 → 영향 레슨 일괄 처리 (취소·보강·이월) |
+| **휴무** | Day Off | (표시명) | — | 선생님 비근무일 (1일 단위, 레슨 없음). `스케줄 예외`(`TimeException`/`ScheduleException`)로 표현. 사용하지 않는 표현: 쉬는날 |
+| **휴가** | Vacation | `TeacherAvailability.vacationPeriods` | `vacation_periods` | 기간형 휴무 (다중일). 휴가 기간 일괄 등록 → 영향 레슨 일괄 처리 (취소·보강·이월) + 수강권 자동 연장. 사용하지 않는 표현: 휴가 모드, 방학 중 |
+| **휴강** | Lesson Cancellation (by teacher) | `RequestEventType.lessonCancelledByTeacher` | `lessonCancelledByTeacher` | 잡힌 레슨을 안 함 + 보상 발생 (보강 크레딧/무료/이월). 변경권 미차감. cf. `선생님 휴강 이벤트` |
 | 레슨 1회 시간 | Lesson Duration | `slotDurationMinutes` | `slot_duration_minutes` | 사용자 표시명. 한국 음악 레슨 표준 50분 |
 | 쉬는 시간 | Break Time | `breakTimeBetweenLessons` | `break_time_between_lessons` | 사용자 표시명. 표준 10분 |
 
@@ -69,7 +71,7 @@
 | 입금 대기 | Payment Pending | `PaymentPendingCard` | (집계) | 입금 확인 전 수강권 제안 상태 (`paymentRequested`) 집계. 선생님 홈 상단 카드로 노출 |
 | 입금 추적 | Payment Tracking | `PaymentTrackingService` | `PaymentTrackingService` | D+1/3/7 자동 리마인드 시스템. 학생·선생님 양측 발송 |
 | 입금 확인 되돌리기 | Confirm Payment Undo | `undoConfirmPayment` | `undo_confirm_payment` | 입금 확인 후 24시간 내 취소 가능. 첫 레슨 차감 발생 시 불가 |
-| 수강권 자동 연장 | Auto-Extension | `Subscription.autoExtendedDays` | `auto_extended_days` | 선생님 휴가 모드 등록 시 휴가 일수만큼 만료일 자동 연장 |
+| 수강권 자동 연장 | Auto-Extension | `Subscription.autoExtendedDays` | `auto_extended_days` | 선생님 휴가 등록 시 휴가 일수만큼 만료일 자동 연장 |
 | 스케줄된 회차 | Scheduled Lessons | `Subscription.scheduledLessons` | `scheduled_lessons` | 실제 잡힌 레슨 수. `remainingLessons` 와 별개 트랙 |
 | 보강 크레딧 | Makeup Credit | `MakeupCredit` | `MakeupCredit` | 별도 엔티티. 휴가·노쇼 면제·일괄변경 손실 회차 적립. 30일 만료 |
 
@@ -575,6 +577,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-17 | 스케줄 휴무/휴가/휴강 SSOT 통일 (검토 #14) — 휴무(비근무일)·휴가(기간형, "휴가 모드"·"방학 중" 흡수)·휴강(레슨 취소+보상) 3 canonical. Deprecated: 쉬는날→휴무, 방학 중→휴가, 휴가 모드→휴가. 표시명·glossary만 정렬(코드 식별자 불변). |
 | 2026-06-16 | §16 연습장 제본(Practice Journal — Binding) 신설 — `BoundVolume` 엔티티(+`pieceName`) + `BoundVolumeSpine`/`BoundShelfScreen` + 정책 용어 3종(제본 / 곡 완성 트리거 / 연습중) + Deprecated 1건(출판→제본). 본 변경은 `.harness/spec/2026-06-16-practice-journal-p2-binding.md` |
 | 2026-06-12 | §15 P3 Spotlight 용어 추가 — `SpotlightPrompt` 엔티티 + `SpotlightType` enum (3종) + 정책 용어 7종 (스포트라이트 슬롯 / 노출 조건 / 큐 우선순위 / 거절 cooldown / 8주 hide / 영구 hide / 스포트라이트 시드) + 서비스 메서드 3종 (Eligibility / Queue / DeclineLearning) + Deprecated 표현 2건 ("필수 알림" → "스포트라이트 권유", "거절 패널티" → "거절 학습"). 본 변경은 `.harness/decomposition/2026-06-12-student-gamification-p3-spotlight.md` Job 0 Step 2 |
 | 2026-06-12 | §15 P2 Visual Growth 용어 추가 — `StreakFreeze` 엔티티 + 정책 용어 7종 (동결 잔액 / 시험 모드 / 복귀 보너스 / 1년 히트맵 / 트로피 모음 / 30일 chunk / D-day 마이그레이션 / 휴식 권고) + 서비스 메서드 2종 (자동 발급 / 자동 적용) + Deprecated 표현 2건 ("freeze 보상" → "스트릭 동결", "트로피 카테고리" → "트로피 모음"). 본 변경은 `.harness/decomposition/2026-06-11-student-gamification-p2-visual-growth.md` Job 0 Step 2 |

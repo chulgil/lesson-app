@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/teacher_availability_split_page.dart';
 import 'package:lessonaza/features/schedule/presentation/widgets/schedule_edit_bottom_sheet.dart';
@@ -74,21 +75,21 @@ void main() {
   testWidgets('mock 시드 존재 (teacher_1) — 추가한 시간대가 리스트에 즉시 반영', (tester) async {
     await pumpRealRepoSplitPage(tester, teacherId: 'teacher_1');
 
-    // 시드: 화/목/토 14:00-18:00 등. 월요일은 쉬는 날.
+    // 시드: 화/목/토 14:00-18:00 등. 월요일은 휴무.
     expect(find.text('14:00 - 18:00'), findsWidgets);
 
     await addSlotViaSheet(tester, day: '월');
 
-    // 시트 기본 시간이 무엇이든, 월요일 카드에 새 행이 생겨 "쉬는 날" 이
+    // 시트 기본 시간이 무엇이든, 월요일 카드에 새 행이 생겨 "휴무" 이
     // 사라져야 한다. (시트 기본 14:00-18:00 가정 — 시드와 동일 텍스트가
-    // 1개 늘어난 것으로도 판정 가능하나, 쉬는 날 라벨 감소가 더 견고)
+    // 1개 늘어난 것으로도 판정 가능하나, 휴무 라벨 감소가 더 견고)
     expect(tester.takeException(), isNull, reason: 'add 흐름에서 예외가 나면 안 된다');
-    // 월요일이 더 이상 비어 있지 않음 — 쉬는날 라벨이 줄었는지 확인.
-    // 시드에서 월/수/금/일 4개 요일이 쉬는날 → 추가 후 3개.
+    // 월요일이 더 이상 비어 있지 않음 — 휴무 라벨이 줄었는지 확인.
+    // 시드에서 월/수/금/일 4개 요일이 휴무 → 추가 후 3개.
     expect(
-      find.text('쉬는날'),
+      find.textContaining('· ${AppStrings.dayOff}'),
       findsNWidgets(3),
-      reason: '월요일에 시간대가 추가되어 쉬는날 라벨이 4→3 으로 줄어야 한다',
+      reason: '월요일에 시간대가 추가되어 휴무 라벨이 4→3 으로 줄어야 한다',
     );
   });
 
@@ -97,14 +98,14 @@ void main() {
   ) async {
     await pumpRealRepoSplitPage(tester, teacherId: 'teacher_brand_new');
 
-    // 레코드 없음 → 모든 요일 쉬는날 (7개).
-    expect(find.text('쉬는날'), findsNWidgets(7));
+    // 레코드 없음 → 모든 요일 휴무 (7개).
+    expect(find.textContaining('· ${AppStrings.dayOff}'), findsNWidgets(7));
 
     await addSlotViaSheet(tester, day: '월');
 
     expect(tester.takeException(), isNull);
     expect(
-      find.text('쉬는날'),
+      find.textContaining('· ${AppStrings.dayOff}'),
       findsNWidgets(6),
       reason: '첫 설정 사용자도 추가 즉시 반영되어야 한다 (silent fail 금지)',
     );

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../core/widgets/notebook/notebook_banner.dart';
 import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../domain/entities/vacation_period.dart';
@@ -36,6 +37,11 @@ class TeacherVacationModeScreen extends ConsumerWidget {
       body: ListView(
         padding: EdgeInsets.all(AppSpacing.space4),
         children: [
+          // 휴가 처리 안내 (검토 #14) — 이 기간 레슨 = 휴강 처리 + 보상.
+          const NotebookBanner(
+            message: AppStrings.vacationModeGuide,
+            leadingIcon: Icons.info_outline,
+          ),
           // Active vacations + 24h Recovery (spec §7 + §9.1).
           const _ActiveVacationSection(),
           SizedBox(height: AppSpacing.space4),

@@ -6,7 +6,7 @@ library;
 
 /// 3-option disposition for impacted lessons during a vacation period.
 ///
-/// Glossary: 휴가 모드 / Vacation Mode.
+/// Glossary: 휴가 / Vacation Mode.
 enum VacationDisposition {
   /// (a) 보강 크레딧 자동 적립.
   makeupCredit,

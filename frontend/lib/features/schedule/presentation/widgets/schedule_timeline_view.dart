@@ -110,7 +110,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   @override
   Widget build(BuildContext context) {
     // 2026-06-12 — 하드코딩 'teacher_1' 제거 (#703 동일 패턴). remote 에서
-    // 타임라인 쉬는날 판정이 가짜 계정 기준으로 동작하던 잠재 결함.
+    // 타임라인 휴무 판정이 가짜 계정 기준으로 동작하던 잠재 결함.
     final teacherId = ref.watch(currentUserIdProvider);
     final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
     final availability = availabilityAsync.valueOrNull;
