@@ -20,7 +20,8 @@ import '../providers/home_dashboard_provider.dart';
 /// - 텍스트: ink, 아이콘: ink (color overload 지양)
 /// - 3색 미만 원칙 (ux_rules.md) — semantic error/warning/info 구분 제거
 ///
-/// Policy (2026-04-16): Top 1 + Expandable (ux_guidelines §2.5)
+/// Policy (2026-06-17 #793): 종류가 다른 알림은 최대 3건까지 항상 표시.
+/// 동일 종류(타입) 다건은 "외 N건"으로 압축. 나머지는 펼치기 유지.
 class UrgentAlertZone extends ConsumerStatefulWidget {
   final String teacherId;
   final AsyncValue<({int totalAmount, int studentCount})> unpaidSummary;
@@ -129,18 +130,28 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
 
     if (items.isEmpty) return const SizedBox.shrink();
 
-    // Top 1 + Expandable policy (ux_guidelines §2.5)
-    final primary = items.first;
-    final rest = items.sublist(1);
-    final extraCount = rest.length;
+    // Policy (2026-06-17 #793): 서로 다른 종류는 최대 3건 항상 표시.
+    // items 는 종류별로 이미 1건씩 생성됨(5종 × 1행) — 다건은 text에 count 포함.
+    // 따라서 "같은 타입 다건" 압축은 items 레벨에서 불필요하며,
+    // 상위 3건은 항상 노출, 4건째부터만 "외 N건" 토글로 처리.
+    const kAlwaysVisible = 3;
+    final visible = items.take(kAlwaysVisible).toList();
+    final hidden =
+        items.length > kAlwaysVisible
+            ? items.sublist(kAlwaysVisible)
+            : <Widget>[];
+    final extraCount = hidden.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        primary,
+        ...visible.expand(
+          (item) => [item, if (item != visible.last) const SizedBox(height: 2)],
+        ),
         if (extraCount > 0) ...[
+          const SizedBox(height: 2),
           if (_expanded)
-            ...rest.expand((item) => [const SizedBox(height: 2), item]),
+            ...hidden.expand((item) => [item, const SizedBox(height: 2)]),
           _ExpandToggle(
             count: extraCount,
             expanded: _expanded,
@@ -171,9 +182,7 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
       // Refresh the home dashboard so lesson stats / needsConfirmation list
       // and unpaid summary reflect the updated lesson state immediately.
       if (lesson.teacherId != null) {
-        await ref
-            .read(homeDashboardRefreshProvider)
-            .refresh(lesson.teacherId!);
+        await ref.read(homeDashboardRefreshProvider).refresh(lesson.teacherId!);
       }
     }
   }

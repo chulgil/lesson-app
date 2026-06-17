@@ -16,6 +16,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../billing/billing_facade.dart';
+import '../../../notifications/presentation/providers/notification_providers.dart';
 import '../../../practice/domain/entities/practice_loop_stats.dart';
 import '../../../practice/practice_facade.dart';
 import '../../../profile/profile_facade.dart';
@@ -76,7 +77,7 @@ class DashboardTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Masthead: Playfair eyebrow + IBM Plex Mono 메타 ──
-                  _buildMasthead(context),
+                  _buildMasthead(context, ref),
 
                   // ── Programme Title: 페이지 타이틀 ──
                   _buildProgrammeTitle(context, todayLessons),
@@ -192,17 +193,47 @@ class DashboardTab extends ConsumerWidget {
 
   /// Masthead — Notebook × Score 상단 헤더.
   /// 좌측: "LESSONAZA" (Playfair eyebrow)
-  /// 우측: 알림 아이콘
-  Widget _buildMasthead(BuildContext context) {
+  /// 우측: 알림 아이콘 + 미읽음 배지
+  Widget _buildMasthead(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
       meta: _volumeIssueString(DateTime.now()),
       trailing: IconButton(
         onPressed: () => context.push(AppRoutes.notifications),
-        icon: const Icon(
-          Icons.notifications_outlined,
-          color: AppColors.ink,
-          size: 22,
+        icon: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.ink,
+              size: 22,
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                top: -2,
+                right: -4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.paperAccent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    AppStrings.unreadBadgeCount(unreadCount),
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.paper,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                      fontSize: 9,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         tooltip: AppStrings.notifications,
         padding: EdgeInsets.zero,

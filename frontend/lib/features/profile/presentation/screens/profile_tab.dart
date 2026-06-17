@@ -71,8 +71,8 @@ class ProfileTab extends ConsumerWidget {
                     meta:
                         'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
                     trailing: IconButton(
-                      onPressed:
-                          () => context.push(AppRoutes.notificationSettings),
+                      onPressed: () =>
+                          context.push(AppRoutes.notificationSettings),
                       icon: const Icon(
                         Icons.notifications_outlined,
                         color: AppColors.ink,
@@ -101,7 +101,7 @@ class ProfileTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space5),
 
             // Stats section (팔로워 → 입금대기(후불))
-            _buildStatsSection(ref, teacherId),
+            _buildStatsSection(context, ref, teacherId),
 
             const SizedBox(height: AppSpacing.space5),
 
@@ -187,27 +187,25 @@ class ProfileTab extends ConsumerWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space1,
-              children:
-                  instruments
-                      .map(
-                        (inst) => Chip(
-                          label: Text(
-                            inst,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.paperAccent,
-                            ),
-                          ),
-                          backgroundColor: AppColors.paperAccent.withValues(
-                            alpha: 0.08,
-                          ),
-                          side: BorderSide.none,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
+              children: instruments
+                  .map(
+                    (inst) => Chip(
+                      label: Text(
+                        inst,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.paperAccent,
                         ),
-                      )
-                      .toList(),
+                      ),
+                      backgroundColor: AppColors.paperAccent.withValues(
+                        alpha: 0.08,
+                      ),
+                      side: BorderSide.none,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                    ),
+                  )
+                  .toList(),
             ),
           ],
           // Introduction
@@ -359,7 +357,9 @@ class ProfileTab extends ConsumerWidget {
     return null;
   }
 
-  /// 자주 쓰는 설정 3개 카드 (가용시간 · 입금대기(후불) · 수강권 템플릿).
+  /// 자주 쓰는 설정 2개 카드 (가용시간 · 수강권 템플릿).
+  ///
+  /// #802 입금대기 진입점 일원화: 입금대기 단축카드 제거 → 통계 카드 탭으로 일원화.
   Widget _buildQuickShortcuts(BuildContext context, String teacherId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -370,14 +370,6 @@ class ProfileTab extends ConsumerWidget {
               icon: Icons.calendar_month,
               label: AppStrings.profileShortcutAvailability,
               onTap: () => context.push(AppRoutes.teacherAvailability),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space2),
-          Expanded(
-            child: _ShortcutCard(
-              icon: Icons.warning_amber_outlined,
-              label: AppStrings.profileShortcutOutstandingPayment,
-              onTap: () => context.push(AppRoutes.outstandingPayments),
             ),
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -406,9 +398,8 @@ class ProfileTab extends ConsumerWidget {
       child: LifetimePromoBanner(
         endsAt: snapshot.lifetimeOfferEndsAt!,
         onBuy: () => handleBuyLifetime(context: context, ref: ref),
-        onDismiss:
-            () =>
-                ref.read(lifetimePromoDismissedProvider.notifier).state = true,
+        onDismiss: () =>
+            ref.read(lifetimePromoDismissedProvider.notifier).state = true,
       ),
     );
   }
@@ -430,16 +421,14 @@ class ProfileTab extends ConsumerWidget {
       snapshot: snapshot,
       studentCount: studentCount,
       onUpgrade: () => handleBuyPro(context: context, ref: ref),
-      onManage:
-          () => _openStoreSubscriptionManagement(
-            context,
-            AppStrings.billingManageStoreOpening,
-          ),
-      onReceipts:
-          () => _openStoreSubscriptionManagement(
-            context,
-            AppStrings.billingReceiptStoreOpening,
-          ),
+      onManage: () => _openStoreSubscriptionManagement(
+        context,
+        AppStrings.billingManageStoreOpening,
+      ),
+      onReceipts: () => _openStoreSubscriptionManagement(
+        context,
+        AppStrings.billingReceiptStoreOpening,
+      ),
     );
   }
 
@@ -455,10 +444,9 @@ class ProfileTab extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(SnackBar(content: Text(openingHint)));
 
-    final url =
-        Platform.isIOS
-            ? Uri.parse('https://apps.apple.com/account/subscriptions')
-            : Uri.parse('https://play.google.com/store/account/subscriptions');
+    final url = Platform.isIOS
+        ? Uri.parse('https://apps.apple.com/account/subscriptions')
+        : Uri.parse('https://play.google.com/store/account/subscriptions');
 
     try {
       final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -474,7 +462,11 @@ class ProfileTab extends ConsumerWidget {
     }
   }
 
-  Widget _buildStatsSection(WidgetRef ref, String teacherId) {
+  Widget _buildStatsSection(
+    BuildContext context,
+    WidgetRef ref,
+    String teacherId,
+  ) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
     // 팔로워 → 입금대기(후불)로 교체 (profile_master.md §2.4)
@@ -516,30 +508,38 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('입금대기(후불)', unpaidValue),
+            // #802 입금대기 진입점 일원화: 통계 숫자 탭 → 입금대기 화면 직접 이동.
+            _buildStatItem(
+              '입금대기(후불)',
+              unpaidValue,
+              onTap: () => context.push(AppRoutes.outstandingPayments),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildStatItem(String label, String value, {VoidCallback? onTap}) {
+    final column = Column(
+      children: [
+        Text(
+          value,
+          style: AppTypography.headingMedium.copyWith(color: AppColors.paper),
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        Text(
+          label,
+          style: AppTypography.caption.copyWith(
+            color: AppColors.paper.withValues(alpha: 0.8),
+          ),
+        ),
+      ],
+    );
     return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: AppTypography.headingMedium.copyWith(color: AppColors.paper),
-          ),
-          const SizedBox(height: AppSpacing.space1),
-          Text(
-            label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.paper.withValues(alpha: 0.8),
-            ),
-          ),
-        ],
-      ),
+      child: onTap != null
+          ? GestureDetector(onTap: onTap, child: column)
+          : column,
     );
   }
 
@@ -563,11 +563,11 @@ class ProfileTab extends ConsumerWidget {
     return CategoryMenuGrid(
       onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
       onLessonStyleTap: () => context.push(AppRoutes.lessonStyleSettings),
-      onSubscriptionBillingTap:
-          () => showSubscriptionBillingSheet(context, teacherId),
+      onSubscriptionBillingTap: () =>
+          showSubscriptionBillingSheet(context, teacherId),
       onMyProfileTap: () => showMyProfileSheet(context),
-      onPolicyNotificationsTap:
-          () => showPolicyNotificationsSheet(context, ref),
+      onPolicyNotificationsTap: () =>
+          showPolicyNotificationsSheet(context, ref),
     );
   }
 }

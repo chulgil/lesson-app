@@ -448,6 +448,57 @@ void main() {
     // 보드 자체는 hidden.
     expect(find.text(AppStrings.questBoardTitle), findsNothing);
   });
+
+  // ── UX #4 한글화 + 전체완료 collapse smoke tests ──
+
+  testWidgets('UX#4: 미완료 상태 — 준비 체크리스트 타이틀 표시 (320px 좁은 폭)', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[0] = hasAvailableSlotsProvider.overrideWithValue(false);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questBoardTitle), findsOneWidget);
+  });
+
+  testWidgets('UX#4: 전체완료 + dismiss → 카드 완전 hide (320px 좁은 폭)', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    // 기본: _DismissedCelebration → graduated == true → SizedBox.shrink
+    await _pump(tester, _allMandatoryDone(phoneVerified: false));
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questBoardTitle), findsNothing);
+  });
+
+  testWidgets('UX#4: 전체완료 + 졸업 카드 pending → collapse(QuestCelebrationCard) 표시 (320px)', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final overrides = _allMandatoryDone(phoneVerified: false);
+    overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+      _PendingCelebration.new,
+    );
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    // 보드 타이틀 숨겨짐 (카드가 졸업 카드로 교체됨).
+    expect(find.text(AppStrings.questBoardTitle), findsNothing);
+    // 졸업 카드 표시.
+    expect(find.text(AppStrings.questCelebrationTitle), findsOneWidget);
+  });
+
 }
 
 /// 가입 직후 첫 도착 윈도우 simulation — markShown 된 상태로 시작.

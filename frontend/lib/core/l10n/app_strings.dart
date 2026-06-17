@@ -5827,7 +5827,7 @@ class AppStrings {
   static const onboardingIntroOptionalHint = '나중에 작성해도 돼요';
 
   /// Quest Board 섹션 헤더 라벨.
-  static const questBoardTitle = 'QUEST BOARD';
+  static const questBoardTitle = '준비 체크리스트';
 
   /// Quest Board 인트로 안내 — 프로필 완성 유도.
   static const questBoardIntro = '프로필을 완성하면 학생에게 더 많이 노출돼요!';
@@ -5843,7 +5843,7 @@ class AppStrings {
   static const questGroupBonusLabel = '선택 보너스';
 
   /// 선택 보너스 그룹 라벨 (점선 카드 외).
-  static const questGroupBonusOptionalTag = '[선택]';
+  static const questGroupBonusOptionalTag = '선택';
 
   /// Lock 토스트 — Q7~Q10 클릭 시 Q6 으로 이동 안내.
   static const questLockedStudentRequiredToast = '먼저 학생을 초대해주세요';
@@ -9501,4 +9501,11 @@ class AppStrings {
   static const String inquiryStatusUnanswered = '미답변';
   static const String inquiryStatusAnswered = '답변완료';
   static const String inquiryReplySla = '보통 1~2일 내 답변';
+
+
+  // [검토 #8] UX wave6
+  static String urgentAlertMoreOfType(int n) => '외 $n건';
+
+  // [검토 #10] UX wave6
+  static String unreadBadgeCount(int n) => n > 9 ? '9+' : '$n';
 }
