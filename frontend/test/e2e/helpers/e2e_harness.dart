@@ -145,7 +145,11 @@ class _E2eAppState extends ConsumerState<E2eApp> {
 /// Pump [E2eApp] and log in as [account], landing on the role home with the
 /// mock role context synced to the account. Asserts the login tile is present
 /// and that no exception is thrown reaching the home.
-Future<void> bootAsRole(WidgetTester tester, DevAccount account) async {
+Future<void> bootAsRole(
+  WidgetTester tester,
+  DevAccount account, {
+  List<Override> overrides = const [],
+}) async {
   // Phone portrait viewport so screens lay out as in production (the default
   // 800x600 host surface triggers spurious RenderFlex overflows).
   tester.view.physicalSize = const Size(390, 844);
@@ -155,7 +159,9 @@ Future<void> bootAsRole(WidgetTester tester, DevAccount account) async {
     tester.view.resetDevicePixelRatio();
   });
 
-  await tester.pumpWidget(const ProviderScope(child: E2eApp()));
+  await tester.pumpWidget(
+    ProviderScope(overrides: overrides, child: const E2eApp()),
+  );
   await settle(tester);
 
   final tile = find.text(account.name);

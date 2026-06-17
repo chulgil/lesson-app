@@ -5710,6 +5710,12 @@ class AppStrings {
   /// 레슨 로딩 실패 에러 카드 메시지.
   static const dashboardLessonsLoadError = '레슨을 불러올 수 없습니다';
 
+  /// 레슨 로딩 실패 — 부드러운 재시도 상태 타이틀(에러처럼 보이지 않게).
+  static const dashboardLessonsLoadErrorTitle = '레슨을 잠시 불러오지 못했어요';
+
+  /// 레슨 로딩 실패 — 재시도 안내 서브타이틀.
+  static const dashboardLessonsLoadErrorHint = '네트워크를 확인하고 다시 시도해 주세요';
+
   /// 이번 달 — 통계 카드 타이틀.
   static const dashboardThisMonth = '이번 달';
 
