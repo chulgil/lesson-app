@@ -76,7 +76,7 @@ class _IssueSubscriptionScreenState
 
   SubscriptionType _selectedType = SubscriptionType.package;
   String? _selectedMembershipId;
-  bool _isPaymentConfirmed = true;
+  IssuePaymentMode _paymentMode = IssuePaymentMode.prepaid;
   SubscriptionPaymentMethod _selectedPaymentMethod =
       SubscriptionPaymentMethod.bankTransfer;
   int _totalLessons = 8;
@@ -132,7 +132,9 @@ class _IssueSubscriptionScreenState
   @override
   String? get selectedMembershipId => _selectedMembershipId;
   @override
-  bool get isPaymentConfirmed => _isPaymentConfirmed;
+  bool get isPaymentConfirmed => _paymentMode == IssuePaymentMode.prepaid;
+  @override
+  bool get isFreeIssue => _paymentMode == IssuePaymentMode.free;
   @override
   SubscriptionPaymentMethod get selectedPaymentMethod => _selectedPaymentMethod;
   @override
@@ -486,7 +488,13 @@ class _IssueSubscriptionScreenState
           // Subscription type selector
           SubscriptionTypeSelector(
             selectedType: _selectedType,
-            onChanged: (type) => setState(() => _selectedType = type),
+            onChanged: (type) => setState(() {
+              _selectedType = type;
+              if (type != SubscriptionType.trial &&
+                  _paymentMode == IssuePaymentMode.free) {
+                _paymentMode = IssuePaymentMode.prepaid;
+              }
+            }),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -497,17 +505,20 @@ class _IssueSubscriptionScreenState
           const SizedBox(height: AppSpacing.space6),
 
           // Amount input
-          AmountInputSection(
-            originalAmount: _originalAmount,
-            controller: _amountController,
-            selectedType: _selectedType,
-            totalLessons: _totalLessons,
-            finalAmount: finalAmount,
-            discountPercent: _discountPercent,
-            onAmountChanged: (value) => setState(() => _originalAmount = value),
-          ),
+          if (!isFreeIssue) ...[
+            AmountInputSection(
+              originalAmount: _originalAmount,
+              controller: _amountController,
+              selectedType: _selectedType,
+              totalLessons: _totalLessons,
+              finalAmount: finalAmount,
+              discountPercent: _discountPercent,
+              onAmountChanged: (value) =>
+                  setState(() => _originalAmount = value),
+            ),
 
-          const SizedBox(height: AppSpacing.space6),
+            const SizedBox(height: AppSpacing.space6),
+          ],
 
           // Discount section
           if (_selectedType != SubscriptionType.trial) ...[
@@ -560,10 +571,16 @@ class _IssueSubscriptionScreenState
 
           // Payment status
           PaymentStatusSection(
-            isPaymentConfirmed: _isPaymentConfirmed,
+            mode: _paymentMode,
             selectedPaymentMethod: _selectedPaymentMethod,
-            onPaymentConfirmedChanged:
-                (value) => setState(() => _isPaymentConfirmed = value),
+            onModeChanged: (m) => setState(() {
+              _paymentMode = m;
+              if (m == IssuePaymentMode.free) {
+                _selectedType = SubscriptionType.trial;
+                _originalAmount = 0;
+                _amountController.clear();
+              }
+            }),
             onPaymentMethodChanged:
                 (method) => setState(() => _selectedPaymentMethod = method),
           ),
@@ -581,7 +598,7 @@ class _IssueSubscriptionScreenState
             discountPercent: _discountPercent,
             bonusLessons: _bonusLessons,
             effectiveBonusReason: effectiveBonusReason,
-            isPaymentConfirmed: _isPaymentConfirmed,
+            isPaymentConfirmed: isPaymentConfirmed,
             selectedPaymentMethod: _selectedPaymentMethod,
             startDate: _startDate,
             effectivePolicy: _effectivePolicy,
@@ -607,7 +624,13 @@ class _IssueSubscriptionScreenState
 
           SubscriptionTypeSelector(
             selectedType: _selectedType,
-            onChanged: (type) => setState(() => _selectedType = type),
+            onChanged: (type) => setState(() {
+              _selectedType = type;
+              if (type != SubscriptionType.trial &&
+                  _paymentMode == IssuePaymentMode.free) {
+                _paymentMode = IssuePaymentMode.prepaid;
+              }
+            }),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -616,17 +639,20 @@ class _IssueSubscriptionScreenState
 
           const SizedBox(height: AppSpacing.space6),
 
-          AmountInputSection(
-            originalAmount: _originalAmount,
-            controller: _amountController,
-            selectedType: _selectedType,
-            totalLessons: _totalLessons,
-            finalAmount: finalAmount,
-            discountPercent: _discountPercent,
-            onAmountChanged: (value) => setState(() => _originalAmount = value),
-          ),
+          if (!isFreeIssue) ...[
+            AmountInputSection(
+              originalAmount: _originalAmount,
+              controller: _amountController,
+              selectedType: _selectedType,
+              totalLessons: _totalLessons,
+              finalAmount: finalAmount,
+              discountPercent: _discountPercent,
+              onAmountChanged: (value) =>
+                  setState(() => _originalAmount = value),
+            ),
 
-          const SizedBox(height: AppSpacing.space6),
+            const SizedBox(height: AppSpacing.space6),
+          ],
 
           if (_selectedType != SubscriptionType.trial) ...[
             DiscountSection(
@@ -675,10 +701,16 @@ class _IssueSubscriptionScreenState
           ],
 
           PaymentStatusSection(
-            isPaymentConfirmed: _isPaymentConfirmed,
+            mode: _paymentMode,
             selectedPaymentMethod: _selectedPaymentMethod,
-            onPaymentConfirmedChanged:
-                (value) => setState(() => _isPaymentConfirmed = value),
+            onModeChanged: (m) => setState(() {
+              _paymentMode = m;
+              if (m == IssuePaymentMode.free) {
+                _selectedType = SubscriptionType.trial;
+                _originalAmount = 0;
+                _amountController.clear();
+              }
+            }),
             onPaymentMethodChanged:
                 (method) => setState(() => _selectedPaymentMethod = method),
           ),
