@@ -447,7 +447,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 | 수강권·정산 | Subscription & Billing | 수강권 템플릿 + 가격표 + 시험레슨 정책 + 계좌. 5묶음 §8 BottomSheet 진입 | 결제 (개별 용어는 OK), 빌링 |
 | lessonDurationMinutes | — | 레슨 1회 시간 (분). 기본값 50. `TeacherSettings` 필드 | defaultLessonDuration, slotDurationMinutes |
 | 카테고리 미리보기 | Category Preview | 가입 직후 Step 2.5 (`OnboardingCategoryPreviewScreen`) — 5묶음 인지 1회 화면. W6 에서 기존 가입자 마이그레이션 overlay 로 재활용 | 카테고리 가이드, 5묶음 가이드 |
-| 퀘스트 졸업 | Quest Graduation | Q1~Q10 100% 완료 시점 (`User.quest_celebrated_at`) + 7일 grace (`kQuestGraduationGrace`) 후 메인에서 hide. "⚙️ 정책·알림·지원 → 가이드 다시 보기" 로 재노출 | 퀘스트 완료 (개별 quest 완료와 구분), 퀘스트 dismiss |
+| 퀘스트 졸업 | Quest Graduation | Q1~Q10 100% 완료 시점 (`User.quest_celebrated_at`) + 7일 grace (`kQuestGraduationGrace`) 후 메인에서 hide. "⚙️ 알림·소식·지원 → 가이드 다시 보기" 로 재노출 | 퀘스트 완료 (개별 quest 완료와 구분), 퀘스트 dismiss |
 
 **관련 스펙**: [profile_master.md §2.1](profile/profile_master.md), [availability_settings_ux_redesign_spec.md](schedule/availability_settings_ux_redesign_spec.md), [teacher_quest_audit_2026-06-08.md §6~§7](design/teacher_quest_audit_2026-06-08.md), [teacher_first_availability_setup.md §3.3](onboarding/teacher_first_availability_setup.md).
 
@@ -474,6 +474,7 @@ lesson-app에서 사용하는 핵심 용어와 개념을 정의합니다.
 
 | 날짜 | 기존 용어 | 신규 용어 | 이유 |
 |------|----------|----------|------|
+| 2026-06-18 | 정책·알림·지원 (13항목 과적재) | 알림·소식·지원 (3 섹션: 템플릿/알림·소식/지원·계정) | 검토 #43 Miller's Law — 시트 내 섹션 청킹 + 라벨 정정(정책 항목 부재). 5묶음 카드 유지, FE 표시만 (.harness 동기화) |
 | 2026-06-18 | 취소 정책 디폴트 | 취소 정책 기본값 (+역할 교차참조) | 검토 #34 "디폴트" 개발어 제거 + 취소/노쇼 정책(운영규칙) vs 취소 정책 기본값(지각취소 보상·알림) 역할 명시. 통합 안 함, FE 표시만 (.harness/knowledge/glossary.md 동기화) |
 | 2026-06-18 | (초대 유효기간 미표기) | 학생/동료 7일 · 학부모 24시간 병기 | 검토 #30 초대 유효기간 일원화 — 차등 유지+모든 면 병기. 진입점 구조 불변, FE 표시만 (.harness/knowledge/glossary.md SSOT 동기화) |
 | 2026-06-17 | 입금대기(후불) / 입금 대기 | 미수금 (후불) / 입금 확인 대기 (선불) | 검토 #50 입금 용어 분리 — 후불 미수 채권 vs 선불 입금 안내 후 확인 대기 혼동 해소 + 미수금 금액 반올림 제거(만/원 정확). 표시명·glossary만, enum 불변 (.harness/knowledge/glossary.md SSOT 동기화) |

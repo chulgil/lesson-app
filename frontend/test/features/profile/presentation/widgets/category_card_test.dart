@@ -103,7 +103,7 @@ void main() {
       await tester.pumpWidget(
         wrap(
           CategoryCard(
-            title: '정책·알림·지원',
+            title: '알림·소식·지원',
             icon: Icons.settings,
             status: const CategoryStatusNeutral(),
             onTap: () {},

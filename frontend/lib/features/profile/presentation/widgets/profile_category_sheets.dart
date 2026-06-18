@@ -2,7 +2,7 @@
 // spec §3 (IA) + §7.2 (메인 홈) + ux-rules.md (BottomSheet 다중 액션 패턴).
 //
 // 단일 묶음은 CategoryMenuGrid 에서 직접 라우트 push.
-// 복합 묶음 (수강권·정산, 정책·알림·지원) 만 본 헬퍼의 BottomSheet 로 분기.
+// 복합 묶음 (수강권·정산, 알림·소식·지원) 만 본 헬퍼의 BottomSheet 로 분기.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +16,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
-import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../auth/auth_facade.dart';
 
 /// 💰 수강권·정산 BottomSheet — 수강권 템플릿/미수금/입금 계좌/취소 정책.
@@ -179,7 +178,7 @@ void showMyProfileSheet(BuildContext context) {
   );
 }
 
-/// ⚙️ 정책·알림·지원 BottomSheet — 템플릿/알림/녹음/가이드/팔로우/뉴스/지원/계정/로그아웃.
+/// ⚙️ 알림·소식·지원 BottomSheet — 3 섹션(템플릿 / 알림·소식 / 지원·계정). #805.
 void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
   showNotebookModalBottomSheet<void>(
     context: context,
@@ -192,6 +191,9 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
             children: [
               const _SheetHeader(
                 title: AppStrings.categorySheetPolicyNotificationsTitle,
+              ),
+              const _SheetSectionLabel(
+                title: AppStrings.categorySheetSectionTemplates,
               ),
               ListTile(
                 leading: const Icon(Icons.chat_outlined),
@@ -211,6 +213,9 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
                   context.push(AppRoutes.tipTemplateManagement);
                 },
               ),
+              const _SheetSectionLabel(
+                title: AppStrings.categorySheetSectionNotificationsNews,
+              ),
               ListTile(
                 leading: const Icon(Icons.notifications_outlined),
                 title: const Text(AppStrings.profileNotificationLabel),
@@ -225,16 +230,6 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
                 onTap: () {
                   Navigator.pop(sheetContext);
                   context.push(AppRoutes.allRecordings);
-                },
-              ),
-              // 가이드 다시 보기 — W5 Task 5.6 (spec §8.4).
-              ListTile(
-                leading: const Icon(Icons.menu_book_outlined),
-                title: const Text(AppStrings.categoryGuideReplayLabel),
-                subtitle: const Text(AppStrings.categoryGuideReplaySubtitle),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  context.push(AppRoutes.guideReshow);
                 },
               ),
               ListTile(
@@ -263,6 +258,19 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
                   context.push(AppRoutes.newsRoadmap);
                 },
               ),
+              const _SheetSectionLabel(
+                title: AppStrings.categorySheetSectionSupportAccount,
+              ),
+              // 가이드 다시 보기 — W5 Task 5.6 (spec §8.4).
+              ListTile(
+                leading: const Icon(Icons.menu_book_outlined),
+                title: const Text(AppStrings.categoryGuideReplayLabel),
+                subtitle: const Text(AppStrings.categoryGuideReplaySubtitle),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  context.push(AppRoutes.guideReshow);
+                },
+              ),
               ListTile(
                 leading: const Icon(Icons.help_outline),
                 title: const Text(AppStrings.profileHelpLabel),
@@ -284,10 +292,6 @@ void showPolicyNotificationsSheet(BuildContext context, WidgetRef ref) {
                   Navigator.pop(sheetContext);
                   context.push(AppRoutes.appInfo);
                 },
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.space4),
-                child: ThinRule(),
               ),
               ListTile(
                 leading: const Icon(Icons.description_outlined),
@@ -363,6 +367,35 @@ class _SheetHeader extends StatelessWidget {
             style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// #805 시트 내 성격별 섹션 헤더 (작은 캡션). 카테고리 그리드 섹션 타이틀 스타일 미러.
+class _SheetSectionLabel extends StatelessWidget {
+  final String title;
+
+  const _SheetSectionLabel({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        AppSpacing.space3,
+        AppSpacing.space4,
+        AppSpacing.space1,
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkTertiary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

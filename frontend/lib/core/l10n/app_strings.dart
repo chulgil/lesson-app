@@ -9165,8 +9165,8 @@ class AppStrings {
   /// 👤 내 프로필 묶음 카드 제목.
   static const categoryMyProfile = '내 프로필';
 
-  /// ⚙️ 정책·알림·지원 묶음 카드 제목.
-  static const categoryPolicyNotifications = '정책·알림·지원';
+  /// ⚙️ 알림·소식·지원 묶음 카드 제목.
+  static const categoryPolicyNotifications = '알림·소식·지원';
 
   /// 메인 홈 5묶음 메뉴 영역 섹션 헤더.
   static const categorySectionTitle = '설정';
@@ -9177,10 +9177,19 @@ class AppStrings {
   /// 👤 내 프로필 BottomSheet 제목.
   static const categorySheetMyProfileTitle = '내 프로필';
 
-  /// ⚙️ 정책·알림·지원 BottomSheet 제목.
-  static const categorySheetPolicyNotificationsTitle = '정책·알림·지원';
+  /// ⚙️ 알림·소식·지원 BottomSheet 제목.
+  static const categorySheetPolicyNotificationsTitle = '알림·소식·지원';
 
-  /// "가이드 다시 보기" 메뉴 (정책·알림·지원 묶음 — W5 졸업 후 활성).
+  /// #805 알림·소식·지원 시트 섹션 헤더 — 템플릿(피드백/연습팁).
+  static const categorySheetSectionTemplates = '템플릿';
+
+  /// #805 알림·소식·지원 시트 섹션 헤더 — 알림·소식(알림/녹음/팔로잉/소식/공지).
+  static const categorySheetSectionNotificationsNews = '알림·소식';
+
+  /// #805 알림·소식·지원 시트 섹션 헤더 — 지원·계정(가이드/도움말/앱정보/약관/개인정보/로그아웃).
+  static const categorySheetSectionSupportAccount = '지원·계정';
+
+  /// "가이드 다시 보기" 메뉴 (알림·소식·지원 묶음 — W5 졸업 후 활성).
   ///
   /// UX 카피 원칙 (2026-06-12): 내부 용어 (퀘스트 졸업/5묶음) 대신 사용자
   /// 가치 언어. "완료한 설정 가이드" = 사용자가 이해하는 대상.

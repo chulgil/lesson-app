@@ -365,7 +365,7 @@
 | 수업방식 묶음 | Lesson Style Group | `TeacherSettings.lessonDurationMinutes` / `minBookingHours` / `studentGuideMessage` (profile) | "어떻게 가르치는가" — 레슨 1회 시간 + 최소 사전예약 + 학생 안내 메시지 |
 | 수강권·정산 묶음 | Subscription & Billing Group | `TeacherSettings.priceTable` + `trialLessonPolicy` + `cancellationDefaults` + `SubscriptionTemplate` + `BankAccount` + `OutstandingPayment` | "어떻게 받는가" |
 | 내 프로필 묶음 | My Profile Group | `TeacherProfile` / `Instrument` / `Credential` / `Repertoire` | "나는 누구인가" |
-| 정책·알림·지원 묶음 | Policy/Notification/Support Group | `CancellationPolicy` / `NotificationSettings` / `FeedbackTemplate` 등 | 가끔 보는 것 |
+| 알림·소식·지원 묶음 | Notification/News/Support Group | `NotificationSettings` / `FeedbackTemplate` / `Following`/`News` 등 | 가끔 보는 것. #805: 시트 3 섹션(템플릿 / 알림·소식 / 지원·계정)으로 청킹, 라벨 "정책·알림·지원"→"알림·소식·지원"(정책 항목은 수강권·정산 소관이라 제거). 묶음 enum `policyNotifications` 불변 |
 
 ### 신규 용어
 
@@ -374,7 +374,7 @@
 | 카테고리 미리보기 | Category Preview | `OnboardingCategoryPreviewScreen` + `onboardingCategoryShownProvider` | 가입 직후 Step 2.5 5묶음 인지 화면. 1회 노출, 스킵 가능 |
 | 카테고리 카드 | Category Card | (DashboardTab 5묶음 카드 그리드) | 미설정 시 노란 점 affordance + 진행 상태 라벨 |
 | 퀘스트 졸업 | Quest Graduation | `questCelebrationProvider` + 7일 dismiss | Q1~Q10 100% 완료 후 메인에서 자동 hide. 졸업 카드 1주일 노출 후 dismiss |
-| 가이드 다시 보기 | Guide Re-show | (정책·알림·지원 메뉴) | 졸업 후 퀘스트 보드 + 카테고리 미리보기 재실행 fallback |
+| 가이드 다시 보기 | Guide Re-show | (알림·소식·지원 메뉴) | 졸업 후 퀘스트 보드 + 카테고리 미리보기 재실행 fallback |
 | 메뉴 NEW 배지 | NEW Badge | (5묶음 카테고리 카드) | 새 카테고리 7일간 NEW 점 표시. 한 번 진입 시 해당 카드만 dismiss |
 | 다음 미션 spotlight | Next Mission Spotlight | (메인 첫 진입 오버레이) | 메인 첫 진입 1회 — 화면 어둡게 + 다음 quest 카드 1개만 highlight |
 
@@ -579,6 +579,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-18 | 정책·알림·지원 시트 성격별 분리 (검토 #43) — 과적재 13항목을 3 섹션(템플릿/알림·소식/지원·계정)으로 청킹(Miller's Law). 가이드 다시 보기→지원·계정 재배치. 카드/시트 라벨 "정책·알림·지원"→"알림·소식·지원"(정책 항목 부재). `_SheetSectionLabel` 섹션 헤더 신설. 5묶음 카드/enum/status 불변(시트 내부만). |
 | 2026-06-18 | 취소 정책 두 화면 역할 명시 (검토 #34) — "취소 정책 디폴트"→"취소 정책 기본값"(개발어 제거). 취소/노쇼 정책(변경권·최소취소시간·노쇼·이월, `LessonPolicy`) vs 취소 정책 기본값(지각취소 보상·알림·마감 기본값, `CancellationDefaults`) 역할 분담 명시 + 양방향 교차참조(관련설정 링크/안내 노트). 두 화면 통합 안 함(2 feature/엔티티), FE 표시만. |
 | 2026-06-18 | 초대 유효기간 표기 일원화 (검토 #30) — 학생/동료 초대 **7일** / 학부모 초대 **24시간** 차등 유지(정책·BE 불변, FE 표시만) + 모든 초대 면 병기. 학부모 초대 공유 텍스트·다이얼로그(`inviteParentValidityNote`)·수신 코드입력 캡션·학생/동료 공유(`inviteShareMessageFormat`)에 유효기간 추가. 진입점 구조 현행 유지(통합 아님). |
 | 2026-06-17 | 입금 용어 분리 + 금액 정확 표기 (검토 #50) — 후불 **미수금**(입금대기(후불)·입금대기 흡수) vs 선불 **입금 확인 대기**(입금 대기 흡수) 분리. 미수금 긴급알림 금액 절사/반올림 제거 → 만/원 정확 표기(`formatKoreanWon` 동등 inline). 표시명·glossary만, enum/식별자 불변. |

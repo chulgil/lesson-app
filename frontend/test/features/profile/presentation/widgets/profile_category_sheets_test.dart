@@ -121,7 +121,13 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text(AppStrings.categoryGuideReplayLabel));
+      final guide = find.text(AppStrings.categoryGuideReplayLabel);
+      await tester.scrollUntilVisible(
+        guide,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(guide);
       await tester.pumpAndSettle();
 
       // 시트가 닫히고 catch-all stub 라우트로 push 됨 — 시트 항목 사라짐.
@@ -140,6 +146,27 @@ void main() {
       expect(find.text(AppStrings.profileTermsLabel), findsOneWidget);
       expect(find.text(AppStrings.profilePrivacyPolicyLabel), findsOneWidget);
       expect(find.text(AppStrings.profileLogoutLabel), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('3 섹션 헤더 노출 (템플릿/알림·소식/지원·계정) (#805)', (tester) async {
+      await tester.pumpWidget(const _PolicySheetHost());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.categorySheetSectionTemplates),
+        findsOneWidget,
+      );
+      expect(
+        find.text(AppStrings.categorySheetSectionNotificationsNews),
+        findsOneWidget,
+      );
+      expect(
+        find.text(AppStrings.categorySheetSectionSupportAccount),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   });
