@@ -426,6 +426,12 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
       children: [
         _buildSectionHeader(AppStrings.policyRelatedHeader, Icons.settings),
         const SizedBox(height: AppSpacing.space3),
+        // #801: 지각취소 보상·알림 기본값은 취소 정책 기본값 화면에서 관리 (교차참조).
+        _buildRelatedSettingItem(
+          icon: Icons.event_busy,
+          label: AppStrings.profileCancellationDefaultsLabel,
+          onTap: () => context.push(AppRoutes.cancellationDefaults),
+        ),
         _buildRelatedSettingItem(
           icon: Icons.schedule,
           label: AppStrings.lessonTimeSettings,

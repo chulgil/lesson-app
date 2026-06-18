@@ -112,4 +112,19 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('LessonPolicyScreen — 관련 설정 교차참조 (#801)', () {
+    testWidgets('취소 정책 기본값 링크가 관련 설정에 노출', (tester) async {
+      await tester.pumpWidget(_pumpScreen(policy: _makePolicy()));
+      await tester.pumpAndSettle();
+
+      final link = find.text(AppStrings.profileCancellationDefaultsLabel);
+      await tester.scrollUntilVisible(
+        link,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(link, findsOneWidget);
+    });
+  });
 }

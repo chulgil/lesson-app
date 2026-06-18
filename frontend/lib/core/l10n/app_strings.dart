@@ -3404,40 +3404,40 @@ class AppStrings {
 
   /// override 화면 푸터
   static const subscriptionPolicyOverrideFooter =
-      'ⓘ 이 값들은 본 수강권에만 적용됩니다. 디폴트 자체를 바꾸려면 설정 화면에서 변경하세요.';
+      'ⓘ 이 값들은 본 수강권에만 적용됩니다. 기본값을 바꾸려면 설정 화면에서 변경하세요.';
 
-  /// 시트 행 — override 미설정 (디폴트 사용)
-  static const subscriptionPolicyUsingDefault = '디폴트 사용';
+  /// 시트 행 — override 미설정 (기본값 사용)
+  static const subscriptionPolicyUsingDefault = '기본값 사용';
 
   /// 시트 행 — 1개 이상 override 적용 중
   static const subscriptionPolicyOverridden = '개별 설정 적용';
 
-  /// 변경/취소 마감 시간 안내 (디폴트 값)
+  /// 변경/취소 마감 시간 안내 (기본값)
   static String policyDeadlineHoursHelper(int defaultHours) =>
-      '디폴트: $defaultHours시간 전. 이 시간 안에 학생이 변경하면 변경권을 차감합니다.';
+      '기본값: $defaultHours시간 전. 이 시간 안에 학생이 변경하면 변경권을 차감합니다.';
 
   /// 학생 변경권 자동 적립 (라벨)
   static const policyCompensationCreditLabel = '학생 변경권 자동 적립';
 
-  /// 학생 변경권 자동 적립 안내 (디폴트 ON/OFF)
+  /// 학생 변경권 자동 적립 안내 (기본값 ON/OFF)
   static String policyCompensationCreditHelper(bool defaultEnabled) =>
-      '디폴트: ${defaultEnabled ? "켜짐" : "꺼짐"}. 강사 사유 12시간 이내 취소 시 학생에게 변경권 1회를 자동으로 적립합니다.';
+      '기본값: ${defaultEnabled ? "켜짐" : "꺼짐"}. 강사 사유 12시간 이내 취소 시 학생에게 변경권 1회를 자동으로 적립합니다.';
 
   /// 추가 시간 안내 문구 포함 (라벨)
   static const policyIncludeExtraMinutesTextLabel = '"추가 시간 안내" 문구 포함';
 
   /// 추가 시간 안내 문구 포함 안내
   static String policyIncludeExtraMinutesTextHelper(bool defaultEnabled) =>
-      '디폴트: ${defaultEnabled ? "켜짐" : "꺼짐"}. 학생에게 보내는 카톡에 "다음 레슨 추가 시간 안내" 문구를 포함합니다.';
+      '기본값: ${defaultEnabled ? "켜짐" : "꺼짐"}. 학생에게 보내는 카톡에 "다음 레슨 추가 시간 안내" 문구를 포함합니다.';
 
   /// 안내 문구 (라벨)
   static const policyCompensationMessageLabel = '안내 문구';
 
-  /// 안내 문구 도움말 (디폴트 메시지가 있을 때)
+  /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
           ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '디폴트: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -3448,7 +3448,7 @@ class AppStrings {
 
   /// 학원 관리자 알림 안내
   static String policyNotifyOwnerHelper(bool defaultEnabled) =>
-      '디폴트: ${defaultEnabled ? "켜짐" : "꺼짐"}. 강사 사유 12시간 이내 취소 시 학원 관리자에게 푸시 알림을 보냅니다.';
+      '기본값: ${defaultEnabled ? "켜짐" : "꺼짐"}. 강사 사유 12시간 이내 취소 시 학원 관리자에게 푸시 알림을 보냅니다.';
 
   // -- Issue Form Type Options (수강권 발급 폼 타입 옵션) --
 
@@ -7120,8 +7120,8 @@ class AppStrings {
   static const profileAvailabilityLabel = '가용 시간 관리';
   static const profileAvailabilitySubtitle = '주간 스케줄, 휴무, 예외 시간';
   static const profileCancelPolicyLabel = '취소/노쇼 정책';
-  static const profileCancelPolicySubtitle = '변경 횟수, 취소 기한, 노쇼 처리';
-  static const profileCancellationDefaultsLabel = '취소 정책 디폴트';
+  static const profileCancelPolicySubtitle = '변경 횟수, 최소 취소 시간, 노쇼·이월';
+  static const profileCancellationDefaultsLabel = '취소 정책 기본값';
   static const profileCancellationDefaultsSubtitle = '마감 시간, 학생 보상, 학원 알림 기본값';
   static const profileRepertoireLabel = '레퍼토리 관리';
   static const profileRepertoireSubtitle = '교재 및 곡 목록';
@@ -7353,8 +7353,12 @@ class AppStrings {
   static const profilePriceTableHint = '예: 50000';
 
   // ── Cancellation Defaults Settings ──
-  static const profileCancellationDefaultsTitle = '취소 정책 디폴트';
-  static const profileCancellationDefaultsSection = '취소 정책 디폴트';
+  static const profileCancellationDefaultsTitle = '취소 정책 기본값';
+
+  /// 취소 정책 기본값 화면 역할 안내 — #801. 변경권·노쇼는 취소/노쇼 정책 소관 명시.
+  static const cancellationDefaultsRoleNote =
+      '지각취소 시 보상·알림의 전역 기본값입니다. 변경 횟수·최소 취소 시간·노쇼·이월은 「취소/노쇼 정책」에서 설정합니다.';
+  static const profileCancellationDefaultsSection = '취소 정책 기본값';
   static const profileCancellationDeadlineHours = '취소 페널티 없는 시간';
   static const profileCancellationDeadlineHoursHint = '시간';
   static const profileCancellationDeadlineDescription =

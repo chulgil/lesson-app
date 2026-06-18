@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_banner.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
@@ -136,6 +137,10 @@ class _CancellationDefaultsContentState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          NotebookBanner(
+            message: AppStrings.cancellationDefaultsRoleNote,
+            leadingIcon: Icons.info_outline,
+          ),
           _buildDeadlineSection(),
           const SizedBox(height: AppSpacing.space6),
           _buildCompensationSection(),
