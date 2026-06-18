@@ -1,6 +1,6 @@
 # CLAUDE.md - Lessonaza
 
-> 마지막 업데이트: 2026-05-04
+> 마지막 업데이트: 2026-06-18
 
 음악 레슨/연습 관리 앱 — Flutter 3.29.0, Riverpod, Go Router, Hive | Clean Architecture + Feature-based
 
@@ -30,6 +30,18 @@ Phase 0: brownfield-scan → Phase 1: interview → Phase 2: spec
 - 유비쿼터스 언어: `.harness/knowledge/glossary.md` (SSOT)
 
 > **⚠️ 새 코드는 반드시 `features/[domain]/` 아래에 작성** → [상세 아키텍처](docs/architecture.md)
+
+### 지식 그물 + 멀티에이전트 워커 (cg-harness v0.10.0)
+
+- **지식 그물 (Knot)**: lessonaza 는 공유 vault `~/Dev/mybrain` 에 연결됨(`.cg/knot.toml`). Claude·Codex·Gemini 가 **같은 평문 md 지식 그물**을 읽어 결정·도메인 지식이 세션을 넘어 누적된다.
+  - `cg knot status` / `cg knot lint` (프로젝트 안에서 실행 → vault 자동 해석). knot 명령은 `--vault` 사용.
+  - 스킬: `cg-knot-ingest`(inbox->wiki 컴파일) · `cg-knot-query`(질의·합성) · `cg-knot-lint`(AI 의미 점검).
+- **멀티에이전트 워커**: 무거운 job 을 교차 벤더 워커(claude-main / codex / gemini)로 분배. 디스패치 층 = `cg-orchestrate` 스킬.
+  - 레지스트리 `.cg/backends.json`, 라우팅(4토폴로지)·승인 게이트·불변식 `.harness/orchestration/`.
+  - `cg orchestrate doctor`(백엔드 가용성), `cg orchestrate validate`(config 일관성). orchestrate 명령은 `--path` 사용.
+  - graceful degradation: `agy`/`codex` 미설치 시 claude-main native Task 로 자동 폴백. 워커 호출은 인터랙티브 전용 + 승인 게이트 통과.
+- 카파시 4원칙(AI 브레이크)은 `golden-principles.md`(#3·#5·#9·#12)에 이미 강제 — 워커도 상속한다.
+- 사용 가이드(레슨앱 예제 + 아키텍처): mybrain `10 Projects/CG-Harness/cg-harness-knot-멀티에이전트-사용가이드.md`.
 
 ## 명령어
 
