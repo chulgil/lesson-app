@@ -211,4 +211,46 @@ void main() {
       expect(resolveAuthRedirect(const AuthLoading(), '/teacher/home'), isNull);
     });
   });
+
+  group('resolveAuthRedirect — splash gate (no login flash)', () {
+    const teacher = AuthAuthenticated(
+      userId: 'u',
+      name: 'n',
+      email: 'e',
+      role: UserRole.teacher,
+    );
+
+    test('stays on splash while loading (the flash this fix removes)', () {
+      // Router starts at splash. During AuthLoading we must NOT redirect to
+      // login — that bounce is the flash.
+      expect(
+        resolveAuthRedirect(const AuthLoading(), AppRoutes.splash),
+        isNull,
+      );
+    });
+
+    test('authenticated on splash redirects to home (not stranded)', () {
+      // Without the splash branch this returns null and the logged-in user is
+      // stuck on the loading screen after auth resolves.
+      final result = resolveAuthRedirect(teacher, AppRoutes.splash);
+      expect(result, isNotNull);
+      expect(result, isNot(AppRoutes.splash));
+      expect(result, isNot(AppRoutes.login));
+    });
+
+    test('unauthenticated on splash redirects to login', () {
+      expect(
+        resolveAuthRedirect(const AuthUnauthenticated(), AppRoutes.splash),
+        AppRoutes.login,
+      );
+    });
+
+    test('needs-role on splash redirects to roleSelect', () {
+      const state = AuthNeedsRole(userId: 'u', name: 'n', email: 'e');
+      expect(
+        resolveAuthRedirect(state, AppRoutes.splash),
+        AppRoutes.roleSelect,
+      );
+    });
+  });
 }
