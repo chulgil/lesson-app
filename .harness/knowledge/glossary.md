@@ -581,6 +581,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-18 | 학생 상세 전화/문자 상단 승격 + 메뉴 그룹핑 (검토 #28) — 매일 쓰는 전화·문자를 more(...) 메뉴(2탭) → 신원 스트립(1탭, `StudentContactActions`). more 메뉴를 관리/상태 변경 섹션(`_MoreSectionLabel`)으로 그룹핑 + 학생 보관 맨 아래 분리. 데이터·플로우 불변(UI/IA만). |
 | 2026-06-18 | 레슨 요약 공유 버튼 (검토 #62) — 레슨 상세 공유 액션을 로컬 텍스트 스낵바 → 서버 토큰 발급(`POST /lesson-summaries/{id}/share`, BE 기구현)으로 교체. URL 클립보드 복사 + "학생과 공유하기" 토스트. FE-only(LessonSummaryShare 모델 + repo mock/remote + 수동 provider). 구 lessonShareText/shareTextCopied orphan 제거. |
 | 2026-06-18 | 만료임박 카드 갱신 제안 CTA (검토 #45) — `SubscriptionCard.onRenew` + 만료임박 화면 wiring → `issueSubscription?renewFromSubscriptionId=` 로 이전 수강권(회차·금액·유효기간·변경허용) 프리필 발급. `_applyRenewalDefaults` 폼 초기값만(발급 로직·빌링 불변, 교사 확인 후 발급). 임박→갱신 한 화면 완결. |
 | 2026-06-18 | 정책·알림·지원 시트 성격별 분리 (검토 #43) — 과적재 13항목을 3 섹션(템플릿/알림·소식/지원·계정)으로 청킹(Miller's Law). 가이드 다시 보기→지원·계정 재배치. 카드/시트 라벨 "정책·알림·지원"→"알림·소식·지원"(정책 항목 부재). `_SheetSectionLabel` 섹션 헤더 신설. 5묶음 카드/enum/status 불변(시트 내부만). |

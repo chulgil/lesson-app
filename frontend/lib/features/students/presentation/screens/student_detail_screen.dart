@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
@@ -17,6 +16,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../widgets/student_detail/student_contact_actions.dart';
 import '../../../../features/students/students_facade.dart'
     show
         Student,
@@ -200,6 +200,11 @@ class _StudentDetailContent extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           _StudentMetaLine(student: student),
+                          if (student.phone != null &&
+                              student.phone!.isNotEmpty) ...[
+                            const SizedBox(height: AppSpacing.space3),
+                            StudentContactActions(phone: student.phone),
+                          ],
                         ],
                       ),
                     ),
@@ -238,6 +243,9 @@ class _StudentDetailContent extends ConsumerWidget {
           (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const _MoreSectionLabel(
+                title: AppStrings.managementSectionTitle,
+              ),
               _MoreOptionTile(
                 icon: Icons.edit_outlined,
                 title: AppStrings.studentEditInfoTitle,
@@ -246,37 +254,6 @@ class _StudentDetailContent extends ConsumerWidget {
                   context.push(
                     AppRoutes.editStudent.replaceFirst(':id', student.id),
                   );
-                },
-              ),
-              const _MoreOptionDivider(),
-              _MoreOptionTile(
-                icon: Icons.phone_outlined,
-                title: AppStrings.studentCallTitle,
-                enabled: student.phone != null && student.phone!.isNotEmpty,
-                hint:
-                    student.phone == null || student.phone!.isEmpty
-                        ? AppStrings.studentNoPhone
-                        : null,
-                onTap: () {
-                  Navigator.pop(context);
-                  if (student.phone != null && student.phone!.isNotEmpty) {
-                    launchUrl(Uri.parse('tel:${student.phone}'));
-                  }
-                },
-              ),
-              _MoreOptionTile(
-                icon: Icons.message_outlined,
-                title: AppStrings.studentSendMessage,
-                enabled: student.phone != null && student.phone!.isNotEmpty,
-                hint:
-                    student.phone == null || student.phone!.isEmpty
-                        ? AppStrings.studentNoPhone
-                        : null,
-                onTap: () {
-                  Navigator.pop(context);
-                  if (student.phone != null && student.phone!.isNotEmpty) {
-                    launchUrl(Uri.parse('sms:${student.phone}'));
-                  }
                 },
               ),
               _MoreOptionTile(
@@ -306,7 +283,18 @@ class _StudentDetailContent extends ConsumerWidget {
                   );
                 },
               ),
-              const _MoreOptionDivider(),
+              _MoreOptionTile(
+                icon: Icons.family_restroom,
+                title: AppStrings.studentParentInviteLabel,
+                hint: AppStrings.studentParentInviteHint,
+                onTap: () {
+                  Navigator.pop(context);
+                  _showInviteCodeDialog(context, student.name, ref);
+                },
+              ),
+              const _MoreSectionLabel(
+                title: AppStrings.studentStatusChangeSection,
+              ),
               if (student.status == StudentStatus.trial)
                 _MoreOptionTile(
                   icon: Icons.upgrade,
@@ -349,15 +337,6 @@ class _StudentDetailContent extends ConsumerWidget {
                         dialogBody: '${student.name} 학생의 레슨을 재개하시겠습니까?',
                       ),
                 ),
-              _MoreOptionTile(
-                icon: Icons.family_restroom,
-                title: AppStrings.studentParentInviteLabel,
-                hint: AppStrings.studentParentInviteHint,
-                onTap: () {
-                  Navigator.pop(context);
-                  _showInviteCodeDialog(context, student.name, ref);
-                },
-              ),
               const _MoreOptionDivider(),
               _MoreOptionTile(
                 icon: Icons.archive_outlined,
@@ -746,11 +725,38 @@ class _MoreOptionDivider extends StatelessWidget {
 
 /// More options 시트의 ink-only ListTile.
 /// hint = subtitle (회색), enabled=false 시 비활성, isDestructive=true 시 Vermillion.
+class _MoreSectionLabel extends StatelessWidget {
+  final String title;
+
+  const _MoreSectionLabel({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        AppSpacing.space3,
+        AppSpacing.space4,
+        AppSpacing.space1,
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.inkTertiary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _MoreOptionTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? hint;
-  final bool enabled;
   final bool isDestructive;
   final VoidCallback onTap;
 
@@ -758,7 +764,6 @@ class _MoreOptionTile extends StatelessWidget {
     required this.icon,
     required this.title,
     this.hint,
-    this.enabled = true,
     this.isDestructive = false,
     required this.onTap,
   });
@@ -766,13 +771,8 @@ class _MoreOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        !enabled
-            ? AppColors.inkTertiary
-            : isDestructive
-            ? AppColors.paperAccent
-            : AppColors.ink;
+        isDestructive ? AppColors.paperAccent : AppColors.ink;
     return ListTile(
-      enabled: enabled,
       leading: Icon(icon, color: color, size: 22),
       title: Text(title, style: AppTypography.bodyLarge.copyWith(color: color)),
       subtitle:
@@ -784,7 +784,7 @@ class _MoreOptionTile extends StatelessWidget {
                 ),
               )
               : null,
-      onTap: enabled ? onTap : null,
+      onTap: onTap,
     );
   }
 }

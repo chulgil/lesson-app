@@ -7538,6 +7538,15 @@ class AppStrings {
   static const studentParentInviteHint = '연결을 위한 초대 코드 생성';
   static const studentEditInfoTitle = '학생 정보 수정';
   static const studentCallTitle = '전화하기';
+
+  /// #779 신원 스트립 전화 단축 버튼 라벨.
+  static const studentContactCallShort = '전화';
+
+  /// #779 신원 스트립 문자 단축 버튼 라벨.
+  static const studentContactMessageShort = '문자';
+
+  /// #779 더보기 메뉴 상태 변경 섹션 헤더.
+  static const studentStatusChangeSection = '상태 변경';
   static const studentViewLessonHistory = '레슨 기록 보기';
   static const studentConvertRegular = '정규 전환';
   static const studentConvertRegularHint = '체험 학생을 정규 학생으로';
