@@ -171,6 +171,14 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
                   () => context.push(
                     AppRoutes.subscriptionDetail.replaceFirst(':id', sub.id),
                   ),
+              // #806 임박 → 갱신 한 화면 완결: 이전 수강권 프리필 발급 진입.
+              onRenew:
+                  () => context.push(
+                    '${AppRoutes.issueSubscription}'
+                    '?renewFromSubscriptionId=${sub.id}'
+                    '&studentId=${sub.studentId}'
+                    '&membershipId=${sub.membershipId}',
+                  ),
             ),
           ),
         ),

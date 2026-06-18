@@ -3285,6 +3285,9 @@ class AppStrings {
   /// 갱신 요청 (액션 라벨)
   static const subscriptionRenewalAction = '갱신 요청';
 
+  /// #806 만료임박 카드 교사용 갱신 제안 CTA — 이전 수강권 프리필 발급 화면 진입.
+  static const subscriptionRenewProposeCta = '갱신 제안';
+
   /// 수강권 만료 (이미 만료된 알림 제목)
   static const subscriptionExpiredTitle = '수강권이 만료되었습니다';
 

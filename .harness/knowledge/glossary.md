@@ -75,6 +75,7 @@
 | 수강권 자동 연장 | Auto-Extension | `Subscription.autoExtendedDays` | `auto_extended_days` | 선생님 휴가 등록 시 휴가 일수만큼 만료일 자동 연장 |
 | 스케줄된 회차 | Scheduled Lessons | `Subscription.scheduledLessons` | `scheduled_lessons` | 실제 잡힌 레슨 수. `remainingLessons` 와 별개 트랙 |
 | 보강 크레딧 | Makeup Credit | `MakeupCredit` | `MakeupCredit` | 별도 엔티티. 휴가·노쇼 면제·일괄변경 손실 회차 적립. 30일 만료 |
+| 갱신 제안 | Renewal Propose | (만료임박 카드 `onRenew` CTA → issueSubscription `renewFromSubscriptionId`) | — | 만료임박 수강권을 이전 값(회차·금액·유효기간·변경허용) 프리필 발급 화면으로 바로 발급. 교사 수동 갱신. "연장"(자동 만료연장)과 구분 — 갱신=새 수강권 발급(폼 프리필만, 발급은 교사 확인). #806 |
 
 ---
 
@@ -579,6 +580,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-18 | 만료임박 카드 갱신 제안 CTA (검토 #45) — `SubscriptionCard.onRenew` + 만료임박 화면 wiring → `issueSubscription?renewFromSubscriptionId=` 로 이전 수강권(회차·금액·유효기간·변경허용) 프리필 발급. `_applyRenewalDefaults` 폼 초기값만(발급 로직·빌링 불변, 교사 확인 후 발급). 임박→갱신 한 화면 완결. |
 | 2026-06-18 | 정책·알림·지원 시트 성격별 분리 (검토 #43) — 과적재 13항목을 3 섹션(템플릿/알림·소식/지원·계정)으로 청킹(Miller's Law). 가이드 다시 보기→지원·계정 재배치. 카드/시트 라벨 "정책·알림·지원"→"알림·소식·지원"(정책 항목 부재). `_SheetSectionLabel` 섹션 헤더 신설. 5묶음 카드/enum/status 불변(시트 내부만). |
 | 2026-06-18 | 취소 정책 두 화면 역할 명시 (검토 #34) — "취소 정책 디폴트"→"취소 정책 기본값"(개발어 제거). 취소/노쇼 정책(변경권·최소취소시간·노쇼·이월, `LessonPolicy`) vs 취소 정책 기본값(지각취소 보상·알림·마감 기본값, `CancellationDefaults`) 역할 분담 명시 + 양방향 교차참조(관련설정 링크/안내 노트). 두 화면 통합 안 함(2 feature/엔티티), FE 표시만. |
 | 2026-06-18 | 초대 유효기간 표기 일원화 (검토 #30) — 학생/동료 초대 **7일** / 학부모 초대 **24시간** 차등 유지(정책·BE 불변, FE 표시만) + 모든 초대 면 병기. 학부모 초대 공유 텍스트·다이얼로그(`inviteParentValidityNote`)·수신 코드입력 캡션·학생/동료 공유(`inviteShareMessageFormat`)에 유효기간 추가. 진입점 구조 현행 유지(통합 아님). |

@@ -37,6 +37,9 @@ class SubscriptionCard extends StatelessWidget {
   /// Default: 7 (alert when 7 or fewer days remain).
   final int renewalAlertDays;
 
+  /// #806 갱신 제안 CTA 콜백. null 이면 CTA 미표시(기존 사용처 영향 없음).
+  final VoidCallback? onRenew;
+
   const SubscriptionCard({
     super.key,
     required this.subscription,
@@ -48,6 +51,7 @@ class SubscriptionCard extends StatelessWidget {
     this.personName,
     this.renewalAlertThreshold = 1,
     this.renewalAlertDays = 7,
+    this.onRenew,
   });
 
   @override
@@ -411,6 +415,22 @@ class SubscriptionCard extends StatelessWidget {
 
               // Warnings (multiple possible)
               ..._buildWarnings(),
+
+              // #806 갱신 제안 CTA — 만료임박 등에서 onRenew 제공 시만 노출.
+              if (onRenew != null) ...[
+                const SizedBox(height: AppSpacing.space3),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onRenew,
+                    icon: const Icon(Icons.autorenew, size: 18),
+                    label: const Text(AppStrings.subscriptionRenewProposeCta),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, AppSpacing.buttonHeight),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

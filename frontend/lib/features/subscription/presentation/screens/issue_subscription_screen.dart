@@ -22,6 +22,7 @@ import '../../../schedule/schedule_facade.dart';
 import '../extensions/lesson_policy_visuals.dart';
 import '../providers/proposal_draft_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
+import '../providers/subscription_providers.dart';
 import '../providers/subscription_template_providers.dart';
 import '../widgets/issue_form_discount_bonus.dart';
 import '../widgets/issue_form_membership_widgets.dart';
@@ -41,6 +42,9 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   final List<String> studentIds;
   final String? membershipId;
   final String? templateId;
+
+  /// #806 갱신 발급: 이 수강권의 값(회차·금액·유효기간·변경허용)으로 폼 프리필.
+  final String? renewFromSubscriptionId;
   final String? lessonRequestId;
   final List<String> lessonRequestIds;
 
@@ -49,6 +53,7 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
     required this.studentIds,
     this.membershipId,
     this.templateId,
+    this.renewFromSubscriptionId,
     this.lessonRequestId,
     this.lessonRequestIds = const [],
   });
@@ -90,6 +95,7 @@ class _IssueSubscriptionScreenState
   String? _selectedLocationId;
   int _travelTimeMinutes = 0;
   String? _appliedTemplateId;
+  String? _appliedRenewalId;
 
   // 선생님 정책 기본값 연동.
   // 수강권 생성 시 정책값을 기본으로 표기하되, 실제 컨트롤은 수강권 단위.
@@ -213,6 +219,7 @@ class _IssueSubscriptionScreenState
   @override
   Widget build(BuildContext context) {
     _scheduleTemplateDefaults();
+    _scheduleRenewalDefaults();
 
     final membershipsAsync =
         widget.isBatchMode
@@ -321,6 +328,56 @@ class _IssueSubscriptionScreenState
       _amountController.text = formatPriceWithCommas(template.price);
       _hasPrefilledAmount = true;
       _appliedTemplateId = template.id;
+    });
+  }
+
+  /// #806 — 갱신 발급: 이전 수강권을 로드해 폼을 프리필 (선생님 확인 후 발급).
+  void _scheduleRenewalDefaults() {
+    final id = widget.renewFromSubscriptionId;
+    if (id == null || _appliedRenewalId == id) return;
+
+    final prevAsync = ref.watch(subscriptionProvider(id));
+    prevAsync.whenData((prev) {
+      if (prev == null || _appliedRenewalId == prev.id) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _appliedRenewalId == prev.id) return;
+        _applyRenewalDefaults(prev);
+      });
+    });
+  }
+
+  /// 이전 수강권 값으로 폼 초기값을 채운다. 발급 로직은 불변 — 값은 폼에서
+  /// 그대로 수정 가능하며 최종 발급은 선생님 확인 후 진행한다.
+  void _applyRenewalDefaults(Subscription prev) {
+    setState(() {
+      _selectedType = prev.type;
+      if (prev.type == SubscriptionType.package &&
+          (prev.totalLessons ?? 0) > 0) {
+        _totalLessons = prev.totalLessons!;
+        _lessonsController.text = _totalLessons.toString();
+      } else if (prev.type == SubscriptionType.monthly &&
+          (prev.lessonsPerMonth ?? 0) > 0) {
+        _lessonsPerMonth = prev.lessonsPerMonth!;
+      }
+      // 유효기간: 이전 수강권 기간에서 산출(있으면).
+      final start = prev.startDate;
+      final end = prev.endDate;
+      if (start != null && end != null) {
+        final days = end.difference(start).inDays;
+        if (days > 0) {
+          _validityDays = days;
+          _validityController.text = days.toString();
+        }
+      }
+      // 금액: 이전 결제액 프리필 (선생님이 확인 후 조정).
+      if (prev.amount > 0) {
+        _originalAmount = prev.amount;
+        _amountController.text = formatPriceWithCommas(prev.amount);
+        _hasPrefilledAmount = true;
+      }
+      _rescheduleAllowance = prev.totalRescheduleAllowance;
+      _selectedMembershipId = prev.membershipId;
+      _appliedRenewalId = prev.id;
     });
   }
 

@@ -86,6 +86,8 @@ List<RouteBase> subscriptionRoutes = [
       final studentIdParam = state.uri.queryParameters['studentId'];
       final membershipId = state.uri.queryParameters['membershipId'];
       final templateId = state.uri.queryParameters['templateId'];
+      final renewFromSubscriptionId =
+          state.uri.queryParameters['renewFromSubscriptionId'];
 
       final lessonRequestId = state.uri.queryParameters['lessonRequestId'];
       final lessonRequestIdsParam =
@@ -119,6 +121,7 @@ List<RouteBase> subscriptionRoutes = [
           studentIds: studentIds,
           membershipId: membershipId,
           templateId: templateId,
+          renewFromSubscriptionId: renewFromSubscriptionId,
           lessonRequestId: lessonRequestId,
           lessonRequestIds: lessonRequestIds,
         ),
