@@ -595,6 +595,11 @@ class _SwipeableLessonCard extends ConsumerWidget {
         lesson.displayStatus == LessonStatus.scheduled ||
         lesson.displayStatus == LessonStatus.reschedulePending;
 
+    // #766: 수강권 레슨은 스와이프 취소(우→좌)를 비활성화 — plain cancelLesson 이
+    // 차감 되돌림/변경권/휴강 이벤트를 우회하기 때문. 수강권 레슨 취소는 카드 탭 →
+    // 상세 → 구독 취소(휴강) 플로우에서만. 완료(좌→우) 스와이프는 그대로 둔다.
+    final canSwipeCancel = lesson.subscriptionId == null;
+
     final card = LessonCard(
       lesson: lesson,
       onTap: () =>
@@ -605,6 +610,9 @@ class _SwipeableLessonCard extends ConsumerWidget {
 
     return Dismissible(
       key: ValueKey('lesson-swipe-${lesson.id}'),
+      direction: canSwipeCancel
+          ? DismissDirection.horizontal // 완료(좌→우) + 취소(우→좌)
+          : DismissDirection.startToEnd, // 완료만, 취소 스와이프 없음
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
           return await _showConfirmDialog(
