@@ -2852,17 +2852,11 @@ class AppStrings {
   static String lessonDetailAppBarTitle(String studentName) =>
       '$studentName (레슨)';
 
-  /// {studentName} {instrument} 레슨\n{date} {startTime} ({duration}분) (share text template)
-  static String lessonShareText({
-    required String studentName,
-    required String instrument,
-    required String date,
-    required String startTime,
-    required int duration,
-  }) => '$studentName $instrument 레슨\n$date $startTime ($duration분)';
+  /// 학생과 공유하기 토스트 — #808 요약 공유 링크 복사 성공.
+  static const lessonSummaryShareCopied = '학생과 공유하기 · 링크가 복사되었습니다';
 
-  /// 공유 텍스트가 복사되었습니다: {text} (share text copied)
-  static String shareTextCopied(String text) => '공유 텍스트가 복사되었습니다: $text';
+  /// 요약 공유 실패 — #808.
+  static const lessonSummaryShareError = '공유 링크 생성에 실패했습니다. 다시 시도해주세요.';
 
   /// 완료 처리 (mark complete menu item)
   static const markComplete = '완료 처리';

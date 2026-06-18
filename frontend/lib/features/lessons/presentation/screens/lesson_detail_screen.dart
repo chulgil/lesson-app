@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -17,6 +17,7 @@ import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/lesson_crud_provider.dart';
+import '../../../share/presentation/providers/lesson_summary_share_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
@@ -42,6 +43,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   Timer? _feedbackDebounce;
+  bool _isSharingSummary = false;
   String? _pendingFeedbackText;
   // _proposalBannerDismissed removed — 정규레슨 제안은 학생 상세 수강권 현황에서 표시
 
@@ -191,26 +193,43 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
+  /// #808 — 레슨 요약 공유: 서버 토큰 생성 → 공유 URL 클립보드 복사 + 토스트.
+  /// 토큰 발급만 서버, 발급된 URL 은 그대로 복사(랜딩=학생 요약 화면).
+  Future<void> _handleShareSummary(Lesson lesson) async {
+    if (_isSharingSummary) return;
+    setState(() => _isSharingSummary = true);
+    try {
+      final share = await ref
+          .read(lessonSummaryShareRepositoryProvider)
+          .createLessonSummaryShare(lesson.id);
+      await Clipboard.setData(ClipboardData(text: share.url));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.lessonSummaryShareCopied),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.lessonSummaryShareError),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSharingSummary = false);
+    }
+  }
+
   PreferredSizeWidget _buildAppBar(Lesson lesson) {
     return NotebookDetailAppBar(
       title: AppStrings.lessonDetailAppBarTitle(lesson.studentName),
       actions: const [DetailAppBarAction.share],
       onAction: (action) {
         if (action == DetailAppBarAction.share) {
-          final date = formatDateYMD(lesson.date);
-          final text = AppStrings.lessonShareText(
-            studentName: lesson.studentName,
-            instrument: lesson.instrument,
-            date: date,
-            startTime: lesson.startTime,
-            duration: lesson.duration,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppStrings.shareTextCopied(text)),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          _handleShareSummary(lesson);
         }
       },
       customActions: [

@@ -33,6 +33,7 @@
 | 보강 레슨 | Makeup Lesson | `LessonBooking(type: makeup)` | `LessonBooking(lesson_type: makeup)` | 노쇼/취소 보충 |
 | 레슨 노트 | Lesson Note | `Lesson.teacherNotes` | `Lesson.teacher_notes` | 선생님 수업 기록 |
 | 곡 | Piece | `LessonPiece` | `LessonPiece` | 레슨에서 다루는 곡 |
+| 레슨 요약 공유 | Lesson Summary Share | `LessonSummaryShare` / `lessonSummaryShareRepositoryProvider` | `ShareTokenService.issue_lesson_summary_share` | 교사가 레슨 상세에서 공개 요약 공유 토큰 발급(`POST /lesson-summaries/{id}/share`) → 학생 요약 랜딩(`StudentSummaryScreen`, `/student/summary/:token`) 연결. 서버가 URL·공유텍스트 생성, FE는 복사/공유만. #808 |
 
 ---
 
@@ -580,6 +581,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-18 | 레슨 요약 공유 버튼 (검토 #62) — 레슨 상세 공유 액션을 로컬 텍스트 스낵바 → 서버 토큰 발급(`POST /lesson-summaries/{id}/share`, BE 기구현)으로 교체. URL 클립보드 복사 + "학생과 공유하기" 토스트. FE-only(LessonSummaryShare 모델 + repo mock/remote + 수동 provider). 구 lessonShareText/shareTextCopied orphan 제거. |
 | 2026-06-18 | 만료임박 카드 갱신 제안 CTA (검토 #45) — `SubscriptionCard.onRenew` + 만료임박 화면 wiring → `issueSubscription?renewFromSubscriptionId=` 로 이전 수강권(회차·금액·유효기간·변경허용) 프리필 발급. `_applyRenewalDefaults` 폼 초기값만(발급 로직·빌링 불변, 교사 확인 후 발급). 임박→갱신 한 화면 완결. |
 | 2026-06-18 | 정책·알림·지원 시트 성격별 분리 (검토 #43) — 과적재 13항목을 3 섹션(템플릿/알림·소식/지원·계정)으로 청킹(Miller's Law). 가이드 다시 보기→지원·계정 재배치. 카드/시트 라벨 "정책·알림·지원"→"알림·소식·지원"(정책 항목 부재). `_SheetSectionLabel` 섹션 헤더 신설. 5묶음 카드/enum/status 불변(시트 내부만). |
 | 2026-06-18 | 취소 정책 두 화면 역할 명시 (검토 #34) — "취소 정책 디폴트"→"취소 정책 기본값"(개발어 제거). 취소/노쇼 정책(변경권·최소취소시간·노쇼·이월, `LessonPolicy`) vs 취소 정책 기본값(지각취소 보상·알림·마감 기본값, `CancellationDefaults`) 역할 분담 명시 + 양방향 교차참조(관련설정 링크/안내 노트). 두 화면 통합 안 함(2 feature/엔티티), FE 표시만. |
