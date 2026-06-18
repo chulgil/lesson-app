@@ -514,70 +514,103 @@ class _UnifiedSubscriptionSheetState
         color: AppColors.paper,
         border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (isSingleSelect)
-            Expanded(
-              child: OutlinedButton(
-                onPressed: canSubmit ? _onDirectIssue : null,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.space3,
-                  ),
-                  side: BorderSide(
-                    color:
-                        canSubmit
-                            ? AppColors.paperAccent
-                            : AppColors.inkQuaternary,
-                  ),
-                  shape: RoundedRectangleBorder(),
-                ),
-                child: Text(
-                  AppStrings.unifiedSubscriptionDirectIssueButton,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color:
-                        canSubmit
-                            ? AppColors.paperAccent
-                            : AppColors.inkQuaternary,
-                  ),
-                ),
-              ),
-            ),
-
-          if (isSingleSelect) const SizedBox(width: AppSpacing.space2),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: canSubmit ? _onSendProposal : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.space3,
-                ),
-                shape: RoundedRectangleBorder(),
-                disabledBackgroundColor: AppColors.paperAccentSoft,
-              ),
-              child:
-                  _isSubmitting
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.paper,
-                        ),
-                      )
-                      : Text(
-                        _selectedTemplateIds.length > 1
-                            ? AppStrings.unifiedSubscriptionMultiSendFormat(
-                              _selectedTemplateIds.length,
-                            )
-                            : AppStrings.proposalSend,
-                        style: AppTypography.buttonSmall.copyWith(
-                          color: AppColors.paper,
-                        ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (isSingleSelect)
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: canSubmit ? _onDirectIssue : null,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.space3,
                       ),
-            ),
+                      side: BorderSide(
+                        color:
+                            canSubmit
+                                ? AppColors.paperAccent
+                                : AppColors.inkQuaternary,
+                      ),
+                      shape: RoundedRectangleBorder(),
+                    ),
+                    child: Text(
+                      AppStrings.unifiedSubscriptionDirectIssueButton,
+                      style: AppTypography.buttonSmall.copyWith(
+                        color:
+                            canSubmit
+                                ? AppColors.paperAccent
+                                : AppColors.inkQuaternary,
+                      ),
+                    ),
+                  ),
+                ),
+              if (isSingleSelect) const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: canSubmit ? _onSendProposal : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.paperAccent,
+                    foregroundColor: AppColors.paper,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.space3,
+                    ),
+                    shape: RoundedRectangleBorder(),
+                    disabledBackgroundColor: AppColors.paperAccentSoft,
+                  ),
+                  child:
+                      _isSubmitting
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.paper,
+                            ),
+                          )
+                          : Text(
+                            _selectedTemplateIds.length > 1
+                                ? AppStrings.unifiedSubscriptionMultiSendFormat(
+                                  _selectedTemplateIds.length,
+                                )
+                                : AppStrings.proposalSend,
+                            style: AppTypography.buttonSmall.copyWith(
+                              color: AppColors.paper,
+                            ),
+                          ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          // #769: 발급 방식 차이 캡션 — 버튼과 동일한 Expanded/SizedBox 구조로
+          // 각 버튼 아래 정렬. 로직 변경 없이 설명만 추가.
+          Row(
+            children: [
+              if (isSingleSelect) ...[
+                Expanded(
+                  child: Text(
+                    AppStrings.unifiedSubscriptionDirectIssueCaption,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+              ],
+              Expanded(
+                child: Text(
+                  AppStrings.unifiedSubscriptionProposalCaption,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

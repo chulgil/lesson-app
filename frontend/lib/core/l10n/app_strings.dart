@@ -4803,6 +4803,10 @@ class AppStrings {
 
   /// 바로 발급 (단일 선택 시 outlined 액션)
   static const unifiedSubscriptionDirectIssueButton = '바로 발급';
+  /// #769: 발급 방식 차이 캡션 — 교사 즉시 발급.
+  static const unifiedSubscriptionDirectIssueCaption = '교사가 즉시 발급';
+  /// #769: 발급 방식 차이 캡션 — 학생 수락·입금 후 발급(제안).
+  static const unifiedSubscriptionProposalCaption = '학생 수락·입금 후 발급';
 
   /// $count개 제안 보내기 (복수 템플릿 송신 버튼)
   static String unifiedSubscriptionMultiSendFormat(int count) =>
