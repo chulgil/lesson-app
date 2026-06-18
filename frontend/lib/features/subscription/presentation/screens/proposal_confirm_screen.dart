@@ -23,6 +23,10 @@ import '../providers/subscription_template_providers.dart';
 import '../providers/subscription_providers.dart';
 
 /// Screen for teachers to confirm payments and issue subscriptions.
+///
+/// Supports both single confirmation (per-card button) and batch confirmation
+/// (checkbox selection + bottom action bar) — the latter relieves the "1건씩
+/// 수동 확인" burden when deposits pile up at semester start (#771).
 class ProposalConfirmScreen extends ConsumerStatefulWidget {
   final String teacherId;
   final String teacherName; // 🆕 For notification
@@ -41,14 +45,23 @@ class ProposalConfirmScreen extends ConsumerStatefulWidget {
 class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   String? _processingProposalId;
 
+  /// Proposal ids currently checked for batch confirmation.
+  final Set<String> _selectedProposalIds = {};
+
+  /// True while a batch confirmation is running (disables the bar button).
+  bool _batchProcessing = false;
+
   @override
   Widget build(BuildContext context) {
     final proposalsAsync = ref.watch(
       awaitingConfirmationProposalsProvider(widget.teacherId),
     );
+    final proposals =
+        proposalsAsync.asData?.value ?? const <SubscriptionProposal>[];
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(title: AppStrings.paymentConfirm),
+      bottomNavigationBar: _buildBatchBar(proposals),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
@@ -108,6 +121,11 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       subscriptionIssueStudentProvider(proposal.studentId),
     );
 
+    // Multi-choice proposals the student hasn't decided yet can't be issued, so
+    // they are excluded from batch selection (checkbox disabled).
+    final selectable = !proposal.needsTemplateSelection;
+    final isSelected = _selectedProposalIds.contains(proposal.id);
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -118,9 +136,31 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with student info
+          // Header with selection checkbox + student info
           Row(
             children: [
+              // Batch selection checkbox
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(
+                  value: isSelected,
+                  onChanged:
+                      selectable
+                          ? (checked) {
+                            setState(() {
+                              if (checked == true) {
+                                _selectedProposalIds.add(proposal.id);
+                              } else {
+                                _selectedProposalIds.remove(proposal.id);
+                              }
+                            });
+                          }
+                          : null,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+
               // Status indicator
               Container(
                 width: 8,
@@ -169,6 +209,16 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                                   color: AppColors.inkTertiary,
                                 ),
                               ),
+                              // 입금자명(예금주) — 통장 대조용. 학부모 우선, 없으면 학생.
+                              Text(
+                                AppStrings.paymentDepositorFormat(
+                                  _depositorName(student),
+                                ),
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.inkSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -199,25 +249,26 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           // Action buttons
           templateAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (e, st) => Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.inkTertiary,
+            error:
+                (e, st) => Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: AppColors.inkTertiary,
+                      ),
+                      const SizedBox(height: AppSpacing.space3),
+                      Text(
+                        AppStrings.loadDataFailed,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.inkSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.loadDataFailed,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
             data: (template) {
               if (template == null) return const SizedBox.shrink();
               return _buildActionButtons(proposal, template);
@@ -228,13 +279,22 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     );
   }
 
+  /// Expected depositor (예금주) for bank-transfer matching. Parents usually
+  /// transfer on the student's behalf, so prefer the parent name when present.
+  String _depositorName(Student student) {
+    final parent = student.parentName;
+    if (parent != null && parent.trim().isNotEmpty) return parent;
+    return student.name;
+  }
+
   Widget _buildTemplateInfo(
     SubscriptionTemplate template,
     SubscriptionProposal proposal,
   ) {
-    final price = proposal.hasDiscount
-        ? template.price - (proposal.discountAmount ?? 0)
-        : template.price;
+    final price =
+        proposal.hasDiscount
+            ? template.price - (proposal.discountAmount ?? 0)
+            : template.price;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
@@ -314,22 +374,72 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         Expanded(
           flex: 2,
           child: ElevatedButton(
-            onPressed: isProcessing
-                ? null
-                : () => _confirmPayment(proposal, template),
+            onPressed:
+                isProcessing ? null : () => _confirmPayment(proposal, template),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
-            child: isProcessing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text(AppStrings.paymentVerifyToIssueButton),
+            child:
+                isProcessing
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Text(AppStrings.paymentVerifyToIssueButton),
           ),
         ),
       ],
+    );
+  }
+
+  /// Sticky bottom bar for batch confirmation. Returns null when no selectable
+  /// proposal is checked, so the bar only appears on demand.
+  Widget? _buildBatchBar(List<SubscriptionProposal> proposals) {
+    final selectedCount =
+        proposals
+            .where(
+              (p) =>
+                  _selectedProposalIds.contains(p.id) &&
+                  !p.needsTemplateSelection,
+            )
+            .length;
+    if (selectedCount == 0) return null;
+
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Top divider as a standalone line (avoids partial-border paint
+          // assertions — see Border non-uniform × strokeAlign lesson).
+          Container(height: 0.5, color: AppColors.inkQuaternary),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed:
+                    _batchProcessing ? null : () => _confirmBatch(proposals),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.space3,
+                  ),
+                ),
+                child:
+                    _batchProcessing
+                        ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : Text(
+                          AppStrings.paymentBatchConfirmAction(selectedCount),
+                        ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -352,20 +462,201 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       _processingProposalId = proposal.id;
     });
 
+    try {
+      await _issueSubscriptionForProposal(proposal, template);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.subscriptionIssuedMessage),
+            backgroundColor: AppColors.paperOk,
+          ),
+        );
+
+        // Refresh proposal list + subscription list/detail views so the new
+        // subscription appears immediately (create bypasses the notifier).
+        ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
+        invalidateSubscriptionListsForStudent(
+          ref,
+          proposal.studentId,
+          teacherId: widget.teacherId,
+        );
+      }
+    } on PhoneVerificationRequiredException catch (_) {
+      // #430 G1 §4.3 — E3 게이트. 미인증 선생님이 수강권을 발급하려 할 때
+      // 인증 안내 다이얼로그 노출. (orphan cleanup은 헬퍼에서 수행됨)
+      if (mounted) {
+        await PhoneVerificationGate.show(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(AppStrings.errorTryAgain),
+            backgroundColor: AppColors.paperAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _processingProposalId = null;
+        });
+      }
+    }
+  }
+
+  /// Confirm payment for every selected proposal in one pass. Shows a single
+  /// confirmation dialog (money / impact gate), issues each sequentially, and
+  /// reports an aggregate result. Aborts the remaining issues if the teacher
+  /// needs phone verification.
+  Future<void> _confirmBatch(List<SubscriptionProposal> all) async {
+    final selected =
+        all
+            .where(
+              (p) =>
+                  _selectedProposalIds.contains(p.id) &&
+                  !p.needsTemplateSelection,
+            )
+            .toList();
+    if (selected.isEmpty) return;
+
+    // Resolve each template up front so the dialog can show an accurate total.
+    final templates = <String, SubscriptionTemplate>{};
+    var total = 0;
+    for (final p in selected) {
+      final template = await ref.read(
+        subscriptionTemplateProvider(p.effectiveTemplateId).future,
+      );
+      if (template == null) continue;
+      templates[p.id] = template;
+      final discount = p.hasDiscount ? (p.discountAmount ?? 0) : 0;
+      final amount =
+          (template.price - discount) < 0 ? 0 : (template.price - discount);
+      total += amount;
+    }
+    final issuable =
+        selected.where((p) => templates.containsKey(p.id)).toList();
+    if (issuable.isEmpty || !mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (dialogContext) => NotebookAlertDialog(
+            title: AppStrings.paymentBatchConfirmDialogTitle,
+            content: Text(
+              AppStrings.paymentBatchConfirmDialogBody(
+                issuable.length,
+                _formatPrice(total),
+              ),
+            ),
+            cancelLabel: AppStrings.cancel,
+            onCancel: () => Navigator.pop(dialogContext, false),
+            confirmLabel: AppStrings.paymentBatchIssueConfirm,
+            onConfirm: () => Navigator.pop(dialogContext, true),
+          ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() {
+      _batchProcessing = true;
+    });
+
+    final succeeded = <SubscriptionProposal>[];
+    var failed = 0;
+    var needsPhoneVerification = false;
+
+    try {
+      for (final proposal in issuable) {
+        try {
+          await _issueSubscriptionForProposal(
+            proposal,
+            templates[proposal.id]!,
+          );
+          succeeded.add(proposal);
+        } on PhoneVerificationRequiredException catch (_) {
+          // Stop the batch — the teacher must verify before issuing anything
+          // more, otherwise every remaining item would fail the same gate.
+          needsPhoneVerification = true;
+          break;
+        } catch (e) {
+          failed++;
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          for (final p in succeeded) {
+            _selectedProposalIds.remove(p.id);
+          }
+          _batchProcessing = false;
+        });
+      }
+    }
+
+    if (!mounted) return;
+
+    ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
+    for (final p in succeeded) {
+      invalidateSubscriptionListsForStudent(
+        ref,
+        p.studentId,
+        teacherId: widget.teacherId,
+      );
+    }
+
+    if (needsPhoneVerification) {
+      await PhoneVerificationGate.show(context);
+      return;
+    }
+
+    if (failed == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppStrings.paymentBatchConfirmResultAll(succeeded.length),
+          ),
+          backgroundColor: AppColors.paperOk,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppStrings.paymentBatchConfirmResultPartial(
+              succeeded.length,
+              failed,
+            ),
+          ),
+          backgroundColor: AppColors.paperAccent,
+        ),
+      );
+    }
+  }
+
+  /// Core issue: create a payment-confirmed subscription and confirm the
+  /// proposal. Throws on failure (after deactivating the orphan subscription)
+  /// so single + batch callers can each render their own UX.
+  Future<void> _issueSubscriptionForProposal(
+    SubscriptionProposal proposal,
+    SubscriptionTemplate template,
+  ) async {
     final subscriptionRepo = ref.read(subscriptionRepositoryProvider);
     String? createdSubscriptionId;
 
     try {
-      // 1. Create subscription. Deposit is confirmed here (manual bank
-      // transfer only — no PG), so seed payment fields accordingly.
+      // Create subscription. Deposit is confirmed here (manual bank transfer
+      // only — no PG), so seed payment fields accordingly.
       final now = DateTime.now();
-      final discount = proposal.hasDiscount ? (proposal.discountAmount ?? 0) : 0;
-      // Clamp: a discount larger than the price must not yield a negative amount.
+      final discount =
+          proposal.hasDiscount ? (proposal.discountAmount ?? 0) : 0;
+      // Clamp: a discount larger than the price must not yield a negative
+      // amount.
       final amount =
           (template.price - discount) < 0 ? 0 : (template.price - discount);
-      // Resolve the student's active membership to attach the subscription
-      // to the correct class context. Falls back to the first membership if
-      // the student has multiple active memberships.
+      // Resolve the student's active membership to attach the subscription to
+      // the correct class context. Falls back to the first membership if the
+      // student has multiple active memberships.
       final memberships = await ref.read(
         activeStudentMembershipsProvider(proposal.studentId).future,
       );
@@ -396,11 +687,10 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         paymentConfirmedAt: now,
       );
 
-      // Create the subscription (using repository directly for now)
       final createdSubscription = await subscriptionRepo.create(subscription);
       createdSubscriptionId = createdSubscription.id;
 
-      // 2. Confirm the proposal with the subscription ID. If this fails the
+      // Confirm the proposal with the subscription ID. If this fails the
       // subscription would be orphaned, so the catch below deactivates it.
       final proposalNotifier = ref.read(
         subscriptionProposalNotifierProvider.notifier,
@@ -408,58 +698,16 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       await proposalNotifier.confirmPayment(
         proposal.id,
         createdSubscription.id,
-        // 🆕 For notification
         teacherName: widget.teacherName,
         templateName: template.name,
         totalLessons: template.totalLessons,
       );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.subscriptionIssuedMessage),
-            backgroundColor: AppColors.paperOk,
-          ),
-        );
-
-        // Refresh proposal list + subscription list/detail views so the new
-        // subscription appears immediately (create bypasses the notifier).
-        // membershipId is a synthetic placeholder here (`membership_<id>`), so
-        // passing it would invalidate a non-existent membership provider —
-        // rely on the student + teacher scope, which are real, instead.
-        ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
-        invalidateSubscriptionListsForStudent(
-          ref,
-          proposal.studentId,
-          teacherId: widget.teacherId,
-        );
-      }
-    } on PhoneVerificationRequiredException catch (_) {
-      // Verification gate fires before/within confirm — clean up the orphan.
-      await _deactivateOrphanSubscription(subscriptionRepo, createdSubscriptionId);
-      // #430 G1 §4.3 — E3 게이트. 미인증 선생님이 수강권을 발급하려 할 때
-      // 인증 안내 다이얼로그 노출.
-      if (mounted) {
-        await PhoneVerificationGate.show(context);
-      }
     } catch (e) {
-      // Confirm failed after the subscription was created — deactivate the
-      // orphan so it never surfaces as an active, unconfirmed subscription.
-      await _deactivateOrphanSubscription(subscriptionRepo, createdSubscriptionId);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(AppStrings.errorTryAgain),
-            backgroundColor: AppColors.paperAccent,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _processingProposalId = null;
-        });
-      }
+      await _deactivateOrphanSubscription(
+        subscriptionRepo,
+        createdSubscriptionId,
+      );
+      rethrow;
     }
   }
 
@@ -481,14 +729,15 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   Future<void> _showInquiryDialog(SubscriptionProposal proposal) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => NotebookAlertDialog(
-        title: AppStrings.paymentUnverifiedAction,
-        content: const Text(AppStrings.paymentInquiryDialogBody),
-        cancelLabel: AppStrings.cancel,
-        onCancel: () => Navigator.pop(context, false),
-        confirmLabel: AppStrings.sendMessage,
-        onConfirm: () => Navigator.pop(context, true),
-      ),
+      builder:
+          (context) => NotebookAlertDialog(
+            title: AppStrings.paymentUnverifiedAction,
+            content: const Text(AppStrings.paymentInquiryDialogBody),
+            cancelLabel: AppStrings.cancel,
+            onCancel: () => Navigator.pop(context, false),
+            confirmLabel: AppStrings.sendMessage,
+            onConfirm: () => Navigator.pop(context, true),
+          ),
     );
 
     if (result == true && mounted) {
