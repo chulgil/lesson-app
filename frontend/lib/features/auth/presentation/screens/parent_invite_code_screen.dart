@@ -94,6 +94,15 @@ class _ParentInviteCodeScreenState
                         textAlign: TextAlign.center,
                       ),
 
+                      const SizedBox(height: AppSpacing.space2),
+                      Text(
+                        AppStrings.inviteParentCodeValidityHint,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.inkTertiary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
                       const SizedBox(height: AppSpacing.space6),
 
                       // Invite code input

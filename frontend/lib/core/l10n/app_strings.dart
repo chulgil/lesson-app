@@ -6094,6 +6094,21 @@ class AppStrings {
   /// 유효기간: $formatted — 만료 정보.
   static String inviteExpiryFormat(String formatted) => '유효기간: $formatted';
 
+  /// 학부모 초대 코드 유효기간 안내(다이얼로그) — #799 일원화.
+  static const inviteParentValidityNote = '* 코드는 24시간 동안 유효합니다';
+
+  /// 학부모 초대 공유 텍스트 내 유효기간 줄 — #799.
+  static const inviteParentShareValidity = '유효기간: 24시간 (발급 후 24시간 이내 입력)';
+
+  /// 학부모 초대 코드 입력(수신) 화면 유효기간 캡션 — #799.
+  static const inviteParentCodeValidityHint = '초대 코드는 발급 후 24시간 이내 유효합니다';
+
+  /// 학생 초대 코드 입력(수신) 화면 유효기간 캡션 — #799.
+  static const inviteStudentCodeValidityHint = '초대 코드는 발급 후 7일 이내 유효합니다';
+
+  /// 학생/동료 초대 공유 메시지 내 유효기간 줄 — #799.
+  static const inviteStudentShareValidity = '유효기간: 7일 (발급 후 7일 이내 입력)';
+
   /// 다른 방법으로 연결하기 — alternative options 섹션 헤더.
   static const inviteAlternativeOptionsTitle = '다른 방법으로 연결하기';
 
@@ -6143,6 +6158,7 @@ class AppStrings {
     return '$header\n\n'
         '초대 코드: $code\n'
         '또는 링크: $url\n\n'
+        '$inviteStudentShareValidity\n\n'
         '$signature';
   }
 

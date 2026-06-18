@@ -87,4 +87,30 @@ void main() {
       expect(text, contains('드림'));
     });
   });
+
+  group('inviteShareMessageFormat — 유효기간 병기 (#799)', () {
+    test('공유 메시지에 유효기간(7일)이 병기된다', () {
+      final text = AppStrings.inviteShareMessageFormat(
+        '123456',
+        'https://lesson.app/i/123456',
+        AppStrings.teacher,
+      );
+
+      expect(text, contains('유효기간'));
+      expect(text, contains('7일'));
+    });
+  });
+
+  group('초대 유효기간 표기 상수 (#799)', () {
+    test('학부모 초대(24시간) 표기 상수', () {
+      expect(AppStrings.inviteParentShareValidity, contains('24시간'));
+      expect(AppStrings.inviteParentCodeValidityHint, contains('24시간'));
+      expect(AppStrings.inviteParentValidityNote, contains('24시간'));
+    });
+
+    test('학생/동료 초대(7일) 표기 상수', () {
+      expect(AppStrings.inviteStudentShareValidity, contains('7일'));
+      expect(AppStrings.inviteStudentCodeValidityHint, contains('7일'));
+    });
+  });
 }

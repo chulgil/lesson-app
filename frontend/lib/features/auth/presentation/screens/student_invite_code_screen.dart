@@ -93,6 +93,15 @@ class _StudentInviteCodeScreenState
                         textAlign: TextAlign.center,
                       ),
 
+                      const SizedBox(height: AppSpacing.space2),
+                      Text(
+                        AppStrings.inviteStudentCodeValidityHint,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.inkTertiary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
                       const SizedBox(height: AppSpacing.space6),
 
                       // Invite code input

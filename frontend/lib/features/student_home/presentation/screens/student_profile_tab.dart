@@ -568,7 +568,7 @@ class StudentProfileTab extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '* 코드는 24시간 동안 유효합니다',
+            AppStrings.inviteParentValidityNote,
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
@@ -594,7 +594,7 @@ class StudentProfileTab extends ConsumerWidget {
                 text:
                     '[레슨앱] 학부모 초대\n\n'
                     '학생의 학부모님을 초대합니다.\n\n'
-                    '초대 코드: $inviteCode\n\n'
+                    '초대 코드: $inviteCode\n${AppStrings.inviteParentShareValidity}\n\n'
                     '앱을 설치하고 위 코드를 입력해주세요.',
               ),
             );

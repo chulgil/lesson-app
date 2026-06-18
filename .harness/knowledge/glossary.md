@@ -106,7 +106,8 @@
 |------|------|-----------|-----------|------|
 | 연결 | Connection | `Relationship` | `Relationship` | 선생님-학생 관계 |
 | 관계 상태 | Relationship Status | `RelationshipStatus` | `RelationStatus` | ⚠️ FE-BE 불일치. **레슨 관계 SSOT**. ConnectionStatus는 deprecate 예정 |
-| 초대 코드 | Invite Code | `InviteCode` | `InviteCode` | 학생 초대용 6자리 코드 + QR + URL. 만료 7일 |
+| 초대 코드 (학생·동료) | Invite Code | `InviteCode` | `InviteCode` | 학생/동료 초대용 6자리 코드 + QR + URL. **유효기간 7일** (#799 명시) |
+| 학부모 초대 코드 | Parent Invite Code | `ParentInvitation` | `ParentInvitation` | 자녀-학부모 연결용 6자리 코드 (교사: 학생 상세 / 학생: 프로필에서 생성). **유효기간 24시간** — 학생/동료(7일)와 차등 유지. 모든 초대 생성·공유·입력 면에 유효기간 병기 (#799) |
 | 초대 대기 | Invite Pending | `RelationshipStatus.invitePending` | `invite_pending` | 초대 전송 후 학생 미진입 상태. 학생 리스트에서 별도 그룹 표시 |
 | 팔로우 | Follow | `Follow` | `Follow` | 소식 구독 (레슨 무관) |
 | 학급 | Class | `LessonClass` | `LessonClass` | 선생님의 레슨 그룹 |
@@ -578,6 +579,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-18 | 초대 유효기간 표기 일원화 (검토 #30) — 학생/동료 초대 **7일** / 학부모 초대 **24시간** 차등 유지(정책·BE 불변, FE 표시만) + 모든 초대 면 병기. 학부모 초대 공유 텍스트·다이얼로그(`inviteParentValidityNote`)·수신 코드입력 캡션·학생/동료 공유(`inviteShareMessageFormat`)에 유효기간 추가. 진입점 구조 현행 유지(통합 아님). |
 | 2026-06-17 | 입금 용어 분리 + 금액 정확 표기 (검토 #50) — 후불 **미수금**(입금대기(후불)·입금대기 흡수) vs 선불 **입금 확인 대기**(입금 대기 흡수) 분리. 미수금 긴급알림 금액 절사/반올림 제거 → 만/원 정확 표기(`formatKoreanWon` 동등 inline). 표시명·glossary만, enum/식별자 불변. |
 | 2026-06-17 | 학생/연습 상태 어휘 정렬 (검토 #26) — StudentStatus.active 표시명 정규→수강중, 연습(PracticeLevel.onBreak/PracticeStatus.paused) 표시명 휴강→기록없음(무기록). 학생 라이프사이클 휴강(paused)·MembershipStatus는 유지(별 축). 표시명만, enum 값 불변. |
 | 2026-06-17 | 스케줄 휴무/휴가/휴강 SSOT 통일 (검토 #14) — 휴무(비근무일)·휴가(기간형, "휴가 모드"·"방학 중" 흡수)·휴강(레슨 취소+보상) 3 canonical. Deprecated: 쉬는날→휴무, 방학 중→휴가, 휴가 모드→휴가. 표시명·glossary만 정렬(코드 식별자 불변). |
