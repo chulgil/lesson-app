@@ -190,7 +190,11 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
     )
     session_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     lesson_source: Mapped[LessonSource] = mapped_column(
-        Enum(LessonSource, native_enum=True),
+        Enum(
+            LessonSource,
+            native_enum=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         nullable=False,
         default=LessonSource.manual,
     )
@@ -207,7 +211,11 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
     visibility: Mapped[LessonVisibility] = mapped_column(
-        Enum(LessonVisibility, native_enum=True),
+        Enum(
+            LessonVisibility,
+            native_enum=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         nullable=False,
         default=LessonVisibility.academy_full,
     )

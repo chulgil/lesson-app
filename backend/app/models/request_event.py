@@ -89,7 +89,11 @@ class RequestEvent(UUIDMixin, TimestampMixin, Base):
     actor_type: Mapped[str] = mapped_column(String(20), nullable=False)
     actor_id: Mapped[str] = mapped_column(String(36), nullable=False)
     event_type: Mapped[RequestEventType] = mapped_column(
-        Enum(RequestEventType, native_enum=True),
+        Enum(
+            RequestEventType,
+            native_enum=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         nullable=False,
     )
     suggested_slots: Mapped[list | None] = mapped_column(JSON, nullable=True)

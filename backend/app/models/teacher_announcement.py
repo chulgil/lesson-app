@@ -25,7 +25,11 @@ class TeacherAnnouncement(UUIDMixin, TimestampMixin, Base):
 
     teacher_id: Mapped[str] = mapped_column(String(36), ForeignKey("teachers.id"), nullable=False)
     type: Mapped[TeacherAnnouncementType] = mapped_column(
-        Enum(TeacherAnnouncementType, native_enum=True),
+        Enum(
+            TeacherAnnouncementType,
+            native_enum=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         nullable=False,
     )
     message: Mapped[str] = mapped_column(Text, nullable=False)
