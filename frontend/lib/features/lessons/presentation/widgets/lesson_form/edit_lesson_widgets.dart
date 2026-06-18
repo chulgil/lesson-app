@@ -94,34 +94,36 @@ class EditLessonStudentCard extends StatelessWidget {
 
 /// Action buttons for edit lesson screen (cancel/archive)
 class LessonActionButtons extends StatelessWidget {
-  final VoidCallback onCancel;
+  final VoidCallback? onCancel;
   final VoidCallback onDelete;
 
-  const LessonActionButtons({
-    super.key,
-    required this.onCancel,
-    required this.onDelete,
-  });
+  const LessonActionButtons({super.key, this.onCancel, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: onCancel,
-            icon: Icon(Icons.event_busy, color: AppColors.paperAccent),
-            label: Text(
-              AppStrings.actionLessonCancel,
-              style: TextStyle(color: AppColors.paperAccent),
-            ),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(color: AppColors.paperAccent),
+        // #766 후속: 수강권 레슨(onCancel == null)은 취소 버튼을 노출하지 않음 —
+        // plain cancelLesson 이 차감/변경권/휴강 이벤트를 우회. 보관 버튼만 표시.
+        if (onCancel != null) ...[
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onCancel,
+              icon: Icon(Icons.event_busy, color: AppColors.paperAccent),
+              label: Text(
+                AppStrings.actionLessonCancel,
+                style: TextStyle(color: AppColors.paperAccent),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space3,
+                ),
+                side: BorderSide(color: AppColors.paperAccent),
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.space3),
+          const SizedBox(width: AppSpacing.space3),
+        ],
         Expanded(
           child: OutlinedButton.icon(
             onPressed: onDelete,

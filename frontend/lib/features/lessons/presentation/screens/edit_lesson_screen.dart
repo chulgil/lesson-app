@@ -133,16 +133,19 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
             },
             itemBuilder:
                 (context) => [
-                  PopupMenuItem(
-                    value: 'cancel',
-                    child: Row(
-                      children: [
-                        Icon(Icons.event_busy, color: AppColors.paperAccent),
-                        const SizedBox(width: AppSpacing.space2),
-                        const Text(AppStrings.actionLessonCancel),
-                      ],
+                  // #766 후속: 수강권 레슨은 plain-cancel 메뉴 비노출 — 취소/휴강은
+                  // 수강권 배너 → 구독 플로우로만.
+                  if (!isSubscriptionLesson)
+                    PopupMenuItem(
+                      value: 'cancel',
+                      child: Row(
+                        children: [
+                          Icon(Icons.event_busy, color: AppColors.paperAccent),
+                          const SizedBox(width: AppSpacing.space2),
+                          const Text(AppStrings.actionLessonCancel),
+                        ],
+                      ),
                     ),
-                  ),
                   PopupMenuItem(
                     value: 'archive',
                     child: Row(
@@ -372,7 +375,8 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
 
               // Cancel/Delete buttons
               LessonActionButtons(
-                onCancel: _showCancelDialog,
+                // #766 후속: 수강권 레슨은 취소 버튼 비노출(plain cancel 우회 차단).
+                onCancel: isSubscriptionLesson ? null : _showCancelDialog,
                 onDelete: _showDeleteDialog,
               ),
 
