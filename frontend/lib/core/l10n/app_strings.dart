@@ -4331,6 +4331,30 @@ class AppStrings {
   /// 입금 확인 → 수강권 발급 (확인 버튼)
   static const paymentVerifyToIssueButton = '입금 확인 → 수강권 발급';
 
+  // [검토 #47] 입금 일괄 확인 (다건 체크박스)
+  /// 선택 N건 일괄 입금확인 (하단 일괄 액션 바)
+  static String paymentBatchConfirmAction(int n) => '선택 $n건 일괄 입금확인';
+
+  /// 일괄 입금 확인 (확인 다이얼로그 타이틀)
+  static const paymentBatchConfirmDialogTitle = '일괄 입금 확인';
+
+  /// N명에게 수강권을 발급합니다 ... (확인 다이얼로그 본문)
+  static String paymentBatchConfirmDialogBody(int n, String amount) =>
+      '$n명에게 수강권을 발급합니다. 입금을 모두 확인하셨나요?\n합계 $amount';
+
+  /// 발급하기 (일괄 확인 다이얼로그 확인 버튼)
+  static const paymentBatchIssueConfirm = '발급하기';
+
+  /// N건 발급 완료 (일괄 전건 성공 SnackBar)
+  static String paymentBatchConfirmResultAll(int n) => '$n건 발급 완료';
+
+  /// M건 발급 완료, K건 실패 (일괄 부분 성공 SnackBar)
+  static String paymentBatchConfirmResultPartial(int ok, int fail) =>
+      '$ok건 발급 완료, $fail건 실패';
+
+  /// 입금자명 {name} (통장 대조용 예금주 표시)
+  static String paymentDepositorFormat(String name) => '입금자명 $name';
+
   /// 학생이 아직 수강권을 선택하지 않았습니다 (멀티초이스 미선택 가드)
   static const proposalAwaitingTemplateSelection = '학생이 아직 수강권을 선택하지 않았습니다';
 
