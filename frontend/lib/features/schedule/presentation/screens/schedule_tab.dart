@@ -615,20 +615,12 @@ class _SwipeableLessonCard extends ConsumerWidget {
           : DismissDirection.startToEnd, // 완료만, 취소 스와이프 없음
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          return await _showConfirmDialog(
-            context,
-            ref,
-            title: AppStrings.lessonComplete,
-            message: AppStrings.confirmLessonCompletion(lesson.studentName),
-            confirmLabel: AppStrings.statusCompleted,
-            confirmColor: AppColors.paperOk,
-            onConfirm: () async {
-              final updated = lesson.copyWith(status: LessonStatus.completed);
-              await ref
-                  .read(lessonsNotifierProvider.notifier)
-                  .updateLesson(updated);
-            },
-          );
+          // #767: 완료=출석 확정 단일화 — confirmAttendance 로 라우팅해 수강권
+          // 1회 차감(confirmLessonCompleted)을 발생시킨다. plain updateLesson 은
+          // 차감을 누락했다. 다이얼로그가 확인을 처리하고 lessonsProvider
+          // invalidate 로 카드가 갱신되므로 false 반환.
+          await confirmAttendance(context, ref, lesson);
+          return false;
         } else {
           return await _showConfirmDialog(
             context,
@@ -656,7 +648,7 @@ class _SwipeableLessonCard extends ConsumerWidget {
             Icon(Icons.check_circle, color: AppColors.paper),
             SizedBox(width: AppSpacing.space2),
             Text(
-              AppStrings.statusCompleted,
+              AppStrings.attendanceConfirmAction,
               style: TextStyle(
                 color: AppColors.paper,
                 fontWeight: FontWeight.w600,

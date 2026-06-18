@@ -249,7 +249,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 if (lesson.displayStatus == LessonStatus.scheduled)
                   const PopupMenuItem(
                     value: 'complete',
-                    child: Text(AppStrings.markComplete),
+                    child: Text(AppStrings.attendanceConfirmAction),
                   ),
                 if (lesson.displayStatus == LessonStatus.scheduled)
                   PopupMenuItem(
@@ -327,32 +327,17 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         }
       }
     } else if (value == 'complete') {
-      final confirmed = await showNotebookDialog(
-        context: context,
-        title: AppStrings.lessonCompleteTitle,
-        message: AppStrings.lessonCompleteConfirm,
-        confirmLabel: AppStrings.completeAction,
-        cancelLabel: AppStrings.cancel,
-      );
-      if (confirmed == true) {
-        try {
-          final updatedLesson = lesson.copyWith(status: LessonStatus.completed);
-          await ref
-              .read(lessonsNotifierProvider.notifier)
-              .updateLesson(updatedLesson);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text(AppStrings.lessonCompletedSnack)),
-            );
-          }
-
-          // Auto-propose regular lessons if student has no active subscription
+      // #767: 완료=출석 확정 단일화 — confirmAttendance 로 라우팅(차감 notice
+      // 다이얼로그 + confirmLessonCompleted 차감). plain updateLesson 은 차감을
+      // 누락했다. 자동제안·평점은 onCompleted 로 보존.
+      await confirmAttendance(
+        context,
+        ref,
+        lesson,
+        onCompleted: () async {
           if (widget.isTeacher && lesson.teacherId != null) {
             _tryAutoProposal(lesson);
           }
-
-          // App rating prompt — fires only when trigger conditions allow
-          // (spec: docs/specs/settings/app_rating_prompt_spec.md §2-5).
           if (widget.isTeacher && mounted) {
             final completedCount =
                 ref
@@ -368,17 +353,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               completedLessonCount: completedCount,
             );
           }
-        } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text(AppStrings.lessonCompleteFailed),
-                backgroundColor: AppColors.paperAccent,
-              ),
-            );
-          }
-        }
-      }
+        },
+      );
     } else if (value == 'archive') {
       final confirmed = await showDeleteLessonConfirmation(context);
       if (confirmed == true) {
