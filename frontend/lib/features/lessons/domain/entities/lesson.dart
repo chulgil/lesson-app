@@ -252,6 +252,16 @@ class Lesson {
     return hoursSinceEnd < 24;
   }
 
+  /// Whether this lesson awaits the teacher's written feedback.
+  ///
+  /// True only for a connected (subscription) lesson that has actually been
+  /// 출석 확인 처리됨(raw `status == completed`) and still has no feedback.
+  /// Uses raw `status` rather than [displayStatus] so the feedback prompt never
+  /// appears before attendance is confirmed (#796): past unconfirmed lessons
+  /// project to `completed` via [displayStatus] but must not nag for feedback.
+  bool get awaitsTeacherFeedback =>
+      hasSubscription && status == LessonStatus.completed && !hasFeedback;
+
   /// Calculate lesson end time from date + startTime + duration.
   DateTime _calculateEndDateTime() {
     final parts = startTime.split(':');

@@ -94,4 +94,59 @@ void main() {
       expect(lesson.isPreview, isFalse); // immutability
     });
   });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // awaitsTeacherFeedback — #796 피드백 프롬프트는 출석 확인 후에만
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  group('awaitsTeacherFeedback', () {
+    test('출석 확인 완료(completed) + 수강권 + 피드백 없음 → true', () {
+      final lesson = createLesson(
+        subscriptionId: 'sub_001',
+        status: LessonStatus.completed,
+      );
+      expect(lesson.awaitsTeacherFeedback, isTrue);
+    });
+
+    test('피드백 이미 작성됨 → false', () {
+      final lesson = createLesson(
+        subscriptionId: 'sub_001',
+        status: LessonStatus.completed,
+      ).copyWith(feedback: '잘했어요');
+      expect(lesson.awaitsTeacherFeedback, isFalse);
+    });
+
+    test('과거 미확인 레슨(scheduled, 종료 시간 지남) → false (#796 핵심)', () {
+      // date 2026-04-01 은 과거 → displayStatus 는 completed 로 투영되지만,
+      // 실제 status 는 scheduled(출석 미확인). 프롬프트가 떠선 안 된다.
+      final lesson = createLesson(
+        subscriptionId: 'sub_001',
+        status: LessonStatus.scheduled,
+      );
+      expect(lesson.displayStatus, LessonStatus.completed); // 투영 확인
+      expect(lesson.isUnconfirmed, isTrue); // 출석 미확인 확인
+      expect(lesson.awaitsTeacherFeedback, isFalse); // 그래도 프롬프트 없음
+    });
+
+    test('수강권 없는 수동 레슨(completed) → false', () {
+      final lesson = createLesson(status: LessonStatus.completed);
+      expect(lesson.awaitsTeacherFeedback, isFalse);
+    });
+
+    test('휴강(cancelledByTeacher) + 수강권 → false', () {
+      final lesson = createLesson(
+        subscriptionId: 'sub_001',
+        status: LessonStatus.cancelledByTeacher,
+      );
+      expect(lesson.awaitsTeacherFeedback, isFalse);
+    });
+
+    test('학생 결석(studentAbsent) + 수강권 → false', () {
+      final lesson = createLesson(
+        subscriptionId: 'sub_001',
+        status: LessonStatus.studentAbsent,
+      );
+      expect(lesson.awaitsTeacherFeedback, isFalse);
+    });
+  });
 }

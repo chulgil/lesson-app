@@ -421,20 +421,24 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   Widget _buildNotesTab(Lesson lesson) {
-    // Feedback prompt only for subscription lessons (student is connected).
-    // Manual lessons without student connection don't need feedback alerts.
-    final needsFeedback =
-        widget.isTeacher &&
-        lesson.subscriptionId != null &&
-        lesson.displayStatus == LessonStatus.completed &&
-        (lesson.feedback == null || lesson.feedback!.isEmpty);
+    // #796: 피드백 프롬프트는 출석 확인(실제 status == completed) 후에만 노출.
+    // displayStatus(과거 미확인 레슨을 completed 로 투영)를 쓰면 출석 확인 전에
+    // 프롬프트가 떠 출석 액션 위를 가린다. 출석 섹션을 프롬프트 위에 배치.
+    final needsFeedback = widget.isTeacher && lesson.awaitsTeacherFeedback;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Prompt to write feedback for completed lessons
+          // #473: 미확인 레슨 액션(출석 확인/휴강) + 사전 안내 배너 + 차감 결과
+          AttendanceSection(
+            lesson: lesson,
+            isTeacher: widget.isTeacher,
+            onCompleted: () => _tryAutoProposal(lesson),
+          ),
+
+          // 출석 확인 후 피드백 작성 유도 프롬프트 (#796: 출석 섹션 아래)
           if (needsFeedback) ...[
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
@@ -460,13 +464,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             ),
             const SizedBox(height: AppSpacing.space4),
           ],
-
-          // #473: 미확인 레슨 액션(출석 확인/휴강) + 사전 안내 배너 + 차감 결과
-          AttendanceSection(
-            lesson: lesson,
-            isTeacher: widget.isTeacher,
-            onCompleted: () => _tryAutoProposal(lesson),
-          ),
 
           // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨 또는 활성 수강권이 있는 수동 레슨
           _buildScheduleChangeButton(lesson),
