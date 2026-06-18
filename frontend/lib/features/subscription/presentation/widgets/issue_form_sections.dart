@@ -140,18 +140,21 @@ class SubscriptionTypeSelector extends StatelessWidget {
   }
 }
 
-/// Payment status section with prepaid/postpaid toggle and payment method selector
+/// #770: 직접 발급 결제 모드 — 선불/후불/무료 3종(제안 PaymentMethod 어휘 정렬).
+enum IssuePaymentMode { prepaid, postpaid, free }
+
+/// Payment status section with prepaid/postpaid/free selector and payment method.
 class PaymentStatusSection extends StatelessWidget {
-  final bool isPaymentConfirmed;
+  final IssuePaymentMode mode;
   final SubscriptionPaymentMethod selectedPaymentMethod;
-  final ValueChanged<bool> onPaymentConfirmedChanged;
+  final ValueChanged<IssuePaymentMode> onModeChanged;
   final ValueChanged<SubscriptionPaymentMethod> onPaymentMethodChanged;
 
   const PaymentStatusSection({
     super.key,
-    required this.isPaymentConfirmed,
+    required this.mode,
     required this.selectedPaymentMethod,
-    required this.onPaymentConfirmedChanged,
+    required this.onModeChanged,
     required this.onPaymentMethodChanged,
   });
 
@@ -173,8 +176,8 @@ class PaymentStatusSection extends StatelessWidget {
               child: _PaymentStatusChip(
                 label: AppStrings.issueFormPaymentPrepaidLabel,
                 icon: Icons.payment,
-                isSelected: isPaymentConfirmed,
-                onTap: () => onPaymentConfirmedChanged(true),
+                isSelected: mode == IssuePaymentMode.prepaid,
+                onTap: () => onModeChanged(IssuePaymentMode.prepaid),
               ),
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -182,8 +185,18 @@ class PaymentStatusSection extends StatelessWidget {
               child: _PaymentStatusChip(
                 label: AppStrings.issueFormPaymentPostpaidLabel,
                 icon: Icons.schedule,
-                isSelected: !isPaymentConfirmed,
-                onTap: () => onPaymentConfirmedChanged(false),
+                isSelected: mode == IssuePaymentMode.postpaid,
+                onTap: () => onModeChanged(IssuePaymentMode.postpaid),
+                accentColor: AppColors.paperAccent,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: _PaymentStatusChip(
+                label: AppStrings.methodFreeChip,
+                icon: Icons.card_giftcard,
+                isSelected: mode == IssuePaymentMode.free,
+                onTap: () => onModeChanged(IssuePaymentMode.free),
                 accentColor: AppColors.paperAccent,
               ),
             ),
@@ -191,7 +204,7 @@ class PaymentStatusSection extends StatelessWidget {
         ),
 
         // Payment method selector (only when prepaid)
-        if (isPaymentConfirmed) ...[
+        if (mode == IssuePaymentMode.prepaid) ...[
           const SizedBox(height: AppSpacing.space3),
           Wrap(
             spacing: AppSpacing.space2,
@@ -228,7 +241,7 @@ class PaymentStatusSection extends StatelessWidget {
         ],
 
         // Info for postpaid
-        if (!isPaymentConfirmed) ...[
+        if (mode == IssuePaymentMode.postpaid) ...[
           const SizedBox(height: AppSpacing.space3),
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
@@ -244,6 +257,33 @@ class PaymentStatusSection extends StatelessWidget {
                 Expanded(
                   child: Text(
                     AppStrings.issueFormPaymentPostpaidNotice,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.paperAccent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // #770: 무료 발급 안내 (입금 없이 바로 발급).
+        if (mode == IssuePaymentMode.free) ...[
+          const SizedBox(height: AppSpacing.space3),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.card_giftcard,
+                  size: 16,
+                  color: AppColors.paperAccent,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: Text(
+                    AppStrings.methodFreeDesc,
                     style: AppTypography.caption.copyWith(
                       color: AppColors.paperAccent,
                     ),

@@ -58,6 +58,9 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   SubscriptionType get selectedType;
   String? get selectedMembershipId;
   bool get isPaymentConfirmed;
+
+  /// #770: 무료 발급 모드 — true 면 amount=0, 결제 미기록.
+  bool get isFreeIssue;
   SubscriptionPaymentMethod get selectedPaymentMethod;
   int get totalLessons;
   int get validityDays;
@@ -140,7 +143,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       bonusReason: effectiveBonusReason,
       startDate: startDate,
       endDate: endDate,
-      amount: finalAmount,
+      amount: isFreeIssue ? 0 : finalAmount,
       status: SubscriptionStatus.active,
       createdAt: now,
       paymentConfirmed: isPaymentConfirmed,
@@ -536,7 +539,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             bonusReason: effectiveBonusReason,
             startDate: startDate,
             endDate: endDate,
-            amount: finalAmount,
+            amount: isFreeIssue ? 0 : finalAmount,
             status: SubscriptionStatus.active,
             createdAt: now,
             paymentConfirmed: isPaymentConfirmed,
