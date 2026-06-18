@@ -9,6 +9,7 @@ import '../../../features/auth/presentation/screens/academy_invite_expired_scree
 import '../../../features/auth/presentation/screens/login_screen.dart';
 import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
+import '../../../features/auth/presentation/screens/splash_screen.dart';
 import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
 import '../../../features/onboarding/presentation/screens/first_availability_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/onboarding_category_preview_screen.dart';
@@ -22,6 +23,15 @@ import '../app_routes.dart';
 
 /// Auth and onboarding routes
 List<GoRoute> authRoutes = [
+  // Splash — initial location. Shown while AuthLoading (session restore) so the
+  // login screen does not flash before auth resolves; the redirect then sends
+  // the user to home (authenticated) or login (unauthenticated).
+  GoRoute(
+    path: AppRoutes.splash,
+    name: 'splash',
+    builder: (context, state) => const SplashScreen(),
+  ),
+
   // Login
   GoRoute(
     path: AppRoutes.login,

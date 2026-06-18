@@ -74,6 +74,7 @@ String? resolveAuthRedirect(
       _publicPaths.contains(currentPath) ||
       _publicPathPrefixes.any(currentPath.startsWith);
   final isRoleSelect = currentPath == _roleSelectPath;
+  final isSplash = currentPath == AppRoutes.splash;
 
   if (authState is AuthLoading) return null;
 
@@ -119,7 +120,10 @@ String? resolveAuthRedirect(
     }
   }
 
-  if (authState is AuthAuthenticated && (isPublic || isRoleSelect)) {
+  // Splash is the initial location: once auth resolves, an authenticated user
+  // must be sent to home instead of being stranded on the loading screen.
+  if (authState is AuthAuthenticated &&
+      (isPublic || isRoleSelect || isSplash)) {
     return authState.role.homeRoute;
   }
 
@@ -206,7 +210,7 @@ class AppRouter {
   static GoRouter createRouter(WidgetRef ref, {Listenable? refreshListenable}) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: AppRoutes.login,
+      initialLocation: AppRoutes.splash,
       debugLogDiagnostics: true,
       refreshListenable: refreshListenable,
       redirect: (context, state) => resolveAuthRedirect(
