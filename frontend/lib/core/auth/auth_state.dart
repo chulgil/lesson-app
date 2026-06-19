@@ -10,9 +10,19 @@ class AuthLoading extends AuthState {
   const AuthLoading();
 }
 
+/// Reason why the user is unauthenticated.
+///
+/// Used to surface meaningful feedback in LoginScreen (#866).
+/// [none] = normal (no token / manual logout).
+/// [networkError] = auto-login failed due to network/timeout.
+/// [serverError] = auto-login failed due to 5xx server error.
+enum AuthUnauthenticatedReason { none, networkError, serverError }
+
 /// User is not authenticated.
 class AuthUnauthenticated extends AuthState {
-  const AuthUnauthenticated();
+  final AuthUnauthenticatedReason reason;
+
+  const AuthUnauthenticated({this.reason = AuthUnauthenticatedReason.none});
 }
 
 /// User is authenticated but has no role assigned yet (new OAuth signup).

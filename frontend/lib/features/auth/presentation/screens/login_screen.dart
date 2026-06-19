@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -59,6 +60,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     // DEV accounts visibility follows the centralized runtime data mode.
     final showDevAccounts = ref.watch(mockDataModeProvider);
+
+    // Show feedback when auto-login fails with a server/network error (#866).
+    // Distinguishes between "no token" (silent) and "server unavailable" (toast).
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      if (next is AuthUnauthenticated &&
+          next.reason != AuthUnauthenticatedReason.none &&
+          mounted) {
+        final message = next.reason == AuthUnauthenticatedReason.networkError
+            ? AppStrings.authLoginNetworkError
+            : AppStrings.authAutoLoginServerError;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        );
+      }
+    });
+
     return NotebookScreenScaffold(
       body: PaperScaffold(
         child: SafeArea(
@@ -328,7 +345,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Google 로그인이 아직 설정되지 않았습니다. 테스트 계정을 사용해주세요.'),
+            content: Text(AppStrings.authGoogleNotConfigured),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -375,9 +392,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       if (context.mounted) {
+        final message = _loginErrorMessage(e);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Google 로그인 실패. 다시 시도해주세요.'),
+            content: Text(message),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.paperAccent,
           ),
@@ -386,6 +404,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  /// Maps caught exceptions to user-facing snackbar messages (#866).
+  ///
+  /// NetworkException → 연결 오류 / ServerException(5xx) → 서버 오류
+  /// UnauthorizedException(401) → 인증 실패 / 기타 → 일반 실패.
+  String _loginErrorMessage(Object e) {
+    if (e is NetworkException) return AppStrings.authLoginNetworkError;
+    if (e is ServerException) return AppStrings.authLoginServerError;
+    if (e is UnauthorizedException) return AppStrings.authLoginUnauthorized;
+    return AppStrings.authLoginFailed;
   }
 
   void _handleKakaoLogin(BuildContext context) {
@@ -402,7 +431,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // TODO(remote): Replace with real Apple Sign In when integrated
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Apple 로그인은 준비 중입니다.'),
+        content: Text(AppStrings.authAppleNotReady),
         behavior: SnackBarBehavior.floating,
       ),
     );

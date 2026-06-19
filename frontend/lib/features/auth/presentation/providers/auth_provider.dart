@@ -120,13 +120,18 @@ class AuthNotifier extends _$AuthNotifier {
     } on NetworkException catch (e) {
       // Network error — preserve tokens for next auto-login attempt
       debugPrint('[Auth] Auto-login failed (network): ${e.message}');
-      state = const AuthUnauthenticated();
+      state = const AuthUnauthenticated(
+        reason: AuthUnauthenticatedReason.networkError,
+      );
     } on ApiException catch (e) {
       // Server error — preserve tokens for next auto-login attempt
       debugPrint(
         '[Auth] Auto-login failed (API ${e.statusCode}): ${e.message}',
       );
-      state = const AuthUnauthenticated();
+      final reason = (e.statusCode != null && e.statusCode! >= 500)
+          ? AuthUnauthenticatedReason.serverError
+          : AuthUnauthenticatedReason.none;
+      state = AuthUnauthenticated(reason: reason);
     } catch (e) {
       // Unexpected error — preserve tokens
       debugPrint('[Auth] Auto-login failed (unexpected): $e');
