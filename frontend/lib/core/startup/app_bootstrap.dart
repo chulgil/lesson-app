@@ -8,6 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../../features/lessons/data/local/lesson_cache_store.dart';
 import '../../features/schedule/data/local/teacher_availability_cache_store.dart';
 import '../../features/students/data/local/student_cache_store.dart';
+import '../../features/subscription/data/local/subscription_cache_store.dart';
 import '../../features/notifications/data/services/fcm_service.dart';
 import '../../features/practice/data/models/practice_recording_hive_adapter.dart';
 import '../../features/practice/data/models/recording_hive_adapters.dart';
@@ -59,6 +60,7 @@ Future<StartupRecoveryResult> bootstrapApp() async {
   await Hive.openBox<String>(LessonCacheStore.boxName);
   await Hive.openBox<String>(StudentCacheStore.boxName);
   await Hive.openBox<String>(TeacherAvailabilityCacheStore.boxName);
+  await Hive.openBox<String>(SubscriptionCacheStore.boxName);
 
   // Recording-path recovery uses dart:io (File/Directory) + path_provider,
   // which are native-only. Skip on web.
