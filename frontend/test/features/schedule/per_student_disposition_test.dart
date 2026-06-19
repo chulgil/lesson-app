@@ -59,6 +59,27 @@ class _StubRepo implements VacationRepository {
   }) async => [];
 
   @override
+  Future<List<VacationPeriod>> registerVacationBatch({
+    required List<VacationSegment> segments,
+    String? reason,
+    Map<String, VacationDisposition>? perStudentDisposition,
+  }) async {
+    lastPerStudent = perStudentDisposition;
+    return [
+      for (final s in segments)
+        VacationPeriod(
+          id: 'stub',
+          teacherId: 'stub-teacher',
+          startDate: s.startDate,
+          endDate: s.endDate,
+          reason: reason,
+          defaultDisposition: s.disposition,
+          createdAt: DateTime.now(),
+        ),
+    ];
+  }
+
+  @override
   Future<VacationPeriod> cancelVacation(String periodId) async {
     throw UnimplementedError();
   }
@@ -105,8 +126,8 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(vacationFormProvider.notifier);
-      notifier.setStartDate(DateTime(2026, 8, 1));
-      notifier.setEndDate(DateTime(2026, 8, 5));
+      notifier.setDraftStart(DateTime(2026, 8, 1));
+      notifier.setDraftEnd(DateTime(2026, 8, 5));
       notifier.setStudentOverride('sA', VacationDisposition.makeupCredit);
 
       final period = await notifier.submit();
@@ -122,8 +143,8 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(vacationFormProvider.notifier);
-      notifier.setStartDate(DateTime(2026, 8, 1));
-      notifier.setEndDate(DateTime(2026, 8, 5));
+      notifier.setDraftStart(DateTime(2026, 8, 1));
+      notifier.setDraftEnd(DateTime(2026, 8, 5));
 
       await notifier.submit();
       expect(repo.lastPerStudent, isNull);
@@ -148,14 +169,21 @@ void main() {
       );
       // Set date range so impact preview can be loaded.
       final notifier = container.read(vacationFormProvider.notifier);
-      notifier.setStartDate(DateTime(2026, 8, 1));
-      notifier.setEndDate(DateTime(2026, 8, 5));
+      notifier.setDraftStart(DateTime(2026, 8, 1));
+      notifier.setDraftEnd(DateTime(2026, 8, 5));
       await notifier.loadImpact();
 
       // Apply an override before pumping again.
       notifier.setStudentOverride('sA', VacationDisposition.makeupCredit);
       await tester.pumpAndSettle();
 
+      // Impact section sits below the (taller) draft disposition section, so
+      // scroll it into view before asserting (#768 ② reorder).
+      await tester.scrollUntilVisible(
+        find.text('민수'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('민수'), findsOneWidget);
       expect(find.text('다른 처리: 보강 크레딧 적립'), findsOneWidget);
     });

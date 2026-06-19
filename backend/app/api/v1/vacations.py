@@ -26,6 +26,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, get_db
 from app.models.user import User
 from app.schemas.vacation import (
+    VacationBatchCreate,
+    VacationBatchResponse,
     VacationImpactPreview,
     VacationListResponse,
     VacationPeriodCreate,
@@ -55,6 +57,29 @@ async def register_vacation(
     service = VacationService(db)
     try:
         return await service.register_vacation(teacher_id, body)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post(
+    "/batch",
+    response_model=VacationBatchResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register multiple vacation segments at once (#768 ②)",
+)
+async def register_vacation_batch(
+    body: VacationBatchCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> VacationBatchResponse:
+    """다구간 휴가 등록. 보상옵션은 구간별, 사유/학생별 예외는 전 구간 공유.
+
+    구간 간 겹침은 거부한다 (같은 레슨 이중 처리로 차감/연장 무결성 훼손 방지).
+    """
+    teacher_id = await resolve_teacher_id(db, current_user.id)
+    service = VacationService(db)
+    try:
+        return await service.register_vacation_batch(teacher_id, body)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

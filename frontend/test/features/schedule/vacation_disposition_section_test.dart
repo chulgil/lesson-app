@@ -42,6 +42,13 @@ class _StubRepo implements VacationRepository {
   }) async => [];
 
   @override
+  Future<List<VacationPeriod>> registerVacationBatch({
+    required List<VacationSegment> segments,
+    String? reason,
+    Map<String, VacationDisposition>? perStudentDisposition,
+  }) async => throw UnimplementedError();
+
+  @override
   Future<VacationPeriod> cancelVacation(String periodId) async {
     throw UnimplementedError();
   }
@@ -114,7 +121,7 @@ void main() {
       await tester.pumpAndSettle();
       // Default disposition = rollForward.
       expect(
-        container.read(vacationFormProvider).disposition,
+        container.read(vacationFormProvider).draftDisposition,
         VacationDisposition.rollForward,
       );
 
@@ -124,7 +131,7 @@ void main() {
       await tester.tap(find.text('보강 크레딧 적립'));
       await tester.pumpAndSettle();
       expect(
-        container.read(vacationFormProvider).disposition,
+        container.read(vacationFormProvider).draftDisposition,
         VacationDisposition.makeupCredit,
       );
 
@@ -134,7 +141,7 @@ void main() {
       await tester.tap(find.text('무료 처리'));
       await tester.pumpAndSettle();
       expect(
-        container.read(vacationFormProvider).disposition,
+        container.read(vacationFormProvider).draftDisposition,
         VacationDisposition.freeCancel,
       );
     });

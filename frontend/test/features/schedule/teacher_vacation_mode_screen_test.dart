@@ -53,6 +53,13 @@ class _StubVacationRepository implements VacationRepository {
   }) async => [];
 
   @override
+  Future<List<VacationPeriod>> registerVacationBatch({
+    required List<VacationSegment> segments,
+    String? reason,
+    Map<String, VacationDisposition>? perStudentDisposition,
+  }) async => throw UnimplementedError();
+
+  @override
   Future<VacationPeriod> cancelVacation(String periodId) async {
     throw UnimplementedError();
   }

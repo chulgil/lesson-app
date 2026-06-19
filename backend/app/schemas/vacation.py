@@ -40,6 +40,44 @@ class VacationPeriodCreate(BaseModel):
         return self
 
 
+class VacationSegmentCreate(BaseModel):
+    """One vacation segment within a multi-segment batch (#768 ②).
+
+    보상옵션(default_disposition)은 구간별. 사유/학생별 예외는 batch 가 공유한다.
+    """
+
+    start_date: _dt.date
+    end_date: _dt.date
+    default_disposition: VacationDisposition = VacationDisposition.rollForward
+
+    @model_validator(mode="after")
+    def validate_date_range(self) -> VacationSegmentCreate:
+        if self.end_date < self.start_date:
+            raise ValueError("end_date must be >= start_date")
+        return self
+
+
+class VacationBatchCreate(BaseModel):
+    """Request body for POST /api/teacher/vacation/batch — 다구간 휴가 (#768 ②).
+
+    사유/학생별 예외는 전 구간 공유, 보상옵션은 구간별. 구간 간 겹침은 허용하지 않는다
+    (겹치면 같은 레슨이 두 번 처리되어 차감/연장 무결성이 깨진다).
+    """
+
+    reason: str | None = Field(default=None, max_length=200)
+    per_student_disposition: dict[str, VacationDisposition] | None = None
+    segments: list[VacationSegmentCreate] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_no_overlap(self) -> VacationBatchCreate:
+        ordered = sorted(self.segments, key=lambda s: s.start_date)
+        for prev, cur in zip(ordered, ordered[1:], strict=False):
+            # Inclusive ranges: a shared boundary day is still an overlap.
+            if cur.start_date <= prev.end_date:
+                raise ValueError("vacation segments must not overlap")
+        return self
+
+
 class VacationPeriodResponse(BaseModel):
     """Response body for vacation period CRUD."""
 
@@ -59,6 +97,13 @@ class VacationPeriodResponse(BaseModel):
 
 class VacationListResponse(BaseModel):
     """Response body for GET /api/teacher/vacation — list of periods."""
+
+    vacations: list[VacationPeriodResponse] = []
+    total_count: int
+
+
+class VacationBatchResponse(BaseModel):
+    """Response body for POST /api/teacher/vacation/batch — created segments."""
 
     vacations: list[VacationPeriodResponse] = []
     total_count: int

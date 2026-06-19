@@ -107,4 +107,24 @@ class MockVacationRepository implements VacationRepository {
     _periods[index] = cancelled;
     return cancelled;
   }
+
+  @override
+  Future<List<VacationPeriod>> registerVacationBatch({
+    required List<VacationSegment> segments,
+    String? reason,
+    Map<String, VacationDisposition>? perStudentDisposition,
+  }) async {
+    final created = <VacationPeriod>[];
+    for (final segment in segments) {
+      final period = await registerVacation(
+        startDate: segment.startDate,
+        endDate: segment.endDate,
+        reason: reason,
+        defaultDisposition: segment.disposition,
+        perStudentDisposition: perStudentDisposition,
+      );
+      created.add(period);
+    }
+    return created;
+  }
 }

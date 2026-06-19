@@ -202,6 +202,7 @@
 |------|----------|-----------|
 | 휴가 처리 방식 | `VacationDisposition` | makeupCredit / freeCancel / rollForward |
 | 휴가 영향 미리보기 | `VacationImpactPreview` | 영향 레슨/학생 집계 (`VacationImpactedStudent`) |
+| 휴가 구간 | `VacationSegment` | 다구간 휴가의 한 기간 (start/end + 구간별 disposition). 배치 등록 시 N개 `VacationPeriod` 로 저장 (#768 ②). 사유·학생별 예외는 전 구간 공유 |
 | 요청 필터 | `RequestFilter` | 요청 목록 필터/정렬 (FE 전용) |
 | 요청 단계 | `RequestPhase` | request / subscription / lessons / completed / terminal |
 | 요청 상태 그룹 | `RequestStatusGroup` | 상태 묶음 (목록 그룹핑) |
@@ -581,6 +582,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-19 | 휴가 구간(`VacationSegment`) 신설 — 다구간 휴가(#768 ②). 한 번에 여러 비겹침 기간을 등록(구간별 보상옵션 / 사유·학생별 예외 공통). BE 배치 계약 `POST /teacher/vacation/batch`(구간마다 기존 `register_vacation` 재사용, 원자적). 겹침 구간 거부(이중 차감/연장 방지). 기존 단일 등록 경로 불변. |
 | 2026-06-18 | 학생 상세 전화/문자 상단 승격 + 메뉴 그룹핑 (검토 #28) — 매일 쓰는 전화·문자를 more(...) 메뉴(2탭) → 신원 스트립(1탭, `StudentContactActions`). more 메뉴를 관리/상태 변경 섹션(`_MoreSectionLabel`)으로 그룹핑 + 학생 보관 맨 아래 분리. 데이터·플로우 불변(UI/IA만). |
 | 2026-06-18 | 레슨 요약 공유 버튼 (검토 #62) — 레슨 상세 공유 액션을 로컬 텍스트 스낵바 → 서버 토큰 발급(`POST /lesson-summaries/{id}/share`, BE 기구현)으로 교체. URL 클립보드 복사 + "학생과 공유하기" 토스트. FE-only(LessonSummaryShare 모델 + repo mock/remote + 수동 provider). 구 lessonShareText/shareTextCopied orphan 제거. |
 | 2026-06-18 | 만료임박 카드 갱신 제안 CTA (검토 #45) — `SubscriptionCard.onRenew` + 만료임박 화면 wiring → `issueSubscription?renewFromSubscriptionId=` 로 이전 수강권(회차·금액·유효기간·변경허용) 프리필 발급. `_applyRenewalDefaults` 폼 초기값만(발급 로직·빌링 불변, 교사 확인 후 발급). 임박→갱신 한 화면 완결. |

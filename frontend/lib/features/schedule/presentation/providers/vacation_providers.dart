@@ -26,22 +26,31 @@ final vacationRepositoryProvider = Provider<VacationRepository>((ref) {
 // ──────────────────────────────────────────────────────────────
 
 class VacationFormState {
-  final DateTime? startDate;
-  final DateTime? endDate;
+  /// Committed segments. Each carries its own disposition (보상옵션 구간별).
+  final List<VacationSegment> segments;
+
+  // Draft editor — the segment currently being composed.
+  final DateTime? draftStart;
+  final DateTime? draftEnd;
+  final VacationDisposition draftDisposition;
+
+  // Shared across every segment (사유/학생별 예외 공통).
   final String reason;
-  final VacationDisposition disposition;
   // spec §4.2 — per-student override. Absent key = "follow default".
   final Map<String, VacationDisposition> perStudentOverrides;
+
+  // Impact preview for the draft range (informational).
   final VacationImpactPreview? impact;
   final bool isLoadingImpact;
   final bool isSubmitting;
   final String? errorMessage;
 
   const VacationFormState({
-    this.startDate,
-    this.endDate,
+    this.segments = const [],
+    this.draftStart,
+    this.draftEnd,
+    this.draftDisposition = VacationDisposition.rollForward,
     this.reason = '',
-    this.disposition = VacationDisposition.rollForward,
     this.perStudentOverrides = const {},
     this.impact,
     this.isLoadingImpact = false,
@@ -49,22 +58,51 @@ class VacationFormState {
     this.errorMessage,
   });
 
-  bool get hasValidRange {
-    final s = startDate;
-    final e = endDate;
+  /// Whether the draft range is valid (non-null, non-inverted, not in the past).
+  bool get hasValidDraft {
+    final s = draftStart;
+    final e = draftEnd;
     if (s == null || e == null || e.isBefore(s)) return false;
-    // Start date must not be in the past (date-only comparison).
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final startDay = DateTime(s.year, s.month, s.day);
     return !startDay.isBefore(today);
   }
 
+  /// The draft as a segment, or null when [hasValidDraft] is false.
+  VacationSegment? get draftSegment => hasValidDraft
+      ? VacationSegment(
+          startDate: draftStart!,
+          endDate: draftEnd!,
+          disposition: draftDisposition,
+        )
+      : null;
+
+  /// Whether a valid draft overlaps any already-committed segment.
+  bool get draftOverlaps {
+    final d = draftSegment;
+    if (d == null) return false;
+    return vacationSegmentsOverlap([...segments, d]);
+  }
+
+  /// Segments that would actually be submitted: committed segments plus the
+  /// draft when it is valid and non-overlapping (single-segment teachers never
+  /// need to press "구간 추가").
+  List<VacationSegment> get effectiveSegments {
+    final d = draftSegment;
+    if (d != null && !draftOverlaps) return [...segments, d];
+    return segments;
+  }
+
+  /// Whether registration can proceed (at least one effective segment).
+  bool get canSubmit => effectiveSegments.isNotEmpty;
+
   VacationFormState copyWith({
-    DateTime? startDate,
-    DateTime? endDate,
+    List<VacationSegment>? segments,
+    DateTime? draftStart,
+    DateTime? draftEnd,
+    VacationDisposition? draftDisposition,
     String? reason,
-    VacationDisposition? disposition,
     Map<String, VacationDisposition>? perStudentOverrides,
     VacationImpactPreview? impact,
     bool? isLoadingImpact,
@@ -73,12 +111,16 @@ class VacationFormState {
     bool clearImpact = false,
     bool clearError = false,
     bool clearOverrides = false,
+    bool clearDraft = false,
   }) {
     return VacationFormState(
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      segments: segments ?? this.segments,
+      draftStart: clearDraft ? null : (draftStart ?? this.draftStart),
+      draftEnd: clearDraft ? null : (draftEnd ?? this.draftEnd),
+      draftDisposition: clearDraft
+          ? VacationDisposition.rollForward
+          : (draftDisposition ?? this.draftDisposition),
       reason: reason ?? this.reason,
-      disposition: disposition ?? this.disposition,
       perStudentOverrides: clearOverrides
           ? const {}
           : (perStudentOverrides ?? this.perStudentOverrides),
@@ -95,30 +137,29 @@ class VacationForm extends _$VacationForm {
   @override
   VacationFormState build() => const VacationFormState();
 
-  VacationRepository get _repository =>
-      ref.read(vacationRepositoryProvider);
+  VacationRepository get _repository => ref.read(vacationRepositoryProvider);
 
-  void setStartDate(DateTime date) {
+  void setDraftStart(DateTime date) {
     state = state.copyWith(
-      startDate: date,
+      draftStart: date,
       clearImpact: true,
       clearError: true,
     );
   }
 
-  void setEndDate(DateTime date) {
-    state = state.copyWith(endDate: date, clearImpact: true, clearError: true);
+  void setDraftEnd(DateTime date) {
+    state = state.copyWith(draftEnd: date, clearImpact: true, clearError: true);
+  }
+
+  void setDraftDisposition(VacationDisposition value) {
+    state = state.copyWith(draftDisposition: value);
   }
 
   void setReason(String value) {
     state = state.copyWith(reason: value);
   }
 
-  void setDisposition(VacationDisposition value) {
-    state = state.copyWith(disposition: value);
-  }
-
-  /// spec §4.2 — Set or clear (`null`) the override for one student.
+  /// spec §4.2 — Set or clear (`null`) the override for one student (shared).
   void setStudentOverride(String studentId, VacationDisposition? override) {
     final next = Map<String, VacationDisposition>.from(
       state.perStudentOverrides,
@@ -131,13 +172,37 @@ class VacationForm extends _$VacationForm {
     state = state.copyWith(perStudentOverrides: next);
   }
 
+  /// Commit the current draft as a segment. Returns false when the draft is
+  /// invalid or overlaps an existing segment (caller surfaces the reason via
+  /// [VacationFormState.hasValidDraft] / [VacationFormState.draftOverlaps]).
+  bool addSegment() {
+    final draft = state.draftSegment;
+    if (draft == null) return false;
+    if (vacationSegmentsOverlap([...state.segments, draft])) return false;
+    final next = [...state.segments, draft]
+      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+    state = state.copyWith(
+      segments: next,
+      clearDraft: true,
+      clearImpact: true,
+      clearError: true,
+    );
+    return true;
+  }
+
+  void removeSegment(int index) {
+    if (index < 0 || index >= state.segments.length) return;
+    final next = [...state.segments]..removeAt(index);
+    state = state.copyWith(segments: next);
+  }
+
   Future<void> loadImpact() async {
-    if (!state.hasValidRange) return;
+    if (!state.hasValidDraft) return;
     state = state.copyWith(isLoadingImpact: true, clearError: true);
     try {
       final impact = await _repository.previewImpact(
-        startDate: state.startDate!,
-        endDate: state.endDate!,
+        startDate: state.draftStart!,
+        endDate: state.draftEnd!,
       );
       state = state.copyWith(impact: impact, isLoadingImpact: false);
     } catch (e) {
@@ -148,22 +213,23 @@ class VacationForm extends _$VacationForm {
     }
   }
 
-  Future<VacationPeriod?> submit() async {
-    if (!state.hasValidRange || state.isSubmitting) return null;
+  /// Register all effective segments as one batch (#768 ②). Returns the created
+  /// periods, or null on failure / nothing to submit.
+  Future<List<VacationPeriod>?> submit() async {
+    final segments = state.effectiveSegments;
+    if (segments.isEmpty || state.isSubmitting) return null;
     state = state.copyWith(isSubmitting: true, clearError: true);
     try {
-      final period = await _repository.registerVacation(
-        startDate: state.startDate!,
-        endDate: state.endDate!,
+      final periods = await _repository.registerVacationBatch(
+        segments: segments,
         reason: state.reason.trim().isEmpty ? null : state.reason.trim(),
-        defaultDisposition: state.disposition,
         perStudentDisposition: state.perStudentOverrides.isEmpty
             ? null
             : state.perStudentOverrides,
       );
       state = state.copyWith(isSubmitting: false);
       ref.invalidate(vacationListProvider);
-      return period;
+      return periods;
     } catch (e) {
       state = state.copyWith(isSubmitting: false, errorMessage: e.toString());
       return null;

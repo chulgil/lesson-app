@@ -33,4 +33,14 @@ abstract class VacationRepository {
   /// - 409 if 24h elapsed or vacation already started
   /// - 403/404 if not the creator
   Future<VacationPeriod> cancelVacation(String periodId);
+
+  /// Register multiple non-overlapping vacation segments at once (#768 ②).
+  ///
+  /// 보상옵션은 구간별([VacationSegment.disposition]), [reason] 과
+  /// [perStudentDisposition] 은 전 구간 공유. 구간 수만큼 [VacationPeriod] 를 반환한다.
+  Future<List<VacationPeriod>> registerVacationBatch({
+    required List<VacationSegment> segments,
+    String? reason,
+    Map<String, VacationDisposition>? perStudentDisposition,
+  });
 }
