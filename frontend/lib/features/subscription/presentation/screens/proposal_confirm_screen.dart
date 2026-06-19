@@ -17,6 +17,7 @@ import '../../domain/entities/subscription_template.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../../../students/students_facade.dart';
+import '../providers/payment_inquiry_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
@@ -24,9 +25,10 @@ import '../providers/subscription_providers.dart';
 
 /// Screen for teachers to confirm payments and issue subscriptions.
 ///
-/// Supports both single confirmation (per-card button) and batch confirmation
-/// (checkbox selection + bottom action bar) — the latter relieves the "1건씩
-/// 수동 확인" burden when deposits pile up at semester start (#771).
+/// Supports single confirmation (per-card button), batch confirmation (checkbox
+/// selection + bottom action bar, #771), and a "확인 보류" memo: tapping "입금
+/// 미확인" stamps an inquiry time so the card shows a hold badge and the list
+/// can filter to held items (#772).
 class ProposalConfirmScreen extends ConsumerStatefulWidget {
   final String teacherId;
   final String teacherName; // 🆕 For notification
@@ -51,31 +53,61 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   /// True while a batch confirmation is running (disables the bar button).
   bool _batchProcessing = false;
 
+  /// When true, the list shows only "확인 보류" (inquiry-recorded) proposals.
+  bool _holdOnly = false;
+
   @override
   Widget build(BuildContext context) {
     final proposalsAsync = ref.watch(
       awaitingConfirmationProposalsProvider(widget.teacherId),
     );
+    final records =
+        ref
+            .watch(paymentInquiryRecordsProvider(widget.teacherId))
+            .asData
+            ?.value ??
+        const <String, DateTime>{};
     final proposals =
         proposalsAsync.asData?.value ?? const <SubscriptionProposal>[];
 
+    // On-hold = awaiting AND has a recorded inquiry.
+    final holdCount = proposals.where((p) => records.containsKey(p.id)).length;
+    // Auto-clear the filter when nothing is held.
+    final holdOnly = _holdOnly && holdCount > 0;
+    final visibleProposals =
+        holdOnly
+            ? proposals.where((p) => records.containsKey(p.id)).toList()
+            : proposals;
+
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(title: AppStrings.paymentConfirm),
-      bottomNavigationBar: _buildBatchBar(proposals),
+      bottomNavigationBar: _buildBatchBar(visibleProposals),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(child: Text('${AppStrings.errorOccurred}.')),
-        data: (proposals) {
+        data: (_) {
           if (proposals.isEmpty) {
             return _buildEmptyState();
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(AppSpacing.screenPadding),
-            itemCount: proposals.length,
-            itemBuilder: (context, index) {
-              return _buildProposalCard(proposals[index]);
-            },
+          return Column(
+            children: [
+              if (holdCount > 0)
+                _buildHoldFilter(
+                  total: proposals.length,
+                  hold: holdCount,
+                  holdOnly: holdOnly,
+                ),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                  itemCount: visibleProposals.length,
+                  itemBuilder: (context, index) {
+                    return _buildProposalCard(visibleProposals[index], records);
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -111,7 +143,42 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     );
   }
 
-  Widget _buildProposalCard(SubscriptionProposal proposal) {
+  /// Filter chips above the list — shown only when at least one proposal is on
+  /// hold (progressive disclosure). Mirrors the notification list filter style.
+  Widget _buildHoldFilter({
+    required int total,
+    required int hold,
+    required bool holdOnly,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.screenPadding,
+        AppSpacing.screenPadding,
+        0,
+      ),
+      child: Row(
+        children: [
+          _HoldFilterChip(
+            label: AppStrings.paymentFilterAllCount(total),
+            selected: !holdOnly,
+            onTap: () => setState(() => _holdOnly = false),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          _HoldFilterChip(
+            label: AppStrings.paymentFilterHoldCount(hold),
+            selected: holdOnly,
+            onTap: () => setState(() => _holdOnly = true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProposalCard(
+    SubscriptionProposal proposal,
+    Map<String, DateTime> records,
+  ) {
     // Multi-choice proposals must use the student's selected template
     // (effectiveTemplateId), not the first/base templateId.
     final templateAsync = ref.watch(
@@ -125,6 +192,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     // they are excluded from batch selection (checkbox disabled).
     final selectable = !proposal.needsTemplateSelection;
     final isSelected = _selectedProposalIds.contains(proposal.id);
+    final lastInquiryAt = records[proposal.id];
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -219,6 +287,16 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
+                              // 확인 보류일 때 마지막 문의 시각.
+                              if (lastInquiryAt != null)
+                                Text(
+                                  AppStrings.paymentInquiryRecordedFormat(
+                                    _formatDateTime(lastInquiryAt),
+                                  ),
+                                  style: AppTypography.caption.copyWith(
+                                    color: AppColors.paperAccent,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -227,6 +305,12 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                   },
                 ),
               ),
+
+              // 확인 보류 배지 (입금 미확인으로 표시된 항목).
+              if (lastInquiryAt != null) ...[
+                const SizedBox(width: AppSpacing.space2),
+                _buildHoldBadge(),
+              ],
             ],
           ),
 
@@ -275,6 +359,27 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  /// "확인 보류" pill — small outlined accent badge.
+  Widget _buildHoldBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: AppSpacing.space1,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccent),
+      ),
+      child: Text(
+        AppStrings.paymentHoldBadge,
+        style: AppTypography.caption.copyWith(
+          color: AppColors.paperAccent,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -481,6 +586,10 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           proposal.studentId,
           teacherId: widget.teacherId,
         );
+        // Issuance resolves the hold — drop any "확인 보류" memo.
+        ref
+            .read(paymentInquiryRecordsProvider(widget.teacherId).notifier)
+            .clear(proposal.id);
       }
     } on PhoneVerificationRequiredException catch (_) {
       // #430 G1 §4.3 — E3 게이트. 미인증 선생님이 수강권을 발급하려 할 때
@@ -597,12 +706,17 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     if (!mounted) return;
 
     ref.invalidate(awaitingConfirmationProposalsProvider(widget.teacherId));
+    final inquiryNotifier = ref.read(
+      paymentInquiryRecordsProvider(widget.teacherId).notifier,
+    );
     for (final p in succeeded) {
       invalidateSubscriptionListsForStudent(
         ref,
         p.studentId,
         teacherId: widget.teacherId,
       );
+      // Issuance resolves the hold — drop any "확인 보류" memo.
+      inquiryNotifier.clear(p.id);
     }
 
     if (needsPhoneVerification) {
@@ -741,10 +855,17 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     );
 
     if (result == true && mounted) {
-      // TODO: Send inquiry message notification
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.inquiryMessageSent)),
-      );
+      // Record the inquiry time → the card shows a "확인 보류" badge and the
+      // list can filter to held items (#772). The actual outbound message
+      // notification is a separate TODO.
+      await ref
+          .read(paymentInquiryRecordsProvider(widget.teacherId).notifier)
+          .recordInquiry(proposal.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.paymentMarkedOnHold)),
+        );
+      }
     }
   }
 
@@ -763,4 +884,45 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   }
 
   String _formatPrice(int price) => price.toKoreanWon;
+}
+
+/// Filter chip for the 전체 / 보류 toggle — matches the notification list style.
+class _HoldFilterChip extends StatelessWidget {
+  const _HoldFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space1,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.ink : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppSpacing.space4),
+          border: Border.all(
+            color: selected ? AppColors.ink : AppColors.inkTertiary,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.bodySmall.copyWith(
+            color: selected ? AppColors.paper : AppColors.inkSecondary,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
 }

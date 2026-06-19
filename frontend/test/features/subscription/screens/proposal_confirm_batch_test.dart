@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/subscription/data/repositories/mock_subscription_repository.dart';
+import 'package:lessonaza/features/subscription/data/repositories/payment_inquiry_storage.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 import 'package:lessonaza/features/subscription/domain/entities/subscription_proposal.dart';
 import 'package:lessonaza/features/subscription/domain/repositories/subscription_proposal_repository.dart';
+import 'package:lessonaza/features/subscription/presentation/providers/payment_inquiry_provider.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_proposal_providers.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 import 'package:lessonaza/features/subscription/presentation/screens/proposal_confirm_screen.dart';
@@ -61,6 +63,19 @@ class _FakeProposalRepository implements SubscriptionProposalRepository {
       throw UnimplementedError('${invocation.memberName} not stubbed');
 }
 
+/// In-memory inquiry storage — keeps the screen's hold-memo provider off Hive
+/// (uninitialised in widget tests).
+class _FakeInquiryStorage extends PaymentInquiryStorage {
+  @override
+  Future<void> recordInquiry(String userId, String proposalId) async {}
+
+  @override
+  Future<Map<String, DateTime>> loadAll(String userId) async => const {};
+
+  @override
+  Future<void> clear(String userId, String proposalId) async {}
+}
+
 SubscriptionProposal _awaiting(String id, String studentId, String templateId) {
   final now = DateTime(2026, 1, 1);
   return SubscriptionProposal(
@@ -99,6 +114,9 @@ void main() {
           subscriptionRepositoryProvider.overrideWithValue(subRepo),
           subscriptionProposalRepositoryProvider.overrideWithValue(
             proposalRepo,
+          ),
+          paymentInquiryStorageProvider.overrideWithValue(
+            _FakeInquiryStorage(),
           ),
         ],
         child: const MaterialApp(
@@ -164,6 +182,9 @@ void main() {
           subscriptionRepositoryProvider.overrideWithValue(subRepo),
           subscriptionProposalRepositoryProvider.overrideWithValue(
             proposalRepo,
+          ),
+          paymentInquiryStorageProvider.overrideWithValue(
+            _FakeInquiryStorage(),
           ),
         ],
         child: const MaterialApp(
