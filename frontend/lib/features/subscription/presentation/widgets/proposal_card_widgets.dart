@@ -633,7 +633,16 @@ class _PaymentInfoRow extends StatelessWidget {
 class ProposalWaitingCard extends StatelessWidget {
   final VoidCallback onContactTapped;
 
-  const ProposalWaitingCard({super.key, required this.onContactTapped});
+  /// Optional — re-show the deposit account (통장 대조용) while waiting (#773).
+  /// Null on screens without an account context (e.g. renewal), where the link
+  /// is hidden.
+  final VoidCallback? onReconfirmAccount;
+
+  const ProposalWaitingCard({
+    super.key,
+    required this.onContactTapped,
+    this.onReconfirmAccount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -671,6 +680,14 @@ class ProposalWaitingCard extends StatelessWidget {
             icon: const Icon(Icons.chat_bubble_outline, size: 18),
             label: const Text(AppStrings.proposalWaitingContactCta),
           ),
+          // #773: 결제 후 계좌 카드가 숨겨지므로, 통장 대조를 위해 입금 계좌를
+          // 다시 볼 수 있는 링크를 제공한다. 계좌 컨텍스트가 없는 화면에서는 숨김.
+          if (onReconfirmAccount != null)
+            TextButton.icon(
+              onPressed: onReconfirmAccount,
+              icon: const Icon(Icons.account_balance, size: 18),
+              label: const Text(AppStrings.proposalReconfirmAccountCta),
+            ),
         ],
       ),
     );
