@@ -90,8 +90,11 @@ class ChipInputField extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space3),
 
-        // Single row: chips + input field
-        Row(
+        // Chips + input field — Wrap 으로 좁은 뷰포트에서 줄바꿈(오버플로우 방지).
+        // #751: chip_input_field Row 가 375px 에서 가로 오버플로우(정책/제안 설정 화면).
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          runSpacing: AppSpacing.space2,
           children: [
             // Quick selection chips
             ...options.map((value) {
