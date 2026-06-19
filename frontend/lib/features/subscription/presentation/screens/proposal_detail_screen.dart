@@ -442,7 +442,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text('⭐', style: AppTypography.caption),
+                                        Icon(Icons.star_rounded, size: 14, color: AppColors.paperAccent),
                                         const SizedBox(width: 2),
                                         Text(
                                           AppStrings

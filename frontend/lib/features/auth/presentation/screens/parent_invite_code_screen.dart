@@ -60,7 +60,7 @@ class _ParentInviteCodeScreenState
                     children: [
                       const SizedBox(height: AppSpacing.space4),
 
-                      // Parent emoji icon
+                      // Parent icon
                       Container(
                         width: 80,
                         height: 80,
@@ -68,11 +68,10 @@ class _ParentInviteCodeScreenState
                           color: AppColors.ink.withValues(alpha: 0.1),
                         ),
                         child: Center(
-                          child: Text(
-                            '👨‍👩‍👧',
-                            style: AppTypography.displayLarge.copyWith(
-                              fontSize: 40,
-                            ),
+                          child: Icon(
+                            Icons.family_restroom,
+                            size: 40,
+                            color: AppColors.ink,
                           ),
                         ),
                       ),

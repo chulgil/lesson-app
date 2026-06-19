@@ -59,7 +59,7 @@ class _StudentInviteCodeScreenState
                     children: [
                       const SizedBox(height: AppSpacing.space4),
 
-                      // Student emoji icon
+                      // Student icon
                       Container(
                         width: 80,
                         height: 80,
@@ -67,11 +67,10 @@ class _StudentInviteCodeScreenState
                           color: AppColors.paperAccentSoft,
                         ),
                         child: Center(
-                          child: Text(
-                            '🎵',
-                            style: AppTypography.displayLarge.copyWith(
-                              fontSize: 40,
-                            ),
+                          child: Icon(
+                            Icons.music_note,
+                            size: 40,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ),
