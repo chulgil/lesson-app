@@ -3,6 +3,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/lessons/data/local/lesson_cache_store.dart';
 import '../../../../features/lessons/data/repositories/remote_lesson_repository.dart';
+import '../../../../features/schedule/data/local/teacher_availability_cache_store.dart';
+import '../../../../features/schedule/data/repositories/remote_teacher_availability_repository.dart';
+import '../../../../features/students/data/local/student_cache_store.dart';
+import '../../../../features/students/data/repositories/remote_student_repository.dart';
 import '../../../network/api_client.dart';
 import '../../application/initial_pull_service.dart';
 import 'sync_provider.dart';
@@ -21,6 +25,14 @@ InitialPullService initialPullService(InitialPullServiceRef ref) {
     remoteLessons: RemoteLessonRepository(apiClient),
     lessonCache: LessonCacheStore(
       box: Hive.box<String>(LessonCacheStore.boxName),
+    ),
+    remoteStudents: RemoteStudentRepository(apiClient),
+    studentCache: StudentCacheStore(
+      box: Hive.box<String>(StudentCacheStore.boxName),
+    ),
+    remoteAvailability: RemoteTeacherAvailabilityRepository(apiClient),
+    availabilityCache: TeacherAvailabilityCacheStore(
+      box: Hive.box<String>(TeacherAvailabilityCacheStore.boxName),
     ),
     connectivity: connectivity,
   );
