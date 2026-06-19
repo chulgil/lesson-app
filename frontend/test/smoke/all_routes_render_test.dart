@@ -127,19 +127,14 @@ const _parentRoutes = <String>[
 /// 80개 라우트의 게이트를 녹색으로 유지한다. 수정 시 이 목록에서 제거하면 가드 복원.
 ///
 /// 발견 이슈 (#751 sweep, 2026-06-19):
-/// - /home @375 — RenderFlex 6.5px overflow (교사 대시보드). 출처 화면별 조사 필요.
-/// - /payments/pending @375 — RenderFlex 53px overflow. 출처 화면별 조사 필요.
-/// - /proposals/settings @1440 — DropdownButtonFormField overflow
-///   (proposal_settings_screen.dart:456/492, desktop 폭).
-/// - addStudent(/students/add) @375 — 주소/요일 섹션 RenderFlex 6.5px overflow
-///   (/home 과 동일 수치 — 공유 위젯 의심, 화면별 조사 필요). #750 가드는 본문
-///   full-width(93px 붕괴 회귀)만 검증하도록 조정됨.
-/// 이미 수정됨(공유 컴포넌트): chip_input_field Row→Wrap, teacher_search_card 요금 Flexible.
-const _knownRenderIssues = <String>{
-  AppRoutes.home,
-  AppRoutes.paymentPending,
-  AppRoutes.proposalSettings,
-};
+/// - /home @375 — RenderFlex 6.5px overflow. 출처 = `lesson_card.dart:210`
+///   (LessonCard contextBadge+SubscriptionBadge Row, 공유 위젯). 코어 위젯이라
+///   별도 후속(#853)에서 신중 수정 — 현재 제외 유지. addStudent #750 의 6.5px 도
+///   동일 출처(뷰포트 전환 중 home 카드)였음.
+/// 수정 완료(본 PR, #853): /payments/pending 53px(payment_pending_list_screen
+///   학생명 Flexible), /proposals/settings dropdown(isExpanded). → 제외 해제.
+/// 이미 수정됨(#852): chip_input_field Row→Wrap, teacher_search_card 요금 Flexible.
+const _knownRenderIssues = <String>{AppRoutes.home};
 
 void main() {
   setUpAll(initE2eEnvironment);
