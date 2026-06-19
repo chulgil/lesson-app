@@ -1,0 +1,65 @@
+name: Backend Migration Validation
+
+# Runs the alembic migration chain against a REAL Postgres and checks model↔DB
+# enum parity — the gap that let production 500s through (long revision id
+# overflowing alembic_version.version_num; native enum members missing from the
+# Postgres type). The default test suite uses SQLite create_all, which hides both
+# classes, so this gate is the only place they are caught before merge.
+# See backend/tests/test_alembic_postgres_validation.py.
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-migration-validation.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-migration-validation.yml"
+
+concurrency:
+  group: backend-migration-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  alembic-postgres-validation:
+    name: alembic upgrade head + enum parity (Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: lesson_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Enables the otherwise-skipped guard in test_alembic_postgres_validation.py.
+      ALEMBIC_TEST_DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/lesson_test
+      TESTING: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies (incl. dev)
+        run: uv sync --frozen
+
+      - name: Validate migration chain + enum parity on Postgres
+        run: uv run pytest tests/test_alembic_postgres_validation.py -v
