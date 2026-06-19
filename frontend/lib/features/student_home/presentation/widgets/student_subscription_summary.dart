@@ -119,6 +119,11 @@ class StudentSubscriptionSummary extends ConsumerWidget {
             '선생님에게 수강권 발급을 요청하세요',
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
+          const SizedBox(height: AppSpacing.space2),
+          TextButton(
+            onPressed: () => context.push(AppRoutes.lessonRequests),
+            child: const Text(AppStrings.subscriptionEmptyRequestLessonCta),
+          ),
         ],
       ),
     );

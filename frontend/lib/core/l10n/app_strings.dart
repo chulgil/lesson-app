@@ -9720,4 +9720,8 @@ class AppStrings {
   // 팔로우 피드 (follow_feed_screen)
   static const followFeedLoadError = '소식을 불러올 수 없습니다';
   static const followFeedEmptySubtitle = '팔로우한 선생님의 소식이 표시됩니다';
+
+  // [검토 #84·#87] UX 0619 (c)
+  static const paymentPendingProcessingEstimate = '보통 1영업일 소요됩니다';
+  static const subscriptionEmptyRequestLessonCta = '레슨 신청하기';
 }

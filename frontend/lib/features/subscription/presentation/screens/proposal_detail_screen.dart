@@ -758,17 +758,28 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       ),
       child: SafeArea(
         top: false,
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: null,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              shape: const RoundedRectangleBorder(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
+                  shape: const RoundedRectangleBorder(),
+                ),
+                icon: const Icon(Icons.schedule),
+                label: const Text(AppStrings.paymentNotifiedButtonLabel),
+              ),
             ),
-            icon: const Icon(Icons.schedule),
-            label: const Text(AppStrings.paymentNotifiedButtonLabel),
-          ),
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              AppStrings.paymentPendingProcessingEstimate,
+              style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
