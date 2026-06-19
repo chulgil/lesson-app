@@ -124,7 +124,7 @@ class StudentLessonsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space2),
           NotebookMasthead(
             eyebrow: 'LESSON',
-            meta: 'VOL. ${romanOf(now.month - 1)} · NO. ${now.day}',
+            meta: volNoLabel(now),
             trailing: IconButton(
               onPressed: () => context.push(AppRoutes.selectTeacher),
               icon: const Icon(Icons.add, color: AppColors.ink, size: 22),

@@ -15,6 +15,7 @@ import '../../../auth/auth_facade.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
 import '../../../relationship/relationship_facade.dart';
+import '../../../search/presentation/providers/teacher_providers.dart';
 import '../../domain/entities/manual_teacher.dart';
 import '../extensions/manual_teacher_visuals.dart';
 import '../providers/manual_teacher_provider.dart';
@@ -282,33 +283,15 @@ class MyTeachersScreen extends ConsumerWidget {
 // App Teacher Card
 // ============================================================
 
-// TODO: Replace with actual teacher profile lookup when backend is ready
-String _teacherDisplayName(String teacherId) {
-  const mockNames = {
-    'teacher_1': '김선생님',
-    'teacher_2': '이선생님',
-    'teacher_3': '박선생님',
-  };
-  return mockNames[teacherId] ?? '선생님';
-}
-
-String _teacherInstrument(String teacherId) {
-  const mockInstruments = {
-    'teacher_1': '바이올린',
-    'teacher_2': '피아노',
-    'teacher_3': '첼로',
-  };
-  return mockInstruments[teacherId] ?? '악기 미정';
-}
-
-class _AppTeacherCard extends StatelessWidget {
+class _AppTeacherCard extends ConsumerWidget {
   final TeacherStudentRelation relation;
 
   const _AppTeacherCard({required this.relation});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isActive = relation.status == RelationshipStatus.active;
+    final teacherAsync = ref.watch(teacherProvider(relation.teacherId));
 
     return Container(
       decoration: BoxDecoration(
@@ -350,7 +333,13 @@ class _AppTeacherCard extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                _teacherDisplayName(relation.teacherId),
+                                teacherAsync.maybeWhen(
+                                  data: (t) =>
+                                      t?.name ??
+                                      AppStrings.myTeachersUnknownTeacher,
+                                  orElse:
+                                      () => AppStrings.myTeachersUnknownTeacher,
+                                ),
                                 style: AppTypography.bodyLarge.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -361,7 +350,18 @@ class _AppTeacherCard extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSpacing.space1),
                           Text(
-                            _teacherInstrument(relation.teacherId),
+                            teacherAsync.when(
+                              data:
+                                  (t) =>
+                                      (t == null || t.instruments.isEmpty)
+                                          ? AppStrings.myTeachersInstrumentUnset
+                                          : t.instrumentsText,
+                              loading:
+                                  () => AppStrings.myTeachersInstrumentLoading,
+                              error:
+                                  (_, __) =>
+                                      AppStrings.myTeachersInstrumentUnset,
+                            ),
                             style: AppTypography.bodySmall.copyWith(
                               color: AppColors.inkSecondary,
                             ),

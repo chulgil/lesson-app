@@ -4457,8 +4457,6 @@ class AppStrings {
   /// 수강권을 제안했어요 (헤더 부제)
   static const proposalSubmittedSubtitle = '수강권을 제안했어요';
 
-  /// 다음에 할게요 (제안 거절 버튼)
-  static const proposalDeclineNextTime = '다음에 할게요';
 
   /// 선택 후 위 계좌로 입금해 주세요 (입금 안내 캡션)
   static const paymentDepositInstruction = '선택 후 위 계좌로 입금해 주세요';
@@ -4585,8 +4583,6 @@ class AppStrings {
   /// 입금 완료했어요 (학생 입금 알림 CTA)
   static const proposalDetailPaymentDoneAction = '입금 완료했어요';
 
-  /// 이번엔 스킵할게요 (학생 거절 CTA)
-  static const proposalDetailSkipAction = '이번엔 스킵할게요';
 
   /// 이번 제안을 스킵했습니다 (거절 SnackBar)
   static const proposalDetailSkippedSnackbar = '이번 제안을 스킵했습니다';
@@ -9722,6 +9718,22 @@ class AppStrings {
   static const followFeedEmptySubtitle = '팔로우한 선생님의 소식이 표시됩니다';
 
   // [검토 #84·#87] UX 0619 (c)
+  /// 받은 수강권 제안 (학생 측 제안 상세 AppBar, 검토 #82)
+  static const proposalReceivedAppBarTitle = '받은 수강권 제안';
+
+  // ── Notebook masthead signature (검토 #90/#91 — 브랜드 시그니처 중앙화) ──
+  /// Programme eyebrow — English brand line, e.g. 'Programme for Thursday'.
+  static String studentHomeProgrammeFor(String dayLabel) =>
+      'Programme for $dayLabel';
+  /// Notebook masthead date — Hanja style, e.g. '6月 19日'.
+  static String studentHomeMastheadHanjaDate(int month, int day) =>
+      '$month月 $day日';
+
+  // 내 선생님 카드 실데이터 폴백 문구 (검토 #94)
+  static const myTeachersUnknownTeacher = '선생님';
+  static const myTeachersInstrumentLoading = '불러오는 중…';
+  static const myTeachersInstrumentUnset = '악기 미정';
+
   static const paymentPendingProcessingEstimate = '보통 1영업일 소요됩니다';
   static const subscriptionEmptyRequestLessonCta = '레슨 신청하기';
 }

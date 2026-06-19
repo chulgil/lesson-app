@@ -47,7 +47,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(
-        title: AppStrings.proposalCreateAppBarTitle,
+        title: AppStrings.proposalReceivedAppBarTitle,
       ),
       // 처리 중일 때는 provider 상태 변화로 인한 UI 깜빡임 방지
       body: _isProcessing
@@ -268,7 +268,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        AppStrings.proposalCreateAppBarTitle,
+                        AppStrings.proposalReceivedAppBarTitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.bodyLarge.copyWith(
@@ -862,7 +862,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   ? null
                   : () => _showRejectDialog(proposal),
               child: Text(
-                AppStrings.proposalDetailSkipAction,
+                AppStrings.renewalDeclineLater,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),

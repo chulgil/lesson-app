@@ -42,20 +42,6 @@ class StudentProfileTab extends ConsumerWidget {
                   eyebrow: 'PROFILE',
                   meta:
                       'VOL. ${romanOf(DateTime.now().month - 1)} · NO. ${DateTime.now().day}',
-                  trailing: IconButton(
-                    onPressed:
-                        () => context.push(AppRoutes.notificationSettings),
-                    icon: const Icon(
-                      Icons.settings_outlined,
-                      color: AppColors.ink,
-                      size: 22,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -283,12 +269,6 @@ class StudentProfileTab extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          _buildMenuItem(
-            icon: Icons.person_outline,
-            title: AppStrings.studentHomeMenuProfileEdit,
-            onTap: () => context.push(AppRoutes.profileEdit),
-          ),
-          _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.school_outlined,
             title: AppStrings.studentHomeMenuMyTeachers,

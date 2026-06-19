@@ -73,6 +73,23 @@ class StudentDashboardTab extends ConsumerWidget {
           // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
           const NoteAccessActiveBanner(),
 
+          // ── 1순위: 다음 레슨 (가장 궁금한 것) ──────────
+          NextLessonCard(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ── 2순위: 수강권 (잔여 횟수) ─────────────────
+          StudentSubscriptionSummary(
+            studentId: currentStudentId,
+            onViewAll: () {
+              context.push(
+                '${AppRoutes.subscriptions}?studentId=$currentStudentId',
+              );
+            },
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // ── Student gamification P1: [연습 시작] 단일 진입점 (스펙 §4.1) ──
           PracticeStartSection(studentId: currentStudentId),
 
@@ -113,23 +130,6 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
-          // ── 1순위: 다음 레슨 (가장 궁금한 것) ──────────
-          NextLessonCard(studentId: currentStudentId),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // ── 2순위: 수강권 (잔여 횟수) ─────────────────
-          StudentSubscriptionSummary(
-            studentId: currentStudentId,
-            onViewAll: () {
-              context.push(
-                '${AppRoutes.subscriptions}?studentId=$currentStudentId',
-              );
-            },
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
           // ── 3순위: 이벤트 그룹 (대응 필요, 4개 배너 통합) ──
           _StudentEventsGroup(studentId: currentStudentId),
 
@@ -155,7 +155,7 @@ class StudentDashboardTab extends ConsumerWidget {
   Widget _buildMasthead(BuildContext context) {
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
-      meta: 'VOL. ${DateTime.now().month} · NO. ${DateTime.now().day}',
+      meta: volNoLabel(DateTime.now()),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -196,7 +196,7 @@ class StudentDashboardTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Programme for $dayLabel',
+            AppStrings.studentHomeProgrammeFor(dayLabel),
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
@@ -206,7 +206,8 @@ class StudentDashboardTab extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${now.month}月 ${now.day}日  ·  ${AppStrings.studentHomeGreeting}',
+            '${AppStrings.studentHomeMastheadHanjaDate(now.month, now.day)}'
+            '  ·  ${AppStrings.studentHomeGreeting}',
             style: NotebookTypography.mastheadDate,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

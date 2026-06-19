@@ -7,6 +7,7 @@ import 'package:lessonaza/features/auth/presentation/providers/user_role_provide
 import 'package:lessonaza/features/gamification/domain/entities/challenge.dart';
 import 'package:lessonaza/features/gamification/domain/entities/quest_origin.dart';
 import 'package:lessonaza/features/gamification/domain/entities/student_quest.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/gamification_onboarding_dismissed_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/student_quest_provider.dart';
 import 'package:lessonaza/features/lessons/presentation/providers/booking_providers.dart';
 import 'package:lessonaza/features/student_home/domain/entities/student_lesson_progress_item.dart';
@@ -33,6 +34,14 @@ StudentQuest _activeQuest(String studentId) {
   );
 }
 
+class _FakeOnboardingDismissStore
+    implements GamificationOnboardingDismissStore {
+  @override
+  Future<bool> isDismissed(String studentId) async => false;
+  @override
+  Future<void> markDismissed(String studentId) async {}
+}
+
 void main() {
   testWidgets(
     'student dashboard lays out action widgets without metadata crash',
@@ -50,6 +59,9 @@ void main() {
             activeQuestsProvider(
               'student_1',
             ).overrideWith((ref) async => [_activeQuest('student_1')]),
+            gamificationOnboardingDismissStoreProvider.overrideWithValue(
+              _FakeOnboardingDismissStore(),
+            ),
           ],
           child: const MaterialApp(home: Scaffold(body: StudentDashboardTab())),
         ),
@@ -127,6 +139,9 @@ void main() {
           activeQuestsProvider(
             studentId,
           ).overrideWith((ref) async => [_activeQuest(studentId)]),
+          gamificationOnboardingDismissStoreProvider.overrideWithValue(
+            _FakeOnboardingDismissStore(),
+          ),
         ],
         child: const MaterialApp(home: Scaffold(body: StudentDashboardTab())),
       ),
