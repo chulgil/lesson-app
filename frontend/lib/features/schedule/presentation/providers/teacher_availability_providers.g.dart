@@ -7,7 +7,7 @@ part of 'teacher_availability_providers.dart';
 // **************************************************************************
 
 String _$teacherAvailabilityRepositoryHash() =>
-    r'dfd89892e3e9f9b923662c4e9a512298826fd46c';
+    r'53a041fa349e50fcca4064871ffb8d09d28c4cf7';
 
 /// See also [teacherAvailabilityRepository].
 @ProviderFor(teacherAvailabilityRepository)
@@ -367,7 +367,7 @@ class _AffectedBookingsForWeeklyScheduleProviderElement
 }
 
 String _$availableSlotsForDateHash() =>
-    r'2a8b5a78926f3f87370ed8f2a5adddf6ed8bb2a1';
+    r'dbb5887998dcbd7b6d0b03bc8ec6cfbf8502b34e';
 
 /// See also [availableSlotsForDate].
 @ProviderFor(availableSlotsForDate)
@@ -535,7 +535,7 @@ class _AvailableSlotsForDateProviderElement
 }
 
 String _$availableSlotsForDateRangeHash() =>
-    r'6d57c6dcf069ee97f24623ec208ceb64032c96cd';
+    r'94e1fd80634b5cc80aac13ff43a54a96ffdf8aad';
 
 /// See also [availableSlotsForDateRange].
 @ProviderFor(availableSlotsForDateRange)
