@@ -216,10 +216,14 @@ class TeacherSearchCard extends StatelessWidget {
             color: AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space1),
-          Text(
-            publicProfile.feeRange!.formatted,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkSecondary,
+          // #751: 긴 요금 문자열이 375px 에서 Row 를 넘치지 않도록 Flexible+ellipsis.
+          Flexible(
+            child: Text(
+              publicProfile.feeRange!.formatted,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.inkSecondary,
+              ),
             ),
           ),
         ],
