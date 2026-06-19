@@ -5,9 +5,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../../academy/domain/entities/bulk_closure.dart';
+import 'makeup_conflict.dart';
 
 /// 일괄 휴강 적용 후 강사가 보강 일정을 입력하는 화면 (G15).
 ///
@@ -50,6 +52,10 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
     final closureDateText = formatDateYMD(widget.closure.closureDate);
     final completedCount = _drafts.values.whereType<DateTime>().length;
     final totalCount = widget.closure.affectedLessons.length;
+    final conflicts = detectMakeupConflicts(
+      widget.closure.affectedLessons,
+      _drafts,
+    );
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
@@ -62,9 +68,9 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
               child:
                   widget.closure.affectedLessons.isEmpty
                       ? _buildEmptyState()
-                      : _buildLessonsList(),
+                      : _buildLessonsList(conflicts),
             ),
-            _buildBottomBar(completedCount, totalCount),
+            _buildBottomBar(completedCount, totalCount, conflicts),
           ],
         ),
       ),
@@ -108,7 +114,7 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
     );
   }
 
-  Widget _buildLessonsList() {
+  Widget _buildLessonsList(Set<String> conflicts) {
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.space4),
       itemCount: widget.closure.affectedLessons.length,
@@ -118,13 +124,14 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
         return _MakeupLessonRow(
           lesson: lesson,
           draft: _drafts[lesson.lessonId],
+          hasConflict: conflicts.contains(lesson.lessonId),
           onPick: () => _pickMakeupTime(lesson),
         );
       },
     );
   }
 
-  Widget _buildBottomBar(int completed, int total) {
+  Widget _buildBottomBar(int completed, int total, Set<String> conflicts) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: const BoxDecoration(
@@ -137,6 +144,16 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (conflicts.isNotEmpty) ...[
+              Text(
+                AppStrings.makeupInputConflictNotice(conflicts.length),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.paperAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space2),
+            ],
             Text(
               AppStrings.makeupInputNoticeConfirm,
               style: AppTypography.bodySmall.copyWith(
@@ -175,7 +192,7 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
                     onPressed:
                         (completed == 0 || _isSaving)
                             ? null
-                            : () => _save(confirm: true),
+                            : () => _showConfirmSummary(conflicts),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.paperAccent,
                       minimumSize: const Size(0, AppSpacing.buttonHeight),
@@ -225,6 +242,65 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
     });
   }
 
+  Future<void> _showConfirmSummary(Set<String> conflicts) async {
+    final filled = widget.closure.affectedLessons
+        .where((l) => _drafts[l.lessonId] != null)
+        .toList();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => NotebookAlertDialog(
+        title: AppStrings.makeupInputSummaryTitle,
+        scrollable: true,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (conflicts.isNotEmpty) ...[
+              Text(
+                AppStrings.makeupInputConflictNotice(conflicts.length),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.paperAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space2),
+            ],
+            for (final l in filled)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space1,
+                ),
+                child: Text(
+                  AppStrings.makeupInputSummaryRow(
+                    l.studentName,
+                    _formatSummary(_drafts[l.lessonId]!),
+                  ),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: conflicts.contains(l.lessonId)
+                        ? AppColors.paperAccent
+                        : AppColors.ink,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        cancelLabel: AppStrings.cancel,
+        onCancel: () => Navigator.pop(dialogContext, false),
+        confirmLabel: AppStrings.makeupInputBulkConfirm,
+        onConfirm: () => Navigator.pop(dialogContext, true),
+      ),
+    );
+    if (result == true) await _save(confirm: true);
+  }
+
+  String _formatSummary(DateTime d) {
+    final mm = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    final hh = d.hour.toString().padLeft(2, '0');
+    final mi = d.minute.toString().padLeft(2, '0');
+    return '$mm/$dd $hh:$mi';
+  }
+
   Future<void> _save({required bool confirm}) async {
     final filled = <String, DateTime>{
       for (final e in _drafts.entries)
@@ -247,11 +323,13 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
 class _MakeupLessonRow extends StatelessWidget {
   final AffectedLesson lesson;
   final DateTime? draft;
+  final bool hasConflict;
   final VoidCallback onPick;
 
   const _MakeupLessonRow({
     required this.lesson,
     required this.draft,
+    required this.hasConflict,
     required this.onPick,
   });
 
@@ -267,7 +345,9 @@ class _MakeupLessonRow extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.paper,
-        border: Border.all(color: AppColors.inkQuaternary),
+        border: Border.all(
+          color: hasConflict ? AppColors.paperAccent : AppColors.inkQuaternary,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,6 +391,16 @@ class _MakeupLessonRow extends StatelessWidget {
               ),
             ],
           ),
+          if (hasConflict) ...[
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              AppStrings.makeupInputConflictBadge,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.paperAccent,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ],
       ),
     );
