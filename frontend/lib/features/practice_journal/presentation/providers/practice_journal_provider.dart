@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_practice_journal_repository.dart';
+import '../../data/repositories/remote_practice_journal_repository.dart';
 import '../../domain/entities/bound_volume.dart';
 import '../../domain/entities/practice_ledger.dart';
 import '../../domain/repositories/practice_journal_repository.dart';
@@ -10,8 +12,11 @@ part 'practice_journal_provider.g.dart';
 @Riverpod(keepAlive: true)
 PracticeJournalRepository practiceJournalRepository(
   PracticeJournalRepositoryRef ref,
-) => MockPracticeJournalRepository();
-// NOTE: Remote 추가 시 createRepository<PracticeJournalRepository>(ref: ref, mock: ..., remote: ...) 로 교체.
+) => createRepository<PracticeJournalRepository>(
+  ref: ref,
+  mock: () => MockPracticeJournalRepository(),
+  remote: (apiClient) => RemotePracticeJournalRepository(apiClient),
+);
 
 @riverpod
 Future<PracticeLedger> practiceLedger(
