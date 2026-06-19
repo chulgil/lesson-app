@@ -60,6 +60,26 @@ def do_run_migrations(connection: Connection) -> None:
     naming_convention (Base.metadata) 과 결합해 모든 constraint 이름이 결정적이어야 batch 가 성공.
     """
     dialect_name = connection.dialect.name
+
+    # Alembic's default ``alembic_version.version_num`` is VARCHAR(32). Slug-style
+    # revision ids longer than 32 chars overflow it on Postgres
+    # (StringDataRightTruncationError) and break the entire migration chain — a
+    # failure SQLite tests never catch (SQLite ignores VARCHAR length). Ensure the
+    # column is wide enough before any version stamp. Idempotent and safe whether
+    # the table is absent (fresh DB), narrow (legacy), or already wide.
+    if dialect_name == "postgresql":
+        from sqlalchemy import text
+
+        with connection.begin():
+            connection.execute(
+                text(
+                    "CREATE TABLE IF NOT EXISTS alembic_version ("
+                    "version_num VARCHAR(255) NOT NULL, "
+                    "CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"
+                )
+            )
+            connection.execute(text("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)"))
+
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
