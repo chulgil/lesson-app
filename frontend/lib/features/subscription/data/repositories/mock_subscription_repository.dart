@@ -1061,6 +1061,12 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
+  Future<bool> requestPaymentConfirmation(String proposalId) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    return true;
+  }
+
+  @override
   Future<void> revokeProposal(String proposalId) async {
     await Future.delayed(const Duration(milliseconds: 50));
     final index = _subscriptions.indexWhere((s) => s.id == proposalId);

@@ -4384,9 +4384,6 @@ class AppStrings {
   /// 보류 N (보류 필터 — 보류 칩)
   static String paymentFilterHoldCount(int n) => '보류 $n';
 
-  /// 확인 보류로 표시했어요 (입금 미확인 처리 스낵바)
-  static const paymentMarkedOnHold = '확인 보류로 표시했어요';
-
   /// 학생이 아직 수강권을 선택하지 않았습니다 (멀티초이스 미선택 가드)
   static const proposalAwaitingTemplateSelection = '학생이 아직 수강권을 선택하지 않았습니다';
 
@@ -4399,6 +4396,15 @@ class AppStrings {
 
   /// 확인 요청 메시지를 보냈습니다 (Inquiry 전송 후 snackbar)
   static const inquiryMessageSent = '확인 요청 메시지를 보냈습니다';
+
+  /// 최근에 요청을 보냈어요 ... (입금 확인 요청 쿨다운 — 409)
+  static const paymentInquiryCooldown = '최근에 요청을 보냈어요. 잠시 후 다시 시도해 주세요';
+
+  /// 요청 전송에 실패했어요 ... (입금 확인 요청 실패)
+  static const paymentInquiryFailed = '요청 전송에 실패했어요. 잠시 후 다시 시도해 주세요';
+
+  /// 아직 앱에 가입하지 않은 학생 ... (미가입 학생 — notified=false)
+  static const paymentInquiryNoAccount = '아직 앱에 가입하지 않은 학생이라 알림을 보낼 수 없어요';
 
   // -- Subscription List Screen (학생 수강권 목록 5-3b-12) --
 

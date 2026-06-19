@@ -72,26 +72,42 @@ class PaymentTrackingService:
     # ------------------------------------------------------------------ actions
 
     async def resend(self, proposal_id: str, current_user: Any) -> dict[str, Any]:
-        """Send a reminder push to the student. Cooldown: 30 minutes."""
+        """Send a payment reminder notification to the student. Cooldown: 30 minutes."""
         proposal = await self._require_teacher_proposal(proposal_id, current_user)
+        self._require_awaiting_payment(proposal)
+        self._require_cooldown_elapsed(proposal)
 
-        if proposal.status not in ACTIVE_PROPOSAL_STATUSES:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Proposal is not awaiting payment",
-            )
-
+        notified = await self._send_student_payment_notification(
+            proposal,
+            title="입금 안내 재발송",
+            body="아직 입금이 확인되지 않았어요. 수강료 입금을 확인해 주세요.",
+            source="payment_reminder",
+        )
         now = datetime.now(UTC)
-        last_sent = _aware(proposal.last_reminder_sent_at)
-        if last_sent is not None and (now - last_sent) < timedelta(minutes=RESEND_COOLDOWN_MINUTES):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"재발송은 {RESEND_COOLDOWN_MINUTES}분에 한 번만 가능합니다. cooldown 안내",
-            )
-
         proposal.last_reminder_sent_at = now
         await self.db.flush()
-        return {"resent_at": now.isoformat(), "proposal_id": proposal.id}
+        return {"resent_at": now.isoformat(), "proposal_id": proposal.id, "notified": notified}
+
+    async def request_payment_confirmation(self, proposal_id: str, current_user: Any) -> dict[str, Any]:
+        """Ask the student to re-check their deposit (teacher couldn't confirm it) — #80.
+
+        Sends a real push/in-app notification, replacing a device-local fake snackbar.
+        Cooldown: 30 minutes, shared with ``resend`` to avoid spamming the student.
+        """
+        proposal = await self._require_teacher_proposal(proposal_id, current_user)
+        self._require_awaiting_payment(proposal)
+        self._require_cooldown_elapsed(proposal)
+
+        notified = await self._send_student_payment_notification(
+            proposal,
+            title="입금 확인 요청",
+            body="선생님이 입금 내역을 확인하지 못했어요. 입금 정보를 다시 확인해 주세요.",
+            source="payment_inquiry",
+        )
+        now = datetime.now(UTC)
+        proposal.last_reminder_sent_at = now
+        await self.db.flush()
+        return {"sent_at": now.isoformat(), "proposal_id": proposal.id, "notified": notified}
 
     async def revoke(self, proposal_id: str, current_user: Any) -> SubscriptionProposalResponse:
         """Cancel a proposal (teacher's correction path)."""
@@ -121,6 +137,58 @@ class PaymentTrackingService:
         if proposal is None or proposal.teacher_id not in teacher_ids:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
         return proposal
+
+    def _require_awaiting_payment(self, proposal: SubscriptionProposal) -> None:
+        if proposal.status not in ACTIVE_PROPOSAL_STATUSES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Proposal is not awaiting payment",
+            )
+
+    def _require_cooldown_elapsed(self, proposal: SubscriptionProposal) -> None:
+        last_sent = _aware(proposal.last_reminder_sent_at)
+        if last_sent is not None and (datetime.now(UTC) - last_sent) < timedelta(minutes=RESEND_COOLDOWN_MINUTES):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"재발송은 {RESEND_COOLDOWN_MINUTES}분에 한 번만 가능합니다. cooldown 안내",
+            )
+
+    async def _send_student_payment_notification(
+        self,
+        proposal: SubscriptionProposal,
+        *,
+        title: str,
+        body: str,
+        source: str,
+    ) -> bool:
+        """Send a real push/in-app payment notification to the linked student.
+
+        Returns False (no exception) when the student has no linked user account
+        (offline student) — there is nobody to notify.
+        """
+        from app.models.notification import NotificationPriority
+        from app.models.student import Student
+        from app.services.notification_service import NotificationService
+
+        student = await self.db.get(Student, proposal.student_id)
+        if student is None or not student.user_id:
+            return False
+
+        await NotificationService(self.db).create_and_send(
+            user_id=student.user_id,
+            notification_type="paymentReminder",
+            title=title,
+            body=body,
+            priority=NotificationPriority.high,
+            data={
+                "proposalId": proposal.id,
+                "studentId": proposal.student_id,
+                "source": source,
+            },
+            action_url=f"/proposals/{proposal.id}",
+            action_label="입금 확인",
+        )
+        return True
 
     async def _fetch_active_proposals(self, current_user: Any) -> list[SubscriptionProposal]:
         teacher_ids = await self._require_teacher_ids(current_user)

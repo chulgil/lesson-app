@@ -845,19 +845,35 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       ),
     );
 
-    if (result == true && mounted) {
-      // Record the inquiry time → the card shows a "확인 보류" badge and the
-      // list can filter to held items (#772). The actual outbound message
-      // notification is a separate TODO.
-      await ref
-          .read(paymentInquiryRecordsProvider(widget.teacherId).notifier)
-          .recordInquiry(proposal.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.paymentMarkedOnHold)),
-        );
-      }
+    if (result != true || !mounted) return;
+
+    // Record the inquiry time locally → the card shows a "확인 보류" badge and
+    // the list can filter to held items (#772). Best-effort; never blocks send.
+    await ref
+        .read(paymentInquiryRecordsProvider(widget.teacherId).notifier)
+        .recordInquiry(proposal.id);
+
+    // #80: actually notify the student (replaces a device-local fake snackbar).
+    String message;
+    try {
+      final notified = await ref
+          .read(subscriptionRepositoryProvider)
+          .requestPaymentConfirmation(proposal.id);
+      message = notified
+          ? AppStrings.inquiryMessageSent
+          : AppStrings.paymentInquiryNoAccount;
+    } on ApiException catch (e) {
+      message = e.statusCode == 409
+          ? AppStrings.paymentInquiryCooldown
+          : AppStrings.paymentInquiryFailed;
+    } catch (_) {
+      message = AppStrings.paymentInquiryFailed;
     }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _formatDateTime(DateTime? dateTime) {

@@ -648,6 +648,20 @@ async def resend_proposal_reminder(
 
 
 @router.post(
+    "-proposals/{proposal_id}/request-payment-confirmation",
+    status_code=status.HTTP_200_OK,
+    summary="Ask the student to re-check their deposit (teacher only, 30-min cooldown) — #80",
+)
+async def request_payment_confirmation(
+    proposal_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> dict:
+    service = PaymentTrackingService(db)
+    return await service.request_payment_confirmation(proposal_id, current_user)
+
+
+@router.post(
     "-proposals/{proposal_id}/revoke",
     response_model=SubscriptionProposalResponse,
     status_code=status.HTTP_200_OK,

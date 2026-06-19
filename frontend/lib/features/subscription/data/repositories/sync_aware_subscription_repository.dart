@@ -154,6 +154,10 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
       _remote.resendProposalReminder(proposalId);
 
   @override
+  Future<bool> requestPaymentConfirmation(String proposalId) =>
+      _remote.requestPaymentConfirmation(proposalId);
+
+  @override
   Future<void> revokeProposal(String proposalId) =>
       _remote.revokeProposal(proposalId);
 

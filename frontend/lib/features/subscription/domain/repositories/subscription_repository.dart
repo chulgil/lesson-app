@@ -85,6 +85,11 @@ abstract class SubscriptionRepository {
   /// Resend the payment reminder to the student (30-minute cooldown server-side).
   Future<void> resendProposalReminder(String proposalId);
 
+  /// Ask the student to re-check their deposit when the teacher couldn't confirm
+  /// it (30-minute cooldown server-side, shared with resend). Returns whether a
+  /// notification was actually sent (false = student has no linked app account). — #80
+  Future<bool> requestPaymentConfirmation(String proposalId);
+
   /// Revoke a proposal (teacher-side correction).
   Future<void> revokeProposal(String proposalId);
 
