@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
@@ -83,10 +84,7 @@ class _SuggestAlternativeScreenState
     return DateTime(date.year, date.month, date.day - diff);
   }
 
-  int _parseTimeMinutes(String time) {
-    final parts = time.split(':');
-    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
-  }
+  int _parseTimeMinutes(String time) => ClockTime.parse(time).inMinutes;
 
   int _lessonEndMinutes(Lesson lesson) =>
       _parseTimeMinutes(lesson.startTime) + lesson.duration;
@@ -105,18 +103,14 @@ class _SuggestAlternativeScreenState
   String? _checkSlotConflict(PreferredTimeSlot slot, List<Lesson> lessons) {
     final slotDate = _dateForPreferredSlot(slot);
     if (slotDate == null) return null;
-    final startParts = slot.startTime.split(':');
-    final endParts = slot.endTime.split(':');
-    final slotStart = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
-    final slotEnd = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
+    final slotStart = _parseTimeMinutes(slot.startTime);
+    final slotEnd = _parseTimeMinutes(slot.endTime);
 
     for (final lesson in lessons) {
       if (lesson.date.year == slotDate.year &&
           lesson.date.month == slotDate.month &&
           lesson.date.day == slotDate.day) {
-        final lessonParts = lesson.startTime.split(':');
-        final lessonStart =
-            int.parse(lessonParts[0]) * 60 + int.parse(lessonParts[1]);
+        final lessonStart = _parseTimeMinutes(lesson.startTime);
         final lessonEnd = lessonStart + lesson.duration;
         if (slotStart < lessonEnd && slotEnd > lessonStart) {
           return lesson.isPreview ? 'preview' : 'confirmed';
@@ -138,12 +132,10 @@ class _SuggestAlternativeScreenState
     final selectedDate = _dateForPreferredSlot(selected);
     if (selectedDate == null) return null;
 
-    final startParts = selected.startTime.split(':');
-    final endParts = selected.endTime.split(':');
     return PreferredTimeSlotHighlight(
       date: selectedDate,
-      startMinutes: int.parse(startParts[0]) * 60 + int.parse(startParts[1]),
-      endMinutes: int.parse(endParts[0]) * 60 + int.parse(endParts[1]),
+      startMinutes: _parseTimeMinutes(selected.startTime),
+      endMinutes: _parseTimeMinutes(selected.endTime),
     );
   }
 

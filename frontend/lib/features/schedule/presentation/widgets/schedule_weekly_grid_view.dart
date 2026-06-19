@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import 'lesson_action_sheet.dart';
@@ -506,8 +507,7 @@ class _ScheduleWeeklyGridViewState
     }
 
     // Check if this is the start slot of a lesson
-    final parts = lesson.startTime.split(':');
-    final lessonStartMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    final lessonStartMinutes = ClockTime.parse(lesson.startTime).inMinutes;
     final isStartSlot = slotMinutes == lessonStartMinutes;
 
     // Preview lessons navigate to student detail; normal lessons to lesson detail
@@ -641,8 +641,8 @@ class _ScheduleWeeklyGridViewState
     if (availability != null) {
       for (final schedule in availability.weeklySchedules) {
         if (!schedule.isActive) continue;
-        final startH = int.parse(schedule.startTime.split(':')[0]);
-        final endH = int.parse(schedule.endTime.split(':')[0]);
+        final startH = ClockTime.parse(schedule.startTime).hour;
+        final endH = ClockTime.parse(schedule.endTime).hour;
         if (startH < earliest) earliest = startH;
         if (endH > latest) latest = endH;
       }
@@ -650,8 +650,7 @@ class _ScheduleWeeklyGridViewState
 
     // Include actual lesson hours (+ travel time BEFORE lesson)
     for (final lesson in lessons) {
-      final parts = lesson.startTime.split(':');
-      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final startMinutes = ClockTime.parse(lesson.startTime).inMinutes;
       final travelStartMinutes = startMinutes - lesson.travelTimeMinutes;
       final travelStartHour = (travelStartMinutes / 60).floor();
       final endMinutes = startMinutes + lesson.duration;
@@ -670,8 +669,7 @@ class _ScheduleWeeklyGridViewState
 
     for (final lesson in lessons) {
       final dayIndex = lesson.date.weekday - 1; // 1=Mon → 0
-      final parts = lesson.startTime.split(':');
-      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final startMinutes = ClockTime.parse(lesson.startTime).inMinutes;
 
       map.putIfAbsent(dayIndex, () => {});
 
@@ -693,8 +691,7 @@ class _ScheduleWeeklyGridViewState
       if (lesson.travelTimeMinutes <= 0) continue;
 
       final dayIndex = lesson.date.weekday - 1;
-      final parts = lesson.startTime.split(':');
-      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final startMinutes = ClockTime.parse(lesson.startTime).inMinutes;
       final travelStartMinutes = startMinutes - lesson.travelTimeMinutes;
 
       map.putIfAbsent(dayIndex, () => {});
