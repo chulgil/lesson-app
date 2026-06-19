@@ -139,4 +139,71 @@ void main() {
       expect(received!.isEmpty, isTrue);
     });
   });
+
+  group('#768 ③ 보강 충돌 경고 + 요약', () {
+    BulkClosure overlapping() {
+      final same = DateTime(2026, 8, 22, 15, 0);
+      return _buildClosure(
+        lessons: [
+          _buildLesson(id: 'l1', studentName: '박학생', makeupAt: same),
+          _buildLesson(id: 'l2', studentName: '이학생', makeupAt: same),
+        ],
+      );
+    }
+
+    testWidgets('겹치는 두 보강은 충돌 배지 2개 + 안내를 보여준다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MakeupLessonInputScreen(
+            closure: overlapping(),
+            onSaveAll: (_) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('시간 겹침'), findsNWidgets(2));
+      expect(find.text('2건 보강 시각이 겹칩니다. 확인해 주세요.'), findsOneWidget);
+    });
+
+    testWidgets('전체 확정 시 최종 확인 요약 다이얼로그가 뜬다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MakeupLessonInputScreen(
+            closure: overlapping(),
+            onSaveAll: (_) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.ancestor(
+          of: find.text('전체 확정'),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('보강 일정 확인'), findsOneWidget);
+    });
+
+    testWidgets('375 폭에서 overflow 없이 렌더', (tester) async {
+      tester.view.physicalSize = const Size(375, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MakeupLessonInputScreen(
+            closure: overlapping(),
+            onSaveAll: (_) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

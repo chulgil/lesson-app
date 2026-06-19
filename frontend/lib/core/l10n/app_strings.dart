@@ -8161,6 +8161,21 @@ class AppStrings {
   /// 보강 입력 — 저장 성공 토스트
   static const makeupInputSavedToast = '보강 일정이 저장되었습니다.';
 
+  // #768 ③ — 보강 시간 충돌 경고 + 최종 확인 요약
+  /// 시간 겹침 (충돌 보강 행 배지)
+  static const makeupInputConflictBadge = '시간 겹침';
+
+  /// N건 보강 시각이 겹칩니다 (충돌 안내)
+  static String makeupInputConflictNotice(int n) =>
+      '$n건 보강 시각이 겹칩니다. 확인해 주세요.';
+
+  /// 보강 일정 확인 (최종 확인 요약 다이얼로그 제목)
+  static const makeupInputSummaryTitle = '보강 일정 확인';
+
+  /// {학생} · {보강시각} (요약 행)
+  static String makeupInputSummaryRow(String student, String makeupText) =>
+      '$student · $makeupText';
+
   // ── Closure Opinion Window (G15 §5.2) ─────────────────────
 
   /// 의견 위젯 — 헤더
