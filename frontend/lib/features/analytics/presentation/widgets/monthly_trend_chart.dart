@@ -91,7 +91,9 @@ class _TrendChartPainter extends CustomPainter {
 
     final points = <Offset>[];
     for (int i = 0; i < data.length; i++) {
-      final x = (i / (data.length - 1)) * size.width;
+      final divisor =
+          data.length > 1 ? data.length - 1 : 1; // #73 단일 포인트 NaN 방지
+      final x = (i / divisor) * size.width;
       final y =
           size.height -
           ((data[i].lessonCount - minValue) / range) * size.height * 0.8 -
