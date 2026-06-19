@@ -178,7 +178,6 @@ class AppRoutes {
   static const proposalSettings = '/proposals/settings';
   static const proposalDetail = '/proposals/:id';
   static const renewalDetail = '/proposals/renewal/:id';
-  static const proposalAccept = '/proposals/accept/:id';
 
   // Parent routes
   static const childProfiles = '/parent/children';

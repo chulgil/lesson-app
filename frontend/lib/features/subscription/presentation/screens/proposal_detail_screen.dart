@@ -150,6 +150,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 const SizedBox(height: AppSpacing.space6),
                 ProposalWaitingCard(
                   onContactTapped: () => _showContactOptions(proposal),
+                  onReconfirmAccount: () => _showAccountReconfirm(proposal),
                 ),
               ],
 
@@ -222,6 +223,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             const SizedBox(height: AppSpacing.space6),
             ProposalWaitingCard(
               onContactTapped: () => _showContactOptions(proposal),
+              onReconfirmAccount: () => _showAccountReconfirm(proposal),
             ),
           ],
 
@@ -574,6 +576,33 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         if (template == null) return const SizedBox.shrink();
         return _buildPaymentCard(proposal, template);
       },
+    );
+  }
+
+  /// #773: 입금 대기 중 계좌 재확인 — 결제 후 숨겨진 계좌 카드를 바텀시트로
+  /// 다시 보여줘 통장 대조를 돕는다. 발급 화면이 이미 쓰는 provider·위젯 재사용.
+  Future<void> _showAccountReconfirm(SubscriptionProposal proposal) async {
+    final profile = await ref.read(
+      teacherFullProfileProvider(proposal.teacherId).future,
+    );
+    if (!mounted) return;
+    showNotebookBottomSheet<void>(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.proposalPaymentInfoTitle,
+            style: NotebookTypography.appBarTitle,
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          ProposalPaymentInfoCard(
+            bankAccount: profile?.defaultBankAccount,
+            bankAccounts: profile?.bankAccounts ?? const [],
+          ),
+        ],
+      ),
     );
   }
 

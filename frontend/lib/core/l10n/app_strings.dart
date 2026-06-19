@@ -3760,6 +3760,9 @@ class AppStrings {
   /// 선생님께 문의하기 (대기 카드 CTA)
   static const proposalWaitingContactCta = '선생님께 문의하기';
 
+  /// 입금 계좌 재확인 (대기 카드 — 결제 후 계좌 다시 보기, #773)
+  static const proposalReconfirmAccountCta = '입금 계좌 재확인';
+
   // -- Payment Pending Visibility (#693) --
 
   /// 입금 완료 알림 전송 직후 SnackBar — "선생님에게 전달되었어요"

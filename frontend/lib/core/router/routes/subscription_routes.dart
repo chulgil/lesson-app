@@ -15,7 +15,6 @@ import '../../../features/subscription/presentation/screens/makeup_credit_screen
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
 import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
-import '../../../features/subscription/presentation/screens/student_proposal_accept_screen.dart';
 import '../../../features/subscription/presentation/screens/schedule_change_request_list_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_template_list_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_settings_screen.dart';
@@ -181,14 +180,6 @@ List<RouteBase> subscriptionRoutes = [
         initialSelectedSession: initialSession,
         focusLessonId: focusLessonId,
       );
-    },
-  ),
-  // Student proposal accept (must come before proposalDetail)
-  GoRoute(
-    path: AppRoutes.proposalAccept,
-    builder: (context, state) {
-      final id = state.pathParameters['id']!;
-      return StudentProposalAcceptScreen(proposalId: id);
     },
   ),
   // Proposal detail route
