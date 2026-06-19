@@ -99,9 +99,15 @@ class _StudentProfileEditScreenState
     }
   }
 
-  // ignore: unused_element -- Save CTA is currently hidden while the student profile flow is being rebuilt.
-  Future<void> _onSave() async {
-    if (_currentStudent == null || _isSaving) return;
+  /// #77 저장 버튼 없이 이탈 시 자동 저장. 변경이 없으면 즉시 닫고, 변경이 있으면
+  /// 저장 후 닫는다. 저장 실패 시 데이터 유실 방지를 위해 화면을 유지하고 에러를
+  /// 안내한다(뒤로가기 재시도 가능).
+  Future<void> _saveAndExit() async {
+    if (!_hasChanges || _currentStudent == null) {
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
+    if (_isSaving) return;
 
     setState(() => _isSaving = true);
 
@@ -117,21 +123,17 @@ class _StudentProfileEditScreenState
           .read(studentHomeProfileEditActionsProvider)
           .updateStudent(updated);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.studentHomeProfileSaved)),
-        );
-        Navigator.pop(context);
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.studentHomeProfileSaved)),
+      );
+      Navigator.of(context).pop();
     } catch (e) {
-      if (mounted) {
-        setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.studentHomeProfileSaveFailed),
-          ),
-        );
-      }
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.studentHomeProfileSaveFailed)),
+      );
     }
   }
 
@@ -144,85 +146,93 @@ class _StudentProfileEditScreenState
       );
     }
 
-    return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.studentHomeProfileEdit,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        children: [
-          // Profile image section
-          Center(child: _buildProfileImageSection()),
+    // #77 뒤로가기(앱바/시스템) 시 자동 저장 — 별도 저장 버튼 없이 이탈=저장.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        await _saveAndExit();
+      },
+      child: NotebookScreenScaffold(
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.studentHomeProfileEdit,
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          children: [
+            // Profile image section
+            Center(child: _buildProfileImageSection()),
 
-          const SizedBox(height: AppSpacing.space8),
+            const SizedBox(height: AppSpacing.space8),
 
-          // Name field
-          _buildFieldLabel('이름'),
-          const SizedBox(height: AppSpacing.space2),
-          _buildTextField(
-            controller: _nameController,
-            hintText: AppStrings.studentHomeNameHint,
-            onChanged: (_) => _onFieldChanged(),
-          ),
-
-          const SizedBox(height: AppSpacing.space5),
-
-          // Instrument field
-          _buildFieldLabel('악기'),
-          const SizedBox(height: AppSpacing.space2),
-          _buildInstrumentSelector(),
-
-          const SizedBox(height: AppSpacing.space5),
-
-          // Email field
-          _buildFieldLabel('이메일'),
-          const SizedBox(height: AppSpacing.space2),
-          _buildTextField(
-            controller: _emailController,
-            hintText: AppStrings.studentHomeEmailHint,
-            keyboardType: TextInputType.emailAddress,
-            onChanged: (_) => _onFieldChanged(),
-          ),
-
-          const SizedBox(height: AppSpacing.space5),
-
-          // Phone field
-          _buildFieldLabel('전화번호'),
-          const SizedBox(height: AppSpacing.space2),
-          _buildTextField(
-            controller: _phoneController,
-            hintText: AppStrings.studentHomePhoneHint,
-            keyboardType: TextInputType.phone,
-            onChanged: (_) => _onFieldChanged(),
-          ),
-
-          const SizedBox(height: AppSpacing.space8),
-
-          // Info text
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.ink.withValues(alpha: 0.08),
-              border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+            // Name field
+            _buildFieldLabel('이름'),
+            const SizedBox(height: AppSpacing.space2),
+            _buildTextField(
+              controller: _nameController,
+              hintText: AppStrings.studentHomeNameHint,
+              onChanged: (_) => _onFieldChanged(),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.info_outline, size: 20, color: AppColors.ink),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: Text(
-                    '프로필 정보는 선생님에게 공유됩니다.\n정확한 정보를 입력해주세요.',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.ink,
-                      height: 1.5,
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // Instrument field
+            _buildFieldLabel('악기'),
+            const SizedBox(height: AppSpacing.space2),
+            _buildInstrumentSelector(),
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // Email field
+            _buildFieldLabel('이메일'),
+            const SizedBox(height: AppSpacing.space2),
+            _buildTextField(
+              controller: _emailController,
+              hintText: AppStrings.studentHomeEmailHint,
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (_) => _onFieldChanged(),
+            ),
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // Phone field
+            _buildFieldLabel('전화번호'),
+            const SizedBox(height: AppSpacing.space2),
+            _buildTextField(
+              controller: _phoneController,
+              hintText: AppStrings.studentHomePhoneHint,
+              keyboardType: TextInputType.phone,
+              onChanged: (_) => _onFieldChanged(),
+            ),
+
+            const SizedBox(height: AppSpacing.space8),
+
+            // Info text
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              decoration: BoxDecoration(
+                color: AppColors.ink.withValues(alpha: 0.08),
+                border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline, size: 20, color: AppColors.ink),
+                  const SizedBox(width: AppSpacing.space3),
+                  Expanded(
+                    child: Text(
+                      '프로필 정보는 선생님에게 공유됩니다.\n정확한 정보를 입력해주세요.',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.ink,
+                        height: 1.5,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
