@@ -83,7 +83,7 @@ class TeacherSettings {
       'Use TeacherAvailability.breakTimeBetweenLessons — 운영시간 묶음 SSOT (W1 2026-06-11 spec §5.2)',
     )
     this.breakTimeBetweenLessons = 0,
-    this.minBookingHours = 24,
+    this.minBookingHours = 0,
     this.lessonPriceTable,
     this.trialLessonFree = false,
     this.bookingGuidanceMessage,

@@ -276,6 +276,28 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
 
   Future<void> _confirmAndBook() async {
     final slot = _selectedSlot!;
+    // #850 belt-and-suspenders — slots are already filtered by lead time in
+    // the provider, but re-check here against a stale selection (screen left
+    // open past the cutoff). 0 = no restriction.
+    final availability = await ref.read(
+      teacherAvailabilityProvider(widget.params.teacherId).future,
+    );
+    final minHours = availability?.minBookingHours ?? 0;
+    if (minHours > 0 &&
+        slot.startDateTime.isBefore(
+          DateTime.now().add(Duration(hours: minHours)),
+        )) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.lessonBookingTooSoon(minHours)),
+          backgroundColor: AppColors.paperAccent,
+        ),
+      );
+      setState(() => _selectedSlot = null);
+      return;
+    }
+    if (!mounted) return;
     final confirmed = await showNotebookDialog<bool>(
       context: context,
       title: AppStrings.lessonBookingConfirmTitle,

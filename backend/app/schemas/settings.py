@@ -18,7 +18,7 @@ class TeacherSettingsResponse(BaseModel):
     custom_lesson_durations: list[int] = []
     disabled_durations: list[int] = []
     break_time_between_lessons: int = 10
-    min_booking_hours: int = 24
+    min_booking_hours: int = 0
     lesson_price_table: dict | None = None
     trial_lesson_free: bool = False
     booking_guidance_message: str | None = None

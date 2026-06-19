@@ -19,7 +19,7 @@ async def test_get_teacher_settings_default(client: AsyncClient, auth_headers, c
     assert data["teacher_id"] == "test-user-id"
     assert data["default_lesson_duration"] == 60
     assert data["break_time_between_lessons"] == 10
-    assert data["min_booking_hours"] == 24
+    assert data["min_booking_hours"] == 0  # #850 — default relaxed to 0 (no lead time)
 
 
 @pytest.mark.asyncio
@@ -36,7 +36,7 @@ async def test_update_teacher_settings(client: AsyncClient, auth_headers, create
     data = response.json()
     assert data["default_lesson_duration"] == 45
     assert data["break_time_between_lessons"] == 15
-    assert data["min_booking_hours"] == 24  # unchanged
+    assert data["min_booking_hours"] == 0  # unchanged (default 0 since #850)
 
 
 @pytest.mark.asyncio

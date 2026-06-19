@@ -14,6 +14,7 @@ import '../../data/repositories/remote_teacher_availability_repository.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
+import '../../domain/services/booking_lead_time_service.dart';
 import '../../domain/services/slot_recommendation_service.dart';
 import '../services/booking_notification_service.dart';
 
@@ -103,10 +104,19 @@ Future<List<AvailabilitySlot>> availableSlotsForDate(
   String? currentStudentId,
 }) async {
   final repository = ref.watch(teacherAvailabilityRepositoryProvider);
-  return repository.getAvailableSlotsForDate(
+  final slots = await repository.getAvailableSlotsForDate(
     teacherId,
     date,
     currentStudentId: currentStudentId,
+  );
+  // #850 — exclude slots inside the teacher's minimum booking lead time.
+  final availability = await ref.watch(
+    teacherAvailabilityProvider(teacherId).future,
+  );
+  return BookingLeadTimeService.filterByLeadTime(
+    slots: slots,
+    minBookingHours: availability?.minBookingHours ?? 0,
+    now: DateTime.now(),
   );
 }
 
@@ -123,11 +133,20 @@ Future<List<AvailabilitySlot>> availableSlotsForDateRange(
   String? currentStudentId,
 }) async {
   final repository = ref.watch(teacherAvailabilityRepositoryProvider);
-  return repository.getAvailableSlotsForDateRange(
+  final slots = await repository.getAvailableSlotsForDateRange(
     teacherId,
     startDate,
     endDate,
     currentStudentId: currentStudentId,
+  );
+  // #850 — exclude slots inside the teacher's minimum booking lead time.
+  final availability = await ref.watch(
+    teacherAvailabilityProvider(teacherId).future,
+  );
+  return BookingLeadTimeService.filterByLeadTime(
+    slots: slots,
+    minBookingHours: availability?.minBookingHours ?? 0,
+    now: DateTime.now(),
   );
 }
 

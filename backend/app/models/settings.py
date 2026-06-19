@@ -18,7 +18,7 @@ class TeacherSettings(UUIDMixin, TimestampMixin, Base):
     custom_lesson_durations: Mapped[dict | list | None] = mapped_column(JSON, nullable=True, default=list)
     disabled_durations: Mapped[dict | list | None] = mapped_column(JSON, nullable=True, default=list)
     break_time_between_lessons: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
-    min_booking_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=24)
+    min_booking_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     # Lesson pricing: {"바이올린": {"beginner": 40000, "intermediate": 50000, "advanced": 70000}}
     lesson_price_table: Mapped[dict | None] = mapped_column(JSON, nullable=True)
