@@ -36,13 +36,21 @@ class SubscriptionBadge extends StatelessWidget {
             Icon(icon, size: 11, color: color),
             const SizedBox(width: AppSpacing.space1),
           ],
-          Text(
-            _label(),
-            style: GoogleFonts.ibmPlexMono(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: color,
-              letterSpacing: 0.5,
+          // Flexible+ellipsis: compact 배지는 좁은 컨테이너(home 카드 info 칼럼,
+          // students 탭 56px)에 놓여 라벨이 폭을 넘을 수 있다. bounded 폭을 받으면
+          // 축약, 넉넉하면 자연폭(#853). 모든 사용처가 bounded 폭이라 flex assert 없음.
+          Flexible(
+            child: Text(
+              _label(),
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: color,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         ],

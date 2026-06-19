@@ -20,6 +20,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/students/presentation/screens/add_student_screen.dart';
+import 'package:lessonaza/features/home/home_ui_facade.dart';
 
 import '../e2e/helpers/e2e_harness.dart';
 
@@ -122,19 +123,17 @@ const _parentRoutes = <String>[
   AppRoutes.notificationSettings,
 ];
 
-/// 본 하네스가 발견했으나 본 PR 범위(하네스 구축 + 공유 컴포넌트 수정)를 벗어나는
-/// 화면별 레이아웃 이슈 — 별도 후속에서 수정한다. 스윕은 이들을 건너뛰어 나머지
-/// 80개 라우트의 게이트를 녹색으로 유지한다. 수정 시 이 목록에서 제거하면 가드 복원.
+/// 본 하네스가 발견한 화면별 레이아웃 이슈 추적. 현재 전부 수정됨 → 제외 목록 비움
+/// (스윕이 전 라우트를 가드). 새 이슈를 잠시 보류하려면 여기에 라우트를 추가한다.
 ///
-/// 발견 이슈 (#751 sweep, 2026-06-19):
-/// - /home @375 — RenderFlex 6.5px overflow. 출처 = `lesson_card.dart:210`
-///   (LessonCard contextBadge+SubscriptionBadge Row, 공유 위젯). 코어 위젯이라
-///   별도 후속(#853)에서 신중 수정 — 현재 제외 유지. addStudent #750 의 6.5px 도
-///   동일 출처(뷰포트 전환 중 home 카드)였음.
-/// 수정 완료(본 PR, #853): /payments/pending 53px(payment_pending_list_screen
-///   학생명 Flexible), /proposals/settings dropdown(isExpanded). → 제외 해제.
-/// 이미 수정됨(#852): chip_input_field Row→Wrap, teacher_search_card 요금 Flexible.
-const _knownRenderIssues = <String>{AppRoutes.home};
+/// 수정 완료:
+/// - #853 /home @375 — RenderFlex 6.5px overflow. 근본원인 = `SubscriptionBadge`
+///   내부 Row(고정 폭·ellipsis 없음)가 좁은 info 칼럼(~145px)보다 6.5px 넓음.
+///   수정 = 배지 라벨 Flexible+ellipsis + LessonCard 배지행 Row→Wrap(배지에 bounded
+///   폭 부여). addStudent #750 의 6.5px 도 동일 출처(home 카드)였음 → 함께 해소.
+/// - #853 /payments/pending 53px(학생명 Flexible), /proposals/settings(isExpanded).
+/// - #852 chip_input_field Row→Wrap, teacher_search_card 요금 Flexible.
+const _knownRenderIssues = <String>{};
 
 void main() {
   setUpAll(initE2eEnvironment);
@@ -262,9 +261,13 @@ void main() {
 
     expect(find.byType(AddStudentScreen), findsOneWidget);
     // 본 가드의 핵심은 본문이 93px 로 붕괴하지 않는지(#746 cascade 회귀)다.
-    // addStudent @375 의 사소한 6.5px overflow(주소/요일 섹션)는 main 에 이미
-    // 존재하던 별개 이슈로 _knownRenderIssues 주석에 추적 — 여기서는 소비만 한다.
-    tester.takeException();
+    // addStudent @375 의 6.5px overflow 는 home 카드 SubscriptionBadge 가 출처였고
+    // #853 에서 해소됨 — 이제 오버플로우 없음을 단언해 회귀를 가드한다.
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'addStudent @375 렌더 오버플로우 없음 (#853 해소 회귀 가드)',
+    );
     final body = find.byType(SingleChildScrollView);
     expect(body, findsOneWidget);
     final bodyWidth = tester.getSize(body).width;
@@ -273,6 +276,27 @@ void main() {
       greaterThan(300),
       reason:
           '폼 본문이 full-width 여야 함 (93px 압축 회귀 가드). 실제 ${bodyWidth.toInt()}px',
+    );
+  });
+
+  // ── 회귀 가드: #853 /home LessonCard 배지 행 오버플로우 ───────────────────
+  testWidgets('#853 교사 홈 — mobile(375) LessonCard 배지 행 오버플로우 없음', (
+    tester,
+  ) async {
+    await bootAsRole(tester, DevAccount.teacher);
+
+    // 홈은 boot 직후 랜딩. 375 로 좁혀 배지 행(contextBadge+SubscriptionBadge)이
+    // info 칼럼 폭을 넘지 않는지 확인. 출처: lesson_card.dart `_buildBadgesRow`.
+    tester.view.physicalSize = _mobile;
+    tester.view.devicePixelRatio = 1.0;
+    GoRouter.of(tester.element(find.byType(Scaffold).first)).go(AppRoutes.home);
+    await settle(tester);
+
+    expect(find.byType(LessonCard), findsWidgets, reason: '홈 레슨 카드 렌더');
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: '홈 LessonCard 배지 행 RenderFlex 오버플로우 없음 (@375)',
     );
   });
 }
