@@ -255,3 +255,10 @@ String romanOf(int index) {
   if (index < table.length) return table[index];
   return (index + 1).toString();
 }
+
+/// Notebook masthead VOL/NO 라벨 — 전 화면 공통 시그니처 (#91).
+///
+/// 월은 로마숫자(`romanOf(month - 1)`), 일은 아라비아 숫자.
+/// 예: 6월 19일 → 'VOL. VI · NO. 19'.
+String volNoLabel(DateTime date) =>
+    'VOL. ${romanOf(date.month - 1)} · NO. ${date.day}';

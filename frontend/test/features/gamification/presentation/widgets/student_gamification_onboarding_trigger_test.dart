@@ -15,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/gamification/domain/entities/challenge.dart';
 import 'package:lessonaza/features/gamification/domain/entities/quest_origin.dart';
 import 'package:lessonaza/features/gamification/domain/entities/student_quest.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/gamification_onboarding_dismissed_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/student_quest_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/screens/student_gamification_onboarding_screen.dart';
 import 'package:lessonaza/features/gamification/presentation/widgets/student_gamification_onboarding_trigger.dart';
@@ -34,6 +35,14 @@ StudentQuest _quest(String studentId) {
   );
 }
 
+class _FakeOnboardingDismissStore
+    implements GamificationOnboardingDismissStore {
+  @override
+  Future<bool> isDismissed(String studentId) async => false;
+  @override
+  Future<void> markDismissed(String studentId) async {}
+}
+
 void main() {
   const studentId = 'student_1';
 
@@ -41,6 +50,9 @@ void main() {
     return ProviderScope(
       overrides: [
         activeQuestsProvider(studentId).overrideWith((ref) async => quests),
+        gamificationOnboardingDismissStoreProvider.overrideWithValue(
+          _FakeOnboardingDismissStore(),
+        ),
       ],
       child: MaterialApp(
         home: StudentGamificationOnboardingTrigger(
