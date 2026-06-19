@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../../../students/data/repositories/mock_student_repository.dart';
 import '../../domain/entities/invite.dart';
 import '../../domain/entities/pending_invite.dart';
 import '../../domain/repositories/invite_repository.dart';
@@ -358,6 +359,15 @@ class MockInviteRepository implements InviteRepository {
     );
 
     _connections[connectionId] = connection;
+
+    // #848 — mock parity with BE `_attach_student_to_teacher`: surface the
+    // newly-connected student in the teacher roster so it appears in the
+    // student list (previously the mock created only the connection).
+    MockStudentRepository.registerConnectedStudent(
+      studentId: studentId,
+      studentName: studentName,
+    );
+
     return connection;
   }
 

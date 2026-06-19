@@ -9,6 +9,34 @@ class MockStudentRepository implements StudentRepository {
   final _uuid = const Uuid();
   final List<Student> _students = [];
 
+  /// #848 — mock parity with BE `_attach_student_to_teacher`: students attached
+  /// to the teacher roster when an app connection request is accepted. Static so
+  /// the separately-constructed MockInviteRepository can register here and the
+  /// student surfaces in [getStudents]. Empty unless an accept happens → seeded
+  /// fixtures and existing tests are unaffected.
+  static final List<Student> _connectedStudents = <Student>[];
+
+  /// Register a student attached via an accepted connection (idempotent by id).
+  /// Mirrors BE which creates the Student row only if none exists yet.
+  static void registerConnectedStudent({
+    required String studentId,
+    required String studentName,
+  }) {
+    if (_connectedStudents.any((s) => s.id == studentId)) return;
+    _connectedStudents.add(
+      Student(
+        id: studentId,
+        name: studentName,
+        instrument: '',
+        status: StudentStatus.trial,
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  /// Test hook — clear connection-attached students between tests.
+  static void resetConnectedStudents() => _connectedStudents.clear();
+
   MockStudentRepository() {
     _initMockData();
   }
@@ -396,8 +424,12 @@ class MockStudentRepository implements StudentRepository {
   Future<List<Student>> getStudents() async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 300));
+    // Merge connection-attached students (#848), skipping ids already seeded.
+    final connected = _connectedStudents.where(
+      (c) => !_students.any((s) => s.id == c.id),
+    );
     return List.unmodifiable(
-      _students.where((s) => s.isActive && !s.isArchived),
+      [..._students, ...connected].where((s) => s.isActive && !s.isArchived),
     );
   }
 
