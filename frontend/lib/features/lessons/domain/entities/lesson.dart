@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../academy/domain/entities/academy_enums.dart';
 
 part 'lesson.g.dart';
@@ -241,8 +242,7 @@ class Lesson {
   /// Teacher must mark it 출석 확인(completed) or 휴강(cancelledByTeacher),
   /// otherwise backend auto-completes after 24h.
   bool get isUnconfirmed =>
-      status == LessonStatus.scheduled &&
-      endDateTime.isBefore(DateTime.now());
+      status == LessonStatus.scheduled && endDateTime.isBefore(DateTime.now());
 
   /// Whether the lesson ended within the last 24h (pre-notice window).
   /// Used to show the auto-complete heads-up banner.
@@ -263,16 +263,18 @@ class Lesson {
       hasSubscription && status == LessonStatus.completed && !hasFeedback;
 
   /// Calculate lesson end time from date + startTime + duration.
+  ///
+  /// Uses [ClockTime.parse] (total — never throws) so a malformed remote
+  /// `startTime` cannot crash build-time callers like [displayStatus] /
+  /// [endDateTime] (#64 — release-mode gray ErrorWidget).
   DateTime _calculateEndDateTime() {
-    final parts = startTime.split(':');
-    final hour = int.parse(parts[0]);
-    final minute = int.parse(parts[1]);
+    final start = ClockTime.parse(startTime);
     return DateTime(
       date.year,
       date.month,
       date.day,
-      hour,
-      minute,
+      start.hour,
+      start.minute,
     ).add(Duration(minutes: duration));
   }
 

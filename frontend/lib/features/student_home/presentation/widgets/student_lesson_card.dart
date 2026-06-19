@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -19,14 +20,16 @@ class StudentLessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Parse startTime (format: "HH:mm") to DateTime for display
-    final timeParts = lesson.startTime.split(':');
+    // Parse startTime (format: "HH:mm") to DateTime for display.
+    // ClockTime.parse is total (#64) — malformed remote startTime falls back to
+    // 00:00 instead of crashing the whole student home (IndexedStack).
+    final startClock = ClockTime.parse(lesson.startTime);
     final lessonDateTime = DateTime(
       lesson.date.year,
       lesson.date.month,
       lesson.date.day,
-      int.parse(timeParts[0]),
-      int.parse(timeParts[1]),
+      startClock.hour,
+      startClock.minute,
     );
     final daysUntil = lesson.daysFromNow;
     final isUpcoming = lesson.isUpcoming;
@@ -229,7 +232,7 @@ class StudentLessonCard extends StatelessWidget {
                       child: Text(
                         lesson.feedback!,
                         style: NotebookTypography.handSmall.copyWith(
-color: AppColors.paperPencil,
+                          color: AppColors.paperPencil,
                           height: 1.3,
                         ),
                         maxLines: 2,

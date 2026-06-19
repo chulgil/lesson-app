@@ -8,7 +8,19 @@ class ClockTime {
       assert(minute >= 0 && minute < 60);
 
   factory ClockTime.fromJson(Map<String, dynamic> json) {
-    return ClockTime(hour: json['hour'] as int, minute: json['minute'] as int);
+    return ClockTime(
+      hour: _coerceInt(json['hour']).clamp(0, 23),
+      minute: _coerceInt(json['minute']).clamp(0, 59),
+    );
+  }
+
+  /// Coerce a dynamic JSON value (int / num / numeric String / null) to int.
+  /// Defensive against remote serialization variants; never throws.
+  static int _coerceInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value.trim()) ?? 0;
+    return 0;
   }
 
   factory ClockTime.fromMinutes(int minutes) {
@@ -19,9 +31,15 @@ class ClockTime {
     );
   }
 
+  /// Parses a wall-clock string. Total function — never throws on malformed
+  /// input. Missing / extra / non-numeric / out-of-range parts fall back to 0
+  /// and are clamped, so a single bad remote `startTime` cannot crash a build
+  /// (#64 — release-mode gray ErrorWidget).
   factory ClockTime.parse(String time) {
     final parts = time.split(':');
-    return ClockTime(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    final hour = parts.isNotEmpty ? (int.tryParse(parts[0].trim()) ?? 0) : 0;
+    final minute = parts.length > 1 ? (int.tryParse(parts[1].trim()) ?? 0) : 0;
+    return ClockTime(hour: hour.clamp(0, 23), minute: minute.clamp(0, 59));
   }
 
   int get inMinutes => hour * Duration.minutesPerHour + minute;
