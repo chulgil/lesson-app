@@ -6,6 +6,10 @@ import 'package:lessonaza/core/sync/application/initial_pull_service.dart';
 import 'package:lessonaza/features/lessons/data/local/lesson_cache_store.dart';
 import 'package:lessonaza/features/lessons/data/repositories/remote_lesson_repository.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
+import 'package:lessonaza/features/schedule/data/local/teacher_availability_cache_store.dart';
+import 'package:lessonaza/features/schedule/data/repositories/remote_teacher_availability_repository.dart';
+import 'package:lessonaza/features/students/data/local/student_cache_store.dart';
+import 'package:lessonaza/features/students/data/repositories/remote_student_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
 // ---------------------------------------------------------------------------
@@ -14,6 +18,12 @@ import 'package:mocktail/mocktail.dart';
 
 class MockRemoteLessonRepository extends Mock
     implements RemoteLessonRepository {}
+
+class MockRemoteStudentRepository extends Mock
+    implements RemoteStudentRepository {}
+
+class MockRemoteTeacherAvailabilityRepository extends Mock
+    implements RemoteTeacherAvailabilityRepository {}
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 
@@ -41,22 +51,39 @@ Lesson _testLesson({String id = 'lesson-1'}) {
 
 void main() {
   late MockRemoteLessonRepository remote;
+  late MockRemoteStudentRepository remoteStudents;
+  late MockRemoteTeacherAvailabilityRepository remoteAvailability;
   late MockConnectivityService connectivity;
   late LessonCacheStore cache;
+  late StudentCacheStore studentCache;
+  late TeacherAvailabilityCacheStore availabilityCache;
   late InitialPullService service;
   const userId = 'teacher_test_001';
 
   setUp(() async {
     await setUpTestHive();
     final box = await Hive.openBox<String>(LessonCacheStore.boxName);
+    final studentBox = await Hive.openBox<String>(StudentCacheStore.boxName);
+    final availabilityBox = await Hive.openBox<String>(
+      TeacherAvailabilityCacheStore.boxName,
+    );
 
     remote = MockRemoteLessonRepository();
+    remoteStudents = MockRemoteStudentRepository();
+    remoteAvailability = MockRemoteTeacherAvailabilityRepository();
     connectivity = MockConnectivityService();
+
     cache = LessonCacheStore(box: box);
+    studentCache = StudentCacheStore(box: studentBox);
+    availabilityCache = TeacherAvailabilityCacheStore(box: availabilityBox);
 
     service = InitialPullService(
       remoteLessons: remote,
       lessonCache: cache,
+      remoteStudents: remoteStudents,
+      studentCache: studentCache,
+      remoteAvailability: remoteAvailability,
+      availabilityCache: availabilityCache,
       connectivity: connectivity,
     );
   });
@@ -71,6 +98,10 @@ void main() {
       final lessons = [_testLesson(id: 'l1'), _testLesson(id: 'l2')];
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
       when(() => remote.getLessons()).thenAnswer((_) async => lessons);
+      when(() => remoteStudents.getStudents()).thenAnswer((_) async => []);
+      when(
+        () => remoteAvailability.getAvailability(userId),
+      ).thenAnswer((_) async => null);
 
       // Pre-condition: cache is empty
       expect(cache.getLessons(LessonCacheStore.keyAll()), isNull);
@@ -91,6 +122,10 @@ void main() {
       // Arrange — set flag by running once successfully
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
       when(() => remote.getLessons()).thenAnswer((_) async => [_testLesson()]);
+      when(() => remoteStudents.getStudents()).thenAnswer((_) async => []);
+      when(
+        () => remoteAvailability.getAvailability(userId),
+      ).thenAnswer((_) async => null);
 
       await service.runIfNeeded(userId);
       verify(() => remote.getLessons()).called(1);
@@ -125,6 +160,10 @@ void main() {
       when(
         () => remote.getLessons(),
       ).thenAnswer((_) async => [_testLesson(id: 'l-retry')]);
+      when(() => remoteStudents.getStudents()).thenAnswer((_) async => []);
+      when(
+        () => remoteAvailability.getAvailability(userId),
+      ).thenAnswer((_) async => null);
 
       await service.runIfNeeded(userId);
 
@@ -137,6 +176,11 @@ void main() {
     test('서로 다른 userId는 각자 독립된 플래그를 가진다', () async {
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
       when(() => remote.getLessons()).thenAnswer((_) async => [_testLesson()]);
+      when(() => remoteStudents.getStudents()).thenAnswer((_) async => []);
+      // Each userId uses its own flag key in getAvailability(userId)
+      when(
+        () => remoteAvailability.getAvailability(any()),
+      ).thenAnswer((_) async => null);
 
       await service.runIfNeeded('user_A');
       await service.runIfNeeded('user_B');
@@ -149,14 +193,19 @@ void main() {
       // Arrange
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
       when(() => remote.getLessons()).thenThrow(Exception('network error'));
+      when(() => remoteStudents.getStudents()).thenAnswer((_) async => []);
+      when(
+        () => remoteAvailability.getAvailability(userId),
+      ).thenAnswer((_) async => null);
 
       // Act — should not throw
       await expectLater(service.runIfNeeded(userId), completes);
 
-      // Assert — flag not set, so retry will happen on next call
+      // Assert — flag not set (lessons failed), so retry will happen on next call
       when(
         () => remote.getLessons(),
       ).thenAnswer((_) async => [_testLesson(id: 'l-recovered')]);
+
       await service.runIfNeeded(userId);
 
       final cached = cache.getLessons(LessonCacheStore.keyAll());

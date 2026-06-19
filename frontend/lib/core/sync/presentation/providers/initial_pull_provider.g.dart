@@ -7,7 +7,7 @@ part of 'initial_pull_provider.dart';
 // **************************************************************************
 
 String _$initialPullServiceHash() =>
-    r'a32506fbbe2f8b3dfa6b98199ffa91edf25c0c73';
+    r'3611777bfc5216089d8d859a98462823f6f37831';
 
 /// Provider for [InitialPullService].
 ///

@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../data/local/subscription_cache_store.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/remote_subscription_repository.dart';
 import 'payment_tracking_provider.dart';
@@ -23,6 +25,9 @@ SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
     syncAware: (api, queue) => SyncAwareSubscriptionRepository(
       remote: RemoteSubscriptionRepository(api),
       queue: queue,
+      cache: SubscriptionCacheStore(
+        box: Hive.box<String>(SubscriptionCacheStore.boxName),
+      ),
     ),
   );
 }
