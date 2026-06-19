@@ -107,16 +107,6 @@ def test_alembic_chain_applies_on_postgres(migrated_pg: str) -> None:
     assert migrated_pg
 
 
-# Pre-existing enum drift that needs model changes / data-safe conversions rather
-# than a plain ADD VALUE — tracked in issue #858, fixed separately. Excluded here so
-# this guard turns GREEN for the value-addition class while still catching any NEW
-# drift. Remove each entry as #858 resolves it.
-KNOWN_PENDING_ENUM_DRIFT = {
-    "paymenttype",  # two distinct PaymentType enums collide on one pg type name (#858)
-    "confirmationcardtype",  # model is native enum but DB column is still VARCHAR(30) (#858)
-}
-
-
 def test_model_enum_values_present_in_db(migrated_pg: str) -> None:
     """Every model enum value must exist in its Postgres enum type.
 
@@ -129,8 +119,6 @@ def test_model_enum_values_present_in_db(migrated_pg: str) -> None:
 
     violations: list[str] = []
     for type_name, model_values in sorted(expected.items()):
-        if type_name in KNOWN_PENDING_ENUM_DRIFT:
-            continue
         db_values = db_enums.get(type_name)
         if db_values is None:
             violations.append(
