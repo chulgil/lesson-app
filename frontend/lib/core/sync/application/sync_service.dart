@@ -155,7 +155,6 @@ class SyncService {
       updatedAt: now,
       maxRetryCount: maxRetryCount ?? defaultMaxRetryCount,
       clientUpdatedAt: clientUpdatedAt,
-      versionVector: const {},
     );
 
     await _queueStore.upsert(entry);
@@ -227,10 +226,9 @@ class SyncService {
         final nextRetryCount = syncing.retryCount + 1;
 
         final failed = syncing.copyWith(
-          status:
-              nextRetryCount >= syncing.maxRetryCount
-                  ? SyncQueueStatus.failed
-                  : SyncQueueStatus.pending,
+          status: nextRetryCount >= syncing.maxRetryCount
+              ? SyncQueueStatus.failed
+              : SyncQueueStatus.pending,
           lastSyncedAt: DateTime.now().toUtc(),
           retryCount: nextRetryCount,
           errorCode: errorCode,
@@ -250,7 +248,9 @@ class SyncService {
     // For pending entries with retry count, check if backoff period has elapsed
     if (entry.status == SyncQueueStatus.pending && entry.retryCount > 0) {
       final requiredBackoff = _backoffDelay(entry.retryCount);
-      final timeSinceUpdate = DateTime.now().toUtc().difference(entry.updatedAt);
+      final timeSinceUpdate = DateTime.now().toUtc().difference(
+        entry.updatedAt,
+      );
       if (timeSinceUpdate < requiredBackoff) {
         return false; // Still in backoff period
       }
@@ -281,14 +281,18 @@ class SyncService {
     final allEntries = await _queueStore.fetchAll();
     return SyncServiceStats(
       total: allEntries.length,
-      pending:
-          allEntries.where((e) => e.status == SyncQueueStatus.pending).length,
-      syncing:
-          allEntries.where((e) => e.status == SyncQueueStatus.syncing).length,
-      synced:
-          allEntries.where((e) => e.status == SyncQueueStatus.synced).length,
-      failed:
-          allEntries.where((e) => e.status == SyncQueueStatus.failed).length,
+      pending: allEntries
+          .where((e) => e.status == SyncQueueStatus.pending)
+          .length,
+      syncing: allEntries
+          .where((e) => e.status == SyncQueueStatus.syncing)
+          .length,
+      synced: allEntries
+          .where((e) => e.status == SyncQueueStatus.synced)
+          .length,
+      failed: allEntries
+          .where((e) => e.status == SyncQueueStatus.failed)
+          .length,
       online: await _connectivityService.isOnline,
       lastSyncAt: _lastSyncAt,
       nextAction: nextAction,
@@ -328,7 +332,8 @@ class SyncService {
 
   Duration _backoffDelay(int retryCount) {
     // Exponential backoff: 2^retryCount, capped at 30 seconds
-    final baseSeconds = 1 << (retryCount - 1).clamp(0, 4); // 2^0=1, 2^1=2, 2^2=4, 2^3=8, 2^4=16
+    final baseSeconds =
+        1 << (retryCount - 1).clamp(0, 4); // 2^0=1, 2^1=2, 2^2=4, 2^3=8, 2^4=16
     return Duration(seconds: baseSeconds.clamp(1, 30));
   }
 }
