@@ -203,6 +203,7 @@
 | 휴가 처리 방식 | `VacationDisposition` | makeupCredit / freeCancel / rollForward |
 | 휴가 영향 미리보기 | `VacationImpactPreview` | 영향 레슨/학생 집계 (`VacationImpactedStudent`) |
 | 휴가 구간 | `VacationSegment` | 다구간 휴가의 한 기간 (start/end + 구간별 disposition). 배치 등록 시 N개 `VacationPeriod` 로 저장 (#768 ②). 사유·학생별 예외는 전 구간 공유 |
+| 일괄 처리 | Batch Action | 스케줄 리스트 다중선택(long-press 진입) → 선택 N건 일괄 완료/휴강 (#768 ①). 완료는 레슨당 `confirmLessonCompleted` 1회씩 정확히 N회 차감, 휴강은 차감 0. `LessonSelection` 선택 상태 |
 | 요청 필터 | `RequestFilter` | 요청 목록 필터/정렬 (FE 전용) |
 | 요청 단계 | `RequestPhase` | request / subscription / lessons / completed / terminal |
 | 요청 상태 그룹 | `RequestStatusGroup` | 상태 묶음 (목록 그룹핑) |
@@ -582,6 +583,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-06-19 | 일괄 처리(Batch Action) 신설 — 스케줄 다중선택 일괄 완료/휴강(#768 ①). 리스트 long-press 진입 + 탭 토글 → 선택 N건 일괄 완료(레슨당 `confirmLessonCompleted` 1회씩 정확히 N회 차감)/휴강(차감 0). `LessonSelection` 선택 상태 + 하단 액션바. 기존 스와이프(단건 완료/취소) 불변. |
 | 2026-06-19 | 휴가 구간(`VacationSegment`) 신설 — 다구간 휴가(#768 ②). 한 번에 여러 비겹침 기간을 등록(구간별 보상옵션 / 사유·학생별 예외 공통). BE 배치 계약 `POST /teacher/vacation/batch`(구간마다 기존 `register_vacation` 재사용, 원자적). 겹침 구간 거부(이중 차감/연장 방지). 기존 단일 등록 경로 불변. |
 | 2026-06-18 | 학생 상세 전화/문자 상단 승격 + 메뉴 그룹핑 (검토 #28) — 매일 쓰는 전화·문자를 more(...) 메뉴(2탭) → 신원 스트립(1탭, `StudentContactActions`). more 메뉴를 관리/상태 변경 섹션(`_MoreSectionLabel`)으로 그룹핑 + 학생 보관 맨 아래 분리. 데이터·플로우 불변(UI/IA만). |
 | 2026-06-18 | 레슨 요약 공유 버튼 (검토 #62) — 레슨 상세 공유 액션을 로컬 텍스트 스낵바 → 서버 토큰 발급(`POST /lesson-summaries/{id}/share`, BE 기구현)으로 교체. URL 클립보드 복사 + "학생과 공유하기" 토스트. FE-only(LessonSummaryShare 모델 + repo mock/remote + 수동 provider). 구 lessonShareText/shareTextCopied orphan 제거. |

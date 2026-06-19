@@ -17,6 +17,7 @@ import '../../../lessons/lessons_facade.dart';
 import '../../../student_home/student_home_ui_facade.dart';
 import '../providers/schedule_tab_state_provider.dart';
 import '../providers/schedule_view_mode_provider.dart';
+import '../providers/lesson_selection_provider.dart';
 import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
 import '../widgets/schedule_weekly_grid_view.dart';
@@ -34,10 +35,26 @@ class ScheduleTab extends ConsumerWidget {
     // WeekStrip sticky 패턴 공유 (body 55% → 80% 확대). weeklyGrid 은 자체
     // ScrollController 를 제거하고 intrinsic 높이로 외부 sliver 에 위임.
     // timeline 은 자체 스크롤이 있어 Column 유지 (Phase B 예정).
+    // #768 ①: 날짜 변경 시 다중선택 해제 (이전 날짜 레슨 id 가 stale).
+    ref.listen(teacherSelectedDateProvider, (_, __) {
+      ref.read(lessonSelectionProvider.notifier).clear();
+    });
+    final selectedIds = ref.watch(lessonSelectionProvider);
+    final body = viewMode == ScheduleViewMode.timeline
+        ? _buildPinnedLayout(context, ref, viewMode)
+        : _buildCollapsibleListLayout(context, ref, viewMode);
+    // 다중선택 액션바는 리스트 뷰 + 선택 항목이 있을 때만.
+    final showSelectionBar =
+        viewMode == ScheduleViewMode.list && selectedIds.isNotEmpty;
     return PaperScaffold(
-      child: viewMode == ScheduleViewMode.timeline
-          ? _buildPinnedLayout(context, ref, viewMode)
-          : _buildCollapsibleListLayout(context, ref, viewMode),
+      child: showSelectionBar
+          ? Column(
+              children: [
+                Expanded(child: body),
+                const _SelectionActionBar(),
+              ],
+            )
+          : body,
     );
   }
 
@@ -595,18 +612,38 @@ class _SwipeableLessonCard extends ConsumerWidget {
         lesson.displayStatus == LessonStatus.scheduled ||
         lesson.displayStatus == LessonStatus.reschedulePending;
 
+    // #768 ①: 다중선택 — 예정 레슨만 선택 가능. long-press 로 선택 모드 진입,
+    // 모드 중 탭=토글. 선택 모드에서는 스와이프를 비활성화한다.
+    final selectedIds = ref.watch(lessonSelectionProvider);
+    final selectionMode = selectedIds.isNotEmpty;
+    final isSelected = selectedIds.contains(lesson.id);
+    final selection = ref.read(lessonSelectionProvider.notifier);
+
+    final card = LessonCard(
+      lesson: lesson,
+      onTap: selectionMode && isScheduled
+          ? () => selection.toggle(lesson.id)
+          : () => context.push(
+              AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+            ),
+    );
+
+    final content = isScheduled
+        ? _SelectableLessonRow(
+            isSelected: isSelected,
+            showIndicator: selectionMode,
+            onLongPress: () => selection.toggle(lesson.id),
+            child: card,
+          )
+        : card;
+
+    // 비예정이거나 선택 모드 → 스와이프 없음.
+    if (!isScheduled || selectionMode) return content;
+
     // #766: 수강권 레슨은 스와이프 취소(우→좌)를 비활성화 — plain cancelLesson 이
     // 차감 되돌림/변경권/휴강 이벤트를 우회하기 때문. 수강권 레슨 취소는 카드 탭 →
     // 상세 → 구독 취소(휴강) 플로우에서만. 완료(좌→우) 스와이프는 그대로 둔다.
     final canSwipeCancel = lesson.subscriptionId == null;
-
-    final card = LessonCard(
-      lesson: lesson,
-      onTap: () =>
-          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id)),
-    );
-
-    if (!isScheduled) return card;
 
     return Dismissible(
       key: ValueKey('lesson-swipe-${lesson.id}'),
@@ -676,7 +713,7 @@ class _SwipeableLessonCard extends ConsumerWidget {
           ],
         ),
       ),
-      child: card,
+      child: content,
     );
   }
 
@@ -773,5 +810,185 @@ class _ViewModeToggle extends StatelessWidget {
       case ScheduleViewMode.weeklyGrid:
         return Icons.grid_view;
     }
+  }
+}
+
+
+// ──────────────────────────────────────────────────────────────
+// 다중선택 (#768 ①).
+// ──────────────────────────────────────────────────────────────
+
+/// 다중선택 시 카드에 체크 인디케이터 + 선택 배경을 덧입히고, long-press 로 선택을
+/// 토글한다. 선택 모드가 아니면 인디케이터 없이 long-press 만 노출(모드 진입용).
+class _SelectableLessonRow extends StatelessWidget {
+  final bool isSelected;
+  final bool showIndicator;
+  final VoidCallback onLongPress;
+  final Widget child;
+
+  const _SelectableLessonRow({
+    required this.isSelected,
+    required this.showIndicator,
+    required this.onLongPress,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Container(
+        color: isSelected
+            ? AppColors.paperAccent.withValues(alpha: 0.08)
+            : Colors.transparent,
+        child: Row(
+          children: [
+            if (showIndicator)
+              Padding(
+                padding: const EdgeInsets.only(left: AppSpacing.space2),
+                child: Icon(
+                  isSelected
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  size: 22,
+                  color: isSelected
+                      ? AppColors.paperAccent
+                      : AppColors.inkTertiary,
+                ),
+              ),
+            Expanded(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 다중선택 하단 액션바 — 선택 개수 + 전체선택 + 일괄 완료/휴강.
+class _SelectionActionBar extends ConsumerWidget {
+  const _SelectionActionBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedIds = ref.watch(lessonSelectionProvider);
+    final selectedDate = ref.watch(teacherSelectedDateProvider);
+    final lessonsAsync = ref.watch(lessonsProvider);
+    final selection = ref.read(lessonSelectionProvider.notifier);
+
+    final dayScheduled = lessonsAsync.maybeWhen(
+      data: (lessons) => lessons
+          .where(
+            (l) =>
+                l.date.year == selectedDate.year &&
+                l.date.month == selectedDate.month &&
+                l.date.day == selectedDate.day &&
+                (l.displayStatus == LessonStatus.scheduled ||
+                    l.displayStatus == LessonStatus.reschedulePending),
+          )
+          .toList(),
+      orElse: () => <Lesson>[],
+    );
+    final selectedLessons = dayScheduled
+        .where((l) => selectedIds.contains(l.id))
+        .toList();
+    final count = selectedLessons.length;
+
+    return Container(
+      color: AppColors.paper,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(height: 0.5, color: AppColors.inkQuaternary),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.space3,
+                AppSpacing.space2,
+                AppSpacing.space3,
+                AppSpacing.space2,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        tooltip: AppStrings.selectionExitTooltip,
+                        color: AppColors.inkSecondary,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                        onPressed: selection.clear,
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Text(
+                        AppStrings.selectionCountLabel(count),
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.ink,
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () =>
+                            selection.selectAll(dayScheduled.map((l) => l.id)),
+                        child: const Text(AppStrings.selectAllAction),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: count == 0
+                              ? null
+                              : () => batchMarkDayOff(
+                                  context,
+                                  ref,
+                                  selectedLessons,
+                                  onDone: selection.clear,
+                                ),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(
+                              0,
+                              AppSpacing.buttonHeightSmall,
+                            ),
+                          ),
+                          child: Text(AppStrings.batchSelectionDayOff(count)),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: count == 0
+                              ? null
+                              : () => batchConfirmAttendance(
+                                  context,
+                                  ref,
+                                  selectedLessons,
+                                  onDone: selection.clear,
+                                ),
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(
+                              0,
+                              AppSpacing.buttonHeightSmall,
+                            ),
+                          ),
+                          child: Text(AppStrings.batchSelectionComplete(count)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
