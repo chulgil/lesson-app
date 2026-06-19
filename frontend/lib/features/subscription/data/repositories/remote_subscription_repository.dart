@@ -208,6 +208,15 @@ class RemoteSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
+  Future<bool> requestPaymentConfirmation(String proposalId) async {
+    final response = await _apiClient.post(
+      '/subscriptions-proposals/$proposalId/request-payment-confirmation',
+    );
+    final data = response.data;
+    return data is Map && data['notified'] == true;
+  }
+
+  @override
   Future<void> revokeProposal(String proposalId) async {
     await _apiClient.post('/subscriptions-proposals/$proposalId/revoke');
   }

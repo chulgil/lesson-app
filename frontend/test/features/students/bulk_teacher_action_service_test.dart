@@ -293,6 +293,9 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
   Future<void> resendProposalReminder(String proposalId) async {}
 
   @override
+  Future<bool> requestPaymentConfirmation(String proposalId) async => true;
+
+  @override
   Future<void> revokeProposal(String proposalId) async {}
 
   @override
