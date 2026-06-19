@@ -17,6 +17,7 @@ import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
 import 'duplicate_proposal_dialog.dart';
+import 'bank_account_guard.dart';
 
 /// Unified bottom sheet for subscription proposal creation and direct issuance.
 ///
@@ -633,6 +634,14 @@ class _UnifiedSubscriptionSheetState
 
   Future<void> _onSendProposal() async {
     if (_selectedTemplateIds.isEmpty) return;
+
+    // #847 입금 계좌 미등록 시 제안 차단(학생 결제 불가 dead-end 방지).
+    final bankOk = await ensureBankAccountRegistered(
+      context: context,
+      ref: ref,
+      teacherId: widget.teacherId,
+    );
+    if (!bankOk || !mounted) return;
 
     // #696 §3.1.5 — single-student send: block while a pending/paymentNotified
     // proposal already exists for this student. Batch sends rely on the BE

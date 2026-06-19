@@ -9719,6 +9719,14 @@ class AppStrings {
 
   // [검토 #84·#87] UX 0619 (c)
   /// 받은 수강권 제안 (학생 측 제안 상세 AppBar, 검토 #82)
+  // #846 수강권 발급 학생 선택(무인자 진입 dead-end 방지)
+  static const issueSelectStudentTitle = '수강권을 발급할 학생 선택';
+  static const issueSelectStudentEmpty = '연결된 학생이 없습니다';
+  // #847 입금 계좌 미등록 발급/제안 가드
+  static const bankAccountRequiredTitle = '입금 계좌를 먼저 등록하세요';
+  static const bankAccountRequiredBody =
+      '수강권 결제 안내를 위해 입금 계좌가 필요합니다. 계좌를 등록한 뒤 다시 발급해주세요.';
+  static const bankAccountRequiredCta = '계좌 등록';
   static const proposalReceivedAppBarTitle = '받은 수강권 제안';
 
   // ── Notebook masthead signature (검토 #90/#91 — 브랜드 시그니처 중앙화) ──

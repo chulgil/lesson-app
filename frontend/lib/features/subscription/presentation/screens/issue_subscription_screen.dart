@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -14,6 +16,8 @@ import '../../../analytics/analytics_facade.dart'
 import '../../../auth/auth_facade.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/domain/entities/lesson_location.dart';
+import '../../../students/domain/entities/student_with_membership.dart';
+import '../../../students/students_facade.dart' show groupedStudentsProvider;
 import '../../data/repositories/proposal_draft_storage.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
@@ -216,10 +220,58 @@ class _IssueSubscriptionScreenState
     super.dispose();
   }
 
+  /// #846 무인자 진입 시 연결 학생 선택 → studentId 로 재진입.
+  Widget _buildStudentSelection(BuildContext context) {
+    final teacherId = ref.watch(currentUserIdProvider);
+    final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
+    return NotebookScreenScaffold(
+      appBar: NotebookDetailAppBar(
+        title: AppStrings.issueSelectStudentTitle,
+      ),
+      body: groupsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const Center(child: Text(AppStrings.errorOccurred)),
+        data: (groups) {
+          final seen = <String>{};
+          final students = <StudentWithMembership>[];
+          for (final group in groups) {
+            for (final s in group.students) {
+              if (seen.add(s.studentId)) students.add(s);
+            }
+          }
+          if (students.isEmpty) {
+            return const Center(
+              child: Text(AppStrings.issueSelectStudentEmpty),
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.screenPadding),
+            itemCount: students.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final s = students[index];
+              return ListTile(
+                title: Text(s.name, style: AppTypography.bodyLarge),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushReplacement(
+                  '${AppRoutes.issueSubscription}?studentId=${s.studentId}',
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
   // --- Build ---
 
   @override
   Widget build(BuildContext context) {
+    // #846 studentId 없이 진입(준비 체크리스트 Q7 등) 시 학생 선택 UI.
+    if (!widget.isBatchMode && widget.primaryStudentId.isEmpty) {
+      return _buildStudentSelection(context);
+    }
     _scheduleTemplateDefaults();
     _scheduleRenewalDefaults();
 
