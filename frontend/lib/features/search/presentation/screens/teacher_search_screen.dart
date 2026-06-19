@@ -350,43 +350,49 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
     final filter = ref.watch(teacherSearchFilterStateProvider);
 
     if (result.teachers.isEmpty) {
-      return SingleChildScrollView(
-        child: Column(
-          children: [
-            // Active filters in empty state
-            if (!filter.isEmpty) _buildActiveFilters(filter),
-            // Empty state message
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    isAcademyTab
-                        ? Icons.school_outlined
-                        : Icons.person_search_outlined,
-                    size: 64,
-                    color: AppColors.inkTertiary,
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Active filters in empty state
+                if (!filter.isEmpty) _buildActiveFilters(filter),
+                // Empty state message
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isAcademyTab
+                            ? Icons.school_outlined
+                            : Icons.person_search_outlined,
+                        size: 64,
+                        color: AppColors.inkTertiary,
+                      ),
+                      const SizedBox(height: AppSpacing.space3),
+                      Text(
+                        isAcademyTab
+                            ? AppStrings.searchNoAcademiesFound
+                            : AppStrings.searchNoTeachersFound,
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: AppColors.inkSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space1),
+                      Text(
+                        AppStrings.searchTrySuggestion,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.inkTertiary,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    isAcademyTab
-                        ? AppStrings.searchNoAcademiesFound
-                        : AppStrings.searchNoTeachersFound,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    AppStrings.searchTrySuggestion,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkTertiary,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }

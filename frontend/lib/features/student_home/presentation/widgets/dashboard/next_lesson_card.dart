@@ -83,10 +83,6 @@ class NextLessonCard extends ConsumerWidget {
               ],
             ),
           ),
-          TextButton(
-            onPressed: () => context.push(AppRoutes.teacherSearch),
-            child: const Text(AppStrings.studentHomeFindTeacher),
-          ),
         ],
       ),
     );

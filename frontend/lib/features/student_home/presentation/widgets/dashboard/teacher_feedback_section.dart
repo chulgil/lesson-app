@@ -22,6 +22,7 @@ class TeacherFeedbackSection extends ConsumerWidget {
     final feedbackAsync = ref.watch(
       studentHomeLatestTeacherFeedbackProvider(studentId),
     );
+    final feedbackLessonId = feedbackAsync.valueOrNull?.id;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,11 +36,11 @@ class TeacherFeedbackSection extends ConsumerWidget {
               style: NotebookTypography.sectionTitle,
             ),
             TextButton(
-              onPressed: () {
-                context.push(
-                  '${AppRoutes.repertoireHistory}?studentId=$studentId',
-                );
-              },
+              onPressed: feedbackLessonId == null
+                  ? null
+                  : () => context.push(
+                      AppRoutes.lessonDetail.replaceFirst(':id', feedbackLessonId),
+                    ),
               child: const Text(AppStrings.showMore),
             ),
           ],
