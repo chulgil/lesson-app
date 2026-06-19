@@ -1885,8 +1885,7 @@ class AppStrings {
   static const lessonBookingFailed = '예약에 실패했습니다. 다른 시간을 선택해주세요';
 
   /// 리드타임 미달 안내: "최소 24시간 전에 예약할 수 있어요" (#850)
-  static String lessonBookingTooSoon(int hours) =>
-      '최소 $hours시간 전에 예약할 수 있어요';
+  static String lessonBookingTooSoon(int hours) => '최소 $hours시간 전에 예약할 수 있어요';
 
   /// 미리보기: "선생님 · 50분 · 잔여 N회"
   static String lessonBookingPreview(String teacher, int minutes) =>
@@ -3437,8 +3436,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -4200,9 +4199,11 @@ class AppStrings {
 
   /// 수강권이 발급되었습니다 (snackbar: 단건 발급 성공)
   static const subscriptionIssueSuccess = '수강권이 발급되었습니다';
+
   /// 후불(선불 미확인) 발급 직후 — 미수금 추적 안내 (검토 #848).
   static const subscriptionIssuePostpaidSuccess =
       '수강권을 발급했어요. 입금 확인은 미수금에서 추적하세요';
+
   /// 연결 수락 직후 교사 다음 단계 CTA (검토 #848).
   static const connectionAcceptedIssueCta = '수강권 발급';
 
@@ -4222,8 +4223,7 @@ class AppStrings {
       '이미 진행 중인 제안이 있어 건너뜀: $names';
 
   /// 일괄 발급 실패 학생들 (검토 #849).
-  static String batchSubscriptionFailed(String names) =>
-      '발급 실패: $names';
+  static String batchSubscriptionFailed(String names) => '발급 실패: $names';
 
   // -- Subscription Display Layer (badge + status colors, P2 5-3b-7a) --
 
@@ -4480,7 +4480,6 @@ class AppStrings {
   /// 수강권을 제안했어요 (헤더 부제)
   static const proposalSubmittedSubtitle = '수강권을 제안했어요';
 
-
   /// 선택 후 위 계좌로 입금해 주세요 (입금 안내 캡션)
   static const paymentDepositInstruction = '선택 후 위 계좌로 입금해 주세요';
 
@@ -4605,7 +4604,6 @@ class AppStrings {
 
   /// 입금 완료했어요 (학생 입금 알림 CTA)
   static const proposalDetailPaymentDoneAction = '입금 완료했어요';
-
 
   /// 이번 제안을 스킵했습니다 (거절 SnackBar)
   static const proposalDetailSkippedSnackbar = '이번 제안을 스킵했습니다';
@@ -4865,8 +4863,10 @@ class AppStrings {
 
   /// 바로 발급 (단일 선택 시 outlined 액션)
   static const unifiedSubscriptionDirectIssueButton = '바로 발급';
+
   /// #769: 발급 방식 차이 캡션 — 교사 즉시 발급.
   static const unifiedSubscriptionDirectIssueCaption = '교사가 즉시 발급';
+
   /// #769: 발급 방식 차이 캡션 — 학생 수락·입금 후 발급(제안).
   static const unifiedSubscriptionProposalCaption = '학생 수락·입금 후 발급';
 
@@ -6211,12 +6211,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6427,6 +6426,27 @@ class AppStrings {
   static const authSelectRole = '역할을 선택하세요';
   static const authRoleSetupFailed = '역할 설정 실패. 다시 시도해주세요.';
   static const authLoginFailed = '로그인 실패. 다시 시도해주세요.';
+
+  // -- Auth error messages (server error differentiation, #866) --
+  /// 네트워크 연결 없음 또는 타임아웃 시 로그인 실패 메시지.
+  static const authLoginNetworkError = '네트워크 연결을 확인해주세요.';
+
+  /// 서버 오류(5xx) 발생 시 로그인 실패 메시지.
+  static const authLoginServerError = '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+
+  /// 인증 만료 또는 실패(401) 시 메시지.
+  static const authLoginUnauthorized = '인증에 실패했습니다. 다시 로그인해주세요.';
+
+  /// Google 로그인 클라이언트 미설정 안내.
+  static const authGoogleNotConfigured =
+      'Google 로그인이 아직 설정되지 않았습니다. 테스트 계정을 사용해주세요.';
+
+  /// Apple 로그인 준비 중 안내.
+  static const authAppleNotReady = 'Apple 로그인은 준비 중입니다.';
+
+  /// 자동 로그인 실패 시 서버/네트워크 오류 안내 (홈 복귀 후 토스트).
+  static const authAutoLoginServerError =
+      '서버 연결에 실패했습니다. 네트워크를 확인하고 다시 로그인해주세요.';
 
   // 학생 직접 가입 안전망 (phone_verification_policy.md §3.2)
   /// 학생 직접 가입 차단 화면 제목.
@@ -8185,8 +8205,7 @@ class AppStrings {
   static const makeupInputConflictBadge = '시간 겹침';
 
   /// N건 보강 시각이 겹칩니다 (충돌 안내)
-  static String makeupInputConflictNotice(int n) =>
-      '$n건 보강 시각이 겹칩니다. 확인해 주세요.';
+  static String makeupInputConflictNotice(int n) => '$n건 보강 시각이 겹칩니다. 확인해 주세요.';
 
   /// 보강 일정 확인 (최종 확인 요약 다이얼로그 제목)
   static const makeupInputSummaryTitle = '보강 일정 확인';
@@ -8482,9 +8501,9 @@ class AppStrings {
 
   /// 휴가 진입 CTA — 가용성 화면 특수일정 섹션에서 휴가 등록 화면으로 이동.
   static const vacationModeEntry = '휴가';
+
   /// 휴가 진입 안내 — 이 기간 레슨 처리 방식 고지 (검토 #14).
-  static const vacationModeGuide =
-      '이 기간의 레슨은 모두 휴강 처리되고, 선택한 보상 방식이 적용됩니다.';
+  static const vacationModeGuide = '이 기간의 레슨은 모두 휴강 처리되고, 선택한 보상 방식이 적용됩니다.';
 
   /// 휴가 등록 액션 버튼.
   static const vacationRegisterButton = '휴가 등록';
@@ -9595,10 +9614,13 @@ class AppStrings {
   static const sortByNextLesson = '다음 레슨순';
   static const sortBySubscriptionExpiry = '수강권 만료순';
   static const studentSearchExtended = '이름, 악기, 학부모명, 메모로 검색';
+
   /// 알림 필터 — 전체
   static const notifFilterAll = '전체';
+
   /// 알림 필터 — 안읽음
   static const notifFilterUnread = '안읽음';
+
   /// 알림 없음 (안읽음 필터 적용 시)
   static const notifNoUnread = '읽지 않은 알림이 없습니다';
   static const trophyCollectionTitleTeacher = '학생 트로피';
@@ -9619,7 +9641,6 @@ class AppStrings {
 
   /// 곡 완성(제본) 축하.
   static const boundVolumeCelebration = '완성본으로 제본되었어요 · 책장에서 확인하세요';
-
 
   // [검토 #19] UX wave5
   static const String vacationDispositionMakeupCreditHint =
@@ -9642,10 +9663,12 @@ class AppStrings {
   static const statusDepleted = '회차 소진';
 
   /// 소진 임박 — 잔여 N회 (회차 기반)
-  static String statusExpiringSoonSessions(int remaining) => '소진 임박 · 잔여 $remaining회';
+  static String statusExpiringSoonSessions(int remaining) =>
+      '소진 임박 · 잔여 $remaining회';
 
   /// 임박 — D-N일 (날짜 기반)
-  static String statusExpiringSoonDays(int days) => days <= 0 ? 'D-day' : 'D-$days';
+  static String statusExpiringSoonDays(int days) =>
+      days <= 0 ? 'D-day' : 'D-$days';
 
   // [검토 #51] UX wave5
   /// 추가 증정 회차 (섹션 제목, #787 — 보너스 → 추가 증정 회차)
@@ -9680,12 +9703,16 @@ class AppStrings {
   static const journalLegendStudent = '학생';
   static const journalLegendGuardian = '보호자';
   static const journalLegendTeacher = '선생님';
+
   /// 범례 제목 (연습장 상세 화면).
   static const journalActorLegendTitle = '도장 의미';
+
   /// 학생 자가기록 설명.
   static const journalActorStudentDesc = '학생 자가기록';
+
   /// 보호자 확인 설명.
   static const journalActorGuardianDesc = '보호자 확인';
+
   /// 선생님 인증 설명.
   static const journalActorTeacherDesc = '선생님 인증';
 
@@ -9694,13 +9721,11 @@ class AppStrings {
   static const String inquiryStatusAnswered = '답변완료';
   static const String inquiryReplySla = '보통 1~2일 내 답변';
 
-
   // [검토 #8] UX wave6
   static String urgentAlertMoreOfType(int n) => '외 $n건';
 
   // [검토 #10] UX wave6
   static String unreadBadgeCount(int n) => n > 9 ? '9+' : '$n';
-
 
   // [검토 #29] UX wave7
   static const String registerDirectPrimary = '직접 등록';
@@ -9756,6 +9781,7 @@ class AppStrings {
   /// Programme eyebrow — English brand line, e.g. 'Programme for Thursday'.
   static String studentHomeProgrammeFor(String dayLabel) =>
       'Programme for $dayLabel';
+
   /// Notebook masthead date — Hanja style, e.g. '6月 19日'.
   static String studentHomeMastheadHanjaDate(int month, int day) =>
       '$month月 $day日';
@@ -9767,4 +9793,7 @@ class AppStrings {
 
   static const paymentPendingProcessingEstimate = '보통 1영업일 소요됩니다';
   static const subscriptionEmptyRequestLessonCta = '레슨 신청하기';
+
+  /// 오프라인 배너 문구 (#868)
+  static const offlineBannerMessage = '오프라인 — 저장된 데이터를 표시 중';
 }
