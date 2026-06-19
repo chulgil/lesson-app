@@ -172,27 +172,27 @@ class _SummaryContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _LabelValue(label: '수업일', value: summary.lessonDate),
-                _LabelValue(label: '시작 시간', value: summary.startTime),
+                _LabelValue(label: AppStrings.summaryLessonDateLabel, value: summary.lessonDate),
+                _LabelValue(label: AppStrings.selectStartTime, value: summary.startTime),
                 _LabelValue(
-                  label: '수업 시간',
-                  value: '${summary.durationMinutes}분',
+                  label: AppStrings.infoLabelDuration,
+                  value: AppStrings.durationMinutesValue(summary.durationMinutes),
                 ),
                 if (summary.teacherName?.isNotEmpty == true)
-                  _LabelValue(label: '선생님', value: summary.teacherName!),
+                  _LabelValue(label: AppStrings.teacher, value: summary.teacherName!),
               ],
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
         if (summary.feedback?.isNotEmpty == true)
-          _Section(title: '피드백', body: summary.feedback!),
+          _Section(title: AppStrings.feedbackTitle, body: summary.feedback!),
         if (summary.practiceTips?.isNotEmpty == true)
-          _Section(title: '연습 팁', body: summary.practiceTips!),
+          _Section(title: AppStrings.practiceTipsSection, body: summary.practiceTips!),
         if (summary.studentNote?.isNotEmpty == true)
-          _Section(title: '학생 메모', body: summary.studentNote!),
+          _Section(title: AppStrings.studentContactMemoLabel, body: summary.studentNote!),
         if (summary.keyPoints.isNotEmpty)
-          _Section(title: '핵심 포인트', items: summary.keyPoints),
+          _Section(title: AppStrings.summaryKeyPointsLabel, items: summary.keyPoints),
       ],
     );
   }

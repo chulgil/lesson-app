@@ -15,6 +15,8 @@ import '../../domain/entities/notification.dart';
 import '../navigation/notification_navigation_target.dart';
 import '../providers/notification_providers.dart';
 import '../widgets/notification_item.dart';
+import '../../../../core/utils/date_utils.dart';
+import '../../../../core/utils/date_format_utils.dart';
 
 /// 알림 목록 화면
 ///
@@ -50,7 +52,7 @@ class _NotificationListScreenState
             onPressed: () => _markAllAsRead(),
             // §7.131: 액션 라벨도 시스템 메타이므로 sectionLabel(uppercase) 톤.
             child: Text(
-              '모두 읽음',
+              AppStrings.notifMarkAllRead,
               style: NotebookTypography.sectionLabel.copyWith(
                 color: AppColors.ink,
                 fontWeight: FontWeight.w700,
@@ -146,16 +148,15 @@ class _NotificationListScreenState
 
       String label;
       if (date == today) {
-        label = '오늘';
+        label = AppStrings.todayLabel;
       } else if (date == yesterday) {
-        label = '어제';
+        label = AppStrings.yesterdayLabel;
       } else if (date.isAfter(today.subtract(const Duration(days: 7)))) {
         // Within last 7 days - show day name
-        final weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
-        label = weekdays[date.weekday - 1];
+        label = LessonDateUtils.getWeekdayFullNameKorean(date.weekday);
       } else {
         // Older - show date
-        label = '${date.month}월 ${date.day}일';
+        label = formatDateMDKorean(date);
       }
 
       grouped.putIfAbsent(label, () => []).add(notification);
@@ -167,8 +168,8 @@ class _NotificationListScreenState
   Widget _buildEmptyState() {
     return const EmptyStateWidget(
       icon: Icons.notifications_none_outlined,
-      title: '알림이 없습니다',
-      subtitle: '새로운 소식이 있으면 알려드릴게요',
+      title: AppStrings.notifEmptyTitle,
+      subtitle: AppStrings.notifEmptySubtitle,
     );
   }
 
@@ -176,7 +177,7 @@ class _NotificationListScreenState
     return EmptyStateWidget(
       icon: Icons.mark_email_read_outlined,
       title: AppStrings.notifNoUnread,
-      subtitle: '${AppStrings.notifFilterAll} 탭에서 전체 알림을 확인하세요',
+      subtitle: AppStrings.notifNoUnreadSubtitle(AppStrings.notifFilterAll),
     );
   }
 
@@ -192,7 +193,7 @@ class _NotificationListScreenState
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
-            '알림을 불러올 수 없습니다',
+            AppStrings.notifLoadError,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
