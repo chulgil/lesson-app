@@ -4,13 +4,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
+import 'package:hive/hive.dart';
+
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../data/local/teacher_availability_cache_store.dart';
 import '../../data/repositories/mock_teacher_availability_repository.dart';
 import '../../data/repositories/remote_teacher_availability_repository.dart';
+import '../../data/repositories/sync_aware_teacher_availability_repository.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
@@ -25,13 +29,18 @@ part 'teacher_availability_providers.g.dart';
 // ============================================================
 
 @Riverpod(keepAlive: true)
-TeacherAvailabilityRepository teacherAvailabilityRepository(Ref ref) {
-  return createRepository<TeacherAvailabilityRepository>(
-    ref: ref,
-    mock: () => MockTeacherAvailabilityRepository(),
-    remote: (api) => RemoteTeacherAvailabilityRepository(api),
-  );
-}
+TeacherAvailabilityRepository teacherAvailabilityRepository(Ref ref) =>
+    createSyncAwareRepository<TeacherAvailabilityRepository>(
+      ref: ref,
+      mock: () => MockTeacherAvailabilityRepository(),
+      syncAware: (api, queue) => SyncAwareTeacherAvailabilityRepository(
+        remote: RemoteTeacherAvailabilityRepository(api),
+        queue: queue,
+        cache: TeacherAvailabilityCacheStore(
+          box: Hive.box<String>(TeacherAvailabilityCacheStore.boxName),
+        ),
+      ),
+    );
 
 // ============================================================
 // Teacher Availability Settings

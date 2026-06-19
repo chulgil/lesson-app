@@ -6,9 +6,9 @@ part of 'student_repository_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$studentRepositoryHash() => r'83ec87aa71f7d8f29e17b7af22d3dd1d1e7b0548';
+String _$studentRepositoryHash() => r'bfe7effc81ef4d938597856d7d70602d776616b5';
 
-/// Student repository provider - switches between Mock and Remote.
+/// Student repository provider - switches between Mock and SyncAware (Remote with offline queue).
 ///
 /// Copied from [studentRepository].
 @ProviderFor(studentRepository)

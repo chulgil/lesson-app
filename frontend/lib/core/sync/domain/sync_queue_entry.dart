@@ -22,7 +22,6 @@ class SyncQueueEntry {
     this.errorCode,
     this.lastSyncedAt,
     this.clientUpdatedAt,
-    this.versionVector = const {},
   });
 
   factory SyncQueueEntry.fromMap(Map<String, dynamic> map) {
@@ -47,9 +46,6 @@ class SyncQueueEntry {
       errorCode: map['errorCode'] as String?,
       lastSyncedAt: _parseDateTime(map['lastSyncedAt'] as String?),
       clientUpdatedAt: _parseDateTime(map['clientUpdatedAt'] as String?),
-      versionVector: Map<String, dynamic>.from(
-        map['versionVector'] as Map<dynamic, dynamic>? ?? const {},
-      ),
     );
   }
 
@@ -69,7 +65,6 @@ class SyncQueueEntry {
   final String? errorCode;
   final DateTime? lastSyncedAt;
   final DateTime? clientUpdatedAt;
-  final Map<String, dynamic> versionVector;
 
   bool get isRetryable => retryCount < maxRetryCount;
   String get requestFingerprint =>
@@ -86,7 +81,6 @@ class SyncQueueEntry {
     String? errorCode,
     DateTime? lastSyncedAt,
     DateTime? clientUpdatedAt,
-    Map<String, dynamic>? versionVector,
   }) {
     return SyncQueueEntry(
       id: id,
@@ -105,7 +99,6 @@ class SyncQueueEntry {
       errorCode: errorCode,
       lastSyncedAt: lastSyncedAt,
       clientUpdatedAt: clientUpdatedAt ?? this.clientUpdatedAt,
-      versionVector: versionVector ?? this.versionVector,
     );
   }
 
@@ -127,7 +120,6 @@ class SyncQueueEntry {
       'errorCode': errorCode,
       'lastSyncedAt': lastSyncedAt?.toIso8601String(),
       'clientUpdatedAt': clientUpdatedAt?.toIso8601String(),
-      'versionVector': versionVector,
     };
   }
 

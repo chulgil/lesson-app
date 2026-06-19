@@ -1,17 +1,26 @@
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../data/local/student_cache_store.dart';
 import '../../data/repositories/mock_student_repository.dart';
 import '../../data/repositories/remote_student_repository.dart';
+import '../../data/repositories/sync_aware_student_repository.dart';
 import '../../domain/repositories/student_repository.dart';
 
 part 'student_repository_provider.g.dart';
 
-/// Student repository provider - switches between Mock and Remote.
+/// Student repository provider - switches between Mock and SyncAware (Remote with offline queue).
 @Riverpod(keepAlive: true)
 StudentRepository studentRepository(StudentRepositoryRef ref) =>
-    createRepository<StudentRepository>(
+    createSyncAwareRepository<StudentRepository>(
       ref: ref,
       mock: () => MockStudentRepository(),
-      remote: (api) => RemoteStudentRepository(api),
+      syncAware: (api, queue) => SyncAwareStudentRepository(
+        remote: RemoteStudentRepository(api),
+        queue: queue,
+        cache: StudentCacheStore(
+          box: Hive.box<String>(StudentCacheStore.boxName),
+        ),
+      ),
     );

@@ -9,6 +9,7 @@ import '../../../../core/auth/token_storage.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/providers/repository_provider.dart';
+import '../../../../core/sync/presentation/providers/initial_pull_provider.dart';
 import '../../data/repositories/remote_auth_repository.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/entities/user_role.dart';
@@ -112,6 +113,7 @@ class AuthNotifier extends _$AuthNotifier {
       // data-privacy: 개인정보(email)를 로그에 출력하지 않는다
       debugPrint('[Auth] Auto-login succeeded (role=${user.role})');
       state = _stateFromUser(user);
+      _triggerInitialPull(user.id);
     } on UnauthorizedException {
       // Token is invalid/expired and refresh also failed — must re-login
       debugPrint('[Auth] Token invalid (401), clearing tokens');
@@ -137,6 +139,17 @@ class AuthNotifier extends _$AuthNotifier {
       debugPrint('[Auth] Auto-login failed (unexpected): $e');
       state = const AuthUnauthenticated();
     }
+  }
+
+  /// Triggers initial pull for [userId] in the background (fire-and-forget).
+  ///
+  /// Only runs in remote mode; skipped in mock mode (no network layer).
+  /// Safe to call multiple times — [InitialPullService.runIfNeeded] is idempotent.
+  void _triggerInitialPull(String userId) {
+    final isMock = ref.read(mockDataModeProvider);
+    if (isMock) return;
+    final service = ref.read(initialPullServiceProvider);
+    unawaited(service.runIfNeeded(userId));
   }
 
   /// Build the appropriate auth state based on user's role and onboarding status.
@@ -201,6 +214,7 @@ class AuthNotifier extends _$AuthNotifier {
 
       final user = await _authRepository.getMe();
       state = _stateFromUser(user);
+      _triggerInitialPull(user.id);
     } on ApiException {
       state = const AuthUnauthenticated();
       rethrow;
@@ -308,6 +322,7 @@ class AuthNotifier extends _$AuthNotifier {
 
       final user = result.user;
       state = _stateFromUser(user);
+      _triggerInitialPull(user.id);
     } on ApiException {
       state = const AuthUnauthenticated();
       rethrow;
