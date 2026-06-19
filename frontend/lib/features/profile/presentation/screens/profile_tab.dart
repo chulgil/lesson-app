@@ -21,7 +21,6 @@ import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_extended_profile_provider.dart';
 import '../widgets/category_menu_grid.dart';
-import '../widgets/profile_category_sheets.dart';
 import '../widgets/teacher_migration_overlay_gate.dart';
 
 /// Profile tab with user info and 5묶음 카테고리 메뉴 그리드.
@@ -563,11 +562,12 @@ class ProfileTab extends ConsumerWidget {
     return CategoryMenuGrid(
       onOperatingHoursTap: () => context.push(AppRoutes.teacherAvailability),
       onLessonStyleTap: () => context.push(AppRoutes.lessonStyleSettings),
-      onSubscriptionBillingTap: () =>
-          showSubscriptionBillingSheet(context, teacherId),
-      onMyProfileTap: () => showMyProfileSheet(context),
+      onSubscriptionBillingTap: () => context.push(
+        '${AppRoutes.subscriptionBillingCategory}?teacherId=$teacherId',
+      ),
+      onMyProfileTap: () => context.push(AppRoutes.myProfileCategory),
       onPolicyNotificationsTap: () =>
-          showPolicyNotificationsSheet(context, ref),
+          context.push(AppRoutes.policyNotificationsCategory),
     );
   }
 }

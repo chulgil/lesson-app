@@ -102,6 +102,16 @@ class AppRoutes {
   /// spec §6.3 — `PriceTableScreen` 진입로.
   /// `LessonTimeSettingsScreen` §6 가격표 섹션을 분리.
   static const priceTable = '/profile/price-table';
+
+  // #765 — 복합 카테고리 BottomSheet → 정식 라우트 승격.
+  /// 💰 수강권·정산 카테고리 메뉴 화면 (#765). teacherId 쿼리 파라미터 전달.
+  static const subscriptionBillingCategory = '/profile/subscription-billing';
+
+  /// 👤 내 프로필 카테고리 메뉴 화면 (#765).
+  static const myProfileCategory = '/profile/my-profile';
+
+  /// ⚙️ 알림·소식·지원 카테고리 메뉴 화면 (#765).
+  static const policyNotificationsCategory = '/profile/policy-notifications';
   static const tipTemplateManagement = '/profile/templates';
   static const feedbackTemplateManagement = '/profile/feedback-templates';
   static const extendedProfile = '/profile/extended';

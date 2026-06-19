@@ -96,6 +96,9 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.lessonTimeSettings, // redirect-only — still registered
     AppRoutes.lessonStyleSettings,
     AppRoutes.priceTable,
+    AppRoutes.subscriptionBillingCategory,
+    AppRoutes.myProfileCategory,
+    AppRoutes.policyNotificationsCategory,
     AppRoutes.tipTemplateManagement,
     AppRoutes.feedbackTemplateManagement,
     AppRoutes.extendedProfile,
@@ -270,6 +273,9 @@ const _registeredTemplates = <String>{
   '/profile/lesson-time', // redirect-only
   '/profile/lesson-style',
   '/profile/price-table',
+  '/profile/subscription-billing', // #765
+  '/profile/my-profile', // #765
+  '/profile/policy-notifications', // #765
   '/profile/guide-reshow',
   '/profile/templates',
   '/profile/feedback-templates',
@@ -446,6 +452,9 @@ Map<String, String> get _appRoutesMap {
     'lessonTimeSettings': AppRoutes.lessonTimeSettings,
     'lessonStyleSettings': AppRoutes.lessonStyleSettings,
     'priceTable': AppRoutes.priceTable,
+    'subscriptionBillingCategory': AppRoutes.subscriptionBillingCategory,
+    'myProfileCategory': AppRoutes.myProfileCategory,
+    'policyNotificationsCategory': AppRoutes.policyNotificationsCategory,
     'tipTemplateManagement': AppRoutes.tipTemplateManagement,
     'feedbackTemplateManagement': AppRoutes.feedbackTemplateManagement,
     'extendedProfile': AppRoutes.extendedProfile,
