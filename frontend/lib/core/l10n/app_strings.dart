@@ -4196,6 +4196,11 @@ class AppStrings {
 
   /// 수강권이 발급되었습니다 (snackbar: 단건 발급 성공)
   static const subscriptionIssueSuccess = '수강권이 발급되었습니다';
+  /// 후불(선불 미확인) 발급 직후 — 미수금 추적 안내 (검토 #848).
+  static const subscriptionIssuePostpaidSuccess =
+      '수강권을 발급했어요. 입금 확인은 미수금에서 추적하세요';
+  /// 연결 수락 직후 교사 다음 단계 CTA (검토 #848).
+  static const connectionAcceptedIssueCta = '수강권 발급';
 
   /// 발급 실패. 다시 시도해주세요. (snackbar: 발급 실패)
   static const subscriptionIssueFailRetry = '발급 실패. 다시 시도해주세요.';
@@ -4207,6 +4212,14 @@ class AppStrings {
   /// $success명 발급 완료, $fail명 실패 (snackbar: 일괄 발급 부분 성공)
   static String batchSubscriptionIssuePartial(int success, int fail) =>
       '$success명 발급 완료, $fail명 실패';
+
+  /// 일괄 발급 중 이미 제안이 있어 건너뛴 학생들 (검토 #849).
+  static String batchSubscriptionSkipped(String names) =>
+      '이미 진행 중인 제안이 있어 건너뜀: $names';
+
+  /// 일괄 발급 실패 학생들 (검토 #849).
+  static String batchSubscriptionFailed(String names) =>
+      '발급 실패: $names';
 
   // -- Subscription Display Layer (badge + status colors, P2 5-3b-7a) --
 

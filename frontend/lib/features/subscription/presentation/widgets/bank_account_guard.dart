@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../search/search_facade.dart' show teacherFullProfileProvider;
 
 /// #847 입금 계좌 미등록 시 수강권 발급/제안을 막고 계좌 등록을 유도한다.
@@ -26,29 +26,16 @@ Future<bool> ensureBankAccountRegistered({
   if (hasAccount) return true;
   if (!context.mounted) return false;
 
-  await showDialog<void>(
+  await showNotebookDialog<void>(
     context: context,
-    builder:
-        (dialogContext) => AlertDialog(
-          title: const Text(AppStrings.bankAccountRequiredTitle),
-          content: const Text(AppStrings.bankAccountRequiredBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text(AppStrings.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                context.push(AppRoutes.bankAccountEdit);
-              },
-              child: Text(
-                AppStrings.bankAccountRequiredCta,
-                style: TextStyle(color: AppColors.paperAccent),
-              ),
-            ),
-          ],
-        ),
+    title: AppStrings.bankAccountRequiredTitle,
+    message: AppStrings.bankAccountRequiredBody,
+    confirmLabel: AppStrings.bankAccountRequiredCta,
+    cancelLabel: AppStrings.cancel,
+    onConfirm: () {
+      Navigator.of(context).pop();
+      context.push(AppRoutes.bankAccountEdit);
+    },
   );
   return false;
 }

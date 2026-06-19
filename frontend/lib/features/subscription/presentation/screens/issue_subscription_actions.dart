@@ -16,6 +16,7 @@ import '../../domain/entities/subscription.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../providers/proposal_draft_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
+import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/duplicate_proposal_dialog.dart';
 import '../widgets/bank_account_guard.dart';
@@ -233,9 +234,14 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       }
 
       if (mounted) {
+        final isPostpaid = !isFreeIssue && !isPaymentConfirmed;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.subscriptionIssueSuccess),
+          SnackBar(
+            content: Text(
+              isPostpaid
+                  ? AppStrings.subscriptionIssuePostpaidSuccess
+                  : AppStrings.subscriptionIssueSuccess,
+            ),
             backgroundColor: AppColors.paperAccent,
           ),
         );
@@ -518,13 +524,27 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       int successCount = 0;
-      int failCount = 0;
+      final skippedStudentIds = <String>[];
+      final failedStudentIds = <String>[];
+      final batchTeacherId = ref.read(currentUserIdProvider);
 
       final now = DateTime.now();
       final flow = ref.read(subscriptionIssueFlowControllerProvider);
       for (int i = 0; i < allStudentIds.length; i++) {
         final studentId = allStudentIds[i];
         try {
+          // #849 이미 진행 중인 제안이 있으면 중복 발급을 조용히 건너뜀.
+          try {
+            final existing = await ref
+                .read(subscriptionProposalRepositoryProvider)
+                .getActiveProposal(batchTeacherId, studentId);
+            if (existing != null) {
+              skippedStudentIds.add(studentId);
+              continue;
+            }
+          } catch (_) {
+            // 조회 실패는 BE 409 가 2차 방어 — 발급 진행.
+          }
           // Resolve the student's membership (and teacher) so batch-issued
           // subscriptions carry a membership id and surface in teacher-scoped
           // lists / unpaid summary (getByTeacherId filters by membership).
@@ -594,13 +614,21 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           // 다른 학생도 의미가 있으므로 한 번 노출 후 종료.
           rethrow;
         } catch (e) {
-          failCount++;
+          failedStudentIds.add(studentId);
           debugPrint('Failed to issue subscription for student $studentId: $e');
         }
       }
 
+      final skippedNames = skippedStudentIds.isEmpty
+          ? ''
+          : (await Future.wait(skippedStudentIds.map(flow.studentName)))
+                .join(', ');
+      final failedNames = failedStudentIds.isEmpty
+          ? ''
+          : (await Future.wait(failedStudentIds.map(flow.studentName)))
+                .join(', ');
       if (mounted) {
-        if (failCount == 0) {
+        if (skippedStudentIds.isEmpty && failedStudentIds.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -610,18 +638,21 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             ),
           );
         } else {
+          final lines = <String>[];
+          if (successCount > 0) {
+            lines.add(AppStrings.batchSubscriptionIssueSuccess(successCount));
+          }
+          if (skippedNames.isNotEmpty) {
+            lines.add(AppStrings.batchSubscriptionSkipped(skippedNames));
+          }
+          if (failedNames.isNotEmpty) {
+            lines.add(AppStrings.batchSubscriptionFailed(failedNames));
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                AppStrings.batchSubscriptionIssuePartial(
-                  successCount,
-                  failCount,
-                ),
-              ),
-              backgroundColor:
-                  failCount == allStudentIds.length
-                      ? AppColors.paperAccent
-                      : AppColors.paperAccent,
+              content: Text(lines.join('\n')),
+              backgroundColor: AppColors.paperAccent,
+              duration: const Duration(seconds: 6),
             ),
           );
         }
