@@ -1,0 +1,20 @@
+# cg 컴패니언 레지스트리 — 옵트인 외부 도구. cg 코어는 번들하지 않는다(의존성0 유지).
+# 도구는 별도 설치, cg 는 탐지 + 브리지 스킬만 제공.
+[understand-anything]
+purpose = "tree-sitter 기반 코드 지식그래프 + 의존성 시각화 대시보드"
+kind = "claude-plugin"
+detect = "understand-anything"
+install = "/plugin marketplace add Egonex-AI/Understand-Anything 그리고 /plugin install understand-anything"
+use = "/understand · /understand-knowledge"
+skill = "cg-companion-understand"
+repo = "https://github.com/Egonex-AI/Understand-Anything"
+
+[agentmemory]
+purpose = "벡터 의미검색 + 자동 회상 에이전트 메모리 (별도 서버 :3111)"
+kind = "cli-server"
+detect = "agentmemory"
+detect_port = 3111
+install = "npm install -g @agentmemory/agentmemory (서버 기동: agentmemory)"
+use = "agentmemory 서버 기동 후 자동 hook 캡처 + 회상"
+skill = "cg-companion-agentmemory"
+repo = "https://github.com/rohitg00/agentmemory"
