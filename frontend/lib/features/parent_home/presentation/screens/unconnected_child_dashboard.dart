@@ -62,8 +62,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               children: [
                 _buildChildHeader(activeChild),
                 const SizedBox(height: AppSpacing.space6),
-                _buildFeatureCards(context, activeChild),
-                const SizedBox(height: AppSpacing.space6),
+                // #78 "연습 기록" 카드는 NO-OP(스낵바만, 미구현 화면) 이라 제거.
                 _buildTeacherConnectionBanner(context),
                 const SizedBox(height: AppSpacing.space6),
                 _buildPracticeHistory(),
@@ -150,34 +149,6 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               ),
             ],
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeatureCards(BuildContext context, ChildProfile child) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
-        Text(
-          AppStrings.parentHomeTodayPractice,
-          style: NotebookTypography.sectionTitle,
-        ),
-        const SizedBox(height: AppSpacing.space3),
-        Row(
-          children: [
-            Expanded(
-              child: _FeatureCard(
-                title: '연습 기록',
-                subtitle: '시간 기반 연습',
-                icon: Icons.timer,
-                color: AppColors.paperAccent,
-                onTap: () => _startPractice(context, child),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-          ],
         ),
       ],
     );
@@ -279,21 +250,11 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
-            Text(
-              AppStrings.parentHomeWeeklyPractice,
-              style: NotebookTypography.sectionTitle,
-            ),
-            TextButton(
-              onPressed: () {
-                // TODO: Navigate to practice history
-              },
-              child: const Text(AppStrings.viewAll),
-            ),
-          ],
+        // Notebook × Score: 정적 섹션 헤더 (§7.17) — Playfair sectionTitle.
+        // #78 "전체 보기" NO-OP(TODO) 버튼 제거.
+        Text(
+          AppStrings.parentHomeWeeklyPractice,
+          style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space3),
         _buildWeeklyPracticeGrid(),
@@ -335,37 +296,33 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color:
-                    isToday
-                        ? AppColors.paperAccent
-                        : hasPractice
-                        ? AppColors.paperOk.withValues(alpha: 0.1)
-                        : isPast
-                        ? AppColors.paperDark
-                        : Colors.transparent,
+                color: isToday
+                    ? AppColors.paperAccent
+                    : hasPractice
+                    ? AppColors.paperOk.withValues(alpha: 0.1)
+                    : isPast
+                    ? AppColors.paperDark
+                    : Colors.transparent,
                 borderRadius: BorderRadius.zero,
-                border:
-                    isToday
-                        ? null
-                        : Border.all(
-                          color:
-                              hasPractice
-                                  ? AppColors.paperOk
-                                  : AppColors.inkQuaternary,
-                          width: hasPractice ? 2 : 1,
-                        ),
+                border: isToday
+                    ? null
+                    : Border.all(
+                        color: hasPractice
+                            ? AppColors.paperOk
+                            : AppColors.inkQuaternary,
+                        width: hasPractice ? 2 : 1,
+                      ),
               ),
               child: Center(
                 child: Text(
                   '${date.day}',
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                    color:
-                        isToday
-                            ? AppColors.paper
-                            : hasPractice
-                            ? AppColors.paperOk
-                            : AppColors.inkSecondary,
+                    color: isToday
+                        ? AppColors.paper
+                        : hasPractice
+                        ? AppColors.paperOk
+                        : AppColors.inkSecondary,
                   ),
                 ),
               ),
@@ -376,105 +333,13 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     );
   }
 
-  void _startPractice(BuildContext context, ChildProfile child) {
-    // TODO: Navigate to time-based practice screen for unconnected child
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${child.name}의 연습을 시작합니다'),
-        backgroundColor: AppColors.paperAccent,
-      ),
-    );
-  }
-
   void _showFindTeacherDialog(BuildContext context) {
     // TODO: Navigate to teacher search
     context.push(AppRoutes.teacherSearch);
   }
 
   void _enterInviteCode(BuildContext context) {
-    // TODO: Show invite code input dialog
-    showNotebookDialog(
-      context: context,
-      titleWidget: const Text(AppStrings.parentHomeInviteCode),
-      content: const TextField(
-        decoration: InputDecoration(
-          hintText: AppStrings.parentHomeInviteCodeHint,
-          border: OutlineInputBorder(),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(AppStrings.cancel),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            // TODO: Process invite code
-            Navigator.pop(context);
-          },
-          child: const Text(AppStrings.parentHomeConnect),
-        ),
-      ],
-    );
-  }
-}
-
-class _FeatureCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _FeatureCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        decoration: BoxDecoration(
-          color: AppColors.paper,
-          borderRadius: BorderRadius.zero,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.zero,
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            // Notebook × Score: _FeatureCard(icon+title+subtitle) helper 의
-            // title 은 Playfair sectionTitle 로 통일 (§7.17).
-            Text(
-              title,
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.ink,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space1),
-            Text(
-              subtitle,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    // #78 NO-OP 인라인 다이얼로그(코드 미처리) 제거 → 실제 학부모 초대코드 화면으로.
+    context.push(AppRoutes.parentInviteCode);
   }
 }
