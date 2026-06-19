@@ -459,7 +459,7 @@ class RemoteTeacherAvailabilityRepository
       slotStartInterval: (json['slot_start_interval'] as num?)?.toInt() ?? 30,
       breakTimeBetweenLessons:
           (json['break_time_between_lessons'] as num?)?.toInt() ?? 0,
-      minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 24,
+      minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 0,
     );
   }
 

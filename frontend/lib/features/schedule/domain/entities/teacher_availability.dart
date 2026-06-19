@@ -69,7 +69,7 @@ class TeacherAvailability {
     this.updatedAt,
     this.slotStartInterval = 60,
     this.breakTimeBetweenLessons = 10,
-    this.minBookingHours = 24,
+    this.minBookingHours = 0,
   });
 
   factory TeacherAvailability.fromJson(Map<String, dynamic> json) =>

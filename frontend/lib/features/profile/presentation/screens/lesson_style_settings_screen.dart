@@ -1,7 +1,7 @@
 // W3 Task 3.2 — LessonStyleSettingsScreen (수업방식 묶음).
 // spec §6.2 — 3 항목 단일 화면:
 //   ① 레슨 1회 시간 (라디오 — 30/45/50/60분, 기본 50분)
-//   ② 최소 사전 예약 시간 (라디오 — 1/2/3/6/12/24/48/72시간, 기본 24)
+//   ② 최소 사전 예약 시간 (라디오 — 0(제한 없음)/1/2/3/6/12/24/48/72시간, 기본 0)
 //   ③ 학생 안내 메시지 (TextField — 빈 입력 시 defaultGuidanceMessage fallback)
 //
 // W1 SSOT 사용:
@@ -117,13 +117,13 @@ class _DurationSection extends ConsumerWidget {
 
 /// ② 최소 사전 예약 시간 섹션.
 ///
-/// 1/2/3/6/12/24/48/72 시간 라디오 (기본 24).
+/// 0(제한 없음)/1/2/3/6/12/24/48/72 시간 라디오 (기본 0).
 class _MinBookingSection extends ConsumerWidget {
   final int current;
 
   const _MinBookingSection({required this.current});
 
-  static const _options = <int>[1, 2, 3, 6, 12, 24, 48, 72];
+  static const _options = <int>[0, 1, 2, 3, 6, 12, 24, 48, 72];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -151,6 +151,9 @@ class _MinBookingSection extends ConsumerWidget {
   }
 
   String _formatHours(int hours) {
+    if (hours <= 0) {
+      return '제한 없음';
+    }
     if (hours < 24) {
       return '$hours시간 전';
     }

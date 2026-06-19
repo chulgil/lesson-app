@@ -28,7 +28,7 @@ TeacherSettings _$TeacherSettingsFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updated_at'] as String),
       breakTimeBetweenLessons:
           (json['break_time_between_lessons'] as num?)?.toInt() ?? 0,
-      minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 24,
+      minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 0,
       lessonPriceTable:
           (json['lesson_price_table'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, Map<String, int>.from(e as Map)),

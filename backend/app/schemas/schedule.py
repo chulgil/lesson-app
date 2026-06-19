@@ -67,7 +67,7 @@ class AvailabilityResponse(BaseModel):
     # Settings (stored in TeacherSettings, returned for convenience)
     slot_duration_minutes: int = 30
     break_time_between_lessons: int = 10
-    min_booking_hours: int = 24
+    min_booking_hours: int = 0
     auto_generate_weeks: int = 4
     slot_start_interval: int = 30
 

@@ -1884,6 +1884,10 @@ class AppStrings {
   /// 예약 실패 (이미 다른 학생이 예약한 슬롯 등)
   static const lessonBookingFailed = '예약에 실패했습니다. 다른 시간을 선택해주세요';
 
+  /// 리드타임 미달 안내: "최소 24시간 전에 예약할 수 있어요" (#850)
+  static String lessonBookingTooSoon(int hours) =>
+      '최소 $hours시간 전에 예약할 수 있어요';
+
   /// 미리보기: "선생님 · 50분 · 잔여 N회"
   static String lessonBookingPreview(String teacher, int minutes) =>
       '$teacher · $minutes분';
