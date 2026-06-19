@@ -207,11 +207,15 @@ class LessonCard extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.only(top: 2),
-      child: Row(
+      // Wrap(=Row 대체): contextBadge + SubscriptionBadge 가 한 줄에 안 맞으면
+      // 배지가 다음 줄로 흐른다. Row 는 고정 폭 SubscriptionBadge(ellipsis 없음)
+      // 때문에 좁은 info 칼럼에서 6.5px 넘침(#853) — Wrap 은 수평 오버플로우 원천 제거.
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 2,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          if (contextBadge != null) Flexible(child: contextBadge),
-          if (contextBadge != null && subscription != null)
-            const SizedBox(width: 6),
+          if (contextBadge != null) contextBadge,
           if (subscription != null)
             SubscriptionBadge(subscription: subscription),
         ],
