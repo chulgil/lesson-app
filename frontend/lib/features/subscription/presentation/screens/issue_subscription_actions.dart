@@ -18,6 +18,7 @@ import '../providers/proposal_draft_provider.dart';
 import '../providers/subscription_issue_flow_provider.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/duplicate_proposal_dialog.dart';
+import '../widgets/bank_account_guard.dart';
 
 UnifiedRequestStatus lessonRequestStatusForIssuedSubscription() =>
     UnifiedRequestStatus.subscriptionIssued;
@@ -114,6 +115,16 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       studentName: studentNameForGuard,
     );
     if (!canProceed || !mounted) return;
+
+    // #847 결제 필요(선불 미확인) 발급은 입금 계좌 등록 필수.
+    if (!isFreeIssue && !isPaymentConfirmed) {
+      final bankOk = await ensureBankAccountRegistered(
+        context: context,
+        ref: ref,
+        teacherId: ref.read(currentUserIdProvider),
+      );
+      if (!bankOk || !mounted) return;
+    }
 
     DateTime? endDate;
     int? computedTotalLessons;
