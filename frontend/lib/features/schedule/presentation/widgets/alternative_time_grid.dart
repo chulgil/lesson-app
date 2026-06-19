@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -111,17 +112,14 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     int startHour = 9;
     if (lessons.isNotEmpty) {
       final minHour = lessons
-          .map((l) => int.parse(l.startTime.split(':')[0]))
+          .map((l) => ClockTime.parse(l.startTime).hour)
           .reduce((a, b) => a < b ? a : b);
       startHour = minHour < startHour ? minHour : startHour;
     }
     return startHour;
   }
 
-  int _parseTimeMinutes(String time) {
-    final parts = time.split(':');
-    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
-  }
+  int _parseTimeMinutes(String time) => ClockTime.parse(time).inMinutes;
 
   int _lessonEndMinutes(Lesson lesson) =>
       _parseTimeMinutes(lesson.startTime) + lesson.duration;
@@ -180,7 +178,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     int endHour = 21;
     if (lessons.isNotEmpty) {
       final minHour = lessons
-          .map((l) => int.parse(l.startTime.split(':')[0]))
+          .map((l) => ClockTime.parse(l.startTime).hour)
           .reduce((a, b) => a < b ? a : b);
       final maxHour = lessons
           .map((l) {

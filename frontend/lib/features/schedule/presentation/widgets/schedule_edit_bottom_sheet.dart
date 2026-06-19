@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -46,8 +47,8 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
   }
 
   TimeOfDay _parseTime(String time) {
-    final parts = time.split(':');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    final clock = ClockTime.parse(time); // total — never throws (#64)
+    return TimeOfDay(hour: clock.hour, minute: clock.minute);
   }
 
   String _formatTime(TimeOfDay time) {
@@ -101,24 +102,23 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                     return ChoiceChip(
                       label: Text(days[index]),
                       selected: isSelected,
-                      onSelected:
-                          isEditing
-                              ? null
-                              : (selected) {
-                                if (selected) {
-                                  setState(() => _selectedDay = index);
-                                }
-                              },
+                      onSelected: isEditing
+                          ? null
+                          : (selected) {
+                              if (selected) {
+                                setState(() => _selectedDay = index);
+                              }
+                            },
                       selectedColor: AppColors.paperAccentSoft,
                       labelStyle: AppTypography.bodySmall.copyWith(
-                        color:
-                            isSelected
-                                ? AppColors.paperAccent
-                                : isWeekend
-                                ? AppColors.paperAccent
-                                : AppColors.inkSecondary,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected
+                            ? AppColors.paperAccent
+                            : isWeekend
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     );
                   }),
@@ -193,7 +193,9 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: Text(isEditing ? AppStrings.edit : AppStrings.add),
+                        child: Text(
+                          isEditing ? AppStrings.edit : AppStrings.add,
+                        ),
                       ),
                     ),
                   ],

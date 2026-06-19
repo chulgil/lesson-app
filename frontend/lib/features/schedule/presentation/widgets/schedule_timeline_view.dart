@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -87,8 +88,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       // Scroll to first lesson with 40px top margin
       final sortedLessons = List<Lesson>.from(widget.lessons)
         ..sort((a, b) => a.startTime.compareTo(b.startTime));
-      final parts = sortedLessons.first.startTime.split(':');
-      final minutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final minutes = ClockTime.parse(sortedLessons.first.startTime).inMinutes;
       final offset = _minutesToOffset(minutes) - 40;
       _scrollController.jumpTo(
         offset.clamp(0, _scrollController.position.maxScrollExtent),
@@ -236,8 +236,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
     // Check if tap is on an existing lesson or travel time block
     for (final lesson in lessons) {
-      final parts = lesson.startTime.split(':');
-      final lessonStart = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final lessonStart = ClockTime.parse(lesson.startTime).inMinutes;
       final lessonEnd = lessonStart + lesson.duration;
       final travelStart = lessonStart - lesson.travelTimeMinutes;
       final tappedMinutes = hour * 60 + minute;
@@ -278,10 +277,8 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     if (availability != null) {
       for (final schedule in availability.weeklySchedules) {
         if (schedule.isActive) {
-          final startParts = schedule.startTime.split(':');
-          final endParts = schedule.endTime.split(':');
-          final startH = int.parse(startParts[0]);
-          final endH = int.parse(endParts[0]);
+          final startH = ClockTime.parse(schedule.startTime).hour;
+          final endH = ClockTime.parse(schedule.endTime).hour;
           if (startH < earliest) earliest = startH;
           if (endH > latest) latest = endH;
         }
@@ -290,8 +287,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
     // Consider lesson times + travel time BEFORE lesson (some lessons may be outside availability)
     for (final lesson in sortedLessons) {
-      final parts = lesson.startTime.split(':');
-      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final startMinutes = ClockTime.parse(lesson.startTime).inMinutes;
       final travelStartMinutes = startMinutes - lesson.travelTimeMinutes;
       final travelStartHour = (travelStartMinutes / 60).floor();
       final endMinutes = startMinutes + lesson.duration;
@@ -359,8 +355,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     int nextMinutesUntil = 0;
     if (_isToday) {
       for (final lesson in lessons) {
-        final parts = lesson.startTime.split(':');
-        final lessonMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+        final lessonMinutes = ClockTime.parse(lesson.startTime).inMinutes;
         if (lessonMinutes > nowMinutes) {
           nextLesson = lesson;
           nextMinutesUntil = lessonMinutes - nowMinutes;
@@ -372,8 +367,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     final widgets = <Widget>[];
 
     for (final lesson in lessons) {
-      final parts = lesson.startTime.split(':');
-      final lessonMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final lessonMinutes = ClockTime.parse(lesson.startTime).inMinutes;
       final endMinutes = lessonMinutes + lesson.duration;
       final top =
           ((lessonMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
@@ -537,8 +531,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
     // Check if any lesson is in progress
     for (final lesson in sortedLessons) {
-      final parts = lesson.startTime.split(':');
-      final start = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final start = ClockTime.parse(lesson.startTime).inMinutes;
       final end = start + lesson.duration;
       if (start <= nowMinutes && end > nowMinutes) {
         final remaining = end - nowMinutes;
@@ -548,8 +541,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
     // Find next lesson
     for (final lesson in sortedLessons) {
-      final parts = lesson.startTime.split(':');
-      final start = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final start = ClockTime.parse(lesson.startTime).inMinutes;
       if (start > nowMinutes) {
         final until = start - nowMinutes;
         if (until <= 60) {
