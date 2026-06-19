@@ -62,7 +62,16 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
                 },
               ),
               loading: () => const _LoadingPlaceholder(),
-              error: (_, __) => const SizedBox.shrink(),
+              // #74 무음 실패(SizedBox.shrink) → 보이는 에러 상태
+              error: (_, __) => Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                child: Text(
+                  AppStrings.errorOccurred,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+              ),
             ),
             SizedBox(height: AppSpacing.space5),
 
