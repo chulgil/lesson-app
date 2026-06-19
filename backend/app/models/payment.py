@@ -48,7 +48,7 @@ class Payment(UUIDMixin, TimestampMixin, Base):
     student_id: Mapped[str] = mapped_column(String(36), nullable=False)
     student_name: Mapped[str] = mapped_column(String(100), nullable=False)
     type: Mapped[PaymentType] = mapped_column(
-        Enum(PaymentType, native_enum=True),
+        Enum(PaymentType, native_enum=True, name="paymentcategorytype"),
         nullable=False,
         default=PaymentType.regular,
     )
