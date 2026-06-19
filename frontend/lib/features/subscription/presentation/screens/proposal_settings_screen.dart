@@ -454,6 +454,7 @@ class _ProposalSettingsScreenState
                   SizedBox(
                     width: 80,
                     child: DropdownButtonFormField<int>(
+                      isExpanded: true,
                       initialValue: _discountPercent,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
@@ -490,6 +491,7 @@ class _ProposalSettingsScreenState
                   SizedBox(
                     width: 100,
                     child: DropdownButtonFormField<int>(
+                      isExpanded: true,
                       initialValue: _discountHours,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(

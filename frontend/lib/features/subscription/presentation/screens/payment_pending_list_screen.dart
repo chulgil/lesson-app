@@ -141,10 +141,14 @@ class _Row extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        item.studentName,
-                        style: NotebookTypography.sectionTitle.copyWith(
-                          color: AppColors.ink,
+                      // #853: 긴 학생명이 D+N 배지와 함께 Row 를 넘치지 않도록 Flexible+ellipsis.
+                      Flexible(
+                        child: Text(
+                          item.studentName,
+                          overflow: TextOverflow.ellipsis,
+                          style: NotebookTypography.sectionTitle.copyWith(
+                            color: AppColors.ink,
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
