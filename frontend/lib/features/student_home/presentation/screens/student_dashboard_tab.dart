@@ -240,7 +240,7 @@ class StudentDashboardTab extends ConsumerWidget {
                     color: AppColors.ink,
                   ),
                   label: Text(
-                    '연습 기록 더보기',
+                    AppStrings.studentPracticeRecordMore,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.bodyMedium.copyWith(

@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../subscription/subscription_facade.dart';
+import '../../../../../core/l10n/app_strings.dart';
 
 /// Banner showing pending subscription proposals for a student.
 class PendingProposalsBanner extends ConsumerWidget {
@@ -65,15 +66,15 @@ class PendingProposalsBanner extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '수강권 제안이 도착했어요!',
+                        AppStrings.notifProposalTitle,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
                         proposal.isAutoProposal
-                            ? (proposal.discountReason ?? '지금 확인하고 혜택 받으세요')
-                            : (proposal.message ?? '선생님이 수강권을 제안했습니다'),
+                            ? (proposal.discountReason ?? AppStrings.pendingProposalDefaultReason)
+                            : (proposal.message ?? AppStrings.pendingProposalDefaultMessage),
                         style: AppTypography.caption.copyWith(
                           color: AppColors.inkSecondary,
                         ),

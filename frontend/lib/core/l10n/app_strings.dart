@@ -9623,4 +9623,32 @@ class AppStrings {
 
   // [검토 #40] UX wave7
   static const String profilePreviewAndPublic = '미리보기 · 공개 설정';
+
+  // [검토 #96] UX 0619 — 학생/학부모 i18n (하드코딩 한국어 → AppStrings)
+  // 학생 대시보드
+  static const studentPracticeRecordMore = '연습 기록 더보기';
+  // 수강권 갱신 배너 (subscription_renewal_banner)
+  static const renewalBannerProposalArrivedTitle = '갱신 제안이 도착했어요!';
+  static const subscriptionExpiringSoonTitle = '수강권이 곧 만료됩니다';
+  static const renewalBannerProposalSubtitle = '선생님이 수강권 갱신을 제안했습니다';
+  static const renewalBannerSendRequestSubtitle = '갱신 요청을 보내 레슨을 이어가세요';
+  static String renewalBannerRemainingSubtitle(int remaining, int days) =>
+      '남은 횟수 $remaining회 · $days일 남음';
+  static const renewalBannerCheckCta = '확인하기';
+  // 수강권 제안 배너 (pending_proposals_banner)
+  static const pendingProposalDefaultReason = '지금 확인하고 혜택 받으세요';
+  static const pendingProposalDefaultMessage = '선생님이 수강권을 제안했습니다';
+  // 알림 목록 (notification_list_screen)
+  static const notifMarkAllRead = '모두 읽음';
+  static const notifEmptyTitle = '알림이 없습니다';
+  static const notifEmptySubtitle = '새로운 소식이 있으면 알려드릴게요';
+  static String notifNoUnreadSubtitle(String filterName) =>
+      '$filterName 탭에서 전체 알림을 확인하세요';
+  static const notifLoadError = '알림을 불러올 수 없습니다';
+  // 학생 요약 공유 (student_summary_screen)
+  static const summaryLessonDateLabel = '수업일';
+  static const summaryKeyPointsLabel = '핵심 포인트';
+  // 팔로우 피드 (follow_feed_screen)
+  static const followFeedLoadError = '소식을 불러올 수 없습니다';
+  static const followFeedEmptySubtitle = '팔로우한 선생님의 소식이 표시됩니다';
 }

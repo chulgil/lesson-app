@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -58,19 +59,19 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
 
         final title =
             hasRenewalProposal
-                ? '갱신 제안이 도착했어요!'
-                : (hasExpired ? '수강권이 만료되었습니다' : '수강권이 곧 만료됩니다');
+                ? AppStrings.renewalBannerProposalArrivedTitle
+                : (hasExpired ? AppStrings.subscriptionExpiredTitle : AppStrings.subscriptionExpiringSoonTitle);
 
         final targetSub =
             hasExpired ? expiredSubs.first : expiringSoonSubs.first;
         final subtitle =
             hasRenewalProposal
-                ? '선생님이 수강권 갱신을 제안했습니다'
+                ? AppStrings.renewalBannerProposalSubtitle
                 : (hasExpired
-                    ? '갱신 요청을 보내 레슨을 이어가세요'
-                    : '남은 횟수 ${targetSub.remainingLessons ?? 0}회 · ${targetSub.daysUntilExpiration ?? 0}일 남음');
+                    ? AppStrings.renewalBannerSendRequestSubtitle
+                    : AppStrings.renewalBannerRemainingSubtitle(targetSub.remainingLessons ?? 0, targetSub.daysUntilExpiration ?? 0));
 
-        final ctaText = hasRenewalProposal ? '확인하기' : '갱신 요청';
+        final ctaText = hasRenewalProposal ? AppStrings.renewalBannerCheckCta : AppStrings.subscriptionRenewalAction;
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space3),

@@ -32,7 +32,7 @@ class FollowFeedScreen extends ConsumerWidget {
         error:
             (e, _) => Center(
               child: Text(
-                '소식을 불러올 수 없습니다',
+                AppStrings.followFeedLoadError,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -67,7 +67,7 @@ class FollowFeedScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '팔로우한 선생님의 소식이 표시됩니다',
+              AppStrings.followFeedEmptySubtitle,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
