@@ -1,5 +1,7 @@
 # Golden Principles
 
+> 카파시 4원칙(코딩전생각/단순함/수술하듯/목표지향)의 원전: Andrej Karpathy — https://x.com/karpathy/status/2015883857489522876
+
 > 12 core principles for writing clean, maintainable code.
 
 ## 1. Immutability
