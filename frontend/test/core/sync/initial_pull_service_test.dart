@@ -1,0 +1,167 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_test/hive_test.dart';
+import 'package:lessonaza/core/sync/application/connectivity_service.dart';
+import 'package:lessonaza/core/sync/application/initial_pull_service.dart';
+import 'package:lessonaza/features/lessons/data/local/lesson_cache_store.dart';
+import 'package:lessonaza/features/lessons/data/repositories/remote_lesson_repository.dart';
+import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
+import 'package:mocktail/mocktail.dart';
+
+// ---------------------------------------------------------------------------
+// Mocks
+// ---------------------------------------------------------------------------
+
+class MockRemoteLessonRepository extends Mock
+    implements RemoteLessonRepository {}
+
+class MockConnectivityService extends Mock implements ConnectivityService {}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+Lesson _testLesson({String id = 'lesson-1'}) {
+  return Lesson(
+    id: id,
+    studentId: 'student-1',
+    studentName: 'Test Student',
+    teacherId: 'teacher-1',
+    instrument: 'piano',
+    date: DateTime(2026, 6, 1),
+    startTime: '10:00',
+    status: LessonStatus.scheduled,
+    createdAt: DateTime(2026, 6, 1),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+void main() {
+  late MockRemoteLessonRepository remote;
+  late MockConnectivityService connectivity;
+  late LessonCacheStore cache;
+  late InitialPullService service;
+  const userId = 'teacher_test_001';
+
+  setUp(() async {
+    await setUpTestHive();
+    final box = await Hive.openBox<String>(LessonCacheStore.boxName);
+
+    remote = MockRemoteLessonRepository();
+    connectivity = MockConnectivityService();
+    cache = LessonCacheStore(box: box);
+
+    service = InitialPullService(
+      remoteLessons: remote,
+      lessonCache: cache,
+      connectivity: connectivity,
+    );
+  });
+
+  tearDown(() async {
+    await tearDownTestHive();
+  });
+
+  group('InitialPullService', () {
+    test('첫 로그인 시 lessons를 pull하여 캐시에 시드한다', () async {
+      // Arrange — first login: no flag, online
+      final lessons = [_testLesson(id: 'l1'), _testLesson(id: 'l2')];
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(() => remote.getLessons()).thenAnswer((_) async => lessons);
+
+      // Pre-condition: cache is empty
+      expect(cache.getLessons(LessonCacheStore.keyAll()), isNull);
+
+      // Act
+      await service.runIfNeeded(userId);
+
+      // Assert — cache seeded with server lessons
+      final cached = cache.getLessons(LessonCacheStore.keyAll());
+      expect(cached, isNotNull);
+      expect(cached!.length, 2);
+      expect(cached.map((l) => l.id).toList(), containsAll(['l1', 'l2']));
+
+      verify(() => remote.getLessons()).called(1);
+    });
+
+    test('플래그가 세팅된 경우 두 번째 호출에서 pull을 건너뛴다', () async {
+      // Arrange — set flag by running once successfully
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(() => remote.getLessons()).thenAnswer((_) async => [_testLesson()]);
+
+      await service.runIfNeeded(userId);
+      verify(() => remote.getLessons()).called(1);
+
+      // Act — second call, same user
+      await service.runIfNeeded(userId);
+
+      // Assert — remote NOT called a second time
+      verifyNever(() => remote.getLessons());
+    });
+
+    test('오프라인 상태이면 pull을 건너뛰고 플래그를 세팅하지 않는다', () async {
+      // Arrange — offline
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+
+      // Act
+      await service.runIfNeeded(userId);
+
+      // Assert — remote never called, cache still empty
+      verifyNever(() => remote.getLessons());
+      expect(cache.getLessons(LessonCacheStore.keyAll()), isNull);
+    });
+
+    test('오프라인 skip 후 다음 온라인 로그인에서 pull이 실행된다', () async {
+      // Phase 1: offline
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+      await service.runIfNeeded(userId);
+      verifyNever(() => remote.getLessons());
+
+      // Phase 2: online — same user, flag was NOT set during offline skip
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(
+        () => remote.getLessons(),
+      ).thenAnswer((_) async => [_testLesson(id: 'l-retry')]);
+
+      await service.runIfNeeded(userId);
+
+      final cached = cache.getLessons(LessonCacheStore.keyAll());
+      expect(cached, isNotNull);
+      expect(cached!.first.id, 'l-retry');
+      verify(() => remote.getLessons()).called(1);
+    });
+
+    test('서로 다른 userId는 각자 독립된 플래그를 가진다', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(() => remote.getLessons()).thenAnswer((_) async => [_testLesson()]);
+
+      await service.runIfNeeded('user_A');
+      await service.runIfNeeded('user_B');
+
+      // Both users trigger a pull (each has their own flag)
+      verify(() => remote.getLessons()).called(2);
+    });
+
+    test('remote 에러 발생 시 예외를 삼키고 플래그를 세팅하지 않는다', () async {
+      // Arrange
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(() => remote.getLessons()).thenThrow(Exception('network error'));
+
+      // Act — should not throw
+      await expectLater(service.runIfNeeded(userId), completes);
+
+      // Assert — flag not set, so retry will happen on next call
+      when(
+        () => remote.getLessons(),
+      ).thenAnswer((_) async => [_testLesson(id: 'l-recovered')]);
+      await service.runIfNeeded(userId);
+
+      final cached = cache.getLessons(LessonCacheStore.keyAll());
+      expect(cached, isNotNull);
+      expect(cached!.first.id, 'l-recovered');
+    });
+  });
+}
