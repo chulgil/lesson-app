@@ -8888,6 +8888,46 @@ class AppStrings {
   /// 처리 실패 스낵바.
   static const attendanceActionFailed = '처리에 실패했습니다. 다시 시도해주세요.';
 
+  // 다중선택 일괄 처리 (#768 ①).
+  /// 일괄 완료 확인 다이얼로그 제목.
+  static const batchCompleteDialogTitle = '선택한 레슨 완료';
+
+  /// 일괄 완료 확인 다이얼로그 본문 (차감 고지).
+  static String batchCompleteDialogMessage(int count) =>
+      '$count건을 출석 확인해요. 수강권이 있는 레슨은 각 1회 차감돼요.';
+
+  /// 일괄 휴강 확인 다이얼로그 제목.
+  static const batchDayOffDialogTitle = '선택한 레슨 휴강';
+
+  /// 일괄 휴강 확인 다이얼로그 본문 (차감 없음).
+  static String batchDayOffDialogMessage(int count) =>
+      '$count건을 휴강 처리해요. 수강권 차감은 없어요.';
+
+  /// 일괄 완료 완료 스낵바.
+  static String batchCompleteDoneSnack(int count) => '$count건을 완료했어요.';
+
+  /// 일괄 휴강 완료 스낵바.
+  static String batchDayOffDoneSnack(int count) => '$count건을 휴강 처리했어요.';
+
+  /// 일괄 처리 부분 실패 스낵바.
+  static String batchPartialSnack(int success, int failed) =>
+      '$success건 처리, $failed건 실패';
+
+  /// 선택 모드 — 선택 개수 라벨.
+  static String selectionCountLabel(int count) => '$count개 선택';
+
+  /// 선택 모드 — 전체 선택.
+  static const selectAllAction = '전체 선택';
+
+  /// 선택 모드 — 액션바 완료 버튼 (N건 완료).
+  static String batchSelectionComplete(int count) => '$count건 완료';
+
+  /// 선택 모드 — 액션바 휴강 버튼 (N건 휴강).
+  static String batchSelectionDayOff(int count) => '$count건 휴강';
+
+  /// 선택 모드 종료(선택 해제) 툴팁.
+  static const selectionExitTooltip = '선택 해제';
+
   /// 사전 안내 배너 — 24시간 후 자동 출석 완료 + 1회 차감 고지.
   static const attendanceAutoCompleteNotice =
       '미확인 상태입니다. 종료 후 24시간이 지나면 자동으로 출석 완료 처리되며 수강권 1회가 차감됩니다.';

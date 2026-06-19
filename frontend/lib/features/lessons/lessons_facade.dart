@@ -14,6 +14,8 @@ export 'presentation/providers/feedback_template_providers.dart'
 export 'presentation/providers/lesson_confirmation_provider.dart';
 export 'presentation/widgets/lesson_detail/attendance_actions.dart'
     show confirmAttendance;
+export 'presentation/widgets/lesson_detail/lesson_batch_actions.dart'
+    show batchConfirmAttendance, batchMarkDayOff;
 export 'presentation/providers/lesson_crud_provider.dart';
 export 'presentation/providers/lesson_note_providers.dart'
     show studentLessonNotesProvider;
