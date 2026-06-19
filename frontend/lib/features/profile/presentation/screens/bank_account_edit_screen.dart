@@ -492,7 +492,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
   }
 
   void _submit() {
-    if (!_consentChecked || !_formKey.currentState!.validate()) return;
+    if (!_consentChecked || !(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
 
     final account = BankAccount(
       id: 'ba_${DateTime.now().millisecondsSinceEpoch}',

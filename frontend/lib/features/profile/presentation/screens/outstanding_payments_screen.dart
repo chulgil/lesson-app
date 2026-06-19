@@ -291,8 +291,10 @@ class _UnpaidCard extends ConsumerWidget {
   }
 
   int _calculateDaysOverdue(Subscription subscription) {
+    // #851 입금 안내는 보통 1영업일 소요 — 발급 당일·익일은 연체 표시 제외.
     final createdAt = subscription.createdAt;
-    return DateTime.now().difference(createdAt).inDays;
+    final days = DateTime.now().difference(createdAt).inDays - 1;
+    return days > 0 ? days : 0;
   }
 
   String _subscriptionTypeLabel(Subscription subscription) {

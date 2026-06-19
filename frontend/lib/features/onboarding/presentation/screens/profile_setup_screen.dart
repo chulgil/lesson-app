@@ -64,12 +64,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   bool get _isFormValid {
-    return _nameController.text.isNotEmpty && _selectedInstruments.isNotEmpty;
+    return _nameController.text.trim().isNotEmpty &&
+        _selectedInstruments.isNotEmpty;
   }
 
   List<String> get _missingFields {
     final fields = <String>[];
-    if (_nameController.text.isEmpty) {
+    if (_nameController.text.trim().isEmpty) {
       fields.add(AppStrings.onboardingFieldName);
     }
     if (_selectedInstruments.isEmpty) {
@@ -87,7 +88,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       // v3 §3.2 Phase A: 이름 + 악기 only. introduction 은 Phase C 보상 퀘스트로
       // 이관 (profileIntroduction). 빈 문자열은 backend 호환을 위해 유지.
       final profile = TeacherOnboardingProfile(
-        name: _nameController.text,
+        name: _nameController.text.trim(),
         profileImage: _profileImage,
         instruments: _selectedInstruments,
         introduction: '',

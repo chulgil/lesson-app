@@ -15,7 +15,7 @@ import '../../../auth/auth_facade.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
 import '../../../relationship/relationship_facade.dart';
-import '../../../search/presentation/providers/teacher_providers.dart';
+import '../../../search/search_facade.dart' show teacherProvider;
 import '../../domain/entities/manual_teacher.dart';
 import '../extensions/manual_teacher_visuals.dart';
 import '../providers/manual_teacher_provider.dart';

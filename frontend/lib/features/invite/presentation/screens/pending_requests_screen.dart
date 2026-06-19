@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -134,6 +136,8 @@ class PendingRequestsScreen extends ConsumerWidget {
         .acceptRequest(request.id);
 
     if (connection != null && context.mounted) {
+      final isTeacher =
+          ref.read(currentInviteUserRoleProvider) == InviteUserRole.teacher;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -142,6 +146,15 @@ class PendingRequestsScreen extends ConsumerWidget {
             ),
           ),
           backgroundColor: AppColors.paperOk,
+          // #848 교사 수락 직후 다음 단계(수강권 발급) 안내. studentId 미지정 →
+          // 발급 화면이 학생 선택 UI 노출(#846).
+          action: isTeacher
+              ? SnackBarAction(
+                  label: AppStrings.connectionAcceptedIssueCta,
+                  textColor: AppColors.paper,
+                  onPressed: () => context.push(AppRoutes.issueSubscription),
+                )
+              : null,
         ),
       );
     }
