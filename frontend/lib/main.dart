@@ -15,6 +15,7 @@ import 'core/startup/startup_provider_observer.dart';
 import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
+import 'core/widgets/offline_banner.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
 import 'features/practice/presentation/providers/recording_provider.dart';
@@ -168,6 +169,10 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
 
         // Router
         routerConfig: routerConfig,
+
+        // Global offline banner injected above every screen.
+        builder: (context, child) =>
+            OfflineBannerWrapper(child: child ?? const SizedBox.shrink()),
       ),
     );
   }

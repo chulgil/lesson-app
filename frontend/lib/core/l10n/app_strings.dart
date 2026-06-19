@@ -9793,4 +9793,7 @@ class AppStrings {
 
   static const paymentPendingProcessingEstimate = '보통 1영업일 소요됩니다';
   static const subscriptionEmptyRequestLessonCta = '레슨 신청하기';
+
+  /// 오프라인 배너 문구 (#868)
+  static const offlineBannerMessage = '오프라인 — 저장된 데이터를 표시 중';
 }

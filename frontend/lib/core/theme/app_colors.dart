@@ -163,4 +163,12 @@ class AppColors {
   static const heatmapL2 = Color(0x803F5D2F); // 50% paperOk
   static const heatmapL3 = Color(0xBF3F5D2F); // 75% paperOk
   static const heatmapL4 = Color(0xFF3F5D2F); // 100% paperOk
+
+  // ─────────────────────────────────────────────────────────────
+  // Connectivity banner — offline state indicator
+  // ─────────────────────────────────────────────────────────────
+  static const offlineBannerBackground = Color(
+    0xFF616161,
+  ); // grey 700 — neutral warning
+  static const offlineBannerForeground = Color(0xFFFFFFFF); // white text / icon
 }
