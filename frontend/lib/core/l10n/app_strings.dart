@@ -4355,6 +4355,22 @@ class AppStrings {
   /// 입금자명 {name} (통장 대조용 예금주 표시)
   static String paymentDepositorFormat(String name) => '입금자명 $name';
 
+  // [검토 #48] 입금 미확인 → 확인 보류 상태 기록
+  /// 확인 보류 (입금 미확인으로 표시한 항목 배지)
+  static const paymentHoldBadge = '확인 보류';
+
+  /// 마지막 문의 {time} (확인 보류 카드 부가 캡션)
+  static String paymentInquiryRecordedFormat(String time) => '마지막 문의 $time';
+
+  /// 전체 N (보류 필터 — 전체 칩)
+  static String paymentFilterAllCount(int n) => '전체 $n';
+
+  /// 보류 N (보류 필터 — 보류 칩)
+  static String paymentFilterHoldCount(int n) => '보류 $n';
+
+  /// 확인 보류로 표시했어요 (입금 미확인 처리 스낵바)
+  static const paymentMarkedOnHold = '확인 보류로 표시했어요';
+
   /// 학생이 아직 수강권을 선택하지 않았습니다 (멀티초이스 미선택 가드)
   static const proposalAwaitingTemplateSelection = '학생이 아직 수강권을 선택하지 않았습니다';
 
