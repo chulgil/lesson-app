@@ -52,12 +52,11 @@ class UnifiedSubscriptionSheet extends ConsumerStatefulWidget {
       isScrollControlled: true,
       padding: EdgeInsets.zero,
       showHandle: false,
-      builder:
-          (_) => UnifiedSubscriptionSheet(
-            teacherId: teacherId,
-            studentIds: studentIds,
-            studentName: studentName,
-          ),
+      builder: (_) => UnifiedSubscriptionSheet(
+        teacherId: teacherId,
+        studentIds: studentIds,
+        studentName: studentName,
+      ),
     );
   }
 
@@ -110,19 +109,18 @@ class _UnifiedSubscriptionSheetState
               _buildHeader(),
               Expanded(
                 child: templatesAsync.when(
-                  loading:
-                      () => const Center(child: CircularProgressIndicator()),
-                  error:
-                      (_, __) => Center(
-                        child: Text(
-                          AppStrings.errorOccurred,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
-                        ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (_, __) => Center(
+                    child: Text(
+                      AppStrings.errorOccurred,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.inkSecondary,
                       ),
-                  data:
-                      (templates) => _buildContent(templates, scrollController),
+                    ),
+                  ),
+                  data: (templates) =>
+                      _buildContent(templates, scrollController),
                 ),
               ),
               _buildBottomButtons(),
@@ -251,10 +249,9 @@ class _UnifiedSubscriptionSheetState
 
           return GestureDetector(
             onTap: () => _onTemplateTap(template.id),
-            onLongPress:
-                isSelected && _selectedTemplateIds.length > 1
-                    ? () => _setRecommended(template)
-                    : null,
+            onLongPress: isSelected && _selectedTemplateIds.length > 1
+                ? () => _setRecommended(template)
+                : null,
             child: _TemplateChip(
               template: template,
               isSelected: isSelected,
@@ -272,10 +269,9 @@ class _UnifiedSubscriptionSheetState
       if (_selectedTemplateIds.contains(templateId)) {
         _selectedTemplateIds.remove(templateId);
         if (_recommendedTemplateId == templateId) {
-          _recommendedTemplateId =
-              _selectedTemplateIds.isNotEmpty
-                  ? _selectedTemplateIds.first
-                  : null;
+          _recommendedTemplateId = _selectedTemplateIds.isNotEmpty
+              ? _selectedTemplateIds.first
+              : null;
         }
       } else {
         if (_selectedTemplateIds.length < _maxTemplateSelections) {
@@ -407,8 +403,9 @@ class _UnifiedSubscriptionSheetState
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
             side: BorderSide(
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+              color: isSelected
+                  ? AppColors.paperAccent
+                  : AppColors.inkQuaternary,
             ),
           );
         }),
@@ -461,31 +458,26 @@ class _UnifiedSubscriptionSheetState
   Widget _buildValidityChips() {
     return Wrap(
       spacing: AppSpacing.space2,
-      children:
-          _validityDaysOptions.map((days) {
-            final isSelected =
-                (_customValidityDays ?? _autoValidityDays) == days;
-            return ChoiceChip(
-              label: Text(AppStrings.unifiedSubscriptionDaysChipFormat(days)),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  _customValidityDays = selected ? days : null;
-                });
-              },
-              selectedColor: AppColors.paperAccentSoft,
-              labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected ? AppColors.paperAccent : AppColors.ink,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
-              side: BorderSide(
-                color:
-                    isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkQuaternary,
-              ),
-            );
-          }).toList(),
+      children: _validityDaysOptions.map((days) {
+        final isSelected = (_customValidityDays ?? _autoValidityDays) == days;
+        return ChoiceChip(
+          label: Text(AppStrings.unifiedSubscriptionDaysChipFormat(days)),
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _customValidityDays = selected ? days : null;
+            });
+          },
+          selectedColor: AppColors.paperAccentSoft,
+          labelStyle: AppTypography.bodySmall.copyWith(
+            color: isSelected ? AppColors.paperAccent : AppColors.ink,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
+          side: BorderSide(
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -529,20 +521,18 @@ class _UnifiedSubscriptionSheetState
                         vertical: AppSpacing.space3,
                       ),
                       side: BorderSide(
-                        color:
-                            canSubmit
-                                ? AppColors.paperAccent
-                                : AppColors.inkQuaternary,
+                        color: canSubmit
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                       ),
                       shape: RoundedRectangleBorder(),
                     ),
                     child: Text(
                       AppStrings.unifiedSubscriptionDirectIssueButton,
                       style: AppTypography.buttonSmall.copyWith(
-                        color:
-                            canSubmit
-                                ? AppColors.paperAccent
-                                : AppColors.inkQuaternary,
+                        color: canSubmit
+                            ? AppColors.paperAccent
+                            : AppColors.inkQuaternary,
                       ),
                     ),
                   ),
@@ -560,26 +550,25 @@ class _UnifiedSubscriptionSheetState
                     shape: RoundedRectangleBorder(),
                     disabledBackgroundColor: AppColors.paperAccentSoft,
                   ),
-                  child:
-                      _isSubmitting
-                          ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                          : Text(
-                            _selectedTemplateIds.length > 1
-                                ? AppStrings.unifiedSubscriptionMultiSendFormat(
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.paper,
+                          ),
+                        )
+                      : Text(
+                          _selectedTemplateIds.length > 1
+                              ? AppStrings.unifiedSubscriptionMultiSendFormat(
                                   _selectedTemplateIds.length,
                                 )
-                                : AppStrings.proposalSend,
-                            style: AppTypography.buttonSmall.copyWith(
-                              color: AppColors.paper,
-                            ),
+                              : AppStrings.proposalSend,
+                          style: AppTypography.buttonSmall.copyWith(
+                            color: AppColors.paper,
                           ),
+                        ),
                 ),
               ),
             ],
@@ -624,6 +613,7 @@ class _UnifiedSubscriptionSheetState
   }
 
   Future<void> _onDirectIssue() async {
+    if (widget.studentIds.isEmpty) return; // #72 빈 학생 목록 .first StateError 방지
     if (_selectedTemplateIds.isEmpty && !_hasValidDirectInput) return;
 
     if (_selectedTemplateIds.isNotEmpty) {
@@ -675,8 +665,9 @@ class _UnifiedSubscriptionSheetState
           teacherId: widget.teacherId,
           studentId: studentId,
           templateIds: _selectedTemplateIds.toList(),
-          recommendedTemplateId:
-              _selectedTemplateIds.length > 1 ? _recommendedTemplateId : null,
+          recommendedTemplateId: _selectedTemplateIds.length > 1
+              ? _recommendedTemplateId
+              : null,
           templateName: templateName,
         );
       }
@@ -688,8 +679,8 @@ class _UnifiedSubscriptionSheetState
             content: Text(
               _selectedTemplateIds.length > 1
                   ? AppStrings.proposalCreateMultiSentMessageFormat(
-                    _selectedTemplateIds.length,
-                  )
+                      _selectedTemplateIds.length,
+                    )
                   : AppStrings.proposalCreateSentMessage,
             ),
             backgroundColor: AppColors.paperOk,
@@ -810,8 +801,9 @@ class _TemplateChip extends StatelessWidget {
             template.formattedPrice,
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
-              color:
-                  isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
+              color: isSelected
+                  ? AppColors.paperAccent
+                  : AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
