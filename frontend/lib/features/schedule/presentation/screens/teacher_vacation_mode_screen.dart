@@ -44,23 +44,31 @@ class TeacherVacationModeScreen extends ConsumerWidget {
           ),
           // Active vacations + 24h Recovery (spec §7 + §9.1).
           const _ActiveVacationSection(),
+          // 추가한 휴가 구간 (다구간, #768 ②).
+          if (state.segments.isNotEmpty) ...[
+            SizedBox(height: AppSpacing.space4),
+            _AddedSegmentsSection(
+              segments: state.segments,
+              onRemove: notifier.removeSegment,
+            ),
+          ],
           SizedBox(height: AppSpacing.space4),
           _SectionHeader(text: AppStrings.vacationPeriodSection),
           SizedBox(height: AppSpacing.space2),
           _DateRow(
             label: AppStrings.vacationStartDateLabel,
-            date: state.startDate,
-            onPick: (d) => notifier.setStartDate(d),
+            date: state.draftStart,
+            onPick: (d) => notifier.setDraftStart(d),
             disablePast: true,
           ),
           _DateRow(
             label: AppStrings.vacationEndDateLabel,
-            date: state.endDate,
-            onPick: (d) => notifier.setEndDate(d),
+            date: state.draftEnd,
+            onPick: (d) => notifier.setDraftEnd(d),
           ),
-          if (state.startDate != null &&
-              state.endDate != null &&
-              !state.hasValidRange)
+          if (state.draftStart != null &&
+              state.draftEnd != null &&
+              !state.hasValidDraft)
             Padding(
               padding: EdgeInsets.only(top: AppSpacing.space1),
               child: Text(
@@ -71,15 +79,20 @@ class TeacherVacationModeScreen extends ConsumerWidget {
               ),
             ),
           SizedBox(height: AppSpacing.space3),
+          _DispositionSection(
+            selected: state.draftDisposition,
+            onChange: notifier.setDraftDisposition,
+            projectedExtensionDays: _projectedExtensionDays(state),
+          ),
+          // 여러 기간을 묶으려면 '구간 추가' (다구간, #768 ②).
+          _AddSegmentButton(
+            state: state,
+            onAdd: () => _onAddSegment(context, ref),
+          ),
+          SizedBox(height: AppSpacing.space3),
           _ReasonField(value: state.reason, onChanged: notifier.setReason),
           SizedBox(height: AppSpacing.space4),
           _ImpactSection(state: state, onRefresh: notifier.loadImpact),
-          SizedBox(height: AppSpacing.space4),
-          _DispositionSection(
-            selected: state.disposition,
-            onChange: notifier.setDisposition,
-            projectedExtensionDays: _projectedExtensionDays(state),
-          ),
           SizedBox(height: AppSpacing.space5),
           _SubmitButton(state: state, onSubmit: () => _onSubmit(context, ref)),
         ],
@@ -90,17 +103,39 @@ class TeacherVacationModeScreen extends ConsumerWidget {
   /// Inclusive day count of the picked range, or null when range is invalid.
   /// Mirrors VacationPeriod.vacationDays; BE confirms the actual extension.
   int? _projectedExtensionDays(VacationFormState state) {
-    if (!state.hasValidRange) return null;
-    final diff = state.endDate!.difference(state.startDate!).inDays;
+    if (!state.hasValidDraft) return null;
+    final diff = state.draftEnd!.difference(state.draftStart!).inDays;
     return diff < 0 ? null : diff + 1;
   }
 
+  /// Commit the current draft as a segment, surfacing overlap/invalid reasons.
+  void _onAddSegment(BuildContext context, WidgetRef ref) {
+    final overlap = ref.read(vacationFormProvider).draftOverlaps;
+    final ok = ref.read(vacationFormProvider.notifier).addSegment();
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            overlap
+                ? AppStrings.vacationSegmentOverlapError
+                : AppStrings.vacationSegmentInvalidError,
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> _onSubmit(BuildContext context, WidgetRef ref) async {
+    final segments = ref.read(vacationFormProvider).effectiveSegments;
+    if (segments.isEmpty) return;
+    // 최종 확인 요약 (구간별 기간 + 보상). #768 ②.
+    final confirmed = await _showVacationSummary(context, segments);
+    if (confirmed != true || !context.mounted) return;
     final notifier = ref.read(vacationFormProvider.notifier);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final result = await notifier.submit();
-    if (result != null) {
+    if (result != null && result.isNotEmpty) {
       messenger.showSnackBar(
         const SnackBar(content: Text(AppStrings.vacationRegisterSuccess)),
       );
@@ -236,7 +271,7 @@ class _ImpactSection extends StatelessWidget {
             const _SectionHeader(text: AppStrings.vacationImpactSection),
             const Spacer(),
             TextButton(
-              onPressed: state.hasValidRange && !state.isLoadingImpact
+              onPressed: state.hasValidDraft && !state.isLoadingImpact
                   ? onRefresh
                   : null,
               child: const Text(AppStrings.vacationImpactRefresh),
@@ -446,7 +481,7 @@ class _SubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canSubmit =
-        state.hasValidRange && !state.isSubmitting && !state.isLoadingImpact;
+        state.canSubmit && !state.isSubmitting && !state.isLoadingImpact;
     return FilledButton(
       onPressed: canSubmit ? onSubmit : null,
       style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
@@ -813,4 +848,150 @@ class _ActiveVacationCard extends ConsumerWidget {
       ).showSnackBar(SnackBar(content: Text(friendly)));
     }
   }
+}
+
+
+// ──────────────────────────────────────────────────────────────
+// Multi-segment widgets (#768 ②).
+// ──────────────────────────────────────────────────────────────
+
+class _AddedSegmentsSection extends StatelessWidget {
+  final List<VacationSegment> segments;
+  final void Function(int index) onRemove;
+  const _AddedSegmentsSection({required this.segments, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(text: AppStrings.vacationAddedSegmentsSection),
+        SizedBox(height: AppSpacing.space2),
+        for (var i = 0; i < segments.length; i++)
+          _AddedSegmentRow(segment: segments[i], onRemove: () => onRemove(i)),
+      ],
+    );
+  }
+}
+
+class _AddedSegmentRow extends StatelessWidget {
+  final VacationSegment segment;
+  final VoidCallback onRemove;
+  const _AddedSegmentRow({required this.segment, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: AppSpacing.space2),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.vacationCardDateRange(
+                    _shortDate(segment.startDate),
+                    _shortDate(segment.endDate),
+                  ),
+                  style: AppTypography.bodyLarge.copyWith(color: AppColors.ink),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  _dispositionLabel(segment.disposition),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            tooltip: AppStrings.vacationSegmentRemoveTooltip,
+            color: AppColors.inkTertiary,
+            onPressed: onRemove,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddSegmentButton extends StatelessWidget {
+  final VacationFormState state;
+  final VoidCallback onAdd;
+  const _AddSegmentButton({required this.state, required this.onAdd});
+
+  @override
+  Widget build(BuildContext context) {
+    final canAdd = state.hasValidDraft && !state.draftOverlaps;
+    return Padding(
+      padding: EdgeInsets.only(top: AppSpacing.space2),
+      child: OutlinedButton.icon(
+        onPressed: canAdd ? onAdd : null,
+        icon: const Icon(Icons.add, size: 18),
+        label: const Text(AppStrings.vacationSegmentAddButton),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, AppSpacing.buttonHeight),
+        ),
+      ),
+    );
+  }
+}
+
+String _shortDate(DateTime d) => '${d.month}/${d.day}';
+
+/// 최종 확인 요약 다이얼로그 — 등록될 구간별 기간 + 보상옵션을 나열한다 (#768 ②).
+Future<bool?> _showVacationSummary(
+  BuildContext context,
+  List<VacationSegment> segments,
+) {
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => NotebookAlertDialog(
+      title: AppStrings.vacationSummaryTitle,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppStrings.vacationSummaryCount(segments.length),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+            SizedBox(height: AppSpacing.space2),
+            for (final s in segments)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Text(
+                  AppStrings.vacationSummarySegmentLabel(
+                    AppStrings.vacationCardDateRange(
+                      _shortDate(s.startDate),
+                      _shortDate(s.endDate),
+                    ),
+                    _dispositionLabel(s.disposition),
+                  ),
+                  style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
+                ),
+              ),
+          ],
+        ),
+      ),
+      confirmLabel: AppStrings.vacationSummaryConfirm,
+      cancelLabel: AppStrings.cancel,
+      onConfirm: () => Navigator.pop(ctx, true),
+      onCancel: () => Navigator.pop(ctx, false),
+    ),
+  );
 }

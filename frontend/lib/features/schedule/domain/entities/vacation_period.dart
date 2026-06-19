@@ -129,3 +129,81 @@ class VacationImpactPreview {
     this.impactedStudents = const [],
   });
 }
+
+// ──────────────────────────────────────────────────────────────
+// Multi-segment vacation (#768 ②).
+// ──────────────────────────────────────────────────────────────
+
+/// One vacation segment in a multi-segment registration.
+///
+/// 보상옵션([disposition])은 구간별. 사유/학생별 예외는 폼 전체가 공유한다.
+/// Pure value type — no display strings / no presentation imports.
+class VacationSegment {
+  final DateTime startDate;
+  final DateTime endDate;
+  final VacationDisposition disposition;
+
+  const VacationSegment({
+    required this.startDate,
+    required this.endDate,
+    this.disposition = VacationDisposition.rollForward,
+  });
+
+  /// Inclusive day count (both ends), date-only. Never negative.
+  int get days {
+    final s = DateTime(startDate.year, startDate.month, startDate.day);
+    final e = DateTime(endDate.year, endDate.month, endDate.day);
+    final diff = e.difference(s).inDays;
+    return diff < 0 ? 0 : diff + 1;
+  }
+
+  VacationSegment copyWith({
+    DateTime? startDate,
+    DateTime? endDate,
+    VacationDisposition? disposition,
+  }) {
+    return VacationSegment(
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      disposition: disposition ?? this.disposition,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is VacationSegment &&
+      _sameDay(other.startDate, startDate) &&
+      _sameDay(other.endDate, endDate) &&
+      other.disposition == disposition;
+
+  @override
+  int get hashCode => Object.hash(
+    startDate.year,
+    startDate.month,
+    startDate.day,
+    endDate.year,
+    endDate.month,
+    endDate.day,
+    disposition,
+  );
+}
+
+bool _sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
+
+DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+/// True if any two segments share a calendar day (inclusive ranges).
+///
+/// 겹치는 구간은 같은 레슨을 두 번 처리해 차감/연장 무결성을 깨므로 등록 전에 차단한다.
+bool vacationSegmentsOverlap(List<VacationSegment> segments) {
+  if (segments.length < 2) return false;
+  final ordered = [...segments]
+    ..sort((a, b) => _dateOnly(a.startDate).compareTo(_dateOnly(b.startDate)));
+  for (var i = 1; i < ordered.length; i++) {
+    final prevEnd = _dateOnly(ordered[i - 1].endDate);
+    final curStart = _dateOnly(ordered[i].startDate);
+    if (!curStart.isAfter(prevEnd)) return true; // curStart <= prevEnd
+  }
+  return false;
+}

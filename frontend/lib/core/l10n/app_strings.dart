@@ -8595,6 +8595,35 @@ class AppStrings {
   /// 배너 행: 휴가 취소 아이콘 버튼의 시맨틱 라벨.
   static const vacationBannerCancelTooltip = '휴가 취소';
 
+  // 다구간 휴가 (#768 ②) — 구간 스택 + 확인 요약.
+  /// 현재 편집 중인 기간을 구간으로 추가.
+  static const vacationSegmentAddButton = '구간 추가';
+
+  /// 추가한 구간 리스트 섹션 제목.
+  static const vacationAddedSegmentsSection = '추가한 휴가 구간';
+
+  /// 구간 삭제 아이콘 툴팁.
+  static const vacationSegmentRemoveTooltip = '구간 삭제';
+
+  /// 추가하려는 구간이 기존 구간과 겹칠 때.
+  static const vacationSegmentOverlapError = '이미 추가한 기간과 겹쳐요. 다른 날짜를 선택해주세요.';
+
+  /// 추가하려는 구간의 날짜가 유효하지 않을 때.
+  static const vacationSegmentInvalidError = '시작일·종료일을 올바르게 선택해주세요.';
+
+  /// 최종 확인 요약 다이얼로그 제목.
+  static const vacationSummaryTitle = '이렇게 등록할까요?';
+
+  /// 요약 다이얼로그 등록 버튼.
+  static const vacationSummaryConfirm = '등록';
+
+  /// 요약 한 구간 라벨: "7/15 ~ 7/17 · 다음 회차로 이월".
+  static String vacationSummarySegmentLabel(String range, String disposition) =>
+      '$range · $disposition';
+
+  /// 요약 상단 구간 수 안내.
+  static String vacationSummaryCount(int count) => '휴가 구간 $count개';
+
   // ── 가용시간 — 시간대 삭제/변경 영향 경고 (C3) ──────────────────────
 
   /// 시간대 삭제 확인 다이얼로그 — 기본 (영향 0건).

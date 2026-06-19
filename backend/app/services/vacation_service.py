@@ -39,6 +39,8 @@ from app.models.schedule import (
 from app.models.student import Student
 from app.models.subscription import Subscription
 from app.schemas.vacation import (
+    VacationBatchCreate,
+    VacationBatchResponse,
     VacationDisposition,
     VacationImpactedStudent,
     VacationImpactPreview,
@@ -193,6 +195,39 @@ class VacationService:
         await self.db.flush()
         await self.db.refresh(period)
         return VacationPeriodResponse.model_validate(period)
+
+    async def register_vacation_batch(
+        self,
+        teacher_id: str,
+        data: VacationBatchCreate,
+    ) -> VacationBatchResponse:
+        """Register multiple non-overlapping vacation segments (#768 ②).
+
+        보상옵션(disposition)은 구간별, 사유/학생별 예외는 전 구간 공유한다. 각 구간은
+        기존 ``register_vacation`` 파이프라인(disposition 처리 + 알림 fan-out)을 그대로
+        재사용한다. 한 요청 = 한 트랜잭션 — 한 구간이라도 실패하면 전체 롤백된다.
+        """
+        if not data.segments:
+            raise ValueError("at least one vacation segment is required")
+
+        # Defensive overlap re-check (schema validator is the primary guard).
+        ordered = sorted(data.segments, key=lambda s: s.start_date)
+        for prev, cur in zip(ordered, ordered[1:], strict=False):
+            if cur.start_date <= prev.end_date:
+                raise ValueError("vacation segments must not overlap")
+
+        responses: list[VacationPeriodResponse] = []
+        for segment in data.segments:
+            per_segment = VacationPeriodCreate(
+                start_date=segment.start_date,
+                end_date=segment.end_date,
+                reason=data.reason,
+                default_disposition=segment.default_disposition,
+                per_student_disposition=data.per_student_disposition,
+            )
+            responses.append(await self.register_vacation(teacher_id, per_segment))
+
+        return VacationBatchResponse(vacations=responses, total_count=len(responses))
 
     async def _impacted_student_ids(
         self,

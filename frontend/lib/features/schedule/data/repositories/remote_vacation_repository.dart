@@ -68,6 +68,37 @@ class RemoteVacationRepository implements VacationRepository {
     return _periodFromJson(response.data as Map<String, dynamic>);
   }
 
+  @override
+  Future<List<VacationPeriod>> registerVacationBatch({
+    required List<VacationSegment> segments,
+    String? reason,
+    Map<String, VacationDisposition>? perStudentDisposition,
+  }) async {
+    final response = await _apiClient.post(
+      '/teacher/vacation/batch',
+      data: {
+        if (reason != null && reason.isNotEmpty) 'reason': reason,
+        if (perStudentDisposition != null && perStudentDisposition.isNotEmpty)
+          'per_student_disposition': {
+            for (final entry in perStudentDisposition.entries)
+              entry.key: _dispositionToWire(entry.value),
+          },
+        'segments': [
+          for (final s in segments)
+            {
+              'start_date': _formatDate(s.startDate),
+              'end_date': _formatDate(s.endDate),
+              'default_disposition': _dispositionToWire(s.disposition),
+            },
+        ],
+      },
+    );
+    final data = response.data as Map<String, dynamic>;
+    final items = (data['vacations'] as List<dynamic>? ?? [])
+        .cast<Map<String, dynamic>>();
+    return items.map(_periodFromJson).toList(growable: false);
+  }
+
   // ──────────────────────────────────────────────────────────
   // JSON helpers
   // ──────────────────────────────────────────────────────────
