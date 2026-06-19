@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
@@ -708,28 +709,24 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     }
   }
 
-  void _launchPhone(String phoneNumber) async {
-    // Copy to clipboard (url_launcher can be added later for actual call)
-    await Clipboard.setData(ClipboardData(text: phoneNumber));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.phoneNumberCopiedFormat(phoneNumber)),
-        ),
-      );
-    }
-  }
+  // #79 입금 후 문의 데드엔드 해소 — 클립보드 복사 → 실제 전화/문자 실행.
+  // 실행 실패(다이얼러 없는 기기 등) 시에만 클립보드 복사로 폴백.
+  void _launchPhone(String phoneNumber) => _launchContact('tel', phoneNumber);
 
-  void _launchSms(String phoneNumber) async {
-    // Copy to clipboard (url_launcher can be added later for actual SMS)
-    await Clipboard.setData(ClipboardData(text: phoneNumber));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.phoneNumberCopiedFormat(phoneNumber)),
-        ),
-      );
+  void _launchSms(String phoneNumber) => _launchContact('sms', phoneNumber);
+
+  Future<void> _launchContact(String scheme, String phoneNumber) async {
+    try {
+      final launched = await launchUrl(Uri(scheme: scheme, path: phoneNumber));
+      if (launched) return;
+    } catch (_) {
+      // fall through to clipboard fallback
     }
+    await Clipboard.setData(ClipboardData(text: phoneNumber));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppStrings.phoneNumberCopiedFormat(phoneNumber))),
+    );
   }
 
   /// audit C2-F02: confirmed 상태 학생용 액션바 — SubscriptionDetail 진입.
