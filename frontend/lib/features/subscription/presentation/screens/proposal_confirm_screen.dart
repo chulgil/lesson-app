@@ -74,10 +74,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     final holdCount = proposals.where((p) => records.containsKey(p.id)).length;
     // Auto-clear the filter when nothing is held.
     final holdOnly = _holdOnly && holdCount > 0;
-    final visibleProposals =
-        holdOnly
-            ? proposals.where((p) => records.containsKey(p.id)).toList()
-            : proposals;
+    final visibleProposals = holdOnly
+        ? proposals.where((p) => records.containsKey(p.id)).toList()
+        : proposals;
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(title: AppStrings.paymentConfirm),
@@ -213,18 +212,17 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                 height: 24,
                 child: Checkbox(
                   value: isSelected,
-                  onChanged:
-                      selectable
-                          ? (checked) {
-                            setState(() {
-                              if (checked == true) {
-                                _selectedProposalIds.add(proposal.id);
-                              } else {
-                                _selectedProposalIds.remove(proposal.id);
-                              }
-                            });
-                          }
-                          : null,
+                  onChanged: selectable
+                      ? (checked) {
+                          setState(() {
+                            if (checked == true) {
+                              _selectedProposalIds.add(proposal.id);
+                            } else {
+                              _selectedProposalIds.remove(proposal.id);
+                            }
+                          });
+                        }
+                      : null,
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -252,7 +250,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                           radius: 16,
                           backgroundColor: AppColors.paperAccentSoft,
                           child: Text(
-                            student.name[0],
+                            student.name.isNotEmpty ? student.name[0] : '?',
                             style: AppTypography.bodySmall.copyWith(
                               color: AppColors.paperAccent,
                             ),
@@ -333,26 +331,25 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           // Action buttons
           templateAsync.when(
             loading: () => const SizedBox.shrink(),
-            error:
-                (e, st) => Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: AppColors.inkTertiary,
-                      ),
-                      const SizedBox(height: AppSpacing.space3),
-                      Text(
-                        AppStrings.loadDataFailed,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
-                    ],
+            error: (e, st) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.inkTertiary,
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text(
+                    AppStrings.loadDataFailed,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             data: (template) {
               if (template == null) return const SizedBox.shrink();
               return _buildActionButtons(proposal, template);
@@ -396,10 +393,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
     SubscriptionTemplate template,
     SubscriptionProposal proposal,
   ) {
-    final price =
-        proposal.hasDiscount
-            ? template.price - (proposal.discountAmount ?? 0)
-            : template.price;
+    final price = proposal.hasDiscount
+        ? template.price - (proposal.discountAmount ?? 0)
+        : template.price;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
@@ -479,19 +475,19 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         Expanded(
           flex: 2,
           child: ElevatedButton(
-            onPressed:
-                isProcessing ? null : () => _confirmPayment(proposal, template),
+            onPressed: isProcessing
+                ? null
+                : () => _confirmPayment(proposal, template),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
-            child:
-                isProcessing
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : const Text(AppStrings.paymentVerifyToIssueButton),
+            child: isProcessing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text(AppStrings.paymentVerifyToIssueButton),
           ),
         ),
       ],
@@ -501,14 +497,12 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   /// Sticky bottom bar for batch confirmation. Returns null when no selectable
   /// proposal is checked, so the bar only appears on demand.
   Widget? _buildBatchBar(List<SubscriptionProposal> proposals) {
-    final selectedCount =
-        proposals
-            .where(
-              (p) =>
-                  _selectedProposalIds.contains(p.id) &&
-                  !p.needsTemplateSelection,
-            )
-            .length;
+    final selectedCount = proposals
+        .where(
+          (p) =>
+              _selectedProposalIds.contains(p.id) && !p.needsTemplateSelection,
+        )
+        .length;
     if (selectedCount == 0) return null;
 
     return SafeArea(
@@ -523,23 +517,21 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed:
-                    _batchProcessing ? null : () => _confirmBatch(proposals),
+                onPressed: _batchProcessing
+                    ? null
+                    : () => _confirmBatch(proposals),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.space3,
                   ),
                 ),
-                child:
-                    _batchProcessing
-                        ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : Text(
-                          AppStrings.paymentBatchConfirmAction(selectedCount),
-                        ),
+                child: _batchProcessing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(AppStrings.paymentBatchConfirmAction(selectedCount)),
               ),
             ),
           ),
@@ -620,14 +612,12 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   /// reports an aggregate result. Aborts the remaining issues if the teacher
   /// needs phone verification.
   Future<void> _confirmBatch(List<SubscriptionProposal> all) async {
-    final selected =
-        all
-            .where(
-              (p) =>
-                  _selectedProposalIds.contains(p.id) &&
-                  !p.needsTemplateSelection,
-            )
-            .toList();
+    final selected = all
+        .where(
+          (p) =>
+              _selectedProposalIds.contains(p.id) && !p.needsTemplateSelection,
+        )
+        .toList();
     if (selected.isEmpty) return;
 
     // Resolve each template up front so the dialog can show an accurate total.
@@ -640,30 +630,31 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       if (template == null) continue;
       templates[p.id] = template;
       final discount = p.hasDiscount ? (p.discountAmount ?? 0) : 0;
-      final amount =
-          (template.price - discount) < 0 ? 0 : (template.price - discount);
+      final amount = (template.price - discount) < 0
+          ? 0
+          : (template.price - discount);
       total += amount;
     }
-    final issuable =
-        selected.where((p) => templates.containsKey(p.id)).toList();
+    final issuable = selected
+        .where((p) => templates.containsKey(p.id))
+        .toList();
     if (issuable.isEmpty || !mounted) return;
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (dialogContext) => NotebookAlertDialog(
-            title: AppStrings.paymentBatchConfirmDialogTitle,
-            content: Text(
-              AppStrings.paymentBatchConfirmDialogBody(
-                issuable.length,
-                _formatPrice(total),
-              ),
-            ),
-            cancelLabel: AppStrings.cancel,
-            onCancel: () => Navigator.pop(dialogContext, false),
-            confirmLabel: AppStrings.paymentBatchIssueConfirm,
-            onConfirm: () => Navigator.pop(dialogContext, true),
+      builder: (dialogContext) => NotebookAlertDialog(
+        title: AppStrings.paymentBatchConfirmDialogTitle,
+        content: Text(
+          AppStrings.paymentBatchConfirmDialogBody(
+            issuable.length,
+            _formatPrice(total),
           ),
+        ),
+        cancelLabel: AppStrings.cancel,
+        onCancel: () => Navigator.pop(dialogContext, false),
+        confirmLabel: AppStrings.paymentBatchIssueConfirm,
+        onConfirm: () => Navigator.pop(dialogContext, true),
+      ),
     );
     if (confirmed != true || !mounted) return;
 
@@ -762,22 +753,23 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       // Create subscription. Deposit is confirmed here (manual bank transfer
       // only — no PG), so seed payment fields accordingly.
       final now = DateTime.now();
-      final discount =
-          proposal.hasDiscount ? (proposal.discountAmount ?? 0) : 0;
+      final discount = proposal.hasDiscount
+          ? (proposal.discountAmount ?? 0)
+          : 0;
       // Clamp: a discount larger than the price must not yield a negative
       // amount.
-      final amount =
-          (template.price - discount) < 0 ? 0 : (template.price - discount);
+      final amount = (template.price - discount) < 0
+          ? 0
+          : (template.price - discount);
       // Resolve the student's active membership to attach the subscription to
       // the correct class context. Falls back to the first membership if the
       // student has multiple active memberships.
       final memberships = await ref.read(
         activeStudentMembershipsProvider(proposal.studentId).future,
       );
-      final membershipId =
-          memberships.isNotEmpty
-              ? memberships.first.id
-              : 'membership_${proposal.studentId}';
+      final membershipId = memberships.isNotEmpty
+          ? memberships.first.id
+          : 'membership_${proposal.studentId}';
 
       final subscription = Subscription(
         id: const Uuid().v4(),
@@ -843,15 +835,14 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   Future<void> _showInquiryDialog(SubscriptionProposal proposal) async {
     final result = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: AppStrings.paymentUnverifiedAction,
-            content: const Text(AppStrings.paymentInquiryDialogBody),
-            cancelLabel: AppStrings.cancel,
-            onCancel: () => Navigator.pop(context, false),
-            confirmLabel: AppStrings.sendMessage,
-            onConfirm: () => Navigator.pop(context, true),
-          ),
+      builder: (context) => NotebookAlertDialog(
+        title: AppStrings.paymentUnverifiedAction,
+        content: const Text(AppStrings.paymentInquiryDialogBody),
+        cancelLabel: AppStrings.cancel,
+        onCancel: () => Navigator.pop(context, false),
+        confirmLabel: AppStrings.sendMessage,
+        onConfirm: () => Navigator.pop(context, true),
+      ),
     );
 
     if (result == true && mounted) {

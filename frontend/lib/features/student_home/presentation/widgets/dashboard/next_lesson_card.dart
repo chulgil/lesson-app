@@ -94,7 +94,14 @@ class NextLessonCard extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, LessonBooking booking) {
     final now = DateTime.now();
-    final daysUntil = booking.lessonDate.difference(now).inDays;
+    // 캘린더 일자 기준 차이 (#66). difference(now) 는 시각을 포함해 오늘/내일 오표시.
+    final today = DateTime(now.year, now.month, now.day);
+    final lessonDay = DateTime(
+      booking.lessonDate.year,
+      booking.lessonDate.month,
+      booking.lessonDate.day,
+    );
+    final daysUntil = lessonDay.difference(today).inDays;
     final isToday = daysUntil == 0;
     final isTomorrow = daysUntil == 1;
 

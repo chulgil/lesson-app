@@ -283,7 +283,8 @@ class ProposalDiscountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final originalPrice = template.price;
-    final discountedPrice = originalPrice - (proposal.discountAmount ?? 0);
+    final rawDiscounted = originalPrice - (proposal.discountAmount ?? 0);
+    final discountedPrice = rawDiscounted < 0 ? 0 : rawDiscounted; // #68 음수 방지
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
