@@ -17,6 +17,9 @@ import '../../../features/profile/presentation/screens/basic_info_edit_screen.da
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/profile/presentation/screens/bank_account_edit_screen.dart';
 import '../../../features/profile/presentation/screens/cancellation_defaults_screen.dart';
+import '../../../features/profile/presentation/screens/subscription_billing_category_screen.dart';
+import '../../../features/profile/presentation/screens/my_profile_category_screen.dart';
+import '../../../features/profile/presentation/screens/policy_notifications_category_screen.dart';
 import '../../../features/profile/presentation/screens/guide_reshow_screen.dart';
 import '../../../features/analytics/presentation/screens/analytics_dashboard_screen.dart';
 import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
@@ -197,5 +200,24 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.cancellationDefaults,
     name: 'cancellationDefaults',
     builder: (context, state) => const CancellationDefaultsScreen(),
+  ),
+
+  // #765 — 복합 카테고리 BottomSheet → 정식 라우트 승격 (뒤로가기 정상 복귀).
+  GoRoute(
+    path: AppRoutes.subscriptionBillingCategory,
+    name: 'subscriptionBillingCategory',
+    builder: (context, state) => SubscriptionBillingCategoryScreen(
+      teacherId: state.uri.queryParameters['teacherId'] ?? '',
+    ),
+  ),
+  GoRoute(
+    path: AppRoutes.myProfileCategory,
+    name: 'myProfileCategory',
+    builder: (context, state) => const MyProfileCategoryScreen(),
+  ),
+  GoRoute(
+    path: AppRoutes.policyNotificationsCategory,
+    name: 'policyNotificationsCategory',
+    builder: (context, state) => const PolicyNotificationsCategoryScreen(),
   ),
 ];
