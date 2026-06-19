@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_test/hive_test.dart';
 import 'package:lessonaza/core/network/api_exceptions.dart';
 import 'package:lessonaza/core/sync/application/connectivity_service.dart';
 import 'package:lessonaza/core/sync/application/mutation_queue_helper.dart';
 import 'package:lessonaza/core/sync/application/sync_service.dart';
 import 'package:lessonaza/core/sync/domain/sync_queue_entry.dart';
+import 'package:lessonaza/features/lessons/data/local/lesson_cache_store.dart';
 import 'package:lessonaza/features/lessons/data/repositories/remote_lesson_repository.dart';
 import 'package:lessonaza/features/lessons/data/repositories/sync_aware_lesson_repository.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
@@ -52,7 +55,15 @@ void main() {
   late MockSyncService syncService;
   late SyncAwareLessonRepository repo;
 
-  setUp(() {
+  setUpAll(() {
+    registerFallbackValue(_fakeEntry());
+    registerFallbackValue(_testLesson());
+  });
+
+  setUp(() async {
+    await setUpTestHive();
+    final box = await Hive.openBox<String>('lesson_cache_test_sync');
+
     remote = MockRemoteLessonRepository();
     connectivity = MockConnectivityService();
     syncService = MockSyncService();
@@ -63,12 +74,12 @@ void main() {
         connectivity: connectivity,
         syncService: syncService,
       ),
+      cache: LessonCacheStore(box: box),
     );
   });
 
-  setUpAll(() {
-    registerFallbackValue(_fakeEntry());
-    registerFallbackValue(_testLesson());
+  tearDown(() async {
+    await tearDownTestHive();
   });
 
   group('read methods delegate to remote', () {
@@ -83,16 +94,14 @@ void main() {
 
     test('getLesson', () async {
       final lesson = _testLesson();
-      when(() => remote.getLesson('test-id'))
-          .thenAnswer((_) async => lesson);
+      when(() => remote.getLesson('test-id')).thenAnswer((_) async => lesson);
 
       final result = await repo.getLesson('test-id');
       expect(result, equals(lesson));
     });
 
     test('getLessonsByStudent', () async {
-      when(() => remote.getLessonsByStudent('s1'))
-          .thenAnswer((_) async => []);
+      when(() => remote.getLessonsByStudent('s1')).thenAnswer((_) async => []);
 
       final result = await repo.getLessonsByStudent('s1');
       expect(result, isEmpty);
@@ -104,8 +113,9 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
       final lesson = _testLesson(id: 'new');
       final serverLesson = _testLesson(id: 'server-assigned');
-      when(() => remote.createLesson(lesson))
-          .thenAnswer((_) async => serverLesson);
+      when(
+        () => remote.createLesson(lesson),
+      ).thenAnswer((_) async => serverLesson);
 
       final result = await repo.createLesson(lesson);
       expect(result.id, equals('server-assigned'));
@@ -140,8 +150,9 @@ void main() {
 
     test('NetworkException: falls back to queue', () async {
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
-      when(() => remote.createLesson(any()))
-          .thenThrow(const NetworkException(message: 'timeout'));
+      when(
+        () => remote.createLesson(any()),
+      ).thenThrow(const NetworkException(message: 'timeout'));
       when(
         () => syncService.queueMutation(
           domain: any(named: 'domain'),
@@ -161,8 +172,7 @@ void main() {
     test('online: returns server entity', () async {
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
       final lesson = _testLesson();
-      when(() => remote.updateLesson(lesson))
-          .thenAnswer((_) async => lesson);
+      when(() => remote.updateLesson(lesson)).thenAnswer((_) async => lesson);
 
       final result = await repo.updateLesson(lesson);
       expect(result.id, equals('test-id'));
