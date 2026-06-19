@@ -117,6 +117,7 @@ class MembershipInfoCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (memberships.isEmpty) return const SizedBox.shrink(); // #72 빈 목록 가드
     final membership = memberships.firstWhere(
       (m) => m.id == selectedMembershipId,
       orElse: () => memberships.first,

@@ -117,16 +117,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: NotebookDetailAppBar(
-        title:
-            _isRecordMode
-                ? AppStrings.lessonRecordTitle
-                : AppStrings.lessonAddTitle,
-        onLeadingTap:
-            () => showLessonExitConfirmation(
-              context: context,
-              hasData: _hasFormData(),
-              onExit: () => context.pop(),
-            ),
+        title: _isRecordMode
+            ? AppStrings.lessonRecordTitle
+            : AppStrings.lessonAddTitle,
+        onLeadingTap: () => showLessonExitConfirmation(
+          context: context,
+          hasData: _hasFormData(),
+          onExit: () => context.pop(),
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -150,8 +148,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   studentId: _selectedStudent!.id,
                   studentInstrument: _selectedStudent!.instrument,
                   selectedSubscription: _selectedSubscription,
-                  onPickRequested:
-                      () => _openSubscriptionPicker(_selectedStudent!.id),
+                  onPickRequested: () =>
+                      _openSubscriptionPicker(_selectedStudent!.id),
                 ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -303,8 +301,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       students: studentInfos,
       selectedStudent: _selectedStudent,
       onStudentSelected: (selected) {
-        final student = students.firstWhere((s) => s.id == selected.id);
-        _onStudentChosen(student);
+        final matches = students.where((s) => s.id == selected.id);
+        if (matches.isEmpty) return; // #72 선택이 목록에서 사라진 race 무시
+        _onStudentChosen(matches.first);
       },
     );
   }
@@ -555,8 +554,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           existingLessons,
         );
         if (conflict != null) {
-          final dayLabel =
-              dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
+          final dayLabel = dayIndex < dayNames.length
+              ? dayNames[dayIndex]
+              : '?';
           conflictDays.add(AppStrings.recurringConflictDay(dayLabel, conflict));
         }
       }
@@ -584,18 +584,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         LessonPiece(
           id: 'piece_${DateTime.now().millisecondsSinceEpoch}',
           name: _pieceController.text,
-          notes:
-              _notesController.text.isNotEmpty ? _notesController.text : null,
+          notes: _notesController.text.isNotEmpty
+              ? _notesController.text
+              : null,
         ),
       );
     }
 
     // Past date → completed status (record mode), future → scheduled
     final isPastLesson = isLessonDateTimeInPast(_selectedDate, _selectedTime);
-    final lessonStatus =
-        isPastLesson && !_isRecurring
-            ? LessonStatus.completed
-            : LessonStatus.scheduled;
+    final lessonStatus = isPastLesson && !_isRecurring
+        ? LessonStatus.completed
+        : LessonStatus.scheduled;
 
     // Create the lesson object
     // Instrument: subscription (membership) is the SSOT; fall back to the
@@ -619,13 +619,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       duration: _lessonDuration,
       status: lessonStatus,
       pieces: pieces,
-      location:
-          _selectedLocation == null
-              ? null
-              : LessonLocationInfo(
-                name: _selectedLocation!.name,
-                address: _selectedLocation!.address,
-              ),
+      location: _selectedLocation == null
+          ? null
+          : LessonLocationInfo(
+              name: _selectedLocation!.name,
+              address: _selectedLocation!.address,
+            ),
       createdAt: DateTime.now(),
     );
 
@@ -693,10 +692,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
         if (!mounted) return;
 
-        final message =
-            isPastLesson
-                ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
-                : AppStrings.lessonAddedFor(_selectedStudent!.name);
+        final message = isPastLesson
+            ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
+            : AppStrings.lessonAddedFor(_selectedStudent!.name);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

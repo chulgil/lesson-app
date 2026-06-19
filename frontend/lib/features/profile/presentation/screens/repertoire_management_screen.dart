@@ -42,9 +42,8 @@ class _RepertoireManagementScreenState
         children: [
           // Search and filter section
           RepertoireSearchAndFilter(
-            onSearchChanged:
-                (value) =>
-                    ref.read(pieceSearchQueryProvider.notifier).setQuery(value),
+            onSearchChanged: (value) =>
+                ref.read(pieceSearchQueryProvider.notifier).setQuery(value),
             selectedDifficulty: _selectedDifficulty,
             selectedComposer: _selectedComposer,
             onDifficultyTap: _showDifficultyFilter,
@@ -62,30 +61,26 @@ class _RepertoireManagementScreenState
             child: piecesAsync.when(
               data: (pieces) => _buildPiecesList(pieces, searchQuery),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (_, __) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: AppColors.paperAccent,
-                        ),
-                        const SizedBox(height: AppSpacing.space4),
-                        const Text(AppStrings.profileRepertoireError),
-                        const SizedBox(height: AppSpacing.space4),
-                        FilledButton(
-                          onPressed:
-                              () =>
-                                  ref
-                                      .read(piecesNotifierProvider.notifier)
-                                      .refresh(),
-                          child: const Text(AppStrings.retry),
-                        ),
-                      ],
+              error: (_, __) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.paperAccent,
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.space4),
+                    const Text(AppStrings.profileRepertoireError),
+                    const SizedBox(height: AppSpacing.space4),
+                    FilledButton(
+                      onPressed: () =>
+                          ref.read(piecesNotifierProvider.notifier).refresh(),
+                      child: const Text(AppStrings.retry),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -95,28 +90,26 @@ class _RepertoireManagementScreenState
 
   Widget _buildPiecesList(List<Piece> allPieces, String searchQuery) {
     // Apply filters
-    var filteredPieces =
-        allPieces.where((piece) {
-          if (searchQuery.isNotEmpty) {
-            final query = searchQuery.toLowerCase();
-            if (!piece.title.toLowerCase().contains(query) &&
-                !(piece.composer?.toLowerCase().contains(query) ?? false)) {
-              return false;
-            }
-          }
+    var filteredPieces = allPieces.where((piece) {
+      if (searchQuery.isNotEmpty) {
+        final query = searchQuery.toLowerCase();
+        if (!piece.title.toLowerCase().contains(query) &&
+            !(piece.composer?.toLowerCase().contains(query) ?? false)) {
+          return false;
+        }
+      }
 
-          if (_selectedDifficulty != null &&
-              piece.difficulty != _selectedDifficulty) {
-            return false;
-          }
+      if (_selectedDifficulty != null &&
+          piece.difficulty != _selectedDifficulty) {
+        return false;
+      }
 
-          if (_selectedComposer != null &&
-              piece.composer != _selectedComposer) {
-            return false;
-          }
+      if (_selectedComposer != null && piece.composer != _selectedComposer) {
+        return false;
+      }
 
-          return true;
-        }).toList();
+      return true;
+    }).toList();
 
     // Sort by title
     filteredPieces.sort((a, b) => a.title.compareTo(b.title));
@@ -179,37 +172,35 @@ class _RepertoireManagementScreenState
   void _showAddPieceDialog() {
     showDialog(
       context: context,
-      builder:
-          (dialogContext) => PieceDialog(
-            onSave: (piece) async {
-              await ref.read(piecesNotifierProvider.notifier).addPiece(piece);
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')),
-              );
-            },
-          ),
+      builder: (dialogContext) => PieceDialog(
+        onSave: (piece) async {
+          await ref.read(piecesNotifierProvider.notifier).addPiece(piece);
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')));
+        },
+      ),
     );
   }
 
   void _showEditPieceDialog(Piece piece) {
     showDialog(
       context: context,
-      builder:
-          (dialogContext) => PieceDialog(
-            existingPiece: piece,
-            onSave: (updatedPiece) async {
-              await ref
-                  .read(piecesNotifierProvider.notifier)
-                  .updatePiece(updatedPiece);
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(AppStrings.profileRepertoirePieceUpdated),
-                ),
-              );
-            },
-          ),
+      builder: (dialogContext) => PieceDialog(
+        existingPiece: piece,
+        onSave: (updatedPiece) async {
+          await ref
+              .read(piecesNotifierProvider.notifier)
+              .updatePiece(updatedPiece);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.profileRepertoirePieceUpdated),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -242,10 +233,13 @@ class _RepertoireManagementScreenState
             .assignPiece(piece.id);
         if (mounted) {
           final students = ref.read(studentsNotifierProvider).value ?? [];
-          final student = students.firstWhere((s) => s.id == studentId);
+          final matches = students.where((s) => s.id == studentId);
+          final studentName = matches.isEmpty
+              ? '학생'
+              : matches.first.name; // #72
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${piece.title}이(가) ${student.name}에게 할당되었습니다'),
+              content: Text('${piece.title}이(가) $studentName에게 할당되었습니다'),
             ),
           );
         }
