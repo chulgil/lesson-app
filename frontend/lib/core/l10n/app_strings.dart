@@ -2759,11 +2759,11 @@ class AppStrings {
   /// 레슨 추가하기 (add lesson submit button)
   static const addLessonButton = '레슨 추가하기';
 
-  /// 이 학생은 현재 유효한 수강권이 없습니다... (no active subscription banner)
+  /// 수강권 없는 학생 레슨 추가 시 안내 — 체험권 자동연결 (spec §2.4: 선생님은 수강권을 의식하지 않는다)
   static const noActiveSubscriptionBanner =
-      '현재 유효한 수강권이 없는 학생입니다.\n'
-      '수기로 레슨을 등록할 수 있으며, 수강권 발급 후에는\n'
-      '레슨 횟수와 이동시간이 자동으로 관리됩니다.';
+      '이 레슨은 1회 체험 수강권으로 자동 연결됩니다.\n'
+      '수강권을 발급하면 이후 레슨 횟수와 이동시간이\n'
+      '자동으로 관리됩니다.';
   static String activeSubscriptionBanner(int remaining, int total) =>
       '수강권 $remaining/$total회 남음 · 이 레슨은 1회차로 차감됩니다.';
 

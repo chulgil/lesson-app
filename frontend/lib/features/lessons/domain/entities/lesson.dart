@@ -123,6 +123,17 @@ class LessonRecording {
 Duration _durationFromSeconds(int seconds) => Duration(seconds: seconds);
 int _durationToSeconds(Duration duration) => duration.inSeconds;
 
+/// Serialize a lesson date as a calendar date (`yyyy-MM-dd`) to match the
+/// backend `LessonCreate.date` (Pydantic `date`), which 422-rejects datetimes
+/// carrying a non-midnight time. The default serializer emits a full ISO
+/// string, so the time component is stripped here.
+String _lessonDateToJson(DateTime date) {
+  final y = date.year.toString().padLeft(4, '0');
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
+}
+
 /// Lesson location info (simplified for display)
 @JsonSerializable()
 class LessonLocationInfo {
@@ -146,6 +157,7 @@ class Lesson {
   final String? teacherId;
   final String? teacherName;
   final String instrument;
+  @JsonKey(toJson: _lessonDateToJson)
   final DateTime date;
   final String startTime;
   final int duration; // in minutes

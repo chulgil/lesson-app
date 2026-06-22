@@ -113,7 +113,7 @@ Map<String, dynamic> _$LessonToJson(Lesson instance) => <String, dynamic>{
       'teacher_id': instance.teacherId,
       'teacher_name': instance.teacherName,
       'instrument': instance.instrument,
-      'date': instance.date.toIso8601String(),
+      'date': _lessonDateToJson(instance.date),
       'start_time': instance.startTime,
       'duration': instance.duration,
       'status': _$LessonStatusEnumMap[instance.status]!,
