@@ -5,8 +5,8 @@ typedef BeatCallback = void Function(int beatNumber, bool isAccent);
 
 /// Abstract interface for metronome engines.
 ///
-/// Implemented by both [MetronomeEngine] (Flutter/Timer-based) and
-/// [NativeMetronomeEngine] (Platform-specific AudioTrack/AVAudioEngine).
+/// Implemented by [NativeMetronomeEngine] (platform-specific AudioTrack/AVAudioEngine)
+/// and [SoLoudMetronomeEngine] (macOS).
 abstract class MetronomeEngineInterface {
   /// Whether the metronome is currently playing.
   bool get isPlaying;
