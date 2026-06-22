@@ -72,10 +72,17 @@ class CurrentUserRoleStateHandle {
 @Riverpod(keepAlive: true)
 String currentUserId(CurrentUserIdRef ref) {
   if (!ref.watch(mockDataModeProvider)) {
-    final authState = ref.watch(authNotifierProvider);
-    if (authState is AuthAuthenticated) {
-      return authState.userId;
-    }
+    // #101: use the real user id for ANY identified auth state (including the
+    // onboarding states), never the shared mock fallback. Onboarding-phase Hive
+    // keys (coachmark/quest/dismiss) are user-scoped and would cross-contaminate
+    // between real users — and collide with mock data — under 'teacher_1' etc.
+    final userId = switch (ref.watch(authNotifierProvider)) {
+      AuthAuthenticated(:final userId) => userId,
+      AuthNeedsOnboarding(:final userId) => userId,
+      AuthNeedsRole(:final userId) => userId,
+      _ => null,
+    };
+    if (userId != null) return userId;
   }
   final role = ref.watch(currentUserRoleProvider);
   switch (role) {
