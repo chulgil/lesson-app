@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/subscription.dart';
+import '../extensions/subscription_urgency.dart';
 
 /// Compact badge — **Notebook × Score 스타일 수강권 티켓 라벨**.
 ///
@@ -58,27 +59,28 @@ class SubscriptionBadge extends StatelessWidget {
     );
   }
 
-  /// monthly 는 daysUntilExpiration 이 음수일 수 있어 status==expired 와 병합.
+  /// 배지 표시용 만료 — 공유 긴급도 모델(SSOT) 위임.
   bool get _isExpired =>
-      subscription.status == SubscriptionStatus.expired ||
-      (subscription.type == SubscriptionType.monthly &&
-          (subscription.daysUntilExpiration ?? 0) <= 0);
+      subscription.badgeUrgency == SubscriptionUrgency.expired;
 
   /// 긴급도 모델: 조치 필요(미수금·만료·임박)=버밀리온, 정상=중립 잉크.
   Color _accentColor() {
-    if (subscription.isUnpaid || _isExpired || subscription.isExpiringSoon) {
-      return AppColors.paperAccent;
-    }
-    return AppColors.inkSecondary;
+    return subscription.badgeUrgency == SubscriptionUrgency.normal
+        ? AppColors.inkSecondary
+        : AppColors.paperAccent;
   }
 
   /// 색맹 안전: 조치 필요 상태에만 상태 아이콘. 정상은 아이콘 없음.
   IconData? _stateIcon() {
-    if (subscription.isUnpaid || _isExpired) {
-      return Icons.warning_amber_rounded;
+    switch (subscription.badgeUrgency) {
+      case SubscriptionUrgency.unpaid:
+      case SubscriptionUrgency.expired:
+        return Icons.warning_amber_rounded;
+      case SubscriptionUrgency.expiringSoon:
+        return Icons.access_time;
+      case SubscriptionUrgency.normal:
+        return null;
     }
-    if (subscription.isExpiringSoon) return Icons.access_time;
-    return null;
   }
 
   /// Returns true when expiry is caused by session depletion (not date).
