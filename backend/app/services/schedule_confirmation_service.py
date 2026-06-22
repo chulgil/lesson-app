@@ -298,20 +298,44 @@ class ScheduleConfirmationService:
         if student is not None:
             student_name = student.name
 
+        # #301: distribute `count` lessons across weekly slots (주N회), week by week.
+        # Uses card.proposed_slots when present; falls back to single proposed_day/time.
         base_date = dt.date.today()
-        proposed_day = int(card.proposed_day) if card.proposed_day else base_date.weekday()
+        default_time = card.proposed_time or "14:00"
+        default_duration = card.proposed_duration or 60
 
-        # Find next occurrence of proposed_day (0=Mon)
-        days_ahead = proposed_day - base_date.weekday()
-        if days_ahead <= 0:
-            days_ahead += 7
-        first_date = base_date + timedelta(days=days_ahead)
+        slots: list[tuple[int, str, int]] = []
+        raw_slots = card.proposed_slots
+        if isinstance(raw_slots, list):
+            for entry in raw_slots:
+                if not isinstance(entry, dict) or entry.get("day") is None:
+                    continue
+                try:
+                    day_idx = int(entry["day"])
+                except (TypeError, ValueError):
+                    continue
+                slot_time = str(entry.get("time") or default_time)
+                slot_duration = int(entry.get("duration") or default_duration)
+                slots.append((day_idx, slot_time, slot_duration))
+        if not slots:
+            fallback_day = int(card.proposed_day) if card.proposed_day else base_date.weekday()
+            slots = [(fallback_day, default_time, default_duration)]
 
-        for i in range(count):
-            scheduled_date = first_date + timedelta(weeks=i)
-            scheduled_time = card.proposed_time or "14:00"
-            duration = card.proposed_duration or 60
+        # Generate exactly `count` occurrences, cycling slots across weeks (0=Mon).
+        occurrences: list[tuple[dt.date, str, int]] = []
+        week = 0
+        while len(occurrences) < count:
+            for slot_day, slot_time, slot_duration in slots:
+                if len(occurrences) >= count:
+                    break
+                days_ahead = slot_day - base_date.weekday()
+                if days_ahead <= 0:
+                    days_ahead += 7
+                scheduled_date = base_date + timedelta(days=days_ahead, weeks=week)
+                occurrences.append((scheduled_date, slot_time, slot_duration))
+            week += 1
 
+        for i, (scheduled_date, scheduled_time, duration) in enumerate(occurrences):
             # Skip this date if teacher already has a booking at this time
             conflict = await self._check_time_conflict(
                 teacher_id=teacher_profile_id,

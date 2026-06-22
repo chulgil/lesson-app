@@ -479,3 +479,65 @@ async def test_card_rejected_no_bookings(db_session: AsyncSession, create_test_u
 
     bookings = (await db_session.scalars(select(LessonBooking).where(LessonBooking.student_id == STUDENT_ID))).all()
     assert len(bookings) == 0
+
+
+@pytest.mark.asyncio
+async def test_regular_multislot_distributes_across_weekly_slots(db_session: AsyncSession, create_test_user):
+    """#301: proposed_slots(주N회)는 모든 주간 슬롯에 레슨을 분배해야 한다 (첫 슬롯만 X)."""
+    await create_test_user(user_id=TEACHER_ID, role="teacher")
+    await create_test_user(user_id=STUDENT_ID, role="student", name="Student", email="s@t.com")
+
+    lr_id = await _create_lesson_request(db_session)
+    tmpl_id = await _create_template(db_session)  # monthly, 4 lessons
+    await _create_relationship(db_session)
+
+    svc = _sub_svc(db_session)
+    teacher = _FakeUser(TEACHER_ID, "teacher")
+    student = _FakeUser(STUDENT_ID, "student")
+
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
+
+    proposal = await svc.create_proposal(
+        SubscriptionProposalCreate(
+            student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id
+        ),
+        teacher,
+    )
+    await svc.respond_to_proposal(
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
+    )
+    result = await svc.confirm_proposal(proposal.id, teacher)
+
+    from app.models.policy import ScheduleConfirmationCard
+
+    card = (
+        await db_session.scalars(
+            select(ScheduleConfirmationCard).where(
+                ScheduleConfirmationCard.subscription_id == result.subscription_id
+            )
+        )
+    ).one()
+
+    # 주2회: 월(0) 10:00 + 수(2) 15:00
+    card.proposed_slots = [{"day": "0", "time": "10:00"}, {"day": "2", "time": "15:00"}]
+    await db_session.flush()
+
+    from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
+
+    await _card_svc(db_session).confirm_card(
+        card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student
+    )
+
+    from app.models.lesson import Lesson
+
+    lessons = (
+        await db_session.scalars(
+            select(Lesson).where(Lesson.subscription_id == result.subscription_id)
+        )
+    ).all()
+    assert len(lessons) == 4  # total_lessons=4 across 2 weekly slots
+    assert sorted(lsn.date.weekday() for lsn in lessons) == [0, 0, 2, 2]
+    assert sorted(lsn.session_number for lsn in lessons) == [1, 2, 3, 4]
+    assert {lsn.start_time for lsn in lessons} == {"10:00", "15:00"}
