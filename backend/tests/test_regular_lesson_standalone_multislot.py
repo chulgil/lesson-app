@@ -148,8 +148,8 @@ async def test_standalone_conflicting_occurrence_pushed_forward_keeps_count(
         )
 
     assert response.status_code == 201, response.text
-    # 부분 손실이 응답에 실려 FE 가 교사에게 안내할 수 있다.
-    assert response.json()["recurring_skipped_count"] == 1
+    # push-forward 로 전부 배치되므로 응답의 skipped 는 0 (FE 안내 스낵바 미발동).
+    assert response.json()["recurring_skipped_count"] == 0
     lessons = (await db_session.scalars(select(Lesson).where(Lesson.student_id == "student-303"))).all()
     # 충돌 회차는 밀려서 8회 전부 생성 (월 4 / 수 4), 부분 손실 없음.
     assert len(lessons) == 8
