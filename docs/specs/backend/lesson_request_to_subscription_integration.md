@@ -204,6 +204,12 @@ sub = Subscription(
 > `proposed_slots`로 운반되고(`_create_confirmation_card`), 생성기가 totalLessons를 모든
 > 슬롯에 주차별 round-robin 분배한다(`_create_bookings_for_subscription`). 슬롯이 없으면
 > 단일 `proposed_day/time` 백워드 호환. 마이그레이션 0(기존 JSON 컬럼 재사용).
+>
+> #301 standalone: 교사용 `register_regular_lesson_screen` → `POST /bookings`(`fixed_time_slots`)
+> 가 N개 동시 주간 슬롯을 운반하면 `ScheduleService.create_booking`이 공유 헬퍼
+> `_generate_recurring_lessons`(생성기에서 추출)로 위임해 동일하게 분배 생성한다. 회차는
+> 구독 연동 시 `total_lessons`, 없으면 `lessons_per_week × 4`(1개월). FE 요일은 1=Mon..7=Sun
+> → BE 0=Mon..6=Sun 변환. 마이그레이션 0.
 
 #### GAP-6: RequestStatus 전이 불완전
 

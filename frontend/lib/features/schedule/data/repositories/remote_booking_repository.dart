@@ -183,7 +183,16 @@ class RemoteBookingRepository implements BookingRepository {
         'student_name': studentName,
         'schedule_type': registration.scheduleType.name,
         'lessons_per_week': registration.lessonsPerWeek,
-        'start_date': registration.startDate.toIso8601String(),
+        'start_date': registration.startDate.toIso8601String().split('T').first,
+        'fixed_time_slots': registration.fixedTimeSlots
+            .map(
+              (slot) => {
+                'day_of_week': slot.dayOfWeek - 1, // FE 1=Mon..7=Sun -> BE 0=Mon..6=Sun
+                'start_time': slot.startTime.format24Hour(),
+                'duration_minutes': slot.durationMinutes,
+              },
+            )
+            .toList(),
         'fee': registration.monthlyFee,
       },
     );

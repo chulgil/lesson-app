@@ -452,7 +452,7 @@ class _RegisterRegularLessonScreenState
       final registration = RegularLessonRegistration(
         studentId: widget.studentId ?? 'new_student',
         scheduleType: _scheduleType,
-        fixedTimeSlot: fixedSlots.isNotEmpty ? fixedSlots.first : null,
+        fixedTimeSlots: fixedSlots,
         lessonsPerWeek: _lessonsPerWeek,
         monthlyFee: _monthlyFee,
         startDate: _startDate,
