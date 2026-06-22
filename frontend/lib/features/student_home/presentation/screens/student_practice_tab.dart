@@ -13,7 +13,7 @@ import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../features/practice/practice_ui_facade.dart';
-import '../providers/student_home_session_provider.dart';
+import '../../../students/students_facade.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 
 /// Student practice tab with calendar-based repertoire management
@@ -29,7 +29,18 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final studentId = ref.watch(studentHomeCurrentStudentIdProvider);
+    // Resolve the real Student.id (GET /students/me/profile). The auth userId
+    // is not a Student.id — using it 404s on remote (mock matched by luck).
+    return ref
+        .watch(currentStudentProvider)
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => Center(child: Text(AppStrings.cannotLoadData)),
+          data: (student) => _buildBody(context, student.id),
+        );
+  }
+
+  Widget _buildBody(BuildContext context, String studentId) {
     final params = RepertoiresForDateParams(
       studentId: studentId,
       date: _selectedDate,

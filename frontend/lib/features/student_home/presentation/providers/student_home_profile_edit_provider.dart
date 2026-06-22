@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../auth/auth_facade.dart';
 import '../../../students/students_facade.dart';
 
 part 'student_home_profile_edit_provider.g.dart';
@@ -11,8 +10,9 @@ part 'student_home_profile_edit_provider.g.dart';
 Future<Student?> studentHomeProfileEditStudent(
   StudentHomeProfileEditStudentRef ref,
 ) {
-  final studentId = ref.watch(currentUserIdProvider);
-  return ref.watch(studentProvider(studentId).future);
+  // Resolve the real Student record via /students/me/profile. Using the auth
+  // userId as a Student.id 404s on remote (mock matched by coincidence).
+  return ref.watch(currentStudentProvider.future);
 }
 
 @riverpod

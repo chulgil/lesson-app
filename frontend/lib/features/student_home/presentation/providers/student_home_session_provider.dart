@@ -5,11 +5,6 @@ import '../../../auth/auth_facade.dart';
 part 'student_home_session_provider.g.dart';
 
 @riverpod
-String studentHomeCurrentStudentId(StudentHomeCurrentStudentIdRef ref) {
-  return ref.watch(currentUserIdProvider);
-}
-
-@riverpod
 StudentHomeSessionActions studentHomeSessionActions(
   StudentHomeSessionActionsRef ref,
 ) {

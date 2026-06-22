@@ -10,6 +10,7 @@ import 'package:lessonaza/features/practice/presentation/providers/practice_goal
 import 'package:lessonaza/features/practice/presentation/providers/practice_note_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import 'package:lessonaza/features/student_home/presentation/screens/student_practice_tab.dart';
+import 'package:lessonaza/features/students/students_facade.dart';
 
 void main() {
   group('StudentPracticeTab — §2.4 노트 섹션 통합 smoke (#492)', () {
@@ -78,7 +79,17 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('student-1'),
-            goalStatusProvider('student-1').overrideWith((_) async => fakeGoalStatus()),
+            currentStudentProvider.overrideWith(
+              (ref) async => Student(
+                id: 'student-1',
+                name: '학생',
+                instrument: '바이올린',
+                createdAt: DateTime(2026),
+              ),
+            ),
+            goalStatusProvider(
+              'student-1',
+            ).overrideWith((_) async => fakeGoalStatus()),
             studentRepertoiresProvider(
               'student-1',
             ).overrideWith((_) async => [repertoire]),
@@ -112,7 +123,17 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('student-1'),
-            goalStatusProvider('student-1').overrideWith((_) async => fakeGoalStatus()),
+            currentStudentProvider.overrideWith(
+              (ref) async => Student(
+                id: 'student-1',
+                name: '학생',
+                instrument: '바이올린',
+                createdAt: DateTime(2026),
+              ),
+            ),
+            goalStatusProvider(
+              'student-1',
+            ).overrideWith((_) async => fakeGoalStatus()),
             studentRepertoiresProvider(
               'student-1',
             ).overrideWith((_) async => const <PracticeRepertoire>[]),
@@ -153,7 +174,17 @@ void main() {
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('student-1'),
-            goalStatusProvider('student-1').overrideWith((_) async => fakeGoalStatus()),
+            currentStudentProvider.overrideWith(
+              (ref) async => Student(
+                id: 'student-1',
+                name: '학생',
+                instrument: '바이올린',
+                createdAt: DateTime(2026),
+              ),
+            ),
+            goalStatusProvider(
+              'student-1',
+            ).overrideWith((_) async => fakeGoalStatus()),
             studentRepertoiresProvider(
               'student-1',
             ).overrideWith((_) async => [repertoire]),

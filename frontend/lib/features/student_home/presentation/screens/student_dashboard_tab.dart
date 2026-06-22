@@ -15,8 +15,8 @@ import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
+import '../../../students/students_facade.dart';
 import '../providers/student_home_practice_provider.dart';
-import '../providers/student_home_session_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
@@ -30,18 +30,29 @@ class StudentDashboardTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final currentStudentId = ref.watch(studentHomeCurrentStudentIdProvider);
+    // Resolve the real Student.id (GET /students/me/profile). Passing the auth
+    // userId as a student id 404s on remote (mock matched by coincidence).
+    return ref
+        .watch(currentStudentProvider)
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => Center(child: Text(AppStrings.cannotLoadData)),
+          data: (student) {
+            final currentStudentId = student.id;
 
-    // O7: StudentQuest 0개 시 자동 onboarding (Job 6 Task 6.2).
-    //
-    // 2026-06-12 회귀 수정 — trigger 는 반드시 스크롤 **밖** (tab 전체 wrap).
-    // onboarding 화면은 Scaffold 기반 full-screen 이므로 SingleChildScrollView
-    // 내부 슬롯에 두면 unbounded height 크래시 (RenderCustomMultiChildLayoutBox
-    // infinite size). W6 TeacherMigrationOverlayGate 와 동일한 게이트 패턴.
-    return StudentGamificationOnboardingTrigger(
-      studentId: currentStudentId,
-      child: _buildDashboardBody(context, now, currentStudentId),
-    );
+            // O7: StudentQuest 0개 시 자동 onboarding (Job 6 Task 6.2).
+            //
+            // 2026-06-12 회귀 수정 — trigger 는 반드시 스크롤 **밖** (tab 전체 wrap).
+            // onboarding 화면은 Scaffold 기반 full-screen 이므로
+            // SingleChildScrollView 내부 슬롯에 두면 unbounded height 크래시
+            // (RenderCustomMultiChildLayoutBox infinite size). W6
+            // TeacherMigrationOverlayGate 와 동일한 게이트 패턴.
+            return StudentGamificationOnboardingTrigger(
+              studentId: currentStudentId,
+              child: _buildDashboardBody(context, now, currentStudentId),
+            );
+          },
+        );
   }
 
   Widget _buildDashboardBody(
@@ -102,11 +113,10 @@ class StudentDashboardTab extends ConsumerWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder:
-                      (_) => PracticeJournalScreen(
-                        childProfileId: currentStudentId,
-                        role: JournalRole.student,
-                      ),
+                  builder: (_) => PracticeJournalScreen(
+                    childProfileId: currentStudentId,
+                    role: JournalRole.student,
+                  ),
                 ),
               );
             },
@@ -117,10 +127,9 @@ class StudentDashboardTab extends ConsumerWidget {
           // Gamification header (선생님 quest / badge — P1 무변)
           GamificationHeader(
             studentId: currentStudentId,
-            onTap:
-                () => context.push(
-                  '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
-                ),
+            onTap: () => context.push(
+              '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
+            ),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -292,10 +301,9 @@ class _StudentTimeBanner extends ConsumerWidget {
     );
 
     // 학생은 streak 중심 메시지로 충분 — booking→Lesson 매핑 생략.
-    final streakDays =
-        practiceLogsAsync.valueOrNull != null
-            ? _calculateStreak(practiceLogsAsync.value!)
-            : 0;
+    final streakDays = practiceLogsAsync.valueOrNull != null
+        ? _calculateStreak(practiceLogsAsync.value!)
+        : 0;
 
     return TimeContextBanner(
       todayLessons: const <Lesson>[],

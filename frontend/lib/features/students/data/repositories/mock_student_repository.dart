@@ -444,6 +444,16 @@ class MockStudentRepository implements StudentRepository {
   }
 
   @override
+  Future<Student> getMyProfile() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    // Mock current student = student_1 (matches mock devLogin userId).
+    return _students.firstWhere(
+      (s) => s.id == 'student_1',
+      orElse: () => _students.first,
+    );
+  }
+
+  @override
   Future<Student> createStudent(Student student) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final newStudent = student.copyWith(
@@ -512,9 +522,7 @@ class MockStudentRepository implements StudentRepository {
   @override
   Future<List<Student>> getStudentsByStatus(StudentStatus status) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return _students
-        .where((s) => s.status == status && !s.isArchived)
-        .toList();
+    return _students.where((s) => s.status == status && !s.isArchived).toList();
   }
 
   @override

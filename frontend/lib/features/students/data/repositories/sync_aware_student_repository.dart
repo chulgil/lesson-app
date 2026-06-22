@@ -54,6 +54,22 @@ class SyncAwareStudentRepository implements StudentRepository {
   }
 
   @override
+  Future<Student> getMyProfile() async {
+    final key = StudentCacheStore.keyStudent('me');
+    try {
+      final result = await _remote.getMyProfile();
+      await _cache.putStudent(key, result);
+      return result;
+    } on Exception catch (e) {
+      if (_isNetworkFailure(e)) {
+        final cached = _cache.getStudent(key);
+        if (cached != null) return cached;
+      }
+      rethrow;
+    }
+  }
+
+  @override
   Future<List<Student>> searchStudents(String query) => _readListWithCache(
     StudentCacheStore.keySearch(query),
     () => _remote.searchStudents(query),

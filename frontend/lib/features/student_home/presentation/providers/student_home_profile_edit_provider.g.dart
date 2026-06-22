@@ -7,7 +7,7 @@ part of 'student_home_profile_edit_provider.dart';
 // **************************************************************************
 
 String _$studentHomeProfileEditStudentHash() =>
-    r'969612c2bd495b02d6193bd0c205029761f97eed';
+    r'4d030b451a4bbe40eee4eb6b57d024c8b35dc200';
 
 /// See also [studentHomeProfileEditStudent].
 @ProviderFor(studentHomeProfileEditStudent)
