@@ -29,6 +29,7 @@ class _StudentInviteCodeScreenState
   final _codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _isSkipping = false; // #104: skip 경로 전용 가드 (제출 스피너와 분리)
   String? _errorMessage;
 
   @override
@@ -234,7 +235,8 @@ class _StudentInviteCodeScreenState
                         width: double.infinity,
                         height: AppSpacing.buttonHeight,
                         child: OutlinedButton(
-                          onPressed: _handleStartWithoutCode,
+                          onPressed:
+                              _isSkipping ? null : _handleStartWithoutCode,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.inkSecondary,
                             side: BorderSide(color: AppColors.inkQuaternary),
@@ -260,14 +262,19 @@ class _StudentInviteCodeScreenState
   }
 
   Future<void> _handleStartWithoutCode() async {
+    // #104: skip 더블탭 가드 — 진행 중이면 재진입 무시 (age-gate 중복·navigation 중복 방지).
+    if (_isSkipping) return;
+    setState(() => _isSkipping = true);
     // 만 14세 미만 차단 안전망 (phone_verification_policy.md §2.2).
     //
     // 정식 연령 검증은 통신사 본인인증(PASS) 으로 자동 처리될 예정이나, PASS
     // 통합 전까지 코드 없이 진입하는 학생에 대한 최소 게이트로 자가신고 확인을
     // 둔다. PASS 연동 시 이 다이얼로그는 본인인증 플로우로 대체한다.
     final isOverFourteen = await _confirmAgeGate();
-    if (isOverFourteen != true) return;
-
+    if (isOverFourteen != true) {
+      if (mounted) setState(() => _isSkipping = false);
+      return;
+    }
     if (!mounted) return;
     // Set role to student and go directly to profile setup
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
