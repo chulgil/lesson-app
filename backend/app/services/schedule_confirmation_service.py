@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Any
 
@@ -18,6 +19,8 @@ from app.schemas.schedule_confirmation import (
     ScheduleConfirmationCardStatusUpdate,
 )
 from app.services.actor import actor_type
+
+logger = logging.getLogger(__name__)
 
 
 class ScheduleConfirmationService:
@@ -421,6 +424,19 @@ class ScheduleConfirmationService:
                 lesson_source=lesson_source,
             )
             self.db.add(lesson)
+
+        # #301: surface partial loss — conflicting occurrences were silently skipped.
+        skipped = count - len(created)
+        if skipped > 0:
+            logger.warning(
+                "#301 recurring lessons: %d/%d occurrence(s) skipped due to teacher booking "
+                "conflicts (teacher=%s student=%s subscription=%s)",
+                skipped,
+                count,
+                teacher_profile_id,
+                student_id,
+                subscription_id,
+            )
 
         return created
 

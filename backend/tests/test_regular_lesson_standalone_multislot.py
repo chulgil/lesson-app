@@ -91,3 +91,63 @@ async def test_standalone_single_slot_still_works(
     assert len(lessons) == 4
     assert all(le.date.weekday() == 4 for le in lessons)
     assert all(le.duration == 45 for le in lessons)
+
+
+@pytest.mark.asyncio
+async def test_standalone_conflicting_occurrence_is_skipped_and_warned(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session,
+    caplog,
+):
+    """#301: 일부 슬롯이 기존 일정과 충돌하면 그 회차만 제외되고(부분 손실),
+    조용히 사라지지 않도록 경고 로그로 surface 된다."""
+    import datetime as dt
+    import logging
+
+    from app.models.lesson import Lesson
+    from app.models.schedule import LessonBooking
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    # 교사의 기존 예약이 월요일 첫 회차(2026-07-06 10:00)와 충돌하도록 미리 생성.
+    db_session.add(
+        LessonBooking(
+            teacher_id="test-user-id-prof",
+            student_id="existing-student",
+            lesson_type="regular",
+            scheduled_date=dt.date(2026, 7, 6),
+            scheduled_time="10:00",
+            duration=60,
+            status="confirmed",
+        )
+    )
+    await db_session.flush()
+
+    with caplog.at_level(logging.WARNING):
+        response = await client.post(
+            "/api/v1/bookings",
+            headers=auth_headers,
+            json={
+                "teacher_id": "test-user-id",
+                "student_id": "student-303",
+                "lesson_type": "regular",
+                "start_date": "2026-07-01",  # Wednesday
+                "duration": 60,
+                "lessons_per_week": 2,
+                "fixedTimeSlots": [
+                    {"day_of_week": 0, "start_time": "10:00", "duration_minutes": 60},
+                    {"day_of_week": 2, "start_time": "14:00", "duration_minutes": 60},
+                ],
+            },
+        )
+
+    assert response.status_code == 201, response.text
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.student_id == "student-303"))).all()
+    # 8회 요청 중 충돌 1회(월 07-06) 제외 → 7회 생성 (월 3 / 수 4).
+    assert len(lessons) == 7
+    assert sum(1 for le in lessons if le.date.weekday() == 0) == 3
+    assert sum(1 for le in lessons if le.date.weekday() == 2) == 4
+    # 부분 손실이 로그로 surface 됨.
+    assert any("skipped" in r.message and "#301" in r.message for r in caplog.records)
