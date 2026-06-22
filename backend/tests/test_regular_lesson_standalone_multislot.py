@@ -144,6 +144,8 @@ async def test_standalone_conflicting_occurrence_is_skipped_and_warned(
         )
 
     assert response.status_code == 201, response.text
+    # 부분 손실이 응답에 실려 FE 가 교사에게 안내할 수 있다.
+    assert response.json()["recurring_skipped_count"] == 1
     lessons = (await db_session.scalars(select(Lesson).where(Lesson.student_id == "student-303"))).all()
     # 8회 요청 중 충돌 1회(월 07-06) 제외 → 7회 생성 (월 3 / 수 4).
     assert len(lessons) == 7

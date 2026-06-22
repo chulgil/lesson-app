@@ -460,7 +460,7 @@ class _RegisterRegularLessonScreenState
         isAcademyPrivate: _isAcademyPrivate,
       );
 
-      await ref
+      final booking = await ref
           .read(bookingsNotifierProvider.notifier)
           .registerRegularLesson(
             teacherId: widget.teacherId,
@@ -471,10 +471,18 @@ class _RegisterRegularLessonScreenState
           );
 
       if (mounted) {
+        // #301: 일부 회차가 기존 일정과 겹쳐 제외되면 교사에게 안내 (비차단).
+        final skipped = booking.recurringSkippedCount;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.regularLessonRegistered),
-            backgroundColor: AppColors.paperOk,
+          SnackBar(
+            content: Text(
+              skipped > 0
+                  ? AppStrings.regularLessonRegisteredWithConflicts(skipped)
+                  : AppStrings.regularLessonRegistered,
+            ),
+            backgroundColor: skipped > 0
+                ? AppColors.paperAccent
+                : AppColors.paperOk,
           ),
         );
         context.pop();

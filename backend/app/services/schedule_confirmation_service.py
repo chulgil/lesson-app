@@ -440,10 +440,11 @@ class ScheduleConfirmationService:
 
         return created
 
-    async def create_standalone_regular_lessons(self, data: Any, current_user: Any) -> list[Any]:
+    async def create_standalone_regular_lessons(self, data: Any, current_user: Any) -> tuple[list[Any], int]:
         """#301: Create recurring multi-slot lessons from a standalone regular-lesson
         registration (register_regular_lesson_screen → POST /bookings with
-        ``fixed_time_slots``). Returns the created LessonBooking rows (first = primary).
+        ``fixed_time_slots``). Returns (created LessonBooking rows, requested count) so
+        callers can surface partial loss (requested - created = skipped conflicts).
 
         Source of N concurrent weekly slots: the teacher's register-regular-lesson
         screen. Each slot is {day_of_week, start_time, duration_minutes}.
@@ -507,7 +508,7 @@ class ScheduleConfirmationService:
         await self.db.flush()
         for booking in created:
             await self.db.refresh(booking)
-        return created
+        return created, count
 
     async def _check_time_conflict(
         self,

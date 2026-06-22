@@ -86,4 +86,48 @@ void main() {
       });
     },
   );
+
+  test(
+    'registerRegularLesson surfaces recurring_skipped_count from response',
+    () async {
+      final repository = repositoryFor((options, handler) {
+        handler.resolve(
+          Response(
+            requestOptions: options,
+            data: {
+              'id': 'booking-1',
+              'teacher_id': 'teacher-1',
+              'lesson_date': '2026-07-06',
+              'recurring_skipped_count': 2, // 2 회차가 충돌로 제외됨
+            },
+            statusCode: 201,
+          ),
+        );
+      });
+
+      final booking = await repository.registerRegularLesson(
+        teacherId: 'teacher-1',
+        teacherName: '김선생님',
+        studentId: 'student-1',
+        studentName: '학생',
+        registration: RegularLessonRegistration(
+          studentId: 'student-1',
+          scheduleType: ScheduleType.fixed,
+          fixedTimeSlots: [
+            TimeSlot(
+              id: 'slot_1',
+              dayOfWeek: 1,
+              startTime: const ClockTime(hour: 10, minute: 0),
+              endTime: const ClockTime(hour: 11, minute: 0),
+            ),
+          ],
+          lessonsPerWeek: 1,
+          monthlyFee: 100000,
+          startDate: DateTime(2026, 7, 1),
+        ),
+      );
+
+      expect(booking.recurringSkippedCount, 2);
+    },
+  );
 }

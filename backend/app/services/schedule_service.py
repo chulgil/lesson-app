@@ -816,10 +816,15 @@ class ScheduleService:
         if data.fixed_time_slots:
             from app.services.schedule_confirmation_service import ScheduleConfirmationService
 
-            created = await ScheduleConfirmationService(self.db).create_standalone_regular_lessons(data, current_user)
+            created, requested = await ScheduleConfirmationService(self.db).create_standalone_regular_lessons(
+                data, current_user
+            )
             if not created:
                 raise ValueError("선택한 시간이 모두 기존 일정과 충돌합니다")
-            return await self._to_booking_response(created[0])
+            response = await self._to_booking_response(created[0])
+            # 충돌로 건너뛴 회차 수를 응답에 실어 FE 가 교사에게 안내하게 한다.
+            response.recurring_skipped_count = requested - len(created)
+            return response
 
         await self._check_booking_overlap(
             teacher_id=data.teacher_id,
