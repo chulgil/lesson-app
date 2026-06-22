@@ -17,6 +17,7 @@ from app.schemas.schedule_confirmation import (
     ScheduleConfirmationCardResponse,
     ScheduleConfirmationCardStatusUpdate,
 )
+from app.services.actor import actor_type
 
 
 class ScheduleConfirmationService:
@@ -79,10 +80,12 @@ class ScheduleConfirmationService:
 
         # Notify student about new schedule confirmation card
         from app.models.student import Student
+
         _student = await self.db.get(Student, card.student_id)
         if _student and _student.user_id:
             from app.models.notification import NotificationPriority
             from app.services.notification_service import NotificationService
+
             _notification_service = NotificationService(self.db)
             _response = await self._response_for_card(card)
             _teacher_name = _response.teacher_name or "선생님"
@@ -357,6 +360,7 @@ class ScheduleConfirmationService:
         """Check if teacher has an existing booking at this date/time."""
         from app.models.lesson import Lesson
         from app.models.schedule import LessonBooking
+
         teacher_ids = await self._resolve_teacher_id_scope(teacher_id)
 
         existing = await self.db.scalars(
@@ -446,7 +450,7 @@ class ScheduleConfirmationService:
         return card
 
     async def _can_access(self, card: Any, current_user: Any) -> bool:
-        role = self._actor_type(current_user)
+        role = actor_type(current_user)
         if role == "teacher":
             result: bool = card.teacher_id in await self._teacher_identifiers(current_user)
             return result
@@ -461,7 +465,7 @@ class ScheduleConfirmationService:
     async def _apply_access_filter(self, query: Any, current_user: Any) -> Any:
         from app.models.policy import ScheduleConfirmationCard
 
-        role = self._actor_type(current_user)
+        role = actor_type(current_user)
         if role == "teacher":
             teacher_ids = await self._teacher_identifiers(current_user)
             return query.where(ScheduleConfirmationCard.teacher_id.in_(teacher_ids))
@@ -472,10 +476,6 @@ class ScheduleConfirmationService:
                 ScheduleConfirmationCard.student_id.in_(await self._parent_child_student_ids(current_user))
             )
         return query.where(False)
-
-    def _actor_type(self, user: Any) -> str:
-        role = getattr(user, "role", None)
-        return getattr(role, "value", role) or ""
 
     async def _student_identifiers(self, user: Any) -> list[str]:
         """Return user id plus linked Student profile ids for student actors."""

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.request_event import RequestEvent, RequestEventType
 from app.schemas.request_event import RequestEventCreate, RequestEventResponse
+from app.services.actor import actor_type
 
 
 class RequestEventService:
@@ -35,7 +36,7 @@ class RequestEventService:
 
         # Derive actor identity from the authenticated user — ignore client-supplied values.
         server_actor_id = current_user.id
-        server_actor_type = self._actor_type(current_user)
+        server_actor_type = actor_type(current_user)
 
         event = RequestEvent(
             request_id=request_id,
@@ -68,7 +69,7 @@ class RequestEventService:
                 detail="Lesson request not found",
             )
 
-        role = self._actor_type(current_user)
+        role = actor_type(current_user)
         if role == "student" and request.student_id == current_user.id:
             return
         if role == "teacher":
@@ -80,7 +81,3 @@ class RequestEventService:
                 return
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-
-    def _actor_type(self, user: Any) -> str:
-        role = getattr(user, "role", None)
-        return getattr(role, "value", role) or ""
