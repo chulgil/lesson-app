@@ -11,37 +11,6 @@ class AppException(Exception):
         self.code = code
 
 
-class NotFoundException(AppException):
-    """Resource not found."""
-
-    def __init__(self, resource: str, resource_id: str = ""):
-        detail = f"{resource} not found"
-        if resource_id:
-            detail = f"{resource} not found: {resource_id}"
-        super().__init__(404, detail, "not_found")
-
-
-class ForbiddenException(AppException):
-    """Access forbidden."""
-
-    def __init__(self, message: str = "Forbidden"):
-        super().__init__(403, message, "forbidden")
-
-
-class UnauthorizedException(AppException):
-    """Authentication required."""
-
-    def __init__(self, message: str = "Unauthorized"):
-        super().__init__(401, message, "unauthorized")
-
-
-class ValidationException(AppException):
-    """Validation error."""
-
-    def __init__(self, message: str = "Validation error"):
-        super().__init__(422, message, "validation_error")
-
-
 class PhoneVerificationRequiredException(AppException):
     """Phone verification required for the requested action.
 
