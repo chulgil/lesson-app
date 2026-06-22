@@ -31,10 +31,42 @@ void main() {
     expect(students, hasLength(1));
     expect(students.single.id, 'student-1');
   });
+
+  test(
+    'currentStudentId resolves the real Student.id via getMyProfile (not auth userId)',
+    () async {
+      // Regression guard: the student home must resolve the logged-in user's
+      // real Student.id (GET /students/me/profile), never use the auth userId
+      // as a student id. On remote those differ → 404 "Student not found"
+      // (mock matched by coincidence). The id must come from getMyProfile().
+      final repository =
+          _FakeStudentRepository()
+            ..myProfile = Student(
+              id: 'real-student-42',
+              name: '김민준',
+              instrument: '바이올린',
+              createdAt: DateTime(2026),
+            );
+      final container = ProviderContainer(
+        overrides: [studentRepositoryProvider.overrideWithValue(repository)],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        await container.read(currentStudentIdProvider.future),
+        'real-student-42',
+      );
+      final student = await container.read(currentStudentProvider.future);
+      expect(student.id, 'real-student-42');
+    },
+  );
 }
 
 class _FakeStudentRepository implements StudentRepository {
   final List<Student> _students = [];
+
+  /// Profile returned by [getMyProfile] (the logged-in student's own record).
+  Student? myProfile;
 
   @override
   Future<List<Student>> getStudents() async => List.unmodifiable(_students);
@@ -44,6 +76,10 @@ class _FakeStudentRepository implements StudentRepository {
     _students.add(student);
     return student;
   }
+
+  @override
+  Future<Student> getMyProfile() async =>
+      myProfile ?? (throw StateError('myProfile not set'));
 
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -182,6 +182,45 @@ class _StudentProviderElement extends FutureProviderElement<Student?>
   String get id => (origin as StudentProvider).id;
 }
 
+String _$currentStudentHash() => r'74a7ff4ce8f2edd7422dbcf79a20357f4c8df72e';
+
+/// Current authenticated student's own profile (GET /students/me/profile).
+///
+/// SSOT for resolving the logged-in user's real [Student.id]. The auth
+/// `userId` is NOT a `Student.id`; using it as one yields 404 "Student not
+/// found" on remote (mock happened to match by coincidence). Watch this
+/// instead of passing `currentUserId` as a student id.
+///
+/// Copied from [currentStudent].
+@ProviderFor(currentStudent)
+final currentStudentProvider = FutureProvider<Student>.internal(
+  currentStudent,
+  name: r'currentStudentProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentStudentHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentStudentRef = FutureProviderRef<Student>;
+String _$currentStudentIdHash() => r'6615b24c422b10de0f763db0ca9fa52408fdb967';
+
+/// Convenience: the logged-in student's real `Student.id`.
+///
+/// Copied from [currentStudentId].
+@ProviderFor(currentStudentId)
+final currentStudentIdProvider = FutureProvider<String>.internal(
+  currentStudentId,
+  name: r'currentStudentIdProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentStudentIdHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef CurrentStudentIdRef = FutureProviderRef<String>;
 String _$filteredStudentsHash() => r'ffbb3037ed0741ff836dd3091eac828737cf6a3a';
 
 /// See also [filteredStudents].

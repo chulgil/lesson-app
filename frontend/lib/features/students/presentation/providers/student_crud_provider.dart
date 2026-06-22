@@ -20,6 +20,25 @@ Future<Student?> student(StudentRef ref, String id) async {
   return repository.getStudent(id);
 }
 
+/// Current authenticated student's own profile (GET /students/me/profile).
+///
+/// SSOT for resolving the logged-in user's real [Student.id]. The auth
+/// `userId` is NOT a `Student.id`; using it as one yields 404 "Student not
+/// found" on remote (mock happened to match by coincidence). Watch this
+/// instead of passing `currentUserId` as a student id.
+@Riverpod(keepAlive: true)
+Future<Student> currentStudent(CurrentStudentRef ref) async {
+  final repository = ref.watch(studentRepositoryProvider);
+  return repository.getMyProfile();
+}
+
+/// Convenience: the logged-in student's real `Student.id`.
+@Riverpod(keepAlive: true)
+Future<String> currentStudentId(CurrentStudentIdRef ref) async {
+  final student = await ref.watch(currentStudentProvider.future);
+  return student.id;
+}
+
 /// Search students provider
 @Riverpod(keepAlive: true)
 class StudentSearchQuery extends _$StudentSearchQuery {

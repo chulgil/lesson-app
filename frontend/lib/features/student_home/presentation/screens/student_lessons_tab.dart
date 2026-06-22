@@ -12,8 +12,8 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../students/students_facade.dart';
 import '../providers/student_home_booking_provider.dart';
-import '../providers/student_home_session_provider.dart';
 import '../providers/student_lessons_tab_state_provider.dart';
 import '../widgets/student_lesson_card.dart';
 import '../widgets/trial_booking_card.dart';
@@ -25,7 +25,22 @@ class StudentLessonsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentStudentId = ref.watch(studentHomeCurrentStudentIdProvider);
+    // Resolve the real Student.id (GET /students/me/profile). The auth userId
+    // is not a Student.id — using it 404s on remote (mock matched by luck).
+    return ref
+        .watch(currentStudentProvider)
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => Center(child: Text(AppStrings.cannotLoadData)),
+          data: (student) => _buildBody(context, ref, student.id),
+        );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    WidgetRef ref,
+    String currentStudentId,
+  ) {
     final selectedDate = ref.watch(studentSelectedDateProvider);
     final sortType = ref.watch(studentLessonSortTypeProvider);
     final scheduleAsync = ref.watch(
@@ -38,15 +53,14 @@ class StudentLessonsTab extends ConsumerWidget {
     final markedDates = schedule?.markerDates ?? <DateTime>{};
 
     // Filter lessons for selected date
-    final dayLessons =
-        studentLessons
-            .where(
-              (l) =>
-                  l.date.year == selectedDate.year &&
-                  l.date.month == selectedDate.month &&
-                  l.date.day == selectedDate.day,
-            )
-            .toList();
+    final dayLessons = studentLessons
+        .where(
+          (l) =>
+              l.date.year == selectedDate.year &&
+              l.date.month == selectedDate.month &&
+              l.date.day == selectedDate.day,
+        )
+        .toList();
 
     // Sort lessons
     switch (sortType) {
@@ -59,15 +73,14 @@ class StudentLessonsTab extends ConsumerWidget {
     }
 
     // Filter trial bookings for selected date
-    final dayTrialBookings =
-        trialBookings
-            .where(
-              (b) =>
-                  b.lessonDate.year == selectedDate.year &&
-                  b.lessonDate.month == selectedDate.month &&
-                  b.lessonDate.day == selectedDate.day,
-            )
-            .toList();
+    final dayTrialBookings = trialBookings
+        .where(
+          (b) =>
+              b.lessonDate.year == selectedDate.year &&
+              b.lessonDate.month == selectedDate.month &&
+              b.lessonDate.day == selectedDate.day,
+        )
+        .toList();
 
     final isLoading = scheduleAsync.isLoading;
     final totalCount = dayLessons.length + dayTrialBookings.length;
@@ -192,29 +205,23 @@ class StudentLessonsTab extends ConsumerWidget {
       onSelected: (value) {
         ref.read(studentLessonSortTypeProvider.notifier).state = value;
       },
-      itemBuilder:
-          (context) =>
-              LessonSortType.values
-                  .map(
-                    (type) => PopupMenuItem(
-                      value: type,
-                      child: Row(
-                        children: [
-                          if (type == sortType)
-                            Icon(
-                              Icons.check,
-                              size: 16,
-                              color: AppColors.paperAccent,
-                            )
-                          else
-                            const SizedBox(width: AppSpacing.space4),
-                          const SizedBox(width: AppSpacing.space2),
-                          Text(type.displayName),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
+      itemBuilder: (context) => LessonSortType.values
+          .map(
+            (type) => PopupMenuItem(
+              value: type,
+              child: Row(
+                children: [
+                  if (type == sortType)
+                    Icon(Icons.check, size: 16, color: AppColors.paperAccent)
+                  else
+                    const SizedBox(width: AppSpacing.space4),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(type.displayName),
+                ],
+              ),
+            ),
+          )
+          .toList(),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -26,6 +26,12 @@ class RemoteStudentRepository implements StudentRepository {
   }
 
   @override
+  Future<Student> getMyProfile() async {
+    final response = await _apiClient.get('/students/me/profile');
+    return Student.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
   Future<Student> createStudent(Student student) async {
     final response = await _apiClient.post('/students', data: student.toJson());
     return Student.fromJson(response.data as Map<String, dynamic>);

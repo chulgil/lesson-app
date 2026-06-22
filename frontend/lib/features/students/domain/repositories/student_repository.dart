@@ -4,6 +4,13 @@ import '../entities/entities.dart';
 abstract class StudentRepository {
   Future<List<Student>> getStudents();
   Future<Student?> getStudent(String id);
+
+  /// Get the authenticated student's own profile (GET /students/me/profile).
+  ///
+  /// Resolves the real [Student] record (incl. its `id`) for the logged-in
+  /// user. Distinct from [getStudent], which looks up by `Student.id` — the
+  /// auth `userId` is NOT a `Student.id` and must not be used as one.
+  Future<Student> getMyProfile();
   Future<Student> createStudent(Student student);
   Future<Student> updateStudent(Student student);
   Future<void> deleteStudent(String id);

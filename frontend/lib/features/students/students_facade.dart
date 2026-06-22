@@ -15,6 +15,8 @@ export 'presentation/providers/grouped_students_provider.dart'
 export 'presentation/providers/student_crud_provider.dart'
     show
         StudentsNotifier,
+        currentStudentIdProvider,
+        currentStudentProvider,
         studentProvider,
         studentsNotifierProvider,
         studentsProvider;
