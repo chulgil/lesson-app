@@ -78,6 +78,21 @@ file-as-memory 와 충돌 → 미사용.
 - **gemini**: 백엔드 = `agy` CLI(`.cg/backends.json` 정본), 기본 `gemini-3.1-pro-high`,
   폴백 `api`. agy 모델은 전역 단위라 per-call 핀 불가 → gemini 전용 전역을 pro-high 로.
 
+### 난이도별 모델 티어 (native 서브에이전트 디스패치)
+
+claude-main 워커는 `opus` 고정이지만, native Task 로 보조 서브에이전트를 띄울 때는
+**작업 난이도에 모델 티어를 맞춘다** — 모두 Opus 로 띄우지 않는다:
+
+| 작업 성격 | 모델 티어 |
+|-----------|-----------|
+| 코드베이스 탐색·검색, 기계적 변환, 단순 추출 | Haiku |
+| 일반 구현·수정 (탐색 + 편집) | Sonnet |
+| 계획 수립·어려운 검증·adversarial 비평 | Opus |
+
+> 컨텍스트 격리된 서브에이전트는 작은 작업을 다루므로 작은 모델로 충분하다. 난이도↔티어를
+> 맞추면 토큰·시간을 아끼면서 품질을 유지한다. Claude Code 내장 Explore(Haiku)·Plan(상속)·
+> General(Sonnet) 이 이미 이 원리를 따른다. (출처: Claude Code 멀티에이전트 — 모델 인텔리전스 라우팅)
+
 ## 최소 Worker Set
 
 | 작업 유형 | 권장 최소 set |
