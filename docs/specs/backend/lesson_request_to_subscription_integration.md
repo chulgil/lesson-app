@@ -200,10 +200,12 @@ sub = Subscription(
 - Trial: 단일 레슨 생성
 - LessonBooking 레코드도 함께 생성
 
-> #301 주N회: `LessonRequest.preferred_slots`(합의된 N개 주간 슬롯)가 자동 확인카드의
-> `proposed_slots`로 운반되고(`_create_confirmation_card`), 생성기가 totalLessons를 모든
-> 슬롯에 주차별 round-robin 분배한다(`_create_bookings_for_subscription`). 슬롯이 없으면
-> 단일 `proposed_day/time` 백워드 호환. 마이그레이션 0(기존 JSON 컬럼 재사용).
+> #301 주N회 (Option A): 자동 확인카드(`_create_confirmation_card`)는 **단일 대표 슬롯만**
+> 운반한다(`proposed_day/time`). `LessonRequest.preferred_slots`는 **우선순위 대안**(priority
+> 1·2·3 — 교사가 1개 선택)이지 동시 주간 슬롯이 아니므로 `proposed_slots`로 옮기지 않는다
+> (옮기면 주1회+대안3개 학생이 주3회로 오생성됨). 주N회는 아래 standalone 경로에서만 생성.
+> 생성기 자체는 `proposed_slots`가 채워져 있으면(standalone·수동 카드) 모든 슬롯에 주차별
+> round-robin 분배한다(`_create_bookings_for_subscription`, PR #887).
 >
 > #301 standalone: 교사용 `register_regular_lesson_screen` → `POST /bookings`(`fixed_time_slots`)
 > 가 N개 동시 주간 슬롯을 운반하면 `ScheduleService.create_booking`이 공유 헬퍼

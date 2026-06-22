@@ -536,10 +536,12 @@ async def test_regular_multislot_distributes_across_weekly_slots(db_session: Asy
 
 
 @pytest.mark.asyncio
-async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: AsyncSession, create_test_user):
-    """#301 상류: 주N회 합의(preferred_slots)가 자동 확인카드의 proposed_slots 로 실려야 한다.
-
-    수동 주입 없이 발급 → 카드 자동 생성 → 두 요일 분배까지 end-to-end 로 확인한다.
+async def test_auto_card_does_not_promote_preferred_alternatives_to_multislot(
+    db_session: AsyncSession, create_test_user
+):
+    """#301 Option A: preferred_slots(우선순위 대안)는 자동 확인카드의 proposed_slots 로
+    옮겨지지 않는다. auto-card 는 단일 대표 슬롯만 운반하고, 주N회는 standalone
+    register_regular_lesson 경로에서만 생성된다. (대안 N개 → 주N회 오생성 방지)
     """
     await create_test_user(user_id=TEACHER_ID, role="teacher")
     await create_test_user(user_id=STUDENT_ID, role="student", name="Student", email="s@t.com")
@@ -582,11 +584,10 @@ async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: A
         )
     ).one()
 
-    # 상류 핵심: 카드가 두 슬롯을 그대로 운반 (수동 주입 없음).
-    assert card.proposed_slots is not None
-    assert [int(s["day"]) for s in card.proposed_slots] == [0, 2]
-    assert {s["time"] for s in card.proposed_slots} == {"10:00", "15:00"}
-    assert all(s["duration"] == 60 for s in card.proposed_slots)
+    # Option A 핵심: 대안 슬롯은 proposed_slots 로 승격되지 않는다 — 단일 대표 슬롯만.
+    assert card.proposed_slots is None
+    assert card.proposed_day == "0"
+    assert card.proposed_time == "10:00"
 
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
 
@@ -595,6 +596,7 @@ async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: A
     from app.models.lesson import Lesson
 
     lessons = (await db_session.scalars(select(Lesson).where(Lesson.subscription_id == result.subscription_id))).all()
+    # 주1회 단일 슬롯으로만 생성 (대안이 주2회로 부풀지 않음).
     assert len(lessons) == 4
-    assert sorted(lsn.date.weekday() for lsn in lessons) == [0, 0, 2, 2]
-    assert {lsn.start_time for lsn in lessons} == {"10:00", "15:00"}
+    assert all(lsn.date.weekday() == 0 for lsn in lessons)
+    assert {lsn.start_time for lsn in lessons} == {"10:00"}
