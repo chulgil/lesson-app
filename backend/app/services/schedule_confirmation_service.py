@@ -370,10 +370,16 @@ class ScheduleConfirmationService:
         if lesson_source is None:
             lesson_source = LessonSource.subscription_generated
 
-        # Generate exactly `count` occurrences, cycling slots across weeks (0=Mon).
+        # Generate `count` NON-conflicting occurrences, cycling slots across weeks
+        # (0=Mon). When the teacher already has a booking at a candidate slot we
+        # push that occurrence to the next week's slot instead of dropping it, so
+        # the student always gets the `count` lessons they paid for (#897 follow-up).
+        # ponytail: cap weeks so a permanently-blocked slot can't loop forever;
+        # `count` weeks covers the no-conflict span, +52 gives headroom for conflicts.
         occurrences: list[tuple[dt.date, str, int]] = []
         week = 0
-        while len(occurrences) < count:
+        max_weeks = count + 52
+        while len(occurrences) < count and week < max_weeks:
             for slot_day, slot_time, slot_duration in slots:
                 if len(occurrences) >= count:
                     break
@@ -381,21 +387,19 @@ class ScheduleConfirmationService:
                 if days_ahead <= 0:
                     days_ahead += 7
                 scheduled_date = base_date + timedelta(days=days_ahead, weeks=week)
+                conflict = await self._check_time_conflict(
+                    teacher_id=teacher_profile_id,
+                    scheduled_date=scheduled_date,
+                    scheduled_time=slot_time,
+                    duration=slot_duration,
+                )
+                if conflict:
+                    continue  # push to next week's slot — don't drop the lesson
                 occurrences.append((scheduled_date, slot_time, slot_duration))
             week += 1
 
         created: list[Any] = []
         for i, (scheduled_date, scheduled_time, duration) in enumerate(occurrences):
-            # Skip this date if teacher already has a booking at this time
-            conflict = await self._check_time_conflict(
-                teacher_id=teacher_profile_id,
-                scheduled_date=scheduled_date,
-                scheduled_time=scheduled_time,
-                duration=duration,
-            )
-            if conflict:
-                continue
-
             booking = LessonBooking(
                 teacher_id=teacher_profile_id,
                 student_id=student_id,
@@ -425,14 +429,17 @@ class ScheduleConfirmationService:
             )
             self.db.add(lesson)
 
-        # #301: surface partial loss — conflicting occurrences were silently skipped.
+        # #301: safety net — push-forward normally fills all `count`. If conflicts
+        # persist past the week cap we still under-deliver; surface it loudly.
         skipped = count - len(created)
         if skipped > 0:
             logger.warning(
-                "#301 recurring lessons: %d/%d occurrence(s) skipped due to teacher booking "
-                "conflicts (teacher=%s student=%s subscription=%s)",
-                skipped,
+                "#301 recurring lessons: only %d/%d occurrence(s) placed; %d unfilled after "
+                "%d weeks of booking conflicts (teacher=%s student=%s subscription=%s)",
+                len(created),
                 count,
+                skipped,
+                max_weeks,
                 teacher_profile_id,
                 student_id,
                 subscription_id,
