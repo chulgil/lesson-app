@@ -614,7 +614,10 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           AppStrings.teacher,
       instrument: lessonInstrument,
       subscriptionId: _selectedSubscription?.id,
-      date: _selectedDate,
+      // Calendar date only: strip any time so the BE `LessonCreate.date`
+      // (Pydantic `date`) accepts it. Defense-in-depth with the date-only
+      // JSON serializer on `Lesson.date`.
+      date: DateUtils.dateOnly(_selectedDate),
       startTime: formatLessonTime(_selectedTime),
       duration: _lessonDuration,
       status: lessonStatus,
