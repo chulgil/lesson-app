@@ -35,46 +35,6 @@ from app.services.subscription_access_service import SubscriptionAccessService
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 
-def _slot_duration_minutes(start: str | None, end: str | None) -> int | None:
-    """Minutes between two HH:MM strings, or None if unparseable / non-positive."""
-    if not start or not end:
-        return None
-    try:
-        sh, sm = (int(x) for x in start.split(":"))
-        eh, em = (int(x) for x in end.split(":"))
-    except (ValueError, AttributeError):
-        return None
-    minutes = (eh * 60 + em) - (sh * 60 + sm)
-    return minutes if minutes > 0 else None
-
-
-def _proposed_slots_from_preferred(
-    preferred_slots: list | None,
-    fallback_duration: int | None,
-) -> list[dict] | None:
-    """#301: map LessonRequest.preferred_slots -> card.proposed_slots ([{day,time,duration}]).
-
-    Returns None when no usable weekly slot exists, so the generator keeps falling
-    back to the single proposed_day/proposed_time. Duration is derived from the
-    slot's start/end, falling back to the request's preferred_duration.
-    """
-    if not isinstance(preferred_slots, list):
-        return None
-    out: list[dict] = []
-    for entry in preferred_slots:
-        if not isinstance(entry, dict) or entry.get("day_of_week") is None:
-            continue
-        start = entry.get("start_time")
-        duration = _slot_duration_minutes(start, entry.get("end_time")) or fallback_duration
-        slot: dict = {"day": entry["day_of_week"]}
-        if start:
-            slot["time"] = start
-        if duration:
-            slot["duration"] = duration
-        out.append(slot)
-    return out or None
-
-
 class SubscriptionService:
     """Handle subscription lifecycle, templates, and proposals."""
 
@@ -2339,7 +2299,6 @@ class SubscriptionService:
         proposed_day: str | None = None
         proposed_time: str | None = None
         proposed_duration: int | None = None
-        proposed_slots: list[dict] | None = None
         instrument: str | None = None
         card_type = ConfirmationCardType.afterTrial
         total_lessons: int | None = None
@@ -2352,9 +2311,6 @@ class SubscriptionService:
                 proposed_day = str(lr.preferred_day) if lr.preferred_day is not None else None
                 proposed_time = lr.preferred_time
                 proposed_duration = lr.preferred_duration
-                # #301: carry the agreed weekly slots (주N회) onto the card so the
-                # generator distributes lessons across all of them, not just slot[0].
-                proposed_slots = _proposed_slots_from_preferred(lr.preferred_slots, lr.preferred_duration)
                 instrument = lr.instrument
                 if lr.is_returning_student:
                     card_type = ConfirmationCardType.reEnrollment
@@ -2378,7 +2334,6 @@ class SubscriptionService:
             proposed_day=proposed_day,
             proposed_time=proposed_time,
             proposed_duration=proposed_duration,
-            proposed_slots=proposed_slots,
             total_lessons=total_lessons,
         )
         self.db.add(card)

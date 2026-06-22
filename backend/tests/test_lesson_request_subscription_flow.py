@@ -28,7 +28,6 @@ async def _create_lesson_request(
     preferred_day: int = 2,  # Wednesday
     preferred_time: str = "15:00",
     preferred_duration: int = 60,
-    preferred_slots: list | None = None,
 ) -> str:
     """Insert a LessonRequest with timeConfirmed status (negotiation already done)."""
     from app.models.schedule import LessonRequest
@@ -41,7 +40,6 @@ async def _create_lesson_request(
         preferred_day=preferred_day,
         preferred_time=preferred_time,
         preferred_duration=preferred_duration,
-        preferred_slots=preferred_slots,
         status="timeConfirmed",
         expires_at=dt.datetime.now(dt.UTC) + dt.timedelta(days=7),
         current_round=1,
@@ -536,24 +534,28 @@ async def test_regular_multislot_distributes_across_weekly_slots(db_session: Asy
 
 
 @pytest.mark.asyncio
-async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: AsyncSession, create_test_user):
-    """#301 상류: 주N회 합의(preferred_slots)가 자동 확인카드의 proposed_slots 로 실려야 한다.
+async def test_preferred_slots_priority_alternatives_stay_weekly_once(db_session: AsyncSession, create_test_user):
+    """#890 회귀 가드: preferred_slots 는 1·2·3지망 대안이지 주N회 슬롯이 아니다.
 
-    수동 주입 없이 발급 → 카드 자동 생성 → 두 요일 분배까지 end-to-end 로 확인한다.
+    다중 지망(priority)을 가진 주1회 신청은 1순위 요일에만 totalLessons 만큼 생성돼야
+    하며, 카드의 proposed_slots 로 매핑되어 여러 요일로 과다생성되면 안 된다.
     """
     await create_test_user(user_id=TEACHER_ID, role="teacher")
     await create_test_user(user_id=STUDENT_ID, role="student", name="Student", email="s@t.com")
 
-    # 주2회 합의: 월(0) 10:00-11:00 + 수(2) 15:00-16:00
-    lr_id = await _create_lesson_request(
-        db_session,
-        preferred_day=0,
-        preferred_time="10:00",
-        preferred_slots=[
-            {"priority": 1, "day_of_week": 0, "start_time": "10:00", "end_time": "11:00"},
-            {"priority": 2, "day_of_week": 2, "start_time": "15:00", "end_time": "16:00"},
-        ],
-    )
+    lr_id = await _create_lesson_request(db_session, preferred_day=0, preferred_time="10:00")
+
+    # 학생이 1·2·3지망 대안 3개를 고른 상태 (주1회 — WeeklyCalendarPicker priority).
+    from app.models.schedule import LessonRequest
+
+    lr = await db_session.get(LessonRequest, lr_id)
+    lr.preferred_slots = [
+        {"priority": 1, "day_of_week": 0, "start_time": "10:00", "end_time": "11:00"},
+        {"priority": 2, "day_of_week": 2, "start_time": "15:00", "end_time": "16:00"},
+        {"priority": 3, "day_of_week": 4, "start_time": "18:00", "end_time": "19:00"},
+    ]
+    await db_session.flush()
+
     tmpl_id = await _create_template(db_session)  # monthly, 4 lessons
     await _create_relationship(db_session)
 
@@ -582,11 +584,8 @@ async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: A
         )
     ).one()
 
-    # 상류 핵심: 카드가 두 슬롯을 그대로 운반 (수동 주입 없음).
-    assert card.proposed_slots is not None
-    assert [int(s["day"]) for s in card.proposed_slots] == [0, 2]
-    assert {s["time"] for s in card.proposed_slots} == {"10:00", "15:00"}
-    assert all(s["duration"] == 60 for s in card.proposed_slots)
+    # 핵심: 대안들을 다중슬롯으로 매핑하지 않는다.
+    assert card.proposed_slots is None
 
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
 
@@ -595,6 +594,6 @@ async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: A
     from app.models.lesson import Lesson
 
     lessons = (await db_session.scalars(select(Lesson).where(Lesson.subscription_id == result.subscription_id))).all()
+    # 주1회: 4회 모두 1순위 요일(월=0)에만. 2·3지망 요일(수=2, 금=4)로 새지 않는다.
     assert len(lessons) == 4
-    assert sorted(lsn.date.weekday() for lsn in lessons) == [0, 0, 2, 2]
-    assert {lsn.start_time for lsn in lessons} == {"10:00", "15:00"}
+    assert {lsn.date.weekday() for lsn in lessons} == {0}
