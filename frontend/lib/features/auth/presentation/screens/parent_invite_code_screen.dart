@@ -30,6 +30,7 @@ class _ParentInviteCodeScreenState
   final _codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _isSkipping = false; // #103: skip 경로 전용 가드 (제출 스피너와 분리)
   String? _errorMessage;
 
   @override
@@ -227,7 +228,7 @@ class _ParentInviteCodeScreenState
 
                       // Skip option
                       GestureDetector(
-                        onTap: _handleSkip,
+                        onTap: _isSkipping ? null : _handleSkip,
                         child: Column(
                           children: [
                             Text(
@@ -332,9 +333,17 @@ class _ParentInviteCodeScreenState
   }
 
   Future<void> _handleSkip() async {
+    // #103: skip 더블탭 가드 — 진행 중이면 재진입 무시 (PATCH·navigation 중복 방지).
+    if (_isSkipping) return;
+    setState(() => _isSkipping = true);
     // Set role to parent and navigate to empty home.
     ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
-    await _completeParentOnboarding();
+    try {
+      await _completeParentOnboarding();
+    } catch (_) {
+      if (mounted) setState(() => _isSkipping = false);
+      return;
+    }
     if (!mounted) return;
     context.go(AppRoutes.parentHome);
   }
