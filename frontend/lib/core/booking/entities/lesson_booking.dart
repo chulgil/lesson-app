@@ -210,6 +210,8 @@ class LessonBooking {
   final String? selectedOptionId; // ID of option selected by teacher
   // Link to UnifiedLessonRequest (for trial → request detail navigation)
   final String? requestId;
+  // #301: standalone 주N회 등록 시 교사 기존 일정과 충돌해 건너뛴 회차 수 (응답 전용).
+  final int recurringSkippedCount;
 
   const LessonBooking({
     required this.id,
@@ -248,6 +250,7 @@ class LessonBooking {
     this.scheduleOptions,
     this.selectedOptionId,
     this.requestId,
+    this.recurringSkippedCount = 0,
   });
 
   /// Check if booking is trial lesson
@@ -371,6 +374,7 @@ class LessonBooking {
     DateTime? expiredAt,
     List<ScheduleOption>? scheduleOptions,
     String? selectedOptionId,
+    int? recurringSkippedCount,
   }) {
     return LessonBooking(
       id: id ?? this.id,
@@ -408,6 +412,7 @@ class LessonBooking {
       expiredAt: expiredAt ?? this.expiredAt,
       scheduleOptions: scheduleOptions ?? this.scheduleOptions,
       selectedOptionId: selectedOptionId ?? this.selectedOptionId,
+      recurringSkippedCount: recurringSkippedCount ?? this.recurringSkippedCount,
     );
   }
 

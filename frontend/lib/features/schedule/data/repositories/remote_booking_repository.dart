@@ -316,6 +316,7 @@ class RemoteBookingRepository implements BookingRepository {
               ? ScheduleType.values.byName(json['schedule_type'] as String)
               : null,
       lessonsPerWeek: json['lessons_per_week'] as int?,
+      recurringSkippedCount: json['recurring_skipped_count'] as int? ?? 0,
       studentPhone: json['student_phone'] as String?,
       studentEmail: json['student_email'] as String?,
       lessonGoal:

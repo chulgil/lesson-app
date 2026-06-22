@@ -2198,6 +2198,10 @@ class AppStrings {
   /// 정규레슨이 등록되었습니다 (성공 토스트)
   static const regularLessonRegistered = '정규레슨이 등록되었습니다';
 
+  /// 정규레슨 등록 — 일부 회차가 기존 일정과 겹쳐 제외됨 (부분 성공 토스트, #301)
+  static String regularLessonRegisteredWithConflicts(int skipped) =>
+      '정규레슨이 등록되었습니다 ($skipped개 회차는 기존 일정과 겹쳐 제외)';
+
   /// 등록 중 오류가 발생했습니다. 다시 시도해주세요. (실패 토스트)
   static const registrationErrorRetry = '등록 중 오류가 발생했습니다. 다시 시도해주세요.';
 

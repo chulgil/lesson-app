@@ -288,6 +288,8 @@ class BookingResponse(BaseModel):
     # FE UI 빈칸 방지 — service 가 join 으로 채움.
     teacher_name: str | None = None
     student_name: str | None = None
+    # #301: standalone 주N회 등록 시 교사 기존 일정과 충돌해 건너뛴 회차 수.
+    recurring_skipped_count: int | None = None
 
     # Frontend-compatible aliases (computed from backend fields)
     @computed_field
