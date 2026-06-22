@@ -510,6 +510,11 @@ class _UnifiedLessonRequestScreenState
   // -- Estimated duration (read-only, Naver benchmark) --
 
   Widget _buildEstimatedDuration() {
+    // #209: 교사가 설정한 레슨 1회 시간을 표시 (이전: 60분 하드코딩).
+    final settingsAsync = ref.watch(
+      teacherSettingsByIdProvider(widget.params.teacherId),
+    );
+    final duration = settingsAsync.valueOrNull?.lessonDurationMinutes ?? 60;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
@@ -528,7 +533,7 @@ class _UnifiedLessonRequestScreenState
           ),
           const Spacer(),
           Text(
-            AppStrings.durationMinutesValue(60),
+            AppStrings.durationMinutesValue(duration),
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
             ),
