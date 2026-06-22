@@ -200,6 +200,11 @@ sub = Subscription(
 - Trial: 단일 레슨 생성
 - LessonBooking 레코드도 함께 생성
 
+> #301 주N회: `LessonRequest.preferred_slots`(합의된 N개 주간 슬롯)가 자동 확인카드의
+> `proposed_slots`로 운반되고(`_create_confirmation_card`), 생성기가 totalLessons를 모든
+> 슬롯에 주차별 round-robin 분배한다(`_create_bookings_for_subscription`). 슬롯이 없으면
+> 단일 `proposed_day/time` 백워드 호환. 마이그레이션 0(기존 JSON 컬럼 재사용).
+
 #### GAP-6: RequestStatus 전이 불완전
 
 **스펙**: 15개 상태 중 전체 전이 체인

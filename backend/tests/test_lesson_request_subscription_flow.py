@@ -28,6 +28,7 @@ async def _create_lesson_request(
     preferred_day: int = 2,  # Wednesday
     preferred_time: str = "15:00",
     preferred_duration: int = 60,
+    preferred_slots: list | None = None,
 ) -> str:
     """Insert a LessonRequest with timeConfirmed status (negotiation already done)."""
     from app.models.schedule import LessonRequest
@@ -40,6 +41,7 @@ async def _create_lesson_request(
         preferred_day=preferred_day,
         preferred_time=preferred_time,
         preferred_duration=preferred_duration,
+        preferred_slots=preferred_slots,
         status="timeConfirmed",
         expires_at=dt.datetime.now(dt.UTC) + dt.timedelta(days=7),
         current_round=1,
@@ -498,9 +500,7 @@ async def test_regular_multislot_distributes_across_weekly_slots(db_session: Asy
     from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
 
     proposal = await svc.create_proposal(
-        SubscriptionProposalCreate(
-            student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id
-        ),
+        SubscriptionProposalCreate(student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id),
         teacher,
     )
     await svc.respond_to_proposal(
@@ -514,9 +514,7 @@ async def test_regular_multislot_distributes_across_weekly_slots(db_session: Asy
 
     card = (
         await db_session.scalars(
-            select(ScheduleConfirmationCard).where(
-                ScheduleConfirmationCard.subscription_id == result.subscription_id
-            )
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
         )
     ).one()
 
@@ -526,18 +524,77 @@ async def test_regular_multislot_distributes_across_weekly_slots(db_session: Asy
 
     from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
 
-    await _card_svc(db_session).confirm_card(
-        card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student
-    )
+    await _card_svc(db_session).confirm_card(card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student)
 
     from app.models.lesson import Lesson
 
-    lessons = (
-        await db_session.scalars(
-            select(Lesson).where(Lesson.subscription_id == result.subscription_id)
-        )
-    ).all()
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.subscription_id == result.subscription_id))).all()
     assert len(lessons) == 4  # total_lessons=4 across 2 weekly slots
     assert sorted(lsn.date.weekday() for lsn in lessons) == [0, 0, 2, 2]
     assert sorted(lsn.session_number for lsn in lessons) == [1, 2, 3, 4]
+    assert {lsn.start_time for lsn in lessons} == {"10:00", "15:00"}
+
+
+@pytest.mark.asyncio
+async def test_auto_card_carries_preferred_slots_to_proposed_slots(db_session: AsyncSession, create_test_user):
+    """#301 상류: 주N회 합의(preferred_slots)가 자동 확인카드의 proposed_slots 로 실려야 한다.
+
+    수동 주입 없이 발급 → 카드 자동 생성 → 두 요일 분배까지 end-to-end 로 확인한다.
+    """
+    await create_test_user(user_id=TEACHER_ID, role="teacher")
+    await create_test_user(user_id=STUDENT_ID, role="student", name="Student", email="s@t.com")
+
+    # 주2회 합의: 월(0) 10:00-11:00 + 수(2) 15:00-16:00
+    lr_id = await _create_lesson_request(
+        db_session,
+        preferred_day=0,
+        preferred_time="10:00",
+        preferred_slots=[
+            {"priority": 1, "day_of_week": 0, "start_time": "10:00", "end_time": "11:00"},
+            {"priority": 2, "day_of_week": 2, "start_time": "15:00", "end_time": "16:00"},
+        ],
+    )
+    tmpl_id = await _create_template(db_session)  # monthly, 4 lessons
+    await _create_relationship(db_session)
+
+    svc = _sub_svc(db_session)
+    teacher = _FakeUser(TEACHER_ID, "teacher")
+    student = _FakeUser(STUDENT_ID, "student")
+
+    from app.schemas.subscription import ProposalRespondRequest, SubscriptionProposalCreate
+
+    proposal = await svc.create_proposal(
+        SubscriptionProposalCreate(student_id=STUDENT_ID, recommended_template_id=tmpl_id, lesson_request_id=lr_id),
+        teacher,
+    )
+    await svc.respond_to_proposal(
+        proposal.id,
+        ProposalRespondRequest(action="notify_payment", selected_template_id=tmpl_id),
+        student,
+    )
+    result = await svc.confirm_proposal(proposal.id, teacher)
+
+    from app.models.policy import ScheduleConfirmationCard
+
+    card = (
+        await db_session.scalars(
+            select(ScheduleConfirmationCard).where(ScheduleConfirmationCard.subscription_id == result.subscription_id)
+        )
+    ).one()
+
+    # 상류 핵심: 카드가 두 슬롯을 그대로 운반 (수동 주입 없음).
+    assert card.proposed_slots is not None
+    assert [int(s["day"]) for s in card.proposed_slots] == [0, 2]
+    assert {s["time"] for s in card.proposed_slots} == {"10:00", "15:00"}
+    assert all(s["duration"] == 60 for s in card.proposed_slots)
+
+    from app.schemas.schedule_confirmation import ScheduleConfirmationCardConfirm
+
+    await _card_svc(db_session).confirm_card(card.id, ScheduleConfirmationCardConfirm(action="confirmed"), student)
+
+    from app.models.lesson import Lesson
+
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.subscription_id == result.subscription_id))).all()
+    assert len(lessons) == 4
+    assert sorted(lsn.date.weekday() for lsn in lessons) == [0, 0, 2, 2]
     assert {lsn.start_time for lsn in lessons} == {"10:00", "15:00"}
