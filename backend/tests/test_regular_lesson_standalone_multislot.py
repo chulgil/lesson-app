@@ -94,15 +94,19 @@ async def test_standalone_single_slot_still_works(
 
 
 @pytest.mark.asyncio
-async def test_standalone_conflicting_occurrence_is_skipped_and_warned(
+async def test_standalone_conflicting_occurrence_pushed_forward_keeps_count(
     client: AsyncClient,
     auth_headers,
     create_test_user,
     db_session,
     caplog,
 ):
-    """#301: 일부 슬롯이 기존 일정과 충돌하면 그 회차만 제외되고(부분 손실),
-    조용히 사라지지 않도록 경고 로그로 surface 된다."""
+    """#897: 충돌 회차는 드롭하지 않고 다음 주로 밀어 count(8)를 보장한다.
+
+    교사의 기존 예약이 첫 월요일과 겹쳐도, 그 회차는 이후 월요일로 밀려
+    8회 전부 생성되고(부분 손실 0) 충돌일에는 레슨이 없다. count 가 충족되므로
+    부분손실 경고도 발생하지 않는다.
+    """
     import datetime as dt
     import logging
 
@@ -145,9 +149,11 @@ async def test_standalone_conflicting_occurrence_is_skipped_and_warned(
 
     assert response.status_code == 201, response.text
     lessons = (await db_session.scalars(select(Lesson).where(Lesson.student_id == "student-303"))).all()
-    # 8회 요청 중 충돌 1회(월 07-06) 제외 → 7회 생성 (월 3 / 수 4).
-    assert len(lessons) == 7
-    assert sum(1 for le in lessons if le.date.weekday() == 0) == 3
+    # 충돌 회차는 밀려서 8회 전부 생성 (월 4 / 수 4), 부분 손실 없음.
+    assert len(lessons) == 8
+    assert sum(1 for le in lessons if le.date.weekday() == 0) == 4
     assert sum(1 for le in lessons if le.date.weekday() == 2) == 4
-    # 부분 손실이 로그로 surface 됨.
-    assert any("skipped" in r.message and "#301" in r.message for r in caplog.records)
+    # 충돌일(07-06)에는 레슨이 없고, 충돌은 다음 월요일로 밀렸다.
+    assert all(le.date != dt.date(2026, 7, 6) for le in lessons)
+    # count 가 충족되므로 부분손실 경고는 없다.
+    assert not any("#301" in r.message for r in caplog.records)
