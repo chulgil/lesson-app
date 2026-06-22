@@ -125,9 +125,9 @@ async def get_available_slots(
     date: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
-    # TODO(spec): teacher_availability_spec.md (L13-15) 는 50분 기본값 통일 명시. frontend 가
-    # 명시적으로 50 을 보내도록 마이그레이션된 후 변경 — 본 PR 에서는 BC 유지.
-    duration: int = 60,
+    # #202: 미지정 시 교사 설정(default_lesson_duration)을 슬롯 길이·간격으로 사용.
+    # 명시 전달 시 그 값 유지(보강예약 등 BC).
+    duration: int | None = None,
     limit: int | None = None,
     available_only: bool = False,
     student_id: str | None = None,

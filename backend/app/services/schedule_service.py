@@ -370,8 +370,27 @@ class ScheduleService:
             )
         return slots
 
-    async def get_available_slots(self, *, teacher_id: str, date: str, duration: int = 60) -> SlotsResponse:
-        """Compute available booking slots for a date."""
+    async def _resolve_slot_duration(self, teacher_id_scope: list[str], requested: int | None) -> int:
+        """#202: 슬롯 길이는 교사의 레슨 1회 시간(default_lesson_duration)을 따른다.
+
+        명시적으로 전달되면(보강예약 등 BC) 그 값을, 없으면 교사 설정을, 설정 행이
+        없으면 60 을 사용한다. SSOT = TeacherSettings.default_lesson_duration.
+        """
+        if requested is not None:
+            return requested
+        from app.models.settings import TeacherSettings
+
+        configured = await self.db.scalar(
+            select(TeacherSettings.default_lesson_duration).where(TeacherSettings.teacher_id.in_(teacher_id_scope))
+        )
+        return configured or 60
+
+    async def get_available_slots(self, *, teacher_id: str, date: str, duration: int | None = None) -> SlotsResponse:
+        """Compute available booking slots for a date.
+
+        #202: ``duration`` 미지정 시 교사의 레슨 1회 시간(default_lesson_duration)을
+        각 슬롯 길이로 사용한다. 시작 간격(30분)은 유지.
+        """
         from datetime import date as date_type
 
         from app.models.lesson import Lesson, LessonStatus
@@ -385,6 +404,8 @@ class ScheduleService:
         # Resolve teacher_id (could be Teacher.id or User.id)
         user_id = await self._resolve_teacher_user_id(teacher_id)
         teacher_id_scope = await self._resolve_teacher_id_scope(teacher_id)
+        # #202: 슬롯 길이·간격을 교사 설정(default_lesson_duration)으로.
+        duration = await self._resolve_slot_duration(teacher_id_scope, duration)
 
         # Find availability for this day
         availability_rows = await self.db.scalars(
@@ -472,7 +493,7 @@ class ScheduleService:
             start_minutes = int(start_parts[0]) * 60 + int(start_parts[1])
             end_minutes = int(end_parts[0]) * 60 + int(end_parts[1])
 
-            # Generate slots at 30-minute intervals
+            # Generate slots at 30-minute intervals; 슬롯 길이(duration)는 교사 설정(#202).
             current = start_minutes
             while current + duration <= end_minutes:
                 slot_time = f"{current // 60:02d}:{current % 60:02d}"
@@ -499,7 +520,7 @@ class ScheduleService:
                         status=slot_status,
                     )
                 )
-                current += 30  # 30-minute interval
+                current += 30  # 30-minute interval (시작 granularity; 길이는 duration)
 
         return SlotsResponse(date=d, slots=slots)
 
@@ -509,12 +530,16 @@ class ScheduleService:
         teacher_id: str,
         date_from: str,
         date_to: str | None = None,
-        duration: int = 60,
+        duration: int | None = None,
         limit: int | None = None,
         available_only: bool = False,
     ) -> dict[str, Any]:
         """Return slots and dates for frontend range queries."""
         from datetime import date as date_type
+
+        # #202: 교사 설정을 한 번만 해소해 날짜별 호출에 concrete 값을 전달(중복 쿼리 회피).
+        teacher_id_scope = await self._resolve_teacher_id_scope(teacher_id)
+        duration = await self._resolve_slot_duration(teacher_id_scope, duration)
 
         start = date_type.fromisoformat(date_from)
         end = date_type.fromisoformat(date_to) if date_to else start + timedelta(days=27)
