@@ -10,6 +10,7 @@ import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/repositories/subscription_proposal_repository.dart';
 import '../../domain/services/proposal_reminder_service.dart';
 import '../../../notifications/notifications_facade.dart';
+import 'proposal_settings_providers.dart';
 
 part 'subscription_proposal_providers.g.dart';
 
@@ -36,9 +37,8 @@ ProposalReminderService proposalReminderService(
     scheduleNotification: schedulerService.scheduleNotification,
     cancelNotificationsByProposalId:
         schedulerService.cancelNotificationsByProposalId,
-    loadProposal:
-        (proposalId) =>
-            ref.read(subscriptionProposalProvider(proposalId).future),
+    loadProposal: (proposalId) =>
+        ref.read(subscriptionProposalProvider(proposalId).future),
     copy: const ProposalReminderCopy(
       reminder24hTitle: AppStrings.proposalReminder24hTitle,
       reminder24hBody: AppStrings.proposalReminder24hBody,
@@ -449,14 +449,27 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
 
   /// Schedule auto-reminders for a new proposal.
   /// Sends reminders at 24h, 48h, 72h if student hasn't responded.
+  ///
+  /// #203: 교사의 "자동 리마인더" 설정(autoReminderEnabled)이 꺼져 있으면 예약하지
+  /// 않는다. 설정 조회는 비동기이고 리마인더는 비핵심이라 fire-and-forget 으로 둔다.
   void _scheduleReminders(SubscriptionProposal proposal) {
-    try {
-      final reminderService = ref.read(proposalReminderServiceProvider);
-      reminderService.scheduleRemindersForProposal(proposal);
-    } catch (e) {
-      // Don't fail proposal creation due to reminder scheduling error
-      debugPrint('[ProposalNotifier] Failed to schedule reminders: $e');
-    }
+    ref
+        .read(teacherProposalSettingsProvider(proposal.teacherId).future)
+        .then((settings) {
+          if (!settings.autoReminderEnabled) {
+            debugPrint(
+              '[ProposalNotifier] Auto-reminder disabled — skip scheduling',
+            );
+            return;
+          }
+          ref
+              .read(proposalReminderServiceProvider)
+              .scheduleRemindersForProposal(proposal);
+        })
+        .catchError((Object e) {
+          // Don't fail proposal creation due to reminder scheduling error
+          debugPrint('[ProposalNotifier] Failed to schedule reminders: $e');
+        });
   }
 
   /// Cancel pending reminders for a proposal.
