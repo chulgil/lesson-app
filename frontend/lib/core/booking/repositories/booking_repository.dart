@@ -363,8 +363,8 @@ class MockBookingRepository implements BookingRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
-    final startTime = registration.fixedTimeSlot?.startTime;
-    final endTime = registration.fixedTimeSlot?.endTime;
+    final startTime = registration.primaryTimeSlot?.startTime;
+    final endTime = registration.primaryTimeSlot?.endTime;
 
     final booking = LessonBooking(
       id: 'booking_${DateTime.now().millisecondsSinceEpoch}',
@@ -385,7 +385,7 @@ class MockBookingRepository implements BookingRepository {
       ),
       fee: registration.monthlyFee,
       scheduleType: registration.scheduleType,
-      fixedTimeSlot: registration.fixedTimeSlot,
+      fixedTimeSlot: registration.primaryTimeSlot,
       createdAt: DateTime.now(),
       confirmedAt: DateTime.now(),
     );

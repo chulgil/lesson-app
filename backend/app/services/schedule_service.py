@@ -811,6 +811,16 @@ class ScheduleService:
         from app.models.schedule import LessonBooking
 
         assert data.teacher_id is not None  # normalized by BookingCreate
+
+        # #301: standalone 주N회 등록 — N개 동시 주간 슬롯을 recurring 레슨으로 분배 생성.
+        if data.fixed_time_slots:
+            from app.services.schedule_confirmation_service import ScheduleConfirmationService
+
+            created = await ScheduleConfirmationService(self.db).create_standalone_regular_lessons(data, current_user)
+            if not created:
+                raise ValueError("선택한 시간이 모두 기존 일정과 충돌합니다")
+            return await self._to_booking_response(created[0])
+
         await self._check_booking_overlap(
             teacher_id=data.teacher_id,
             scheduled_date=data.scheduled_date,

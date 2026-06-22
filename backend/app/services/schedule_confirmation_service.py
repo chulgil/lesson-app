@@ -268,10 +268,8 @@ class ScheduleConfirmationService:
     async def _create_bookings_for_subscription(self, card: Any) -> None:
         """GAP-5: Create LessonBooking records based on subscription type."""
         import datetime as dt
-        from datetime import timedelta
 
-        from app.models.lesson import Lesson, LessonSource
-        from app.models.schedule import LessonBooking
+        from app.models.lesson import LessonSource
         from app.models.student import Student
         from app.models.subscription import Subscription
 
@@ -321,6 +319,54 @@ class ScheduleConfirmationService:
             fallback_day = int(card.proposed_day) if card.proposed_day else base_date.weekday()
             slots = [(fallback_day, default_time, default_duration)]
 
+        await self._generate_recurring_lessons(
+            teacher_profile_id=teacher_profile_id,
+            student_id=card.student_id,
+            student_name=student_name,
+            slots=slots,
+            count=count,
+            instrument=card.instrument,
+            lesson_type=lesson_type,
+            subscription_id=card.subscription_id,
+            base_date=base_date,
+            lesson_source=LessonSource.subscription_generated,
+        )
+
+    async def _generate_recurring_lessons(
+        self,
+        *,
+        teacher_profile_id: str,
+        student_id: str,
+        student_name: str,
+        slots: list[tuple[int, str, int]],
+        count: int,
+        instrument: str | None,
+        lesson_type: str,
+        subscription_id: str | None = None,
+        base_date: Any = None,
+        lesson_source: Any = None,
+    ) -> list[Any]:
+        """#301: Generate `count` recurring lessons across weekly `slots` (주N회).
+
+        Shared by subscription-card confirmation and standalone regular-lesson
+        registration. Each slot is (weekday 0=Mon, "HH:MM", duration_minutes).
+        Occurrences cycle slot-by-slot, week by week (round-robin). Occurrences
+        that conflict with an existing teacher booking are skipped. Returns the
+        created LessonBooking rows (callers may ignore).
+        """
+        import datetime as dt
+        from datetime import timedelta
+
+        from app.models.lesson import Lesson, LessonSource
+        from app.models.schedule import LessonBooking
+
+        if not slots or count <= 0:
+            return []
+        if base_date is None:
+            base_date = dt.date.today()
+        if lesson_source is None:
+            lesson_source = LessonSource.subscription_generated
+
         # Generate exactly `count` occurrences, cycling slots across weeks (0=Mon).
         occurrences: list[tuple[dt.date, str, int]] = []
         week = 0
@@ -335,6 +381,7 @@ class ScheduleConfirmationService:
                 occurrences.append((scheduled_date, slot_time, slot_duration))
             week += 1
 
+        created: list[Any] = []
         for i, (scheduled_date, scheduled_time, duration) in enumerate(occurrences):
             # Skip this date if teacher already has a booking at this time
             conflict = await self._check_time_conflict(
@@ -348,31 +395,103 @@ class ScheduleConfirmationService:
 
             booking = LessonBooking(
                 teacher_id=teacher_profile_id,
-                student_id=card.student_id,
+                student_id=student_id,
                 lesson_type=lesson_type,
                 scheduled_date=scheduled_date,
                 scheduled_time=scheduled_time,
                 duration=duration,
-                instrument=card.instrument,
-                subscription_id=card.subscription_id,
+                instrument=instrument,
+                subscription_id=subscription_id,
                 status="confirmed",
             )
             self.db.add(booking)
+            created.append(booking)
 
             lesson = Lesson(
                 teacher_id=teacher_profile_id,
-                student_id=card.student_id,
+                student_id=student_id,
                 student_name=student_name,
-                instrument=card.instrument or "",
+                instrument=instrument or "",
                 date=scheduled_date,
                 start_time=scheduled_time,
                 duration=duration,
                 status="scheduled",
-                subscription_id=card.subscription_id,
+                subscription_id=subscription_id,
                 session_number=i + 1,
-                lesson_source=LessonSource.subscription_generated,
+                lesson_source=lesson_source,
             )
             self.db.add(lesson)
+
+        return created
+
+    async def create_standalone_regular_lessons(self, data: Any, current_user: Any) -> list[Any]:
+        """#301: Create recurring multi-slot lessons from a standalone regular-lesson
+        registration (register_regular_lesson_screen → POST /bookings with
+        ``fixed_time_slots``). Returns the created LessonBooking rows (first = primary).
+
+        Source of N concurrent weekly slots: the teacher's register-regular-lesson
+        screen. Each slot is {day_of_week, start_time, duration_minutes}.
+        """
+        import datetime as dt
+
+        from app.models.lesson import LessonSource
+        from app.models.student import Student
+        from app.models.subscription import Subscription
+
+        teacher_profile_id = await self._resolve_teacher_id_for_actor(data.teacher_id)
+        student_id = data.student_id or current_user.id
+
+        student_name = data.student_name or student_id
+        student = await self.db.get(Student, student_id)
+        if student is not None:
+            student_name = student.name
+
+        # Normalize FE slots {day_of_week, start_time, duration_minutes} → (day, time, duration).
+        slots: list[tuple[int, str, int]] = []
+        for entry in data.fixed_time_slots or []:
+            if not isinstance(entry, dict):
+                continue
+            day = entry.get("day_of_week", entry.get("day"))
+            if day is None:
+                continue
+            try:
+                day_idx = int(day)
+            except (TypeError, ValueError):
+                continue
+            slot_time = str(entry.get("start_time") or entry.get("time") or "14:00")
+            slot_duration = int(entry.get("duration_minutes") or entry.get("duration") or data.duration or 60)
+            slots.append((day_idx, slot_time, slot_duration))
+        if not slots:
+            raise ValueError("fixed_time_slots is required for a recurring registration")
+
+        # count: subscription drives total_lessons; standalone falls back to one month.
+        # ponytail: lessons_per_week × 4 horizon; if a subscription is linked, use its
+        # total_lessons. Longer horizons can be parameterized later.
+        count = len(slots) * 4
+        if data.subscription_id:
+            sub = await self.db.get(Subscription, data.subscription_id)
+            if sub is not None and sub.total_lessons:
+                count = sub.total_lessons
+
+        base_date = data.scheduled_date if isinstance(data.scheduled_date, dt.date) else dt.date.today()
+        lesson_source = LessonSource.subscription_generated if data.subscription_id else LessonSource.manual
+
+        created = await self._generate_recurring_lessons(
+            teacher_profile_id=teacher_profile_id,
+            student_id=student_id,
+            student_name=student_name,
+            slots=slots,
+            count=count,
+            instrument=data.instrument,
+            lesson_type=data.lesson_type or "regular",
+            subscription_id=data.subscription_id,
+            base_date=base_date,
+            lesson_source=lesson_source,
+        )
+        await self.db.flush()
+        for booking in created:
+            await self.db.refresh(booking)
+        return created
 
     async def _check_time_conflict(
         self,

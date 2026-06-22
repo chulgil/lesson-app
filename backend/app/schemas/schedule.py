@@ -359,6 +359,11 @@ class BookingCreate(BaseModel):
     schedule_type: str | None = None
     lessons_per_week: int | None = None
     fee: int | None = None
+    # #301: standalone 주N회 등록 — N개 동시 주간 슬롯 [{day_of_week, start_time, duration_minutes}].
+    fixed_time_slots: list[dict] | None = Field(
+        default=None,
+        validation_alias=AliasChoices("fixed_time_slots", "fixedTimeSlots"),
+    )
 
     @model_validator(mode="after")
     def normalize_fields(self) -> "BookingCreate":

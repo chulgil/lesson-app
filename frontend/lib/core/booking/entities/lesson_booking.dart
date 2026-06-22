@@ -524,7 +524,7 @@ class TrialLessonRequest {
 class RegularLessonRegistration {
   final String studentId;
   final ScheduleType scheduleType;
-  final TimeSlot? fixedTimeSlot; // Required for fixed schedule
+  final List<TimeSlot> fixedTimeSlots; // 주N회: N concurrent weekly slots
   final int lessonsPerWeek;
   final int monthlyFee;
   final DateTime startDate;
@@ -535,13 +535,16 @@ class RegularLessonRegistration {
   const RegularLessonRegistration({
     required this.studentId,
     required this.scheduleType,
-    this.fixedTimeSlot,
+    this.fixedTimeSlots = const [],
     this.lessonsPerWeek = 1,
     required this.monthlyFee,
     required this.startDate,
     this.academyId,
     this.isAcademyPrivate = false,
   });
+
+  TimeSlot? get primaryTimeSlot =>
+      fixedTimeSlots.isEmpty ? null : fixedTimeSlots.first;
 }
 
 /// Regular lesson request model (student-initiated, requires teacher approval)
