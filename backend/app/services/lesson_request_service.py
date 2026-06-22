@@ -23,6 +23,7 @@ from app.schemas.lesson_request import (
     TimeProposalCreate,
 )
 from app.schemas.request_event import RequestEventCreate
+from app.services.actor import actor_type
 
 # Statuses from which no further transitions are allowed.
 TERMINAL_STATUSES: frozenset[str] = frozenset({"cancelled", "expired", "completed"})
@@ -207,7 +208,7 @@ class LessonRequestService:
 
         # Derive actor identity from the authenticated user — ignore client-supplied values.
         server_actor_id = current_user.id
-        server_actor_type = self._actor_type(current_user)
+        server_actor_type = actor_type(current_user)
 
         event = RequestEvent(
             request_id=request_id,
@@ -283,7 +284,7 @@ class LessonRequestService:
 
         await self._add_event(
             request_id=request.id,
-            actor_type=self._actor_type(current_user),
+            actor_type=actor_type(current_user),
             actor_id=current_user.id,
             event_type=self._event_type_for_status(data.status),
             message=data.decline_reason,
@@ -737,7 +738,7 @@ class LessonRequestService:
         return request
 
     async def _can_access_request(self, request: Any, current_user: Any) -> bool:
-        role = self._actor_type(current_user)
+        role = actor_type(current_user)
         if role == "student":
             result: bool = request.student_id == current_user.id
             return result
@@ -748,7 +749,7 @@ class LessonRequestService:
     async def _apply_access_filter(self, query: Any, current_user: Any) -> Any:
         from app.models.schedule import LessonRequest
 
-        role = self._actor_type(current_user)
+        role = actor_type(current_user)
         if role == "student":
             return query.where(LessonRequest.student_id == current_user.id)
         if role == "teacher":
@@ -764,12 +765,8 @@ class LessonRequestService:
             identifiers.append(teacher_profile_id)
         return identifiers
 
-    def _actor_type(self, user: Any) -> str:
-        role = getattr(user, "role", None)
-        return getattr(role, "value", role) or ""
-
     def _require_actor(self, user: Any, expected_role: str) -> None:
-        if self._actor_type(user) != expected_role:
+        if actor_type(user) != expected_role:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
     def _event_type_for_status(self, request_status: str) -> str:
