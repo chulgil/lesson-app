@@ -1,10 +1,31 @@
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../profile/domain/entities/teacher_settings.dart';
+import '../../../schedule/domain/repositories/teacher_availability_repository.dart';
 import '../../domain/repositories/settings_repository.dart';
 
 /// Mock implementation of SettingsRepository
 class MockSettingsRepository implements SettingsRepository {
+  MockSettingsRepository({
+    TeacherAvailabilityRepository? availabilityRepository,
+  }) : _availabilityRepository = availabilityRepository;
+
+  final TeacherAvailabilityRepository? _availabilityRepository;
+
+  /// Mirror minBookingHours into the mock availability store so that
+  /// [teacherAvailabilityProvider] returns the updated threshold without a
+  /// real network round-trip. Mirrors RemoteSettingsRepository behaviour.
+  /// (#206)
+  Future<void> _syncAvailabilityConstraints(TeacherSettings settings) async {
+    final repo = _availabilityRepository;
+    if (repo == null) return;
+    final current = await repo.getAvailability(settings.id);
+    if (current == null) return;
+    await repo.saveAvailability(
+      current.copyWith(minBookingHours: settings.minBookingHours),
+    );
+  }
+
   // ignore: deprecated_member_use_from_same_package
   TeacherSettings _settings = TeacherSettings(
     id: 'teacher_1',
@@ -171,11 +192,13 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> removeCustomDuration(int duration) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _settings = _settings.copyWith(
-      customLessonDurations:
-          _settings.customLessonDurations.where((d) => d != duration).toList(),
+      customLessonDurations: _settings.customLessonDurations
+          .where((d) => d != duration)
+          .toList(),
       // Also remove from disabled if it was disabled
-      disabledDurations:
-          _settings.disabledDurations.where((d) => d != duration).toList(),
+      disabledDurations: _settings.disabledDurations
+          .where((d) => d != duration)
+          .toList(),
       updatedAt: DateTime.now(),
     );
     return _settings;
@@ -195,8 +218,9 @@ class MockSettingsRepository implements SettingsRepository {
     List<int> newDisabled;
     if (isActive) {
       // Enable: remove from disabled list
-      newDisabled =
-          _settings.disabledDurations.where((d) => d != duration).toList();
+      newDisabled = _settings.disabledDurations
+          .where((d) => d != duration)
+          .toList();
     } else {
       // Disable: add to disabled list
       newDisabled = [..._settings.disabledDurations, duration];
@@ -278,6 +302,7 @@ class MockSettingsRepository implements SettingsRepository {
       minBookingHours: hours,
       updatedAt: DateTime.now(),
     );
+    await _syncAvailabilityConstraints(_settings);
     return _settings;
   }
 

@@ -3,6 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
 import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
+import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
+import 'package:lessonaza/features/schedule/domain/repositories/teacher_availability_repository.dart';
+import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
 import 'package:lessonaza/features/settings/domain/repositories/settings_repository.dart';
 import 'package:lessonaza/features/settings/presentation/providers/settings_repository_provider.dart';
 import 'package:lessonaza/features/settings/presentation/providers/teacher_settings_boot_migration_provider.dart';
@@ -31,7 +34,10 @@ void main() {
   test('replaceAvailableSlots persists into the settings mirror', () async {
     final repo = _MutableSettingsRepository();
     final container = ProviderContainer(
-      overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
+      overrides: [
+        settingsRepositoryProvider.overrideWithValue(repo),
+        _skipBootMigration,
+      ],
     );
     addTearDown(container.dispose);
 
@@ -70,7 +76,10 @@ void main() {
       // here — that is exactly the cold path that used to fail.
       final repo = _MutableSettingsRepository();
       final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
+        overrides: [
+          settingsRepositoryProvider.overrideWithValue(repo),
+          _skipBootMigration,
+        ],
       );
       addTearDown(container.dispose);
 
@@ -108,7 +117,10 @@ void main() {
       // errors (matching the production best-effort mirror).
       final repo = _MutableSettingsRepository();
       final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
+        overrides: [
+          settingsRepositoryProvider.overrideWithValue(repo),
+          _skipBootMigration,
+        ],
       );
       addTearDown(container.dispose);
 
@@ -135,7 +147,10 @@ void main() {
       // Now a failure rolls back to the last known-good value instead.
       final repo = _ThrowingBreakTimeRepository();
       final container = ProviderContainer(
-        overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
+        overrides: [
+          settingsRepositoryProvider.overrideWithValue(repo),
+          _skipBootMigration,
+        ],
       );
       addTearDown(container.dispose);
 
@@ -161,7 +176,10 @@ void main() {
   test('updateTrialLessonFree refreshes the read-side settings', () async {
     final repo = _MutableSettingsRepository();
     final container = ProviderContainer(
-      overrides: [settingsRepositoryProvider.overrideWithValue(repo), _skipBootMigration],
+      overrides: [
+        settingsRepositoryProvider.overrideWithValue(repo),
+        _skipBootMigration,
+      ],
     );
     addTearDown(container.dispose);
 
@@ -179,6 +197,9 @@ void main() {
     final refreshed = await container.read(teacherSettingsProvider.future);
     expect(refreshed.trialLessonFree, isTrue);
   });
+
+  // #205 / #206 — min booking hours invalidation + mock mirror
+  _minBookingTests();
 }
 
 /// In-memory [SettingsRepository] that mutates shared state, so the read-side
@@ -265,4 +286,162 @@ class _ThrowingBreakTimeRepository extends _MutableSettingsRepository {
   @override
   Future<TeacherSettings> updateBreakTime(int minutes) =>
       throw Exception('network');
+}
+
+// ─── #205 / #206 regression tests ───────────────────────────────────────────
+
+/// Settings repository that persists [updateMinBookingHours] and also
+/// mirrors the new threshold into the supplied availability repository —
+/// matching the MockSettingsRepository + _syncAvailabilityConstraints path.
+class _MinBookingSettingsRepository extends _MutableSettingsRepository {
+  _MinBookingSettingsRepository(this._availRepo);
+
+  final _MutableAvailabilityRepository _availRepo;
+
+  @override
+  Future<TeacherSettings> updateMinBookingHours(int hours) async {
+    _settings = _settings.copyWith(minBookingHours: hours);
+    // Mirror into the availability store (mirrors _syncAvailabilityConstraints).
+    final current = await _availRepo.getAvailability(_settings.id);
+    if (current != null) {
+      await _availRepo.saveAvailability(
+        current.copyWith(minBookingHours: hours),
+      );
+    }
+    return _settings;
+  }
+}
+
+/// Minimal in-memory [TeacherAvailabilityRepository] used by these tests.
+/// Only [getAvailability] and [saveAvailability] are implemented.
+class _MutableAvailabilityRepository implements TeacherAvailabilityRepository {
+  TeacherAvailability? _availability;
+
+  void seed(TeacherAvailability availability) {
+    _availability = availability;
+  }
+
+  @override
+  Future<TeacherAvailability?> getAvailability(String teacherId) async =>
+      _availability?.teacherId == teacherId ? _availability : null;
+
+  @override
+  Future<TeacherAvailability> saveAvailability(
+    TeacherAvailability availability,
+  ) async {
+    _availability = availability;
+    return availability;
+  }
+
+  // Remaining interface methods — unused in these tests.
+  @override
+  Future<void> deleteAvailability(String teacherId) =>
+      throw UnimplementedError();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+// ── Tests ────────────────────────────────────────────────────────────────────
+
+// These tests are appended to the same file so they share helper classes and
+// can be run with a single `flutter test` invocation.
+
+void _minBookingTests() {
+  const teacherId = 'teacher-1';
+
+  test('#205 updateMinBookingHours invalidates teacherAvailabilityProvider so '
+      'slot filters see the new threshold', () async {
+    final availRepo = _MutableAvailabilityRepository();
+    availRepo.seed(
+      TeacherAvailability(
+        id: 'avail-1',
+        teacherId: teacherId,
+        minBookingHours: 0,
+        slotDurationMinutes: 50,
+        slotStartInterval: 30,
+        breakTimeBetweenLessons: 10,
+        weeklySchedules: const [],
+        exceptions: const [],
+        createdAt: DateTime.utc(2026, 6, 25),
+      ),
+    );
+    final settingsRepo = _MinBookingSettingsRepository(availRepo);
+
+    final container = ProviderContainer(
+      overrides: [
+        settingsRepositoryProvider.overrideWithValue(settingsRepo),
+        teacherAvailabilityRepositoryProvider.overrideWithValue(availRepo),
+        _skipBootMigration,
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await container.read(teacherSettingsProvider.future);
+    await container.read(teacherSettingsNotifierProvider.future);
+
+    // Warm the availability cache before the write.
+    final before = await container.read(
+      teacherAvailabilityProvider(teacherId).future,
+    );
+    expect(before?.minBookingHours, 0);
+
+    // Act — write via the notifier.
+    await container
+        .read(teacherSettingsNotifierProvider.notifier)
+        .updateMinBookingHours(24);
+
+    // The provider must have been invalidated and now returns the new value.
+    final after = await container.read(
+      teacherAvailabilityProvider(teacherId).future,
+    );
+    expect(
+      after?.minBookingHours,
+      24,
+      reason: 'availability cache must reflect the new threshold (#205)',
+    );
+  });
+
+  test('#206 MockSettingsRepository._syncAvailabilityConstraints mirrors '
+      'minBookingHours into the availability store', () async {
+    final availRepo = _MutableAvailabilityRepository();
+    availRepo.seed(
+      TeacherAvailability(
+        id: 'avail-1',
+        teacherId: teacherId,
+        minBookingHours: 0,
+        slotDurationMinutes: 50,
+        slotStartInterval: 30,
+        breakTimeBetweenLessons: 10,
+        weeklySchedules: const [],
+        exceptions: const [],
+        createdAt: DateTime.utc(2026, 6, 25),
+      ),
+    );
+    final settingsRepo = _MinBookingSettingsRepository(availRepo);
+
+    final container = ProviderContainer(
+      overrides: [
+        settingsRepositoryProvider.overrideWithValue(settingsRepo),
+        teacherAvailabilityRepositoryProvider.overrideWithValue(availRepo),
+        _skipBootMigration,
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await container.read(teacherSettingsProvider.future);
+    await container.read(teacherSettingsNotifierProvider.future);
+
+    await container
+        .read(teacherSettingsNotifierProvider.notifier)
+        .updateMinBookingHours(48);
+
+    // The availability store must hold the mirrored value (#206).
+    final stored = await availRepo.getAvailability(teacherId);
+    expect(
+      stored?.minBookingHours,
+      48,
+      reason: 'availability store must mirror the new minBookingHours (#206)',
+    );
+  });
 }

@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../schedule/schedule_facade.dart'
+    show teacherAvailabilityRepositoryProvider;
 import '../../data/repositories/mock_settings_repository.dart';
 import '../../data/repositories/remote_settings_repository.dart';
 import '../../domain/repositories/settings_repository.dart';
@@ -12,6 +14,10 @@ part 'settings_repository_provider.g.dart';
 SettingsRepository settingsRepository(SettingsRepositoryRef ref) =>
     createRepository<SettingsRepository>(
       ref: ref,
-      mock: () => MockSettingsRepository(),
+      mock: () => MockSettingsRepository(
+        availabilityRepository: ref.watch(
+          teacherAvailabilityRepositoryProvider,
+        ),
+      ),
       remote: (api) => RemoteSettingsRepository(api),
     );

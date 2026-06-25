@@ -2,6 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../schedule/schedule_facade.dart'
+    show teacherAvailabilityProvider;
 import '../../domain/repositories/settings_repository.dart';
 import 'settings_repository_provider.dart';
 import 'teacher_settings_boot_migration_provider.dart';
@@ -124,8 +126,9 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final instruments =
-        current.instruments.where((i) => i != instrument).toList();
+    final instruments = current.instruments
+        .where((i) => i != instrument)
+        .toList();
     state = AsyncValue.data(current.copyWith(instruments: instruments));
     try {
       final updated = await _repository.updateInstruments(instruments);
@@ -232,8 +235,9 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final slots =
-        current.availableSlots.where((slot) => slot.id != slotId).toList();
+    final slots = current.availableSlots
+        .where((slot) => slot.id != slotId)
+        .toList();
     state = AsyncValue.data(current.copyWith(availableSlots: slots));
     try {
       final updated = await _repository.updateAvailableSlots(slots);
@@ -293,6 +297,9 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
       final updated = await _repository.updateMinBookingHours(hours);
       state = AsyncValue.data(updated);
       _refreshReadSide();
+      // Bust the availability cache so slot filters re-read the new threshold.
+      // (#205 — mirrors RemoteSettingsRepository._syncAvailabilityConstraints)
+      ref.invalidate(teacherAvailabilityProvider(updated.id));
     } catch (e, st) {
       _rollbackOrError(current, e, st);
     }
@@ -303,8 +310,9 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final effectiveMessage =
-        (message != null && message.isEmpty) ? null : message;
+    final effectiveMessage = (message != null && message.isEmpty)
+        ? null
+        : message;
     state = AsyncValue.data(
       current.copyWith(bookingGuidanceMessage: effectiveMessage),
     );
