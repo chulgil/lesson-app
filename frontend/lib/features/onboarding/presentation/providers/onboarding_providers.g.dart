@@ -486,7 +486,7 @@ final teacherOnboardingNotifierProvider = NotifierProvider<
 
 typedef _$TeacherOnboardingNotifier = Notifier<TeacherOnboardingState>;
 String _$currentTeacherProfileNotifierHash() =>
-    r'514ec0f1d9d54b85fa7da141759591e119a143a8';
+    r'c1625080ccccc5a7568efc3875ce2198c8475efc';
 
 /// Profile completion info for current teacher
 ///

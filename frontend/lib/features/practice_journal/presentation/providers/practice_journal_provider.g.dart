@@ -7,7 +7,7 @@ part of 'practice_journal_provider.dart';
 // **************************************************************************
 
 String _$practiceJournalRepositoryHash() =>
-    r'79fe90af42ecb0e41caa768e1f9d50358f6f7d61';
+    r'070e92c1ccb3daedf26b5caa6af9dc2ea7aa6904';
 
 /// See also [practiceJournalRepository].
 @ProviderFor(practiceJournalRepository)

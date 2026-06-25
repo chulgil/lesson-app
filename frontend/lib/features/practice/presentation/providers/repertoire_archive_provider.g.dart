@@ -317,7 +317,7 @@ class _ArchivedRepertoiresProviderElement
 }
 
 String _$repertoireArchiveNotifierHash() =>
-    r'ca0c3c1166d0f781654c0e22bb428bb898449f23';
+    r'1666e48a5dde0401a82e97586b0b252409a2e7ef';
 
 /// Repertoire archive notifier
 ///

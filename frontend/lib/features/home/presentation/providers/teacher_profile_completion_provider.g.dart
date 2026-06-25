@@ -61,11 +61,15 @@ final hasIntroductionProvider = Provider<bool>.internal(
 );
 
 typedef HasIntroductionRef = ProviderRef<bool>;
-String _$hasInstrumentsHash() => r'7993c4eb48b9a28b9271f68f73e7441a55e874c2';
+String _$hasInstrumentsHash() => r'2ebfc34bd64787b75d4f4f7155552eee7eb27513';
 
-/// 2026-06-10 UX fix — 악기 설정 quest. 가격 설정의 prerequisite.
-/// FE 가입 흐름에서 onboarding profile setup 단계 A 에 악기를 입력하나,
-/// 빠뜨리거나 추후 추가하려는 경우 진입점이 모호했음 → quest 카드 명시.
+/// 악기 등록 완료 여부 — Q3b quest (#732 SSOT fix).
+///
+/// SSOT: [currentTeacherProfileProvider] (TeacherProfile.instruments).
+///
+/// #732 fix — 관리 화면이 이제 profile 에 직접 쓰므로 단일 소스로 단순화.
+/// #726 band-aid (settings ∪ profile OR 판정) 제거. migration 로직은
+/// InstrumentManagementScreen 초기화 시 settings → profile 일회성 시드.
 ///
 /// Copied from [hasInstruments].
 @ProviderFor(hasInstruments)

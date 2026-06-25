@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/challenge.dart';
 import '../providers/challenge_provider.dart';
 
@@ -31,7 +32,13 @@ class ChallengesCard extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
       data: (challenges) {
-        if (challenges.isEmpty) return const SizedBox.shrink();
+        if (challenges.isEmpty) {
+          return EmptyStateWidget(
+            icon: Icons.local_fire_department_outlined,
+            title: AppStrings.gamificationChallengesComingSoon,
+            subtitle: AppStrings.gamificationChallengesComingSoonSubtitle,
+          );
+        }
 
         final visible = challenges.take(maxVisible).toList();
 
@@ -116,19 +123,17 @@ class _ChallengeItem extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color:
-                      challenge.period == ChallengePeriod.weekly
-                          ? AppColors.ink.withValues(alpha: 0.1)
-                          : AppColors.paperAccentSoft,
+                  color: challenge.period == ChallengePeriod.weekly
+                      ? AppColors.ink.withValues(alpha: 0.1)
+                      : AppColors.paperAccentSoft,
                   borderRadius: BorderRadius.zero,
                 ),
                 child: Text(
                   challenge.period.displayName,
                   style: AppTypography.caption.copyWith(
-                    color:
-                        challenge.period == ChallengePeriod.weekly
-                            ? AppColors.ink
-                            : AppColors.paperAccent,
+                    color: challenge.period == ChallengePeriod.weekly
+                        ? AppColors.ink
+                        : AppColors.paperAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -178,10 +183,9 @@ class _ChallengeItem extends StatelessWidget {
               Text(
                 'D-${challenge.remainingDays}',
                 style: AppTypography.caption.copyWith(
-                  color:
-                      challenge.remainingDays <= 2
-                          ? AppColors.paperAccent
-                          : AppColors.inkTertiary,
+                  color: challenge.remainingDays <= 2
+                      ? AppColors.paperAccent
+                      : AppColors.inkTertiary,
                 ),
               ),
             ],

@@ -6,7 +6,7 @@ part of 'vacation_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$vacationFormHash() => r'c7092aaea7501c81907ec57f465836154e6d487c';
+String _$vacationFormHash() => r'537d7e37420db5961affa43378c7744e757cd546';
 
 /// See also [VacationForm].
 @ProviderFor(VacationForm)

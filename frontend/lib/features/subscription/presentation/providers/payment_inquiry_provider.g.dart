@@ -26,7 +26,7 @@ final paymentInquiryStorageProvider = Provider<PaymentInquiryStorage>.internal(
 
 typedef PaymentInquiryStorageRef = ProviderRef<PaymentInquiryStorage>;
 String _$paymentInquiryRecordsHash() =>
-    r'8b4f46a3537f70211f18fa8bfd1528d399da5126';
+    r'2ca4d7cd12f866fb1c4f659036c5d27ed3a702ef';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -63,6 +63,10 @@ abstract class _$PaymentInquiryRecords
 /// Mutations update the Hive store and the in-memory state directly (no
 /// invalidateSelf) so the cached box / family instance survives.
 ///
+/// The hold memo is a best-effort re-matching aid, never blocking issuance —
+/// storage I/O failures (e.g. Hive unavailable) are swallowed so they never
+/// surface as errors in the payment flow.
+///
 /// Copied from [PaymentInquiryRecords].
 @ProviderFor(PaymentInquiryRecords)
 const paymentInquiryRecordsProvider = PaymentInquiryRecordsFamily();
@@ -72,6 +76,10 @@ const paymentInquiryRecordsProvider = PaymentInquiryRecordsFamily();
 /// Mutations update the Hive store and the in-memory state directly (no
 /// invalidateSelf) so the cached box / family instance survives.
 ///
+/// The hold memo is a best-effort re-matching aid, never blocking issuance —
+/// storage I/O failures (e.g. Hive unavailable) are swallowed so they never
+/// surface as errors in the payment flow.
+///
 /// Copied from [PaymentInquiryRecords].
 class PaymentInquiryRecordsFamily
     extends Family<AsyncValue<Map<String, DateTime>>> {
@@ -80,6 +88,10 @@ class PaymentInquiryRecordsFamily
   /// Mutations update the Hive store and the in-memory state directly (no
   /// invalidateSelf) so the cached box / family instance survives.
   ///
+  /// The hold memo is a best-effort re-matching aid, never blocking issuance —
+  /// storage I/O failures (e.g. Hive unavailable) are swallowed so they never
+  /// surface as errors in the payment flow.
+  ///
   /// Copied from [PaymentInquiryRecords].
   const PaymentInquiryRecordsFamily();
 
@@ -87,6 +99,10 @@ class PaymentInquiryRecordsFamily
   ///
   /// Mutations update the Hive store and the in-memory state directly (no
   /// invalidateSelf) so the cached box / family instance survives.
+  ///
+  /// The hold memo is a best-effort re-matching aid, never blocking issuance —
+  /// storage I/O failures (e.g. Hive unavailable) are swallowed so they never
+  /// surface as errors in the payment flow.
   ///
   /// Copied from [PaymentInquiryRecords].
   PaymentInquiryRecordsProvider call(
@@ -126,6 +142,10 @@ class PaymentInquiryRecordsFamily
 /// Mutations update the Hive store and the in-memory state directly (no
 /// invalidateSelf) so the cached box / family instance survives.
 ///
+/// The hold memo is a best-effort re-matching aid, never blocking issuance —
+/// storage I/O failures (e.g. Hive unavailable) are swallowed so they never
+/// surface as errors in the payment flow.
+///
 /// Copied from [PaymentInquiryRecords].
 class PaymentInquiryRecordsProvider
     extends AutoDisposeAsyncNotifierProviderImpl<PaymentInquiryRecords,
@@ -134,6 +154,10 @@ class PaymentInquiryRecordsProvider
   ///
   /// Mutations update the Hive store and the in-memory state directly (no
   /// invalidateSelf) so the cached box / family instance survives.
+  ///
+  /// The hold memo is a best-effort re-matching aid, never blocking issuance —
+  /// storage I/O failures (e.g. Hive unavailable) are swallowed so they never
+  /// surface as errors in the payment flow.
   ///
   /// Copied from [PaymentInquiryRecords].
   PaymentInquiryRecordsProvider(

@@ -7,7 +7,7 @@ part of 'settings_repository_provider.dart';
 // **************************************************************************
 
 String _$settingsRepositoryHash() =>
-    r'3ed4cbab3328cc108478626b2aa3880062bc8025';
+    r'12885dc86729645da0a21cdddf81f57a8fdb221e';
 
 /// Settings repository provider - switches between Mock and Remote.
 ///

@@ -43,7 +43,7 @@ final currentUserRoleStateHandleProvider =
 );
 
 typedef CurrentUserRoleStateHandleRef = ProviderRef<CurrentUserRoleStateHandle>;
-String _$currentUserIdHash() => r'54acdde57b5f270677d25087fe2d50b4470665a8';
+String _$currentUserIdHash() => r'1230dc13f21da013975fbc4444c00a836d171fc7';
 
 /// Current user ID based on role.
 ///

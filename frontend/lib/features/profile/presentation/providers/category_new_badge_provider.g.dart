@@ -6,7 +6,7 @@ part of 'category_new_badge_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$categoryNewBadgeHash() => r'5a5b3c74bdf6ea3174ea910a90fc66421df451f1';
+String _$categoryNewBadgeHash() => r'f3f8044b75eb89e7650490d0520a31f7f309de51';
 
 /// W6 마이그레이션 NEW 배지 영속 provider.
 ///

@@ -1298,7 +1298,7 @@ class _ActiveProposalBetweenProviderElement
 }
 
 String _$subscriptionProposalNotifierHash() =>
-    r'ed3ffc3457886053a3d450cc2f3b14a1eef6984c';
+    r'02eff788687665d1a278fb2cfb4e4a8ae9ea9b47';
 
 /// See also [SubscriptionProposalNotifier].
 @ProviderFor(SubscriptionProposalNotifier)

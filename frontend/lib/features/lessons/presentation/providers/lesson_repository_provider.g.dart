@@ -6,7 +6,7 @@ part of 'lesson_repository_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lessonRepositoryHash() => r'2e081b870c0e79e329f0d221ed3f43361b3f461a';
+String _$lessonRepositoryHash() => r'7a65c21adaeeacbb35a8624d958f50ea29dc6b5a';
 
 /// Lesson repository provider - switches between Mock and SyncAware (Remote with offline queue).
 ///
