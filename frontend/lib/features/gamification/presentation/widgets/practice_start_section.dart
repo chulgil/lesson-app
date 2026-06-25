@@ -44,7 +44,7 @@ class PracticeStartSection extends ConsumerWidget {
   }
 
   void _onMoreTap(BuildContext context) {
-    context.go('${AppRoutes.studentGrowthDetail}?studentId=$studentId');
+    context.push('${AppRoutes.studentGrowthDetail}?studentId=$studentId');
   }
 
   Future<void> _onStartTap(BuildContext context, WidgetRef ref) async {
