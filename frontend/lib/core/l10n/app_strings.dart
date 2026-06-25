@@ -2192,6 +2192,9 @@ class AppStrings {
   /// 각 요일의 레슨 시간을 선택해주세요 (검증 메시지)
   static const selectTimeForEachDay = '각 요일의 레슨 시간을 선택해주세요';
 
+  /// 같은 요일에 겹치는 시간대가 있습니다 — [start, start+duration) 구간 중복 검증 메시지
+  static const slotTimeOverlap = '같은 요일에 겹치는 시간대가 있습니다. 시간을 다시 선택해주세요';
+
   /// 신규 학생 (기본값)
   static const newStudentDefault = '신규 학생';
 

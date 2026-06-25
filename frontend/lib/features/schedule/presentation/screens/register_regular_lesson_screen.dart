@@ -407,9 +407,13 @@ class _RegisterRegularLessonScreenState
   }
 
   bool _isFormValid() {
-    return _scheduleType == ScheduleType.flexible ||
-        (_selectedDays.length == _lessonsPerWeek &&
-            _selectedTimesPerDay.length == _lessonsPerWeek);
+    if (_scheduleType == ScheduleType.flexible) return true;
+    if (_selectedDays.length != _lessonsPerWeek) return false;
+    if (_selectedTimesPerDay.length != _lessonsPerWeek) return false;
+    if (hasSlotOverlap(_selectedTimesPerDay, _selectedLessonDuration)) {
+      return false;
+    }
+    return true;
   }
 
   Future<void> _submitRegistration() async {
@@ -427,6 +431,15 @@ class _RegisterRegularLessonScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(AppStrings.selectTimeForEachDay),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+      if (hasSlotOverlap(_selectedTimesPerDay, _selectedLessonDuration)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.slotTimeOverlap),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -480,9 +493,8 @@ class _RegisterRegularLessonScreenState
                   ? AppStrings.regularLessonRegisteredWithConflicts(skipped)
                   : AppStrings.regularLessonRegistered,
             ),
-            backgroundColor: skipped > 0
-                ? AppColors.paperAccent
-                : AppColors.paperOk,
+            backgroundColor:
+                skipped > 0 ? AppColors.paperAccent : AppColors.paperOk,
           ),
         );
         context.pop();
@@ -502,4 +514,27 @@ class _RegisterRegularLessonScreenState
       }
     }
   }
+}
+
+/// Returns true if any two slots in [timesPerDay] share the same dayOfWeek
+/// AND their [start, start + durationMinutes) intervals overlap.
+///
+/// With Map(int→TimeOfDay) each day key holds exactly one time, so same-day
+/// duplicates are structurally impossible and this always returns false.
+/// The function is exposed at top-level so unit tests can verify the interval
+/// logic directly, and it future-proofs the form against refactors that allow
+/// multiple slots per day.
+bool hasSlotOverlap(Map<int, TimeOfDay> timesPerDay, int durationMinutes) {
+  final entries = timesPerDay.entries.toList();
+  for (int i = 0; i < entries.length; i++) {
+    for (int j = i + 1; j < entries.length; j++) {
+      if (entries[i].key != entries[j].key) continue; // different days — skip
+      final startA = entries[i].value.hour * 60 + entries[i].value.minute;
+      final endA = startA + durationMinutes;
+      final startB = entries[j].value.hour * 60 + entries[j].value.minute;
+      final endB = startB + durationMinutes;
+      if (startA < endB && startB < endA) return true;
+    }
+  }
+  return false;
 }
