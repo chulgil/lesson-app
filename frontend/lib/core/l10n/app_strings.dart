@@ -9800,4 +9800,99 @@ class AppStrings {
 
   /// 오프라인 배너 문구 (#868)
   static const offlineBannerMessage = '오프라인 — 저장된 데이터를 표시 중';
+
+  // ── Issue #920 i18n bundle ──
+
+  // Role Select
+  static String roleSelectWelcome(String name) => '$name님, 환영합니다!';
+  static const roleSelectSubtitle = '약관에 동의하고 사용할 역할을 선택해 주세요.';
+  static const roleSelectTeacher = '선생님';
+  static const roleSelectTeacherDesc = '학생 관리, 레슨 일정, 피드백 작성';
+  static const roleSelectStudent = '학생';
+  static const roleSelectStudentDesc = '레슨 확인, 연습 기록, 피드백 확인';
+  static const roleSelectParent = '학부모';
+  static const roleSelectParentDesc = '자녀의 레슨과 연습을 확인';
+  static const roleSelectConsentRequired = '필수 약관에 동의하면 역할을 선택할 수 있어요.';
+
+  // Student Invite Code
+  static const inviteCodeScreenDesc = '선생님으로부터 받은\n초대 코드를 입력해주세요';
+  static const inviteCodeValidationEmpty = '초대 코드를 입력해주세요';
+  static const inviteCodeSubmitButton = '코드 확인하기';
+  static const inviteCodeHelpInfo = '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 아래에서 바로 시작할 수 있어요.';
+  static const inviteCodeSkipButton = '코드 없이 시작하기';
+  static const inviteCodeCheckError = '코드 확인 중 오류가 발생했습니다';
+
+  // Phone Verification
+  static const phoneVerifyPhoneLabel = '휴대폰 번호';
+  static const phoneVerifyCodeLabel = '인증번호';
+  static const phoneVerifyCodeHint = '6자리 인증번호';
+  static const phoneVerifyStepTitlePhone = '휴대폰 인증';
+  static const phoneVerifyStepTitleCode = '인증번호 입력';
+  static String phoneVerifyStepDescCode(String phone) => '$phone으로 전송된\n인증번호 6자리를 입력해주세요';
+  static const phoneVerifyStepDescPhone = '레슨 관리와 학생 초대를 위해\n휴대폰 인증이 필요합니다';
+  static const phoneVerifyButtonVerify = '인증 완료';
+  static const phoneVerifyButtonSend = '인증번호 받기';
+  static const phoneVerifyButtonResend = '인증번호 다시 받기';
+  static const phoneVerifyButtonChangePhone = '휴대폰 번호 변경';
+  static const phoneVerifyErrorInvalidPhone = '올바른 휴대폰 번호를 입력해주세요';
+  static const phoneVerifyErrorInvalidCode = '6자리 인증번호를 입력해주세요';
+
+  // Onboarding Profile Setup (teacher)
+  static const profileSetupSubtitle = '학생들에게 보여질 기본 정보를 설정해주세요';
+  static const profileSetupDeletePhoto = '사진 삭제';
+  static const profileSetupNameLabel = '이름';
+  static const profileSetupInstrumentLabel = '악기';
+  static const profileSetupInstrumentHint = '악기를 선택해주세요';
+  static String profileSetupMissingFields(String fields) => '필수 항목: $fields';
+
+  // Student Profile Setup
+  static const studentProfileSetupSubtitle = '기본 정보를 설정해주세요';
+  static const studentProfileSetupNameLabel = '이름';
+  static const studentProfileSetupNameHint = '이름을 입력해주세요';
+  static const studentProfileSetupInstrumentLabel = '악기';
+  static const studentProfileSetupInstrumentHint = '악기를 선택해주세요';
+
+  // Common instrument list (SSOT — shared between teacher and student selectors)
+  static const List<String> instrumentList = [
+    '바이올린', '피아노', '첼로', '플루트', '클라리넷',
+    '비올라', '기타', '성악', '드럼', '작곡',
+  ];
+
+  // Bank Account Edit
+  static const bankAccountNoAccount = '등록된 계좌가 없습니다';
+  static const bankAccountAddPrompt = '학생의 수강료 입금을 위한 계좌를 추가하세요.';
+  static const bankAccountDefaultNote = '기본 계좌가 수강권 제안 시 학생에게 표시됩니다.';
+  static const bankAccountDefaultBadge = '기본';
+  static const bankAccountDirectInput = '직접입력';
+  static const List<String> bankNames = [
+    '국민은행', '신한은행', '우리은행', '하나은행', '농협은행',
+    'SC제일은행', '한국씨티은행', '기업은행', '카카오뱅크', '토스뱅크',
+    '케이뱅크', '새마을금고', '신협', '우체국', '수협은행',
+    '대구은행', '부산은행', '경남은행', '광주은행', '전북은행', '제주은행',
+  ];
+  static const bankAccountConsentContent =
+      '[개인정보(계좌정보) 수집·이용 동의]\n\n'
+      '1. 수집 항목\n  - 은행명, 계좌번호, 예금주\n\n'
+      '2. 수집 목적\n  - 수강료 입금 안내를 위해 학생에게 계좌 정보를 표시\n\n'
+      '3. 보유 기간\n  - 회원탈퇴 시까지 (탈퇴 후 30일 이내 파기)\n'
+      '  - 계좌 변경이력: 전자상거래법에 따라 5년 보관\n\n'
+      '4. 동의 거부 시 불이익\n  - 동의를 거부할 수 있으나, 계좌 등록이 불가합니다.\n';
+  static const bankAccountConsentSheetTitle = '개인정보 수집·이용 동의';
+  static const bankAccountConsentCheckboxLabel = '개인정보(계좌정보) 수집·이용 동의';
+  static const bankAccountConsentRequired = '필수';
+  static const bankAccountConsentViewContent = '내용보기';
+  static const bankAccountValidationBank = '은행명을 입력해주세요';
+  static const bankAccountValidationNumber = '계좌번호를 입력해주세요';
+  static const bankAccountValidationNumberFormat = '올바른 계좌번호를 입력해주세요';
+  static const bankAccountValidationHolder = '예금주를 입력해주세요';
+
+  // Lesson Style Settings
+  static String lessonStyleMinutes(int minutes) => '$minutes분';
+  static const lessonStyleNoLimit = '제한 없음';
+  static String lessonStyleHoursBefore(int hours) => '$hours시간 전';
+  static String lessonStyleDaysBefore(int days) => '$days일 전';
+
+  // Pending Bookings
+  static const pendingBookingsEmpty = '대기 중인 신청이 없습니다';
+  static const pendingBookingsEmptyDesc = '새로운 레슨 신청이 들어오면 여기에 표시돼요';
 }

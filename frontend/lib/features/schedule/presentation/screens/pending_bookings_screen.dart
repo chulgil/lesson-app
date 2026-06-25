@@ -92,7 +92,7 @@ class PendingBookingsScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 빈 상태 타이틀은 Playfair sectionTitle (§7.87).
           Text(
-            '대기 중인 신청이 없습니다',
+            AppStrings.pendingBookingsEmpty,
             style: NotebookTypography.sectionTitle.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -101,7 +101,7 @@ class PendingBookingsScreen extends ConsumerWidget {
           // 빈 상태 부연 = 시스템 일반 안내 → Tier 3 Pretendard bodyMedium
           // (README §1.1.1 결정 가이드, §7.128 자필 회피).
           Text(
-            '새로운 레슨 신청이 들어오면 여기에 표시돼요',
+            AppStrings.pendingBookingsEmptyDesc,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),

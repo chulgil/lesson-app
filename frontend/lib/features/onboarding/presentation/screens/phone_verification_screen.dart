@@ -117,7 +117,7 @@ class _PhoneVerificationScreenState
   Future<void> _sendCode() async {
     final phone = _phoneController.text.replaceAll('-', '').replaceAll(' ', '');
     if (phone.length < 10) {
-      setState(() => _errorMessage = '올바른 휴대폰 번호를 입력해주세요');
+      setState(() => _errorMessage = AppStrings.phoneVerifyErrorInvalidPhone);
       return;
     }
 
@@ -172,7 +172,7 @@ class _PhoneVerificationScreenState
   Future<void> _verifyCode() async {
     final code = _codeController.text;
     if (code.length != 6) {
-      setState(() => _errorMessage = '6자리 인증번호를 입력해주세요');
+      setState(() => _errorMessage = AppStrings.phoneVerifyErrorInvalidCode);
       return;
     }
 
@@ -247,14 +247,14 @@ class _PhoneVerificationScreenState
 
                 // Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-h).
                 Text(
-                  _codeSent ? '인증번호 입력' : '휴대폰 인증',
+                  _codeSent ? AppStrings.phoneVerifyStepTitleCode : AppStrings.phoneVerifyStepTitlePhone,
                   style: NotebookTypography.sectionTitle,
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   _codeSent
-                      ? '${_phoneController.text}로 전송된\n인증번호 6자리를 입력해주세요'
-                      : '레슨 관리와 학생 초대를 위해\n휴대폰 인증이 필요합니다',
+                      ? AppStrings.phoneVerifyStepDescCode(_phoneController.text)
+                      : AppStrings.phoneVerifyStepDescPhone,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -302,7 +302,7 @@ class _PhoneVerificationScreenState
                               ),
                             )
                             : Text(
-                              _codeSent ? '인증 완료' : '인증번호 받기',
+                              _codeSent ? AppStrings.phoneVerifyButtonVerify : AppStrings.phoneVerifyButtonSend,
                               style: AppTypography.button,
                             ),
                   ),
@@ -346,7 +346,7 @@ class _PhoneVerificationScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '휴대폰 번호',
+          AppStrings.phoneVerifyPhoneLabel,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -391,7 +391,7 @@ class _PhoneVerificationScreenState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '인증번호',
+              AppStrings.phoneVerifyCodeLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -419,7 +419,7 @@ class _PhoneVerificationScreenState
             LengthLimitingTextInputFormatter(6),
           ],
           decoration: InputDecoration(
-            hintText: '6자리 인증번호',
+            hintText: AppStrings.phoneVerifyCodeHint,
             prefixIcon: const Icon(Icons.lock_outline),
             border: OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
@@ -438,7 +438,7 @@ class _PhoneVerificationScreenState
             onPressed:
                 _remainingSeconds <= 120 && !_isLoading ? _resendCode : null,
             child: Text(
-              '인증번호 다시 받기',
+              AppStrings.phoneVerifyButtonResend,
               style: AppTypography.bodyMedium.copyWith(
                 color:
                     _remainingSeconds <= 120
@@ -461,7 +461,7 @@ class _PhoneVerificationScreenState
               });
             },
             child: Text(
-              '휴대폰 번호 변경',
+              AppStrings.phoneVerifyButtonChangePhone,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkTertiary,
                 decoration: TextDecoration.underline,

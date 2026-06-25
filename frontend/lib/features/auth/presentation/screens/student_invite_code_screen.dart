@@ -86,7 +86,7 @@ class _StudentInviteCodeScreenState
 
                       // Description
                       Text(
-                        '선생님으로부터 받은\n초대 코드를 입력해주세요',
+                        AppStrings.inviteCodeScreenDesc,
                         style: AppTypography.bodyLarge.copyWith(
                           color: AppColors.inkSecondary,
                         ),
@@ -143,7 +143,7 @@ class _StudentInviteCodeScreenState
                           textCapitalization: TextCapitalization.characters,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '초대 코드를 입력해주세요';
+                              return AppStrings.inviteCodeValidationEmpty;
                             }
                             return null;
                           },
@@ -180,23 +180,19 @@ class _StudentInviteCodeScreenState
                             foregroundColor: AppColors.paper,
                             shape: RoundedRectangleBorder(),
                           ),
-                          child:
-                              _isLoading
-                                  ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      // Notebook × Score §7.50: Vermillion CTA spinner = paper.
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.paper,
-                                      ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    // Notebook × Score §7.50: Vermillion CTA spinner = paper.
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.paper,
                                     ),
-                                  )
-                                  : Text(
-                                    '코드 확인하기',
-                                    style: AppTypography.button,
                                   ),
+                                )
+                              : Text(AppStrings.inviteCodeSubmitButton, style: AppTypography.button),
                         ),
                       ),
 
@@ -218,7 +214,7 @@ class _StudentInviteCodeScreenState
                             const SizedBox(width: AppSpacing.space3),
                             Expanded(
                               child: Text(
-                                '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 아래에서 바로 시작할 수 있어요.',
+                                AppStrings.inviteCodeHelpInfo,
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.ink,
                                 ),
@@ -235,15 +231,16 @@ class _StudentInviteCodeScreenState
                         width: double.infinity,
                         height: AppSpacing.buttonHeight,
                         child: OutlinedButton(
-                          onPressed:
-                              _isSkipping ? null : _handleStartWithoutCode,
+                          onPressed: _isSkipping
+                              ? null
+                              : _handleStartWithoutCode,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.inkSecondary,
                             side: BorderSide(color: AppColors.inkQuaternary),
                             shape: RoundedRectangleBorder(),
                           ),
                           child: Text(
-                            '코드 없이 시작하기',
+                            AppStrings.inviteCodeSkipButton,
                             style: AppTypography.button.copyWith(
                               color: AppColors.inkSecondary,
                             ),
@@ -319,7 +316,7 @@ class _StudentInviteCodeScreenState
         // Mock: accept any 6+ character code
         await Future.delayed(const Duration(seconds: 1));
         if (code.length < 6) {
-          setState(() => _errorMessage = '올바르지 않은 초대 코드입니다');
+          setState(() => _errorMessage = AppStrings.inviteCodeInvalid);
           return;
         }
       } else {
@@ -335,7 +332,7 @@ class _StudentInviteCodeScreenState
             },
           );
         } catch (e) {
-          setState(() => _errorMessage = '올바르지 않은 초대 코드입니다');
+          setState(() => _errorMessage = AppStrings.inviteCodeInvalid);
           return;
         }
       }
@@ -355,7 +352,7 @@ class _StudentInviteCodeScreenState
         context.go(AppRoutes.studentProfileSetup);
       }
     } catch (e) {
-      setState(() => _errorMessage = '코드 확인 중 오류가 발생했습니다');
+      setState(() => _errorMessage = AppStrings.inviteCodeCheckError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

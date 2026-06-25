@@ -100,7 +100,7 @@ class _DurationSection extends ConsumerWidget {
               (minutes) => NotebookRadioListTile<int>(
                 value: minutes,
                 groupValue: current,
-                title: Text('$minutes분'),
+                title: Text(AppStrings.lessonStyleMinutes(minutes)),
                 onChanged: (value) {
                   if (value == null || value == current) return;
                   ref
@@ -152,13 +152,13 @@ class _MinBookingSection extends ConsumerWidget {
 
   String _formatHours(int hours) {
     if (hours <= 0) {
-      return '제한 없음';
+      return AppStrings.lessonStyleNoLimit;
     }
     if (hours < 24) {
-      return '$hours시간 전';
+      return AppStrings.lessonStyleHoursBefore(hours);
     }
     final days = hours ~/ 24;
-    return '$days일 전';
+    return AppStrings.lessonStyleDaysBefore(days);
   }
 }
 

@@ -54,14 +54,14 @@ class BankAccountEditScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '등록된 계좌가 없습니다',
+            AppStrings.bankAccountNoAccount,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '학생의 수강료 입금을 위한 계좌를 추가하세요.',
+            AppStrings.bankAccountAddPrompt,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -91,7 +91,7 @@ class BankAccountEditScreen extends ConsumerWidget {
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(
-                  '기본 계좌가 수강권 제안 시 학생에게 표시됩니다.',
+                  AppStrings.bankAccountDefaultNote,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -273,7 +273,7 @@ class _BankAccountCard extends StatelessWidget {
                       borderRadius: BorderRadius.zero,
                     ),
                     child: Text(
-                      '기본',
+                      AppStrings.bankAccountDefaultBadge,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
@@ -357,50 +357,13 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
   final _accountNumberController = TextEditingController();
   final _accountHolderController = TextEditingController();
 
-  static const _directInputLabel = '직접입력';
-  static const _bankNames = [
-    '국민은행',
-    '신한은행',
-    '우리은행',
-    '하나은행',
-    '농협은행',
-    'SC제일은행',
-    '한국씨티은행',
-    '기업은행',
-    '카카오뱅크',
-    '토스뱅크',
-    '케이뱅크',
-    '새마을금고',
-    '신협',
-    '우체국',
-    '수협은행',
-    '대구은행',
-    '부산은행',
-    '경남은행',
-    '광주은행',
-    '전북은행',
-    '제주은행',
-  ];
+  // AppStrings.bankAccountDirectInput migrated to AppStrings.bankAccountDirectInput (#920)
+  // AppStrings.bankNames migrated to AppStrings.bankNames (#920)
 
   String? _selectedDropdownValue;
   bool _consentChecked = false;
 
-  static const _consentContent = '''
-[개인정보(계좌정보) 수집·이용 동의]
-
-1. 수집 항목
-  - 은행명, 계좌번호, 예금주
-
-2. 수집 목적
-  - 수강료 입금 안내를 위해 학생에게 계좌 정보를 표시
-
-3. 보유 기간
-  - 회원탈퇴 시까지 (탈퇴 후 30일 이내 파기)
-  - 계좌 변경이력: 전자상거래법에 따라 5년 보관
-
-4. 동의 거부 시 불이익
-  - 동의를 거부할 수 있으나, 계좌 등록이 불가합니다.
-''';
+  // AppStrings.bankAccountConsentContent migrated to AppStrings.bankAccountConsentContent (#920)
 
   @override
   void initState() {
@@ -419,15 +382,15 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
 
   void _onBankNameChanged() {
     final text = _bankNameController.text.trim();
-    if (_bankNames.contains(text)) {
+    if (AppStrings.bankNames.contains(text)) {
       if (_selectedDropdownValue != text) {
         setState(() => _selectedDropdownValue = text);
       }
     } else {
-      if (_selectedDropdownValue != _directInputLabel) {
+      if (_selectedDropdownValue != AppStrings.bankAccountDirectInput) {
         setState(
           () =>
-              _selectedDropdownValue = text.isEmpty ? null : _directInputLabel,
+              _selectedDropdownValue = text.isEmpty ? null : AppStrings.bankAccountDirectInput,
         );
       }
     }
@@ -435,9 +398,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
 
   void _onDropdownChanged(String? value) {
     if (value == null) return;
-    if (value == _directInputLabel) {
+    if (value == AppStrings.bankAccountDirectInput) {
       setState(() {
-        _selectedDropdownValue = _directInputLabel;
+        _selectedDropdownValue = AppStrings.bankAccountDirectInput;
         _bankNameController.clear();
       });
       // Focus the text field for manual input
@@ -467,7 +430,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                       padding: const EdgeInsets.all(AppSpacing.space4),
                       // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
                       child: Text(
-                        '개인정보 수집·이용 동의',
+                        AppStrings.bankAccountConsentSheetTitle,
                         style: NotebookTypography.sectionTitle,
                       ),
                     ),
@@ -477,7 +440,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                         controller: scrollController,
                         padding: const EdgeInsets.all(AppSpacing.space4),
                         child: Text(
-                          _consentContent,
+                          AppStrings.bankAccountConsentContent,
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.inkSecondary,
                             height: 1.6,
@@ -564,7 +527,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                             () => _consentChecked = !_consentChecked,
                           ),
                       child: Text(
-                        '개인정보(계좌정보) 수집·이용 동의',
+                        AppStrings.bankAccountConsentCheckboxLabel,
                         style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -578,7 +541,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     ),
                     decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                     child: Text(
-                      '필수',
+                      AppStrings.bankAccountConsentRequired,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
@@ -589,7 +552,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                   GestureDetector(
                     onTap: () => _showConsentContent(context),
                     child: Text(
-                      '내용보기',
+                      AppStrings.bankAccountConsentViewContent,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.inkTertiary,
                         decoration: TextDecoration.underline,
@@ -631,15 +594,15 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     ),
                     items: [
                       DropdownMenuItem(
-                        value: _directInputLabel,
+                        value: AppStrings.bankAccountDirectInput,
                         child: Text(
-                          _directInputLabel,
+                          AppStrings.bankAccountDirectInput,
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
-                      ..._bankNames.map(
+                      ...AppStrings.bankNames.map(
                         (name) => DropdownMenuItem(
                           value: name,
                           child: Text(name, style: AppTypography.bodySmall),
@@ -662,7 +625,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return '은행명을 입력해주세요';
+                        return AppStrings.bankAccountValidationBank;
                       }
                       return null;
                     },
@@ -692,11 +655,11 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '계좌번호를 입력해주세요';
+                  return AppStrings.bankAccountValidationNumber;
                 }
                 final digitsOnly = value.replaceAll('-', '');
                 if (digitsOnly.length < 8 || digitsOnly.length > 16) {
-                  return '올바른 계좌번호를 입력해주세요';
+                  return AppStrings.bankAccountValidationNumberFormat;
                 }
                 return null;
               },
@@ -718,7 +681,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 ),
               ),
               validator: (value) {
-                if (value == null || value.trim().isEmpty) return '예금주를 입력해주세요';
+                if (value == null || value.trim().isEmpty) return AppStrings.bankAccountValidationHolder;
                 return null;
               },
             ),

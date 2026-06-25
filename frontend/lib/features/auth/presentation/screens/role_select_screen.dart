@@ -126,13 +126,13 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               ),
               const SizedBox(height: AppSpacing.space4),
               Text(
-                '$userName님, 환영합니다!',
+                AppStrings.roleSelectWelcome(userName),
                 style: NotebookTypography.sectionTitle,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.space2),
               Text(
-                '약관에 동의하고 사용할 역할을 선택해 주세요.',
+                AppStrings.roleSelectSubtitle,
                 style: AppTypography.bodyLarge.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -149,8 +149,8 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               // Role cards — disabled until required terms checked
               _RoleCard(
                 icon: Icons.school_rounded,
-                title: '선생님',
-                description: '학생 관리, 레슨 일정, 피드백 작성',
+                title: AppStrings.roleSelectTeacher,
+                description: AppStrings.roleSelectTeacherDesc,
                 color: AppColors.paperAccent,
                 isEnabled: _canSelectRole,
                 isLoading: _isLoading,
@@ -159,8 +159,8 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               const SizedBox(height: AppSpacing.space3),
               _RoleCard(
                 icon: Icons.music_note_rounded,
-                title: '학생',
-                description: '레슨 확인, 연습 기록, 피드백 확인',
+                title: AppStrings.roleSelectStudent,
+                description: AppStrings.roleSelectStudentDesc,
                 color: AppColors.paperAccent,
                 isEnabled: _canSelectRole,
                 isLoading: _isLoading,
@@ -169,8 +169,8 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               const SizedBox(height: AppSpacing.space3),
               _RoleCard(
                 icon: Icons.family_restroom_rounded,
-                title: '학부모',
-                description: '자녀의 레슨과 연습을 확인',
+                title: AppStrings.roleSelectParent,
+                description: AppStrings.roleSelectParentDesc,
                 color: AppColors.ink,
                 isEnabled: _canSelectRole,
                 isLoading: _isLoading,
@@ -180,7 +180,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
               if (!_terms.requiredAccepted) ...[
                 const SizedBox(height: AppSpacing.space4),
                 Text(
-                  '필수 약관에 동의하면 역할을 선택할 수 있어요.',
+                  AppStrings.roleSelectConsentRequired,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkTertiary,
                   ),

@@ -15,19 +15,7 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
 
-/// Available instruments for student selection
-const _instruments = [
-  '바이올린',
-  '비올라',
-  '첼로',
-  '피아노',
-  '플루트',
-  '클라리넷',
-  '기타',
-  '드럼',
-  '성악',
-  '작곡',
-];
+// instruments list migrated to AppStrings.instrumentList (#920)
 
 /// Student profile setup screen for student onboarding (step 1 of 2)
 class StudentProfileSetupScreen extends ConsumerStatefulWidget {
@@ -116,7 +104,7 @@ class _StudentProfileSetupScreenState
       context: context,
       builder:
           (context) => _InstrumentSelectorSheet(
-            instruments: _instruments,
+            instruments: AppStrings.instrumentList,
             selectedInstrument: _selectedInstrument,
             onSelected: (instrument) {
               setState(() => _selectedInstrument = instrument);
@@ -158,7 +146,7 @@ class _StudentProfileSetupScreenState
                       ),
                       const SizedBox(height: AppSpacing.space2),
                       Text(
-                        '기본 정보를 설정해주세요',
+                        AppStrings.studentProfileSetupSubtitle,
                         style: AppTypography.bodyLarge.copyWith(
                           color: AppColors.inkSecondary,
                         ),
@@ -241,7 +229,7 @@ class _StudentProfileSetupScreenState
         Row(
           children: [
             Text(
-              '이름',
+              AppStrings.studentProfileSetupNameLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -257,7 +245,7 @@ class _StudentProfileSetupScreenState
           onChanged: (_) => setState(() {}),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return '이름을 입력해주세요';
+              return AppStrings.studentProfileSetupNameHint;
             }
             return null;
           },
@@ -283,7 +271,7 @@ class _StudentProfileSetupScreenState
         Row(
           children: [
             Text(
-              '악기',
+              AppStrings.studentProfileSetupInstrumentLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -308,7 +296,7 @@ class _StudentProfileSetupScreenState
                         Icon(Icons.music_note, color: AppColors.inkTertiary),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
-                          '악기를 선택해주세요',
+                          AppStrings.studentProfileSetupInstrumentHint,
                           style: AppTypography.bodyMedium.copyWith(
                             color: AppColors.inkTertiary,
                           ),

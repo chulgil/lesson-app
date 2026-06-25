@@ -150,7 +150,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ListTile(
               leading: Icon(Icons.delete_outline, color: AppColors.paperAccent),
               title: Text(
-                '사진 삭제',
+                AppStrings.profileSetupDeletePhoto,
                 style: TextStyle(color: AppColors.paperAccent),
               ),
               onTap: () {
@@ -237,7 +237,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
-                      '학생들에게 보여질 기본 정보를 설정해주세요',
+                      AppStrings.profileSetupSubtitle,
                       style: AppTypography.bodyLarge.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -278,7 +278,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             const SizedBox(width: AppSpacing.space2),
                             Expanded(
                               child: Text(
-                                '필수 항목: ${_missingFields.join(', ')}',
+                                AppStrings.profileSetupMissingFields(_missingFields.join(', ')),
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.paperAccent,
                                 ),
@@ -434,7 +434,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         Row(
           children: [
             Text(
-              '이름',
+              AppStrings.profileSetupNameLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -472,7 +472,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         Row(
           children: [
             Text(
-              '악기',
+              AppStrings.profileSetupInstrumentLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -498,7 +498,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       Icon(Icons.add, color: AppColors.inkTertiary),
                       const SizedBox(width: AppSpacing.space2),
                       Text(
-                        '악기를 선택해주세요',
+                        AppStrings.profileSetupInstrumentHint,
                         style: AppTypography.bodyMedium.copyWith(
                           color: AppColors.inkTertiary,
                         ),
