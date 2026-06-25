@@ -16,3 +16,6 @@ export 'presentation/widgets/youtube/section_video_affordance.dart'
     show SectionVideoAffordance;
 // 학생 P1 — gamification [연습 시작] 진입점이 메트로놈 modal 을 호출.
 export 'presentation/widgets/practice_tools_modal.dart' show PracticeToolsModal;
+// #405 — 수동 연습 기록 입력 시트 (학생 연습 탭 진입점).
+export 'presentation/widgets/manual_practice_entry_sheet.dart'
+    show ManualPracticeEntrySheet;

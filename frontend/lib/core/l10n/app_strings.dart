@@ -7098,6 +7098,15 @@ class AppStrings {
   static const practiceRecordTodayLabel = '오늘 연습 기록하기';
   static const practiceErrorOccurredShort = '오류 발생';
 
+  // -- Manual practice entry (#405) --
+  static const manualPracticeTitle = '연습 기록 추가';
+  static const manualPracticeMinutesLabel = '연습 시간 (분)';
+  static const manualPracticeMinutesHint = '예: 30';
+  static const manualPracticeDateLabel = '날짜';
+  static const manualPracticeInvalidMinutes = '연습 시간을 분 단위로 입력하세요';
+  static const manualPracticeSaved = '연습 기록이 추가되었습니다';
+  static const manualPracticeSaveFailed = '연습 기록 저장에 실패했습니다';
+
   // -- Tuner --
   static const tunerSettingsTitle = '튜너 설정';
   static const tunerReferenceFrequencyTitle = '기준 주파수 (A4)';
