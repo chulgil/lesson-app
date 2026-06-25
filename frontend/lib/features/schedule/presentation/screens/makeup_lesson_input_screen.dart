@@ -190,7 +190,7 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
                 Expanded(
                   child: FilledButton(
                     onPressed:
-                        (completed == 0 || _isSaving)
+                        (completed == 0 || conflicts.isNotEmpty || _isSaving)
                             ? null
                             : () => _showConfirmSummary(conflicts),
                     style: FilledButton.styleFrom(
@@ -243,52 +243,55 @@ class _MakeupLessonInputScreenState extends State<MakeupLessonInputScreen> {
   }
 
   Future<void> _showConfirmSummary(Set<String> conflicts) async {
-    final filled = widget.closure.affectedLessons
-        .where((l) => _drafts[l.lessonId] != null)
-        .toList();
+    final filled =
+        widget.closure.affectedLessons
+            .where((l) => _drafts[l.lessonId] != null)
+            .toList();
     final result = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => NotebookAlertDialog(
-        title: AppStrings.makeupInputSummaryTitle,
-        scrollable: true,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (conflicts.isNotEmpty) ...[
-              Text(
-                AppStrings.makeupInputConflictNotice(conflicts.length),
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.paperAccent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space2),
-            ],
-            for (final l in filled)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.space1,
-                ),
-                child: Text(
-                  AppStrings.makeupInputSummaryRow(
-                    l.studentName,
-                    _formatSummary(_drafts[l.lessonId]!),
+      builder:
+          (dialogContext) => NotebookAlertDialog(
+            title: AppStrings.makeupInputSummaryTitle,
+            scrollable: true,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (conflicts.isNotEmpty) ...[
+                  Text(
+                    AppStrings.makeupInputConflictNotice(conflicts.length),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.paperAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  style: AppTypography.bodySmall.copyWith(
-                    color: conflicts.contains(l.lessonId)
-                        ? AppColors.paperAccent
-                        : AppColors.ink,
+                  const SizedBox(height: AppSpacing.space2),
+                ],
+                for (final l in filled)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.space1,
+                    ),
+                    child: Text(
+                      AppStrings.makeupInputSummaryRow(
+                        l.studentName,
+                        _formatSummary(_drafts[l.lessonId]!),
+                      ),
+                      style: AppTypography.bodySmall.copyWith(
+                        color:
+                            conflicts.contains(l.lessonId)
+                                ? AppColors.paperAccent
+                                : AppColors.ink,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-          ],
-        ),
-        cancelLabel: AppStrings.cancel,
-        onCancel: () => Navigator.pop(dialogContext, false),
-        confirmLabel: AppStrings.makeupInputBulkConfirm,
-        onConfirm: () => Navigator.pop(dialogContext, true),
-      ),
+              ],
+            ),
+            cancelLabel: AppStrings.cancel,
+            onCancel: () => Navigator.pop(dialogContext, false),
+            confirmLabel: AppStrings.makeupInputBulkConfirm,
+            onConfirm: () => Navigator.pop(dialogContext, true),
+          ),
     );
     if (result == true) await _save(confirm: true);
   }

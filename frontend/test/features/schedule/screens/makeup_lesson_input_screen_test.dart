@@ -166,11 +166,26 @@ void main() {
       expect(find.text('2건 보강 시각이 겹칩니다. 확인해 주세요.'), findsOneWidget);
     });
 
-    testWidgets('전체 확정 시 최종 확인 요약 다이얼로그가 뜬다', (tester) async {
+    testWidgets('충돌 없을 때 전체 확정 탭하면 요약 다이얼로그가 뜬다', (tester) async {
+      // 겹치지 않는 두 보강 — 버튼이 활성이어야 다이얼로그 진입 가능.
+      final noConflict = _buildClosure(
+        lessons: [
+          _buildLesson(
+            id: 'l1',
+            studentName: '박학생',
+            makeupAt: DateTime(2026, 8, 22, 14, 0),
+          ),
+          _buildLesson(
+            id: 'l2',
+            studentName: '이학생',
+            makeupAt: DateTime(2026, 8, 22, 16, 0),
+          ),
+        ],
+      );
       await tester.pumpWidget(
         MaterialApp(
           home: MakeupLessonInputScreen(
-            closure: overlapping(),
+            closure: noConflict,
             onSaveAll: (_) async {},
           ),
         ),
@@ -204,6 +219,62 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
+    });
+
+    // #922 — 충돌 존재 시 전체 확정 버튼 비활성
+    testWidgets('충돌 있으면 전체 확정 버튼이 비활성이다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MakeupLessonInputScreen(
+            closure: overlapping(),
+            onSaveAll: (_) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final confirm = tester.widget<FilledButton>(
+        find.ancestor(
+          of: find.text('전체 확정'),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      // 보강이 입력됐지만(completed>0) 충돌이 있으면 비활성이어야 한다.
+      expect(confirm.onPressed, isNull);
+    });
+
+    testWidgets('충돌 없으면 전체 확정 버튼이 활성이다', (tester) async {
+      final closure = _buildClosure(
+        lessons: [
+          _buildLesson(
+            id: 'l1',
+            studentName: '박학생',
+            makeupAt: DateTime(2026, 8, 22, 14, 0),
+          ),
+          _buildLesson(
+            id: 'l2',
+            studentName: '이학생',
+            makeupAt: DateTime(2026, 8, 22, 16, 0), // 2시간 뒤 — 겹치지 않음
+          ),
+        ],
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MakeupLessonInputScreen(
+            closure: closure,
+            onSaveAll: (_) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final confirm = tester.widget<FilledButton>(
+        find.ancestor(
+          of: find.text('전체 확정'),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(confirm.onPressed, isNotNull);
     });
   });
 }
