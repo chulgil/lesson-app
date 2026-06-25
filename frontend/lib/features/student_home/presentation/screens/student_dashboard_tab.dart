@@ -13,6 +13,7 @@ import '../../../../features/home/home_ui_facade.dart';
 import '../../../gamification/gamification_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/domain/entities/practice_log.dart';
+import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
 import '../../../students/students_facade.dart';
@@ -20,6 +21,7 @@ import '../providers/student_home_practice_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
+import '../widgets/weekly_assignments_section.dart';
 import '../widgets/student_lesson_progress_section.dart';
 import '../widgets/student_subscription_summary.dart';
 
@@ -131,6 +133,11 @@ class StudentDashboardTab extends ConsumerWidget {
               '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
             ),
           ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ── 이번 주 과제 (미완료 항목 최대 3개 미리보기) ──
+          WeeklyAssignmentsSection(studentId: currentStudentId),
 
           const SizedBox(height: AppSpacing.space4),
 
