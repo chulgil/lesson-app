@@ -129,9 +129,9 @@ class CategoryStatusCalculator {
     var filled = 0;
     // lessonDurationMinutes 는 entity constructor 기본 50 → 항상 "입력".
     if (settings.lessonDurationMinutes > 0) filled++;
-    // minBookingHours: 0(=리드타임 없음) 도 유효한 설정값 → 항상 "입력"으로 카운트.
-    // 명시 설정 교사만 강제(#850) → 기본 0이 완성도 게이지를 떨어뜨리지 않게.
-    filled++;
+    // minBookingHours: 0 은 기본/미설정 상태 → filled 에 포함하지 않음 (#924).
+    // 1 이상인 경우에만 사용자가 명시적으로 리드타임을 설정한 것으로 간주.
+    if (settings.minBookingHours > 0) filled++;
     final guidance = settings.bookingGuidanceMessage?.trim();
     if (guidance != null && guidance.isNotEmpty) filled++;
     const total = 3;

@@ -152,6 +152,36 @@ void main() {
       final status = CategoryStatusCalculator.lessonStyle(settings: null);
       expect(status, isA<CategoryStatusEmpty>());
     });
+
+    // #924: minBookingHours 카운트 기준 명확화
+    test('minBookingHours == 0(기본/미설정) → filled 에 포함 안 됨 (1/3 partial)', () {
+      // 기본값 0은 사용자가 설정하지 않은 상태 → 게이지에 포함하면 과장됨
+      final status = CategoryStatusCalculator.lessonStyle(
+        settings: buildSettings(
+          lessonDurationMinutes: 50,
+          minBookingHours: 0,
+          bookingGuidanceMessage: null,
+        ),
+      );
+      expect(status, isA<CategoryStatusPartial>());
+      final partial = status as CategoryStatusPartial;
+      expect(partial.filled, 1); // lessonDurationMinutes 만 카운트
+      expect(partial.total, 3);
+    });
+
+    test('minBookingHours > 0 (명시 설정) → filled 에 포함 됨 (2/3 partial)', () {
+      final status = CategoryStatusCalculator.lessonStyle(
+        settings: buildSettings(
+          lessonDurationMinutes: 50,
+          minBookingHours: 1,
+          bookingGuidanceMessage: null,
+        ),
+      );
+      expect(status, isA<CategoryStatusPartial>());
+      final partial = status as CategoryStatusPartial;
+      expect(partial.filled, 2);
+      expect(partial.total, 3);
+    });
   });
 
   group('CategoryStatusCalculator.subscriptionBilling (수강권·정산 묶음)', () {
