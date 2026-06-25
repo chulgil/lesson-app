@@ -73,6 +73,33 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // #405 수동 연습 기록 진입점 — 오프라인 연습을 직접 기록.
+                    IconButton(
+                      onPressed: () async {
+                        final saved = await ManualPracticeEntrySheet.show(
+                          context,
+                          studentId: studentId,
+                        );
+                        if (saved == true && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(AppStrings.manualPracticeSaved),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.more_time,
+                        color: AppColors.ink,
+                        size: 20,
+                      ),
+                      tooltip: AppStrings.practiceRecordTodayLabel,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 28,
+                        minHeight: 32,
+                      ),
+                    ),
                     IconButton(
                       onPressed: () => context.push(
                         '${AppRoutes.repertoireHistory}?studentId=$studentId',
