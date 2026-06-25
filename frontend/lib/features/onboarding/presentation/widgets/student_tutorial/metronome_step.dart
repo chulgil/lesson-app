@@ -80,7 +80,9 @@ class _MetronomeStepState extends State<MetronomeStep> {
     final isBeatActive = _isPlaying;
     final activeBeat = _getActiveBeat();
 
-    return SingleChildScrollView(
+    // 버그 B: 부모 _StudentTutorialPage 가 이미 SingleChildScrollView 이므로
+    // step 은 스크롤하지 않는다. 중첩 스크롤(중복 제스처 인식기) 제거 → Padding.
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
