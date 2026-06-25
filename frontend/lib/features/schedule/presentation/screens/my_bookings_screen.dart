@@ -53,7 +53,8 @@ class MyBookingsRoute extends ConsumerWidget {
 
     // teacherId 가 없으면 정확한 수강권을 특정할 수 없어 변경권 0 (버튼 비활성).
     if (teacherId.isEmpty) {
-      return _screen(resolvedStudentId, remaining: 0, total: 0, subId: null);
+      return _screen(resolvedStudentId, remaining: 0, total: 0, subId: null,
+          deadlineHours: 12);
     }
 
     final subAsync = ref.watch(
@@ -69,13 +70,15 @@ class MyBookingsRoute extends ConsumerWidget {
         remaining: sub?.remainingReschedule ?? 0,
         total: sub?.effectiveRescheduleAllowance ?? 0,
         subId: sub?.id,
+        deadlineHours: sub?.effectiveCancelDeadlineHours ?? 12,
       ),
       loading: () => const NotebookScreenScaffold(
         backgroundColor: AppColors.paper,
         body: Center(child: CircularProgressIndicator()),
       ),
       error: (_, _) =>
-          _screen(resolvedStudentId, remaining: 0, total: 0, subId: null),
+          _screen(resolvedStudentId, remaining: 0, total: 0, subId: null,
+          deadlineHours: 12),
     );
   }
 
@@ -84,6 +87,7 @@ class MyBookingsRoute extends ConsumerWidget {
     required int remaining,
     required int total,
     required String? subId,
+    required int deadlineHours,
   }) {
     return MyBookingsScreen(
       studentId: resolvedStudentId,
@@ -94,6 +98,7 @@ class MyBookingsRoute extends ConsumerWidget {
       totalReschedules: total,
       instrument: instrument,
       subscriptionId: subId,
+      cancelDeadlineHours: deadlineHours,
     );
   }
 }
@@ -111,6 +116,9 @@ class MyBookingsScreen extends ConsumerWidget {
   final String? instrument;
   final String? subscriptionId; // 🆕 For reschedule count deduction
 
+  /// 무료-취소 마감(레슨 전 N시간). 수강권에서 파생, 미지정 12h.
+  final int cancelDeadlineHours;
+
   const MyBookingsScreen({
     super.key,
     required this.studentId,
@@ -121,6 +129,7 @@ class MyBookingsScreen extends ConsumerWidget {
     required this.totalReschedules,
     this.instrument,
     this.subscriptionId,
+    this.cancelDeadlineHours = 12,
   });
 
   @override
@@ -508,6 +517,7 @@ class MyBookingsScreen extends ConsumerWidget {
               instrument: instrument,
               subscriptionId: subscriptionId,
               studentId: studentId,
+              cancelDeadlineHours: cancelDeadlineHours,
             ),
       ),
     );

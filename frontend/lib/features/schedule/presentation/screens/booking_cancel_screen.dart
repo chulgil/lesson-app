@@ -13,6 +13,8 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../domain/entities/cancel_reason.dart';
+import '../../domain/services/cancellation_credit_policy.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/teacher_cancel_policy_banner.dart';
 
@@ -33,6 +35,9 @@ class BookingCancelScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
   final String? studentId;
 
+  /// Free-cancel deadline window (hours before lesson). Spec §3.3.
+  final int cancelDeadlineHours;
+
   const BookingCancelScreen({
     super.key,
     required this.bookingId,
@@ -46,6 +51,7 @@ class BookingCancelScreen extends ConsumerStatefulWidget {
     this.isTeacherCancel = false,
     this.subscriptionId,
     this.studentId,
+    this.cancelDeadlineHours = 12,
   });
 
   @override
@@ -65,9 +71,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canCancel = widget.isTeacherCancel || widget.remainingReschedules > 0;
-    final isLastChance =
-        !widget.isTeacherCancel && widget.remainingReschedules == 1;
+    final outcome = _computeOutcome();
+    final canCancel = !outcome.blocked;
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
@@ -84,8 +89,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               const SizedBox(height: AppSpacing.space4),
 
               // Warning for student cancellation
-              if (!widget.isTeacherCancel)
-                _buildCancelWarning(canCancel, isLastChance),
+              if (!widget.isTeacherCancel) _buildCancelWarning(outcome),
 
               // Teacher cancel info
               if (widget.isTeacherCancel) _buildTeacherCancelInfo(),
@@ -106,7 +110,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Action buttons
-              _buildActionButtons(canCancel, isLastChance),
+              _buildActionButtons(canCancel),
             ],
           ),
         ),
@@ -170,8 +174,8 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     );
   }
 
-  Widget _buildCancelWarning(bool canCancel, bool isLastChance) {
-    if (!canCancel) {
+  Widget _buildCancelWarning(CancellationCreditOutcome outcome) {
+    if (outcome.blocked) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
@@ -215,7 +219,26 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       );
     }
 
-    if (isLastChance) {
+    if (outcome.beforeDeadline) {
+      return Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+        child: Row(
+          children: [
+            const Icon(Icons.info_outline, color: AppColors.ink, size: 20),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                AppStrings.bookingCancelFreeBeforeDeadline,
+                style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (outcome.remainingAfter == 0) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
@@ -373,7 +396,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     );
   }
 
-  Widget _buildActionButtons(bool canCancel, bool isLastChance) {
+  Widget _buildActionButtons(bool canCancel) {
     return Column(
       children: [
         // Cancel button
@@ -382,7 +405,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
           child: FilledButton(
             onPressed:
                 canCancel && !_isLoading
-                    ? () => _handleCancel(isLastChance)
+                    ? () => _handleCancel()
                     : null,
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
@@ -461,22 +484,49 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     );
   }
 
-  /// Hours from now until lesson start. Negative when past.
-  double _hoursUntilLesson() {
-    final lessonStart = DateTime(
-      widget.bookingDate.year,
-      widget.bookingDate.month,
-      widget.bookingDate.day,
-      widget.startTime.hour,
-      widget.startTime.minute,
-    );
-    final diff = lessonStart.difference(DateTime.now());
-    return diff.inMinutes / 60.0;
-  }
+  /// Scheduled lesson start datetime (date + startTime).
+  DateTime _lessonStart() => DateTime(
+    widget.bookingDate.year,
+    widget.bookingDate.month,
+    widget.bookingDate.day,
+    widget.startTime.hour,
+    widget.startTime.minute,
+  );
 
-  Future<void> _handleCancel(bool isLastChance) async {
-    if (isLastChance && !widget.isTeacherCancel) {
-      // Show confirmation dialog for last chance
+  /// Hours from now until lesson start. Negative when past.
+  double _hoursUntilLesson() =>
+      _lessonStart().difference(DateTime.now()).inMinutes / 60.0;
+
+  /// Cancellation credit outcome per spec (CancellationCreditPolicy = SSOT).
+  CancellationCreditOutcome _computeOutcome() =>
+      const CancellationCreditPolicy().compute(
+        reason: widget.isTeacherCancel
+            ? CancelReason.teacherCancel
+            : CancelReason.studentSchedule,
+        lessonStart: _lessonStart(),
+        now: DateTime.now(),
+        deadlineHours: widget.cancelDeadlineHours,
+        usedReschedule: widget.totalReschedules - widget.remainingReschedules,
+        maxReschedule: widget.totalReschedules,
+      );
+
+  Future<void> _handleCancel() async {
+    // Re-evaluate at tap time in case the lesson crossed the deadline while
+    // the screen was open.
+    final current = _computeOutcome();
+    if (current.blocked) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.bookingCancelImpossible)),
+        );
+      }
+      return;
+    }
+
+    // Confirm only when this student cancel will consume the last credit.
+    if (current.creditUsed > 0 &&
+        current.remainingAfter == 0 &&
+        !widget.isTeacherCancel) {
       final confirmed = await showNotebookDialog<bool>(
         context: context,
         title: AppStrings.bookingCancelLastChanceDialogTitle,
@@ -512,10 +562,10 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       if (confirmed != true) return;
     }
 
-    await _performCancel();
+    await _performCancel(current);
   }
 
-  Future<void> _performCancel() async {
+  Future<void> _performCancel(CancellationCreditOutcome outcome) async {
     setState(() => _isLoading = true);
 
     try {
@@ -527,8 +577,10 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         throw Exception('booking cancel failed');
       }
 
-      // Deduct reschedule allowance for student cancellations
+      // Deduct a credit only when the policy charges this cancel (after
+      // deadline, student reason). Before-deadline / teacher cancels are free.
       if (!widget.isTeacherCancel &&
+          outcome.creditUsed > 0 &&
           widget.subscriptionId != null &&
           widget.studentId != null) {
         await ref

@@ -1677,6 +1677,7 @@ class AppStrings {
 
   /// 취소 시 1회 차감 안내
   static const bookingCancelDeductNotice = '취소 시 1회 차감됩니다.';
+  static const bookingCancelFreeBeforeDeadline = '마감 전 취소는 변경권 차감 없이 무료입니다.';
 
   /// 선생님 취소 (배지)
   static const teacherCancelLabel = '선생님 취소';
