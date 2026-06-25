@@ -116,7 +116,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
         ],
       ),
       bottomNavigationBar: MetronomeControllerBar(
-        onExpand: () => PracticeToolsModal.show(context),
+        // studentId 전달 — stop 시 logMetronome 실행 (#932)
+        onExpand:
+            () => PracticeToolsModal.show(context, studentId: widget.studentId),
       ),
       body: sectionAsync.when(
         data: (section) {

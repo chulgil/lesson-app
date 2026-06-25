@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../features/auth/auth_facade.dart' show currentUserIdProvider;
 import '../../features/practice/presentation/widgets/practice_tools_modal.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -23,32 +25,38 @@ const _metronomeIconSvg = '''
 /// Central practice button for bottom navigation bar.
 ///
 /// Features:
-/// - Tap: Open practice tools modal with Tuner tab
-/// - Long press: Open practice tools modal with Metronome tab
+/// - Tap: Open practice tools modal with Metronome tab
+/// - Long press: Open practice tools modal with Tuner tab
 /// - Pixel art style icon (tuning fork + metronome)
-class PracticeCenterButton extends StatefulWidget {
+/// - Passes currentUserIdProvider as studentId so logMetronome fires on stop.
+class PracticeCenterButton extends ConsumerStatefulWidget {
   const PracticeCenterButton({super.key, this.size = 56});
 
   /// Button size (width and height).
   final double size;
 
   @override
-  State<PracticeCenterButton> createState() => _PracticeCenterButtonState();
+  ConsumerState<PracticeCenterButton> createState() =>
+      _PracticeCenterButtonState();
 }
 
-class _PracticeCenterButtonState extends State<PracticeCenterButton> {
+class _PracticeCenterButtonState extends ConsumerState<PracticeCenterButton> {
   bool _isPressed = false;
 
   void _onTap() {
     HapticFeedback.mediumImpact();
-    // Open modal with Metronome tab (index 0)
-    PracticeToolsModal.show(context, initialTab: 0);
+    // Open modal with Metronome tab (index 0).
+    // studentId 전달 — stop 시 logMetronome 실행 (#932)
+    final studentId = ref.read(currentUserIdProvider);
+    PracticeToolsModal.show(context, initialTab: 0, studentId: studentId);
   }
 
   void _onLongPress() {
     HapticFeedback.heavyImpact();
-    // Open modal with Tuner tab (index 1)
-    PracticeToolsModal.show(context, initialTab: 1);
+    // Open modal with Tuner tab (index 1).
+    // studentId 전달 — stop 시 logMetronome 실행 (#932)
+    final studentId = ref.read(currentUserIdProvider);
+    PracticeToolsModal.show(context, initialTab: 1, studentId: studentId);
   }
 
   @override
