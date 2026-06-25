@@ -12,6 +12,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../home/home_ui_facade.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../student_home/student_home_ui_facade.dart';
@@ -645,116 +646,54 @@ class _SwipeableLessonCard extends ConsumerWidget {
     // 상세 → 구독 취소(휴강) 플로우에서만. 완료(좌→우) 스와이프는 그대로 둔다.
     final canSwipeCancel = lesson.subscriptionId == null;
 
-    return Dismissible(
+    // Phase 2b (#931): Dismissible → SwipeActionTile (swipe 4원칙 일원화).
+    // 완료(출석 확인): 좌→우=편의(convenience, 녹색) → startActions.
+    // 취소(레슨 취소): 우→좌=관리/destructive → actions. 수강권 레슨은 취소 제거.
+    return SwipeActionTile(
       key: ValueKey('lesson-swipe-${lesson.id}'),
-      direction: canSwipeCancel
-          ? DismissDirection.horizontal // 완료(좌→우) + 취소(우→좌)
-          : DismissDirection.startToEnd, // 완료만, 취소 스와이프 없음
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          // #767: 완료=출석 확정 단일화 — confirmAttendance 로 라우팅해 수강권
-          // 1회 차감(confirmLessonCompleted)을 발생시킨다. plain updateLesson 은
-          // 차감을 누락했다. 다이얼로그가 확인을 처리하고 lessonsProvider
-          // invalidate 로 카드가 갱신되므로 false 반환.
-          await confirmAttendance(context, ref, lesson);
-          return false;
-        } else {
-          return await _showConfirmDialog(
-            context,
-            ref,
-            title: AppStrings.actionLessonCancel,
-            message: AppStrings.confirmLessonCancellation(lesson.studentName),
-            confirmLabel: AppStrings.cancel,
-            confirmColor: AppColors.paperAccent,
-            onConfirm: () async {
-              await ref
-                  .read(lessonsNotifierProvider.notifier)
-                  .cancelLesson(lesson.id);
-            },
-          );
-        }
-      },
-      // Notebook × Score: 스와이프 배경도 paper 톤 + 둥근 모서리 제거로
-      // 카드 경계(좌 3px · 하단 1px)와 같은 평면 질감을 유지.
-      background: Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.only(left: AppSpacing.space5),
-        color: AppColors.paperOk,
-        child: Row(
-          children: const [
-            Icon(Icons.check_circle, color: AppColors.paper),
-            SizedBox(width: AppSpacing.space2),
-            Text(
-              AppStrings.attendanceConfirmAction,
-              style: TextStyle(
-                color: AppColors.paper,
-                fontWeight: FontWeight.w600,
+      actions: canSwipeCancel
+          ? [
+              SwipeAction(
+                // #766: 수강권 레슨은 취소 불가 → actions 비움.
+                label: AppStrings.actionLessonCancel,
+                icon: Icons.cancel,
+                tone: SwipeActionTone.destructive,
+                onPressed: () => _confirmCancel(context, ref),
               ),
-            ),
-          ],
+            ]
+          : const [],
+      startActions: [
+        SwipeAction(
+          // #767: 완료=출석 확정 단일화 (confirmAttendance → 수강권 차감).
+          label: AppStrings.attendanceConfirmAction,
+          icon: Icons.check_circle,
+          tone: SwipeActionTone.convenience,
+          onPressed: () => confirmAttendance(context, ref, lesson),
         ),
-      ),
-      secondaryBackground: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: AppSpacing.space5),
-        color: AppColors.paperAccent,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: const [
-            Text(
-              AppStrings.cancel,
-              style: TextStyle(
-                color: AppColors.paper,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(width: AppSpacing.space2),
-            Icon(Icons.cancel, color: AppColors.paper),
-          ],
-        ),
-      ),
+      ],
       child: content,
     );
   }
 
-  Future<bool> _showConfirmDialog(
-    BuildContext context,
-    WidgetRef ref, {
-    required String title,
-    required String message,
-    required String confirmLabel,
-    required Color confirmColor,
-    required Future<void> Function() onConfirm,
-  }) async {
+  // Phase 2b (#931): Dismissible 취소 다이얼로그 → _confirmCancel 단독 헬퍼.
+  // SwipeActionTile.onPressed 에서 직접 호출. 수강권 레슨은 canSwipeCancel=false 로
+  // actions 에서 이미 제외되어 여기까지 오지 않는다 (#766).
+  Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: title,
-      content: Text(message),
-      confirmLabel: confirmLabel,
+      title: AppStrings.actionLessonCancel,
+      content: Text(AppStrings.confirmLessonCancellation(lesson.studentName)),
+      confirmLabel: AppStrings.actionLessonCancel,
       cancelLabel: AppStrings.goBack,
-      confirmColor: confirmColor,
+      confirmColor: AppColors.paperAccent,
       onConfirm: () => Navigator.of(context).pop(true),
       onCancel: () => Navigator.of(context).pop(false),
     );
-
     if (confirmed == true) {
-      await onConfirm();
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppStrings.lessonActionCompleted(
-                lesson.studentName,
-                confirmLabel,
-              ),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-      return false;
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .cancelLesson(lesson.id);
     }
-    return false;
   }
 }
 
