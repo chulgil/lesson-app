@@ -9,6 +9,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_screen_scaffold.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/endorsement.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/guardian_seal.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/practice_ledger.dart';
+import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/practice_journal/presentation/extensions/journal_tone.dart';
 import 'package:lessonaza/features/practice_journal/presentation/widgets/journal_month_grid.dart';
 
@@ -184,9 +185,7 @@ class _LegendRow extends StatelessWidget {
           const SizedBox(width: AppSpacing.space2),
           Text(
             label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -243,6 +242,7 @@ class _BottomAction extends ConsumerWidget {
 
   Future<void> _onTap(BuildContext context, WidgetRef ref) async {
     final repo = ref.read(practiceJournalRepositoryProvider);
+    final userId = ref.read(currentUserIdProvider);
     final today = DateTime.utc(
       DateTime.now().year,
       DateTime.now().month,
@@ -256,7 +256,7 @@ class _BottomAction extends ConsumerWidget {
         final monday = today.subtract(Duration(days: weekday - 1));
         await repo.addGuardianSeal(
           childProfileId,
-          GuardianSeal(weekStart: monday, guardianUserId: 'me'),
+          GuardianSeal(weekStart: monday, guardianUserId: userId),
         );
       case JournalRole.teacher:
         await repo.addEndorsement(
@@ -264,8 +264,8 @@ class _BottomAction extends ConsumerWidget {
           Endorsement(
             by: EndorsedBy.teacher,
             date: today,
-            authorUserId: 'me',
-            assignmentRef: 'a1', // P1 placeholder — real picker in later phase
+            authorUserId: userId,
+            // assignmentRef: real picker not yet implemented — null until Phase 2
             note: '',
           ),
         );
@@ -275,7 +275,7 @@ class _BottomAction extends ConsumerWidget {
           Endorsement(
             by: EndorsedBy.self,
             date: today,
-            authorUserId: 'me',
+            authorUserId: userId,
             note: '',
           ),
         );
