@@ -14,16 +14,14 @@ import '../providers/vacation_providers.dart';
 
 /// Teacher vacation mode entry screen (#431, G3).
 ///
-/// 본 화면은 **골격** 이다. 현재 PR 범위:
-/// - 기간 선택 (시작/종료) + 사유 입력
-/// - 영향 받는 레슨 미리보기 (BE GET impact)
-/// - 휴가 등록 (BE POST) — default disposition = rollForward
+/// 구현 현황 (Phase 2-3 완료):
+/// A1. 3 옵션 선택 (보강 크레딧 / 무료 처리 / 이월) — ✓ 구현됨
+/// A2. 학생별 처리 옵션 변경 (long-press 오버라이드) — ✓ 구현됨
+/// A3. 활성 휴가 카드 + 24h Recovery (취소) — ✓ 구현됨
+/// A5. 다구간 휴가 (구간 추가/제거) — ✓ 구현됨
 ///
-/// 후속 PR:
-/// - 3 옵션 (보강 크레딧 / 무료 처리 / 이월) UI 선택
-/// - 학생별 처리 옵션 변경 (long-press)
-/// - 활성 휴가 카드 + 24h Recovery 버튼
-/// - LNZ_TEACHER_VACATION 알림톡 트리거 표시
+/// 미구현 항목 (BE 대기):
+/// A4. LNZ_TEACHER_VACATION 알림톡 발송 + 인앱 수신 UI — 백엔드 알림 큐 준비 후
 class TeacherVacationModeScreen extends ConsumerWidget {
   const TeacherVacationModeScreen({super.key});
 
@@ -850,7 +848,6 @@ class _ActiveVacationCard extends ConsumerWidget {
   }
 }
 
-
 // ──────────────────────────────────────────────────────────────
 // Multi-segment widgets (#768 ②).
 // ──────────────────────────────────────────────────────────────
@@ -982,7 +979,9 @@ Future<bool?> _showVacationSummary(
                     ),
                     _dispositionLabel(s.disposition),
                   ),
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.ink,
+                  ),
                 ),
               ),
           ],
