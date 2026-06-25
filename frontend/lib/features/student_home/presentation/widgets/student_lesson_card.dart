@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/value_objects/clock_time.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -59,10 +60,9 @@ class StudentLessonCard extends StatelessWidget {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color:
-                          isUpcoming
-                              ? AppColors.paperAccentSoft
-                              : AppColors.paperDark,
+                      color: isUpcoming
+                          ? AppColors.paperAccentSoft
+                          : AppColors.paperDark,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -70,20 +70,18 @@ class StudentLessonCard extends StatelessWidget {
                         Text(
                           formatTimeHM(lessonDateTime),
                           style: AppTypography.bodyLarge.copyWith(
-                            color:
-                                isUpcoming
-                                    ? AppColors.paperAccent
-                                    : AppColors.inkSecondary,
+                            color: isUpcoming
+                                ? AppColors.paperAccent
+                                : AppColors.inkSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           '${lesson.duration}분',
                           style: AppTypography.caption.copyWith(
-                            color:
-                                isUpcoming
-                                    ? AppColors.paperAccent
-                                    : AppColors.inkTertiary,
+                            color: isUpcoming
+                                ? AppColors.paperAccent
+                                : AppColors.inkTertiary,
                           ),
                         ),
                       ],
@@ -100,7 +98,8 @@ class StudentLessonCard extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              lesson.teacherName ?? '선생님',
+                              lesson.teacherName ??
+                                  AppStrings.studentLessonDefaultTeacher,
                               style: AppTypography.bodyLarge.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -174,7 +173,7 @@ class StudentLessonCard extends StatelessWidget {
                         border: Border.all(color: AppColors.paperAccent),
                       ),
                       child: Text(
-                        '휴강',
+                        AppStrings.studentLessonCancelled,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
                           fontWeight: FontWeight.w700,
@@ -188,22 +187,20 @@ class StudentLessonCard extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            daysUntil <= 1
-                                ? AppColors.ink
-                                : AppColors.paperDark,
+                        color: daysUntil <= 1
+                            ? AppColors.ink
+                            : AppColors.paperDark,
                       ),
                       child: Text(
                         daysUntil == 0
-                            ? '오늘'
+                            ? AppStrings.studentLessonToday
                             : daysUntil == 1
-                            ? '내일'
+                            ? AppStrings.studentLessonTomorrow
                             : 'D-$daysUntil',
                         style: AppTypography.caption.copyWith(
-                          color:
-                              daysUntil <= 1
-                                  ? AppColors.paper
-                                  : AppColors.inkSecondary,
+                          color: daysUntil <= 1
+                              ? AppColors.paper
+                              : AppColors.inkSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

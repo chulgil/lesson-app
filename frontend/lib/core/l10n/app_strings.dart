@@ -9952,4 +9952,63 @@ class AppStrings {
   static const roleSelectStudentInviteBadge = '초대 필요';
   // #118 Social login coming soon badge
   static const authComingSoonBadge = '준비중';
+
+  // #939 — 이모지 제거 + 한글 → AppStrings (연습/게이미피케이션)
+  // PracticeStartCard
+  static String practiceStartHeader(String name) => '$name의 연습';
+  static String practiceStartStreak(int days) => '$days일';
+  static const practiceStartButton = '연습 시작';
+  static String practiceStartYesterdayMinutes(int minutes) =>
+      '어제 $minutes분 했어요';
+
+  // CompletionToggle (standard mode)
+  static const practiceCompleteLabel = '연습 완료!';
+  static const practiceCompleteMarkLabel = '연습 완료로 표시';
+  static const practiceCompleteUndoLabel = '탭하여 완료 취소';
+  static const practiceCompleteHintLabel = '탭하여 이 섹션을 완료로 표시하세요';
+
+  // CompletionToggle (N회 반복 mode)
+  static String practiceRepeatAllDone(int done, int total) =>
+      '오늘 연습 완료! ($done/$total회)';
+  static String practiceRepeatTap(int done, int total) =>
+      '탭하여 연습 기록 ($done/$total회)';
+  static const practiceRepeatReset = '탭하여 초기화';
+  static String practiceRepeatDailyCount(int total) => '하루 $total회 반복';
+
+  // BadgeCollectionScreen
+  static String badgeLevelTotalPoints(int points) => '총 ${points}P';
+  static String badgeLevelNextPoints(int points) => '다음 레벨까지 ${points}P';
+  static const badgeRarityNotEarned = '미획득';
+  static const badgePointHistoryEmpty = '포인트 기록이 없습니다';
+  static const badgeRarityCommon = '일반';
+  static const badgeRarityRare = '희귀';
+  static const badgeRarityEpic = '영웅';
+  static const badgeRarityLegendary = '전설';
+
+  // StudentLessonCard
+  static const studentLessonDefaultTeacher = '선생님';
+  static const studentLessonCancelled = '휴강';
+  static const studentLessonToday = '오늘';
+  static const studentLessonTomorrow = '내일';
+
+  // NextLessonCard
+  static const nextLessonLabel = '다음 레슨';
+  static const lessonTypeRegular = '정기';
+  static const lessonTypeTrial = '체험';
+  static const weekdayMon = '월';
+  static const weekdayTue = '화';
+  static const weekdayWed = '수';
+  static const weekdayThu = '목';
+  static const weekdayFri = '금';
+  static const weekdaySat = '토';
+  static const weekdaySun = '일';
+
+  // StudentLessonsTab
+  static String studentLessonsCount(int count) => '$count개 레슨';
+
+  // StudentGamificationOnboardingScreen
+  static const gamificationOnboardingGreeting = '안녕! 무슨 악기 해?';
+  static const gamificationOnboardingRecommendationLabel = '오늘 한 가지 추천해줄게:';
+  static const gamificationOnboardingAccept = '좋아! 시작하기';
+  static const gamificationOnboardingDecline = '내가 정할래';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
@@ -59,7 +60,7 @@ class _StudentGamificationOnboardingScreenState
               const SizedBox(height: AppSpacing.space8),
               Text(
                 key: const ValueKey('onboarding_greeting'),
-                '안녕! 무슨 악기 해?',
+                AppStrings.gamificationOnboardingGreeting,
                 style: AppTypography.headingLarge,
               ),
               const SizedBox(height: AppSpacing.space5),
@@ -77,7 +78,10 @@ class _StudentGamificationOnboardingScreenState
                 ],
               ),
               const SizedBox(height: AppSpacing.space8),
-              Text('오늘 한 가지 추천해줄게:', style: AppTypography.bodyMedium),
+              Text(
+                AppStrings.gamificationOnboardingRecommendationLabel,
+                style: AppTypography.bodyMedium,
+              ),
               const SizedBox(height: AppSpacing.space2),
               Text(
                 key: const ValueKey('onboarding_recommendation'),
@@ -90,9 +94,10 @@ class _StudentGamificationOnboardingScreenState
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   key: const ValueKey('onboarding_accept'),
-                  onPressed:
-                      _canProceed ? () => _confirm(accepted: true) : null,
-                  child: const Text('좋아! 시작하기'),
+                  onPressed: _canProceed
+                      ? () => _confirm(accepted: true)
+                      : null,
+                  child: const Text(AppStrings.gamificationOnboardingAccept),
                 ),
               ),
               const SizedBox(height: AppSpacing.space3),
@@ -101,9 +106,10 @@ class _StudentGamificationOnboardingScreenState
                 height: AppSpacing.buttonHeight,
                 child: OutlinedButton(
                   key: const ValueKey('onboarding_decline'),
-                  onPressed:
-                      _canProceed ? () => _confirm(accepted: false) : null,
-                  child: const Text('내가 정할래'),
+                  onPressed: _canProceed
+                      ? () => _confirm(accepted: false)
+                      : null,
+                  child: const Text(AppStrings.gamificationOnboardingDecline),
                 ),
               ),
             ],

@@ -188,7 +188,7 @@ class StudentLessonsTab extends ConsumerWidget {
           ],
           const Spacer(),
           Text(
-            '$totalCount개 레슨',
+            AppStrings.studentLessonsCount(totalCount),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),

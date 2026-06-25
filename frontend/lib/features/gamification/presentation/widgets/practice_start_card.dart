@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
@@ -35,14 +36,22 @@ class PracticeStartCard extends StatelessWidget {
           children: [
             Text(
               key: const ValueKey('practice_start_card_header'),
-              '🎵 $studentName의 연습',
+              AppStrings.practiceStartHeader(studentName),
               style: AppTypography.headingMedium,
             ),
             const SizedBox(height: AppSpacing.space2),
-            Text(
-              key: const ValueKey('practice_start_card_streak'),
-              '🔥 $streakDays일',
-              style: AppTypography.bodySmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.local_fire_department, size: 16),
+                const SizedBox(width: 2),
+                Text(
+                  key: const ValueKey('practice_start_card_streak'),
+                  AppStrings.practiceStartStreak(streakDays),
+                  style: AppTypography.bodySmall,
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.space5),
             SizedBox(
@@ -51,13 +60,21 @@ class PracticeStartCard extends StatelessWidget {
               child: FilledButton(
                 key: const ValueKey('practice_start_button'),
                 onPressed: onStartTap,
-                child: const Text('▶ 연습 시작'),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.play_arrow, size: 18),
+                    const SizedBox(width: 4),
+                    const Text(AppStrings.practiceStartButton),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               key: const ValueKey('practice_start_card_yesterday'),
-              '어제 $yesterdayMinutes분 했어요',
+              AppStrings.practiceStartYesterdayMinutes(yesterdayMinutes),
               style: AppTypography.bodySmall,
             ),
             if (onMoreTap != null) ...[

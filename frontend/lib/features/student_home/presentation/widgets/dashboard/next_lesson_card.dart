@@ -103,16 +103,26 @@ class NextLessonCard extends ConsumerWidget {
 
     String dDayText;
     if (isToday) {
-      dDayText = '오늘';
+      dDayText = AppStrings.studentLessonToday;
     } else if (isTomorrow) {
-      dDayText = '내일';
+      dDayText = AppStrings.studentLessonTomorrow;
     } else {
       dDayText = 'D-$daysUntil';
     }
 
-    final dayOfWeek = ['월', '화', '수', '목', '금', '토', '일'];
+    final dayOfWeek = [
+      AppStrings.weekdayMon,
+      AppStrings.weekdayTue,
+      AppStrings.weekdayWed,
+      AppStrings.weekdayThu,
+      AppStrings.weekdayFri,
+      AppStrings.weekdaySat,
+      AppStrings.weekdaySun,
+    ];
     final weekdayText = dayOfWeek[booking.lessonDate.weekday - 1];
-    final typeText = booking.lessonType == LessonType.regular ? '정기' : '체험';
+    final typeText = booking.lessonType == LessonType.regular
+        ? AppStrings.lessonTypeRegular
+        : AppStrings.lessonTypeTrial;
 
     return GestureDetector(
       onTap: () {
@@ -179,7 +189,7 @@ class NextLessonCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
-                        '다음 레슨',
+                        AppStrings.nextLessonLabel,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paper.withValues(alpha: 0.8),
                         ),

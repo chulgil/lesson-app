@@ -67,14 +67,18 @@ class CompletionToggle extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isCompleted ? '연습 완료!' : '연습 완료로 표시',
+                      isCompleted
+                          ? AppStrings.practiceCompleteLabel
+                          : AppStrings.practiceCompleteMarkLabel,
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isCompleted ? AppColors.paperOk : AppColors.ink,
                       ),
                     ),
                     Text(
-                      isCompleted ? '탭하여 완료 취소' : '탭하여 이 섹션을 완료로 표시하세요',
+                      isCompleted
+                          ? AppStrings.practiceCompleteUndoLabel
+                          : AppStrings.practiceCompleteHintLabel,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -122,12 +126,12 @@ class CompletionToggle extends StatelessWidget {
                     ),
                     child: Opacity(
                       opacity: isCompleted ? 1.0 : 0.3,
-                      child: Text(
-                        '🐾',
-                        style: (totalCount <= 5
-                                ? AppTypography.displayMedium
-                                : AppTypography.headingMedium)
-                            .copyWith(height: 1),
+                      child: Icon(
+                        Icons.pets,
+                        size: totalCount <= 5 ? 32 : 24,
+                        color: isCompleted
+                            ? AppColors.paperOk
+                            : AppColors.inkTertiary,
                       ),
                     ),
                   );
@@ -138,15 +142,20 @@ class CompletionToggle extends StatelessWidget {
               // Progress text (x/n format)
               Text(
                 isAllCompleted
-                    ? '오늘 연습 완료! ($completedCount/$totalCount회)'
-                    : '탭하여 연습 기록 ($completedCount/$totalCount회)',
+                    ? AppStrings.practiceRepeatAllDone(
+                        completedCount,
+                        totalCount,
+                      )
+                    : AppStrings.practiceRepeatTap(completedCount, totalCount),
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color: isAllCompleted ? AppColors.paperOk : AppColors.ink,
                 ),
               ),
               Text(
-                isAllCompleted ? '탭하여 초기화' : '하루 $totalCount회 반복',
+                isAllCompleted
+                    ? AppStrings.practiceRepeatReset
+                    : AppStrings.practiceRepeatDailyCount(totalCount),
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),

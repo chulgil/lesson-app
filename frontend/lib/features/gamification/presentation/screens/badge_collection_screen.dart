@@ -30,10 +30,8 @@ class BadgeCollectionScreen extends ConsumerWidget {
       ),
       body: gamificationAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => const Center(
-              child: Text(AppStrings.gamificationDataLoadFailed),
-            ),
+        error: (_, __) =>
+            const Center(child: Text(AppStrings.gamificationDataLoadFailed)),
         data: (data) => _buildContent(context, data),
       ),
     );
@@ -114,7 +112,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
-            '총 ${data.totalPoints}P',
+            AppStrings.badgeLevelTotalPoints(data.totalPoints),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -135,7 +133,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '다음 레벨까지 ${data.pointsToNextLevel}P',
+            AppStrings.badgeLevelNextPoints(data.pointsToNextLevel),
             style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
@@ -157,7 +155,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '미획득',
+              AppStrings.badgeRarityNotEarned,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.inkTertiary,
               ),
@@ -180,10 +178,9 @@ class BadgeCollectionScreen extends ConsumerWidget {
         color: badge.isEarned ? AppColors.paper : AppColors.paperDark,
         borderRadius: BorderRadius.zero,
         border: Border.all(
-          color:
-              badge.isEarned
-                  ? rarityColor.withValues(alpha: 0.3)
-                  : AppColors.inkQuaternary,
+          color: badge.isEarned
+              ? rarityColor.withValues(alpha: 0.3)
+              : AppColors.inkQuaternary,
         ),
       ),
       child: Row(
@@ -193,10 +190,9 @@ class BadgeCollectionScreen extends ConsumerWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color:
-                  badge.isEarned
-                      ? rarityColor.withValues(alpha: 0.15)
-                      : AppColors.paperDark,
+              color: badge.isEarned
+                  ? rarityColor.withValues(alpha: 0.15)
+                  : AppColors.paperDark,
               borderRadius: BorderRadius.zero,
             ),
             alignment: Alignment.center,
@@ -217,8 +213,9 @@ class BadgeCollectionScreen extends ConsumerWidget {
                   badge.name,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color:
-                        badge.isEarned ? AppColors.ink : AppColors.inkTertiary,
+                    color: badge.isEarned
+                        ? AppColors.ink
+                        : AppColors.inkTertiary,
                   ),
                 ),
                 Text(
@@ -266,7 +263,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
         ),
         child: Center(
           child: Text(
-            '포인트 기록이 없습니다',
+            AppStrings.badgePointHistoryEmpty,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),
@@ -282,65 +279,64 @@ class BadgeCollectionScreen extends ConsumerWidget {
         border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
-        children:
-            history.asMap().entries.map((entry) {
-              final item = entry.value;
-              final isLast = entry.key == history.length - 1;
-              final d = item.earnedAt;
+        children: history.asMap().entries.map((entry) {
+          final item = entry.value;
+          final isLast = entry.key == history.length - 1;
+          final d = item.earnedAt;
 
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space4,
-                      vertical: AppSpacing.space3,
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space4,
+                  vertical: AppSpacing.space3,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _getPointTypeIcon(item.type),
+                      size: 18,
+                      color: AppColors.inkSecondary,
                     ),
-                    child: Row(
+                    const SizedBox(width: AppSpacing.space3),
+                    Expanded(
+                      child: Text(
+                        item.description,
+                        style: AppTypography.bodyMedium,
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Icon(
-                          _getPointTypeIcon(item.type),
-                          size: 18,
-                          color: AppColors.inkSecondary,
-                        ),
-                        const SizedBox(width: AppSpacing.space3),
-                        Expanded(
-                          child: Text(
-                            item.description,
-                            style: AppTypography.bodyMedium,
+                        Text(
+                          '+${item.points}P',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.paperAccent,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '+${item.points}P',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.paperAccent,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              '${d.month}/${d.day} ${d.hour.toString().padLeft(2, "0")}:${d.minute.toString().padLeft(2, "0")}',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.inkTertiary,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          '${d.month}/${d.day} ${d.hour.toString().padLeft(2, "0")}:${d.minute.toString().padLeft(2, "0")}',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.inkTertiary,
+                          ),
                         ),
                       ],
                     ),
+                  ],
+                ),
+              ),
+              if (!isLast)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: AppSpacing.space4,
+                    right: AppSpacing.space4,
                   ),
-                  if (!isLast)
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: AppSpacing.space4,
-                        right: AppSpacing.space4,
-                      ),
-                      child: const ThinRule(),
-                    ),
-                ],
-              );
-            }).toList(),
+                  child: const ThinRule(),
+                ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -361,13 +357,13 @@ class BadgeCollectionScreen extends ConsumerWidget {
   String _getRarityLabel(BadgeRarity rarity) {
     switch (rarity) {
       case BadgeRarity.common:
-        return '일반';
+        return AppStrings.badgeRarityCommon;
       case BadgeRarity.rare:
-        return '희귀';
+        return AppStrings.badgeRarityRare;
       case BadgeRarity.epic:
-        return '영웅';
+        return AppStrings.badgeRarityEpic;
       case BadgeRarity.legendary:
-        return '전설';
+        return AppStrings.badgeRarityLegendary;
     }
   }
 
