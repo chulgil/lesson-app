@@ -157,6 +157,17 @@ class _AssignmentRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          // #412 연습 진척 — 누적 횟수 표시. 완료(isCompleted)와 별개.
+          if (item.practiceCount > 0) ...[
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              AppStrings.practiceProgressCount(item.practiceCount),
+              style: AppTypography.captionSmall.copyWith(
+                color: AppColors.paperAccent,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ],
       ),
     );
