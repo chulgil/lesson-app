@@ -93,11 +93,12 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
-    final userName = authState is AuthNeedsRole
-        ? authState.name
-        : authState is AuthNeedsOnboarding
-        ? authState.name
-        : '';
+    final userName =
+        authState is AuthNeedsRole
+            ? authState.name
+            : authState is AuthNeedsOnboarding
+            ? authState.name
+            : '';
 
     return NotebookScreenScaffold(
       body: SafeArea(
@@ -164,6 +165,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 color: AppColors.paperAccent,
                 isEnabled: _canSelectRole,
                 isLoading: _isLoading,
+                badge: AppStrings.roleSelectStudentInviteBadge, // #112
                 onTap: () => _selectRole(UserRole.student),
               ),
               const SizedBox(height: AppSpacing.space3),
@@ -205,6 +207,7 @@ class _RoleCard extends StatelessWidget {
   final bool isEnabled;
   final bool isLoading;
   final VoidCallback onTap;
+  final String? badge; // #112: optional pre-badge (e.g. "초대 필요")
 
   const _RoleCard({
     required this.icon,
@@ -214,6 +217,7 @@ class _RoleCard extends StatelessWidget {
     required this.isEnabled,
     required this.isLoading,
     required this.onTap,
+    this.badge,
   });
 
   @override
@@ -244,6 +248,29 @@ class _RoleCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (badge != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(
+                        color: effectiveColor.withValues(alpha: 0.12),
+                        border: Border.all(
+                          color: effectiveColor.withValues(alpha: 0.4),
+                        ),
+                        borderRadius: BorderRadius.zero, // §1.3.1 각진 원칙
+                      ),
+                      child: Text(
+                        badge!,
+                        style: AppTypography.caption.copyWith(
+                          color: effectiveColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                   Text(
                     title,
                     style: AppTypography.bodyLarge.copyWith(

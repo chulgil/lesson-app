@@ -67,9 +67,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (next is AuthUnauthenticated &&
           next.reason != AuthUnauthenticatedReason.none &&
           mounted) {
-        final message = next.reason == AuthUnauthenticatedReason.networkError
-            ? AppStrings.authLoginNetworkError
-            : AppStrings.authAutoLoginServerError;
+        final message =
+            next.reason == AuthUnauthenticatedReason.networkError
+                ? AppStrings.authLoginNetworkError
+                : AppStrings.authAutoLoginServerError;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
         );
@@ -225,12 +226,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: AppSpacing.space3),
         _NotebookAuthBtn(
           label: 'Kakao로 시작',
-          onTap: () => _handleKakaoLogin(context),
+          onTap: null, // #118: 준비중 — NO-OP 제거
+          comingSoonBadge: AppStrings.authComingSoonBadge,
         ),
         const SizedBox(height: AppSpacing.space3),
         _NotebookAuthBtn(
           label: 'Apple 계정으로 시작',
-          onTap: () => _handleAppleLogin(context),
+          onTap: null, // #118: 준비중 — NO-OP 제거
+          comingSoonBadge: AppStrings.authComingSoonBadge,
         ),
         const SizedBox(height: AppSpacing.space5),
         GestureDetector(
@@ -416,27 +419,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (e is UnauthorizedException) return AppStrings.authLoginUnauthorized;
     return AppStrings.authLoginFailed;
   }
-
-  void _handleKakaoLogin(BuildContext context) {
-    // TODO(remote): Replace with real Kakao OAuth when SDK is integrated
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(AppStrings.authKakaoNotReady),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _handleAppleLogin(BuildContext context) {
-    // TODO(remote): Replace with real Apple Sign In when integrated
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(AppStrings.authAppleNotReady),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 }
+// #118: _handleKakaoLogin / _handleAppleLogin 제거 — NO-OP snackbar 금지 (ux-rules.md)
 
 // ─────────────────────────────────────────────────────────────────
 // Notebook × Score auth button — HBAuthBtn 레퍼런스 이식.
@@ -447,21 +431,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 class _NotebookAuthBtn extends StatelessWidget {
   final String label;
   final bool primary;
-  final VoidCallback onTap;
+  final VoidCallback? onTap; // #118: nullable — null = disabled (준비중)
+  final String? comingSoonBadge; // #118: 준비중 배지 텍스트
 
   const _NotebookAuthBtn({
     required this.label,
     required this.onTap,
     this.primary = false,
+    this.comingSoonBadge,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDisabled = onTap == null;
     final bg = primary ? AppColors.ink : Colors.transparent;
-    final fg = primary ? AppColors.paper : AppColors.ink;
+    final fg =
+        isDisabled
+            ? AppColors.inkTertiary
+            : (primary ? AppColors.paper : AppColors.ink);
+    final borderColor = isDisabled ? AppColors.inkTertiary : AppColors.ink;
     final borderWidth = primary ? 1.0 : 1.2;
 
-    return GestureDetector(
+    final button = GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -469,7 +460,7 @@ class _NotebookAuthBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         decoration: BoxDecoration(
           color: bg,
-          border: Border.all(color: AppColors.ink, width: borderWidth),
+          border: Border.all(color: borderColor, width: borderWidth),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -480,6 +471,33 @@ class _NotebookAuthBtn extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    if (comingSoonBadge == null) return button;
+
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        button,
+        Positioned(
+          top: 6,
+          right: 10,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: const BoxDecoration(
+              color: AppColors.inkTertiary, // §1.3.1 각진 원칙 — BorderRadius.zero
+            ),
+            child: Text(
+              comingSoonBadge!,
+              style: NotebookTypography.metaMono.copyWith(
+                color: AppColors.paper,
+                fontSize: 9,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

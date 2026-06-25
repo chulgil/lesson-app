@@ -9940,4 +9940,15 @@ class AppStrings {
   // Pending Bookings
   static const pendingBookingsEmpty = '대기 중인 신청이 없습니다';
   static const pendingBookingsEmptyDesc = '새로운 레슨 신청이 들어오면 여기에 표시돼요';
+
+  // #930 — Onboarding UX polish
+  // #111 Profile setup back confirmation dialog
+  static const profileSetupBackDialogTitle = '작성을 그만두실건가요?';
+  static const profileSetupBackDialogMessage = '입력한 내용이 저장되지 않습니다.';
+  static const profileSetupBackDialogConfirm = '나가기';
+  static const profileSetupBackDialogCancel = '계속 작성';
+  // #112 Student role invite badge
+  static const roleSelectStudentInviteBadge = '초대 필요';
+  // #118 Social login coming soon badge
+  static const authComingSoonBadge = '준비중';
 }

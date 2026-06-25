@@ -133,33 +133,37 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   Future<void> _selectProfileImage() async {
     final source = await showNotebookBottomSheet<ImageSource>(
       context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.photo_library),
-            title: const Text(AppStrings.onboardingSelectFromGallery),
-            onTap: () => Navigator.pop(context, ImageSource.gallery),
-          ),
-          ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text(AppStrings.onboardingTakePhoto),
-            onTap: () => Navigator.pop(context, ImageSource.camera),
-          ),
-          if (_profileImage != null)
-            ListTile(
-              leading: Icon(Icons.delete_outline, color: AppColors.paperAccent),
-              title: Text(
-                AppStrings.profileSetupDeletePhoto,
-                style: TextStyle(color: AppColors.paperAccent),
+      builder:
+          (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text(AppStrings.onboardingSelectFromGallery),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() => _profileImage = null);
-              },
-            ),
-        ],
-      ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text(AppStrings.onboardingTakePhoto),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              if (_profileImage != null)
+                ListTile(
+                  leading: Icon(
+                    Icons.delete_outline,
+                    color: AppColors.paperAccent,
+                  ),
+                  title: Text(
+                    AppStrings.profileSetupDeletePhoto,
+                    style: TextStyle(color: AppColors.paperAccent),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() => _profileImage = null);
+                  },
+                ),
+            ],
+          ),
     );
 
     if (source == null || !mounted) return;
@@ -194,18 +198,36 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     }
   }
 
+  // #111: 뒤로가기 시 데이터 손실 경고 다이얼로그
+  Future<void> _confirmBack(BuildContext context) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.profileSetupBackDialogTitle,
+      message: AppStrings.profileSetupBackDialogMessage,
+      confirmLabel: AppStrings.profileSetupBackDialogConfirm,
+      cancelLabel: AppStrings.profileSetupBackDialogCancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed == true && context.mounted) {
+      context.go(AppRoutes.roleSelect);
+    }
+  }
+
   void _showInstrumentSelector() {
     showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showHandle: false,
       padding: EdgeInsets.zero,
-      builder: (context) => _InstrumentSelectorSheet(
-        selectedInstruments: _selectedInstruments,
-        onSelectionChanged: (instruments) {
-          setState(() => _selectedInstruments = instruments);
-        },
-      ),
+      builder:
+          (context) => _InstrumentSelectorSheet(
+            selectedInstruments: _selectedInstruments,
+            onSelectionChanged: (instruments) {
+              setState(() => _selectedInstruments = instruments);
+            },
+          ),
     );
   }
 
@@ -214,7 +236,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.onboardingProfileSetup,
-        onLeadingTap: () => context.go(AppRoutes.roleSelect),
+        onLeadingTap: () => _confirmBack(context), // #111
       ),
       body: SafeArea(
         child: Column(
@@ -278,7 +300,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                             const SizedBox(width: AppSpacing.space2),
                             Expanded(
                               child: Text(
-                                AppStrings.profileSetupMissingFields(_missingFields.join(', ')),
+                                AppStrings.profileSetupMissingFields(
+                                  _missingFields.join(', '),
+                                ),
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.paperAccent,
                                 ),
@@ -309,19 +333,20 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       borderRadius: BorderRadius.zero,
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.paper,
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.paper,
+                            ),
+                          )
+                          : Text(
+                            AppStrings.onboardingNext,
+                            style: AppTypography.button,
                           ),
-                        )
-                      : Text(
-                          AppStrings.onboardingNext,
-                          style: AppTypography.button,
-                        ),
                 ),
               ),
             ),
@@ -384,22 +409,26 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.inkQuaternary,
                     shape: BoxShape.circle,
-                    image: _profileImage != null
-                        ? DecorationImage(
-                            image: _profileImage!.startsWith('http')
-                                ? NetworkImage(_profileImage!) as ImageProvider
-                                : FileImage(File(_profileImage!)),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    image:
+                        _profileImage != null
+                            ? DecorationImage(
+                              image:
+                                  _profileImage!.startsWith('http')
+                                      ? NetworkImage(_profileImage!)
+                                          as ImageProvider
+                                      : FileImage(File(_profileImage!)),
+                              fit: BoxFit.cover,
+                            )
+                            : null,
                   ),
-                  child: _profileImage == null
-                      ? Icon(
-                          Icons.person,
-                          size: 48,
-                          color: AppColors.inkTertiary,
-                        )
-                      : null,
+                  child:
+                      _profileImage == null
+                          ? Icon(
+                            Icons.person,
+                            size: 48,
+                            color: AppColors.inkTertiary,
+                          )
+                          : null,
                 ),
                 Positioned(
                   right: 0,
@@ -492,44 +521,46 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               border: Border.all(color: AppColors.inkQuaternary),
               borderRadius: BorderRadius.zero,
             ),
-            child: _selectedInstruments.isEmpty
-                ? Row(
-                    children: [
-                      Icon(Icons.add, color: AppColors.inkTertiary),
-                      const SizedBox(width: AppSpacing.space2),
-                      Text(
-                        AppStrings.profileSetupInstrumentHint,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkTertiary,
+            child:
+                _selectedInstruments.isEmpty
+                    ? Row(
+                      children: [
+                        Icon(Icons.add, color: AppColors.inkTertiary),
+                        const SizedBox(width: AppSpacing.space2),
+                        Text(
+                          AppStrings.profileSetupInstrumentHint,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.inkTertiary,
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-                : Wrap(
-                    spacing: AppSpacing.space2,
-                    runSpacing: AppSpacing.space2,
-                    children: _selectedInstruments.map((instrument) {
-                      return Chip(
-                        label: Text(instrument),
-                        labelStyle: AppTypography.bodySmall.copyWith(
-                          color: AppColors.paperAccent,
-                        ),
-                        backgroundColor: AppColors.paperAccent.withValues(
-                          alpha: 0.1,
-                        ),
-                        deleteIcon: Icon(
-                          Icons.close,
-                          size: 16,
-                          color: AppColors.paperAccent,
-                        ),
-                        onDeleted: () {
-                          setState(() {
-                            _selectedInstruments.remove(instrument);
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
+                      ],
+                    )
+                    : Wrap(
+                      spacing: AppSpacing.space2,
+                      runSpacing: AppSpacing.space2,
+                      children:
+                          _selectedInstruments.map((instrument) {
+                            return Chip(
+                              label: Text(instrument),
+                              labelStyle: AppTypography.bodySmall.copyWith(
+                                color: AppColors.paperAccent,
+                              ),
+                              backgroundColor: AppColors.paperAccent.withValues(
+                                alpha: 0.1,
+                              ),
+                              deleteIcon: Icon(
+                                Icons.close,
+                                size: 16,
+                                color: AppColors.paperAccent,
+                              ),
+                              onDeleted: () {
+                                setState(() {
+                                  _selectedInstruments.remove(instrument);
+                                });
+                              },
+                            );
+                          }).toList(),
+                    ),
           ),
         ),
       ],
@@ -676,12 +707,16 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
 
                 return ListTile(
                   title: Text(instrument),
-                  trailing: isSelected
-                      ? Icon(Icons.check_circle, color: AppColors.paperAccent)
-                      : Icon(
-                          Icons.circle_outlined,
-                          color: AppColors.inkQuaternary,
-                        ),
+                  trailing:
+                      isSelected
+                          ? Icon(
+                            Icons.check_circle,
+                            color: AppColors.paperAccent,
+                          )
+                          : Icon(
+                            Icons.circle_outlined,
+                            color: AppColors.inkQuaternary,
+                          ),
                   onTap: () {
                     final next = List<String>.from(_selected);
                     setState(() {
