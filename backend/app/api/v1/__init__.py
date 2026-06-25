@@ -36,6 +36,7 @@ from app.api.v1 import (
     parents,
     posts,
     practice,
+    practice_journal,
     practice_logs,
     practice_loop_stats,
     profile_images,
@@ -193,4 +194,9 @@ api_router.include_router(
     practice_loop_stats.teacher_router,
     prefix="/teachers/me/practice-loop-stats",
     tags=["practice-loop-stats"],
+)
+api_router.include_router(
+    practice_journal.router,
+    prefix="/practice-journal",
+    tags=["practice-journal"],
 )

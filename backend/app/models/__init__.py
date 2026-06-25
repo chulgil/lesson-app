@@ -96,6 +96,12 @@ from app.models.practice import (  # noqa: F401
     RecordingFeedback,
     StudentPracticePiece,
 )
+from app.models.practice_journal import (  # noqa: F401
+    BoundVolume,
+    Endorsement,
+    GuardianSeal,
+    PracticeMark,
+)
 from app.models.practice_log import PracticeLog  # noqa: F401
 from app.models.practice_loop_stats import PracticeLoopStats  # noqa: F401
 from app.models.relationship import Follow, TeacherStudentRelation  # noqa: F401
