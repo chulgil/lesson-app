@@ -4895,6 +4895,9 @@ class AppStrings {
   /// 이번 주 과제가 없습니다 (대시보드 빈 상태)
   static const weeklyAssignmentEmpty = '이번 주 과제가 없습니다';
 
+  /// #412 과제 진척 — 연습 누적 횟수 (예: "3회 연습"). 완료와 별개 표시.
+  static String practiceProgressCount(int n) => '$n회 연습';
+
   /// 미완료 학생 (섹션 헤더)
   static const incompleteStudentsLabel = '미완료 학생';
 

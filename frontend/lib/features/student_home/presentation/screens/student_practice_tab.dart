@@ -812,6 +812,24 @@ class _SectionTile extends ConsumerWidget {
                           studentId,
                           selectedDate,
                         );
+                    // #412 연습(섹션 일일완료) → 연결된 과제 진척 누적.
+                    // 완료(isCompleted)는 자동 변경하지 않음 — 학생 확인 유지.
+                    final itemId = section.practiceItemId;
+                    if (itemId != null) {
+                      final nowCompleted = !isCompletedForDate;
+                      final notifier = ref.read(
+                        studentPracticeNotifierProvider(studentId).notifier,
+                      );
+                      try {
+                        if (nowCompleted) {
+                          await notifier.incrementCount(itemId);
+                        } else {
+                          await notifier.decrementCount(itemId);
+                        }
+                      } catch (_) {
+                        // 진척 반영 실패는 비치명적 — 섹션 완료 UX 유지.
+                      }
+                    }
                   },
                   behavior: HitTestBehavior.opaque,
                   child: SizedBox(

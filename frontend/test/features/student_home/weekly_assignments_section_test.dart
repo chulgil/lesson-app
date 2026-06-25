@@ -9,6 +9,7 @@ PracticeItem _item({
   required String title,
   PracticePriority priority = PracticePriority.should,
   bool isCompleted = false,
+  int practiceCount = 0,
 }) {
   return PracticeItem(
     id: id,
@@ -19,6 +20,7 @@ PracticeItem _item({
     title: title,
     priority: priority,
     isCompleted: isCompleted,
+    practiceCount: practiceCount,
     createdAt: DateTime(2026, 6, 23),
   );
 }
@@ -139,6 +141,38 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('연습 진척 횟수 노출 (완료는 미변경)', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(375, 667));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final items = [
+        _item(id: '1', title: '연습한 과제', practiceCount: 3),
+        _item(id: '2', title: '안한 과제'),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            weeklyPracticeItemsProvider(
+              'student_1',
+            ).overrideWith((ref) async => items),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: WeeklyAssignmentsSection(studentId: 'student_1'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      // practiceCount>0 인 항목만 진척 캡션 노출.
+      expect(find.text('3회 연습'), findsOneWidget);
+      expect(find.text('0회 연습'), findsNothing);
     });
   });
 }
