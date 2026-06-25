@@ -6822,6 +6822,7 @@ class AppStrings {
   static const parentHomeChildManagement = '자녀 관리';
   static const parentHomeChildSelect = '자녀 선택';
   static const parentHomeNoChildren = '등록된 자녀가 없습니다';
+  static const parentHomeNoChildrenDesc = '자녀를 추가하거나\n선생님 초대코드를 입력하세요';
   static const parentHomeAssignmentStatus = '과제 현황';
   static const parentHomePaymentSubscription = '입금·수강권';
   static const parentHomeUpcomingLessons = '예정된 레슨';

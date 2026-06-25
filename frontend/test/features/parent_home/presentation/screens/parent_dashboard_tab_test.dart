@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/lessons/lessons_facade.dart';
 import 'package:lessonaza/features/parent_home/domain/entities/child_profile.dart';
@@ -31,8 +33,11 @@ ChildProfile _profile({String? linkedStudentId = 'student-1'}) {
   );
 }
 
-PracticeStreak _streak() =>
-    PracticeStreak(id: 's-1', studentId: 'student-1', updatedAt: DateTime.now());
+PracticeStreak _streak() => PracticeStreak(
+  id: 's-1',
+  studentId: 'student-1',
+  updatedAt: DateTime.now(),
+);
 
 Subscription _activeSubscription() {
   final now = DateTime.now();
@@ -77,6 +82,37 @@ List<Override> _baseOverrides({
     ).overrideWith((_) async => const []),
   ];
 }
+
+// ---------------------------------------------------------------------------
+// Empty state CTA + navigation helpers (#925)
+// ---------------------------------------------------------------------------
+
+/// Minimal GoRouter with sentinel routes for [addChildProfile] and
+/// [parentInviteCode] so navigation assertions can use [find.text].
+GoRouter _emptyStateRouter() {
+  return GoRouter(
+    initialLocation: '/parent-dashboard',
+    routes: [
+      GoRoute(
+        path: '/parent-dashboard',
+        builder: (_, __) => const Scaffold(body: ParentDashboardTab()),
+      ),
+      GoRoute(
+        path: AppRoutes.addChildProfile,
+        builder: (_, __) => const Scaffold(body: Text('add-child-sentinel')),
+      ),
+      GoRoute(
+        path: AppRoutes.parentInviteCode,
+        builder: (_, __) => const Scaffold(body: Text('invite-code-sentinel')),
+      ),
+    ],
+  );
+}
+
+List<Override> _emptyOverrides() => [
+  currentUserIdProvider.overrideWithValue('parent-1'),
+  childProfilesProvider('parent-1').overrideWith((_) async => const []),
+];
 
 void main() {
   group('ParentDashboardTab — 자녀 실데이터 연결 (#585)', () {
@@ -139,6 +175,68 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text(AppStrings.parentHomeNotLinked), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('ParentDashboardTab 빈 상태 CTA (#925)', () {
+    testWidgets('자녀 0명일 때 빈 상태 CTA 2개 노출 — 예외 없음', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(440, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _emptyOverrides(),
+          child: MaterialApp.router(routerConfig: _emptyStateRouter()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text(AppStrings.parentHomeNoChildren), findsOneWidget);
+      expect(find.text(AppStrings.parentHomeNoChildrenDesc), findsOneWidget);
+      expect(find.text(AppStrings.parentHomeAddChild), findsOneWidget);
+      expect(find.text(AppStrings.parentHomeInviteCode), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('자녀 추가 CTA 탭 → addChildProfile 라우트로 이동', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(440, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _emptyOverrides(),
+          child: MaterialApp.router(routerConfig: _emptyStateRouter()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      await tester.tap(find.text(AppStrings.parentHomeAddChild));
+      await tester.pumpAndSettle();
+
+      expect(find.text('add-child-sentinel'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('초대코드 입력 CTA 탭 → parentInviteCode 라우트로 이동', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(440, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _emptyOverrides(),
+          child: MaterialApp.router(routerConfig: _emptyStateRouter()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      await tester.tap(find.text(AppStrings.parentHomeInviteCode));
+      await tester.pumpAndSettle();
+
+      expect(find.text('invite-code-sentinel'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
