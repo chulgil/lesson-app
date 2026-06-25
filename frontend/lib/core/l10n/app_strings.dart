@@ -3443,8 +3443,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -6218,11 +6218,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -8519,6 +8520,18 @@ class AppStrings {
   /// 휴가 등록 성공 스낵바.
   static const vacationRegisterSuccess = '휴가가 등록되었어요.';
 
+  /// 휴가 등록 성공 확인 다이얼로그 제목.
+  static const vacationNotifyDialogTitle = '통보 완료';
+
+  /// 휴가 등록 성공 확인 다이얼로그 본문 — 영향 학생 수 포함.
+  static String vacationNotifyDialogBody(int studentCount) =>
+      studentCount == 0
+          ? '해당 기간에 영향 받는 학생이 없어요.'
+          : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
+
+  /// 휴가 등록 성공 확인 다이얼로그 확인 버튼.
+  static const vacationNotifyDialogConfirm = '확인';
+
   /// 휴가 등록 실패 스낵바.
   static const vacationRegisterFailed = '휴가 등록을 완료하지 못했어요. 잠시 후 다시 시도해주세요.';
 
@@ -9822,7 +9835,8 @@ class AppStrings {
   static const inviteCodeScreenDesc = '선생님으로부터 받은\n초대 코드를 입력해주세요';
   static const inviteCodeValidationEmpty = '초대 코드를 입력해주세요';
   static const inviteCodeSubmitButton = '코드 확인하기';
-  static const inviteCodeHelpInfo = '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 아래에서 바로 시작할 수 있어요.';
+  static const inviteCodeHelpInfo =
+      '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 아래에서 바로 시작할 수 있어요.';
   static const inviteCodeSkipButton = '코드 없이 시작하기';
   static const inviteCodeCheckError = '코드 확인 중 오류가 발생했습니다';
 
@@ -9832,7 +9846,8 @@ class AppStrings {
   static const phoneVerifyCodeHint = '6자리 인증번호';
   static const phoneVerifyStepTitlePhone = '휴대폰 인증';
   static const phoneVerifyStepTitleCode = '인증번호 입력';
-  static String phoneVerifyStepDescCode(String phone) => '$phone으로 전송된\n인증번호 6자리를 입력해주세요';
+  static String phoneVerifyStepDescCode(String phone) =>
+      '$phone으로 전송된\n인증번호 6자리를 입력해주세요';
   static const phoneVerifyStepDescPhone = '레슨 관리와 학생 초대를 위해\n휴대폰 인증이 필요합니다';
   static const phoneVerifyButtonVerify = '인증 완료';
   static const phoneVerifyButtonSend = '인증번호 받기';
@@ -9858,8 +9873,16 @@ class AppStrings {
 
   // Common instrument list (SSOT — shared between teacher and student selectors)
   static const List<String> instrumentList = [
-    '바이올린', '피아노', '첼로', '플루트', '클라리넷',
-    '비올라', '기타', '성악', '드럼', '작곡',
+    '바이올린',
+    '피아노',
+    '첼로',
+    '플루트',
+    '클라리넷',
+    '비올라',
+    '기타',
+    '성악',
+    '드럼',
+    '작곡',
   ];
 
   // Bank Account Edit
@@ -9869,10 +9892,27 @@ class AppStrings {
   static const bankAccountDefaultBadge = '기본';
   static const bankAccountDirectInput = '직접입력';
   static const List<String> bankNames = [
-    '국민은행', '신한은행', '우리은행', '하나은행', '농협은행',
-    'SC제일은행', '한국씨티은행', '기업은행', '카카오뱅크', '토스뱅크',
-    '케이뱅크', '새마을금고', '신협', '우체국', '수협은행',
-    '대구은행', '부산은행', '경남은행', '광주은행', '전북은행', '제주은행',
+    '국민은행',
+    '신한은행',
+    '우리은행',
+    '하나은행',
+    '농협은행',
+    'SC제일은행',
+    '한국씨티은행',
+    '기업은행',
+    '카카오뱅크',
+    '토스뱅크',
+    '케이뱅크',
+    '새마을금고',
+    '신협',
+    '우체국',
+    '수협은행',
+    '대구은행',
+    '부산은행',
+    '경남은행',
+    '광주은행',
+    '전북은행',
+    '제주은행',
   ];
   static const bankAccountConsentContent =
       '[개인정보(계좌정보) 수집·이용 동의]\n\n'

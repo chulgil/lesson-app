@@ -124,7 +124,8 @@ class TeacherVacationModeScreen extends ConsumerWidget {
   }
 
   Future<void> _onSubmit(BuildContext context, WidgetRef ref) async {
-    final segments = ref.read(vacationFormProvider).effectiveSegments;
+    final formState = ref.read(vacationFormProvider);
+    final segments = formState.effectiveSegments;
     if (segments.isEmpty) return;
     // 최종 확인 요약 (구간별 기간 + 보상). #768 ②.
     final confirmed = await _showVacationSummary(context, segments);
@@ -132,10 +133,21 @@ class TeacherVacationModeScreen extends ConsumerWidget {
     final notifier = ref.read(vacationFormProvider.notifier);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    // Capture impact count before submit (impact preview may be null if user skipped it).
+    final impactedCount = formState.impact?.impactedStudentCount ?? 0;
     final result = await notifier.submit();
     if (result != null && result.isNotEmpty) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text(AppStrings.vacationRegisterSuccess)),
+      if (!context.mounted) return;
+      // A4 FE visibility: show how many students were notified (#929).
+      await showDialog<void>(
+        context: context,
+        builder:
+            (_) => NotebookAlertDialog(
+              title: AppStrings.vacationNotifyDialogTitle,
+              content: Text(AppStrings.vacationNotifyDialogBody(impactedCount)),
+              confirmLabel: AppStrings.vacationNotifyDialogConfirm,
+              onConfirm: () => Navigator.of(context).pop(),
+            ),
       );
       if (navigator.canPop()) navigator.pop();
     } else {
@@ -269,9 +281,10 @@ class _ImpactSection extends StatelessWidget {
             const _SectionHeader(text: AppStrings.vacationImpactSection),
             const Spacer(),
             TextButton(
-              onPressed: state.hasValidDraft && !state.isLoadingImpact
-                  ? onRefresh
-                  : null,
+              onPressed:
+                  state.hasValidDraft && !state.isLoadingImpact
+                      ? onRefresh
+                      : null,
               child: const Text(AppStrings.vacationImpactRefresh),
             ),
           ],
@@ -332,12 +345,13 @@ class _ImpactSummary extends ConsumerWidget {
           _ImpactStudentRow(
             student: student,
             dispositionOverride: overrides[student.studentId],
-            onLongPress: () => _openPerStudentSheet(
-              context,
-              ref,
-              studentId: student.studentId,
-              studentLabel: student.studentName ?? student.studentId,
-            ),
+            onLongPress:
+                () => _openPerStudentSheet(
+                  context,
+                  ref,
+                  studentId: student.studentId,
+                  studentLabel: student.studentName ?? student.studentId,
+                ),
           ),
       ],
     );
@@ -441,18 +455,20 @@ Future<void> _openPerStudentSheet(
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(_dispositionLabel(option)),
-              trailing: current == option
-                  ? const Icon(Icons.check, color: AppColors.paperAccent)
-                  : null,
+              trailing:
+                  current == option
+                      ? const Icon(Icons.check, color: AppColors.paperAccent)
+                      : null,
               onTap: () => Navigator.pop(sheetCtx, option),
             ),
           const Divider(height: 1),
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text(AppStrings.vacationPerStudentUseDefault),
-            trailing: current == null
-                ? const Icon(Icons.check, color: AppColors.paperAccent)
-                : null,
+            trailing:
+                current == null
+                    ? const Icon(Icons.check, color: AppColors.paperAccent)
+                    : null,
             onTap: () => Navigator.pop(sheetCtx, null),
           ),
         ],
@@ -483,13 +499,14 @@ class _SubmitButton extends StatelessWidget {
     return FilledButton(
       onPressed: canSubmit ? onSubmit : null,
       style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
-      child: state.isSubmitting
-          ? const SizedBox(
-              height: 18,
-              width: 18,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Text(AppStrings.vacationRegisterButton),
+      child:
+          state.isSubmitting
+              ? const SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+              : const Text(AppStrings.vacationRegisterButton),
     );
   }
 }
@@ -599,9 +616,8 @@ class _DispositionOption extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.paperDark,
             border: Border.all(
-              color: isSelected
-                  ? AppColors.paperAccent
-                  : AppColors.inkQuaternary,
+              color:
+                  isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -617,24 +633,26 @@ class _DispositionOption extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected
-                        ? AppColors.paperAccent
-                        : AppColors.inkTertiary,
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkTertiary,
                     width: 2,
                   ),
                 ),
-                child: isSelected
-                    ? Center(
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.paperAccent,
+                child:
+                    isSelected
+                        ? Center(
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.paperAccent,
+                            ),
                           ),
-                        ),
-                      )
-                    : null,
+                        )
+                        : null,
               ),
               SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -813,15 +831,16 @@ class _ActiveVacationCard extends ConsumerWidget {
   Future<void> _confirmCancel(BuildContext context, WidgetRef ref) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (ctx) => NotebookAlertDialog(
-        title: AppStrings.vacationCancelConfirmTitle,
-        content: const Text(AppStrings.vacationCancelConfirmBody),
-        confirmLabel: AppStrings.vacationCancelLabel,
-        cancelLabel: AppStrings.cancel,
-        isDestructive: true,
-        onConfirm: () => Navigator.pop(ctx, true),
-        onCancel: () => Navigator.pop(ctx, false),
-      ),
+      builder:
+          (ctx) => NotebookAlertDialog(
+            title: AppStrings.vacationCancelConfirmTitle,
+            content: const Text(AppStrings.vacationCancelConfirmBody),
+            confirmLabel: AppStrings.vacationCancelLabel,
+            cancelLabel: AppStrings.cancel,
+            isDestructive: true,
+            onConfirm: () => Navigator.pop(ctx, true),
+            onCancel: () => Navigator.pop(ctx, false),
+          ),
     );
     if (result != true || !context.mounted) return;
     try {
@@ -834,13 +853,14 @@ class _ActiveVacationCard extends ConsumerWidget {
       if (!context.mounted) return;
       final message = e.toString();
       // Map server error semantics to friendly text (spec §7.2).
-      final friendly = message.contains('이미 시작')
-          ? AppStrings.vacationCancelAlreadyStarted
-          : message.contains('24')
-          ? AppStrings.vacationCancelWindowExpired
-          : message.contains('이미 취소')
-          ? AppStrings.vacationCancelAlreadyCancelled
-          : AppStrings.vacationCancelFailed;
+      final friendly =
+          message.contains('이미 시작')
+              ? AppStrings.vacationCancelAlreadyStarted
+              : message.contains('24')
+              ? AppStrings.vacationCancelWindowExpired
+              : message.contains('이미 취소')
+              ? AppStrings.vacationCancelAlreadyCancelled
+              : AppStrings.vacationCancelFailed;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(friendly)));
@@ -954,43 +974,44 @@ Future<bool?> _showVacationSummary(
 ) {
   return showDialog<bool>(
     context: context,
-    builder: (ctx) => NotebookAlertDialog(
-      title: AppStrings.vacationSummaryTitle,
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppStrings.vacationSummaryCount(segments.length),
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            SizedBox(height: AppSpacing.space2),
-            for (final s in segments)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3),
-                child: Text(
-                  AppStrings.vacationSummarySegmentLabel(
-                    AppStrings.vacationCardDateRange(
-                      _shortDate(s.startDate),
-                      _shortDate(s.endDate),
-                    ),
-                    _dispositionLabel(s.disposition),
-                  ),
+    builder:
+        (ctx) => NotebookAlertDialog(
+          title: AppStrings.vacationSummaryTitle,
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.vacationSummaryCount(segments.length),
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.ink,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
-              ),
-          ],
+                SizedBox(height: AppSpacing.space2),
+                for (final s in segments)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Text(
+                      AppStrings.vacationSummarySegmentLabel(
+                        AppStrings.vacationCardDateRange(
+                          _shortDate(s.startDate),
+                          _shortDate(s.endDate),
+                        ),
+                        _dispositionLabel(s.disposition),
+                      ),
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          confirmLabel: AppStrings.vacationSummaryConfirm,
+          cancelLabel: AppStrings.cancel,
+          onConfirm: () => Navigator.pop(ctx, true),
+          onCancel: () => Navigator.pop(ctx, false),
         ),
-      ),
-      confirmLabel: AppStrings.vacationSummaryConfirm,
-      cancelLabel: AppStrings.cancel,
-      onConfirm: () => Navigator.pop(ctx, true),
-      onCancel: () => Navigator.pop(ctx, false),
-    ),
   );
 }
