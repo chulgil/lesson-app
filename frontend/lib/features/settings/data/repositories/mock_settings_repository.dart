@@ -175,65 +175,6 @@ class MockSettingsRepository implements SettingsRepository {
   }
 
   @override
-  Future<TeacherSettings> addCustomDuration(int duration) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (_settings.customLessonDurations.contains(duration) ||
-        LessonDurations.defaults.contains(duration)) {
-      return _settings;
-    }
-    _settings = _settings.copyWith(
-      customLessonDurations: [..._settings.customLessonDurations, duration],
-      updatedAt: DateTime.now(),
-    );
-    return _settings;
-  }
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _settings = _settings.copyWith(
-      customLessonDurations: _settings.customLessonDurations
-          .where((d) => d != duration)
-          .toList(),
-      // Also remove from disabled if it was disabled
-      disabledDurations: _settings.disabledDurations
-          .where((d) => d != duration)
-          .toList(),
-      updatedAt: DateTime.now(),
-    );
-    return _settings;
-  }
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // Ensure at least one duration remains active
-    final activeCount = _settings.allLessonDurations.length;
-    if (!isActive && activeCount <= 1) {
-      // Cannot disable the last active duration
-      return _settings;
-    }
-
-    List<int> newDisabled;
-    if (isActive) {
-      // Enable: remove from disabled list
-      newDisabled = _settings.disabledDurations
-          .where((d) => d != duration)
-          .toList();
-    } else {
-      // Disable: add to disabled list
-      newDisabled = [..._settings.disabledDurations, duration];
-    }
-
-    _settings = _settings.copyWith(
-      disabledDurations: newDisabled,
-      updatedAt: DateTime.now(),
-    );
-    return _settings;
-  }
-
-  @override
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _settings = _settings.copyWith(

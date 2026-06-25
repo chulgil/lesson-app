@@ -170,42 +170,6 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
     }
   }
 
-  /// Add a custom lesson duration
-  Future<void> addCustomDuration(int duration) async {
-    final current = state.value;
-    try {
-      final updated = await _repository.addCustomDuration(duration);
-      state = AsyncValue.data(updated);
-      _refreshReadSide();
-    } catch (e, st) {
-      _rollbackOrError(current, e, st);
-    }
-  }
-
-  /// Remove a custom lesson duration
-  Future<void> removeCustomDuration(int duration) async {
-    final current = state.value;
-    try {
-      final updated = await _repository.removeCustomDuration(duration);
-      state = AsyncValue.data(updated);
-      _refreshReadSide();
-    } catch (e, st) {
-      _rollbackOrError(current, e, st);
-    }
-  }
-
-  /// Toggle duration active/disabled state
-  Future<void> toggleDuration(int duration, bool isActive) async {
-    final current = state.value;
-    try {
-      final updated = await _repository.toggleDuration(duration, isActive);
-      state = AsyncValue.data(updated);
-      _refreshReadSide();
-    } catch (e, st) {
-      _rollbackOrError(current, e, st);
-    }
-  }
-
   /// Update a time slot
   Future<void> updateTimeSlot(TimeSlot slot) async {
     final current = state.value;

@@ -27,11 +27,10 @@ void main() {
         teacherSettingsBootMigrationProvider.overrideWith((ref) async => true),
       ],
       child: MaterialApp(
-        home: width == null
-            ? child
-            : Center(
-                child: SizedBox(width: width, child: child),
-              ),
+        home:
+            width == null
+                ? child
+                : Center(child: SizedBox(width: width, child: child)),
       ),
     );
   }
@@ -148,18 +147,6 @@ class _FakeSettingsRepository implements SettingsRepository {
   // ── Unused by LessonStyleSettingsScreen — throw on accidental call. ──
   @override
   Future<TeacherSettings> updateInstruments(List<String> instruments) =>
-      throw UnimplementedError('not used by LessonStyleSettingsScreen');
-
-  @override
-  Future<TeacherSettings> addCustomDuration(int duration) =>
-      throw UnimplementedError('not used by LessonStyleSettingsScreen');
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) =>
-      throw UnimplementedError('not used by LessonStyleSettingsScreen');
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) =>
       throw UnimplementedError('not used by LessonStyleSettingsScreen');
 
   @override

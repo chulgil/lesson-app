@@ -153,18 +153,6 @@ class _FakeSettingsRepository implements SettingsRepository {
       throw UnimplementedError('unused');
 
   @override
-  Future<TeacherSettings> addCustomDuration(int duration) =>
-      throw UnimplementedError('unused');
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) =>
-      throw UnimplementedError('unused');
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) =>
-      throw UnimplementedError('unused');
-
-  @override
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots) =>
       throw UnimplementedError('unused');
 

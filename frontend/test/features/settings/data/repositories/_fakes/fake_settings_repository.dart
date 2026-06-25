@@ -61,18 +61,6 @@ class FakeSettingsRepository implements SettingsRepository {
       throw UnimplementedError('not used by boot migration');
 
   @override
-  Future<TeacherSettings> addCustomDuration(int duration) =>
-      throw UnimplementedError('not used by boot migration');
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) =>
-      throw UnimplementedError('not used by boot migration');
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) =>
-      throw UnimplementedError('not used by boot migration');
-
-  @override
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot) =>
       throw UnimplementedError('not used by boot migration');
 

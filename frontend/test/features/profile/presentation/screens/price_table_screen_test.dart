@@ -71,7 +71,9 @@ void main() {
   group('PriceTableScreen (W3 Task 3.3)', () {
     testWidgets('AppBar 제목 + 섹션 헤더 노출', (tester) async {
       final repo = _FakeSettingsRepository(settings(instruments: ['피아노']));
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']));
+      await tester.pumpWidget(
+        wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text(AppStrings.priceTableScreenTitle), findsOneWidget);
@@ -81,7 +83,9 @@ void main() {
 
     testWidgets('빈 instruments → empty 안내 노출 (헤더만, 표 없음)', (tester) async {
       final repo = _FakeSettingsRepository(settings(instruments: const []));
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: const []));
+      await tester.pumpWidget(
+        wrap(const PriceTableScreen(), repo: repo, instruments: const []),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text(AppStrings.priceTableEmptyInstruments), findsOneWidget);
@@ -94,7 +98,9 @@ void main() {
 
     testWidgets('instruments=[피아노] → 헤더 + 1행 + 가격 셀 "—"', (tester) async {
       final repo = _FakeSettingsRepository(settings(instruments: ['피아노']));
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']));
+      await tester.pumpWidget(
+        wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']),
+      );
       await tester.pumpAndSettle();
 
       // Level 헤더 3개 (초급/중급/고급) — 가로 1행.
@@ -118,7 +124,9 @@ void main() {
           },
         ),
       );
-      await tester.pumpWidget(wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']));
+      await tester.pumpWidget(
+        wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']),
+      );
       await tester.pumpAndSettle();
 
       // 5만 / 7만 만원 단위 표시.
@@ -134,7 +142,12 @@ void main() {
     ) async {
       final repo = _FakeSettingsRepository(settings(instruments: ['피아노']));
       await tester.pumpWidget(
-        wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노'], width: 200),
+        wrap(
+          const PriceTableScreen(),
+          repo: repo,
+          instruments: ['피아노'],
+          width: 200,
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -183,18 +196,6 @@ class _FakeSettingsRepository implements SettingsRepository {
 
   @override
   Future<TeacherSettings> updateInstruments(List<String> instruments) =>
-      throw UnimplementedError('not used by PriceTableScreen');
-
-  @override
-  Future<TeacherSettings> addCustomDuration(int duration) =>
-      throw UnimplementedError('not used by PriceTableScreen');
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) =>
-      throw UnimplementedError('not used by PriceTableScreen');
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) =>
       throw UnimplementedError('not used by PriceTableScreen');
 
   @override

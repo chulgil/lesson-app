@@ -54,39 +54,6 @@ class RemoteSettingsRepository implements SettingsRepository {
   }
 
   @override
-  Future<TeacherSettings> addCustomDuration(int duration) async {
-    final current = await getTeacherSettings();
-    final updated = [...current.customLessonDurations, duration];
-    return _updateSettings({'custom_lesson_durations': updated});
-  }
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) async {
-    final current = await getTeacherSettings();
-    final updated =
-        current.customLessonDurations.where((d) => d != duration).toList();
-    final updatedDisabled =
-        current.disabledDurations.where((d) => d != duration).toList();
-    return _updateSettings({
-      'custom_lesson_durations': updated,
-      'disabled_durations': updatedDisabled,
-    });
-  }
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) async {
-    final current = await getTeacherSettings();
-    List<int> newDisabled;
-    if (isActive) {
-      newDisabled =
-          current.disabledDurations.where((d) => d != duration).toList();
-    } else {
-      newDisabled = [...current.disabledDurations, duration];
-    }
-    return _updateSettings({'disabled_durations': newDisabled});
-  }
-
-  @override
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots) async {
     final current = await getTeacherSettings();
     return _saveAvailableSlots(current, slots);
@@ -233,15 +200,14 @@ class RemoteSettingsRepository implements SettingsRepository {
         ..sort((a, b) => a.startTime.inMinutes - b.startTime.inMinutes);
       return {
         'day_of_week': entry.key,
-        'time_slots':
-            daySlots
-                .map(
-                  (slot) => {
-                    'start_time': _clockTimeToJson(slot.startTime),
-                    'end_time': _clockTimeToJson(slot.endTime),
-                  },
-                )
-                .toList(),
+        'time_slots': daySlots
+            .map(
+              (slot) => {
+                'start_time': _clockTimeToJson(slot.startTime),
+                'end_time': _clockTimeToJson(slot.endTime),
+              },
+            )
+            .toList(),
       };
     }).toList();
   }

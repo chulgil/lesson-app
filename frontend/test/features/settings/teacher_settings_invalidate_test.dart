@@ -231,18 +231,6 @@ class _MutableSettingsRepository implements SettingsRepository {
   }
 
   @override
-  Future<TeacherSettings> addCustomDuration(int duration) =>
-      throw UnimplementedError();
-
-  @override
-  Future<TeacherSettings> removeCustomDuration(int duration) =>
-      throw UnimplementedError();
-
-  @override
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive) =>
-      throw UnimplementedError();
-
-  @override
   Future<TeacherSettings> toggleTimeSlot(String slotId, bool isActive) =>
       throw UnimplementedError();
 

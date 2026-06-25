@@ -7,9 +7,6 @@ abstract class SettingsRepository {
   Future<TeacherSettings> getTeacherSettingsById(String teacherId);
   Future<TeacherSettings> updateInstruments(List<String> instruments);
   Future<TeacherSettings> updateDefaultDuration(int duration);
-  Future<TeacherSettings> addCustomDuration(int duration);
-  Future<TeacherSettings> removeCustomDuration(int duration);
-  Future<TeacherSettings> toggleDuration(int duration, bool isActive);
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots);
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot);
   Future<TeacherSettings> toggleTimeSlot(String slotId, bool isActive);
