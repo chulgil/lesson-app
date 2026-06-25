@@ -21,7 +21,15 @@ class AvailabilityPreviewGrid extends StatelessWidget {
   /// The current availability config to preview.
   final TeacherAvailability availability;
 
-  const AvailabilityPreviewGrid({super.key, required this.availability});
+  /// Optional override for lesson duration (SSOT from TeacherSettings).
+  /// When provided, slot length uses this value instead of availability.slotDurationMinutes.
+  final int? lessonDurationMinutes;
+
+  const AvailabilityPreviewGrid({
+    super.key,
+    required this.availability,
+    this.lessonDurationMinutes,
+  });
 
   static const _dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
@@ -151,8 +159,10 @@ class AvailabilityPreviewGrid extends StatelessWidget {
       byDay[i] = [];
     }
 
-    final interval = availability.slotStartInterval;
-    final duration = availability.slotDurationMinutes;
+    final duration = lessonDurationMinutes ?? availability.slotDurationMinutes;
+    final interval = lessonDurationMinutes != null
+        ? duration + availability.breakTimeBetweenLessons
+        : availability.slotStartInterval;
     if (interval <= 0 || duration <= 0) return byDay;
 
     for (final s in schedules) {

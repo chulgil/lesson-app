@@ -6,6 +6,8 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
+import 'package:lessonaza/features/settings/settings_facade.dart';
+import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/teacher_availability_split_page.dart';
 import 'package:lessonaza/features/schedule/presentation/widgets/availability/availability_preview_grid.dart';
 
@@ -46,6 +48,10 @@ void main() {
           teacherAvailabilityProvider(
             'teacher_test',
           ).overrideWith((ref) async => availability),
+          // Override SSOT settings so _SplitLayout doesn't need Hive/network.
+          teacherSettingsNotifierProvider.overrideWith(
+            () => _FakeSettingsNotifier(50),
+          ),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -311,5 +317,116 @@ void main() {
             'discoverable entry point — vacationModeEntry CTA must now render',
       );
     },
+  );
+
+  // ── #927 (#201) SSOT tests ─────────────────────────────────────────────
+
+  /// Helper: pump split page with both availability and settings overrides.
+  Future<void> pumpWithSettings(
+    WidgetTester tester, {
+    TeacherAvailability? availability,
+    required int ssotDurationMinutes,
+  }) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          teacherAvailabilityProvider(
+            'teacher_test',
+          ).overrideWith((ref) async => availability),
+          teacherSettingsNotifierProvider.overrideWith(
+            () => _FakeSettingsNotifier(ssotDurationMinutes),
+          ),
+        ],
+        child: const MaterialApp(
+          home: TeacherAvailabilitySplitPage(teacherId: 'teacher_test'),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+  }
+
+  testWidgets(
+    '#201-A: read-only duration row shows SSOT value and nav hint, no editable radio',
+    (tester) async {
+      await pumpWithSettings(
+        tester,
+        availability: null,
+        ssotDurationMinutes: 45,
+      );
+      expect(tester.takeException(), isNull);
+
+      // SSOT duration label rendered (e.g. "45분")
+      expect(
+        find.text(AppStrings.lessonDurationOptionLabel(45)),
+        findsOneWidget,
+        reason: 'SSOT duration (45) must appear in the read-only row',
+      );
+
+      // Nav hint text present
+      expect(
+        find.text(AppStrings.lessonDurationManagedInStyle),
+        findsOneWidget,
+        reason: 'Read-only affordance must show navigation hint',
+      );
+    },
+  );
+
+  testWidgets(
+    '#201-B: preview grid uses SSOT duration overriding availability.slotDurationMinutes',
+    (tester) async {
+      // availability has slotDurationMinutes=30 but SSOT says 60
+      final availability = TeacherAvailability(
+        id: 'b',
+        teacherId: 'teacher_test',
+        slotDurationMinutes: 30,
+        slotStartInterval: 30,
+        breakTimeBetweenLessons: 0,
+        weeklySchedules: [
+          WeeklySchedule(
+            id: 'w1',
+            dayOfWeek: 1, // 화요일
+            startTime: '14:00',
+            endTime: '16:00',
+            createdAt: DateTime(2026, 1, 1),
+          ),
+        ],
+        createdAt: DateTime(2026, 1, 1),
+      );
+
+      await pumpWithSettings(
+        tester,
+        availability: availability,
+        ssotDurationMinutes: 60,
+      );
+      expect(tester.takeException(), isNull);
+
+      // AvailabilityPreviewGrid must receive the SSOT override
+      final grid = tester.widget<AvailabilityPreviewGrid>(
+        find.byType(AvailabilityPreviewGrid),
+      );
+      expect(
+        grid.lessonDurationMinutes,
+        60,
+        reason:
+            'Preview grid must use SSOT duration (60), not '
+            'availability.slotDurationMinutes (30)',
+      );
+    },
+  );
+}
+
+/// Fake [TeacherSettingsNotifier] that immediately returns a [TeacherSettings]
+/// with the given lesson duration.
+class _FakeSettingsNotifier extends TeacherSettingsNotifier {
+  _FakeSettingsNotifier(this._duration);
+  final int _duration;
+
+  @override
+  Future<TeacherSettings> build() async => TeacherSettings(
+    id: 'fake',
+    instruments: const [],
+    lessonDurationMinutes: _duration,
+    createdAt: DateTime(2026, 1, 1),
   );
 }

@@ -88,11 +88,20 @@ class _SplitLayout extends ConsumerWidget {
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width > TeacherAvailabilitySplitPage.mobileBreakpoint;
 
+    // Read SSOT lesson duration from TeacherSettings.
+    final ssotDuration = ref
+        .watch(teacherSettingsNotifierProvider)
+        .valueOrNull
+        ?.lessonDurationMinutes;
+
     final settings = _SettingsPanel(
       teacherId: teacherId,
       availability: availability,
     );
-    final preview = AvailabilityPreviewGrid(availability: availability);
+    final preview = AvailabilityPreviewGrid(
+      availability: availability,
+      lessonDurationMinutes: ssotDuration,
+    );
 
     if (isWide) {
       return SingleChildScrollView(
@@ -574,8 +583,6 @@ class _LessonSettingsPanel extends ConsumerWidget {
     required this.availability,
   });
 
-  /// Allowed options per schedule_master.md §2.1.
-  static const _durationOptions = <int>[30, 45, 50, 60];
   static const _breakOptions = <int>[0, 5, 10, 15];
 
   @override
@@ -589,19 +596,8 @@ class _LessonSettingsPanel extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _OptionRow(
-            label: AppStrings.lessonDurationLabel,
-            helpText: AppStrings.lessonLengthHelp,
-            options: _durationOptions,
-            selected: availability.slotDurationMinutes,
-            buildLabel: AppStrings.lessonDurationOptionLabel,
-            onSelected:
-                (value) => _updateSettings(
-                  context,
-                  ref,
-                  slotDurationMinutes: value,
-                  breakTimeBetweenLessons: availability.breakTimeBetweenLessons,
-                ),
+          _ReadOnlyDurationRow(
+            teacherId: teacherId,
           ),
           const SizedBox(height: AppSpacing.space3),
           const ThinRule(),
@@ -616,7 +612,6 @@ class _LessonSettingsPanel extends ConsumerWidget {
                 (value) => _updateSettings(
                   context,
                   ref,
-                  slotDurationMinutes: availability.slotDurationMinutes,
                   breakTimeBetweenLessons: value,
                 ),
           ),
@@ -628,15 +623,20 @@ class _LessonSettingsPanel extends ConsumerWidget {
   Future<void> _updateSettings(
     BuildContext context,
     WidgetRef ref, {
-    required int slotDurationMinutes,
     required int breakTimeBetweenLessons,
   }) async {
+    // SSOT: read lesson duration from TeacherSettings, not from availability.
+    final ssotDuration = ref
+        .read(teacherSettingsNotifierProvider)
+        .valueOrNull
+        ?.lessonDurationMinutes
+        ?? availability.slotDurationMinutes;
     // slotStartInterval is the internal computed value: duration + break.
-    final interval = slotDurationMinutes + breakTimeBetweenLessons;
+    final interval = ssotDuration + breakTimeBetweenLessons;
     await ref
         .read(teacherAvailabilityNotifierProvider(teacherId).notifier)
         .updateLessonSettings(
-          slotDurationMinutes: slotDurationMinutes,
+          slotDurationMinutes: ssotDuration,
           slotStartInterval: interval,
           breakTimeBetweenLessons: breakTimeBetweenLessons,
         );
@@ -894,6 +894,75 @@ class _ErrorState extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
           TextButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Read-only lesson duration row (SSOT from TeacherSettings) ──────────────
+
+class _ReadOnlyDurationRow extends ConsumerWidget {
+  final String teacherId;
+  const _ReadOnlyDurationRow({required this.teacherId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsAsync = ref.watch(teacherSettingsNotifierProvider);
+    final duration = settingsAsync.valueOrNull?.lessonDurationMinutes;
+
+    return InkWell(
+      onTap: () => context.push(AppRoutes.lessonStyleSettings),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.space1),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.lessonDurationLabel,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    AppStrings.lessonLengthHelp,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (duration != null)
+                  Text(
+                    AppStrings.lessonDurationOptionLabel(duration),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.lessonDurationManagedInStyle,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                const Icon(
+                  Icons.chevron_right,
+                  size: 16,
+                  color: AppColors.inkTertiary,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

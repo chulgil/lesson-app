@@ -9893,6 +9893,7 @@ class AppStrings {
   // Lesson Style Settings
   static String lessonStyleMinutes(int minutes) => '$minutes분';
   static const lessonStyleNoLimit = '제한 없음';
+  static const lessonDurationManagedInStyle = '수업방식에서 변경';
   static String lessonStyleHoursBefore(int hours) => '$hours시간 전';
   static String lessonStyleDaysBefore(int days) => '$days일 전';
 
