@@ -5,6 +5,7 @@ import 'package:lessonaza/features/gamification/domain/entities/daily_practice.d
 import 'package:lessonaza/features/gamification/domain/entities/gamification.dart';
 import 'package:lessonaza/features/gamification/domain/entities/growth_heatmap.dart';
 import 'package:lessonaza/features/gamification/domain/repositories/growth_heatmap_repository.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/gamification_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/growth_heatmap_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/screens/student_growth_detail_screen.dart';
 
@@ -27,6 +28,23 @@ class _StubGrowthHeatmapRepository implements GrowthHeatmapRepository {
   ) async {}
 }
 
+StudentGamification _makeGamification({
+  required String studentId,
+  List<PracticeBadge> badges = const [],
+}) {
+  return StudentGamification(
+    studentId: studentId,
+    totalPoints: 0,
+    level: 1,
+    levelTitle: 'Beginner',
+    pointsToNextLevel: 100,
+    currentLevelMinPoints: 0,
+    nextLevelMinPoints: 100,
+    earnedBadges: badges,
+    recentHistory: const [],
+  );
+}
+
 Future<void> _pump(
   WidgetTester tester, {
   required String studentId,
@@ -37,15 +55,20 @@ Future<void> _pump(
   final stub = _StubGrowthHeatmapRepository(
     heatmap ?? GrowthHeatmap(studentId: studentId, days: const {}),
   );
+  final gamification = _makeGamification(studentId: studentId, badges: badges);
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [growthHeatmapRepositoryProvider.overrideWithValue(stub)],
+      overrides: [
+        growthHeatmapRepositoryProvider.overrideWithValue(stub),
+        studentGamificationProvider(
+          studentId,
+        ).overrideWith((_) async => gamification),
+      ],
       child: MaterialApp(
         home: Scaffold(
           body: StudentGrowthDetailScreen(
             studentId: studentId,
-            earnedBadges: badges,
             isUnder14: isUnder14,
           ),
         ),
@@ -69,7 +92,10 @@ void main() {
       expect(find.byKey(const ValueKey('year_heatmap_grid')), findsOneWidget);
     });
 
-    testWidgets('TrophyCollectionCard 노출 (badges)', (tester) async {
+    // #936: provider 에서 earnedBadges 읽어 트로피 그리드에 노출
+    testWidgets('TrophyCollectionCard 노출 — provider earnedBadges 반영 (#936)', (
+      tester,
+    ) async {
       final badges = [
         PracticeBadge(
           id: 'b1',
@@ -81,6 +107,21 @@ void main() {
         ),
       ];
       await _pump(tester, studentId: 's1', badges: badges);
+      expect(
+        find.byKey(const ValueKey('trophy_collection_card')),
+        findsOneWidget,
+      );
+      // 트로피 아이템이 provider 배지로 렌더링되어야 함 (#936 핵심 검증)
+      expect(
+        find.byKey(const ValueKey('trophy_collection_item_b1')),
+        findsOneWidget,
+        reason: '#936: provider 배지 b1 이 트로피 그리드에 노출되어야 한다',
+      );
+    });
+
+    // #936: 빈 배지 → 트로피 아이템 0건 (빈 상태)
+    testWidgets('TrophyCollectionCard 빈 상태 — badges 0개 (#936)', (tester) async {
+      await _pump(tester, studentId: 's1', badges: const []);
       expect(
         find.byKey(const ValueKey('trophy_collection_card')),
         findsOneWidget,

@@ -7,7 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/daily_practice.dart';
-import '../../domain/entities/gamification.dart';
+import '../providers/gamification_provider.dart';
 import '../providers/growth_heatmap_provider.dart';
 import '../widgets/heatmap_day_detail_sheet.dart';
 import '../widgets/trophy_collection_card.dart';
@@ -21,17 +21,20 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
   const StudentGrowthDetailScreen({
     super.key,
     required this.studentId,
-    this.earnedBadges = const [],
     this.isUnder14 = false,
   });
 
   final String studentId;
-  final List<PracticeBadge> earnedBadges;
   final bool isUnder14;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final heatmapAsync = ref.watch(growthHeatmapProvider(studentId));
+    // #936: earnedBadges 는 provider 에서 읽어야 트로피 그리드에 반영됨.
+    // 라우터에서 직접 전달하지 않아도 studentGamificationProvider 가 최신 값을 공급.
+    final gamificationAsync = ref.watch(studentGamificationProvider(studentId));
+    final earnedBadges =
+        gamificationAsync.valueOrNull?.earnedBadges ?? const [];
 
     return NotebookScreenScaffold(
       appBarTitle: AppStrings.growthDetailScreenTitle,
@@ -47,31 +50,34 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
             ),
             SizedBox(height: AppSpacing.space3),
             heatmapAsync.when(
-              data: (heatmap) => YearHeatmapGrid(
-                heatmap: heatmap,
-                asOf: DateTime.now().toUtc(),
-                onDayTap: (date) {
-                  final daily = heatmap.days[date];
-                  showNotebookBottomSheet<void>(
-                    context: context,
-                    builder: (_) => HeatmapDayDetailSheet(
-                      date: date,
-                      daily: daily ?? const DailyPractice(),
-                    ),
-                  );
-                },
-              ),
+              data:
+                  (heatmap) => YearHeatmapGrid(
+                    heatmap: heatmap,
+                    asOf: DateTime.now().toUtc(),
+                    onDayTap: (date) {
+                      final daily = heatmap.days[date];
+                      showNotebookBottomSheet<void>(
+                        context: context,
+                        builder:
+                            (_) => HeatmapDayDetailSheet(
+                              date: date,
+                              daily: daily ?? const DailyPractice(),
+                            ),
+                      );
+                    },
+                  ),
               loading: () => const _LoadingPlaceholder(),
               // #74 무음 실패(SizedBox.shrink) → 보이는 에러 상태
-              error: (_, __) => Padding(
-                padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
-                child: Text(
-                  AppStrings.errorOccurred,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkTertiary,
+              error:
+                  (_, __) => Padding(
+                    padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                    child: Text(
+                      AppStrings.errorOccurred,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.inkTertiary,
+                      ),
+                    ),
                   ),
-                ),
-              ),
             ),
             SizedBox(height: AppSpacing.space5),
 
