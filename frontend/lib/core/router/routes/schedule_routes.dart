@@ -175,7 +175,9 @@ List<GoRoute> scheduleRoutes = [
     name: 'myBookings',
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
-      return MyBookingsScreen(
+      // 변경권 수·subscriptionId 는 라우트 param 이 아니라 학생 활성 수강권에서
+      // 파생한다(MyBookingsRoute). 가짜 기본값(?? 2) 제거 — #522.
+      return MyBookingsRoute(
         studentId:
             extra?['studentId'] ?? state.uri.queryParameters['studentId'] ?? '',
         studentName:
@@ -188,13 +190,8 @@ List<GoRoute> scheduleRoutes = [
             extra?['teacherName'] ??
             state.uri.queryParameters['teacherName'] ??
             '',
-        remainingReschedules: extra?['remainingReschedules'] ?? 2,
-        totalReschedules: extra?['totalReschedules'] ?? 2,
         instrument:
             extra?['instrument'] ?? state.uri.queryParameters['instrument'],
-        subscriptionId:
-            extra?['subscriptionId'] ??
-            state.uri.queryParameters['subscriptionId'], // 🆕
       );
     },
   ),

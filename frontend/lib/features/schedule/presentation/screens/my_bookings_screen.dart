@@ -18,6 +18,85 @@ import '../providers/teacher_availability_providers.dart';
 import 'booking_cancel_screen.dart';
 import 'booking_reschedule_screen.dart';
 import 'lesson_booking_screen.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
+import '../../../subscription/subscription_facade.dart'
+    show activeSubscriptionBetweenProvider;
+
+/// Route-level resolver for [MyBookingsScreen].
+///
+/// 변경/취소 진입점들이 변경권 수·subscriptionId 를 하드코딩(가짜 0/0·2/2)으로
+/// 넘겨 버튼이 죽거나(#522) remote 쓰기가 빈 값으로 실패하던 문제를, 학생의 활성
+/// 수강권(SSOT)에서 직접 파생해 차단한다. teacherId 가 빈 보조 진입점(#521)은
+/// 후속 작업에서 자신의 teacherId 를 전달하도록 한다.
+class MyBookingsRoute extends ConsumerWidget {
+  final String studentId;
+  final String studentName;
+  final String teacherId;
+  final String teacherName;
+  final String? instrument;
+
+  const MyBookingsRoute({
+    super.key,
+    required this.studentId,
+    required this.studentName,
+    required this.teacherId,
+    required this.teacherName,
+    this.instrument,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 학생 본인 화면 — studentId 가 비면 현재 로그인 사용자 (route_params 폴백 원칙).
+    final resolvedStudentId = studentId.isNotEmpty
+        ? studentId
+        : ref.watch(currentUserIdProvider);
+
+    // teacherId 가 없으면 정확한 수강권을 특정할 수 없어 변경권 0 (버튼 비활성).
+    if (teacherId.isEmpty) {
+      return _screen(resolvedStudentId, remaining: 0, total: 0, subId: null);
+    }
+
+    final subAsync = ref.watch(
+      activeSubscriptionBetweenProvider(
+        studentId: resolvedStudentId,
+        teacherId: teacherId,
+      ),
+    );
+
+    return subAsync.when(
+      data: (sub) => _screen(
+        resolvedStudentId,
+        remaining: sub?.remainingReschedule ?? 0,
+        total: sub?.effectiveRescheduleAllowance ?? 0,
+        subId: sub?.id,
+      ),
+      loading: () => const NotebookScreenScaffold(
+        backgroundColor: AppColors.paper,
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, _) =>
+          _screen(resolvedStudentId, remaining: 0, total: 0, subId: null),
+    );
+  }
+
+  Widget _screen(
+    String resolvedStudentId, {
+    required int remaining,
+    required int total,
+    required String? subId,
+  }) {
+    return MyBookingsScreen(
+      studentId: resolvedStudentId,
+      studentName: studentName,
+      teacherId: teacherId,
+      teacherName: teacherName,
+      remainingReschedules: remaining,
+      totalReschedules: total,
+      instrument: instrument,
+      subscriptionId: subId,
+    );
+  }
+}
 
 /// My bookings screen
 ///
