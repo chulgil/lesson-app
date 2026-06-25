@@ -393,7 +393,14 @@ class RecordingNotifier extends _$RecordingNotifier {
   /// Play a recording.
   Future<void> playRecording(String recordingId) async {
     try {
-      final recording = state.recordings.firstWhere((r) => r.id == recordingId);
+      // Find recording, guard against stale id (fixes #934)
+      Recording? recording;
+      try {
+        recording = state.recordings.firstWhere((r) => r.id == recordingId);
+      } catch (e) {
+        state = state.copyWith(error: 'Recording not found');
+        return;
+      }
 
       // Check if file exists
       final file = File(recording.localPath);
