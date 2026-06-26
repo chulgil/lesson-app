@@ -51,7 +51,14 @@ class PracticeRecordingService {
         evidence.durationMinutes >= JournalThresholds.fullMinutes
             ? MarkIntensity.full
             : MarkIntensity.short;
-    await journalRepository?.upsertMark(studentId, date, journalIntensity);
+    // 연습장 도장은 best-effort — journal 미가용/실패가 본경로(heatmap/quest)를
+    // 막지 않도록 가드 (#424). EmptyPracticeJournalRepository 는 no-op 이지만
+    // 미래 remote 구현이 throw 해도 quest bump 가 스킵되지 않게 한다.
+    try {
+      await journalRepository?.upsertMark(studentId, date, journalIntensity);
+    } catch (_) {
+      // 도장 파생 실패는 조용히 무시 — 본경로는 계속 진행한다.
+    }
     if (evidence.source != PracticeSource.recording) {
       await _bumpPracticeMinutesQuests(studentId, evidence.durationMinutes);
     }

@@ -6,6 +6,8 @@ import 'package:lessonaza/features/gamification/domain/entities/quest_origin.dar
 import 'package:lessonaza/features/gamification/domain/entities/student_quest.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_evidence.dart';
 import 'package:lessonaza/features/practice/domain/services/practice_recording_service.dart';
+import 'package:lessonaza/features/practice_journal/data/repositories/empty_practice_journal_repository.dart';
+import 'package:lessonaza/features/practice_journal/domain/entities/practice_mark.dart';
 
 StudentQuest _quest({
   String id = 'q1',
@@ -25,6 +27,16 @@ StudentQuest _quest({
   endDate: DateTime(2026, 6, 30),
   isCompleted: isCompleted,
 );
+
+/// upsertMark 가 throw 하는 stub — #424 가드(본경로 보호) 검증용.
+class _ThrowingJournalRepository extends EmptyPracticeJournalRepository {
+  @override
+  Future<void> upsertMark(
+    String childProfileId,
+    DateTime date,
+    MarkIntensity intensity,
+  ) async => throw UnsupportedError('boom');
+}
 
 void main() {
   late MockGrowthHeatmapRepository heatmap;
@@ -239,6 +251,33 @@ void main() {
       );
       final all = await quest.getQuestsByOrigin('s1', QuestOrigin.selfCreated);
       expect(all.single.currentValue, 5); // 무변 (recording 은 분 단위 X)
+    });
+  });
+
+  group('#424 — journal 훅 가드', () {
+    test('journal upsertMark throw 해도 heatmap+quest 본경로 진행', () async {
+      await quest.createQuest(
+        _quest(id: 'q1', type: ChallengeType.practiceMinutes, currentValue: 5),
+      );
+      final throwingService = PracticeRecordingService(
+        heatmapRepository: heatmap,
+        questRepository: quest,
+        journalRepository: _ThrowingJournalRepository(),
+      );
+      // 가드가 throw 를 삼켜 본경로가 완료되어야 한다 (예외 전파 X).
+      await throwingService.recordPractice(
+        's1',
+        PracticeEvidence(
+          source: PracticeSource.metronome,
+          durationMinutes: 7,
+          occurredAt: DateTime.utc(2026, 6, 11),
+          metadata: const {},
+        ),
+      );
+      final hm = await heatmap.getHeatmap('s1');
+      expect(hm.days[DateTime.utc(2026, 6, 11)]?.metronomeMinutes, 7);
+      final all = await quest.getQuestsByOrigin('s1', QuestOrigin.selfCreated);
+      expect(all.single.currentValue, 12); // 5 + 7 — 가드 없으면 throw 로 스킵
     });
   });
 }
