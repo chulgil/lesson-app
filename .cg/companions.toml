@@ -18,3 +18,12 @@ install = "npm install -g @agentmemory/agentmemory (서버 기동: agentmemory)"
 use = "agentmemory 서버 기동 후 자동 hook 캡처 + 회상"
 skill = "cg-companion-agentmemory"
 repo = "https://github.com/rohitg00/agentmemory"
+
+[rtk]
+purpose = "Bash 출력 압축 프록시 — ls/cat/grep/git 등 토큰 60~90%↓ (Rust Token Killer)"
+kind = "cli"
+detect = "rtk"
+install = "brew install rtk (또는 cargo install --git https://github.com/rtk-ai/rtk). jq 필요."
+use = "rtk init -g 로 PreToolUse(Bash) 훅 자동 설치 → Bash 출력 자동 압축"
+skill = "cg-companion-rtk"
+repo = "https://github.com/rtk-ai/rtk"
