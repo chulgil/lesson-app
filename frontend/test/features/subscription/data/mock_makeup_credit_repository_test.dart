@@ -44,5 +44,47 @@ void main() {
         throwsA(isA<Exception>()),
       );
     });
+
+    group('useCredit (spend — #928)', () {
+      test('marks an unused credit used with usedAt/usedLessonId', () async {
+        final repo = MockMakeupCreditRepository();
+        final unused = (await repo.listStudentCredits()).firstWhere(
+          (c) => !c.isUsed,
+        );
+
+        final updated = await repo.useCredit(
+          creditId: unused.id,
+          lessonId: 'lesson-77',
+        );
+        expect(updated.isUsed, isTrue);
+        expect(updated.usedLessonId, 'lesson-77');
+
+        // Persisted in the store, not just the returned copy.
+        final stored = (await repo.listStudentCredits()).firstWhere(
+          (c) => c.id == unused.id,
+        );
+        expect(stored.isUsed, isTrue);
+        expect(stored.usedLessonId, 'lesson-77');
+      });
+
+      test('throws when credit already used', () async {
+        final repo = MockMakeupCreditRepository();
+        final used = (await repo.listStudentCredits()).firstWhere(
+          (c) => c.isUsed,
+        );
+        expect(
+          () => repo.useCredit(creditId: used.id, lessonId: 'lesson-1'),
+          throwsA(isA<Exception>()),
+        );
+      });
+
+      test('throws when credit not found', () async {
+        final repo = MockMakeupCreditRepository();
+        expect(
+          () => repo.useCredit(creditId: 'no-such-id', lessonId: 'lesson-1'),
+          throwsA(isA<Exception>()),
+        );
+      });
+    });
   });
 }

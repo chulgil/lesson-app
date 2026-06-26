@@ -23,4 +23,17 @@ abstract class MakeupCreditRepository {
   /// Teacher-side revoke of an unused credit (mistaken grant cleanup).
   /// Server rejects (409) if the credit is already used.
   Future<void> revokeCredit(String creditId);
+
+  /// Student-side: spend one makeup credit on a booking (spec §5.3).
+  ///
+  /// Marks [creditId] used against [lessonId] and returns the updated entity.
+  /// Rejects if the credit is already used or expired.
+  ///
+  /// Note: the production booking endpoint resolves credit use server-side via
+  /// `POST /api/bookings { useCredit }` (spec §8.1), so the remote client has no
+  /// standalone endpoint for this — see [RemoteMakeupCreditRepository.useCredit].
+  Future<MakeupCredit> useCredit({
+    required String creditId,
+    required String lessonId,
+  });
 }

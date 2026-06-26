@@ -76,4 +76,19 @@ class MakeupCreditActions {
     _ref.invalidate(teacherMakeupCreditsProvider(studentId));
     _ref.invalidate(studentMakeupCreditsProvider);
   }
+
+  /// Student-side: spend the earliest-expiring available credit on [lessonId]
+  /// at booking time (spec §5.3 / #928). Returns true when a credit was spent,
+  /// false when the student has none available (caller falls back to regular).
+  Future<bool> useOldestCredit({required String lessonId}) async {
+    final balance = await _ref.read(studentMakeupCreditBalanceProvider.future);
+    if (!balance.hasAny) return false;
+    // `available` is pre-sorted earliest-expiry first (fromCredits) — spend that
+    // one so soon-to-expire credits are consumed before they lapse.
+    final credit = balance.available.first;
+    final repo = _ref.read(makeupCreditRepositoryProvider);
+    await repo.useCredit(creditId: credit.id, lessonId: lessonId);
+    _ref.invalidate(studentMakeupCreditsProvider);
+    return true;
+  }
 }

@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_date_navigator.dart';
@@ -51,6 +52,11 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
   late DateTime _selectedDate;
   AvailabilitySlot? _selectedSlot;
   bool _isBooking = false;
+
+  /// Booking-time deduction source (#928). Defaults to the regular subscription;
+  /// the credit option only appears when the student has spendable credits.
+  BookingPaymentSource _paymentSource =
+      BookingPaymentSource.regularSubscription;
 
   @override
   void initState() {
@@ -223,6 +229,7 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
 
   Widget _buildBottomBar() {
     final slot = _selectedSlot!;
+    final balance = ref.watch(studentMakeupCreditBalanceProvider).valueOrNull;
     return NotebookCard(
       color: AppColors.paperDark,
       child: Padding(
@@ -240,6 +247,15 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
                 color: AppColors.inkSecondary,
               ),
             ),
+            // #928: choose deduction source when the student has makeup credits.
+            if (balance != null && balance.hasAny) ...[
+              const SizedBox(height: AppSpacing.space3),
+              MakeupCreditUseSelector(
+                balance: balance,
+                selected: _paymentSource,
+                onChanged: (source) => setState(() => _paymentSource = source),
+              ),
+            ],
             const SizedBox(height: AppSpacing.space3),
             SizedBox(
               width: double.infinity,
@@ -329,6 +345,7 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         slotEndTime: slot.endTime.toFlutterTimeOfDay(),
         instrument: widget.params.instrument,
         lessonType: LessonType.oneTime,
+        useCredit: _paymentSource == BookingPaymentSource.makeupCredit,
       );
       if (ref.read(slotBookingNotifierProvider).hasError) {
         throw Exception('slot booking failed');
