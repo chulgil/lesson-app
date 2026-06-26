@@ -173,3 +173,21 @@ grep -rn "🎵\|🎶\|❤️\|⭐" frontend/lib --include="*.dart"
 ```
 
 **자동 감지**: `.claude/hooks/check-notebook-icon.sh` PostToolUse 훅 (stderr 경고, exit 0)
+
+## 일관성 계약 — C1~C8 (전 기능 감사 2026-06-26, HARD-GATE)
+
+> 23개 기능 전수 일관성 감사(81건)에서 도출한 **불변식**. 신규/수정 코드는 C1~C8 을 통과해야 한다.
+> 근거·위반 목록: 옵시디언 `37-일관성-계약-전기능감사-2026-06-26`. 멀티 Discipline 공통 UX 룰(U1~U8) 추상화의 전제 — 이슈 #986~#992.
+
+| # | 불변식 | rg 강제 |
+|---|---|---|
+| C1 | **빈 상태 = `EmptyStateWidget`만** (icon 32px+inkTertiary / pieceTitle / bodyMedium / OutlinedButton). icon 48/56/64 손코딩 금지 | `rg -n 'Icon\(.*size:\s*(48\|56\|64)' frontend/lib/features/` × '없습니다' 컨텍스트 |
+| C2 | **enum 이모지 getter 금지.** 상태/타입 아이콘은 `IconData`(Material Icons.*/InstrumentColors)만 | `rg -nP 'String get (emoji\|icon\|statusIcon)' frontend/lib/features/*/domain/ frontend/lib/features/*/presentation/extensions/` + `flutter test test/architecture` |
+| C3 | **상태→라벨/색상은 presentation/extensions getter 1곳 SSOT.** 인라인 switch 금지 | `rg -n 'case (LessonStatus\|NoteAccessStatus\|MembershipStatus)\.' frontend/lib/features/ \| rg -v 'extensions/'` |
+| C4 | **동일 의미 CTA·문구는 AppStrings 단일 상수.** 동의어(showMore/studentHomeViewAllSpaced/cannotLoadData…) 신규 금지 | `rg -n 'studentHomeViewAllSpaced\|showMore' frontend/lib/features/` |
+| C5 | **사용자 한글은 AppStrings/AppLocalizations만.** 인라인 리터럴 금지 | `rg -n "Text\('[가-힣]" frontend/lib/features/` · 훅 `i18n-l10n-guard.py` |
+| C6 | **반복 리스트 행 편집·삭제는 `SwipeActionTile`만**(우→좌). trailing PopupMenuButton 편집/삭제 금지 | `rg -n 'PopupMenuButton' frontend/lib/features/` × 행 컨텍스트 |
+| C7 | **형제 카드 로딩/에러 단일 규칙.** indeterminate=CircularProgressIndicator만(Linear=진행률 전용), 형제 에러=공통 `_ErrorView` | 디렉토리 내 `rg -n 'LinearProgressIndicator\|SizedBox.shrink'` 혼용 |
+| C8 | **배지·소프트 배경은 시맨틱 토큰만.** `withValues(alpha:)` raw 톤·Material Colors.red/grey 금지, 한 화면 3색 이하 | `rg -n 'withValues\(alpha:' frontend/lib/features/ \| rg -v 'Soft'` · `rg -n 'Colors\.(red\|grey)\['` |
+
+**잘 지켜지는 기반(불변, 재점검 불요)**: AppColors raw `Color(0x)` 0건 · `BorderRadius.zero` · `NotebookScreenScaffold` 셸 · `inkQuaternary` 카드 테두리 · 전체화면 `Center(CircularProgressIndicator)` · AppSpacing 토큰.
