@@ -1187,6 +1187,7 @@ class AppStrings {
   static String cancellationCreditUsed(int used, int remaining) =>
       '변경/취소권 $used회 사용 · 잔여 $remaining회';
   static const cancellationNoCreditUsed = '마감 시간 전 취소 · 변경/취소권 미사용';
+  static const rescheduleNoCreditUsed = '마감 시간 전 변경 · 변경/취소권 미사용';
   static const cancellationFreeProcess = '무료 처리';
   static const cancellationAcknowledge = '확인';
   static const cancellationFreeConfirmDialog =
@@ -1645,6 +1646,9 @@ class AppStrings {
 
   /// 취소 불가 (배지)
   static const bookingCancelImpossible = '취소 불가';
+
+  /// 변경 불가 (배지) — 마감 후 변경/취소권 소진
+  static const bookingRescheduleImpossible = '변경 불가';
 
   /// 변경/취소 횟수 모두 사용 안내
   static String rescheduleQuotaExhausted(int total) =>
