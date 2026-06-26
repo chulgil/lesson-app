@@ -12,6 +12,8 @@ import '../../../notifications/domain/entities/notification.dart';
 import '../../../notifications/notifications_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/availability_slot.dart';
+import '../../domain/entities/cancel_reason.dart';
+import '../../domain/services/cancellation_credit_policy.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_date_navigator.dart';
 import '../widgets/availability/empty_slots_suggestion.dart';
@@ -32,6 +34,8 @@ class BookingRescheduleScreen extends ConsumerStatefulWidget {
   final int totalReschedules;
   final String? instrument;
   final String? subscriptionId; // 🆕 For reschedule count deduction
+  final int
+  cancelDeadlineHours; // Free-change window (reschedule_credit_spec §3)
 
   const BookingRescheduleScreen({
     super.key,
@@ -46,6 +50,7 @@ class BookingRescheduleScreen extends ConsumerStatefulWidget {
     required this.totalReschedules,
     this.instrument,
     this.subscriptionId,
+    this.cancelDeadlineHours = 12,
   });
 
   @override
@@ -166,8 +171,39 @@ class _BookingRescheduleScreenState
   }
 
   Widget _buildRescheduleCountBadge() {
-    final isLastChance = widget.remainingReschedules == 1;
-    final cannotReschedule = widget.remainingReschedules <= 0;
+    final outcome = _computeOutcome();
+
+    // Before the deadline → free, regardless of remaining credits
+    // (reschedule_credit_spec §3).
+    if (!outcome.blocked && outcome.creditUsed == 0) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+        child: Row(
+          children: [
+            const Icon(Icons.swap_horiz, color: AppColors.ink, size: 20),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                AppStrings.rescheduleNoCreditUsed,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.ink,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // After the deadline: one credit will be used; warn on the last one.
+    final isLastChance = outcome.remainingAfter == 0;
+    final cannotReschedule = outcome.blocked;
 
     if (cannotReschedule) {
       return Container(
@@ -399,8 +435,7 @@ class _BookingRescheduleScreenState
   }
 
   Widget _buildActionButtons() {
-    final canReschedule = widget.remainingReschedules > 0;
-    final isLastChance = widget.remainingReschedules == 1;
+    final canReschedule = !_computeOutcome().blocked;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -444,9 +479,7 @@ class _BookingRescheduleScreenState
             width: double.infinity,
             child: FilledButton(
               onPressed:
-                  canReschedule && !_isLoading
-                      ? () => _handleReschedule(isLastChance)
-                      : null,
+                  canReschedule && !_isLoading ? _handleReschedule : null,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
                 padding: const EdgeInsets.symmetric(
@@ -480,9 +513,45 @@ class _BookingRescheduleScreenState
     );
   }
 
-  Future<void> _handleReschedule(bool isLastChance) async {
-    if (isLastChance) {
-      // Show confirmation dialog for last chance
+  /// Scheduled lesson start datetime (currentDate + currentStartTime).
+  DateTime _lessonStart() => DateTime(
+    widget.currentDate.year,
+    widget.currentDate.month,
+    widget.currentDate.day,
+    widget.currentStartTime.hour,
+    widget.currentStartTime.minute,
+  );
+
+  /// Reschedule credit outcome per spec (CancellationCreditPolicy = SSOT).
+  /// A reschedule is a student-reason change: free before the deadline, one
+  /// credit after, blocked after the deadline with no credits left
+  /// (reschedule_credit_spec §3).
+  CancellationCreditOutcome _computeOutcome() =>
+      const CancellationCreditPolicy().compute(
+        reason: CancelReason.studentSchedule,
+        lessonStart: _lessonStart(),
+        now: DateTime.now(),
+        deadlineHours: widget.cancelDeadlineHours,
+        usedReschedule: widget.totalReschedules - widget.remainingReschedules,
+        maxReschedule: widget.totalReschedules,
+      );
+
+  Future<void> _handleReschedule() async {
+    // Re-evaluate at tap time in case the lesson crossed the deadline while
+    // the screen was open.
+    final outcome = _computeOutcome();
+    if (outcome.blocked) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.bookingRescheduleImpossible)),
+        );
+      }
+      return;
+    }
+
+    // Confirm only when this change will consume the last credit (after the
+    // deadline). Before-deadline changes are free — no dialog.
+    if (outcome.creditUsed > 0 && outcome.remainingAfter == 0) {
       final confirmed = await showNotebookDialog<bool>(
         context: context,
         title: AppStrings.bookingRescheduleLastChanceDialogTitle,
@@ -517,10 +586,10 @@ class _BookingRescheduleScreenState
       if (confirmed != true) return;
     }
 
-    await _performReschedule();
+    await _performReschedule(outcome);
   }
 
-  Future<void> _performReschedule() async {
+  Future<void> _performReschedule(CancellationCreditOutcome outcome) async {
     if (_selectedSlot == null) return;
 
     setState(() => _isLoading = true);
@@ -569,18 +638,21 @@ class _BookingRescheduleScreenState
         rethrow;
       }
 
-      // 3. 🆕 Deduct reschedule allowance from subscription (only after the
-      //    slot swap succeeded).
-      int newRemainingReschedules = widget.remainingReschedules - 1;
-      if (widget.subscriptionId != null) {
-        final updated = await ref
-            .read(subscriptionNotifierProvider(widget.studentId).notifier)
-            .useReschedule(widget.subscriptionId!);
-        newRemainingReschedules = updated.remainingReschedule;
-      }
+      // 3. Deduct a credit only when the policy charges this change (after
+      //    the deadline). Before-deadline changes are free
+      //    (reschedule_credit_spec §3) — no deduction, no usage notification.
+      if (outcome.creditUsed > 0) {
+        int newRemainingReschedules = widget.remainingReschedules - 1;
+        if (widget.subscriptionId != null) {
+          final updated = await ref
+              .read(subscriptionNotifierProvider(widget.studentId).notifier)
+              .useReschedule(widget.subscriptionId!);
+          newRemainingReschedules = updated.remainingReschedule;
+        }
 
-      // 4. 🆕 Send notification about reschedule allowance usage
-      await _sendRescheduleNotification(newRemainingReschedules);
+        // 4. Notify about reschedule allowance usage.
+        await _sendRescheduleNotification(newRemainingReschedules);
+      }
 
       if (mounted) {
         // Show success and pop

@@ -496,6 +496,7 @@ class MyBookingsScreen extends ConsumerWidget {
               instrument: instrument,
               subscriptionId:
                   subscriptionId, // 🆕 For reschedule count deduction
+              cancelDeadlineHours: cancelDeadlineHours,
             ),
       ),
     );
