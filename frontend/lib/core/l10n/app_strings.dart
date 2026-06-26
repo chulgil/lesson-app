@@ -1,3 +1,5 @@
+import 'string_overlay.dart';
+
 /// Centralized UI strings for the app.
 ///
 /// All user-facing text should reference this class instead of hardcoding.
@@ -6976,16 +6978,25 @@ class AppStrings {
 
   // ── Practice Domain (연습 도메인 한글 상수) ────────────────────────
 
-  // -- Metronome --
-  static const metronomeTimeSignaturePickerTitle = '박자표 선택';
-  static const metronomeSimpleTimeTitle = '단순 박자';
-  static const metronomeCompoundTimeTitle = '복합 박자';
-  static const metronomeSubdivisionPickerTitle = '서브디비전 선택';
-  static const metronomeBasicPatternTitle = '기본 패턴';
-  static const metronomeVariationTitle = '베리에이션 (쉼표 포함)';
-  static const metronomeOptionsTitle = '옵션';
-  static const metronomeVisualFlashLabel = '시각 플래시';
-  static const metronomeVibrationLabel = '진동';
+  // -- Metronome -- (분야 의존 문구 → StringOverlay #968, music overlay 위임)
+  static String get metronomeTimeSignaturePickerTitle =>
+      StringOverlayRegistry.music.metronome.timeSignaturePickerTitle;
+  static String get metronomeSimpleTimeTitle =>
+      StringOverlayRegistry.music.metronome.simpleTimeTitle;
+  static String get metronomeCompoundTimeTitle =>
+      StringOverlayRegistry.music.metronome.compoundTimeTitle;
+  static String get metronomeSubdivisionPickerTitle =>
+      StringOverlayRegistry.music.metronome.subdivisionPickerTitle;
+  static String get metronomeBasicPatternTitle =>
+      StringOverlayRegistry.music.metronome.basicPatternTitle;
+  static String get metronomeVariationTitle =>
+      StringOverlayRegistry.music.metronome.variationTitle;
+  static String get metronomeOptionsTitle =>
+      StringOverlayRegistry.music.metronome.optionsTitle;
+  static String get metronomeVisualFlashLabel =>
+      StringOverlayRegistry.music.metronome.visualFlashLabel;
+  static String get metronomeVibrationLabel =>
+      StringOverlayRegistry.music.metronome.vibrationLabel;
 
   // -- Goal --
   static const practiceGoalTodayTitle = '오늘의 목표';
