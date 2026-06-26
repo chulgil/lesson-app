@@ -32,14 +32,14 @@ void main() {
       find.byKey(const ValueKey('practice_start_card_header')),
       findsOneWidget,
     );
-    expect(find.text('🎵 민지의 연습'), findsOneWidget);
+    expect(find.text('민지의 연습'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('practice_start_card_streak')),
       findsOneWidget,
     );
-    expect(find.text('🔥 3일'), findsOneWidget);
+    expect(find.text('3일'), findsOneWidget);
     expect(find.byKey(const ValueKey('practice_start_button')), findsOneWidget);
-    expect(find.text('▶ 연습 시작'), findsOneWidget);
+    expect(find.text('연습 시작'), findsOneWidget);
     expect(find.text('어제 25분 했어요'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

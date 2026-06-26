@@ -37,7 +37,7 @@ void main() {
       find.byKey(const ValueKey('practice_start_card_header')),
       findsOneWidget,
     );
-    expect(find.text('🎵 민지짱의 연습'), findsOneWidget);
+    expect(find.text('민지짱의 연습'), findsOneWidget);
     expect(find.byKey(const ValueKey('practice_start_button')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

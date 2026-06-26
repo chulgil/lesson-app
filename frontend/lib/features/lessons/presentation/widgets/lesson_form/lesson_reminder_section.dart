@@ -87,10 +87,17 @@ class LessonReminderSection extends StatelessWidget {
                     color: AppColors.inkSecondary,
                   ),
                 ),
-                const Spacer(),
-                _ReminderTimeSelector(
-                  selectedMinutes: reminderMinutes,
-                  onChanged: onReminderTimeChanged,
+                const SizedBox(width: AppSpacing.space2),
+                // 좁은 폭(375)에서 시간 칩이 넘치면 우측 정렬 + 가로 스크롤.
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    reverse: true,
+                    child: _ReminderTimeSelector(
+                      selectedMinutes: reminderMinutes,
+                      onChanged: onReminderTimeChanged,
+                    ),
+                  ),
                 ),
               ],
             ),

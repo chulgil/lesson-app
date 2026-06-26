@@ -125,6 +125,11 @@ void main() {
     await tester.drag(card, const Offset(600, 0));
     await tester.pumpAndSettle();
 
+    // #931 SwipeActionTile: 드래그는 액션 노출만 → 노출된 '출석 확인' 액션을
+    // 탭해야 confirmAttendance 다이얼로그가 열린다.
+    await tester.tap(find.text(AppStrings.attendanceConfirmAction));
+    await tester.pumpAndSettle();
+
     // 완료/출석 확인 다이얼로그의 confirm 버튼('완료') 탭.
     // (스와이프 배경 라벨과 구분 위해 TextButton 으로 한정 — notebook 다이얼로그
     //  액션은 TextButton.)
