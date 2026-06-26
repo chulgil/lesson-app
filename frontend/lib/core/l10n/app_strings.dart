@@ -6870,9 +6870,6 @@ class AppStrings {
   static const parentHomeLessonNote = '레슨 노트';
   static const parentHomeViewDetail = '상세보기';
   static const parentHomeRegularLesson = '정규 레슨';
-  static const parentHomeLessonScheduled = '예정';
-  static const parentHomeLessonCompleted = '완료';
-  static const parentHomeLessonCancelled = '취소';
   static const parentHomeTodayPractice = '오늘의 연습';
   static const parentHomeFindTeacher = '선생님 찾기';
   static const parentHomeInviteCode = '초대코드 입력';

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/features/students/domain/entities/class_membership.dart';
@@ -71,8 +72,8 @@ void main() {
         createdAt: DateTime(2026),
       );
 
-      expect(academy.icon, '■');
-      expect(private.icon, '●');
+      expect(academy.icon, Icons.business);
+      expect(private.icon, Icons.person);
       expect(academy.displayLabel, 'ABC Music');
       expect(private.displayLabel, '개인레슨');
     });
@@ -94,10 +95,10 @@ void main() {
       const uncategorized = StudentGroup(students: <StudentWithMembership>[]);
 
       expect(group.title, 'ABC Music');
-      expect(group.icon, '■');
+      expect(group.icon, Icons.business);
       expect(group.count, 0);
       expect(uncategorized.title, '미분류');
-      expect(uncategorized.icon, '○');
+      expect(uncategorized.icon, Icons.circle_outlined);
     });
   });
 
@@ -125,7 +126,7 @@ void main() {
         createdAt: DateTime(2026),
       );
 
-      expect(LocationType.online.icon, '💻');
+      expect(LocationType.online.icon, Icons.computer);
       expect(online.displayAddress, 'Zoom');
       expect(physical.displayAddress, '서울시 강남구 2층');
     });

@@ -138,23 +138,7 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color;
-    switch (status) {
-      case LessonStatus.scheduled:
-      case LessonStatus.reschedulePending:
-        color = AppColors.paperAccent;
-      case LessonStatus.completed:
-        color = AppColors.paperOk;
-      case LessonStatus.cancelled:
-      case LessonStatus.cancelledByStudentAdvance:
-      case LessonStatus.cancelledByTeacher:
-      case LessonStatus.cancelledMutual:
-        color = AppColors.inkTertiary;
-      case LessonStatus.noShow:
-      case LessonStatus.cancelledByStudentLate:
-      case LessonStatus.studentAbsent:
-        color = AppColors.paperAccent;
-    }
+    final color = status.color;
 
     return Container(
       padding: const EdgeInsets.symmetric(
