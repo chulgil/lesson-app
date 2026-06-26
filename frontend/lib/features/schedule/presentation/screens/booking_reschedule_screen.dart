@@ -340,7 +340,13 @@ class _BookingRescheduleScreenState
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (slot.isRecommended && !isSelected) ...[
-                      Text('⭐', style: AppTypography.bodySmall),
+                      // #530 — recommended marker as a Material icon (UI-emoji
+                      // HARD-GATE: no ⭐ pictograph in UI text).
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 16,
+                        color: AppColors.paperAccent,
+                      ),
                       const SizedBox(width: AppSpacing.space1),
                     ],
                     Text(

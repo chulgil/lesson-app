@@ -410,6 +410,12 @@ class AppStrings {
   /// 이미 수업이 있는 시간
   static const slotConflict = '이미 수업이 있는 시간입니다';
 
+  /// 휴가/휴무 기간과 겹치는 시간 (#526 역제안 충돌 검증)
+  static const slotVacationConflict = '휴가 기간입니다';
+
+  /// 운영시간 밖 시간 (#526 역제안 충돌 검증)
+  static const slotOutsideOperatingHours = '운영시간이 아닙니다';
+
   /// 제안 시간 (N/3)
   static String suggestedSlotsCount(int count) => '제안 시간 ($count/3)';
 
