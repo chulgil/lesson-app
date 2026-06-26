@@ -475,6 +475,62 @@ void main() {
   );
 
   testWidgets(
+    'rejected event after a proposal resets the bottom bar to Default (#543)',
+    (tester) async {
+      // The acceptor previously stayed stuck in Waiting after a rejection
+      // because scheduleChangeRejected was not in the input bar terminal set.
+      final proposedEvent = RequestEvent(
+        id: 'event_proposed_543',
+        requestId: '',
+        actorType: ProposerRole.student,
+        actorId: 'student_1',
+        eventType: RequestEventType.scheduleChangeProposed,
+        suggestedSlots: [
+          TimeSlotOption(
+            id: 'slot_1',
+            dayOfWeek: 1,
+            startTime: '18:00',
+            endTime: '19:00',
+          ),
+        ],
+        createdAt: DateTime(2026, 5, 4, 18),
+        sessionNumber: 4,
+      );
+      final rejectedEvent = RequestEvent(
+        id: 'event_rejected_543',
+        requestId: '',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.scheduleChangeRejected,
+        message: '이번 주는 어려워요',
+        createdAt: DateTime(2026, 5, 7, 18),
+        sessionNumber: 4,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SubscriptionBottomInputBar(
+              subscription: _activeSubscription(),
+              viewerRole: 'student',
+              messageController: TextEditingController(),
+              events: [proposedEvent, rejectedEvent],
+              opponentName: '김선아',
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Rejection is terminal for both parties: the bar reverts to Default,
+      // never leaving the proposer stuck on Waiting / 결정 변경.
+      expect(find.text('김선아님의 응답을 기다리고 있습니다'), findsNothing);
+      expect(find.text('결정 변경'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'withdraw schedule event shows changed decision with strikethrough slot',
     (tester) async {
       await tester.pumpWidget(

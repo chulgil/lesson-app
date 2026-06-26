@@ -542,11 +542,21 @@ const _pendingScheduleChangeSourceTypes = {
   RequestEventType.lessonCancelled,
 };
 
-const _pendingScheduleChangeTerminalTypes = {
-  RequestEventType.scheduleChangeAccepted,
+/// SSOT for schedule-change negotiation terminal events shared across the
+/// subscription detail UI (#543). These types end the negotiation thread for
+/// BOTH parties, so the input bar reverts to Default and the pending badge
+/// clears. [scheduleChangeAccepted] is intentionally excluded here: the
+/// acceptor keeps seeing Waiting until the thread moves on, so accept is
+/// terminal only for the pending-list provider below.
+const scheduleChangeNegotiationTerminalTypes = {
   RequestEventType.scheduleChangeRejected,
   // #692: 72h 만료 시 양측 Default 복귀
   RequestEventType.scheduleChangeExpired,
+};
+
+const _pendingScheduleChangeTerminalTypes = {
+  RequestEventType.scheduleChangeAccepted,
+  ...scheduleChangeNegotiationTerminalTypes,
 };
 
 String _scheduleChangeThreadKey(RequestEvent event) {

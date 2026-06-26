@@ -68,7 +68,8 @@ void main() {
     });
 
     test('label - 역제안', () {
-      expect(RequestEventType.counterPropose.label, '다른 시간 제안하기');
+      // #548: counterPropose 는 proposeAlternative 와 구분되는 역제안 라벨.
+      expect(RequestEventType.counterPropose.label, '역제안');
     });
 
     test('label - 대안 수락', () {

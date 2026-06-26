@@ -595,6 +595,7 @@ class AppStrings {
   static const eventApprove = '수락';
   static const eventReject = '거절';
   static const eventProposeAlternative = '다른 시간 제안하기';
+  static const eventCounterPropose = '역제안';
   static const eventAcceptAlternative = '시간 수락';
   static const eventCancel = '취소';
   static const eventExpire = '기간 만료';
@@ -614,6 +615,8 @@ class AppStrings {
   static const eventTeacherAnnouncement = '공지';
   static const eventScheduleChanged = '스케줄 변경';
   static const eventLessonNoteAdded = '레슨 노트';
+  static const eventScheduleChangeReminder = '응답 리마인드';
+  static const eventMessage = '메시지';
   static const eventSubscriptionRenewed = '수강권 연장';
   static const eventSubscriptionCompleted = '수강 완료';
 
@@ -694,6 +697,9 @@ class AppStrings {
   static const scheduleChangeRecommended = '추천';
   static const scheduleChangeResponseNeeded = '일정 변경 응답이 필요합니다';
   static const scheduleChangeResponseAction = '일정 변경 응답 필요 →';
+
+  // ── Schedule Change Response — reject reason / accept memo (#544/#545) ──
+  static const scheduleChangeResponseMessageHint = '사유나 메모를 남겨주세요 (선택)';
 
   // ── Progress Bar Phase Labels ─────────────────────────────
 

@@ -102,5 +102,33 @@ void main() {
       );
       expect(noPreferredDay.preferredDayLabel, isNull);
     });
+
+    test(
+      'negotiating list-chip and status label share the same base (#547)',
+      () {
+        final request = UnifiedLessonRequest(
+          id: 'req_neg',
+          studentId: 'student_1',
+          teacherId: 'teacher_1',
+          type: LessonRequestType.regular,
+          instrument: '바이올린',
+          goal: UnifiedLessonGoal.hobby,
+          experience: UnifiedExperienceLevel.beginner,
+          status: UnifiedRequestStatus.negotiating,
+          currentRound: 2,
+          createdAt: DateTime(2026, 3, 1),
+        );
+
+        // Detail/short label has no round; chip enriches with the round but
+        // both must read the same base phrase so list and detail never drift.
+        expect(request.status.label, '시간 조율 중');
+        expect(request.statusChipLabel, '시간 조율 중 (2회차)');
+        expect(request.statusChipLabel, startsWith(request.status.label));
+
+        // When the round is unknown the chip collapses to the exact base label.
+        final noRound = request.copyWith(currentRound: 0);
+        expect(noRound.statusChipLabel, noRound.status.label);
+      },
+    );
   });
 }
