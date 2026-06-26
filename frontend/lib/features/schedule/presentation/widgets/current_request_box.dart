@@ -29,7 +29,6 @@ class CurrentRequestBox extends StatefulWidget {
   // Phase 1 callbacks
   final void Function(int slotIndex, String message)? onAccept;
   final VoidCallback? onCounterPropose;
-  final VoidCallback? onModify;
   final VoidCallback? onCancel;
   final VoidCallback? onWithdraw;
   final int? initialSelectedSlot;
@@ -67,7 +66,6 @@ class CurrentRequestBox extends StatefulWidget {
     this.onAccept,
     this.initialSelectedSlot,
     this.onCounterPropose,
-    this.onModify,
     this.onCancel,
     this.onWithdraw,
     this.onSendPaymentGuide,
