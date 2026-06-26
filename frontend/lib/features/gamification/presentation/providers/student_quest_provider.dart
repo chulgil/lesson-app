@@ -1,7 +1,10 @@
 // Student gamification P1 — quest providers.
 
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
+import '../../data/repositories/hive_student_quest_repository.dart';
 import '../../data/repositories/mock_student_quest_repository.dart';
 import '../../domain/entities/student_quest.dart';
 import '../../domain/repositories/student_quest_repository.dart';
@@ -10,8 +13,13 @@ part 'student_quest_provider.g.dart';
 
 /// P1: Mock 만 사용. P2 에서 BE 구현체 도입 시 환경 분기 추가 (O1 결정).
 @Riverpod(keepAlive: true)
-StudentQuestRepository studentQuestRepository(StudentQuestRepositoryRef ref) =>
-    MockStudentQuestRepository();
+StudentQuestRepository studentQuestRepository(StudentQuestRepositoryRef ref) {
+  // DEV(mock) / 실사용(Hive 로컬 영속) 분기 — box 부팅 사전 open (#422).
+  if (ref.watch(mockDataModeProvider)) return MockStudentQuestRepository();
+  return HiveStudentQuestRepository(
+    box: Hive.box<String>(HiveStudentQuestRepository.boxName),
+  );
+}
 
 @riverpod
 Future<List<StudentQuest>> activeQuests(
