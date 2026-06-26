@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -72,7 +73,7 @@ class _TunerStepState extends State<TunerStep> {
         children: [
           // 안내 텍스트
           Text(
-            '원하는 음을 선택하면 정확한 음높이를 확인할 수 있어요',
+            AppStrings.tunerStepGuide,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),

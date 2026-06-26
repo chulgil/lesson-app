@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -82,7 +83,7 @@ class _RecordingStepState extends State<RecordingStep> {
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space5),
               child: Text(
-                '버튼을 길게 눌러 녹음을 시작하세요\n(2초 이상)',
+                AppStrings.recordingStepGuide,
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
@@ -126,7 +127,7 @@ class _RecordingStepState extends State<RecordingStep> {
                 // Recording duration text
                 if (isRecording)
                   Text(
-                    '녹음중... ${_pressDuration.toStringAsFixed(1)}s',
+                    AppStrings.recordingInProgressSeconds(_pressDuration.toStringAsFixed(1)),
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
@@ -155,7 +156,7 @@ class _RecordingStepState extends State<RecordingStep> {
                   Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.space3),
                     child: Text(
-                      '조금 더 길게 눌러보세요',
+                      AppStrings.recordingStepHoldLonger,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.inkTertiary,
                       ),
@@ -182,7 +183,7 @@ class _RecordingStepState extends State<RecordingStep> {
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
                     child: Text(
-                      '원본 2.0초 → 자동 트리밍\n0.3 ~ 1.8초 (저장 가능)',
+                      AppStrings.recordingStepTrimInfo,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.paperAccent,
                       ),

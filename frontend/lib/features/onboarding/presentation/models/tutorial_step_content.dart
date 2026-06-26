@@ -1,3 +1,4 @@
+import '../../../../core/l10n/app_strings.dart';
 import '../../../profile/domain/entities/teacher_onboarding.dart';
 
 /// Tutorial step content for onboarding presentation.
@@ -20,19 +21,19 @@ class TutorialStepContent {
     TutorialStepContent(
       step: TutorialStep.welcome,
       title: '1. 선생님 기본 정보',
-      description: '이름과 대표 악기를 입력해 첫 설정을 완성하세요',
+      description: AppStrings.tutorialDescProfileSetup,
       imageAsset: 'assets/images/onboarding/welcome.png',
     ),
     TutorialStepContent(
       step: TutorialStep.inviteStudent,
       title: '2. 샘플 학생 만들기',
-      description: '학생 카드가 어떻게 보이는지 샘플로 확인하세요',
+      description: AppStrings.tutorialDescStudentPreview,
       imageAsset: 'assets/images/onboarding/invite.png',
     ),
     TutorialStepContent(
       step: TutorialStep.writeFeedback,
       title: '3. 첫 레슨 노트',
-      description: '레슨 후 남길 기록을 미리 작성해보세요',
+      description: AppStrings.tutorialDescLessonNote,
       imageAsset: 'assets/images/onboarding/feedback.png',
     ),
   ];

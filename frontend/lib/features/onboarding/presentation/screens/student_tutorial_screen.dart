@@ -122,7 +122,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                   TextButton(
                     onPressed: _skipTutorial,
                     child: Text(
-                      '건너뛰기',
+                      AppStrings.onboardingCategoryPreviewSkip,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkTertiary,
                       ),
@@ -188,7 +188,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                           minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
                         child: Text(
-                          '이전',
+                          AppStrings.onboardingPrevious,
                           style: AppTypography.button.copyWith(
                             color: AppColors.inkSecondary,
                           ),
@@ -213,7 +213,7 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
                       ),
                       onPressed: _canContinue ? _nextPage : null,
                       child: Text(
-                        isLastPage ? '시작하기' : '다음',
+                        isLastPage ? AppStrings.onboardingCategoryPreviewStart : AppStrings.onboardingNext,
                         style: AppTypography.button,
                       ),
                     ),
