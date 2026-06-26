@@ -55,14 +55,6 @@ extension PieceDisplay on Piece {
 }
 
 extension QuickReactionDisplay on QuickReaction {
-  String get emoji {
-    return switch (this) {
-      QuickReaction.good => '👍',
-      QuickReaction.excellent => '⭐',
-      QuickReaction.tryHarder => '💪',
-    };
-  }
-
   String get label {
     return switch (this) {
       QuickReaction.good => '잘했어요',
@@ -73,13 +65,6 @@ extension QuickReactionDisplay on QuickReaction {
 }
 
 extension StudentResponseDisplay on StudentResponse {
-  String get emoji {
-    return switch (this) {
-      StudentResponse.thanks => '🙏',
-      StudentResponse.question => '❓',
-    };
-  }
-
   String get label {
     return switch (this) {
       StudentResponse.thanks => '감사합니다',
@@ -110,14 +95,6 @@ extension PracticePriorityDisplay on PracticePriority {
       PracticePriority.must => '필수',
       PracticePriority.should => '권장',
       PracticePriority.could => '선택',
-    };
-  }
-
-  String get emoji {
-    return switch (this) {
-      PracticePriority.must => '⭐⭐⭐',
-      PracticePriority.should => '⭐⭐',
-      PracticePriority.could => '⭐',
     };
   }
 

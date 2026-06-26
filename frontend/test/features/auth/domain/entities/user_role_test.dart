@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/auth/domain/entities/user_role.dart';
 import 'package:lessonaza/features/auth/presentation/extensions/user_role_visuals.dart';
@@ -16,16 +17,16 @@ void main() {
       expect(UserRole.parent.label, '학부모');
     });
 
-    test('teacher has correct emoji', () {
-      expect(UserRole.teacher.emoji, '👩‍🏫');
+    test('teacher has correct icon', () {
+      expect(UserRole.teacher.icon, Icons.school);
     });
 
-    test('student has correct emoji', () {
-      expect(UserRole.student.emoji, '🎻');
+    test('student has correct icon', () {
+      expect(UserRole.student.icon, Icons.music_note);
     });
 
-    test('parent has correct emoji', () {
-      expect(UserRole.parent.emoji, '👨‍👩‍👧');
+    test('parent has correct icon', () {
+      expect(UserRole.parent.icon, Icons.family_restroom);
     });
 
     test('teacher has correct home route', () {
@@ -45,9 +46,9 @@ void main() {
       expect(labels.length, UserRole.values.length);
     });
 
-    test('all roles have unique emojis', () {
-      final emojis = UserRole.values.map((r) => r.emoji).toSet();
-      expect(emojis.length, UserRole.values.length);
+    test('all roles have unique icons', () {
+      final icons = UserRole.values.map((r) => r.icon).toSet();
+      expect(icons.length, UserRole.values.length);
     });
   });
 

@@ -137,21 +137,4 @@ class GroupClassBooking {
     }
   }
 
-  /// Get status icon
-  String get statusIcon {
-    switch (status) {
-      case GroupBookingStatus.confirmed:
-        return '✅';
-      case GroupBookingStatus.waitlist:
-        return '⏳';
-      case GroupBookingStatus.attended:
-        return '🟢';
-      case GroupBookingStatus.noShow:
-        return '🔴';
-      case GroupBookingStatus.cancelled:
-        return '❌';
-      case GroupBookingStatus.autoCancelled:
-        return '⚠️';
-    }
-  }
 }

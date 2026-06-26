@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../extensions/challenge_visuals.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
@@ -107,7 +108,8 @@ class _ChallengeItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(challenge.type.icon, style: AppTypography.bodyLarge),
+              Icon(challenge.type.icon,
+                  size: AppSpacing.iconMD, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(

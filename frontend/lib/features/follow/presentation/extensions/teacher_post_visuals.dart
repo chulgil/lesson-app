@@ -1,15 +1,17 @@
+import 'package:flutter/material.dart';
+
 import '../../../../core/l10n/app_strings.dart';
 import '../../domain/entities/teacher_post.dart';
 
 extension PostTypeVisualX on PostType {
-  String get emoji {
+  IconData get icon {
     switch (this) {
       case PostType.performance:
-        return '🎵';
+        return Icons.music_note;
       case PostType.event:
-        return '🎉';
+        return Icons.celebration;
       case PostType.notice:
-        return '📢';
+        return Icons.campaign;
     }
   }
 

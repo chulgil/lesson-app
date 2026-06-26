@@ -41,14 +41,6 @@ enum ChallengeType {
         pointsEarned => '포인트 획득',
       };
 
-  String get icon => switch (this) {
-        practiceDays => '📅',
-        practiceMinutes => '⏱️',
-        recordings => '🎙️',
-        lessons => '🎵',
-        streak => '🔥',
-        pointsEarned => '💎',
-      };
 }
 
 class Challenge {

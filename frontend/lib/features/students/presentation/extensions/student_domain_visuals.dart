@@ -135,34 +135,35 @@ extension ClassMembershipVisuals on ClassMembership {
 }
 
 extension LessonClassVisuals on LessonClass {
-  String get icon => type.icon;
+  IconData get icon => type.icon;
 
   String get displayLabel =>
       type == LessonClassType.academy ? name : AppStrings.individualLesson;
 }
 
 extension LessonClassTypeVisuals on LessonClassType {
-  String get icon => this == LessonClassType.academy ? '■' : '●';
+  IconData get icon =>
+      this == LessonClassType.academy ? Icons.business : Icons.person;
 }
 
 extension StudentGroupVisuals on StudentGroup {
   String get title => lessonClass?.name ?? '미분류';
-  String get icon => lessonClass?.icon ?? '○';
+  IconData get icon => lessonClass?.icon ?? Icons.circle_outlined;
 }
 
 extension LocationTypeVisuals on LocationType {
-  String get icon {
+  IconData get icon {
     switch (this) {
       case LocationType.academyRoom:
-        return '🏫';
+        return Icons.school;
       case LocationType.teacherStudio:
-        return '🏠';
+        return Icons.home;
       case LocationType.studentHome:
-        return '🚗';
+        return Icons.directions_car;
       case LocationType.externalPlace:
-        return '📍';
+        return Icons.place;
       case LocationType.online:
-        return '💻';
+        return Icons.computer;
     }
   }
 
@@ -183,7 +184,7 @@ extension LocationTypeVisuals on LocationType {
 }
 
 extension LessonLocationVisuals on LessonLocation {
-  String get icon => type.icon;
+  IconData get icon => type.icon;
   String get typeLabel => type.label;
 
   String get displayAddress {

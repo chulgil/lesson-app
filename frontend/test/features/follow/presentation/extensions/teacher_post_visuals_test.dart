@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/follow/domain/entities/teacher_post.dart';
 import 'package:lessonaza/features/follow/presentation/extensions/teacher_post_visuals.dart';
@@ -10,10 +11,10 @@ void main() {
       expect(PostType.notice.label, '공지사항');
     });
 
-    test('maps post type emoji', () {
-      expect(PostType.performance.emoji, '🎵');
-      expect(PostType.event.emoji, '🎉');
-      expect(PostType.notice.emoji, '📢');
+    test('maps post type icon', () {
+      expect(PostType.performance.icon, Icons.music_note);
+      expect(PostType.event.icon, Icons.celebration);
+      expect(PostType.notice.icon, Icons.campaign);
     });
   });
 }

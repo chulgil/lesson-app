@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../../domain/entities/teaching_resource.dart';
 
 extension TeachingResourceTypeVisuals on TeachingResourceType {
@@ -12,14 +14,14 @@ extension TeachingResourceTypeVisuals on TeachingResourceType {
     }
   }
 
-  String get icon {
+  IconData get icon {
     switch (this) {
       case TeachingResourceType.teacherRecording:
-        return '🎵';
+        return Icons.music_note;
       case TeachingResourceType.youtube:
-        return '🎬';
+        return Icons.smart_display;
       case TeachingResourceType.externalLink:
-        return '🔗';
+        return Icons.link;
     }
   }
 }

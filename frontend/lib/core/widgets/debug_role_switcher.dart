@@ -55,7 +55,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
               borderRadius: BorderRadius.zero,
             ),
             child: Text(
-              '${currentRole.emoji} ${currentRole.label}',
+              currentRole.label,
               style: AppTypography.caption.copyWith(
                 color: AppColors.paper,
                 fontWeight: FontWeight.w600,
@@ -118,7 +118,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
     // Show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${newRole.emoji} ${newRole.label} 모드로 전환'),
+        content: Text('${newRole.label} 모드로 전환'),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
         backgroundColor: _getRoleColor(newRole),
@@ -148,7 +148,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${role.emoji} ${role.label} 모드로 전환'),
+            content: Text('${role.label} 모드로 전환'),
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
             backgroundColor: _getRoleColor(role),
@@ -299,10 +299,7 @@ class _DebugOptionsSheet extends ConsumerWidget {
                             ),
                             child: Column(
                               children: [
-                                Text(
-                                  role.emoji,
-                                  style: const TextStyle(fontSize: 24),
-                                ),
+                                Icon(role.icon, size: 24),
                                 const SizedBox(height: AppSpacing.space1),
                                 Text(
                                   role.label,
