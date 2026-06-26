@@ -110,6 +110,7 @@ export 'domain/entities/subscription.dart';
 export 'domain/entities/subscription_proposal.dart';
 export 'domain/entities/subscription_template.dart';
 export 'domain/entities/subscription_usage.dart';
+export 'domain/entities/makeup_credit.dart';
 
 // =============================================================================
 // DOMAIN SERVICES — used by lessons feature for auto-proposal & renewal
@@ -129,6 +130,7 @@ export 'presentation/providers/subscription_lifecycle_service_providers.dart'
 export 'presentation/providers/subscription_proposal_providers.dart';
 export 'presentation/providers/subscription_providers.dart';
 export 'presentation/providers/subscription_template_providers.dart';
+export 'presentation/providers/makeup_credit_providers.dart';
 
 // =============================================================================
 // PRESENTATION — display extensions + reusable picker (manual lesson §2.5)
@@ -136,3 +138,5 @@ export 'presentation/providers/subscription_template_providers.dart';
 export 'presentation/extensions/subscription_visuals.dart';
 export 'presentation/widgets/subscription_picker_sheet.dart'
     show showSubscriptionPickerSheet;
+export 'presentation/widgets/makeup_credit_use_selector.dart'
+    show MakeupCreditUseSelector, BookingPaymentSource;

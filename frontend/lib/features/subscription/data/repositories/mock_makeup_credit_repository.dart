@@ -88,6 +88,30 @@ class MockMakeupCreditRepository implements MakeupCreditRepository {
     _credits.removeAt(index);
   }
 
+  @override
+  Future<MakeupCredit> useCredit({
+    required String creditId,
+    required String lessonId,
+  }) async {
+    final index = _credits.indexWhere((c) => c.id == creditId);
+    if (index == -1) {
+      throw Exception('Makeup credit not found: $creditId');
+    }
+    final credit = _credits[index];
+    if (credit.isUsed) {
+      throw Exception('이미 사용된 크레딧이에요.');
+    }
+    if (credit.isExpired(DateTime.now())) {
+      throw Exception('만료된 크레딧은 사용할 수 없어요.');
+    }
+    final used = credit.copyWith(
+      usedAt: DateTime.now(),
+      usedLessonId: lessonId,
+    );
+    _credits[index] = used;
+    return used;
+  }
+
   List<MakeupCredit> _sortedCopy() {
     return [..._credits]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }

@@ -1,4 +1,5 @@
 // #580 — LessonBookingScreen widget smoke + 핵심 인터랙션.
+// #928 — 보강 크레딧 출처 selector 노출 + 선택값 캡처.
 // ux-rules HARD-GATE: top-level 위젯 smoke test 필수.
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,9 @@ import 'package:lessonaza/features/schedule/data/repositories/mock_teacher_avail
 import 'package:lessonaza/features/schedule/domain/entities/availability_slot.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/lesson_booking_screen.dart';
+import 'package:lessonaza/features/subscription/domain/entities/makeup_credit.dart';
+import 'package:lessonaza/features/subscription/presentation/providers/makeup_credit_providers.dart';
+import 'package:lessonaza/features/subscription/presentation/widgets/makeup_credit_use_selector.dart';
 
 class _StubRepo extends MockTeacherAvailabilityRepository {
   final List<AvailabilitySlot> slots;
@@ -33,10 +37,24 @@ AvailabilitySlot _slot(String id, int hour) => AvailabilitySlot(
   status: AvailabilitySlotStatus.available,
 );
 
-Widget _harness(_StubRepo repo) {
+MakeupCredit _credit(String id) => MakeupCredit(
+  id: id,
+  studentId: 's1',
+  teacherId: 't1',
+  reason: MakeupCreditReason.teacherVacation,
+  createdAt: DateTime(2026, 6, 1),
+  expiresAt: DateTime(2026, 7, 1),
+);
+
+Widget _harness(_StubRepo repo, {List<MakeupCredit> credits = const []}) {
   return ProviderScope(
     overrides: [
       teacherAvailabilityRepositoryProvider.overrideWithValue(repo),
+      // #928: decouple the booking screen from the makeup repo — drive the
+      // spendable balance directly so selector exposure is deterministic.
+      studentMakeupCreditBalanceProvider.overrideWith(
+        (ref) async => MakeupCreditBalance(available: credits),
+      ),
     ],
     child: const MaterialApp(
       home: LessonBookingScreen(
@@ -88,5 +106,56 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  // #928 — 보강 크레딧 출처 선택 UI.
+  testWidgets('크레딧 보유 + 슬롯 선택 → 보강 크레딧 selector 노출', (tester) async {
+    await tester.pumpWidget(
+      _harness(
+        _StubRepo([_slot('a', 10)]),
+        credits: [_credit('c1'), _credit('c2')],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('10:00'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(MakeupCreditUseSelector), findsOneWidget);
+  });
+
+  testWidgets('크레딧 미보유 → selector 미노출 (정규 전용)', (tester) async {
+    await tester.pumpWidget(_harness(_StubRepo([_slot('a', 10)])));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('10:00'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MakeupCreditUseSelector), findsNothing);
+  });
+
+  testWidgets('보강 크레딧 옵션 탭 → 선택값이 makeupCredit 으로 캡처됨', (tester) async {
+    await tester.pumpWidget(
+      _harness(_StubRepo([_slot('a', 10)]), credits: [_credit('c1')]),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('10:00'));
+    await tester.pumpAndSettle();
+
+    // 기본값은 정규 수강권.
+    var selector = tester.widget<MakeupCreditUseSelector>(
+      find.byType(MakeupCreditUseSelector),
+    );
+    expect(selector.selected, BookingPaymentSource.regularSubscription);
+
+    await tester.tap(find.text('보강 크레딧 사용'));
+    await tester.pumpAndSettle();
+
+    selector = tester.widget<MakeupCreditUseSelector>(
+      find.byType(MakeupCreditUseSelector),
+    );
+    expect(selector.selected, BookingPaymentSource.makeupCredit);
   });
 }
