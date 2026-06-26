@@ -59,7 +59,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
             if (onViewAll != null)
               TextButton(
                 onPressed: onViewAll,
-                child: const Text(AppStrings.studentHomeViewAllSpaced),
+                child: const Text(AppStrings.viewAll),
               ),
           ],
         ),

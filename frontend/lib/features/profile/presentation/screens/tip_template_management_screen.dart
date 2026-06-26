@@ -135,7 +135,7 @@ class _TipTemplateManagementScreenState
                 ),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
-                  '템플릿을 불러오는데 실패했습니다',
+                  AppStrings.templateLoadFailed,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.inkSecondary,
                   ),

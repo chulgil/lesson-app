@@ -6660,7 +6660,6 @@ class AppStrings {
   static const studentHomeWeeklyPractice = '이번 주 연습';
   static const studentHomePracticeJournal = '연습 일지';
   static const studentHomeMySubscriptions = '내 수강권';
-  static const studentHomeViewAllSpaced = '전체 보기';
   static const studentHomeTrialLesson = '체험레슨';
   static const studentHomeScheduleChangeLabel = '일정 변경';
   static const studentHomeRetryBooking = '다른 시간으로 다시 신청';
@@ -6754,7 +6753,6 @@ class AppStrings {
   static const studentHomeEditAction = '편집';
   static const studentHomeScheduleTitle = '스케줄';
   static const studentHomeBookAction = '예약';
-  static const studentHomeDataLoadFailed = '데이터를 불러오는데 실패했습니다';
   static const studentHomePracticeEmpty = '아직 연습 과제가 없습니다';
   static const studentHomePracticeTeacherHint = '선생님이 과제를 등록하면 여기에 표시됩니다';
   static const studentHomeConnectTeacher = '선생님 연결하기';

@@ -91,7 +91,7 @@ class StudentDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
-                  '데이터를 불러오는데 실패했습니다',
+                  AppStrings.loadDataFailed,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.inkSecondary,
                   ),
