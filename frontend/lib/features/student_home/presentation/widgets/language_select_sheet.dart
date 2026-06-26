@@ -10,7 +10,10 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 
-/// Bottom sheet for language selection (MVP: Korean only).
+/// Bottom sheet for language selection.
+///
+/// MVP supports Korean only. EN/JP are not offered until a real locale
+/// provider exists, so no NO-OP "coming soon" rows are shown (#506).
 class LanguageSelectSheet extends StatelessWidget {
   const LanguageSelectSheet({super.key});
 
@@ -50,47 +53,11 @@ class LanguageSelectSheet extends StatelessWidget {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Korean - selected
+              // Korean — the only supported language (selected).
               _buildLanguageItem(
                 context,
-                flag: '🇰🇷',
-                name: '한국어',
-                isSelected: true,
+                name: AppStrings.studentHomeLanguageKorean,
                 onTap: () => Navigator.pop(context),
-              ),
-
-              const SizedBox(height: AppSpacing.space2),
-
-              // English - coming soon
-              _buildLanguageItem(
-                context,
-                flag: '🇺🇸',
-                name: 'English',
-                isSelected: false,
-                isComingSoon: true,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('English will be supported soon'),
-                    ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: AppSpacing.space2),
-
-              // Japanese - coming soon
-              _buildLanguageItem(
-                context,
-                flag: '🇯🇵',
-                name: '日本語',
-                isSelected: false,
-                isComingSoon: true,
-                onTap: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('日本語は準備中です')));
-                },
               ),
 
               const SizedBox(height: AppSpacing.space4),
@@ -103,10 +70,7 @@ class LanguageSelectSheet extends StatelessWidget {
 
   Widget _buildLanguageItem(
     BuildContext context, {
-    required String flag,
     required String name,
-    required bool isSelected,
-    bool isComingSoon = false,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
@@ -114,39 +78,21 @@ class LanguageSelectSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.paperAccentSoft : AppColors.paperDark,
-          border: Border.all(
-            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
-          ),
+          color: AppColors.paperAccentSoft,
+          border: Border.all(color: AppColors.paperAccent),
         ),
         child: Row(
           children: [
-            Text(flag, style: AppTypography.headingLarge.copyWith(height: 1)),
-            const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
                 name,
                 style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isComingSoon ? AppColors.inkTertiary : AppColors.ink,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
                 ),
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check_circle, color: AppColors.paperAccent, size: 22),
-            if (isComingSoon)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.inkTertiary.withValues(alpha: 0.1),
-                ),
-                child: Text(
-                  '준비 중',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                ),
-              ),
+            Icon(Icons.check_circle, color: AppColors.paperAccent, size: 22),
           ],
         ),
       ),

@@ -144,20 +144,20 @@ extension NotificationCategoryVisuals on NotificationCategory {
     }
   }
 
-  String get icon {
+  IconData get icon {
     switch (this) {
       case NotificationCategory.payment:
-        return '💰';
+        return Icons.payments;
       case NotificationCategory.lesson:
-        return '📅';
+        return Icons.calendar_today;
       case NotificationCategory.assignment:
-        return '📝';
+        return Icons.edit_note;
       case NotificationCategory.practice:
-        return '🔥';
+        return Icons.local_fire_department;
       case NotificationCategory.communication:
-        return '💬';
+        return Icons.chat_bubble_outline;
       case NotificationCategory.report:
-        return '📊';
+        return Icons.bar_chart;
     }
   }
 }
