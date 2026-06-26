@@ -115,7 +115,9 @@ class ProposalNotificationService {
         title: '✅ 수강권 발급 완료',
         body: '$teacherName 선생님의 $templateName($totalLessons회) 수강권이 발급되었습니다!',
         createdAt: DateTime.now(),
-        actionUrl: AppRoutes.myBookings,
+        // #521 — 실 studentId 를 쿼리로 전달. 빈 id 면 라우트가 빈 예약/404 로
+        // 폴백한다 (myBookings 라우트는 studentId 쿼리/extra 를 읽음).
+        actionUrl: '${AppRoutes.myBookings}?studentId=$studentId',
         actionLabel: '예약하기',
         data: {
           'teacherName': teacherName,

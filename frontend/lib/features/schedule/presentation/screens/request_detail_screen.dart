@@ -306,7 +306,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     _handleAccept(context, ref, request, slotIndex, message),
                 onCounterPropose: () =>
                     _handleCounterPropose(context, ref, request),
-                onModify: () => _handleModify(context, request),
                 onCancel: () => _handleCancel(context, ref, request),
                 onWithdraw: () => _handleWithdraw(context, ref, request),
                 // Phase 2
@@ -418,17 +417,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   }
 
   void _showMoreMenu(BuildContext context, UnifiedLessonRequest request) {
-    final isTerminal = request.currentPhase == RequestPhase.terminal;
     final items = <(IconData, String, VoidCallback)>[
-      if (!isTerminal)
-        (
-          Icons.edit_outlined,
-          AppStrings.modifyRequest,
-          () {
-            Navigator.pop(context);
-            _handleModify(context, request);
-          },
-        ),
       if (request.hasProposal)
         (
           Icons.receipt_long_outlined,
@@ -1357,11 +1346,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       case RequestPhase.terminal:
         return null;
     }
-  }
-
-  void _handleModify(BuildContext context, UnifiedLessonRequest request) {
-    // TODO: Navigate to edit screen (requires request edit flow)
-    _showError(AppStrings.modifyRequestPreparing);
   }
 
   Future<void> _handleCancel(

@@ -113,7 +113,14 @@ class StudentGettingStartedCard extends ConsumerWidget {
             title: AppStrings.studentHomeCheckFirstLesson,
             subtitle: AppStrings.studentHomeCheckFirstLessonHint,
             isCompleted: hasLessons,
-            onTap: hasLessons ? null : () => context.push(AppRoutes.myBookings),
+            // #521 — 실 studentId 를 extra 로 전달. 누락 시 라우트가 빈 id 로
+            // 폴백해 remote 에서 빈 예약/404 가 났다.
+            onTap: hasLessons
+                ? null
+                : () => context.push(
+                    AppRoutes.myBookings,
+                    extra: {'studentId': studentId},
+                  ),
           ),
         ],
       ),
