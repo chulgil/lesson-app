@@ -116,35 +116,14 @@ extension UnifiedLessonRequestVisualX on UnifiedLessonRequest {
     return '${_shortWeekdayLabels[preferredDay!.clamp(0, 6)]}요일';
   }
 
+  /// List-chip label. Delegates to the single status-label SSOT
+  /// ([UnifiedRequestStatusVisualX.label]) so list and detail never drift
+  /// (#547), enriching only [negotiating] with the current round when known.
   String get statusChipLabel {
-    switch (status) {
-      case UnifiedRequestStatus.pending:
-        return AppStrings.statusPending;
-      case UnifiedRequestStatus.approved:
-        return AppStrings.statusApproved;
-      case UnifiedRequestStatus.negotiating:
-        return AppStrings.statusNegotiating(currentRound);
-      case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.statusTimeConfirmed;
-      case UnifiedRequestStatus.proposalSent:
-        return AppStrings.statusProposalSent;
-      case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.statusProposalAccepted;
-      case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.statusPaymentDone;
-      case UnifiedRequestStatus.completed:
-        return AppStrings.statusCompleted;
-      case UnifiedRequestStatus.rejected:
-        return AppStrings.statusRejected;
-      case UnifiedRequestStatus.cancelled:
-        return AppStrings.statusCancelled;
-      case UnifiedRequestStatus.expired:
-        return AppStrings.statusExpiredFull;
-      case UnifiedRequestStatus.subscriptionIssued:
-        return AppStrings.statusSubscriptionIssued;
-      case UnifiedRequestStatus.inProgress:
-        return AppStrings.statusInProgress;
+    if (status == UnifiedRequestStatus.negotiating && currentRound > 0) {
+      return AppStrings.statusNegotiating(currentRound);
     }
+    return status.label;
   }
 
   String get teacherActionLabel {

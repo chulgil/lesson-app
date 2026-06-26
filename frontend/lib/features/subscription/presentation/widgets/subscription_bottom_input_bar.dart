@@ -9,6 +9,7 @@ import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/extensions/unified_lesson_request_visuals.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../domain/entities/subscription.dart';
+import '../providers/subscription_providers.dart';
 
 typedef AcceptScheduleChoice =
     void Function(RequestEvent event, int slotIndex, String message);
@@ -205,11 +206,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   /// moves on (spec §3.3 결정 변경 흐름).
   RequestEvent? _latestScheduleDecisionEvent() {
     // Terminal events: once one appears after a proposal/counter, the thread
-    // is resolved and the bar reverts to Default.
-    const terminalTypes = {
-      // #692: 72h 만료는 양측 Default 복귀
-      RequestEventType.scheduleChangeExpired,
-    };
+    // is resolved and the bar reverts to Default. Shares the SSOT terminal set
+    // with the pending-badge provider so reject/expire agree across both (#543).
+    const terminalTypes = scheduleChangeNegotiationTerminalTypes;
     const sourceTypes = {
       RequestEventType.scheduleChanged,
       RequestEventType.scheduleChangeProposed,

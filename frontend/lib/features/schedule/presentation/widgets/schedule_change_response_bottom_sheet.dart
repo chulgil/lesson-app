@@ -72,6 +72,7 @@ class _ScheduleChangeResponseBottomSheet extends StatefulWidget {
 class _ScheduleChangeResponseBottomSheetState
     extends State<_ScheduleChangeResponseBottomSheet> {
   int? _selectedSlotIndex;
+  final TextEditingController _messageController = TextEditingController();
 
   @override
   void initState() {
@@ -80,6 +81,12 @@ class _ScheduleChangeResponseBottomSheetState
     if (widget.proposedSlots.length == 1) {
       _selectedSlotIndex = 0;
     }
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -134,6 +141,31 @@ class _ScheduleChangeResponseBottomSheetState
                 ),
                 const SizedBox(height: AppSpacing.space4),
               ],
+
+              // Optional reason / memo — captured into the reject/accept
+              // event message so the bubble shows the real text, not a label
+              // placeholder (#544 거절 사유 / #545 수락 메모).
+              TextField(
+                controller: _messageController,
+                minLines: 1,
+                maxLines: 3,
+                maxLength: 200,
+                style: AppTypography.bodySmall,
+                decoration: InputDecoration(
+                  hintText: AppStrings.scheduleChangeResponseMessageHint,
+                  hintStyle: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkTertiary,
+                  ),
+                  counterText: '',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space4),
 
               // CTA buttons: Accept | Reject | Counter-propose
               Column(
@@ -213,7 +245,7 @@ class _ScheduleChangeResponseBottomSheetState
   void _accept() {
     Navigator.pop<ScheduleChangeResponseResult>(context, (
       action: ScheduleChangeResponseAction.accept,
-      message: '',
+      message: _messageController.text.trim(),
       counterSlots: <TimeSlot>[],
       acceptedSlotIndex: _selectedSlotIndex,
     ));
@@ -222,7 +254,7 @@ class _ScheduleChangeResponseBottomSheetState
   void _reject() {
     Navigator.pop<ScheduleChangeResponseResult>(context, (
       action: ScheduleChangeResponseAction.reject,
-      message: AppStrings.scheduleChangeReject,
+      message: _messageController.text.trim(),
       counterSlots: <TimeSlot>[],
       acceptedSlotIndex: null,
     ));

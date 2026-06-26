@@ -91,6 +91,40 @@ void main() {
       );
     },
   );
+
+  test('shared negotiation terminal set covers reject and expire (#543)', () {
+    expect(
+      scheduleChangeNegotiationTerminalTypes,
+      containsAll(<RequestEventType>[
+        RequestEventType.scheduleChangeRejected,
+        RequestEventType.scheduleChangeExpired,
+      ]),
+    );
+    // Accept stays a source for the acceptor, so it is NOT in the shared set.
+    expect(
+      scheduleChangeNegotiationTerminalTypes,
+      isNot(contains(RequestEventType.scheduleChangeAccepted)),
+    );
+  });
+
+  test('rejected event clears the pending request for the same session (#543)', () {
+    final baseTime = DateTime(2026, 5, 8, 10);
+    final source = _event(
+      id: 'proposed',
+      type: RequestEventType.scheduleChangeProposed,
+      createdAt: baseTime,
+    );
+    final rejected = _event(
+      id: 'rejected',
+      type: RequestEventType.scheduleChangeRejected,
+      createdAt: baseTime.add(const Duration(minutes: 10)),
+    );
+
+    expect(
+      pendingScheduleChangeEventsFromHistory([source, rejected]),
+      isEmpty,
+    );
+  });
 }
 
 RequestEvent _event({

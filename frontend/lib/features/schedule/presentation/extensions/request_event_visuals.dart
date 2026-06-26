@@ -11,8 +11,9 @@ extension RequestEventTypeVisualX on RequestEventType {
       case RequestEventType.reject:
         return AppStrings.eventReject;
       case RequestEventType.proposeAlternative:
-      case RequestEventType.counterPropose:
         return AppStrings.eventProposeAlternative;
+      case RequestEventType.counterPropose:
+        return AppStrings.eventCounterPropose;
       case RequestEventType.acceptAlternative:
         return AppStrings.eventAcceptAlternative;
       case RequestEventType.cancel:
@@ -58,9 +59,9 @@ extension RequestEventTypeVisualX on RequestEventType {
       case RequestEventType.scheduleChangeExpired:
         return AppStrings.eventScheduleChangeExpired;
       case RequestEventType.scheduleChangeReminder:
-        return '';
+        return AppStrings.eventScheduleChangeReminder;
       case RequestEventType.message:
-        return '';
+        return AppStrings.eventMessage;
       case RequestEventType.lessonCancellationConfirmed:
         return AppStrings.eventLessonCancellationConfirmed;
       case RequestEventType.cancellationCreditRefunded:
