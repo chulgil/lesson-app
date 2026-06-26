@@ -10,7 +10,7 @@ void main() {
       studentId: 's1',
       origin: QuestOrigin.selfCreated,
       title: '스케일 5분',
-      type: ChallengeType.practiceMinutes,
+      type: ActivityType.practiceMinutes,
       targetValue: 5,
       currentValue: 0,
       startDate: DateTime(2026, 6, 11),
@@ -43,6 +43,13 @@ void main() {
       expect(restored.endDate, base.endDate);
       expect(restored.isCompleted, base.isCompleted);
       expect(restored.completedAt, base.completedAt);
+    });
+
+    test('wire values unchanged after ActivityType rename (#965)', () {
+      // 직렬화 문자열 값은 ChallengeType 시절과 동일해야 기존 저장 데이터가 디코드됨.
+      expect(base.toJson()['type'], 'practiceMinutes');
+      final decoded = StudentQuest.fromJson({...base.toJson(), 'type': 'streak'});
+      expect(decoded.type, ActivityType.streak);
     });
   });
 }

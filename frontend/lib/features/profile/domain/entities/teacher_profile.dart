@@ -402,6 +402,9 @@ class TeacherProfile {
   final String? profileImage;
   final String? backgroundImage;
   final List<String> instruments;
+
+  /// Discipline vertical (#963); null = music (DisciplineRegistry.fallback).
+  final String? disciplineId;
   final String introduction;
 
   // Extended info (for basic/standard)
@@ -418,7 +421,8 @@ class TeacherProfile {
   final String? addressDetail; // 상세주소 (비공개)
 
   // Complete info
-  final List<String>? specialties;
+  @JsonKey(name: 'specialties')
+  final List<String>? expertiseTags;
   final String? teachingStyle;
   final List<String>? portfolioVideoUrls;
 
@@ -460,6 +464,7 @@ class TeacherProfile {
     this.profileImage,
     this.backgroundImage,
     required this.instruments,
+    this.disciplineId,
     required this.introduction,
     this.experienceYears,
     this.lessonAreas,
@@ -470,7 +475,7 @@ class TeacherProfile {
     this.postalCode,
     this.address,
     this.addressDetail,
-    this.specialties,
+    this.expertiseTags,
     this.teachingStyle,
     this.portfolioVideoUrls,
     this.bankAccount,
@@ -547,7 +552,7 @@ class TeacherProfile {
       score += 8;
     }
     if (teachingStyle != null && teachingStyle!.isNotEmpty) score += 6;
-    if (specialties != null && specialties!.isNotEmpty) score += 6;
+    if (expertiseTags != null && expertiseTags!.isNotEmpty) score += 6;
 
     return score.clamp(0, 100);
   }
@@ -577,7 +582,7 @@ class TeacherProfile {
       fields.add('연주 영상');
     }
     if (teachingStyle == null || teachingStyle!.isEmpty) fields.add('레슨 스타일');
-    if (specialties == null || specialties!.isEmpty) fields.add('전문 분야');
+    if (expertiseTags == null || expertiseTags!.isEmpty) fields.add('전문 분야');
 
     return fields;
   }
@@ -629,6 +634,7 @@ class TeacherProfile {
     String? profileImage,
     String? backgroundImage,
     List<String>? instruments,
+    String? disciplineId,
     String? introduction,
     int? experienceYears,
     List<String>? lessonAreas,
@@ -639,7 +645,7 @@ class TeacherProfile {
     String? postalCode,
     String? address,
     String? addressDetail,
-    List<String>? specialties,
+    List<String>? expertiseTags,
     String? teachingStyle,
     List<String>? portfolioVideoUrls,
     BankAccount? bankAccount,
@@ -659,6 +665,7 @@ class TeacherProfile {
       profileImage: profileImage ?? this.profileImage,
       backgroundImage: backgroundImage ?? this.backgroundImage,
       instruments: instruments ?? this.instruments,
+      disciplineId: disciplineId ?? this.disciplineId,
       introduction: introduction ?? this.introduction,
       experienceYears: experienceYears ?? this.experienceYears,
       lessonAreas: lessonAreas ?? this.lessonAreas,
@@ -669,7 +676,7 @@ class TeacherProfile {
       postalCode: postalCode ?? this.postalCode,
       address: address ?? this.address,
       addressDetail: addressDetail ?? this.addressDetail,
-      specialties: specialties ?? this.specialties,
+      expertiseTags: expertiseTags ?? this.expertiseTags,
       teachingStyle: teachingStyle ?? this.teachingStyle,
       portfolioVideoUrls: portfolioVideoUrls ?? this.portfolioVideoUrls,
       bankAccount: bankAccount ?? this.bankAccount,

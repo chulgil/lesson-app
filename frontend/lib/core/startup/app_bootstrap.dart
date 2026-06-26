@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import '../../features/gamification/data/repositories/hive_streak_freeze_repository.dart';
+import '../../features/gamification/data/repositories/hive_student_quest_repository.dart';
+import '../../features/gamification/data/services/growth_heatmap_chunk_cache.dart';
 import '../../features/lessons/data/local/lesson_cache_store.dart';
 import '../../features/schedule/data/local/teacher_availability_cache_store.dart';
 import '../../features/students/data/local/student_cache_store.dart';
@@ -61,6 +64,12 @@ Future<StartupRecoveryResult> bootstrapApp() async {
   await Hive.openBox<String>(StudentCacheStore.boxName);
   await Hive.openBox<String>(TeacherAvailabilityCacheStore.boxName);
   await Hive.openBox<String>(SubscriptionCacheStore.boxName);
+
+  // gamification 로컬 영속 (#422) — heatmap/streak/quest 휘발 해소.
+  // provider 가 sync 로 Hive.box(...) 를 동기 참조하도록 부팅 시 미리 연다.
+  await Hive.openBox<String>(GrowthHeatmapChunkCache.boxName);
+  await Hive.openBox<String>(HiveStreakFreezeRepository.boxName);
+  await Hive.openBox<String>(HiveStudentQuestRepository.boxName);
 
   // Recording-path recovery uses dart:io (File/Directory) + path_provider,
   // which are native-only. Skip on web.

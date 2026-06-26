@@ -11,7 +11,7 @@ StudentQuest _$StudentQuestFromJson(Map<String, dynamic> json) => StudentQuest(
       studentId: json['student_id'] as String,
       origin: $enumDecode(_$QuestOriginEnumMap, json['origin']),
       title: json['title'] as String,
-      type: $enumDecodeNullable(_$ChallengeTypeEnumMap, json['type']),
+      type: $enumDecodeNullable(_$ActivityTypeEnumMap, json['type']),
       targetValue: (json['target_value'] as num).toInt(),
       currentValue: (json['current_value'] as num).toInt(),
       startDate: DateTime.parse(json['start_date'] as String),
@@ -28,7 +28,7 @@ Map<String, dynamic> _$StudentQuestToJson(StudentQuest instance) =>
       'student_id': instance.studentId,
       'origin': _$QuestOriginEnumMap[instance.origin]!,
       'title': instance.title,
-      'type': _$ChallengeTypeEnumMap[instance.type],
+      'type': _$ActivityTypeEnumMap[instance.type],
       'target_value': instance.targetValue,
       'current_value': instance.currentValue,
       'start_date': instance.startDate.toIso8601String(),
@@ -46,11 +46,11 @@ const _$QuestOriginEnumMap = {
   QuestOrigin.seasonEvent: 'seasonEvent',
 };
 
-const _$ChallengeTypeEnumMap = {
-  ChallengeType.practiceDays: 'practiceDays',
-  ChallengeType.practiceMinutes: 'practiceMinutes',
-  ChallengeType.recordings: 'recordings',
-  ChallengeType.lessons: 'lessons',
-  ChallengeType.streak: 'streak',
-  ChallengeType.pointsEarned: 'pointsEarned',
+const _$ActivityTypeEnumMap = {
+  ActivityType.practiceDays: 'practiceDays',
+  ActivityType.practiceMinutes: 'practiceMinutes',
+  ActivityType.recordings: 'recordings',
+  ActivityType.lessons: 'lessons',
+  ActivityType.streak: 'streak',
+  ActivityType.pointsEarned: 'pointsEarned',
 };

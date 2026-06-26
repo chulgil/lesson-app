@@ -14,7 +14,7 @@ StudentQuest _make({
   studentId: studentId,
   origin: origin,
   title: '스케일 5분',
-  type: ChallengeType.practiceMinutes,
+  type: ActivityType.practiceMinutes,
   targetValue: 5,
   currentValue: 0,
   startDate: DateTime(2026, 6, 11),

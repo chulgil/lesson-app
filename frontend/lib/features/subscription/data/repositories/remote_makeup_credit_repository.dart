@@ -52,6 +52,20 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
     await _apiClient.delete('/teachers/me/makeup-credits/$creditId');
   }
 
+  @override
+  Future<MakeupCredit> useCredit({
+    required String creditId,
+    required String lessonId,
+  }) {
+    // Deferred (#928): production spends a credit server-side via
+    // `POST /api/bookings { useCredit }` (spec §8.1), not a standalone endpoint.
+    // Until that lands, fail loudly rather than hit a non-existent route.
+    throw UnsupportedError(
+      'useCredit is resolved by the bookings endpoint server-side; '
+      'no standalone remote endpoint yet (#928, prod bundle).',
+    );
+  }
+
   // ──────────────────────────────────────────────────────────
   // JSON helpers
   // ──────────────────────────────────────────────────────────

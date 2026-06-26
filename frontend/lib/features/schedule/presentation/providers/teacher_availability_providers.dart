@@ -369,6 +369,7 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
     String? instrument,
     LessonType lessonType = LessonType.oneTime,
     int fee = 50000,
+    bool useCredit = false,
   }) async {
     debugPrint('[SlotBookingNotifier] bookSlot called');
     debugPrint('[SlotBookingNotifier] slotId: $slotId');
@@ -413,6 +414,18 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
       debugPrint(
         '[SlotBookingNotifier] Step 2 completed, booking id: ${booking.id}',
       );
+
+      // 3. Spend a makeup credit when the student chose it (#928, spec §5.3).
+      // Non-fatal: a failed spend must not roll back a confirmed booking.
+      if (useCredit) {
+        try {
+          await ref
+              .read(makeupCreditActionsProvider)
+              .useOldestCredit(lessonId: booking.id);
+        } catch (e) {
+          debugPrint('[SlotBookingNotifier] credit spend skipped: $e');
+        }
+      }
 
       state = AsyncValue.data(bookedSlot);
 

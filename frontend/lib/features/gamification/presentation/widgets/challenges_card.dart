@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../extensions/challenge_visuals.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/challenge.dart';
+import '../extensions/challenge_visuals.dart';
 import '../providers/challenge_provider.dart';
 
 /// Card showing active challenges for a student.
@@ -108,8 +108,7 @@ class _ChallengeItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(challenge.type.icon,
-                  size: AppSpacing.iconMD, color: AppColors.ink),
+              Icon(challenge.type.icon, size: 20, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(

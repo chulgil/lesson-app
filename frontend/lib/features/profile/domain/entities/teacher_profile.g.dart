@@ -194,6 +194,7 @@ TeacherProfile _$TeacherProfileFromJson(Map<String, dynamic> json) =>
       instruments: (json['instruments'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
+      disciplineId: json['discipline_id'] as String?,
       introduction: json['introduction'] as String,
       experienceYears: (json['experience_years'] as num?)?.toInt(),
       lessonAreas: (json['lesson_areas'] as List<dynamic>?)
@@ -214,7 +215,7 @@ TeacherProfile _$TeacherProfileFromJson(Map<String, dynamic> json) =>
       postalCode: json['postal_code'] as String?,
       address: json['address'] as String?,
       addressDetail: json['address_detail'] as String?,
-      specialties: (json['specialties'] as List<dynamic>?)
+      expertiseTags: (json['specialties'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
       teachingStyle: json['teaching_style'] as String?,
@@ -253,6 +254,7 @@ Map<String, dynamic> _$TeacherProfileToJson(TeacherProfile instance) =>
       'profile_image': instance.profileImage,
       'background_image': instance.backgroundImage,
       'instruments': instance.instruments,
+      'discipline_id': instance.disciplineId,
       'introduction': instance.introduction,
       'experience_years': instance.experienceYears,
       'lesson_areas': instance.lessonAreas,
@@ -265,7 +267,7 @@ Map<String, dynamic> _$TeacherProfileToJson(TeacherProfile instance) =>
       'postal_code': instance.postalCode,
       'address': instance.address,
       'address_detail': instance.addressDetail,
-      'specialties': instance.specialties,
+      'specialties': instance.expertiseTags,
       'teaching_style': instance.teachingStyle,
       'portfolio_video_urls': instance.portfolioVideoUrls,
       'bank_account': instance.bankAccount?.toJson(),

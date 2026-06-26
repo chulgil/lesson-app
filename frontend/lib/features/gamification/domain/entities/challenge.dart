@@ -5,15 +5,14 @@ library;
 
 enum ChallengePeriod {
   weekly,
-  monthly;
-
-  String get displayName => switch (this) {
-        weekly => '주간',
-        monthly => '월간',
-      };
+  monthly,
 }
 
-enum ChallengeType {
+/// Activity measurement type for a challenge/quest.
+///
+/// Discipline-neutral value. Display labels/icons live in
+/// presentation/extensions/challenge_visuals.dart (flutter-architecture rule).
+enum ActivityType {
   /// Practice N days in a period.
   practiceDays,
 
@@ -30,17 +29,7 @@ enum ChallengeType {
   streak,
 
   /// Earn N points in a period.
-  pointsEarned;
-
-  String get displayName => switch (this) {
-        practiceDays => '연습 일수',
-        practiceMinutes => '연습 시간',
-        recordings => '녹음 횟수',
-        lessons => '레슨 완료',
-        streak => '연속 연습',
-        pointsEarned => '포인트 획득',
-      };
-
+  pointsEarned,
 }
 
 class Challenge {
@@ -63,7 +52,7 @@ class Challenge {
   final String id;
   final String title;
   final String description;
-  final ChallengeType type;
+  final ActivityType type;
   final ChallengePeriod period;
   final int targetValue;
   final int currentValue;
@@ -88,16 +77,6 @@ class Challenge {
   /// Whether the challenge is still active (not expired and not completed).
   bool get isActive =>
       !isCompleted && DateTime.now().isBefore(endDate);
-
-  /// Display string for the target (e.g., "5일", "30분", "3회").
-  String get targetDisplay => switch (type) {
-        ChallengeType.practiceDays => '$targetValue일',
-        ChallengeType.practiceMinutes => '$targetValue분',
-        ChallengeType.recordings => '$targetValue회',
-        ChallengeType.lessons => '$targetValue회',
-        ChallengeType.streak => '$targetValue일',
-        ChallengeType.pointsEarned => '${targetValue}P',
-      };
 
   Challenge copyWith({
     int? currentValue,
