@@ -60,7 +60,7 @@ class AcademyInquiryScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('오류: $error')),
+        error: (error, stack) => Center(child: Text(AppStrings.inquiryLoadErrorWith(error))),
       ),
     );
   }
@@ -206,11 +206,11 @@ class _InquiryCard extends StatelessWidget {
 
     if (difference.inDays == 0) {
       if (difference.inHours < 1) {
-        return '방금 전';
+        return AppStrings.timeAgoJustNow;
       }
       return '${difference.inHours}시간 전';
     } else if (difference.inDays == 1) {
-      return '어제';
+      return AppStrings.yesterdayLabel;
     } else if (difference.inDays < 7) {
       return '${difference.inDays}일 전';
     } else {

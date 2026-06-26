@@ -8096,6 +8096,15 @@ class AppStrings {
   static const inquiryFormMessageLabel = '문의 내용';
   static const inquiryFormMessageHint = '문의 내용을 입력해주세요';
   static const inquiryFormSubmit = '문의 보내기';
+  static const inquiryFormRelationLabel = '관계 선택';
+  static const inquiryFormRelationParent = '학부모';
+  static const inquiryFormPhoneRequired = '연락처를 입력해주세요';
+  static String inquiryFormSubmitFailed(Object e) => '문의 전송 실패: $e';
+  static String inquiryReplySubmitFailed(Object e) => '답변 전송 실패: $e';
+  static String inquiryReplyCountLabel(int count) => '답변 ($count)';
+  static const inquiryReplyFromAcademy = '학원 답변';
+  static const inquiryReplyFromMe = '내 답변';
+  static String inquiryLoadErrorWith(Object e) => '오류: $e';
 
   // ── Note Access Requests ───────────────────────────────────
 

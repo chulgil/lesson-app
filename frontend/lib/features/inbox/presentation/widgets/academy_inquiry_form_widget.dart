@@ -78,7 +78,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('문의 전송 실패: $e'),
+            content: Text(AppStrings.inquiryFormSubmitFailed(e)),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -104,7 +104,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
           SizedBox(height: AppSpacing.space3),
           // Role selection
           Text(
-            '관계 선택',
+            AppStrings.inquiryFormRelationLabel,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -117,11 +117,11 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
                   segments: const [
                     ButtonSegment(
                       value: InquirySenderRole.student,
-                      label: Text('학생'),
+                      label: Text(AppStrings.student),
                     ),
                     ButtonSegment(
                       value: InquirySenderRole.parent,
-                      label: Text('학부모'),
+                      label: Text(AppStrings.inquiryFormRelationParent),
                     ),
                   ],
                   selected: {_selectedRole},
@@ -144,7 +144,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return '이름을 입력해주세요';
+                return AppStrings.templateNameRequired;
               }
               return null;
             },
@@ -162,7 +162,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             keyboardType: TextInputType.phone,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return '연락처를 입력해주세요';
+                return AppStrings.inquiryFormPhoneRequired;
               }
               return null;
             },
@@ -181,7 +181,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             minLines: 3,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return '문의 내용을 입력해주세요';
+                return AppStrings.inquiryFormMessageHint;
               }
               if (value.trim().length < 10) {
                 return '10글자 이상 입력해주세요';
