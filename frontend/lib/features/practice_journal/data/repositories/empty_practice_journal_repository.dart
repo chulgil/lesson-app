@@ -7,8 +7,11 @@ import '../../domain/repositories/practice_journal_repository.dart';
 
 /// Empty stub used in remote mode until the practice-journal API ships (#872).
 ///
-/// Returns empty ledgers/volumes and rejects mutations — real users see an
-/// empty journal instead of an infinite spinner from a dead endpoint.
+/// Reads return empty ledgers/volumes; mutations are best-effort **no-ops**
+/// (#424). The API is not deployed yet, so silently skipping a journal write is
+/// correct — throwing `UnsupportedError` instead would propagate into the
+/// shared `recordPractice` main path (heatmap + quest, where the journal hook
+/// runs before the quest bump) and crash the song-completion archive flow.
 class EmptyPracticeJournalRepository implements PracticeJournalRepository {
   @override
   Future<PracticeLedger> getLedger(
@@ -31,16 +34,12 @@ class EmptyPracticeJournalRepository implements PracticeJournalRepository {
     DateTime date,
     MarkIntensity intensity,
   ) async {
-    throw UnsupportedError(
-      'Practice journal API is not available in remote mode.',
-    );
+    // no-op (#424)
   }
 
   @override
   Future<void> addGuardianSeal(String childProfileId, GuardianSeal seal) async {
-    throw UnsupportedError(
-      'Practice journal API is not available in remote mode.',
-    );
+    // no-op (#424)
   }
 
   @override
@@ -48,9 +47,7 @@ class EmptyPracticeJournalRepository implements PracticeJournalRepository {
     String childProfileId,
     Endorsement endorsement,
   ) async {
-    throw UnsupportedError(
-      'Practice journal API is not available in remote mode.',
-    );
+    // no-op (#424)
   }
 
   @override
@@ -58,9 +55,13 @@ class EmptyPracticeJournalRepository implements PracticeJournalRepository {
     required String childProfileId,
     required String pieceId,
     required String pieceName,
-  }) async {
-    throw UnsupportedError(
-      'Practice journal API is not available in remote mode.',
-    );
-  }
+  }) async => BoundVolume(
+    // Echo the inputs with placeholder metadata so callers (archive flow) get a
+    // valid object instead of an exception. Not persisted in remote mode.
+    childProfileId: childProfileId,
+    pieceId: pieceId,
+    pieceName: pieceName,
+    volumeNo: 0,
+    boundDate: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+  );
 }
