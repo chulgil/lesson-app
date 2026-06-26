@@ -445,8 +445,16 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
       );
       state = AsyncValue.data(bookedSlot);
 
-      // Invalidate related providers to refresh data
+      // Invalidate related providers to refresh data.
+      // #528 — invalidateSelf() alone only refreshes this notifier's last-slot
+      // state, leaving the bookings list (availableSlotsForDateRangeProvider) and
+      // the student home next-lesson card (studentBookingsProvider →
+      // studentHomeNextLessonProvider) stale after a successful (re)booking.
+      // Whole-family invalidate: the date-range family is keyed by DateTime args
+      // computed at the call site, so a specific-instance match is impossible.
       ref.invalidateSelf();
+      ref.invalidate(availableSlotsForDateRangeProvider);
+      ref.invalidate(studentBookingsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -481,8 +489,13 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
         debugPrint('Cancellation notification created: ${notification.title}');
       }
 
-      // Invalidate related providers to refresh data
+      // Invalidate related providers to refresh data.
+      // #528 — same rationale as bookSlotSimple: refresh the bookings list and
+      // the student home next-lesson card so a successful cancel is reflected
+      // immediately instead of only showing a success toast over a stale list.
       ref.invalidateSelf();
+      ref.invalidate(availableSlotsForDateRangeProvider);
+      ref.invalidate(studentBookingsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

@@ -23,12 +23,15 @@ import '../widgets/request_list_item.dart';
 /// 2. Phase tabs — lifecycle phase (primary filter)
 /// 3. Secondary filters — source, sort, period (single row)
 class AllLessonRequestsScreen extends ConsumerStatefulWidget {
-  final String teacherId;
+  // #524 — viewer 의 식별자. viewerRole=='teacher' 면 교사 id, 'student' 면
+  // 학생 id 를 담는다. (이전 이름 teacherId 는 학생 뷰에서 학생 id 가 들어가
+  // 의미 혼동을 유발했다 — 라우트에서 studentId 를 teacherId 파라미터에 주입.)
+  final String subjectId;
   final String viewerRole;
 
   const AllLessonRequestsScreen({
     super.key,
-    required this.teacherId,
+    required this.subjectId,
     this.viewerRole = 'teacher',
   });
 
@@ -51,8 +54,8 @@ class _AllLessonRequestsScreenState
   Widget build(BuildContext context) {
     final requestsAsync =
         widget.viewerRole == 'teacher'
-            ? ref.watch(teacherUnifiedRequestsProvider(widget.teacherId))
-            : ref.watch(studentUnifiedRequestsProvider(widget.teacherId));
+            ? ref.watch(teacherUnifiedRequestsProvider(widget.subjectId))
+            : ref.watch(studentUnifiedRequestsProvider(widget.subjectId));
     final studentNames = ref.watch(studentNameMapProvider);
     final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);

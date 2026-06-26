@@ -122,7 +122,12 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
             icon: Icons.event_note_outlined,
             text: AppStrings.pendingBookings(count),
             urgent: false,
-            onTap: () => context.push(AppRoutes.myBookings),
+            // #521 — 교사 승인 대기 큐는 교사용 pendingBookings 화면으로 보낸다.
+            // 기존엔 학생용 myBookings(빈 id) 로 잘못 보내 remote 에서 빈값/404
+            // 였다. teacherId 를 쿼리로 전달해 라우트 폴백 의존을 끊는다.
+            onTap: () => context.push(
+              '${AppRoutes.pendingBookings}?teacherId=$teacherId',
+            ),
           ),
         );
       }

@@ -132,7 +132,7 @@ List<GoRoute> scheduleRoutes = [
       final extra = state.extra as Map<String, dynamic>?;
       final fromExtra = extra?['teacherId'] as String?;
       return AllLessonRequestsScreen(
-        teacherId: (fromExtra != null && fromExtra.isNotEmpty)
+        subjectId: (fromExtra != null && fromExtra.isNotEmpty)
             ? fromExtra
             : teacherIdParamOrCurrent(context, state),
       );
@@ -147,8 +147,10 @@ List<GoRoute> scheduleRoutes = [
       final extra = state.extra as Map<String, dynamic>?;
       final studentId =
           extra?['studentId'] ?? state.uri.queryParameters['studentId'] ?? '';
+      // #524 — 학생 뷰: 학생 id 를 subjectId 로 전달 (이전엔 teacherId 파라미터에
+      // 주입해 의미가 혼동됐다). 기능 동일, 파라미터 의미만 정정.
       return AllLessonRequestsScreen(
-        teacherId: studentId,
+        subjectId: studentId,
         viewerRole: 'student',
       );
     },
