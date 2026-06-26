@@ -4,6 +4,8 @@
 
 음악 레슨/연습 관리 앱 — Flutter 3.29.0, Riverpod, Go Router, Hive | Clean Architecture + Feature-based
 
+> **정체성 노트 (Discipline 전환, 2026-06-26)**: 현재 **음악 전용(Discipline 0)**. 멀티 Discipline(헬스/필라테스/어학) 일반화는 **설계 단계·코드 미구현** — 방향 SSOT = 옵시디언 `36-멀티카테고리-Discipline-플랫폼-설계`, 이슈 #962~#980, 색인 = `docs/SPEC_ROUTING.md` §0. 정체성 문장 재정의·용어(Discipline) 도입은 #962 Phase 진행 시 doc-sync 로 반영하며, 그 전까지 위 "음악 레슨/연습 관리 앱" 유지(지금 일반화 편집 금지 — 역드리프트).
+
 ## 프로젝트 구조
 
 ```
