@@ -6656,6 +6656,7 @@ class AppStrings {
   static const studentHomeTrialCancelSuccess = '체험레슨 신청이 취소되었습니다';
   static const studentHomeTrialCancelError = '취소 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
   static const studentHomeLanguageSettings = '언어 설정';
+  static const studentHomeLanguageKorean = '한국어';
   static const studentHomeMyTrialLessons = '내 체험레슨';
   static const studentHomeApply = '신청';
   static const studentHomeAllTrialInScheduleTab =
@@ -6719,6 +6720,12 @@ class AppStrings {
   static const studentHomeNameHint = '이름을 입력하세요';
   static const studentHomeEmailHint = '이메일을 입력하세요';
   static const studentHomePhoneHint = '전화번호를 입력하세요';
+  static const studentHomeEditNameLabel = '이름';
+  static const studentHomeEditInstrumentLabel = '악기';
+  static const studentHomeEditEmailLabel = '이메일';
+  static const studentHomeEditPhoneLabel = '전화번호';
+  static const studentHomeEditProfileShareInfo =
+      '프로필 정보는 선생님에게 공유됩니다.\n정확한 정보를 입력해주세요.';
   static const studentHomeDeleteTeacher = '선생님 삭제';
   static const studentHomeCancelWriting = '작성 취소';
   static const studentHomeCancelWritingConfirm = '작성 중인 내용이 있습니다. 나가시겠습니까?';
@@ -6784,6 +6791,8 @@ class AppStrings {
   static const parentHomeDetailSettings = '상세 설정';
   static const parentHomeNotificationDetailSettings = '알림 상세 설정';
   static const parentHomeAssignmentNotification = '과제 알림';
+  static const parentHomeAssignmentNotificationSubtitle =
+      '새 과제 등록, 미완료 알림';
   static const parentHomeLessonNotification = '레슨 알림';
   static const parentHomePracticeNotification = '연습 알림';
   static const parentHomePaymentNotification = '입금 상태 알림';

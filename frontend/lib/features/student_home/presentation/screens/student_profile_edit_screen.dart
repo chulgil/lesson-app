@@ -166,7 +166,7 @@ class _StudentProfileEditScreenState
             const SizedBox(height: AppSpacing.space8),
 
             // Name field
-            _buildFieldLabel('이름'),
+            _buildFieldLabel(AppStrings.studentHomeEditNameLabel),
             const SizedBox(height: AppSpacing.space2),
             _buildTextField(
               controller: _nameController,
@@ -177,14 +177,14 @@ class _StudentProfileEditScreenState
             const SizedBox(height: AppSpacing.space5),
 
             // Instrument field
-            _buildFieldLabel('악기'),
+            _buildFieldLabel(AppStrings.studentHomeEditInstrumentLabel),
             const SizedBox(height: AppSpacing.space2),
             _buildInstrumentSelector(),
 
             const SizedBox(height: AppSpacing.space5),
 
             // Email field
-            _buildFieldLabel('이메일'),
+            _buildFieldLabel(AppStrings.studentHomeEditEmailLabel),
             const SizedBox(height: AppSpacing.space2),
             _buildTextField(
               controller: _emailController,
@@ -196,7 +196,7 @@ class _StudentProfileEditScreenState
             const SizedBox(height: AppSpacing.space5),
 
             // Phone field
-            _buildFieldLabel('전화번호'),
+            _buildFieldLabel(AppStrings.studentHomeEditPhoneLabel),
             const SizedBox(height: AppSpacing.space2),
             _buildTextField(
               controller: _phoneController,
@@ -221,7 +221,7 @@ class _StudentProfileEditScreenState
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
                     child: Text(
-                      '프로필 정보는 선생님에게 공유됩니다.\n정확한 정보를 입력해주세요.',
+                      AppStrings.studentHomeEditProfileShareInfo,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.ink,
                         height: 1.5,

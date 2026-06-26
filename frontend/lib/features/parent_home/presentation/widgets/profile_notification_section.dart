@@ -83,7 +83,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildNotificationItem(
                       icon: Icons.assignment_outlined,
                       label: AppStrings.parentHomeAssignmentNotification,
-                      subtitle: '새 과제 등록, 미완료 알림',
+                      subtitle: AppStrings.parentHomeAssignmentNotificationSubtitle,
                       value: s.newAssignment || s.assignmentIncomplete,
                       onChanged:
                           (value) => _toggleNotificationGroup(

@@ -139,7 +139,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
           ),
           child: Row(
             children: [
-              Text(category.icon, style: AppTypography.bodyLarge),
+              Icon(category.icon, size: 18, color: AppColors.inkSecondary),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 category.label,
