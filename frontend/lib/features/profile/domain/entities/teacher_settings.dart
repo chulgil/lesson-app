@@ -4,6 +4,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 
 part 'teacher_settings.g.dart';
@@ -202,26 +203,9 @@ class TeacherSettings {
 
 /// Predefined list of common instruments
 class InstrumentList {
-  static const List<String> all = [
-    '바이올린',
-    '비올라',
-    '첼로',
-    '콘트라베이스',
-    '피아노',
-    '플루트',
-    '클라리넷',
-    '오보에',
-    '바순',
-    '호른',
-    '트럼펫',
-    '트롬본',
-    '튜바',
-    '타악기',
-    '하프',
-    '기타',
-    '성악',
-    '작곡/이론',
-  ];
+  /// Delegates to the music ExpertiseCatalog (SSOT, #964). instruments 는 음악
+  /// 분야 expertise 의 별칭 — 이름 추가/변경은 ExpertiseCatalogRegistry.music 에서.
+  static List<String> get all => ExpertiseCatalogRegistry.music.items;
 
   /// Get commonly used instruments (top 10)
   static List<String> get common => all.take(10).toList();
