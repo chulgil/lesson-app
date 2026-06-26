@@ -1,8 +1,12 @@
 // Student gamification P1 — growth heatmap providers.
 
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
+import '../../data/repositories/hive_growth_heatmap_repository.dart';
 import '../../data/repositories/mock_growth_heatmap_repository.dart';
+import '../../data/services/growth_heatmap_chunk_cache.dart';
 import '../../domain/entities/growth_heatmap.dart';
 import '../../domain/repositories/growth_heatmap_repository.dart';
 
@@ -12,7 +16,14 @@ part 'growth_heatmap_provider.g.dart';
 @Riverpod(keepAlive: true)
 GrowthHeatmapRepository growthHeatmapRepository(
   GrowthHeatmapRepositoryRef ref,
-) => MockGrowthHeatmapRepository();
+) {
+  // DEV(mock 샘플) / 실사용(Hive 로컬 영속) 분기. box 는 app_bootstrap
+  // 에서 미리 열려 sync 동기 참조 — 소비처 async 연쇄 회피 (#422).
+  if (ref.watch(mockDataModeProvider)) return MockGrowthHeatmapRepository();
+  return HiveGrowthHeatmapRepository(
+    box: Hive.box<String>(GrowthHeatmapChunkCache.boxName),
+  );
+}
 
 @riverpod
 Future<GrowthHeatmap> growthHeatmap(
