@@ -320,7 +320,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     String? nickname,
     required String introduction,
     String? teachingStyle,
-    List<String>? specialties,
+    List<String>? expertiseTags,
     List<String>? lessonAreas,
     String? postalCode,
     String? address,
@@ -337,7 +337,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
           nickname: nickname ?? current.nickname,
           introduction: introduction,
           teachingStyle: teachingStyle ?? current.teachingStyle,
-          specialties: specialties ?? current.specialties,
+          expertiseTags: expertiseTags ?? current.expertiseTags,
           lessonAreas: lessonAreas ?? current.lessonAreas,
           postalCode: postalCode ?? current.postalCode,
           address: address ?? current.address,
@@ -393,14 +393,14 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
   }
 
   /// Update specialties
-  Future<void> updateSpecialties(List<String> specialties) async {
+  Future<void> updateExpertiseTags(List<String> expertiseTags) async {
     final current = state.valueOrNull;
     if (current == null) return;
 
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
       final updated = await repo.updateProfile(
-        current.copyWith(specialties: specialties),
+        current.copyWith(expertiseTags: expertiseTags),
       );
       state = AsyncValue.data(updated);
       ref.invalidate(currentTeacherProfileProvider);

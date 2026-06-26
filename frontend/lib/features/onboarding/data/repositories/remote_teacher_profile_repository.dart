@@ -316,7 +316,7 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       profileImage: profileImage,
       backgroundImage: json['background_image'] as String?,
       instruments: instruments,
-      specialties: specialties,
+      expertiseTags: specialties,
       introduction: json['introduction'] as String? ?? '',
       experienceYears: json['experience_years'] as int?,
       lessonAreas: lessonAreas,
@@ -350,7 +350,7 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       'instruments': profile.instruments,
       'introduction': profile.introduction,
       'experience_years': profile.experienceYears,
-      'specialties': profile.specialties,
+      'specialties': profile.expertiseTags,
       'lesson_areas': profile.lessonAreas,
       'lesson_types':
           profile.lessonTypes?.map((t) {

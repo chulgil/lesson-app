@@ -90,8 +90,8 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     _nicknameController.text = profile.nickname ?? profile.name;
     _introductionController.text = profile.introduction;
     _teachingStyleController.text = profile.teachingStyle ?? '';
-    if (profile.specialties != null) {
-      _selectedSpecialties.addAll(profile.specialties!);
+    if (profile.expertiseTags != null) {
+      _selectedSpecialties.addAll(profile.expertiseTags!);
     }
     if (profile.lessonAreas != null) {
       _lessonAreas.addAll(profile.lessonAreas!);
@@ -199,7 +199,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         nickname: nicknameText.isNotEmpty ? nicknameText : null,
         introduction: _introductionController.text.trim(),
         teachingStyle: teachingStyle.isNotEmpty ? teachingStyle : null,
-        specialties: _selectedSpecialties.toList(),
+        expertiseTags: _selectedSpecialties.toList(),
         lessonAreas: _lessonAreas.toList(),
         postalCode: _postalCode,
         address: _address,

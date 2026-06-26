@@ -88,14 +88,14 @@ class ProfilePreviewScreen extends ConsumerWidget {
             ),
 
           // Specialties chips
-          if (profile.specialties != null && profile.specialties!.isNotEmpty)
+          if (profile.expertiseTags != null && profile.expertiseTags!.isNotEmpty)
             _buildSection(
               title: AppStrings.profilePreviewSectionSpecialty,
               child: Wrap(
                 spacing: AppSpacing.space2,
                 runSpacing: AppSpacing.space2,
                 children:
-                    profile.specialties!.map((specialty) {
+                    profile.expertiseTags!.map((specialty) {
                       return Chip(
                         label: Text(specialty),
                         labelStyle: AppTypography.bodySmall.copyWith(
@@ -442,10 +442,10 @@ class ProfilePreviewScreen extends ConsumerWidget {
     }
 
     // Specialties
-    if (profile.specialties != null && profile.specialties!.isNotEmpty) {
+    if (profile.expertiseTags != null && profile.expertiseTags!.isNotEmpty) {
       buffer.writeln();
       buffer.writeln('[전문 분야]');
-      buffer.writeln(profile.specialties!.join(', '));
+      buffer.writeln(profile.expertiseTags!.join(', '));
     }
 
     // Education
