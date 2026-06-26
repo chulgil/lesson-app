@@ -12,7 +12,7 @@ import 'package:lessonaza/features/practice_journal/domain/entities/practice_mar
 StudentQuest _quest({
   String id = 'q1',
   String studentId = 's1',
-  required ChallengeType? type,
+  required ActivityType? type,
   int currentValue = 0,
   bool isCompleted = false,
 }) => StudentQuest(
@@ -158,15 +158,15 @@ void main() {
         await quest.createQuest(
           _quest(
             id: 'q1',
-            type: ChallengeType.practiceMinutes,
+            type: ActivityType.practiceMinutes,
             currentValue: 5,
           ),
         );
         await quest.createQuest(
-          _quest(id: 'q2', type: ChallengeType.practiceDays, currentValue: 2),
+          _quest(id: 'q2', type: ActivityType.practiceDays, currentValue: 2),
         );
         await quest.createQuest(
-          _quest(id: 'q3', type: ChallengeType.streak, currentValue: 1),
+          _quest(id: 'q3', type: ActivityType.streak, currentValue: 1),
         );
 
         await service.recordPractice(
@@ -196,7 +196,7 @@ void main() {
       await quest.createQuest(
         _quest(
           id: 'q-done',
-          type: ChallengeType.practiceMinutes,
+          type: ActivityType.practiceMinutes,
           currentValue: 60,
           isCompleted: true,
         ),
@@ -219,7 +219,7 @@ void main() {
         _quest(
           id: 'q-other',
           studentId: 's2',
-          type: ChallengeType.practiceMinutes,
+          type: ActivityType.practiceMinutes,
           currentValue: 5,
         ),
       );
@@ -238,7 +238,7 @@ void main() {
 
     test('recording source does not affect practiceMinutes quests', () async {
       await quest.createQuest(
-        _quest(id: 'q1', type: ChallengeType.practiceMinutes, currentValue: 5),
+        _quest(id: 'q1', type: ActivityType.practiceMinutes, currentValue: 5),
       );
       await service.recordPractice(
         's1',
@@ -257,7 +257,7 @@ void main() {
   group('#424 — journal 훅 가드', () {
     test('journal upsertMark throw 해도 heatmap+quest 본경로 진행', () async {
       await quest.createQuest(
-        _quest(id: 'q1', type: ChallengeType.practiceMinutes, currentValue: 5),
+        _quest(id: 'q1', type: ActivityType.practiceMinutes, currentValue: 5),
       );
       final throwingService = PracticeRecordingService(
         heatmapRepository: heatmap,

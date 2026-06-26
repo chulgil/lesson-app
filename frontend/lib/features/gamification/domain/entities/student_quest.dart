@@ -14,7 +14,7 @@ class StudentQuest {
   final String studentId;
   final QuestOrigin origin;
   final String title;
-  final ChallengeType? type;
+  final ActivityType? type;
   final int targetValue;
   final int currentValue;
   final DateTime startDate;
