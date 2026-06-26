@@ -157,6 +157,9 @@ class Lesson {
   final String? teacherId;
   final String? teacherName;
   final String instrument;
+
+  /// Discipline vertical (#963); null = music (DisciplineRegistry.fallback).
+  final String? disciplineId;
   @JsonKey(toJson: _lessonDateToJson)
   final DateTime date;
   final String startTime;
@@ -188,6 +191,7 @@ class Lesson {
     this.teacherId,
     this.teacherName,
     required this.instrument,
+    this.disciplineId,
     required this.date,
     required this.startTime,
     this.duration = 60,
@@ -306,6 +310,7 @@ class Lesson {
     String? teacherId,
     String? teacherName,
     String? instrument,
+    String? disciplineId,
     DateTime? date,
     String? startTime,
     int? duration,
@@ -335,6 +340,7 @@ class Lesson {
       teacherId: teacherId ?? this.teacherId,
       teacherName: teacherName ?? this.teacherName,
       instrument: instrument ?? this.instrument,
+      disciplineId: disciplineId ?? this.disciplineId,
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       duration: duration ?? this.duration,

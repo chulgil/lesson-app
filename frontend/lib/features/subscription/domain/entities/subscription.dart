@@ -67,6 +67,9 @@ class Subscription {
   /// Provided by the backend; null for legacy rows without a mapped instrument.
   final String? instrument;
 
+  /// Discipline vertical (#963); null = music (DisciplineRegistry.fallback).
+  final String? disciplineId;
+
   @Deprecated('Use paymentConfirmed instead. Will be removed in future.')
   final String? paymentId; // Legacy: connected payment ID
 
@@ -173,6 +176,7 @@ class Subscription {
     required this.studentId,
     required this.membershipId,
     this.instrument,
+    this.disciplineId,
     this.paymentId,
     required this.type,
     this.totalLessons,
@@ -331,6 +335,7 @@ class Subscription {
     String? studentId,
     String? membershipId,
     String? instrument,
+    String? disciplineId,
     String? paymentId,
     SubscriptionType? type,
     int? totalLessons,
@@ -377,6 +382,7 @@ class Subscription {
       studentId: studentId ?? this.studentId,
       membershipId: membershipId ?? this.membershipId,
       instrument: instrument ?? this.instrument,
+      disciplineId: disciplineId ?? this.disciplineId,
       paymentId: paymentId ?? this.paymentId,
       type: type ?? this.type,
       totalLessons: totalLessons ?? this.totalLessons,

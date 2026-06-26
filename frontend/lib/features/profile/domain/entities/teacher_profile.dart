@@ -402,6 +402,9 @@ class TeacherProfile {
   final String? profileImage;
   final String? backgroundImage;
   final List<String> instruments;
+
+  /// Discipline vertical (#963); null = music (DisciplineRegistry.fallback).
+  final String? disciplineId;
   final String introduction;
 
   // Extended info (for basic/standard)
@@ -460,6 +463,7 @@ class TeacherProfile {
     this.profileImage,
     this.backgroundImage,
     required this.instruments,
+    this.disciplineId,
     required this.introduction,
     this.experienceYears,
     this.lessonAreas,
@@ -629,6 +633,7 @@ class TeacherProfile {
     String? profileImage,
     String? backgroundImage,
     List<String>? instruments,
+    String? disciplineId,
     String? introduction,
     int? experienceYears,
     List<String>? lessonAreas,
@@ -659,6 +664,7 @@ class TeacherProfile {
       profileImage: profileImage ?? this.profileImage,
       backgroundImage: backgroundImage ?? this.backgroundImage,
       instruments: instruments ?? this.instruments,
+      disciplineId: disciplineId ?? this.disciplineId,
       introduction: introduction ?? this.introduction,
       experienceYears: experienceYears ?? this.experienceYears,
       lessonAreas: lessonAreas ?? this.lessonAreas,
