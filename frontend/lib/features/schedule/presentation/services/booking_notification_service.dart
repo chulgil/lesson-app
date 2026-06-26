@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../notifications/domain/entities/notification.dart';
 
 /// Service for creating and sending booking-related notifications
@@ -203,6 +204,83 @@ class BookingNotificationService {
         'startTime': '${startTime.hour}:${startTime.minute}',
         'instrument': instrument,
       },
+      createdAt: DateTime.now(),
+      sentAt: DateTime.now(),
+    );
+  }
+
+  // ─── 일정 변경 협상 알림 (#541) ───
+  // 협상 이벤트(제안/수락/거절/역제안) 시 상대에게 보내는 비동기 핸드오프 통지.
+  // [userId] 받는 사람(상대), [fromTeacher] 보낸 사람이 선생님인지.
+
+  static AppNotification createScheduleChangeProposed({
+    required String userId,
+    required bool fromTeacher,
+    Map<String, dynamic>? data,
+  }) => _scheduleChangeNotification(
+    userId: userId,
+    type: NotificationType.scheduleChangeRequested,
+    title: AppStrings.scheduleChangeNotifyProposedTitle,
+    body: AppStrings.scheduleChangeNotifyProposedBody(fromTeacher),
+    priority: NotificationPriority.high,
+    data: data,
+  );
+
+  static AppNotification createScheduleChangeAccepted({
+    required String userId,
+    required bool fromTeacher,
+    Map<String, dynamic>? data,
+  }) => _scheduleChangeNotification(
+    userId: userId,
+    type: NotificationType.scheduleChangeApproved,
+    title: AppStrings.scheduleChangeNotifyAcceptedTitle,
+    body: AppStrings.scheduleChangeNotifyAcceptedBody(fromTeacher),
+    priority: NotificationPriority.normal,
+    data: data,
+  );
+
+  static AppNotification createScheduleChangeRejected({
+    required String userId,
+    required bool fromTeacher,
+    Map<String, dynamic>? data,
+  }) => _scheduleChangeNotification(
+    userId: userId,
+    type: NotificationType.scheduleChangeRejected,
+    title: AppStrings.scheduleChangeNotifyRejectedTitle,
+    body: AppStrings.scheduleChangeNotifyRejectedBody(fromTeacher),
+    priority: NotificationPriority.normal,
+    data: data,
+  );
+
+  static AppNotification createScheduleChangeCountered({
+    required String userId,
+    required bool fromTeacher,
+    Map<String, dynamic>? data,
+  }) => _scheduleChangeNotification(
+    userId: userId,
+    type: NotificationType.scheduleChangeAlternative,
+    title: AppStrings.scheduleChangeNotifyCounteredTitle,
+    body: AppStrings.scheduleChangeNotifyCounteredBody(fromTeacher),
+    priority: NotificationPriority.high,
+    data: data,
+  );
+
+  static AppNotification _scheduleChangeNotification({
+    required String userId,
+    required NotificationType type,
+    required String title,
+    required String body,
+    required NotificationPriority priority,
+    Map<String, dynamic>? data,
+  }) {
+    return AppNotification(
+      id: _uuid.v4(),
+      userId: userId,
+      type: type,
+      priority: priority,
+      title: title,
+      body: body,
+      data: data,
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
     );

@@ -7,6 +7,8 @@ export 'domain/entities/unified_lesson_request.dart'
     show ProposerRole, UnifiedLessonRequest, UnifiedRequestStatus;
 export 'domain/services/cancellation_credit_policy.dart'
     show CancellationCreditPolicy, CancellationCreditOutcome;
+export 'presentation/services/booking_notification_service.dart'
+    show BookingNotificationService;
 export 'presentation/providers/schedule_confirmation_card_providers.dart'
     show
         pendingScheduleConfirmationCardsProvider,

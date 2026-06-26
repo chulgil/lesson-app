@@ -14,6 +14,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../lessons/lessons_facade.dart';
 import '../../../schedule/schedule_facade.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_ui_facade.dart';
@@ -497,6 +498,16 @@ class _SubscriptionDetailBodyState
   // Action Handlers
   // ═══════════════════════════════════════════════════════════════
 
+  /// 협상 상대(알림 받는 사람) userId. 내가 선생이면 학생, 학생이면 선생.
+  String _scheduleOpponentId() =>
+      _isTeacher ? subscription.studentId : (_getTeacherId() ?? '');
+
+  /// 협상 알림 data 페이로드 (알림 탭 시 이 수강권/회차로 이동).
+  Map<String, dynamic> _scheduleChangeData() => {
+    'subscriptionId': subscription.id,
+    'sessionNumber': _selectedSession,
+  };
+
   /// Accept a proposed schedule slot.
   void _handleAcceptScheduleChoice(
     RequestEvent event,
@@ -523,6 +534,21 @@ class _SubscriptionDetailBodyState
       _selectedSession,
       acceptEvent,
     );
+    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
+    final opp = _scheduleOpponentId();
+    if (opp.isNotEmpty) {
+      unawaited(
+        ref
+            .read(notificationServiceProvider)
+            .showNotification(
+              BookingNotificationService.createScheduleChangeAccepted(
+                userId: opp,
+                fromTeacher: _isTeacher,
+                data: _scheduleChangeData(),
+              ),
+            ),
+      );
+    }
     if (mounted) _showSuccess(AppStrings.scheduleChangeAccepted);
   }
 
@@ -580,6 +606,21 @@ class _SubscriptionDetailBodyState
       _selectedSession,
       counterEvent,
     );
+    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
+    final opp = _scheduleOpponentId();
+    if (opp.isNotEmpty) {
+      unawaited(
+        ref
+            .read(notificationServiceProvider)
+            .showNotification(
+              BookingNotificationService.createScheduleChangeCountered(
+                userId: opp,
+                fromTeacher: _isTeacher,
+                data: _scheduleChangeData(),
+              ),
+            ),
+      );
+    }
     if (mounted) _showSuccess(AppStrings.alternativeProposeSent);
   }
 
@@ -693,6 +734,22 @@ class _SubscriptionDetailBodyState
     );
 
     addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
+
+    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
+    final opp = _scheduleOpponentId();
+    if (opp.isNotEmpty) {
+      unawaited(
+        ref
+            .read(notificationServiceProvider)
+            .showNotification(
+              BookingNotificationService.createScheduleChangeProposed(
+                userId: opp,
+                fromTeacher: _isTeacher,
+                data: _scheduleChangeData(),
+              ),
+            ),
+      );
+    }
 
     if (mounted) {
       _showSuccess(AppStrings.scheduleChangePropose);
