@@ -235,7 +235,7 @@
 |------|----------|-----------|
 | 노트 열람 요청 | `NoteAccessRequest` / `NoteAccessStatus` | requested / consented / rejected / revoked |
 | 피치 분석 결과 | `PitchAnalysisResult` | 음정 분석 (S~D 등급) |
-| 도전 과제 유형/주기 | `ChallengeType` / `ChallengePeriod` | 챌린지 분류 |
+| 도전 과제 유형/주기 | `ActivityType` / `ChallengePeriod` | 챌린지 분류 (구 ChallengeType, #965) |
 | 랭킹 티어 | `RankingTier` | 주간 랭킹 등급 |
 | 콤보 티어 | `ComboTier` | 튜너 콤보 5단계 (`ComboState`) |
 | 판정 결과 | `JudgementResult` | 튜너 음정 판정 |

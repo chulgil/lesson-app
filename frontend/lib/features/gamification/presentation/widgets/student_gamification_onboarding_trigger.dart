@@ -55,7 +55,7 @@ class StudentGamificationOnboardingTrigger extends ConsumerWidget {
                     studentId: studentId,
                     origin: QuestOrigin.systemRoutine,
                     title: '스케일 5분',
-                    type: ChallengeType.practiceMinutes,
+                    type: ActivityType.practiceMinutes,
                     targetValue: 5,
                     currentValue: 0,
                     startDate: DateTime(n.year, n.month, n.day),

@@ -10,7 +10,7 @@ import 'package:lessonaza/features/gamification/domain/entities/student_quest.da
 StudentQuest _quest({
   String id = 'q1',
   String studentId = 's1',
-  ChallengeType? type = ChallengeType.practiceMinutes,
+  ActivityType? type = ActivityType.practiceMinutes,
   int currentValue = 0,
   bool isCompleted = false,
   QuestOrigin origin = QuestOrigin.selfCreated,
@@ -53,7 +53,7 @@ void main() {
       expect(active.length, 1);
       expect(active.single.id, 'q1');
       expect(active.single.currentValue, 5);
-      expect(active.single.type, ChallengeType.practiceMinutes);
+      expect(active.single.type, ActivityType.practiceMinutes);
     });
 
     test('updateProgress 영속', () async {

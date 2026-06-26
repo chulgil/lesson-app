@@ -130,20 +130,22 @@
 
 `weekly`(주간), `monthly`(월간) — 각 `displayName`.
 
-#### ChallengeType enum (6종)
+#### ActivityType enum (6종)
 
-| 값 | displayName | icon |
-|----|-------------|:----:|
-| practiceDays | 연습 일수 | 📅 |
-| practiceMinutes | 연습 시간 | ⏱️ |
-| recordings | 녹음 횟수 | 🎙️ |
-| lessons | 레슨 완료 | 🎵 |
-| streak | 연속 연습 | 🔥 |
-| pointsEarned | 포인트 획득 | 💎 |
+> 표시 라벨(displayName)·아이콘·targetDisplay 는 `presentation/extensions/challenge_visuals.dart` 로 분리 (#965 — 도메인 표시문자열/이모지 0, 아이콘은 Material 벡터). 구 `ChallengeType`.
+
+| 값 | displayName | icon (Material) |
+|----|-------------|-----------------|
+| practiceDays | 연습 일수 | `Icons.event` |
+| practiceMinutes | 연습 시간 | `Icons.timer` |
+| recordings | 녹음 횟수 | `Icons.mic` |
+| lessons | 레슨 완료 | `Icons.music_note` |
+| streak | 연속 연습 | `Icons.local_fire_department` |
+| pointsEarned | 포인트 획득 | `Icons.diamond` |
 
 #### Challenge 모델
 
-id, title, description, type, period, targetValue, currentValue, rewardPoints, startDate, endDate, rewardBadgeId?, isCompleted, completedAt?. 파생: `progress`(0~1), `remainingDays`, `isActive`, `targetDisplay`(타입별 단위), `copyWith`.
+id, title, description, type, period, targetValue, currentValue, rewardPoints, startDate, endDate, rewardBadgeId?, isCompleted, completedAt?. 파생: `progress`(0~1), `remainingDays`, `isActive`, `copyWith` (표시용 `targetDisplay` 는 presentation extension).
 
 Provider: `studentChallengesProvider`(현재 mock 폴백, remote API 대기), `activeChallengesProvider`, `completedChallengesProvider`.
 

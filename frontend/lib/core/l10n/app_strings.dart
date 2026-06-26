@@ -1443,6 +1443,15 @@ class AppStrings {
   /// 주간 포인트 값 표시
   static String weeklyPointsValue(int points) => '${points}pt';
 
+  /// 챌린지 주기: 주간
+  static const challengePeriodWeekly = '주간';
+
+  /// 챌린지 주기: 월간
+  static const challengePeriodMonthly = '월간';
+
+  /// 챌린지 목표 포인트 표시
+  static String challengeTargetPoints(int value) => '${value}P';
+
   // ── Subscription Chapter Lessons (C-3) ──────────────────────
 
   /// 고정 스케줄 자동 생성 안내 (정규권)

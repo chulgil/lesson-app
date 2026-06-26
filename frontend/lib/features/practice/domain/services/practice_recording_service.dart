@@ -15,7 +15,7 @@ import '../entities/practice_evidence.dart';
 /// 책임:
 /// 1. [GrowthHeatmapRepository.recordPractice] 호출 — [PracticeSource] 에
 ///    대응하는 [DailyPractice] 필드 1개만 채워서 전달.
-/// 2. 학생의 active [ChallengeType.practiceMinutes] quest 진척 갱신
+/// 2. 학생의 active [ActivityType.practiceMinutes] quest 진척 갱신
 ///    (recording 은 분 단위 X — 진척 무영향).
 ///
 /// 단방향 의존: Service → Repository. 역방향 금지.
@@ -83,7 +83,7 @@ class PracticeRecordingService {
     if (minutes <= 0) return;
     final active = await questRepository.getActiveQuests(studentId);
     for (final q in active) {
-      if (q.type != ChallengeType.practiceMinutes) continue;
+      if (q.type != ActivityType.practiceMinutes) continue;
       await questRepository.updateProgress(q.id, q.currentValue + minutes);
     }
   }
