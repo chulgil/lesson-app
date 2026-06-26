@@ -47,7 +47,7 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -450));
     await tester.pumpAndSettle();
 
-    expect(_hasTextFieldValue(tester, '360000'), isTrue);
+    expect(_hasTextFieldValue(tester, '360,000'), isTrue);
 
     await tester.drag(find.byType(ListView), const Offset(0, -600));
     await tester.pumpAndSettle();

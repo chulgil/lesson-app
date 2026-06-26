@@ -122,6 +122,11 @@ void main() {
       await tester.tap(find.text('전체 확정'));
       await tester.pumpAndSettle();
 
+      // #829 확인 요약 다이얼로그(NotebookAlertDialog) → confirm('전체 확정')
+      // 탭해야 submitMakeupSchedule 저장. (하단 버튼과 동일 라벨이라 .last)
+      await tester.tap(find.text('전체 확정').last);
+      await tester.pumpAndSettle();
+
       expect(fakeRepo.lastSavedMakeup, isNotNull,
           reason: 'submitMakeupSchedule must be invoked on confirm');
       expect(fakeRepo.lastSavedClosureId, 'closure-1');

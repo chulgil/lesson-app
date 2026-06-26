@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/parent_home/domain/entities/parent_notification_settings.dart';
 import 'package:lessonaza/features/parent_home/presentation/extensions/parent_home_domain_visuals.dart';
@@ -12,8 +13,8 @@ void main() {
       expect(NotificationCategory.communication.label, '소통');
       expect(NotificationCategory.report.label, '리포트');
 
-      expect(NotificationCategory.payment.icon, '💰');
-      expect(NotificationCategory.lesson.icon, '📅');
+      expect(NotificationCategory.payment.icon, Icons.payments);
+      expect(NotificationCategory.lesson.icon, Icons.calendar_today);
     });
   });
 
