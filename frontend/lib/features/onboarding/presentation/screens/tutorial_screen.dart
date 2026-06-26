@@ -129,7 +129,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                   TextButton(
                     onPressed: _skipTutorial,
                     child: Text(
-                      '건너뛰기',
+                      AppStrings.onboardingCategoryPreviewSkip,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkTertiary,
                       ),
@@ -195,7 +195,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                           minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
                         child: Text(
-                          '이전',
+                          AppStrings.onboardingPrevious,
                           style: AppTypography.button.copyWith(
                             color: AppColors.inkSecondary,
                           ),
@@ -220,7 +220,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                       ),
                       onPressed: _canContinue ? _nextPage : null,
                       child: Text(
-                        isLastPage ? '시작하기' : '다음',
+                        isLastPage ? AppStrings.onboardingCategoryPreviewStart : AppStrings.onboardingNext,
                         style: AppTypography.button,
                       ),
                     ),
@@ -372,7 +372,7 @@ class _TutorialPage extends StatelessWidget {
               child: Text(
                 sampleStudentCreated
                     ? '샘플 학생: 이서연 · $selectedInstrument'
-                    : '샘플 학생을 생성하면 수강 관리 카드가 준비됩니다.',
+                    : AppStrings.tutorialSampleStudentHint,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.inkSecondary,
                 ),
@@ -381,7 +381,7 @@ class _TutorialPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.space3),
             OutlinedButton(
               onPressed: sampleStudentCreated ? null : onSampleStudentCreated,
-              child: Text(sampleStudentCreated ? '생성 완료' : '샘플 학생 생성'),
+              child: Text(sampleStudentCreated ? AppStrings.tutorialSampleStudentCreated : AppStrings.tutorialSampleStudentCreate),
             ),
           ],
         );

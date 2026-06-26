@@ -65,7 +65,8 @@ class FollowFeedItem extends StatelessWidget {
           // Type badge + title
           Row(
             children: [
-              Text(post.postType.emoji, style: AppTypography.bodyLarge),
+              Icon(post.postType.icon,
+                  size: AppSpacing.iconMD, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 post.postType.label,

@@ -6375,6 +6375,22 @@ class AppStrings {
   static const searchProfileLoadError = '프로필을 불러올 수 없습니다';
   static const searchProfileNotFound = '선생님 정보를 찾을 수 없습니다';
   static const searchAnonymousTeacher = '익명 선생님';
+  static const searchSpecialtyInstrumentTitle = '전문 악기';
+  static const searchLessonStyleTitle = '수업 방식';
+  static const searchLessonAreaTitle = '수업 지역';
+  static const searchCareerDetailTitle = '경력 사항';
+  static const searchCertifiedTitle = '인증된 자격증';
+  static const searchPreviousLessonTeacher = '이전에 레슨을 받았던 선생님입니다';
+  static const searchPremiumProfileLabel = '프리미엄 프로필';
+  static const searchLessonTypeInPerson = '대면 수업';
+  static const searchLessonTypeVisit = '방문 수업';
+  static const searchAcademyLoadError = '학원 정보를 불러올 수 없습니다';
+  static const searchAcademyNotFound = '학원 정보를 찾을 수 없습니다';
+  static const searchAcademyTeacherListError = '선생님 목록을 불러올 수 없습니다';
+  static const searchAcademyNoPublicTeachers = '공개된 강사 정보가 없습니다';
+  static const searchFilterLessonInPerson = '대면 레슨';
+  static const searchFilterLessonOnline = '온라인 레슨';
+  static const searchFilterLessonVisit = '방문 레슨';
   static const searchLessonRequestInfo = '선생님에게 레슨 신청서가 전달됩니다';
   static const searchScopeAll = '전체';
   static const searchScopeTeachers = '선생님';
@@ -6456,6 +6472,22 @@ class AppStrings {
       '사진을 불러오지 못했습니다. 권한을 확인하거나 다시 시도해주세요.';
   static const onboardingProfileImageCanceled = '사진 선택이 취소되었습니다.';
   static const onboardingNext = '다음';
+  static const onboardingPrevious = '이전';
+  static const tutorialDescProfileSetup = '이름과 대표 악기를 입력해 첫 설정을 완성하세요';
+  static const tutorialDescStudentPreview = '학생 카드가 어떻게 보이는지 샘플로 확인하세요';
+  static const tutorialDescLessonNote = '레슨 후 남길 기록을 미리 작성해보세요';
+  static const studentTutorialDescTuner = '원하는 음을 선택해 정확한 음높이를 확인하세요';
+  static const studentTutorialDescRecording = '버튼을 길게 눌러 2초 이상 녹음해보세요';
+  static const studentTutorialDescFeedback = '레슨 후 받게 될 피드백을 미리 살펴보세요';
+  static const tutorialSampleStudentHint = '샘플 학생을 생성하면 수강 관리 카드가 준비됩니다.';
+  static const tutorialSampleStudentCreated = '생성 완료';
+  static const tutorialSampleStudentCreate = '샘플 학생 생성';
+  static const tunerStepGuide = '원하는 음을 선택하면 정확한 음높이를 확인할 수 있어요';
+  static const recordingStepGuide = '버튼을 길게 눌러 녹음을 시작하세요\n(2초 이상)';
+  static String recordingInProgressSeconds(String seconds) => '녹음중... ${seconds}s';
+  static const recordingStepHoldLonger = '조금 더 길게 눌러보세요';
+  static const recordingStepTrimInfo = '원본 2.0초 → 자동 트리밍\n0.3 ~ 1.8초 (저장 가능)';
+  static const feedbackStepGuide = '선생님이 남기는 피드백 카드를 펼쳐보세요';
   static const onboardingSelectInstrument = '악기 선택';
   static const onboardingNameHint = '선생님 이름을 입력해주세요';
   static const onboardingIntroHint = '학생들에게 보여질 자기소개를 작성해주세요 (20자 이상)';
@@ -6671,7 +6703,6 @@ class AppStrings {
   static const studentHomeWeeklyPractice = '이번 주 연습';
   static const studentHomePracticeJournal = '연습 일지';
   static const studentHomeMySubscriptions = '내 수강권';
-  static const studentHomeViewAllSpaced = '전체 보기';
   static const studentHomeTrialLesson = '체험레슨';
   static const studentHomeScheduleChangeLabel = '일정 변경';
   static const studentHomeRetryBooking = '다른 시간으로 다시 신청';
@@ -6765,7 +6796,6 @@ class AppStrings {
   static const studentHomeEditAction = '편집';
   static const studentHomeScheduleTitle = '스케줄';
   static const studentHomeBookAction = '예약';
-  static const studentHomeDataLoadFailed = '데이터를 불러오는데 실패했습니다';
   static const studentHomePracticeEmpty = '아직 연습 과제가 없습니다';
   static const studentHomePracticeTeacherHint = '선생님이 과제를 등록하면 여기에 표시됩니다';
   static const studentHomeConnectTeacher = '선생님 연결하기';
@@ -6881,9 +6911,6 @@ class AppStrings {
   static const parentHomeLessonNote = '레슨 노트';
   static const parentHomeViewDetail = '상세보기';
   static const parentHomeRegularLesson = '정규 레슨';
-  static const parentHomeLessonScheduled = '예정';
-  static const parentHomeLessonCompleted = '완료';
-  static const parentHomeLessonCancelled = '취소';
   static const parentHomeTodayPractice = '오늘의 연습';
   static const parentHomeFindTeacher = '선생님 찾기';
   static const parentHomeInviteCode = '초대코드 입력';
@@ -8121,6 +8148,15 @@ class AppStrings {
   static const inquiryFormMessageLabel = '문의 내용';
   static const inquiryFormMessageHint = '문의 내용을 입력해주세요';
   static const inquiryFormSubmit = '문의 보내기';
+  static const inquiryFormRelationLabel = '관계 선택';
+  static const inquiryFormRelationParent = '학부모';
+  static const inquiryFormPhoneRequired = '연락처를 입력해주세요';
+  static String inquiryFormSubmitFailed(Object e) => '문의 전송 실패: $e';
+  static String inquiryReplySubmitFailed(Object e) => '답변 전송 실패: $e';
+  static String inquiryReplyCountLabel(int count) => '답변 ($count)';
+  static const inquiryReplyFromAcademy = '학원 답변';
+  static const inquiryReplyFromMe = '내 답변';
+  static String inquiryLoadErrorWith(Object e) => '오류: $e';
 
   // ── Note Access Requests ───────────────────────────────────
 

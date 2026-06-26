@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/lesson.dart';
 
 extension LessonStatusVisualX on LessonStatus {
@@ -24,6 +27,26 @@ extension LessonStatusVisualX on LessonStatus {
         return AppStrings.statusStudentAbsent;
       case LessonStatus.reschedulePending:
         return AppStrings.statusReschedulePending;
+    }
+  }
+
+  /// SSOT status color (C3). scheduled=ink (중립). 모든 화면이 참조.
+  Color get color {
+    switch (this) {
+      case LessonStatus.scheduled:
+      case LessonStatus.reschedulePending:
+        return AppColors.ink;
+      case LessonStatus.completed:
+        return AppColors.paperOk;
+      case LessonStatus.cancelled:
+      case LessonStatus.cancelledByStudentAdvance:
+      case LessonStatus.cancelledByTeacher:
+      case LessonStatus.cancelledMutual:
+        return AppColors.inkTertiary;
+      case LessonStatus.noShow:
+      case LessonStatus.cancelledByStudentLate:
+      case LessonStatus.studentAbsent:
+        return AppColors.paperAccent;
     }
   }
 }

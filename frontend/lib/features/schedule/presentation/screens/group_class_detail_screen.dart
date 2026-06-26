@@ -10,6 +10,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../extensions/group_class_booking_visuals.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
@@ -380,7 +381,8 @@ class _GroupClassDetailScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(booking.statusIcon, style: AppTypography.headingLarge),
+              Icon(booking.status.statusIcon,
+                  size: AppSpacing.iconLG, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 booking.statusText,

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/lessons/domain/entities/teaching_resource.dart';
 import 'package:lessonaza/features/lessons/presentation/extensions/teaching_resource_visuals.dart';
@@ -17,9 +18,9 @@ void main() {
     });
 
     test('각 타입의 icon이 올바르다', () {
-      expect(TeachingResourceType.teacherRecording.icon, '🎵');
-      expect(TeachingResourceType.youtube.icon, '🎬');
-      expect(TeachingResourceType.externalLink.icon, '🔗');
+      expect(TeachingResourceType.teacherRecording.icon, Icons.music_note);
+      expect(TeachingResourceType.youtube.icon, Icons.smart_display);
+      expect(TeachingResourceType.externalLink.icon, Icons.link);
     });
 
     test('모든 타입은 고유한 label을 가진다', () {

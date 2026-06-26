@@ -70,7 +70,7 @@ class _AcademyInquiryDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('답변 전송 실패: $e'),
+            content: Text(AppStrings.inquiryReplySubmitFailed(e)),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -101,7 +101,7 @@ class _AcademyInquiryDetailScreenState
                   // Replies
                   if (_currentInquiry.replies.isNotEmpty) ...[
                     Text(
-                      '답변 (${_currentInquiry.replies.length})',
+                      AppStrings.inquiryReplyCountLabel(_currentInquiry.replies.length),
                       style: AppTypography.headingSmall.copyWith(
                         color: AppColors.ink,
                       ),
@@ -226,7 +226,7 @@ class _AcademyInquiryDetailScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                reply.isFromAcademy ? '학원 답변' : '내 답변',
+                reply.isFromAcademy ? AppStrings.inquiryReplyFromAcademy : AppStrings.inquiryReplyFromMe,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.bold,

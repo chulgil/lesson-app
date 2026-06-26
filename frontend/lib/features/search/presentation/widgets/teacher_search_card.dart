@@ -175,7 +175,7 @@ class TeacherSearchCard extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            publicProfile.name ?? '선생님',
+            publicProfile.name ?? AppStrings.teacher,
             style: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
             ),

@@ -33,19 +33,4 @@ extension TipCategoryVisuals on TipCategory {
         return '일반';
     }
   }
-
-  String get icon {
-    switch (this) {
-      case TipCategory.technique:
-        return 'build';
-      case TipCategory.musicality:
-        return 'music_note';
-      case TipCategory.practice:
-        return 'repeat';
-      case TipCategory.mindset:
-        return 'psychology';
-      case TipCategory.general:
-        return 'lightbulb';
-    }
-  }
 }

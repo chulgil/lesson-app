@@ -235,7 +235,8 @@ class _AttachedResourceList extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text(resource.type.icon, style: AppTypography.bodyLarge),
+          Icon(resource.type.icon,
+              size: AppSpacing.iconMD, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -439,9 +440,10 @@ class _AddResourceButton extends ConsumerWidget {
                             itemBuilder: (_, index) {
                               final r = resources[index];
                               return ListTile(
-                                leading: Text(
+                                leading: Icon(
                                   r.type.icon,
-                                  style: AppTypography.headingLarge,
+                                  size: AppSpacing.iconLG,
+                                  color: AppColors.ink,
                                 ),
                                 title: Text(
                                   r.title,

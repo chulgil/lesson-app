@@ -1,3 +1,5 @@
+import '../../../../core/l10n/app_strings.dart';
+
 enum StudentTutorialStep { metronome, tuner, recording, feedback }
 
 class StudentTutorialStepContent {
@@ -24,19 +26,19 @@ class StudentTutorialStepContent {
       step: StudentTutorialStep.tuner,
       index: 2,
       title: '2. 튜너로 음 맞추기',
-      description: '원하는 음을 선택해 정확한 음높이를 확인하세요',
+      description: AppStrings.studentTutorialDescTuner,
     ),
     StudentTutorialStepContent(
       step: StudentTutorialStep.recording,
       index: 3,
       title: '3. 첫 녹음 체험',
-      description: '버튼을 길게 눌러 2초 이상 녹음해보세요',
+      description: AppStrings.studentTutorialDescRecording,
     ),
     StudentTutorialStepContent(
       step: StudentTutorialStep.feedback,
       index: 4,
       title: '4. 선생님 피드백 확인',
-      description: '레슨 후 받게 될 피드백을 미리 살펴보세요',
+      description: AppStrings.studentTutorialDescFeedback,
     ),
   ];
 

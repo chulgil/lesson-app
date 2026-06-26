@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../../domain/entities/user_role.dart';
 
 extension UserRoleVisuals on UserRole {
@@ -12,14 +14,14 @@ extension UserRoleVisuals on UserRole {
     }
   }
 
-  String get emoji {
+  IconData get icon {
     switch (this) {
       case UserRole.teacher:
-        return '👩‍🏫';
+        return Icons.school;
       case UserRole.student:
-        return '🎻';
+        return Icons.music_note;
       case UserRole.parent:
-        return '👨‍👩‍👧';
+        return Icons.family_restroom;
     }
   }
 

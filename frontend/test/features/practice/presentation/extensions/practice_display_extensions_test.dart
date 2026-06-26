@@ -12,15 +12,12 @@ import 'package:lessonaza/features/practice/presentation/extensions/practice_dis
 void main() {
   group('practice display extensions', () {
     test('maps practice item enum display values', () {
-      expect(QuickReaction.good.emoji, '👍');
       expect(QuickReaction.excellent.label, '훌륭해요');
-      expect(StudentResponse.question.emoji, '❓');
       expect(StudentResponse.thanks.label, '감사합니다');
 
       expect(PracticePriority.must.label, '필수');
       expect(PracticePriority.should.childLabel, '해보면 좋아요~');
       expect(PracticePriority.could.shortLabel, '선택');
-      expect(PracticePriority.must.emoji, '⭐⭐⭐');
 
       expect(PracticeType.repertoire.label, '레퍼토리');
     });

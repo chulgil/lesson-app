@@ -44,7 +44,7 @@ class LessonCard extends ConsumerWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: Border(
-              left: BorderSide(color: _getStatusColor(), width: 3),
+              left: BorderSide(color: lesson.displayStatus.color, width: 3),
               bottom: const BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
@@ -109,7 +109,7 @@ class LessonCard extends ConsumerWidget {
                     child: Text(
                       _getStatusLabel(),
                       style: NotebookTypography.sectionLabel.copyWith(
-                        color: _getStatusColor(),
+                        color: lesson.displayStatus.color,
                         fontSize: 10,
                       ),
                       textAlign: TextAlign.end,
@@ -149,24 +149,6 @@ class LessonCard extends ConsumerWidget {
     }
   }
 
-  Color _getStatusColor() {
-    switch (lesson.displayStatus) {
-      case LessonStatus.scheduled:
-      case LessonStatus.reschedulePending:
-        return AppColors.ink;
-      case LessonStatus.completed:
-        return AppColors.paperOk;
-      case LessonStatus.cancelled:
-      case LessonStatus.cancelledByStudentAdvance:
-      case LessonStatus.cancelledByTeacher:
-      case LessonStatus.cancelledMutual:
-        return AppColors.inkTertiary;
-      case LessonStatus.noShow:
-      case LessonStatus.cancelledByStudentLate:
-      case LessonStatus.studentAbsent:
-        return AppColors.paperAccent;
-    }
-  }
 
   /// Build context badge and subscription badge row.
   Widget _buildBadgesRow(WidgetRef ref) {

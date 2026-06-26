@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../features/lessons/presentation/extensions/lesson_visuals.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -713,20 +714,16 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color textColor;
-    String label;
-
+    final textColor = status.color;
+    final String label;
     switch (status) {
       case lessons.LessonStatus.scheduled:
       case lessons.LessonStatus.reschedulePending:
-        textColor = AppColors.paperOk;
-        label = AppStrings.parentHomeLessonScheduled;
+        label = AppStrings.statusUpcoming;
       case lessons.LessonStatus.completed:
-        textColor = AppColors.inkSecondary;
-        label = AppStrings.parentHomeLessonCompleted;
+        label = AppStrings.statusCompleted;
       default:
-        textColor = AppColors.paperAccent;
-        label = AppStrings.parentHomeLessonCancelled;
+        label = AppStrings.statusCancelled;
     }
 
     return Container(

@@ -263,9 +263,9 @@ class _TeacherSearchFilterSheetState
   Widget _buildLessonTypeOptionSelection() {
     final selected = _filter.lessonTypes ?? [];
     final types = [
-      (LessonTypeOption.inPerson, '대면 레슨'),
-      (LessonTypeOption.online, '온라인 레슨'),
-      (LessonTypeOption.visit, '방문 레슨'),
+      (LessonTypeOption.inPerson, AppStrings.searchFilterLessonInPerson),
+      (LessonTypeOption.online, AppStrings.searchFilterLessonOnline),
+      (LessonTypeOption.visit, AppStrings.searchFilterLessonVisit),
     ];
 
     return Wrap(

@@ -193,7 +193,7 @@ class _ProgressSummary extends StatelessWidget {
                   borderRadius: BorderRadius.zero,
                 ),
                 child: Text(
-                  '$percent% ${AppStrings.parentHomeLessonCompleted}',
+                  '$percent% ${AppStrings.statusCompleted}',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.paper,
                     fontWeight: FontWeight.bold,
@@ -223,7 +223,7 @@ class _ProgressSummary extends StatelessWidget {
                 color: AppColors.paper,
               ),
               _ProgressStat(
-                label: AppStrings.parentHomeLessonCompleted,
+                label: AppStrings.statusCompleted,
                 value: '$completed',
                 color: AppColors.paperDark,
               ),

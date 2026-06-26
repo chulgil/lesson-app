@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../core/l10n/app_strings.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -53,7 +54,7 @@ class _FeedbackStepState extends State<FeedbackStep> {
             vertical: AppSpacing.space2,
           ),
           child: Text(
-            '선생님이 남기는 피드백 카드를 펼쳐보세요',
+            AppStrings.feedbackStepGuide,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkTertiary,
             ),
