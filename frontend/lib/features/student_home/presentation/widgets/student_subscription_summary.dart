@@ -95,6 +95,9 @@ class StudentSubscriptionSummary extends ConsumerWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Container(
+      // 빈 수강권 카드도 채워진 카드와 동일하게 전폭 — width 미지정 시 Column 이
+      // intrinsic 폭으로 줄어 좌측 정사각형으로 렌더됨(#631).
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
