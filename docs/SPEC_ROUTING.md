@@ -1,7 +1,41 @@
 # Spec Routing — AI 작업 지시용 문서 라우팅
 
-> 최종 업데이트: 2026-05-02
+> 최종 업데이트: 2026-06-26 (0절 방향 SSOT 신설 / 직전 2026-05-02)
 > 목적: Claude에게 작업 지시 시 "어떤 문서를 읽어라/읽지 마라"를 명시하여 토큰 낭비와 상태 모순 방지
+
+---
+
+## 0. 방향 SSOT — 멀티 Discipline 전환 (작업 시작 시 먼저 읽기)
+
+> 이 절은 클로드가 어떤 작업이든 시작할 때 1분 안에 "현재 정체성 / 향후 방향 / 손대도 되는 문서 / Phase 이슈가 소유한 문서"를 구분하게 하는 가드레일 색인이다.
+
+### 0.1 현재 상태 (역드리프트 가드)
+
+레슨앱은 **현재 음악 전용(Discipline 0)** 이다. 멀티 Discipline(헬스/필라테스/어학) 일반화는 **설계 단계이며 코드 미구현**. glossary·architecture·마스터 스펙을 **지금 일반화하지 말 것** — 일반화는 #962~#980(Phase 0~4)이 doc-sync 로 점진 수행한다.
+
+### 0.2 방향 SSOT 포인터
+
+북극성 = 옵시디언 `36-멀티카테고리-Discipline-플랫폼-설계-2026-06-26` (status=active, Phase 0~5 미착수). Discipline/SettingGroup 명명 결정 진원지 = 36-문서. 이슈 = #962(명명 분리)~#980. repo 결정 기록은 커밋 trailer(bare key: Directive/Constraint/Rejected).
+
+### 0.3 용어 충돌 경고 (Category 동음이의)
+
+`카테고리/Category` 는 현재 glossary §14 의 **선생님 설정 5묶음(= SettingGroup)** 만 지칭. 신규 "분야" 개념은 `Discipline`. SettingGroup 리네이밍(#962) 전까지 **신규 코드/스펙에서 `카테고리`를 분야 의미로 쓰지 말 것**. glossary 수정은 `.harness/knowledge/glossary.md` 가 SSOT, `docs/specs/glossary.md` 는 단방향 미러.
+
+### 0.4 음악-hard 문서 → Phase 매핑 (이슈 소유 · 지금 재작성 금지)
+
+practice 마스터 / practice_screen / youtube_loop / backup / practice_journal_master / metronome_master / avaudioengine_guide / tuner / 분석 대시보드 + 옵시디언 13·25·34 — 모두 음악 전제 hard. RangeSpec/RepeatTarget 일반화(P2~3) · CenterActionSlot 도구 슬롯화(P3) 시 해당 Phase 이슈가 doc-sync 로 갱신. **클로드는 읽되 일반화 편집은 Phase 지시 없이 금지.**
+
+### 0.5 안정 포인터 문서 (분야무관 코칭 척추 · 불변)
+
+schedule / subscription / user / notification / lesson / invite / relationship / follow / billing / sync / 휴가 마스터는 Discipline 전환에 **불변**(36- 재사용 자산). 본문 변경 없이 36- 포인터만.
+
+### 0.6 stale 주의 (재구현 방지)
+
+옵시디언 `35-선생님휴가...` §8 의 "빈곳" 표는 0622 검토가 코드로 반증 — **A1/A2/A3/A5 구현완료, A4만 미구현**. 구현완료 기능 재구현 금지. (repo `teacher_vacation_mode.md` §8 은 TimeException 구분 — stale 아님, 정상). `payment.md`(레거시) ≠ `subscription_master`(현행).
+
+### 0.7 참조 금지 (archive)
+
+`docs/specs/_archive/`, `docs/requirement/requirement.md`(폐기), `implementation_status.md`, `design_master.md`(SSOT=notebook/README), `schema/entities/payment.md`(레거시), `.claude/rules/archive/` — 역사 링크만, 작업 근거 비대상.
 
 ---
 
