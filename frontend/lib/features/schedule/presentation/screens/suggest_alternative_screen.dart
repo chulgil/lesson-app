@@ -16,8 +16,11 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
+import '../../domain/entities/teacher_availability.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../../domain/services/schedule_window_conflict_service.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
+import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
 import '../widgets/alternative_time_grid.dart';
 
@@ -98,13 +101,31 @@ class _SuggestAlternativeScreenState
     return _weekStart.add(Duration(days: dayOfWeek.clamp(0, 6)));
   }
 
-  /// Check if a preferred slot conflicts with existing lessons.
-  /// Returns: null=no conflict, 'confirmed'=hard conflict, 'preview'=preview conflict
-  String? _checkSlotConflict(PreferredTimeSlot slot, List<Lesson> lessons) {
+  /// Check if a preferred slot conflicts with the teacher's schedule.
+  /// Returns: null=no conflict, 'confirmed'=hard lesson conflict,
+  /// 'preview'=preview lesson conflict, 'vacation'=vacation/holiday block,
+  /// 'hours'=outside operating hours (#526). Vacation/operating-hours are
+  /// evaluated first so a slot the teacher is unavailable for is never reported
+  /// as conflict-free just because no lesson overlaps it.
+  String? _checkSlotConflict(
+    PreferredTimeSlot slot,
+    List<Lesson> lessons,
+    TeacherAvailability? availability,
+  ) {
     final slotDate = _dateForPreferredSlot(slot);
     if (slotDate == null) return null;
     final slotStart = _parseTimeMinutes(slot.startTime);
     final slotEnd = _parseTimeMinutes(slot.endTime);
+
+    // #526 — vacation / operating-hours window check (independent of lessons).
+    final window = ScheduleWindowConflictService.check(
+      availability: availability,
+      date: slotDate,
+      startMinutes: slotStart,
+      endMinutes: slotEnd,
+    );
+    if (window == ScheduleWindowConflict.vacation) return 'vacation';
+    if (window == ScheduleWindowConflict.outsideOperatingHours) return 'hours';
 
     for (final lesson in lessons) {
       if (lesson.date.year == slotDate.year &&
@@ -118,6 +139,43 @@ class _SuggestAlternativeScreenState
       }
     }
     return null;
+  }
+
+  /// Human label for a conflict code, or null when there is no conflict.
+  String? _conflictLabel(String? conflict) {
+    switch (conflict) {
+      case 'confirmed':
+        return AppStrings.slotConflict;
+      case 'preview':
+        return AppStrings.previewConflict;
+      case 'vacation':
+        return AppStrings.slotVacationConflict;
+      case 'hours':
+        return AppStrings.slotOutsideOperatingHours;
+      default:
+        return null;
+    }
+  }
+
+  /// Inline warning icon + label for a conflict code (empty when no conflict).
+  List<Widget> _conflictHint(String? conflict) {
+    final label = _conflictLabel(conflict);
+    if (label == null) return const [];
+    return [
+      const SizedBox(width: AppSpacing.space1),
+      Icon(
+        Icons.warning_amber_rounded,
+        size: 16,
+        color: AppColors.paperAccent,
+      ),
+      const SizedBox(width: 2),
+      Text(
+        label,
+        style: AppTypography.captionSmall.copyWith(
+          color: AppColors.paperAccent,
+        ),
+      ),
+    ];
   }
 
   /// Compute highlight for the selected preferred slot (for grid display).
@@ -144,6 +202,14 @@ class _SuggestAlternativeScreenState
   String get _effectiveTeacherId =>
       widget.teacherId ?? ref.read(currentUserIdProvider);
 
+  /// Current value of the teacher's availability (vacation + operating
+  /// hours) for #526 window conflict checks. Read non-blocking — when the
+  /// provider is still loading or errored we get null and the check is
+  /// skipped rather than blocking the UI.
+  TeacherAvailability? _teacherAvailability() => ref
+      .watch(teacherAvailabilityProvider(_effectiveTeacherId))
+      .valueOrNull;
+
   @override
   Widget build(BuildContext context) {
     final teacherId = _effectiveTeacherId;
@@ -162,7 +228,10 @@ class _SuggestAlternativeScreenState
         children: [
           // Student's preferred slots (if any)
           if (widget.preferredSlots.isNotEmpty)
-            _buildPreferredSlotsSection(weekLessonsAsync.valueOrNull ?? []),
+            _buildPreferredSlotsSection(
+              weekLessonsAsync.valueOrNull ?? [],
+              _teacherAvailability(),
+            ),
 
           // Week navigation
           _buildWeekNav(),
@@ -199,7 +268,10 @@ class _SuggestAlternativeScreenState
   }
 
   /// Student's preferred time slots as selectable cards.
-  Widget _buildPreferredSlotsSection(List<Lesson> currentWeekLessons) {
+  Widget _buildPreferredSlotsSection(
+    List<Lesson> currentWeekLessons,
+    TeacherAvailability? availability,
+  ) {
     final sorted = [...widget.preferredSlots]
       ..sort((a, b) => a.priority.compareTo(b.priority));
 
@@ -238,7 +310,11 @@ class _SuggestAlternativeScreenState
             final index = entry.key;
             final slot = entry.value;
             final isSelected = _selectedPreferredIndex == slot.priority;
-            final conflict = _checkSlotConflict(slot, currentWeekLessons);
+            final conflict = _checkSlotConflict(
+      slot,
+      currentWeekLessons,
+      availability,
+    );
 
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space2),
@@ -318,36 +394,8 @@ class _SuggestAlternativeScreenState
                           ),
                         ),
                       ),
-                      // Conflict hint
-                      if (conflict == 'confirmed') ...[
-                        const SizedBox(width: AppSpacing.space1),
-                        Icon(
-                          Icons.warning_amber_rounded,
-                          size: 16,
-                          color: AppColors.paperAccent,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          AppStrings.slotConflict,
-                          style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.paperAccent,
-                          ),
-                        ),
-                      ] else if (conflict == 'preview') ...[
-                        const SizedBox(width: AppSpacing.space1),
-                        Icon(
-                          Icons.warning_amber_rounded,
-                          size: 16,
-                          color: AppColors.paperAccent,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          AppStrings.previewConflict,
-                          style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.paperAccent,
-                          ),
-                        ),
-                      ],
+                      // Conflict hint (lesson / vacation / operating hours)
+                      ..._conflictHint(conflict),
                     ],
                   ),
                 ),
@@ -425,6 +473,7 @@ class _SuggestAlternativeScreenState
                             )
                             .valueOrNull ??
                         [],
+                    _teacherAvailability(),
                   )
                 : _buildProposeButtons(),
           ],
@@ -433,18 +482,28 @@ class _SuggestAlternativeScreenState
     );
   }
 
-  /// Accept mode: confirm button — 3 states:
+  /// Accept mode: confirm button — states:
   /// - null conflict: green "이 일정으로 확정"
   /// - 'preview' conflict: warning "프리뷰 겹침 — 확정" (enabled)
   /// - 'confirmed' conflict: disabled "일정 겹침"
-  Widget _buildAcceptButton(List<Lesson> lessons) {
+  /// - 'vacation'/'hours' conflict (#526): disabled with the matching reason —
+  ///   the teacher cannot accept a slot inside their own vacation or outside
+  ///   operating hours.
+  Widget _buildAcceptButton(
+    List<Lesson> lessons,
+    TeacherAvailability? availability,
+  ) {
     final selectedSlot = widget.preferredSlots.firstWhere(
       (s) => s.priority == _selectedPreferredIndex,
       orElse: () => widget.preferredSlots.first,
     );
-    final conflict = _checkSlotConflict(selectedSlot, lessons);
-    final hasHardConflict = conflict == 'confirmed';
+    final conflict = _checkSlotConflict(selectedSlot, lessons, availability);
     final hasPreviewConflict = conflict == 'preview';
+    // Lesson overlap, vacation, and outside-operating-hours all hard-block.
+    final hasHardConflict =
+        conflict == 'confirmed' ||
+        conflict == 'vacation' ||
+        conflict == 'hours';
 
     final Color bgColor;
     final IconData icon;
@@ -453,7 +512,7 @@ class _SuggestAlternativeScreenState
     if (hasHardConflict) {
       bgColor = AppColors.paperAccent;
       icon = Icons.block;
-      label = AppStrings.slotConflict;
+      label = _conflictLabel(conflict) ?? AppStrings.slotConflict;
     } else if (hasPreviewConflict) {
       bgColor = AppColors.paperAccent;
       icon = Icons.warning_amber_rounded;
@@ -580,6 +639,35 @@ class _SuggestAlternativeScreenState
     );
   }
 
+  /// Localized reason a proposed window is unavailable due to the teacher's
+  /// own schedule (#526), or null when the window is fine. Existing-lesson
+  /// overlap is checked separately by the caller.
+  String? _windowConflictMessage(
+    DateTime date,
+    int startMinutes,
+    int endMinutes,
+  ) {
+    // ref.read (not _teacherAvailability()'s watch) — called from event
+    // handlers (_addSlotFromGrid/_editSlot), not during build.
+    final availability = ref
+        .read(teacherAvailabilityProvider(_effectiveTeacherId))
+        .valueOrNull;
+    final window = ScheduleWindowConflictService.check(
+      availability: availability,
+      date: date,
+      startMinutes: startMinutes,
+      endMinutes: endMinutes,
+    );
+    switch (window) {
+      case ScheduleWindowConflict.vacation:
+        return AppStrings.slotVacationConflict;
+      case ScheduleWindowConflict.outsideOperatingHours:
+        return AppStrings.slotOutsideOperatingHours;
+      case ScheduleWindowConflict.none:
+        return null;
+    }
+  }
+
   void _addSlotFromGrid(DateTime date, int hour, int minute) {
     if (_suggestedSlots.length >= 3) {
       showErrorSnackBar(context, AppStrings.maxSlotsReached);
@@ -611,6 +699,14 @@ class _SuggestAlternativeScreenState
           return;
         }
       }
+    }
+
+    // #526 — block proposing a slot inside the teacher's vacation or outside
+    // their operating hours.
+    final windowMessage = _windowConflictMessage(date, startMinutes, endMinutes);
+    if (windowMessage != null) {
+      showErrorSnackBar(context, windowMessage);
+      return;
     }
 
     setState(() {
@@ -756,6 +852,19 @@ class _SuggestAlternativeScreenState
           return;
         }
       }
+    }
+
+    // #526 — block editing a slot into the teacher's vacation or outside hours.
+    final windowMessage = _windowConflictMessage(
+      newDate,
+      startMinutes,
+      endMinutes,
+    );
+    if (windowMessage != null) {
+      if (mounted) {
+        showErrorSnackBar(context, windowMessage);
+      }
+      return;
     }
 
     setState(() {
