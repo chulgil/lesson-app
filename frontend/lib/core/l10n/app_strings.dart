@@ -694,6 +694,20 @@ class AppStrings {
   static const scheduleChangeReject = '거절';
   static const scheduleChangeCounter = '다른 시간 제안하기';
   static const scheduleChangeConfirmed = '시간이 변경되었습니다';
+
+  // 일정 변경 협상 알림 (#541) — 상대에게 보내는 비동기 핸드오프 통지
+  static const scheduleChangeNotifyProposedTitle = '일정 변경 제안';
+  static const scheduleChangeNotifyAcceptedTitle = '일정 변경 수락';
+  static const scheduleChangeNotifyRejectedTitle = '일정 변경 거절';
+  static const scheduleChangeNotifyCounteredTitle = '일정 변경 역제안';
+  static String scheduleChangeNotifyProposedBody(bool fromTeacher) =>
+      '${fromTeacher ? '선생님' : '학생'}이 일정 변경을 제안했습니다.';
+  static String scheduleChangeNotifyAcceptedBody(bool fromTeacher) =>
+      '${fromTeacher ? '선생님' : '학생'}이 일정 변경을 수락했습니다.';
+  static String scheduleChangeNotifyRejectedBody(bool fromTeacher) =>
+      '${fromTeacher ? '선생님' : '학생'}이 일정 변경을 거절했습니다.';
+  static String scheduleChangeNotifyCounteredBody(bool fromTeacher) =>
+      '${fromTeacher ? '선생님' : '학생'}이 다른 시간을 제안했습니다.';
   static const scheduleChangeRecommended = '추천';
   static const scheduleChangeResponseNeeded = '일정 변경 응답이 필요합니다';
   static const scheduleChangeResponseAction = '일정 변경 응답 필요 →';
