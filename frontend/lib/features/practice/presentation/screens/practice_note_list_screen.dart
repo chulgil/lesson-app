@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/entities.dart';
+import '../extensions/practice_section_visuals.dart';
 import '../providers/practice_note_provider.dart';
 import '../providers/practice_repertoire_crud_provider.dart';
 import '../widgets/notes/note_edit_dialog.dart';
@@ -80,7 +81,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(dynamic section, String? repertoireName) {
+  Widget _buildSectionHeader(PracticeSection section, String? repertoireName) {
     return Row(
       children: [
         Icon(Icons.library_music, color: AppColors.paperAccent, size: 20),
@@ -123,15 +124,15 @@ class PracticeNoteListScreen extends ConsumerWidget {
     );
   }
 
-  String _formatSectionInfo(dynamic section) {
+  String _formatSectionInfo(PracticeSection section) {
     final parts = <String>[];
-    if (section.sectionName != null && section.sectionName.isNotEmpty) {
-      parts.add(section.sectionName);
+    final sectionName = section.sectionName;
+    if (sectionName != null && sectionName.isNotEmpty) {
+      parts.add(sectionName);
     }
-    if (section.rangeText != null &&
-        section.rangeText.isNotEmpty &&
-        section.rangeText != '전체') {
-      parts.add(section.rangeText);
+    final range = section.rangeText;
+    if (range.isNotEmpty && range != '전체') {
+      parts.add(range);
     }
     return parts.isEmpty ? '전체' : parts.join(' · ');
   }

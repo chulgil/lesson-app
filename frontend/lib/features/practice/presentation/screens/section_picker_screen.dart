@@ -16,6 +16,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/practice_repertoire.dart';
+import '../extensions/practice_section_visuals.dart';
 import '../../../settings/settings_facade.dart';
 
 /// Result returned when a section is selected.
