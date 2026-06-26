@@ -37,10 +37,10 @@ class AcademyDetailScreen extends ConsumerWidget {
       ),
       body: academyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => _buildErrorState(context, '학원 정보를 불러올 수 없습니다'),
+        error: (error, stack) => _buildErrorState(context, AppStrings.searchAcademyLoadError),
         data: (academy) {
           if (academy == null) {
-            return _buildErrorState(context, '학원 정보를 찾을 수 없습니다');
+            return _buildErrorState(context, AppStrings.searchAcademyNotFound);
           }
           return _buildScrollBody(context, ref, academy, teachersAsync);
         },
@@ -130,7 +130,7 @@ class AcademyDetailScreen extends ConsumerWidget {
             error:
                 (error, stack) => Center(
                   child: Text(
-                    '선생님 목록을 불러올 수 없습니다',
+                    AppStrings.searchAcademyTeacherListError,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -277,7 +277,7 @@ class AcademyDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Center(
           child: Text(
-            '공개된 강사 정보가 없습니다',
+            AppStrings.searchAcademyNoPublicTeachers,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -306,7 +306,7 @@ class AcademyDetailScreen extends ConsumerWidget {
                     'instrument':
                         teacher.instruments.isNotEmpty
                             ? teacher.instruments.first
-                            : '악기',
+                            : AppStrings.instrumentLabel,
                     'studentId': userProfile.userId,
                     'studentName': userProfile.userName,
                     'isTrialLesson': true,
@@ -369,7 +369,7 @@ class _AcademyTeacherCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      teacher.name ?? '익명 선생님',
+                      teacher.name ?? AppStrings.searchAnonymousTeacher,
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

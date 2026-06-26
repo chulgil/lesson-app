@@ -169,7 +169,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 // Instruments
                 _buildSection(
                   icon: Icons.music_note,
-                  title: '전문 악기',
+                  title: AppStrings.searchSpecialtyInstrumentTitle,
                   child: Wrap(
                     spacing: AppSpacing.space2,
                     runSpacing: AppSpacing.space1,
@@ -193,7 +193,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 // Introduction
                 _buildSection(
                   icon: Icons.info_outline,
-                  title: '소개',
+                  title: AppStrings.profilePreviewSectionIntro,
                   child: Text(
                     profile.introduction,
                     style: AppTypography.bodyMedium.copyWith(
@@ -208,7 +208,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 if (profile.experienceYears != null) ...[
                   _buildSection(
                     icon: Icons.work_outline,
-                    title: '경력',
+                    title: AppStrings.profileVisibilityCareerTitle,
                     child: Text(
                       '${profile.experienceYears}년 경력',
                       style: AppTypography.bodyMedium.copyWith(
@@ -224,7 +224,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                     profile.lessonTypes!.isNotEmpty) ...[
                   _buildSection(
                     icon: Icons.school_outlined,
-                    title: '수업 방식',
+                    title: AppStrings.searchLessonStyleTitle,
                     child: Wrap(
                       spacing: AppSpacing.space2,
                       runSpacing: AppSpacing.space1,
@@ -251,7 +251,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                     profile.lessonAreas!.isNotEmpty) ...[
                   _buildSection(
                     icon: Icons.location_on_outlined,
-                    title: '수업 지역',
+                    title: AppStrings.searchLessonAreaTitle,
                     child: Wrap(
                       spacing: AppSpacing.space2,
                       runSpacing: AppSpacing.space1,
@@ -281,7 +281,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                     profile.education!.isNotEmpty) ...[
                   _buildSection(
                     icon: Icons.school,
-                    title: '학력',
+                    title: AppStrings.profilePreviewSectionEducation,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:
@@ -307,7 +307,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 if (profile.career != null && profile.career!.isNotEmpty) ...[
                   _buildSection(
                     icon: Icons.work,
-                    title: '경력 사항',
+                    title: AppStrings.searchCareerDetailTitle,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:
@@ -352,7 +352,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 if (profile.verifiedCertificates.isNotEmpty) ...[
                   _buildSection(
                     icon: Icons.verified,
-                    title: '인증된 자격증',
+                    title: AppStrings.searchCertifiedTitle,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:
@@ -490,7 +490,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '이전에 레슨을 받았던 선생님입니다',
+                      AppStrings.searchPreviousLessonTeacher,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.ink,
@@ -645,22 +645,22 @@ class _TeacherDetailContent extends ConsumerWidget {
   String _getBadgeLabel(VerificationBadge badge) {
     switch (badge) {
       case VerificationBadge.phoneVerified:
-        return '휴대폰 인증';
+        return AppStrings.onboardingPhoneVerification;
       case VerificationBadge.certified:
-        return '자격증 인증';
+        return AppStrings.verificationBadgeCertifiedLabel;
       case VerificationBadge.premium:
-        return '프리미엄 프로필';
+        return AppStrings.searchPremiumProfileLabel;
     }
   }
 
   String _getLessonTypeLabel(LessonType type) {
     switch (type) {
       case LessonType.inPerson:
-        return '대면 수업';
+        return AppStrings.searchLessonTypeInPerson;
       case LessonType.online:
-        return '온라인';
+        return AppStrings.locationOnlineLabel;
       case LessonType.visit:
-        return '방문 수업';
+        return AppStrings.searchLessonTypeVisit;
     }
   }
 }

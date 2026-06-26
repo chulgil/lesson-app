@@ -289,7 +289,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
     if (filter.hasVerifiedCertificate == true) {
       chips.add(
-        _buildFilterChip('자격증 인증', () {
+        _buildFilterChip(AppStrings.verificationBadgeCertifiedLabel, () {
           ref
               .read(teacherSearchFilterStateProvider.notifier)
               .updateHasVerifiedCertificate(null);
