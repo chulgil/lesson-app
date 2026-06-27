@@ -28,30 +28,22 @@ class AssignmentDashboardScreen extends ConsumerWidget {
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.inkTertiary,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.cannotLoadData,
-                    style: AppTypography.bodyMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  OutlinedButton(
-                    onPressed:
-                        () => ref.invalidate(weeklyAssignmentSummaryProvider),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
+        error: (_, __) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+              const SizedBox(height: AppSpacing.space3),
+              Text(AppStrings.cannotLoadData, style: AppTypography.bodyMedium),
+              const SizedBox(height: AppSpacing.space3),
+              OutlinedButton(
+                onPressed: () =>
+                    ref.invalidate(weeklyAssignmentSummaryProvider),
+                child: const Text(AppStrings.retry),
               ),
-            ),
+            ],
+          ),
+        ),
         data: (summary) => _buildContent(context, summary),
       ),
     );
@@ -75,20 +67,24 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                 color: AppColors.inkSecondary,
               ),
             ),
+            const SizedBox(height: AppSpacing.space4),
+            OutlinedButton.icon(
+              onPressed: () => context.push(AppRoutes.addLesson),
+              icon: const Icon(Icons.add, size: 16),
+              label: const Text(AppStrings.lessonAddTitle),
+            ),
           ],
         ),
       );
     }
 
     final rate = summary.completionRate;
-    final completedStudents =
-        summary.incompleteStudents
-            .where((s) => s.completedItems == s.totalItems)
-            .toList();
-    final incompleteStudents =
-        summary.incompleteStudents
-            .where((s) => s.completedItems < s.totalItems)
-            .toList();
+    final completedStudents = summary.incompleteStudents
+        .where((s) => s.completedItems == s.totalItems)
+        .toList();
+    final incompleteStudents = summary.incompleteStudents
+        .where((s) => s.completedItems < s.totalItems)
+        .toList();
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -144,12 +140,11 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     WeeklyAssignmentSummary summary,
     double rate,
   ) {
-    final color =
-        rate >= 0.8
-            ? AppColors.paperOk
-            : rate >= 0.5
-            ? AppColors.paperAccent
-            : AppColors.paperAccent;
+    final color = rate >= 0.8
+        ? AppColors.paperOk
+        : rate >= 0.5
+        ? AppColors.paperAccent
+        : AppColors.paperAccent;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
@@ -306,24 +301,23 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     StudentAssignmentStatus status,
     bool isCompleted,
   ) {
-    final rate =
-        status.totalItems > 0 ? status.completedItems / status.totalItems : 0.0;
-    final color =
-        isCompleted
-            ? AppColors.paperOk
-            : rate >= 0.5
-            ? AppColors.paperAccent
-            : AppColors.paperAccent;
+    final rate = status.totalItems > 0
+        ? status.completedItems / status.totalItems
+        : 0.0;
+    final color = isCompleted
+        ? AppColors.paperOk
+        : rate >= 0.5
+        ? AppColors.paperAccent
+        : AppColors.paperAccent;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: Material(
         color: AppColors.paper,
         child: InkWell(
-          onTap:
-              () => context.push(
-                AppRoutes.studentDetail.replaceFirst(':id', status.studentId),
-              ),
+          onTap: () => context.push(
+            AppRoutes.studentDetail.replaceFirst(':id', status.studentId),
+          ),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(

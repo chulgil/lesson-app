@@ -34,49 +34,37 @@ class PracticeItemsSection extends ConsumerWidget {
 
     return itemsAsync.when(
       data: (items) => _buildContent(context, ref, items),
-      loading:
-          () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.space6),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-      error:
-          (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.space6),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.loadDataFailed,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  TextButton.icon(
-                    onPressed:
-                        () =>
-                            ref
-                                .read(
-                                  lessonWidgetPracticeItemActionsProvider(
-                                    lessonId,
-                                  ),
-                                )
-                                .invalidateItems(),
-                    icon: const Icon(Icons.refresh),
-                    label: const Text(AppStrings.retry),
-                  ),
-                ],
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacing.space6),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.space6),
+          child: Column(
+            children: [
+              Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
+              const SizedBox(height: AppSpacing.space3),
+              Text(
+                AppStrings.loadDataFailed,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
               ),
-            ),
+              const SizedBox(height: AppSpacing.space3),
+              TextButton.icon(
+                onPressed: () => ref
+                    .read(lessonWidgetPracticeItemActionsProvider(lessonId))
+                    .invalidateItems(),
+                icon: const Icon(Icons.refresh),
+                label: const Text(AppStrings.retry),
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -115,7 +103,12 @@ class PracticeItemsSection extends ConsumerWidget {
 
   Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
       child: Column(
         children: [
           Icon(
@@ -218,8 +211,9 @@ class PracticeItemsSection extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap:
-              isTeacher ? () => _showEditItemDialog(context, ref, item) : null,
+          onTap: isTeacher
+              ? () => _showEditItemDialog(context, ref, item)
+              : null,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space3),
             child: Row(
@@ -238,10 +232,9 @@ class PracticeItemsSection extends ConsumerWidget {
                         item.title,
                         style: NotebookTypography.hand.copyWith(
                           fontWeight: FontWeight.w600,
-                          color:
-                              item.isCompleted
-                                  ? AppColors.inkTertiary
-                                  : AppColors.ink,
+                          color: item.isCompleted
+                              ? AppColors.inkTertiary
+                              : AppColors.ink,
                         ),
                       ),
                       if (item.description != null &&
@@ -251,10 +244,9 @@ class PracticeItemsSection extends ConsumerWidget {
                         Text(
                           item.description!,
                           style: NotebookTypography.handSmall.copyWith(
-color:
-                                item.isCompleted
-                                    ? AppColors.inkTertiary
-                                    : AppColors.inkSecondary,
+                            color: item.isCompleted
+                                ? AppColors.inkTertiary
+                                : AppColors.inkSecondary,
                           ),
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis,
@@ -349,9 +341,8 @@ color:
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) =>
-              AddPracticeItemSheet(lessonId: lessonId, studentId: studentId),
+      builder: (context) =>
+          AddPracticeItemSheet(lessonId: lessonId, studentId: studentId),
     );
   }
 
@@ -363,12 +354,11 @@ color:
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => EditPracticeItemSheet(
-            item: item,
-            lessonId: lessonId,
-            studentId: studentId,
-          ),
+      builder: (context) => EditPracticeItemSheet(
+        item: item,
+        lessonId: lessonId,
+        studentId: studentId,
+      ),
     );
   }
 }

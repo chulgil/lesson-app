@@ -2263,6 +2263,12 @@ class AppStrings {
   /// 예정된 레슨이 없습니다 (empty state)
   static const noUpcomingLessons = '예정된 레슨이 없습니다';
 
+  /// 학생 선택 바텀시트 빈 상태 타이틀
+  static const studentPickerEmptyTitle = '등록된 학생이 없습니다';
+
+  /// 학생 등록 CTA
+  static const studentRegisterAction = '학생 등록';
+
   /// 레슨 정보를 불러오는데 실패했습니다 (error state)
   static const lessonLoadFailed = '레슨 정보를 불러오는데 실패했습니다';
 
@@ -6487,7 +6493,8 @@ class AppStrings {
   static const tutorialSampleStudentCreate = '샘플 학생 생성';
   static const tunerStepGuide = '원하는 음을 선택하면 정확한 음높이를 확인할 수 있어요';
   static const recordingStepGuide = '버튼을 길게 눌러 녹음을 시작하세요\n(2초 이상)';
-  static String recordingInProgressSeconds(String seconds) => '녹음중... ${seconds}s';
+  static String recordingInProgressSeconds(String seconds) =>
+      '녹음중... ${seconds}s';
   static const recordingStepHoldLonger = '조금 더 길게 눌러보세요';
   static const recordingStepTrimInfo = '원본 2.0초 → 자동 트리밍\n0.3 ~ 1.8초 (저장 가능)';
   static const feedbackStepGuide = '선생님이 남기는 피드백 카드를 펼쳐보세요';
@@ -6849,8 +6856,7 @@ class AppStrings {
   static const parentHomeDetailSettings = '상세 설정';
   static const parentHomeNotificationDetailSettings = '알림 상세 설정';
   static const parentHomeAssignmentNotification = '과제 알림';
-  static const parentHomeAssignmentNotificationSubtitle =
-      '새 과제 등록, 미완료 알림';
+  static const parentHomeAssignmentNotificationSubtitle = '새 과제 등록, 미완료 알림';
   static const parentHomeLessonNotification = '레슨 알림';
   static const parentHomePracticeNotification = '연습 알림';
   static const parentHomePaymentNotification = '입금 상태 알림';

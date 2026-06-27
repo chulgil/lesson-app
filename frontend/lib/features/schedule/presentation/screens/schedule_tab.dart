@@ -130,7 +130,7 @@ class ScheduleTab extends ConsumerWidget {
             else if (dayLessons.isEmpty)
               SliverFillRemaining(
                 hasScrollBody: false,
-                child: _buildEmptyState(scrollable: false),
+                child: _buildEmptyState(context, ref, scrollable: false),
               )
             else
               SliverPadding(
@@ -338,7 +338,7 @@ class ScheduleTab extends ConsumerWidget {
             _buildDateHeader(ref, selectedDate, dayLessons.length, sortType),
             const SizedBox(height: AppSpacing.space3),
             Expanded(
-              child: _buildLessonList(context, dayLessons, selectedDate),
+              child: _buildLessonList(context, ref, dayLessons, selectedDate),
             ),
           ],
         );
@@ -548,11 +548,12 @@ class ScheduleTab extends ConsumerWidget {
 
   Widget _buildLessonList(
     BuildContext context,
+    WidgetRef ref,
     List<Lesson> dayLessons,
     DateTime selectedDate,
   ) {
     if (dayLessons.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context, ref);
     }
 
     // Notebook × Score: 갭 + 둥근카드 + 그림자 패턴을 제거하고, LessonCard 의
@@ -568,10 +569,17 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState({bool scrollable = true}) {
+  Widget _buildEmptyState(
+    BuildContext context,
+    WidgetRef ref, {
+    bool scrollable = true,
+  }) {
     return EmptyStateWidget(
       icon: Icons.event_available,
       title: AppStrings.noUpcomingLessons,
+      actionLabel: AppStrings.lessonAddTitle,
+      actionIcon: Icons.add,
+      onAction: () => _navigateToAddLesson(context, ref),
       scrollable: scrollable,
     );
   }
@@ -690,9 +698,7 @@ class _SwipeableLessonCard extends ConsumerWidget {
       onCancel: () => Navigator.of(context).pop(false),
     );
     if (confirmed == true) {
-      await ref
-          .read(lessonsNotifierProvider.notifier)
-          .cancelLesson(lesson.id);
+      await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
     }
   }
 }
@@ -751,7 +757,6 @@ class _ViewModeToggle extends StatelessWidget {
     }
   }
 }
-
 
 // ──────────────────────────────────────────────────────────────
 // 다중선택 (#768 ①).
