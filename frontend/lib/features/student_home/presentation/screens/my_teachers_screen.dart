@@ -85,45 +85,41 @@ class MyTeachersScreen extends ConsumerWidget {
             if (relations.isEmpty) {
               return _buildAppTeachersEmpty(context);
             }
-            final sorted = [...relations]..sort((a, b) {
-              final aActive = a.status == RelationshipStatus.active ? 0 : 1;
-              final bActive = b.status == RelationshipStatus.active ? 0 : 1;
-              if (aActive != bActive) return aActive.compareTo(bActive);
-              return (b.lastLessonAt ?? b.createdAt).compareTo(
-                a.lastLessonAt ?? a.createdAt,
-              );
-            });
+            final sorted = [...relations]
+              ..sort((a, b) {
+                final aActive = a.status == RelationshipStatus.active ? 0 : 1;
+                final bActive = b.status == RelationshipStatus.active ? 0 : 1;
+                if (aActive != bActive) return aActive.compareTo(bActive);
+                return (b.lastLessonAt ?? b.createdAt).compareTo(
+                  a.lastLessonAt ?? a.createdAt,
+                );
+              });
             return Column(
-              children:
-                  sorted
-                      .map(
-                        (r) => Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: AppSpacing.space3,
-                          ),
-                          child: _AppTeacherCard(relation: r),
-                        ),
-                      )
-                      .toList(),
+              children: sorted
+                  .map(
+                    (r) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                      child: _AppTeacherCard(relation: r),
+                    ),
+                  )
+                  .toList(),
             );
           },
-          loading:
-              () => const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.space8),
-                  child: CircularProgressIndicator(),
-                ),
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space8),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (e, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Text(
+              AppStrings.studentHomeDataLoadError,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
               ),
-          error:
-              (e, _) => Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text(
-                  AppStrings.studentHomeDataLoadError,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ),
+            ),
+          ),
         ),
       ],
     );
@@ -212,23 +208,21 @@ class MyTeachersScreen extends ConsumerWidget {
               ],
             );
           },
-          loading:
-              () => const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.space8),
-                  child: CircularProgressIndicator(),
-                ),
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space8),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (e, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Text(
+              AppStrings.studentHomeDataLoadError,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
               ),
-          error:
-              (e, _) => Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text(
-                  AppStrings.studentHomeDataLoadError,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ),
+            ),
+          ),
         ),
       ],
     );
@@ -303,10 +297,9 @@ class _AppTeacherCard extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap:
-              () => context.push(
-                AppRoutes.teacherDetail.replaceFirst(':id', relation.teacherId),
-              ),
+          onTap: () => context.push(
+            AppRoutes.teacherDetail.replaceFirst(':id', relation.teacherId),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(
@@ -316,13 +309,15 @@ class _AppTeacherCard extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 28,
-                      backgroundColor:
-                          isActive ? AppColors.ink : AppColors.paperDark,
+                      backgroundColor: isActive
+                          ? AppColors.ink
+                          : AppColors.paperDark,
                       child: Icon(
                         Icons.person,
                         size: 28,
-                        color:
-                            isActive ? AppColors.paper : AppColors.inkTertiary,
+                        color: isActive
+                            ? AppColors.paper
+                            : AppColors.inkTertiary,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
@@ -337,8 +332,8 @@ class _AppTeacherCard extends ConsumerWidget {
                                   data: (t) =>
                                       t?.name ??
                                       AppStrings.myTeachersUnknownTeacher,
-                                  orElse:
-                                      () => AppStrings.myTeachersUnknownTeacher,
+                                  orElse: () =>
+                                      AppStrings.myTeachersUnknownTeacher,
                                 ),
                                 style: AppTypography.bodyLarge.copyWith(
                                   fontWeight: FontWeight.w600,
@@ -351,16 +346,13 @@ class _AppTeacherCard extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.space1),
                           Text(
                             teacherAsync.when(
-                              data:
-                                  (t) =>
-                                      (t == null || t.instruments.isEmpty)
-                                          ? AppStrings.myTeachersInstrumentUnset
-                                          : t.instrumentsText,
-                              loading:
-                                  () => AppStrings.myTeachersInstrumentLoading,
-                              error:
-                                  (_, __) =>
-                                      AppStrings.myTeachersInstrumentUnset,
+                              data: (t) => (t == null || t.instruments.isEmpty)
+                                  ? AppStrings.myTeachersInstrumentUnset
+                                  : t.instrumentsText,
+                              loading: () =>
+                                  AppStrings.myTeachersInstrumentLoading,
+                              error: (_, __) =>
+                                  AppStrings.myTeachersInstrumentUnset,
                             ),
                             style: AppTypography.bodySmall.copyWith(
                               color: AppColors.inkSecondary,
@@ -406,11 +398,12 @@ class _AppTeacherCard extends ConsumerWidget {
   }
 
   Widget _buildStatusBadge() {
-    final (label, color) = switch (relation.status) {
-      RelationshipStatus.active => ('수강 중', AppColors.paperOk),
-      RelationshipStatus.expired => ('만료', AppColors.inkTertiary),
-      RelationshipStatus.trialBooked => ('체험 예약', AppColors.paperAccent),
-      RelationshipStatus.past => ('종료', AppColors.inkTertiary),
+    final label = relation.status.displayName;
+    final color = switch (relation.status) {
+      RelationshipStatus.active => AppColors.paperOk,
+      RelationshipStatus.expired => AppColors.inkTertiary,
+      RelationshipStatus.trialBooked => AppColors.paperAccent,
+      RelationshipStatus.past => AppColors.inkTertiary,
     };
 
     return Container(
@@ -589,36 +582,35 @@ class _ManualTeacherCard extends ConsumerWidget {
                       _confirmDelete(context, ref);
                     }
                   },
-                  itemBuilder:
-                      (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit_outlined, size: 18),
-                              SizedBox(width: AppSpacing.space2),
-                              Text(AppStrings.studentHomeEditAction),
-                            ],
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_outlined, size: 18),
+                          SizedBox(width: AppSpacing.space2),
+                          Text(AppStrings.studentHomeEditAction),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: AppColors.paperAccent,
                           ),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.delete_outline,
-                                size: 18,
-                                color: AppColors.paperAccent,
-                              ),
-                              const SizedBox(width: AppSpacing.space2),
-                              Text(
-                                '삭제',
-                                style: TextStyle(color: AppColors.paperAccent),
-                              ),
-                            ],
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(
+                            '삭제',
+                            style: TextStyle(color: AppColors.paperAccent),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                  ],
                   icon: Icon(
                     Icons.more_vert,
                     color: AppColors.inkTertiary,

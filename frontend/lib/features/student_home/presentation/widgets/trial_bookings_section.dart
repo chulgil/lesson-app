@@ -80,17 +80,17 @@ class TrialBookingsSection extends ConsumerWidget {
           ],
         );
       },
-      loading:
-          () => const SizedBox(
-            height: 80,
-            child: Center(child: CircularProgressIndicator()),
-          ),
+      loading: () => const SizedBox(
+        height: 80,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
