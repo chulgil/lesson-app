@@ -44,15 +44,6 @@ description: Phase 2 — 인터뷰를 공식 스펙으로 변환하고, 이 feat
 {타입/스키마 정의}
 ```
 
-### 4.1 도메인 용어 (Ubiquitous Language)
-
-> `.harness/knowledge/glossary.md` 에서 기존 용어를 확인한 뒤 작성.
-> 신규 용어는 glossary 에 먼저 추가하고 스펙에서 사용한다.
-
-| 한글 | 영문 | FE 클래스 | BE 클래스 | 신규/기존 |
-|------|------|-----------|-----------|----------|
-| | | | | |
-
 ### API 엔드포인트
 | Method | Path | Body | Response |
 |--------|------|------|----------|
@@ -85,22 +76,8 @@ description: Phase 2 — 인터뷰를 공식 스펙으로 변환하고, 이 feat
 - 새 lib 추가 → current.md 의 "허용 라이브러리" 업데이트
 - 새 테스트 프레임 → current.md 의 "테스트" 섹션 갱신
 
-## 스펙 머지 규칙 (harness → docs)
-
-> `docs/specs/` = 도메인 마스터 (영구 SSOT), `.harness/spec/` = feature 작업 스펙 (임시)
-
-| 시점 | 행동 |
-|------|------|
-| Phase 2 완료 | `.harness/spec/{feature}.md` 에 작업 스펙 작성 |
-| Phase 6 PASS | 작업 스펙의 내용을 `docs/specs/{domain}/` 마스터에 머지 |
-| 머지 후 | `.harness/spec/{feature}.md` 상단에 `> ✅ 머지 완료 → docs/specs/{domain}/{file}.md` 표기 |
-
-머지 = 마스터 스펙에 새 섹션/항목 추가 또는 기존 항목 갱신. 작업 스펙은 삭제하지 않음 (이력 보존).
-
 ## 완료 조건
 
 1. 모든 성공 기준이 **측정 가능** (이진 또는 숫자)
-2. **§4.1 도메인 용어**: 신규 용어가 `.harness/knowledge/glossary.md` 에 반영됨
-3. **glossary 일치**: 스펙 본문의 모든 엔티티/상태명이 glossary 와 동일
-4. 사용자가 "spec locked" 를 명시적으로 승인
-5. `.harness/spec/...` 파일 커밋
+2. 사용자가 "spec locked" 를 명시적으로 승인
+3. `.harness/spec/...` 파일 커밋

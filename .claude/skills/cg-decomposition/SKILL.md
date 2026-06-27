@@ -127,3 +127,4 @@ DAG 와 별개로, **인수 기준 트리** 를 함께 작성한다. 파일: `.h
 - DAG 가 모든 spec 성공 기준을 커버
 - **AC Tree 작성 완료** (모든 AC 초기 `pending`)
 - 사용자 승인
+- **`cg-plan-check`(Phase 4.5) 게이트 PASS** — Phase 5 실행 진입 전 필수. REVISE 면 위 DAG/AC Tree 를 고친 뒤 재검증.

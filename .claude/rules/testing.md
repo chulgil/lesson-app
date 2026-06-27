@@ -1,13 +1,6 @@
----
-paths:
-  - "**/*.test.*"
-  - "**/*.spec.*"
-  - "**/tests/**"
-  - "**/__tests__/**"
-  - "**/playwright/**"
----
-
 # Testing Requirements
+
+> 적용 범위: 테스트 파일 작업 시 (`**/*.test.*`, `**/*.spec.*`, `**/tests/**`, `**/__tests__/**`, `**/playwright/**`). `CLAUDE.md` 가 참조.
 
 ## Minimum Test Coverage: 80%
 

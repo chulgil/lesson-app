@@ -488,7 +488,7 @@ rm .claude/handoff.md  # 존재 시
 - effort가 max일 때 ultrathink를 사용하므로 토큰 소비가 크다.
 - --security는 effort와 무관하게 security-reviewer 에이전트를 호출한다.
 - --extract와 --coverage는 루프하지 않는다 (분석 전용 모드).
-- 서브에이전트는 Sonnet 모델로 실행되어 비용 효율적이다.
+- 서브에이전트는 메인 세션보다 가벼운 모델 티어로 실행해 비용을 절약할 수 있다 (Agent 호출 시 model 옵션).
 - 부모 컨텍스트가 보존되므로 검증 후 바로 /commit-push-pr 진행 가능.
 - handoff.md의 검증 권장 설정은 CLI 플래그보다 낮은 우선순위로 병합된다.
 - v5의 /handoff, /verify는 이 커맨드로 대체된다.

@@ -43,79 +43,21 @@ effort:max가 항상 강제 적용된다. 보안 검증은 축약하지 않는�
 
 ## CWE Scanning Rules
 
-### Critical (커밋 차단)
+CWE Top 25 를 3단계 심각도로 분류해 grep 패턴으로 매칭한다:
 
-| CWE ID | Rule | Grep Pattern |
-|--------|------|--------------|
-| CWE-89 | SQL Injection | `query\(.*\$\{`, `query\(.*\+` |
-| CWE-79 | XSS | `innerHTML`, `dangerouslySetInnerHTML`, `v-html` |
-| CWE-78 | OS Command Injection | `exec\(.*\$\{`, `spawn\(.*req\.` |
-| CWE-77 | Command Injection | Template string in shell command |
-| CWE-798 | Hardcoded Credentials | `apiKey\s*=\s*['"]`, `secret\s*=\s*['"]` |
+- **Critical (커밋 차단)** — CWE-89 SQLi, CWE-79 XSS, CWE-78/77 Command Injection, CWE-798 Hardcoded Credentials.
+- **High (경고, 커밋 허용)** — CWE-22 Path Traversal, CWE-352 CSRF, CWE-287/862 Auth, CWE-502 Deserialization, CWE-918 SSRF, CWE-434 Upload, CWE-269 Privilege Escalation.
+- **Medium (정보 제공)** — CWE-200 Info Disclosure, CWE-20 Input Validation, CWE-327 Broken Crypto, CWE-276 Incorrect Perms.
 
-### High (경고, 커밋 허용)
-
-| CWE ID | Rule | Grep Pattern |
-|--------|------|--------------|
-| CWE-22 | Path Traversal | `\.\.\/` with user input |
-| CWE-352 | CSRF | POST handler without csrf check |
-| CWE-287 | Improper Auth | Route without auth middleware |
-| CWE-862 | Missing Authz | Handler without role/permission check |
-| CWE-502 | Unsafe Deserialization | `eval\(`, `new Function\(` |
-| CWE-918 | SSRF | `fetch\(.*req\.`, `axios.*req\.` |
-| CWE-434 | Unrestricted Upload | Upload without validation |
-| CWE-269 | Privilege Escalation | Role change without verification |
-
-### Medium (정보 제공)
-
-| CWE ID | Rule | Grep Pattern |
-|--------|------|--------------|
-| CWE-200 | Info Disclosure | `console\.log.*password\|token\|secret` |
-| CWE-20 | Input Validation | Endpoint without schema validation |
-| CWE-327 | Broken Crypto | `md5\(`, `sha1\(`, `Math\.random\(\)` |
-| CWE-276 | Incorrect Perms | `origin:\s*['"]?\*`, `0o?777` |
+각 항목의 정확한 grep 패턴: [reference.md](reference.md) §CWE Scanning Rules.
 
 ---
 
 ## Auto-Fix Rules
 
-자동 수정은 사용자 승인 후 적용한다. 신뢰도가 High인 항목만 자동 수정 대상이다.
-
-### Parameterized Queries (CWE-89)
-
-```
-Before: db.query(`SELECT * FROM users WHERE id = '${id}'`)
-After:  db.query('SELECT * FROM users WHERE id = $1', [id])
-```
-
-### Environment Variables (CWE-798)
-
-```
-Before: const apiKey = 'sk-proj-abc123'
-After:  const apiKey = process.env.API_KEY
-+ .env.example에 API_KEY= 추가
-```
-
-### Safe DOM Manipulation (CWE-79)
-
-```
-Before: element.innerHTML = userInput
-After:  element.textContent = userInput
-```
-
-### Remove Sensitive Logs (CWE-200)
-
-```
-Before: console.log('Token:', token)
-After:  // (line removed)
-```
-
-### Secure Hash (CWE-327)
-
-```
-Before: const hash = md5(data)
-After:  const hash = crypto.createHash('sha256').update(data).digest('hex')
-```
+자동 수정은 사용자 승인 후, 신뢰도 High 항목만 적용한다. 대상: Parameterized Queries
+(CWE-89), Environment Variables (CWE-798), Safe DOM (CWE-79), Remove Sensitive Logs
+(CWE-200), Secure Hash (CWE-327). before/after 예시: [reference.md](reference.md) §Auto-Fix Rules.
 
 ---
 
