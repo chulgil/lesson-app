@@ -110,12 +110,12 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     // Validate range based on type
     if (_rangeType == SectionRangeType.measure) {
       if (_startMeasure > _endMeasure) {
-        _showErrorSnackBar('시작 마디가 끝 마디보다 클 수 없습니다');
+        _showErrorSnackBar(AppStrings.practiceStartMeasureGreaterError);
         return;
       }
     } else if (_rangeType == SectionRangeType.line) {
       if (_startLine > _endLine) {
-        _showErrorSnackBar('시작 줄이 끝 줄보다 클 수 없습니다');
+        _showErrorSnackBar(AppStrings.practiceStartLineGreaterError);
         return;
       }
     }
@@ -126,7 +126,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     );
     if (repertoire != null && _isDuplicateSection(repertoire)) {
       if (!mounted) return;
-      _showErrorSnackBar('동일한 곡명과 범위의 섹션이 이미 존재합니다');
+      _showErrorSnackBar(AppStrings.practiceSectionDuplicateError);
       return;
     }
 
@@ -168,7 +168,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('섹션 추가에 실패했습니다. 다시 시도해주세요.');
+        _showErrorSnackBar(AppStrings.practiceSectionAddFailedRetry);
       }
     } finally {
       if (mounted) {
@@ -219,8 +219,10 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     showNotebookModalBottomSheet<void>(
       context: context,
       builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 마디' : '끝 마디',
-        unit: '마디',
+        title: isStart
+            ? AppStrings.practiceStartMeasureLabel
+            : AppStrings.practiceEndMeasureLabel,
+        unit: AppStrings.practiceRangeTypeMeasure,
         initialValue: initialValue,
         maxValue: 100,
         onSelected: (value) {
@@ -245,8 +247,10 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     showNotebookModalBottomSheet<void>(
       context: context,
       builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 줄' : '끝 줄',
-        unit: '줄',
+        title: isStart
+            ? AppStrings.practiceStartLineLabel
+            : AppStrings.practiceEndLineLabel,
+        unit: AppStrings.practiceRangeTypeLine,
         initialValue: initialValue,
         maxValue: 10,
         onSelected: (value) {
@@ -267,9 +271,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
   String _getRangePreviewText() {
     if (_rangeType == SectionRangeType.measure) {
-      return '$_startMeasure~$_endMeasure마디';
+      return '$_startMeasure~$_endMeasure${AppStrings.practiceRangeTypeMeasure}';
     } else {
-      return '$_startLine~$_endLine줄';
+      return '$_startLine~$_endLine${AppStrings.practiceRangeTypeLine}';
     }
   }
 
@@ -345,14 +349,14 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 controller: _pieceNameController,
                 focusNode: _pieceNameFocusNode,
                 decoration: const InputDecoration(
-                  labelText: '곡/연습곡 이름 *',
+                  labelText: AppStrings.practicePieceNameLabel,
                   hintText: AppStrings.practicePieceNameHint,
                   prefixIcon: Icon(Icons.music_note),
                 ),
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '곡 이름을 입력해주세요';
+                    return AppStrings.practicePieceNameRequired;
                   }
                   return null;
                 },
@@ -475,7 +479,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          isMeasure ? '연습할 마디 구간을 선택하세요' : '연습할 줄 구간을 선택하세요 (1~10줄)',
+          isMeasure
+              ? AppStrings.practiceMeasureRangeSelectHint
+              : AppStrings.practiceLineRangeSelectHint,
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
@@ -484,9 +490,15 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
         RangePickers(
           startValue: isMeasure ? _startMeasure : _startLine,
           endValue: isMeasure ? _endMeasure : _endLine,
-          startLabel: isMeasure ? '시작 마디' : '시작 줄',
-          endLabel: isMeasure ? '끝 마디' : '끝 줄',
-          unit: isMeasure ? '마디' : '줄',
+          startLabel: isMeasure
+              ? AppStrings.practiceStartMeasureLabel
+              : AppStrings.practiceStartLineLabel,
+          endLabel: isMeasure
+              ? AppStrings.practiceEndMeasureLabel
+              : AppStrings.practiceEndLineLabel,
+          unit: isMeasure
+              ? AppStrings.practiceRangeTypeMeasure
+              : AppStrings.practiceRangeTypeLine,
           onStartTap: isMeasure
               ? () => _showMeasurePicker(isStart: true)
               : () => _showLinePicker(isStart: true),
@@ -504,9 +516,11 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
         TextFormField(
           controller: _sectionNameController,
           decoration: InputDecoration(
-            labelText: '섹션 별칭 (선택)',
+            labelText: AppStrings.practiceSectionAliasLabel,
             hintText: AppStrings.practiceSectionAliasHint,
-            helperText: '비워두면 "${_getRangePreviewText()}"로 표시됩니다',
+            helperText: AppStrings.practiceSectionAliasHelper(
+              _getRangePreviewText(),
+            ),
             prefixIcon: const Icon(Icons.label_outline),
           ),
           textInputAction: TextInputAction.done,

@@ -100,7 +100,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       initialDate: _startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      helpText: '시작일 선택',
+      helpText: AppStrings.selectStartDate,
     );
     if (picked != null) {
       setState(() {
@@ -118,7 +118,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       initialDate: _endDate ?? _startDate,
       firstDate: _startDate,
       lastDate: DateTime(2030),
-      helpText: '종료일 선택',
+      helpText: AppStrings.selectEndDate,
     );
     if (picked != null) {
       setState(() => _endDate = picked);
@@ -151,7 +151,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
     // Validate all sections have piece names
     for (int i = 0; i < _sections.length; i++) {
       if (!_sections[i].isValid) {
-        _showErrorSnackBar('섹션 ${i + 1}의 곡명을 입력해주세요');
+        _showErrorSnackBar(AppStrings.practiceSectionPieceNameRequired(i + 1));
         return;
       }
     }
@@ -165,10 +165,9 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
           .createRepertoire(
             studentId: widget.studentId,
             name: _repertoireNameController.text.trim(),
-            description:
-                _descriptionController.text.trim().isEmpty
-                    ? null
-                    : _descriptionController.text.trim(),
+            description: _descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim(),
             startDate: _startDate,
             endDate: _endDate,
           );
@@ -181,22 +180,18 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               repertoireId: repertoire.id,
               pieceName: section.pieceName,
               rangeType: section.rangeType,
-              startMeasure:
-                  section.rangeType == SectionRangeType.measure
-                      ? section.startMeasure
-                      : 1,
-              endMeasure:
-                  section.rangeType == SectionRangeType.measure
-                      ? section.endMeasure
-                      : 1,
-              startLine:
-                  section.rangeType == SectionRangeType.line
-                      ? section.startLine
-                      : null,
-              endLine:
-                  section.rangeType == SectionRangeType.line
-                      ? section.endLine
-                      : null,
+              startMeasure: section.rangeType == SectionRangeType.measure
+                  ? section.startMeasure
+                  : 1,
+              endMeasure: section.rangeType == SectionRangeType.measure
+                  ? section.endMeasure
+                  : 1,
+              startLine: section.rangeType == SectionRangeType.line
+                  ? section.startLine
+                  : null,
+              endLine: section.rangeType == SectionRangeType.line
+                  ? section.endLine
+                  : null,
             );
       }
 
@@ -214,7 +209,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('저장에 실패했습니다. 다시 시도해주세요.');
+        _showErrorSnackBar(AppStrings.practiceSaveFailedRetry);
       }
     } finally {
       if (mounted) {
@@ -235,25 +230,26 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (context) => RangePickerSheet(
-            title: isStart ? '시작 마디' : '끝 마디',
-            unit: '마디',
-            initialValue: initialValue,
-            maxValue: 100,
-            onSelected: (value) {
-              setState(() {
-                if (isStart) {
-                  section.startMeasure = value;
-                  if (section.endMeasure < section.startMeasure) {
-                    section.endMeasure = section.startMeasure;
-                  }
-                } else {
-                  section.endMeasure = value;
-                }
-              });
-            },
-          ),
+      builder: (context) => RangePickerSheet(
+        title: isStart
+            ? AppStrings.practiceStartMeasureLabel
+            : AppStrings.practiceEndMeasureLabel,
+        unit: AppStrings.practiceRangeTypeMeasure,
+        initialValue: initialValue,
+        maxValue: 100,
+        onSelected: (value) {
+          setState(() {
+            if (isStart) {
+              section.startMeasure = value;
+              if (section.endMeasure < section.startMeasure) {
+                section.endMeasure = section.startMeasure;
+              }
+            } else {
+              section.endMeasure = value;
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -263,32 +259,35 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (context) => RangePickerSheet(
-            title: isStart ? '시작 줄' : '끝 줄',
-            unit: '줄',
-            initialValue: initialValue,
-            maxValue: 10,
-            onSelected: (value) {
-              setState(() {
-                if (isStart) {
-                  section.startLine = value;
-                  if (section.endLine < section.startLine) {
-                    section.endLine = section.startLine;
-                  }
-                } else {
-                  section.endLine = value;
-                }
-              });
-            },
-          ),
+      builder: (context) => RangePickerSheet(
+        title: isStart
+            ? AppStrings.practiceStartLineLabel
+            : AppStrings.practiceEndLineLabel,
+        unit: AppStrings.practiceRangeTypeLine,
+        initialValue: initialValue,
+        maxValue: 10,
+        onSelected: (value) {
+          setState(() {
+            if (isStart) {
+              section.startLine = value;
+              if (section.endLine < section.startLine) {
+                section.endLine = section.startLine;
+              }
+            } else {
+              section.endLine = value;
+            }
+          });
+        },
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceRepertoireAddTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceRepertoireAddTitle,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -300,14 +299,14 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               TextFormField(
                 controller: _repertoireNameController,
                 decoration: const InputDecoration(
-                  labelText: '레퍼토리 이름 *',
+                  labelText: AppStrings.repertoireNameLabel,
                   hintText: AppStrings.practiceRepertoireNameHintSuzuki,
                   prefixIcon: Icon(Icons.library_music),
                 ),
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '레퍼토리 이름을 입력해주세요';
+                    return AppStrings.repertoireNameRequired;
                   }
                   return null;
                 },
@@ -318,14 +317,13 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               Wrap(
                 spacing: AppSpacing.space2,
                 runSpacing: AppSpacing.space1,
-                children:
-                    _repertoireSuggestions.map((name) {
-                      return ActionChip(
-                        label: Text(name, style: AppTypography.bodySmall),
-                        onPressed: () => _repertoireNameController.text = name,
-                        visualDensity: VisualDensity.compact,
-                      );
-                    }).toList(),
+                children: _repertoireSuggestions.map((name) {
+                  return ActionChip(
+                    label: Text(name, style: AppTypography.bodySmall),
+                    onPressed: () => _repertoireNameController.text = name,
+                    visualDensity: VisualDensity.compact,
+                  );
+                }).toList(),
               ),
 
               const SizedBox(height: AppSpacing.space4),
@@ -334,7 +332,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                  labelText: '설명 (선택)',
+                  labelText: AppStrings.descriptionOptional,
                   hintText: AppStrings.repertoireDescriptionHint,
                   prefixIcon: Icon(Icons.description_outlined),
                 ),
@@ -351,7 +349,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 onStartDateTap: _selectStartDate,
                 onEndDateTap: _selectEndDate,
                 onEndDateClear: _clearEndDate,
-                endDatePlaceholder: '설정 안함 (매일 반복)',
+                endDatePlaceholder: AppStrings.endDateNotSetDaily,
                 showHintMessage: true,
               ),
 
@@ -404,17 +402,16 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child:
-                      _isLoading
-                          ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                          : const Text(AppStrings.practiceSaveButton),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.paper,
+                          ),
+                        )
+                      : const Text(AppStrings.practiceSaveButton),
                 ),
               ),
 
@@ -441,7 +438,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '섹션 ${index + 1}',
+                  AppStrings.practiceSectionNumberLabel(index + 1),
                   style: AppTypography.headingSmall.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -461,7 +458,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
             TextFormField(
               controller: section.pieceNameController,
               decoration: const InputDecoration(
-                labelText: '곡명 *',
+                labelText: AppStrings.practicePieceNameSimpleLabel,
                 hintText: AppStrings.practicePieceNameHintStar,
                 prefixIcon: Icon(Icons.music_note),
               ),
@@ -473,17 +470,16 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
             Wrap(
               spacing: AppSpacing.space1,
               runSpacing: AppSpacing.space1,
-              children:
-                  _pieceSuggestions.take(5).map((name) {
-                    return ActionChip(
-                      label: Text(name, style: AppTypography.caption),
-                      onPressed: () => section.pieceNameController.text = name,
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space1,
-                      ),
-                    );
-                  }).toList(),
+              children: _pieceSuggestions.take(5).map((name) {
+                return ActionChip(
+                  label: Text(name, style: AppTypography.caption),
+                  onPressed: () => section.pieceNameController.text = name,
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space1,
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: AppSpacing.space4),
 
@@ -553,13 +549,13 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
         // Start picker
         Expanded(
           child: OutlinedButton(
-            onPressed:
-                () =>
-                    isMeasure
-                        ? _showMeasurePicker(index, isStart: true)
-                        : _showLinePicker(index, isStart: true),
+            onPressed: () => isMeasure
+                ? _showMeasurePicker(index, isStart: true)
+                : _showLinePicker(index, isStart: true),
             child: Text(
-              isMeasure ? '${section.startMeasure}마디' : '${section.startLine}줄',
+              isMeasure
+                  ? '${section.startMeasure}${AppStrings.practiceRangeTypeMeasure}'
+                  : '${section.startLine}${AppStrings.practiceRangeTypeLine}',
             ),
           ),
         ),
@@ -570,13 +566,13 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
         // End picker
         Expanded(
           child: OutlinedButton(
-            onPressed:
-                () =>
-                    isMeasure
-                        ? _showMeasurePicker(index, isStart: false)
-                        : _showLinePicker(index, isStart: false),
+            onPressed: () => isMeasure
+                ? _showMeasurePicker(index, isStart: false)
+                : _showLinePicker(index, isStart: false),
             child: Text(
-              isMeasure ? '${section.endMeasure}마디' : '${section.endLine}줄',
+              isMeasure
+                  ? '${section.endMeasure}${AppStrings.practiceRangeTypeMeasure}'
+                  : '${section.endLine}${AppStrings.practiceRangeTypeLine}',
             ),
           ),
         ),

@@ -7312,6 +7312,27 @@ class AppStrings {
   static const practiceSaveThenAddSection = '저장 후 섹션 추가하기';
   static const practiceRepertoireDeleteTitle = '레퍼토리 삭제';
 
+  // -- Repertoire/Section Add (#616 i18n) --
+  static const practiceSaveThenAddSectionHint = '레퍼토리 저장 후 섹션 추가 화면으로 이동합니다';
+  static const practiceSectionDuplicateError = '동일한 곡명과 범위의 섹션이 이미 존재합니다';
+  static const practiceSectionAddFailedRetry = '섹션 추가에 실패했습니다. 다시 시도해주세요.';
+  static const practiceSaveFailedRetry = '저장에 실패했습니다. 다시 시도해주세요.';
+  static const practiceStartMeasureLabel = '시작 마디';
+  static const practiceEndMeasureLabel = '끝 마디';
+  static const practiceStartLineLabel = '시작 줄';
+  static const practiceEndLineLabel = '끝 줄';
+  static const practicePieceNameLabel = '곡/연습곡 이름 *';
+  static const practicePieceNameSimpleLabel = '곡명 *';
+  static const practicePieceNameRequired = '곡 이름을 입력해주세요';
+  static const practiceMeasureRangeSelectHint = '연습할 마디 구간을 선택하세요';
+  static const practiceLineRangeSelectHint = '연습할 줄 구간을 선택하세요 (1~10줄)';
+  static const practiceSectionAliasLabel = '섹션 별칭 (선택)';
+  static String practiceSectionAliasHelper(String preview) =>
+      '비워두면 "$preview"로 표시됩니다';
+  static String practiceSectionNumberLabel(int number) => '섹션 $number';
+  static String practiceSectionPieceNameRequired(int number) =>
+      '섹션 $number의 곡명을 입력해주세요';
+
   // -- Smart Recording --
   static String practiceSmartTrimFront(String duration) => '앞 $duration 트림';
   static String practiceSmartTrimEnd(String duration) => '뒤 $duration 트림';
