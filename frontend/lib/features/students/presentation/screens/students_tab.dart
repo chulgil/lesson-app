@@ -797,12 +797,20 @@ class _ClassGroupSectionState extends State<_ClassGroupSection> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    '${widget.group.icon} ${widget.group.title} (${widget.group.count})',
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.ink,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(widget.group.icon, size: 18, color: AppColors.ink),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          '${widget.group.title} (${widget.group.count})',
+                          style: AppTypography.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Icon(
