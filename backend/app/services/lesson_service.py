@@ -9,6 +9,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.date_utils import to_date
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import (
     LessonClassCreate,
@@ -57,11 +58,11 @@ class LessonService:
         if student_id:
             query = query.where(Lesson.student_id == student_id)
         if date:
-            query = query.where(Lesson.date == date)
+            query = query.where(Lesson.date == to_date(date))
         if date_from:
-            query = query.where(Lesson.date >= date_from)
+            query = query.where(Lesson.date >= to_date(date_from))
         if date_to:
-            query = query.where(Lesson.date <= date_to)
+            query = query.where(Lesson.date <= to_date(date_to))
         if status:
             query = query.where(Lesson.status == status)
 
