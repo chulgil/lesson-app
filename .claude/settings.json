@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
     "enabledPlugins": {},
     "permissions": {
         "allow": [
@@ -19,10 +20,39 @@
         ]
     },
     "hooks": {
+        "SessionStart": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/session-start.py\"",
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/keyword-detector.py\"",
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
         "PreToolUse": [
             {
                 "matcher": "Bash",
                 "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/bash-guard.py\"",
+                        "timeout": 3
+                    },
                     {
                         "type": "command",
                         "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\"",
@@ -67,6 +97,36 @@
                 "hooks": [
                     {
                         "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/drift-monitor.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/loop-detection.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/i18n-l10n-guard.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/check-spec-claim.sh\"",
+                        "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/check-version-leftover.sh\"",
+                        "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/check-lore-inline.sh\"",
+                        "timeout": 5
+                    },
+                    {
+                        "type": "command",
                         "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-hardcoded-strings.sh",
                         "timeout": 5
                     },
@@ -78,16 +138,6 @@
                     {
                         "type": "command",
                         "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-unused-enum.sh",
-                        "timeout": 5
-                    },
-                    {
-                        "type": "command",
-                        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-spec-claim.sh",
-                        "timeout": 5
-                    },
-                    {
-                        "type": "command",
-                        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-version-leftover.sh",
                         "timeout": 5
                     },
                     {
@@ -112,11 +162,6 @@
                     },
                     {
                         "type": "command",
-                        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-lore-inline.sh",
-                        "timeout": 5
-                    },
-                    {
-                        "type": "command",
                         "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-handwriting-tier.sh",
                         "timeout": 5
                     },
@@ -124,6 +169,17 @@
                         "type": "command",
                         "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-widget-smoke-test.sh",
                         "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/stop-journal-reminder.py\"",
+                        "timeout": 3
                     }
                 ]
             }
