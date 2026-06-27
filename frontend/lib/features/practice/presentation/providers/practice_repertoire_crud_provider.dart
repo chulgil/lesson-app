@@ -192,6 +192,7 @@ class SectionCrud extends _$SectionCrud {
     DateTime? startDate,
     DateTime? endDate,
     int? targetPracticeSeconds,
+    String? studentId,
   }) async {
     state = const AsyncLoading();
     try {
@@ -215,8 +216,20 @@ class SectionCrud extends _$SectionCrud {
       );
       final result = await repository.createSection(section);
 
-      // Invalidate related providers
+      // Invalidate related providers (mirror updateSection symmetry)
       ref.invalidate(repertoireProvider(repertoireId));
+      ref.invalidate(sectionProvider(result.id));
+
+      // Also invalidate list providers if studentId is provided
+      if (studentId != null) {
+        ref.invalidate(studentRepertoiresProvider(studentId));
+        final today = DateTime.now();
+        ref.invalidate(
+          repertoiresForDateProvider(
+            RepertoiresForDateParams(studentId: studentId, date: today),
+          ),
+        );
+      }
 
       state = const AsyncData(null);
       return result;

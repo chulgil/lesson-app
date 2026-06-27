@@ -78,10 +78,9 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
           .createRepertoire(
             studentId: widget.studentId,
             name: _nameController.text.trim(),
-            description:
-                _descriptionController.text.trim().isEmpty
-                    ? null
-                    : _descriptionController.text.trim(),
+            description: _descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim(),
             startDate: _startDate,
             endDate: _endDate,
           );
@@ -157,7 +156,9 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceRepertoireAddTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceRepertoireAddTitle,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -205,14 +206,13 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 Wrap(
                   spacing: AppSpacing.space2,
                   runSpacing: AppSpacing.space2,
-                  children:
-                      _suggestions.map((suggestion) {
-                        return ActionChip(
-                          label: Text(suggestion.name),
-                          onPressed: () => _selectSuggestion(suggestion),
-                          avatar: const Icon(Icons.add, size: 18),
-                        );
-                      }).toList(),
+                  children: _suggestions.map((suggestion) {
+                    return ActionChip(
+                      label: Text(suggestion.name),
+                      onPressed: () => _selectSuggestion(suggestion),
+                      avatar: const Icon(Icons.add, size: 18),
+                    );
+                  }).toList(),
                 ),
               ],
 
@@ -236,17 +236,16 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : () => _submit(),
-                  child:
-                      _isLoading
-                          ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                          : const Text(AppStrings.practiceRepertoireAddTitle),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.paper,
+                          ),
+                        )
+                      : const Text(AppStrings.practiceRepertoireAddTitle),
                 ),
               ),
 
@@ -256,15 +255,16 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed:
-                      _isLoading ? null : () => _submit(addSectionAfter: true),
+                  onPressed: _isLoading
+                      ? null
+                      : () => _submit(addSectionAfter: true),
                   icon: const Icon(Icons.playlist_add),
                   label: const Text(AppStrings.practiceSaveThenAddSection),
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
-                '💡 레퍼토리 저장 후 섹션 추가 화면으로 이동합니다',
+                '레퍼토리 저장 후 섹션 추가 화면으로 이동합니다',
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),

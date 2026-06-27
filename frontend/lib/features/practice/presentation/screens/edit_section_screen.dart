@@ -36,6 +36,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   final _sectionNameController = TextEditingController();
   bool _isLoading = false;
   bool _isInitialized = false;
+  bool _loadError = false;
 
   // Original section for comparison
   PracticeSection? _originalSection;
@@ -67,14 +68,25 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   }
 
   Future<void> _loadSectionData() async {
-    // Load repertoire data for context display
-    final repertoire = await ref.read(
-      repertoireProvider(widget.repertoireId).future,
-    );
+    try {
+      // Load repertoire data for context display
+      final repertoire = await ref.read(
+        repertoireProvider(widget.repertoireId).future,
+      );
 
-    // Load section data
-    final section = await ref.read(sectionProvider(widget.sectionId).future);
-    if (section != null && mounted) {
+      // Load section data
+      final section = await ref.read(sectionProvider(widget.sectionId).future);
+      if (!mounted) return;
+
+      if (section == null) {
+        // Section not found — exit the infinite spinner with an error state.
+        setState(() {
+          _isInitialized = true;
+          _loadError = true;
+        });
+        return;
+      }
+
       _repertoire = repertoire;
       setState(() {
         _originalSection = section;
@@ -86,12 +98,19 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         _startLine = section.startLine ?? 1;
         _endLine = section.endLine ?? 2;
         _repeatCount = section.repeatCount;
-        _targetPracticeMinutes =
-            section.targetPracticeSeconds != null
-                ? (section.targetPracticeSeconds! / 60).round()
-                : null;
+        _targetPracticeMinutes = section.targetPracticeSeconds != null
+            ? (section.targetPracticeSeconds! / 60).round()
+            : null;
         _isInitialized = true;
       });
+    } catch (e) {
+      // Load failure — exit the infinite spinner with an error state.
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+          _loadError = true;
+        });
+      }
     }
   }
 
@@ -135,26 +154,25 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
       final updatedSection = _originalSection!.copyWith(
         pieceName: _pieceNameController.text.trim(),
         rangeType: _rangeType,
-        startMeasure:
-            _rangeType == SectionRangeType.measure ? _startMeasure : 1,
+        startMeasure: _rangeType == SectionRangeType.measure
+            ? _startMeasure
+            : 1,
         endMeasure: _rangeType == SectionRangeType.measure ? _endMeasure : 1,
         startLine: _rangeType == SectionRangeType.line ? _startLine : null,
         endLine: _rangeType == SectionRangeType.line ? _endLine : null,
         clearStartLine: _rangeType != SectionRangeType.line,
         clearEndLine: _rangeType != SectionRangeType.line,
-        sectionName:
-            _sectionNameController.text.trim().isEmpty
-                ? null
-                : _sectionNameController.text.trim(),
+        sectionName: _sectionNameController.text.trim().isEmpty
+            ? null
+            : _sectionNameController.text.trim(),
         isRepeat: true, // 섹션은 레퍼토리 기간 동안 매일 반복
         repeatCount: _repeatCount,
         clearRepeatCount: _repeatCount == null,
         clearStartDate: true, // 섹션 날짜는 레퍼토리에서 상속
         clearEndDate: true,
-        targetPracticeSeconds:
-            _targetPracticeMinutes != null
-                ? _targetPracticeMinutes! * 60
-                : null,
+        targetPracticeSeconds: _targetPracticeMinutes != null
+            ? _targetPracticeMinutes! * 60
+            : null,
         clearTargetPracticeSeconds: _targetPracticeMinutes == null,
         updatedAt: DateTime.now(),
       );
@@ -199,25 +217,24 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (context) => RangePickerSheet(
-            title: isStart ? '시작 마디' : '끝 마디',
-            unit: '마디',
-            initialValue: initialValue,
-            maxValue: 100,
-            onSelected: (value) {
-              setState(() {
-                if (isStart) {
-                  _startMeasure = value;
-                  if (_endMeasure < _startMeasure) {
-                    _endMeasure = _startMeasure;
-                  }
-                } else {
-                  _endMeasure = value;
-                }
-              });
-            },
-          ),
+      builder: (context) => RangePickerSheet(
+        title: isStart ? '시작 마디' : '끝 마디',
+        unit: '마디',
+        initialValue: initialValue,
+        maxValue: 100,
+        onSelected: (value) {
+          setState(() {
+            if (isStart) {
+              _startMeasure = value;
+              if (_endMeasure < _startMeasure) {
+                _endMeasure = _startMeasure;
+              }
+            } else {
+              _endMeasure = value;
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -226,25 +243,24 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (context) => RangePickerSheet(
-            title: isStart ? '시작 줄' : '끝 줄',
-            unit: '줄',
-            initialValue: initialValue,
-            maxValue: 10,
-            onSelected: (value) {
-              setState(() {
-                if (isStart) {
-                  _startLine = value;
-                  if (_endLine < _startLine) {
-                    _endLine = _startLine;
-                  }
-                } else {
-                  _endLine = value;
-                }
-              });
-            },
-          ),
+      builder: (context) => RangePickerSheet(
+        title: isStart ? '시작 줄' : '끝 줄',
+        unit: '줄',
+        initialValue: initialValue,
+        maxValue: 10,
+        onSelected: (value) {
+          setState(() {
+            if (isStart) {
+              _startLine = value;
+              if (_endLine < _startLine) {
+                _endLine = _startLine;
+              }
+            } else {
+              _endLine = value;
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -260,13 +276,43 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return NotebookScreenScaffold(
-        appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionEditTitle),
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.practiceSectionEditTitle,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
+    if (_loadError) {
+      return NotebookScreenScaffold(
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.practiceSectionEditTitle,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppStrings.cannotLoadData,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space4),
+              OutlinedButton(
+                onPressed: () => context.pop(),
+                child: const Text(AppStrings.goBack),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionEditTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceSectionEditTitle,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -465,8 +511,8 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // ========================================
               TargetTimeSection(
                 targetMinutes: _targetPracticeMinutes,
-                onChanged:
-                    (value) => setState(() => _targetPracticeMinutes = value),
+                onChanged: (value) =>
+                    setState(() => _targetPracticeMinutes = value),
               ),
 
               const SizedBox(height: AppSpacing.space8),
@@ -476,17 +522,16 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child:
-                      _isLoading
-                          ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                          : const Text(AppStrings.practiceSaveChanges),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.paper,
+                          ),
+                        )
+                      : const Text(AppStrings.practiceSaveChanges),
                 ),
               ),
 

@@ -139,24 +139,25 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
             repertoireId: widget.repertoireId,
             pieceName: _pieceNameController.text.trim(),
             rangeType: _rangeType,
-            startMeasure:
-                _rangeType == SectionRangeType.measure ? _startMeasure : 1,
-            endMeasure:
-                _rangeType == SectionRangeType.measure ? _endMeasure : 1,
+            startMeasure: _rangeType == SectionRangeType.measure
+                ? _startMeasure
+                : 1,
+            endMeasure: _rangeType == SectionRangeType.measure
+                ? _endMeasure
+                : 1,
             startLine: _rangeType == SectionRangeType.line ? _startLine : null,
             endLine: _rangeType == SectionRangeType.line ? _endLine : null,
-            sectionName:
-                _sectionNameController.text.trim().isEmpty
-                    ? null
-                    : _sectionNameController.text.trim(),
+            sectionName: _sectionNameController.text.trim().isEmpty
+                ? null
+                : _sectionNameController.text.trim(),
             isRepeat: true, // 섹션은 레퍼토리 기간 동안 매일 반복
             repeatCount: _repeatCount,
             startDate: null, // 섹션 날짜는 레퍼토리에서 상속
             endDate: null,
-            targetPracticeSeconds:
-                _targetPracticeMinutes != null
-                    ? _targetPracticeMinutes! * 60
-                    : null,
+            targetPracticeSeconds: _targetPracticeMinutes != null
+                ? _targetPracticeMinutes! * 60
+                : null,
+            studentId: widget.studentId,
           );
 
       // Invalidate providers to refresh
@@ -217,25 +218,24 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (context) => RangePickerSheet(
-            title: isStart ? '시작 마디' : '끝 마디',
-            unit: '마디',
-            initialValue: initialValue,
-            maxValue: 100,
-            onSelected: (value) {
-              setState(() {
-                if (isStart) {
-                  _startMeasure = value;
-                  if (_endMeasure < _startMeasure) {
-                    _endMeasure = _startMeasure;
-                  }
-                } else {
-                  _endMeasure = value;
-                }
-              });
-            },
-          ),
+      builder: (context) => RangePickerSheet(
+        title: isStart ? '시작 마디' : '끝 마디',
+        unit: '마디',
+        initialValue: initialValue,
+        maxValue: 100,
+        onSelected: (value) {
+          setState(() {
+            if (isStart) {
+              _startMeasure = value;
+              if (_endMeasure < _startMeasure) {
+                _endMeasure = _startMeasure;
+              }
+            } else {
+              _endMeasure = value;
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -244,25 +244,24 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder:
-          (context) => RangePickerSheet(
-            title: isStart ? '시작 줄' : '끝 줄',
-            unit: '줄',
-            initialValue: initialValue,
-            maxValue: 10,
-            onSelected: (value) {
-              setState(() {
-                if (isStart) {
-                  _startLine = value;
-                  if (_endLine < _startLine) {
-                    _endLine = _startLine;
-                  }
-                } else {
-                  _endLine = value;
-                }
-              });
-            },
-          ),
+      builder: (context) => RangePickerSheet(
+        title: isStart ? '시작 줄' : '끝 줄',
+        unit: '줄',
+        initialValue: initialValue,
+        maxValue: 10,
+        onSelected: (value) {
+          setState(() {
+            if (isStart) {
+              _startLine = value;
+              if (_endLine < _startLine) {
+                _endLine = _startLine;
+              }
+            } else {
+              _endLine = value;
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -278,13 +277,17 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return NotebookScreenScaffold(
-        appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionAddTitle),
+        appBar: const NotebookDetailAppBar(
+          title: AppStrings.practiceSectionAddTitle,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.practiceSectionAddTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.practiceSectionAddTitle,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -383,8 +386,8 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
               // 목표 연습시간 설정
               TargetTimeSection(
                 targetMinutes: _targetPracticeMinutes,
-                onChanged:
-                    (value) => setState(() => _targetPracticeMinutes = value),
+                onChanged: (value) =>
+                    setState(() => _targetPracticeMinutes = value),
               ),
               const SizedBox(height: AppSpacing.space8),
 
@@ -393,17 +396,16 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child:
-                      _isLoading
-                          ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                          : const Text(AppStrings.practiceSectionAddTitle),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.paper,
+                          ),
+                        )
+                      : const Text(AppStrings.practiceSectionAddTitle),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -485,14 +487,12 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
           startLabel: isMeasure ? '시작 마디' : '시작 줄',
           endLabel: isMeasure ? '끝 마디' : '끝 줄',
           unit: isMeasure ? '마디' : '줄',
-          onStartTap:
-              isMeasure
-                  ? () => _showMeasurePicker(isStart: true)
-                  : () => _showLinePicker(isStart: true),
-          onEndTap:
-              isMeasure
-                  ? () => _showMeasurePicker(isStart: false)
-                  : () => _showLinePicker(isStart: false),
+          onStartTap: isMeasure
+              ? () => _showMeasurePicker(isStart: true)
+              : () => _showLinePicker(isStart: true),
+          onEndTap: isMeasure
+              ? () => _showMeasurePicker(isStart: false)
+              : () => _showLinePicker(isStart: false),
         ),
         const SizedBox(height: AppSpacing.space2),
 

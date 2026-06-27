@@ -69,10 +69,9 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
 
       final updatedRepertoire = currentRepertoire.copyWith(
         name: _nameController.text.trim(),
-        description:
-            _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
         startDate: _startDate,
         endDate: _endDate,
         clearEndDate: _endDate == null,
@@ -237,7 +236,9 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(title: AppStrings.editRepertoireAppBarTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.editRepertoireAppBarTitle,
+      ),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => const Center(child: Text(AppStrings.errorOccurred)),
@@ -259,7 +260,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                   // 📋 기본 정보 섹션
                   // ========================================
                   const SectionHeader(
-                    icon: '📋',
+                    icon: Icons.info_outline,
                     title: AppStrings.basicInfoTitle,
                     subtitle: AppStrings.editRepertoireBasicInfoSubtitle,
                   ),
@@ -318,17 +319,16 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: _isLoading ? null : _submit,
-                      child:
-                          _isLoading
-                              ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.paper,
-                                ),
-                              )
-                              : const Text(AppStrings.saveChangesButton),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.paper,
+                              ),
+                            )
+                          : const Text(AppStrings.saveChangesButton),
                     ),
                   ),
 
@@ -338,7 +338,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                   // 🗄️ 관리 섹션
                   // ========================================
                   const SettingSectionHeader(
-                    icon: '🗄️',
+                    icon: Icons.inventory_2_outlined,
                     title: AppStrings.managementSectionTitle,
                     description: AppStrings.managementSectionDescription,
                   ),

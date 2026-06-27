@@ -7,9 +7,9 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import 'range_picker_button.dart';
 
-/// Section header widget with emoji icon, title and subtitle
+/// Section header widget with icon, title and subtitle
 class SectionHeader extends StatelessWidget {
-  final String icon;
+  final IconData icon;
   final String title;
   final String subtitle;
 
@@ -33,7 +33,7 @@ class SectionHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(icon, style: AppTypography.headingMedium.copyWith(height: 1)),
+          Icon(icon, size: 20, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -118,9 +118,9 @@ class RangePickers extends StatelessWidget {
   }
 }
 
-/// Section header row with emoji, title and optional label
+/// Section header row with icon, title and optional label
 class SettingSectionHeader extends StatelessWidget {
-  final String icon;
+  final IconData icon;
   final String title;
   final String? trailingLabel;
   final String? description;
@@ -140,7 +140,7 @@ class SettingSectionHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(icon, style: AppTypography.headingMedium.copyWith(height: 1)),
+            Icon(icon, size: 20, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space2),
             // Notebook × Score: SettingSectionHeader helper 의 title 은 Playfair
             // sectionTitle 로 통일. 호출부 3곳(edit_repertoire_screen +
@@ -187,7 +187,7 @@ class RepeatCountSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SettingSectionHeader(
-          icon: '🐾',
+          icon: Icons.repeat,
           title: 'N회 반복',
           trailingLabel: '선택',
           description: '하루에 여러 번 연습해야 하는 경우 설정하세요',
@@ -213,7 +213,7 @@ class RepeatCountSection extends StatelessWidget {
               9,
               (index) => DropdownMenuItem(
                 value: index + 2,
-                child: Text('${index + 2}회 🐾'),
+                child: Text('${index + 2}회'),
               ),
             ),
           ],
@@ -243,7 +243,7 @@ class _RepeatCountHint extends StatelessWidget {
       decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
-          Text('🐾', style: AppTypography.headingSmall.copyWith(height: 1)),
+          const Icon(Icons.pets, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -285,7 +285,7 @@ class TargetTimeSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SettingSectionHeader(
-          icon: '⏱️',
+          icon: Icons.timer,
           title: AppStrings.practiceTargetTimeTitle,
           trailingLabel: '선택',
           description: '이 섹션의 목표 연습시간을 설정하세요',
@@ -409,14 +409,13 @@ class PieceSuggestionChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space1,
-      children:
-          suggestions.take(maxItems).map((name) {
-            return ActionChip(
-              label: Text(name, style: AppTypography.bodySmall),
-              onPressed: () => onSelected(name),
-              visualDensity: VisualDensity.compact,
-            );
-          }).toList(),
+      children: suggestions.take(maxItems).map((name) {
+        return ActionChip(
+          label: Text(name, style: AppTypography.bodySmall),
+          onPressed: () => onSelected(name),
+          visualDensity: VisualDensity.compact,
+        );
+      }).toList(),
     );
   }
 }
