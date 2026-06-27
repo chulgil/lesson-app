@@ -100,12 +100,11 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
           label: AppStrings.authTermsOfService,
           value: _termsOfService,
           onChanged: _setTerms,
-          onViewContent:
-              () => _showTermsContent(
-                context,
-                '서비스 이용약관',
-                _termsOfServiceContent,
-              ),
+          onViewContent: () => _showTermsContent(
+            context,
+            AppStrings.authTermsOfServiceTitle,
+            _termsOfServiceContent,
+          ),
         ),
         const SizedBox(height: AppSpacing.space2),
         _buildTermItem(
@@ -113,12 +112,11 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
           label: AppStrings.authPrivacyPolicy,
           value: _privacyPolicy,
           onChanged: _setPrivacy,
-          onViewContent:
-              () => _showTermsContent(
-                context,
-                '개인정보 수집·이용 동의',
-                _privacyPolicyContent,
-              ),
+          onViewContent: () => _showTermsContent(
+            context,
+            AppStrings.authPrivacyPolicy,
+            _privacyPolicyContent,
+          ),
         ),
         const SizedBox(height: AppSpacing.space2),
         _buildTermItem(
@@ -126,12 +124,11 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
           label: AppStrings.authMarketingConsent,
           value: _marketingConsent,
           onChanged: _setMarketing,
-          onViewContent:
-              () => _showTermsContent(
-                context,
-                '마케팅 정보 수신 동의',
-                _marketingConsentContent,
-              ),
+          onViewContent: () => _showTermsContent(
+            context,
+            AppStrings.authMarketingConsent,
+            _marketingConsentContent,
+          ),
         ),
       ],
     );
@@ -148,8 +145,9 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(
-            color:
-                _allChecked ? AppColors.paperAccent : AppColors.inkQuaternary,
+            color: _allChecked
+                ? AppColors.paperAccent
+                : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -160,7 +158,7 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
-              '전체 동의',
+              AppStrings.authTermsSelectAll,
               style: AppTypography.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -207,7 +205,7 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
             GestureDetector(
               onTap: onViewContent,
               child: Text(
-                '보기',
+                AppStrings.authTermsView,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkTertiary,
                   decoration: TextDecoration.underline,

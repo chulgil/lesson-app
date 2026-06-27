@@ -54,17 +54,16 @@ class DevLoginSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
-          emoji: '👩‍🏫',
+          icon: Icons.school,
           name: '박미연',
           description: '학생 3명, 레슨/구독 관리',
           color: AppColors.paperAccent,
           isLoading: isLoading,
-          onTap:
-              () => onDevLogin(
-                email: 'minyeon@example.com',
-                role: 'teacher',
-                name: '박미연',
-              ),
+          onTap: () => onDevLogin(
+            email: 'minyeon@example.com',
+            role: 'teacher',
+            name: '박미연',
+          ),
         ),
 
         const SizedBox(height: AppSpacing.space4),
@@ -76,45 +75,42 @@ class DevLoginSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
-          emoji: '🎻',
+          icon: Icons.music_note,
           name: '김소연',
           description: '레슨 6개, 연습 기록, 수강권 보유',
           color: AppColors.paperAccent,
           isLoading: isLoading,
-          onTap:
-              () => onDevLogin(
-                email: 'soyeon@example.com',
-                role: 'student',
-                name: '김소연',
-              ),
+          onTap: () => onDevLogin(
+            email: 'soyeon@example.com',
+            role: 'student',
+            name: '김소연',
+          ),
         ),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
-          emoji: '🎻',
+          icon: Icons.music_note,
           name: '이준호',
           description: '레슨 2개, 초급 학생',
           color: AppColors.paperAccent,
           isLoading: isLoading,
-          onTap:
-              () => onDevLogin(
-                email: 'junho@example.com',
-                role: 'student',
-                name: '이준호',
-              ),
+          onTap: () => onDevLogin(
+            email: 'junho@example.com',
+            role: 'student',
+            name: '이준호',
+          ),
         ),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
-          emoji: '🎵',
+          icon: Icons.piano,
           name: '최유진',
           description: '체험 레슨 1개 (플루트)',
           color: AppColors.paperAccent,
           isLoading: isLoading,
-          onTap:
-              () => onDevLogin(
-                email: 'yujin@example.com',
-                role: 'student',
-                name: '최유진',
-              ),
+          onTap: () => onDevLogin(
+            email: 'yujin@example.com',
+            role: 'student',
+            name: '최유진',
+          ),
         ),
 
         const SizedBox(height: AppSpacing.space4),
@@ -123,17 +119,16 @@ class DevLoginSection extends StatelessWidget {
         DevSectionHeader(label: AppStrings.authDevParent, color: AppColors.ink),
         const SizedBox(height: AppSpacing.space2),
         DevAccountCard(
-          emoji: '👨‍👩‍👧',
+          icon: Icons.family_restroom,
           name: '김정수',
           description: '자녀: 김소연 (레슨/연습 확인)',
           color: AppColors.ink,
           isLoading: isLoading,
-          onTap:
-              () => onDevLogin(
-                email: 'parent@example.com',
-                role: 'parent',
-                name: '김정수',
-              ),
+          onTap: () => onDevLogin(
+            email: 'parent@example.com',
+            role: 'parent',
+            name: '김정수',
+          ),
         ),
       ],
     );

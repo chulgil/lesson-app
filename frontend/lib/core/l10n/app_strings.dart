@@ -6581,6 +6581,27 @@ class AppStrings {
   static const authDevStudent = '학생';
   static const authDevParent = '학부모';
 
+  // ── Parent Invite Code (#601) ──
+  static const authParentInviteCodeDesc = '자녀의 선생님으로부터 받은\n초대 코드를 입력해주세요';
+  static const authInviteOrDivider = '또는';
+  static const authParentSkipTitle = '코드가 없어도 괜찮아요';
+  static const authParentSkipSubtitle = '나중에 프로필에서 자녀를 등록할 수 있습니다';
+
+  // ── Terms Agreement (#606) — 보기용 시트 타이틀/라벨 (본문은 위젯 const 유지) ──
+  static const authTermsOfServiceTitle = '서비스 이용약관';
+  static const authTermsSelectAll = '전체 동의';
+  static const authTermsView = '보기';
+
+  // ── Academy Invite Accept (#605) ──
+  static const academyInviteTitle = '학원 초대';
+  static const academyInviteRejectReasonTitle = '거절 사유를 선택해주세요';
+  static const academyInviteRejectReasonNotInterested = '관심 없음';
+  static const academyInviteRejectReasonAlreadyMember = '이미 다른 학원 소속';
+  static const academyInviteRejectReasonOther = '기타';
+  static const academyInviteOwnerPrefix = '대표: ';
+  static const academyInviteRolesTitle = '부여될 권한';
+  static const academyInvitePublicConsentLabel = '학원 공개 페이지에 내 프로필 노출 허용';
+
   // ── Age Gate (만 14세 미만 차단 안전망) ──
   // 정책: docs/specs/user/phone_verification_policy.md — 본인인증(PASS) 통합
   // 전까지의 최소 안전망. 자가신고 기반 확인이며, 정식 연령 검증은 PASS 연동 시
