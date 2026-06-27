@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
@@ -84,4 +86,27 @@ void main() {
       );
     },
   );
+
+  // 회귀 가드(#998 C2 이모지→IconData 전환 누락): _ClassGroupSection 헤더가
+  // `'${widget.group.icon} ...'` 로 IconData 를 String 보간하면 IconData.toString()
+  // ("IconData(U+0E3C5)") 이 그대로 렌더되어 "IconData(...) 미분류 (N)" 로 보였다.
+  // group.icon 은 IconData 이므로 Icon 위젯으로 렌더해야 한다.
+  test('그룹 헤더는 IconData(group.icon) 를 String 보간하지 않고 Icon 위젯으로 렌더한다', () {
+    final source = File(
+      'lib/features/students/presentation/screens/students_tab.dart',
+    ).readAsStringSync();
+
+    expect(
+      source.contains(r'${widget.group.icon}'),
+      isFalse,
+      reason:
+          'group.icon 은 IconData 이므로 String 보간 시 "IconData(...)" 가 그대로 렌더된다. '
+          'Icon(widget.group.icon) 위젯으로 분리해야 한다.',
+    );
+    expect(
+      RegExp(r'Icon\(\s*widget\.group\.icon').hasMatch(source),
+      isTrue,
+      reason: '그룹 헤더 아이콘은 Icon(widget.group.icon, ...) 위젯으로 렌더해야 한다.',
+    );
+  });
 }
