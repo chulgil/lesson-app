@@ -5,6 +5,7 @@ import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
 import 'schedule_option_card.dart';
@@ -282,7 +283,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               shape: RoundedRectangleBorder(),
             ),
             child: Text(
-              '거절하기',
+              AppStrings.rejectAction,
               style: AppTypography.button.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -302,7 +303,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               shape: RoundedRectangleBorder(),
             ),
             child: Text(
-              '승인하기',
+              AppStrings.approveAction,
               style: AppTypography.button.copyWith(color: AppColors.paper),
             ),
           ),

@@ -391,6 +391,9 @@ class AppStrings {
   /// 거절하기
   static const rejectAction = '거절하기';
 
+  /// 승인하기
+  static const approveAction = '승인하기';
+
   /// 시간을 선택하세요
   static const selectTimePrompt = '시간을 선택하세요';
 

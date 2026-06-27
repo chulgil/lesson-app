@@ -370,7 +370,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
         context: context,
         title: AppStrings.studentAddCompleteTitle,
         message: '${_nameController.text} 학생이 추가되었습니다.\n수강권을 발급하시겠습니까?',
-        confirmLabel: '발급하기',
+        confirmLabel: AppStrings.paymentBatchIssueConfirm,
         cancelLabel: '나중에',
       );
 
