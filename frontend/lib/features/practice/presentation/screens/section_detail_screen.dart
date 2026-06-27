@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/practice_facade.dart';
+import '../extensions/practice_section_visuals.dart';
 import '../widgets/metronome/metronome.dart';
 import '../widgets/notes/note_preview_card.dart';
 import '../widgets/practice_tools_modal.dart';

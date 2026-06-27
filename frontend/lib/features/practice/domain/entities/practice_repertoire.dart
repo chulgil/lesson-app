@@ -254,28 +254,6 @@ class PracticeSection {
     this.practiceItemId,
   });
 
-  /// Get measure range display string (e.g., "1~4 마디")
-  String get measureRangeText => '$startMeasure~$endMeasure 마디';
-
-  /// Get line range display string (e.g., "1~3줄")
-  String get lineRangeText =>
-      startLine != null && endLine != null ? '$startLine~$endLine줄' : '';
-
-  /// Get range display string based on rangeType
-  String get rangeText {
-    switch (rangeType) {
-      case SectionRangeType.full:
-        return '전체';
-      case SectionRangeType.line:
-        return lineRangeText;
-      case SectionRangeType.measure:
-        return measureRangeText;
-    }
-  }
-
-  /// Get display name (section name or auto-generated)
-  String get displayName => sectionName ?? rangeText;
-
   /// Check if N회 반복 is enabled
   bool get hasRepeatCount => repeatCount != null && repeatCount! >= 2;
 

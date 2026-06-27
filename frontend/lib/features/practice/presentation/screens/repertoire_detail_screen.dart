@@ -12,6 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../domain/entities/section_sort_type.dart';
+import '../extensions/practice_section_visuals.dart';
 import '../providers/repertoire_archive_provider.dart';
 import '../providers/section_sort_provider.dart';
 import '../widgets/section_management/section_sort_dropdown.dart';

@@ -27,6 +27,32 @@ class MetronomeStrings {
   });
 }
 
+/// Discipline-dependent vocabulary for a practice section's range display
+/// (#966). Music sections measure progress in 마디·줄; other disciplines name
+/// their own units (e.g. 세트·회) by registering their own overlay.
+class PracticeSectionStrings {
+  /// Unit for a measure range (music: '마디').
+  final String measureUnit;
+
+  /// Unit for a line range (music: '줄').
+  final String lineUnit;
+
+  /// Label for a full-piece range (music: '전체').
+  final String fullRangeLabel;
+
+  const PracticeSectionStrings({
+    required this.measureUnit,
+    required this.lineUnit,
+    required this.fullRangeLabel,
+  });
+
+  /// e.g. "1~4 마디" — preserves the legacy space before the unit.
+  String measureRange(int start, int end) => '$start~$end $measureUnit';
+
+  /// e.g. "1~3줄" — preserves the legacy no-space form.
+  String lineRange(int start, int end) => '$start~$end$lineUnit';
+}
+
 /// Per-discipline bundle of **discipline-dependent** UI strings (악기·곡·연습·
 /// 레퍼토리·메트로놈), separated from the shared core `AppStrings` (저장·확인·
 /// 결제·스케줄) for the multi-Discipline platform (#968, design doc
@@ -38,8 +64,13 @@ class MetronomeStrings {
 class StringOverlay {
   final String disciplineId;
   final MetronomeStrings metronome;
+  final PracticeSectionStrings practiceSection;
 
-  const StringOverlay({required this.disciplineId, required this.metronome});
+  const StringOverlay({
+    required this.disciplineId,
+    required this.metronome,
+    required this.practiceSection,
+  });
 }
 
 /// SSOT registry of [StringOverlay]s keyed by `Discipline.id` (#968, mirrors
@@ -65,6 +96,11 @@ class StringOverlayRegistry {
       optionsTitle: '옵션',
       visualFlashLabel: '시각 플래시',
       vibrationLabel: '진동',
+    ),
+    practiceSection: PracticeSectionStrings(
+      measureUnit: '마디',
+      lineUnit: '줄',
+      fullRangeLabel: '전체',
     ),
   );
 

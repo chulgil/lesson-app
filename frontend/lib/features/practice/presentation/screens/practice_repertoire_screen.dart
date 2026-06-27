@@ -15,6 +15,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/practice_facade.dart';
+import '../extensions/practice_section_visuals.dart';
 import '../providers/repertoire_archive_provider.dart';
 
 /// Main practice repertoire screen showing all repertoires and sections
