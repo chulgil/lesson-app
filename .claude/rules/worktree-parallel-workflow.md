@@ -10,7 +10,7 @@
 |------|------|
 | 새 작업 시작 | git worktree 생성 + tmux 세션 분리 |
 | 코드 작성 | worktree 안에서만 — main 직접 편집/커밋 금지 |
-| 검증 | worktree 내 테스트/빌드/UI 회귀 통과 |
+| 검증 | worktree 내 테스트/빌드/린트 통과 (`cg diagnose`) + 프론트 변경 시 UI 회귀 |
 | 병합 | 검증 통과 후 main 으로 merge (PR 권장) |
 | 정리 | merge 후 worktree 제거 |
 

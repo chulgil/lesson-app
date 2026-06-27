@@ -1,6 +1,6 @@
 ---
 name: cg-resume
-description: "이전 세션이 끊겼거나 새 세션에서 컨텍스트가 비어 있을 때 .harness/ 의 spec + journal + drift.json 을 읽어 1분 안에 재개점을 복원. 트리거: resume, 이어서, 어디까지 했지, where was i, 이어가기, restore context."
+description: "이전 세션이 끊겼거나 새 세션에서 컨텍스트가 비어 있을 때 .harness/ 의 handoff + spec + journal + drift.json 을 읽어 1분 안에 재개점을 복원. 트리거: resume, 이어서, 어디까지 했지, where was i, 이어가기, restore context."
 ---
 
 # cg-resume — 세션 재개점 복원
@@ -20,12 +20,13 @@ description: "이전 세션이 끊겼거나 새 세션에서 컨텍스트가 비
 
 ## 입력 우선순위
 
-1. `.harness/status/drift.json` — 가장 최근 세션의 변경 스냅샷.
-2. `.harness/journal/{today}.md` 또는 가장 최근 journal — 최근 결정.
-3. `.harness/spec/` 의 가장 최근 `*-{feature}.md` — active feature.
-4. `.harness/spec/ac-tree-*-{feature}.md` — 마지막 AC 진행도.
-5. `.harness/lore/*.md` — **미해결 lore candidate** (trailer 미커밋 결정).
-6. `.harness/recipes/*.md` — **미승격 recipe candidate** (반복 패턴 미스킬).
+1. `.harness/status/handoff.md` — **가장 최근 working-set 스냅샷** (PreCompact/SessionEnd 훅이 자동 기록). 있으면 여기부터: 브랜치·미커밋 수·활성 spec·journal tail 이 한 곳에 모여 있다.
+2. `.harness/status/drift.json` — 가장 최근 세션의 변경 스냅샷.
+3. `.harness/journal/{today}.md` 또는 가장 최근 journal — 최근 결정.
+4. `.harness/spec/` 의 가장 최근 `*-{feature}.md` — active feature.
+5. `.harness/spec/ac-tree-*-{feature}.md` — 마지막 AC 진행도.
+6. `.harness/lore/*.md` — **미해결 lore candidate** (trailer 미커밋 결정).
+7. `.harness/recipes/*.md` — **미승격 recipe candidate** (반복 패턴 미스킬).
 
 ## 절차
 

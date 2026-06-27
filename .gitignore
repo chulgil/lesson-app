@@ -163,3 +163,9 @@ autopus.yaml
 # Retired BMAD project artifacts
 _bmad/
 _bmad-output/
+
+# cg-harness upgrade backups (timestamped snapshot dirs — not for commit)
+.cg-harness-backup-*/
+
+# Compiled hook bytecode
+.claude/hooks/scripts/__pycache__/

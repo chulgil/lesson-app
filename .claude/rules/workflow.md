@@ -1,6 +1,6 @@
 # Workflow Rules
 
-> 이 규칙은 매 세션 자동 로딩되어 워크플로우를 강제합니다.
+> 이 규칙은 `CLAUDE.md` 가 참조하며, 워크플로우 기준으로 적용됩니다.
 
 ## 7-Phase 기본 흐름
 
@@ -12,6 +12,7 @@ Phase 1: cg-interview          (요구사항 인터뷰)
 Phase 2: cg-spec-and-harness   (공식 스펙 작성)
 Phase 3: cg-visuals            (Mermaid 다이어그램)
 Phase 4: cg-decomposition      (DAG 분해)
+Phase 4.5: cg-plan-check       (실행 전 계획 검증 게이트 — PASS 여야 Phase 5)
 Phase 5: cg-execution-loop     (구현 루프)
 Phase 6: cg-evaluation         (3-critic 평가)
 ```
@@ -33,6 +34,7 @@ Phase 6: cg-evaluation         (3-critic 평가)
 
 ## 역피드백 (Feedback Loop)
 
+- Phase 4.5 의 plan-check 가 REVISE 하면 Phase 4 로 복귀 (실행 전, 최대 3회)
 - Phase 6 의 critic 이 FAIL 하면 Phase 5 로 복귀
 - 스펙이 잘못된 걸 발견하면 Phase 2 로 복귀 (단방향 아님)
 - Lore: 결정을 바꾸면 커밋 메시지 trailer 에 `Lore-directive:` 로 기록
