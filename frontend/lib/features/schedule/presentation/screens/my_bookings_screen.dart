@@ -244,7 +244,7 @@ class MyBookingsScreen extends ConsumerWidget {
                       canReschedule
                           ? (isLastChance
                               ? Icons.warning_amber
-                              : Icons.swap_horiz)
+                              : Icons.swap_horiz_rounded)
                           : Icons.block,
                       size: 14,
                       color:
@@ -421,7 +421,7 @@ class MyBookingsScreen extends ConsumerWidget {
                           canReschedule
                               ? () => _navigateToReschedule(context, booking)
                               : null,
-                      icon: const Icon(Icons.swap_horiz, size: 18),
+                      icon: const Icon(Icons.swap_horiz_rounded, size: 18),
                       label: const Text(AppStrings.rescheduleShort),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.paperAccent,

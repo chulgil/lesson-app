@@ -353,7 +353,7 @@ class _PracticeYoutubePlayerState extends ConsumerState<PracticeYoutubePlayer> {
               if (_showCountIn)
                 Positioned.fill(
                   child: ColoredBox(
-                    color: const Color(0x33000000),
+                    color: AppColors.scrimLight,
                     child: CountInOverlay(onCompleted: _onCountInCompleted),
                   ),
                 ),

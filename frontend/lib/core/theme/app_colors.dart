@@ -138,6 +138,7 @@ class AppColors {
   static const inkTertiary = Color(0x8C14161C); // 55% alpha
   static const inkQuaternary = Color(0x4014161C); // 25% alpha
   static const inkScrim = Color(0x8A14161C); // 54% alpha, modal barrier
+  static const scrimLight = Color(0x33000000); // black 20% scrim
   static const inkScrimStrong = Color(0xDE14161C); // 87% alpha, dark barrier
   static const paperPencil = Color(0x9914161C); // 60% alpha (손글씨)
   @Deprecated(

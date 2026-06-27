@@ -24,8 +24,8 @@ class ExpiryStreakBanner extends StatelessWidget {
       ),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
-        decoration: const BoxDecoration(
-          color: Color(0x1A4A90D9), // profileBlue 10% alpha
+        decoration: BoxDecoration(
+          color: AppColors.profileBlue.withValues(alpha: 0.10), // profileBlue 10% alpha
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,8 +41,8 @@ class ExpiryStreakBanner extends StatelessWidget {
                       horizontal: AppSpacing.space2,
                       vertical: 2,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color(0x264A90D9), // profileBlue 15% alpha
+                    decoration: BoxDecoration(
+                      color: AppColors.profileBlue.withValues(alpha: 0.15), // profileBlue 15% alpha
                     ),
                     child: Text(
                       AppStrings.scheduleChangeExpiredBannerTitle,

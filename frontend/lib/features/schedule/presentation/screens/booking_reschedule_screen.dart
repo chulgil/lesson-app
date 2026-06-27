@@ -185,7 +185,7 @@ class _BookingRescheduleScreenState
         decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
         child: Row(
           children: [
-            const Icon(Icons.swap_horiz, color: AppColors.ink, size: 20),
+            const Icon(Icons.swap_horiz_rounded, color: AppColors.ink, size: 20),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(

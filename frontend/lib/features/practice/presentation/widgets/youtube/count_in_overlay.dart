@@ -79,8 +79,8 @@ class _CountInOverlayState extends State<CountInOverlay> {
         opacity: 1.0,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 24),
-          decoration: const BoxDecoration(
-            color: Color(0x99F2ECDD), // paper 60% opacity
+          decoration: BoxDecoration(
+            color: AppColors.paper.withValues(alpha: 0.60), // paper 60% opacity
             borderRadius: BorderRadius.zero,
           ),
           child: Text(

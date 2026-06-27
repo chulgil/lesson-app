@@ -592,7 +592,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 if (focusLessonId != null) 'focusLessonId': focusLessonId,
               },
             ),
-        icon: const Icon(Icons.swap_horiz, size: 18),
+        icon: const Icon(Icons.swap_horiz_rounded, size: 18),
         label: Text(label),
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
