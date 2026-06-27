@@ -57,7 +57,8 @@ doc-sync 는 스펙/문서 동기화만 담당한다. 품질·검증·커밋 관
 | 4-기준 자가평가 (Phase 6) | [rubric-evaluation.md](rubric-evaluation.md) |
 | 서브에이전트 결과 포맷 (200단어) | [subagent-output.md](subagent-output.md) |
 | git trailer 결정 기록 | [lore-commit.md](lore-commit.md) |
-| Immutability, 파일 크기, 에러 처리 | [coding-style.md](coding-style.md) |
+| 완료 전 코드 품질 체크리스트 | [coding-style.md](coding-style.md) |
+| 언어별 구현 패턴 (immutability·검증·디렉토리·테스트 배치) | [tech-patterns.md](tech-patterns.md) |
 | 상호작용 (가정 명시, 결론 우선, 분석) | [interaction.md](interaction.md) |
 | 보안 체크리스트, 시크릿 관리 | [security.md](security.md) |
 | 2단계 스킬 로딩 (토큰 절약) | [skill-loading.md](skill-loading.md) |

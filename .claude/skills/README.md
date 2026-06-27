@@ -24,6 +24,18 @@ Claude Code 가 로드하는 **7-phase 워크플로우 스킬** 모음. 각 스�
 
 이 스킬들은 `mattpocock/skills`의 engineering 스킬에서 아이디어를 가져와 cg-harness 산출물 경로에 맞춘 어댑터입니다.
 
+## 데이터 인덱싱
+
+| Skill | 역할 |
+|-------|------|
+| `pdf-rag-ingest` | 한국어 PDF(스캔본 포함)를 OCRmyPDF + BGE-M3 + Qdrant 로 깨지지 않게 인덱싱 |
+
+## 코드 품질 (lesson-app 운영 흡수)
+
+| Skill | 역할 |
+|-------|------|
+| `clean-comments` | 디버그 흔적·주석 처리된 코드·자명한 주석 정리, 가치 있는 주석만 유지 |
+
 ## 원칙
 
 - **Phase 를 건너뛰지 않는다**: 각 phase 는 다음 phase 의 입력. spec 없이 바로 execution 으로 가면 드리프트.

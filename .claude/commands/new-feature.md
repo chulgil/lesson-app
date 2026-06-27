@@ -12,12 +12,10 @@ Brand-new feature 를 처음부터 끝까지 하네스 프로토콜로 진행합
 
 1. 사용자에게 **feature 이름** 을 물음 (slug 형태: `lesson-booking`)
 2. 오늘 날짜 + feature-slug 로 파일 경로 계산
-3. **Phase 0 게이트**: `.harness/harness/current.md` 가 템플릿 상태(플레이스홀더 포함)이면 **Phase 0 (cg-brownfield-scan)** 을 먼저 실행하여 프로젝트 스택을 current.md 에 반영
-4. **Phase 1 (cg-interview)** 을 스킬로 호출
+3. **Phase 1 (cg-interview)** 을 스킬로 호출
    - `.harness/interview/{YYYY-MM-DD}-{feature-slug}.md` 생성
-   - `.harness/knowledge/glossary.md` 에 신규 용어 반영
-5. 사용자 승인 후 **Phase 2 (cg-spec-and-harness)** 진행
-6. 이후 Phase 3 → 6 까지 순차 실행, 각 phase 경계에서 `/compact` 제안
+4. 사용자 승인 후 **Phase 2 (cg-spec-and-harness)** 진행
+5. 이후 Phase 3 → 6 까지 순차 실행, 각 phase 경계에서 `/compact` 제안
 
 ## 스킵 조건
 

@@ -87,3 +87,4 @@ Phase 5 Execution Loop 의 journal 엔트리에서 **반복되는 명령 패턴*
 - 글로벌 규칙: `~/.../claude-forge/rules/golden-principles.md §12 Surgical Changes`
 - 비교 대상: Hermes Agent (DEFER, CHANGELOG `[Unreleased]` 참조)
 - 트리거 위치: `cg-execution-loop` SKILL.md `## 학습 누적 (Recipe Promotion)`
+- 승격 스킬 품질: `skill-authoring.md` (description=WHEN not WHAT · 긍정 슬롯 · 무가이드 압박테스트)
