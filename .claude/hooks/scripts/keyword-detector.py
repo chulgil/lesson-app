@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Keyword detector hook for cg-harness.
+"""Keyword/category detector hook for cg-harness (UserPromptSubmit).
 
-UserPromptSubmit 단계에서 사용자 입력을 stdin 으로 받아,
-cg-ralph / cg-unstuck / cg-qa 트리거 키워드를 감지하고
-원 프롬프트 뒤에 <skill-suggestion> 블록을 덧붙여 stdout 으로 내보낸다.
+사용자 입력을 stdin 으로 받아 **대화 카테고리**(계획·디버깅·검증·리팩토링·보안 등)를
+키워드로 추정하고, 그 카테고리에 맞는 스킬을 원 프롬프트 뒤에 `<skill-suggestion>`
+블록으로 덧붙여 stdout 으로 내보낸다. Claude 는 이 넛지를 보고 해당 스킬을 호출한다.
 
-키워드가 없으면 원본을 그대로 통과시킨다.
+이것은 "명령어 없이 자동으로 스킬을 유도"하는 결정적(deterministic) 경로다.
+또 다른 경로 — 모델이 스킬 description(트리거 조건)을 보고 스스로 호출하는 것 —
+은 모델 판단이라 100% 보장이 아니므로, 이 훅이 결정적 보완재 역할을 한다.
 
-Adapted from Q00/ouroboros (MIT).
+매칭이 없으면 원본을 그대로 통과시킨다. stdlib only · 어떤 예외도 프롬프트를
+삼키지 않도록 graceful (실패 시 원본 패스스루).
+
+Adapted from Q00/ouroboros (MIT); v0.12.0 에서 카테고리 인식 + 상위 N 추천으로 확장.
 """
 
 from __future__ import annotations
@@ -15,8 +20,153 @@ from __future__ import annotations
 import re
 import sys
 
-KEYWORD_MAP: list[tuple[tuple[str, ...], str]] = [
+# (카테고리 라벨, 트리거들, 추천 스킬들). 위에서부터 우선순위(동점 시).
+CATEGORY_MAP: list[tuple[str, tuple[str, ...], tuple[str, ...]]] = [
     (
+        "요구사항/새 기능",
+        (
+            "새 기능",
+            "기능 추가",
+            "만들어줘",
+            "요구사항",
+            "인터뷰",
+            "뭘 만들",
+            "feature",
+            "requirement",
+        ),
+        ("cg-interview", "cg-spec-and-harness"),
+    ),
+    (
+        "분해/계획",
+        (
+            "분해",
+            "decompose",
+            "dag",
+            "작업 나눠",
+            "job 으로",
+            "계획 세워",
+            "decomposition",
+        ),
+        ("cg-decomposition",),
+    ),
+    (
+        "계획 검증(실행 전)",
+        (
+            "계획 검증",
+            "계획 점검",
+            "실행 전 점검",
+            "plan check",
+            "이 계획",
+            "계획 맞나",
+            "계획 리뷰",
+        ),
+        ("cg-plan-check",),
+    ),
+    (
+        "디버깅",
+        (
+            "디버그",
+            "debug",
+            "왜 안 돼",
+            "왜 안돼",
+            "버그",
+            "에러",
+            "오류",
+            "고장",
+            "root cause",
+            "근본 원인",
+            "stack trace",
+            "안 돼요",
+            "재현",
+        ),
+        ("cg-debug",),
+    ),
+    (
+        "교착 탈출",
+        (
+            "막혔",
+            "stuck",
+            "안 풀려",
+            "측면 사고",
+            "측면으로 생각",
+            "lateral thinking",
+            "다른 접근",
+            "아이디어가 없",
+        ),
+        ("cg-unstuck",),
+    ),
+    (
+        "검증/품질",
+        (
+            "검증",
+            "verify",
+            "테스트 통과",
+            "빌드 확인",
+            "품질 확인",
+            "qa 판정",
+            "qa verdict",
+            "quality check",
+            "확인해줘",
+        ),
+        ("cg-qa", "verification-engine"),
+    ),
+    (
+        "TDD/테스트 작성",
+        ("tdd", "테스트 먼저", "red green", "red-green", "테스트 작성", "테스트부터"),
+        ("tdd-loop",),
+    ),
+    (
+        "리뷰 피드백 수신",
+        ("리뷰 피드백", "리뷰 반영", "코드 리뷰 결과", "review feedback", "리뷰어가"),
+        ("cg-review-receive",),
+    ),
+    (
+        "리팩토링/아키텍처",
+        (
+            "리팩토링",
+            "refactor",
+            "아키텍처",
+            "구조 개선",
+            "얕은 모듈",
+            "deep module",
+            "모듈 정리",
+        ),
+        ("improve-architecture",),
+    ),
+    (
+        "보안",
+        ("보안", "security", "취약점", "cwe", "stride", "owasp", "인증 검토", "암호화"),
+        ("security-pipeline",),
+    ),
+    (
+        "병렬 실행",
+        (
+            "병렬",
+            "parallel",
+            "동시에 해결",
+            "독립 작업",
+            "여러 작업 동시",
+            "independent tasks",
+        ),
+        ("cg-parallel-dispatch",),
+    ),
+    (
+        "서브에이전트 구현",
+        ("서브에이전트", "subagent", "sdd", "태스크별 에이전트", "에이전트로 분배"),
+        ("cg-subagent-dev",),
+    ),
+    (
+        "워크트리/격리",
+        ("worktree", "워크트리", "격리 브랜치", "isolated workspace", "병렬 개발"),
+        ("cg-worktree",),
+    ),
+    (
+        "브랜치 완료/PR",
+        ("브랜치 완료", "작업 마무리", "pr 생성", "finish branch", "머지 준비"),
+        ("cg-finish-branch",),
+    ),
+    (
+        "영속 루프",
         (
             "ralph",
             "계속 돌려",
@@ -27,98 +177,46 @@ KEYWORD_MAP: list[tuple[tuple[str, ...], str]] = [
             "don't stop",
             "until it works",
         ),
-        "cg-ralph",
+        ("cg-ralph",),
     ),
     (
-        (
-            "unstuck",
-            "막혔어",
-            "i'm stuck",
-            "im stuck",
-            "i am stuck",
-            "think sideways",
-            "측면으로 생각",
-            "측면 사고",
-            "lateral thinking",
-        ),
-        "cg-unstuck",
-    ),
-    (
-        (
-            "qa verdict",
-            "quality check",
-            "품질 확인",
-            "qa 판정",
-        ),
-        "cg-qa",
-    ),
-    (
+        "상태/드리프트",
         (
             "drift",
             "드리프트",
-            "session status",
-            "내가 벗어나고 있나",
-            "harness status",
             "상태 보고",
+            "session status",
+            "harness status",
+            "내가 벗어나",
         ),
-        "cg-status",
+        ("cg-status",),
     ),
     (
+        "세션 재개",
         (
-            "subagent",
-            "서브에이전트",
-            "SDD",
-            "병렬 구현",
-            "태스크별 에이전트",
+            "resume",
+            "이어서",
+            "어디까지 했",
+            "where was i",
+            "컨텍스트 복원",
+            "이어가기",
+            "다시 시작",
         ),
-        "cg-subagent-dev",
+        ("cg-resume",),
     ),
     (
-        (
-            "parallel dispatch",
-            "병렬 파견",
-            "동시에 해결",
-            "independent tasks",
-        ),
-        "cg-parallel-dispatch",
+        "지식 그물",
+        ("지식 그물", "knot", "그물에 넣", "그물에서 찾", "위키에 정리", "inbox 처리"),
+        ("cg-knot-query", "cg-knot-ingest"),
     ),
     (
-        (
-            "worktree",
-            "격리 브랜치",
-            "isolated workspace",
-        ),
-        "cg-worktree",
-    ),
-    (
-        (
-            "finish branch",
-            "브랜치 완료",
-            "작업 마무리",
-            "PR 생성",
-        ),
-        "cg-finish-branch",
-    ),
-    (
-        (
-            "debug",
-            "디버그",
-            "왜 안 돼",
-            "root cause",
-            "근본 원인",
-        ),
-        "cg-debug",
-    ),
-    (
-        (
-            "review feedback",
-            "리뷰 피드백",
-            "리뷰 반영",
-            "코드 리뷰 결과",
-        ),
-        "cg-review-receive",
+        "평가/critic",
+        ("평가해줘", "critic", "evaluation", "오라클", "3-critic"),
+        ("cg-evaluation",),
     ),
 ]
+
+MAX_SUGGESTIONS = 3
 
 
 def _word_boundary_match(pattern: str, text: str) -> bool:
@@ -128,36 +226,49 @@ def _word_boundary_match(pattern: str, text: str) -> bool:
     return bool(re.search(r"(?:^|\b)" + re.escape(pattern) + r"(?:\b|$)", text))
 
 
-def detect(text: str) -> tuple[str, str] | None:
+def detect_all(text: str) -> list[tuple[str, tuple[str, ...], int, str]]:
+    """매칭된 카테고리를 (라벨, 스킬들, 매칭수, 첫키워드) 로, 매칭수 내림차순 반환."""
     lower = text.lower().strip()
-    for patterns, skill in KEYWORD_MAP:
-        for pattern in patterns:
-            if _word_boundary_match(pattern, lower):
-                return skill, pattern
-    return None
+    hits: list[tuple[str, tuple[str, ...], int, str]] = []
+    for label, triggers, skills in CATEGORY_MAP:
+        matched = [t for t in triggers if _word_boundary_match(t, lower)]
+        if matched:
+            hits.append((label, skills, len(matched), matched[0]))
+    # 매칭수 내림차순, 동점은 CATEGORY_MAP 원순서 유지(stable sort).
+    hits.sort(key=lambda h: -h[2])
+    return hits[:MAX_SUGGESTIONS]
+
+
+def _render(hits: list[tuple[str, tuple[str, ...], int, str]]) -> str:
+    lines = [
+        "",
+        "",
+        "<skill-suggestion>",
+        "이 대화에 맞을 수 있는 스킬 (keyword-detector 자동 추천):",
+    ]
+    for label, skills, _count, kw in hits:
+        skill_str = " / ".join(skills)
+        lines.append(f'- [{label}] {skill_str} — "{kw}" 감지')
+    lines.append("필요하면 위 스킬을 사용하세요. 무관하면 무시하고 진행하세요.")
+    lines.append("</skill-suggestion>")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def main() -> None:
     try:
         user_input = sys.stdin.read()
     except OSError:
-        user_input = ""
+        return
 
     stripped = user_input.strip()
-    match = detect(stripped) if stripped else None
+    hits = detect_all(stripped) if stripped else []
 
-    if match is None:
+    if not hits:
         sys.stdout.write(user_input)
         return
 
-    skill, keyword = match
-    suggestion = (
-        f"\n\n<skill-suggestion>\n"
-        f"MATCHED SKILL:\n"
-        f'- /{skill} — detected "{keyword}"\n'
-        f"</skill-suggestion>\n"
-    )
-    sys.stdout.write(user_input.rstrip() + suggestion)
+    sys.stdout.write(user_input.rstrip() + _render(hits))
 
 
 if __name__ == "__main__":
