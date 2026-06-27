@@ -6072,6 +6072,22 @@ class AppStrings {
   /// 정책: docs/specs/user/phone_verification_policy.md §2.
   static const questTitlePhoneVerification = '전화인증';
 
+  // ── OnboardingProgress required quest checklist (#602) ───────────────
+  // OnboardingQuest 표시 문자열 — 도메인 엔티티에서 이전. id → 라벨 매핑은
+  // features/onboarding/presentation/extensions/onboarding_quest_visuals.dart.
+  // 식별자: profile-created, first-student, first-lesson, first-note, phone-verified.
+  static const onboardingQuestProfileCreatedTitle = '프로필 생성';
+  static const onboardingQuestProfileCreatedDescription =
+      '선생님 프로필을 최소 정보로 완성합니다.';
+  static const onboardingQuestFirstStudentTitle = '첫 학생 추가';
+  static const onboardingQuestFirstStudentDescription = '첫 학생을 등록합니다.';
+  static const onboardingQuestFirstLessonTitle = '첫 레슨 등록';
+  static const onboardingQuestFirstLessonDescription = '첫 레슨 일정을 등록합니다.';
+  static const onboardingQuestFirstNoteTitle = '첫 레슨 노트 작성';
+  static const onboardingQuestFirstNoteDescription = '첫 레슨 피드백을 남깁니다.';
+  static const onboardingQuestPhoneVerifiedTitle = '전화번호 인증';
+  static const onboardingQuestPhoneVerifiedDescription = '전화번호 인증을 완료합니다.';
+
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';
