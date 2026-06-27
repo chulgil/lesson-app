@@ -10,6 +10,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.date_utils import to_date
 from app.schemas.common import PaginatedResponse
 from app.schemas.schedule import (
     AvailabilityCreate,
@@ -788,9 +789,9 @@ class ScheduleService:
         if status:
             query = query.where(LessonBooking.status == status)
         if date_from:
-            query = query.where(LessonBooking.scheduled_date >= date_from)
+            query = query.where(LessonBooking.scheduled_date >= to_date(date_from))
         if date_to:
-            query = query.where(LessonBooking.scheduled_date <= date_to)
+            query = query.where(LessonBooking.scheduled_date <= to_date(date_to))
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0
