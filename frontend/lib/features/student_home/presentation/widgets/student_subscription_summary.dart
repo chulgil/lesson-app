@@ -136,8 +136,13 @@ class StudentSubscriptionSummary extends ConsumerWidget {
 
   Widget _buildLoadingState() {
     return Container(
+      // #635 — 로딩→빈/콘텐츠 전환 시 테두리 pop-in 방지(동일 전폭+테두리).
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(color: AppColors.paper),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
       child: const Center(child: CircularProgressIndicator()),
     );
   }

@@ -92,8 +92,9 @@ class TrialBookingsSection extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
+      // #636 — 빈 카드 배경을 subscription 빈 카드와 통일(paper).
       decoration: BoxDecoration(
-        color: AppColors.paperDark,
+        color: AppColors.paper,
         border: Border.all(
           color: AppColors.inkQuaternary,
           style: BorderStyle.solid,
