@@ -259,23 +259,11 @@ class _EmptyAssignments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.space6),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.assignment_outlined,
-            size: 56,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.parentHomeNoAssignment,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
+    return const SizedBox(
+      height: 160,
+      child: EmptyStateWidget(
+        icon: Icons.assignment_outlined,
+        title: AppStrings.parentHomeNoAssignment,
       ),
     );
   }

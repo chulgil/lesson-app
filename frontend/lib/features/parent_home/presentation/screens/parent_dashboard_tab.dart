@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
@@ -275,64 +276,33 @@ class ParentDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context, String parentId) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.child_care_outlined,
-              size: 80,
-              color: AppColors.inkTertiary,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-            Text(
-              AppStrings.parentHomeNoChildren,
-              style: NotebookTypography.sectionTitle,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.parentHomeNoChildrenDesc,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
-              },
-              icon: const Icon(Icons.add),
-              label: const Text(AppStrings.parentHomeAddChild),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                minimumSize: const Size(0, AppSpacing.buttonHeight),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space6,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            OutlinedButton.icon(
-              onPressed: () => context.push(AppRoutes.parentInviteCode),
-              icon: const Icon(Icons.qr_code, size: 18),
-              label: const Text(AppStrings.parentHomeInviteCode),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-                side: const BorderSide(color: AppColors.paperAccent),
-                minimumSize: const Size(0, AppSpacing.buttonHeight),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space6,
-                ),
-              ),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        EmptyStateWidget(
+          icon: Icons.child_care_outlined,
+          title: AppStrings.parentHomeNoChildren,
+          subtitle: AppStrings.parentHomeNoChildrenDesc,
+          actionLabel: AppStrings.parentHomeAddChild,
+          actionIcon: Icons.add,
+          onAction: () {
+            context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
+          },
         ),
-      ),
+        const SizedBox(height: AppSpacing.space3),
+        // #631 보조 CTA — 초대코드 입력 (EmptyStateWidget 1액션 제약으로 외부 유지).
+        OutlinedButton.icon(
+          onPressed: () => context.push(AppRoutes.parentInviteCode),
+          icon: const Icon(Icons.qr_code, size: 18),
+          label: const Text(AppStrings.parentHomeInviteCode),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.paperAccent,
+            side: const BorderSide(color: AppColors.paperAccent),
+            minimumSize: const Size(0, AppSpacing.buttonHeight),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space6),
+          ),
+        ),
+      ],
     );
   }
 
