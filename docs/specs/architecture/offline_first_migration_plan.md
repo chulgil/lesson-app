@@ -1,6 +1,7 @@
 # 오프라인-퍼스트 전면 적용 계획 (47-site)
 
-> 상태: 계획(draft) — 코드 착수 전 검토용. 작성 2026-06-27.
+> 상태: 결정 확정 — 작성 2026-06-27 · D1~D6 확정 2026-06-28.
+> 결정: **D1=옵션 A(HTTP 응답캐시 인터셉터)**, D2~D6 기본안 전부 채택. 전제는 코드로 독립 검증함(§2.6). 다음 단계 = 배치 0 구현.
 > 트리거: "서버 미연결 시 로컬데이터 표기 + 나중에 동기화" 컨셉과 현재 동작 불일치 제보.
 > 관련: 조사 결과(이 세션), `core/sync/`, 이슈 #872(practice_journal remote/sync) · #879(billing read-through) · #880(delta sync).
 
@@ -12,7 +13,7 @@
 
 ### 2.1 오프라인 스택은 이미 존재 (opt-in)
 
-`core/sync/`: `connectivity_service` · `mutation_queue_helper` · `sync_service` · `sync_adapter_registry` · `initial_pull_service` · `offline_banner`.
+`core/sync/`: `application/`(`connectivity_service` · `mutation_queue_helper` · `sync_service` · `sync_adapter_registry` · `initial_pull_service` · `sync_adapter`) · `sync_facade` · `domain/sync_queue_store` · `presentation/providers/`(`connectivity_banner_provider`(=오프라인 인디케이터) · `initial_pull_provider`). (검증 §2.6: 계획 초안의 `offline_banner` 는 실제로 `connectivity_banner_provider`)
 
 ### 2.2 3개 factory (`core/providers/repository_provider.dart`)
 
@@ -42,7 +43,21 @@
 
 practice 7 · subscription 5 · lessons 5 · students 4 · schedule 4 · academy 4 · settings 2 · search 2 · parent_home 2 · follow 2 · auth 2 · (각 1) student_home · share · relationship · profile · onboarding · gamification · billing · analytics · core:providers.
 
-> 주의: academy(4)는 **읽기 전용 표시 + web console 소관**(CLAUDE.md HARD-GATE). 캐시는 적용하되 쓰기 큐는 불요. billing/payment(#879)는 서버 권위 — 읽기 캐시만, 표시 전용.
+> 주의: academy(4)의 **createRepository 배선 4곳(activity·detail·announcement·visibility)은 읽기 전용**이다. 단 academy 도메인 인터페이스에는 mutation 메서드가 존재한다(invoice·settlement·delegation·payment·inquiry·billing_rule — 검증 §2.6). 이 쓰기는 **web console 소관이라 Flutter 에 배선하지 않으며**(CLAUDE.md HARD-GATE), 오프라인 계획은 academy **읽기 캐시만** 적용하고 **쓰기 큐는 제외**한다. billing/payment(#879)는 서버 권위 — 읽기 캐시만, 표시 전용.
+
+### 2.6 검증 로그 (2026-06-28, 코드 독립 검증)
+
+계획 전제를 코드로 독립 검증함(병렬 검증 + 직접 확인). 요약:
+
+| 전제 | 판정 | 근거 |
+|---|---|---|
+| createRepository 48 / SyncAware 5 / LocalFallback 6 | 확인 | 정확 일치 |
+| 도메인 분포 (practice 7 … 1씩) | 확인 | 100% 일치 |
+| SyncAware 패턴(`_readListWithCache` + `MutationQueueHelper` + `_isNetworkFailure`) | 확인 | 5 데코레이터 실재 |
+| HTTP=Dio 5.4 + 단일 ApiClient 싱글톤 + 인터셉터 체인 4종 | 확인 | 옵션 A 구현가능·관용적 |
+| billing 서버권위·표시전용 | 확인 | 인터페이스 3메서드 |
+| `core/sync` 구성 | 명칭편차 | `offline_banner` 부재 → `connectivity_banner_provider`(§2.1 수정) |
+| "academy 읽기전용" | 부분반박 | 도메인 인터페이스에 mutation 존재 — Flutter 미배선 전제로 D6 강화(§2.5 수정) |
 
 ## 3. 기반 설계 — 핵심 분기 (선행 결정)
 
@@ -67,11 +82,13 @@ Dart는 런타임 리플렉션이 없어 **임의 인터페이스 T를 자동 �
 
 - 장점: 최대 정밀도. 단점: 48 도메인 × 2 파일 = 과도한 작업/유지비.
 
-> **권장**: **옵션 A(HTTP 응답 캐시) + 쓰기는 MutationQueueHelper 유지**. 읽기 저하를 전 도메인에 즉시 부여하고, 쓰기 낙관성은 트래픽 높은 도메인부터 점진. 정밀 무효화가 필요한 소수 도메인만 옵션 B로 보강.
+> **결정(D1, 2026-06-28)**: **옵션 A(HTTP 응답 캐시) + 쓰기는 MutationQueueHelper 유지**. 읽기 저하를 전 도메인에 즉시 부여하고, 쓰기 낙관성은 트래픽 높은 도메인부터 점진. 정밀 무효화가 필요한 소수 도메인만 옵션 B로 보강. (검증 §2.6: HTTP=Dio 5.4, 단일 ApiClient 싱글톤, 기존 인터셉터 체인 [Logging/Auth/Error/Refresh] 확인 → 응답캐시 인터셉터 추가가 관용적·구현가능)
 
-## 4. 결정 필요 항목 (Lore 후보)
+## 4. 결정 (2026-06-28 확정)
 
-| # | 결정 | 기본 제안 |
+> D1~D6 전부 확정(D1=옵션 A, D2~D6 기본안 채택). 결정 trailer 는 배치 0 구현 커밋에 `Directive:`/`Constraint:`/`Rejected:` 로 기록.
+
+| # | 결정 | 확정 내용 |
 |---|---|---|
 | D1 | 읽기 캐시 위치 | 옵션 A(HTTP 인터셉터) |
 | D2 | staleness 정책 | 오프라인 중 stale 무기한 제공 + "마지막 동기화 HH:MM" 배너. 온라인 복귀 시 재검증 |
