@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -402,29 +403,12 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   }
 
   Widget _buildEmptyState(String studentId) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.screenPadding,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.library_music_outlined,
-              size: 64,
-              color: AppColors.inkSecondary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              _isToday() ? '오늘 연습할 레퍼토리가 없습니다' : '이 날짜에 연습 기록이 없습니다',
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.library_music_outlined,
+      title: _isToday()
+          ? AppStrings.studentPracticeTodayEmpty
+          : AppStrings.studentPracticeDateEmpty,
+      scrollable: true,
     );
   }
 

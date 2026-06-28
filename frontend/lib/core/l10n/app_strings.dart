@@ -10181,4 +10181,13 @@ class AppStrings {
   static const gamificationOnboardingRecommendationLabel = '오늘 한 가지 추천해줄게:';
   static const gamificationOnboardingAccept = '좋아! 시작하기';
   static const gamificationOnboardingDecline = '내가 정할래';
+
+  // C1 empty-state consts (#634·#637)
+  static const practiceRecordingEmpty = '녹음이 없습니다';
+  static const practiceRecordingEmptyHint = '위의 마이크 버튼을 눌러 녹음을 시작하세요';
+  static const sectionPickerEmpty = '섹션이 없습니다';
+  static const sectionPickerEmptyHint = '먼저 레퍼토리와 섹션을 만들어주세요.';
+  static const repertoireArchiveEmpty = '아카이브된 레퍼토리가 없습니다';
+  static const studentPracticeTodayEmpty = '오늘 연습할 레퍼토리가 없습니다';
+  static const studentPracticeDateEmpty = '이 날짜에 연습 기록이 없습니다';
 }

@@ -6,6 +6,7 @@ import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -647,27 +648,10 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
 class _EmptyRecordingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.mic_none, size: 64, color: AppColors.inkSecondary),
-          SizedBox(height: AppSpacing.space4),
-          Text(
-            '녹음이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          SizedBox(height: AppSpacing.space2),
-          Text(
-            '위의 마이크 버튼을 눌러 녹음을 시작하세요',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.mic_none,
+      title: AppStrings.practiceRecordingEmpty,
+      subtitle: AppStrings.practiceRecordingEmptyHint,
     );
   }
 }
