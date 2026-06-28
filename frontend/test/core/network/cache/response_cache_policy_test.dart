@@ -34,10 +34,10 @@ void main() {
     });
   });
 
-  group('active policy (batch 1d)', () {
+  group('active policy (batch 1e)', () {
     test('enables consolidated domains, not yet-unmigrated ones', () {
       // Consolidated batches: lessons (batch 1), students (batch 1c),
-      // subscriptions (batch 1d).
+      // subscriptions (batch 1d), schedule availability/slots (batch 1e).
       expect(ResponseCachePolicy.active.isCacheable('/lessons'), isTrue);
       expect(ResponseCachePolicy.active.isCacheable('/students'), isTrue);
       expect(ResponseCachePolicy.active.isCacheable('/students/123'), isTrue);
@@ -46,7 +46,25 @@ void main() {
         ResponseCachePolicy.active.isCacheable('/subscriptions/abc'),
         isTrue,
       );
-      // schedule keeps its SyncAware cache until its own consolidation batch —
+      // schedule availability + computed slots (batch 1e).
+      expect(
+        ResponseCachePolicy.active.isCacheable('/schedule/availability'),
+        isTrue,
+      );
+      expect(
+        ResponseCachePolicy.active.isCacheable('/schedule/availability/t1'),
+        isTrue,
+      );
+      expect(ResponseCachePolicy.active.isCacheable('/schedule/slots'), isTrue);
+      // The bare /schedule prefix is intentionally NOT allowlisted, so other
+      // schedule-feature repos (booking, group_class, vacation — still
+      // createRepository, no cache) must not be HTTP-cached.
+      expect(ResponseCachePolicy.active.isCacheable('/schedule'), isFalse);
+      expect(
+        ResponseCachePolicy.active.isCacheable('/schedule/weekly'),
+        isFalse,
+      );
+      // bookings repo is NOT consolidated (different repo, createRepository) —
       // must stay out of the HTTP allowlist.
       expect(ResponseCachePolicy.active.isCacheable('/bookings'), isFalse);
       // Sibling text prefixes must not match consolidated domains. The proposal

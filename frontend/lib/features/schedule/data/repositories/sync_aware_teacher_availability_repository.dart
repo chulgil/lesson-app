@@ -1,62 +1,36 @@
 import '../../../../core/domain/value_objects/clock_time.dart';
-import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/sync/application/mutation_queue_helper.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
-import '../local/teacher_availability_cache_store.dart';
 import 'remote_teacher_availability_repository.dart';
 
-/// Decorator that wraps [RemoteTeacherAvailabilityRepository] with:
-///   1. Hive read-through cache for [TeacherAvailability] settings.
-///   2. Offline queue support for mutations.
+/// Decorator that wraps [RemoteTeacherAvailabilityRepository] with offline
+/// **write-queue** support ([MutationQueueHelper]).
 ///
-/// Only [getAvailability] is cached because computed [AvailabilitySlot]s use
-/// [ClockTime] value objects without a public `fromJson` factory and are
-/// time-sensitive (stale slots would mislead booking UI).
-///
-/// Read behaviour for [getAvailability]:
-///   - Online success → write to cache, return result.
-///   - Network failure ([NetworkException] / [ServerException]) → return cached
-///     last-known-good if available, otherwise rethrow.
-///   - Cache miss + network failure → rethrow original error.
+/// Reads delegate straight to the remote repository — offline read fallback is
+/// provided transparently at the HTTP layer by `ResponseCacheInterceptor`
+/// (offline-first plan §3 option A; batch 1e 일원화 — the previous Hive
+/// read-through cache layer was removed in favour of the single HTTP response
+/// cache). Writes are queued when offline and replayed on reconnect.
 class SyncAwareTeacherAvailabilityRepository
     implements TeacherAvailabilityRepository {
   SyncAwareTeacherAvailabilityRepository({
     required RemoteTeacherAvailabilityRepository remote,
     required MutationQueueHelper queue,
-    required TeacherAvailabilityCacheStore cache,
   }) : _remote = remote,
-       _queue = queue,
-       _cache = cache;
+       _queue = queue;
 
   final RemoteTeacherAvailabilityRepository _remote;
   final MutationQueueHelper _queue;
-  final TeacherAvailabilityCacheStore _cache;
 
   // --------------------------------------------------------------------------
-  // Read with cache — getAvailability only
+  // Read methods — delegate to remote; HTTP response cache handles offline.
   // --------------------------------------------------------------------------
 
   @override
-  Future<TeacherAvailability?> getAvailability(String teacherId) async {
-    final key = TeacherAvailabilityCacheStore.keyAvailability(teacherId);
-    try {
-      final result = await _remote.getAvailability(teacherId);
-      await _cache.putAvailability(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache.getAvailability(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Slot queries — no cache (time-sensitive, ClockTime not JSON-serialisable)
-  // --------------------------------------------------------------------------
+  Future<TeacherAvailability?> getAvailability(String teacherId) =>
+      _remote.getAvailability(teacherId);
 
   @override
   Future<List<AvailabilitySlot>> getAvailableSlotsForDate(
@@ -321,17 +295,4 @@ class SyncAwareTeacherAvailabilityRepository
       clientUpdatedAt: DateTime.now().toUtc(),
     ),
   );
-
-  // --------------------------------------------------------------------------
-  // Private helpers
-  // --------------------------------------------------------------------------
-
-  bool _isNetworkFailure(Exception e) {
-    if (e is NetworkException) return true;
-    if (e is ServerException) return true;
-    if (e is ApiException && e.statusCode != null && e.statusCode! >= 500) {
-      return true;
-    }
-    return false;
-  }
 }

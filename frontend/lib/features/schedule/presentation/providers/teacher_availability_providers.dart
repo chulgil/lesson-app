@@ -4,14 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
-import 'package:hive/hive.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../data/local/teacher_availability_cache_store.dart';
 import '../../data/repositories/mock_teacher_availability_repository.dart';
 import '../../data/repositories/remote_teacher_availability_repository.dart';
 import '../../data/repositories/sync_aware_teacher_availability_repository.dart';
@@ -36,9 +34,6 @@ TeacherAvailabilityRepository teacherAvailabilityRepository(Ref ref) =>
       syncAware: (api, queue) => SyncAwareTeacherAvailabilityRepository(
         remote: RemoteTeacherAvailabilityRepository(api),
         queue: queue,
-        cache: TeacherAvailabilityCacheStore(
-          box: Hive.box<String>(TeacherAvailabilityCacheStore.boxName),
-        ),
       ),
     );
 
