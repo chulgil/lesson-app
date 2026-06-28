@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/router/app_routes.dart';
 import 'lesson_action_sheet.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -583,22 +584,11 @@ class _ScheduleWeeklyGridViewState
   }
 
   Widget _buildEmptyWeek() {
-    return SizedBox(
+    return const SizedBox(
       height: 240,
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.event_available, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              '이번 주는 레슨이 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
+      child: EmptyStateWidget(
+        icon: Icons.event_available,
+        title: AppStrings.scheduleWeekEmpty,
       ),
     );
   }

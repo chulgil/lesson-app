@@ -10190,4 +10190,6 @@ class AppStrings {
   static const repertoireArchiveEmpty = '아카이브된 레퍼토리가 없습니다';
   static const studentPracticeTodayEmpty = '오늘 연습할 레퍼토리가 없습니다';
   static const studentPracticeDateEmpty = '이 날짜에 연습 기록이 없습니다';
+  static const scheduleWeekEmpty = '이번 주는 레슨이 없습니다';
+  static const settingsBackupEmpty = '저장된 백업이 없습니다';
 }
