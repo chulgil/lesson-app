@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/lesson_policy.dart';
@@ -1070,13 +1071,9 @@ class _SheetFrame extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.space2),
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(color: AppColors.inkQuaternary),
-            ),
+          const Padding(
+            padding: EdgeInsets.only(top: AppSpacing.space2),
+            child: BottomSheetHandle(margin: EdgeInsets.zero),
           ),
           Flexible(
             child: SingleChildScrollView(
