@@ -6,8 +6,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../providers/student_home_booking_provider.dart';
 import 'compact_trial_booking_card.dart';
 
@@ -100,26 +100,15 @@ class TrialBookingsSection extends ConsumerWidget {
           style: BorderStyle.solid,
         ),
       ),
-      child: Column(
-        children: [
-          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.studentHomeStartNewLesson,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          FilledButton.icon(
-            onPressed: () => context.push(AppRoutes.teacherSearch),
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text(AppStrings.studentHomeTrialBooking),
-            style: FilledButton.styleFrom(
-              minimumSize: Size(0, AppSpacing.buttonHeight),
-            ),
-          ),
-        ],
+      child: SizedBox(
+        height: 190,
+        child: EmptyStateWidget(
+          icon: Icons.school_outlined,
+          title: AppStrings.studentHomeStartNewLesson,
+          actionLabel: AppStrings.studentHomeTrialBooking,
+          actionIcon: Icons.add,
+          onAction: () => context.push(AppRoutes.teacherSearch),
+        ),
       ),
     );
   }

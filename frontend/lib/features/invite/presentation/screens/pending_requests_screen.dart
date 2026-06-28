@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../profile/presentation/extensions/profile_domain_visuals.dart';
 import '../../../profile/profile_facade.dart';
@@ -62,45 +62,12 @@ class PendingRequestsScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty(InviteUserRole userRole) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.zero,
-              ),
-              child: Icon(
-                Icons.inbox_outlined,
-                size: 40,
-                color: AppColors.paperAccent,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            // Notebook × Score: 빈 상태 제목도 Playfair appBarTitle 로 통일 (§7.27 패턴).
-            Text(
-              AppStrings.pendingRequestsEmptyTitle,
-              style: NotebookTypography.appBarTitle,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              userRole == InviteUserRole.teacher
-                  ? AppStrings.pendingRequestsEmptyTeacher
-                  : AppStrings.pendingRequestsEmptyStudent,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.inbox_outlined,
+      title: AppStrings.pendingRequestsEmptyTitle,
+      subtitle: userRole == InviteUserRole.teacher
+          ? AppStrings.pendingRequestsEmptyTeacher
+          : AppStrings.pendingRequestsEmptyStudent,
     );
   }
 

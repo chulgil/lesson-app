@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -117,21 +118,7 @@ class StudentDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyMessage({required IconData icon, required String message}) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            message,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
+    return EmptyStateWidget(icon: icon, title: message);
   }
 }
 

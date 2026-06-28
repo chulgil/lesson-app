@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
@@ -134,30 +135,16 @@ class MyTeachersScreen extends ConsumerWidget {
         color: AppColors.paperDark,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Column(
-        children: [
-          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            '연결된 앱 선생님이 없습니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            AppStrings.studentHomeSearchTeacherHint,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          FilledButton.icon(
-            onPressed: () => context.push(AppRoutes.teacherSearch),
-            icon: const Icon(Icons.search, size: 18),
-            label: const Text(AppStrings.studentHomeFindTeacher),
-          ),
-        ],
+      child: SizedBox(
+        height: 220,
+        child: EmptyStateWidget(
+          icon: Icons.school_outlined,
+          title: AppStrings.studentHomeAppTeacherEmpty,
+          subtitle: AppStrings.studentHomeSearchTeacherHint,
+          actionLabel: AppStrings.studentHomeFindTeacher,
+          actionIcon: Icons.search,
+          onAction: () => context.push(AppRoutes.teacherSearch),
+        ),
       ),
     );
   }
@@ -237,23 +224,15 @@ class MyTeachersScreen extends ConsumerWidget {
         color: AppColors.paperDark,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.person_add_outlined,
-            size: 40,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.studentHomeManualTeacherEmpty,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          _buildAddManualTeacherButton(context),
-        ],
+      child: SizedBox(
+        height: 200,
+        child: EmptyStateWidget(
+          icon: Icons.person_add_outlined,
+          title: AppStrings.studentHomeManualTeacherEmpty,
+          actionLabel: AppStrings.studentHomeManualTeacherRegister,
+          actionIcon: Icons.add,
+          onAction: () => context.push(AppRoutes.addManualTeacher),
+        ),
       ),
     );
   }

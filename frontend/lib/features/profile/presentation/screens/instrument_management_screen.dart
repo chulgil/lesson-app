@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -191,18 +192,11 @@ class _InstrumentManagementScreenState
           Container(
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(color: AppColors.paperDark),
-            child: Center(
-              child: Column(
-                children: [
-                  Icon(Icons.music_off, size: 48, color: AppColors.inkTertiary),
-                  const SizedBox(height: AppSpacing.space2),
-                  Text(
-                    '등록된 악기가 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ],
+            child: const SizedBox(
+              height: 140,
+              child: EmptyStateWidget(
+                icon: Icons.music_off,
+                title: AppStrings.instrumentManagementEmpty,
               ),
             ),
           )

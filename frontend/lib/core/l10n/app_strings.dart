@@ -10181,4 +10181,26 @@ class AppStrings {
   static const gamificationOnboardingRecommendationLabel = '오늘 한 가지 추천해줄게:';
   static const gamificationOnboardingAccept = '좋아! 시작하기';
   static const gamificationOnboardingDecline = '내가 정할래';
+
+  // C1 empty-state consts (#634·#637)
+  static const practiceRecordingEmpty = '녹음이 없습니다';
+  static const practiceRecordingEmptyHint = '위의 마이크 버튼을 눌러 녹음을 시작하세요';
+  static const sectionPickerEmpty = '섹션이 없습니다';
+  static const sectionPickerEmptyHint = '먼저 레퍼토리와 섹션을 만들어주세요.';
+  static const repertoireArchiveEmpty = '아카이브된 레퍼토리가 없습니다';
+  static const studentPracticeTodayEmpty = '오늘 연습할 레퍼토리가 없습니다';
+  static const studentPracticeDateEmpty = '이 날짜에 연습 기록이 없습니다';
+  static const scheduleWeekEmpty = '이번 주는 레슨이 없습니다';
+  static const settingsBackupEmpty = '저장된 백업이 없습니다';
+  static const repertoireEmptyTitle = '등록된 곡이 없습니다';
+  static const repertoireEmptyHint = '곡을 추가하여 레퍼토리를 관리하세요';
+  static const sectionRecordingEmptyTitle = '아직 녹음이 없습니다';
+  static const sectionRecordingEmptyHint = '위의 녹음 버튼을 눌러 연습을 기록해보세요';
+
+  // C1 hybrid empty-state consts (#634 wave2)
+  static const studentHomeAppTeacherEmpty = '연결된 앱 선생님이 없습니다';
+  static const noSubscriptionsRegisteredHint = '선생님에게 수강권 발급을 요청하세요';
+  static const parentChildNotLinkedSuffix = '은(는) 아직 선생님과 연결되지 않았습니다';
+  static const parentChildNotLinkedDesc = '선생님 연결 후 수강권 정보가 표시됩니다';
+  static const instrumentManagementEmpty = '등록된 악기가 없습니다';
 }

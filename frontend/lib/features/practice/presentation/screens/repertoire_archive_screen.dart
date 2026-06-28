@@ -3,6 +3,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -52,24 +53,9 @@ class RepertoireArchiveScreen extends ConsumerWidget {
             child: archivedAsync.when(
               data: (repertoires) {
                 if (repertoires.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 64,
-                          color: AppColors.inkSecondary.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: AppSpacing.space4),
-                        Text(
-                          '아카이브된 레퍼토리가 없습니다',
-                          style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
+                  return const EmptyStateWidget(
+                    icon: Icons.inventory_2_outlined,
+                    title: AppStrings.repertoireArchiveEmpty,
                   );
                 }
 

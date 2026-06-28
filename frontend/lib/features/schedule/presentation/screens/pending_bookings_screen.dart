@@ -6,7 +6,7 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/lessons_facade.dart';
@@ -84,31 +84,11 @@ class PendingBookingsScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.inbox, size: 64, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space4),
-          // Notebook × Score: 빈 상태 타이틀은 Playfair sectionTitle (§7.87).
-          Text(
-            AppStrings.pendingBookingsEmpty,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          // 빈 상태 부연 = 시스템 일반 안내 → Tier 3 Pretendard bodyMedium
-          // (README §1.1.1 결정 가이드, §7.128 자필 회피).
-          Text(
-            AppStrings.pendingBookingsEmptyDesc,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.inbox,
+      title: AppStrings.pendingBookingsEmpty,
+      subtitle: AppStrings.pendingBookingsEmptyDesc,
+      scrollable: true,
     );
   }
 
