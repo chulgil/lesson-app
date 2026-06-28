@@ -86,18 +86,6 @@ abstract class PracticeRepertoireRepository {
 
   // Assignment integration (teacher → student repertoire)
   Future<PracticeRepertoire> getOrCreateDefaultRepertoire(String studentId);
-  Future<PracticeSection> createSectionFromAssignment({
-    required String studentId,
-    required String pieceName,
-    String? sectionName,
-    String? youtubeUrl,
-    String? youtubeVideoId,
-    int? youtubeStartSeconds,
-    int? youtubeEndSeconds,
-    List<String> teachingResourceIds,
-    required String assignedByTeacherId,
-    required String practiceItemId,
-  });
 
   // Cache management
   Future<void> reloadFromHive();
