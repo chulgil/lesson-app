@@ -480,7 +480,7 @@ class ScheduleTab extends ConsumerWidget {
               ),
               // Notebook × Score: 각진 뱃지 (§7.113 매트릭스 — 컨테이너 bg zero)
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
               ),
               // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
               // (README §1.1 4계층, §7.127 Gaegu 회피).

@@ -809,7 +809,7 @@ void showAssignToStudentDialog({
               final student = students[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                  backgroundColor: AppColors.paperAccentSoft,
                   child: Text(
                     student.name[0],
                     style: TextStyle(color: AppColors.paperAccent),

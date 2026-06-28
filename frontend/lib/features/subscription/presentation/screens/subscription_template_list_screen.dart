@@ -379,7 +379,7 @@ class _TemplateCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
+                        color: AppColors.paperAccentSoft,
                       ),
                       child: Text(
                         template.formattedDiscountRate,

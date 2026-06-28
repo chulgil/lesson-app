@@ -213,7 +213,7 @@ class _BookingRescheduleScreenState
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
+          color: AppColors.paperAccentSoft,
         ),
         child: Row(
           children: [
@@ -245,7 +245,7 @@ class _BookingRescheduleScreenState
       decoration: BoxDecoration(
         color:
             isLastChance
-                ? AppColors.paperAccent.withValues(alpha: 0.1)
+                ? AppColors.paperAccentSoft
                 : AppColors.ink.withValues(alpha: 0.1),
       ),
       child: Row(
