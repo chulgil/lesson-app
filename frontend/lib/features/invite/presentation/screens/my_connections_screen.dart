@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
@@ -625,8 +626,8 @@ class _ConnectionCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     isActive
-                        ? '연결됨: ${_formatRelativeDate(connection.connectedAt)}'
-                        : '해제됨: ${_formatRelativeDate(connection.deactivatedAt ?? connection.connectedAt)}',
+                        ? '연결됨: ${formatRelativeDay(connection.connectedAt)}'
+                        : '해제됨: ${formatRelativeDay(connection.deactivatedAt ?? connection.connectedAt)}',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -653,24 +654,6 @@ class _ConnectionCard extends StatelessWidget {
     );
   }
 
-  String _formatRelativeDate(DateTime date) {
-    final now = DateTime.now();
-    final diff = now.difference(date);
-
-    if (diff.inDays == 0) {
-      return '오늘';
-    } else if (diff.inDays == 1) {
-      return '어제';
-    } else if (diff.inDays < 7) {
-      return '${diff.inDays}일 전';
-    } else if (diff.inDays < 30) {
-      return '${(diff.inDays / 7).floor()}주 전';
-    } else if (diff.inDays < 365) {
-      return '${(diff.inDays / 30).floor()}개월 전';
-    } else {
-      return '${(diff.inDays / 365).floor()}년 전';
-    }
-  }
 }
 
 class _StatusBadge extends StatelessWidget {
