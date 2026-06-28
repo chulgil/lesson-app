@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
@@ -363,7 +364,7 @@ class _AppTeacherCard extends ConsumerWidget {
                       _buildStat(
                         Icons.calendar_today_outlined,
                         '마지막 레슨',
-                        _formatRelativeDate(relation.lastLessonAt!),
+                        formatRelativeDay(relation.lastLessonAt!),
                       ),
                     const SizedBox(width: AppSpacing.space6),
                     _buildStat(
@@ -427,16 +428,6 @@ class _AppTeacherCard extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  String _formatRelativeDate(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays == 0) return '오늘';
-    if (diff.inDays == 1) return '어제';
-    if (diff.inDays < 7) return '${diff.inDays}일 전';
-    if (diff.inDays < 30) return '${diff.inDays ~/ 7}주 전';
-    if (diff.inDays < 365) return '${diff.inDays ~/ 30}개월 전';
-    return '${diff.inDays ~/ 365}년 전';
   }
 
   String _formatDuration(DateTime startDate) {
