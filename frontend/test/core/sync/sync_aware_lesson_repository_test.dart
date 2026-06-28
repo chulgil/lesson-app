@@ -1,12 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_test/hive_test.dart';
 import 'package:lessonaza/core/network/api_exceptions.dart';
 import 'package:lessonaza/core/sync/application/connectivity_service.dart';
 import 'package:lessonaza/core/sync/application/mutation_queue_helper.dart';
 import 'package:lessonaza/core/sync/application/sync_service.dart';
 import 'package:lessonaza/core/sync/domain/sync_queue_entry.dart';
-import 'package:lessonaza/features/lessons/data/local/lesson_cache_store.dart';
 import 'package:lessonaza/features/lessons/data/repositories/remote_lesson_repository.dart';
 import 'package:lessonaza/features/lessons/data/repositories/sync_aware_lesson_repository.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
@@ -60,10 +57,7 @@ void main() {
     registerFallbackValue(_testLesson());
   });
 
-  setUp(() async {
-    await setUpTestHive();
-    final box = await Hive.openBox<String>('lesson_cache_test_sync');
-
+  setUp(() {
     remote = MockRemoteLessonRepository();
     connectivity = MockConnectivityService();
     syncService = MockSyncService();
@@ -74,12 +68,7 @@ void main() {
         connectivity: connectivity,
         syncService: syncService,
       ),
-      cache: LessonCacheStore(box: box),
     );
-  });
-
-  tearDown(() async {
-    await tearDownTestHive();
   });
 
   group('read methods delegate to remote', () {

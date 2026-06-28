@@ -164,16 +164,16 @@ ApiClient apiClient(ApiClientRef ref) {
   ]);
 
   // Offline read cache (offline-first plan §3 option A) — added LAST so it
-  // observes the final (post-refresh) response and the terminal error. Gated by
-  // an empty allowlist in batch 0 (runtime no-op). Skipped when the cache box is
-  // not open (e.g. unit tests without app bootstrap).
+  // observes the final (post-refresh) response and the terminal error. Gated
+  // per-domain by ResponseCachePolicy.active's allowlist (grows per batch).
+  // Skipped when the cache box is not open (e.g. unit tests without bootstrap).
   if (Hive.isBoxOpen(ResponseCacheStore.boxName)) {
     dio.interceptors.add(
       ResponseCacheInterceptor(
         store: ResponseCacheStore(
           box: Hive.box<String>(ResponseCacheStore.boxName),
         ),
-        policy: const ResponseCachePolicy(),
+        policy: ResponseCachePolicy.active,
       ),
     );
   }
