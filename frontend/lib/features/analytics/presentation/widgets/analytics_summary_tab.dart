@@ -135,7 +135,13 @@ class AnalyticsSummaryTab extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space3),
         summaryListAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const SizedBox.shrink(),
+          // C7 — primary 하위리스트: 에러도 빈 상태와 동일 inline 텍스트로 표시 (가시성 일치).
+          error: (_, __) => Text(
+            AppStrings.cannotLoadData,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkTertiary,
+            ),
+          ),
           data: (list) => list.isEmpty
               ? Text(
                   AppStrings.analyticsNoStudentData,
