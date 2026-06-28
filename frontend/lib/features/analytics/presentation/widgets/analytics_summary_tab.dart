@@ -13,6 +13,7 @@ import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../domain/entities/teacher_stats.dart';
 import '../providers/analytics_providers.dart';
+import 'analytics_error_view.dart';
 import 'monthly_trend_chart.dart';
 import 'practice_ranking_list.dart';
 
@@ -35,7 +36,7 @@ class AnalyticsSummaryTab extends ConsumerWidget {
 
     return statsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => _ErrorView(
+      error: (e, _) => AnalyticsErrorView(
         onRetry: () => ref.invalidate(teacherMonthlyStatsProvider(selectedMonth)),
       ),
       data: (stats) => RefreshIndicator(
@@ -247,28 +248,6 @@ class _StudentSummaryRow extends StatelessWidget {
         ),
         Container(height: 1, color: AppColors.inkQuaternary),
       ],
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(AppStrings.cannotLoadData, style: AppTypography.bodyMedium),
-          const SizedBox(height: AppSpacing.space3),
-          OutlinedButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
-        ],
-      ),
     );
   }
 }

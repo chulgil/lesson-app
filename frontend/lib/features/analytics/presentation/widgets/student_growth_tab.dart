@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart' as dfmt;
 import '../../domain/entities/analytics_models.dart';
 import '../providers/analytics_providers.dart';
+import 'analytics_error_view.dart';
 import 'practice_weekly_line_chart.dart';
 import 'repertoire_progress_list.dart';
 
@@ -48,12 +49,9 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
         Expanded(
           child: progressAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(
-              child: Text(
-                AppStrings.cannotLoadData,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
+            error: (e, _) => AnalyticsErrorView(
+              onRetry: () => ref.invalidate(
+                studentProgressDataProvider(_selectedStudentId, _selectedPeriod),
               ),
             ),
             data: (progress) => _buildContent(progress),
