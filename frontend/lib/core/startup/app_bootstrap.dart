@@ -20,6 +20,7 @@ import '../../features/practice/domain/entities/recording.dart';
 import '../../features/student_home/data/models/manual_teacher_hive_model.dart';
 import '../../firebase_options.dart';
 import '../audio/audio_session_manager.dart';
+import '../network/cache/response_cache_store.dart';
 import 'startup_recovery.dart';
 
 Future<StartupRecoveryResult> bootstrapApp() async {
@@ -64,6 +65,9 @@ Future<StartupRecoveryResult> bootstrapApp() async {
   await Hive.openBox<String>(StudentCacheStore.boxName);
   await Hive.openBox<String>(TeacherAvailabilityCacheStore.boxName);
   await Hive.openBox<String>(SubscriptionCacheStore.boxName);
+  // Offline-first read cache (offline-first plan §3 option A). The
+  // ResponseCacheInterceptor reads/writes this box synchronously.
+  await Hive.openBox<String>(ResponseCacheStore.boxName);
 
   // gamification 로컬 영속 (#422) — heatmap/streak/quest 휘발 해소.
   // provider 가 sync 로 Hive.box(...) 를 동기 참조하도록 부팅 시 미리 연다.
@@ -73,12 +77,13 @@ Future<StartupRecoveryResult> bootstrapApp() async {
 
   // Recording-path recovery uses dart:io (File/Directory) + path_provider,
   // which are native-only. Skip on web.
-  final recoveryResult = kIsWeb
-      ? (recovered: 0, cleanedUp: 0, total: 0)
-      : await recoverStartupRecordingPaths(
-          recordingsBox: recordingsBox,
-          practiceRecordingsBox: practiceRecordingsBox,
-        );
+  final recoveryResult =
+      kIsWeb
+          ? (recovered: 0, cleanedUp: 0, total: 0)
+          : await recoverStartupRecordingPaths(
+            recordingsBox: recordingsBox,
+            practiceRecordingsBox: practiceRecordingsBox,
+          );
 
   // Initialize date formatting for Korean locale
   await initializeDateFormatting('ko');
