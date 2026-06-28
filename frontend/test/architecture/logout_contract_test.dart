@@ -48,4 +48,28 @@ void main() {
 
     expect(source, matches(studentCase));
   });
+
+  test('auth identity changes clear the offline response cache', () {
+    // Cross-user privacy (offline-first plan D2; data-privacy §Level-2): the
+    // offline HTTP read cache must be dropped when the authenticated identity
+    // changes, so user A's cached GET responses are never served to user B.
+    // Wiring must exist at logout, explicit login (oauth + dev), and session
+    // expiry — NOT on auto-login success (same-user restore) or token refresh.
+    final source =
+        File(
+          'lib/features/auth/presentation/providers/auth_provider.dart',
+        ).readAsStringSync();
+
+    expect(source, contains('_clearOfflineReadCache'));
+    // 1 helper definition + 4 call sites (logout, oauth login, dev login,
+    // session expiry) = 5 occurrences.
+    final occurrences = '_clearOfflineReadCache'.allMatches(source).length;
+    expect(
+      occurrences,
+      greaterThanOrEqualTo(5),
+      reason:
+          'offline cache clear must be wired at logout, oauth/dev login, and '
+          'session expiry',
+    );
+  });
 }

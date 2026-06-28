@@ -1,13 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../auth/token_storage.dart';
 import '../config/environment.dart';
 import 'api_exceptions.dart';
+import 'cache/response_cache_policy.dart';
+import 'cache/response_cache_store.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/refresh_interceptor.dart';
+import 'interceptors/response_cache_interceptor.dart';
 
 part 'api_client.g.dart';
 
@@ -158,6 +162,21 @@ ApiClient apiClient(ApiClientRef ref) {
     ErrorInterceptor(),
     RefreshInterceptor(dio, tokenStorage),
   ]);
+
+  // Offline read cache (offline-first plan §3 option A) — added LAST so it
+  // observes the final (post-refresh) response and the terminal error. Gated by
+  // an empty allowlist in batch 0 (runtime no-op). Skipped when the cache box is
+  // not open (e.g. unit tests without app bootstrap).
+  if (Hive.isBoxOpen(ResponseCacheStore.boxName)) {
+    dio.interceptors.add(
+      ResponseCacheInterceptor(
+        store: ResponseCacheStore(
+          box: Hive.box<String>(ResponseCacheStore.boxName),
+        ),
+        policy: const ResponseCachePolicy(),
+      ),
+    );
+  }
 
   return ApiClient(dio);
 }
