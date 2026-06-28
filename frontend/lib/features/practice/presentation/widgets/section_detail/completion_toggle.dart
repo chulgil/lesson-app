@@ -49,7 +49,7 @@ class CompletionToggle extends StatelessWidget {
     final isCompleted = section.isCompletedForDate(date);
 
     return NotebookCard(
-      color: isCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
+      color: isCompleted ? AppColors.paperOkSoft : null,
       child: InkWell(
         onTap: onToggle,
         child: Padding(
@@ -108,7 +108,7 @@ class CompletionToggle extends StatelessWidget {
     final isAllCompleted = completedCount >= totalCount;
 
     return NotebookCard(
-      color: isAllCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
+      color: isAllCompleted ? AppColors.paperOkSoft : null,
       child: InkWell(
         onTap: onToggle,
         child: Padding(

@@ -44,7 +44,7 @@ class LessonReminderSection extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.paperOk.withValues(alpha: 0.1),
+                  color: AppColors.paperOkSoft,
                 ),
                 child: const Icon(
                   Icons.notifications_active,

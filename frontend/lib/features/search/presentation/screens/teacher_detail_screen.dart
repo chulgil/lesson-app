@@ -363,7 +363,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                               ),
                               padding: const EdgeInsets.all(AppSpacing.space3),
                               decoration: BoxDecoration(
-                                color: AppColors.paperOk.withValues(alpha: 0.1),
+                                color: AppColors.paperOkSoft,
                                 border: Border.all(
                                   color: AppColors.paperOk.withValues(
                                     alpha: 0.3,

@@ -688,7 +688,7 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             isActive
-                ? AppColors.paperOk.withValues(alpha: 0.1)
+                ? AppColors.paperOkSoft
                 : AppColors.inkTertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.zero,
       ),

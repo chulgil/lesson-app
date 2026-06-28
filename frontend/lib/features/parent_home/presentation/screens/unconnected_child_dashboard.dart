@@ -299,7 +299,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 color: isToday
                     ? AppColors.paperAccent
                     : hasPractice
-                    ? AppColors.paperOk.withValues(alpha: 0.1)
+                    ? AppColors.paperOkSoft
                     : isPast
                     ? AppColors.paperDark
                     : Colors.transparent,
