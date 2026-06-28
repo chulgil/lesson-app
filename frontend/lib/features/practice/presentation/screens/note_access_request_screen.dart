@@ -188,14 +188,14 @@ class _NoteAccessRequestScreenState
 
     final badgeColor = switch (request.status) {
       NoteAccessStatus.consented => AppColors.bubbleSuccessBackground,
-      NoteAccessStatus.rejected => Colors.red[50],
+      NoteAccessStatus.rejected => AppColors.paperAccentSoft,
       NoteAccessStatus.revoked => AppColors.paperDark,
       NoteAccessStatus.requested => AppColors.bubbleIdleBackground,
     };
 
     final textColor = switch (request.status) {
       NoteAccessStatus.consented => AppColors.bubbleSuccessText,
-      NoteAccessStatus.rejected => Colors.red[700],
+      NoteAccessStatus.rejected => AppColors.paperAccent,
       NoteAccessStatus.revoked => AppColors.inkSecondary,
       NoteAccessStatus.requested => AppColors.bubbleIdleText,
     };

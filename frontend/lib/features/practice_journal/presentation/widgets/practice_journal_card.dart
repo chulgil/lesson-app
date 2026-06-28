@@ -76,9 +76,9 @@ class PracticeJournalCard extends ConsumerWidget {
                     const SizedBox(height: 2),
                     if (isLoading)
                       const SizedBox(
-                        height: 12,
-                        width: 40,
-                        child: LinearProgressIndicator(),
+                        height: 14,
+                        width: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     else
                       _ActorSummaryRow(ledger: ledgerAsync.valueOrNull),
