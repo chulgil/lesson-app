@@ -193,7 +193,7 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
           // Submit button
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: FilledButton(
               onPressed: _isSubmitting ? null : _submitForm,
               child: _isSubmitting
                   ? SizedBox(

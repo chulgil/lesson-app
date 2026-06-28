@@ -134,7 +134,7 @@ class _AcademyInquiryDetailScreenState
                 SizedBox(height: AppSpacing.space3),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: FilledButton(
                     onPressed: _isReplying ? null : _submitReply,
                     child: _isReplying
                         ? const SizedBox(
