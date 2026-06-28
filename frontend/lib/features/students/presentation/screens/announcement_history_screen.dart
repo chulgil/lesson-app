@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -54,24 +55,9 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
             ),
         data: (announcements) {
           if (announcements.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.campaign_outlined,
-                    size: 48,
-                    color: AppColors.inkTertiary,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.announcementHistoryEmpty,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkTertiary,
-                    ),
-                  ),
-                ],
-              ),
+            return const EmptyStateWidget(
+              icon: Icons.campaign_outlined,
+              title: AppStrings.announcementHistoryEmpty,
             );
           }
 

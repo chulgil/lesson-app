@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -59,45 +60,10 @@ class InviteHistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.zero,
-              ),
-              child: Icon(
-                Icons.history,
-                size: 40,
-                color: AppColors.paperAccent,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            // Notebook × Score: 빈 상태 3축(§7.89) + 정적 명사 단일 헤드라인 → §7.17 승격.
-            Text(
-              AppStrings.inviteHistoryEmptyTitle,
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.inviteHistoryEmptyBody,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.history,
+      title: AppStrings.inviteHistoryEmptyTitle,
+      subtitle: AppStrings.inviteHistoryEmptyBody,
     );
   }
 
