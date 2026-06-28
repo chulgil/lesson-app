@@ -42,7 +42,7 @@ class ProposalIssuedActionBar extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.paperOk.withValues(alpha: 0.1),
+                color: AppColors.paperOkSoft,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

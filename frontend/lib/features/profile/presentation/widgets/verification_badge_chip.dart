@@ -82,7 +82,7 @@ class VerificationBadgeChip extends StatelessWidget {
       case VerificationBadge.phoneVerified:
         return AppColors.paperAccentSoft;
       case VerificationBadge.certified:
-        return AppColors.paperOk.withValues(alpha: 0.12);
+        return AppColors.paperOkSoft;
       case VerificationBadge.premium:
         return AppColors.amberLight;
     }

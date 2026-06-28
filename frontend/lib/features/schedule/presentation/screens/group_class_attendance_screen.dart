@@ -276,7 +276,7 @@ class _GroupClassAttendanceScreenState
                   decoration: BoxDecoration(
                     color:
                         isAttended
-                            ? AppColors.paperOk.withValues(alpha: 0.1)
+                            ? AppColors.paperOkSoft
                             : AppColors.paperAccentSoft,
                   ),
                   child: Center(

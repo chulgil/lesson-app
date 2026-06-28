@@ -230,7 +230,7 @@ class EducationCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.paperOk.withValues(alpha: 0.1),
+                color: AppColors.paperOkSoft,
               ),
               child: Icon(Icons.school, color: AppColors.paperOk, size: 24),
             ),
@@ -334,7 +334,7 @@ class CareerCard extends ConsumerWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.paperOk.withValues(alpha: 0.1),
+                            color: AppColors.paperOkSoft,
                             borderRadius: BorderRadius.zero,
                           ),
                           child: Text(
