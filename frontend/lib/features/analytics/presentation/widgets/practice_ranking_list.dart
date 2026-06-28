@@ -159,7 +159,8 @@ class PracticeRankingList extends StatelessWidget {
             child: Text(
               '$percent%',
               textAlign: TextAlign.right,
-              style: AppTypography.bodyMedium.copyWith(
+              // #991 — 진행바 % 라벨 captionSmall 통일 (형제 repertoire/summary 일치).
+              style: AppTypography.captionSmall.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
