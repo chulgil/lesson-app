@@ -34,19 +34,34 @@ void main() {
     });
   });
 
-  group('active policy (batch 1c)', () {
+  group('active policy (batch 1d)', () {
     test('enables consolidated domains, not yet-unmigrated ones', () {
-      // Consolidated batches: lessons (batch 1), students (batch 1c).
+      // Consolidated batches: lessons (batch 1), students (batch 1c),
+      // subscriptions (batch 1d).
       expect(ResponseCachePolicy.active.isCacheable('/lessons'), isTrue);
       expect(ResponseCachePolicy.active.isCacheable('/students'), isTrue);
       expect(ResponseCachePolicy.active.isCacheable('/students/123'), isTrue);
-      // subscription/schedule keep their SyncAware cache until their own
-      // consolidation batch — must stay out of the HTTP allowlist.
-      expect(ResponseCachePolicy.active.isCacheable('/subscriptions'), isFalse);
+      expect(ResponseCachePolicy.active.isCacheable('/subscriptions'), isTrue);
+      expect(
+        ResponseCachePolicy.active.isCacheable('/subscriptions/abc'),
+        isTrue,
+      );
+      // schedule keeps its SyncAware cache until its own consolidation batch —
+      // must stay out of the HTTP allowlist.
       expect(ResponseCachePolicy.active.isCacheable('/bookings'), isFalse);
-      // Sibling text prefixes must not match either consolidated domain.
+      // Sibling text prefixes must not match consolidated domains. The proposal
+      // and template repos use plain createRepository (no cache) and must NOT
+      // be HTTP-cached just because they share the `/subscriptions` text prefix.
       expect(
         ResponseCachePolicy.active.isCacheable('/lessons-classes'),
+        isFalse,
+      );
+      expect(
+        ResponseCachePolicy.active.isCacheable('/subscriptions-proposals'),
+        isFalse,
+      );
+      expect(
+        ResponseCachePolicy.active.isCacheable('/subscriptions-templates'),
         isFalse,
       );
     });
