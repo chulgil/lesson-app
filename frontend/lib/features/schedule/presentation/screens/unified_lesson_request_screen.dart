@@ -172,7 +172,7 @@ class _UnifiedLessonRequestScreenState
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+            backgroundColor: AppColors.paperAccentSoft,
             child: const Icon(
               Icons.person,
               size: 32,

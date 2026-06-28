@@ -175,7 +175,7 @@ class _AcademyInquiryDetailScreenState
                     vertical: AppSpacing.space1,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.1),
+                    color: AppColors.paperAccentSoft,
                   ),
                   child: Text(
                     inquiry.senderRole == InquirySenderRole.student

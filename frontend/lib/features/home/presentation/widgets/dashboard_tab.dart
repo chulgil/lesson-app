@@ -575,7 +575,7 @@ class DashboardTab extends ConsumerWidget {
 
             return DecoratedBox(
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.12),
+                color: AppColors.paperAccentSoft,
                 border: Border.all(color: AppColors.inkQuaternary, width: 1),
               ),
               child: Padding(
