@@ -7,6 +7,7 @@ import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -173,24 +174,9 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
     return nextDatesAsync.when(
       data: (dates) {
         if (dates.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.event_busy,
-                  size: 64,
-                  color: AppColors.inkTertiary,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                Text(
-                  AppStrings.noAvailableBookingTime,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
-            ),
+          return const EmptyStateWidget(
+            icon: Icons.event_busy,
+            title: AppStrings.noAvailableBookingTime,
           );
         }
         final suggestions =
