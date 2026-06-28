@@ -534,6 +534,9 @@ class _UnlinkedChildState extends StatelessWidget {
       icon: Icons.link_off,
       title: '${profile.name}${AppStrings.parentChildNotLinkedSuffix}',
       subtitle: AppStrings.parentChildNotLinkedDesc,
+      actionLabel: AppStrings.inviteTeacher,
+      actionIcon: Icons.link,
+      onAction: () => context.push(AppRoutes.parentInviteCode),
     );
   }
 }

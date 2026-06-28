@@ -8,13 +8,16 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../auth/auth_facade.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../extensions/practice_section_visuals.dart';
 import '../../../settings/settings_facade.dart';
@@ -201,10 +204,16 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
   }
 
   Widget _buildEmptyState() {
-    return const EmptyStateWidget(
+    return EmptyStateWidget(
       icon: Icons.library_music_outlined,
       title: AppStrings.sectionPickerEmpty,
       subtitle: AppStrings.sectionPickerEmptyHint,
+      actionLabel: AppStrings.repertoireAdd,
+      actionIcon: Icons.add,
+      onAction: () {
+        final studentId = ref.read(currentUserIdProvider);
+        context.push('${AppRoutes.addRepertoire}?studentId=$studentId');
+      },
     );
   }
 
