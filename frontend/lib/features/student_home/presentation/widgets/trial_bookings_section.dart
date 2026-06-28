@@ -84,7 +84,8 @@ class TrialBookingsSection extends ConsumerWidget {
         height: 80,
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      // C7 — primary 섹션: 에러도 빈 상태로 graceful degrade (가시성 일치).
+      error: (_, __) => _buildEmptyState(context),
     );
   }
 
