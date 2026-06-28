@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../domain/services/billing_guard.dart';
 
@@ -56,8 +57,7 @@ class FreeLimitSheet extends StatelessWidget {
       children: [
         Text(
           _title,
-          style: const TextStyle(
-            fontSize: 18,
+          style: AppTypography.headingSmall.copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.ink,
           ),
@@ -65,8 +65,7 @@ class FreeLimitSheet extends StatelessWidget {
         const SizedBox(height: AppSpacing.space2),
         Text(
           _subtitle,
-          style: const TextStyle(
-            fontSize: 14,
+          style: AppTypography.bodyMedium.copyWith(
             color: AppColors.inkSecondary,
             height: 1.45,
           ),
@@ -137,8 +136,7 @@ class _PlanCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 15,
+            style: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.w700,
               color: emphasized ? AppColors.paperAccent : AppColors.ink,
             ),
@@ -146,7 +144,7 @@ class _PlanCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             description,
-            style: const TextStyle(fontSize: 13, color: AppColors.inkSecondary),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary),
           ),
           const SizedBox(height: AppSpacing.space3),
           Align(

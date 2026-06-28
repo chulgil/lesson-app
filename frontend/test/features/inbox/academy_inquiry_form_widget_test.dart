@@ -40,7 +40,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap submit without filling form
-      final submitButton = find.byType(ElevatedButton);
+      final submitButton = find.byType(FilledButton);
       await tester.tap(submitButton);
       await tester.pumpAndSettle();
 

@@ -84,7 +84,7 @@ class _BulkClosureDetailScreenState
           if (closure == null) {
             return Center(
               child: Text(
-                AppStrings.bulkClosureStatusCancelled,
+                AppStrings.bulkClosureNotFound,
                 style: AppTypography.bodyMedium,
               ),
             );

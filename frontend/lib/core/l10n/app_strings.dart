@@ -9174,6 +9174,7 @@ class AppStrings {
 
   /// 휴강 상세 화면 AppBar.
   static const bulkClosureDetailTitle = '학원 휴강 안내';
+  static const bulkClosureNotFound = '휴강 정보를 찾을 수 없습니다';
 
   /// 학원 사유 / 강사 페이 보장 안내 (§5.2).
   static const bulkClosureAcademyReasonNote =
