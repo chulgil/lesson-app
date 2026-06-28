@@ -10192,6 +10192,10 @@ class AppStrings {
   static const studentPracticeDateEmpty = '이 날짜에 연습 기록이 없습니다';
   static const scheduleWeekEmpty = '이번 주는 레슨이 없습니다';
   static const settingsBackupEmpty = '저장된 백업이 없습니다';
+  static const repertoireEmptyTitle = '등록된 곡이 없습니다';
+  static const repertoireEmptyHint = '곡을 추가하여 레퍼토리를 관리하세요';
+  static const sectionRecordingEmptyTitle = '아직 녹음이 없습니다';
+  static const sectionRecordingEmptyHint = '위의 녹음 버튼을 눌러 연습을 기록해보세요';
 
   // C1 hybrid empty-state consts (#634 wave2)
   static const studentHomeAppTeacherEmpty = '연결된 앱 선생님이 없습니다';
