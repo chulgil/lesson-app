@@ -51,10 +51,14 @@ class CompactTrialBookingCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        booking.teacherName,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          booking.teacherName,
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (booking.instrument != null) ...[

@@ -87,10 +87,14 @@ class TeacherFeedbackSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                teacherName,
-                style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  teacherName,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const Spacer(),

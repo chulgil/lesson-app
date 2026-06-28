@@ -307,16 +307,20 @@ class _AppTeacherCard extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                teacherAsync.maybeWhen(
-                                  data: (t) =>
-                                      t?.name ??
-                                      AppStrings.myTeachersUnknownTeacher,
-                                  orElse: () =>
-                                      AppStrings.myTeachersUnknownTeacher,
-                                ),
-                                style: AppTypography.bodyLarge.copyWith(
-                                  fontWeight: FontWeight.w600,
+                              Flexible(
+                                child: Text(
+                                  teacherAsync.maybeWhen(
+                                    data: (t) =>
+                                        t?.name ??
+                                        AppStrings.myTeachersUnknownTeacher,
+                                    orElse: () =>
+                                        AppStrings.myTeachersUnknownTeacher,
+                                  ),
+                                  style: AppTypography.bodyLarge.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.space2),

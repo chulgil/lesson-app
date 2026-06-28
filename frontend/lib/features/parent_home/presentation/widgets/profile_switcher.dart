@@ -239,12 +239,16 @@ class _ProfileDropdown extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      option.label,
-                      style: TextStyle(
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
-                        color: AppColors.ink,
+                    Flexible(
+                      child: Text(
+                        option.label,
+                        style: TextStyle(
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                          color: AppColors.ink,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (option.badge != null) ...[
