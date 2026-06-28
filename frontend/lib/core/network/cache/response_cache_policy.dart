@@ -20,7 +20,7 @@ class ResponseCachePolicy {
   /// "일원화") may be added — otherwise the HTTP cache double-caches with the
   /// domain's `*CacheStore`. See plan §5 batch ordering.
   static const ResponseCachePolicy active = ResponseCachePolicy(
-    allowlist: {'/lessons'},
+    allowlist: {'/lessons', '/students'},
   );
 
   /// Path prefixes eligible for response caching, e.g. `/lessons`.

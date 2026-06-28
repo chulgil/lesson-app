@@ -34,14 +34,17 @@ void main() {
     });
   });
 
-  group('active policy (batch 1)', () {
-    test('enables lessons only, not yet-unmigrated domains', () {
+  group('active policy (batch 1c)', () {
+    test('enables consolidated domains, not yet-unmigrated ones', () {
+      // Consolidated batches: lessons (batch 1), students (batch 1c).
       expect(ResponseCachePolicy.active.isCacheable('/lessons'), isTrue);
-      // students/subscription/schedule keep their SyncAware cache until their
-      // own consolidation batch — must stay out of the HTTP allowlist.
-      expect(ResponseCachePolicy.active.isCacheable('/students'), isFalse);
+      expect(ResponseCachePolicy.active.isCacheable('/students'), isTrue);
+      expect(ResponseCachePolicy.active.isCacheable('/students/123'), isTrue);
+      // subscription/schedule keep their SyncAware cache until their own
+      // consolidation batch — must stay out of the HTTP allowlist.
       expect(ResponseCachePolicy.active.isCacheable('/subscriptions'), isFalse);
       expect(ResponseCachePolicy.active.isCacheable('/bookings'), isFalse);
+      // Sibling text prefixes must not match either consolidated domain.
       expect(
         ResponseCachePolicy.active.isCacheable('/lessons-classes'),
         isFalse,

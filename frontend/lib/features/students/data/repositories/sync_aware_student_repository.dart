@@ -1,107 +1,48 @@
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/sync/application/mutation_queue_helper.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/student_repository.dart';
-import '../local/student_cache_store.dart';
 import 'remote_student_repository.dart';
 
-/// Decorator that wraps [RemoteStudentRepository] with:
-///   1. Hive read-through cache — successful remote reads are persisted.
-///   2. Offline queue support for mutations.
+/// Decorator that wraps [RemoteStudentRepository] with offline **write-queue**
+/// support ([MutationQueueHelper]).
 ///
-/// Read behaviour (per method):
-///   - Online success → write to cache, return result.
-///   - Network failure ([NetworkException] / [ServerException]) → return cached
-///     last-known-good if available, otherwise rethrow.
-///   - Cache miss + network failure → rethrow original error.
+/// Reads delegate straight to the remote repository — offline read fallback is
+/// provided transparently at the HTTP layer by `ResponseCacheInterceptor`
+/// (offline-first plan §3 option A; batch 1 일원화 — the previous Hive
+/// read-through cache layer was removed in favour of the single HTTP response
+/// cache). Writes are queued when offline and replayed on reconnect.
 class SyncAwareStudentRepository implements StudentRepository {
   SyncAwareStudentRepository({
     required RemoteStudentRepository remote,
     required MutationQueueHelper queue,
-    required StudentCacheStore cache,
   }) : _remote = remote,
-       _queue = queue,
-       _cache = cache;
+       _queue = queue;
 
   final RemoteStudentRepository _remote;
   final MutationQueueHelper _queue;
-  final StudentCacheStore _cache;
 
   // --------------------------------------------------------------------------
-  // Read methods — with cache fallback
+  // Read methods — delegate to remote; HTTP response cache handles offline.
   // --------------------------------------------------------------------------
 
   @override
-  Future<List<Student>> getStudents() =>
-      _readListWithCache(StudentCacheStore.keyAll(), _remote.getStudents);
+  Future<List<Student>> getStudents() => _remote.getStudents();
 
   @override
-  Future<Student?> getStudent(String id) async {
-    final key = StudentCacheStore.keyStudent(id);
-    try {
-      final result = await _remote.getStudent(id);
-      await _cache.putStudent(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache.getStudent(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
+  Future<Student?> getStudent(String id) => _remote.getStudent(id);
 
   @override
-  Future<Student> getMyProfile() async {
-    final key = StudentCacheStore.keyStudent('me');
-    try {
-      final result = await _remote.getMyProfile();
-      await _cache.putStudent(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache.getStudent(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
+  Future<Student> getMyProfile() => _remote.getMyProfile();
 
   @override
-  Future<List<Student>> searchStudents(String query) => _readListWithCache(
-    StudentCacheStore.keySearch(query),
-    () => _remote.searchStudents(query),
-  );
+  Future<List<Student>> searchStudents(String query) =>
+      _remote.searchStudents(query);
 
   @override
   Future<List<Student>> getStudentsByStatus(StudentStatus status) =>
-      _readListWithCache(
-        StudentCacheStore.keyStatus(status.name),
-        () => _remote.getStudentsByStatus(status),
-      );
-
-  // --------------------------------------------------------------------------
-  // Shared list read helper
-  // --------------------------------------------------------------------------
-
-  Future<List<Student>> _readListWithCache(
-    String key,
-    Future<List<Student>> Function() fetch,
-  ) async {
-    try {
-      final result = await fetch();
-      await _cache.putStudents(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache.getStudents(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
+      _remote.getStudentsByStatus(status);
 
   // --------------------------------------------------------------------------
   // Mutation methods — use MutationQueueHelper for offline support
@@ -184,17 +125,4 @@ class SyncAwareStudentRepository implements StudentRepository {
       clientUpdatedAt: DateTime.now().toUtc(),
     ),
   );
-
-  // --------------------------------------------------------------------------
-  // Private helpers
-  // --------------------------------------------------------------------------
-
-  bool _isNetworkFailure(Exception e) {
-    if (e is NetworkException) return true;
-    if (e is ServerException) return true;
-    if (e is ApiException && e.statusCode != null && e.statusCode! >= 500) {
-      return true;
-    }
-    return false;
-  }
 }
