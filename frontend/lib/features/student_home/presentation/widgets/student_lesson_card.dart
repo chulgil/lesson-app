@@ -97,11 +97,15 @@ class StudentLessonCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              lesson.teacherName ??
-                                  AppStrings.studentLessonDefaultTeacher,
-                              style: AppTypography.bodyLarge.copyWith(
-                                fontWeight: FontWeight.w600,
+                            Flexible(
+                              child: Text(
+                                lesson.teacherName ??
+                                    AppStrings.studentLessonDefaultTeacher,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: AppSpacing.space2),

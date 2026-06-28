@@ -453,10 +453,14 @@ class ParentDashboardTab extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        profile.name,
-                        style: AppTypography.headingMedium.copyWith(
-                          color: AppColors.paper,
+                      Flexible(
+                        child: Text(
+                          profile.name,
+                          style: AppTypography.headingMedium.copyWith(
+                            color: AppColors.paper,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -519,10 +523,14 @@ class ParentDashboardTab extends ConsumerWidget {
                           color: AppColors.paper.withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: AppSpacing.space1),
-                        Text(
-                          profile.teacherName!,
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.paper.withValues(alpha: 0.7),
+                        Flexible(
+                          child: Text(
+                            profile.teacherName!,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.paper.withValues(alpha: 0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

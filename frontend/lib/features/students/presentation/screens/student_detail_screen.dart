@@ -617,10 +617,14 @@ class _StudentMetaLine extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          student.instrument,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
+        Flexible(
+          child: Text(
+            student.instrument,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         Text(

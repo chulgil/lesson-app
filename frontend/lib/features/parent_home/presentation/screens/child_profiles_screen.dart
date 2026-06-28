@@ -224,10 +224,14 @@ class _ChildProfileCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          profile.name,
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
+                        Flexible(
+                          child: Text(
+                            profile.name,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space2),
@@ -279,10 +283,14 @@ class _ChildProfileCard extends StatelessWidget {
                             color: AppColors.inkTertiary,
                           ),
                           const SizedBox(width: AppSpacing.space1),
-                          Text(
-                            profile.teacherName!,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.inkTertiary,
+                          Flexible(
+                            child: Text(
+                              profile.teacherName!,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.inkTertiary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
