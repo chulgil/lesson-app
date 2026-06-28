@@ -3,29 +3,41 @@
 ///
 /// Reconciles option A's *global* Dio interceptor with the *per-batch* rollout
 /// (offline-first migration plan §5): the interceptor is always installed, but
-/// only requests whose path starts with an allowlisted prefix are cached or
-/// served from cache.
+/// only requests whose path matches an allowlisted prefix are cached or served
+/// from cache.
 ///
-/// Batch 0 ships an EMPTY allowlist → the interceptor is a runtime no-op
-/// (zero behaviour change, zero blast radius). Each subsequent batch adds its
-/// domain's path prefixes to [allowlist] — this class is the single edit point
-/// for the rollout.
+/// [active] is the single edit point for the rollout — each batch adds its
+/// domain's path prefixes there.
 class ResponseCachePolicy {
   const ResponseCachePolicy({this.allowlist = const <String>{}});
 
+  /// The live policy used in production wiring (see `apiClient`).
+  ///
+  /// Batch 0 shipped an empty set (runtime no-op). Batch 1 enables the lessons
+  /// domain; subsequent batches append their prefixes here.
+  ///
+  /// NOTE: only domains whose bespoke read-cache has been removed (offline-first
+  /// "일원화") may be added — otherwise the HTTP cache double-caches with the
+  /// domain's `*CacheStore`. See plan §5 batch ordering.
+  static const ResponseCachePolicy active = ResponseCachePolicy(
+    allowlist: {'/lessons'},
+  );
+
   /// Path prefixes eligible for response caching, e.g. `/lessons`.
   ///
-  /// Empty in batch 0. Batch 1 adds `/lessons`, `/schedule`, `/subscriptions`,
-  /// `/students`; later batches extend further. Sensitive write-authoritative
-  /// paths (billing, auth) stay excluded until their dedicated batch (D3/D6).
+  /// Sensitive write-authoritative paths (billing, auth) stay excluded until
+  /// their dedicated batch (D3/D6).
   final Set<String> allowlist;
 
   /// Whether responses for [path] may be cached / served from cache.
   ///
-  /// Returns false when the allowlist is empty (batch 0 no-op) or when no
-  /// prefix matches.
+  /// Segment-aware: a prefix `/lessons` matches `/lessons` and `/lessons/123`
+  /// but NOT a sibling path like `/lessons-classes`. Returns false when the
+  /// allowlist is empty or when no prefix matches.
   bool isCacheable(String path) {
     if (allowlist.isEmpty) return false;
-    return allowlist.any(path.startsWith);
+    return allowlist.any(
+      (prefix) => path == prefix || path.startsWith('$prefix/'),
+    );
   }
 }

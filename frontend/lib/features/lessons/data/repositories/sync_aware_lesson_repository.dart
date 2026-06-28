@@ -1,111 +1,57 @@
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/sync/application/mutation_queue_helper.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/lesson_repository.dart';
-import '../local/lesson_cache_store.dart';
 import 'remote_lesson_repository.dart';
 
-/// Decorator that wraps [RemoteLessonRepository] with:
-///   1. Hive read-through cache — successful remote reads are persisted.
-///   2. Offline queue support for mutations.
+/// Decorator that wraps [RemoteLessonRepository] with offline **write-queue**
+/// support ([MutationQueueHelper]).
 ///
-/// Read behaviour (per method):
-///   - Online success → write to cache, return result.
-///   - Network failure ([NetworkException] / [ServerException]) → return cached
-///     last-known-good if available, otherwise rethrow.
-///   - Cache miss + network failure → rethrow original error.
+/// Reads delegate straight to the remote repository — offline read fallback is
+/// provided transparently at the HTTP layer by `ResponseCacheInterceptor`
+/// (offline-first plan §3 option A; batch 1 일원화 — the previous Hive
+/// read-through cache layer was removed in favour of the single HTTP response
+/// cache). Writes are queued when offline and replayed on reconnect.
 class SyncAwareLessonRepository implements LessonRepository {
   SyncAwareLessonRepository({
     required RemoteLessonRepository remote,
     required MutationQueueHelper queue,
-    required LessonCacheStore cache,
   }) : _remote = remote,
-       _queue = queue,
-       _cache = cache;
+       _queue = queue;
 
   final RemoteLessonRepository _remote;
   final MutationQueueHelper _queue;
-  final LessonCacheStore _cache;
 
   // --------------------------------------------------------------------------
-  // Read methods — with cache fallback
+  // Read methods — delegate to remote; HTTP response cache handles offline.
   // --------------------------------------------------------------------------
 
   @override
-  Future<List<Lesson>> getLessons() =>
-      _readListWithCache(LessonCacheStore.keyAll(), _remote.getLessons);
+  Future<List<Lesson>> getLessons() => _remote.getLessons();
 
   @override
   Future<List<Lesson>> getLessonsByStudent(String studentId) =>
-      _readListWithCache(
-        LessonCacheStore.keyStudent(studentId),
-        () => _remote.getLessonsByStudent(studentId),
-      );
+      _remote.getLessonsByStudent(studentId);
 
   @override
-  Future<List<Lesson>> getLessonsByDate(DateTime date) => _readListWithCache(
-    LessonCacheStore.keyDate(date),
-    () => _remote.getLessonsByDate(date),
-  );
+  Future<List<Lesson>> getLessonsByDate(DateTime date) =>
+      _remote.getLessonsByDate(date);
 
   @override
   Future<List<Lesson>> getLessonsByDateRange(DateTime start, DateTime end) =>
-      _readListWithCache(
-        LessonCacheStore.keyRange(start, end),
-        () => _remote.getLessonsByDateRange(start, end),
-      );
+      _remote.getLessonsByDateRange(start, end);
 
   @override
   Future<List<Lesson>> getUpcomingLessons({int limit = 10}) =>
-      _readListWithCache(
-        LessonCacheStore.keyUpcoming(limit),
-        () => _remote.getUpcomingLessons(limit: limit),
-      );
+      _remote.getUpcomingLessons(limit: limit);
 
   @override
-  Future<List<Lesson>> getRecentLessons({int limit = 10}) => _readListWithCache(
-    LessonCacheStore.keyRecent(limit),
-    () => _remote.getRecentLessons(limit: limit),
-  );
+  Future<List<Lesson>> getRecentLessons({int limit = 10}) =>
+      _remote.getRecentLessons(limit: limit);
 
   @override
-  Future<Lesson?> getLesson(String id) async {
-    final key = LessonCacheStore.keyLesson(id);
-    try {
-      final result = await _remote.getLesson(id);
-      await _cache.putLesson(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache.getLesson(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Shared list read helper
-  // --------------------------------------------------------------------------
-
-  Future<List<Lesson>> _readListWithCache(
-    String key,
-    Future<List<Lesson>> Function() fetch,
-  ) async {
-    try {
-      final result = await fetch();
-      await _cache.putLessons(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache.getLessons(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
+  Future<Lesson?> getLesson(String id) => _remote.getLesson(id);
 
   // --------------------------------------------------------------------------
   // Mutation methods — use MutationQueueHelper for offline support
@@ -184,17 +130,4 @@ class SyncAwareLessonRepository implements LessonRepository {
       clientUpdatedAt: DateTime.now().toUtc(),
     ),
   );
-
-  // --------------------------------------------------------------------------
-  // Private helpers
-  // --------------------------------------------------------------------------
-
-  bool _isNetworkFailure(Exception e) {
-    if (e is NetworkException) return true;
-    if (e is ServerException) return true;
-    if (e is ApiException && e.statusCode != null && e.statusCode! >= 500) {
-      return true;
-    }
-    return false;
-  }
 }
