@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
@@ -477,7 +478,7 @@ class _ManualTeacherCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+    final card = Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
@@ -572,58 +573,30 @@ class _ManualTeacherCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-
-                // Edit/Delete menu
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      context.push(AppRoutes.addManualTeacher, extra: teacher);
-                    } else if (value == 'delete') {
-                      _confirmDelete(context, ref);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit_outlined, size: 18),
-                          SizedBox(width: AppSpacing.space2),
-                          Text(AppStrings.studentHomeEditAction),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.delete_outline,
-                            size: 18,
-                            color: AppColors.paperAccent,
-                          ),
-                          const SizedBox(width: AppSpacing.space2),
-                          Text(
-                            '삭제',
-                            style: TextStyle(color: AppColors.paperAccent),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: AppColors.inkTertiary,
-                    size: 20,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
               ],
             ),
           ),
         ),
       ),
+    );
+
+    // C6: 행 관리 액션(편집·삭제) = 우→좌 스와이프 (trailing 메뉴 대체).
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.studentHomeEditAction,
+          icon: Icons.edit_outlined,
+          onPressed: () =>
+              context.push(AppRoutes.addManualTeacher, extra: teacher),
+        ),
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _confirmDelete(context, ref),
+        ),
+      ],
+      child: card,
     );
   }
 
