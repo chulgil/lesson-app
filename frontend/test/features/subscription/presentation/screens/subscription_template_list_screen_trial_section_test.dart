@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/core/widgets/swipe_action_tile.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/settings/domain/repositories/settings_repository.dart';
 import 'package:lessonaza/features/settings/presentation/providers/settings_repository_provider.dart';
@@ -110,6 +111,34 @@ void main() {
       );
       // 체험 레슨 섹션은 비어 있어도 노출 (위치 안정성).
       expect(find.text(AppStrings.profileTrialLessonSection), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('템플릿 행 — SwipeActionTile 사용, trailing PopupMenu 없음 (C6)', (
+      tester,
+    ) async {
+      final settingsRepo = _FakeSettingsRepository(baseSettings());
+      final templateRepo = _FakeTemplateRepository([
+        SubscriptionTemplate(
+          id: 'template-1',
+          ownerId: 'teacher-1',
+          ownerType: SubscriptionTemplateOwnerType.teacher,
+          name: '주 1회 12회권',
+          totalLessons: 12,
+          lessonDurationMinutes: 50,
+          validityDays: 90,
+          price: 480000,
+          createdAt: DateTime.utc(2026, 6, 11),
+        ),
+      ]);
+      await tester.pumpWidget(
+        wrap(settingsRepo: settingsRepo, templateRepo: templateRepo),
+      );
+      await tester.pumpAndSettle();
+
+      // C6: 행 관리(편집·삭제)는 SwipeActionTile, trailing PopupMenu 금지.
+      expect(find.byType(SwipeActionTile), findsWidgets);
+      expect(find.byType(PopupMenuButton<String>), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });

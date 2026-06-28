@@ -181,7 +181,7 @@ class _InstrumentManagementScreenState
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
-          '오른쪽으로 스와이프해 악기를 삭제할 수 있습니다',
+          '왼쪽으로 스와이프해 악기를 삭제할 수 있습니다',
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.inkSecondary,
           ),
