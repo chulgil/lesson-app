@@ -53,38 +53,6 @@ class ParentVisibilitySettings {
     );
   }
 
-  /// Get list of enabled visibility items for display
-  List<String> get enabledItems {
-    final items = <String>[];
-    if (canViewSchedule) items.add('레슨 일정');
-    if (canViewAssignments) items.add('과제 현황');
-    if (canViewPractice) items.add('연습 기록');
-    if (canViewLessonNotes) items.add('레슨 노트');
-    if (canViewRecordings) items.add('연습 녹음');
-    if (canViewDetailedFeedback) items.add('상세 피드백');
-    if (canViewChat) items.add('채팅 내역');
-    return items;
-  }
-
-  /// Get count of enabled items
-  int get enabledCount {
-    int count = 0;
-    if (canViewSchedule) count++;
-    if (canViewAssignments) count++;
-    if (canViewPractice) count++;
-    if (canViewLessonNotes) count++;
-    if (canViewRecordings) count++;
-    if (canViewDetailedFeedback) count++;
-    if (canViewChat) count++;
-    return count;
-  }
-
-  /// Total available items
-  static const int totalItems = 7;
-
-  /// Get visibility summary (e.g., "5/7 항목 공개")
-  String get summary => '$enabledCount/$totalItems 항목 공개';
-
   /// Copy with new values
   ParentVisibilitySettings copyWith({
     String? id,
