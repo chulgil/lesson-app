@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
@@ -45,7 +46,7 @@ class AcademyInviteExpiredScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: Colors.red),
+                Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
                 SizedBox(height: AppSpacing.space4),
                 Text(_getTitle(), style: AppTypography.bodyLarge),
                 SizedBox(height: AppSpacing.space2),
@@ -55,7 +56,7 @@ class AcademyInviteExpiredScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(AppSpacing.space2),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red),
+                      border: Border.all(color: AppColors.paperAccent),
                     ),
                     child: Text(
                       errorMessage!,
