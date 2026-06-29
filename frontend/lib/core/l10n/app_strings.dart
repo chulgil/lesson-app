@@ -6461,6 +6461,112 @@ class AppStrings {
 
   // ── Invite / Connection ──
   static const inviteHowToConnect = '연결 방법 알아보기';
+
+  // ── My Connections / Invite Confirm (i18n §16 C5) ───────────────────
+  /// 잘못된 역할로 연결 시도 시 연결 실패 헤드라인
+  static const inviteCannotConnect = '연결할 수 없습니다';
+
+  /// 선생님이 선생님 코드를 입력한 경우 안내
+  static const inviteSelfCodeTeacher =
+      '선생님은 선생님의 초대 코드를 사용할 수 없습니다.\n학생의 초대 코드를 사용해주세요.';
+
+  /// 학생이 학생 코드를 입력한 경우 안내
+  static const inviteSelfCodeStudent =
+      '학생은 학생의 초대 코드를 사용할 수 없습니다.\n선생님의 초대 코드를 사용해주세요.';
+
+  /// 연결 확인 화면 제목 ($role = 상대 역할 라벨)
+  static String inviteConnectWithRoleFormat(String role) => '$role과 연결하기';
+
+  /// 연결 요청 확인 부제
+  static const inviteConnectRequestPrompt = '연결 요청을 보내시겠습니까?';
+
+  /// 이미 연결된 상대에게 재요청 시 헤드라인
+  static const inviteAlreadyConnected = '이미 연결되어 있습니다';
+
+  /// 이미 연결된 상대 안내 본문 ($role = 상대 역할 라벨)
+  static String inviteAlreadyConnectedBodyFormat(String role) =>
+      '해당 $role과 이미\n연결되어 있습니다.';
+
+  /// 연결 요청 전송 완료 헤드라인
+  static const inviteRequestSent = '연결 요청이 전송되었습니다!';
+
+  /// 연결 요청 전송 완료 본문 ($role = 상대 역할 라벨)
+  static String inviteRequestSentBodyFormat(String role) =>
+      '$role이 요청을 수락하면\n연결이 완료됩니다.';
+
+  /// 학생→선생님 연결 직후 체험레슨 예약 유도
+  static const inviteTrialBookingHint = '지금 바로 체험레슨을 예약할 수 있어요!';
+
+  /// 내 연결 목록 화면 제목 — 교사 측
+  static const inviteMyStudentsTitle = '내 학생';
+
+  /// 내 연결 목록 화면 제목 — 학생 측
+  static const inviteMyTeachersTitle = '내 선생님';
+
+  /// 연결 목록 로드 실패 (재시도 안내 포함)
+  static const inviteConnectionsLoadError = '연결 목록을 불러올 수 없습니다. 다시 시도해주세요.';
+
+  /// 연결 목록 로드 오류 설명
+  static const inviteConnectionsLoadErrorDescription =
+      '연결 목록을 불러오는 중 오류가 발생했습니다';
+
+  /// 빈 상태 — 연결된 학생 없음 (교사 측)
+  static const inviteNoConnectedStudents = '아직 연결된 학생이 없습니다';
+
+  /// 빈 상태 — 연결된 선생님 없음 (학생 측)
+  static const inviteNoConnectedTeachers = '아직 연결된 선생님이 없습니다';
+
+  /// 빈 상태 안내 — 교사 측 (초대 링크 공유)
+  static const inviteEmptyHintTeacher = '초대 링크를 공유하거나\n학생의 QR 코드를 스캔하세요.';
+
+  /// 빈 상태 안내 — 학생 측 (초대 코드 입력)
+  static const inviteEmptyHintStudent = '선생님의 초대 코드를 입력하거나\nQR 코드를 스캔하세요.';
+
+  /// 연결 방법 도움말 — 코드 입력 부제
+  static const inviteHelpCodeSubtitle = '선생님에게 받은 6자리 코드를 입력하세요';
+
+  /// 연결 방법 도움말 — QR 스캔 부제
+  static const inviteHelpScanSubtitle = '선생님의 QR 코드를 카메라로 스캔하세요';
+
+  /// 연결 방법 도움말 — 선생님 검색 부제
+  static const inviteHelpSearchSubtitle = '이름, 악기, 지역으로 선생님을 검색하세요';
+
+  /// 연결 카드 상태 배지 — 활성
+  static const inviteStatusConnected = '연결됨';
+
+  /// 연결 카드 상태 배지 — 해제
+  static const inviteStatusDisconnected = '해제됨';
+
+  /// 활성 연결 섹션 헤더 ($role = 학생/선생님)
+  static String inviteConnectedSectionFormat(String role) => '연결된 $role';
+
+  /// 이전(해제) 연결 섹션 헤더 ($role = 학생/선생님)
+  static String invitePreviousSectionFormat(String role) => '이전 $role';
+
+  /// 재연결 완료 SnackBar ($name = 상대 이름)
+  static String inviteReconnectedFormat(String name) => '$name님과 다시 연결되었습니다';
+
+  /// 연결 상세 — 연결일 ($date = 포맷된 날짜)
+  static String inviteConnectedDateFormat(String date) => '연결일: $date';
+
+  /// 연결 해제 확인 다이얼로그 본문 ($name = 상대 이름)
+  static String inviteDisconnectConfirmFormat(String name) =>
+      '$name님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.';
+
+  /// 연결 해제 완료 SnackBar ($name = 상대 이름)
+  static String inviteDisconnectedFormat(String name) => '$name님과의 연결이 해제되었습니다';
+
+  /// 연결 섹션 헤더 카운트 ($title = 섹션명, $count = 인원)
+  static String inviteSectionCountFormat(String title, int count) =>
+      '$title ($count명)';
+
+  /// 연결 카드 — 연결됨 + 경과 ($when = 상대 시각 표기)
+  static String inviteConnectedSinceFormat(String when) =>
+      '$inviteStatusConnected: $when';
+
+  /// 연결 카드 — 해제됨 + 경과 ($when = 상대 시각 표기)
+  static String inviteDisconnectedSinceFormat(String when) =>
+      '$inviteStatusDisconnected: $when';
   static const inviteConnectWithTeacher = '선생님과 연결하는 방법';
   static const inviteViewLessonSchedule = '레슨 일정 보기';
   static const inviteSendMessage = '메시지 보내기';
