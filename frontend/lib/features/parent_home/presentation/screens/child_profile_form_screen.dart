@@ -71,10 +71,10 @@ class _ChildProfileFormScreenState
 
   // Levels
   static const _levels = [
-    ('beginner', '입문'),
-    ('elementary', '초급'),
-    ('intermediate', '중급'),
-    ('advanced', '고급'),
+    ('beginner', AppStrings.studentLevelBeginner),
+    ('elementary', AppStrings.studentLevelElementary),
+    ('intermediate', AppStrings.studentLevelIntermediate),
+    ('advanced', AppStrings.studentLevelAdvanced),
   ];
 
   @override
@@ -126,7 +126,7 @@ class _ChildProfileFormScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? '자녀 정보가 수정되었습니다' : '자녀 프로필이 추가되었습니다'),
+            content: Text(isEditing ? AppStrings.parentHomeChildUpdated : AppStrings.parentHomeChildAdded),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -178,7 +178,7 @@ class _ChildProfileFormScreenState
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '만 14세 미만 자녀는 별도 계정 없이 학부모 계정에서 관리됩니다.',
+                      AppStrings.parentHomeUnder14Notice,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.ink,
                       ),
@@ -191,7 +191,7 @@ class _ChildProfileFormScreenState
 
             // Profile color selector
             Text(
-              '프로필 색상',
+              AppStrings.parentHomeProfileColorLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -233,7 +233,7 @@ class _ChildProfileFormScreenState
 
             // Name field
             Text(
-              '이름/별명',
+              AppStrings.parentHomeChildNameLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -256,10 +256,10 @@ class _ChildProfileFormScreenState
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '이름을 입력해주세요';
+                  return AppStrings.parentHomeChildNameRequired;
                 }
                 if (value.trim().length < 2) {
-                  return '2글자 이상 입력해주세요';
+                  return AppStrings.parentHomeChildNameMinLength;
                 }
                 return null;
               },
@@ -268,7 +268,7 @@ class _ChildProfileFormScreenState
 
             // Birth year selector
             Text(
-              '출생년도',
+              AppStrings.parentHomeBirthYearLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -292,7 +292,7 @@ class _ChildProfileFormScreenState
                     final age = currentYear - year;
                     return DropdownMenuItem(
                       value: year,
-                      child: Text('$year년 (만 $age세)'),
+                      child: Text(AppStrings.parentHomeBirthYearAgeFormat(year, age)),
                     );
                   }),
                   onChanged: (value) {
@@ -322,7 +322,7 @@ class _ChildProfileFormScreenState
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
-                        '만 14세 이상은 별도 계정 등록이 가능합니다.',
+                        AppStrings.parentHomeOver14Notice,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
                         ),
@@ -336,7 +336,7 @@ class _ChildProfileFormScreenState
 
             // Instrument selector
             Text(
-              '악기',
+              AppStrings.instrumentLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -374,7 +374,7 @@ class _ChildProfileFormScreenState
 
             // Level selector
             Text(
-              '수준',
+              AppStrings.parentHomeLevelLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -435,7 +435,7 @@ class _ChildProfileFormScreenState
                           ),
                         )
                         : Text(
-                          isEditing ? '저장' : '자녀 추가',
+                          isEditing ? AppStrings.save : AppStrings.parentHomeChildAdd,
                           style: AppTypography.button.copyWith(
                             color: AppColors.paper,
                           ),
@@ -449,7 +449,7 @@ class _ChildProfileFormScreenState
               TextButton(
                 onPressed: _isLoading ? null : _showDeleteConfirmation,
                 child: Text(
-                  '자녀 프로필 삭제',
+                  AppStrings.parentHomeDeleteChildProfile,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -467,7 +467,7 @@ class _ChildProfileFormScreenState
       context: context,
       title: AppStrings.parentHomeDeleteChildProfile,
       message:
-          "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
+          AppStrings.parentHomeChildDeleteConfirmFormat(widget.existingProfile!.name),
       confirmLabel: AppStrings.delete,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,

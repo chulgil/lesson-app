@@ -90,7 +90,7 @@ class ChildProfilesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요',
+              AppStrings.parentHomeChildrenEmptySubtitle,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -229,7 +229,7 @@ class _ChildProfileCard extends StatelessWidget {
                             borderRadius: BorderRadius.zero,
                           ),
                           child: Text(
-                            '만 ${profile.age}세',
+                            AppStrings.parentHomeAgeFormat(profile.age),
                             style: AppTypography.caption.copyWith(
                               color: AppColors.paperAccent,
                               fontWeight: FontWeight.w500,

@@ -148,7 +148,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                       Text(profile.name, style: AppTypography.bodyLarge),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
-                        '(만 ${profile.age}세)',
+                        '(${AppStrings.parentHomeAgeFormat(profile.age)})',
                         style: AppTypography.caption.copyWith(
                           color: AppColors.inkTertiary,
                         ),
@@ -156,7 +156,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                     ],
                   ),
                   Text(
-                    '${profile.instrumentLabel} • ${profile.teacherName ?? "선생님 미연결"}',
+                    '${profile.instrumentLabel} • ${profile.teacherName ?? AppStrings.parentHomeTeacherNotConnected}',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -208,7 +208,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.space2),
                   Text(
-                    '자녀를 추가할 방법을 선택하세요',
+                    AppStrings.parentHomeChildAddMethodTitle,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -220,7 +220,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                     icon: Icons.child_care,
                     iconColor: AppColors.paperAccent,
                     title: AppStrings.parentHomeRegisterMinorChild,
-                    description: '별도 계정 없이 학부모 계정에서 관리',
+                    description: AppStrings.parentHomeChildAddDirectDesc,
                     onTap: () {
                       Navigator.pop(context);
                       context.push(
@@ -236,7 +236,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                     icon: Icons.link,
                     iconColor: AppColors.paperAccent,
                     title: AppStrings.parentHomeConnectExistingStudent,
-                    description: '초대 코드로 만 14세 이상 학생 계정 연결',
+                    description: AppStrings.parentHomeChildAddInviteDesc,
                     onTap: () {
                       Navigator.pop(context);
                       context.push(AppRoutes.parentInviteCode);

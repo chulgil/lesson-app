@@ -7142,6 +7142,118 @@ class AppStrings {
   static const parentHomePriorityMust = '필수';
   static const parentHomePriorityShould = '권장';
   static const parentHomePriorityCould = '선택';
+
+  // ── Parent Home Phase 2 (i18n §16 C5) ───────────────────────────────
+  /// 자녀 정보 수정 완료 SnackBar
+  static const parentHomeChildUpdated = '자녀 정보가 수정되었습니다';
+
+  /// 자녀 프로필 추가 완료 SnackBar
+  static const parentHomeChildAdded = '자녀 프로필이 추가되었습니다';
+
+  /// 자녀 폼 — 만 14세 미만 안내 배너
+  static const parentHomeUnder14Notice =
+      '만 14세 미만 자녀는 별도 계정 없이 학부모 계정에서 관리됩니다.';
+
+  /// 자녀 폼 — 프로필 색상 필드 라벨
+  static const parentHomeProfileColorLabel = '프로필 색상';
+
+  /// 자녀 폼 — 이름/별명 필드 라벨
+  static const parentHomeChildNameLabel = '이름/별명';
+
+  /// 자녀 폼 — 이름 필수 검증 메시지
+  static const parentHomeChildNameRequired = '이름을 입력해주세요';
+
+  /// 자녀 폼 — 이름 최소 길이 검증 메시지
+  static const parentHomeChildNameMinLength = '2글자 이상 입력해주세요';
+
+  /// 자녀 폼 — 출생년도 필드 라벨
+  static const parentHomeBirthYearLabel = '출생년도';
+
+  /// 자녀 폼 — 만 14세 이상 별도 계정 안내
+  static const parentHomeOver14Notice = '만 14세 이상은 별도 계정 등록이 가능합니다.';
+
+  /// 자녀 폼 — 수준 필드 라벨
+  static const parentHomeLevelLabel = '수준';
+
+  /// 자녀 폼 — 추가 버튼(신규)
+  static const parentHomeChildAdd = '자녀 추가';
+
+  /// 자녀 목록 빈 상태 부제
+  static const parentHomeChildrenEmptySubtitle =
+      '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요';
+
+  /// 자녀 카드 부제 — 선생님 미연결 fallback
+  static const parentHomeTeacherNotConnected = '선생님 미연결';
+
+  /// 자녀 추가 방법 선택 시트 제목
+  static const parentHomeChildAddMethodTitle = '자녀를 추가할 방법을 선택하세요';
+
+  /// 자녀 추가 방법 — 직접 추가 설명
+  static const parentHomeChildAddDirectDesc = '별도 계정 없이 학부모 계정에서 관리';
+
+  /// 자녀 추가 방법 — 초대 코드 연결 설명
+  static const parentHomeChildAddInviteDesc = '초대 코드로 만 14세 이상 학생 계정 연결';
+
+  /// 프로필 전환 — 자녀 프로필 섹션 라벨
+  static const parentHomeChildProfilesSectionLabel = '자녀 프로필';
+
+  /// 프로필 전환 — 미연결 자녀 배지
+  static const parentHomeUnconnectedBadge = '미연결';
+
+  /// 프로필 전환 — 연결 대기 중 부제
+  static const parentHomeConnectionPending = '연결 대기 중';
+
+  /// 프로필 전환 — 미연결 자녀 기능 안내 부제
+  static const parentHomePracticeMetronomeOnly = '연습/메트로놈만 가능';
+
+  /// 프로필 전환 시트 제목
+  static const parentHomeSwitchProfileTitle = '프로필 전환';
+
+  /// 프로필 전환 — 본인(학생 본인) 연습 부제
+  static const parentHomeOwnPractice = '본인 연습';
+
+  /// 프로필 헤더 — 아바타 이니셜 fallback(이름 없음)
+  static const parentHomeAvatarInitialFallback = '학';
+
+  /// 미연결 자녀 대시보드 — 선생님 연결 CTA
+  static const parentHomeConnectTeacherCta = '선생님과 연결하세요';
+
+  /// 미연결 자녀 대시보드 — 연결 시 혜택 안내
+  static const parentHomeConnectBenefits = '레퍼토리, 레슨 예약, 숙제 확인이 가능해집니다';
+
+  /// 나이 표기 ($age = 만 나이)
+  static String parentHomeAgeFormat(int age) => '만 $age세';
+
+  /// 출생년도 드롭다운 항목 ($year = 연도, $age = 만 나이)
+  static String parentHomeBirthYearAgeFormat(int year, int age) =>
+      '$year년 (${parentHomeAgeFormat(age)})';
+
+  /// 자녀 프로필 삭제 확인 본문 ($name = 자녀 이름)
+  static String parentHomeChildDeleteConfirmFormat(String name) =>
+      "'$name' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.";
+
+  /// 자녀 레슨 섹션 제목 ($name = 자녀 이름)
+  static String parentHomeChildLessonsTitleFormat(String name) => '$name의 레슨';
+
+  /// 일수 표기 ($n일)
+  static String parentHomeDaysFormat(int n) => '$n일';
+
+  /// 횟수 표기 ($n회)
+  static String parentHomeLessonCountFormat(int n) => '$n회';
+
+  /// 연습 일수 표기 ($n일 연습)
+  static String parentHomePracticedDaysFormat(int n) => '$n일 연습';
+
+  /// 프로필 전환 — 학생 프로필 라벨 ($name (학생))
+  static String parentHomeStudentProfileLabelFormat(String name) =>
+      '$name (학생)';
+
+  /// 프로필 전환 — 선생님 부제 ($name 선생님)
+  static String parentHomeTeacherSubtitleFormat(String name) => '$name 선생님';
+
+  /// 알림 활성 개수 ($enabled/$total개 알림 활성화)
+  static String parentHomeNotificationActiveFormat(int enabled, int total) =>
+      '$enabled/$total개 알림 활성화';
   static const parentHomeCompletedLabel = '완료됨';
   // ── Parent Lessons tab (실데이터) + 노트 접근동의 게이트 ──────
   static const parentHomeNoUpcomingLessons = '예정된 레슨이 없습니다';

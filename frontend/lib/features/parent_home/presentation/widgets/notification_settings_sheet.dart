@@ -93,7 +93,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
-                '${_settings.enabledCount}/${ParentNotificationSettings.totalConfigurable}개 알림 활성화',
+                AppStrings.parentHomeNotificationActiveFormat(_settings.enabledCount, ParentNotificationSettings.totalConfigurable),
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,

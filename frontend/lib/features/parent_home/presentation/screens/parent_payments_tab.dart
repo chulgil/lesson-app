@@ -264,7 +264,7 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
           (lessonClass) => SubscriptionCard(
             compact: true,
             subscription: subscription,
-            className: lessonClass?.name ?? '개인레슨',
+            className: lessonClass?.name ?? AppStrings.individualLesson,
             instrument: membership.instrument,
             personName: personName,
             onTap: onTap,
@@ -282,7 +282,7 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
           (_, __) => SubscriptionCard(
             compact: true,
             subscription: subscription,
-            className: '레슨',
+            className: AppStrings.lessonClassErrorFallback,
             instrument: membership.instrument,
             personName: personName,
             onTap: onTap,

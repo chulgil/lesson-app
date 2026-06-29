@@ -146,12 +146,12 @@ class _ProfileDropdown extends ConsumerWidget {
         _buildProfileItem(
           option: _ProfileOption(
             type: ProfileType.student,
-            label: '${userProfile.userName} (학생)',
+            label: AppStrings.parentHomeStudentProfileLabelFormat(userProfile.userName),
             icon: ProfileType.student.icon,
             color: ProfileType.student.color,
             subtitle:
                 userProfile.studentTeacherName != null
-                    ? '${userProfile.studentTeacherName} 선생님'
+                    ? AppStrings.parentHomeTeacherSubtitleFormat(userProfile.studentTeacherName!)
                     : null,
           ),
           isSelected: userProfile.activeProfile == ProfileType.student,
@@ -168,7 +168,7 @@ class _ProfileDropdown extends ConsumerWidget {
           enabled: false,
           height: 30,
           child: Text(
-            '자녀 프로필',
+            AppStrings.parentHomeChildProfilesSectionLabel,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
               fontWeight: FontWeight.w500,
@@ -187,7 +187,7 @@ class _ProfileDropdown extends ConsumerWidget {
               icon: ProfileType.child.icon,
               color: child.profileColor,
               subtitle: _getChildSubtitle(child),
-              badge: child.isUnconnected ? '미연결' : null,
+              badge: child.isUnconnected ? AppStrings.parentHomeUnconnectedBadge : null,
               badgeColor: child.connectionStatus.color,
             ),
             isSelected:
@@ -203,13 +203,13 @@ class _ProfileDropdown extends ConsumerWidget {
 
   String? _getChildSubtitle(ChildProfile child) {
     if (child.isConnected && child.teacherName != null) {
-      return '${child.teacherName} 선생님';
+      return AppStrings.parentHomeTeacherSubtitleFormat(child.teacherName!);
     }
     if (child.isPending) {
-      return '연결 대기 중';
+      return AppStrings.parentHomeConnectionPending;
     }
     if (child.isUnconnected) {
-      return '연습/메트로놈만 가능';
+      return AppStrings.parentHomePracticeMetronomeOnly;
     }
     return child.instrumentLabel;
   }
@@ -391,7 +391,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             // Notebook × Score: 바텀시트 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
             // (BottomSheetHandle 없이 showModalBottomSheet 사용 → 일반 sectionTitle 적용.)
             Text(
-              '프로필 전환',
+              AppStrings.parentHomeSwitchProfileTitle,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.ink,
               ),
@@ -417,11 +417,11 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             // Student option
             if (availableProfiles.contains(ProfileType.student))
               _ProfileTile(
-                label: '${userProfile.userName} (학생)',
+                label: AppStrings.parentHomeStudentProfileLabelFormat(userProfile.userName),
                 subtitle:
                     userProfile.studentTeacherName != null
-                        ? '${userProfile.studentTeacherName} 선생님'
-                        : '본인 연습',
+                        ? AppStrings.parentHomeTeacherSubtitleFormat(userProfile.studentTeacherName!)
+                        : AppStrings.parentHomeOwnPractice,
                 icon: ProfileType.student.icon,
                 color: ProfileType.student.color,
                 isSelected: userProfile.activeProfile == ProfileType.student,
@@ -439,7 +439,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
               const ThinRule(),
               const SizedBox(height: AppSpacing.space3),
               Text(
-                '자녀 프로필',
+                AppStrings.parentHomeChildProfilesSectionLabel,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.inkSecondary,
@@ -451,14 +451,14 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
                   label: child.name,
                   subtitle:
                       child.isUnconnected
-                          ? '연습/메트로놈만 가능'
+                          ? AppStrings.parentHomePracticeMetronomeOnly
                           : child.teacherName ?? child.instrumentLabel,
                   icon: ProfileType.child.icon,
                   color: child.profileColor,
                   isSelected:
                       userProfile.activeProfile == ProfileType.child &&
                       userProfile.activeChildId == child.id,
-                  badge: child.isUnconnected ? '미연결' : null,
+                  badge: child.isUnconnected ? AppStrings.parentHomeUnconnectedBadge : null,
                   badgeColor: child.connectionStatus.color,
                   onTap: () {
                     ref
