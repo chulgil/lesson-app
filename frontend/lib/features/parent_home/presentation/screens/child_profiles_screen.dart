@@ -134,7 +134,6 @@ class ChildProfilesScreen extends ConsumerWidget {
       builder:
           (sheetContext) => ChildProfileActionsBottomSheet(
             profile: profile,
-            onSwitchToChild: () => _switchToChildView(context, ref, profile),
             onEditProfile: () => _navigateToEditChild(context, profile, pid),
           ),
     );
@@ -164,23 +163,6 @@ class ChildProfilesScreen extends ConsumerWidget {
     );
   }
 
-  void _switchToChildView(
-    BuildContext context,
-    WidgetRef ref,
-    ChildProfile profile,
-  ) {
-    // Set selected child profile
-    ref.read(selectedChildProfileProvider.notifier).select(profile);
-
-    // Navigate to student home with child profile context
-    // For now, show a message - full implementation would switch UI mode
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("${profile.name}의 화면으로 전환합니다")));
-
-    // TODO: Implement proper view switching
-    // This would typically navigate to StudentHomeScreen with the child profile
-  }
 }
 
 class _ChildProfileCard extends StatelessWidget {

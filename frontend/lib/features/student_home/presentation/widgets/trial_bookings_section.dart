@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../providers/student_home_booking_provider.dart';
+import '../providers/student_home_tab_request_provider.dart';
 import 'compact_trial_booking_card.dart';
 
 /// Trial bookings section for student dashboard
@@ -64,16 +65,11 @@ class TrialBookingsSection extends ConsumerWidget {
             if (trialBookings.length > 2)
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          AppStrings.studentHomeAllTrialInScheduleTab,
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
+                  // #749: take the user to the Lessons tab (index 1) where all
+                  // trial bookings live, instead of a no-op SnackBar.
+                  onPressed: () => ref
+                      .read(studentHomeTabRequestProvider.notifier)
+                      .state = 1,
                   child: Text('${trialBookings.length - 2}개 더보기'),
                 ),
               ),

@@ -15,18 +15,15 @@ import '../../domain/entities/child_profile.dart';
 /// swipe 패턴은 적용하지 않고, 행 탭으로 본 시트를 띄워 2 액션을 노출한다.
 ///
 /// 액션:
-/// - [학생 계정 전환] — [onSwitchToChild]
-/// - [프로필 편집]    — [onEditProfile]
+/// - [프로필 편집] — [onEditProfile]
 class ChildProfileActionsBottomSheet extends StatelessWidget {
   const ChildProfileActionsBottomSheet({
     super.key,
     required this.profile,
-    required this.onSwitchToChild,
     required this.onEditProfile,
   });
 
   final ChildProfile profile;
-  final VoidCallback onSwitchToChild;
   final VoidCallback onEditProfile;
 
   @override
@@ -46,15 +43,6 @@ class ChildProfileActionsBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           const ThinRule(),
-          ListTile(
-            leading: Icon(Icons.switch_account, color: AppColors.paperAccent),
-            title: const Text(AppStrings.childProfileActionsSwitchAccount),
-            trailing: Icon(Icons.chevron_right, color: AppColors.inkTertiary),
-            onTap: () {
-              Navigator.of(context).pop();
-              onSwitchToChild();
-            },
-          ),
           ListTile(
             leading: Icon(Icons.edit_outlined, color: AppColors.ink),
             title: const Text(AppStrings.childProfileActionsEditProfile),

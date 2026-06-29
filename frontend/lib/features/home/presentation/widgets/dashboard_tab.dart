@@ -146,7 +146,7 @@ class DashboardTab extends ConsumerWidget {
                   const QuestBoardCard(),
 
                   // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
-                  _buildStatsRow(context, dashboard.lessonStats),
+                  _buildStatsRow(context, ref, dashboard.lessonStats),
 
                   const SizedBox(height: AppSpacing.space3),
 
@@ -286,6 +286,7 @@ class DashboardTab extends ConsumerWidget {
 
   Widget _buildStatsRow(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
     final monthCard = lessonStatsAsync.when(
@@ -295,7 +296,14 @@ class DashboardTab extends ConsumerWidget {
             value: AppStrings.usageCountShort(stats['completed'] ?? 0),
             color: AppColors.ink,
             icon: Icons.check_circle_outline,
-            onTap: () => context.push(AppRoutes.analytics),
+            // #749: same Pro paywall guard as the sibling "통계 더보기" link.
+            onTap: () => guardProFeatureNavigation(
+              context: context,
+              ref: ref,
+              required: TierRequirement.pro,
+              featureName: AppStrings.featureLockedMonthlyStats,
+              onPass: () => context.push(AppRoutes.analytics),
+            ),
           ),
       loading:
           () => StatCard(

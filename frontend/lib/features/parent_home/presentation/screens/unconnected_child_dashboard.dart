@@ -46,13 +46,6 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           elevation: 0,
           title: const ProfileSwitcher(),
           centerTitle: false,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () => _showFindTeacherDialog(context),
-              tooltip: AppStrings.parentHomeFindTeacher,
-            ),
-          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
