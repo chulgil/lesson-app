@@ -17,20 +17,6 @@ enum RepertoireSortType {
 
 /// Extension for RepertoireSortType display
 extension RepertoireSortTypeExtension on RepertoireSortType {
-  /// Get display name in Korean
-  String get displayName {
-    switch (this) {
-      case RepertoireSortType.createdDesc:
-        return '최신순';
-      case RepertoireSortType.createdAsc:
-        return '오래된순';
-      case RepertoireSortType.nameAsc:
-        return '이름순';
-      case RepertoireSortType.custom:
-        return '사용자지정';
-    }
-  }
-
   /// Get icon for the sort type
   String get iconName {
     switch (this) {

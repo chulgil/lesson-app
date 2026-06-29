@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/follow.dart';
 import '../../domain/entities/follow_target_type.dart';
+import '../extensions/follow_target_type_visuals.dart';
 
 /// Card widget for displaying a follow item in the list.
 class FollowCard extends StatelessWidget {

@@ -23,24 +23,6 @@ enum SectionSortType {
 
 /// Extension for SectionSortType display
 extension SectionSortTypeExtension on SectionSortType {
-  /// Get display name in Korean
-  String get displayName {
-    switch (this) {
-      case SectionSortType.createdDesc:
-        return '최신순';
-      case SectionSortType.createdAsc:
-        return '오래된순';
-      case SectionSortType.nameAsc:
-        return '이름순';
-      case SectionSortType.measureAsc:
-        return '마디순';
-      case SectionSortType.lastPracticedDesc:
-        return '최근연습순';
-      case SectionSortType.custom:
-        return '사용자지정';
-    }
-  }
-
   /// Get icon for the sort type
   String get iconName {
     switch (this) {

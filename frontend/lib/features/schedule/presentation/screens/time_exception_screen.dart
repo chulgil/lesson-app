@@ -15,6 +15,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
+import '../extensions/exception_type_visuals.dart';
 import '../providers/teacher_availability_providers.dart';
 
 /// Screen for managing time exceptions (holidays, vacations, additional slots)

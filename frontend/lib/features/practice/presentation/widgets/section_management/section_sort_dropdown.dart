@@ -5,6 +5,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/section_sort_type.dart';
+import '../../extensions/section_sort_type_visuals.dart';
 import '../../providers/section_sort_provider.dart';
 
 /// Dropdown for selecting section sort type
