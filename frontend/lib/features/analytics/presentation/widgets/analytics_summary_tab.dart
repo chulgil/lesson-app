@@ -111,7 +111,7 @@ class AnalyticsSummaryTab extends ConsumerWidget {
               child: StatCard(
                 title: AppStrings.analyticsTravelTimeLabel,
                 value: travelM > 0 ? '${travelH}h ${travelM}m' : '${travelH}h',
-                subtitle: '월 합산',
+                subtitle: AppStrings.analyticsMonthlyTotal,
                 color: AppColors.inkTertiary,
                 icon: Icons.directions_car,
               ),
@@ -129,7 +129,7 @@ class AnalyticsSummaryTab extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '학생별 연습 현황',
+          AppStrings.analyticsStudentPracticeStatus,
           style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -224,7 +224,7 @@ class _StudentSummaryRow extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
-                          '연습 $pr%',
+                          AppStrings.analyticsPracticePercentFormat(pr),
                           style: AppTypography.captionSmall.copyWith(
                             color: AppColors.paperOk,
                           ),
@@ -240,7 +240,7 @@ class _StudentSummaryRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '출석 $ar%',
+                    AppStrings.analyticsAttendancePercentFormat(ar),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.inkSecondary,
                     ),
