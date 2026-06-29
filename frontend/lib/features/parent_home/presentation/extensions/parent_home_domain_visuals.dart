@@ -8,6 +8,44 @@ import '../../domain/entities/parent_child_relation.dart';
 import '../../domain/entities/parent_notification_settings.dart';
 import '../../domain/entities/user_profile.dart';
 
+/// Canonical child-profile instrument key-space (English keys -> label / icon).
+/// SSOT shared by the form dropdown and [ChildProfileVisuals]; eliminates the
+/// former domain-entity display getters (flutter-architecture).
+const kChildInstrumentKeys = <String>[
+  'violin',
+  'piano',
+  'cello',
+  'viola',
+  'flute',
+];
+
+const _kChildInstrumentLabels = <String, String>{
+  'violin': AppStrings.instrumentViolin,
+  'piano': AppStrings.instrumentPiano,
+  'cello': AppStrings.instrumentCello,
+  'viola': AppStrings.instrumentViola,
+  'flute': AppStrings.instrumentFlute,
+};
+
+const _kChildInstrumentIcons = <String, IconData>{
+  'violin': Icons.music_note,
+  'piano': Icons.piano,
+  'cello': Icons.music_note,
+  'viola': Icons.music_note,
+  'flute': Icons.music_note,
+};
+
+const _kChildLevelLabels = <String, String>{
+  'beginner': AppStrings.studentLevelBeginner,
+  'elementary': AppStrings.studentLevelElementary,
+  'intermediate': AppStrings.studentLevelIntermediate,
+  'advanced': AppStrings.studentLevelAdvanced,
+};
+
+/// Resolve a child-profile instrument key to its display label (raw key fallback).
+String childInstrumentLabel(String key) =>
+    _kChildInstrumentLabels[key.toLowerCase()] ?? key;
+
 Color _colorForKey(String key) {
   switch (key) {
     case 'paperAccent':
@@ -38,29 +76,6 @@ String parentHomeColorKeyForColor(Color color) {
   if (color == AppColors.profilePink) return 'profilePink';
   if (color == AppColors.profileGreen) return 'profileGreen';
   return 'paperAccent';
-}
-
-IconData _iconForKey(String key) {
-  switch (key) {
-    case 'familyRestroom':
-      return Icons.family_restroom;
-    case 'school':
-      return Icons.school;
-    case 'childCare':
-      return Icons.child_care;
-    case 'link':
-      return Icons.link;
-    case 'hourglassEmpty':
-      return Icons.hourglass_empty;
-    case 'linkOff':
-      return Icons.link_off;
-    case 'piano':
-      return Icons.piano;
-    case 'musicNote':
-      return Icons.music_note;
-    default:
-      return Icons.music_note;
-  }
 }
 
 extension ParentStatusVisuals on ParentStatus {
@@ -298,5 +313,8 @@ extension ChildProfileStatusVisuals on ChildProfileStatus {
 
 extension ChildProfileVisuals on ChildProfile {
   Color get profileColor => _colorForKey(profileColorKey);
-  IconData get instrumentIcon => _iconForKey(instrumentIconKey);
+  IconData get instrumentIcon =>
+      _kChildInstrumentIcons[instrument.toLowerCase()] ?? Icons.music_note;
+  String get instrumentLabel => childInstrumentLabel(instrument);
+  String get levelLabel => _kChildLevelLabels[level.toLowerCase()] ?? level;
 }
