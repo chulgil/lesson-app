@@ -97,7 +97,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildNotificationItem(
                       icon: Icons.schedule,
                       label: AppStrings.parentHomeLessonNotification,
-                      subtitle: '일정 변경, 취소 알림',
+                      subtitle: AppStrings.parentHomeLessonNotificationSubtitle,
                       value: s.lessonChange || s.lessonCancel,
                       onChanged:
                           (value) => _toggleNotificationGroup(
@@ -111,7 +111,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildNotificationItem(
                       icon: Icons.music_note,
                       label: AppStrings.parentHomePracticeNotification,
-                      subtitle: '연습 완료, 스트릭 달성',
+                      subtitle: AppStrings.parentHomePracticeNotificationSubtitle,
                       value: s.practiceComplete || s.streakAchievement,
                       onChanged:
                           (value) => _toggleNotificationGroup(
@@ -125,7 +125,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                     _buildNotificationItem(
                       icon: Icons.payment,
                       label: AppStrings.parentHomePaymentNotification,
-                      subtitle: '입금 안내, 입금 확인 (필수)',
+                      subtitle: AppStrings.parentHomePaymentNotificationSubtitle,
                       value: true,
                       isRequired: true,
                       onChanged: null,

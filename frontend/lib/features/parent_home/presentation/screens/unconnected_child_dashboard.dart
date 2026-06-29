@@ -50,7 +50,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: () => _showFindTeacherDialog(context),
-              tooltip: '선생님 찾기',
+              tooltip: AppStrings.parentHomeFindTeacher,
             ),
           ],
         ),

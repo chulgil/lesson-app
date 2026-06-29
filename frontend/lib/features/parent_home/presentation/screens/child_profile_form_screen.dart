@@ -465,7 +465,7 @@ class _ChildProfileFormScreenState
   Future<void> _showDeleteConfirmation() async {
     final confirmed = await showNotebookDialog(
       context: context,
-      title: '자녀 프로필 삭제',
+      title: AppStrings.parentHomeDeleteChildProfile,
       message:
           "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
       confirmLabel: AppStrings.delete,

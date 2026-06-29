@@ -206,7 +206,7 @@ class ParentDashboardTab extends ConsumerWidget {
       trailing: IconButton(
         onPressed: () => _showChildSelector(context, ref, parentId),
         icon: const Icon(Icons.swap_horiz, color: AppColors.ink, size: 22),
-        tooltip: '자녀 전환',
+        tooltip: AppStrings.parentHomeSwitchChild,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
       ),
