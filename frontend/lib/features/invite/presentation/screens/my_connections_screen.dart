@@ -28,7 +28,7 @@ class MyConnectionsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: userRole == InviteUserRole.teacher ? '내 학생' : '내 선생님',
+        title: userRole == InviteUserRole.teacher ? AppStrings.inviteMyStudentsTitle : AppStrings.inviteMyTeachersTitle,
         actions: const [DetailAppBarAction.add],
         onAction: (action) {
           if (action == DetailAppBarAction.add) {
@@ -38,7 +38,7 @@ class MyConnectionsScreen extends ConsumerWidget {
       ),
       body: connections.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _buildError('연결 목록을 불러올 수 없습니다. 다시 시도해주세요.'),
+        error: (_, __) => _buildError(AppStrings.inviteConnectionsLoadError),
         data: (activeList) {
           final inactiveAsync = ref.watch(myDisconnectedConnectionsProvider);
           final inactiveList = inactiveAsync.valueOrNull ?? [];
@@ -68,7 +68,7 @@ class MyConnectionsScreen extends ConsumerWidget {
             Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space4),
             Text(
-              '연결 목록을 불러오는 중 오류가 발생했습니다',
+              AppStrings.inviteConnectionsLoadErrorDescription,
               style: AppTypography.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -102,8 +102,8 @@ class MyConnectionsScreen extends ConsumerWidget {
             // Notebook × Score: 빈 상태 3축(§7.89) 통과 + §7.87-h 2원 유한집합 (teacher/parent·student).
             Text(
               userRole == InviteUserRole.teacher
-                  ? '아직 연결된 학생이 없습니다'
-                  : '아직 연결된 선생님이 없습니다',
+                  ? AppStrings.inviteNoConnectedStudents
+                  : AppStrings.inviteNoConnectedTeachers,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -112,8 +112,8 @@ class MyConnectionsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space2),
             Text(
               userRole == InviteUserRole.teacher
-                  ? '초대 링크를 공유하거나\n학생의 QR 코드를 스캔하세요.'
-                  : '선생님의 초대 코드를 입력하거나\nQR 코드를 스캔하세요.',
+                  ? AppStrings.inviteEmptyHintTeacher
+                  : AppStrings.inviteEmptyHintStudent,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -151,8 +151,8 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 _HelpItem(
                   icon: Icons.dialpad,
-                  title: '초대 코드 입력',
-                  subtitle: '선생님에게 받은 6자리 코드를 입력하세요',
+                  title: AppStrings.inviteCodeAppBarTitle,
+                  subtitle: AppStrings.inviteHelpCodeSubtitle,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(AppRoutes.inviteCode);
@@ -161,8 +161,8 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space2),
                 _HelpItem(
                   icon: Icons.qr_code_scanner,
-                  title: 'QR 코드 스캔',
-                  subtitle: '선생님의 QR 코드를 카메라로 스캔하세요',
+                  title: AppStrings.inviteScanQrTitle,
+                  subtitle: AppStrings.inviteHelpScanSubtitle,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(AppRoutes.inviteScan);
@@ -171,8 +171,8 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space2),
                 _HelpItem(
                   icon: Icons.search,
-                  title: '선생님 검색',
-                  subtitle: '이름, 악기, 지역으로 선생님을 검색하세요',
+                  title: AppStrings.inviteTeacherSearchTitle,
+                  subtitle: AppStrings.inviteHelpSearchSubtitle,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(AppRoutes.teacherSearch);
@@ -192,7 +192,7 @@ class MyConnectionsScreen extends ConsumerWidget {
     List<Connection> inactiveConnections,
     InviteUserRole userRole,
   ) {
-    final sectionLabel = userRole == InviteUserRole.teacher ? '학생' : '선생님';
+    final sectionLabel = userRole == InviteUserRole.teacher ? AppStrings.student : AppStrings.teacher;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -202,7 +202,7 @@ class MyConnectionsScreen extends ConsumerWidget {
           // Active connections section
           if (activeConnections.isNotEmpty) ...[
             _SectionHeader(
-              title: '연결된 $sectionLabel',
+              title: AppStrings.inviteConnectedSectionFormat(sectionLabel),
               count: activeConnections.length,
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -245,7 +245,7 @@ class MyConnectionsScreen extends ConsumerWidget {
           if (inactiveConnections.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.space4),
             _SectionHeader(
-              title: '이전 $sectionLabel',
+              title: AppStrings.invitePreviousSectionFormat(sectionLabel),
               count: inactiveConnections.length,
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -289,7 +289,7 @@ class MyConnectionsScreen extends ConsumerWidget {
               : connection.teacherName;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('$name님과 다시 연결되었습니다')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.inviteReconnectedFormat(name))));
     }
   }
 
@@ -327,14 +327,14 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 Text(otherName, style: AppTypography.headingMedium),
                 Text(
-                  userRole == InviteUserRole.teacher ? '학생' : '선생님',
+                  userRole == InviteUserRole.teacher ? AppStrings.student : AppStrings.teacher,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  '연결일: ${_formatDate(connection.connectedAt)}',
+                  AppStrings.inviteConnectedDateFormat(_formatDate(connection.connectedAt)),
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -385,9 +385,9 @@ class MyConnectionsScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: '연결 해제',
-      content: Text('$otherName님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.'),
-      confirmLabel: '연결 해제',
+      title: AppStrings.swipeActionDisconnect,
+      content: Text(AppStrings.inviteDisconnectConfirmFormat(otherName)),
+      confirmLabel: AppStrings.swipeActionDisconnect,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,
       onConfirm: () => Navigator.pop(context, true),
@@ -402,7 +402,7 @@ class MyConnectionsScreen extends ConsumerWidget {
       if (success && context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('$otherName님과의 연결이 해제되었습니다')));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.inviteDisconnectedFormat(otherName))));
       }
     }
   }
@@ -442,7 +442,7 @@ class MyConnectionsScreen extends ConsumerWidget {
     if (success && context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('$otherName님과의 연결이 해제되었습니다')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.inviteDisconnectedFormat(otherName))));
     }
   }
 
@@ -462,7 +462,7 @@ class _SectionHeader extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '$title ($count명)',
+          AppStrings.inviteSectionCountFormat(title, count),
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.inkSecondary,
@@ -626,8 +626,8 @@ class _ConnectionCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     isActive
-                        ? '연결됨: ${formatRelativeDay(connection.connectedAt)}'
-                        : '해제됨: ${formatRelativeDay(connection.deactivatedAt ?? connection.connectedAt)}',
+                        ? AppStrings.inviteConnectedSinceFormat(formatRelativeDay(connection.connectedAt))
+                        : AppStrings.inviteDisconnectedSinceFormat(formatRelativeDay(connection.deactivatedAt ?? connection.connectedAt)),
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -676,7 +676,7 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.zero,
       ),
       child: Text(
-        isActive ? '연결됨' : '해제됨',
+        isActive ? AppStrings.inviteStatusConnected : AppStrings.inviteStatusDisconnected,
         style: AppTypography.caption.copyWith(
           color: isActive ? AppColors.paperOk : AppColors.inkTertiary,
           fontWeight: FontWeight.w500,
