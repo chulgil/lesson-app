@@ -13,9 +13,10 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../students/students_facade.dart';
 
-// instruments list migrated to AppStrings.instrumentList (#920)
+// instruments unified to InstrumentList.all (catalog SSOT, §16) — was #920 split
 
 /// Student profile setup screen for student onboarding (step 1 of 2)
 class StudentProfileSetupScreen extends ConsumerStatefulWidget {
@@ -104,7 +105,7 @@ class _StudentProfileSetupScreenState
       context: context,
       builder:
           (context) => _InstrumentSelectorSheet(
-            instruments: AppStrings.instrumentList,
+            instruments: InstrumentList.all,
             selectedInstrument: _selectedInstrument,
             onSelected: (instrument) {
               setState(() => _selectedInstrument = instrument);
