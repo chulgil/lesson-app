@@ -10319,20 +10319,6 @@ class AppStrings {
   static const studentProfileSetupInstrumentLabel = '악기';
   static const studentProfileSetupInstrumentHint = '악기를 선택해주세요';
 
-  // Common instrument list (SSOT — shared between teacher and student selectors)
-  static const List<String> instrumentList = [
-    '바이올린',
-    '피아노',
-    '첼로',
-    '플루트',
-    '클라리넷',
-    '비올라',
-    '기타',
-    '성악',
-    '드럼',
-    '작곡',
-  ];
-
   // Bank Account Edit
   static const bankAccountNoAccount = '등록된 계좌가 없습니다';
   static const bankAccountAddPrompt = '학생의 수강료 입금을 위한 계좌를 추가하세요.';
