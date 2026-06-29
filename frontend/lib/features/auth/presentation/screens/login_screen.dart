@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -367,7 +369,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // account picker (Bug #726 fix).
       final googleSignIn = _getGoogleSignIn();
       await googleSignIn.signOut();
-      final account = await googleSignIn.signIn();
+      // #login: cap the OAuth wait. On macOS the flow opens the external
+      // default browser; if that browser fails to hand the custom-scheme
+      // redirect back (e.g. a stale/automation Chrome intercepting it), the
+      // callback never arrives. Time out instead of hanging forever with a
+      // stuck spinner so the button recovers and the user can retry.
+      final account = await googleSignIn.signIn().timeout(
+        const Duration(seconds: 90),
+        onTimeout: () => throw TimeoutException('Google sign-in timed out'),
+      );
       if (account == null) {
         if (mounted) setState(() => _isLoading = false);
         return;
