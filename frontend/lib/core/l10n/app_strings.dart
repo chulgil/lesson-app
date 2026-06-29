@@ -1309,6 +1309,21 @@ class AppStrings {
   /// Trial lesson detail bottom sheet
   static const trialLessonDetail = '체험레슨 상세';
   static const instrumentLabel = '악기';
+
+  /// 악기명 — 바이올린 (parent_home child-profile 키 SSOT, 향후 광역 dedup seed)
+  static const instrumentViolin = '바이올린';
+
+  /// 악기명 — 피아노
+  static const instrumentPiano = '피아노';
+
+  /// 악기명 — 첼로
+  static const instrumentCello = '첼로';
+
+  /// 악기명 — 비올라
+  static const instrumentViola = '비올라';
+
+  /// 악기명 — 플루트
+  static const instrumentFlute = '플루트';
   static const lessonDate = '날짜';
   static const lessonTime = '시간';
   static const statusLabel = '상태';

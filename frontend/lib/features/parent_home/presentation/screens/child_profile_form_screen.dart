@@ -60,13 +60,9 @@ class _ChildProfileFormScreenState
     AppColors.profileIndigo,
   ];
 
-  // Instruments
-  static const _instruments = [
-    ('violin', '바이올린'),
-    ('piano', '피아노'),
-    ('cello', '첼로'),
-    ('viola', '비올라'),
-    ('flute', '플루트'),
+  // Instruments — derived from the canonical key-space SSOT (no inline labels).
+  static final _instruments = [
+    for (final k in kChildInstrumentKeys) (k, childInstrumentLabel(k)),
   ];
 
   // Levels
