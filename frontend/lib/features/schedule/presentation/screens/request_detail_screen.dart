@@ -419,15 +419,18 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   }
 
   void _showMoreMenu(BuildContext context, UnifiedLessonRequest request) {
+    final events =
+        ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
     final items = <(IconData, String, VoidCallback)>[
-      if (request.hasProposal)
+      // #749: only offer "수강권 보기" when a subscription actually exists to
+      // view — otherwise it led to a "준비중" dead-end.
+      if (request.hasProposal &&
+          requestDetailSubscriptionRoute(events) != null)
         (
           Icons.receipt_long_outlined,
           AppStrings.viewSubscription,
           () {
             Navigator.pop(context);
-            final events =
-                ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
             _handleViewSubscription(context, events);
           },
         ),

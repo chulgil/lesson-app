@@ -11,6 +11,7 @@ import '../../../../main.dart'
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/practice_center_button.dart';
 import '../providers/student_home_session_provider.dart';
+import '../providers/student_home_tab_request_provider.dart';
 import 'student_dashboard_tab.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
@@ -73,6 +74,14 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // #749: descendant widgets request a tab switch (e.g. trial "더보기" →
+    // Lessons) via studentHomeTabRequestProvider; consume and reset it here.
+    ref.listen<int?>(studentHomeTabRequestProvider, (_, next) {
+      if (next != null) {
+        setState(() => _currentIndex = next);
+        ref.read(studentHomeTabRequestProvider.notifier).state = null;
+      }
+    });
     return DebugWrapper(
       child: NotebookScreenScaffold(
         body: SafeArea(
