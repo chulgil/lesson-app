@@ -98,6 +98,16 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           }
         }
       });
+    } else {
+      // #749: auto-select the only student when none is preselected
+      // (mirrors the subscription auto-select in _resolveSubscriptionForStudent).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _selectedStudent != null) return;
+        final students = ref.read(studentsProvider).valueOrNull ?? [];
+        if (students.length == 1) {
+          _onStudentChosen(students.first);
+        }
+      });
     }
   }
 

@@ -135,8 +135,14 @@ class _ScheduleChangeResponseBottomSheetState
                   selectedIndex: _selectedSlotIndex,
                   onSelected:
                       (index) => setState(() {
-                        _selectedSlotIndex =
-                            _selectedSlotIndex == index ? null : index;
+                        // #749: single slot stays selected — toggling it off
+                        // would disable Accept with no other slot (dead-end).
+                        if (widget.proposedSlots.length == 1) {
+                          _selectedSlotIndex = 0;
+                        } else {
+                          _selectedSlotIndex =
+                              _selectedSlotIndex == index ? null : index;
+                        }
                       }),
                 ),
                 const SizedBox(height: AppSpacing.space4),
