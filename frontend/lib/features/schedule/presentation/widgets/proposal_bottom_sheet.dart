@@ -371,6 +371,24 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           profile.defaultBankAccount?.id ?? allAccounts.first.id;
     }
 
+    // Single account → static display (no redundant 1-item dropdown). #749
+    if (allAccounts.length == 1) {
+      final account = allAccounts.first;
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Text(
+          '${account.bankName} ${account.accountNumber}',
+          style: AppTypography.bodySmall.copyWith(color: AppColors.ink),
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space3,
