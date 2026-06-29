@@ -17,6 +17,8 @@
 
 북극성 = 옵시디언 `36-멀티카테고리-Discipline-플랫폼-설계-2026-06-26` (status=active, Phase 0~5 미착수). Discipline/SettingGroup 명명 결정 진원지 = 36-문서. 이슈 = #962(명명 분리)~#980. repo 결정 기록은 커밋 trailer(bare key: Directive/Constraint/Rejected).
 
+> **GX specialty 보완(2026-06-29)** = 36- **§5.1**: 헬스·필라테스·요가·댄스를 fitness Discipline 의 specialty 로 구체화(별도 vertical 아님). 도구 프리미티브 5종 조합 + `RepeatTarget=Count|Duration`. 코드 0 · Phase 4 gated · additive — "GX 미설계"로 오인해 재작성 금지.
+
 ### 0.3 용어 충돌 경고 (Category 동음이의)
 
 `카테고리/Category` 는 현재 glossary §14 의 **선생님 설정 5묶음(= SettingGroup)** 만 지칭. 신규 "분야" 개념은 `Discipline`. SettingGroup 리네이밍(#962) 전까지 **신규 코드/스펙에서 `카테고리`를 분야 의미로 쓰지 말 것**. glossary 수정은 `.harness/knowledge/glossary.md` 가 SSOT, `docs/specs/glossary.md` 는 단방향 미러.
