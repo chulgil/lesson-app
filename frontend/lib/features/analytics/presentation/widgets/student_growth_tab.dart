@@ -177,16 +177,16 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: _MiniStatCard(
-            label: '레슨 수',
-            value: '${progress.attendedLessons}회',
+            label: AppStrings.analyticsLessonCountLabel,
+            value: AppStrings.analyticsLessonCountValueFormat(progress.attendedLessons),
             color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: _MiniStatCard(
-            label: '연속 연습',
-            value: '${progress.practiceStreakDays}일',
+            label: AppStrings.analyticsStreakLabel,
+            value: AppStrings.analyticsStreakDaysFormat(progress.practiceStreakDays),
             color: AppColors.amber,
           ),
         ),

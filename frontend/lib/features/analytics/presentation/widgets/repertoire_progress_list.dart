@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -22,7 +23,7 @@ class RepertoireProgressList extends StatelessWidget {
     // Group by book
     final bookGroups = <String, List<RepertoirePiece>>{};
     for (final p in pieces) {
-      final book = p.bookTitle ?? '기타';
+      final book = p.bookTitle ?? AppStrings.analyticsRepertoireBookOther;
       (bookGroups[book] ??= []).add(p);
     }
 
@@ -56,9 +57,9 @@ class _PieceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, color, label) = switch (piece.status) {
-      RepertoireStatus.completed => (Icons.check_circle, AppColors.paperOk, '완료'),
-      RepertoireStatus.inProgress => (Icons.play_circle_outline, AppColors.paperAccent, '진행중'),
-      RepertoireStatus.planned => (Icons.radio_button_unchecked, AppColors.inkQuaternary, '예정'),
+      RepertoireStatus.completed => (Icons.check_circle, AppColors.paperOk, AppStrings.analyticsRepertoireStatusCompleted),
+      RepertoireStatus.inProgress => (Icons.play_circle_outline, AppColors.paperAccent, AppStrings.analyticsRepertoireStatusInProgress),
+      RepertoireStatus.planned => (Icons.radio_button_unchecked, AppColors.inkQuaternary, AppStrings.analyticsRepertoireStatusPlanned),
     };
 
     return Padding(

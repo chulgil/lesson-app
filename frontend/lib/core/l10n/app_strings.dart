@@ -5417,6 +5417,43 @@ class AppStrings {
   /// 학생 데이터가 없습니다 (빈 상태)
   static const analyticsNoStudentData = '학생 데이터가 없습니다';
 
+  // ── Analytics: 학생별 성장 / 요약 / 레퍼토리 (i18n §16 C5) ──────────────
+  /// 학생별 성장 탭 — 미니 통계 카드 라벨: 레슨 수
+  static const analyticsLessonCountLabel = '레슨 수';
+
+  /// 학생별 성장 탭 — 미니 통계 카드 라벨: 연속 연습
+  static const analyticsStreakLabel = '연속 연습';
+
+  /// 미니 통계 카드 값 — 레슨 횟수 ($n회)
+  static String analyticsLessonCountValueFormat(int n) => '$n회';
+
+  /// 미니 통계 카드 값 — 연속 연습 일수 ($n일)
+  static String analyticsStreakDaysFormat(int n) => '$n일';
+
+  /// 요약 탭 — 이동시간 카드 부제 (월 합산)
+  static const analyticsMonthlyTotal = '월 합산';
+
+  /// 요약 탭 — 학생별 연습 현황 섹션 제목
+  static const analyticsStudentPracticeStatus = '학생별 연습 현황';
+
+  /// 학생별 연습 현황 행 — 연습 달성률 ($pct%)
+  static String analyticsPracticePercentFormat(int pct) => '연습 $pct%';
+
+  /// 학생별 연습 현황 행 — 출석률 ($pct%)
+  static String analyticsAttendancePercentFormat(int pct) => '출석 $pct%';
+
+  /// 레퍼토리 진도 — 미분류 곡집 그룹 (기타)
+  static const analyticsRepertoireBookOther = '기타';
+
+  /// 레퍼토리 진도 상태 라벨 — 완료
+  static const analyticsRepertoireStatusCompleted = '완료';
+
+  /// 레퍼토리 진도 상태 라벨 — 진행중
+  static const analyticsRepertoireStatusInProgress = '진행중';
+
+  /// 레퍼토리 진도 상태 라벨 — 예정
+  static const analyticsRepertoireStatusPlanned = '예정';
+
   // ── Edit Repertoire Screen (레퍼토리 편집 5-3b-26) ──────────────────────
   /// 레퍼토리 편집 (AppBar 타이틀)
   static const editRepertoireAppBarTitle = '레퍼토리 편집';
