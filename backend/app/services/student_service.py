@@ -197,11 +197,15 @@ class StudentService:
 
         attendance_rate = (completed_lessons / total_lessons * 100) if total_lessons > 0 else 0.0
 
+        from app.services.streak_service import compute_streak
+
+        practice_streak = (await compute_streak(self.db, student_id)).current
+
         return StudentStatsResponse(
             total_lessons=total_lessons,
             completed_lessons=completed_lessons,
             attendance_rate=round(attendance_rate, 1),
-            practice_streak=0,
+            practice_streak=practice_streak,
             total_practice_minutes=0,
             repertoire_count=0,
         )
