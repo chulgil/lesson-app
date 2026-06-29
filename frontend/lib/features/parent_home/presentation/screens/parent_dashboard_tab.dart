@@ -227,7 +227,7 @@ class ParentDashboardTab extends ConsumerWidget {
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
-          Text('${profile.name}의 레슨', style: NotebookTypography.masthead),
+          Text(AppStrings.parentHomeChildLessonsTitleFormat(profile.name), style: NotebookTypography.masthead),
           const SizedBox(height: 6),
           Text(
             '${now.month}月 ${now.day}日  ·  ${profile.instrumentLabel}',
@@ -474,7 +474,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
-                          '만 ${profile.age}세',
+                          AppStrings.parentHomeAgeFormat(profile.age),
                           style: AppTypography.caption.copyWith(
                             color: AppColors.paper,
                             fontWeight: FontWeight.w500,
@@ -635,7 +635,7 @@ class _QuickStatsSection extends ConsumerWidget {
     );
 
     final streakLabel = streakAsync.maybeWhen(
-      data: (streak) => '${streak.currentStreak}일',
+      data: (streak) => AppStrings.parentHomeDaysFormat(streak.currentStreak),
       orElse: () => null,
     );
 
@@ -645,7 +645,7 @@ class _QuickStatsSection extends ConsumerWidget {
           child: StatCard(
             icon: Icons.calendar_today,
             title: AppStrings.parentHomeWeeklyLesson,
-            value: weeklyLessonCount == null ? '-' : '$weeklyLessonCount회',
+            value: weeklyLessonCount == null ? '-' : AppStrings.parentHomeLessonCountFormat(weeklyLessonCount),
             color: AppColors.paperAccent,
           ),
         ),
@@ -846,7 +846,7 @@ class _PracticeStreakSection extends ConsumerWidget {
           title: AppStrings.parentHomeThisWeekPractice,
           icon: Icons.local_fire_department,
           trailing: Text(
-            '${practicedDays.length}일 연습',
+            AppStrings.parentHomePracticedDaysFormat(practicedDays.length),
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.paperOk,
               fontWeight: FontWeight.w600,
@@ -1046,7 +1046,7 @@ class _PaymentStatusSection extends ConsumerWidget {
                     style: AppTypography.bodyMedium,
                   ),
                   Text(
-                    '$totalRemaining회',
+                    AppStrings.parentHomeLessonCountFormat(totalRemaining),
                     style: AppTypography.headingSmall.copyWith(
                       color: AppColors.paperAccent,
                     ),

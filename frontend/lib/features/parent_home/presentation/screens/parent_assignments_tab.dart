@@ -322,7 +322,7 @@ class _SectionHeader extends StatelessWidget {
             borderRadius: BorderRadius.zero,
           ),
           child: Text(
-            '$count개',
+            AppStrings.countItemsSuffix(count),
             style: AppTypography.caption.copyWith(
               color: color,
               fontWeight: FontWeight.bold,
@@ -494,11 +494,11 @@ color: AppColors.inkSecondary,
   String _getPriorityLabel() {
     switch (priority) {
       case AssignmentPriority.must:
-        return '필수';
+        return AppStrings.parentHomePriorityMust;
       case AssignmentPriority.should:
-        return '권장';
+        return AppStrings.parentHomePriorityShould;
       case AssignmentPriority.could:
-        return '선택';
+        return AppStrings.parentHomePriorityCould;
     }
   }
 
