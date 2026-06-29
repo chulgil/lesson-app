@@ -86,6 +86,18 @@ class HiveRecordingRepository implements RecordingRepository {
       }
 
       await box.delete(id);
+
+      // #749: if the representative was deleted, promote the most recent
+      // remaining recording in the same repertoire so it never loses one.
+      if (recording.isRepresentative) {
+        final heir = Recording.pickRepresentativeHeir(
+          box.values.where((r) => r.repertoireId == recording.repertoireId),
+        );
+        if (heir != null) {
+          await box.put(heir.id, heir.copyWith(isRepresentative: true));
+        }
+      }
+
       await box.flush();
     }
   }
