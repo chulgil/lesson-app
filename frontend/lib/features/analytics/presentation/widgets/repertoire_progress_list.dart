@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/analytics_models.dart';
+import '../extensions/repertoire_status_visuals.dart';
 
 // ignore: widget-smoke-test
 /// Displays a list of repertoire pieces with completion status.
@@ -56,11 +57,9 @@ class _PieceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (icon, color, label) = switch (piece.status) {
-      RepertoireStatus.completed => (Icons.check_circle, AppColors.paperOk, AppStrings.analyticsRepertoireStatusCompleted),
-      RepertoireStatus.inProgress => (Icons.play_circle_outline, AppColors.paperAccent, AppStrings.analyticsRepertoireStatusInProgress),
-      RepertoireStatus.planned => (Icons.radio_button_unchecked, AppColors.inkQuaternary, AppStrings.analyticsRepertoireStatusPlanned),
-    };
+    final icon = piece.status.icon;
+    final color = piece.status.color;
+    final label = piece.status.label;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
