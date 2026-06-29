@@ -402,7 +402,7 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             if (availableProfiles.contains(ProfileType.parent))
               _ProfileTile(
                 label: AppStrings.parentHomeParentLabel,
-                subtitle: '자녀 관리',
+                subtitle: AppStrings.parentHomeChildManagement,
                 icon: ProfileType.parent.icon,
                 color: ProfileType.parent.color,
                 isSelected: userProfile.activeProfile == ProfileType.parent,

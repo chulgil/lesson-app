@@ -219,7 +219,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   AddChildOption(
                     icon: Icons.child_care,
                     iconColor: AppColors.paperAccent,
-                    title: '만 14세 미만 자녀 등록',
+                    title: AppStrings.parentHomeRegisterMinorChild,
                     description: '별도 계정 없이 학부모 계정에서 관리',
                     onTap: () {
                       Navigator.pop(context);
@@ -235,7 +235,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   AddChildOption(
                     icon: Icons.link,
                     iconColor: AppColors.paperAccent,
-                    title: '기존 학생 연결',
+                    title: AppStrings.parentHomeConnectExistingStudent,
                     description: '초대 코드로 만 14세 이상 학생 계정 연결',
                     onTap: () {
                       Navigator.pop(context);

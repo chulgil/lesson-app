@@ -6959,6 +6959,13 @@ class AppStrings {
   static const parentHomeRegularLesson = '정규 레슨';
   static const parentHomeTodayPractice = '오늘의 연습';
   static const parentHomeFindTeacher = '선생님 찾기';
+  static const parentHomeRegisterMinorChild = '만 14세 미만 자녀 등록';
+  static const parentHomeConnectExistingStudent = '기존 학생 연결';
+  static const parentHomeLessonNotificationSubtitle = '일정 변경, 취소 알림';
+  static const parentHomePracticeNotificationSubtitle = '연습 완료, 스트릭 달성';
+  static const parentHomePaymentNotificationSubtitle = '입금 안내, 입금 확인 (필수)';
+  static const parentHomeSwitchChild = '자녀 전환';
+  static const parentHomeDeleteChildProfile = '자녀 프로필 삭제';
   static const parentHomeInviteCode = '초대코드 입력';
   static const parentHomeWeeklyPractice = '이번 주 연습';
   static const parentHomeConnect = '연결';

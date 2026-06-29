@@ -42,7 +42,7 @@ class ParentPaymentsTab extends ConsumerWidget {
           IconButton(
             onPressed: () => _showChildSelector(context, ref, parentId),
             icon: const Icon(Icons.swap_horiz),
-            tooltip: '자녀 전환',
+            tooltip: AppStrings.parentHomeSwitchChild,
           ),
         ],
       ),
