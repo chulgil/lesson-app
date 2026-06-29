@@ -382,7 +382,6 @@ class PracticeService:
         offset: int,
         student_id: str | None = None,
         include_archived: bool = False,
-        date: str | None = None,
     ) -> PaginatedResponse[RepertoireResponse]:
         """List repertoires with filters."""
         from app.models.practice import PracticeRepertoire

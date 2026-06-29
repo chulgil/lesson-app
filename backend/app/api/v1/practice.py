@@ -420,7 +420,6 @@ async def list_repertoires(
     pagination: Annotated[dict, Depends(get_pagination)],
     student_id: str | None = None,
     include_archived: bool = False,
-    repertoire_date: str | None = None,
 ) -> PaginatedResponse[RepertoireResponse]:
     """List repertoires for a student."""
     service = PracticeService(db)
@@ -431,7 +430,6 @@ async def list_repertoires(
         offset=pagination["offset"],
         student_id=student_id,
         include_archived=include_archived,
-        date=repertoire_date,
     )
 
 
