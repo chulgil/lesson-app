@@ -1,11 +1,13 @@
 import '../../../gamification/domain/entities/challenge.dart';
 import '../../../gamification/domain/entities/daily_practice.dart';
+import '../../../gamification/domain/entities/daily_practice_effort.dart';
 import '../../../gamification/domain/repositories/growth_heatmap_repository.dart';
 import '../../../gamification/domain/repositories/student_quest_repository.dart';
 import '../../../practice_journal/domain/entities/practice_mark.dart';
 import '../../../practice_journal/domain/journal_thresholds.dart';
 import '../../../practice_journal/domain/repositories/practice_journal_repository.dart';
 import '../entities/practice_evidence.dart';
+import '../entities/practice_evidence_effort.dart';
 
 /// 모든 연습 evidence 의 단일 진입점 서비스.
 ///
@@ -64,20 +66,8 @@ class PracticeRecordingService {
     }
   }
 
-  DailyPractice _toDailyPractice(PracticeEvidence evidence) {
-    switch (evidence.source) {
-      case PracticeSource.metronome:
-        return DailyPractice(metronomeMinutes: evidence.durationMinutes);
-      case PracticeSource.tuner:
-        return DailyPractice(tunerMinutes: evidence.durationMinutes);
-      case PracticeSource.youtube:
-        return DailyPractice(youtubeMinutes: evidence.durationMinutes);
-      case PracticeSource.manual:
-        return DailyPractice(manualMinutes: evidence.durationMinutes);
-      case PracticeSource.recording:
-        return const DailyPractice(recordingCount: 1);
-    }
-  }
+  DailyPractice _toDailyPractice(PracticeEvidence evidence) =>
+      evidence.source.effortSource.toDailyPractice(evidence.durationMinutes);
 
   Future<void> _bumpPracticeMinutesQuests(String studentId, int minutes) async {
     if (minutes <= 0) return;
