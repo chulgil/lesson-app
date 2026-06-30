@@ -11,6 +11,11 @@ class AppRoutes {
   static const parentInviteCode = '/parent/invite-code';
   static const studentInviteCode = '/student/invite-code';
 
+  /// 분야(Discipline) 선택 — 멀티 Discipline 가입 첫 단계(#977).
+  /// 등록 분야가 1개(music)면 RoleSelect 게이트에서 auto-skip 되어 도달하지
+  /// 않는다. Phase 4 에서 2번째 분야 등록 시 활성화.
+  static const disciplineSelection = '/discipline-select';
+
   // Teacher onboarding routes
   static const teacherPhoneVerification = '/onboarding/phone-verification';
   static const teacherProfileSetup = '/onboarding/profile-setup';

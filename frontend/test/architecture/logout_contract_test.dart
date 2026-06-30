@@ -36,17 +36,37 @@ void main() {
     // signup-blocked screen until carrier-based age-14 identity verification
     // (PASS) is integrated. Direct student signup is blocked, NOT routed to
     // profile setup. Policy: phone_verification_policy.md §3.2.
-    final source =
+    //
+    // #977: the role -> onboarding mapping is the SSOT UserRole.onboardingRoute,
+    // shared by RoleSelectScreen's discipline gate and DisciplineSelectionScreen.
+    // The student arm must still resolve to studentSignupBlocked, and
+    // RoleSelectScreen must route onboarding through that SSOT (no bypass).
+    final mapping =
+        File(
+          'lib/features/auth/presentation/extensions/user_role_visuals.dart',
+        ).readAsStringSync();
+
+    final studentCase = RegExp(
+      r'case UserRole\.student:[\s\S]*?return AppRoutes\.studentSignupBlocked;',
+      multiLine: true,
+    );
+
+    expect(
+      mapping,
+      matches(studentCase),
+      reason: 'onboardingRoute student arm must stay studentSignupBlocked',
+    );
+
+    final roleSelect =
         File(
           'lib/features/auth/presentation/screens/role_select_screen.dart',
         ).readAsStringSync();
 
-    final studentCase = RegExp(
-      r'case UserRole\.student:[\s\S]*?context\.go\(AppRoutes\.studentSignupBlocked\);',
-      multiLine: true,
+    expect(
+      roleSelect.contains('context.go(role.onboardingRoute)'),
+      isTrue,
+      reason: 'RoleSelectScreen must route onboarding through the SSOT',
     );
-
-    expect(source, matches(studentCase));
   });
 
   test('auth identity changes clear the offline response cache', () {
