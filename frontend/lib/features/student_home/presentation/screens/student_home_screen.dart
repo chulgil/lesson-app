@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/center_action_slot.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart'
     show getStartupRecoveryResult, clearStartupRecoveryResult;
@@ -117,8 +118,12 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
             children: [
               _buildNavItem(0, 'I', AppStrings.navHome),
               _buildNavItem(1, 'II', AppStrings.navLessons),
-              // Center practice button (same level as other items)
-              const PracticeCenterButton(size: 48),
+              // Center practice button via discipline-neutral slot (#975).
+              // Music injects the action; null slots stay unwrapped (see
+              // CenterActionSlot doc) so non-music shells do not shift.
+              const CenterActionSlot(
+                centerAction: PracticeCenterButton(size: 48),
+              ),
               _buildNavItem(2, 'III', AppStrings.navPractice),
               _buildNavItem(3, 'IV', AppStrings.navProfile),
             ],
