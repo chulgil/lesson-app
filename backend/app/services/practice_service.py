@@ -855,17 +855,18 @@ class PracticeService:
     # ------------------------------------------------------------------
 
     async def get_streak(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
-        """Get current and longest streak."""
-        from app.models.practice import PracticeStreak
+        """Get current and longest streak, recomputed from practice logs (SSOT)."""
+        from app.services.streak_service import compute_streak
 
         sid = student_id or current_user.id
         await self._assert_can_read_student(sid, current_user)
-        streak = await self.db.scalar(
-            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+        summary = await compute_streak(self.db, sid)
+        return PracticeStreakResponse(
+            student_id=sid,
+            current_streak=summary.current,
+            longest_streak=summary.longest,
+            last_practice_date=summary.last_date,
         )
-        if streak is None:
-            return PracticeStreakResponse()
-        return PracticeStreakResponse.model_validate(streak)
 
     async def update_streak(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
         """Ensure a streak row exists and return it."""
@@ -920,7 +921,8 @@ class PracticeService:
         """Get monthly practice statistics from DailyPracticeStatus."""
         from datetime import date as date_cls
 
-        from app.models.practice import DailyPracticeStatus, PracticeRepertoire, PracticeSection, PracticeStreak
+        from app.models.practice import DailyPracticeStatus, PracticeRepertoire, PracticeSection
+        from app.services.streak_service import compute_streak
 
         sid = student_id or current_user.id
         await self._assert_can_read_student(sid, current_user)
@@ -969,16 +971,14 @@ class PracticeService:
         )
         total_minutes = (total_minutes_result or 0) // 60
 
-        streak = await self.db.scalar(
-            select(PracticeStreak).where(PracticeStreak.student_id == sid)
-        )
+        summary = await compute_streak(self.db, sid)
 
         return PracticeStatsResponse(
             total_practice_minutes=total_minutes,
             total_practice_days=len(daily_map),
             completed_sections=completed_sections,
-            current_streak=streak.current_streak if streak else 0,
-            longest_streak=streak.longest_streak if streak else 0,
+            current_streak=summary.current,
+            longest_streak=summary.longest,
             daily_stats=daily_map,
         )
 
