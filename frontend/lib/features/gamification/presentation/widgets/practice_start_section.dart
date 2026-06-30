@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../practice/practice_facade.dart' show practiceStreakProvider;
 import '../../../practice/practice_ui_facade.dart' show PracticeToolsModal;
 import '../../../students/students_facade.dart' show studentProvider;
 import '../providers/growth_heatmap_provider.dart';
@@ -25,6 +26,7 @@ class PracticeStartSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final studentAsync = ref.watch(studentProvider(studentId));
     final heatmapAsync = ref.watch(growthHeatmapProvider(studentId));
+    final streakAsync = ref.watch(practiceStreakProvider(studentId));
 
     final name = studentAsync.value?.nickname ?? studentAsync.value?.name ?? '';
     final heatmap = heatmapAsync.value;
@@ -32,7 +34,8 @@ class PracticeStartSection extends ConsumerWidget {
     final today = DateTime.utc(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final yesterdayMinutes = heatmap?.days[yesterday]?.totalMinutes ?? 0;
-    final streakDays = heatmap?.streakDays(today) ?? 0;
+    // 표시 streak 은 SSOT(practiceStreakProvider) — KST/grace, 전 화면 일치 (G3 PR-C2).
+    final streakDays = streakAsync.value?.currentStreak ?? 0;
 
     return PracticeStartCard(
       studentName: name,
@@ -55,18 +58,17 @@ class PracticeStartSection extends ConsumerWidget {
     if (!context.mounted) return;
     if (practicedMinutes == null || practicedMinutes <= 0) return;
 
-    // heatmap 은 stop hook 의 logger 호출 결과로 갱신됨 — 최신 streak 조회.
+    // recordPractice hub 가 heatmap+practice-logs 양쪽을 갱신 → 두 provider 무효화.
+    // 표시 streak 은 SSOT(practiceStreakProvider), heatmap 은 viz 갱신용. (G3 PR-C2)
     ref.invalidate(growthHeatmapProvider(studentId));
-    final heatmap = await ref.read(growthHeatmapProvider(studentId).future);
-    final now = DateTime.now().toUtc();
-    final today = DateTime.utc(now.year, now.month, now.day);
-    final streak = heatmap.streakDays(today);
+    ref.invalidate(practiceStreakProvider(studentId));
+    final streak = await ref.read(practiceStreakProvider(studentId).future);
 
     if (!context.mounted) return;
     await _showCelebration(
       context,
       practiceMinutes: practicedMinutes,
-      streakDays: streak,
+      streakDays: streak.currentStreak,
     );
   }
 
