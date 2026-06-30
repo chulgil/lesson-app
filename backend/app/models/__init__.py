@@ -92,7 +92,6 @@ from app.models.practice import (  # noqa: F401
     PracticeRecording,
     PracticeRepertoire,
     PracticeSection,
-    PracticeStreak,
     RecordingFeedback,
     StudentPracticePiece,
 )
