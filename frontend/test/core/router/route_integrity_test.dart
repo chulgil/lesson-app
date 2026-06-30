@@ -46,6 +46,7 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.splash,
     AppRoutes.login,
     AppRoutes.roleSelect,
+    AppRoutes.disciplineSelection,
     AppRoutes.parentInviteCode,
     AppRoutes.studentInviteCode,
     AppRoutes.teacherPhoneVerification,
@@ -206,6 +207,7 @@ const _registeredTemplates = <String>{
   // auth_routes.dart
   '/login',
   '/role-select',
+  '/discipline-select',
   '/parent/invite-code',
   '/student/invite-code',
   '/onboarding/phone-verification',
@@ -402,6 +404,7 @@ Map<String, String> get _appRoutesMap {
     'splash': AppRoutes.splash,
     'login': AppRoutes.login,
     'roleSelect': AppRoutes.roleSelect,
+    'disciplineSelection': AppRoutes.disciplineSelection,
     'parentInviteCode': AppRoutes.parentInviteCode,
     'studentInviteCode': AppRoutes.studentInviteCode,
     'teacherPhoneVerification': AppRoutes.teacherPhoneVerification,

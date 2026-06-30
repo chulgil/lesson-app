@@ -8,6 +8,8 @@ import '../../../features/auth/presentation/screens/academy_invite_accept_screen
 import '../../../features/auth/presentation/screens/academy_invite_expired_screen.dart';
 import '../../../features/auth/presentation/screens/login_screen.dart';
 import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
+import '../../../features/auth/domain/entities/user_role.dart';
+import '../../../features/auth/presentation/screens/discipline_selection_screen.dart';
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
 import '../../../features/auth/presentation/screens/splash_screen.dart';
 import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
@@ -47,6 +49,17 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.roleSelect,
     name: 'roleSelect',
     builder: (context, state) => const RoleSelectScreen(),
+  ),
+
+  // Discipline Selection (#977) — multi-discipline sign-up step. With the
+  // single music discipline this is auto-skipped by RoleSelectScreen's gate,
+  // so it stays dead until a 2nd discipline registers (Phase 4). `extra`
+  // carries the chosen UserRole to continue to role onboarding.
+  GoRoute(
+    path: AppRoutes.disciplineSelection,
+    name: 'disciplineSelection',
+    builder: (context, state) =>
+        DisciplineSelectionScreen(role: state.extra as UserRole?),
   ),
 
   // Parent Invite Code

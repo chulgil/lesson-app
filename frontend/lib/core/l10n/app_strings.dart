@@ -10279,6 +10279,13 @@ class AppStrings {
   static const roleSelectParentDesc = '자녀의 레슨과 연습을 확인';
   static const roleSelectConsentRequired = '필수 약관에 동의하면 역할을 선택할 수 있어요.';
 
+  // Discipline Select (#977) — 멀티 Discipline 가입 첫 단계.
+  static const disciplineSelectTitle = '분야 선택';
+  static const disciplineSelectSubtitle = '시작할 분야를 선택해 주세요.';
+
+  /// music 분야 표시명 (Discipline.displayKey 'discipline.music').
+  static const disciplineMusic = '음악';
+
   // Student Invite Code
   static const inviteCodeScreenDesc = '선생님으로부터 받은\n초대 코드를 입력해주세요';
   static const inviteCodeValidationEmpty = '초대 코드를 입력해주세요';
