@@ -1,26 +1,20 @@
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_stats_repository.dart';
+import '../../domain/services/streak_calculator.dart';
+import '../mock/mock_practice_logs.dart';
 
 /// Mock implementation for practice stats repository
 class MockPracticeStatsRepository implements PracticeStatsRepository {
   final bool _empty;
 
+  /// Shared mock practice logs so the streak shown here matches every other
+  /// mock surface (single source of truth — docs/specs/practice/streak_ssot.md).
+  final Map<String, List<PracticeLog>> _practiceLogs = buildMockPracticeLogs();
+
   MockPracticeStatsRepository({bool empty = false}) : _empty = empty;
 
-  /// Student-specific streak data (varies per student)
-  Map<String, (int current, int max)> get _streakByStudent => {
-    'student_1': (5, 12),
-    'student_2': (6, 14),
-    'student_3': (3, 8),
-    'student_4': (1, 1),  // trial student
-    'student_5': (4, 9),
-    'student_11': (7, 21), // model student
-    'student_12': (2, 5),
-  };
-
-  (int current, int max) _getStreak(String studentId) {
-    return _streakByStudent[studentId] ?? (0, 0);
-  }
+  StreakSummary _streakFor(String studentId) =>
+      StreakCalculator.fromLogs(_practiceLogs[studentId] ?? const []);
 
   @override
   Future<PracticeStatsReport> getWeeklyReport(
@@ -113,7 +107,7 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       ),
     ];
 
-    final streak = _getStreak(studentId);
+    final streak = _streakFor(studentId);
     return PracticeStatsReport(
       startDate: normalizedStart,
       endDate: endDate,
@@ -124,8 +118,8 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       totalSectionCount: 12,
       dailyStats: dailyStats,
       repertoireStats: repertoireStats,
-      currentStreak: streak.$1,
-      maxStreak: streak.$2,
+      currentStreak: streak.currentStreak,
+      maxStreak: streak.longestStreak,
     );
   }
 
@@ -250,7 +244,7 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       ),
     ];
 
-    final streak = _getStreak(studentId);
+    final streak = _streakFor(studentId);
     return PracticeStatsReport(
       startDate: startDate,
       endDate: endDate,
@@ -262,8 +256,8 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       dailyStats: dailyStats,
       repertoireStats: repertoireStats,
       weeklyStats: weeklyStats,
-      currentStreak: streak.$1,
-      maxStreak: streak.$2 > streak.$1 ? streak.$2 + 3 : streak.$2, // monthly max slightly higher
+      currentStreak: streak.currentStreak,
+      maxStreak: streak.longestStreak,
     );
   }
 
