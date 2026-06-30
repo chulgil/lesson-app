@@ -19,6 +19,9 @@ class PracticeSummarySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
+    // Streak comes from the single source of truth (practiceStreakProvider) —
+    // never recomputed here. See docs/specs/practice/streak_ssot.md.
+    final streakAsync = ref.watch(practiceStreakProvider(studentId));
 
     final now = DateTime.now();
     // Monday of current week
@@ -27,34 +30,16 @@ class PracticeSummarySection extends ConsumerWidget {
     final sundayDate = mondayDate.add(const Duration(days: 6));
 
     // Default values
-    var streakDays = 0;
+    final streakDays = streakAsync.maybeWhen(
+      data: (streak) => streak.currentStreak,
+      orElse: () => 0,
+    );
     var weeklyTotalMinutes = 0;
     var weeklyPracticedDays = 0;
     var weeklyProgress = List.filled(7, 0.0);
 
     final logs = practiceLogsAsync.valueOrNull;
     if (logs != null && logs.isNotEmpty) {
-      // Calculate streak: consecutive days from today going backwards
-      final sortedLogs = [...logs]..sort((a, b) => b.date.compareTo(a.date));
-      final practicedDates = <String>{};
-      for (final log in sortedLogs) {
-        if (log.totalMinutes > 0) {
-          final d = log.date;
-          practicedDates.add('${d.year}-${d.month}-${d.day}');
-        }
-      }
-
-      var checkDate = DateTime(now.year, now.month, now.day);
-      for (var i = 0; i < 100; i++) {
-        final key = '${checkDate.year}-${checkDate.month}-${checkDate.day}';
-        if (practicedDates.contains(key)) {
-          streakDays++;
-          checkDate = checkDate.subtract(const Duration(days: 1));
-        } else {
-          break;
-        }
-      }
-
       // Weekly stats
       for (final log in logs) {
         final logDate = DateTime(log.date.year, log.date.month, log.date.day);

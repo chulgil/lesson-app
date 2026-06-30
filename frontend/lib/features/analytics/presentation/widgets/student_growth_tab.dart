@@ -11,6 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart' as dfmt;
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../practice/practice_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../providers/analytics_providers.dart';
@@ -191,6 +192,12 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
   Widget _buildSummaryCards(StudentProgressData progress) {
     final prPct = (progress.practiceAchievementRate * 100).toStringAsFixed(1);
     final arPct = (progress.attendanceRate * 100).toStringAsFixed(1);
+    // Streak comes from the single source of truth (practiceStreakProvider) via
+    // the practice facade — not progress.practiceStreakDays. The cross-feature
+    // dependency goes through the facade. See docs/specs/practice/streak_ssot.md.
+    final streakDays = ref
+        .watch(practiceStreakProvider(progress.studentId))
+        .maybeWhen(data: (s) => s.currentStreak, orElse: () => 0);
 
     return Row(
       children: [
@@ -221,7 +228,7 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
         Expanded(
           child: _MiniStatCard(
             label: AppStrings.analyticsStreakLabel,
-            value: AppStrings.analyticsStreakDaysFormat(progress.practiceStreakDays),
+            value: AppStrings.analyticsStreakDaysFormat(streakDays),
             color: AppColors.amber,
           ),
         ),
