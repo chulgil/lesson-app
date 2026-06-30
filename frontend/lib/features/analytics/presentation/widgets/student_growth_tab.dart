@@ -193,8 +193,8 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
     final prPct = (progress.practiceAchievementRate * 100).toStringAsFixed(1);
     final arPct = (progress.attendanceRate * 100).toStringAsFixed(1);
     // Streak comes from the single source of truth (practiceStreakProvider) via
-    // the practice facade — not progress.practiceStreakDays. The cross-feature
-    // dependency goes through the facade. See docs/specs/practice/streak_ssot.md.
+    // the practice facade. The cross-feature dependency goes through the facade.
+    // See docs/specs/practice/streak_ssot.md.
     final streakDays = ref
         .watch(practiceStreakProvider(progress.studentId))
         .maybeWhen(data: (s) => s.currentStreak, orElse: () => 0);

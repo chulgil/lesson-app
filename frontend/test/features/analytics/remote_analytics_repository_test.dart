@@ -107,7 +107,6 @@ void main() {
                   'total_lessons': 8,
                   'practice_achievement_rate': 75.0,
                   'total_practice_minutes': 420,
-                  'practice_streak_days': 12,
                 },
               ),
             );
@@ -131,7 +130,6 @@ void main() {
       expect(student.totalLessons, 8);
       expect(student.practiceAchievementRate, 75.0);
       expect(student.totalPracticeMinutes, 420);
-      expect(student.practiceStreakDays, 12);
     },
   );
 }
