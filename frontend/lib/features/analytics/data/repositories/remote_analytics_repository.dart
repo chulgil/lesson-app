@@ -45,7 +45,6 @@ class RemoteAnalyticsRepository implements AnalyticsRepository {
       practiceAchievementRate:
           ((data['practice_achievement_rate'] as num?) ?? 0).toDouble(),
       totalPracticeMinutes: (data['total_practice_minutes'] as int?) ?? 0,
-      practiceStreakDays: (data['practice_streak_days'] as int?) ?? 0,
       weeklyPractice: const [],
       attendanceCalendar: const [],
       repertoire: const [],

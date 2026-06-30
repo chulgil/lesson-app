@@ -91,7 +91,6 @@ class StudentProgressData {
   final int totalLessons;
   final double practiceAchievementRate; // 0.0 ~ 1.0
   final int totalPracticeMinutes;
-  final int practiceStreakDays;
   final List<WeeklyPracticePoint> weeklyPractice;
   final List<AttendanceDay> attendanceCalendar;
   final List<RepertoirePiece> repertoire;
@@ -107,7 +106,6 @@ class StudentProgressData {
     required this.totalLessons,
     required this.practiceAchievementRate,
     required this.totalPracticeMinutes,
-    required this.practiceStreakDays,
     required this.weeklyPractice,
     required this.attendanceCalendar,
     required this.repertoire,

@@ -87,9 +87,6 @@ class MockAnalyticsRepository implements AnalyticsRepository {
       totalLessons: 24,
       practiceAchievementRate: 0.78,
       totalPracticeMinutes: 2040,
-      // Streak is sourced from practiceStreakProvider (SSOT), not this field.
-      // See docs/specs/practice/streak_ssot.md.
-      practiceStreakDays: 0,
       weeklyPractice: [
         WeeklyPracticePoint(
           weekStart: DateTime(2026, 3, 4),
