@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/domain/value_objects/discipline_registry.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../data/repositories/mock_teacher_search_repository.dart';
 import '../../data/repositories/remote_teacher_search_repository.dart';
 import '../../domain/repositories/teacher_search_repository.dart';
+import '../../domain/value_objects/provider_search_facet.dart';
 
 part 'teacher_search_provider.g.dart';
 
@@ -176,7 +178,13 @@ Future<List<TeacherPublicProfile>> featuredTeachers(Ref ref) async {
 @riverpod
 Future<List<String>> availableInstruments(Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
-  return repo.getAvailableInstruments();
+  // Discipline-keyed facet resolution (#976): music's instruments facet resolves
+  // to the same teacher-scan source — byte-identical. A future discipline (Phase 4)
+  // registers its own facet without touching this provider.
+  final resolver = ProviderSearchFacetRegistry.byId(
+    DisciplineRegistry.music.expertiseCatalogId,
+  );
+  return resolver == null ? const <String>[] : resolver(repo);
 }
 
 /// Available areas for filter
