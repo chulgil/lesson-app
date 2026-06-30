@@ -8,6 +8,7 @@ import '../../../practice_journal/domain/journal_thresholds.dart';
 import '../../../practice_journal/domain/repositories/practice_journal_repository.dart';
 import '../entities/practice_evidence.dart';
 import '../entities/practice_evidence_effort.dart';
+import '../repositories/practice_repository.dart';
 
 /// 모든 연습 evidence 의 단일 진입점 서비스.
 ///
@@ -28,10 +29,16 @@ class PracticeRecordingService {
   /// 연습장(practice_journal) 도장 파생용. 미연결 시 null — 회귀 안전.
   final PracticeJournalRepository? journalRepository;
 
+  /// 스트릭 SSOT 동기화용 — 연습일을 practice-logs store 에도 반영해
+  /// practiceStreakProvider(표시 SSOT) 가 새 연습을 읽도록 한다 (G3 PR-C2).
+  /// 미연결 시 null — best-effort, 본경로(heatmap/quest) 회귀 안전.
+  final PracticeRepository? practiceRepository;
+
   const PracticeRecordingService({
     required this.heatmapRepository,
     required this.questRepository,
     this.journalRepository,
+    this.practiceRepository,
   });
 
   Future<void> recordPractice(
@@ -60,6 +67,18 @@ class PracticeRecordingService {
       await journalRepository?.upsertMark(studentId, date, journalIntensity);
     } catch (_) {
       // 도장 파생 실패는 조용히 무시 — 본경로는 계속 진행한다.
+    }
+    // 스트릭 SSOT 동기화: 연습일(minutes>0)을 practice-logs store 에도 반영해
+    // practiceStreakProvider(표시 SSOT)가 새 연습을 읽도록 한다 (G3 PR-C2).
+    // recording(0분)은 연습일 아님(스펙 §1 minutes 게이트)→ 제외. best-effort —
+    // 실패가 본경로(heatmap/quest)를 막지 않도록 가드.
+    if (evidence.source != PracticeSource.recording &&
+        evidence.durationMinutes > 0) {
+      try {
+        await practiceRepository?.recordPractice(studentId);
+      } catch (_) {
+        // streak 동기화 실패는 조용히 무시 — 본경로는 계속 진행한다.
+      }
     }
     if (evidence.source != PracticeSource.recording) {
       await _bumpPracticeMinutesQuests(studentId, evidence.durationMinutes);

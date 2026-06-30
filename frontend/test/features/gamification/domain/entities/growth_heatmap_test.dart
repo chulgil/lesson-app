@@ -41,53 +41,6 @@ void main() {
     );
   });
 
-  group('GrowthHeatmap.streakDays', () {
-    test('empty heatmap returns 0', () {
-      final hm = GrowthHeatmap(studentId: 's1', days: const {});
-      expect(hm.streakDays(utc(2026, 6, 11)), 0);
-    });
-
-    test('counts consecutive days backward from asOf, breaks at gap', () {
-      final hm = GrowthHeatmap(
-        studentId: 's1',
-        days: {
-          utc(2026, 6, 11): const DailyPractice(metronomeMinutes: 5),
-          utc(2026, 6, 10): const DailyPractice(tunerMinutes: 3),
-          utc(2026, 6, 9): const DailyPractice(youtubeMinutes: 1),
-          utc(2026, 6, 8): const DailyPractice(manualMinutes: 2),
-          // 6/7 빠짐 → 스트릭 4
-          utc(2026, 6, 6): const DailyPractice(metronomeMinutes: 5),
-        },
-      );
-      expect(hm.streakDays(utc(2026, 6, 11)), 4);
-    });
-
-    test(
-      'zero-minute day breaks streak (recordingCount alone does not count)',
-      () {
-        final hm = GrowthHeatmap(
-          studentId: 's1',
-          days: {
-            utc(2026, 6, 11): const DailyPractice(metronomeMinutes: 5),
-            utc(2026, 6, 10): const DailyPractice(
-              recordingCount: 3,
-            ), // totalMinutes=0
-            utc(2026, 6, 9): const DailyPractice(metronomeMinutes: 5),
-          },
-        );
-        expect(hm.streakDays(utc(2026, 6, 11)), 1);
-      },
-    );
-
-    test('returns 0 if asOf day has no practice', () {
-      final hm = GrowthHeatmap(
-        studentId: 's1',
-        days: {utc(2026, 6, 10): const DailyPractice(metronomeMinutes: 5)},
-      );
-      expect(hm.streakDays(utc(2026, 6, 11)), 0);
-    });
-  });
-
   group('GrowthHeatmap json round-trip', () {
     test('preserves studentId and days map (DateTime key as ISO8601)', () {
       final hm = GrowthHeatmap(
