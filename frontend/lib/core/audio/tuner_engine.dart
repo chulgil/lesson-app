@@ -3,28 +3,34 @@
 
 import 'package:lessonaza/features/practice/domain/entities/tuner_types.dart';
 
+import 'signal_gauge_tool.dart';
+
 /// Callback type for pitch detection events.
 typedef OnPitchDetected = void Function(TunerNote? note);
 
 /// Callback type for tuner error events.
 typedef OnTunerError = void Function(String message);
 
-/// Abstract interface for tuner engines.
+/// Abstract interface for tuner engines — the music (discipline 0)
+/// [SignalGaugeTool].
+///
+/// Extends the discipline-neutral signal-gauge contract (active state +
+/// start/stop/toggle/dispose lifecycle) with the tuner's pitch surface:
+/// note stream, current note, reference frequency, sensitivity and the
+/// microphone keep-warm controls (#978). A future fitness/language gauge
+/// registers its own [SignalGaugeTool] without importing this interface.
 ///
 /// Implementations can use different pitch detection algorithms:
 /// - FFT-based (Fast Fourier Transform)
 /// - Autocorrelation
 /// - YIN algorithm
 /// - McLeod Pitch Method
-abstract class TunerEngine {
+abstract class TunerEngine extends SignalGaugeTool {
   /// Stream of detected notes.
   ///
   /// Emits null when no clear pitch is detected.
   /// Emits a [TunerNote] when a pitch is detected.
   Stream<TunerNote?> get noteStream;
-
-  /// Whether the engine is currently listening for audio.
-  bool get isListening;
 
   /// Current detected note (null if none).
   TunerNote? get currentNote;
@@ -49,25 +55,6 @@ abstract class TunerEngine {
   /// Returns true if initialization was successful.
   /// Returns false if microphone permission was denied.
   Future<bool> init();
-
-  /// Start listening for audio input.
-  ///
-  /// The engine will begin emitting notes through [noteStream].
-  Future<void> start();
-
-  /// Stop listening for audio input.
-  ///
-  /// The [noteStream] will stop emitting notes.
-  Future<void> stop();
-
-  /// Toggle between listening and stopped states.
-  Future<void> toggle() async {
-    if (isListening) {
-      await stop();
-    } else {
-      await start();
-    }
-  }
 
   /// Warm up the engine by starting the audio stream without processing.
   ///
@@ -106,11 +93,6 @@ abstract class TunerEngine {
 
   /// Whether pitch processing is enabled.
   bool get isProcessingEnabled => isListening;
-
-  /// Clean up resources.
-  ///
-  /// Must be called when the engine is no longer needed.
-  void dispose();
 
   /// Callback for pitch detection events.
   OnPitchDetected? onPitchDetected;
