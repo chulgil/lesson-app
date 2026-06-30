@@ -1,39 +1,22 @@
 import '../../features/practice/domain/entities/metronome_settings.dart';
+import 'pace_cue_engine.dart';
 
-/// Callback for beat events.
-typedef BeatCallback = void Function(int beatNumber, bool isAccent);
+// Re-export so existing importers of this file keep seeing [BeatCallback]
+// (it moved to pace_cue_engine.dart as a discipline-neutral concept, #974).
+export 'pace_cue_engine.dart' show BeatCallback;
 
-/// Abstract interface for metronome engines.
+/// Music (discipline 0) metronome engine — the music [PaceCueEngine].
 ///
-/// Implemented by [NativeMetronomeEngine] (platform-specific AudioTrack/AVAudioEngine)
-/// and [SoLoudMetronomeEngine] (macOS).
-abstract class MetronomeEngineInterface {
-  /// Whether the metronome is currently playing.
-  bool get isPlaying;
-
-  /// Current beat number (1-based).
-  int get currentBeat;
-
+/// Extends the discipline-neutral pace contract (lifecycle + beat callback) with
+/// the metronome's BPM / time-signature / sound surface (#974). Implemented by
+/// [NativeMetronomeEngine] (platform-specific AudioTrack/AVAudioEngine) and
+/// [SoLoudMetronomeEngine] (macOS).
+abstract class MetronomeEngineInterface extends PaceCueEngine {
   /// Current settings.
   MetronomeSettings get settings;
 
-  /// Callback for beat events.
-  BeatCallback? onBeat;
-
-  /// Initialize the engine.
-  Future<void> init();
-
   /// Update settings.
   Future<void> updateSettings(MetronomeSettings newSettings);
-
-  /// Start the metronome.
-  Future<void> start();
-
-  /// Stop the metronome.
-  Future<void> stop();
-
-  /// Toggle play/stop.
-  Future<void> toggle();
 
   /// Set BPM.
   Future<void> setBpm(int bpm);
@@ -43,7 +26,4 @@ abstract class MetronomeEngineInterface {
 
   /// Play a single tap sound (for tap tempo feedback).
   Future<void> playTapSound();
-
-  /// Dispose resources.
-  Future<void> dispose();
 }
