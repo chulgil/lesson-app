@@ -12,12 +12,10 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
 import '../../../gamification/gamification_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
-import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
 import '../../../students/students_facade.dart';
-import '../providers/student_home_practice_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
@@ -303,14 +301,11 @@ class _StudentTimeBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final practiceLogsAsync = ref.watch(
-      studentHomePracticeLogsProvider(studentId),
-    );
-
-    // 학생은 streak 중심 메시지로 충분 — booking→Lesson 매핑 생략.
-    final streakDays = practiceLogsAsync.valueOrNull != null
-        ? _calculateStreak(practiceLogsAsync.value!)
-        : 0;
+    // Streak from the single source of truth (practiceStreakProvider) — never
+    // recomputed here. See docs/specs/practice/streak_ssot.md.
+    final streakDays = ref
+        .watch(practiceStreakProvider(studentId))
+        .maybeWhen(data: (streak) => streak.currentStreak, orElse: () => 0);
 
     return TimeContextBanner(
       todayLessons: const <Lesson>[],
@@ -319,31 +314,6 @@ class _StudentTimeBanner extends ConsumerWidget {
     );
   }
 
-  /// 최근 연속 연습일 계산 (오늘부터 역순으로 연속된 연습일).
-  int _calculateStreak(List<PracticeLog> logs) {
-    if (logs.isEmpty) return 0;
-    final now = DateTime.now();
-    final practicedDates = <String>{};
-    for (final log in logs) {
-      if (log.totalMinutes > 0) {
-        practicedDates.add(_dateKey(log.date));
-      }
-    }
-    var streak = 0;
-    var checkDate = DateTime(now.year, now.month, now.day);
-    for (var i = 0; i < 100; i++) {
-      if (practicedDates.contains(_dateKey(checkDate))) {
-        streak++;
-        checkDate = checkDate.subtract(const Duration(days: 1));
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }
-
-  String _dateKey(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
 /// 학생용 이벤트 그룹.
