@@ -2,222 +2,28 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_repository.dart';
+import '../../domain/services/streak_calculator.dart';
+import '../mock/mock_practice_logs.dart';
 
 /// Mock implementation for development
 class MockPracticeRepository implements PracticeRepository {
   final _uuid = const Uuid();
   final Map<String, List<PracticeLog>> _logs = {};
-  final Map<String, PracticeStreak> _streaks = {};
 
   MockPracticeRepository() {
-    _initMockData();
+    _logs.addAll(buildMockPracticeLogs());
   }
 
-  void _initMockData() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    // Varied practice task templates
-    final taskTemplates = [
-      ('음계 연습', 10, true),
-      ('활 연습', 15, true),
-      ('에튀드 #3', 20, true),
-      ('비브라토 연습', 10, false),
-      ('시창·청음', 10, true),
-      ('곡 통주', 25, false),
-      ('포지션 이동', 15, true),
-      ('스타카토 연습', 10, true),
-      ('레가토 보잉', 15, false),
-      ('리듬 훈련', 10, true),
-    ];
-
-    // Helper to create a practice log for a given day offset
-    PracticeLog makeLog(String studentId, int daysAgo, int minutes) {
-      final date = today.subtract(Duration(days: daysAgo));
-      // Pick 1-3 tasks based on hash of studentId + daysAgo
-      final seed = studentId.hashCode + daysAgo * 7;
-      final taskCount = (seed.abs() % 3) + 1;
-      final tasks = <PracticeTask>[];
-      for (int i = 0; i < taskCount; i++) {
-        final idx = (seed.abs() + i * 13) % taskTemplates.length;
-        final (title, target, completed) = taskTemplates[idx];
-        tasks.add(PracticeTask(
-          id: _uuid.v4(),
-          title: title,
-          targetMinutes: target,
-          isCompleted: completed,
-          completedAt: completed ? date : null,
-        ));
-      }
-      return PracticeLog(
-        id: _uuid.v4(),
-        studentId: studentId,
-        date: date,
-        totalMinutes: minutes,
-        tasks: tasks,
-        createdAt: date,
-      );
-    }
-
-    // student_1 (김민준): 이번 주 5/7일 연습
-    for (final d in [0, 1, 2, 3, 5]) {
-      _logs.putIfAbsent('student_1', () => []);
-      _logs['student_1']!.add(makeLog('student_1', d, 30));
-    }
-
-    // student_2 (이서연): 이번 주 6/7일 연습
-    for (final d in [0, 1, 2, 3, 4, 6]) {
-      _logs.putIfAbsent('student_2', () => []);
-      _logs['student_2']!.add(makeLog('student_2', d, 45));
-    }
-
-    // student_3 (박지호): 이번 주 3/7일 연습
-    for (final d in [0, 2, 4]) {
-      _logs.putIfAbsent('student_3', () => []);
-      _logs['student_3']!.add(makeLog('student_3', d, 20));
-    }
-
-    // student_4 (최유진): 체험 - 1/7일
-    _logs.putIfAbsent('student_4', () => []);
-    _logs['student_4']!.add(makeLog('student_4', 1, 15));
-
-    // student_5 (정다은): 이번 주 4/7일 연습
-    for (final d in [0, 1, 3, 5]) {
-      _logs.putIfAbsent('student_5', () => []);
-      _logs['student_5']!.add(makeLog('student_5', d, 25));
-    }
-
-    // student_11 (이하은): 이번 주 7/7일 연습 (모범생)
-    for (final d in [0, 1, 2, 3, 4, 5, 6]) {
-      _logs.putIfAbsent('student_11', () => []);
-      _logs['student_11']!.add(makeLog('student_11', d, 40));
-    }
-
-    // student_12 (박준혁): 이번 주 2/7일 연습
-    for (final d in [1, 4]) {
-      _logs.putIfAbsent('student_12', () => []);
-      _logs['student_12']!.add(makeLog('student_12', d, 15));
-    }
-  }
-
-  /// Check if a date is a weekend (Saturday or Sunday)
-  bool _isWeekend(DateTime date) {
-    return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
-  }
-
-  /// Check if all days between two dates are weekends
-  /// Returns true if streak should continue (gap is only weekends)
-  bool _isGapOnlyWeekends(DateTime newerDate, DateTime olderDate) {
-    final daysDiff = newerDate.difference(olderDate).inDays;
-    if (daysDiff <= 1) return true; // Consecutive days
-
-    // Check each day in the gap
-    for (int i = 1; i < daysDiff; i++) {
-      final gapDate = olderDate.add(Duration(days: i));
-      if (!_isWeekend(gapDate)) {
-        return false; // Found a weekday in the gap
-      }
-    }
-    return true; // Gap only contains weekends
-  }
-
-  /// Check if streak is still active considering weekend exclusion
-  bool _isStreakActive(DateTime lastPracticeDate, DateTime today) {
-    final daysSince = today.difference(lastPracticeDate).inDays;
-    if (daysSince <= 1) return true; // Same day or yesterday
-
-    // Check if gap is only weekends
-    return _isGapOnlyWeekends(today, lastPracticeDate);
-  }
-
-  PracticeStreak _calculateStreak(String studentId) {
-    final logs = _logs[studentId] ?? [];
-    if (logs.isEmpty) {
-      return PracticeStreak(
-        id: 'streak_$studentId',
-        studentId: studentId,
-        currentStreak: 0,
-        longestStreak: 0,
-        lastPracticeDate: null,
-        updatedAt: DateTime.now(),
-      );
-    }
-
-    // Sort logs by date descending
-    final sortedLogs = List<PracticeLog>.from(logs)
-      ..sort((a, b) => b.date.compareTo(a.date));
-
-    // Find consecutive practice days
-    int currentStreak = 0;
-    int longestStreak = 0;
-    DateTime? lastPracticeDate;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    // Get all practice dates with actual practice
-    final practiceDates = sortedLogs
-        .where((log) => log.totalMinutes > 0 || log.tasks.any((t) => t.isCompleted))
-        .map((log) => DateTime(log.date.year, log.date.month, log.date.day))
-        .toSet()
-        .toList()
-      ..sort((a, b) => b.compareTo(a));
-
-    if (practiceDates.isEmpty) {
-      return PracticeStreak(
-        id: 'streak_$studentId',
-        studentId: studentId,
-        currentStreak: 0,
-        longestStreak: 0,
-        lastPracticeDate: null,
-        updatedAt: DateTime.now(),
-      );
-    }
-
-    lastPracticeDate = practiceDates.first;
-
-    // Calculate current streak with weekend exclusion
-    // Streak is active if practiced today, yesterday, or gap is only weekends
-    if (_isStreakActive(lastPracticeDate, today)) {
-      currentStreak = 1;
-
-      for (int i = 1; i < practiceDates.length; i++) {
-        final currentDate = practiceDates[i - 1];
-        final previousDate = practiceDates[i];
-
-        // Check if streak continues (consecutive or gap is only weekends)
-        if (_isGapOnlyWeekends(currentDate, previousDate)) {
-          currentStreak++;
-        } else {
-          break; // Streak broken by weekday gap
-        }
-      }
-    }
-
-    // Calculate longest streak with weekend exclusion
-    int tempStreak = 1;
-    for (int i = 0; i < practiceDates.length - 1; i++) {
-      final currentDate = practiceDates[i];
-      final previousDate = practiceDates[i + 1];
-
-      if (_isGapOnlyWeekends(currentDate, previousDate)) {
-        tempStreak++;
-      } else {
-        if (tempStreak > longestStreak) {
-          longestStreak = tempStreak;
-        }
-        tempStreak = 1;
-      }
-    }
-    if (tempStreak > longestStreak) {
-      longestStreak = tempStreak;
-    }
-
+  /// Recompute the streak from the student's logs on every read (self-healing),
+  /// using the single shared algorithm. See docs/specs/practice/streak_ssot.md.
+  PracticeStreak _toStreak(String studentId) {
+    final summary = StreakCalculator.fromLogs(_logs[studentId] ?? const []);
     return PracticeStreak(
       id: 'streak_$studentId',
       studentId: studentId,
-      currentStreak: currentStreak,
-      longestStreak: longestStreak > currentStreak ? longestStreak : currentStreak,
-      lastPracticeDate: lastPracticeDate,
+      currentStreak: summary.currentStreak,
+      longestStreak: summary.longestStreak,
+      lastPracticeDate: summary.lastPracticeDate,
       updatedAt: DateTime.now(),
     );
   }
@@ -243,14 +49,18 @@ class MockPracticeRepository implements PracticeRepository {
 
   @override
   Future<PracticeLog?> getPracticeLogByDate(
-      String studentId, DateTime date) async {
+    String studentId,
+    DateTime date,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final logs = _logs[studentId] ?? [];
     try {
-      return logs.firstWhere((l) =>
-          l.date.year == date.year &&
-          l.date.month == date.month &&
-          l.date.day == date.day);
+      return logs.firstWhere(
+        (l) =>
+            l.date.year == date.year &&
+            l.date.month == date.month &&
+            l.date.day == date.day,
+      );
     } catch (_) {
       return null;
     }
@@ -258,7 +68,10 @@ class MockPracticeRepository implements PracticeRepository {
 
   @override
   Future<Map<DateTime, PracticeLog>> getPracticeLogsByMonth(
-      String studentId, int year, int month) async {
+    String studentId,
+    int year,
+    int month,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final logs = _logs[studentId] ?? [];
     final result = <DateTime, PracticeLog>{};
@@ -273,16 +86,19 @@ class MockPracticeRepository implements PracticeRepository {
 
   @override
   Future<PracticeStats> getPracticeStats(
-      String studentId, int year, int month) async {
+    String studentId,
+    int year,
+    int month,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final logs = _logs[studentId] ?? [];
     final monthLogs = logs.where(
-        (l) => l.date.year == year && l.date.month == month);
+      (l) => l.date.year == year && l.date.month == month,
+    );
 
     final totalDays = DateTime(year, month + 1, 0).day;
     final practicedDays = monthLogs.where((l) => l.totalMinutes > 0).length;
-    final totalMinutes =
-        monthLogs.fold(0, (sum, l) => sum + l.totalMinutes);
+    final totalMinutes = monthLogs.fold(0, (sum, l) => sum + l.totalMinutes);
 
     return PracticeStats(
       year: year,
@@ -306,21 +122,20 @@ class MockPracticeRepository implements PracticeRepository {
 
     return List.generate(7, (index) {
       final date = monday.add(Duration(days: index));
-      return logs.any((l) =>
-          l.date.year == date.year &&
-          l.date.month == date.month &&
-          l.date.day == date.day &&
-          l.totalMinutes > 0);
+      return logs.any(
+        (l) =>
+            l.date.year == date.year &&
+            l.date.month == date.month &&
+            l.date.day == date.day &&
+            l.totalMinutes > 0,
+      );
     });
   }
 
   @override
   Future<PracticeLog> createPracticeLog(PracticeLog log) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    final newLog = log.copyWith(
-      id: _uuid.v4(),
-      createdAt: DateTime.now(),
-    );
+    final newLog = log.copyWith(id: _uuid.v4(), createdAt: DateTime.now());
     _logs.putIfAbsent(log.studentId, () => []);
     _logs[log.studentId]!.add(newLog);
     return newLog;
@@ -395,30 +210,13 @@ class MockPracticeRepository implements PracticeRepository {
   @override
   Future<PracticeStreak> getStreak(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-
-    if (_streaks.containsKey(studentId)) {
-      return _streaks[studentId]!;
-    }
-
-    // Create new streak for student
-    final streak = PracticeStreak(
-      id: 'streak_$studentId',
-      studentId: studentId,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastPracticeDate: null,
-      updatedAt: DateTime.now(),
-    );
-    _streaks[studentId] = streak;
-    return streak;
+    return _toStreak(studentId);
   }
 
   @override
   Future<PracticeStreak> updateStreak(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    final streak = _calculateStreak(studentId);
-    _streaks[studentId] = streak;
-    return streak;
+    return _toStreak(studentId);
   }
 
   @override
