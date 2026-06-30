@@ -9,13 +9,17 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/practice/practice_facade.dart'
     show metronomeProvider;
 import '../providers/tuner_provider.dart';
-import 'practice_tools/metronome_panel.dart';
-import 'practice_tools/tuner_panel.dart';
-import 'tuner/tuner_settings_sheet.dart';
+import 'practice_tools/music_practice_tools.dart';
+import 'practice_tools/practice_tool.dart';
 
 /// Practice tools modal with tab-based navigation between Metronome and Tuner.
 class PracticeToolsModal extends ConsumerStatefulWidget {
-  const PracticeToolsModal({super.key, this.initialTab = 0, this.studentId});
+  const PracticeToolsModal({
+    super.key,
+    this.initialTab = 0,
+    this.studentId,
+    this.tools,
+  });
 
   /// Initial tab index (0 = Metronome, 1 = Tuner)
   final int initialTab;
@@ -23,6 +27,12 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
   /// 학생 컨텍스트. null 이면 메트로놈 stop 시 [PracticeSourceLoggers] 트리거 안 함.
   /// 학생 게이미피케이션 P1 — Job 7 라우팅 진입점에서 주입.
   final String? studentId;
+
+  /// Injectable practice-tool set. Defaults to [musicPracticeTools] (Phase 3 =
+  /// music only). A Phase 4 (#979) discipline-keyed registry resolves this; the
+  /// [show] entry point keeps its byte-identical signature, so callers never
+  /// pass it today.
+  final List<PracticeTool>? tools;
 
   /// 메트로놈 stop 시 [studentId] 가 주어졌고 측정된 분이 1 이상이면
   /// modal 이 자동으로 닫히면서 그 분 수를 반환한다. 그 외 경우 (튜너 사용,
@@ -48,14 +58,17 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
 class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
+  late final List<PracticeTool> _tools;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    _tools = widget.tools ?? musicPracticeTools;
+
     _tabController = TabController(
-      length: 2,
+      length: _tools.length,
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -92,6 +105,11 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     super.dispose();
   }
 
+  // NOTE (#973): the tuner microphone lifecycle handlers below are
+  // music-specific and assume the tuner is `_tools[1]` (the music tool order:
+  // metronome, tuner). Per-tool lifecycle hooks are a Phase 4 (#979) concern;
+  // this slice only makes the visual tab structure tool-driven and leaves these
+  // handlers verbatim, so music behaviour is byte-identical.
   /// Handle tab changes - toggle tuner processing (instant, no blocking)
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) return;
@@ -186,17 +204,21 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                     unselectedLabelStyle: AppTypography.headingSmall.copyWith(
                       fontWeight: FontWeight.normal,
                     ),
-                    tabs: const [Tab(text: '메트로놈'), Tab(text: '튜너')],
+                    tabs: [
+                      for (final tool in _tools) Tab(text: tool.displayLabel),
+                    ],
                   ),
                 ),
                 // Settings button for tuner
                 AnimatedBuilder(
                   animation: _tabController,
                   builder: (context, child) {
-                    return _tabController.index == 1
+                    final onShowSettings =
+                        _tools[_tabController.index].onShowSettings;
+                    return onShowSettings != null
                         ? IconButton(
                           icon: const Icon(Icons.settings_outlined),
-                          onPressed: () => TunerSettingsSheet.show(context),
+                          onPressed: () => onShowSettings(context),
                           constraints: const BoxConstraints(
                             minWidth: 40,
                             minHeight: 40,
@@ -216,8 +238,8 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
               controller: _tabController,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                MetronomePanel(studentId: widget.studentId),
-                const TunerPanel(),
+                for (final tool in _tools)
+                  tool.panelBuilder(context, widget.studentId),
               ],
             ),
           ),
