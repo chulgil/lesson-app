@@ -12,11 +12,10 @@ const _boxName = 'selected_discipline';
 /// Persists the coaching discipline the user chose at sign-up (#979-A, Phase 4).
 ///
 /// User-scoped (mirrors `OnboardingProgressStorage`): the Hive key carries the
-/// current user id, so choices never cross-contaminate between accounts. With
-/// music as the only registered discipline the selection screen auto-skips, so
-/// nothing is persisted yet and [build] returns null — [activeDiscipline] then
-/// falls back to music (byte-identical). Phase 4 (#979-B) registers a 2nd
-/// discipline, the selection screen goes live, and this stores the choice.
+/// current user id, so choices never cross-contaminate between accounts. Live
+/// since #979-B registered fitness: the selection screen is shown at sign-up
+/// and this stores the pick. Before a pick (or for legacy sessions) [build]
+/// returns null and [activeDiscipline] falls back to music.
 @Riverpod(keepAlive: true)
 class SelectedDisciplineStorage extends _$SelectedDisciplineStorage {
   @override
@@ -41,9 +40,9 @@ class SelectedDisciplineStorage extends _$SelectedDisciplineStorage {
 ///
 /// Resolves the persisted [SelectedDisciplineStorage] id through
 /// [DisciplineRegistry], falling back to music for null / legacy / unknown ids
-/// (including while the async storage is still loading). Music-only today, so
-/// this always resolves to music = byte-identical; it is the seam the practice
-/// tools modal reads to pick a discipline's tool set.
+/// (including while the async storage is still loading). Resolves to music or
+/// fitness today (#979-B); it is the seam the practice tools modal reads to
+/// pick a discipline's tool set.
 @riverpod
 Discipline activeDiscipline(ActiveDisciplineRef ref) {
   final id = ref.watch(selectedDisciplineStorageProvider).valueOrNull;
