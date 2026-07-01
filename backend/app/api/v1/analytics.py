@@ -29,7 +29,9 @@ router = APIRouter()
 async def get_monthly_stats(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
-    month: str,
+    # 0625 §20 N17 — 경계 검증: YYYY-MM(1900~2099, 01~12)만 허용 → malformed 입력은 422 (500 방지)
+    # Pydantic v2(Rust regex)는 look-around 미지원 → 연도 범위로 0000 등 무효 datetime 차단
+    month: Annotated[str, Query(pattern=r"^(19|20)\d{2}-(0[1-9]|1[0-2])$")],
 ) -> TeacherMonthlyStatsResponse:
     service = AnalyticsService(db)
     return await service.get_monthly_stats(current_user, month)

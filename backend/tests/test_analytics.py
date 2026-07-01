@@ -165,3 +165,23 @@ async def test_monthly_stats_returns_six_month_lesson_trend_for_frontend_contrac
         {"month": "2026-04-01T00:00:00", "lesson_count": 0, "revenue": 150000},
         {"month": "2026-05-01T00:00:00", "lesson_count": 1, "revenue": 200000},
     ]
+
+
+@pytest.mark.asyncio
+async def test_monthly_stats_rejects_malformed_month_with_422(
+    client, auth_headers, create_test_user
+):
+    """Malformed month query returns 422, not an opaque 500 (0625 §20 N17)."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    bad = await client.get(
+        "/api/v1/analytics/monthly-stats?month=abc",
+        headers=auth_headers,
+    )
+    assert bad.status_code == 422
+
+    out_of_range = await client.get(
+        "/api/v1/analytics/monthly-stats?month=2026-13",
+        headers=auth_headers,
+    )
+    assert out_of_range.status_code == 422
