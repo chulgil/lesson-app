@@ -1020,6 +1020,22 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             .toList(),
         message: result.message.isEmpty ? null : result.message,
       );
+      // #541 — 제안 이벤트를 상대에게 알림 (응답 3종과 대칭, 비동기 핸드오프)
+      final fromTeacher = actorRole == ProposerRole.teacher;
+      final opponentId = fromTeacher ? request.studentId : request.teacherId;
+      if (opponentId.isNotEmpty) {
+        unawaited(
+          ref
+              .read(notificationServiceProvider)
+              .showNotification(
+                BookingNotificationService.createScheduleChangeProposed(
+                  userId: opponentId,
+                  fromTeacher: fromTeacher,
+                  data: {'requestId': request.id},
+                ),
+              ),
+        );
+      }
       if (context.mounted) {
         _showSuccess(AppStrings.scheduleChangePropose);
       }
