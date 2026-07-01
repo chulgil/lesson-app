@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -17,7 +18,6 @@ import '../../../../core/utils/image_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/auth/auth_facade.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
-import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';
 
 typedef OnboardingProfileImageSaver =
@@ -216,6 +216,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   void _showInstrumentSelector() {
+    // #1071: list the active discipline's expertise catalog (music =
+    // instruments, byte-identical), not a hardcoded music list.
+    final items =
+        ExpertiseCatalogRegistry.forDiscipline(
+          ref.read(activeDisciplineProvider),
+        ).items;
     showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -223,6 +229,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       padding: EdgeInsets.zero,
       builder:
           (context) => _InstrumentSelectorSheet(
+            items: items,
             selectedInstruments: _selectedInstruments,
             onSelectionChanged: (instruments) {
               setState(() => _selectedInstruments = instruments);
@@ -632,10 +639,12 @@ class _ProgressDivider extends StatelessWidget {
 }
 
 class _InstrumentSelectorSheet extends StatefulWidget {
+  final List<String> items;
   final List<String> selectedInstruments;
   final ValueChanged<List<String>> onSelectionChanged;
 
   const _InstrumentSelectorSheet({
+    required this.items,
     required this.selectedInstruments,
     required this.onSelectionChanged,
   });
@@ -700,9 +709,9 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
           // Instrument list
           Expanded(
             child: ListView.builder(
-              itemCount: InstrumentList.all.length,
+              itemCount: widget.items.length,
               itemBuilder: (context, index) {
-                final instrument = InstrumentList.all[index];
+                final instrument = widget.items[index];
                 final isSelected = _selected.contains(instrument);
 
                 return ListTile(

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
+import 'package:lessonaza/features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import 'package:lessonaza/features/onboarding/presentation/screens/profile_setup_screen.dart';
 
 void main() {
@@ -36,6 +39,11 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          overrides: [
+            activeDisciplineProvider.overrideWith(
+              (ref) => DisciplineRegistry.music,
+            ),
+          ],
           child: MaterialApp(
             theme: AppTheme.light,
             home: const ProfileSetupScreen(),
@@ -81,6 +89,11 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [
+          activeDisciplineProvider.overrideWith(
+            (ref) => DisciplineRegistry.music,
+          ),
+        ],
         child: MaterialApp(
           theme: AppTheme.light,
           home: const ProfileSetupScreen(),

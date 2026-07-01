@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/providers/repository_provider.dart';
@@ -13,10 +14,10 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../../features/profile/domain/entities/teacher_settings.dart';
+import '../../../../features/auth/auth_facade.dart';
 import '../../../students/students_facade.dart';
 
-// instruments unified to InstrumentList.all (catalog SSOT, §16) — was #920 split
+// instruments come from the active discipline's ExpertiseCatalog (#1071) — was #920 split
 
 /// Student profile setup screen for student onboarding (step 1 of 2)
 class StudentProfileSetupScreen extends ConsumerStatefulWidget {
@@ -101,11 +102,20 @@ class _StudentProfileSetupScreenState
   }
 
   void _showInstrumentSelector() {
+    // #1071: list the active discipline's expertise catalog (music =
+    // instruments, byte-identical), not a hardcoded music list.
+    final items =
+        ExpertiseCatalogRegistry.forDiscipline(
+          ref.read(activeDisciplineProvider),
+        ).items;
     showNotebookModalBottomSheet<void>(
       context: context,
+      // #1071: scroll-controlled so the full expertise list is reachable —
+      // the non-scrollable chip Wrap otherwise clips/overflows a short modal.
+      isScrollControlled: true,
       builder:
           (context) => _InstrumentSelectorSheet(
-            instruments: InstrumentList.all,
+            instruments: items,
             selectedInstrument: _selectedInstrument,
             onSelected: (instrument) {
               setState(() => _selectedInstrument = instrument);
