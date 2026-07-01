@@ -1,4 +1,5 @@
 import '../../../../../core/domain/value_objects/discipline_registry.dart';
+import 'fitness_practice_tools.dart';
 import 'music_practice_tools.dart';
 import 'practice_tool.dart';
 
@@ -18,6 +19,7 @@ class PracticeToolRegistry {
   /// #979-B: fitness) registers its own tool list here as one map entry.
   static final Map<String, List<PracticeTool>> _byId = {
     DisciplineRegistry.music.id: musicPracticeTools,
+    DisciplineRegistry.fitness.id: fitnessPracticeTools,
   };
 
   /// The tools registered for [disciplineId]; null if none registered.
@@ -28,6 +30,6 @@ class PracticeToolRegistry {
   static List<PracticeTool> forDiscipline(String disciplineId) =>
       _byId[disciplineId] ?? musicPracticeTools;
 
-  /// All registered discipline ids (music: `music`).
+  /// All registered discipline ids (music, fitness) — #979-B.
   static Iterable<String> get registeredDisciplineIds => _byId.keys;
 }

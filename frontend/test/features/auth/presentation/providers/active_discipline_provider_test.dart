@@ -8,8 +8,8 @@ import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/auth/presentation/providers/active_discipline_provider.dart';
 
 /// #979-A — persisted discipline selection + derived active discipline.
-/// Music-only today, so [activeDiscipline] always resolves to music (fallback),
-/// keeping the practice tools byte-identical.
+/// #979-B registers fitness, so [activeDiscipline] resolves the persisted id
+/// (music or fitness), falling back to music for null / legacy / unknown ids.
 void main() {
   late Directory tempDir;
 
@@ -79,12 +79,24 @@ void main() {
       expect(container.read(activeDisciplineProvider), DisciplineRegistry.music);
     });
 
-    test('falls back to music for an unregistered persisted id', () async {
-      // Guards Phase 4 (#979-B): a stale / unknown id must not break resolution.
+    test('resolves the persisted fitness discipline (#979-B)', () async {
       final container = containerFor('user_a');
       await container
           .read(selectedDisciplineStorageProvider.notifier)
           .select('fitness');
+      await container.read(selectedDisciplineStorageProvider.future);
+      expect(
+        container.read(activeDisciplineProvider),
+        DisciplineRegistry.fitness,
+      );
+    });
+
+    test('falls back to music for an unregistered persisted id', () async {
+      // A stale / unknown id must not break resolution.
+      final container = containerFor('user_a');
+      await container
+          .read(selectedDisciplineStorageProvider.notifier)
+          .select('language');
       await container.read(selectedDisciplineStorageProvider.future);
       expect(
         container.read(activeDisciplineProvider),

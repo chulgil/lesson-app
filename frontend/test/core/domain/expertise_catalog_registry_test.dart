@@ -22,7 +22,20 @@ void main() {
         ExpertiseCatalogRegistry.byId('instruments'),
         same(ExpertiseCatalogRegistry.music),
       );
-      expect(ExpertiseCatalogRegistry.byId('fitness'), isNull);
+      expect(
+        ExpertiseCatalogRegistry.byId('specialties'),
+        same(ExpertiseCatalogRegistry.fitness),
+      );
+      expect(ExpertiseCatalogRegistry.byId('unknown'), isNull);
+    });
+
+    test('fitness 카탈로그 = id specialties, 3종 (웨이트/필라테스/PT) (#979-B)', () {
+      expect(ExpertiseCatalogRegistry.fitness.id, 'specialties');
+      expect(ExpertiseCatalogRegistry.fitness.items, ['웨이트', '필라테스', 'PT']);
+      expect(
+        ExpertiseCatalogRegistry.forDiscipline(DisciplineRegistry.fitness),
+        same(ExpertiseCatalogRegistry.fitness),
+      );
     });
 
     test('forDiscipline(music) → music 카탈로그 (expertiseCatalogId 경유)', () {
