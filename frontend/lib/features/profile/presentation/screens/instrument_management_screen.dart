@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
@@ -10,7 +11,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
-import '../../../../features/profile/domain/entities/teacher_settings.dart';
+import '../../../../features/auth/auth_facade.dart';
 import '../../../onboarding/onboarding_facade.dart';
 import '../../../settings/settings_facade.dart';
 
@@ -249,9 +250,9 @@ class _InstrumentManagementScreenState
   Widget _buildAddInstrumentSection(List<String> currentInstruments) {
     // Filter out already added instruments
     final availableInstruments =
-        InstrumentList.all
-            .where((i) => !currentInstruments.contains(i))
-            .toList();
+        ExpertiseCatalogRegistry.forDiscipline(
+          ref.read(activeDisciplineProvider),
+        ).items.where((i) => !currentInstruments.contains(i)).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

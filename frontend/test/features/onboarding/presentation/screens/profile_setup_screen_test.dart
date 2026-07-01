@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/auth/auth_state.dart';
+import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
@@ -64,7 +65,14 @@ void main() {
   }) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: overrides,
+        overrides: [
+          // #1071: the instrument picker now reads the active discipline;
+          // pin it to music (what these tests exercise) so it never hits Hive.
+          activeDisciplineProvider.overrideWith(
+            (ref) => DisciplineRegistry.music,
+          ),
+          ...overrides,
+        ],
         child: MaterialApp(
           theme: AppTheme.light,
           home: const ProfileSetupScreen(),
