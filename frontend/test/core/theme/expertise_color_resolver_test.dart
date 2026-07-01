@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/domain/value_objects/discipline.dart';
+import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/expertise_color_resolver.dart';
 import 'package:lessonaza/core/utils/instrument_colors.dart';
@@ -147,5 +148,17 @@ void main() {
       expect(ExpertiseColorResolverRegistry.byId('instruments'), isNotNull);
       expect(ExpertiseColorResolverRegistry.byId('subjects'), isNull);
     });
+
+    test(
+      'forDiscipline(fitness) returns the palette-only fallback (#979-B)',
+      () {
+        // Fitness registers no bespoke resolver, so its specialty tags
+        // (웨이트/필라테스/PT) resolve via the shared palette (#980 "폴백").
+        final resolver = ExpertiseColorResolverRegistry.forDiscipline(
+          DisciplineRegistry.fitness,
+        );
+        expect(resolver.catalogId, '_fallback');
+      },
+    );
   });
 }

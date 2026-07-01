@@ -67,6 +67,12 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
   /// without a tuner (Phase 4 / #979-B: fitness) never touches [tunerProvider].
   late final int _tunerIndex;
 
+  /// Index of the metronome tool within [_tools], or -1 if this discipline has
+  /// no metronome. The pre-warm gates on this so a discipline without a
+  /// metronome (Phase 4 / #979-B: fitness) never spins up the music metronome
+  /// audio engine. Music has the metronome at index 0, so it warms as before.
+  late final int _metronomeIndex;
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +88,9 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
           ref.read(activeDisciplineProvider).id,
         );
     _tunerIndex = _tools.indexWhere((tool) => tool.id == PracticeToolIds.tuner);
+    _metronomeIndex = _tools.indexWhere(
+      (tool) => tool.id == PracticeToolIds.metronome,
+    );
 
     _tabController = TabController(
       length: _tools.length,
@@ -95,7 +104,12 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     // Pre-warm metronome and tuner only when tuner tab is opened.
     // Tuner should keep microphone inactive unless user enters tuner mode.
     Future.microtask(() {
-      ref.read(metronomeProvider.notifier).warmUp();
+      // Only warm the metronome for disciplines that expose it (music at
+      // index 0). A discipline without a metronome (#979-B: fitness) must not
+      // spin up the music metronome audio engine.
+      if (_metronomeIndex >= 0) {
+        ref.read(metronomeProvider.notifier).warmUp();
+      }
 
       if (_tunerIndex >= 0 && widget.initialTab == _tunerIndex) {
         unawaited(_activateTunerProcessing());

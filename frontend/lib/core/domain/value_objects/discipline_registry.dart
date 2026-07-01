@@ -20,9 +20,21 @@ class DisciplineRegistry {
     expertiseCatalogId: 'instruments',
   );
 
+  /// Fitness (헬스 / GX) discipline — Phase 4 (#979-B). The second registered
+  /// vertical; adding it is pure data (this const + the append below), so the
+  /// music vertical stays pixel-identical. expertiseCatalog = specialties
+  /// (웨이트/필라테스/PT). themeColorSeed is provisional — no consumer reads it
+  /// yet, and the fitness brand palette is a later design decision.
+  static const Discipline fitness = Discipline(
+    id: 'fitness',
+    displayKey: 'discipline.fitness',
+    themeColorSeed: 0xFF2E7D32,
+    expertiseCatalogId: 'specialties',
+  );
+
   /// All registered disciplines, in registration order (music first).
-  /// Adding a vertical = append here (Phase 4+: fitness, language).
-  static const List<Discipline> _registered = <Discipline>[music];
+  /// Adding a vertical = append here (Phase 5+: language).
+  static const List<Discipline> _registered = <Discipline>[music, fitness];
 
   static List<Discipline> get all => _registered;
 
