@@ -13,3 +13,5 @@ export 'presentation/providers/user_role_provider.dart'
         currentUserRoleProvider;
 export 'presentation/widgets/phone_verification_gate_modal.dart'
     show PhoneVerificationGate;
+export 'presentation/providers/active_discipline_provider.dart'
+    show activeDisciplineProvider;

@@ -5,6 +5,7 @@ import 'package:lessonaza/features/practice/domain/entities/metronome_settings.d
 import 'package:lessonaza/features/practice/presentation/providers/metronome_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/tuner_provider.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/metronome_panel.dart';
+import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/practice_tool.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools_modal.dart';
 
 import '../../../../test_helper.dart';
@@ -89,6 +90,18 @@ class _NoopTuner extends Notifier<TunerProviderState> implements Tuner {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// A tuner that throws if any member is accessed — proves the modal never reads
+/// the tuner when the active discipline has no tuner tool (#979-A mic gate).
+class _ThrowingTuner extends Notifier<TunerProviderState> implements Tuner {
+  @override
+  TunerProviderState build() => const TunerProviderState();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw StateError(
+    'tunerProvider touched for a non-tuner tool set: ${invocation.memberName}',
+  );
+}
+
 void main() {
   setUpAll(() async {
     await initializeTestEnvironment();
@@ -161,6 +174,62 @@ void main() {
 
     // Tuner tab active from the first frame -> settings button shown at once.
     expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a discipline without a tuner never touches the tuner (mic gate)', (
+    tester,
+  ) async {
+    // Two non-tuner tools (fitness-readiness): _tunerIndex == -1, so tab
+    // changes, lifecycle and teardown must never read tunerProvider. The
+    // metronome warm-up is not gated in #979-A, so it stays stubbed.
+    final tools = <PracticeTool>[
+      PracticeTool(
+        id: 'a',
+        displayLabel: 'A',
+        panelBuilder: (_, __) => const SizedBox(),
+      ),
+      PracticeTool(
+        id: 'b',
+        displayLabel: 'B',
+        panelBuilder: (_, __) => const SizedBox(),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          metronomeProvider.overrideWith(() => _NoopMetronome()),
+          tunerProvider.overrideWith(() => _ThrowingTuner()),
+        ],
+        child: MaterialApp(
+          home: Scaffold(body: PracticeToolsModal(tools: tools)),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    // Two non-tuner tabs, no settings affordance.
+    expect(find.text('A'), findsOneWidget);
+    expect(find.text('B'), findsOneWidget);
+    expect(find.byIcon(Icons.settings_outlined), findsNothing);
+
+    // Switching tabs fires _onTabChanged, which must skip the tuner.
+    await tester.tap(find.text('B'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    // App lifecycle changes fire didChangeAppLifecycleState, which must also
+    // skip the tuner (guards Phase 4 / #979-B tuner-less disciplines).
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    // Tearing the modal down runs deactivate, which must also skip the tuner.
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+
     expect(tester.takeException(), isNull);
   });
 }

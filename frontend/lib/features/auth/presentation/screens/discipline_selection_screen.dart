@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/value_objects/discipline.dart';
@@ -13,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/user_role.dart';
 import '../extensions/discipline_visuals.dart';
 import '../extensions/user_role_visuals.dart';
+import '../providers/active_discipline_provider.dart';
 
 /// Discipline selection — the first sign-up step of the multi-discipline
 /// platform (#977). The user picks a coaching discipline (music today; later
@@ -25,15 +27,24 @@ import '../extensions/user_role_visuals.dart';
 /// [role] (via GoRouter `extra`) is the role chosen on RoleSelectScreen; after a
 /// discipline is picked we continue to that role's onboarding. A null role
 /// (e.g. a direct deep-link) safely restarts at role selection.
-class DisciplineSelectionScreen extends StatelessWidget {
+class DisciplineSelectionScreen extends ConsumerWidget {
   final UserRole? role;
 
   const DisciplineSelectionScreen({super.key, this.role});
 
-  void _onDisciplineSelected(BuildContext context, Discipline discipline) {
-    // Phase 3: the chosen discipline does not yet branch onboarding (music
-    // only). Continue to the role's onboarding; Phase 4 keys onboarding on the
-    // selected discipline.
+  Future<void> _onDisciplineSelected(
+    BuildContext context,
+    WidgetRef ref,
+    Discipline discipline,
+  ) async {
+    // #979-A: persist the chosen discipline so the logged-in session resolves
+    // its active discipline (practice tools, theme, expertise). Music-only today
+    // means RoleSelectScreen auto-skips this screen, so this path stays dormant
+    // until Phase 4 (#979-B) registers a 2nd discipline.
+    await ref
+        .read(selectedDisciplineStorageProvider.notifier)
+        .select(discipline.id);
+    if (!context.mounted) return;
     final selectedRole = role;
     if (selectedRole == null) {
       context.go(AppRoutes.roleSelect);
@@ -43,7 +54,7 @@ class DisciplineSelectionScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final disciplines = DisciplineRegistry.all;
 
     return NotebookScreenScaffold(
@@ -71,7 +82,7 @@ class DisciplineSelectionScreen extends StatelessWidget {
               for (final discipline in disciplines) ...[
                 _DisciplineCard(
                   label: discipline.displayName,
-                  onTap: () => _onDisciplineSelected(context, discipline),
+                  onTap: () => _onDisciplineSelected(context, ref, discipline),
                 ),
                 const SizedBox(height: AppSpacing.space3),
               ],

@@ -6,11 +6,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../features/auth/auth_facade.dart' show activeDisciplineProvider;
 import '../../../../features/practice/practice_facade.dart'
     show metronomeProvider;
 import '../providers/tuner_provider.dart';
 import 'practice_tools/music_practice_tools.dart';
 import 'practice_tools/practice_tool.dart';
+import 'practice_tools/practice_tool_registry.dart';
 
 /// Practice tools modal with tab-based navigation between Metronome and Tuner.
 class PracticeToolsModal extends ConsumerStatefulWidget {
@@ -60,12 +62,26 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
   late TabController _tabController;
   late final List<PracticeTool> _tools;
 
+  /// Index of the tuner tool within [_tools], or -1 if this discipline has no
+  /// tuner. The microphone lifecycle handlers gate on this so a discipline
+  /// without a tuner (Phase 4 / #979-B: fitness) never touches [tunerProvider].
+  late final int _tunerIndex;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _tools = widget.tools ?? musicPracticeTools;
+    // Resolve this session's practice tools from the active discipline (#979-A).
+    // Music is the only registered discipline and its fallback, so this stays a
+    // byte-identical [musicPracticeTools] today. The active discipline is read
+    // only when no explicit [tools] are injected.
+    _tools =
+        widget.tools ??
+        PracticeToolRegistry.forDiscipline(
+          ref.read(activeDisciplineProvider).id,
+        );
+    _tunerIndex = _tools.indexWhere((tool) => tool.id == PracticeToolIds.tuner);
 
     _tabController = TabController(
       length: _tools.length,
@@ -81,7 +97,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
 
-      if (widget.initialTab == 1) {
+      if (_tunerIndex >= 0 && widget.initialTab == _tunerIndex) {
         unawaited(_activateTunerProcessing());
       }
     });
@@ -93,7 +109,9 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     // dispose 가 아닌 deactivate 에 두는 이유: riverpod 3.x 환경에서
     // ConsumerStatefulElement.dispose 가 호출되는 시점에는 ref 가 이미 무효 —
     // 위젯이 element tree 에서 제거되는 deactivate 시점에는 아직 유효.
-    ref.read(tunerProvider.notifier).stopCompletely();
+    if (_tunerIndex >= 0) {
+      ref.read(tunerProvider.notifier).stopCompletely();
+    }
     super.deactivate();
   }
 
@@ -105,17 +123,18 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     super.dispose();
   }
 
-  // NOTE (#973): the tuner microphone lifecycle handlers below are
-  // music-specific and assume the tuner is `_tools[1]` (the music tool order:
-  // metronome, tuner). Per-tool lifecycle hooks are a Phase 4 (#979) concern;
-  // this slice only makes the visual tab structure tool-driven and leaves these
-  // handlers verbatim, so music behaviour is byte-identical.
+  // NOTE (#979-A): the tuner microphone lifecycle handlers below are specific to
+  // the tuner tool. They gate on [_tunerIndex] (the tuner's position within
+  // [_tools], or -1 if absent), so a discipline without a tuner never touches
+  // [tunerProvider]. For the music discipline the tuner is index 1, so behaviour
+  // is byte-identical to the previous hardcoded `== 1` checks.
   /// Handle tab changes - toggle tuner processing (instant, no blocking)
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) return;
+    if (_tunerIndex < 0) return;
 
     final tuner = ref.read(tunerProvider.notifier);
-    if (_tabController.index == 1) {
+    if (_tabController.index == _tunerIndex) {
       // Switching TO tuner tab - warm and enable processing.
       unawaited(_activateTunerProcessing());
     } else {
@@ -125,16 +144,17 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
   }
 
   Future<void> _activateTunerProcessing() async {
-    if (!mounted) return;
+    if (!mounted || _tunerIndex < 0) return;
     final tuner = ref.read(tunerProvider.notifier);
     await tuner.warmUp();
-    if (!mounted || _tabController.index != 1) return;
+    if (!mounted || _tabController.index != _tunerIndex) return;
     await tuner.enableProcessing();
   }
 
   /// Handle app lifecycle changes
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_tunerIndex < 0) return;
     final tuner = ref.read(tunerProvider.notifier);
 
     switch (state) {
@@ -145,7 +165,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
         tuner.onAppPaused();
         break;
       case AppLifecycleState.resumed:
-        if (_tabController.index == 1) {
+        if (_tabController.index == _tunerIndex) {
           // On tuner tab - full resume (permission check + stream restart + enable)
           tuner.onAppResumed();
         } else {
