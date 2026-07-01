@@ -77,10 +77,9 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
   }
 
   void _goToOnboarding(UserRole role) {
-    // Multi-discipline gate (#977): with >1 registered discipline the user
-    // picks a discipline before role onboarding; with the single music
-    // discipline (DisciplineRegistry.all.length == 1) this auto-skips straight
-    // to role onboarding — byte-identical to the prior inline switch.
+    // Multi-discipline gate (#977, live since #979-B): with >1 registered
+    // discipline the user picks a discipline before role onboarding; with a
+    // single discipline this would auto-skip straight to role onboarding.
     if (DisciplineRegistry.all.length > 1) {
       context.go(AppRoutes.disciplineSelection, extra: role);
       return;

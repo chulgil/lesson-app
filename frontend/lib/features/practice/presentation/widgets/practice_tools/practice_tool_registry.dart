@@ -15,8 +15,8 @@ import 'practice_tool.dart';
 class PracticeToolRegistry {
   const PracticeToolRegistry._();
 
-  /// Music (discipline 0): metronome + tuner. A future discipline (Phase 4 /
-  /// #979-B: fitness) registers its own tool list here as one map entry.
+  /// Music (discipline 0): metronome + tuner. Fitness (#979-B) registers its
+  /// own skeleton tool list here as one map entry (see below).
   static final Map<String, List<PracticeTool>> _byId = {
     DisciplineRegistry.music.id: musicPracticeTools,
     DisciplineRegistry.fitness.id: fitnessPracticeTools,

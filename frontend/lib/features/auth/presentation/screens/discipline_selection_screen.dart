@@ -17,12 +17,12 @@ import '../extensions/user_role_visuals.dart';
 import '../providers/active_discipline_provider.dart';
 
 /// Discipline selection — the first sign-up step of the multi-discipline
-/// platform (#977). The user picks a coaching discipline (music today; later
-/// fitness/language) before role onboarding.
+/// platform (#977). The user picks a coaching discipline (music and fitness
+/// today; later language) before role onboarding.
 ///
-/// With the single registered music discipline, RoleSelectScreen's gate
-/// auto-skips here (DisciplineRegistry.all.length == 1), so this screen is dead
-/// until a 2nd discipline registers in Phase 4 — kept intentionally minimal.
+/// Live since #979-B registered fitness: with >1 registered discipline
+/// RoleSelectScreen's gate routes here (music + fitness cards), and the user's
+/// pick is persisted before role onboarding.
 ///
 /// [role] (via GoRouter `extra`) is the role chosen on RoleSelectScreen; after a
 /// discipline is picked we continue to that role's onboarding. A null role
@@ -38,9 +38,8 @@ class DisciplineSelectionScreen extends ConsumerWidget {
     Discipline discipline,
   ) async {
     // #979-A: persist the chosen discipline so the logged-in session resolves
-    // its active discipline (practice tools, theme, expertise). Music-only today
-    // means RoleSelectScreen auto-skips this screen, so this path stays dormant
-    // until Phase 4 (#979-B) registers a 2nd discipline.
+    // its active discipline (practice tools, theme, expertise). Live since #979-B
+    // — RoleSelectScreen routes here once >1 discipline is registered.
     await ref
         .read(selectedDisciplineStorageProvider.notifier)
         .select(discipline.id);
