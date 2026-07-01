@@ -13,6 +13,7 @@ import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
@@ -158,7 +159,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         // Italic serif slogan
         Text(
-          '선생님을 위한 레슨 노트.',
+          '함께 채워가는 레슨 노트.',
           style: NotebookTypography.fine.copyWith(
             color: AppColors.inkSecondary,
             fontWeight: FontWeight.w400,
@@ -260,10 +261,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             child: Text(
               '학부모이신가요?',
-              style: NotebookTypography.hand.copyWith(
-                color: AppColors.paperAccent,
+              style: AppTypography.buttonSmall.copyWith(
+                fontFamily: AppTypography.fontFamily,
+                color: AppColors.inkSecondary,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.paperAccent,
+                decorationColor: AppColors.inkSecondary,
               ),
             ),
           ),
