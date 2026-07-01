@@ -10473,4 +10473,23 @@ class AppStrings {
   static const parentChildNotLinkedSuffix = '은(는) 아직 선생님과 연결되지 않았습니다';
   static const parentChildNotLinkedDesc = '선생님 연결 후 수강권 정보가 표시됩니다';
   static const instrumentManagementEmpty = '등록된 악기가 없습니다';
+
+  // N10: domain enum display labels moved out of domain layer (presentation/extensions).
+  // Relationship status (features/relationship)
+  static const relationshipStatusTrialBooked = '체험 예정';
+  static const relationshipStatusActive = '수강 중';
+  static const relationshipStatusExpired = '수강권 만료';
+  static const relationshipStatusPast = '이전 레슨';
+
+  // Schedule exception type (features/schedule)
+  static const exceptionTypeHoliday = '휴무';
+  static const exceptionTypeVacation = '휴가';
+  static const exceptionTypeAdditionalSlot = '추가 오픈';
+
+  // Practice sort labels (features/practice — shared by section/repertoire sort)
+  static const sortByCreatedDesc = '최신순';
+  static const sortByCreatedAsc = '오래된순';
+  static const sortByMeasureAsc = '마디순';
+  static const sortByLastPracticedDesc = '최근연습순';
+  static const sortByCustom = '사용자지정';
 }

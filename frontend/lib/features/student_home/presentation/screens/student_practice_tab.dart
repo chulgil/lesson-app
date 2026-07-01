@@ -14,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../features/practice/practice_ui_facade.dart';
+import '../../../../features/practice/presentation/extensions/repertoire_sort_type_visuals.dart';
 import '../../../students/students_facade.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
 

@@ -14,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../domain/entities/teacher_availability.dart';
+import '../extensions/exception_type_visuals.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../../../settings/settings_facade.dart';
 import '../widgets/availability/availability_preview_grid.dart';
