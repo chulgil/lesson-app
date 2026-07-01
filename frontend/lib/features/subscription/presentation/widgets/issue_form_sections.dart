@@ -526,13 +526,15 @@ class StartDatePickerField extends StatelessWidget {
               children: [
                 Icon(Icons.calendar_today, color: AppColors.inkSecondary),
                 const SizedBox(width: AppSpacing.space3),
-                Text(
-                  startDate != null
-                      ? formatDateYMDKorean(startDate!)
-                      : AppStrings.issueFormStartDateHint,
-                  style: AppTypography.bodyMedium,
+                Expanded(
+                  child: Text(
+                    startDate != null
+                        ? formatDateYMDKorean(startDate!)
+                        : AppStrings.issueFormStartDateHint,
+                    style: AppTypography.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                const Spacer(),
                 Icon(Icons.chevron_right, color: AppColors.inkTertiary),
               ],
             ),

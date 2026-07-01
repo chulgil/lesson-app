@@ -201,30 +201,43 @@ class NoMembershipState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space6),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.school_outlined, size: 64, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space4),
-            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text(
-              AppStrings.issueFormNoMembershipTitle,
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.inkSecondary,
+    // 짧은 뷰포트/큰 textScale 에서도 bottom overflow 없이 스크롤 + 중앙정렬 유지.
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.space6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.school_outlined,
+                    size: 64,
+                    color: AppColors.inkTertiary,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
+                  Text(
+                    AppStrings.issueFormNoMembershipTitle,
+                    style: NotebookTypography.sectionTitle.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    AppStrings.issueFormNoMembershipBody,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.issueFormNoMembershipBody,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -239,28 +252,41 @@ class SubscriptionErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space6),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-            const SizedBox(height: AppSpacing.space3),
-            // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text(
-              AppStrings.issueFormErrorTitle,
-              style: NotebookTypography.sectionTitle,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              error,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
+    // 짧은 뷰포트/큰 textScale 에서도 bottom overflow 없이 스크롤 + 중앙정렬 유지.
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.space6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.paperAccent,
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
+                  Text(
+                    AppStrings.issueFormErrorTitle,
+                    style: NotebookTypography.sectionTitle,
+                  ),
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    error,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
-          ],
+          ),
         ),
       ),
     );

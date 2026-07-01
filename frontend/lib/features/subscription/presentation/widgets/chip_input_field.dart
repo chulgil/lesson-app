@@ -76,7 +76,13 @@ class ChipInputField extends StatelessWidget {
             // sectionTitle 로 통일. 호출부 9곳(lesson_policy_screen ×5
             // + issue_form_type_options ×2 + issue_form_discount_bonus ×2)
             // 에 일괄 반영 (§7.17).
-            Text(title, style: NotebookTypography.sectionTitle),
+            Flexible(
+              child: Text(
+                title,
+                style: NotebookTypography.sectionTitle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (isOptional) ...[
               const SizedBox(width: AppSpacing.space2),
               Text(

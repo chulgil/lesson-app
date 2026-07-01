@@ -806,9 +806,11 @@ class _IssueSubscriptionScreenState
           children: [
             // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
             // 로 통일 (§7.17).
-            Text(
-              AppStrings.rescheduleAllowanceTitle,
-              style: NotebookTypography.sectionTitle,
+            Flexible(
+              child: Text(
+                AppStrings.rescheduleAllowanceTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ),
             if (policy != null) ...[
               const SizedBox(width: AppSpacing.space2),
@@ -842,7 +844,8 @@ class _IssueSubscriptionScreenState
           ),
         ],
         const SizedBox(height: AppSpacing.space3),
-        Row(
+        Wrap(
+          runSpacing: AppSpacing.space2,
           children: [
             for (final count in [0, 1, 2, 3, 5])
               Padding(
@@ -895,7 +898,8 @@ class _IssueSubscriptionScreenState
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
-          Row(
+          Wrap(
+            runSpacing: AppSpacing.space2,
             children: [
               for (final hours in [6, 12, 24, 48])
                 Padding(
