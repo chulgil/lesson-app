@@ -90,11 +90,9 @@ class _ActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Ink(
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.ink, width: 1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(

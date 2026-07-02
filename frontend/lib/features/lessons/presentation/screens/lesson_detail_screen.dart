@@ -17,7 +17,7 @@ import '../../../../core/widgets/notebook/staff_divider.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/lesson_crud_provider.dart';
-import '../../../share/presentation/providers/lesson_summary_share_provider.dart';
+import '../../../share/share_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';

@@ -144,7 +144,6 @@ class _RegisterRegularLessonScreenState
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.scheduleMutedBackground,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 AppStrings.flexibleScheduleGuide,

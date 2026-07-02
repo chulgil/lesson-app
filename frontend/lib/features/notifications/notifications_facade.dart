@@ -6,7 +6,8 @@ export 'presentation/providers/notification_providers.dart'
         connectionNotificationServiceProvider,
         notificationServiceProvider,
         notificationSchedulerServiceProvider,
-        proposalNotificationServiceProvider;
+        proposalNotificationServiceProvider,
+        unreadNotificationCountProvider;
 export 'domain/services/connection_notification_service.dart'
     show ConnectionInfo;
 export 'presentation/providers/subscription_expiry_providers.dart'

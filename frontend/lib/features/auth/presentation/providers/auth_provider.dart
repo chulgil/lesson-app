@@ -10,7 +10,7 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/network/cache/response_cache_store.dart';
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../core/sync/presentation/providers/initial_pull_provider.dart';
+import '../../../../core/sync/sync_facade.dart';
 import '../../data/repositories/remote_auth_repository.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/entities/user_role.dart';
