@@ -1089,6 +1089,28 @@ class ScheduleService:
         await self.db.delete(booking)
         await self.db.flush()
 
+    async def _assert_booking_slot_free(self, booking: Any) -> None:
+        """409 if the booking's slot overlaps another active lesson/booking.
+
+        0702 audit follow-up (M4 sibling): same semantics as POST /lessons —
+        active lessons + bookings only; vacation/operating hours stay
+        FE-advisory. The booking itself is excluded (no self-collision).
+        """
+        from app.services.schedule_confirmation_service import ScheduleConfirmationService
+
+        has_conflict = await ScheduleConfirmationService(self.db).check_time_conflict(
+            teacher_id=booking.teacher_id,
+            scheduled_date=booking.scheduled_date,
+            scheduled_time=booking.scheduled_time,
+            duration=booking.duration or 60,
+            exclude_booking_id=booking.id,
+        )
+        if has_conflict:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="해당 시간에 이미 레슨 또는 예약이 있습니다",
+            )
+
     async def approve_booking(
         self,
         booking_id: str,
@@ -1109,8 +1131,12 @@ class ScheduleService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         await self._assert_booking_owner(booking, current_user)
         if target_status == "completed":
+            # Completing records a historical fact — never blocked by overlap.
             booking.status = BookingStatus.completed
         else:
+            # Confirming is a future commitment — re-validate the slot
+            # (changeRequested rows / races may have moved onto occupied time).
+            await self._assert_booking_slot_free(booking)
             booking.status = BookingStatus.confirmed
         if selected_option_id:
             prefix = f"[selected_option_id: {selected_option_id}]"
@@ -1161,6 +1187,21 @@ class ScheduleService:
         await self._assert_booking_owner(booking, current_user)
         actually_changes = data.new_date != booking.scheduled_date or data.new_time != booking.scheduled_time
         if actually_changes:
+            # Reject conflicting targets BEFORE consuming the reschedule credit.
+            from app.services.schedule_confirmation_service import ScheduleConfirmationService
+
+            has_conflict = await ScheduleConfirmationService(self.db).check_time_conflict(
+                teacher_id=booking.teacher_id,
+                scheduled_date=data.new_date,
+                scheduled_time=data.new_time,
+                duration=booking.duration or 60,
+                exclude_booking_id=booking.id,
+            )
+            if has_conflict:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="변경하려는 시간에 이미 레슨 또는 예약이 있습니다",
+                )
             await self._consume_reschedule_credit_or_raise(booking, current_user)
         booking.scheduled_date = data.new_date
         booking.scheduled_time = data.new_time
