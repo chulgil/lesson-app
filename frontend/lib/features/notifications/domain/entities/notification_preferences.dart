@@ -77,9 +77,11 @@ class NotificationPreferences {
   bool get isDndEnabled => quietStartHour != null && quietEndHour != null;
 
   /// Whether the current time falls within the DND window.
-  bool get isCurrentlyInDnd {
+  bool get isCurrentlyInDnd => isInDndAt(DateTime.now());
+
+  /// Whether [now] falls within the DND window (clock-injectable for tests).
+  bool isInDndAt(DateTime now) {
     if (!isDndEnabled) return false;
-    final now = DateTime.now();
     final nowMinutes = now.hour * 60 + now.minute;
     final startMinutes = quietStartHour! * 60;
     final endMinutes = quietEndHour! * 60;

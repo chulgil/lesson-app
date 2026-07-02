@@ -42,7 +42,7 @@ final notificationApiRepositoryProvider =
 
 typedef NotificationApiRepositoryRef = ProviderRef<NotificationRepository?>;
 String _$notificationServiceHash() =>
-    r'22046f9f8c790741d2b04a296bcc47739f097ed7';
+    r'8764f0ecc822cc93590e6bb0610c735c5f862474';
 
 /// Provider for the notification service.
 ///
