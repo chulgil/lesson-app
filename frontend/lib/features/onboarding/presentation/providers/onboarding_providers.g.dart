@@ -411,63 +411,8 @@ final isVerificationCodeValidProvider = Provider<bool>.internal(
 );
 
 typedef IsVerificationCodeValidRef = ProviderRef<bool>;
-String _$isProfileFormValidHash() =>
-    r'ccbf57b40512b3e9881cb6db6bf5de1224c0f044';
-
-/// Profile form validation
-///
-/// Copied from [isProfileFormValid].
-@ProviderFor(isProfileFormValid)
-final isProfileFormValidProvider = Provider<bool>.internal(
-  isProfileFormValid,
-  name: r'isProfileFormValidProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$isProfileFormValidHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef IsProfileFormValidRef = ProviderRef<bool>;
-String _$profileMissingFieldsHash() =>
-    r'ca47c43773bf9c22129182d7bf8df882948b57b5';
-
-/// Missing fields for profile
-///
-/// Copied from [profileMissingFields].
-@ProviderFor(profileMissingFields)
-final profileMissingFieldsProvider = Provider<List<String>>.internal(
-  profileMissingFields,
-  name: r'profileMissingFieldsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$profileMissingFieldsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef ProfileMissingFieldsRef = ProviderRef<List<String>>;
-String _$onboardingProfileFromFormHash() =>
-    r'a98c3a267e2a19e6facdda7caf38e90f31d97d46';
-
-/// Build onboarding profile from form data
-///
-/// Copied from [onboardingProfileFromForm].
-@ProviderFor(onboardingProfileFromForm)
-final onboardingProfileFromFormProvider =
-    Provider<TeacherOnboardingProfile?>.internal(
-  onboardingProfileFromForm,
-  name: r'onboardingProfileFromFormProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$onboardingProfileFromFormHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef OnboardingProfileFromFormRef = ProviderRef<TeacherOnboardingProfile?>;
 String _$teacherOnboardingNotifierHash() =>
-    r'd3e87f3ea06c46ef5010cc1da008efa4802c0b55';
+    r'62fc1b4c6ea758a064f87febbc754cbcfc4dc8d1';
 
 /// Teacher onboarding state notifier
 ///
