@@ -47,7 +47,7 @@ class ScheduleConfirmationService:
                 days_ahead += 7
             next_date = base_date + timedelta(days=days_ahead)
 
-            conflict = await self._check_time_conflict(
+            conflict = await self.check_time_conflict(
                 teacher_id=current_user.id,
                 scheduled_date=next_date,
                 scheduled_time=data.proposed_time,
@@ -387,7 +387,7 @@ class ScheduleConfirmationService:
                 if days_ahead <= 0:
                     days_ahead += 7
                 scheduled_date = base_date + timedelta(days=days_ahead, weeks=week)
-                conflict = await self._check_time_conflict(
+                conflict = await self.check_time_conflict(
                     teacher_id=teacher_profile_id,
                     scheduled_date=scheduled_date,
                     scheduled_time=slot_time,
@@ -517,7 +517,7 @@ class ScheduleConfirmationService:
             await self.db.refresh(booking)
         return created, count
 
-    async def _check_time_conflict(
+    async def check_time_conflict(
         self,
         teacher_id: str,
         scheduled_date: Any,

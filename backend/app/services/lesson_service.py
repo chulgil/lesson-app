@@ -94,6 +94,24 @@ class LessonService:
                     )
                 student_name = student.name
 
+        # 0702 audit M4: defense-in-depth against API-direct double booking.
+        # Same conflict semantics as the #301 recurring path (active lessons +
+        # bookings only); vacation/operating-hours stay FE-advisory so the
+        # teacher's manual create remains an intentional override.
+        from app.services.schedule_confirmation_service import ScheduleConfirmationService
+
+        has_conflict = await ScheduleConfirmationService(self.db).check_time_conflict(
+            teacher_id=tid,
+            scheduled_date=data.date,
+            scheduled_time=data.start_time or "00:00",
+            duration=data.duration,
+        )
+        if has_conflict:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Lesson time conflicts with an existing lesson or booking",
+            )
+
         subscription_id = data.subscription_id
         if subscription_id:
             await self._assert_subscription_matches_lesson(
