@@ -104,11 +104,11 @@ class _ProfileVisibilityScreenState
     });
 
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
-    final academiesAsync = ref.watch(
-      teacherAcademiesProvider(
-        ref.watch(teacherExtendedProfileProvider).valueOrNull?.userId ?? '',
-      ),
-    );
+    // M9 (#1074) — 프로필 로딩 완료 전 '' ID 로 학원 목록을 조회하지 않는다.
+    final profileUserId = profileAsync.valueOrNull?.userId;
+    final academiesAsync = profileUserId == null
+        ? const AsyncValue<List<TeacherAcademyMembership>>.loading()
+        : ref.watch(teacherAcademiesProvider(profileUserId));
 
     return PopScope(
       canPop: !_hasChanges && !_isLoading,

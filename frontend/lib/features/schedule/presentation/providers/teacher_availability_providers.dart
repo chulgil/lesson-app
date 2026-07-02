@@ -575,6 +575,11 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
       final repository = ref.read(teacherAvailabilityRepositoryProvider);
       final updated = await repository.addException(teacherId, exception);
       state = AsyncValue.data(updated);
+
+      // M1 (#1074) — TimeExceptionScreen 본문은 read-only
+      // teacherAvailabilityProvider 를 watch 하므로 여기서 invalidate 해야
+      // 추가가 목록에 반영된다 (updateLessonSettings 와 동일 패턴).
+      ref.invalidate(teacherAvailabilityProvider(teacherId));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -587,6 +592,9 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
       final repository = ref.read(teacherAvailabilityRepositoryProvider);
       final updated = await repository.removeException(teacherId, exceptionId);
       state = AsyncValue.data(updated);
+
+      // M1 (#1074) — addException 과 동일: read provider refetch.
+      ref.invalidate(teacherAvailabilityProvider(teacherId));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

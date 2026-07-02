@@ -117,7 +117,7 @@ List<GoRoute> scheduleRoutes = [
       final extra = state.extra as Map<String, dynamic>?;
       return RequestDetailScreen(
         requestId: requestId,
-        viewerRole: extra?['viewerRole'] ?? 'teacher',
+        viewerRole: viewerRoleExtraOrCurrent(context, extra),
       );
     },
   ),
