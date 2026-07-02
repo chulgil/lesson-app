@@ -70,7 +70,7 @@ class ResponseCacheInterceptor extends Interceptor {
         _isNetworkFailure(err) &&
         _policy.isCacheable(options.path)) {
       final cached = _store.get(_keyFor(options));
-      if (cached != null) {
+      if (cached != null && !_isExpired(cached, options.path)) {
         handler.resolve(
           Response<dynamic>(
             requestOptions: options,
@@ -86,6 +86,14 @@ class ResponseCacheInterceptor extends Interceptor {
   }
 
   bool _isGet(RequestOptions options) => options.method.toUpperCase() == 'GET';
+
+  /// N15/D3: sensitive entries (payment-pending) age out after the policy
+  /// TTL; everything else is stale-until-reconnect (no TTL).
+  bool _isExpired(CachedHttpResponse cached, String path) {
+    final ttl = _policy.ttlFor(path);
+    if (ttl == null) return false;
+    return DateTime.now().toUtc().difference(cached.cachedAt) > ttl;
+  }
 
   String _keyFor(RequestOptions options) => ResponseCacheStore.buildKey(
     method: options.method,

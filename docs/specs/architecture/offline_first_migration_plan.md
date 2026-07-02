@@ -92,7 +92,7 @@ Dart는 런타임 리플렉션이 없어 **임의 인터페이스 T를 자동 �
 |---|---|---|
 | D1 | 읽기 캐시 위치 | 옵션 A(HTTP 인터셉터) |
 | D2 | staleness 정책 | 오프라인 중 stale 무기한 제공 + "마지막 동기화 HH:MM" 배너. 온라인 복귀 시 재검증 |
-| D3 | TTL | 표시 전용 도메인 무TTL(연결 복귀 시 갱신). 민감(billing) 짧은 TTL + 항상 서버 우선 |
+| D3 | TTL | 표시 전용 도메인 무TTL(연결 복귀 시 갱신). 민감(billing) 짧은 TTL + 항상 서버 우선 — **구현됨(2026-07-02)**: `ResponseCachePolicy.sensitivePrefixes`(payment-pending, 15분) + 인터셉터 만료검사. 서버 우선은 기존 transport-failure-only 서빙으로 충족 |
 | D4 | 쓰기 충돌 | 기본 last-write-wins + 서버 거절 시 SnackBar 노출. 결제/정산은 큐잉 금지(서버 권위) |
 | D5 | 낙관적 쓰기 범위 | 읽기 캐시는 전 도메인 / 낙관적 쓰기는 lessons·schedule·subscription·students 우선, 나머지는 온라인 전용 유지 |
 | D6 | academy/billing | 읽기 캐시만(표시). 쓰기 큐 제외 |
