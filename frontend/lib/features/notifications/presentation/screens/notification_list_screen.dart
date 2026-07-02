@@ -293,7 +293,6 @@ class _FilterChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: selected ? AppColors.ink : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppSpacing.space4),
           border: Border.all(
             color: selected ? AppColors.ink : AppColors.inkTertiary,
             width: 1,
@@ -315,7 +314,6 @@ class _FilterChip extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
                   color: selected ? AppColors.paper : AppColors.ink,
-                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '$badge',

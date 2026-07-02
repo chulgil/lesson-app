@@ -16,7 +16,7 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../billing/billing_facade.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../../practice/domain/entities/practice_loop_stats.dart';
 import '../../../practice/practice_facade.dart';
 import '../../../profile/profile_facade.dart';
@@ -220,7 +220,6 @@ class DashboardTab extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent,
-                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     AppStrings.unreadBadgeCount(unreadCount),

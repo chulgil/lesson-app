@@ -203,6 +203,7 @@ Iterable<String> _complexStateProviderDeclarations() sync* {
   const allowedExactTypes = {
     'bool',
     'int',
+    'int?',
     'double',
     'String',
     'String?',

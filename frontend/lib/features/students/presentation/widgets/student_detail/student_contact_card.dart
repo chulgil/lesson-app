@@ -81,7 +81,6 @@ class StudentContactCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
