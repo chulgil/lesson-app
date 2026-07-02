@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/value_objects/discipline.dart';
+import '../../../../core/domain/value_objects/discipline_registry.dart';
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/child_profile.dart';
@@ -45,6 +48,24 @@ const _kChildLevelLabels = <String, String>{
 /// Resolve a child-profile instrument key to its display label (raw key fallback).
 String childInstrumentLabel(String key) =>
     _kChildInstrumentLabels[key.toLowerCase()] ?? key;
+
+/// Child-profile expertise options for [discipline] as (storedKey, label).
+///
+/// Music keeps its curated English key-space (`kChildInstrumentKeys` + the
+/// icon map), byte-identical to before. Every other discipline derives from
+/// `ExpertiseCatalogRegistry.forDiscipline` with the label used as both the
+/// stored value and the display - mirroring the discipline-aware pickers
+/// (#1071/#1072). This is a music-vs-rest split (music alone has the legacy
+/// key/icon space), not a per-discipline enum switch.
+List<(String, String)> childInstrumentOptionsFor(Discipline discipline) {
+  if (discipline.id == DisciplineRegistry.music.id) {
+    return [for (final k in kChildInstrumentKeys) (k, childInstrumentLabel(k))];
+  }
+  return [
+    for (final item in ExpertiseCatalogRegistry.forDiscipline(discipline).items)
+      (item, item),
+  ];
+}
 
 Color _colorForKey(String key) {
   switch (key) {
