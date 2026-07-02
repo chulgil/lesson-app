@@ -31,28 +31,46 @@ class SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final labelStyle = AppTypography.bodyMedium.copyWith(
+      color: AppColors.inkSecondary,
+    );
+    final valueStyle = AppTypography.bodyMedium.copyWith(
+      fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+      color: valueColor ?? (strikethrough ? AppColors.inkTertiary : null),
+      decoration: strikethrough ? TextDecoration.lineThrough : null,
+    );
+
+    // #1067: 큰 Dynamic Type(≥1.3x)에서는 label·value 를 세로 스택해 가로
+    // overflow 방지. 기본 글씨에서는 좌우 배치 유지하되 Flexible 로 방어.
+    final isLargeText = MediaQuery.textScalerOf(context).scale(1) >= 1.3;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          Text(
-            value,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-              color:
-                  valueColor ?? (strikethrough ? AppColors.inkTertiary : null),
-              decoration: strikethrough ? TextDecoration.lineThrough : null,
-            ),
-          ),
-        ],
-      ),
+      child:
+          isLargeText
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: labelStyle),
+                  const SizedBox(height: AppSpacing.space1),
+                  Text(value, style: valueStyle),
+                ],
+              )
+              : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(child: Text(label, style: labelStyle)),
+                  const SizedBox(width: AppSpacing.space3),
+                  Flexible(
+                    child: Text(
+                      value,
+                      style: valueStyle,
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                ],
+              ),
     );
   }
 }
@@ -93,11 +111,14 @@ class AppliedPolicySection extends StatelessWidget {
             children: [
               Icon(Icons.rule_rounded, size: 16, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                AppStrings.policyAppliedTitle,
-                style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.paperAccent,
+              // #1067: 제목도 큰 글씨/로케일 확장에서 접히도록 Flexible 방어.
+              Flexible(
+                child: Text(
+                  AppStrings.policyAppliedTitle,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.paperAccent,
+                  ),
                 ),
               ),
             ],

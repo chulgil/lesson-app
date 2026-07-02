@@ -27,7 +27,11 @@ import 'package:lessonaza/features/subscription/data/repositories/mock_subscript
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_issue_flow_provider.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 import 'package:lessonaza/features/subscription/presentation/screens/issue_subscription_screen.dart';
+import 'package:lessonaza/features/subscription/domain/entities/lesson_policy.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 import 'package:lessonaza/features/subscription/presentation/widgets/issue_form_membership_widgets.dart';
+import 'package:lessonaza/features/subscription/presentation/widgets/issue_form_sections.dart';
+import 'package:lessonaza/features/subscription/presentation/widgets/issue_form_summary_widgets.dart';
 
 const _teacherId = 't1';
 const _studentId = 's1';
@@ -84,6 +88,38 @@ Future<void> _pump(
 
 String _label(Size s, double t) =>
     '${s.width.toInt()}x${s.height.toInt()} @${t}x';
+
+/// 단일 sub-widget 을 제약 폭 + textScale 로 직접 pump (Group E, #1067).
+Future<void> _pumpWidget(
+  WidgetTester tester, {
+  required double width,
+  required double textScale,
+  required Widget child,
+}) async {
+  tester.view.physicalSize = Size(width, 2000);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder:
+            (context) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(textScale)),
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: child,
+                ),
+              ),
+            ),
+      ),
+    ),
+  );
+  await tester.pump();
+}
 
 void main() {
   // ── Group A: 학생선택 entry (studentId 없이 진입) — 스크롤 구조, overflow 없어야 ──
@@ -217,19 +253,26 @@ void main() {
   // 배치 모드는 per-student membership 조회를 우회. tall 뷰포트(6000)로 lazy ListView 의
   // 전 섹션을 일괄 빌드해 아래-fold sub-widget 까지 overflow 를 검출한다.
   //
-  // 현실 바(assert): 전 폭 @1.0x(기본 글씨) + 375·800 @1.3x(중간 Dynamic Type) → overflow 0.
-  //   #747 데스크톱/실기기 기본글씨 overflow 를 가드한다.
-  // 잔여(미assert, 별도 추적 #1067): 320 @1.3x, 전 폭 @≥1.6x 는 폼 전역 sub-widget
-  //   (TypeSelector·PaymentSection·Summary 등)이 큰 Dynamic Type 에서 overflow —
-  //   폼 전역 접근성 하드닝은 #1067 에서 이 프로브를 확장해 RED→GREEN 으로 처리.
-  group('D. 배치 폼 (전 섹션, 현실 바)', () {
+  // 가드 바(assert): 전 폭 @1.0x + 375·800 @1.3x (#747) + 320 @1.3x·전 폭 @1.6x·2.0x (#1067).
+  //   #747 데스크톱/실기기 기본글씨 overflow + #1067 큰 Dynamic Type 폼 전역 overflow 를 가드.
+  //   #1067: Summary/PaymentChip/Policy Row 를 Flexible/세로 스택으로 접히게 하드닝.
+  group('D. 배치 폼 (전 섹션, #747+#1067 가드)', () {
     const height = 6000.0;
     final combos = <(double, double)>[
+      // #747 현실 바
       (375.0, 1.0),
       (320.0, 1.0),
       (800.0, 1.0),
       (375.0, 1.3),
       (800.0, 1.3),
+      // #1067 접근성 하드닝 바 (큰 Dynamic Type + 320px)
+      (320.0, 1.3),
+      (375.0, 1.6),
+      (320.0, 1.6),
+      (800.0, 1.6),
+      (375.0, 2.0),
+      (320.0, 2.0),
+      (800.0, 2.0),
     ];
     for (final (width, scale) in combos) {
       final size = Size(width, height);
@@ -258,6 +301,49 @@ void main() {
         );
         expect(tester.takeException(), isNull, reason: 'overflow 없어야');
       });
+    }
+  });
+
+  // ── Group E: 정책·단일 결제 sub-widget 직접 pump (#1067) ──
+  // Group D(배치)가 렌더하지 않는 AppliedPolicySection(정책 적용 시) 과
+  // 단일 폼 PaymentStatusSection(선불) 을 320·375 @1.6x·2.0x 로 직접 검증.
+  group('E. 정책·단일 결제 sub-widget 하드닝 (#1067)', () {
+    for (final width in [320.0, 375.0]) {
+      for (final scale in [1.6, 2.0]) {
+        testWidgets(
+          'AppliedPolicySection ${width.toInt()}@${scale}x → no overflow',
+          (tester) async {
+            await _pumpWidget(
+              tester,
+              width: width,
+              textScale: scale,
+              child: AppliedPolicySection(
+                policy: LessonPolicy.defaultPolicy(id: 'p1', teacherId: 't1'),
+              ),
+            );
+            expect(find.byType(AppliedPolicySection), findsOneWidget);
+            expect(tester.takeException(), isNull, reason: 'overflow 없어야');
+          },
+        );
+        testWidgets(
+          'PaymentStatusSection ${width.toInt()}@${scale}x → no overflow',
+          (tester) async {
+            await _pumpWidget(
+              tester,
+              width: width,
+              textScale: scale,
+              child: PaymentStatusSection(
+                mode: IssuePaymentMode.prepaid,
+                selectedPaymentMethod: SubscriptionPaymentMethod.cash,
+                onModeChanged: (_) {},
+                onPaymentMethodChanged: (_) {},
+              ),
+            );
+            expect(find.byType(PaymentStatusSection), findsOneWidget);
+            expect(tester.takeException(), isNull, reason: 'overflow 없어야');
+          },
+        );
+      }
     }
   });
 }
