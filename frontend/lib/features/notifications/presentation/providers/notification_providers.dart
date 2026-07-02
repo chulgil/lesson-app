@@ -17,8 +17,11 @@ import '../../data/repositories/remote_notification_repository.dart';
 import '../../domain/entities/notification.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../domain/services/connection_notification_service.dart';
+import '../../domain/services/notification_delivery_gate.dart';
 import '../../domain/services/notification_scheduler_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
+
+import 'notification_preferences_provider.dart';
 
 part 'notification_providers.g.dart';
 
@@ -46,7 +49,14 @@ NotificationRepository? notificationApiRepository(Ref ref) {
 /// Provider for the notification service.
 @Riverpod(keepAlive: true)
 LocalNotificationService notificationService(Ref ref) {
-  final service = LocalNotificationService();
+  // #501: every delivery path (show/schedule, incl. FCM foreground and the
+  // scheduler/stub services that wrap this one) passes the preference gate.
+  final service = LocalNotificationService(
+    shouldDeliver: (notification) => shouldDeliverNotification(
+      ref.read(notificationPreferencesNotifierProvider),
+      notification,
+    ),
+  );
   ref.onDispose(() => service.dispose());
   return service;
 }
