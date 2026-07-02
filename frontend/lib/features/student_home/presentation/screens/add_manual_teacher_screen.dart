@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import '../../../students/students_ui_facade.dart';
 import '../../domain/entities/manual_teacher.dart';
 import '../providers/manual_teacher_provider.dart';
@@ -120,6 +123,9 @@ class _AddManualTeacherScreenState
               const SizedBox(height: AppSpacing.space2),
               InstrumentSelector(
                 selectedInstrument: _selectedInstrument,
+                instruments: ExpertiseCatalogRegistry.forDiscipline(
+                  ref.watch(activeDisciplineProvider),
+                ).items,
                 onChanged: (value) {
                   setState(() => _selectedInstrument = value);
                 },
