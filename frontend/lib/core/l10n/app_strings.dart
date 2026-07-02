@@ -6730,7 +6730,10 @@ class AppStrings {
       '아직 선생님이 없다면 가까운 선생님께 초대를 부탁해 주세요.\n'
       '본인 인증이 열리면 직접 가입도 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
-  static const authParentLoginNotReady = '학부모 로그인은 준비 중입니다.';
+  /// M6 (0702 감사) — 학부모도 Google 로그인 → 역할 선택으로 가입 가능.
+  /// '준비 중' 안내는 실제 가능한 경로를 숨겨 이탈을 유발했다.
+  static const authParentLoginNotReady =
+      '학부모도 Google 계정으로 시작한 뒤, 역할 선택에서 학부모를 선택해 주세요.';
   static const academyInviteAcceptFailed = '학원 초대 수락에 실패했습니다. 다시 시도해주세요.';
 
   /// 학원 초대 수락 성공 환영 메시지 (audit C3-F08)
@@ -10541,4 +10544,21 @@ class AppStrings {
 
   /// 녹음 재생 (repertoire recording play tooltip)
   static const repertoireRecordingPlayTooltip = '녹음 재생';
+
+  // ── 0702 감사 M6 — 로그인 화면 문자열 (C5) ──
+
+  /// 함께 채워가는 레슨 노트. (login slogan)
+  static const authSlogan = '함께 채워가는 레슨 노트.';
+
+  /// Google 계정으로 시작 (login CTA)
+  static const authGoogleStart = 'Google 계정으로 시작';
+
+  /// Kakao로 시작 (login CTA, coming soon)
+  static const authKakaoStart = 'Kakao로 시작';
+
+  /// Apple 계정으로 시작 (login CTA, coming soon)
+  static const authAppleStart = 'Apple 계정으로 시작';
+
+  /// 학부모이신가요? (parent guide link)
+  static const authParentLoginLink = '학부모이신가요?';
 }

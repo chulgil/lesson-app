@@ -35,6 +35,12 @@ class CurrentUserRoleController extends _$CurrentUserRoleController {
       if (authState is AuthAuthenticated) {
         return authState.role;
       }
+      // M2/#608 — 온보딩 중에도 role-select 에서 고른 역할을 파생한다.
+      // teacher 폴백이면 초대/프로필 화면의 role 분기와 user-scoped 키가
+      // 과도기 창에서 어긋난다. remote 의 role 단일 소스 = auth state.
+      if (authState is AuthNeedsOnboarding) {
+        return authState.role;
+      }
     }
     return UserRole.teacher; // Default to teacher
   }

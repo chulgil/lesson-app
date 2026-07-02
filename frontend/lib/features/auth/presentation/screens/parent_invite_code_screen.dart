@@ -302,6 +302,8 @@ class _ParentInviteCodeScreenState
 
       // Set role + complete onboarding so the auth gate lets /parent-home
       // through (otherwise AuthNeedsOnboarding bounces to roleSelect, #582).
+      // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
+      // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
       ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
       await _completeParentOnboarding();
       if (!mounted) return;
@@ -332,6 +334,8 @@ class _ParentInviteCodeScreenState
     if (_isSkipping) return;
     setState(() => _isSkipping = true);
     // Set role to parent and navigate to empty home.
+    // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
+    // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
     ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
     try {
       await _completeParentOnboarding();
