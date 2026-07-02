@@ -20,7 +20,6 @@ import '../../../features/onboarding/presentation/screens/profile_setup_screen.d
 import '../../../features/onboarding/presentation/screens/student_profile_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/student_signup_blocked_screen.dart';
 import '../../../features/onboarding/presentation/screens/student_tutorial_screen.dart';
-import '../../../features/onboarding/presentation/screens/tutorial_screen.dart';
 import '../app_routes.dart';
 
 /// Auth and onboarding routes
@@ -92,13 +91,6 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.teacherProfileSetup,
     name: 'teacherProfileSetup',
     builder: (context, state) => const ProfileSetupScreen(),
-  ),
-
-  // Teacher Onboarding - Tutorial
-  GoRoute(
-    path: AppRoutes.teacherTutorial,
-    name: 'teacherTutorial',
-    builder: (context, state) => const TutorialScreen(),
   ),
 
   // Teacher Onboarding - First Availability Quest (#422)
