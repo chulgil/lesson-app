@@ -171,4 +171,43 @@ void main() {
       },
     );
   });
+  group('write-invalidation (N7)', () {
+    test('successful POST drops the domain cached reads', () async {
+      final dio = buildDio(allowlisted);
+      adapter.mode = _Mode.success;
+      await dio.get<dynamic>('/lessons');
+      await dio.get<dynamic>('/lessons/42');
+      expect(store.length, equals(2));
+
+      await dio.post<dynamic>('/lessons/42/complete', data: {'x': 1});
+
+      expect(store.length, equals(0));
+    });
+
+    test('write to a non-allowlisted path leaves the cache untouched',
+        () async {
+      final dio = buildDio(allowlisted);
+      adapter.mode = _Mode.success;
+      await dio.get<dynamic>('/lessons');
+      expect(store.length, equals(1));
+
+      await dio.post<dynamic>('/bookings', data: {'x': 1});
+
+      expect(store.length, equals(1));
+    });
+
+    test('offline read right after an online write propagates the error '
+        'instead of serving pre-write stale data', () async {
+      final dio = buildDio(allowlisted);
+      adapter.mode = _Mode.success;
+      await dio.get<dynamic>('/lessons');
+      await dio.post<dynamic>('/lessons', data: {'x': 1});
+
+      adapter.mode = _Mode.networkError;
+      await expectLater(
+        dio.get<dynamic>('/lessons'),
+        throwsA(isA<DioException>()),
+      );
+    });
+  });
 }

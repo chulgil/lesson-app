@@ -63,6 +63,7 @@ void main() {
       ConnectivityResult initialConnectivity = ConnectivityResult.none,
       Duration pollingInterval = const Duration(seconds: 9999),
       int defaultMaxRetryCount = 5,
+      Future<void> Function(String path)? invalidateCachedReads,
     }) async {
       fakeConnectivity = FakeConnectivity(initialConnectivity);
 
@@ -71,6 +72,7 @@ void main() {
         connectivityService: ConnectivityService(fakeConnectivity),
         adapterRegistry: SyncAdapterRegistry.create(),
         apiClient: apiClient,
+        invalidateCachedReads: invalidateCachedReads,
         pollingInterval: pollingInterval,
         defaultMaxRetryCount: defaultMaxRetryCount,
       );
@@ -378,6 +380,24 @@ void main() {
           options: any(named: 'options'),
         ),
       ).called(greaterThanOrEqualTo(3));
+    });
+
+    test('큐 적재 시 invalidateCachedReads 콜백이 경로와 함께 호출된다 (N7)', () async {
+      final invalidated = <String>[];
+      final service = await createService(
+        initialConnectivity: ConnectivityResult.none,
+        pollingInterval: const Duration(days: 1),
+        invalidateCachedReads: (path) async => invalidated.add(path),
+      );
+
+      await service.queueMutation(
+        domain: 'lesson',
+        httpMethod: 'POST',
+        path: '/lessons',
+        payload: const {'x': 1},
+      );
+
+      expect(invalidated, ['/lessons']);
     });
   });
 }

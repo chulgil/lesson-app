@@ -40,10 +40,16 @@ class ResponseCachePolicy {
   /// Segment-aware: a prefix `/lessons` matches `/lessons` and `/lessons/123`
   /// but NOT a sibling path like `/lessons-classes`. Returns false when the
   /// allowlist is empty or when no prefix matches.
-  bool isCacheable(String path) {
-    if (allowlist.isEmpty) return false;
-    return allowlist.any(
-      (prefix) => path == prefix || path.startsWith('$prefix/'),
-    );
+  bool isCacheable(String path) => matchingPrefix(path) != null;
+
+  /// The allowlisted prefix covering [path], or null when none matches.
+  ///
+  /// Write-invalidation (N7) uses this to scope which cached reads a
+  /// mutation on [path] makes stale.
+  String? matchingPrefix(String path) {
+    for (final prefix in allowlist) {
+      if (path == prefix || path.startsWith('$prefix/')) return prefix;
+    }
+    return null;
   }
 }

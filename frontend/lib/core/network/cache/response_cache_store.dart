@@ -97,6 +97,29 @@ class ResponseCacheStore {
 
   Future<void> remove(String key) => _box.delete(key);
 
+  /// Removes every cached GET entry whose path is covered by [prefix]
+  /// (segment-aware, same matching rule as `ResponseCachePolicy`).
+  ///
+  /// Write-invalidation (N7): a create/update/delete under a domain prefix
+  /// makes that domain's cached reads stale — drop them instead of serving
+  /// pre-write data on the next offline read.
+  Future<void> removeByPathPrefix(String prefix) async {
+    final toRemove = <dynamic>[
+      for (final key in _box.keys)
+        if (_keyMatchesPrefix(key.toString(), prefix)) key,
+    ];
+    if (toRemove.isNotEmpty) {
+      await _box.deleteAll(toRemove);
+    }
+  }
+
+  static bool _keyMatchesPrefix(String key, String prefix) {
+    final base = 'GET $prefix';
+    return key == base ||
+        key.startsWith('$base/') ||
+        key.startsWith('$base?');
+  }
+
   /// Clears all cached responses — call on logout / data-mode switch to prevent
   /// cross-user leakage.
   Future<void> clear() => _box.clear();
