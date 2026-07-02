@@ -57,6 +57,16 @@ class DisciplineSelectionScreen extends ConsumerWidget {
     final disciplines = DisciplineRegistry.all;
 
     return NotebookScreenScaffold(
+      // M7 (0702 감사) — go() 진입이라 스택이 없어 역할을 잘못 고른 사용자가
+      // 복귀할 수 없었다. 명시적 back 으로 역할 선택으로 되돌린다.
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRoutes.roleSelect),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),

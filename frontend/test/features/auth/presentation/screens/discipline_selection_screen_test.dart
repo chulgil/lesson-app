@@ -127,6 +127,36 @@ void main() {
     expect(find.text('student-blocked'), findsOneWidget);
   });
 
+  testWidgets('뒤로가기 → 역할 선택으로 복귀한다 (M7, 0702 감사)', (tester) async {
+    final router = GoRouter(
+      initialLocation: '/discipline',
+      routes: [
+        GoRoute(
+          path: '/discipline',
+          builder:
+              (_, __) =>
+                  const DisciplineSelectionScreen(role: UserRole.student),
+        ),
+        GoRoute(
+          path: AppRoutes.roleSelect,
+          builder: (_, __) => const Scaffold(body: Text('role-select')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    expect(find.text('role-select'), findsOneWidget);
+  });
+
   test('#979-B 게이트 live: 등록 분야 2개(music+fitness) → RoleSelect 가 분야 선택으로 라우팅', () {
     // length > 1 이면 RoleSelectScreen._goToOnboarding 가 DisciplineSelectionScreen
     // 으로 라우팅한다(#977 게이트). Phase 4 에서 fitness 등록으로 게이트가 live 됨.
