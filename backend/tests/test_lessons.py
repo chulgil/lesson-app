@@ -360,3 +360,135 @@ async def test_other_teacher_cannot_access_lesson_class_or_scoped_memberships(
     )
 
     assert response.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# 0702 audit M4 — create-time conflict validation (defense-in-depth)
+# ---------------------------------------------------------------------------
+
+_M4_BASE = {
+    "student_id": "student-001",
+    "instrument": "violin",
+    "date": "2026-03-10",
+    "duration": 60,
+}
+
+
+@pytest.mark.asyncio
+async def test_create_lesson_overlap_returns_409(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Overlapping lesson for the same teacher is rejected with 409."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    first = await client.post(
+        "/api/v1/lessons", headers=auth_headers, json={**_M4_BASE, "start_time": "14:00"}
+    )
+    assert first.status_code == 201
+
+    overlap = await client.post(
+        "/api/v1/lessons", headers=auth_headers, json={**_M4_BASE, "start_time": "14:30"}
+    )
+    assert overlap.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_create_lesson_adjacent_slot_allowed(
+    client: AsyncClient, auth_headers, create_test_user
+):
+    """Back-to-back lessons without minute overlap are both accepted."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    first = await client.post(
+        "/api/v1/lessons", headers=auth_headers, json={**_M4_BASE, "start_time": "14:00"}
+    )
+    assert first.status_code == 201
+
+    adjacent = await client.post(
+        "/api/v1/lessons", headers=auth_headers, json={**_M4_BASE, "start_time": "15:00"}
+    )
+    assert adjacent.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_lesson_overlap_with_cancelled_lesson_allowed(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Cancelled lessons do not block the slot."""
+    from datetime import date as _date
+
+    from app.models.lesson import Lesson, LessonStatus
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add(
+        Lesson(
+            student_id="student-001",
+            student_name="student-001",
+            teacher_id="test-user-id",
+            instrument="violin",
+            date=_date(2026, 3, 10),
+            start_time="14:00",
+            duration=60,
+            status=LessonStatus.cancelled,
+        )
+    )
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/lessons", headers=auth_headers, json={**_M4_BASE, "start_time": "14:30"}
+    )
+    assert response.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_lesson_overlap_with_active_booking_returns_409(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """A non-cancelled booking at the same time blocks manual creation."""
+    from datetime import date as _date
+
+    from app.models.schedule import BookingLessonType, BookingStatus, LessonBooking
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    db_session.add(
+        LessonBooking(
+            teacher_id="test-user-id",
+            student_id="student-001",
+            lesson_type=BookingLessonType.regular,
+            scheduled_date=_date(2026, 3, 10),
+            scheduled_time="14:00",
+            duration=60,
+            status=BookingStatus.confirmed,
+        )
+    )
+    await db_session.flush()
+
+    response = await client.post(
+        "/api/v1/lessons", headers=auth_headers, json={**_M4_BASE, "start_time": "14:30"}
+    )
+    assert response.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_create_lesson_other_teacher_same_time_allowed(
+    client: AsyncClient, create_test_user
+):
+    """Conflict scope is per-teacher — another teacher's lesson does not block."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="other-teacher", role="teacher", email="other-teacher@test.com"
+    )
+
+    first = await client.post(
+        "/api/v1/lessons",
+        headers=_headers("test-user-id"),
+        json={**_M4_BASE, "start_time": "14:00"},
+    )
+    assert first.status_code == 201
+
+    other = await client.post(
+        "/api/v1/lessons",
+        headers=_headers("other-teacher"),
+        json={**_M4_BASE, "start_time": "14:00"},
+    )
+    assert other.status_code == 201
