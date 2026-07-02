@@ -58,20 +58,6 @@ class PracticeStreak {
     return 3;
   }
 
-  /// Get fire emoji based on streak level
-  String get fireEmoji {
-    switch (streakLevel) {
-      case 3:
-        return '🔥🔥';
-      case 2:
-        return '🔥';
-      case 1:
-        return '✨';
-      default:
-        return '';
-    }
-  }
-
   PracticeStreak copyWith({
     String? id,
     String? studentId,

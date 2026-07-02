@@ -41,7 +41,7 @@ void _sendWaitlistPromotionNotification(Ref ref, GroupClassBooking promoted) {
       userId: promoted.studentId,
       type: NotificationType.lessonBooked,
       priority: NotificationPriority.high,
-      title: '🎉 대기 → 예약 확정!',
+      title: '대기 → 예약 확정!',
       body: '취소로 인해 예약이 확정되었습니다.',
       createdAt: DateTime.now(),
       actionLabel: '확인하기',
@@ -316,7 +316,7 @@ class GroupClassBookingNotifier extends _$GroupClassBookingNotifier {
         userId: booking.studentId,
         type: NotificationType.lessonCancelled,
         priority: NotificationPriority.normal,
-        title: '⏳ 대기 자동 취소',
+        title: '대기 자동 취소',
         body: '수업이 시작되어 대기가 자동 취소되었습니다. 다음 기회를 기다려주세요.',
         createdAt: DateTime.now(),
         data: {

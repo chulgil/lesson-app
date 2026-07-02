@@ -97,14 +97,6 @@ extension PracticePriorityDisplay on PracticePriority {
       PracticePriority.could => '선택',
     };
   }
-
-  String get dot {
-    return switch (this) {
-      PracticePriority.must => '🔴',
-      PracticePriority.should => '🟡',
-      PracticePriority.could => '🟢',
-    };
-  }
 }
 
 extension PracticeTypeDisplay on PracticeType {
@@ -181,7 +173,7 @@ extension ClefTypeDisplay on ClefType {
 
   String get symbol {
     return switch (this) {
-      ClefType.treble => '🎼',
+      ClefType.treble => '𝄞',
       ClefType.bass => '𝄢',
       ClefType.alto => '𝄡',
     };

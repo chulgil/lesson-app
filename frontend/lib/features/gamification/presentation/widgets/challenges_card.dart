@@ -55,7 +55,11 @@ class ChallengesCard extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  Text('🏆', style: AppTypography.headingMedium),
+                  Icon(
+                    Icons.emoji_events,
+                    size: AppSpacing.iconMD,
+                    color: AppColors.ink,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
                   // Notebook × Score: 카드 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
                   Text(

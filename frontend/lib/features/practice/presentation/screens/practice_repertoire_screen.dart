@@ -490,12 +490,10 @@ class _PawStampRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 1),
             child: Opacity(
               opacity: isCompleted ? 1.0 : 0.3,
-              child: Text(
-                '🐾',
-                style:
-                    totalCount <= 5
-                        ? AppTypography.bodyLarge.copyWith(height: 1)
-                        : AppTypography.bodySmall.copyWith(height: 1),
+              child: Icon(
+                Icons.pets,
+                size: totalCount <= 5 ? AppSpacing.iconXS : 12,
+                color: AppColors.ink,
               ),
             ),
           );

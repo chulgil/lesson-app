@@ -34,7 +34,7 @@ class ConnectionNotificationService {
         userId: requesterId,
         type: NotificationType.connectionRequestAccepted,
         priority: NotificationPriority.high,
-        title: '✅ 연결 완료',
+        title: '연결 완료',
         body: '$accepterName님과 연결되었습니다! 프로필을 확인하고 레슨을 예약해보세요.',
         createdAt: DateTime.now(),
         actionUrl: requesterIsStudent
@@ -69,7 +69,7 @@ class ConnectionNotificationService {
         userId: targetId,
         type: NotificationType.connectionRequestReceived,
         priority: NotificationPriority.high,
-        title: '🔗 새 연결 요청',
+        title: '새 연결 요청',
         body: '$requesterName님이 연결을 요청했습니다',
         createdAt: DateTime.now(),
         actionUrl: AppRoutes
@@ -96,7 +96,7 @@ class ConnectionNotificationService {
         userId: teacherId,
         type: NotificationType.connectionEstablished,
         priority: NotificationPriority.high,
-        title: '🎉 새 학생 연결',
+        title: '새 학생 연결',
         body: '$studentName님과 연결되었습니다',
         createdAt: DateTime.now(),
         data: {'connectionId': connectionId, 'studentName': studentName},

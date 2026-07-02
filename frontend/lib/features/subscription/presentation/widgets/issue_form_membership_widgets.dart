@@ -140,9 +140,10 @@ class MembershipInfoCard extends ConsumerWidget {
                 height: 48,
                 decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: Center(
-                  child: Text(
-                    isAcademy ? '🏫' : '👤',
-                    style: AppTypography.headingLarge,
+                  child: Icon(
+                    isAcademy ? Icons.school_outlined : Icons.person_outline,
+                    size: AppSpacing.iconMD,
+                    color: AppColors.ink,
                   ),
                 ),
               );
