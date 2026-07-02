@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../providers/assignment_summary_provider.dart';
 
@@ -26,11 +27,35 @@ class AssignmentSummarySection extends ConsumerWidget {
 
     return summaryAsync.when(
       data: (summary) {
-        if (summary.totalItems == 0) return const SizedBox.shrink();
+        // #625 (0702 감사) — 과제 0건이어도 섹션을 숨기지 않는다. 숨기면
+        // 신규 교사가 과제 기능의 존재 자체를 인지할 수 없다 (dead-end).
+        if (summary.totalItems == 0) return _buildEmptyGuide(context);
         return _buildContent(context, summary);
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  /// #625 — 빈 상태 가이드: 헤더 유지 + 첫 과제 CTA (trial_bookings 패턴).
+  Widget _buildEmptyGuide(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const NotebookSectionHeader(label: AppStrings.weeklyAssignmentTitle),
+        const SizedBox(height: AppSpacing.space3),
+        SizedBox(
+          height: 190,
+          width: double.infinity,
+          child: EmptyStateWidget(
+            icon: Icons.edit_note,
+            title: AppStrings.weeklyAssignmentEmpty,
+            actionLabel: AppStrings.weeklyAssignmentFirstCta,
+            actionIcon: Icons.add,
+            onAction: () => context.push(AppRoutes.assignmentDashboard),
+          ),
+        ),
+      ],
     );
   }
 
