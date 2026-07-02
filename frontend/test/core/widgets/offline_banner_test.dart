@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/sync/presentation/providers/connectivity_banner_provider.dart';
+import 'package:lessonaza/core/sync/presentation/providers/stale_data_provider.dart';
 import 'package:lessonaza/core/widgets/offline_banner.dart';
 
 void main() {
@@ -84,6 +85,36 @@ void main() {
       await tester.pumpWidget(buildSubject(isOffline: true));
       await tester.pumpAndSettle();
       expect(find.text('content'), findsOneWidget);
+    });
+
+    testWidgets('offline + cache-served timestamp shows last-sync time (N14)', (
+      tester,
+    ) async {
+      final servedAt = DateTime(2026, 7, 2, 9, 30);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            offlineBannerProvider.overrideWith((ref) => Stream.value(true)),
+          ],
+          child: const MaterialApp(
+            home: OfflineBannerWrapper(child: Scaffold(body: Text('content'))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(AppStrings.offlineBannerMessage), findsOneWidget);
+
+      final context = tester.element(find.byType(OfflineBannerWrapper));
+      ProviderScope.containerOf(context, listen: false)
+          .read(lastServedFromCacheAtProvider.notifier)
+          .record(servedAt);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.offlineBannerLastSync('09:30')),
+        findsOneWidget,
+      );
+      expect(find.text(AppStrings.offlineBannerMessage), findsNothing);
     });
   });
 }

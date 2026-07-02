@@ -271,4 +271,32 @@ void main() {
       expect(sibling.data, {'stale': true});
     });
   });
+  group('onCacheServed (N14 / D2)', () {
+    test('fires with the served entry cachedAt on offline serve only',
+        () async {
+      final served = <DateTime>[];
+      final dio = Dio(BaseOptions(baseUrl: 'https://example.test'));
+      dio.httpClientAdapter = adapter;
+      dio.interceptors.add(
+        ResponseCacheInterceptor(
+          store: store,
+          policy: allowlisted,
+          onCacheServed: served.add,
+        ),
+      );
+
+      adapter.mode = _Mode.success;
+      await dio.get<dynamic>('/lessons');
+      expect(served, isEmpty, reason: 'live responses must not notify');
+
+      adapter.mode = _Mode.networkError;
+      final res = await dio.get<dynamic>('/lessons');
+      expect(res.data, {'ok': true});
+      expect(served, hasLength(1));
+      expect(
+        DateTime.now().toUtc().difference(served.single).inMinutes,
+        lessThan(2),
+      );
+    });
+  });
 }
