@@ -339,11 +339,16 @@ class _PaymentStatusChip extends StatelessWidget {
               color: isSelected ? color : AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space2),
-            Text(
-              label,
-              style: AppTypography.bodySmall.copyWith(
-                color: isSelected ? color : AppColors.inkSecondary,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            // #1067: 큰 Dynamic Type 에서 라벨이 3-across 칩 폭을 넘지 않도록
+            // Flexible 로 줄바꿈 허용.
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: AppTypography.bodySmall.copyWith(
+                  color: isSelected ? color : AppColors.inkSecondary,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
             ),
           ],
