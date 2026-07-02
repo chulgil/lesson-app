@@ -137,7 +137,11 @@ class _GroupClassAttendanceScreenState
             height: 48,
             decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: const Center(
-              child: Text('🎻', style: AppTypography.headingLarge),
+              child: Icon(
+                Icons.music_note,
+                size: AppSpacing.iconMD,
+                color: AppColors.ink,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),

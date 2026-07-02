@@ -673,7 +673,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
       textColor = AppColors.bubbleWarningText;
     } else {
       // Success state
-      message = '좋다냥! 🎵';
+      message = '좋다냥!';
       backgroundColor = AppColors.bubbleSuccessBackground;
       textColor = AppColors.bubbleSuccessText;
     }

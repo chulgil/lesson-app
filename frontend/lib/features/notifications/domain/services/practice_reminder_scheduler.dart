@@ -92,27 +92,20 @@ class PracticeReminderScheduler {
     required int streakDays,
   }) async {
     String message;
-    String emoji;
 
     if (streakDays == 7) {
       message = '일주일 연속 연습! 대단해요!';
-      emoji = '🔥';
     } else if (streakDays == 14) {
       message = '2주 연속 연습! 정말 멋져요!';
-      emoji = '💪';
     } else if (streakDays == 30) {
       message = '한 달 연속 연습! 놀라워요!';
-      emoji = '🎉';
     } else if (streakDays == 100) {
       message = '100일 연속 연습! 전설적이에요!';
-      emoji = '🏆';
     } else if (streakDays % 7 == 0) {
       final weeks = streakDays ~/ 7;
       message = '$weeks주 연속 연습! 잘하고 있어요!';
-      emoji = '⭐';
     } else {
       message = '$streakDays일 연속 연습! 계속 이어가세요!';
-      emoji = '🌟';
     }
 
     final notification = AppNotification(
@@ -120,7 +113,7 @@ class PracticeReminderScheduler {
       userId: userId,
       type: NotificationType.streakMilestone,
       priority: NotificationPriority.low,
-      title: '$emoji 스트릭 달성!',
+      title: '스트릭 달성!',
       body: message,
       data: {'streakDays': streakDays},
       createdAt: DateTime.now(),
@@ -209,7 +202,7 @@ class PracticeReminderScheduler {
       userId: userId,
       type: NotificationType.weeklyGoalAchieved,
       priority: NotificationPriority.low,
-      title: '🎯 주간 목표 달성!',
+      title: '주간 목표 달성!',
       body: '이번 주 $practiceDays일, 총 $timeStr 연습했어요!',
       data: {'practiceDays': practiceDays, 'totalMinutes': totalMinutes},
       createdAt: DateTime.now(),

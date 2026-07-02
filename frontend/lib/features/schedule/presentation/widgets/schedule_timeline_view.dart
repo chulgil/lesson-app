@@ -552,7 +552,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     }
 
     // All lessons done
-    return '오늘 레슨 완료 🎵';
+    return '오늘 레슨 완료';
   }
 }
 

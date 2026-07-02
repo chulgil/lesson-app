@@ -154,9 +154,10 @@ class _GroupClassDetailScreenState
             height: 64,
             decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Center(
-              child: Text(
-                _getInstrumentEmoji(),
-                style: AppTypography.displayLarge,
+              child: Icon(
+                _getInstrumentIcon(),
+                size: AppSpacing.iconLG,
+                color: AppColors.ink,
               ),
             ),
           ),
@@ -565,22 +566,13 @@ class _GroupClassDetailScreenState
     );
   }
 
-  String _getInstrumentEmoji() {
+  IconData _getInstrumentIcon() {
     switch (widget.groupClass.instrument?.toLowerCase()) {
-      case 'violin':
-      case '바이올린':
-        return '🎻';
       case 'piano':
       case '피아노':
-        return '🎹';
-      case 'cello':
-      case '첼로':
-        return '🎻';
-      case 'guitar':
-      case '기타':
-        return '🎸';
+        return Icons.piano;
       default:
-        return '🎵';
+        return Icons.music_note;
     }
   }
 

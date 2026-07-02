@@ -49,8 +49,8 @@ void main() {
     expect(find.byKey(const ValueKey('celebration_minutes')), findsOneWidget);
     expect(find.text('12분 했어요!'), findsOneWidget);
     expect(find.byKey(const ValueKey('celebration_streak')), findsOneWidget);
-    expect(find.text('🔥 3일 연속'), findsOneWidget);
-    expect(find.text('✨'), findsOneWidget);
+    expect(find.text('3일 연속'), findsOneWidget);
+    expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
     expect(tester.takeException(), isNull);
     // 명시적으로 timer 회수
     await tester.pumpAndSettle();
