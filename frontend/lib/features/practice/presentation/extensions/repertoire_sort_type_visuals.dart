@@ -4,8 +4,7 @@ import '../../domain/entities/repertoire_sort_type.dart';
 /// Presentation-layer display label for [RepertoireSortType].
 ///
 /// Lives in `presentation/extensions/` per the flutter-architecture rule —
-/// domain/data must not depend on `AppStrings`. The `iconName` getter stays
-/// in the domain extension.
+/// domain/data must not depend on `AppStrings`.
 extension RepertoireSortTypeVisualsX on RepertoireSortType {
   /// Display name in Korean.
   String get displayName {

@@ -10501,4 +10501,44 @@ class AppStrings {
   static const sortByMeasureAsc = '마디순';
   static const sortByLastPracticedDesc = '최근연습순';
   static const sortByCustom = '사용자지정';
+
+  // ── 0702 감사 M11 — 인라인 한글 추출 (C5) ──
+
+  /// 오류: {e} (academy announcements load error)
+  static String announcementsLoadErrorWith(Object e) => '오류: $e';
+
+  /// 홈으로 이동 (academy invite expired CTA)
+  static const academyInviteExpiredGoHome = '홈으로 이동';
+
+  /// 학생 선택 (lesson form student picker sheet title)
+  static const lessonStudentPickerTitle = '학생 선택';
+
+  /// 메트로놈 박자 연습 (student tutorial metronome section title)
+  static const tutorialMetronomeSectionTitle = '메트로놈 박자 연습';
+
+  /// 재생 (student tutorial metronome play CTA)
+  static const tutorialMetronomePlay = '재생';
+
+  /// 재생중... ({remaining}) (student tutorial metronome countdown)
+  static String tutorialMetronomePlaying(int remaining) =>
+      '재생중... ($remaining)';
+
+  /// 메트로놈 박자를 익혔어요! (student tutorial metronome done)
+  static const tutorialMetronomeDone = '메트로놈 박자를 익혔어요!';
+
+  /// {instrument}이(가) 추가되었습니다 (instrument add success)
+  static String instrumentAddedWith(String instrument) =>
+      '$instrument이(가) 추가되었습니다';
+
+  /// 악기 추가에 실패했습니다 (instrument add failure)
+  static const instrumentAddFailed = '악기 추가에 실패했습니다';
+
+  /// 정지 (recording comparison stop CTA)
+  static const recordingComparisonStop = '정지';
+
+  /// 동시 재생 (recording comparison play-both CTA)
+  static const recordingComparisonPlayBoth = '동시 재생';
+
+  /// 녹음 재생 (repertoire recording play tooltip)
+  static const repertoireRecordingPlayTooltip = '녹음 재생';
 }

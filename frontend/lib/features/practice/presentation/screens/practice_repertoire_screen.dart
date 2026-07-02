@@ -388,7 +388,7 @@ class _SectionListItem extends ConsumerWidget {
                       '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}?repertoireId=$repertoireId&studentId=$studentId',
                     );
                   },
-                  tooltip: '녹음 재생',
+                  tooltip: AppStrings.repertoireRecordingPlayTooltip,
                   constraints: const BoxConstraints(),
                   padding: const EdgeInsets.all(AppSpacing.space2),
                 ),

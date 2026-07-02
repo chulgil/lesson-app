@@ -4,8 +4,7 @@ import '../../domain/entities/section_sort_type.dart';
 /// Presentation-layer display label for [SectionSortType].
 ///
 /// Lives in `presentation/extensions/` per the flutter-architecture rule —
-/// domain/data must not depend on `AppStrings`. The `iconName` getter stays
-/// in the domain extension.
+/// domain/data must not depend on `AppStrings`.
 extension SectionSortTypeVisualsX on SectionSortType {
   /// Display name in Korean.
   String get displayName {

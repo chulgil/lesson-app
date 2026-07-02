@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -76,7 +77,7 @@ class AcademyInviteExpiredScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => context.go(AppRoutes.home),
-                    child: const Text('홈으로 이동'),
+                    child: const Text(AppStrings.academyInviteExpiredGoHome),
                   ),
                 ),
               ],

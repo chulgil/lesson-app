@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -89,7 +90,7 @@ class _MetronomeStepState extends State<MetronomeStep> {
         children: [
           // BPM Slider Label
           Text(
-            '메트로놈 박자 연습',
+            AppStrings.tutorialMetronomeSectionTitle,
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
@@ -167,7 +168,7 @@ class _MetronomeStepState extends State<MetronomeStep> {
                   ),
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
                 ),
-                child: Text('재생', style: AppTypography.button),
+                child: Text(AppStrings.tutorialMetronomePlay, style: AppTypography.button),
               ),
             ),
 
@@ -189,7 +190,7 @@ class _MetronomeStepState extends State<MetronomeStep> {
                   ),
                 ),
                 child: Text(
-                  '재생중... ($_countdownRemaining)',
+                  AppStrings.tutorialMetronomePlaying(_countdownRemaining),
                   style: AppTypography.button.copyWith(color: AppColors.paper),
                 ),
               ),
@@ -206,7 +207,7 @@ class _MetronomeStepState extends State<MetronomeStep> {
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  '메트로놈 박자를 익혔어요!',
+                  AppStrings.tutorialMetronomeDone,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.paperOk,
                     fontWeight: FontWeight.w600,

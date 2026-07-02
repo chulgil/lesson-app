@@ -15,23 +15,6 @@ enum RepertoireSortType {
   custom,
 }
 
-/// Extension for RepertoireSortType display
-extension RepertoireSortTypeExtension on RepertoireSortType {
-  /// Get icon for the sort type
-  String get iconName {
-    switch (this) {
-      case RepertoireSortType.createdDesc:
-        return 'arrow_downward';
-      case RepertoireSortType.createdAsc:
-        return 'arrow_upward';
-      case RepertoireSortType.nameAsc:
-        return 'sort_by_alpha';
-      case RepertoireSortType.custom:
-        return 'drag_handle';
-    }
-  }
-}
-
 /// Extension for sorting practice repertoires
 extension RepertoireSorting on List<PracticeRepertoire> {
   /// Sort repertoires by the given sort type
