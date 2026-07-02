@@ -45,6 +45,9 @@ class _ChildProfileFormScreenState
   late String _selectedLevel;
   late Color _selectedColor;
   bool _isLoading = false;
+  // #1072: true once the user explicitly picks an instrument, so build
+  // stops re-deriving the default when the active discipline resolves.
+  bool _instrumentTouched = false;
 
   bool get isEditing => widget.existingProfile != null;
 
@@ -58,11 +61,6 @@ class _ChildProfileFormScreenState
     AppColors.profileTeal,
     AppColors.profileRed,
     AppColors.profileIndigo,
-  ];
-
-  // Instruments — derived from the canonical key-space SSOT (no inline labels).
-  static final _instruments = [
-    for (final k in kChildInstrumentKeys) (k, childInstrumentLabel(k)),
   ];
 
   // Levels
@@ -79,7 +77,9 @@ class _ChildProfileFormScreenState
     final profile = widget.existingProfile;
     _nameController = TextEditingController(text: profile?.name ?? '');
     _selectedBirthYear = profile?.birthYear ?? DateTime.now().year - 7;
-    _selectedInstrument = profile?.instrument ?? 'violin';
+    // New profiles default in build once the active discipline resolves
+    // (see build); '' is the not-yet-derived sentinel. Edits keep their value.
+    _selectedInstrument = profile?.instrument ?? '';
     _selectedLevel = profile?.level ?? 'beginner';
     _selectedColor = profile?.profileColor ?? _profileColors[0];
   }
@@ -149,6 +149,30 @@ class _ChildProfileFormScreenState
     final currentYear = DateTime.now().year;
     final minYear = currentYear - 18; // Max 18 years old
     final maxYear = currentYear - 3; // Min 3 years old
+
+    // #1072: expertise options follow the active discipline (music keeps its
+    // curated key-space, byte-identical; fitness surfaces its specialties).
+    final catalogOptions = childInstrumentOptionsFor(
+      ref.watch(activeDisciplineProvider),
+    );
+    // A new, untouched profile defaults to the active discipline's first
+    // option. Derived here, not in initState: activeDisciplineProvider first
+    // emits the music fallback while its Hive storage loads, then the resolved
+    // discipline — deriving in build re-snaps the default once it resolves,
+    // instead of leaking 'violin' onto a fitness child. Edits keep their value.
+    if (!isEditing && !_instrumentTouched && catalogOptions.isNotEmpty) {
+      _selectedInstrument = catalogOptions.first.$1;
+    }
+    // Preserve a saved value outside the active catalog (e.g. a music child
+    // viewed under a switched discipline) so the dropdown never asserts /
+    // silently reverts - mirrors the StudentProfileEdit fix (#1098).
+    final instrumentOptions =
+        catalogOptions.any((o) => o.$1 == _selectedInstrument)
+            ? catalogOptions
+            : [
+              (_selectedInstrument, childInstrumentLabel(_selectedInstrument)),
+              ...catalogOptions,
+            ];
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
@@ -352,7 +376,7 @@ class _ChildProfileFormScreenState
                   value: _selectedInstrument,
                   isExpanded: true,
                   items:
-                      _instruments.map((item) {
+                      instrumentOptions.map((item) {
                         return DropdownMenuItem(
                           value: item.$1,
                           child: Text(item.$2),
@@ -360,7 +384,10 @@ class _ChildProfileFormScreenState
                       }).toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      setState(() => _selectedInstrument = value);
+                      setState(() {
+                        _selectedInstrument = value;
+                        _instrumentTouched = true;
+                      });
                     }
                   },
                 ),
