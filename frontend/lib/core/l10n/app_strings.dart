@@ -10561,4 +10561,13 @@ class AppStrings {
 
   /// 학부모이신가요? (parent guide link)
   static const authParentLoginLink = '학부모이신가요?';
+
+  // ── 0702 감사 N8 — 구독 협상 거절 (request_detail 3종 응답과 대칭) ──
+
+  /// 제안 거절 (reject confirm dialog title)
+  static const scheduleChangeRejectConfirmTitle = '제안 거절';
+
+  /// 거절 확인 본문 (reject confirm dialog body)
+  static const scheduleChangeRejectConfirmBody =
+      '이 일정 제안을 거절하시겠습니까? 상대방에게 알림이 전송됩니다.';
 }

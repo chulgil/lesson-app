@@ -13,6 +13,8 @@ import '../providers/subscription_providers.dart';
 
 typedef AcceptScheduleChoice =
     void Function(RequestEvent event, int slotIndex, String message);
+typedef RejectScheduleChoice =
+    void Function(RequestEvent event, String message);
 typedef ScheduleEventAction = void Function(RequestEvent event);
 
 /// Bottom input bar for the subscription detail screen.
@@ -36,6 +38,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   final String? opponentName;
   final int selectedSession;
   final AcceptScheduleChoice? onAcceptScheduleChoice;
+  final RejectScheduleChoice? onRejectScheduleChoice;
   final ScheduleEventAction? onCompareSchedule;
   final ScheduleEventAction? onWithdrawScheduleDecision;
   final void Function(RequestEvent event)? onCancellationFreeProcess;
@@ -52,6 +55,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     this.opponentName,
     this.selectedSession = 1,
     this.onAcceptScheduleChoice,
+    this.onRejectScheduleChoice,
     this.onCompareSchedule,
     this.onWithdrawScheduleDecision,
     this.onCancellationFreeProcess,
@@ -115,6 +119,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
               event: scheduleEvent,
               messageController: messageController,
               onAccept: onAcceptScheduleChoice,
+              onReject: onRejectScheduleChoice,
               onCompare: onCompareSchedule,
             ),
           ] else ...[
@@ -304,12 +309,14 @@ class _ScheduleChoiceBar extends StatefulWidget {
     required this.event,
     this.messageController,
     required this.onAccept,
+    required this.onReject,
     required this.onCompare,
   });
 
   final RequestEvent event;
   final TextEditingController? messageController;
   final AcceptScheduleChoice? onAccept;
+  final RejectScheduleChoice? onReject;
   final ScheduleEventAction? onCompare;
 
   @override
@@ -378,9 +385,36 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
+        // N8 (0702 감사) — request_detail 응답 3종(수락/거절/역제안)과 대칭.
         Row(
           children: [
             Expanded(
+              child: SizedBox(
+                height: AppSpacing.buttonHeightSmall,
+                child: OutlinedButton(
+                  onPressed:
+                      widget.onReject == null
+                          ? null
+                          : () => widget.onReject!(
+                            widget.event,
+                            _messageController.text,
+                          ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.paperAccent),
+                    shape: RoundedRectangleBorder(),
+                  ),
+                  child: Text(
+                    AppStrings.scheduleChangeReject,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.paperAccent,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              flex: 2,
               child: SizedBox(
                 height: AppSpacing.buttonHeightSmall,
                 child: OutlinedButton(
@@ -401,33 +435,32 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: SizedBox(
-                height: AppSpacing.buttonHeightSmall,
-                child: ElevatedButton(
-                  onPressed:
-                      _selectedSlotIndex == null || widget.onAccept == null
-                          ? null
-                          : () => widget.onAccept!(
-                            widget.event,
-                            _selectedSlotIndex!,
-                            _messageController.text,
-                          ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.paperAccent,
-                    shape: RoundedRectangleBorder(),
-                  ),
-                  child: Text(
-                    AppStrings.scheduleChangeAccept,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.paper,
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        SizedBox(
+          width: double.infinity,
+          height: AppSpacing.buttonHeightSmall,
+          child: ElevatedButton(
+            onPressed:
+                _selectedSlotIndex == null || widget.onAccept == null
+                    ? null
+                    : () => widget.onAccept!(
+                      widget.event,
+                      _selectedSlotIndex!,
+                      _messageController.text,
                     ),
-                  ),
-                ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.paperAccent,
+              shape: RoundedRectangleBorder(),
+            ),
+            child: Text(
+              AppStrings.scheduleChangeAccept,
+              style: AppTypography.buttonSmall.copyWith(
+                color: AppColors.paper,
               ),
             ),
-          ],
+          ),
         ),
       ],
     );

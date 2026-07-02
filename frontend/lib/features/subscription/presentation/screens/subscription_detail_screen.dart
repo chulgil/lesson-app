@@ -458,6 +458,9 @@ class _SubscriptionDetailBodyState
             selectedSession: _selectedSession,
             onScheduleChange: () => _handleScheduleChange(context),
             onAcceptScheduleChoice: _handleAcceptScheduleChoice,
+            onRejectScheduleChoice:
+                (event, message) =>
+                    _handleRejectScheduleChoice(context, event, message),
             onCompareSchedule:
                 (event) => _handleCompareSchedule(context, event),
             onWithdrawScheduleDecision:
@@ -550,6 +553,62 @@ class _SubscriptionDetailBodyState
       );
     }
     if (mounted) _showSuccess(AppStrings.scheduleChangeAccepted);
+  }
+
+  /// N8 (0702 감사) — reject the opponent's schedule proposal. Mirrors
+  /// request_detail's 3-action response set; destructive → confirm dialog.
+  Future<void> _handleRejectScheduleChoice(
+    BuildContext context,
+    RequestEvent event,
+    String message,
+  ) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.scheduleChangeRejectConfirmTitle,
+      message: AppStrings.scheduleChangeRejectConfirmBody,
+      confirmLabel: AppStrings.scheduleChangeReject,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final rejectEvent = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
+      actorId: _isTeacher
+          ? (_getTeacherId() ?? subscription.studentId)
+          : subscription.studentId,
+      eventType: RequestEventType.scheduleChangeRejected,
+      suggestedSlots: event.suggestedSlots,
+      message: message.isEmpty ? null : message,
+      sessionNumber: _selectedSession,
+      createdAt: DateTime.now(),
+    );
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      rejectEvent,
+    );
+    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
+    final opp = _scheduleOpponentId();
+    if (opp.isNotEmpty) {
+      unawaited(
+        ref
+            .read(notificationServiceProvider)
+            .showNotification(
+              BookingNotificationService.createScheduleChangeRejected(
+                userId: opp,
+                fromTeacher: _isTeacher,
+                data: _scheduleChangeData(),
+              ),
+            ),
+      );
+    }
+    if (mounted) _showSuccess(AppStrings.scheduleChangeReject);
   }
 
   /// Open schedule comparison screen to counter-propose.
