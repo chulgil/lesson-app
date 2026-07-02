@@ -8,10 +8,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../../features/gamification/data/repositories/hive_streak_freeze_repository.dart';
 import '../../features/gamification/data/repositories/hive_student_quest_repository.dart';
 import '../../features/gamification/data/services/growth_heatmap_chunk_cache.dart';
-import '../../features/lessons/data/local/lesson_cache_store.dart';
-import '../../features/schedule/data/local/teacher_availability_cache_store.dart';
-import '../../features/students/data/local/student_cache_store.dart';
-import '../../features/subscription/data/local/subscription_cache_store.dart';
 import '../../features/notifications/data/services/fcm_service.dart';
 import '../../features/practice/data/models/practice_recording_hive_adapter.dart';
 import '../../features/practice/data/models/recording_hive_adapters.dart';
@@ -61,10 +57,6 @@ Future<StartupRecoveryResult> bootstrapApp() async {
   );
   await Hive.openBox('notification_settings');
   await Hive.openBox<String>('app_review_state');
-  await Hive.openBox<String>(LessonCacheStore.boxName);
-  await Hive.openBox<String>(StudentCacheStore.boxName);
-  await Hive.openBox<String>(TeacherAvailabilityCacheStore.boxName);
-  await Hive.openBox<String>(SubscriptionCacheStore.boxName);
   // Offline-first read cache (offline-first plan §3 option A). The
   // ResponseCacheInterceptor reads/writes this box synchronously.
   await Hive.openBox<String>(ResponseCacheStore.boxName);
