@@ -274,6 +274,8 @@ class _StudentInviteCodeScreenState
     }
     if (!mounted) return;
     // Set role to student and go directly to profile setup
+    // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
+    // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
     context.go(AppRoutes.studentProfileSetup);
   }
@@ -337,6 +339,8 @@ class _StudentInviteCodeScreenState
         }
       }
 
+      // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
+      // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
       ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
       ref.invalidate(mySentRequestsProvider);
       ref.invalidate(myConnectionsProvider);

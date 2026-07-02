@@ -159,7 +159,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         // Italic serif slogan
         Text(
-          '함께 채워가는 레슨 노트.',
+          AppStrings.authSlogan,
           style: NotebookTypography.fine.copyWith(
             color: AppColors.inkSecondary,
             fontWeight: FontWeight.w400,
@@ -222,19 +222,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       children: [
         _NotebookAuthBtn(
-          label: 'Google 계정으로 시작',
+          label: AppStrings.authGoogleStart,
           primary: true,
           onTap: () => _handleGoogleLogin(context),
         ),
         const SizedBox(height: AppSpacing.space3),
         _NotebookAuthBtn(
-          label: 'Kakao로 시작',
+          label: AppStrings.authKakaoStart,
           onTap: null, // #118: 준비중 — NO-OP 제거
           comingSoonBadge: AppStrings.authComingSoonBadge,
         ),
         const SizedBox(height: AppSpacing.space3),
         _NotebookAuthBtn(
-          label: 'Apple 계정으로 시작',
+          label: AppStrings.authAppleStart,
           onTap: null, // #118: 준비중 — NO-OP 제거
           comingSoonBadge: AppStrings.authComingSoonBadge,
         ),
@@ -260,7 +260,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               vertical: AppSpacing.space2,
             ),
             child: Text(
-              '학부모이신가요?',
+              AppStrings.authParentLoginLink,
               style: AppTypography.buttonSmall.copyWith(
                 fontFamily: AppTypography.fontFamily,
                 color: AppColors.inkSecondary,
