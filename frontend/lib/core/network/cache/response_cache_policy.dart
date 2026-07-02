@@ -9,7 +9,11 @@
 /// [active] is the single edit point for the rollout — each batch adds its
 /// domain's path prefixes there.
 class ResponseCachePolicy {
-  const ResponseCachePolicy({this.allowlist = const <String>{}});
+  const ResponseCachePolicy({
+    this.allowlist = const <String>{},
+    this.sensitivePrefixes = const <String>{},
+    this.sensitiveTtl = const Duration(minutes: 15),
+  });
 
   /// The live policy used in production wiring (see `apiClient`).
   ///
@@ -27,6 +31,8 @@ class ResponseCachePolicy {
       '/schedule/availability',
       '/schedule/slots',
     },
+    // D3: money-adjacent reads must not be served stale for long.
+    sensitivePrefixes: {'/subscriptions/payment-pending'},
   );
 
   /// Path prefixes eligible for response caching, e.g. `/lessons`.
@@ -34,6 +40,14 @@ class ResponseCachePolicy {
   /// Sensitive write-authoritative paths (billing, auth) stay excluded until
   /// their dedicated batch (D3/D6).
   final Set<String> allowlist;
+
+  /// Allowlisted sub-prefixes whose cached responses expire after
+  /// [sensitiveTtl] (offline plan D3). Display-only domains have no TTL —
+  /// stale-until-reconnect is the adopted policy (D2).
+  final Set<String> sensitivePrefixes;
+
+  /// Max age an entry under [sensitivePrefixes] may be served offline.
+  final Duration sensitiveTtl;
 
   /// Whether responses for [path] may be cached / served from cache.
   ///
@@ -51,5 +65,14 @@ class ResponseCachePolicy {
       if (path == prefix || path.startsWith('$prefix/')) return prefix;
     }
     return null;
+  }
+
+  /// TTL for [path], or null when the entry never expires (D3: only
+  /// sensitive prefixes age out; display domains are stale-until-reconnect).
+  Duration? ttlFor(String path) {
+    final sensitive = sensitivePrefixes.any(
+      (prefix) => path == prefix || path.startsWith('$prefix/'),
+    );
+    return sensitive ? sensitiveTtl : null;
   }
 }

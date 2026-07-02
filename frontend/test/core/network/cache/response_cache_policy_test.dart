@@ -84,4 +84,36 @@ void main() {
       );
     });
   });
+  group('ttlFor (N15 / D3)', () {
+    const policy = ResponseCachePolicy(
+      allowlist: {'/subscriptions'},
+      sensitivePrefixes: {'/subscriptions/payment-pending'},
+      sensitiveTtl: Duration(minutes: 15),
+    );
+
+    test('sensitive prefix and its subpaths get the short TTL', () {
+      expect(
+        policy.ttlFor('/subscriptions/payment-pending'),
+        const Duration(minutes: 15),
+      );
+      expect(
+        policy.ttlFor('/subscriptions/payment-pending/123'),
+        const Duration(minutes: 15),
+      );
+    });
+
+    test('non-sensitive paths never expire', () {
+      expect(policy.ttlFor('/subscriptions'), isNull);
+      expect(policy.ttlFor('/subscriptions/abc'), isNull);
+      expect(policy.ttlFor('/lessons'), isNull);
+    });
+
+    test('active policy marks payment-pending as sensitive', () {
+      expect(
+        ResponseCachePolicy.active.ttlFor('/subscriptions/payment-pending'),
+        isNotNull,
+      );
+      expect(ResponseCachePolicy.active.ttlFor('/subscriptions'), isNull);
+    });
+  });
 }

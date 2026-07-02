@@ -210,4 +210,65 @@ void main() {
       );
     });
   });
+  group('sensitive TTL (N15 / offline plan D3)', () {
+    Future<void> seedAged(String key, Duration age) async {
+      await box.put(
+        key,
+        jsonEncode({
+          'cachedAt':
+              DateTime.now().toUtc().subtract(age).toIso8601String(),
+          'statusCode': 200,
+          'data': {'stale': true},
+        }),
+      );
+    }
+
+    const sensitivePolicy = ResponseCachePolicy(
+      allowlist: {'/subscriptions'},
+      sensitivePrefixes: {'/subscriptions/payment-pending'},
+      sensitiveTtl: Duration(minutes: 15),
+    );
+
+    test('display-only domains have no TTL — 30-day-old entry still serves',
+        () async {
+      final dio = buildDio(allowlisted);
+      await seedAged('GET /lessons', const Duration(days: 30));
+
+      adapter.mode = _Mode.networkError;
+      final res = await dio.get<dynamic>('/lessons');
+
+      expect(res.data, {'stale': true});
+    });
+
+    test('expired payment-pending entry is NOT served offline', () async {
+      final dio = buildDio(sensitivePolicy);
+      await seedAged(
+        'GET /subscriptions/payment-pending',
+        const Duration(hours: 1),
+      );
+
+      adapter.mode = _Mode.networkError;
+      await expectLater(
+        dio.get<dynamic>('/subscriptions/payment-pending'),
+        throwsA(isA<DioException>()),
+      );
+    });
+
+    test('payment-pending within TTL still serves; sibling path unaffected',
+        () async {
+      final dio = buildDio(sensitivePolicy);
+      await seedAged(
+        'GET /subscriptions/payment-pending',
+        const Duration(minutes: 5),
+      );
+      await seedAged('GET /subscriptions', const Duration(hours: 1));
+
+      adapter.mode = _Mode.networkError;
+      final fresh = await dio.get<dynamic>('/subscriptions/payment-pending');
+      expect(fresh.data, {'stale': true});
+
+      final sibling = await dio.get<dynamic>('/subscriptions');
+      expect(sibling.data, {'stale': true});
+    });
+  });
 }
