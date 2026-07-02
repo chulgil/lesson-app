@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -10,6 +11,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/price_input.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import '../../../../features/students/domain/entities/lesson_slot.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../../features/students/students_facade.dart'
@@ -110,6 +113,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               const SizedBox(height: AppSpacing.space3),
               InstrumentSelector(
                 selectedInstrument: _selectedInstrument,
+                instruments: ExpertiseCatalogRegistry.forDiscipline(
+                  ref.watch(activeDisciplineProvider),
+                ).items,
                 onChanged: (value) {
                   setState(() => _selectedInstrument = value);
                 },

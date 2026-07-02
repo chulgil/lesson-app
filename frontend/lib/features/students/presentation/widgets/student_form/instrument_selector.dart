@@ -8,24 +8,18 @@ import '../../../../../core/theme/app_typography.dart';
 class InstrumentSelector extends StatelessWidget {
   final String? selectedInstrument;
   final ValueChanged<String?> onChanged;
+
+  /// The expertise catalog to choose from. Callers pass the active discipline's
+  /// catalog (`ExpertiseCatalogRegistry.forDiscipline(activeDiscipline).items`),
+  /// not a hardcoded music list (#1072). Music resolves byte-identically to the
+  /// 22-item instrument catalog; fitness surfaces 웨이트/필라테스/PT.
   final List<String> instruments;
 
   const InstrumentSelector({
     super.key,
     required this.selectedInstrument,
     required this.onChanged,
-    this.instruments = const [
-      '바이올린',
-      '피아노',
-      '첼로',
-      '플루트',
-      '클라리넷',
-      '비올라',
-      '기타',
-      '성악',
-      '드럼',
-      '기타(직접입력)',
-    ],
+    required this.instruments,
   });
 
   @override
