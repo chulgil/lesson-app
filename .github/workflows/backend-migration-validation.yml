@@ -59,7 +59,9 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies (incl. dev)
-        run: uv sync --frozen
+        # pytest lives in [project.optional-dependencies].dev — without
+        # --extra dev the gate dies at "Failed to spawn: pytest" (red since 6/22).
+        run: uv sync --frozen --extra dev
 
       - name: Validate migration chain + enum parity on Postgres
         run: uv run pytest tests/test_alembic_postgres_validation.py -v

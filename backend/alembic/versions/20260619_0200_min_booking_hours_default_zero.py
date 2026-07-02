@@ -29,6 +29,12 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    # SQLite cannot ALTER COLUMN SET DEFAULT (test_alembic_sqlite_upgrade
+    # gate); the docstring's "Postgres only" intent needs the actual guard.
+    bind = op.get_bind()
+    if bind.dialect.name != "postgresql":
+        return
+
     # Future rows: default 24 -> 0.
     op.alter_column(
         "teacher_settings",
@@ -42,6 +48,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name != "postgresql":
+        return
+
     # Restore the structural default only. The data reset (24 -> 0) is not
     # reversed: the original value is indistinguishable from a deliberate 0.
     op.alter_column(
