@@ -523,8 +523,14 @@ class ScheduleConfirmationService:
         scheduled_date: Any,
         scheduled_time: str,
         duration: int,
+        exclude_booking_id: str | None = None,
     ) -> bool:
-        """Check if teacher has an existing booking at this date/time."""
+        """Check if teacher has an existing booking at this date/time.
+
+        [exclude_booking_id] skips that booking row — used when re-validating
+        an existing booking's own slot (approve / change-request) so it does
+        not collide with itself.
+        """
         from app.models.lesson import Lesson
         from app.models.schedule import LessonBooking
 
@@ -542,6 +548,8 @@ class ScheduleConfirmationService:
         new_end = new_start + duration
 
         for booking in existing.all():
+            if exclude_booking_id is not None and booking.id == exclude_booking_id:
+                continue
             existing_start = self._time_to_minutes(booking.scheduled_time)
             existing_end = existing_start + (booking.duration or 60)
             if new_start < existing_end and new_end > existing_start:
