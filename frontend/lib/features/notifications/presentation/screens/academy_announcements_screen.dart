@@ -52,7 +52,7 @@ class AcademyAnnouncementsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('오류: $error')),
+        error: (error, stack) => Center(child: Text(AppStrings.announcementsLoadErrorWith(error))),
       ),
     );
   }

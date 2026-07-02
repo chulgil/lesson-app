@@ -514,7 +514,9 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 color: AppColors.paper,
               ),
               label: Text(
-                _playingA || _playingB ? '정지' : '동시 재생',
+                _playingA || _playingB
+                    ? AppStrings.recordingComparisonStop
+                    : AppStrings.recordingComparisonPlayBoth,
                 style: AppTypography.buttonSmall.copyWith(
                   color: AppColors.paper,
                 ),

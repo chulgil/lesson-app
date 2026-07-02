@@ -21,27 +21,6 @@ enum SectionSortType {
   custom,
 }
 
-/// Extension for SectionSortType display
-extension SectionSortTypeExtension on SectionSortType {
-  /// Get icon for the sort type
-  String get iconName {
-    switch (this) {
-      case SectionSortType.createdDesc:
-        return 'arrow_downward';
-      case SectionSortType.createdAsc:
-        return 'arrow_upward';
-      case SectionSortType.nameAsc:
-        return 'sort_by_alpha';
-      case SectionSortType.measureAsc:
-        return 'music_note';
-      case SectionSortType.lastPracticedDesc:
-        return 'schedule';
-      case SectionSortType.custom:
-        return 'drag_handle';
-    }
-  }
-}
-
 /// Extension for sorting practice sections
 extension SectionSorting on List<PracticeSection> {
   /// Sort sections by the given sort type

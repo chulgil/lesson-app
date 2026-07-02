@@ -382,12 +382,12 @@ class _InstrumentManagementScreenState
       Navigator.pop(context);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('$instrument이(가) 추가되었습니다')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.instrumentAddedWith(instrument))));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('악기 추가에 실패했습니다')));
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.instrumentAddFailed)));
     }
   }
 
@@ -410,12 +410,12 @@ class _InstrumentManagementScreenState
       Navigator.pop(context);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('$instrument이(가) 추가되었습니다')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.instrumentAddedWith(instrument))));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('악기 추가에 실패했습니다')));
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.instrumentAddFailed)));
     }
   }
 
