@@ -12,6 +12,7 @@ import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/refresh_interceptor.dart';
 import 'interceptors/response_cache_interceptor.dart';
+import '../sync/presentation/providers/stale_data_provider.dart';
 
 part 'api_client.g.dart';
 
@@ -174,6 +175,9 @@ ApiClient apiClient(ApiClientRef ref) {
           box: Hive.box<String>(ResponseCacheStore.boxName),
         ),
         policy: ResponseCachePolicy.active,
+        // D2: feed the staleness banner with the served entry's cachedAt.
+        onCacheServed: (cachedAt) =>
+            ref.read(lastServedFromCacheAtProvider.notifier).record(cachedAt),
       ),
     );
   }

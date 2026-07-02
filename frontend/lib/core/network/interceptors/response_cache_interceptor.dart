@@ -22,11 +22,17 @@ class ResponseCacheInterceptor extends Interceptor {
   ResponseCacheInterceptor({
     required ResponseCacheStore store,
     required ResponseCachePolicy policy,
+    void Function(DateTime cachedAt)? onCacheServed,
   }) : _store = store,
-       _policy = policy;
+       _policy = policy,
+       _onCacheServed = onCacheServed;
 
   final ResponseCacheStore _store;
   final ResponseCachePolicy _policy;
+
+  /// N14/D2: notified with the served entry's `cachedAt` whenever a request
+  /// is resolved from cache, so the offline banner can show data freshness.
+  final void Function(DateTime cachedAt)? _onCacheServed;
 
   @override
   void onResponse(
@@ -71,6 +77,7 @@ class ResponseCacheInterceptor extends Interceptor {
         _policy.isCacheable(options.path)) {
       final cached = _store.get(_keyFor(options));
       if (cached != null && !_isExpired(cached, options.path)) {
+        _onCacheServed?.call(cached.cachedAt);
         handler.resolve(
           Response<dynamic>(
             requestOptions: options,

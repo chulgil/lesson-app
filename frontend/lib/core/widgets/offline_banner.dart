@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/app_strings.dart';
 import '../sync/presentation/providers/connectivity_banner_provider.dart';
+import '../sync/presentation/providers/stale_data_provider.dart';
+import '../utils/date_format_utils.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -37,7 +39,10 @@ class OfflineBannerWrapper extends ConsumerWidget {
             child: child,
           ),
           child: isOffline
-              ? const _OfflineBanner(key: ValueKey('offline'))
+              ? _OfflineBanner(
+                  key: const ValueKey('offline'),
+                  lastSyncedAt: ref.watch(lastServedFromCacheAtProvider),
+                )
               : const SizedBox.shrink(key: ValueKey('online')),
         ),
         Expanded(child: child),
@@ -48,7 +53,11 @@ class OfflineBannerWrapper extends ConsumerWidget {
 
 /// The visible offline strip.
 class _OfflineBanner extends StatelessWidget {
-  const _OfflineBanner({super.key});
+  const _OfflineBanner({super.key, this.lastSyncedAt});
+
+  /// `cachedAt` of the most recently cache-served response (D2). When set,
+  /// the banner tells the user how fresh the on-screen data is.
+  final DateTime? lastSyncedAt;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +80,11 @@ class _OfflineBanner extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
-                AppStrings.offlineBannerMessage,
+                lastSyncedAt == null
+                    ? AppStrings.offlineBannerMessage
+                    : AppStrings.offlineBannerLastSync(
+                        formatTimeHM(lastSyncedAt!.toLocal()),
+                      ),
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.offlineBannerForeground,
                   fontWeight: FontWeight.w500,

@@ -10269,6 +10269,10 @@ class AppStrings {
   /// 오프라인 배너 문구 (#868)
   static const offlineBannerMessage = '오프라인 — 저장된 데이터를 표시 중';
 
+  /// 오프라인 배너 — 캐시 서빙 시 데이터 신선도 표기 (D2, N14)
+  static String offlineBannerLastSync(String hhmm) =>
+      '오프라인 — $hhmm 동기화 데이터 표시 중';
+
   // ── Issue #920 i18n bundle ──
 
   // Role Select
