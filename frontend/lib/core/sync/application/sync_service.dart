@@ -39,17 +39,25 @@ class SyncService {
     required ConnectivityService connectivityService,
     required SyncAdapterRegistry adapterRegistry,
     required ApiClient apiClient,
+    Future<void> Function(String path)? invalidateCachedReads,
     this.pollingInterval = const Duration(seconds: 30),
     this.defaultMaxRetryCount = 5,
   }) : _queueStore = queueStore,
        _connectivityService = connectivityService,
        _adapterRegistry = adapterRegistry,
-       _apiClient = apiClient;
+       _apiClient = apiClient,
+       _invalidateCachedReads = invalidateCachedReads;
 
   final SyncQueueStore _queueStore;
   final ConnectivityService _connectivityService;
   final SyncAdapterRegistry _adapterRegistry;
   final ApiClient _apiClient;
+
+  /// N7: drops cached GET responses for the mutated path's domain so an
+  /// offline write is not followed by a stale offline read. Replays go
+  /// through the HTTP interceptor, which invalidates again on success.
+  final Future<void> Function(String path)? _invalidateCachedReads;
+
   final Duration pollingInterval;
   final int defaultMaxRetryCount;
 
@@ -158,6 +166,14 @@ class SyncService {
     );
 
     await _queueStore.upsert(entry);
+    final invalidate = _invalidateCachedReads;
+    if (invalidate != null) {
+      try {
+        await invalidate(path);
+      } catch (_) {
+        // Best-effort — a failed invalidation must not lose the queued write.
+      }
+    }
     await _refreshStats(nextAction: 'queued operation');
     unawaited(syncPending());
 

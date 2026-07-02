@@ -53,7 +53,7 @@ final syncAdapterRegistryProvider = Provider<SyncAdapterRegistry>.internal(
 );
 
 typedef SyncAdapterRegistryRef = ProviderRef<SyncAdapterRegistry>;
-String _$syncServiceHash() => r'0d1f67a4fddf0fc48b58cf3cab40f4b26561f611';
+String _$syncServiceHash() => r'3d06436aae7cc87d396a4c45eab78e93957f9147';
 
 /// See also [syncService].
 @ProviderFor(syncService)

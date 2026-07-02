@@ -35,10 +35,8 @@ class ResponseCacheInterceptor extends Interceptor {
   ) async {
     final options = response.requestOptions;
     final statusCode = response.statusCode ?? 0;
-    if (_isGet(options) &&
-        statusCode >= 200 &&
-        statusCode < 300 &&
-        _policy.isCacheable(options.path)) {
+    final isSuccess = statusCode >= 200 && statusCode < 300;
+    if (_isGet(options) && isSuccess && _policy.isCacheable(options.path)) {
       try {
         await _store.put(
           _keyFor(options),
@@ -47,6 +45,19 @@ class ResponseCacheInterceptor extends Interceptor {
         );
       } catch (_) {
         // Cache write is best-effort; never block or fail the response.
+      }
+    } else if (!_isGet(options) && isSuccess) {
+      // N7: a successful write makes the domain's cached reads stale.
+      // Covers direct online writes AND queued-mutation replays (both pass
+      // through this interceptor). Cross-domain effects (e.g. a booking
+      // creating lessons) are intentionally out of scope — prefix-local only.
+      final prefix = _policy.matchingPrefix(options.path);
+      if (prefix != null) {
+        try {
+          await _store.removeByPathPrefix(prefix);
+        } catch (_) {
+          // Invalidation is best-effort; never block the response.
+        }
       }
     }
     handler.next(response);

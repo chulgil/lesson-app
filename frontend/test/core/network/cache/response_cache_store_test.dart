@@ -141,4 +141,22 @@ void main() {
       );
     });
   });
+  group('removeByPathPrefix (N7)', () {
+    test('drops base, id, and query variants; keeps siblings/other domains',
+        () async {
+      await store.put('GET /lessons', statusCode: 200, data: 1);
+      await store.put('GET /lessons/abc', statusCode: 200, data: 2);
+      await store.put('GET /lessons?date=2026-07-01', statusCode: 200, data: 3);
+      await store.put('GET /lessons-classes', statusCode: 200, data: 4);
+      await store.put('GET /students', statusCode: 200, data: 5);
+
+      await store.removeByPathPrefix('/lessons');
+
+      expect(store.get('GET /lessons'), isNull);
+      expect(store.get('GET /lessons/abc'), isNull);
+      expect(store.get('GET /lessons?date=2026-07-01'), isNull);
+      expect(store.get('GET /lessons-classes'), isNotNull);
+      expect(store.get('GET /students'), isNotNull);
+    });
+  });
 }
