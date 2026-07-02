@@ -195,46 +195,6 @@ final unreadNotificationCountProvider = AutoDisposeProvider<int>.internal(
 );
 
 typedef UnreadNotificationCountRef = AutoDisposeProviderRef<int>;
-String _$studentNotificationSettingsNotifierHash() =>
-    r'761947b45d47123e9e9a10b2d445e32ca2a882b5';
-
-/// Provider for student notification settings (persisted to Hive)
-///
-/// Copied from [StudentNotificationSettingsNotifier].
-@ProviderFor(StudentNotificationSettingsNotifier)
-final studentNotificationSettingsNotifierProvider = AutoDisposeNotifierProvider<
-    StudentNotificationSettingsNotifier, StudentNotificationSettings>.internal(
-  StudentNotificationSettingsNotifier.new,
-  name: r'studentNotificationSettingsNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$studentNotificationSettingsNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$StudentNotificationSettingsNotifier
-    = AutoDisposeNotifier<StudentNotificationSettings>;
-String _$teacherNotificationSettingsNotifierHash() =>
-    r'accc3c039ad8d5d4ffc162e011b773e0a93cdf27';
-
-/// Provider for teacher notification settings (persisted to Hive)
-///
-/// Copied from [TeacherNotificationSettingsNotifier].
-@ProviderFor(TeacherNotificationSettingsNotifier)
-final teacherNotificationSettingsNotifierProvider = AutoDisposeNotifierProvider<
-    TeacherNotificationSettingsNotifier, TeacherNotificationSettings>.internal(
-  TeacherNotificationSettingsNotifier.new,
-  name: r'teacherNotificationSettingsNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$teacherNotificationSettingsNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$TeacherNotificationSettingsNotifier
-    = AutoDisposeNotifier<TeacherNotificationSettings>;
 String _$notificationActionsHash() =>
     r'897115ea0277df7ca86bd6d5841720bce4ae1a98';
 

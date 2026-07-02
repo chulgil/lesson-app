@@ -2,7 +2,6 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/domain/value_objects/clock_time.dart';
 import '../entities/notification.dart';
-import '../entities/notification_settings.dart';
 import 'notification_service.dart';
 
 /// Scheduler for practice-related notifications
@@ -120,34 +119,6 @@ class PracticeReminderScheduler {
     );
 
     await _notificationService.showNotification(notification);
-  }
-
-  /// Schedule all daily reminders based on user settings
-  Future<void> scheduleDailyRemindersFromSettings({
-    required String userId,
-    required StudentNotificationSettings settings,
-    required int currentStreak,
-    required bool hasPracticedToday,
-  }) async {
-    // Cancel existing reminders first
-    await cancelDailyReminders(userId);
-
-    // Schedule practice reminder
-    if (settings.practiceReminderEnabled) {
-      await scheduleDailyReminder(
-        userId: userId,
-        reminderTime: settings.practiceReminderTime,
-      );
-    }
-
-    // Schedule streak warning (only if not practiced yet)
-    if (settings.streakWarningEnabled && !hasPracticedToday) {
-      await scheduleStreakWarning(
-        userId: userId,
-        warningTime: settings.streakWarningTime,
-        currentStreak: currentStreak,
-      );
-    }
   }
 
   /// Cancel all daily reminders for a user
