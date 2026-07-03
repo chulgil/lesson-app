@@ -43,6 +43,7 @@ void main() {
     expect(find.text(AppStrings.disciplineSelectTitle), findsOneWidget);
     expect(find.text(AppStrings.disciplineMusic), findsOneWidget);
     expect(find.text(AppStrings.disciplineFitness), findsOneWidget);
+    expect(find.text(AppStrings.disciplineLanguage), findsOneWidget); // #1102
     expect(tester.takeException(), isNull);
   });
 
@@ -127,6 +128,42 @@ void main() {
     expect(find.text('student-blocked'), findsOneWidget);
   });
 
+  testWidgets('어학 분야 선택 → select("language") 영속 + 역할 온보딩 이동 (#1102)', (
+    tester,
+  ) async {
+    final spy = _SpyStorage();
+    final router = GoRouter(
+      initialLocation: '/discipline',
+      routes: [
+        GoRoute(
+          path: '/discipline',
+          builder:
+              (_, __) =>
+                  const DisciplineSelectionScreen(role: UserRole.student),
+        ),
+        GoRoute(
+          path: AppRoutes.studentSignupBlocked,
+          builder: (_, __) => const Scaffold(body: Text('student-blocked')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [selectedDisciplineStorageProvider.overrideWith(() => spy)],
+        child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.disciplineLanguage));
+    await tester.pumpAndSettle();
+
+    // Screen persisted the chosen language discipline and continued to onboarding.
+    expect(spy.selected, [DisciplineRegistry.language.id]);
+    expect(find.text('student-blocked'), findsOneWidget);
+  });
+
   testWidgets('뒤로가기 → 역할 선택으로 복귀한다 (M7, 0702 감사)', (tester) async {
     final router = GoRouter(
       initialLocation: '/discipline',
@@ -157,13 +194,13 @@ void main() {
     expect(find.text('role-select'), findsOneWidget);
   });
 
-  test('#979-B 게이트 live: 등록 분야 2개(music+fitness) → RoleSelect 가 분야 선택으로 라우팅', () {
+  test('#979-B/#1102 게이트 live: 등록 분야 3개(music+fitness+language) → RoleSelect 가 분야 선택으로 라우팅', () {
     // length > 1 이면 RoleSelectScreen._goToOnboarding 가 DisciplineSelectionScreen
-    // 으로 라우팅한다(#977 게이트). Phase 4 에서 fitness 등록으로 게이트가 live 됨.
+    // 으로 라우팅한다(#977 게이트). Phase 4 fitness · Phase 5 language 등록으로 게이트가 live.
     expect(DisciplineRegistry.all.length, greaterThan(1));
     expect(
       DisciplineRegistry.all.map((d) => d.id),
-      containsAll(<String>['music', 'fitness']),
+      containsAll(<String>['music', 'fitness', 'language']),
     );
   });
 }

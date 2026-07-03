@@ -32,9 +32,24 @@ class DisciplineRegistry {
     expertiseCatalogId: 'specialties',
   );
 
+  /// Language (어학) discipline — Phase 5 (#1102). The third registered vertical;
+  /// like fitness, adding it is pure data (this const + the append below), so the
+  /// music vertical stays pixel-identical. expertiseCatalog = subjects
+  /// (영어/중국어/일본어). themeColorSeed is provisional — no consumer reads it yet.
+  static const Discipline language = Discipline(
+    id: 'language',
+    displayKey: 'discipline.language',
+    themeColorSeed: 0xFF1565C0,
+    expertiseCatalogId: 'subjects',
+  );
+
   /// All registered disciplines, in registration order (music first).
-  /// Adding a vertical = append here (Phase 5+: language).
-  static const List<Discipline> _registered = <Discipline>[music, fitness];
+  /// Adding a vertical = append here.
+  static const List<Discipline> _registered = <Discipline>[
+    music,
+    fitness,
+    language,
+  ];
 
   static List<Discipline> get all => _registered;
 

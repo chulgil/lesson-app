@@ -6,13 +6,14 @@ void main() {
   // #962 멀티 Discipline Phase 0 — Discipline 값객체 + DisciplineRegistry SSOT.
   // music(0) + fitness(1) 등록(#979-B). enum switch 금지, id 조회 패턴.
   group('DisciplineRegistry', () {
-    test('music(0) + fitness(1) 이 등록 순서대로 있다 (#979-B)', () {
+    test('music(0) + fitness(1) + language(2) 이 등록 순서대로 있다 (#979-B/#1102)', () {
       expect(DisciplineRegistry.all, isNotEmpty);
       expect(DisciplineRegistry.all.first.id, 'music');
-      // Phase 4 (#979-B) 에서 fitness 를 데이터 등록만으로 추가(코드 변경 0).
+      // Phase 4 (#979-B) fitness, Phase 5 (#1102) language — 데이터 등록만으로 추가.
       expect(DisciplineRegistry.all.map((d) => d.id).toList(), [
         'music',
         'fitness',
+        'language',
       ]);
     });
 
@@ -26,8 +27,12 @@ void main() {
       expect(fitness, isNotNull);
       expect(fitness!.expertiseCatalogId, 'specialties'); // #979-B
 
+      final language = DisciplineRegistry.byId('language');
+      expect(language, isNotNull);
+      expect(language!.expertiseCatalogId, 'subjects'); // #1102
+
       // 미등록/빈 id 는 null (호출처가 fallback 으로 degrade).
-      expect(DisciplineRegistry.byId('language'), isNull);
+      expect(DisciplineRegistry.byId('unknown_discipline'), isNull);
       expect(DisciplineRegistry.byId(''), isNull);
     });
 
@@ -35,6 +40,12 @@ void main() {
       expect(DisciplineRegistry.fitness.id, 'fitness');
       expect(DisciplineRegistry.fitness.displayKey, 'discipline.fitness');
       expect(DisciplineRegistry.fitness.expertiseCatalogId, 'specialties');
+    });
+
+    test('language 는 subjects 카탈로그를 가리킨다 (#1102)', () {
+      expect(DisciplineRegistry.language.id, 'language');
+      expect(DisciplineRegistry.language.displayKey, 'discipline.language');
+      expect(DisciplineRegistry.language.expertiseCatalogId, 'subjects');
     });
 
     test('fallback 은 music — null/legacy disciplineId 폴백', () {

@@ -26,6 +26,10 @@ void main() {
         ExpertiseCatalogRegistry.byId('specialties'),
         same(ExpertiseCatalogRegistry.fitness),
       );
+      expect(
+        ExpertiseCatalogRegistry.byId('subjects'),
+        same(ExpertiseCatalogRegistry.language),
+      );
       expect(ExpertiseCatalogRegistry.byId('unknown'), isNull);
     });
 
@@ -35,6 +39,15 @@ void main() {
       expect(
         ExpertiseCatalogRegistry.forDiscipline(DisciplineRegistry.fitness),
         same(ExpertiseCatalogRegistry.fitness),
+      );
+    });
+
+    test('language 카탈로그 = id subjects, 3종 (영어/중국어/일본어) (#1102)', () {
+      expect(ExpertiseCatalogRegistry.language.id, 'subjects');
+      expect(ExpertiseCatalogRegistry.language.items, ['영어', '중국어', '일본어']);
+      expect(
+        ExpertiseCatalogRegistry.forDiscipline(DisciplineRegistry.language),
+        same(ExpertiseCatalogRegistry.language),
       );
     });
 

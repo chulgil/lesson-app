@@ -160,5 +160,21 @@ void main() {
         expect(resolver.catalogId, '_fallback');
       },
     );
+
+    test(
+      'forDiscipline(language) returns the palette-only fallback (#1102)',
+      () {
+        // Language registers no bespoke resolver either — its subject tags
+        // (영어/중국어/일본어) resolve via the shared palette (#980 "폴백").
+        final resolver = ExpertiseColorResolverRegistry.forDiscipline(
+          DisciplineRegistry.language,
+        );
+        expect(resolver.catalogId, '_fallback');
+        final a = resolver.resolve('영어');
+        final b = resolver.resolve('영어');
+        expect(a.background, b.background);
+        expect(a.accent, b.accent);
+      },
+    );
   });
 }

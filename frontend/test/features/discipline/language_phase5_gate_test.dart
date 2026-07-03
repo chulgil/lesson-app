@@ -1,12 +1,12 @@
-// #980 — 멀티 Discipline Phase 4 검증 게이트.
+// #1102 — 멀티 Discipline Phase 5 검증 게이트 (어학 vertical).
 //
-// music 회귀 0 은 전체 스위트(all_routes_render 2뷰포트 · architecture · modal
-// injection)가 증명한다. 이 파일은 그 위에 **fitness vertical 이 실제로 렌더되고
-// music 과 동일한 UX 계약(C1~C8 → 분야-무관 U1~U8)을 따르는지** 를 고정한다:
-//   A. fitness 셸(분야 선택 + 연습 도구 모달) 2뷰포트 렌더 스모크 (실 skeleton 패널)
-//   B. U1~U8 = C1~C8 일관성 (fitness 가 music 과 같은 계약 준수)
+// music·fitness 회귀 0 은 전체 스위트(all_routes_render · architecture · modal
+// injection)가 증명한다. 이 파일은 그 위에 **language vertical 이 실제로 렌더되고
+// music/fitness 와 동일한 UX 계약(C1~C8)을 따르는지** 를 고정한다:
+//   A. language 셸(분야 선택 + 연습 도구 모달) 2뷰포트 렌더 스모크 (실 skeleton 패널)
+//   B. C1~C8 일관성 (language 가 공통 계약 준수)
 //
-// 설계: 옵시디언 "36-멀티카테고리-Discipline-플랫폼-설계" / 이슈 #980.
+// #979-B/#980 fitness 게이트의 정확한 미러. 설계: 이슈 #1102.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,15 +21,15 @@ import 'package:lessonaza/features/auth/domain/entities/user_role.dart';
 import 'package:lessonaza/features/auth/presentation/screens/discipline_selection_screen.dart';
 import 'package:lessonaza/features/practice/presentation/providers/metronome_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/tuner_provider.dart';
-import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/fitness_practice_tools.dart';
+import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/language_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/music_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools_modal.dart';
 
 const _desktop = Size(1440, 900);
 const _mobile = Size(375, 812);
 
-/// Inert metronome/tuner stubs — fitness gates both to -1 so they are never read;
-/// the overrides only keep the render off any real audio-engine platform init.
+/// Inert metronome/tuner stubs — language gates both to -1 so they are never
+/// read; the overrides only keep the render off any real audio-engine init.
 class _NoopMetronome extends Notifier<MetronomeState> implements Metronome {
   @override
   MetronomeState build() => const MetronomeState(isReady: true);
@@ -46,23 +46,23 @@ class _NoopTuner extends Notifier<TunerProviderState> implements Tuner {
   dynamic noSuchMethod(Invocation invocation) => null;
 }
 
-// Emoji-presentation ranges (mirror check-ui-emoji.sh): fitness UI strings must be
-// icon-free per C2 (Notebook × Score 평면 잉크 — Material Icons / NotebookGlyph only).
+// Emoji-presentation ranges (mirror check-ui-emoji.sh): language UI strings must
+// be icon-free per C2 (Material Icons / NotebookGlyph only).
 final _emojiRe = RegExp(
   r'[\u{1F000}-\u{1FAFF}\u{FE0F}\u{2705}\u{274C}\u{2B50}\u{2B55}\u{26A0}\u{2757}\u{2753}\u{23F0}\u{23F3}\u{2139}\u{2728}]',
   unicode: true,
 );
 
 void main() {
-  // Fitness skeleton panels render EmptyStateWidget (Playfair via google_fonts);
+  // Language skeleton panels render EmptyStateWidget (Playfair via google_fonts);
   // keep tests offline so the async font fetch never reaches the network.
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  group('#980-A fitness 셸 2뷰포트 렌더 스모크', () {
+  group('#1102-A language 셸 2뷰포트 렌더 스모크', () {
     for (final vp in const [_desktop, _mobile]) {
       final label = '@${vp.width.toInt()}';
 
-      testWidgets('분야 선택 화면 — 음악·헬스 카드 렌더 크래시 없음 $label', (tester) async {
+      testWidgets('분야 선택 화면 — 음악·헬스·어학 카드 렌더 크래시 없음 $label', (tester) async {
         tester.view.physicalSize = vp;
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -80,10 +80,11 @@ void main() {
 
         expect(find.text(AppStrings.disciplineMusic), findsOneWidget);
         expect(find.text(AppStrings.disciplineFitness), findsOneWidget);
+        expect(find.text(AppStrings.disciplineLanguage), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('연습 도구 모달 — fitness 스켈레톤 3탭·실 패널 렌더 크래시 없음 $label', (
+      testWidgets('연습 도구 모달 — language 스켈레톤 4탭·실 패널 렌더 크래시 없음 $label', (
         tester,
       ) async {
         tester.view.physicalSize = vp;
@@ -100,23 +101,23 @@ void main() {
             child: MaterialApp(
               theme: AppTheme.light,
               home: Scaffold(
-                body: PracticeToolsModal(tools: fitnessPracticeTools),
+                body: PracticeToolsModal(tools: languagePracticeTools),
               ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
-        // 3 탭 라벨(세트 카운터/인터벌 타이머/폼 영상) 이 좁은 375 에서도 크래시 없이.
+        // 4 탭 라벨(단어장/받아쓰기/발음/회화) 이 좁은 375 에서도 크래시 없이.
         final tabBar = tester.widget<TabBar>(find.byType(TabBar));
-        expect(tabBar.tabs.length, 3);
+        expect(tabBar.tabs.length, 4);
         // 실 skeleton 패널 = EmptyStateWidget (C1). 활성 탭 패널이 렌더된다.
         expect(find.byType(EmptyStateWidget), findsWidgets);
         expect(tester.takeException(), isNull);
 
         // TabBarView 는 활성 페이지만 lazy layout 하므로 각 탭을 구동해
-        // 탭 2·3 패널의 좁은-뷰포트 overflow 도 가드한다(리뷰 보강).
-        for (final tool in fitnessPracticeTools) {
+        // 탭 2·3·4 패널의 좁은-뷰포트 overflow 도 가드한다.
+        for (final tool in languagePracticeTools) {
           await tester.tap(find.text(tool.displayLabel).first);
           await tester.pumpAndSettle();
           expect(
@@ -129,10 +130,10 @@ void main() {
     }
   });
 
-  group('#980-B U1~U8 = C1~C8 일관성 — fitness 가 공통 UX 계약(C1/C2/C5/C8)을 준수한다', () {
-    test('C1 — 모든 fitness 도구 패널이 EmptyStateWidget (빈/준비 상태 SSOT)', () {
+  group('#1102-B C1~C8 일관성 — language 가 공통 UX 계약(C1/C2/C5/C8)을 준수한다', () {
+    test('C1 — 모든 language 도구 패널이 EmptyStateWidget (빈/준비 상태 SSOT)', () {
       final ctx = _StubContext();
-      for (final tool in fitnessPracticeTools) {
+      for (final tool in languagePracticeTools) {
         expect(
           tool.panelBuilder(ctx, null),
           isA<EmptyStateWidget>(),
@@ -141,43 +142,45 @@ void main() {
       }
     });
 
-    test('C2 — fitness UI 문자열에 이모지/픽토그램 없음 (Material/NotebookGlyph만)', () {
+    test('C2 — language UI 문자열에 이모지/픽토그램 없음 (Material/NotebookGlyph만)', () {
       final strings = <String>[
-        AppStrings.disciplineFitness,
-        AppStrings.practiceToolRepCounter,
-        AppStrings.practiceToolIntervalTimer,
-        AppStrings.practiceToolGuideMedia,
+        AppStrings.disciplineLanguage,
+        AppStrings.practiceToolVocabBook,
+        AppStrings.practiceToolDictation,
+        AppStrings.practiceToolPronunciation,
+        AppStrings.practiceToolConversation,
         AppStrings.practiceToolSkeletonSubtitle,
-        ...ExpertiseCatalogRegistry.fitness.items,
+        ...ExpertiseCatalogRegistry.language.items,
       ];
       for (final s in strings) {
         expect(_emojiRe.hasMatch(s), isFalse, reason: s);
       }
     });
 
-    test('C5 — fitness 도구 탭 라벨이 AppStrings 단일 상수', () {
-      expect(fitnessPracticeTools.map((t) => t.displayLabel).toList(), [
-        AppStrings.practiceToolRepCounter,
-        AppStrings.practiceToolIntervalTimer,
-        AppStrings.practiceToolGuideMedia,
+    test('C5 — language 도구 탭 라벨이 AppStrings 단일 상수', () {
+      expect(languagePracticeTools.map((t) => t.displayLabel).toList(), [
+        AppStrings.practiceToolVocabBook,
+        AppStrings.practiceToolDictation,
+        AppStrings.practiceToolPronunciation,
+        AppStrings.practiceToolConversation,
       ]);
     });
 
-    test('C8 — fitness 색상은 시맨틱 팔레트 폴백 (분야별 손코딩 색맵 없음)', () {
+    test('C8 — language 색상은 시맨틱 팔레트 폴백 (분야별 손코딩 색맵 없음)', () {
       final resolver = ExpertiseColorResolverRegistry.forDiscipline(
-        DisciplineRegistry.fitness,
+        DisciplineRegistry.language,
       );
       expect(resolver.catalogId, '_fallback');
-      // 필라테스 같은 실 fitness 태그도 안정적으로 색을 얻는다(폴백 hash-cycle,
-      // 동일 입력 = 동일 색, 크래시 없음). #980 리뷰 nit 반영.
-      final a = resolver.resolve('필라테스');
-      final b = resolver.resolve('필라테스');
+      // 영어 같은 실 language 태그도 안정적으로 색을 얻는다(폴백 hash-cycle,
+      // 동일 입력 = 동일 색, 크래시 없음).
+      final a = resolver.resolve('영어');
+      final b = resolver.resolve('영어');
       expect(a.background, b.background);
       expect(a.accent, b.accent);
     });
   });
 
-  group('#980 music byte-identity 앵커 (분야 추가 후에도 음악 불변)', () {
+  group('#1102 music/fitness byte-identity 앵커 (분야 추가 후에도 불변)', () {
     test('레지스트리 등록 순서 = [music, fitness, language], music 이 0번·fallback', () {
       expect(DisciplineRegistry.all.map((d) => d.id).toList(), [
         'music',
@@ -187,12 +190,11 @@ void main() {
       expect(DisciplineRegistry.fallback, DisciplineRegistry.music);
     });
 
-    test('music 도구셋/카탈로그 불변 (22 악기, 메트로놈+튜너)', () {
-      expect(ExpertiseCatalogRegistry.music.items.length, 22);
-      expect(musicPracticeTools.map((t) => t.id).toList(), [
-        PracticeToolIds.metronome,
-        PracticeToolIds.tuner,
-      ]);
+    test('language 카탈로그/도구 = subjects 3종, 메트로놈·튜너 없음', () {
+      expect(ExpertiseCatalogRegistry.language.items, ['영어', '중국어', '일본어']);
+      final ids = languagePracticeTools.map((t) => t.id).toSet();
+      expect(ids.contains(PracticeToolIds.metronome), isFalse);
+      expect(ids.contains(PracticeToolIds.tuner), isFalse);
     });
   });
 }
