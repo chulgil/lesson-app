@@ -2698,6 +2698,12 @@ class AppStrings {
   /// 연습 팁 (section header)
   static const practiceTipsSection = '연습 팁';
 
+  /// 이번 주 집중 (#1106 — 피드백→연습 연결 카드 제목)
+  static const weeklyFocusTitle = '이번 주 집중';
+
+  /// 지금 연습하기 (#1106 — 집중 카드 CTA, 연습 허브로 이동)
+  static const weeklyFocusPracticeCta = '지금 연습하기';
+
   /// 저장하기 (save action button)
   static const saveAction = '저장하기';
 
