@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/domain/value_objects/discipline_registry.dart';
 import '../../../../core/providers/repository_provider.dart';
+import '../../../../features/auth/auth_facade.dart' show activeDisciplineProvider;
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../data/repositories/mock_teacher_search_repository.dart';
@@ -178,12 +178,13 @@ Future<List<TeacherPublicProfile>> featuredTeachers(Ref ref) async {
 @riverpod
 Future<List<String>> availableInstruments(Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
-  // Discipline-keyed facet resolution (#976): music's instruments facet resolves
-  // to the same teacher-scan source — byte-identical. A future discipline (Phase 4)
-  // registers its own facet without touching this provider.
-  final resolver = ProviderSearchFacetRegistry.byId(
-    DisciplineRegistry.music.expertiseCatalogId,
-  );
+  // Discipline-keyed facet resolution (#976/#1108): route through the ACTIVE
+  // discipline's facet. Music (instruments) resolves to the teacher-scan source —
+  // byte-identical today since every real user's active discipline is music; a
+  // language/fitness user resolves their catalog. Unregistered facet degrades to
+  // an empty filter (unchanged fallback).
+  final facetId = ref.watch(activeDisciplineProvider).expertiseCatalogId;
+  final resolver = ProviderSearchFacetRegistry.byId(facetId);
   return resolver == null ? const <String>[] : resolver(repo);
 }
 
