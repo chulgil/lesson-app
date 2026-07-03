@@ -24,6 +24,9 @@ import 'package:lessonaza/features/practice/presentation/providers/tuner_provide
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/language_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/music_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools_modal.dart';
+import 'package:lessonaza/features/vocabulary/domain/repositories/vocab_repository.dart';
+import 'package:lessonaza/features/vocabulary/presentation/providers/vocab_repository_provider.dart';
+import 'package:lessonaza/features/vocabulary/presentation/widgets/vocab_book_panel.dart';
 
 const _desktop = Size(1440, 900);
 const _mobile = Size(375, 812);
@@ -97,6 +100,11 @@ void main() {
             overrides: [
               metronomeProvider.overrideWith(() => _NoopMetronome()),
               tunerProvider.overrideWith(() => _NoopTuner()),
+              // #1124: 단어장 패널은 실 store 를 읽는다 — 결정적 렌더를 위해 빈
+              // store 로 오버라이드(실 Hive I/O 는 fake-async 에서 완료 안 됨).
+              vocabRepositoryProvider.overrideWithValue(
+                _UnavailableVocabRepository(),
+              ),
             ],
             child: MaterialApp(
               theme: AppTheme.light,
@@ -111,8 +119,8 @@ void main() {
         // 4 탭 라벨(단어장/받아쓰기/발음/회화) 이 좁은 375 에서도 크래시 없이.
         final tabBar = tester.widget<TabBar>(find.byType(TabBar));
         expect(tabBar.tabs.length, 4);
-        // 실 skeleton 패널 = EmptyStateWidget (C1). 활성 탭 패널이 렌더된다.
-        expect(find.byType(EmptyStateWidget), findsWidgets);
+        // 활성 탭 = 단어장(#1124 첫 실 도구) → VocabBookPanel. 나머지 3개는 skeleton.
+        expect(find.byType(VocabBookPanel), findsOneWidget);
         expect(tester.takeException(), isNull);
 
         // TabBarView 는 활성 페이지만 lazy layout 하므로 각 탭을 구동해
@@ -126,19 +134,24 @@ void main() {
             reason: '${tool.id} @${vp.width.toInt()}',
           );
         }
+
+        // skeleton 탭(받아쓰기/발음/회화)은 여전히 EmptyStateWidget (C1).
+        expect(find.byType(EmptyStateWidget), findsWidgets);
       });
     }
   });
 
   group('#1102-B C1~C8 일관성 — language 가 공통 UX 계약(C1/C2/C5/C8)을 준수한다', () {
-    test('C1 — 모든 language 도구 패널이 EmptyStateWidget (빈/준비 상태 SSOT)', () {
+    test('C1 — 준비 중 language 도구는 EmptyStateWidget; 단어장은 실 패널(#1124)', () {
       final ctx = _StubContext();
       for (final tool in languagePracticeTools) {
-        expect(
-          tool.panelBuilder(ctx, null),
-          isA<EmptyStateWidget>(),
-          reason: tool.id,
-        );
+        final panel = tool.panelBuilder(ctx, null);
+        if (tool.id == LanguagePracticeToolIds.vocabBook) {
+          // 첫 실 language 도구 — 준비 상태 SSOT(EmptyStateWidget)를 벗어난다.
+          expect(panel, isA<VocabBookPanel>(), reason: tool.id);
+        } else {
+          expect(panel, isA<EmptyStateWidget>(), reason: tool.id);
+        }
       }
     });
 
@@ -200,8 +213,16 @@ void main() {
 }
 
 /// Minimal BuildContext for building a stateless panel widget off-tree (C1 type
-/// check). panelBuilder returns a const EmptyStateWidget and never reads context.
+/// check). panelBuilder just constructs the widget and never reads context.
 class _StubContext implements BuildContext {
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+/// A [VocabRepository] whose calls throw — the 단어장 panel then hits its error
+/// fallback ("nothing due") deterministically, with no real Hive I/O (#1124).
+class _UnavailableVocabRepository implements VocabRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError('vocab store unavailable in gate test');
 }
