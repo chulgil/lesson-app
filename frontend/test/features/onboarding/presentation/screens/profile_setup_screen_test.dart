@@ -10,6 +10,7 @@ import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/auth/presentation/providers/auth_provider.dart';
 import 'package:lessonaza/features/onboarding/presentation/providers/onboarding_providers.dart';
 import 'package:lessonaza/features/onboarding/presentation/screens/profile_setup_screen.dart';
+import 'package:lessonaza/core/widgets/onboarding_step_header.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_onboarding.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_profile.dart';
 
@@ -185,6 +186,18 @@ void main() {
       1,
       reason: '프로필 저장 후 onboarding-complete도 호출되어야 한다',
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('#1104 프로필 화면은 스텝 헤더에서 3/4(프로필) 단계를 활성화한다', (tester) async {
+    await pumpProfileSetup(tester);
+
+    expect(find.byType(OnboardingStepHeader), findsOneWidget);
+    final header = tester.widget<OnboardingStepHeader>(
+      find.byType(OnboardingStepHeader),
+    );
+    expect(header.steps, OnboardingStepHeader.teacherSteps);
+    expect(header.currentStep, 3, reason: '프로필은 4단계 중 3번째');
     expect(tester.takeException(), isNull);
   });
 }

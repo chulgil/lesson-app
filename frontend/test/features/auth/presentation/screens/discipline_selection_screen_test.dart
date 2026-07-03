@@ -11,6 +11,7 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/auth/domain/entities/user_role.dart';
 import 'package:lessonaza/features/auth/presentation/providers/active_discipline_provider.dart';
 import 'package:lessonaza/features/auth/presentation/screens/discipline_selection_screen.dart';
+import 'package:lessonaza/core/widgets/onboarding_step_header.dart';
 
 /// Records `select` calls without touching Hive, so the screen's tap→persist
 /// wiring can be verified with real navigation (spy pattern — real storage I/O
@@ -49,7 +50,9 @@ void main() {
 
   testWidgets('role 가 null 이어도 안전하게 렌더된다 (deep-link 방어)', (tester) async {
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: DisciplineSelectionScreen())),
+      const ProviderScope(
+        child: MaterialApp(home: DisciplineSelectionScreen()),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -64,9 +67,8 @@ void main() {
       routes: [
         GoRoute(
           path: '/discipline',
-          builder:
-              (_, __) =>
-                  const DisciplineSelectionScreen(role: UserRole.student),
+          builder: (_, __) =>
+              const DisciplineSelectionScreen(role: UserRole.student),
         ),
         GoRoute(
           path: AppRoutes.studentSignupBlocked,
@@ -101,9 +103,8 @@ void main() {
       routes: [
         GoRoute(
           path: '/discipline',
-          builder:
-              (_, __) =>
-                  const DisciplineSelectionScreen(role: UserRole.student),
+          builder: (_, __) =>
+              const DisciplineSelectionScreen(role: UserRole.student),
         ),
         GoRoute(
           path: AppRoutes.studentSignupBlocked,
@@ -137,9 +138,8 @@ void main() {
       routes: [
         GoRoute(
           path: '/discipline',
-          builder:
-              (_, __) =>
-                  const DisciplineSelectionScreen(role: UserRole.student),
+          builder: (_, __) =>
+              const DisciplineSelectionScreen(role: UserRole.student),
         ),
         GoRoute(
           path: AppRoutes.studentSignupBlocked,
@@ -170,9 +170,8 @@ void main() {
       routes: [
         GoRoute(
           path: '/discipline',
-          builder:
-              (_, __) =>
-                  const DisciplineSelectionScreen(role: UserRole.student),
+          builder: (_, __) =>
+              const DisciplineSelectionScreen(role: UserRole.student),
         ),
         GoRoute(
           path: AppRoutes.roleSelect,
@@ -194,13 +193,71 @@ void main() {
     expect(find.text('role-select'), findsOneWidget);
   });
 
-  test('#979-B/#1102 게이트 live: 등록 분야 3개(music+fitness+language) → RoleSelect 가 분야 선택으로 라우팅', () {
-    // length > 1 이면 RoleSelectScreen._goToOnboarding 가 DisciplineSelectionScreen
-    // 으로 라우팅한다(#977 게이트). Phase 4 fitness · Phase 5 language 등록으로 게이트가 live.
-    expect(DisciplineRegistry.all.length, greaterThan(1));
-    expect(
-      DisciplineRegistry.all.map((d) => d.id),
-      containsAll(<String>['music', 'fitness', 'language']),
+  test(
+    '#979-B/#1102 게이트 live: 등록 분야 3개(music+fitness+language) → RoleSelect 가 분야 선택으로 라우팅',
+    () {
+      // length > 1 이면 RoleSelectScreen._goToOnboarding 가 DisciplineSelectionScreen
+      // 으로 라우팅한다(#977 게이트). Phase 4 fitness · Phase 5 language 등록으로 게이트가 live.
+      expect(DisciplineRegistry.all.length, greaterThan(1));
+      expect(
+        DisciplineRegistry.all.map((d) => d.id),
+        containsAll(<String>['music', 'fitness', 'language']),
+      );
+    },
+  );
+
+  testWidgets('#1104 선생님 역할일 때 스텝 헤더(2/4 분야 선택 활성)를 표시한다', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const DisciplineSelectionScreen(role: UserRole.teacher),
+        ),
+      ),
     );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OnboardingStepHeader), findsOneWidget);
+    final header = tester.widget<OnboardingStepHeader>(
+      find.byType(OnboardingStepHeader),
+    );
+    expect(header.steps, OnboardingStepHeader.teacherSteps);
+    expect(header.currentStep, 2, reason: '분야 선택은 4단계 중 2번째');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('#1104 학생·학부모 역할에는 스텝 헤더를 표시하지 않는다 (교사 전용)', (tester) async {
+    for (final role in const [UserRole.student, UserRole.parent]) {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: DisciplineSelectionScreen(role: role),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byType(OnboardingStepHeader),
+        findsNothing,
+        reason: '$role 플로우에는 교사 스텝 헤더가 없어야 한다',
+      );
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('#1104 role 이 null 이면 스텝 헤더를 표시하지 않는다 (deep-link 방어)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: DisciplineSelectionScreen())),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OnboardingStepHeader), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 }

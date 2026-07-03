@@ -136,6 +136,15 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: AppSpacing.space2),
+              // #1104 — reassure the user the onboarding is short.
+              Text(
+                AppStrings.onboardingDurationCaption,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
+                ),
+                textAlign: TextAlign.center,
+              ),
 
               const SizedBox(height: AppSpacing.space6),
 
