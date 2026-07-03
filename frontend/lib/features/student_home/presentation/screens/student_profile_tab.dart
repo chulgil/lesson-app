@@ -14,8 +14,10 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../auth/auth_facade.dart';
+import '../providers/practice_reminder_provider.dart';
 import '../providers/student_home_profile_provider.dart';
 import '../widgets/language_select_sheet.dart';
+import '../widgets/practice_reminder_sheet.dart';
 
 /// Student profile tab with settings and account info
 class StudentProfileTab extends ConsumerWidget {
@@ -322,6 +324,7 @@ class StudentProfileTab extends ConsumerWidget {
   }
 
   Widget _buildSettingsSection(BuildContext context, WidgetRef ref) {
+    final reminderSettings = ref.watch(practiceReminderProvider);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
@@ -336,7 +339,15 @@ class StudentProfileTab extends ConsumerWidget {
             onTap: () => context.push(AppRoutes.notificationSettings),
           ),
           _buildMenuDivider(),
-          // #434: 연습 리마인더 진입점 숨김 — FCM 푸시(#475) 미구현, 구현 후 복원.
+          _buildMenuItem(
+            icon: Icons.alarm_outlined,
+            title: AppStrings.studentHomePracticeReminder,
+            subtitle: reminderSettings.isEnabled
+                ? reminderSettings.formattedTime
+                : AppStrings.studentHomePracticeReminderOff,
+            onTap: () => PracticeReminderSheet.show(context),
+          ),
+          _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.language_outlined,
             title: AppStrings.studentHomeMenuLanguage,

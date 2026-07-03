@@ -6930,6 +6930,7 @@ class AppStrings {
   // ─── Student Home ───
   static const studentHomePracticeReminder = '연습 리마인더';
   static const studentHomePracticeReminderDesc = '설정한 시간에 연습 알림을 받습니다';
+  static const studentHomePracticeReminderOff = '꺼짐';
   static const studentHomeWeeklyPractice = '이번 주 연습';
   static const studentHomePracticeJournal = '연습 일지';
   static const studentHomeMySubscriptions = '내 수강권';
