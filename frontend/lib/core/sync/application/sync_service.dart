@@ -40,13 +40,15 @@ class SyncService {
     required SyncAdapterRegistry adapterRegistry,
     required ApiClient apiClient,
     Future<void> Function(String path)? invalidateCachedReads,
+    void Function(int expiredFailedCount)? onWritesDropped,
     this.pollingInterval = const Duration(seconds: 30),
     this.defaultMaxRetryCount = 5,
   }) : _queueStore = queueStore,
        _connectivityService = connectivityService,
        _adapterRegistry = adapterRegistry,
        _apiClient = apiClient,
-       _invalidateCachedReads = invalidateCachedReads;
+       _invalidateCachedReads = invalidateCachedReads,
+       _onWritesDropped = onWritesDropped;
 
   final SyncQueueStore _queueStore;
   final ConnectivityService _connectivityService;
@@ -57,6 +59,10 @@ class SyncService {
   /// offline write is not followed by a stale offline read. Replays go
   /// through the HTTP interceptor, which invalidates again on success.
   final Future<void> Function(String path)? _invalidateCachedReads;
+
+  /// INV-3 (#1115): notified with the count of failed writes that aged out
+  /// during a cleanup pass, so the user can be told their edits were lost.
+  final void Function(int expiredFailedCount)? _onWritesDropped;
 
   final Duration pollingInterval;
   final int defaultMaxRetryCount;
@@ -80,7 +86,7 @@ class SyncService {
     _isInitialized = true;
 
     await _queueStore.runMigrations();
-    await _queueStore.cleanup();
+    await _runCleanup();
     await _refreshStats();
     await syncPending();
 
@@ -127,7 +133,7 @@ class SyncService {
 
     try {
       await _flushQueue();
-      await _queueStore.cleanup();
+      await _runCleanup();
       await _refreshStats(nextAction: 'all queued operations processed');
     } catch (_) {
       await _refreshStats(nextAction: 'sync error');
@@ -206,6 +212,14 @@ class SyncService {
     return _readStats(nextAction: 'manual status');
   }
 
+  /// Runs a cleanup pass and surfaces any dropped unsent writes (INV-3, #1115).
+  Future<void> _runCleanup() async {
+    final result = await _queueStore.cleanup();
+    if (result.expiredFailedRemoved > 0) {
+      _onWritesDropped?.call(result.expiredFailedRemoved);
+    }
+  }
+
   Future<void> _flushQueue() async {
     final entries = await _queueStore.fetchAll();
     final processable = [...entries.where(_isProcessable)]
@@ -242,9 +256,10 @@ class SyncService {
         final nextRetryCount = syncing.retryCount + 1;
 
         final failed = syncing.copyWith(
-          status: nextRetryCount >= syncing.maxRetryCount
-              ? SyncQueueStatus.failed
-              : SyncQueueStatus.pending,
+          status:
+              nextRetryCount >= syncing.maxRetryCount
+                  ? SyncQueueStatus.failed
+                  : SyncQueueStatus.pending,
           lastSyncedAt: DateTime.now().toUtc(),
           retryCount: nextRetryCount,
           errorCode: errorCode,
@@ -297,18 +312,14 @@ class SyncService {
     final allEntries = await _queueStore.fetchAll();
     return SyncServiceStats(
       total: allEntries.length,
-      pending: allEntries
-          .where((e) => e.status == SyncQueueStatus.pending)
-          .length,
-      syncing: allEntries
-          .where((e) => e.status == SyncQueueStatus.syncing)
-          .length,
-      synced: allEntries
-          .where((e) => e.status == SyncQueueStatus.synced)
-          .length,
-      failed: allEntries
-          .where((e) => e.status == SyncQueueStatus.failed)
-          .length,
+      pending:
+          allEntries.where((e) => e.status == SyncQueueStatus.pending).length,
+      syncing:
+          allEntries.where((e) => e.status == SyncQueueStatus.syncing).length,
+      synced:
+          allEntries.where((e) => e.status == SyncQueueStatus.synced).length,
+      failed:
+          allEntries.where((e) => e.status == SyncQueueStatus.failed).length,
       online: await _connectivityService.isOnline,
       lastSyncAt: _lastSyncAt,
       nextAction: nextAction,

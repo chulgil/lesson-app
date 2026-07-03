@@ -64,6 +64,7 @@ void main() {
       Duration pollingInterval = const Duration(seconds: 9999),
       int defaultMaxRetryCount = 5,
       Future<void> Function(String path)? invalidateCachedReads,
+      void Function(int expiredFailedCount)? onWritesDropped,
     }) async {
       fakeConnectivity = FakeConnectivity(initialConnectivity);
 
@@ -73,6 +74,7 @@ void main() {
         adapterRegistry: SyncAdapterRegistry.create(),
         apiClient: apiClient,
         invalidateCachedReads: invalidateCachedReads,
+        onWritesDropped: onWritesDropped,
         pollingInterval: pollingInterval,
         defaultMaxRetryCount: defaultMaxRetryCount,
       );
@@ -398,6 +400,43 @@ void main() {
       );
 
       expect(invalidated, ['/lessons']);
+    });
+
+    test('cleanup 이 만료된 failed 쓰기를 onWritesDropped 로 통보한다 (INV-3)', () async {
+      final box = await Hive.openBox<dynamic>(store.boxName);
+      final old = DateTime.now().toUtc().subtract(const Duration(days: 8));
+      SyncQueueEntry entry(String id, SyncQueueStatus status) => SyncQueueEntry(
+        id: id,
+        domain: 'lesson',
+        operation: SyncOperationType.create,
+        httpMethod: 'POST',
+        path: '/lessons',
+        payload: const {},
+        queryParameters: const {},
+        status: status,
+        createdAt: old,
+        updatedAt: old,
+      );
+      await box.put(
+        'old-failed',
+        entry('old-failed', SyncQueueStatus.failed).toMap(),
+      );
+      await box.put(
+        'pending-1',
+        entry('pending-1', SyncQueueStatus.pending).toMap(),
+      );
+
+      final dropped = <int>[];
+      // initialize() runs cleanup once (offline → syncPending returns early).
+      await createService(onWritesDropped: dropped.add);
+
+      expect(dropped, [1], reason: 'one expired failed write reported');
+      expect(await store.getById('old-failed'), isNull);
+      expect(
+        await store.getById('pending-1'),
+        isNotNull,
+        reason: 'pending is never dropped',
+      );
     });
   });
 }

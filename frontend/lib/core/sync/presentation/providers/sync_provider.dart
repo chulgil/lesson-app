@@ -10,6 +10,7 @@ import '../../application/connectivity_service.dart';
 import '../../application/sync_adapter_registry.dart';
 import '../../application/sync_service.dart';
 import '../../data/sync_queue_store.dart';
+import '../../lost_writes_provider.dart';
 
 part 'sync_provider.g.dart';
 
@@ -44,6 +45,11 @@ SyncService syncService(SyncServiceRef ref) {
         box: Hive.box<String>(ResponseCacheStore.boxName),
       ).removeByPathPrefix(prefix);
     },
+    // INV-3 (#1115): surface failed writes that aged out so the user is told.
+    onWritesDropped:
+        (count) => ref
+            .read(lostWritesProvider.notifier)
+            .record(count, LostWritesReason.expired),
   );
 }
 
