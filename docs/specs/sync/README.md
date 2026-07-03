@@ -1,0 +1,172 @@
+# 오프라인/동기화 마스터 스펙 (SSOT)
+
+> 상태: 활성 · 작성 2026-07-03 · 소유 범위 `frontend/lib/core/sync`, `frontend/lib/core/network/cache`
+> 정본(SSOT). 요구사항 원안 = 옵시디언 `14-RA-동기화-상세스펙`(2026-05-07, 일부 대체됨). 채택 계획/롤아웃 이력 = `docs/specs/architecture/offline_first_migration_plan.md`(D1~D6). 이 문서는 **현재 구현된 계약(as-built)** 과 **미국 등 느린 네트워크 대응 계약**, **검증된 갭 레지스터**를 정의한다.
+
+## 1. 결론 먼저
+
+앱은 "서버 미연결 시 로컬 데이터 표시 + 나중 동기화"를 지향한다. 현재 구현은 **읽기 = HTTP 응답 캐시 인터셉터**(전송 실패 시 last-known-good 서빙), **쓰기 = 뮤테이션 큐**(오프라인/전송실패 시 큐잉 + 낙관적 결과, 재접속 시 재생)로 되어 있다. 뼈대는 동작하나, **완전 오프라인(무선 차단)** 은 부분 처리되고 **느린-연결(무선 살아있고 타임아웃, 미국 셀룰러 전형)** 은 처리 공백이 크다. 또한 **schedule 도메인 쓰기가 어댑터 미등록으로 영구 손실**되는 P0 데이터 유실 버그가 있다.
+
+- 가장 시급: [G-01 schedule NO_ADAPTER 쓰기 유실](#g-01) (데이터 유실), [G-02 로그아웃 시 쓰기 큐 미삭제 교차사용자 재생](#g-02), [G-03 큐 정리 시 미전송 쓰기 무통보 삭제](#g-03).
+- 느린 네트워크 핵심: [G-04 SWR 부재(풀 타임아웃 대기)](#g-04), [G-05 읽기 캐시 5개 도메인만](#g-05), [G-06 느린망 stale 표시 없음](#g-06), [G-07 타임아웃 중복 생성](#g-07).
+
+## 2. 용어
+
+| 용어 | 정의 |
+|------|------|
+| 완전 오프라인 | `connectivity_plus`가 무선 없음(none) 보고 — 비행기모드/무신호 |
+| 느린-연결(degraded) | 무선은 살아있으나 고RTT/패킷손실/타임아웃 — 미국 셀룰러 전형. 본 스펙의 1급 대상 |
+| 뮤테이션 큐 | 쓰기 재생 큐 (`SyncQueueStore`, Hive box `sync_queue`) |
+| 응답 캐시 | GET 응답 캐시 (`ResponseCacheStore`, Hive box `response_cache_v1`) |
+| 낙관적 결과 | 쓰기를 큐에 넣고 UI에 즉시 성공으로 보이는 임시 결과 |
+| LWW | Last-Write-Wins 충돌 해결 (clientUpdatedAt vs serverUpdatedAt 비교) |
+
+## 3. 아키텍처 (as-built)
+
+```
+쓰기: UI -> SyncAware{Domain}Repository -> MutationQueueHelper
+        온라인 성공 -> 서버 반영
+        오프라인/전송실패 -> SyncQueueStore(enqueue) + 낙관적 결과
+        재접속/30s 폴 -> SyncService.syncPending -> SyncAdapterRegistry.resolve(domain) -> RestSyncAdapter.replay(HTTP 재생)
+
+읽기: UI -> Remote{Domain}Repository -> ApiClient(Dio)
+        인터셉터 체인: Logging -> Auth -> Error -> Refresh -> ResponseCacheInterceptor(말미)
+        성공 GET(allowlist) -> onResponse: 캐시 저장
+        전송실패 GET(allowlist, 캐시히트) -> onError: 캐시 서빙(fromCache)
+```
+
+핵심 파일: `core/sync/application/{sync_service,mutation_queue_helper,sync_adapter,sync_adapter_registry,connectivity_service,initial_pull_service}.dart` · `core/sync/data/sync_queue_store.dart` · `core/network/cache/{response_cache_store,response_cache_policy}.dart` · `core/network/interceptors/response_cache_interceptor.dart`.
+
+## 4. 쓰기 큐 계약
+
+### 4.1 큐 엔트리 (`SyncQueueEntry`)
+
+`id`(uuid) · `domain` · `method`+`path`+`payload`(HTTP 재생용) · `status`(pending/syncing/synced/failed) · `retryCount` · `createdAt` · `lastSyncedAt` · `clientUpdatedAt`(LWW용, 선택).
+
+### 4.2 불변식 (HARD-GATE)
+
+- **INV-1 (도메인-어댑터 정합)**: `queueMutation(domain: X)` 로 큐잉하는 모든 도메인 X는 반드시 `SyncAdapterRegistry`에 등록되어야 한다. 미등록 시 재생이 `NO_ADAPTER`로 영구 실패하고 쓰기가 유실된다. 레지스트리는 실제 큐잉 호출처에서 파생·검증되어야 한다(현재 하드코딩 → [G-01](#g-01) 원인). 큐잉 도메인 전수: `lesson`·`student`·`subscription`·`practice`·`schedule`.
+- **INV-2 (재생 멱등성)**: 재생은 서버가 이미 커밋한 요청을 중복 생성하지 않아야 한다(멱등 키). 현재 미충족 → [G-07](#g-07).
+- **INV-3 (무손실 정리)**: 큐 정리(cleanup)는 **미전송(pending) 쓰기를 무통보로 삭제하지 않는다**. 현재 500 초과 시 status 무관 최오래 삭제 → [G-03](#g-03).
+- **INV-4 (사용자 격리)**: 큐는 사용자 경계에서 격리되어야 한다. 로그아웃 시 이전 사용자 pending 쓰기가 다음 사용자 토큰으로 재생되면 안 된다. 현재 로그아웃이 `sync_queue`를 비우지 않음 → [G-02](#g-02).
+
+### 4.3 재시도/만료
+
+- 재시도: 최대 5회, 지수 백오프 1→16s(상한 30s 폴). 소진 시 status=failed.
+- 만료: failed 엔트리 7일 초과 시 삭제. **삭제 시 사용자 알림 필요**(요구안 §8) — 현재 무통보 → [G-03](#g-03).
+- 재생 에러 분류: 비즈니스 4xx(409/422 등)는 재시도 대상이 아니어야 한다(현재 catch-all 재시도 → [G-14](#기타-확인된-갭)).
+
+## 5. 읽기 캐시 계약
+
+- **저장**: allowlist 경로의 2xx GET 응답을 저장(`ResponseCacheInterceptor.onResponse`).
+- **서빙**: allowlist GET이 **전송 실패**(connectionError / connect·receive·send Timeout)하고 캐시 히트 시 last-known-good 서빙(`onError`, `fromCache:true`). 비즈니스 4xx/5xx·캐시미스·비-GET·비-allowlist는 그대로 전파.
+- **무효화(N7)**: 비-GET 2xx 성공 시 해당 prefix 캐시 제거. 교차 도메인 효과(예: 레슨 완료가 구독 사용량 차감)는 범위 밖 → [G-13](#기타-확인된-갭).
+- **TTL(D3)**: 민감 경로(`/subscriptions/payment-pending`)는 15분 TTL, 그 외 표시 도메인은 무TTL(재접속까지 stale).
+- **allowlist(현재)**: `/lessons` · `/students` · `/subscriptions` · `/schedule/availability` · `/schedule/slots` (5개). segment-aware(형제 경로 `/lessons-classes` 등 미포함). 배치 2~4 미배포 → [G-05](#g-05).
+
+## 6. 느린 네트워크 대응 계약 (미국 시장 1급 요건)
+
+> 완전 오프라인이 아니라 **무선 살아있고 타임아웃**이 미국 셀룰러의 지배적 실패다. 아래는 이 조건의 목표 계약이며 현재 대부분 미충족이다.
+
+| # | 계약 | 현재 | 갭 |
+|---|------|------|-----|
+| SN-1 | 읽기는 캐시가 있으면 **즉시** last-known-good을 보이고 백그라운드 갱신(stale-while-revalidate) | onError 전용 — 풀 타임아웃(최대 30s+30s) 대기 후에야 캐시 | [G-04](#g-04) |
+| SN-2 | 핵심 사용자 화면 읽기는 전부 캐시 보호(연습·홈·게이미피케이션·알림 포함) | allowlist 5개 도메인만, 나머지 fail-closed | [G-05](#g-05) |
+| SN-3 | 캐시(stale) 서빙 중이면 무선 상태와 무관하게 "지난 동기화 시각" 표시 | 배너가 무선-오프라인일 때만 렌더 → 느린망 stale 무표시 | [G-06](#g-06) |
+| SN-4 | 응답 유실된 POST 재생이 서버 중복 생성 금지(멱등 키) | 멱등 키 없음 | [G-07](#g-07) |
+| SN-5 | 전송 타임아웃 값이 느린망에 합리적(과단축=허위실패, 과장=UI 프리즈) + 업로드 sendTimeout 설정 | connect/receive 30s, sendTimeout 미설정, refresh Dio 무타임아웃 | [G-08](#g-08) |
+| SN-6 | 일시적 읽기 실패(단발 패킷손실)에 요청 단위 재시도(백오프) | 읽기 재시도 없음 | [G-11](#기타-확인된-갭) |
+| SN-7 | 쓰기 탭이 풀 타임아웃 동안 UI를 막지 않음(빠른 큐 폴백) | 온라인 판정 통과 시 remoteCall 완료까지 대기(~30s 프리즈) | [G-12](#기타-확인된-갭) |
+
+## 7. 충돌 해결 계약 (D4)
+
+- 전략 맵: `serverWins`(기본: lesson·subscription·student·schedule) / `lastWriteWins`(practice·settings·notification-settings) / `clientWins`(recording).
+- LWW: `clientUpdatedAt > serverUpdatedAt` 이면 로컬 적용, 아니면 `SyncConflictException(CONFLICT_LWW_REJECTED)`.
+- **거절 SnackBar(D4)**: 재생이 서버에 거절되면 사용자에게 알린다.
+- as-built 결함: LWW가 유일 대상 도메인(practice)에서 `clientUpdatedAt` 미전달로 사실상 무력, `CONFLICT_LWW_REJECTED` 코드가 어디서도 소비되지 않음(거절 SnackBar 미구현), LWW 비교가 요청 전송 **후**에 일어나 거절 불가 구조 → [G-09](#g-09).
+
+## 8. 상태 UI 계약 (요구안 §7)
+
+| 상태 | 목표 | 현재 |
+|------|------|------|
+| 오프라인 | "오프라인 · N개 대기" | 오프라인 배너(부울) + 지난 동기화 시각. **N개 대기 카운트 없음** |
+| 동기화 중 | "N개 동기화 중" | 미구현(`SyncServiceStats.syncing` 소비처 0) |
+| 실패 | "N개 실패" + 재시도 | 교사 대시보드 탭에만 존재(학생/학부모 없음), 재시도 버튼이 소진-실패에 무효 |
+
+→ [G-10](#g-10).
+
+## 9. 갭 레지스터 (2026-07-03 검증)
+
+> 워크플로우 7영역 병렬 실측 + 코드 직접 재검증(origin/main `ae5f7377`). severity: P0=데이터유실/무결성, P1=느린망 핵심 사용자 실패, P2=피드백/일관성, P3=폴리시.
+
+### G-01
+**[P0] schedule 도메인 어댑터 미등록 → 큐된 availability 쓰기 영구 유실.** availability 리포 12곳이 `domain: 'schedule'`로 큐잉하나 `SyncAdapterRegistry`는 `'schedule'` 미등록(대신 미사용 `'booking'`). 느린망 타임아웃→큐잉→낙관적 성공 표시 후, 재생이 `NO_ADAPTER`로 즉시 failed → 교사 근무가능시간 저장이 조용히 사라짐. 근거: `sync_adapter_registry.dart:19-41`, `sync_aware_teacher_availability_repository.dart:114-312`(12x), `sync_service.dart:199-208`. **수정: 레지스트리 `'booking'`→`'schedule'` + 도메인별 재생 e2e 테스트.** 즉시 반영 대상.
+
+### G-02
+**[P0] 로그아웃이 쓰기 큐를 비우지 않아 교차 사용자 재생.** `logout()`은 토큰·`notification_settings`·응답 읽기캐시는 비우나 `sync_queue`는 미삭제. 사용자 A의 pending 쓰기가 계정 전환 후 B 토큰으로 재생. 느린망일수록 큐 적체가 커져 노출 확대. 근거: `auth_provider.dart:355-372`, `sync_queue_store.dart:7`(고정 box명, user-scope 아님).
+
+### G-03
+**[P0] 큐 정리 시 미전송 쓰기 무통보 삭제.** `cleanup()`이 500 초과 시 status 무관 최오래 삭제(pending 포함), failed 7일 삭제도 알림 없음. 장기 오프라인/느린망 적체 사용자가 편집을 통보 없이 잃음. 근거: `sync_queue_store.dart:139-203`.
+
+### G-04
+**[P1] SWR 부재 — 모든 읽기가 풀 타임아웃 대기 후에야 캐시.** 캐시는 `onError`에서만 서빙, `onRequest` cache-first 없음. 고RTT/패킷손실 미국망에서 화면마다 최대 30s 스피너 후 last-known-good. 근거: `response_cache_interceptor.dart:37-93`(onRequest 없음), `api_client.dart:146-151`(30s), `environment.dart:24-27`.
+
+### G-05
+**[P1] 읽기 캐시 allowlist 5개 도메인만 — 배치 2~4 미배포.** practice·parent_home·student_home·gamification·notifications·settings·profile·search 등은 fail-closed(타임아웃→에러/무한스피너). 학생측 최고빈도 화면(연습 허브)이 느린망에서 raw 에러. 근거: `response_cache_policy.dart:26-36`(5 prefix), 계획 §5 배치 2~4.
+
+### G-06
+**[P1] 느린망 stale 표시 없음(D2 위반).** stale 배너가 무선-오프라인(`isOffline`)일 때만 렌더. 캐시는 무선 살아있는 타임아웃에도 서빙되므로, 느린망 사용자는 몇 시간 지난 레슨/일정을 최신처럼 무표시로 봄. `onCacheServed`/`lastServedFromCacheAtProvider`는 배선됐으나 offline 분기 안에서만 소비. 근거: `offline_banner.dart:28,41-46`.
+
+### G-07
+**[P1] 타임아웃 시 멱등 키 없어 중복 생성.** POST가 전달됐으나 응답이 receiveTimeout → 큐잉 후 멱등 키 없이 재생 → 서버가 중복 레슨/구독 생성. 느린망의 대표 실패. 근거: `mutation_queue_helper.dart:37-45`, `error_interceptor.dart:23-31`, `sync_queue_entry.dart`(멱등 필드 없음).
+
+### G-08
+**[P1] sendTimeout 미설정 + refresh Dio 무타임아웃.** 본 Dio는 connect/receive만, sendTimeout 없음 → 본문 업로드 정지 시 OS TCP까지 행. `RefreshInterceptor`의 Dio는 타임아웃 전무 + QueuedInterceptor라 정지된 refresh가 전 파이프라인을 분 단위로 동결. 근거: `api_client.dart:143-151`, `refresh_interceptor.dart:29-31`.
+
+### G-09
+**[P1] D4 LWW/거절 SnackBar 미구현(반쪽 dead code).** `CONFLICT_LWW_REJECTED`가 어디서도 소비 안 됨, `_buildReplayError`가 errorCode를 null로 버림, LWW 비교가 요청 전송 후라 거절 불가, practice가 `clientUpdatedAt` 미전달로 LWW 무력. 근거: `sync_adapter.dart:101-131,192-217`, `sync_service.dart:328-331`, `sync_aware_practice_repository.dart:63-150`.
+
+### G-10
+**[P1] 상태 UI 미완 — 대기 카운트/동기화중/역할 커버리지.** pending·syncing 카운트 미표시, 실패 표면이 교사 대시보드 탭 전용(학생/학부모 없음). 느린망에서 쓰기가 조용히 큐에 쌓여도 사용자가 모르고 앱 종료. 근거: `offline_banner.dart:83-86`, `dashboard_tab.dart:576`.
+
+### 기타 확인된 갭 (P2/P3)
+
+| id | sev | 요약 | 근거 |
+|----|-----|------|------|
+| G-11 no-read-retry-backoff | P2 | 읽기 요청 단위 재시도/백오프 없음(단발 실패 즉시 에러→stale) | pubspec 재시도 패키지 없음 |
+| G-12 write-blocks-full-timeout | P2 | 온라인 판정 통과 시 쓰기 탭이 풀 타임아웃 프리즈 후 큐 폴백 | `mutation_queue_helper.dart:30-45` |
+| G-13 cross-domain-invalidation | P2 | 무효화가 prefix-local — 레슨 완료가 구독 사용량 캐시 미무효화 | `response_cache_interceptor.dart:58-59` |
+| G-14 replay-retries-4xx | P2 | 재생이 비즈니스 4xx도 백오프 재시도(무의미 5회) | `sync_service.dart:224-239` |
+| G-15 warmup-misses-subscriptions | P2 | InitialPull이 lessons/students/availability만 워밍, /subscriptions·/schedule/slots 누락 | `initial_pull_service.dart:69-73` |
+| G-16 tmp-id-not-reconciled | P2 | 오프라인 생성 tmp_id가 서버 id로 재조정 안 됨 → 후속 편집 404 | `sync_aware_lesson_repository.dart:124` |
+| G-17 backfill-absent | P2 | 기존 로컬 전용 데이터(녹음 등) 서버 백필 없음 | `rg backfill` 0 |
+| G-18 unknown-socket-not-served | P2 | `DioExceptionType.unknown`+SocketException은 캐시 미서빙 | `response_cache_interceptor.dart:119-129` |
+| G-19 no-reconnect-read-revalidation | P2 | 재접속 시 읽기 재검증 없음(쓰기 큐만) | `connectivity_service` 리스너 2곳 |
+| G-20 sibling-endpoints-uncovered | P2 | segment-aware가 형제 경로(`/subscriptions-templates` 등) 제외 | `response_cache_policy.dart:53-68` |
+| G-21 no-dedupe-coalesce | P2 | 동일 엔티티 반복 쓰기 중복 제거 없음(requestFingerprint dead) | `sync_queue_entry.dart:70-71` |
+| G-22 no-replay-e2e-tests | P2 | 도메인별 재생 e2e/역할별 인증-클리어 행위 테스트 없음(G-01이 이래서 유출) | `sync_service_test.dart` lesson만 |
+| G-23 cache-no-schema-version | P3 | 캐시 payload에 앱/스키마 버전 스탬프 없음(앱 업데이트 후 파싱 실패 가능) | `response_cache_store.dart:26-39` |
+| G-24 inflight-get-dedupe | P3 | 동일 in-flight GET 병합 없음(느린링크 슬롯 낭비) | 없음 |
+| G-25 stats-stream-lag | P3 | 실패 배너가 최대 30s 폴 지연 | `sync_service.dart:57` |
+
+## 10. 반영 계획 · 이슈 매핑 (2026-07-03)
+
+| 갭 | 이슈 | 상태 |
+|----|------|------|
+| G-01 schedule NO_ADAPTER 유실 | #1113 | 본 PR 수정 |
+| G-02 로그아웃 교차사용자 재생 | #1114 | 후속 |
+| G-03 큐 정리 미전송 삭제 | #1115 | 후속 |
+| G-04·G-05·G-06 느린망 읽기(SWR·allowlist·stale표시) | #1116 | 후속(에픽) |
+| G-07 타임아웃 중복 생성(멱등키) | #1117 | 후속 |
+| G-08 sendTimeout/refresh 타임아웃 | #1118 | 후속 |
+| G-09 D4 LWW/거절 SnackBar dead | #1119 | 후속 |
+| G-10 상태 UI 미완 | #1120 | 후속 |
+| G-11~G-25 P2/P3 잔여 | #1121 | 트래킹 |
+
+> INV-1~INV-4는 신규/변경 코드의 HARD-GATE. 특히 새 도메인 큐잉 추가 시 레지스트리 등록 + 재생 e2e 테스트 필수(G-01 재발 방지, #1113).
+
+## 관련 문서
+
+- 요구안 원본(대체 일부): 옵시디언 `14-RA-동기화-상세스펙`
+- 채택 계획/롤아웃 이력: `docs/specs/architecture/offline_first_migration_plan.md`
+- 관련 이슈: #872(practice sync 미구현) · #879(billing read-through) · #880(delta sync)
