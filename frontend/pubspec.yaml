@@ -99,6 +99,7 @@ flutter:
     - assets/sounds/metronome/happy_kitten/
     - assets/sounds/metronome/stick/
     - assets/sounds/metronome/woodblock/
+    - assets/google_fonts/
 
   fonts:
     - family: Pretendard

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -20,6 +21,13 @@ import '../network/cache/response_cache_store.dart';
 import 'startup_recovery.dart';
 
 Future<StartupRecoveryResult> bootstrapApp() async {
+  // Signature fonts (Playfair Display / Gaegu / IBM Plex Mono) are bundled as
+  // local assets under assets/google_fonts/. Force google_fonts to load from
+  // the bundle only — never fetch at runtime — so the notebook signature
+  // typography renders identically offline (offline-first) instead of silently
+  // falling back to the default sans and looking the same as the body text.
+  GoogleFonts.config.allowRuntimeFetching = false;
+
   // Web is a QA / click-through dogfooding target only. Firebase has no web
   // options configured (see firebase_options.dart — currentPlatform throws
   // UnsupportedError on web), the native audio session and the dart:io-based
