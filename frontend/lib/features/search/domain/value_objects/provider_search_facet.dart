@@ -1,3 +1,4 @@
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../repositories/teacher_search_repository.dart';
 
 // Discipline-keyed teacher-search facet registry for the multi-Discipline platform
@@ -24,14 +25,18 @@ class ProviderSearchFacetRegistry {
 
   /// Music (discipline 0): the `instruments` facet resolves to the repository's
   /// teacher-scan instruments list — byte-identical to the pre-#976
-  /// `availableInstruments` provider.
+  /// `availableInstruments` provider. Language/fitness (#1108) register catalog-
+  /// backed facets: their skeleton verticals have no teachers to scan yet, so the
+  /// chips surface the discipline's subjects/종목 directly from the catalog SSOT.
   static final Map<String, ProviderSearchFacetResolver> _byId = {
     'instruments': (repo) => repo.getAvailableInstruments(),
+    'subjects': (repo) async => ExpertiseCatalogRegistry.language.items,
+    'specialties': (repo) async => ExpertiseCatalogRegistry.fitness.items,
   };
 
   /// Resolve a facet by [facetId]; null if no discipline registers it.
   static ProviderSearchFacetResolver? byId(String facetId) => _byId[facetId];
 
-  /// All registered facet ids (music: `instruments`).
+  /// All registered facet ids (instruments, subjects, specialties).
   static Iterable<String> get registeredFacetIds => _byId.keys;
 }
