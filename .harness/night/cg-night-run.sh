@@ -32,6 +32,7 @@ DAY="$(date +%Y-%m-%d)"
 STATUS_DIR="$PROJECT_DIR/.harness/status"
 LOG="$STATUS_DIR/night-run-$STAMP.log"
 mkdir -p "$STATUS_DIR"
+rm -f "$STATUS_DIR/night-stop.flag" 2>/dev/null || true   # 이전 정지 플래그 제거(새 런 오작동 방지)
 
 export CG_UNATTENDED=1
 export CLAUDE_PROJECT_DIR="$PROJECT_DIR"
@@ -63,6 +64,8 @@ PROMPT_PREFIX="너는 야간 무인 자율 세션이다. .claude/rules/unattende
 
 for i in $(seq 1 "$MAX_ITERATIONS"); do
   if [ "$(date +%s)" -ge "$DEADLINE" ]; then log "시간 예산 초과 — 정지"; RESULT="time_budget"; break; fi
+  # 외부 정지 요청(botcontrol /night stop): 다음 iteration 경계에서 안전하게 멈춘다.
+  if [ -f "$STATUS_DIR/night-stop.flag" ]; then log "외부 정지 요청(night-stop.flag) — 정지"; RESULT="stopped"; rm -f "$STATUS_DIR/night-stop.flag"; break; fi
   log "=== iteration $i/$MAX_ITERATIONS ==="
 
   # headless 실행. acceptEdits = 파일편집 자동승인, 셸은 settings.allow 만. 가드가 안전바닥 차단.
@@ -107,4 +110,13 @@ REPORT="$STATUS_DIR/night-report-$DAY.md"
 } > "$REPORT"
 
 log "아침 리포트: $REPORT"
+
+# --- 아웃바운드 알림 (opt-in: CG_NIGHT_NOTIFY_WEBHOOK 설정 시만) -----------------
+# ZCode 흡수: 자는 동안 결과를 채팅앱에서 먼저 확인. 요약만 전송(diff 본문 미전송).
+# 인바운드 원격 제어는 미포함 — 시크릿/원격실행 리스크로 별도 설계 대상.
+if [ -n "${CG_NIGHT_NOTIFY_WEBHOOK:-}" ]; then
+  bash "$PROJECT_DIR/.harness/night/notify.sh" "$REPORT" "$RESULT" >>"$LOG" 2>&1 || true
+  log "알림 전송 시도(요약만): CG_NIGHT_NOTIFY_WEBHOOK"
+fi
+
 log "끝. 결과=$RESULT"

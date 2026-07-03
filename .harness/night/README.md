@@ -52,6 +52,20 @@
 | `CG_NIGHT_MAX_CONSEC_FAIL` | 3 | 연속 검증 실패 상한 |
 | `CG_NIGHT_TASK` | `.harness/night/task.md` | 작업 지시서 |
 | `CG_NIGHT_VERIFY` | `cg diagnose` | 합격 판정 게이트(exit 0=통과) |
+| `CG_NIGHT_NOTIFY_WEBHOOK` | (없음) | 설정 시 아침 리포트 **요약**을 채팅앱 webhook 으로 push(opt-in). 미설정 시 알림 비활성 |
+
+## 알림 (선택 · opt-in)
+
+자는 동안 돈 결과를 아침에 채팅앱에서 먼저 확인하려면 incoming webhook 을 환경변수로 준다:
+
+```bash
+export CG_NIGHT_NOTIFY_WEBHOOK='https://hooks.slack.com/services/...'  # Slack/Discord/Mattermost/Feishu 호환
+```
+
+- **기본 비활성**: 미설정이면 알림은 꺼진다. 시크릿은 커밋하지 않는다 — 환경변수로만 준다.
+- **요약만 전송**: 프로젝트·날짜·결과·리포트 경로만 보낸다. diff·결정로그·미결큐 **본문은 외부로 보내지 않는다**(유출 방지) — 자세한 내용은 로컬 리포트에서 확인.
+- **아웃바운드 전용**: 채팅앱에서 명령으로 야간 루프를 시작·조정하는 **인바운드 원격 제어는 포함하지 않는다**. 시크릿·원격실행 리스크가 커 별도 설계 대상이다.
+- **fail-soft**: 알림 전송이 실패해도 야간 루프는 깨지지 않는다. 실행체: `.harness/night/notify.sh`.
 
 ## 아침 리포트 읽는 법
 
