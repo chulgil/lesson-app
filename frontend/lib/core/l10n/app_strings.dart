@@ -3533,8 +3533,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -6364,11 +6364,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6776,6 +6777,7 @@ class AppStrings {
       '아직 선생님이 없다면 가까운 선생님께 초대를 부탁해 주세요.\n'
       '본인 인증이 열리면 직접 가입도 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
+
   /// M6 (0702 감사) — 학부모도 Google 로그인 → 역할 선택으로 가입 가능.
   /// '준비 중' 안내는 실제 가능한 경로를 숨겨 이탈을 유발했다.
   static const authParentLoginNotReady =
@@ -9022,9 +9024,10 @@ class AppStrings {
   static const vacationNotifyDialogTitle = '통보 완료';
 
   /// 휴가 등록 성공 확인 다이얼로그 본문 — 영향 학생 수 포함.
-  static String vacationNotifyDialogBody(int studentCount) => studentCount == 0
-      ? '해당 기간에 영향 받는 학생이 없어요.'
-      : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
+  static String vacationNotifyDialogBody(int studentCount) =>
+      studentCount == 0
+          ? '해당 기간에 영향 받는 학생이 없어요.'
+          : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
 
   /// 휴가 등록 성공 확인 다이얼로그 확인 버튼.
   static const vacationNotifyDialogConfirm = '확인';
@@ -10319,6 +10322,10 @@ class AppStrings {
   /// 오프라인 배너 — 캐시 서빙 시 데이터 신선도 표기 (D2, N14)
   static String offlineBannerLastSync(String hhmm) =>
       '오프라인 — $hhmm 동기화 데이터 표시 중';
+
+  /// 느린 네트워크 stale 배너 — 무선은 살아있으나 타임아웃으로 캐시 서빙 중 (G-06 / #1116)
+  static String slowNetworkBannerLastSync(String hhmm) =>
+      '연결이 느립니다 — $hhmm 동기화 데이터 표시 중';
 
   // ── Issue #920 i18n bundle ──
 

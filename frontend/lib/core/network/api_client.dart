@@ -181,6 +181,10 @@ ApiClient apiClient(ApiClientRef ref) {
             (cachedAt) => ref
                 .read(lastServedFromCacheAtProvider.notifier)
                 .record(cachedAt),
+        // G-06: a live allowlisted read reached a caller → data is fresh, so
+        // clear the staleness marker (hides the slow-network banner).
+        onFreshServed:
+            () => ref.read(lastServedFromCacheAtProvider.notifier).clear(),
         // G-04/SN-1: publish background-revalidation refreshes so subscribed
         // read providers (ref.autoRevalidate) update live on slow networks.
         onRevalidated:
