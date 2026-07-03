@@ -19,10 +19,18 @@ import '../../../features/practice/presentation/screens/practice_stats_screen.da
 import '../../../features/practice/presentation/screens/repertoire_history_screen.dart';
 import '../../../features/practice/presentation/screens/tuner_screen.dart';
 import '../../../features/practice/presentation/screens/note_access_request_screen.dart';
+import '../../../features/practice/presentation/screens/awaiting_feedback_screen.dart';
 import '../app_routes.dart';
 
 /// Practice routes
 List<GoRoute> practiceRoutes = [
+  // Awaiting Feedback Queue (선생님 피드백 대기 큐 — #1128)
+  GoRoute(
+    path: AppRoutes.awaitingFeedback,
+    name: 'awaitingFeedback',
+    builder: (context, state) => const AwaitingFeedbackScreen(),
+  ),
+
   // Repertoire List
   GoRoute(
     path: AppRoutes.practiceRepertoire,
