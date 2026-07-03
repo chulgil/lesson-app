@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../core/sync/presentation/providers/revalidation_events_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../gamification/gamification_facade.dart'
     show pointAwardNotifierProvider;

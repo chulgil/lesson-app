@@ -3,7 +3,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../core/sync/presentation/providers/revalidation_events_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../data/repositories/mock_gamification_repository.dart';
 import '../../data/repositories/remote_gamification_repository.dart';
 import '../../domain/entities/gamification.dart';

@@ -12,7 +12,7 @@ import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/refresh_interceptor.dart';
 import 'interceptors/response_cache_interceptor.dart';
-import '../sync/presentation/providers/revalidation_events_provider.dart';
+import '../sync/revalidation_events_provider.dart';
 import '../sync/presentation/providers/stale_data_provider.dart';
 
 part 'api_client.g.dart';

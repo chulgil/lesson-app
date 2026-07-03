@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../core/sync/presentation/providers/revalidation_events_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../data/repositories/mock_child_profile_repository.dart';
 import '../../data/repositories/remote_child_profile_repository.dart';
 import '../../domain/entities/child_profile.dart';

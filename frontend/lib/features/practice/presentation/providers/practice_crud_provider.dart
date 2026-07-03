@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/sync/presentation/providers/revalidation_events_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../../../features/practice/domain/entities/practice_log.dart';
 import '../../../gamification/gamification_facade.dart';
 import '../../domain/repositories/practice_repository.dart';

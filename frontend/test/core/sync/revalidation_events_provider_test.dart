@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lessonaza/core/sync/presentation/providers/revalidation_events_provider.dart';
+import 'package:lessonaza/core/sync/revalidation_events_provider.dart';
 
 void main() {
   group('RevalidationEvents', () {

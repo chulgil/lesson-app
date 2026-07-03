@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lessonaza/core/sync/presentation/providers/revalidation_events_provider.dart';
+import 'package:lessonaza/core/sync/revalidation_events_provider.dart';
 import 'package:lessonaza/features/student_home/domain/entities/manual_teacher.dart';
 import 'package:lessonaza/features/student_home/domain/repositories/manual_teacher_repository.dart';
 import 'package:lessonaza/features/student_home/presentation/providers/manual_teacher_provider.dart';
