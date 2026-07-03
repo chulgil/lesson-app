@@ -6644,6 +6644,13 @@ class AppStrings {
   static const onboardingCompleted = '완료';
   static const onboardingPhone = '휴대폰';
   static const onboardingProfile = '프로필';
+  // #1104 — Teacher onboarding step-progress header (역할→분야→프로필→가용시간)
+  // + role-select duration reassurance caption.
+  static const onboardingStepRole = '역할 선택';
+  static const onboardingStepDiscipline = '분야 선택';
+  static const onboardingStepProfile = '프로필';
+  static const onboardingStepAvailability = '첫 가용시간';
+  static const onboardingDurationCaption = '약 3분이면 끝나요';
   static const onboardingProfileSaveError = '프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.';
   static const onboardingProfileSaveFailure = '프로필 저장 실패. 다시 시도해주세요.';
   static const onboardingSelectFromGallery = '갤러리에서 선택';

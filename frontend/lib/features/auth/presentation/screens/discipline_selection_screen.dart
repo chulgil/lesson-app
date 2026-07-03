@@ -15,6 +15,7 @@ import '../../domain/entities/user_role.dart';
 import '../extensions/discipline_visuals.dart';
 import '../extensions/user_role_visuals.dart';
 import '../providers/active_discipline_provider.dart';
+import '../../../../core/widgets/onboarding_step_header.dart';
 
 /// Discipline selection — the first sign-up step of the multi-discipline
 /// platform (#977). The user picks a coaching discipline (music and fitness
@@ -73,6 +74,16 @@ class DisciplineSelectionScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // #1104 — Teacher signup shows the shared step header (분야=2/4).
+              // Student/parent flows reuse this screen without the teacher
+              // step-count, so the header is teacher-only.
+              if (role == UserRole.teacher) ...[
+                const SizedBox(height: AppSpacing.space4),
+                const OnboardingStepHeader(
+                  steps: OnboardingStepHeader.teacherSteps,
+                  currentStep: 2,
+                ),
+              ],
               const SizedBox(height: AppSpacing.space4),
               Text(
                 AppStrings.disciplineSelectTitle,
