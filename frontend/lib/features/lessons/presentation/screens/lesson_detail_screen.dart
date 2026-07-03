@@ -21,6 +21,7 @@ import '../../../share/share_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
+import '../widgets/weekly_focus_card.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../settings/settings_facade.dart';
 
@@ -462,6 +463,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨 또는 활성 수강권이 있는 수동 레슨
           _buildScheduleChangeButton(lesson),
+
+          // #1106: 이번 주 집중 카드 (학생 뷰 · 피드백→연습 연결)
+          if (!widget.isTeacher &&
+              WeeklyFocusCard.focusContentOf(lesson) != null) ...[
+            WeeklyFocusCard(lesson: lesson, isTeacher: widget.isTeacher),
+            const SizedBox(height: AppSpacing.space5),
+          ],
 
           // Teacher notes section
           if (widget.isTeacher) ...[
