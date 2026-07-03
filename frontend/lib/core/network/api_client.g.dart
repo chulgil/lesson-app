@@ -22,7 +22,7 @@ final tokenStorageProvider = Provider<TokenStorage>.internal(
 );
 
 typedef TokenStorageRef = ProviderRef<TokenStorage>;
-String _$apiClientHash() => r'dcf010d42ef5d31d748e526c43626f8fc6848eaa';
+String _$apiClientHash() => r'c1c59df19be5b15cf13ad4017409352e4ca739bb';
 
 /// Singleton ApiClient provider.
 ///

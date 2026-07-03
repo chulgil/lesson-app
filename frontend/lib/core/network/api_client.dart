@@ -12,6 +12,7 @@ import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/refresh_interceptor.dart';
 import 'interceptors/response_cache_interceptor.dart';
+import '../sync/presentation/providers/revalidation_events_provider.dart';
 import '../sync/presentation/providers/stale_data_provider.dart';
 
 part 'api_client.g.dart';
@@ -176,8 +177,24 @@ ApiClient apiClient(ApiClientRef ref) {
         ),
         policy: ResponseCachePolicy.active,
         // D2: feed the staleness banner with the served entry's cachedAt.
-        onCacheServed: (cachedAt) =>
-            ref.read(lastServedFromCacheAtProvider.notifier).record(cachedAt),
+        onCacheServed:
+            (cachedAt) => ref
+                .read(lastServedFromCacheAtProvider.notifier)
+                .record(cachedAt),
+        // G-04/SN-1: publish background-revalidation refreshes so subscribed
+        // read providers (ref.autoRevalidate) update live on slow networks.
+        onRevalidated:
+            (path) => ref.read(revalidationEventsProvider.notifier).emit(path),
+        // Stale-while-revalidate: re-issue the read as a background request
+        // (flagged so it skips the cache-first shortcut) to refresh the store.
+        revalidate:
+            (options) => dio.get<dynamic>(
+              options.path,
+              queryParameters: options.queryParameters,
+              options: Options(
+                extra: const {ResponseCacheInterceptor.swrBackgroundKey: true},
+              ),
+            ),
       ),
     );
   }
