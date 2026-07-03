@@ -316,11 +316,28 @@ class LessonService:
         """Update a lesson."""
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
 
+        # Capture the schedule before mutation so a genuine reschedule can be
+        # distinguished from a no-op edit (#1131).
+        old_date = lesson.date
+        old_start_time = lesson.start_time
+
         update_data = data.model_dump(exclude_unset=True, exclude={"pieces"})
         for key, value in update_data.items():
             setattr(lesson, key, value)
         await self.db.flush()
         await self.db.refresh(lesson)
+
+        # Notify the counterparty only when the date or start time actually
+        # changed; same-value edits send nothing.
+        if lesson.date != old_date or lesson.start_time != old_start_time:
+            await self._notify_lesson_counterparty(
+                lesson,
+                current_user,
+                notification_type="lessonRescheduled",
+                title="레슨 일정이 변경되었습니다",
+                body=f"{old_date} {old_start_time} → {lesson.date} {lesson.start_time} 로 변경되었습니다",
+            )
+
         # NOTE: LessonUpdate has no ``status`` field — status transitions (and
         # thus completion deduction) only happen via ``update_status``.
         return LessonResponse.model_validate(lesson)
@@ -387,6 +404,13 @@ class LessonService:
                     subscription_id=lesson.subscription_id,
                     message=new_status,
                 )
+            )
+            await self._notify_lesson_counterparty(
+                lesson,
+                current_user,
+                notification_type="lessonCancelled",
+                title="레슨이 취소되었습니다",
+                body=f"{lesson.date} {lesson.start_time} 레슨이 취소되었습니다",
             )
 
         await self.db.flush()
@@ -478,6 +502,49 @@ class LessonService:
         if lesson.teacher_id != teacher_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lesson access denied")
         return lesson
+
+    async def _notify_lesson_counterparty(
+        self,
+        lesson: Any,
+        current_user: Any,
+        *,
+        notification_type: str,
+        title: str,
+        body: str,
+    ) -> None:
+        """Send a high-priority lesson event notification to the counterparty only.
+
+        The actor (``current_user``) is excluded: a teacher actor notifies the
+        student, and a student/parent actor notifies the teacher (#1131 §2.2).
+        Silently skips when the counterparty has no linked user account.
+        """
+        from app.models.student import Student
+        from app.models.teacher import Teacher
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        role = getattr(getattr(current_user, "role", None), "value", None) or "teacher"
+
+        recipient_user_id: str | None = None
+        if role == "teacher":
+            if lesson.student_id:
+                student = await self.db.get(Student, lesson.student_id)
+                recipient_user_id = student.user_id if student else None
+        else:
+            if lesson.teacher_id:
+                teacher = await self.db.get(Teacher, lesson.teacher_id)
+                recipient_user_id = teacher.user_id if teacher else None
+
+        if not recipient_user_id:
+            return
+
+        await NotificationService(self.db).create_and_send(
+            user_id=recipient_user_id,
+            notification_type=notification_type,
+            title=title,
+            body=body,
+            priority=NotificationPriority.high,
+            action_url=f"/lessons/{lesson.id}",
+        )
 
     async def get_upcoming(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return upcoming lessons."""
