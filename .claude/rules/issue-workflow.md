@@ -1,6 +1,6 @@
 # Issue 기반 작업 워크플로우
 
-> GitHub Issues (또는 동급 트래커) 를 작업 단위 SSOT 로 사용한다.
+> lesson-app 운영에서 흡수한 패턴. GitHub Issues (또는 동급 트래커) 를 작업 단위 SSOT 로 사용한다.
 
 ## Claude 행동 지침
 
@@ -15,7 +15,7 @@
 |----------|------|
 | 타입 | `bug`, `feature`, `enhancement`, `refactor`, `docs`, `test`, `claude` |
 | 우선순위 | `priority: critical/high/medium/low` |
-| 도메인 | `domain: lesson/student/parent/practice/payment/schedule/notification/auth/recording/metronome/profile` — `.harness/knowledge/glossary.md` 의 공식 용어 사용 |
+| 도메인 | `domain: <프로젝트 도메인명>` — `.harness/knowledge/glossary.md` 의 공식 용어 사용 |
 | 상태 | `status: todo/in-progress/blocked/review/done` |
 
 ## 워크플로우
@@ -28,12 +28,11 @@
 5. 사용자 확인 후 → status: done + 이슈 닫기
 ```
 
-> [!] 기능 구현 후 사용자가 테스트/확인하기 전까지 이슈를 닫지 않는다 (CLAUDE.md "Never" 항목과 동일).
+> 기능 구현 후 사용자가 테스트/확인하기 전까지 이슈를 닫지 않는다 (CLAUDE.md "Never" 항목과 동일).
 
 ## 복잡한 작업 (3시간+)
 
-TODO.md 로 Phase 기반 관리 → Issue 참조, 세션별 Phase 진행, 완료 시 Issue 에 코멘트.
-규모가 크면 `cg-decomposition` 으로 DAG 분해 후 각 job 을 이슈로 등록.
+Phase 기반 분해(`cg-decomposition`) 후 각 job 을 이슈로 등록 — Issue 참조, 세션별 Phase 진행, 완료 시 Issue 에 코멘트.
 
 ## 상위 규칙과의 관계
 
