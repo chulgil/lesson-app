@@ -101,6 +101,7 @@ LessonBookingParams {
 
 ### 예약 실행
 `slotBookingNotifierProvider.bookSlot(slotId, studentId, studentName, teacherId, teacherName, slotDate, slotStartTime, slotEndTime, instrument, lessonType, fee)` → `LessonBooking` (즉시 확정).
+- **BE 구현 (2026-07-03, #1107)**: `POST /bookings` 가 `slot_id` 존재 시 `create_slot_booking` → `create_booking(auto_confirm=True)` 로 `LessonBooking.status=confirmed` 즉시 확정 (교사 approve 불필요). slot_id 없는 요청 경로는 pending 유지.
 - 에러는 `AsyncValue.error`로 삼켜지므로 `ref.read(slotBookingNotifierProvider).hasError` 확인 필수.
 
 ## 7. Notebook × 악보 디자인 적용

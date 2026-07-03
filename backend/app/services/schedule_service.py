@@ -832,9 +832,17 @@ class ScheduleService:
                     detail="해당 시간에 이미 예약이 있습니다",
                 )
 
-    async def create_booking(self, data: BookingCreate, current_user: Any) -> BookingResponse:
-        """Create a new booking request."""
-        from app.models.schedule import LessonBooking
+    async def create_booking(
+        self, data: BookingCreate, current_user: Any, *, auto_confirm: bool = False
+    ) -> BookingResponse:
+        """Create a new booking request.
+
+        [auto_confirm] True for slot-based direct bookings, which the spec
+        (student_direct_booking_spec.md / schedule_master §1.2) confirms
+        immediately (선착순 즉시 확정, 승인 불필요). The request flow leaves it
+        False so the booking stays pending until the teacher approves.
+        """
+        from app.models.schedule import BookingStatus, LessonBooking
 
         assert data.teacher_id is not None  # normalized by BookingCreate
 
@@ -869,7 +877,7 @@ class ScheduleService:
             instrument=data.instrument,
             subscription_id=data.subscription_id,
             notes=data.notes,
-            status="pending",
+            status=BookingStatus.confirmed if auto_confirm else BookingStatus.pending,
         )
         self.db.add(booking)
         await self.db.flush()
@@ -886,8 +894,12 @@ class ScheduleService:
         return await self._to_booking_response(booking)
 
     async def create_slot_booking(self, data: BookingCreate, current_user: Any) -> dict[str, Any]:
-        """Create a booking from a frontend availability slot payload."""
-        booking = await self.create_booking(data, current_user)
+        """Create a booking from a frontend availability slot payload.
+
+        Slot bookings are 선착순 즉시 확정 (spec student_direct_booking_spec.md):
+        the booking is persisted confirmed, with no teacher approval step.
+        """
+        booking = await self.create_booking(data, current_user, auto_confirm=True)
         return {
             "id": booking.id,
             "teacher_id": booking.teacher_id,
