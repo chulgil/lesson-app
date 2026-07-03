@@ -17,6 +17,7 @@ import 'core/theme/app_theme.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
 import 'core/widgets/offline_banner.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/notifications/notifications_facade.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
 import 'features/practice/presentation/providers/recording_provider.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
@@ -74,6 +75,11 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     // Bridge the Riverpod auth state into a stream the router can listen to.
     ref.listenManual<AuthState>(authNotifierProvider, (_, next) {
       _authRefreshController?.add(next);
+      // #475 — register for push once onboarding lands the user in the
+      // authenticated state (permission prompt appears post-onboarding).
+      if (next is AuthAuthenticated) {
+        unawaited(ref.read(pushRegistrationProvider.notifier).ensureStarted());
+      }
     });
     _authRefresh = GoRouterRefreshStream(_authRefreshController!.stream);
     _router = AppRouter.createRouter(ref, refreshListenable: _authRefresh);
@@ -87,6 +93,12 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     // Pre-initialize engines at app startup to eliminate first-use delay
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
+      // Returning users are already authenticated before the auth listener is
+      // wired, so the transition above never fires — kick push registration
+      // here too (ensureStarted is idempotent per session).
+      if (ref.read(authNotifierProvider) is AuthAuthenticated) {
+        unawaited(ref.read(pushRegistrationProvider.notifier).ensureStarted());
+      }
       // Tuner warm-up is intentionally deferred until user opens tuner.
       // Keeping it running globally can hold the microphone active in background.
       unawaited(_initializeSyncService());
