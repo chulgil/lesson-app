@@ -105,9 +105,10 @@ void main() {
       expect(find.text(AppStrings.offlineBannerMessage), findsOneWidget);
 
       final context = tester.element(find.byType(OfflineBannerWrapper));
-      ProviderScope.containerOf(context, listen: false)
-          .read(lastServedFromCacheAtProvider.notifier)
-          .record(servedAt);
+      ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(lastServedFromCacheAtProvider.notifier).record(servedAt);
       await tester.pumpAndSettle();
 
       expect(
@@ -115,6 +116,81 @@ void main() {
         findsOneWidget,
       );
       expect(find.text(AppStrings.offlineBannerMessage), findsNothing);
+    });
+
+    testWidgets('online + stale cache serve shows the slow-network banner '
+        '(G-06)', (tester) async {
+      final servedAt = DateTime(2026, 7, 2, 14, 5);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            offlineBannerProvider.overrideWith((ref) => Stream.value(false)),
+          ],
+          child: const MaterialApp(
+            home: OfflineBannerWrapper(child: Scaffold(body: Text('content'))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // Online with no stale marker → no banner at all.
+      expect(
+        find.text(AppStrings.slowNetworkBannerLastSync('14:05')),
+        findsNothing,
+      );
+
+      final context = tester.element(find.byType(OfflineBannerWrapper));
+      ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(lastServedFromCacheAtProvider.notifier).record(servedAt);
+      await tester.pumpAndSettle();
+
+      // Slow-network copy appears; the offline copy does NOT (device is online).
+      expect(
+        find.text(AppStrings.slowNetworkBannerLastSync('14:05')),
+        findsOneWidget,
+      );
+      expect(
+        find.text(AppStrings.offlineBannerLastSync('14:05')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('a fresh live read clears the slow-network banner (G-06)', (
+      tester,
+    ) async {
+      final servedAt = DateTime(2026, 7, 2, 14, 5);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            offlineBannerProvider.overrideWith((ref) => Stream.value(false)),
+          ],
+          child: const MaterialApp(
+            home: OfflineBannerWrapper(child: Scaffold(body: Text('content'))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final context = tester.element(find.byType(OfflineBannerWrapper));
+      final notifier = ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(lastServedFromCacheAtProvider.notifier);
+
+      notifier.record(servedAt);
+      await tester.pumpAndSettle();
+      expect(
+        find.text(AppStrings.slowNetworkBannerLastSync('14:05')),
+        findsOneWidget,
+      );
+
+      // A live (non-cache) read reaches a caller → marker cleared → banner hides.
+      notifier.clear();
+      await tester.pumpAndSettle();
+      expect(
+        find.text(AppStrings.slowNetworkBannerLastSync('14:05')),
+        findsNothing,
+      );
     });
   });
 }

@@ -16,4 +16,11 @@ class LastServedFromCacheAt extends _$LastServedFromCacheAt {
   void record(DateTime cachedAt) {
     state = cachedAt;
   }
+
+  /// Clears the marker when a genuinely live (non-cache) allowlisted response
+  /// reaches a caller — on-screen data is fresh again, so the banner can hide
+  /// even while the device is on a slow (but connected) network. (G-06)
+  void clear() {
+    state = null;
+  }
 }

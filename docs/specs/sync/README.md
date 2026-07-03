@@ -62,7 +62,7 @@
 - **서빙**: allowlist GET이 **전송 실패**(connectionError / connect·receive·send Timeout)하고 캐시 히트 시 last-known-good 서빙(`onError`, `fromCache:true`). 비즈니스 4xx/5xx·캐시미스·비-GET·비-allowlist는 그대로 전파.
 - **무효화(N7)**: 비-GET 2xx 성공 시 해당 prefix 캐시 제거. 교차 도메인 효과(예: 레슨 완료가 구독 사용량 차감)는 범위 밖 → [G-13](#기타-확인된-갭).
 - **TTL(D3)**: 민감 경로(`/subscriptions/payment-pending`)는 15분 TTL, 그 외 표시 도메인은 무TTL(재접속까지 stale).
-- **allowlist(현재)**: `/lessons` · `/students` · `/subscriptions` · `/schedule/availability` · `/schedule/slots` (5개). segment-aware(형제 경로 `/lessons-classes` 등 미포함). 배치 2~4 미배포 → [G-05](#g-05).
+- **allowlist(현재)**: 배치1 `/lessons` · `/students` · `/subscriptions` · `/schedule/availability` · `/schedule/slots` + 배치2(#1116) `/parents` · `/manual-teachers` · `/practice` · `/practice-logs` · `/recordings` · `/teachers` · `/gamification` (12개). segment-aware(형제 경로 `/lessons-classes` 등 미포함). `/parents/billing-target` 는 민감 15분 TTL. 배치 3~4(profile·settings·search·academy·analytics 등)·알림 미배포, auth·billing 은 fresh 필수로 제외 → [G-05](#g-05).
 
 ## 6. 느린 네트워크 대응 계약 (미국 시장 1급 요건)
 
@@ -70,9 +70,9 @@
 
 | # | 계약 | 현재 | 갭 |
 |---|------|------|-----|
-| SN-1 | 읽기는 캐시가 있으면 **즉시** last-known-good을 보이고 백그라운드 갱신(stale-while-revalidate) | onError 전용 — 풀 타임아웃(최대 30s+30s) 대기 후에야 캐시 | [G-04](#g-04) |
-| SN-2 | 핵심 사용자 화면 읽기는 전부 캐시 보호(연습·홈·게이미피케이션·알림 포함) | allowlist 5개 도메인만, 나머지 fail-closed | [G-05](#g-05) |
-| SN-3 | 캐시(stale) 서빙 중이면 무선 상태와 무관하게 "지난 동기화 시각" 표시 | 배너가 무선-오프라인일 때만 렌더 → 느린망 stale 무표시 | [G-06](#g-06) |
+| SN-1 | 읽기는 캐시가 있으면 **즉시** last-known-good을 보이고 백그라운드 갱신(stale-while-revalidate) | 구현(#1116) — onRequest 소프트타임아웃 레이스: 빠른망 최신 직행, 느린망 캐시 즉시 서빙 후 백그라운드 갱신 | [G-04](#g-04) |
+| SN-2 | 핵심 사용자 화면 읽기는 전부 캐시 보호(연습·홈·게이미피케이션·알림 포함) | 배치2 확장(#1116) — parents·manual-teachers·practice·gamification 캐시 보호. 배치3~4·알림 미배포 | [G-05](#g-05) |
+| SN-3 | 캐시(stale) 서빙 중이면 무선 상태와 무관하게 "지난 동기화 시각" 표시 | 구현(#1116) — 배너가 캐시-서빙 신호로 게이팅(connectivity 무관), fresh 시 소거, 느린망 문구 분리 | [G-06](#g-06) |
 | SN-4 | 응답 유실된 POST 재생이 서버 중복 생성 금지(멱등 키) | 멱등 키 없음 | [G-07](#g-07) |
 | SN-5 | 전송 타임아웃 값이 느린망에 합리적(과단축=허위실패, 과장=UI 프리즈) + 업로드 sendTimeout 설정 | connect/receive 30s, sendTimeout 미설정, refresh Dio 무타임아웃 | [G-08](#g-08) |
 | SN-6 | 일시적 읽기 실패(단발 패킷손실)에 요청 단위 재시도(백오프) | 읽기 재시도 없음 | [G-11](#기타-확인된-갭) |
@@ -109,13 +109,13 @@
 **[P0] 큐 정리 시 미전송 쓰기 무통보 삭제.** `cleanup()`이 500 초과 시 status 무관 최오래 삭제(pending 포함), failed 7일 삭제도 알림 없음. 장기 오프라인/느린망 적체 사용자가 편집을 통보 없이 잃음. 근거: `sync_queue_store.dart:139-203`.
 
 ### G-04
-**[P1] SWR 부재 — 모든 읽기가 풀 타임아웃 대기 후에야 캐시.** 캐시는 `onError`에서만 서빙, `onRequest` cache-first 없음. 고RTT/패킷손실 미국망에서 화면마다 최대 30s 스피너 후 last-known-good. 근거: `response_cache_interceptor.dart:37-93`(onRequest 없음), `api_client.dart:146-151`(30s), `environment.dart:24-27`.
+**[P1] SWR 부재 — 모든 읽기가 풀 타임아웃 대기 후에야 캐시.** 캐시는 `onError`에서만 서빙, `onRequest` cache-first 없음. 고RTT/패킷손실 미국망에서 화면마다 최대 30s 스피너 후 last-known-good. 근거: `response_cache_interceptor.dart:37-93`(onRequest 없음), `api_client.dart:146-151`(30s), `environment.dart:24-27`. **해소(#1116): `onRequest` 캐시-우선 + 단일 백그라운드 재검증을 `swrSoftTimeout`(~2.5s)과 레이스 — 빠른망은 창 안에 최신 직행(무 stale-flash), 느린망은 캐시 즉시 서빙 후 백그라운드가 store 갱신. 서빙 stale 와 다르면 재검증 버스(`RevalidationEvents`/`ref.autoRevalidate`)가 구독 read 프로바이더를 자동 갱신(변경 시에만 emit → 루프 방지).**
 
 ### G-05
-**[P1] 읽기 캐시 allowlist 5개 도메인만 — 배치 2~4 미배포.** practice·parent_home·student_home·gamification·notifications·settings·profile·search 등은 fail-closed(타임아웃→에러/무한스피너). 학생측 최고빈도 화면(연습 허브)이 느린망에서 raw 에러. 근거: `response_cache_policy.dart:26-36`(5 prefix), 계획 §5 배치 2~4.
+**[P1] 읽기 캐시 allowlist 5개 도메인만 — 배치 2~4 미배포.** practice·parent_home·student_home·gamification·notifications·settings·profile·search 등은 fail-closed(타임아웃→에러/무한스피너). 학생측 최고빈도 화면(연습 허브)이 느린망에서 raw 에러. 근거: `response_cache_policy.dart:26-36`(5 prefix), 계획 §5 배치 2~4. **부분 해소(#1116): 배치2(`/parents`·`/manual-teachers`·`/practice`·`/practice-logs`·`/recordings`·`/teachers`·`/gamification`) 추가 — 전부 bespoke 캐시 없는 plain remote(double-cache 실측 0). `/parents/billing-target` 15분 TTL. 배치3~4·알림은 후속, auth·billing 은 fresh 필수로 영구 제외.**
 
 ### G-06
-**[P1] 느린망 stale 표시 없음(D2 위반).** stale 배너가 무선-오프라인(`isOffline`)일 때만 렌더. 캐시는 무선 살아있는 타임아웃에도 서빙되므로, 느린망 사용자는 몇 시간 지난 레슨/일정을 최신처럼 무표시로 봄. `onCacheServed`/`lastServedFromCacheAtProvider`는 배선됐으나 offline 분기 안에서만 소비. 근거: `offline_banner.dart:28,41-46`.
+**[P1] 느린망 stale 표시 없음(D2 위반).** stale 배너가 무선-오프라인(`isOffline`)일 때만 렌더. 캐시는 무선 살아있는 타임아웃에도 서빙되므로, 느린망 사용자는 몇 시간 지난 레슨/일정을 최신처럼 무표시로 봄. `onCacheServed`/`lastServedFromCacheAtProvider`는 배선됐으나 offline 분기 안에서만 소비. 근거: `offline_banner.dart:28,41-46`. **해소(#1116): 배너 게이팅을 `isOffline || staleMarker≠null` 로 확장(connectivity 무관 캐시-서빙 신호 기반). 라이브 읽기 도달 시 `onFreshServed`→marker 소거로 배너 자동 사라짐. 문구·아이콘 분리(오프라인/느린망).**
 
 ### G-07
 **[P1] 타임아웃 시 멱등 키 없어 중복 생성.** POST가 전달됐으나 응답이 receiveTimeout → 큐잉 후 멱등 키 없이 재생 → 서버가 중복 레슨/구독 생성. 느린망의 대표 실패. 근거: `mutation_queue_helper.dart:37-45`, `error_interceptor.dart:23-31`, `sync_queue_entry.dart`(멱등 필드 없음).
@@ -156,7 +156,7 @@
 | G-01 schedule NO_ADAPTER 유실 | #1113 | 본 PR 수정 |
 | G-02 로그아웃 교차사용자 재생 | #1114 | 후속 |
 | G-03 큐 정리 미전송 삭제 | #1115 | 후속 |
-| G-04·G-05·G-06 느린망 읽기(SWR·allowlist·stale표시) | #1116 | 후속(에픽) |
+| G-04·G-05·G-06 느린망 읽기(SWR·allowlist·stale표시) | #1116 | 수정(SWR 레이스+재검증버스 · 배치2 allowlist · stale배너). 배치3~4 allowlist·전 프로바이더 라이브갱신은 후속 |
 | G-07 타임아웃 중복 생성(멱등키) | #1117 | 후속 |
 | G-08 sendTimeout/refresh 타임아웃 | #1118 | 후속 |
 | G-09 D4 LWW/거절 SnackBar dead | #1119 | 후속 |
