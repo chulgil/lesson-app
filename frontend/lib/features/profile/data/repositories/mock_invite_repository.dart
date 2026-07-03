@@ -74,6 +74,48 @@ class MockInviteRepository implements InviteRepository {
       expiresAt: now.add(const Duration(days: 7)),
     );
 
+    // #1105 — teacher_1 invite history seed (수락/만료/회수) so the invite
+    // history screen shows realistic accepted/expired/revoked rows in dev.
+    _invites['invite_used'] = Invite(
+      id: 'invite_used',
+      creatorId: 'teacher_1',
+      creatorName: '김선생님',
+      creatorRole: InviteUserRole.teacher,
+      inviteCode: 'USED01',
+      inviteUrl: '$_appScheme://$_inviteHost/USED01',
+      qrCodeData: '$_appScheme://$_inviteHost/USED01',
+      status: InviteStatus.used,
+      isSingleUse: true,
+      useCount: 1,
+      note: '민준 학생',
+      createdAt: now.subtract(const Duration(days: 10)),
+      expiresAt: now.subtract(const Duration(days: 3)),
+    );
+    _invites['invite_expired'] = Invite(
+      id: 'invite_expired',
+      creatorId: 'teacher_1',
+      creatorName: '김선생님',
+      creatorRole: InviteUserRole.teacher,
+      inviteCode: 'EXP001',
+      inviteUrl: '$_appScheme://$_inviteHost/EXP001',
+      qrCodeData: '$_appScheme://$_inviteHost/EXP001',
+      status: InviteStatus.expired,
+      createdAt: now.subtract(const Duration(days: 14)),
+      expiresAt: now.subtract(const Duration(days: 7)),
+    );
+    _invites['invite_revoked'] = Invite(
+      id: 'invite_revoked',
+      creatorId: 'teacher_1',
+      creatorName: '김선생님',
+      creatorRole: InviteUserRole.teacher,
+      inviteCode: 'REV001',
+      inviteUrl: '$_appScheme://$_inviteHost/REV001',
+      qrCodeData: '$_appScheme://$_inviteHost/REV001',
+      status: InviteStatus.revoked,
+      createdAt: now.subtract(const Duration(days: 5)),
+      expiresAt: now.add(const Duration(days: 2)),
+    );
+
     // Pending connection request
     _requests['request_1'] = ConnectionRequest(
       id: 'request_1',
