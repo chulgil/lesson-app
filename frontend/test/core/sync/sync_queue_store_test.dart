@@ -88,4 +88,117 @@ void main() {
       expect(entries.single.id, equals('valid'));
     });
   });
+
+  group('SyncQueueStore cleanup (INV-3)', () {
+    late Directory tempDir;
+    late SyncQueueStore store;
+
+    setUp(() async {
+      tempDir = await Directory.systemTemp.createTemp(
+        'lessonaza_sync_cleanup_test_',
+      );
+      Hive.init(tempDir.path);
+      store = SyncQueueStore(
+        boxName: 'sync_cleanup_test',
+        metaBoxName: 'sync_cleanup_meta_test',
+      );
+    });
+
+    tearDown(() async {
+      await store.close();
+      await Hive.close();
+      if (await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
+      }
+    });
+
+    Future<void> put(
+      String id,
+      SyncQueueStatus status, {
+      DateTime? createdAt,
+    }) async {
+      final box = await Hive.openBox<dynamic>(store.boxName);
+      final at = createdAt ?? DateTime.utc(2026, 6, 1);
+      await box.put(
+        id,
+        SyncQueueEntry(
+          id: id,
+          domain: 'lesson',
+          operation: SyncOperationType.create,
+          httpMethod: 'POST',
+          path: '/lessons',
+          payload: {'name': id},
+          queryParameters: const {},
+          status: status,
+          createdAt: at,
+          updatedAt: at,
+        ).toMap(),
+      );
+    }
+
+    test('removes synced entries but keeps pending', () async {
+      await put('s1', SyncQueueStatus.synced);
+      await put('p1', SyncQueueStatus.pending);
+
+      final result = await store.cleanup();
+
+      expect(result.syncedRemoved, 1);
+      expect(result.expiredFailedRemoved, 0);
+      expect((await store.fetchAll()).map((e) => e.id), ['p1']);
+    });
+
+    test('never removes pending, even far beyond maxEntries (INV-3)', () async {
+      for (var i = 0; i < 600; i++) {
+        await put(
+          'p$i',
+          SyncQueueStatus.pending,
+          createdAt: DateTime.utc(2026, 1, 1).add(Duration(minutes: i)),
+        );
+      }
+
+      final result = await store.cleanup(maxEntries: 500);
+
+      expect(
+        result.totalRemoved,
+        0,
+        reason: 'unsent writes must not be dropped',
+      );
+      expect((await store.fetchAll()).length, 600);
+    });
+
+    test(
+      'removes failed older than expireAfter, keeps recent failed',
+      () async {
+        final now = DateTime.now().toUtc();
+        await put(
+          'old',
+          SyncQueueStatus.failed,
+          createdAt: now.subtract(const Duration(days: 8)),
+        );
+        await put(
+          'recent',
+          SyncQueueStatus.failed,
+          createdAt: now.subtract(const Duration(days: 1)),
+        );
+
+        final result = await store.cleanup();
+
+        expect(
+          result.expiredFailedRemoved,
+          1,
+          reason: 'lost-write count for user notice',
+        );
+        expect((await store.fetchAll()).map((e) => e.id), ['recent']);
+      },
+    );
+
+    test('never removes syncing entries', () async {
+      await put('sync1', SyncQueueStatus.syncing);
+
+      final result = await store.cleanup();
+
+      expect(result.totalRemoved, 0);
+      expect((await store.fetchAll()).single.id, 'sync1');
+    });
+  });
 }

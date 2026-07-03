@@ -2,6 +2,23 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../domain/sync_queue_entry.dart';
 
+/// Breakdown of what a [SyncQueueStore.cleanup] pass removed.
+///
+/// [expiredFailedRemoved] counts *lost unsent writes* (failed entries that
+/// aged out after exhausting retries) — the caller surfaces this to the user
+/// (INV-3: no silent loss). Pending/syncing entries are never removed.
+class SyncCleanupResult {
+  const SyncCleanupResult({
+    required this.syncedRemoved,
+    required this.expiredFailedRemoved,
+  });
+
+  final int syncedRemoved;
+  final int expiredFailedRemoved;
+
+  int get totalRemoved => syncedRemoved + expiredFailedRemoved;
+}
+
 class SyncQueueStore {
   SyncQueueStore({
     this.boxName = 'sync_queue',
@@ -51,8 +68,9 @@ class SyncQueueStore {
     final queueBox = await _openQueueBox();
     final legacy = queueBox.get('items');
     if (legacy is List) {
-      final legacyItems =
-          legacy.where((row) => row is Map && row['id'] is String).toList();
+      final legacyItems = legacy
+          .where((row) => row is Map && row['id'] is String)
+          .toList();
       if (legacyItems.isEmpty) {
         return;
       }
@@ -133,19 +151,27 @@ class SyncQueueStore {
     return SyncQueueEntry.fromMap(Map<String, dynamic>.from(raw));
   }
 
-  /// Remove synced entries and expired failed entries.
-  /// Keeps up to [maxEntries] pending entries (oldest removed first).
-  /// Failed entries older than [expireAfter] are deleted regardless of maxEntries.
-  Future<int> cleanup({
+  /// Removes only entries that are safe to drop, returning a breakdown so the
+  /// caller can notify the user about lost writes.
+  ///
+  /// - `synced` entries: always removed (already delivered).
+  /// - `failed` entries older than [expireAfter]: removed after giving up
+  ///   (these are *lost unsent writes* — surfaced via
+  ///   [SyncCleanupResult.expiredFailedRemoved] so the user can be told).
+  /// - `pending` / `syncing` entries: **never removed** (INV-3). Unsent writes
+  ///   are user edits and must not be silently discarded, even under capacity
+  ///   pressure. [maxEntries] is retained for API compatibility and to bound
+  ///   how many entries we scan, but a large pending backlog is surfaced via
+  ///   `SyncServiceStats`, not deleted.
+  Future<SyncCleanupResult> cleanup({
     int maxEntries = 500,
     Duration expireAfter = const Duration(days: 7),
   }) async {
     final box = await _openQueueBox();
-    int removed = 0;
     final now = DateTime.now().toUtc();
-    final entriesToDelete = <dynamic>[];
+    final syncedKeys = <dynamic>[];
+    final expiredFailedKeys = <dynamic>[];
 
-    // Collect all synced entries and expired failed entries
     for (final key in box.keys) {
       final raw = box.get(key);
       if (raw is! Map<dynamic, dynamic>) {
@@ -158,48 +184,38 @@ class SyncQueueStore {
 
       final status = entryMap['status'] as String;
 
-      // Remove all synced entries
       if (status == 'synced') {
-        entriesToDelete.add(key);
-        continue;
-      }
-
-      // Remove failed entries older than expireAfter
-      if (status == 'failed' && entryMap['createdAt'] is String) {
+        syncedKeys.add(key);
+      } else if (status == 'failed' && entryMap['createdAt'] is String) {
         try {
-          final createdAt =
-              DateTime.parse(entryMap['createdAt'] as String).toUtc();
+          final createdAt = DateTime.parse(
+            entryMap['createdAt'] as String,
+          ).toUtc();
           if (now.difference(createdAt) > expireAfter) {
-            entriesToDelete.add(key);
+            expiredFailedKeys.add(key);
           }
         } catch (_) {
-          // Invalid date format, skip
+          // Invalid date format — leave it in place rather than risk a drop.
         }
       }
+      // pending / syncing: intentionally untouched (INV-3).
     }
 
-    // Delete collected entries
-    for (final key in entriesToDelete) {
+    var syncedRemoved = 0;
+    for (final key in syncedKeys) {
       await box.delete(key);
-      removed++;
+      syncedRemoved++;
+    }
+    var expiredFailedRemoved = 0;
+    for (final key in expiredFailedKeys) {
+      await box.delete(key);
+      expiredFailedRemoved++;
     }
 
-    // If still over maxEntries, remove oldest pending entries
-    if (removed < entriesToDelete.length) {
-      return removed; // Some deletions failed, return what succeeded
-    }
-
-    final allEntries = await fetchAll();
-    if (allEntries.length > maxEntries) {
-      final excess = allEntries.length - maxEntries;
-      // Remove oldest entries (already sorted by createdAt ascending)
-      for (int i = 0; i < excess; i++) {
-        await box.delete(allEntries[i].id);
-        removed++;
-      }
-    }
-
-    return removed;
+    return SyncCleanupResult(
+      syncedRemoved: syncedRemoved,
+      expiredFailedRemoved: expiredFailedRemoved,
+    );
   }
 
   Future<void> close() async {
