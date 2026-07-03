@@ -20,19 +20,36 @@ class ResponseCachePolicy {
   /// Batch 0 shipped an empty set (runtime no-op). Batch 1 enables the lessons
   /// domain; subsequent batches append their prefixes here.
   ///
-  /// NOTE: only domains whose bespoke read-cache has been removed (offline-first
-  /// "일원화") may be added — otherwise the HTTP cache double-caches with the
-  /// domain's `*CacheStore`. See plan §5 batch ordering.
+  /// NOTE: only domains that do NOT keep a bespoke read-cache may be added —
+  /// otherwise the HTTP cache double-caches with the domain's `*CacheStore`.
+  /// Batch-1 domains removed their SyncAware read-cache ("일원화"); batch-2
+  /// domains (#1116 G-05) are plain `createRepository` remotes with no bespoke
+  /// cache, verified per-domain. See plan §5 batch ordering.
   static const ResponseCachePolicy active = ResponseCachePolicy(
     allowlist: {
+      // batch 1 — consolidated SyncAware domains
       '/lessons',
       '/students',
       '/subscriptions',
       '/schedule/availability',
       '/schedule/slots',
+      // batch 2 (#1116 G-05 / SN-2) — highest-frequency user screens, all
+      // plain remotes with no bespoke cache (double-cache risk verified nil).
+      '/parents', // parent_home
+      '/manual-teachers', // student_home
+      '/practice', // practice hub (segment-aware: excludes /practice-logs)
+      '/practice-logs', // practice logs (sibling of /practice)
+      '/recordings', // recording list metadata (audio itself is local)
+      '/teachers', // teacher profiles read by practice + search
+      '/gamification', // gamification state (heatmap is separate local Hive)
     },
     // D3: money-adjacent reads must not be served stale for long.
-    sensitivePrefixes: {'/subscriptions/payment-pending'},
+    sensitivePrefixes: {
+      '/subscriptions/payment-pending',
+      // Billing target (which parent pays) must stay fresh — short TTL, not
+      // stale-until-reconnect like display reads.
+      '/parents/billing-target',
+    },
   );
 
   /// Path prefixes eligible for response caching, e.g. `/lessons`.

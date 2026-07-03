@@ -84,6 +84,42 @@ void main() {
       );
     });
   });
+  group('active policy (batch 2 / #1116 G-05)', () {
+    test('enables batch-2 domains (highest-frequency user screens)', () {
+      const active = ResponseCachePolicy.active;
+      expect(active.isCacheable('/parents'), isTrue);
+      expect(active.isCacheable('/parents/me/children'), isTrue);
+      expect(active.isCacheable('/manual-teachers'), isTrue);
+      expect(active.isCacheable('/manual-teachers/7'), isTrue);
+      expect(active.isCacheable('/practice'), isTrue);
+      expect(active.isCacheable('/practice/items/9'), isTrue);
+      expect(active.isCacheable('/practice-logs'), isTrue);
+      expect(active.isCacheable('/practice-logs/3'), isTrue);
+      expect(active.isCacheable('/recordings'), isTrue);
+      expect(active.isCacheable('/teachers'), isTrue);
+      expect(active.isCacheable('/gamification'), isTrue);
+      expect(active.isCacheable('/gamification/student_1'), isTrue);
+    });
+
+    test('/practice and /practice-logs are distinct segment prefixes', () {
+      const active = ResponseCachePolicy.active;
+      // A write to /practice-logs must invalidate only /practice-logs, not
+      // /practice (and vice versa) — segment-aware matching keeps them separate.
+      expect(active.matchingPrefix('/practice-logs/1'), '/practice-logs');
+      expect(active.matchingPrefix('/practice/items'), '/practice');
+    });
+
+    test(
+      'billing-target is sensitive (short TTL); other /parents reads are not',
+      () {
+        const active = ResponseCachePolicy.active;
+        expect(active.ttlFor('/parents/billing-target'), isNotNull);
+        expect(active.ttlFor('/parents/billing-target/9'), isNotNull);
+        expect(active.ttlFor('/parents'), isNull);
+        expect(active.ttlFor('/parents/me'), isNull);
+      },
+    );
+  });
   group('ttlFor (N15 / D3)', () {
     const policy = ResponseCachePolicy(
       allowlist: {'/subscriptions'},
