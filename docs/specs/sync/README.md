@@ -47,8 +47,8 @@
 
 - **INV-1 (도메인-어댑터 정합)**: `queueMutation(domain: X)` 로 큐잉하는 모든 도메인 X는 반드시 `SyncAdapterRegistry`에 등록되어야 한다. 미등록 시 재생이 `NO_ADAPTER`로 영구 실패하고 쓰기가 유실된다. 레지스트리는 실제 큐잉 호출처에서 파생·검증되어야 한다(현재 하드코딩 → [G-01](#g-01) 원인). 큐잉 도메인 전수: `lesson`·`student`·`subscription`·`practice`·`schedule`.
 - **INV-2 (재생 멱등성)**: 재생은 서버가 이미 커밋한 요청을 중복 생성하지 않아야 한다(멱등 키). 현재 미충족 → [G-07](#g-07).
-- **INV-3 (무손실 정리)**: 큐 정리(cleanup)는 **미전송(pending) 쓰기를 무통보로 삭제하지 않는다**. 현재 500 초과 시 status 무관 최오래 삭제 → [G-03](#g-03).
-- **INV-4 (사용자 격리)**: 큐는 사용자 경계에서 격리되어야 한다. 로그아웃 시 이전 사용자 pending 쓰기가 다음 사용자 토큰으로 재생되면 안 된다. 현재 로그아웃이 `sync_queue`를 비우지 않음 → [G-02](#g-02).
+- **INV-3 (무손실 정리)**: 큐 정리(cleanup)는 **미전송(pending) 쓰기를 무통보로 삭제하지 않는다**. **충족(#1115)**: cleanup 은 synced·failed-만료(7일)만 삭제, pending/syncing 은 용량 압박에도 미삭제. 만료된 failed(=유실)는 `SyncCleanupResult` → LostWrites SnackBar 로 통보 → [G-03](#g-03).
+- **INV-4 (사용자 격리)**: 큐는 사용자 경계에서 격리되어야 한다. 로그아웃 시 이전 사용자 pending 쓰기가 다음 사용자 토큰으로 재생되면 안 된다. **충족(#1114)**: 신원 변경 4사이트(로그아웃·oauth/dev 로그인·401 만료)에서 `SyncQueueStore.clearAll()` — 읽기캐시 clear 와 동일 지점. 현재 사용자 유실(로그아웃/만료)은 LostWrites 통보, 신규 로그인 orphan 은 무통보 → [G-02](#g-02).
 
 ### 4.3 재시도/만료
 
@@ -103,10 +103,10 @@
 **[P0] schedule 도메인 어댑터 미등록 → 큐된 availability 쓰기 영구 유실.** availability 리포 12곳이 `domain: 'schedule'`로 큐잉하나 `SyncAdapterRegistry`는 `'schedule'` 미등록(대신 미사용 `'booking'`). 느린망 타임아웃→큐잉→낙관적 성공 표시 후, 재생이 `NO_ADAPTER`로 즉시 failed → 교사 근무가능시간 저장이 조용히 사라짐. 근거: `sync_adapter_registry.dart:19-41`, `sync_aware_teacher_availability_repository.dart:114-312`(12x), `sync_service.dart:199-208`. **수정: 레지스트리 `'booking'`→`'schedule'` + 도메인별 재생 e2e 테스트.** 즉시 반영 대상.
 
 ### G-02
-**[P0] 로그아웃이 쓰기 큐를 비우지 않아 교차 사용자 재생.** `logout()`은 토큰·`notification_settings`·응답 읽기캐시는 비우나 `sync_queue`는 미삭제. 사용자 A의 pending 쓰기가 계정 전환 후 B 토큰으로 재생. 느린망일수록 큐 적체가 커져 노출 확대. 근거: `auth_provider.dart:355-372`, `sync_queue_store.dart:7`(고정 box명, user-scope 아님).
+**[P0] 로그아웃이 쓰기 큐를 비우지 않아 교차 사용자 재생.** `logout()`은 토큰·`notification_settings`·응답 읽기캐시는 비우나 `sync_queue`는 미삭제. 사용자 A의 pending 쓰기가 계정 전환 후 B 토큰으로 재생. 느린망일수록 큐 적체가 커져 노출 확대. 근거: `auth_provider.dart:355-372`, `sync_queue_store.dart:7`(고정 box명, user-scope 아님). **해소(#1114): `SyncQueueStore.clearAll()`(미전송 개수 반환) + auth `_clearWriteQueue({notify})` 를 신원 변경 4사이트(로그아웃·oauth/dev 로그인·401 만료)에 배선 — 읽기캐시 clear 와 동일. 로그아웃만 비우면 남는 kill-후-login 재생 구멍까지 차단. 유실은 LostWrites SnackBar 통보. `logout_contract_test` 로 4사이트 배선 강제.**
 
 ### G-03
-**[P0] 큐 정리 시 미전송 쓰기 무통보 삭제.** `cleanup()`이 500 초과 시 status 무관 최오래 삭제(pending 포함), failed 7일 삭제도 알림 없음. 장기 오프라인/느린망 적체 사용자가 편집을 통보 없이 잃음. 근거: `sync_queue_store.dart:139-203`.
+**[P0] 큐 정리 시 미전송 쓰기 무통보 삭제.** `cleanup()`이 500 초과 시 status 무관 최오래 삭제(pending 포함), failed 7일 삭제도 알림 없음. 장기 오프라인/느린망 적체 사용자가 편집을 통보 없이 잃음. 근거: `sync_queue_store.dart:139-203`. **해소(#1115): cleanup 은 synced·failed-만료(7일)만 삭제, pending/syncing 은 용량 압박에도 절대 미삭제. `SyncCleanupResult(syncedRemoved, expiredFailedRemoved)` 반환 → SyncService onWritesDropped → LostWrites SnackBar 로 만료(유실) 통보. cleanup 테스트 신설(pending 600@cap500=0삭제).**
 
 ### G-04
 **[P1] SWR 부재 — 모든 읽기가 풀 타임아웃 대기 후에야 캐시.** 캐시는 `onError`에서만 서빙, `onRequest` cache-first 없음. 고RTT/패킷손실 미국망에서 화면마다 최대 30s 스피너 후 last-known-good. 근거: `response_cache_interceptor.dart:37-93`(onRequest 없음), `api_client.dart:146-151`(30s), `environment.dart:24-27`. **해소(#1116): `onRequest` 캐시-우선 + 단일 백그라운드 재검증을 `swrSoftTimeout`(~2.5s)과 레이스 — 빠른망은 창 안에 최신 직행(무 stale-flash), 느린망은 캐시 즉시 서빙 후 백그라운드가 store 갱신. 서빙 stale 와 다르면 재검증 버스(`RevalidationEvents`/`ref.autoRevalidate`)가 구독 read 프로바이더를 자동 갱신(변경 시에만 emit → 루프 방지).**
@@ -154,8 +154,8 @@
 | 갭 | 이슈 | 상태 |
 |----|------|------|
 | G-01 schedule NO_ADAPTER 유실 | #1113 | 본 PR 수정 |
-| G-02 로그아웃 교차사용자 재생 | #1114 | 후속 |
-| G-03 큐 정리 미전송 삭제 | #1115 | 후속 |
+| G-02 로그아웃 교차사용자 재생 | #1114 | 수정(신원변경 4사이트 clearAll + LostWrites 통보) |
+| G-03 큐 정리 미전송 삭제 | #1115 | 수정(pending 미삭제 + 만료 유실 통보) |
 | G-04·G-05·G-06 느린망 읽기(SWR·allowlist·stale표시) | #1116 | 수정(SWR 레이스+재검증버스 · 배치2 allowlist · stale배너). 배치3~4 allowlist·전 프로바이더 라이브갱신은 후속 |
 | G-07 타임아웃 중복 생성(멱등키) | #1117 | 후속 |
 | G-08 sendTimeout/refresh 타임아웃 | #1118 | 후속 |
