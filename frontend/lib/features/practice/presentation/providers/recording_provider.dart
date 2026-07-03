@@ -12,6 +12,7 @@ import '../../domain/repositories/recording_repository.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../gamification/gamification_facade.dart';
+import 'practice_recording_provider.dart' show practiceSourceLoggersProvider;
 
 part 'recording_provider.g.dart';
 
@@ -355,6 +356,18 @@ class RecordingNotifier extends _$RecordingNotifier {
       ref
           .read(pointAwardNotifierProvider.notifier)
           .awardRecordingSaved(_studentId);
+
+      // #1129: count the recording in the growth heatmap (recordingCount += 1)
+      // then refresh the heatmap viz so the "녹음 N개" cell updates immediately.
+      unawaited(
+        ref
+            .read(practiceSourceLoggersProvider)
+            .logRecording(
+              studentId: _studentId,
+              occurredAt: recording.recordedAt,
+            ),
+      );
+      ref.invalidate(growthHeatmapProvider(_studentId));
 
       // Update state
       state = state.copyWith(
