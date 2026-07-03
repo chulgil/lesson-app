@@ -200,5 +200,20 @@ void main() {
       expect(result.totalRemoved, 0);
       expect((await store.fetchAll()).single.id, 'sync1');
     });
+
+    test(
+      'clearAll empties the queue and returns the unsent count (INV-4)',
+      () async {
+        await put('p1', SyncQueueStatus.pending);
+        await put('f1', SyncQueueStatus.failed);
+        await put('sync1', SyncQueueStatus.syncing);
+        await put('s1', SyncQueueStatus.synced); // delivered — not "unsent"
+
+        final dropped = await store.clearAll();
+
+        expect(dropped, 3, reason: 'pending + failed + syncing, not synced');
+        expect(await store.fetchAll(), isEmpty);
+      },
+    );
   });
 }

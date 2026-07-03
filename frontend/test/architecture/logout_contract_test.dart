@@ -92,4 +92,26 @@ void main() {
           'session expiry',
     );
   });
+
+  test('auth identity changes clear the offline write queue (INV-4, #1114)', () {
+    // Cross-user replay (INV-4): the mutation queue must be cleared whenever the
+    // authenticated identity changes, so user A's unsent writes are never
+    // replayed under user B's token. Wired at the same sites as the read-cache
+    // clear (logout, oauth login, dev login, session expiry).
+    final source =
+        File(
+          'lib/features/auth/presentation/providers/auth_provider.dart',
+        ).readAsStringSync();
+
+    expect(source, contains('_clearWriteQueue'));
+    // 1 helper definition + 4 call sites = 5 occurrences.
+    final occurrences = '_clearWriteQueue'.allMatches(source).length;
+    expect(
+      occurrences,
+      greaterThanOrEqualTo(5),
+      reason:
+          'write queue clear must be wired at logout, oauth/dev login, and '
+          'session expiry (INV-4)',
+    );
+  });
 }

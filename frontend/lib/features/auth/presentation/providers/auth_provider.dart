@@ -120,6 +120,10 @@ class AuthNotifier extends _$AuthNotifier {
       debugPrint('[Auth] Token invalid (401), clearing tokens');
       await _tokenStorage.clearTokens();
       await _clearOfflineReadCache();
+      // INV-4 (#1114): the session is gone with its token — clear the write
+      // queue so unsent writes never replay under a later user, and tell this
+      // user their unsent edits were lost.
+      await _clearWriteQueue();
       state = const AuthUnauthenticated();
     } on NetworkException catch (e) {
       // Network error — preserve tokens for next auto-login attempt
@@ -167,6 +171,23 @@ class AuthNotifier extends _$AuthNotifier {
       }
     } catch (_) {
       // Best-effort: Hive may not be open during unit tests.
+    }
+  }
+
+  /// Clears the offline write (mutation) queue on identity loss so a previous
+  /// user's unsent writes are never replayed under the next user's token
+  /// (INV-4, #1114). Any unsent writes that existed are surfaced to the user
+  /// (INV-3: no silent loss) via [LostWrites].
+  Future<void> _clearWriteQueue({bool notify = true}) async {
+    try {
+      final dropped = await ref.read(syncQueueStoreProvider).clearAll();
+      if (notify && dropped > 0) {
+        ref
+            .read(lostWritesProvider.notifier)
+            .record(dropped, LostWritesReason.logout);
+      }
+    } catch (_) {
+      // Best-effort: Hive / providers may be unavailable in unit tests.
     }
   }
 
@@ -231,6 +252,10 @@ class AuthNotifier extends _$AuthNotifier {
       );
       // New identity established — drop any prior user's offline read cache.
       await _clearOfflineReadCache();
+      // INV-4 (#1114): drop any orphaned write queue so a prior/crashed
+      // session's unsent writes never replay under this new identity. Silent —
+      // these writes are not this user's, so no lost-writes notice.
+      await _clearWriteQueue(notify: false);
 
       final user = await _authRepository.getMe();
       state = _stateFromUser(user);
@@ -341,6 +366,10 @@ class AuthNotifier extends _$AuthNotifier {
       );
       // New identity established — drop any prior user's offline read cache.
       await _clearOfflineReadCache();
+      // INV-4 (#1114): drop any orphaned write queue so a prior/crashed
+      // session's unsent writes never replay under this new identity. Silent —
+      // these writes are not this user's, so no lost-writes notice.
+      await _clearWriteQueue(notify: false);
 
       final user = result.user;
       state = _stateFromUser(user);
@@ -369,6 +398,7 @@ class AuthNotifier extends _$AuthNotifier {
       // Best-effort: Hive may not be open during unit tests.
     }
     await _clearOfflineReadCache();
+    await _clearWriteQueue();
     state = const AuthUnauthenticated();
   }
 

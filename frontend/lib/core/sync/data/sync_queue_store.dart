@@ -68,9 +68,8 @@ class SyncQueueStore {
     final queueBox = await _openQueueBox();
     final legacy = queueBox.get('items');
     if (legacy is List) {
-      final legacyItems = legacy
-          .where((row) => row is Map && row['id'] is String)
-          .toList();
+      final legacyItems =
+          legacy.where((row) => row is Map && row['id'] is String).toList();
       if (legacyItems.isEmpty) {
         return;
       }
@@ -111,6 +110,20 @@ class SyncQueueStore {
   Future<void> delete(String id) async {
     final queueBox = await _openQueueBox();
     await queueBox.delete(id);
+  }
+
+  /// Clears the entire queue on identity change so a previous user's writes are
+  /// never replayed under the next user's token (INV-4, #1114). Returns the
+  /// number of *unsent* writes (pending / syncing / failed) that were dropped,
+  /// so the user can be told they were lost (INV-3: no silent loss).
+  Future<int> clearAll() async {
+    final unsent =
+        (await fetchAll())
+            .where((entry) => entry.status != SyncQueueStatus.synced)
+            .length;
+    final queueBox = await _openQueueBox();
+    await queueBox.clear();
+    return unsent;
   }
 
   Future<List<SyncQueueEntry>> fetchAll() async {
@@ -188,9 +201,8 @@ class SyncQueueStore {
         syncedKeys.add(key);
       } else if (status == 'failed' && entryMap['createdAt'] is String) {
         try {
-          final createdAt = DateTime.parse(
-            entryMap['createdAt'] as String,
-          ).toUtc();
+          final createdAt =
+              DateTime.parse(entryMap['createdAt'] as String).toUtc();
           if (now.difference(createdAt) > expireAfter) {
             expiredFailedKeys.add(key);
           }
