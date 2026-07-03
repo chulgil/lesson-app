@@ -190,7 +190,6 @@ class _AwaitingFeedbackRow extends StatelessWidget {
                 Text(
                   item.title,
                   style: NotebookTypography.hand.copyWith(
-                    fontSize: 15,
                     color: isOverdue ? AppColors.ink : AppColors.inkSecondary,
                     fontWeight: isOverdue ? FontWeight.w700 : FontWeight.w600,
                   ),
