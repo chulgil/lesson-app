@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/app_strings.dart';
+import '../sync/lost_writes_provider.dart';
 import '../sync/presentation/providers/connectivity_banner_provider.dart';
 import '../sync/presentation/providers/stale_data_provider.dart';
 import '../utils/date_format_utils.dart';
@@ -29,6 +30,22 @@ class OfflineBannerWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Surface silently-dropped unsent writes (INV-3/INV-4) as a SnackBar, then
+    // clear so it shows once. Fed by cleanup expiry (#1115) and logout (#1114).
+    ref.listen<LostWritesEvent?>(lostWritesProvider, (previous, next) {
+      if (next == null) return;
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      if (messenger == null) return;
+      final message = switch (next.reason) {
+        LostWritesReason.expired => AppStrings.lostWritesExpired(next.count),
+        LostWritesReason.logout => AppStrings.lostWritesLogout(next.count),
+      };
+      messenger.showSnackBar(
+        SnackBar(content: Text(message), duration: const Duration(seconds: 6)),
+      );
+      ref.read(lostWritesProvider.notifier).clear();
+    });
+
     final isOffline = ref.watch(offlineBannerProvider).valueOrNull ?? false;
     final staleSince = ref.watch(lastServedFromCacheAtProvider);
     // Show while offline, or while serving stale cache on a slow network.

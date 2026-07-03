@@ -2687,8 +2687,7 @@ class AppStrings {
       '$name · $count건';
 
   /// N시간 전 완료 (completion relative-time suffix; time = '2시간 전')
-  static String awaitingFeedbackCompletedAgo(String relative) =>
-      '$relative 완료';
+  static String awaitingFeedbackCompletedAgo(String relative) => '$relative 완료';
 
   /// 리액션 보내기 (1-tap reaction button tooltip)
   static const awaitingFeedbackReactTooltip = '리액션 보내기';
@@ -10326,6 +10325,12 @@ class AppStrings {
   /// 느린 네트워크 stale 배너 — 무선은 살아있으나 타임아웃으로 캐시 서빙 중 (G-06 / #1116)
   static String slowNetworkBannerLastSync(String hhmm) =>
       '연결이 느립니다 — $hhmm 동기화 데이터 표시 중';
+
+  /// 유실 알림 — 만료된 미전송 쓰기 삭제 (INV-3 / #1115)
+  static String lostWritesExpired(int count) => '전송하지 못한 변경 $count건이 삭제되었습니다';
+
+  /// 유실 알림 — 로그아웃/세션 종료로 미전송 쓰기 삭제 (INV-4 / #1114)
+  static String lostWritesLogout(int count) => '로그아웃으로 미전송 변경 $count건이 삭제되었습니다';
 
   // ── Issue #920 i18n bundle ──
 
