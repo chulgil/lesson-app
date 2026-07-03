@@ -91,12 +91,24 @@ void main() {
       );
     });
 
+    test('resolves the persisted language discipline (#1102)', () async {
+      final container = containerFor('user_a');
+      await container
+          .read(selectedDisciplineStorageProvider.notifier)
+          .select('language');
+      await container.read(selectedDisciplineStorageProvider.future);
+      expect(
+        container.read(activeDisciplineProvider),
+        DisciplineRegistry.language,
+      );
+    });
+
     test('falls back to music for an unregistered persisted id', () async {
       // A stale / unknown id must not break resolution.
       final container = containerFor('user_a');
       await container
           .read(selectedDisciplineStorageProvider.notifier)
-          .select('language');
+          .select('unknown_discipline');
       await container.read(selectedDisciplineStorageProvider.future);
       expect(
         container.read(activeDisciplineProvider),
