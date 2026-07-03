@@ -6369,6 +6369,15 @@ class AppStrings {
   /// 만료/취소된 초대 — 비활성 섹션 헤더.
   static const inviteHistoryInactiveSection = '만료/취소된 초대';
 
+  /// 수락 — 초대 이력: 학생이 코드로 가입 완료(used) 섹션 헤더 (#1105).
+  static const inviteHistoryAcceptedSection = '수락';
+
+  /// 만료 — 초대 이력: 유효기간 경과(expired) 섹션 헤더 (#1105).
+  static const inviteHistoryExpiredSection = '만료';
+
+  /// 회수 — 초대 이력: 발급자가 취소(revoked) 섹션 헤더 (#1105).
+  static const inviteHistoryRevokedSection = '회수';
+
   /// 초대 취소 — 취소 다이얼로그 타이틀 + 카드 액션 버튼 라벨.
   static const inviteRevokeDialogTitle = '초대 취소';
 
