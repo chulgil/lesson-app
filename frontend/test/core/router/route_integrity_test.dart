@@ -88,6 +88,7 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.practiceGoalSettings,
     AppRoutes.practiceStats,
     AppRoutes.practiceLoopStats,
+    AppRoutes.awaitingFeedback,
     AppRoutes.repertoireHistory,
     AppRoutes.tuner,
     AppRoutes.profile,
@@ -250,6 +251,7 @@ const _registeredTemplates = <String>{
   '/parent/children/:id/edit',
   '/parent/children',
   // practice_routes.dart
+  '/practice/awaiting-feedback',
   '/practice/repertoire',
   '/practice/repertoire/add',
   '/practice/repertoire/quick-add',
@@ -444,6 +446,7 @@ Map<String, String> get _appRoutesMap {
     'practiceGoalSettings': AppRoutes.practiceGoalSettings,
     'practiceStats': AppRoutes.practiceStats,
     'practiceLoopStats': AppRoutes.practiceLoopStats,
+    'awaitingFeedback': AppRoutes.awaitingFeedback,
     'repertoireHistory': AppRoutes.repertoireHistory,
     'tuner': AppRoutes.tuner,
     'profile': AppRoutes.profile,
