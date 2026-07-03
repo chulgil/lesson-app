@@ -19,6 +19,7 @@ import '../../../billing/billing_facade.dart';
 import '../../../notifications/notifications_facade.dart';
 import '../../../practice/domain/entities/practice_loop_stats.dart';
 import '../../../practice/practice_facade.dart';
+import '../../../practice/practice_ui_facade.dart';
 import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
@@ -163,6 +164,9 @@ class DashboardTab extends ConsumerWidget {
                   _buildEventsGroup(context, ref, dashboard.teacherId),
 
                   const SizedBox(height: AppSpacing.space6),
+
+                  // 피드백 대기 배지 (껍데기 감사 #415 / #1128) — 0건이면 숨김.
+                  const AwaitingFeedbackCard(),
 
                   const AssignmentSummarySection(),
 

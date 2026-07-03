@@ -2678,6 +2678,30 @@ class AppStrings {
   /// 스케줄 변경으로 이동 링크 텍스트
   static const goToScheduleChange = '스케줄 변경으로 이동 →';
 
+  // ── Awaiting Feedback Queue (선생님 피드백 대기 큐 — 껍데기감사 #415) ─
+  /// 피드백 대기 (screen title + home badge label)
+  static const awaitingFeedbackTitle = '피드백 대기';
+
+  /// {name} · N건 (student group header)
+  static String awaitingFeedbackStudentCount(String name, int count) =>
+      '$name · $count건';
+
+  /// N시간 전 완료 (completion relative-time suffix; time = '2시간 전')
+  static String awaitingFeedbackCompletedAgo(String relative) =>
+      '$relative 완료';
+
+  /// 리액션 보내기 (1-tap reaction button tooltip)
+  static const awaitingFeedbackReactTooltip = '리액션 보내기';
+
+  /// 모두 확인했어요 (empty state title)
+  static const awaitingFeedbackEmpty = '모두 확인했어요';
+
+  /// 대기 중인 피드백이 없습니다 (empty state subtitle)
+  static const awaitingFeedbackEmptySubtitle = '대기 중인 피드백이 없습니다';
+
+  /// 피드백 대기 N건 (home badge count label)
+  static String awaitingFeedbackBadge(int count) => '피드백 대기 $count건';
+
   // ── Quick Feedback (빠른 피드백 화면 30차) ─
 
   /// 피드백 (quick feedback screen title)
