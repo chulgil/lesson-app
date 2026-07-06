@@ -15,6 +15,9 @@ Future<List<Lesson>> weekLessons(
   WeekLessonsRef ref,
   DateTime weekStartDate,
 ) async {
+  // #1141: 레슨 추가/수정/삭제 후 주간 그리드가 stale 하지 않도록, 중앙 CRUD 인
+  // lessonsNotifierProvider 를 refresh 신호로 watch 한다 (schedule -> lessons).
+  ref.watch(lessonsNotifierProvider);
   final repository = ref.watch(lessonRepositoryProvider);
   final weekEnd = weekStartDate.add(const Duration(days: 6));
   return repository.getLessonsByDateRange(weekStartDate, weekEnd);
@@ -29,6 +32,8 @@ Future<List<Lesson>> weekLessonsWithPreview(
   WeekLessonsWithPreviewRef ref,
   ({DateTime weekStart, String teacherId}) params,
 ) async {
+  // #1141: 레슨 mutation 후 그리드가 stale 하지 않도록 중앙 CRUD 를 watch.
+  ref.watch(lessonsNotifierProvider);
   // Get real lessons
   final repository = ref.watch(lessonRepositoryProvider);
   final weekEnd = params.weekStart.add(const Duration(days: 6));
