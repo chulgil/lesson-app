@@ -313,7 +313,7 @@ class _AppTeacherCard extends ConsumerWidget {
                                 child: Text(
                                   teacherAsync.maybeWhen(
                                     data: (t) =>
-                                        t?.name ??
+                                        t?.displayName ??
                                         AppStrings.myTeachersUnknownTeacher,
                                     orElse: () =>
                                         AppStrings.myTeachersUnknownTeacher,

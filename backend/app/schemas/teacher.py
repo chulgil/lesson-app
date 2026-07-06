@@ -101,6 +101,8 @@ class TeacherResponse(BaseModel):
     id: str
     user_id: str
     user: UserResponse | None = None
+    # Display name shown to students; null → client falls back to User.name (#1145)
+    nickname: str | None = None
     instruments: list[str] = []
     introduction: str | None = None
     experience_years: int | None = None
@@ -157,6 +159,7 @@ class TeacherResponse(BaseModel):
 class TeacherUpdate(BaseModel):
     """Fields a teacher can update on their profile."""
 
+    nickname: str | None = None
     instruments: list[str] | None = None
     introduction: str | None = None
     experience_years: int | None = None
