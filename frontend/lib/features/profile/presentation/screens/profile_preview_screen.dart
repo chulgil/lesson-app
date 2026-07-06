@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter/services.dart';
@@ -223,10 +225,13 @@ class ProfilePreviewScreen extends ConsumerWidget {
               CircleAvatar(
                 radius: 48,
                 backgroundColor: AppColors.paper.withValues(alpha: 0.2),
-                backgroundImage:
-                    profile.profileImage != null
+                // #1144: 사진 ref 가 서버 URL 이면 Network, 로컬경로면 File.
+                backgroundImage: profile.profileImage == null
+                    ? null
+                    : (profile.profileImage!.startsWith('http')
                         ? NetworkImage(profile.profileImage!)
-                        : null,
+                        : FileImage(File(profile.profileImage!))
+                            as ImageProvider),
                 child:
                     profile.profileImage == null
                         ? Text(

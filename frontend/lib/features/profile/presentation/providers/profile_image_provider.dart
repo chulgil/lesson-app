@@ -39,17 +39,23 @@ class ProfileImageNotifier extends _$ProfileImageNotifier {
     // 4. Update state (immediate — local-first)
     state = AsyncData(savedPath);
 
-    // 5. Upload to server (non-blocking)
+    // 5. Upload to server. On success adopt the server URL as the effective
+    //    reference (#1144) so it persists cross-device and other screens
+    //    (preview·완성도 게이지) read it from the entity. Mock returns null →
+    //    keep the local path as the effective ref.
     final apiClient = ref.read(apiClientProvider);
     final uploadService = ImageUploadService(
       apiClient,
       useMockData: ref.read(mockDataModeProvider),
     );
-    await uploadService.uploadImage(
+    final uploadedUrl = await uploadService.uploadImage(
       filePath: savedPath,
       imageType: 'profile',
       entityType: 'teacher',
     );
+    if (uploadedUrl != null && uploadedUrl.isNotEmpty) {
+      state = AsyncData(uploadedUrl);
+    }
 
     return true;
   }

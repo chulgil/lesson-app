@@ -325,6 +325,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     String? postalCode,
     String? address,
     String? addressDetail,
+    String? profileImage,
   }) async {
     final current = state.valueOrNull;
     if (current == null) return;
@@ -342,6 +343,9 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
           postalCode: postalCode ?? current.postalCode,
           address: address ?? current.address,
           addressDetail: addressDetail ?? current.addressDetail,
+          // #1144: 프로필 사진(effective ref = 서버 URL 또는 로컬경로)을 엔티티에
+          // 저장해 preview·완성도 게이지·타 화면이 반영되게 한다.
+          profileImage: profileImage ?? current.profileImage,
         ),
       );
       state = AsyncValue.data(updated);
