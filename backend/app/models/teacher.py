@@ -29,6 +29,8 @@ class Teacher(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "teachers"
 
     user_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    # Display name shown to students (호칭/닉네임); null → fall back to User.name (#1145)
+    nickname: Mapped[str | None] = mapped_column(String(100), nullable=True)
     instruments: Mapped[dict | list] = mapped_column(JSON, nullable=False, default=list)
     introduction: Mapped[str | None] = mapped_column(Text, nullable=True)
     experience_years: Mapped[int | None] = mapped_column(Integer, nullable=True)

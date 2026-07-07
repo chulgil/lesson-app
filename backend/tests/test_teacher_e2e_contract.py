@@ -149,3 +149,33 @@ async def test_teacher_response_bank_account_null_when_no_bank_info(
     body = response.json()
     assert body["bank_account_id"] is None
     assert body["bank_account_created_at"] is None
+
+
+@pytest.mark.asyncio
+async def test_teacher_nickname_roundtrip_visible_in_response(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """#1145 — 선생님이 설정한 nickname 이 저장되고 teacher 응답에 노출된다.
+
+    nickname 은 학생에게 보일 호칭. TeacherUpdate 가 받아 저장하고
+    TeacherResponse 가 다시 노출해야 학생 화면(Teacher.displayName)이 볼 수 있다.
+    """
+    await _setup(create_test_user)
+    await db_session.commit()
+
+    # write — 선생님이 학생에게 보일 호칭을 설정
+    put = await client.put(
+        "/api/v1/teachers/me/profile",
+        headers=auth_headers,
+        json={"nickname": "지수쌤"},
+    )
+    assert put.status_code == 200, put.text
+    assert put.json()["nickname"] == "지수쌤"
+
+    # read — 재조회 시에도 유지(드롭되지 않음)
+    got = await client.get("/api/v1/teachers/me/profile", headers=auth_headers)
+    assert got.status_code == 200, got.text
+    assert got.json()["nickname"] == "지수쌤"

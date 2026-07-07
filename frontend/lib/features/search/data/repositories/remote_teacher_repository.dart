@@ -120,6 +120,7 @@ class RemoteTeacherRepository implements TeacherRepository {
     return Teacher(
       id: json['id'] as String,
       name: name,
+      nickname: json['nickname'] as String?,
       profileImageUrl: profileImageUrl,
       instruments: instruments,
       bio: json['introduction'] as String?,

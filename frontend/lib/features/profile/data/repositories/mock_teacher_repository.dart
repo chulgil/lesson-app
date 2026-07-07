@@ -49,6 +49,7 @@ List<Teacher> _generateMockTeachers() {
     Teacher(
       id: 'teacher_1',
       name: '김선생님',
+      nickname: '지수쌤', // 학생에게 보이는 호칭 (#1145 파리티)
       instruments: ['바이올린', '비올라'],
       bio:
           '서울대학교 음악대학 졸업 후 15년간 바이올린을 가르치고 있습니다. '

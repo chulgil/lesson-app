@@ -9,6 +9,7 @@ part of 'teacher.dart';
 Teacher _$TeacherFromJson(Map<String, dynamic> json) => Teacher(
       id: json['id'] as String,
       name: json['name'] as String,
+      nickname: json['nickname'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       instruments: (json['instruments'] as List<dynamic>)
           .map((e) => e as String)
@@ -28,6 +29,7 @@ Teacher _$TeacherFromJson(Map<String, dynamic> json) => Teacher(
 Map<String, dynamic> _$TeacherToJson(Teacher instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'nickname': instance.nickname,
       'profile_image_url': instance.profileImageUrl,
       'instruments': instance.instruments,
       'bio': instance.bio,
