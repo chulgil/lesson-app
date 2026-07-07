@@ -68,3 +68,40 @@ async def test_public_profile_excludes_sensitive_fields(
     # These fields must NOT appear in the public response
     for sensitive_field in ("phone_number", "bank_name", "account_number", "account_holder", "bank_accounts"):
         assert sensitive_field not in data, f"Sensitive field '{sensitive_field}' leaked in public profile"
+
+
+@pytest.mark.asyncio
+async def test_get_public_profile_includes_nickname(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+) -> None:
+    """Public profile exposes the teacher's nickname (student display name, #1151)."""
+    from app.models.teacher import Teacher
+
+    await create_test_user(user_id="test-user-id", role="teacher", name="홍길동")
+    teacher = await db_session.get(Teacher, "test-user-id-prof")
+    teacher.nickname = "지수쌤"
+    await db_session.flush()
+
+    response = await client.get("/api/v1/teachers/public/test-user-id-prof")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["nickname"] == "지수쌤"
+    # Real name is still returned; the client decides which to display.
+    assert data["name"] == "홍길동"
+
+
+@pytest.mark.asyncio
+async def test_get_public_profile_nickname_null_when_unset(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    """With no nickname set, public profile returns nickname=None (client falls back to name)."""
+    await create_test_user(user_id="test-user-id", role="teacher", name="홍길동")
+
+    response = await client.get("/api/v1/teachers/public/test-user-id-prof")
+
+    assert response.status_code == 200
+    assert response.json()["nickname"] is None

@@ -18,6 +18,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
       organizationId: 'academy_1',
       organizationName: '김지수 음악학원',
       name: '김지수',
+      nickname: '지수쌤',
       profileImage: 'https://i.pravatar.cc/150?u=teacher1',
       instruments: ['피아노', '작곡'],
       introduction:

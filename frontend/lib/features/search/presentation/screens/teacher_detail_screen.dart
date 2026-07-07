@@ -30,8 +30,8 @@ class TeacherDetailScreen extends ConsumerWidget {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: NotebookDetailAppBar(
-        title: profileAsync.valueOrNull?.name != null
-            ? '${profileAsync.valueOrNull!.name} (선생님)'
+        title: profileAsync.valueOrNull?.displayName != null
+            ? '${profileAsync.valueOrNull!.displayName} (선생님)'
             : AppStrings.searchAnonymousTeacher,
       ),
       body: profileAsync.when(
@@ -145,7 +145,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
-                  profile.name ?? AppStrings.searchAnonymousTeacher,
+                  profile.displayName ?? AppStrings.searchAnonymousTeacher,
                   style: AppTypography.headingMedium.copyWith(
                     color: AppColors.paper,
                   ),
@@ -424,7 +424,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                           AppRoutes.lessonBooking,
                           extra: UnifiedLessonRequestParams(
                             teacherId: profile.id,
-                            teacherName: profile.name ?? '',
+                            teacherName: profile.displayName ?? '',
                             teacherInstruments: profile.instruments,
                             isReturningStudent: false,
                           ),
@@ -519,7 +519,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 AppRoutes.lessonBooking,
                 extra: UnifiedLessonRequestParams(
                   teacherId: profile.id,
-                  teacherName: profile.name ?? '',
+                  teacherName: profile.displayName ?? '',
                   teacherInstruments: profile.instruments,
                   isReturningStudent: true,
                   previousInstrument:

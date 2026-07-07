@@ -199,6 +199,8 @@ class TeacherPublicProfileResponse(BaseModel):
 
     id: str
     name: str
+    # Student-facing display name (nickname); null → client falls back to name (#1151)
+    nickname: str | None = None
     profile_image_url: str | None = None
     instruments: list[str] = []
     introduction: str | None = None
