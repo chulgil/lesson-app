@@ -29,7 +29,11 @@ class _NoopMetronome extends Notifier<MetronomeState> implements Metronome {
   void start() {}
 
   @override
-  void stop({String? studentId, int? practiceMinutesElapsed}) {}
+  void stop({
+    String? studentId,
+    int? practiceMinutesElapsed,
+    String? sectionId,
+  }) {}
 
   @override
   void toggle() {}
@@ -98,9 +102,10 @@ class _ThrowingTuner extends Notifier<TunerProviderState> implements Tuner {
   TunerProviderState build() => const TunerProviderState();
 
   @override
-  dynamic noSuchMethod(Invocation invocation) => throw StateError(
-    'tunerProvider touched for a non-tuner tool set: ${invocation.memberName}',
-  );
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError(
+        'tunerProvider touched for a non-tuner tool set: ${invocation.memberName}',
+      );
 }
 
 /// A metronome that throws if any member is accessed — proves the modal never
@@ -111,10 +116,11 @@ class _ThrowingMetronome extends Notifier<MetronomeState> implements Metronome {
   MetronomeState build() => const MetronomeState(isReady: true);
 
   @override
-  dynamic noSuchMethod(Invocation invocation) => throw StateError(
-    'metronomeProvider touched for a metronome-less tool set: '
-    '${invocation.memberName}',
-  );
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError(
+        'metronomeProvider touched for a metronome-less tool set: '
+        '${invocation.memberName}',
+      );
 }
 
 void main() {
@@ -192,61 +198,62 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('a discipline without a tuner never touches the tuner (mic gate)', (
-    tester,
-  ) async {
-    // Two non-tuner tools (fitness-readiness): _tunerIndex == -1, so tab
-    // changes, lifecycle and teardown must never read tunerProvider. The
-    // metronome warm-up is not gated in #979-A, so it stays stubbed.
-    final tools = <PracticeTool>[
-      PracticeTool(
-        id: 'a',
-        displayLabel: 'A',
-        panelBuilder: (_, __) => const SizedBox(),
-      ),
-      PracticeTool(
-        id: 'b',
-        displayLabel: 'B',
-        panelBuilder: (_, __) => const SizedBox(),
-      ),
-    ];
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          metronomeProvider.overrideWith(() => _NoopMetronome()),
-          tunerProvider.overrideWith(() => _ThrowingTuner()),
-        ],
-        child: MaterialApp(
-          home: Scaffold(body: PracticeToolsModal(tools: tools)),
+  testWidgets(
+    'a discipline without a tuner never touches the tuner (mic gate)',
+    (tester) async {
+      // Two non-tuner tools (fitness-readiness): _tunerIndex == -1, so tab
+      // changes, lifecycle and teardown must never read tunerProvider. The
+      // metronome warm-up is not gated in #979-A, so it stays stubbed.
+      final tools = <PracticeTool>[
+        PracticeTool(
+          id: 'a',
+          displayLabel: 'A',
+          panelBuilder: (_, __, ___) => const SizedBox(),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
+        PracticeTool(
+          id: 'b',
+          displayLabel: 'B',
+          panelBuilder: (_, __, ___) => const SizedBox(),
+        ),
+      ];
 
-    // Two non-tuner tabs, no settings affordance.
-    expect(find.text('A'), findsOneWidget);
-    expect(find.text('B'), findsOneWidget);
-    expect(find.byIcon(Icons.settings_outlined), findsNothing);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            metronomeProvider.overrideWith(() => _NoopMetronome()),
+            tunerProvider.overrideWith(() => _ThrowingTuner()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(body: PracticeToolsModal(tools: tools)),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
 
-    // Switching tabs fires _onTabChanged, which must skip the tuner.
-    await tester.tap(find.text('B'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 350));
+      // Two non-tuner tabs, no settings affordance.
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+      expect(find.byIcon(Icons.settings_outlined), findsNothing);
 
-    // App lifecycle changes fire didChangeAppLifecycleState, which must also
-    // skip the tuner (guards Phase 4 / #979-B tuner-less disciplines).
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    await tester.pump();
+      // Switching tabs fires _onTabChanged, which must skip the tuner.
+      await tester.tap(find.text('B'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
 
-    // Tearing the modal down runs deactivate, which must also skip the tuner.
-    await tester.pumpWidget(const SizedBox());
-    await tester.pump();
+      // App lifecycle changes fire didChangeAppLifecycleState, which must also
+      // skip the tuner (guards Phase 4 / #979-B tuner-less disciplines).
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
 
-    expect(tester.takeException(), isNull);
-  });
+      // Tearing the modal down runs deactivate, which must also skip the tuner.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'fitness tool set: 3 tabs (real ids), warms neither metronome nor tuner (#979-B gates)',
@@ -264,7 +271,7 @@ void main() {
           PracticeTool(
             id: tool.id,
             displayLabel: tool.displayLabel,
-            panelBuilder: (_, __) => const SizedBox(),
+            panelBuilder: (_, __, ___) => const SizedBox(),
           ),
       ];
 

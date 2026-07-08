@@ -3,10 +3,7 @@
 /// Challenges are time-bound goals that reward points and badges on completion.
 library;
 
-enum ChallengePeriod {
-  weekly,
-  monthly,
-}
+enum ChallengePeriod { weekly, monthly }
 
 /// Activity measurement type for a challenge/quest.
 ///
@@ -64,19 +61,23 @@ class Challenge {
   final DateTime? completedAt;
 
   /// Progress ratio (0.0 ~ 1.0).
-  double get progress => targetValue > 0
-      ? (currentValue / targetValue).clamp(0.0, 1.0)
-      : 0.0;
+  double get progress =>
+      targetValue > 0 ? (currentValue / targetValue).clamp(0.0, 1.0) : 0.0;
 
   /// Remaining days until deadline.
+  ///
+  /// 캘린더 날짜 차이로 계산 (#D5) — Duration.inDays 는 24시간 미만을 0 으로
+  /// 버려, 내일 마감이어도 "D-0" 로 하루 일찍 표시하던 버그가 있었다.
   int get remainingDays {
-    final diff = endDate.difference(DateTime.now()).inDays;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final deadline = DateTime(endDate.year, endDate.month, endDate.day);
+    final diff = deadline.difference(today).inDays;
     return diff < 0 ? 0 : diff;
   }
 
   /// Whether the challenge is still active (not expired and not completed).
-  bool get isActive =>
-      !isCompleted && DateTime.now().isBefore(endDate);
+  bool get isActive => !isCompleted && DateTime.now().isBefore(endDate);
 
   Challenge copyWith({
     int? currentValue,

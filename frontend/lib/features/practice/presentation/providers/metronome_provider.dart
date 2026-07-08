@@ -201,7 +201,11 @@ class Metronome extends _$Metronome {
   /// the session is recorded via [PracticeSourceLoggers.logMetronome]
   /// (Job 3 Task 3.3 — 학생 게이미피케이션 P1). Existing callers without
   /// student context can keep calling `stop()` with no arguments.
-  void stop({String? studentId, int? practiceMinutesElapsed}) {
+  void stop({
+    String? studentId,
+    int? practiceMinutesElapsed,
+    String? sectionId,
+  }) {
     if (!state.isPlaying) return; // Already stopped
 
     state = state.copyWith(isPlaying: false, currentBeat: 0, isAccent: false);
@@ -219,6 +223,7 @@ class Metronome extends _$Metronome {
               studentId: studentId,
               durationMinutes: practiceMinutesElapsed,
               bpm: state.settings.bpm,
+              sectionId: sectionId,
             ),
       );
     }

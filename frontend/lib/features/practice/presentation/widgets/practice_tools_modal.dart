@@ -6,7 +6,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../../features/auth/auth_facade.dart' show activeDisciplineProvider;
+import '../../../../features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import '../../../../features/practice/practice_facade.dart'
     show metronomeProvider;
 import '../providers/tuner_provider.dart';
@@ -20,6 +21,7 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
     super.key,
     this.initialTab = 0,
     this.studentId,
+    this.sectionId,
     this.tools,
   });
 
@@ -29,6 +31,10 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
   /// 학생 컨텍스트. null 이면 메트로놈 stop 시 [PracticeSourceLoggers] 트리거 안 함.
   /// 학생 게이미피케이션 P1 — Job 7 라우팅 진입점에서 주입.
   final String? studentId;
+
+  /// 곡/섹션 컨텍스트. 곡 상세에서 열면 주입되어 도구 연습시간이 그 섹션에도
+  /// 크레딧된다(선택적 곡 연결, practice_master §1.2). 홈 무마찰 시작은 null.
+  final String? sectionId;
 
   /// Injectable practice-tool set. Defaults to [musicPracticeTools] (Phase 3 =
   /// music only). A Phase 4 (#979) discipline-keyed registry resolves this; the
@@ -43,13 +49,17 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
     BuildContext context, {
     int initialTab = 0,
     String? studentId,
+    String? sectionId,
   }) {
     return showNotebookModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
       builder:
-          (context) =>
-              PracticeToolsModal(initialTab: initialTab, studentId: studentId),
+          (context) => PracticeToolsModal(
+            initialTab: initialTab,
+            studentId: studentId,
+            sectionId: sectionId,
+          ),
     );
   }
 
@@ -273,7 +283,11 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 for (final tool in _tools)
-                  tool.panelBuilder(context, widget.studentId),
+                  tool.panelBuilder(
+                    context,
+                    widget.studentId,
+                    widget.sectionId,
+                  ),
               ],
             ),
           ),

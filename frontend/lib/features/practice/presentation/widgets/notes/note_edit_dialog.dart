@@ -84,7 +84,9 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 // Notebook × Score: Dialog 헤더 제목은 Playfair dialogTitle
                 // 로 통일. isEditing 분기는 레이블만 교체.
                 Text(
-                  isEditing ? '연습노트 수정' : '연습노트 추가',
+                  isEditing
+                      ? AppStrings.practiceNoteEditTitle
+                      : AppStrings.practiceNoteAddTitle,
                   style: NotebookTypography.dialogTitle,
                 ),
                 const Spacer(),
@@ -141,7 +143,12 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
                 const SizedBox(width: AppSpacing.space2),
                 FilledButton(
                   onPressed: _hasContent ? _save : null,
-                  child: Text(isEditing ? '수정' : '저장'),
+                  // 테마 FilledButton.minimumSize=Size(∞,h) 가 Row(end) 의
+                  // loose 폭과 충돌해 크래시하므로 0 폭으로 override.
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, AppSpacing.buttonHeight),
+                  ),
+                  child: Text(isEditing ? AppStrings.modify : AppStrings.save),
                 ),
               ],
             ),

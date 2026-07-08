@@ -33,13 +33,14 @@ final List<PracticeTool> languagePracticeTools = <PracticeTool>[
     displayLabel: AppStrings.practiceToolVocabBook,
     // #1124: first real language tool — word bank + SM-2 flashcard review. The
     // panel launches full-screen CRUD/review (cross-feature = vocabulary facade).
-    panelBuilder: (context, studentId) => VocabBookPanel(studentId: studentId),
+    panelBuilder:
+        (context, studentId, sectionId) => VocabBookPanel(studentId: studentId),
   ),
   PracticeTool(
     id: LanguagePracticeToolIds.dictation,
     displayLabel: AppStrings.practiceToolDictation,
     panelBuilder:
-        (context, studentId) => const EmptyStateWidget(
+        (context, studentId, sectionId) => const EmptyStateWidget(
           icon: Icons.edit_note_outlined,
           title: AppStrings.practiceToolDictation,
           subtitle: AppStrings.practiceToolSkeletonSubtitle,
@@ -49,7 +50,7 @@ final List<PracticeTool> languagePracticeTools = <PracticeTool>[
     id: LanguagePracticeToolIds.pronunciation,
     displayLabel: AppStrings.practiceToolPronunciation,
     panelBuilder:
-        (context, studentId) => const EmptyStateWidget(
+        (context, studentId, sectionId) => const EmptyStateWidget(
           icon: Icons.record_voice_over_outlined,
           title: AppStrings.practiceToolPronunciation,
           subtitle: AppStrings.practiceToolSkeletonSubtitle,
@@ -59,7 +60,7 @@ final List<PracticeTool> languagePracticeTools = <PracticeTool>[
     id: LanguagePracticeToolIds.conversation,
     displayLabel: AppStrings.practiceToolConversation,
     panelBuilder:
-        (context, studentId) => const EmptyStateWidget(
+        (context, studentId, sectionId) => const EmptyStateWidget(
           icon: Icons.forum_outlined,
           title: AppStrings.practiceToolConversation,
           subtitle: AppStrings.practiceToolSkeletonSubtitle,

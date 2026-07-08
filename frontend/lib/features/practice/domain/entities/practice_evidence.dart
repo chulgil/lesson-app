@@ -9,11 +9,14 @@ enum PracticeSource { metronome, tuner, youtube, recording, manual }
 ///
 /// 스펙 §6.0 + §6.3 / 플랜 Job 3 Task 3.1. 4 경로 wiring 의 단일 페이로드.
 /// [videoId] 는 [PracticeSource.youtube] 일 때만 의미.
+/// [sectionId] 는 특정 곡/섹션 컨텍스트에서 연습했을 때만 채워지며(선택적 곡
+/// 연결, practice_master §1.2), 있으면 hub 가 그 섹션의 연습시간에도 크레딧한다.
 @JsonSerializable()
 class PracticeEvidence {
   final PracticeSource source;
   final int durationMinutes;
   final String? videoId;
+  final String? sectionId;
   final Map<String, dynamic> metadata;
   final DateTime occurredAt;
 
@@ -23,6 +26,7 @@ class PracticeEvidence {
     required this.occurredAt,
     this.metadata = const {},
     this.videoId,
+    this.sectionId,
   });
 
   PracticeEvidence copyWith({
@@ -31,12 +35,14 @@ class PracticeEvidence {
     DateTime? occurredAt,
     Map<String, dynamic>? metadata,
     String? videoId,
+    String? sectionId,
   }) => PracticeEvidence(
     source: source ?? this.source,
     durationMinutes: durationMinutes ?? this.durationMinutes,
     occurredAt: occurredAt ?? this.occurredAt,
     metadata: metadata ?? this.metadata,
     videoId: videoId ?? this.videoId,
+    sectionId: sectionId ?? this.sectionId,
   );
 
   factory PracticeEvidence.fromJson(Map<String, dynamic> json) =>

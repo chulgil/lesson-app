@@ -145,7 +145,7 @@ void main() {
     test('C1 — 준비 중 language 도구는 EmptyStateWidget; 단어장은 실 패널(#1124)', () {
       final ctx = _StubContext();
       for (final tool in languagePracticeTools) {
-        final panel = tool.panelBuilder(ctx, null);
+        final panel = tool.panelBuilder(ctx, null, null);
         if (tool.id == LanguagePracticeToolIds.vocabBook) {
           // 첫 실 language 도구 — 준비 상태 SSOT(EmptyStateWidget)를 벗어난다.
           expect(panel, isA<VocabBookPanel>(), reason: tool.id);

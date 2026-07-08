@@ -10,17 +10,17 @@ import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/
 void main() {
   group('musicPracticeTools (#973)', () {
     test('is metronome then tuner, in tab order', () {
-      expect(
-        musicPracticeTools.map((t) => t.id).toList(),
-        [PracticeToolIds.metronome, PracticeToolIds.tuner],
-      );
+      expect(musicPracticeTools.map((t) => t.id).toList(), [
+        PracticeToolIds.metronome,
+        PracticeToolIds.tuner,
+      ]);
     });
 
     test('tab labels are 메트로놈 / 튜너 (verbatim from the old modal)', () {
-      expect(
-        musicPracticeTools.map((t) => t.displayLabel).toList(),
-        ['메트로놈', '튜너'],
-      );
+      expect(musicPracticeTools.map((t) => t.displayLabel).toList(), [
+        '메트로놈',
+        '튜너',
+      ]);
     });
 
     test('only the tuner exposes a settings affordance', () {
@@ -42,16 +42,20 @@ void main() {
       );
 
       final metronome =
-          musicPracticeTools[0].panelBuilder(ctx, 's1') as MetronomePanel;
+          musicPracticeTools[0].panelBuilder(ctx, 's1', 'sec1')
+              as MetronomePanel;
       expect(metronome.studentId, 's1');
+      // sectionId 도 함께 스레딩된다 (선택적 곡 연결, practice_master §1.2).
+      expect(metronome.sectionId, 'sec1');
 
-      final tuner = musicPracticeTools[1].panelBuilder(ctx, 's1');
+      final tuner = musicPracticeTools[1].panelBuilder(ctx, 's1', null);
       expect(tuner, isA<TunerPanel>());
 
       // A null studentId (non-student entry point) is forwarded as-is.
       final nullStudent =
-          musicPracticeTools[0].panelBuilder(ctx, null) as MetronomePanel;
+          musicPracticeTools[0].panelBuilder(ctx, null, null) as MetronomePanel;
       expect(nullStudent.studentId, isNull);
+      expect(nullStudent.sectionId, isNull);
     });
   });
 }

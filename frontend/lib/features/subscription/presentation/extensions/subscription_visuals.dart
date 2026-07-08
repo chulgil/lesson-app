@@ -152,7 +152,13 @@ extension SubscriptionVisualX on Subscription {
 
   String _formatAmount(int amount) {
     if (amount >= 10000) {
-      return AppStrings.amountManwon((amount / 10000).toStringAsFixed(0));
+      // 반올림 금지 (#D3) — 45,000원을 "5만원"으로 오표기하던 버그.
+      // 만 단위 + 나머지를 정확히 표기. 나머지 0 이면 "N만원".
+      final man = amount ~/ 10000;
+      final remainder = amount % 10000;
+      return remainder == 0
+          ? AppStrings.amountManwon('$man')
+          : AppStrings.amountManwonWithRemainder(man, remainder);
     }
     return AppStrings.amountWon(amount);
   }
