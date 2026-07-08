@@ -20,13 +20,21 @@ import '../providers/teacher_announcement_providers.dart';
 /// Masthead 📢 아이콘 탭 → 타입(휴강/일반) + 날짜(휴강 시) + 메시지 → 발송.
 /// 휴강 시: 영향 학생 목록 결과 화면 표시.
 class AnnouncementSheet extends ConsumerStatefulWidget {
-  const AnnouncementSheet({super.key});
+  const AnnouncementSheet({super.key, this.existing});
 
-  static Future<void> show(BuildContext context, {required WidgetRef ref}) {
+  /// When non-null, the sheet opens in EDIT mode (prefill + update instead of
+  /// create). Type is immutable in edit mode; only message + dates change.
+  final TeacherAnnouncement? existing;
+
+  static Future<void> show(
+    BuildContext context, {
+    required WidgetRef ref,
+    TeacherAnnouncement? existing,
+  }) {
     return showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => const AnnouncementSheet(),
+      builder: (_) => AnnouncementSheet(existing: existing),
     );
   }
 
@@ -45,14 +53,26 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
   static const _systemDefaultDayOff = '개인적인 사정으로 휴강합니다.';
   static const _systemDefaultGeneral = '';
 
-  String get _defaultMessage =>
-      _type == AnnouncementType.dayOff ? _systemDefaultDayOff : _systemDefaultGeneral;
+  String get _defaultMessage => _type == AnnouncementType.dayOff
+      ? _systemDefaultDayOff
+      : _systemDefaultGeneral;
+
+  bool get _isEditMode => widget.existing != null;
 
   @override
   void initState() {
     super.initState();
-    // TODO: 선생님 커스텀 디폴트 메시지가 있으면 우선 사용
-    _messageController.text = _defaultMessage;
+    final existing = widget.existing;
+    if (existing != null) {
+      // Edit mode: prefill from the existing announcement.
+      _type = existing.type;
+      _selectedDate = existing.dates.isNotEmpty ? existing.dates.first : null;
+      _messageController.text = existing.message;
+      _isUsingDefault = false;
+    } else {
+      // TODO: 선생님 커스텀 디폴트 메시지가 있으면 우선 사용
+      _messageController.text = _defaultMessage;
+    }
   }
 
   @override
@@ -81,24 +101,49 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
-      setState(() => _selectedDate = DateTime(picked.year, picked.month, picked.day));
+      setState(
+        () => _selectedDate = DateTime(picked.year, picked.month, picked.day),
+      );
     }
   }
+
+  List<DateTime> get _effectiveDates =>
+      _type == AnnouncementType.dayOff && _selectedDate != null
+      ? [_selectedDate!]
+      : const [];
 
   Future<void> _send() async {
     if (!_canSend) return;
     setState(() => _submitting = true);
 
-    final teacherId = ref.read(currentUserIdProvider);
     final repo = ref.read(teacherAnnouncementRepositoryProvider);
+    final existing = widget.existing;
 
+    // Edit mode: update in place, refresh the list, and close. Type is
+    // immutable so it is carried over unchanged from the existing entry.
+    if (existing != null) {
+      final updated = TeacherAnnouncement(
+        id: existing.id,
+        teacherId: existing.teacherId,
+        type: existing.type,
+        dates: _effectiveDates,
+        message: _effectiveMessage,
+        createdAt: existing.createdAt,
+        affectedLessons: existing.affectedLessons,
+      );
+      await repo.update(updated);
+      if (!mounted) return;
+      ref.invalidate(teacherAnnouncementsProvider(existing.teacherId));
+      Navigator.pop(context);
+      return;
+    }
+
+    final teacherId = ref.read(currentUserIdProvider);
     final announcement = TeacherAnnouncement(
       id: '',
       teacherId: teacherId,
       type: _type,
-      dates: _type == AnnouncementType.dayOff && _selectedDate != null
-          ? [_selectedDate!]
-          : [],
+      dates: _effectiveDates,
       message: _effectiveMessage,
       createdAt: DateTime.now(),
     );
@@ -150,24 +195,35 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
         const SizedBox(height: AppSpacing.space4),
 
         // Title
-        Text(AppStrings.announcementTitle, style: NotebookTypography.sectionTitle),
+        Text(
+          _isEditMode
+              ? AppStrings.announcementEditTitle
+              : AppStrings.announcementTitle,
+          style: NotebookTypography.sectionTitle,
+        ),
         const SizedBox(height: AppSpacing.space4),
 
-        // Type selection
-        Row(
-          children: [
-            _TypeChip(
-              label: AppStrings.announcementTypeDayOff,
-              isSelected: _type == AnnouncementType.dayOff,
-              onTap: () => setState(() => _type = AnnouncementType.dayOff),
+        // Type selection — immutable in edit mode (server-side too).
+        IgnorePointer(
+          ignoring: _isEditMode,
+          child: Opacity(
+            opacity: _isEditMode ? 0.6 : 1.0,
+            child: Row(
+              children: [
+                _TypeChip(
+                  label: AppStrings.announcementTypeDayOff,
+                  isSelected: _type == AnnouncementType.dayOff,
+                  onTap: () => setState(() => _type = AnnouncementType.dayOff),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                _TypeChip(
+                  label: AppStrings.announcementTypeGeneral,
+                  isSelected: _type == AnnouncementType.general,
+                  onTap: () => setState(() => _type = AnnouncementType.general),
+                ),
+              ],
             ),
-            const SizedBox(width: AppSpacing.space2),
-            _TypeChip(
-              label: AppStrings.announcementTypeGeneral,
-              isSelected: _type == AnnouncementType.general,
-              onTap: () => setState(() => _type = AnnouncementType.general),
-            ),
-          ],
+          ),
         ),
         const SizedBox(height: AppSpacing.space4),
 
@@ -218,13 +274,17 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
         ),
         const SizedBox(height: AppSpacing.space4),
 
-        // Send button
+        // Send / Save button
         FilledButton(
           onPressed: _canSend ? _send : null,
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
           ),
-          child: Text(_submitting ? AppStrings.announcementSending : AppStrings.announcementSend),
+          child: Text(
+            _submitting
+                ? AppStrings.announcementSending
+                : (_isEditMode ? AppStrings.save : AppStrings.announcementSend),
+          ),
         ),
       ],
     );
@@ -264,7 +324,9 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
         if (result.dates.isNotEmpty)
           Text(
             '${formatDateYMDWithDay(result.dates.first)} · ${AppStrings.announcementSentCount(result.affectedLessons.length)}',
-            style: AppTypography.bodySmall.copyWith(color: AppColors.inkSecondary),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
           ),
 
         // Affected students (dayOff only)
@@ -272,7 +334,9 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
           const SizedBox(height: AppSpacing.space6),
           Text(
             AppStrings.announcementAffectedHeader,
-            style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
 
@@ -286,8 +350,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
             child: Column(
               children: [
                 for (int i = 0; i < affected.length; i++) ...[
-                  if (i > 0)
-                    const ThinRule(),
+                  if (i > 0) const ThinRule(),
                   _AffectedLessonItem(
                     lesson: affected[i],
                     onScheduleChange: () {
@@ -322,7 +385,11 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, size: 16, color: AppColors.inkTertiary),
+                const Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: AppColors.inkTertiary,
+                ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
@@ -441,7 +508,11 @@ class _AffectedLessonItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            const Icon(Icons.chevron_right, size: 18, color: AppColors.paperAccent),
+            const Icon(
+              Icons.chevron_right,
+              size: 18,
+              color: AppColors.paperAccent,
+            ),
           ],
         ),
       ),
