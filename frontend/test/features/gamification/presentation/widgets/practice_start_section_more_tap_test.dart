@@ -6,6 +6,7 @@ import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/gamification/domain/entities/growth_heatmap.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/growth_heatmap_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/widgets/practice_start_section.dart';
+import 'package:lessonaza/features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import 'package:lessonaza/features/students/domain/entities/student.dart';
 import 'package:lessonaza/features/students/presentation/providers/student_crud_provider.dart';
 
@@ -56,6 +57,9 @@ void main() {
         overrides: [
           studentProvider('s1').overrideWith((ref) async => mockStudent),
           growthHeatmapProvider('s1').overrideWith((ref) async => mockHeatmap),
+          studentRepertoiresProvider(
+            's1',
+          ).overrideWith((ref) async => const []),
         ],
         child: MaterialApp.router(routerConfig: router),
       ),

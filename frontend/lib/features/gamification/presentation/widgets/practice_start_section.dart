@@ -3,7 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../practice/practice_facade.dart' show practiceStreakProvider;
+import '../../../practice/practice_facade.dart'
+    show
+        PracticeRepertoire,
+        PracticeSection,
+        practiceStreakProvider,
+        studentRepertoiresProvider;
 import '../../../practice/practice_ui_facade.dart' show PracticeToolsModal;
 import '../../../students/students_facade.dart' show studentProvider;
 import '../providers/growth_heatmap_provider.dart';
@@ -37,12 +42,22 @@ class PracticeStartSection extends ConsumerWidget {
     // 표시 streak 은 SSOT(practiceStreakProvider) — KST/grace, 전 화면 일치 (G3 PR-C2).
     final streakDays = streakAsync.value?.currentStreak ?? 0;
 
+    // Slice 2 — 가장 최근 연습한 곡을 선택적 "이어서" 칩으로 노출. 없으면 null.
+    final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
+    final recentSection = mostRecentActivePracticeSection(
+      repertoiresAsync.valueOrNull ?? const [],
+    );
+
     return PracticeStartCard(
       studentName: name,
       streakDays: streakDays,
       yesterdayMinutes: yesterdayMinutes,
-      onStartTap: () => _onStartTap(context, ref),
+      onStartTap: () => _practice(context, ref),
       onMoreTap: () => _onMoreTap(context),
+      continuePieceName: recentSection?.pieceName,
+      onContinueTap: recentSection == null
+          ? null
+          : () => _practice(context, ref, sectionId: recentSection.id),
     );
   }
 
@@ -50,10 +65,15 @@ class PracticeStartSection extends ConsumerWidget {
     context.push('${AppRoutes.studentGrowthDetail}?studentId=$studentId');
   }
 
-  Future<void> _onStartTap(BuildContext context, WidgetRef ref) async {
+  Future<void> _practice(
+    BuildContext context,
+    WidgetRef ref, {
+    String? sectionId,
+  }) async {
     final practicedMinutes = await PracticeToolsModal.show(
       context,
       studentId: studentId,
+      sectionId: sectionId,
     );
     if (!context.mounted) return;
     if (practicedMinutes == null || practicedMinutes <= 0) return;
@@ -62,6 +82,10 @@ class PracticeStartSection extends ConsumerWidget {
     // 표시 streak 은 SSOT(practiceStreakProvider), heatmap 은 viz 갱신용. (G3 PR-C2)
     ref.invalidate(growthHeatmapProvider(studentId));
     ref.invalidate(practiceStreakProvider(studentId));
+    // 특정 곡에서 연습했으면 그 곡의 lastPracticedAt/차감이 반영되도록 목록도 무효화.
+    if (sectionId != null) {
+      ref.invalidate(studentRepertoiresProvider(studentId));
+    }
     final streak = await ref.read(practiceStreakProvider(studentId).future);
 
     if (!context.mounted) return;
@@ -81,14 +105,37 @@ class PracticeStartSection extends ConsumerWidget {
       context: context,
       barrierColor: Colors.transparent,
       barrierDismissible: false,
-      builder:
-          (ctx) => PracticeCelebrationOverlay(
-            practiceMinutes: practiceMinutes,
-            streakDays: streakDays,
-            onDismiss: () {
-              if (ctx.mounted) Navigator.of(ctx).pop();
-            },
-          ),
+      builder: (ctx) => PracticeCelebrationOverlay(
+        practiceMinutes: practiceMinutes,
+        streakDays: streakDays,
+        onDismiss: () {
+          if (ctx.mounted) Navigator.of(ctx).pop();
+        },
+      ),
     );
   }
+}
+
+/// 모든 repertoire 의 section 중, 아직 완료되지 않았고(`!isCompleted`)
+/// 실제로 연습된 적이 있는(`lastPracticedAt != null`) 것 가운데
+/// 가장 최근에 연습한 section 을 반환한다. 하나도 연습된 적 없으면 `null`.
+///
+/// Slice 2 "이어서" 칩의 대상 곡을 결정하는 순수 함수 — provider watch 결과를
+/// 주입받아 UI 위젯과 독립적으로 테스트 가능하다.
+@visibleForTesting
+PracticeSection? mostRecentActivePracticeSection(
+  List<PracticeRepertoire> repertoires,
+) {
+  PracticeSection? best;
+  for (final repertoire in repertoires) {
+    for (final section in repertoire.sections) {
+      if (section.isCompleted) continue;
+      final practicedAt = section.lastPracticedAt;
+      if (practicedAt == null) continue;
+      if (best == null || practicedAt.isAfter(best.lastPracticedAt!)) {
+        best = section;
+      }
+    }
+  }
+  return best;
 }
