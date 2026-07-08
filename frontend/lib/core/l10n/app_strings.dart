@@ -3966,6 +3966,9 @@ class AppStrings {
   /// 당일 취소 (24시간 이내)
   static const usageNoteLateCancellation = '당일 취소 (24시간 이내)';
 
+  /// 학생 결석 (사전 연락 없음)
+  static const usageNoteStudentAbsent = '학생 결석 (사전 연락 없음)';
+
   // SubscriptionSettings 디폴트 description
   /// 대량 구매 보너스
   static const bulkPurchaseBonus = '대량 구매 보너스';
