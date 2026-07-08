@@ -19,7 +19,11 @@ class MockMetronome extends Notifier<MetronomeState> implements Metronome {
   void start() {}
 
   @override
-  void stop({String? studentId, int? practiceMinutesElapsed}) {}
+  void stop({
+    String? studentId,
+    int? practiceMinutesElapsed,
+    String? sectionId,
+  }) {}
 
   @override
   void toggle() {}

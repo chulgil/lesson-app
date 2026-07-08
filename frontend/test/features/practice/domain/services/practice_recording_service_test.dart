@@ -5,6 +5,8 @@ import 'package:lessonaza/features/gamification/domain/entities/challenge.dart';
 import 'package:lessonaza/features/gamification/domain/entities/quest_origin.dart';
 import 'package:lessonaza/features/gamification/domain/entities/student_quest.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_evidence.dart';
+import 'package:lessonaza/features/practice/domain/entities/practice_repertoire.dart';
+import 'package:lessonaza/features/practice/domain/repositories/practice_repertoire_repository.dart';
 import 'package:lessonaza/features/practice/domain/services/practice_recording_service.dart';
 import 'package:lessonaza/features/practice_journal/data/repositories/empty_practice_journal_repository.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/practice_mark.dart';
@@ -36,6 +38,30 @@ class _ThrowingJournalRepository extends EmptyPracticeJournalRepository {
     DateTime date,
     MarkIntensity intensity,
   ) async => throw UnsupportedError('boom');
+}
+
+/// incrementPracticeCount 호출을 캡처하는 fake — 선택적 곡 연결(§1.2) 검증용.
+class _RecordingRepertoireRepo implements PracticeRepertoireRepository {
+  final List<({String sectionId, int seconds})> credited = [];
+
+  @override
+  Future<PracticeSection> incrementPracticeCount(
+    String sectionId,
+    int practiceSeconds,
+  ) async {
+    credited.add((sectionId: sectionId, seconds: practiceSeconds));
+    return PracticeSection(
+      id: sectionId,
+      repertoireId: 'rep',
+      pieceName: 'p',
+      startMeasure: 1,
+      endMeasure: 2,
+      createdAt: DateTime.utc(2026, 6, 11),
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
@@ -156,11 +182,7 @@ void main() {
       'updates currentValue of active practiceMinutes quests only',
       () async {
         await quest.createQuest(
-          _quest(
-            id: 'q1',
-            type: ActivityType.practiceMinutes,
-            currentValue: 5,
-          ),
+          _quest(id: 'q1', type: ActivityType.practiceMinutes, currentValue: 5),
         );
         await quest.createQuest(
           _quest(id: 'q2', type: ActivityType.practiceDays, currentValue: 2),
@@ -278,6 +300,91 @@ void main() {
       expect(hm.days[DateTime.utc(2026, 6, 11)]?.metronomeMinutes, 7);
       final all = await quest.getQuestsByOrigin('s1', QuestOrigin.selfCreated);
       expect(all.single.currentValue, 12); // 5 + 7 — 가드 없으면 throw 로 스킵
+    });
+  });
+
+  group('선택적 곡 연결 (§1.2) — 섹션 연습시간 크레딧', () {
+    late _RecordingRepertoireRepo repertoire;
+    late PracticeRecordingService svcWithRepertoire;
+
+    setUp(() {
+      repertoire = _RecordingRepertoireRepo();
+      svcWithRepertoire = PracticeRecordingService(
+        heatmapRepository: heatmap,
+        questRepository: quest,
+        repertoireRepository: repertoire,
+      );
+    });
+
+    test(
+      'sectionId 있는 metronome → 섹션에 minutes*60 초 크레딧 + heatmap 본경로 유지',
+      () async {
+        await svcWithRepertoire.recordPractice(
+          's1',
+          PracticeEvidence(
+            source: PracticeSource.metronome,
+            durationMinutes: 5,
+            occurredAt: DateTime.utc(2026, 6, 11),
+            sectionId: 'sec-1',
+          ),
+        );
+        expect(repertoire.credited, [(sectionId: 'sec-1', seconds: 300)]);
+        final hm = await heatmap.getHeatmap('s1');
+        expect(hm.days[DateTime.utc(2026, 6, 11)]?.metronomeMinutes, 5);
+      },
+    );
+
+    test('sectionId 없으면 섹션 크레딧 없음 (무마찰 홈 시작)', () async {
+      await svcWithRepertoire.recordPractice(
+        's1',
+        PracticeEvidence(
+          source: PracticeSource.metronome,
+          durationMinutes: 5,
+          occurredAt: DateTime.utc(2026, 6, 11),
+        ),
+      );
+      expect(repertoire.credited, isEmpty);
+    });
+
+    test('recording source 는 섹션 크레딧 안 함 (녹음 완료 경로가 별도 누적 — 이중계산 방지)', () async {
+      await svcWithRepertoire.recordPractice(
+        's1',
+        PracticeEvidence(
+          source: PracticeSource.recording,
+          durationMinutes: 0,
+          occurredAt: DateTime.utc(2026, 6, 11),
+          sectionId: 'sec-1',
+        ),
+      );
+      expect(repertoire.credited, isEmpty);
+    });
+
+    test('0분 metronome 은 섹션 크레딧 안 함', () async {
+      await svcWithRepertoire.recordPractice(
+        's1',
+        PracticeEvidence(
+          source: PracticeSource.metronome,
+          durationMinutes: 0,
+          occurredAt: DateTime.utc(2026, 6, 11),
+          sectionId: 'sec-1',
+        ),
+      );
+      expect(repertoire.credited, isEmpty);
+    });
+
+    test('repertoireRepository 미연결(null)이어도 본경로 회귀 안전', () async {
+      // service = repertoireRepository 없이 생성된 인스턴스 (setUp).
+      await service.recordPractice(
+        's1',
+        PracticeEvidence(
+          source: PracticeSource.metronome,
+          durationMinutes: 5,
+          occurredAt: DateTime.utc(2026, 6, 11),
+          sectionId: 'sec-1',
+        ),
+      );
+      final hm = await heatmap.getHeatmap('s1');
+      expect(hm.days[DateTime.utc(2026, 6, 11)]?.metronomeMinutes, 5);
     });
   });
 }

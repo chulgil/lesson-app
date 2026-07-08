@@ -31,7 +31,11 @@ class _NoopMetronome extends Notifier<MetronomeState> implements Metronome {
   void start() {}
 
   @override
-  void stop({String? studentId, int? practiceMinutesElapsed}) {}
+  void stop({
+    String? studentId,
+    int? practiceMinutesElapsed,
+    String? sectionId,
+  }) {}
 
   @override
   void toggle() {}
@@ -147,20 +151,21 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('long-press through the slot opens the modal on the tuner tab', (
-      tester,
-    ) async {
-      await pumpButtonInSlot(tester);
+    testWidgets(
+      'long-press through the slot opens the modal on the tuner tab',
+      (tester) async {
+        await pumpButtonInSlot(tester);
 
-      await tester.longPress(find.byType(PracticeCenterButton));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 350));
+        await tester.longPress(find.byType(PracticeCenterButton));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
 
-      expect(find.text('메트로놈'), findsOneWidget);
-      expect(find.text('튜너'), findsOneWidget);
-      // initialTab 1 = tuner → settings affordance visible (#973).
-      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+        expect(find.text('메트로놈'), findsOneWidget);
+        expect(find.text('튜너'), findsOneWidget);
+        // initialTab 1 = tuner → settings affordance visible (#973).
+        expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

@@ -23,12 +23,14 @@ final List<PracticeTool> musicPracticeTools = <PracticeTool>[
   PracticeTool(
     id: PracticeToolIds.metronome,
     displayLabel: '메트로놈',
-    panelBuilder: (context, studentId) => MetronomePanel(studentId: studentId),
+    panelBuilder:
+        (context, studentId, sectionId) =>
+            MetronomePanel(studentId: studentId, sectionId: sectionId),
   ),
   PracticeTool(
     id: PracticeToolIds.tuner,
     displayLabel: '튜너',
-    panelBuilder: (context, studentId) => const TunerPanel(),
+    panelBuilder: (context, studentId, sectionId) => const TunerPanel(),
     onShowSettings: (context) => TunerSettingsSheet.show(context),
   ),
 ];

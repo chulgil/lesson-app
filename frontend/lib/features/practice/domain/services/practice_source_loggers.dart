@@ -14,29 +14,35 @@ class PracticeSourceLoggers {
   const PracticeSourceLoggers(this.service);
 
   /// 메트로놈 stop 시 호출. [durationMinutes] <= 0 이면 no-op.
+  /// [sectionId] 가 주어지면(곡 상세에서 연 경우) 그 섹션에도 연습시간 크레딧.
   Future<void> logMetronome({
     required String studentId,
     required int durationMinutes,
     int? bpm,
+    String? sectionId,
     DateTime? occurredAt,
   }) => _log(
     studentId: studentId,
     source: PracticeSource.metronome,
     durationMinutes: durationMinutes,
     occurredAt: occurredAt,
+    sectionId: sectionId,
     metadata: {if (bpm != null) 'bpm': bpm},
   );
 
   /// 튜너 stop 시 호출.
+  /// [sectionId] 가 주어지면 그 섹션에도 연습시간 크레딧.
   Future<void> logTuner({
     required String studentId,
     required int durationMinutes,
+    String? sectionId,
     DateTime? occurredAt,
   }) => _log(
     studentId: studentId,
     source: PracticeSource.tuner,
     durationMinutes: durationMinutes,
     occurredAt: occurredAt,
+    sectionId: sectionId,
     metadata: const {},
   );
 
@@ -56,16 +62,19 @@ class PracticeSourceLoggers {
   );
 
   /// 사용자 수동 입력 — "오늘 N분 연습했어요".
+  /// [sectionId] 가 주어지면 그 섹션에도 연습시간 크레딧.
   Future<void> logManual({
     required String studentId,
     required int durationMinutes,
     String? note,
+    String? sectionId,
     DateTime? occurredAt,
   }) => _log(
     studentId: studentId,
     source: PracticeSource.manual,
     durationMinutes: durationMinutes,
     occurredAt: occurredAt,
+    sectionId: sectionId,
     metadata: {if (note != null) 'note': note},
   );
 
@@ -87,6 +96,7 @@ class PracticeSourceLoggers {
     required int durationMinutes,
     required Map<String, dynamic> metadata,
     String? videoId,
+    String? sectionId,
     DateTime? occurredAt,
   }) async {
     if (source != PracticeSource.recording && durationMinutes <= 0) return;
@@ -98,6 +108,7 @@ class PracticeSourceLoggers {
         occurredAt: occurredAt ?? DateTime.now(),
         metadata: metadata,
         videoId: videoId,
+        sectionId: sectionId,
       ),
     );
   }

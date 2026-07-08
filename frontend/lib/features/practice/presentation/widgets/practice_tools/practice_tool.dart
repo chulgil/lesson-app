@@ -29,7 +29,15 @@ class PracticeTool {
 
   /// Builds this tool's tab panel. [studentId] threads the practice student
   /// context (gamification logging) through to the panel; it may be null.
-  final Widget Function(BuildContext context, String? studentId) panelBuilder;
+  /// [sectionId] threads the optional 곡/섹션 context (practice_master §1.2) so a
+  /// tool practised from a piece detail can credit that section's time; null =
+  /// no section context (frictionless home start).
+  final Widget Function(
+    BuildContext context,
+    String? studentId,
+    String? sectionId,
+  )
+  panelBuilder;
 
   /// Optional settings action. When non-null a settings icon appears in the
   /// modal header while this tool's tab is active and invokes this callback.
