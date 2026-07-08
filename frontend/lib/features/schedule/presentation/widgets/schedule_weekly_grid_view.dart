@@ -14,6 +14,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/utils/name_utils.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
@@ -60,9 +61,10 @@ class _ScheduleWeeklyGridViewState
   @override
   Widget build(BuildContext context) {
     final weekLessonsAsync = ref.watch(weekLessonsProvider(_weekStart));
-    final availabilityAsync = ref.watch(
-      teacherAvailabilityProvider('teacher_1'),
-    );
+    // 로그인 교사 본인의 가용시간·휴무를 조회 — 형제 timeline_view(#703)와 동일.
+    // 하드코딩 'teacher_1' 은 beta/remote 에서 유령 교사를 조회했다(#C1).
+    final teacherId = ref.watch(currentUserIdProvider);
+    final availabilityAsync = ref.watch(teacherAvailabilityProvider(teacherId));
     final vacationsAsync = ref.watch(vacationListProvider);
 
     return weekLessonsAsync.when(
@@ -73,14 +75,16 @@ class _ScheduleWeeklyGridViewState
       },
       // intrinsic height — sliver(SliverToBoxAdapter) 임베드 시 unbounded vertical
       // 회피를 위해 고정 높이로 감싼다.
-      loading: () => const SizedBox(
-        height: 240,
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => SizedBox(
-        height: 240,
-        child: Center(child: Text(AppStrings.scheduleLoadFailed('$e'))),
-      ),
+      loading:
+          () => const SizedBox(
+            height: 240,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (e, _) => SizedBox(
+            height: 240,
+            child: Center(child: Text(AppStrings.scheduleLoadFailed('$e'))),
+          ),
     );
   }
 
@@ -97,11 +101,12 @@ class _ScheduleWeeklyGridViewState
     final now = DateTime.now();
     final todayDate = DateTime(now.year, now.month, now.day);
 
-    // v3: 휴강일 조회
+    // v3: 휴강일 조회 — 로그인 교사 본인(하드코딩 'teacher_1' 제거, #C1).
     final weekEnd = _weekStart.add(const Duration(days: 6));
+    final teacherId = ref.watch(currentUserIdProvider);
     final dayOffsAsync = ref.watch(
       teacherDayOffsProvider(
-        teacherId: 'teacher_1',
+        teacherId: teacherId,
         fromDate: _weekStart,
         toDate: weekEnd,
       ),
@@ -217,12 +222,13 @@ class _ScheduleWeeklyGridViewState
               final isDayOff = dayOffSet.contains(
                 DateTime(dayDate.year, dayDate.month, dayDate.day),
               );
-              final columnBg = isDayOff
-                  ? AppColors.paperDark
-                  : weeklyColumnBackground(
-                      dayType: _toScheduleDayType(dayType),
-                      restKind: restKind,
-                    );
+              final columnBg =
+                  isDayOff
+                      ? AppColors.paperDark
+                      : weeklyColumnBackground(
+                        dayType: _toScheduleDayType(dayType),
+                        restKind: restKind,
+                      );
 
               // §7.122 — 컬럼 사이 1px 수직 디바이더로 경계 명확화.
               // dayIndex 0(월) 은 시간 라벨과 인접해 디바이더 생략.
@@ -233,15 +239,16 @@ class _ScheduleWeeklyGridViewState
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: columnBg,
-                    border: dayIndex > 0
-                        ? Border(
-                            left: BorderSide(
-                              color: AppColors.scheduleWeeklyGridLine,
-                              width: 1,
-                              strokeAlign: BorderSide.strokeAlignInside,
-                            ),
-                          )
-                        : null,
+                    border:
+                        dayIndex > 0
+                            ? Border(
+                              left: BorderSide(
+                                color: AppColors.scheduleWeeklyGridLine,
+                                width: 1,
+                                strokeAlign: BorderSide.strokeAlignInside,
+                              ),
+                            )
+                            : null,
                   ),
                   child: Column(
                     children: [
@@ -456,21 +463,22 @@ class _ScheduleWeeklyGridViewState
         availability: availability,
         slotStart: cellDateTime,
       );
-      final Color? cellOverlay = (isAdditional && restKind.isTeacherSetRest)
-          ? AppColors.paper
-          : null;
+      final Color? cellOverlay =
+          (isAdditional && restKind.isTeacherSetRest) ? AppColors.paper : null;
 
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: isPast
-            ? null
-            : () {
-                HapticFeedback.lightImpact();
-                _navigateToAddLesson(date, hour, minute);
-              },
-        child: cellOverlay == null
-            ? SizedBox(width: width, height: height)
-            : Container(width: width, height: height, color: cellOverlay),
+        onTap:
+            isPast
+                ? null
+                : () {
+                  HapticFeedback.lightImpact();
+                  _navigateToAddLesson(date, hour, minute);
+                },
+        child:
+            cellOverlay == null
+                ? SizedBox(width: width, height: height)
+                : Container(width: width, height: height, color: cellOverlay),
       );
     }
 
@@ -512,9 +520,10 @@ class _ScheduleWeeklyGridViewState
     final isStartSlot = slotMinutes == lessonStartMinutes;
 
     // Preview lessons navigate to student detail; normal lessons to lesson detail
-    final tapRoute = lesson.isPreview
-        ? AppRoutes.studentDetail.replaceFirst(':id', lesson.studentId)
-        : AppRoutes.lessonDetail.replaceFirst(':id', lesson.id);
+    final tapRoute =
+        lesson.isPreview
+            ? AppRoutes.studentDetail.replaceFirst(':id', lesson.studentId)
+            : AppRoutes.lessonDetail.replaceFirst(':id', lesson.id);
 
     // Preview border: wider dashed-like accent border
     // Flutter 3.29: strokeAlign != strokeAlignInside 는 uniform border 에서만 허용됨.
@@ -532,8 +541,12 @@ class _ScheduleWeeklyGridViewState
           HapticFeedback.lightImpact();
           context.push(tapRoute);
         },
-        onLongPress: () =>
-            showLessonActionSheet(context: context, ref: ref, lesson: lesson),
+        onLongPress:
+            () => showLessonActionSheet(
+              context: context,
+              ref: ref,
+              lesson: lesson,
+            ),
         child: Container(
           width: width - 2,
           height: height,
@@ -554,8 +567,9 @@ class _ScheduleWeeklyGridViewState
         HapticFeedback.lightImpact();
         context.push(tapRoute);
       },
-      onLongPress: () =>
-          showLessonActionSheet(context: context, ref: ref, lesson: lesson),
+      onLongPress:
+          () =>
+              showLessonActionSheet(context: context, ref: ref, lesson: lesson),
       // Notebook × Score: 시작 셀 topLeft/topRight 4px 라운드 제거 → 직사각
       child: Container(
         width: width - 2,
@@ -570,9 +584,10 @@ class _ScheduleWeeklyGridViewState
           shortName,
           style: NotebookTypography.hand.copyWith(
             fontSize: scheduleWeeklyGridLessonNameFontSize,
-            color: lesson.isPreview
-                ? AppColors.inkTertiary
-                : AppColors.inkSecondary,
+            color:
+                lesson.isPreview
+                    ? AppColors.inkTertiary
+                    : AppColors.inkSecondary,
             fontWeight: FontWeight.w700,
             height: 1.0,
           ),
@@ -597,9 +612,8 @@ class _ScheduleWeeklyGridViewState
     final totalMinutes = lessons.fold<int>(0, (sum, l) => sum + l.duration);
     final hours = totalMinutes ~/ 60;
     final mins = totalMinutes % 60;
-    final timeStr = hours > 0
-        ? (mins > 0 ? '$hours시간 $mins분' : '$hours시간')
-        : '$mins분';
+    final timeStr =
+        hours > 0 ? (mins > 0 ? '$hours시간 $mins분' : '$hours시간') : '$mins분';
 
     return Container(
       padding: const EdgeInsets.symmetric(
