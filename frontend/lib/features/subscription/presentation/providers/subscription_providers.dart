@@ -20,10 +20,11 @@ SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
   return createSyncAwareRepository<SubscriptionRepository>(
     ref: ref,
     mock: () => MockSubscriptionRepository(),
-    syncAware: (api, queue) => SyncAwareSubscriptionRepository(
-      remote: RemoteSubscriptionRepository(api),
-      queue: queue,
-    ),
+    syncAware:
+        (api, queue) => SyncAwareSubscriptionRepository(
+          remote: RemoteSubscriptionRepository(api),
+          queue: queue,
+        ),
   );
 }
 
@@ -129,6 +130,9 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     final repository = ref.read(subscriptionRepositoryProvider);
     final updated = await repository.update(subscription);
     ref.invalidateSelf();
+    // 단일 subscriptionProvider(id)(상세 화면 watch)도 무효화 — 정책 수정이
+    // 상세에 즉시 반영되도록. invalidateSelf 는 리스트만 갱신한다.
+    ref.invalidate(subscriptionProvider(subscription.id));
     return updated;
   }
 
@@ -136,6 +140,7 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     final repository = ref.read(subscriptionRepositoryProvider);
     final updated = await repository.useLesson(id);
     ref.invalidateSelf();
+    ref.invalidate(subscriptionProvider(id));
     return updated;
   }
 
@@ -145,6 +150,7 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     final repository = ref.read(subscriptionRepositoryProvider);
     final updated = await repository.useReschedule(id);
     ref.invalidateSelf();
+    ref.invalidate(subscriptionProvider(id));
     return updated;
   }
 
@@ -317,15 +323,16 @@ Future<Subscription?> activeSubscriptionBetween(
   final teacherSubscriptions = await repository.getByTeacherId(teacherId);
 
   // Find active subscription for this student
-  final studentSubscriptions = teacherSubscriptions
-      .where(
-        (s) =>
-            s.studentId == studentId &&
-            (s.status == SubscriptionStatus.active ||
-                s.status == SubscriptionStatus.expiringSoon) &&
-            (s.remainingLessons ?? 0) > 0,
-      )
-      .toList();
+  final studentSubscriptions =
+      teacherSubscriptions
+          .where(
+            (s) =>
+                s.studentId == studentId &&
+                (s.status == SubscriptionStatus.active ||
+                    s.status == SubscriptionStatus.expiringSoon) &&
+                (s.remainingLessons ?? 0) > 0,
+          )
+          .toList();
 
   if (studentSubscriptions.isEmpty) {
     return null;

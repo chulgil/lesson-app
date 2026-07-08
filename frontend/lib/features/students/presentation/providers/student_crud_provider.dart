@@ -94,6 +94,10 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       final updated = await _repository.updateStudent(student);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      // keepAlive studentsProvider/filteredStudentsProvider 를 watch 하는 화면
+      // (레슨추가 피커·홈·분석)이 stale 되지 않도록 addStudent 와 동일하게 무효화.
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -106,6 +110,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       await _repository.deleteStudent(id);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -117,6 +123,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       await _repository.archiveStudent(id);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -137,6 +145,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       final updated = await _repository.updateStudentStatus(studentId, status);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);

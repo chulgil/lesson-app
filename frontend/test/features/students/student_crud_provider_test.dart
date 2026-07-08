@@ -33,6 +33,80 @@ void main() {
   });
 
   test(
+    'updateStudent 후 keepAlive studentsProvider 가 갱신된다 (read/write 분리 가드 — A1)',
+    () async {
+      // studentsProvider(keepAlive) 를 watch 하는 화면(레슨추가 피커·홈·분석)이
+      // 학생 수정 후 stale 되던 버그(2026-07-08 감사 A1)의 회귀 가드.
+      // fix(updateStudent 의 ref.invalidate)를 되돌리면 캐시된 옛 이름이 남아 RED.
+      final repository = _FakeStudentRepository();
+      final container = ProviderContainer(
+        overrides: [studentRepositoryProvider.overrideWithValue(repository)],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(studentsNotifierProvider.notifier)
+          .addStudent(
+            Student(
+              id: 's1',
+              name: '원래이름',
+              instrument: '피아노',
+              createdAt: DateTime(2026),
+            ),
+          );
+      // 화면이 studentsProvider 를 watch 하는 상황을 재현 (keepAlive 유지).
+      final sub = container.listen(studentsProvider, (_, __) {});
+      addTearDown(sub.close);
+      expect(
+        (await container.read(studentsProvider.future)).single.name,
+        '원래이름',
+      );
+
+      await container
+          .read(studentsNotifierProvider.notifier)
+          .updateStudent(
+            Student(
+              id: 's1',
+              name: '바뀐이름',
+              instrument: '피아노',
+              createdAt: DateTime(2026),
+            ),
+          );
+
+      expect(
+        (await container.read(studentsProvider.future)).single.name,
+        '바뀐이름',
+      );
+    },
+  );
+
+  test('deleteStudent 후 keepAlive studentsProvider 가 갱신된다 (A1)', () async {
+    final repository = _FakeStudentRepository();
+    final container = ProviderContainer(
+      overrides: [studentRepositoryProvider.overrideWithValue(repository)],
+    );
+    addTearDown(container.dispose);
+
+    await container
+        .read(studentsNotifierProvider.notifier)
+        .addStudent(
+          Student(
+            id: 's1',
+            name: '이서연',
+            instrument: '피아노',
+            createdAt: DateTime(2026),
+          ),
+        );
+    final sub = container.listen(studentsProvider, (_, __) {});
+    addTearDown(sub.close);
+    expect(await container.read(studentsProvider.future), hasLength(1));
+
+    await container.read(studentsNotifierProvider.notifier).deleteStudent('s1');
+
+    expect(await container.read(studentsProvider.future), isEmpty);
+  });
+
+  test(
     'currentStudentId resolves the real Student.id via getMyProfile (not auth userId)',
     () async {
       // Regression guard: the student home must resolve the logged-in user's
@@ -75,6 +149,18 @@ class _FakeStudentRepository implements StudentRepository {
   Future<Student> createStudent(Student student) async {
     _students.add(student);
     return student;
+  }
+
+  @override
+  Future<Student> updateStudent(Student student) async {
+    final i = _students.indexWhere((s) => s.id == student.id);
+    if (i != -1) _students[i] = student;
+    return student;
+  }
+
+  @override
+  Future<void> deleteStudent(String id) async {
+    _students.removeWhere((s) => s.id == id);
   }
 
   @override
