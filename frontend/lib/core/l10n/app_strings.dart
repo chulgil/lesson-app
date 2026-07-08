@@ -2687,8 +2687,7 @@ class AppStrings {
       '$name · $count건';
 
   /// N시간 전 완료 (completion relative-time suffix; time = '2시간 전')
-  static String awaitingFeedbackCompletedAgo(String relative) =>
-      '$relative 완료';
+  static String awaitingFeedbackCompletedAgo(String relative) => '$relative 완료';
 
   /// 리액션 보내기 (1-tap reaction button tooltip)
   static const awaitingFeedbackReactTooltip = '리액션 보내기';
@@ -7580,6 +7579,8 @@ class AppStrings {
   // -- Practice Notes --
   static const practiceNoteHint = '연습하면서 느낀 점을 기록하세요...';
   static const practiceNoteTitle = '연습노트';
+  static const practiceNoteEditTitle = '연습노트 수정';
+  static const practiceNoteAddTitle = '연습노트 추가';
   static const practiceNoteEmptyTitle = '연습노트가 없습니다';
   static const practiceNoteEmptySubtitle = '연습하면서 느낀 점을 기록해보세요';
   static const practiceNoteAddedSnack = '연습노트가 추가되었습니다';
