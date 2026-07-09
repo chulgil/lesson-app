@@ -14,6 +14,8 @@ import '../../../../core/utils/price_input.dart';
 import '../../../analytics/analytics_facade.dart'
     show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
+import '../../../onboarding/onboarding_facade.dart'
+    show currentTeacherProfileProvider;
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/domain/entities/lesson_location.dart';
 import '../../../students/domain/entities/student_with_membership.dart';
@@ -33,6 +35,7 @@ import '../widgets/issue_form_membership_widgets.dart';
 import '../widgets/issue_form_sections.dart';
 import '../widgets/issue_form_summary_widgets.dart';
 import '../widgets/issue_form_type_options.dart';
+import '../widgets/location_option_resolver.dart';
 import '../widgets/location_travel_selector.dart';
 import '../widgets/proposal_draft_banner.dart';
 import 'issue_subscription_actions.dart';
@@ -225,9 +228,7 @@ class _IssueSubscriptionScreenState
     final teacherId = ref.watch(currentUserIdProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
-        title: AppStrings.issueSelectStudentTitle,
-      ),
+      appBar: NotebookDetailAppBar(title: AppStrings.issueSelectStudentTitle),
       body: groupsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text(AppStrings.errorOccurred)),
@@ -253,9 +254,10 @@ class _IssueSubscriptionScreenState
               return ListTile(
                 title: Text(s.name, style: AppTypography.bodyLarge),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.pushReplacement(
-                  '${AppRoutes.issueSubscription}?studentId=${s.studentId}',
-                ),
+                onTap:
+                    () => context.pushReplacement(
+                      '${AppRoutes.issueSubscription}?studentId=${s.studentId}',
+                    ),
               );
             },
           );
@@ -532,6 +534,14 @@ class _IssueSubscriptionScreenState
               onTravelTimeChanged:
                   (minutes) => setState(() => _travelTimeMinutes = minutes),
               initialLocationType: _resolvePreferredLocationType(),
+              // #1146 — gate location options by the teacher's lesson types.
+              allowedLocationTypes: allowedLocationTypes(
+                ref
+                    .watch(currentTeacherProfileProvider)
+                    .valueOrNull
+                    ?.lessonTypes,
+                isAcademy: false,
+              ),
             ),
           ],
 
@@ -540,13 +550,14 @@ class _IssueSubscriptionScreenState
           // Subscription type selector
           SubscriptionTypeSelector(
             selectedType: _selectedType,
-            onChanged: (type) => setState(() {
-              _selectedType = type;
-              if (type != SubscriptionType.trial &&
-                  _paymentMode == IssuePaymentMode.free) {
-                _paymentMode = IssuePaymentMode.prepaid;
-              }
-            }),
+            onChanged:
+                (type) => setState(() {
+                  _selectedType = type;
+                  if (type != SubscriptionType.trial &&
+                      _paymentMode == IssuePaymentMode.free) {
+                    _paymentMode = IssuePaymentMode.prepaid;
+                  }
+                }),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -565,8 +576,8 @@ class _IssueSubscriptionScreenState
               totalLessons: _totalLessons,
               finalAmount: finalAmount,
               discountPercent: _discountPercent,
-              onAmountChanged: (value) =>
-                  setState(() => _originalAmount = value),
+              onAmountChanged:
+                  (value) => setState(() => _originalAmount = value),
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -625,14 +636,15 @@ class _IssueSubscriptionScreenState
           PaymentStatusSection(
             mode: _paymentMode,
             selectedPaymentMethod: _selectedPaymentMethod,
-            onModeChanged: (m) => setState(() {
-              _paymentMode = m;
-              if (m == IssuePaymentMode.free) {
-                _selectedType = SubscriptionType.trial;
-                _originalAmount = 0;
-                _amountController.clear();
-              }
-            }),
+            onModeChanged:
+                (m) => setState(() {
+                  _paymentMode = m;
+                  if (m == IssuePaymentMode.free) {
+                    _selectedType = SubscriptionType.trial;
+                    _originalAmount = 0;
+                    _amountController.clear();
+                  }
+                }),
             onPaymentMethodChanged:
                 (method) => setState(() => _selectedPaymentMethod = method),
           ),
@@ -676,13 +688,14 @@ class _IssueSubscriptionScreenState
 
           SubscriptionTypeSelector(
             selectedType: _selectedType,
-            onChanged: (type) => setState(() {
-              _selectedType = type;
-              if (type != SubscriptionType.trial &&
-                  _paymentMode == IssuePaymentMode.free) {
-                _paymentMode = IssuePaymentMode.prepaid;
-              }
-            }),
+            onChanged:
+                (type) => setState(() {
+                  _selectedType = type;
+                  if (type != SubscriptionType.trial &&
+                      _paymentMode == IssuePaymentMode.free) {
+                    _paymentMode = IssuePaymentMode.prepaid;
+                  }
+                }),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -699,8 +712,8 @@ class _IssueSubscriptionScreenState
               totalLessons: _totalLessons,
               finalAmount: finalAmount,
               discountPercent: _discountPercent,
-              onAmountChanged: (value) =>
-                  setState(() => _originalAmount = value),
+              onAmountChanged:
+                  (value) => setState(() => _originalAmount = value),
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -755,14 +768,15 @@ class _IssueSubscriptionScreenState
           PaymentStatusSection(
             mode: _paymentMode,
             selectedPaymentMethod: _selectedPaymentMethod,
-            onModeChanged: (m) => setState(() {
-              _paymentMode = m;
-              if (m == IssuePaymentMode.free) {
-                _selectedType = SubscriptionType.trial;
-                _originalAmount = 0;
-                _amountController.clear();
-              }
-            }),
+            onModeChanged:
+                (m) => setState(() {
+                  _paymentMode = m;
+                  if (m == IssuePaymentMode.free) {
+                    _selectedType = SubscriptionType.trial;
+                    _originalAmount = 0;
+                    _amountController.clear();
+                  }
+                }),
             onPaymentMethodChanged:
                 (method) => setState(() => _selectedPaymentMethod = method),
           ),

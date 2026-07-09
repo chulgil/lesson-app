@@ -14,6 +14,7 @@ import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../features/schedule/schedule_ui_facade.dart';
 import '../../../profile/domain/entities/invite.dart';
+import '../../../profile/presentation/extensions/lesson_type_option_visuals.dart';
 import '../../../profile/profile_facade.dart';
 import '../../search_facade.dart';
 
@@ -30,9 +31,10 @@ class TeacherDetailScreen extends ConsumerWidget {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paperDark,
       appBar: NotebookDetailAppBar(
-        title: profileAsync.valueOrNull?.name != null
-            ? '${profileAsync.valueOrNull!.name} (선생님)'
-            : AppStrings.searchAnonymousTeacher,
+        title:
+            profileAsync.valueOrNull?.name != null
+                ? '${profileAsync.valueOrNull!.name} (선생님)'
+                : AppStrings.searchAnonymousTeacher,
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -232,7 +234,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                           profile.lessonTypes!
                               .map(
                                 (t) => Chip(
-                                  label: Text(_getLessonTypeLabel(t)),
+                                  label: Text(t.label),
                                   backgroundColor: AppColors.paperAccent
                                       .withValues(alpha: 0.1),
                                   labelStyle: AppTypography.bodySmall.copyWith(
@@ -650,17 +652,6 @@ class _TeacherDetailContent extends ConsumerWidget {
         return AppStrings.verificationBadgeCertifiedLabel;
       case VerificationBadge.premium:
         return AppStrings.searchPremiumProfileLabel;
-    }
-  }
-
-  String _getLessonTypeLabel(LessonType type) {
-    switch (type) {
-      case LessonType.inPerson:
-        return AppStrings.searchLessonTypeInPerson;
-      case LessonType.online:
-        return AppStrings.locationOnlineLabel;
-      case LessonType.visit:
-        return AppStrings.searchLessonTypeVisit;
     }
   }
 }

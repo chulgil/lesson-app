@@ -13,7 +13,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/booking/entities/time_slot.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/features/profile/domain/entities/teacher_profile.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
+import 'package:lessonaza/features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 import 'package:lessonaza/features/profile/presentation/screens/lesson_style_settings_screen.dart';
 import 'package:lessonaza/features/settings/domain/repositories/settings_repository.dart';
 import 'package:lessonaza/features/settings/presentation/providers/settings_repository_provider.dart';
@@ -25,6 +27,10 @@ void main() {
       overrides: [
         settingsRepositoryProvider.overrideWithValue(repo),
         teacherSettingsBootMigrationProvider.overrideWith((ref) async => true),
+        // #1146 — the screen now hosts a "레슨 방식" section backed by the
+        // extended profile; provide it immediate data so its real async load
+        // (mock repo Future.delayed) does not leak a pending Timer.
+        teacherExtendedProfileProvider.overrideWith(_FakeExtendedProfile.new),
       ],
       child: MaterialApp(
         home:
@@ -107,6 +113,23 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+}
+
+/// Fake extended profile that returns immediate data (no async repo load) so
+/// the "레슨 방식" section renders without leaking a pending Timer.
+class _FakeExtendedProfile extends TeacherExtendedProfile {
+  @override
+  AsyncValue<TeacherProfile?> build() => AsyncValue.data(
+    TeacherProfile(
+      id: 'p1',
+      userId: 'u1',
+      name: '테스트 선생님',
+      instruments: const [],
+      introduction: '',
+      verification: const TeacherVerification(),
+      createdAt: DateTime(2026),
+    ),
+  );
 }
 
 /// In-memory [SettingsRepository] for LessonStyleSettingsScreen tests.
