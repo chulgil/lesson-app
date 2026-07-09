@@ -3532,8 +3532,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -6366,11 +6366,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -9027,9 +9028,10 @@ class AppStrings {
   static const vacationNotifyDialogTitle = '통보 완료';
 
   /// 휴가 등록 성공 확인 다이얼로그 본문 — 영향 학생 수 포함.
-  static String vacationNotifyDialogBody(int studentCount) => studentCount == 0
-      ? '해당 기간에 영향 받는 학생이 없어요.'
-      : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
+  static String vacationNotifyDialogBody(int studentCount) =>
+      studentCount == 0
+          ? '해당 기간에 영향 받는 학생이 없어요.'
+          : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
 
   /// 휴가 등록 성공 확인 다이얼로그 확인 버튼.
   static const vacationNotifyDialogConfirm = '확인';
@@ -9923,6 +9925,13 @@ class AppStrings {
   /// 학생 안내 메시지 섹션 보조 설명 (빈 입력 → 기본 메시지 fallback 안내).
   static const lessonStyleGuidanceHint =
       '예약 시 학생에게 보내는 안내입니다. 비우면 기본 메시지가 사용됩니다';
+
+  /// 레슨 방식 섹션 헤더 (대면/온라인/방문 다중선택).
+  static const lessonStyleLocationSection = '레슨 방식';
+
+  /// 레슨 방식 섹션 보조 설명 (수강권 등록 장소 선택지 연동 안내).
+  static const lessonStyleLocationHint =
+      '가능한 방식을 모두 선택하세요. 학생에게 표시되고, 수강권 등록 시 장소 선택지가 됩니다';
 
   // ── PriceTableScreen (W3 Task 3.3) ───────────────────────────────
   // spec §6.3 — 악기·레벨별 가격표 (LessonTimeSettingsScreen §6 에서 분리).

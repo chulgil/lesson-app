@@ -97,6 +97,12 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
   /// Used as a default when [currentLocationId] is null or yields no type.
   final LocationType? initialLocationType;
 
+  /// Optional: restrict the selectable location types to those the teacher's
+  /// profile lesson types allow (#1146). null/empty → no restriction (current
+  /// isAcademy behavior). Exactly one remaining option → auto-selected and
+  /// shown read-only (no dead-end zero-option state).
+  final Set<LocationType>? allowedLocationTypes;
+
   const LocationTravelSelector({
     super.key,
     required this.membershipId,
@@ -112,6 +118,7 @@ class LocationTravelSelector extends ConsumerStatefulWidget {
     this.lessonDurationMinutes,
     this.initialLocationType,
     this.onLocationTypeChanged,
+    this.allowedLocationTypes,
   });
 
   @override
@@ -130,11 +137,36 @@ class _LocationTravelSelectorState
     super.initState();
     // Derive initial type from currentLocationId, then fall back to
     // initialLocationType (e.g. student's preferred location from request).
-    _selectedType = _inferTypeFromLocationId(widget.currentLocationId) ??
+    _selectedType =
+        _inferTypeFromLocationId(widget.currentLocationId) ??
         widget.initialLocationType;
     // Initialise travel time text field
     final initial = widget.currentTravelTime;
     _travelTimeController.text = initial > 0 ? initial.toString() : '';
+
+    // #1146 — when the teacher's allowed types leave exactly one option, auto
+    // select it (and notify the parent) so there is no dead-end single chip.
+    final options = _visibleOptions;
+    if (_selectedType == null && options.length == 1) {
+      _selectedType = options.first.type;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _notifySelection(options.first.type);
+      });
+    }
+  }
+
+  /// Location options visible for the current context, after the teacher's
+  /// [LocationTravelSelector.allowedLocationTypes] filter (#1146).
+  ///
+  /// Falls back to the full context list when the filter is null/empty, or when
+  /// it would leave zero options (never a dead end).
+  List<_LocationOption> get _visibleOptions {
+    final base =
+        widget.isAcademy ? _academyLocationOptions : _privateLocationOptions;
+    final allowed = widget.allowedLocationTypes;
+    if (allowed == null || allowed.isEmpty) return base;
+    final filtered = base.where((o) => allowed.contains(o.type)).toList();
+    return filtered.isEmpty ? base : filtered;
   }
 
   @override
@@ -176,7 +208,12 @@ class _LocationTravelSelectorState
     setState(() {
       _selectedType = type;
     });
+    _notifySelection(type);
+  }
 
+  /// Notify the parent of a selected [type] without touching widget state — safe
+  /// to call from a post-frame callback (auto-select) as well as [_onTypeSelected].
+  void _notifySelection(LocationType type) {
     // Generate location ID and notify parent
     widget.onLocationChanged(_locationIdFromType(type));
 
@@ -228,11 +265,20 @@ class _LocationTravelSelectorState
   }
 
   Widget _buildLocationChips() {
+    final options = _visibleOptions;
+
+    // #1146 — a single allowed option is auto-selected; show it read-only
+    // instead of a lone chip the user must still tap.
+    if (options.length == 1) {
+      final only = options.first;
+      return _buildReadOnlyAddress(icon: only.icon, text: only.label);
+    }
+
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
       children:
-          (widget.isAcademy ? _academyLocationOptions : _privateLocationOptions).map((option) {
+          options.map((option) {
             final isSelected = _selectedType == option.type;
             return ChoiceChip(
               avatar: Icon(
@@ -397,9 +443,7 @@ class _LocationTravelSelectorState
             suffixStyle: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-            ),
+            border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
             enabledBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.inkQuaternary),
@@ -470,7 +514,10 @@ class _LocationTravelSelectorState
     final travelTime =
         int.tryParse(_travelTimeController.text) ?? widget.currentTravelTime;
 
-    if (baseFee == null || duration == null || duration == 0 || travelTime <= 0) {
+    if (baseFee == null ||
+        duration == null ||
+        duration == 0 ||
+        travelTime <= 0) {
       return const SizedBox.shrink();
     }
 
