@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -688,7 +688,45 @@ class LessonRequestService:
         response.type = request.request_type
         response.experience = request.experience_level
         response.events = [RequestEventResponse.model_validate(event) for event in events]  # type: ignore[misc]
+        student_name, teacher_name, academy_name = await self._resolve_display_names(request)
+        response.student_name = student_name
+        response.teacher_name = teacher_name
+        response.academy_name = academy_name
         return response
+
+    async def _resolve_display_names(self, request: Any) -> tuple[str | None, str | None, str | None]:
+        """Resolve student/teacher/academy display names from ids on the row.
+
+        Best-effort — unresolved ids yield None so the client can fall back to
+        its local name map. ``student_id`` is the requesting student's User.id;
+        ``teacher_id`` may be a Teacher profile id or a User.id.
+        """
+        from app.models.academy import Academy
+        from app.models.student import Student
+        from app.models.teacher import Teacher
+        from app.models.user import User
+
+        # Student: prefer the roster name a teacher recognizes, else the User name.
+        student_name = await self.db.scalar(select(Student.name).where(Student.user_id == request.student_id))
+        if student_name is None:
+            student_name = await self.db.scalar(select(User.name).where(User.id == request.student_id))
+
+        # Teacher: mirror displayName = nickname ?? name.
+        teacher = (
+            await self.db.scalars(
+                select(Teacher).where(or_(Teacher.id == request.teacher_id, Teacher.user_id == request.teacher_id))
+            )
+        ).first()
+        if teacher is not None:
+            teacher_name = teacher.nickname or await self.db.scalar(select(User.name).where(User.id == teacher.user_id))
+        else:
+            teacher_name = await self.db.scalar(select(User.name).where(User.id == request.teacher_id))
+
+        academy_name: str | None = None
+        if request.academy_id:
+            academy_name = await self.db.scalar(select(Academy.name).where(Academy.id == request.academy_id))
+
+        return student_name, teacher_name, academy_name
 
     async def _get_events(self, request_id: str) -> list[Any]:
         from app.models.request_event import RequestEvent

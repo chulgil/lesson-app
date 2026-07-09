@@ -271,6 +271,78 @@ void main() {
     });
   });
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // C2: display name resolution (entity-first, name-map fallback)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  group('display names (studentName/teacherName/academyName)', () {
+    // Mirrors studentNameMap/teacherNameMap/academyNameMap mock providers.
+    const studentNames = {'student_1': '김민준'};
+    const teacherNames = {'teacher_1': '김선아'};
+    const academyNames = {'academy_1': '서울음악학원'};
+
+    test('fromJson 이 BE 필드(student_name/teacher_name/academy_name)를 파싱', () {
+      final request = UnifiedLessonRequest.fromJson({
+        'id': 'req_1',
+        'student_id': 'student_999',
+        'teacher_id': 'teacher_999',
+        'type': 'regular',
+        'instrument': '바이올린',
+        'goal': 'hobby',
+        'experience': 'beginner',
+        'status': 'pending',
+        'created_at': '2026-03-01T00:00:00.000',
+        'student_name': '실제학생',
+        'teacher_name': '실제선생님',
+        'academy_name': '실제학원',
+      });
+      expect(request.studentName, '실제학생');
+      expect(request.teacherName, '실제선생님');
+      expect(request.academyName, '실제학원');
+    });
+
+    test('기본값 null (mock 시나리오 — 이름 미탑재)', () {
+      final request = createRequest();
+      expect(request.studentName, isNull);
+      expect(request.teacherName, isNull);
+      expect(request.academyName, isNull);
+    });
+
+    test('remote: id 가 map 에 없어도 entity 이름으로 해소 (entity-first)', () {
+      final request = createRequest().copyWith(
+        studentId: 'unknown_id',
+        teacherId: 'unknown_id',
+        academyId: 'unknown_id',
+        studentName: '실제학생',
+        teacherName: '실제선생님',
+        academyName: '실제학원',
+      );
+      // resolver mirrors consumers: request.X ?? nameMap[id] ?? fallback
+      expect(
+        request.studentName ?? studentNames[request.studentId] ?? '학생',
+        '실제학생',
+      );
+      expect(request.teacherName ?? teacherNames[request.teacherId], '실제선생님');
+      expect(request.academyName ?? academyNames[request.academyId], '실제학원');
+    });
+
+    test('mock: entity 이름 null 이면 name map 으로 폴백', () {
+      final request = createRequest(); // studentId='student_1', names null
+      expect(
+        request.studentName ?? studentNames[request.studentId] ?? '학생',
+        '김민준',
+      );
+    });
+
+    test('entity 이름·map 모두 없으면 기본값으로 폴백', () {
+      final request = createRequest().copyWith(studentId: 'ghost');
+      expect(
+        request.studentName ?? studentNames[request.studentId] ?? '학생',
+        '학생',
+      );
+    });
+  });
+
   group('typeDisplayLabel', () {
     test('재수강 우선', () {
       final request = createRequest().copyWith(isReturningStudent: true);
