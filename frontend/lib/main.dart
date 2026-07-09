@@ -21,6 +21,7 @@ import 'features/notifications/notifications_facade.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
 import 'features/practice/presentation/providers/recording_provider.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
+import 'features/settings/presentation/widgets/force_update_gate.dart';
 
 /// Get the startup recovery result.
 startup_recovery.StartupRecoveryResult? getStartupRecoveryResult() =>
@@ -182,9 +183,13 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
         // Router
         routerConfig: routerConfig,
 
-        // Global offline banner injected above every screen.
-        builder: (context, child) =>
-            OfflineBannerWrapper(child: child ?? const SizedBox.shrink()),
+        // Force-update gate wraps the whole shell: when the running version is
+        // below the server min_version it swaps in ForceUpdateScreen. Fails
+        // open while the version check is loading/errored (never locks out).
+        // Inside the gate, the global offline banner sits above every screen.
+        builder: (context, child) => ForceUpdateGate(
+          child: OfflineBannerWrapper(child: child ?? const SizedBox.shrink()),
+        ),
       ),
     );
   }
