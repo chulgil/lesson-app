@@ -292,8 +292,10 @@ String buildNotificationBody(
 | `NOSHOW_WARNING` | 노쇼 경고 | 학생 | 레슨 시작 시 | ✓ | ✓ |
 | `NOSHOW_CONFIRMED` | 노쇼 확정 | 학생/선생님 | 15분 후 | ✓ | ✓ |
 | `TEACHER_NOSHOW` | 선생님 노쇼 | 학생 | 신고 확정 시 | ✓ | ✓ |
-| `COMPENSATION_APPLIED` | 보상 적용 | 학생 | 처리 완료 시 | ✓ | ✓ |
+| `COMPENSATION_APPLIED` | 보상 적용 | 학생 | 지각 취소 처리 시 | ✓ | ✓ |
 | `CANCELLATION_DEADLINE` | 취소 마감 임박 | 학생 | 마감 2시간 전 | ✓ | ✓ |
+
+> **`COMPENSATION_APPLIED` producer (#1167)**: 레슨 상태가 `cancelledByStudentLate` 로 전환될 때 발송한다. 지각 여부는 상태값 자체가 SSOT (선생님이 출결 처리 시 선택) — 마감시간 재계산 없음. 보상 정책은 학원 귀속 수강권이면 `academy_subscriptions` 스냅샷(활성화·문구·원장 알림), 그 외에는 `CancellationDefaults` FE 기본값(활성화)을 따른다. `studentCompensationExtraMinutesEnabled` = 학생 `compensationApplied` 발송 여부, `includeExtraMinutesTextOnLateCancel` = 취소 안내(`lessonCancelled`) 본문에 보상 문구 병기 여부, `notifyOwnerOnLateCancel`(학원 전용) = 학원장 알림 여부. 비학원 선생님의 개인 토글은 FE 로컬 저장이라 BE 미반영(정책 BE 영속화는 별도 마이그레이션 필요 — #1167 범위 외).
 
 ### 5. 관계/팔로우 관련 알림
 
