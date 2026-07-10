@@ -60,10 +60,20 @@ class SmsService:
             False 발송 실패 (네트워크/API 오류)
         """
         if settings.SMS_USE_MOCK:
-            logger.debug(
-                "SMS mock send OTP to %s (mock=True, code not logged)",
-                _mask_phone(phone_number),
-            )
+            if settings.SMS_MOCK_LOG_CODES:
+                # Beta/QA only (#1142): no real SMS is sent in mock mode, so expose the
+                # OTP in the server log for testers. Gated behind an opt-in flag; the
+                # real-send path below never logs the code regardless of any flag.
+                logger.info(
+                    "[MOCK SMS] OTP for %s: %s",
+                    _mask_phone(phone_number),
+                    code,
+                )
+            else:
+                logger.debug(
+                    "SMS mock send OTP to %s (mock=True, code not logged)",
+                    _mask_phone(phone_number),
+                )
             return True
 
         if not settings.SMS_API_KEY or not settings.SMS_API_SECRET or not settings.SMS_SENDER_NUMBER:
