@@ -133,7 +133,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
       );
       await repo.update(updated);
       if (!mounted) return;
-      ref.invalidate(teacherAnnouncementsProvider(existing.teacherId));
+      invalidateAnnouncementViews(ref, existing.teacherId);
       Navigator.pop(context);
       return;
     }
@@ -356,7 +356,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
                     onScheduleChange: () {
                       // 시트 닫고 → 공지 이력에서 스케줄 변경 진행
                       final teacherId = ref.read(currentUserIdProvider);
-                      ref.invalidate(teacherAnnouncementsProvider(teacherId));
+                      invalidateAnnouncementViews(ref, teacherId);
                       Navigator.pop(context);
                       // 수강권 상세(스케줄 변경 챗)로 이동
                       if (affected[i].subscriptionId != null) {
@@ -409,7 +409,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
           onPressed: () {
             // 공지 이력 리스트 즉시 갱신
             final teacherId = ref.read(currentUserIdProvider);
-            ref.invalidate(teacherAnnouncementsProvider(teacherId));
+            invalidateAnnouncementViews(ref, teacherId);
             Navigator.pop(context);
           },
           style: FilledButton.styleFrom(

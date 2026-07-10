@@ -262,6 +262,21 @@ void invalidateSubscriptionListsForStudent(
   String studentId, {
   String? membershipId,
   String? teacherId,
+}) => invalidateSubscriptionListsForStudentOn(
+  ref,
+  studentId,
+  membershipId: membershipId,
+  teacherId: teacherId,
+);
+
+/// Same contract as [invalidateSubscriptionListsForStudent] for callers that
+/// hold a `Ref`/`ProviderContainer` instead of a `WidgetRef` (both expose
+/// `invalidate`). Keeps the invalidation set in one place.
+void invalidateSubscriptionListsForStudentOn(
+  dynamic ref,
+  String studentId, {
+  String? membershipId,
+  String? teacherId,
 }) {
   ref.invalidate(subscriptionNotifierProvider(studentId));
   ref.invalidate(studentSubscriptionsProvider(studentId));

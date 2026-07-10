@@ -98,7 +98,7 @@ class _AnnouncementCard extends ConsumerWidget {
     if (confirmed == true) {
       final repo = ref.read(teacherAnnouncementRepositoryProvider);
       await repo.delete(announcement.id);
-      ref.invalidate(teacherAnnouncementsProvider(announcement.teacherId));
+      invalidateAnnouncementViews(ref, announcement.teacherId);
     }
   }
 
