@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, validate_runtime_configuration
 from app.core.exceptions import register_exception_handlers
 from app.core.i18n import LocaleMiddleware
+from app.core.idempotency import IdempotencyMiddleware  # noqa: F401  add_middleware 에서 사용
 from app.core.security_headers import (
     SecurityHeadersMiddleware,  # noqa: F401  add_middleware 에서 사용 — ruff 가 데코레이터 인자 detect 못함.
 )
@@ -103,6 +104,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Idempotency middleware (#1117) — added FIRST so it is the INNERMOST user
+# middleware (closest to the router). A replayed/stored response therefore
+# still flows back out through CORS/security/locale and receives their headers.
+app.add_middleware(IdempotencyMiddleware)
+
 # CORS middleware — allow_methods / allow_headers 를 명시적으로 화이트리스트한다.
 # wildcard ``*`` 는 allow_credentials=True 와 결합하면 일부 브라우저에서 CORS spec 위반으로
 # 차단되거나, custom request header (예: ``X-Internal-API-Key``) 가 prefli ght 에서 누락된다.
@@ -116,6 +122,7 @@ app.add_middleware(
         "Accept-Language",
         "Authorization",
         "Content-Type",
+        "Idempotency-Key",
         "X-Internal-API-Key",
         "X-Requested-With",
         "X-Forwarded-For",
