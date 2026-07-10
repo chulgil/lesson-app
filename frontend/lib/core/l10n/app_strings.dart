@@ -7840,6 +7840,7 @@ class AppStrings {
   static const profileBankAccountSaveError = '계좌 저장에 실패했어요. 잠시 후 다시 시도해주세요';
 
   static const profileBankAccountAddFormTitle = '계좌 추가';
+  static const profileBankAccountEditFormTitle = '계좌 수정';
   static const profileBankAccountBankNameLabel = '은행명 *';
   static const profileBankAccountHintBankSelect = '은행 선택';
   static const profileBankAccountHintBankName = '은행명 입력';
