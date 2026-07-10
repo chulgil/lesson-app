@@ -13,7 +13,9 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
+import '../providers/makeup_credit_providers.dart';
 import '../providers/subscription_providers.dart';
+import '../widgets/makeup_credit_summary_card.dart';
 import '../widgets/subscription_membership_card.dart';
 
 /// Screen showing list of student's subscriptions.
@@ -172,6 +174,20 @@ class SubscriptionListScreen extends ConsumerWidget {
             expiringSoonSubscriptions.isEmpty &&
             expiredSubscriptions.isEmpty) ...[
           _buildNoSubscriptionsState(context, memberships),
+        ],
+
+        // 보강 크레딧 요약 (#1165 진입점) — 이력 있을 때만 노출.
+        if (ref.watch(studentMakeupCreditsProvider).valueOrNull?.isNotEmpty ??
+            false) ...[
+          const SizedBox(height: AppSpacing.space6),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+            ),
+            child: MakeupCreditSummaryCard(
+              onTap: () => context.push(AppRoutes.makeupCredits),
+            ),
+          ),
         ],
       ],
     );

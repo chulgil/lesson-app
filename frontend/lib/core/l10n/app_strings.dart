@@ -9884,6 +9884,9 @@ class AppStrings {
   /// 메인 홈 5묶음 메뉴 영역 섹션 헤더.
   static const categorySectionTitle = '설정';
 
+  /// 프로필 탭 통계·분석 섹션 헤더 (#1164 — 출석 현황 진입점).
+  static const profileAnalyticsSectionTitle = '통계·분석';
+
   /// 💰 수강권·정산 BottomSheet 제목.
   static const categorySheetSubscriptionBillingTitle = '수강권·정산';
 
