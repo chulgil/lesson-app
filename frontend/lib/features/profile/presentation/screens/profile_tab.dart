@@ -20,6 +20,7 @@ import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_extended_profile_provider.dart';
+import '../widgets/analytics_menu_section.dart';
 import '../widgets/category_menu_grid.dart';
 import '../widgets/teacher_migration_overlay_gate.dart';
 
@@ -124,6 +125,11 @@ class ProfileTab extends ConsumerWidget {
 
             // 5묶음 카테고리 메뉴 그리드 (W2 Task 2.4 — spec §3 + §7.2 + §11.1)
             _buildCategoryGrid(context, ref, teacherId),
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // 통계·분석 섹션 (#1164 — 출석 현황 진입점 복원)
+            _buildAnalyticsSection(context),
 
             SizedBox(
               height:
@@ -568,6 +574,16 @@ class ProfileTab extends ConsumerWidget {
       onMyProfileTap: () => context.push(AppRoutes.myProfileCategory),
       onPolicyNotificationsTap: () =>
           context.push(AppRoutes.policyNotificationsCategory),
+    );
+  }
+
+  /// 통계·분석 섹션 — 출석 현황 진입점 (#1164).
+  ///
+  /// TeacherAttendanceScreen 은 라우트만 등록되고 네비게이션이 없어 도달 불가였다.
+  /// 프로필 탭에서 진입점을 복원한다.
+  Widget _buildAnalyticsSection(BuildContext context) {
+    return AnalyticsMenuSection(
+      onAttendanceTap: () => context.push(AppRoutes.teacherAttendance),
     );
   }
 }
