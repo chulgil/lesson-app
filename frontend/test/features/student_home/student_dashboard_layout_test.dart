@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lessonaza/core/booking/entities/lesson_booking.dart';
 import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 import 'package:lessonaza/features/auth/presentation/providers/user_role_provider.dart';
@@ -43,6 +46,26 @@ class _FakeOnboardingDismissStore
 }
 
 void main() {
+  // StudentDashboardTab → PracticeStartSection → studentRepertoiresProvider →
+  // mock 연습 repo 가 Hive 박스를 연다. Hive 초기화 없이는 HiveError 로 렌더가
+  // 깨진다 (레퍼토리 watch 가 추가되며 생긴 test rot).
+  //
+  // path_provider 를 목킹하는 공용 initializeTestEnvironment 는 쓰지 않는다 —
+  // google_fonts 가 저장 경로를 얻어 런타임 폰트 페치를 시도한다.
+  late Directory tempDir;
+
+  setUpAll(() {
+    tempDir = Directory.systemTemp.createTempSync('student_dashboard_layout_');
+    Hive.init(tempDir.path);
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    if (tempDir.existsSync()) {
+      tempDir.deleteSync(recursive: true);
+    }
+  });
+
   testWidgets(
     'student dashboard lays out action widgets without metadata crash',
     (tester) async {
