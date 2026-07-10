@@ -649,6 +649,17 @@ class UnifiedLessonRequestActions {
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
+    // A2 — the subscription + confirmation card were created through the
+    // repositories directly, so the subscription read providers must be
+    // invalidated too (contract of invalidateSubscriptionListsForStudent).
+    // Without this the student's list and the teacher's payment-pending
+    // badges keep serving the cached value after a successful issue.
+    invalidateSubscriptionListsForStudentOn(
+      ref,
+      studentId,
+      teacherId: teacherId,
+    );
+    ref.invalidate(pendingScheduleConfirmationCardsProvider(studentId));
   }
 
   Future<Subscription> _createSubscriptionForRequest(
