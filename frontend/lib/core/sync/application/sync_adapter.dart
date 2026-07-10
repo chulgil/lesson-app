@@ -1,5 +1,7 @@
-import '../../../core/network/api_client.dart';
+import 'package:dio/dio.dart';
 
+import '../../../core/network/api_client.dart';
+import '../../network/interceptors/idempotency_interceptor.dart';
 import '../domain/sync_queue_entry.dart';
 
 /// Conflict resolution strategy per domain type.
@@ -137,33 +139,49 @@ class RestSyncAdapter extends SyncAdapter {
     required SyncQueueEntry entry,
     required ApiClient apiClient,
   }) async {
+    final options = _replayOptions(entry);
     switch (entry.httpMethod.toUpperCase()) {
       case 'POST':
         return apiClient.post<dynamic>(
           entry.path,
           data: entry.payload,
           queryParameters: _normalizeQuery(entry.queryParameters),
+          options: options,
         );
       case 'PUT':
         return apiClient.put<dynamic>(
           entry.path,
           data: entry.payload,
           queryParameters: _normalizeQuery(entry.queryParameters),
+          options: options,
         );
       case 'PATCH':
         return apiClient.patch<dynamic>(
           entry.path,
           data: entry.payload,
           queryParameters: _normalizeQuery(entry.queryParameters),
+          options: options,
         );
       case 'DELETE':
         return apiClient.delete<dynamic>(
           entry.path,
           queryParameters: _normalizeQuery(entry.queryParameters),
+          options: options,
         );
       default:
         throw StateError('Unsupported queued method: ${entry.httpMethod}');
     }
+  }
+
+  /// #1117: re-attach the entry's stored idempotency key on replay so the server
+  /// dedupes a write it may already have committed. Setting the header here also
+  /// makes `IdempotencyInterceptor` skip regenerating one (it never overwrites).
+  Options? _replayOptions(SyncQueueEntry entry) {
+    final key = entry.idempotencyKey;
+    if (key == null) {
+      return null;
+    }
+    return Options(headers: {IdempotencyInterceptor.headerName: key});
   }
 
   /// Parses `updatedAt` from the response body map.

@@ -78,7 +78,8 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<Subscription> create(Subscription subscription) =>
       _queue.executeMutation<Subscription>(
         remoteCall: () => _remote.create(subscription),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'subscription',
           httpMethod: 'POST',
           path: '/subscriptions',
@@ -92,7 +93,8 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<Subscription> update(Subscription subscription) =>
       _queue.executeMutation<Subscription>(
         remoteCall: () => _remote.update(subscription),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'subscription',
           httpMethod: 'PUT',
           path: '/subscriptions/${subscription.id}',
@@ -125,7 +127,8 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<void> updateStatus(String id, SubscriptionStatus status) =>
       _queue.executeVoidMutation(
         remoteCall: () => _remote.updateStatus(id, status),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'subscription',
           httpMethod: 'PATCH',
           path: '/subscriptions/$id/status',
@@ -173,7 +176,8 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) =>
       _queue.executeMutation<SubscriptionUsage>(
         remoteCall: () => _remote.addUsage(usage),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'subscription',
           httpMethod: 'POST',
           path: '/subscriptions/${usage.subscriptionId}/usage',

@@ -80,6 +80,9 @@ class SyncService {
     _isInitialized = true;
 
     await _queueStore.runMigrations();
+    // #1162: reclassify entries left in `syncing` by an app kill mid-replay
+    // BEFORE any flush, so an orphan is never blindly re-sent.
+    await _recoverOrphanedSyncingEntries();
     await _queueStore.cleanup();
     await _refreshStats();
     await syncPending();
@@ -146,6 +149,7 @@ class SyncService {
     int? maxRetryCount,
     SyncOperationType? operation,
     DateTime? clientUpdatedAt,
+    String? idempotencyKey,
   }) async {
     final now = DateTime.now().toUtc();
     final resolvedOperation =
@@ -163,6 +167,7 @@ class SyncService {
       updatedAt: now,
       maxRetryCount: maxRetryCount ?? defaultMaxRetryCount,
       clientUpdatedAt: clientUpdatedAt,
+      idempotencyKey: idempotencyKey,
     );
 
     await _queueStore.upsert(entry);
@@ -260,9 +265,10 @@ class SyncService {
         final nextRetryCount = syncing.retryCount + 1;
 
         final failed = syncing.copyWith(
-          status: nextRetryCount >= syncing.maxRetryCount
-              ? SyncQueueStatus.failed
-              : SyncQueueStatus.pending,
+          status:
+              nextRetryCount >= syncing.maxRetryCount
+                  ? SyncQueueStatus.failed
+                  : SyncQueueStatus.pending,
           lastSyncedAt: DateTime.now().toUtc(),
           retryCount: nextRetryCount,
           errorCode: errorCode,
@@ -278,13 +284,65 @@ class SyncService {
     }
   }
 
+  /// #1162: error code stamped on a legacy `POST` orphan that cannot be safely
+  /// replayed (no idempotency key → replay risks a duplicate). Surfaced to the
+  /// sync status UI (#1120) rather than silently dropped or duplicated.
+  static const String orphanedUnsafeReplayCode = 'ORPHANED_UNSAFE_REPLAY';
+
+  /// #1162: reclassify entries stuck in `syncing` after an app kill mid-replay.
+  ///
+  /// The server-delivery state of an orphan is unknown, so neither blind replay
+  /// (duplicate) nor drop (lost write) is safe on its own:
+  /// - has an idempotency key → `pending`; replay dedupes on the server (#1117).
+  /// - no key, PUT/PATCH/DELETE → `pending`; these are naturally idempotent
+  ///   (they set a target resource's state, they don't create new rows).
+  /// - no key, POST (legacy entry) → `failed` with [orphanedUnsafeReplayCode];
+  ///   a blind replay could duplicate, so hand the decision to the user.
+  Future<void> _recoverOrphanedSyncingEntries() async {
+    final orphans = await _queueStore.fetchByStatus(SyncQueueStatus.syncing);
+    for (final entry in orphans) {
+      final safeToReplay =
+          entry.idempotencyKey != null ||
+          entry.httpMethod.toUpperCase() != 'POST';
+      if (safeToReplay) {
+        await _queueStore.upsert(
+          entry.copyWith(status: SyncQueueStatus.pending),
+        );
+      } else {
+        // Terminal failure (retryCount maxed) so the flush never auto-replays
+        // it — the user decides via the sync status UI (#1120).
+        await _queueStore.upsert(
+          entry.copyWith(
+            status: SyncQueueStatus.failed,
+            retryCount: entry.maxRetryCount,
+            errorCode: orphanedUnsafeReplayCode,
+            errorMessage:
+                'App closed mid-sync; this create request has no idempotency key '
+                'and cannot be safely retried automatically.',
+          ),
+        );
+      }
+    }
+  }
+
   /// Entries that are candidates for this flush pass (backoff is evaluated
   /// per-entry by [_isProcessable] so a skipped entry can block its domain).
+  ///
+  /// #1162: `syncing` is NOT a candidate. Within a flush each entry is set to
+  /// `syncing` and processed immediately, so a leftover `syncing` means a prior
+  /// run was killed mid-replay — that orphan is reclassified explicitly at
+  /// startup ([_recoverOrphanedSyncingEntries]), never implicitly re-sent here.
   bool _isPending(SyncQueueEntry entry) =>
-      entry.status != SyncQueueStatus.synced && entry.isRetryable;
+      entry.status != SyncQueueStatus.synced &&
+      entry.status != SyncQueueStatus.syncing &&
+      entry.isRetryable;
 
   bool _isProcessable(SyncQueueEntry entry) {
     if (entry.status == SyncQueueStatus.synced) {
+      return false;
+    }
+    // #1162: never treat `syncing` as implicitly retryable (see [_isPending]).
+    if (entry.status == SyncQueueStatus.syncing) {
       return false;
     }
 
@@ -324,18 +382,14 @@ class SyncService {
     final allEntries = await _queueStore.fetchAll();
     return SyncServiceStats(
       total: allEntries.length,
-      pending: allEntries
-          .where((e) => e.status == SyncQueueStatus.pending)
-          .length,
-      syncing: allEntries
-          .where((e) => e.status == SyncQueueStatus.syncing)
-          .length,
-      synced: allEntries
-          .where((e) => e.status == SyncQueueStatus.synced)
-          .length,
-      failed: allEntries
-          .where((e) => e.status == SyncQueueStatus.failed)
-          .length,
+      pending:
+          allEntries.where((e) => e.status == SyncQueueStatus.pending).length,
+      syncing:
+          allEntries.where((e) => e.status == SyncQueueStatus.syncing).length,
+      synced:
+          allEntries.where((e) => e.status == SyncQueueStatus.synced).length,
+      failed:
+          allEntries.where((e) => e.status == SyncQueueStatus.failed).length,
       online: await _connectivityService.isOnline,
       lastSyncAt: _lastSyncAt,
       nextAction: nextAction,

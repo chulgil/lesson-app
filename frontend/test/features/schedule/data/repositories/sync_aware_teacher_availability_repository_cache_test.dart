@@ -101,6 +101,7 @@ void main() {
   void stubQueue() {
     when(
       () => syncService.queueMutation(
+        idempotencyKey: any(named: 'idempotencyKey'),
         domain: any(named: 'domain'),
         httpMethod: any(named: 'httpMethod'),
         path: any(named: 'path'),
@@ -248,6 +249,7 @@ void main() {
       expect(result.teacherId, equals('teacher-1'));
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'PUT',
           path: '/schedule/availability',
@@ -291,6 +293,7 @@ void main() {
       await repo.deleteAvailability('teacher-1');
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'DELETE',
           path: '/schedule/availability',
@@ -319,6 +322,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'POST',
           path: '/schedule/weekly',
@@ -335,6 +339,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'PUT',
           path: '/schedule/weekly/s9',
@@ -351,6 +356,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'DELETE',
           path: '/schedule/weekly/s9',
@@ -378,6 +384,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'POST',
           path: '/schedule/exceptions',
@@ -394,6 +401,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'PUT',
           path: '/schedule/exceptions/e9',
@@ -410,6 +418,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'DELETE',
           path: '/schedule/exceptions/e9',
@@ -437,6 +446,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'POST',
           path: '/schedule/slots/slot-1/book',
@@ -453,6 +463,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'DELETE',
           path: '/schedule/slots/slot-1/booking',
@@ -471,6 +482,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'PATCH',
           path: '/schedule/blocks/toggle',
@@ -486,6 +498,7 @@ void main() {
       ], false);
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'schedule',
           httpMethod: 'PATCH',
           path: '/schedule/blocks/set',

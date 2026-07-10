@@ -129,6 +129,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -140,6 +141,7 @@ void main() {
       expect(result.id, startsWith('tmp_'));
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'subscription',
           httpMethod: 'POST',
           path: '/subscriptions',
@@ -154,6 +156,7 @@ void main() {
           .thenThrow(const NetworkException(message: 'timeout'));
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -171,6 +174,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -189,6 +193,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -199,6 +204,7 @@ void main() {
       await repo.updateStatus('sub-1', SubscriptionStatus.paused);
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'subscription',
           httpMethod: 'PATCH',
           path: '/subscriptions/sub-1/status',
@@ -256,6 +262,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -268,6 +275,7 @@ void main() {
       expect(result.id, equals('usage-1'));
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'subscription',
           httpMethod: 'POST',
           path: '/subscriptions/sub-1/usage',
