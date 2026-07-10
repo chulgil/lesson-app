@@ -112,6 +112,19 @@ class TeacherMakeupCreditSection extends ConsumerWidget {
     WidgetRef ref,
     MakeupCredit credit,
   ) async {
+    // R4 — destructive HARD-GATE: revoking must confirm first (grant does).
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => NotebookAlertDialog(
+        title: AppStrings.makeupCreditRevokeConfirmTitle,
+        content: const Text(AppStrings.makeupCreditRevokeConfirmBody),
+        confirmLabel: AppStrings.makeupCreditRevokeButton,
+        cancelLabel: AppStrings.cancel,
+        onConfirm: () => Navigator.pop(ctx, true),
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     try {
       await ref

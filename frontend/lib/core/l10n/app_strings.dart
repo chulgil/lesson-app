@@ -8162,6 +8162,12 @@ class AppStrings {
   static const studentBulkMessageTitleHint = '예) 5월 연휴 일정 안내';
   static const studentSubscriptionStatus = '수강권 현황';
   static const studentSubscriptionIssue = '발급';
+
+  /// 수강권 미등록 (학생 상세 경고 배너 제목)
+  static const studentSubscriptionMissingTitle = '수강권 미등록';
+
+  /// 학생에게 수강권을 발급해주세요 (학생 상세 경고 배너 설명)
+  static const studentSubscriptionMissingSubtitle = '학생에게 수강권을 발급해주세요';
   static const studentLessonNotes = '레슨 노트';
   static const studentWeeklyPractice = '이번 주 연습';
   static const studentPracticeLoadError = '연습 정보를 불러올 수 없습니다';
@@ -9278,6 +9284,12 @@ class AppStrings {
 
   /// 회수 버튼.
   static const makeupCreditRevokeButton = '회수';
+
+  /// 보강 크레딧을 회수할까요? (회수 확인 다이얼로그 제목)
+  static const makeupCreditRevokeConfirmTitle = '보강 크레딧을 회수할까요?';
+
+  /// 학생의 보강 크레딧 1회를 회수해요. (회수 확인 다이얼로그 본문)
+  static const makeupCreditRevokeConfirmBody = '학생의 보강 크레딧 1회를 회수해요. 회수 후에는 되돌릴 수 없어요.';
 
   /// 회수 성공 스낵바.
   static const makeupCreditRevokeSuccess = '보강 크레딧을 회수했어요.';

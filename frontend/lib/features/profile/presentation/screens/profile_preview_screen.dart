@@ -14,6 +14,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
+import '../../../../features/profile/presentation/extensions/fee_range_visuals.dart';
 import '../../../../features/profile/presentation/widgets/verification_badge_chip.dart';
 import '../../../../features/profile/profile_facade.dart';
 
@@ -493,7 +494,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
     if (profile.feeRange != null) {
       buffer.writeln();
       buffer.writeln('[레슨료]');
-      buffer.writeln(profile.feeRange!.formatted);
+      buffer.writeln(profile.feeRange!.label);
     }
 
     buffer.writeln();

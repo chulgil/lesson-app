@@ -26,8 +26,21 @@ class RefreshInterceptor extends QueuedInterceptor {
 
     try {
       // Use a separate Dio instance to avoid interceptor loops
+      // #1118: a stalled /auth/token/refresh froze the whole HTTP pipeline
+      // (QueuedInterceptor) for minutes — bound it with explicit timeouts.
       final refreshDio = Dio(
-        BaseOptions(baseUrl: EnvironmentConfig.apiBaseUrl),
+        BaseOptions(
+          baseUrl: EnvironmentConfig.apiBaseUrl,
+          connectTimeout: Duration(
+            seconds: EnvironmentConfig.requestTimeoutSeconds,
+          ),
+          receiveTimeout: Duration(
+            seconds: EnvironmentConfig.requestTimeoutSeconds,
+          ),
+          sendTimeout: Duration(
+            seconds: EnvironmentConfig.requestTimeoutSeconds,
+          ),
+        ),
       );
 
       final response = await refreshDio.post(

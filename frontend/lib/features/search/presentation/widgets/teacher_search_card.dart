@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
+import '../../../../features/profile/presentation/extensions/fee_range_visuals.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
 
 /// Card widget displaying a teacher's profile in search results
@@ -219,7 +220,7 @@ class TeacherSearchCard extends StatelessWidget {
           // #751: 긴 요금 문자열이 375px 에서 Row 를 넘치지 않도록 Flexible+ellipsis.
           Flexible(
             child: Text(
-              publicProfile.feeRange!.formatted,
+              publicProfile.feeRange!.label,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.caption.copyWith(
                 color: AppColors.inkSecondary,
