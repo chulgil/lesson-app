@@ -9,6 +9,7 @@ import 'cache/response_cache_policy.dart';
 import 'cache/response_cache_store.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
+import 'interceptors/idempotency_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 import 'interceptors/refresh_interceptor.dart';
 import 'interceptors/response_cache_interceptor.dart';
@@ -152,9 +153,7 @@ ApiClient apiClient(ApiClientRef ref) {
       ),
       // #1118 (SN-5): without sendTimeout a stalled upload hangs until the
       // OS TCP timeout, freezing the pipeline on slow networks.
-      sendTimeout: Duration(
-        seconds: EnvironmentConfig.requestTimeoutSeconds,
-      ),
+      sendTimeout: Duration(seconds: EnvironmentConfig.requestTimeoutSeconds),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -162,8 +161,11 @@ ApiClient apiClient(ApiClientRef ref) {
     ),
   );
 
-  // Order matters: logging → auth → error → refresh
+  // Order matters: idempotency → logging → auth → error → refresh.
+  // IdempotencyInterceptor runs first so the Idempotency-Key header (#1117) is
+  // stamped on every mutating request before it is sent.
   dio.interceptors.addAll([
+    IdempotencyInterceptor(),
     LoggingInterceptor(),
     AuthInterceptor(tokenStorage),
     ErrorInterceptor(),
@@ -182,28 +184,25 @@ ApiClient apiClient(ApiClientRef ref) {
         ),
         policy: ResponseCachePolicy.active,
         // D2: feed the staleness banner with the served entry's cachedAt.
-        onCacheServed:
-            (cachedAt) => ref
-                .read(lastServedFromCacheAtProvider.notifier)
-                .record(cachedAt),
+        onCacheServed: (cachedAt) =>
+            ref.read(lastServedFromCacheAtProvider.notifier).record(cachedAt),
         // G-06: a live allowlisted read reached a caller → data is fresh, so
         // clear the staleness marker (hides the slow-network banner).
-        onFreshServed:
-            () => ref.read(lastServedFromCacheAtProvider.notifier).clear(),
+        onFreshServed: () =>
+            ref.read(lastServedFromCacheAtProvider.notifier).clear(),
         // G-04/SN-1: publish background-revalidation refreshes so subscribed
         // read providers (ref.autoRevalidate) update live on slow networks.
-        onRevalidated:
-            (path) => ref.read(revalidationEventsProvider.notifier).emit(path),
+        onRevalidated: (path) =>
+            ref.read(revalidationEventsProvider.notifier).emit(path),
         // Stale-while-revalidate: re-issue the read as a background request
         // (flagged so it skips the cache-first shortcut) to refresh the store.
-        revalidate:
-            (options) => dio.get<dynamic>(
-              options.path,
-              queryParameters: options.queryParameters,
-              options: Options(
-                extra: const {ResponseCacheInterceptor.swrBackgroundKey: true},
-              ),
-            ),
+        revalidate: (options) => dio.get<dynamic>(
+          options.path,
+          queryParameters: options.queryParameters,
+          options: Options(
+            extra: const {ResponseCacheInterceptor.swrBackgroundKey: true},
+          ),
+        ),
       ),
     );
   }

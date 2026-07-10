@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import '../api_exceptions.dart';
+import 'idempotency_interceptor.dart';
 
 /// Interceptor that converts Dio errors into typed [ApiException]s.
 class ErrorInterceptor extends Interceptor {
@@ -20,15 +21,26 @@ class ErrorInterceptor extends Interceptor {
   }
 
   ApiException _mapDioError(DioException err) {
+    // #1117: the key the IdempotencyInterceptor attached to this attempt. Carried
+    // into queue-fallback exceptions so the replay reuses the exact same key.
+    final idempotencyKey =
+        err.requestOptions.extra[IdempotencyInterceptor.extraKey] as String?;
+
     // Network / timeout errors
     if (err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.sendTimeout ||
         err.type == DioExceptionType.receiveTimeout) {
-      return const NetworkException(message: '서버 응답 시간이 초과되었습니다.');
+      return NetworkException(
+        message: '서버 응답 시간이 초과되었습니다.',
+        idempotencyKey: idempotencyKey,
+      );
     }
     if (err.type == DioExceptionType.connectionError ||
         err.error is SocketException) {
-      return const NetworkException(message: '네트워크 연결을 확인해주세요.');
+      return NetworkException(
+        message: '네트워크 연결을 확인해주세요.',
+        idempotencyKey: idempotencyKey,
+      );
     }
 
     // HTTP status errors
@@ -77,12 +89,16 @@ class ErrorInterceptor extends Interceptor {
         );
       default:
         if (statusCode != null && statusCode >= 500) {
-          return ServerException(message: detail ?? '서버 오류가 발생했습니다.');
+          return ServerException(
+            message: detail ?? '서버 오류가 발생했습니다.',
+            idempotencyKey: idempotencyKey,
+          );
         }
         return ApiException(
           message: detail ?? err.message ?? '알 수 없는 오류가 발생했습니다.',
           statusCode: statusCode,
           data: data,
+          idempotencyKey: idempotencyKey,
         );
     }
   }
