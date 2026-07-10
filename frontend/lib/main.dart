@@ -8,12 +8,14 @@ import 'package:go_router/go_router.dart';
 
 import 'core/auth/auth_state.dart';
 import 'core/deep_link/deep_link_handler.dart';
+import 'core/l10n/app_strings.dart';
 import 'core/l10n/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/startup/app_bootstrap.dart';
 import 'core/startup/startup_provider_observer.dart';
 import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
+import 'core/sync/application/sync_service.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
 import 'core/widgets/offline_banner.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
@@ -61,6 +63,11 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
   /// mode). Replaces the previous "rebuild the whole router" hack.
   StreamController<AuthState>? _authRefreshController;
   GoRouterRefreshStream? _authRefresh;
+
+  /// #1119 (D4): app-root messenger so a sync write rejected by the server
+  /// (LWW conflict) surfaces a SnackBar for any role, from above the router.
+  final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  StreamSubscription<SyncRejectionEvent>? _rejectionSubscription;
 
   /// Builds the router exactly once, wiring auth-state changes to the router's
   /// [refreshListenable] instead of recreating the router.
@@ -112,6 +119,7 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     unawaited(_deepLinkHandler?.dispose());
     _authRefresh?.dispose();
     unawaited(_authRefreshController?.close());
+    unawaited(_rejectionSubscription?.cancel());
     unawaited(ref.read(syncServiceProvider).dispose());
     super.dispose();
   }
@@ -142,6 +150,13 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
 
   Future<void> _initializeSyncService() async {
     final syncService = ref.read(syncServiceProvider);
+    // #1119 (D4): surface deterministic write rejections (LWW conflicts) the
+    // user is not watching (async replay) as a SnackBar.
+    _rejectionSubscription ??= syncService.rejectionStream.listen((_) {
+      _scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(content: Text(AppStrings.syncConflictRejected)),
+      );
+    });
     await syncService.initialize();
   }
 
@@ -164,6 +179,7 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
       child: MaterialApp.router(
         title: 'Lessonaza',
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: _scaffoldMessengerKey,
 
         // Localization
         localizationsDelegates: const [

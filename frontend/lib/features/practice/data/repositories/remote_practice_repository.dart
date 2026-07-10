@@ -1,6 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/sync/application/sync_adapter.dart'
+    show ifUnmodifiedSinceHeader;
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_repository.dart';
 
@@ -76,10 +79,24 @@ class RemotePracticeRepository implements PracticeRepository {
   }
 
   @override
-  Future<PracticeLog> updatePracticeLog(PracticeLog log) async {
+  Future<PracticeLog> updatePracticeLog(
+    PracticeLog log, {
+    DateTime? ifUnmodifiedSince,
+  }) async {
+    // #1119 (D4): Last-Write-Wins precondition. When the caller knows the
+    // base version, send it so the server rejects (412) a superseded write.
+    final options = ifUnmodifiedSince == null
+        ? null
+        : Options(
+            headers: {
+              ifUnmodifiedSinceHeader:
+                  ifUnmodifiedSince.toUtc().toIso8601String(),
+            },
+          );
     final response = await _apiClient.put(
       '/practice-logs/${log.id}',
       data: _practiceLogToJson(log),
+      options: options,
     );
     return _practiceLogFromJson(response.data as Map<String, dynamic>);
   }

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_strings.dart';
 import '../sync/presentation/providers/connectivity_banner_provider.dart';
 import '../sync/presentation/providers/stale_data_provider.dart';
+import '../sync/presentation/providers/sync_provider.dart';
+import '../sync/presentation/widgets/sync_status_banner.dart';
 import '../utils/date_format_utils.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -31,8 +33,16 @@ class OfflineBannerWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isOffline = ref.watch(offlineBannerProvider).valueOrNull ?? false;
     final staleSince = ref.watch(lastServedFromCacheAtProvider);
-    // Show while offline, or while serving stale cache on a slow network.
-    final showBanner = isOffline || staleSince != null;
+    // #1120: the write-queue backlog drives the sync status strip (G-10).
+    final stats = ref.watch(syncServiceStatsStreamProvider).valueOrNull;
+
+    // Read staleness (offline / stale cache) and write backlog are separate
+    // signals; either can raise a strip. Both share ONE top SafeArea so a second
+    // strip never double-applies the status-bar inset.
+    final showStale = isOffline || staleSince != null;
+    final backlog =
+        stats == null ? 0 : stats.pending + stats.syncing + stats.failed;
+    final showAny = showStale || backlog > 0;
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -47,11 +57,23 @@ class OfflineBannerWrapper extends ConsumerWidget {
                 child: child,
               ),
           child:
-              showBanner
-                  ? _OfflineBanner(
-                    key: const ValueKey('stale'),
-                    isOffline: isOffline,
-                    lastSyncedAt: staleSince,
+              showAny
+                  ? SafeArea(
+                    key: const ValueKey('status'),
+                    bottom: false,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (showStale)
+                          _OfflineBanner(
+                            isOffline: isOffline,
+                            lastSyncedAt: staleSince,
+                          ),
+                        if (stats != null && backlog > 0)
+                          SyncStatusBanner(stats: stats),
+                      ],
+                    ),
                   )
                   : const SizedBox.shrink(key: ValueKey('online')),
         ),
@@ -63,7 +85,7 @@ class OfflineBannerWrapper extends ConsumerWidget {
 
 /// The visible staleness strip.
 class _OfflineBanner extends StatelessWidget {
-  const _OfflineBanner({super.key, required this.isOffline, this.lastSyncedAt});
+  const _OfflineBanner({required this.isOffline, this.lastSyncedAt});
 
   /// True = device fully offline; false = connected but serving stale cache
   /// (slow network). Drives the icon and copy.
@@ -92,33 +114,32 @@ class _OfflineBanner extends StatelessWidget {
       message = AppStrings.slowNetworkBannerLastSync(hhmm ?? '');
     }
 
+    // The top SafeArea is applied once by [OfflineBannerWrapper] around the
+    // whole strip group, so this strip does not add its own.
     return ColoredBox(
       color: AppColors.offlineBannerBackground,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space4,
-            vertical: AppSpacing.space2,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: AppSpacing.iconSM,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space2,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: AppSpacing.iconSM,
+              color: AppColors.offlineBannerForeground,
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              message,
+              style: AppTypography.bodySmall.copyWith(
                 color: AppColors.offlineBannerForeground,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                message,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.offlineBannerForeground,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

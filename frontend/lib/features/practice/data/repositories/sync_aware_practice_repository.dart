@@ -83,13 +83,20 @@ class SyncAwarePracticeRepository implements PracticeRepository {
 
   @override
   Future<PracticeLog> updatePracticeLog(PracticeLog log) =>
+      // #1119 (D4): practice is a Last-Write-Wins domain. `log.updatedAt` is
+      // the base version the client edited from — sent as the
+      // If-Unmodified-Since precondition on the direct send and stored as
+      // `clientUpdatedAt` on the queued replay, so the server rejects (412) a
+      // write it has since superseded. Null (never round-tripped) → applies.
       _queue.executeMutation<PracticeLog>(
-        remoteCall: () => _remote.updatePracticeLog(log),
+        remoteCall: () =>
+            _remote.updatePracticeLog(log, ifUnmodifiedSince: log.updatedAt),
         queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
           idempotencyKey: idempotencyKey,
           domain: 'practice',
           httpMethod: 'PUT',
           path: '/practice-logs/${log.id}',
+          clientUpdatedAt: log.updatedAt,
           payload: {
             'id': log.id,
             'student_id': log.studentId,

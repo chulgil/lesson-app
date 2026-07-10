@@ -8531,6 +8531,22 @@ class AppStrings {
   static String syncFailedBanner(int count) => '$count건의 동기화가 실패했습니다';
   static const syncRetryAction = '재시도';
 
+  // ── Sync status UI (#1120) ──
+  static String syncStatusPending(int count) => '$count건 전송 대기 중';
+  static String syncStatusPendingOffline(int count) => '오프라인 · $count건 대기';
+  static String syncStatusSyncing(int count) => '$count건 동기화 중';
+  static String syncStatusFailed(int count) => '$count건 전송 실패';
+  static const syncQueueSheetTitle = '전송 실패 항목';
+  static const syncQueueEmpty = '전송 실패한 항목이 없습니다';
+  static const syncDeleteAction = '삭제';
+  static const syncEntryFailedDescription = '전송에 실패했습니다. 재시도하거나 삭제하세요.';
+  static const syncOrphanEntryDescription =
+      '앱이 종료되며 전송이 중단된 항목입니다. 재시도하면 서버로 다시 보냅니다.';
+  static const syncConflictEntryDescription = '서버의 최신 변경과 충돌해 반영되지 않았습니다.';
+
+  // ── Sync conflict rejection SnackBar (#1119) ──
+  static const syncConflictRejected = '서버의 최신 변경과 충돌해 반영되지 않았습니다';
+
   // ── Academy announcements ──
   static const announcementsTitle = '공지사항';
   static const announcementMarkAsRead = '읽음 처리';

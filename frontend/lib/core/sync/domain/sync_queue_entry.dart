@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 enum SyncOperationType { create, update, delete, custom }
 
 enum SyncQueueStatus { pending, syncing, synced, failed }
@@ -75,8 +73,6 @@ class SyncQueueEntry {
   final String? idempotencyKey;
 
   bool get isRetryable => retryCount < maxRetryCount;
-  String get requestFingerprint =>
-      '$httpMethod $path ${jsonEncode(queryParameters)}';
 
   SyncQueueEntry copyWith({
     SyncOperationType? operation,
