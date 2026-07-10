@@ -150,6 +150,11 @@ ApiClient apiClient(ApiClientRef ref) {
       receiveTimeout: Duration(
         seconds: EnvironmentConfig.requestTimeoutSeconds,
       ),
+      // #1118 (SN-5): without sendTimeout a stalled upload hangs until the
+      // OS TCP timeout, freezing the pipeline on slow networks.
+      sendTimeout: Duration(
+        seconds: EnvironmentConfig.requestTimeoutSeconds,
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

@@ -277,6 +277,11 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
   }
 
   Future<void> _confirmAndBook() async {
+    // R3 (D2-class TOCTOU): engage the guard before ANY await, otherwise a
+    // double tap on a slow network stacks two confirm dialogs → duplicate
+    // bookings. Reset on every early return that keeps the screen alive.
+    if (_isBooking) return;
+    setState(() => _isBooking = true);
     final slot = _selectedSlot!;
     // #850 belt-and-suspenders — slots are already filtered by lead time in
     // the provider, but re-check here against a stale selection (screen left
@@ -296,7 +301,10 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
           backgroundColor: AppColors.paperAccent,
         ),
       );
-      setState(() => _selectedSlot = null);
+      setState(() {
+        _isBooking = false;
+        _selectedSlot = null;
+      });
       return;
     }
     if (!mounted) return;
@@ -315,9 +323,11 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
       confirmLabel: AppStrings.bookAction,
       onConfirm: () => Navigator.pop(context, true),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) {
+      if (mounted) setState(() => _isBooking = false);
+      return;
+    }
 
-    setState(() => _isBooking = true);
     try {
       final notifier = ref.read(slotBookingNotifierProvider.notifier);
       await notifier.bookSlot(
