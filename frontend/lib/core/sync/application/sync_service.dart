@@ -208,10 +208,28 @@ class SyncService {
 
   Future<void> _flushQueue() async {
     final entries = await _queueStore.fetchAll();
-    final processable = [...entries.where(_isProcessable)]
+    final candidates = [...entries.where(_isPending)]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-    for (final entry in processable) {
+    // S3 — dependency order. Writes to one domain are causally ordered
+    // (create → update → delete). If an earlier write is still waiting on its
+    // backoff, or fails during this pass, every later write to the SAME domain
+    // must wait too — otherwise an update replays before the create that
+    // produced the row (404 → retries exhausted → the write is lost).
+    // Permanently failed entries (retries exhausted) do NOT block, or the queue
+    // would stall forever.
+    final blockedDomains = <String>{};
+
+    for (final entry in candidates) {
+      if (blockedDomains.contains(entry.domain)) {
+        continue;
+      }
+      if (!_isProcessable(entry)) {
+        // Still in backoff — hold the rest of this domain for the next pass.
+        blockedDomains.add(entry.domain);
+        continue;
+      }
+
       final adapter = _adapterRegistry.resolve(entry.domain);
       if (adapter == null) {
         final notHandled = entry.copyWith(
@@ -251,10 +269,19 @@ class SyncService {
           errorMessage: message,
         );
         await _queueStore.upsert(failed);
+        // Retryable failure → later writes to this domain must not overtake it.
+        if (failed.status == SyncQueueStatus.pending) {
+          blockedDomains.add(entry.domain);
+        }
         unawaited(_logReplayError(entry.id, error, stack));
       }
     }
   }
+
+  /// Entries that are candidates for this flush pass (backoff is evaluated
+  /// per-entry by [_isProcessable] so a skipped entry can block its domain).
+  bool _isPending(SyncQueueEntry entry) =>
+      entry.status != SyncQueueStatus.synced && entry.isRetryable;
 
   bool _isProcessable(SyncQueueEntry entry) {
     if (entry.status == SyncQueueStatus.synced) {
