@@ -129,19 +129,76 @@ void main() {
 
       expect(find.text(AppStrings.makeupCreditManageTitle), findsOneWidget);
       expect(find.text(AppStrings.makeupCreditEmpty), findsOneWidget);
+      // onViewAll 미지정(전체 화면 맥락) 시 전체보기 어포던스는 노출되지 않는다.
+      expect(find.text(AppStrings.viewAll), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('전체보기 탭 시 studentId 컨텍스트로 makeupCredits(교사 경로)로 이동한다', (
+      tester,
+    ) async {
+      // 모바일 폭(375) — 제목 + 전체보기 + 수동지급 3요소 헤더 오버플로우 회귀 방지.
+      await tester.binding.setSurfaceSize(const Size(375, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final visited = <String?>[];
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (ctx, state) => Scaffold(
+              body: TeacherMakeupCreditSection(
+                studentId: 'stu-42',
+                onViewAll: () =>
+                    ctx.push('${AppRoutes.makeupCredits}?studentId=stu-42'),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.makeupCredits,
+            builder: (ctx, state) {
+              visited.add(state.uri.queryParameters['studentId']);
+              return const Scaffold(body: Text('makeup-teacher'));
+            },
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            makeupCreditRepositoryProvider.overrideWithValue(
+              MockMakeupCreditRepository(),
+            ),
+          ],
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 전체보기 어포던스가 헤더에 노출된다 (onViewAll 지정).
+      expect(find.text(AppStrings.viewAll), findsOneWidget);
+
+      await tester.tap(find.text(AppStrings.viewAll));
+      await tester.pumpAndSettle();
+
+      // 교사 경로: makeupCredits 에 studentId 쿼리 파라미터가 전달된다.
+      expect(visited, contains('stu-42'));
       expect(tester.takeException(), isNull);
     });
   });
 
-  test('student_info_tab 이 TeacherMakeupCreditSection 을 인라인 배선한다', () {
+  test('student_info_tab 이 TeacherMakeupCreditSection 을 전체보기 push 로 배선한다', () {
     final source =
         File(
           'lib/features/students/presentation/widgets/student_detail/student_info_tab.dart',
         ).readAsStringSync();
 
+    expect(source, contains('TeacherMakeupCreditSection('));
+    expect(source, contains('onViewAll:'));
     expect(
       source,
-      contains('TeacherMakeupCreditSection(studentId: student.id)'),
+      contains(r'${AppRoutes.makeupCredits}?studentId=${student.id}'),
     );
   });
 }
