@@ -147,6 +147,56 @@ async def test_update_practice_log(client: AsyncClient, auth_headers, create_tes
 
 
 @pytest.mark.asyncio
+async def test_update_practice_log_lww_conflict_rejected(client: AsyncClient, auth_headers, create_test_user):
+    """#1119: a stale If-Unmodified-Since precondition → 412 CONFLICT_LWW_REJECTED, write not applied."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    cr = await client.post(
+        "/api/v1/practice-logs/",
+        headers=auth_headers,
+        params={"student_id": "s1"},
+        json={"date": "2026-03-16", "total_minutes": 30},
+    )
+    log_id = cr.json()["id"]
+
+    # Base version far in the past → the server row is newer → reject.
+    response = await client.put(
+        f"/api/v1/practice-logs/{log_id}",
+        headers={**auth_headers, "If-Unmodified-Since": "2020-01-01T00:00:00Z"},
+        json={"total_minutes": 99},
+    )
+    assert response.status_code == 412
+    assert response.json()["error"]["code"] == "CONFLICT_LWW_REJECTED"
+
+    # The rejected write must NOT have been applied.
+    fetched = await client.get(f"/api/v1/practice-logs/{log_id}", headers=auth_headers)
+    assert fetched.json()["total_minutes"] == 30
+
+
+@pytest.mark.asyncio
+async def test_update_practice_log_fresh_precondition_applies(client: AsyncClient, auth_headers, create_test_user):
+    """#1119: a fresh If-Unmodified-Since precondition (server not newer) → the write applies."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    cr = await client.post(
+        "/api/v1/practice-logs/",
+        headers=auth_headers,
+        params={"student_id": "s1"},
+        json={"date": "2026-03-16", "total_minutes": 30},
+    )
+    log_id = cr.json()["id"]
+
+    # Base version in the future → the server row is not newer → apply.
+    response = await client.put(
+        f"/api/v1/practice-logs/{log_id}",
+        headers={**auth_headers, "If-Unmodified-Since": "2999-01-01T00:00:00Z"},
+        json={"total_minutes": 60},
+    )
+    assert response.status_code == 200
+    assert response.json()["total_minutes"] == 60
+
+
+@pytest.mark.asyncio
 async def test_delete_practice_log(client: AsyncClient, auth_headers, create_test_user):
     """DELETE /practice-logs/{id} should remove."""
     await create_test_user(user_id="test-user-id", role="teacher")
@@ -232,9 +282,9 @@ async def test_weekly_practice(client: AsyncClient, auth_headers, create_test_us
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 7
-    assert data[0] is True   # Mon
+    assert data[0] is True  # Mon
     assert data[1] is False  # Tue
-    assert data[2] is True   # Wed
+    assert data[2] is True  # Wed
 
 
 @pytest.mark.asyncio

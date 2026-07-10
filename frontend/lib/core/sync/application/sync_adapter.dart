@@ -47,6 +47,19 @@ SyncConflictStrategy conflictStrategyForDomain(String domain) {
   }
 }
 
+/// #1119 (D4): conditional-request header carrying the base version the client
+/// edited from. The server rejects (412) when the resource was modified after
+/// this timestamp, so a Last-Write-Wins conflict is decided BEFORE the write is
+/// committed — not after (which could not reject). We send an ISO-8601 UTC value
+/// (both ends are ours; full sub-second precision, unlike HTTP-date).
+const String ifUnmodifiedSinceHeader = 'If-Unmodified-Since';
+
+/// #1119 (D4): error code the server returns (HTTP 412) when a Last-Write-Wins
+/// write is rejected because the server holds a newer version. Deterministic —
+/// [SyncService] marks the entry failed immediately (no retries) and surfaces a
+/// rejection to the user. Mirrors backend `LastWriteWinsConflictException`.
+const String conflictLwwRejectedCode = 'CONFLICT_LWW_REJECTED';
+
 abstract class SyncAdapter {
   const SyncAdapter({required this.domain});
 
@@ -54,27 +67,6 @@ abstract class SyncAdapter {
 
   bool canHandle(String entryDomain) {
     return domain == entryDomain;
-  }
-
-  /// Returns true if the local mutation should be applied based on LWW.
-  ///
-  /// Only called when the conflict strategy is [SyncConflictStrategy.lastWriteWins].
-  /// Returns true when [serverUpdatedAt] is null (no server record yet) or when
-  /// [entry.clientUpdatedAt] is strictly after [serverUpdatedAt].
-  Future<bool> shouldApplyByLastWriteWins({
-    required SyncQueueEntry entry,
-    DateTime? serverUpdatedAt,
-  }) {
-    if (serverUpdatedAt == null) {
-      return Future.value(true);
-    }
-
-    final localUpdatedAt = entry.clientUpdatedAt;
-    if (localUpdatedAt == null) {
-      return Future.value(true);
-    }
-
-    return Future.value(localUpdatedAt.isAfter(serverUpdatedAt));
   }
 
   Future<void> replay({
@@ -86,51 +78,19 @@ abstract class SyncAdapter {
 class RestSyncAdapter extends SyncAdapter {
   RestSyncAdapter({required super.domain});
 
+  /// #1119 (D4): every strategy just sends the request now — the conflict
+  /// decision is a PRE-send precondition, not a POST-send response comparison.
+  /// For [SyncConflictStrategy.lastWriteWins] domains [_replayOptions] attaches
+  /// the [ifUnmodifiedSinceHeader] so the server rejects (412 with
+  /// [conflictLwwRejectedCode]) when it holds a newer version; the rejection
+  /// then propagates for [SyncService] to mark the entry failed and surface it.
+  /// serverWins/clientWins send unconditionally (no precondition header).
   @override
   Future<void> replay({
     required SyncQueueEntry entry,
     required ApiClient apiClient,
   }) async {
-    final strategy = conflictStrategyForDomain(entry.domain);
-
-    // clientWins: send the request unconditionally without conflict check.
-    if (strategy == SyncConflictStrategy.clientWins) {
-      await _sendRequest(entry: entry, apiClient: apiClient);
-      return;
-    }
-
-    // serverWins or lastWriteWins: send the request and inspect the response.
-    final response = await _sendRequest(entry: entry, apiClient: apiClient);
-
-    if (strategy == SyncConflictStrategy.serverWins) {
-      // Server-Wins: the HTTP request itself is enough — the server's state
-      // is authoritative. No client-side conflict guard needed.
-      return;
-    }
-
-    // lastWriteWins: check the server's updatedAt in the response body.
-    if (strategy == SyncConflictStrategy.lastWriteWins) {
-      final responseData = response?.data;
-      final serverUpdatedAt = _extractUpdatedAt(responseData);
-
-      // If the server record is newer, the server already has a more recent
-      // write. We still completed the HTTP round-trip; the local data should
-      // be treated as superseded. This adapter does not auto-revert the local
-      // cache — callers (repository layer) are responsible for refreshing.
-      // We only raise a [SyncConflictException] so the caller can handle it.
-      final shouldApply = await shouldApplyByLastWriteWins(
-        entry: entry,
-        serverUpdatedAt: serverUpdatedAt,
-      );
-      if (!shouldApply) {
-        throw SyncConflictException(
-          domain: entry.domain,
-          entryId: entry.id,
-          clientUpdatedAt: entry.clientUpdatedAt,
-          serverUpdatedAt: serverUpdatedAt,
-        );
-      }
-    }
+    await _sendRequest(entry: entry, apiClient: apiClient);
   }
 
   /// Sends the appropriate HTTP request and returns the [Response] for callers
@@ -173,63 +133,36 @@ class RestSyncAdapter extends SyncAdapter {
     }
   }
 
-  /// #1117: re-attach the entry's stored idempotency key on replay so the server
-  /// dedupes a write it may already have committed. Setting the header here also
-  /// makes `IdempotencyInterceptor` skip regenerating one (it never overwrites).
-  Options? _replayOptions(SyncQueueEntry entry) {
-    final key = entry.idempotencyKey;
-    if (key == null) {
-      return null;
-    }
-    return Options(headers: {IdempotencyInterceptor.headerName: key});
-  }
-
-  /// Parses `updatedAt` from the response body map.
+  /// Builds the replay request options, attaching:
+  /// - #1117 the stored `Idempotency-Key` so the server dedupes a POST it may
+  ///   already have committed (also makes `IdempotencyInterceptor` skip
+  ///   regenerating one — it never overwrites an existing header).
+  /// - #1119 the [ifUnmodifiedSinceHeader] for Last-Write-Wins domains carrying
+  ///   the entry's `clientUpdatedAt` (the base version), so the server rejects a
+  ///   write it has since superseded (412 [conflictLwwRejectedCode]).
   ///
-  /// Our backend returns `{"updated_at": "..."}` (snake_case) or
-  /// `{"updatedAt": "..."}` (camelCase). Returns null if neither key exists
-  /// or if the value is not a valid ISO-8601 string.
-  DateTime? _extractUpdatedAt(dynamic responseData) {
-    if (responseData is! Map) {
-      return null;
+  /// Returns null when neither header applies.
+  Options? _replayOptions(SyncQueueEntry entry) {
+    final headers = <String, dynamic>{};
+
+    final key = entry.idempotencyKey;
+    if (key != null) {
+      headers[IdempotencyInterceptor.headerName] = key;
     }
-    final raw =
-        responseData['updatedAt'] as String? ??
-        responseData['updated_at'] as String?;
-    if (raw == null) {
-      return null;
+
+    final clientUpdatedAt = entry.clientUpdatedAt;
+    if (clientUpdatedAt != null &&
+        conflictStrategyForDomain(entry.domain) ==
+            SyncConflictStrategy.lastWriteWins) {
+      headers[ifUnmodifiedSinceHeader] = clientUpdatedAt
+          .toUtc()
+          .toIso8601String();
     }
-    return DateTime.tryParse(raw)?.toUtc();
+
+    return headers.isEmpty ? null : Options(headers: headers);
   }
 
   Map<String, dynamic>? _normalizeQuery(Map<String, dynamic> query) {
     return query.isEmpty ? null : query;
   }
-}
-
-/// Thrown by [RestSyncAdapter] when a LWW conflict is detected:
-/// the server record was updated more recently than the local mutation.
-///
-/// The sync service catches this and marks the entry as [SyncQueueStatus.failed]
-/// with errorCode [SyncConflictException.errorCode]. The repository layer is
-/// responsible for re-fetching the server state if needed.
-class SyncConflictException implements Exception {
-  const SyncConflictException({
-    required this.domain,
-    required this.entryId,
-    required this.clientUpdatedAt,
-    required this.serverUpdatedAt,
-  });
-
-  static const String errorCode = 'CONFLICT_LWW_REJECTED';
-
-  final String domain;
-  final String entryId;
-  final DateTime? clientUpdatedAt;
-  final DateTime? serverUpdatedAt;
-
-  @override
-  String toString() =>
-      'SyncConflictException[$domain/$entryId] $errorCode: '
-      'client=$clientUpdatedAt server=$serverUpdatedAt — server is newer, local write rejected';
 }
