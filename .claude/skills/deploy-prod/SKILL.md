@@ -14,7 +14,7 @@ codenavi 서버(108.61.162.25)에 lesson-app 백엔드를 프로덕션 배포합
 | 항목 | 값 |
 |------|-----|
 | 서버 | codenavi (108.61.162.25) |
-| SSH | `ssh -i ~/.ssh/codenavi_rsa admin@108.61.162.25` |
+| SSH | `ssh codenavi` (`~/.ssh/config` alias, `myssh codenavi` 와 동일 키) |
 | 프로젝트 경로 | `~/apps/lesson-app-backend/backend` |
 | 컴포즈 파일 | `docker-compose.prod.yml` |
 | 컨테이너명 | `lessonaza-api` |
@@ -40,7 +40,7 @@ git push
 ### 2단계: 서버 코드 업데이트
 
 ```bash
-SSH_CMD="ssh -i ~/.ssh/codenavi_rsa admin@108.61.162.25"
+SSH_CMD="ssh codenavi"
 $SSH_CMD "cd ~/apps/lesson-app-backend && git pull"
 ```
 

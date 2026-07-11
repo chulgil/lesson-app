@@ -12,7 +12,7 @@ codenavi 서버(108.61.162.25)에 lesson-app 백엔드를 배포합니다.
 | 항목 | 값 |
 |------|-----|
 | 서버 | codenavi (108.61.162.25) |
-| SSH | `ssh -i ~/.ssh/codenavi_rsa admin@108.61.162.25` |
+| SSH | `ssh codenavi` (`~/.ssh/config` alias, `myssh codenavi` 와 동일 키) |
 | 프로젝트 경로 | `~/apps/lesson-app-backend/backend` |
 | 컴포즈 파일 | `docker-compose.beta.yml` |
 | 컨테이너명 | `lessonaza-beta-api` |
@@ -35,7 +35,7 @@ git push
 ### 2단계: 서버 접속 및 코드 업데이트
 
 ```bash
-SSH_CMD="ssh -i ~/.ssh/codenavi_rsa admin@108.61.162.25"
+SSH_CMD="ssh codenavi"
 
 # 코드 풀
 $SSH_CMD "cd ~/apps/lesson-app-backend && git pull"
@@ -83,7 +83,7 @@ curl -s https://api-beta.lessonaza.app/health
 
 | 에러 | 원인 | 해결 |
 |------|------|------|
-| SSH 접속 실패 | 키 경로 또는 권한 | `~/.ssh/codenavi_rsa` 확인 |
+| SSH 접속 실패 | 키 경로 또는 권한 | `~/.ssh/config` 의 `codenavi` alias 확인 (키 위치는 `myssh` 함수의 `config_get CODENAVI_KEY` 로 조회) |
 | git pull 충돌 | 서버에서 추적 파일 직접 수정 | 충돌 파일 확인 후 `git stash` 또는 커밋. **`reset --hard` 는 추적된 로컬 변경을 파괴하므로 금지** (`.env.beta` 는 untracked 라 안전하나 다른 파일 손실 위험) |
 | 구글 로그인 401 | `.env.beta` 의 `GOOGLE_CLIENT_ID/SECRET` placeholder 또는 FE web client 불일치 | `.env.beta` 실제 값 확인 + `run-beta.sh` 의 `GOOGLE_SERVER_CLIENT_ID` 와 동일한지 확인 |
 | 빌드 실패 | 의존성 또는 Dockerfile | 서버 로그 확인: `docker-compose logs app` |

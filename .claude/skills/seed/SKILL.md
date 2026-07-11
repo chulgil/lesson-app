@@ -27,7 +27,7 @@ Beta 서버(codenavi)의 테스트 데이터를 관리합니다.
 3. 시드 실행
 
 ```bash
-SSH_CMD="ssh -i ~/.ssh/codenavi_rsa admin@108.61.162.25"
+SSH_CMD="ssh codenavi"   # ~/.ssh/config alias (myssh codenavi 와 동일 키)
 
 # 배포 (시드 코드 변경 시)
 $SSH_CMD "cd ~/apps/lesson-app-backend && git pull && cd backend && docker-compose -f docker-compose.beta.yml up -d --build"

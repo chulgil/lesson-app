@@ -21,7 +21,7 @@
 
 ```bash
 # SSH 접속
-ssh -i ~/.ssh/codenavi_rsa admin@108.61.162.25
+ssh codenavi   # ~/.ssh/config alias (myssh codenavi 와 동일 키)
 
 # 시드 실행
 cd ~/apps/lesson-app-backend/backend
