@@ -152,6 +152,14 @@ def validate_runtime_configuration() -> None:
         raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
     if settings.DEBUG:
         raise RuntimeError("DEBUG must be False in production-like environments (stack trace exposure risk)")
+    if not settings.SMS_USE_MOCK and not (
+        settings.SMS_API_KEY and settings.SMS_API_SECRET and settings.SMS_SENDER_NUMBER
+    ):
+        # #1179 — fail at boot instead of 502ing every OTP request at runtime.
+        raise RuntimeError(
+            "SMS_USE_MOCK=false requires SMS_API_KEY / SMS_API_SECRET / SMS_SENDER_NUMBER "
+            "in production-like environments"
+        )
     origins = settings.CORS_ORIGINS or []
     if not origins:
         raise RuntimeError("CORS_ORIGINS must be set explicitly in production-like environments")

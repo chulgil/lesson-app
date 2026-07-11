@@ -25,6 +25,9 @@ CODE = "483920"
 class _FakeResponse:
     status_code = 200
 
+    def json(self):
+        return {"failedMessageList": []}
+
 
 class _FakeAsyncClient:
     """httpx.AsyncClient 대체 — 실발송 경로를 성공으로 흉내내되 네트워크 없이 동작."""
