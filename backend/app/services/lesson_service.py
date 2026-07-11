@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
-from typing import Any
+from typing import Any, NamedTuple
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
@@ -25,6 +25,26 @@ from app.schemas.lesson import (
     MembershipUpdate,
 )
 from app.services.teacher_id_resolver import resolve_teacher_id
+
+# #1167 — default body when a teacher grants no custom compensation message.
+_DEFAULT_COMPENSATION_MESSAGE = "지각 취소로 다음 레슨에 보너스 연습시간을 제공해 드립니다."
+
+
+class _LateCancelCompensation(NamedTuple):
+    """Resolved compensation policy for a late student cancellation (#1167).
+
+    The policy is snapshotted on ``academy_subscriptions`` for academy-owned
+    subscriptions; otherwise the teacher-default values (matching the
+    ``CancellationDefaults`` FE entity defaults) apply. The per-teacher toggle
+    for non-academy teachers is stored client-side only, so the backend cannot
+    honour a non-academy teacher's toggle-off without a schema change.
+    """
+
+    enabled: bool
+    include_text: bool
+    message: str
+    notify_owner: bool
+    owner_user_id: str | None
 
 
 class LessonService:
@@ -405,13 +425,25 @@ class LessonService:
                     message=new_status,
                 )
             )
+            # #1167 — late student cancel: resolve compensation policy so the
+            # cancellation notice can echo the promise when the teacher opted in.
+            compensation = (
+                await self._resolve_late_cancel_compensation(lesson)
+                if new_status == LessonStatus.cancelledByStudentLate.value
+                else None
+            )
+            cancel_body = f"{lesson.date} {lesson.start_time} 레슨이 취소되었습니다"
+            if compensation is not None and compensation.enabled and compensation.include_text:
+                cancel_body = f"{cancel_body}\n{compensation.message}"
             await self._notify_lesson_counterparty(
                 lesson,
                 current_user,
                 notification_type="lessonCancelled",
                 title="레슨이 취소되었습니다",
-                body=f"{lesson.date} {lesson.start_time} 레슨이 취소되었습니다",
+                body=cancel_body,
             )
+            if compensation is not None:
+                await self._send_late_cancel_compensation(lesson, compensation)
 
         await self.db.flush()
         await self.db.refresh(lesson)
@@ -545,6 +577,96 @@ class LessonService:
             priority=NotificationPriority.high,
             action_url=f"/lessons/{lesson.id}",
         )
+
+    async def _resolve_late_cancel_compensation(self, lesson: Any) -> _LateCancelCompensation:
+        """Resolve the compensation policy for a late student cancellation (#1167).
+
+        Academy-owned subscriptions snapshot the policy on ``academy_subscriptions``;
+        for all other subscriptions the teacher's persisted ``cancellation_defaults``
+        row applies (#1178), falling back to the enabled defaults when the teacher
+        never saved the settings.
+        """
+        from app.models.academy import Academy
+        from app.models.academy_billing import AcademySubscription
+
+        academy_sub = None
+        if lesson.subscription_id:
+            academy_sub = await self.db.scalar(
+                select(AcademySubscription).where(AcademySubscription.subscription_id == lesson.subscription_id)
+            )
+        if academy_sub is None:
+            # #1178 — non-academy: use the teacher's persisted defaults when a
+            # row exists (cancellation_defaults.teacher_id == teachers.id);
+            # teachers who never saved the settings keep the enabled defaults.
+            from app.models.settings import CancellationDefaults
+
+            defaults = await self.db.scalar(
+                select(CancellationDefaults).where(CancellationDefaults.teacher_id == lesson.teacher_id)
+            )
+            if defaults is None:
+                return _LateCancelCompensation(
+                    enabled=True,
+                    include_text=True,
+                    message=_DEFAULT_COMPENSATION_MESSAGE,
+                    notify_owner=False,
+                    owner_user_id=None,
+                )
+            return _LateCancelCompensation(
+                enabled=defaults.student_compensation_extra_minutes_enabled,
+                include_text=defaults.include_extra_minutes_text_on_late_cancel,
+                message=defaults.student_compensation_extra_minutes_message or _DEFAULT_COMPENSATION_MESSAGE,
+                notify_owner=False,  # owner notification is an academy-only concern
+                owner_user_id=None,
+            )
+
+        owner_user_id = None
+        if academy_sub.notify_owner_on_late_cancel:
+            owner_user_id = await self.db.scalar(
+                select(Academy.owner_user_id).where(Academy.id == academy_sub.academy_id)
+            )
+        message = academy_sub.student_compensation_extra_minutes_message or _DEFAULT_COMPENSATION_MESSAGE
+        return _LateCancelCompensation(
+            enabled=bool(academy_sub.student_compensation_extra_minutes_enabled),
+            include_text=bool(academy_sub.include_extra_minutes_text_on_late_cancel),
+            message=message,
+            notify_owner=bool(academy_sub.notify_owner_on_late_cancel),
+            owner_user_id=owner_user_id,
+        )
+
+    async def _send_late_cancel_compensation(self, lesson: Any, compensation: _LateCancelCompensation) -> None:
+        """Notify the student (and academy owner) about late-cancel compensation (#1167).
+
+        Produces the ``compensationApplied`` student notification mandated by
+        notification_system.md §4 when compensation is enabled, and an oversight
+        notice to the academy owner when the academy subscription opted in.
+        """
+        from app.models.student import Student
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        svc = NotificationService(self.db)
+
+        if compensation.enabled and lesson.student_id:
+            student = await self.db.get(Student, lesson.student_id)
+            student_user_id = student.user_id if student else None
+            if student_user_id:
+                await svc.create_and_send(
+                    user_id=student_user_id,
+                    notification_type="compensationApplied",
+                    title="보너스 연습시간이 적립되었습니다",
+                    body=compensation.message,
+                    priority=NotificationPriority.normal,
+                    action_url=f"/lessons/{lesson.id}",
+                )
+
+        if compensation.notify_owner and compensation.owner_user_id:
+            await svc.create_and_send(
+                user_id=compensation.owner_user_id,
+                notification_type="lessonCancelled",
+                title="학생 지각 취소 알림",
+                body=f"{lesson.student_name} 학생이 {lesson.date} {lesson.start_time} 레슨을 지각 취소했습니다.",
+                priority=NotificationPriority.high,
+                action_url=f"/lessons/{lesson.id}",
+            )
 
     async def get_upcoming(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return upcoming lessons."""

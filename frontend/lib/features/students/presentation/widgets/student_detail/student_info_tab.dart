@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../subscription/subscription_ui_facade.dart';
 import '../../../../students/domain/entities/student.dart';
 import 'student_contact_card.dart';
 import 'student_detail_widgets.dart';
@@ -31,6 +34,16 @@ class StudentInfoTab extends StatelessWidget {
         StudentSubscriptionSection(
           studentId: student.id,
           membershipId: membershipId,
+        ),
+
+        const SizedBox(height: AppSpacing.space6),
+
+        // 보강 크레딧 관리 (#1165 진입점) — 발급/회수 인라인 + 전체보기 진입.
+        TeacherMakeupCreditSection(
+          studentId: student.id,
+          onViewAll: () => context.push(
+            '${AppRoutes.makeupCredits}?studentId=${student.id}',
+          ),
         ),
 
         const SizedBox(height: AppSpacing.space8),

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import calendar
-from datetime import date
+from datetime import UTC, date, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.exceptions import LastWriteWinsConflictException
 
 
 class PracticeLogService:
@@ -39,9 +41,7 @@ class PracticeLogService:
             end = date(year, month, last_day)
             query = query.where(PracticeLog.date >= start, PracticeLog.date <= end)
 
-        result = await self.db.scalars(
-            query.order_by(PracticeLog.date)
-        )
+        result = await self.db.scalars(query.order_by(PracticeLog.date))
         return list(result.all())
 
     async def get_log_by_date(self, student_id: str, log_date: date, current_user: Any) -> Any | None:
@@ -84,14 +84,35 @@ class PracticeLogService:
         await self.db.refresh(log)
         return log
 
-    async def update_log(self, log_id: str, data: dict, current_user: Any) -> Any:
-        """Update a practice log."""
+    async def update_log(
+        self,
+        log_id: str,
+        data: dict,
+        current_user: Any,
+        if_unmodified_since: datetime | None = None,
+    ) -> Any:
+        """Update a practice log.
+
+        #1119 (D4): when ``if_unmodified_since`` is given (the client's base
+        version), reject with 412 ``CONFLICT_LWW_REJECTED`` if the row was
+        modified after it — a Last-Write-Wins conflict. Checked against the
+        loaded row BEFORE any change, so ``onupdate`` does not mask it.
+        """
         from app.models.practice_log import PracticeLog
 
         log = await self.db.get(PracticeLog, log_id)
         if log is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
         await self._assert_can_manage_student(log.student_id, current_user)
+
+        if if_unmodified_since is not None and log.updated_at is not None:
+            server_updated = log.updated_at
+            # SQLite loses tzinfo; normalize both sides to aware UTC to compare.
+            if server_updated.tzinfo is None:
+                server_updated = server_updated.replace(tzinfo=UTC)
+            if server_updated > if_unmodified_since:
+                raise LastWriteWinsConflictException()
+
         for key, value in data.items():
             if value is not None:
                 setattr(log, key, value)
@@ -147,10 +168,7 @@ class PracticeLogService:
             )
         )
         practiced_dates = set(result.all())
-        return [
-            (week_start + timedelta(days=i)) in practiced_dates
-            for i in range(7)
-        ]
+        return [(week_start + timedelta(days=i)) in practiced_dates for i in range(7)]
 
     async def get_monthly_stats(self, student_id: str, year: int, month: int, current_user: Any) -> dict:
         """Get monthly practice statistics."""
@@ -161,21 +179,27 @@ class PracticeLogService:
         _, last_day = calendar.monthrange(year, month)
         end = date(year, month, last_day)
 
-        count = await self.db.scalar(
-            select(func.count()).where(
-                PracticeLog.student_id == student_id,
-                PracticeLog.date >= start,
-                PracticeLog.date <= end,
+        count = (
+            await self.db.scalar(
+                select(func.count()).where(
+                    PracticeLog.student_id == student_id,
+                    PracticeLog.date >= start,
+                    PracticeLog.date <= end,
+                )
             )
-        ) or 0
+            or 0
+        )
 
-        total_minutes = await self.db.scalar(
-            select(func.coalesce(func.sum(PracticeLog.total_minutes), 0)).where(
-                PracticeLog.student_id == student_id,
-                PracticeLog.date >= start,
-                PracticeLog.date <= end,
+        total_minutes = (
+            await self.db.scalar(
+                select(func.coalesce(func.sum(PracticeLog.total_minutes), 0)).where(
+                    PracticeLog.student_id == student_id,
+                    PracticeLog.date >= start,
+                    PracticeLog.date <= end,
+                )
             )
-        ) or 0
+            or 0
+        )
 
         return {
             "year": year,

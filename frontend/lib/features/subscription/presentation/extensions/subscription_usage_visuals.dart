@@ -20,7 +20,9 @@ extension UsageTypeVisualX on UsageType {
       case UsageType.lateCancellation:
         return AppStrings.usageNoteLateCancellation;
       case UsageType.studentAbsent:
-        return AppStrings.usageTypeStudentAbsent;
+        // #D4 — 라벨('학생 결석')이 아니라 실제 설명 노트를 프리필한다
+        // (lateCancellation 과 동일하게 usageNote* 사용).
+        return AppStrings.usageNoteStudentAbsent;
       case UsageType.normal:
       case UsageType.rescheduled:
         return null;

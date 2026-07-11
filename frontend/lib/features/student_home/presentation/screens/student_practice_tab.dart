@@ -12,6 +12,8 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
+import '../../../../features/gamification/gamification_facade.dart'
+    show growthHeatmapProvider;
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../features/practice/practice_ui_facade.dart';
 import '../../../../features/practice/presentation/extensions/repertoire_sort_type_visuals.dart';
@@ -83,6 +85,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           studentId: studentId,
                         );
                         if (saved == true && context.mounted) {
+                          // 수동 연습 기록 후 heatmap/streak provider 무효화 —
+                          // 대시보드가 stale 되지 않게 (A4, practice_start_section 동일).
+                          ref.invalidate(growthHeatmapProvider(studentId));
+                          ref.invalidate(practiceStreakProvider(studentId));
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(AppStrings.manualPracticeSaved),
@@ -103,9 +109,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => context.push(
-                        '${AppRoutes.repertoireHistory}?studentId=$studentId',
-                      ),
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                          ),
                       icon: const Icon(
                         Icons.history,
                         color: AppColors.ink,
@@ -134,9 +141,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => context.push(
-                        '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                      ),
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                          ),
                       icon: const Icon(
                         Icons.add,
                         color: AppColors.ink,
@@ -242,30 +250,32 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 ],
               );
             },
-            loading: () => Row(
-              children: [
-                Text(
-                  _formatDate(_selectedDate),
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
+            loading:
+                () => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
                 ),
-                const Spacer(),
-                _buildSortDropdown(),
-              ],
-            ),
-            error: (_, __) => Row(
-              children: [
-                Text(
-                  _formatDate(_selectedDate),
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
+            error:
+                (_, __) => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.inkSecondary,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
                 ),
-                const Spacer(),
-                _buildSortDropdown(),
-              ],
-            ),
           ),
         ),
 
@@ -310,37 +320,42 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       onSelected: (type) {
         ref.read(repertoireSortTypeStateProvider.notifier).setSortType(type);
       },
-      itemBuilder: (context) => RepertoireSortType.values
-          .where((type) => type != RepertoireSortType.custom)
-          .map((type) {
-            return PopupMenuItem<RepertoireSortType>(
-              value: type,
-              child: Row(
-                children: [
-                  Icon(
-                    _getSortIcon(type),
-                    size: 18,
-                    color: type == sortType
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary,
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    type.displayName,
-                    style: TextStyle(
-                      color: type == sortType
-                          ? AppColors.paperAccent
-                          : AppColors.ink,
-                      fontWeight: type == sortType
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          })
-          .toList(),
+      itemBuilder:
+          (context) =>
+              RepertoireSortType.values
+                  .where((type) => type != RepertoireSortType.custom)
+                  .map((type) {
+                    return PopupMenuItem<RepertoireSortType>(
+                      value: type,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getSortIcon(type),
+                            size: 18,
+                            color:
+                                type == sortType
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkSecondary,
+                          ),
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(
+                            type.displayName,
+                            style: TextStyle(
+                              color:
+                                  type == sortType
+                                      ? AppColors.paperAccent
+                                      : AppColors.ink,
+                              fontWeight:
+                                  type == sortType
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
+                  .toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space2,
@@ -406,9 +421,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   Widget _buildEmptyState(String studentId) {
     return EmptyStateWidget(
       icon: Icons.library_music_outlined,
-      title: _isToday()
-          ? AppStrings.studentPracticeTodayEmpty
-          : AppStrings.studentPracticeDateEmpty,
+      title:
+          _isToday()
+              ? AppStrings.studentPracticeTodayEmpty
+              : AppStrings.studentPracticeDateEmpty,
       scrollable: true,
     );
   }
@@ -478,9 +494,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       return;
     }
 
-    final picked = sections.length == 1
-        ? sections.first
-        : await _pickSection(sections);
+    final picked =
+        sections.length == 1 ? sections.first : await _pickSection(sections);
     if (picked == null) return;
     if (!mounted) return;
 
@@ -719,15 +734,16 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
           // Sections list
           if (_isExpanded && visibleSections.isNotEmpty)
             Column(
-              children: visibleSections.map((section) {
-                return _SectionTile(
-                  section: section,
-                  repertoireId: widget.repertoire.id,
-                  studentId: widget.studentId,
-                  selectedDate: widget.selectedDate,
-                  isToday: widget.isToday,
-                );
-              }).toList(),
+              children:
+                  visibleSections.map((section) {
+                    return _SectionTile(
+                      section: section,
+                      repertoireId: widget.repertoire.id,
+                      studentId: widget.studentId,
+                      selectedDate: widget.selectedDate,
+                      isToday: widget.isToday,
+                    );
+                  }).toList(),
             ),
 
           if (_isExpanded && visibleSections.isEmpty)
@@ -852,12 +868,12 @@ class _SectionTile extends ConsumerWidget {
                     Text(
                       section.pieceName,
                       style: AppTypography.bodyMedium.copyWith(
-                        decoration: isCompletedForDate
-                            ? TextDecoration.lineThrough
-                            : null,
-                        color: isCompletedForDate
-                            ? AppColors.inkSecondary
-                            : null,
+                        decoration:
+                            isCompletedForDate
+                                ? TextDecoration.lineThrough
+                                : null,
+                        color:
+                            isCompletedForDate ? AppColors.inkSecondary : null,
                       ),
                     ),
                     Text(
@@ -890,9 +906,10 @@ class _SectionTile extends ConsumerWidget {
                   },
                   icon: Icon(
                     Icons.repeat,
-                    color: section.isRepeat
-                        ? AppColors.paperAccent
-                        : AppColors.inkSecondary.withValues(alpha: 0.5),
+                    color:
+                        section.isRepeat
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary.withValues(alpha: 0.5),
                     size: 20,
                   ),
                   tooltip: section.isRepeat ? '매일 반복' : '반복 안함',

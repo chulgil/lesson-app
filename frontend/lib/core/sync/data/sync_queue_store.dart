@@ -3,8 +3,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../domain/sync_queue_entry.dart';
 
 class SyncQueueStore {
+  /// Default Hive box name — shared with logout cleanup (#1114, INV-4).
+  static const String defaultBoxName = 'sync_queue';
+
   SyncQueueStore({
-    this.boxName = 'sync_queue',
+    this.boxName = defaultBoxName,
     this.metaBoxName = 'sync_queue_meta',
     this.schemaVersionKey = 'sync_queue_schema_version',
   });
@@ -192,9 +195,19 @@ class SyncQueueStore {
     final allEntries = await fetchAll();
     if (allEntries.length > maxEntries) {
       final excess = allEntries.length - maxEntries;
-      // Remove oldest entries (already sorted by createdAt ascending)
-      for (int i = 0; i < excess; i++) {
-        await box.delete(allEntries[i].id);
+      // INV-3 (#1115): capacity trimming must never silently drop unsent
+      // writes — only synced/failed entries may be removed (oldest first).
+      // The box may stay over maxEntries when the excess is all pending.
+      final trimmable = allEntries
+          .where(
+            (e) =>
+                e.status != SyncQueueStatus.pending &&
+                e.status != SyncQueueStatus.syncing,
+          )
+          .take(excess)
+          .toList();
+      for (final entry in trimmable) {
+        await box.delete(entry.id);
         removed++;
       }
     }

@@ -51,7 +51,8 @@ class SyncAwareStudentRepository implements StudentRepository {
   @override
   Future<Student> createStudent(Student student) => _queue.executeMutation(
     remoteCall: () => _remote.createStudent(student),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'student',
       httpMethod: 'POST',
       path: '/students',
@@ -64,7 +65,8 @@ class SyncAwareStudentRepository implements StudentRepository {
   @override
   Future<Student> updateStudent(Student student) => _queue.executeMutation(
     remoteCall: () => _remote.updateStudent(student),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'student',
       httpMethod: 'PUT',
       path: '/students/${student.id}',
@@ -77,7 +79,8 @@ class SyncAwareStudentRepository implements StudentRepository {
   @override
   Future<void> deleteStudent(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.deleteStudent(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'student',
       httpMethod: 'DELETE',
       path: '/students/$id',
@@ -90,7 +93,8 @@ class SyncAwareStudentRepository implements StudentRepository {
   Future<Student> updateStudentStatus(String studentId, StudentStatus status) =>
       _queue.executeMutation(
         remoteCall: () => _remote.updateStudentStatus(studentId, status),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'student',
           httpMethod: 'PATCH',
           path: '/students/$studentId/status',
@@ -105,7 +109,8 @@ class SyncAwareStudentRepository implements StudentRepository {
   @override
   Future<void> archiveStudent(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.archiveStudent(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'student',
       httpMethod: 'PATCH',
       path: '/students/$id/archive',
@@ -117,7 +122,8 @@ class SyncAwareStudentRepository implements StudentRepository {
   @override
   Future<void> unarchiveStudent(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.unarchiveStudent(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'student',
       httpMethod: 'PATCH',
       path: '/students/$id/unarchive',

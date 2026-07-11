@@ -46,7 +46,7 @@ void main() {
 
       final result = await helper.executeMutation<String>(
         remoteCall: () async => 'server-result',
-        queueCall: (_) async {},
+        queueCall: (_, __) async {},
         optimisticResult: () => 'optimistic',
       );
 
@@ -75,7 +75,7 @@ void main() {
       var queueCallInvoked = false;
       final result = await helper.executeMutation<String>(
         remoteCall: () async => throw StateError('should not be called'),
-        queueCall: (svc) async {
+        queueCall: (svc, _) async {
           queueCallInvoked = true;
           await svc.queueMutation(
             domain: 'test',
@@ -96,9 +96,9 @@ void main() {
 
       var queueCallInvoked = false;
       final result = await helper.executeMutation<String>(
-        remoteCall:
-            () async => throw const NetworkException(message: 'no network'),
-        queueCall: (_) async {
+        remoteCall: () async =>
+            throw const NetworkException(message: 'no network'),
+        queueCall: (_, __) async {
           queueCallInvoked = true;
         },
         optimisticResult: () => 'optimistic',
@@ -113,9 +113,9 @@ void main() {
 
       var queueCallInvoked = false;
       final result = await helper.executeMutation<String>(
-        remoteCall:
-            () async => throw const ServerException(message: 'internal error'),
-        queueCall: (_) async {
+        remoteCall: () async =>
+            throw const ServerException(message: 'internal error'),
+        queueCall: (_, __) async {
           queueCallInvoked = true;
         },
         optimisticResult: () => 'optimistic',
@@ -130,13 +130,9 @@ void main() {
 
       expect(
         () => helper.executeMutation<String>(
-          remoteCall:
-              () async =>
-                  throw const ApiException(
-                    message: 'bad request',
-                    statusCode: 400,
-                  ),
-          queueCall: (_) async {
+          remoteCall: () async =>
+              throw const ApiException(message: 'bad request', statusCode: 400),
+          queueCall: (_, __) async {
             fail('queueCall should not be called for 4xx');
           },
           optimisticResult: () => 'optimistic',
@@ -153,7 +149,7 @@ void main() {
         expect(
           () => helper.executeMutation<String>(
             remoteCall: () async => throw const ValidationException(),
-            queueCall: (_) async {
+            queueCall: (_, __) async {
               fail('queueCall should not be called');
             },
             optimisticResult: () => 'optimistic',
@@ -173,7 +169,7 @@ void main() {
         remoteCall: () async {
           remoteCalled = true;
         },
-        queueCall: (_) async {},
+        queueCall: (_, __) async {},
       );
 
       expect(remoteCalled, isTrue);
@@ -185,7 +181,7 @@ void main() {
       var queueCallInvoked = false;
       await helper.executeVoidMutation(
         remoteCall: () async => throw StateError('should not be called'),
-        queueCall: (_) async {
+        queueCall: (_, __) async {
           queueCallInvoked = true;
         },
       );
@@ -198,14 +194,80 @@ void main() {
 
       var queueCallInvoked = false;
       await helper.executeVoidMutation(
-        remoteCall:
-            () async => throw const NetworkException(message: 'timeout'),
-        queueCall: (_) async {
+        remoteCall: () async =>
+            throw const NetworkException(message: 'timeout'),
+        queueCall: (_, __) async {
           queueCallInvoked = true;
         },
       );
 
       expect(queueCallInvoked, isTrue);
+    });
+  });
+
+  group('idempotency key threading (#1117)', () {
+    test('offline: queueCall receives a generated key', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+
+      String? received;
+      await helper.executeMutation<String>(
+        remoteCall: () async => throw StateError('should not be called'),
+        queueCall: (_, key) async => received = key,
+        optimisticResult: () => 'optimistic',
+      );
+
+      expect(received, isNotNull);
+      expect(received, isNotEmpty);
+    });
+
+    test(
+      'network failure: queueCall reuses the key from the exception',
+      () async {
+        when(() => connectivity.isOnline).thenAnswer((_) async => true);
+
+        String? received;
+        await helper.executeMutation<String>(
+          remoteCall: () async => throw const NetworkException(
+            message: 'timeout',
+            idempotencyKey: 'server-attempt-key',
+          ),
+          queueCall: (_, key) async => received = key,
+          optimisticResult: () => 'optimistic',
+        );
+
+        expect(received, equals('server-attempt-key'));
+      },
+    );
+
+    test(
+      'network failure without a key: queueCall gets a generated fallback',
+      () async {
+        when(() => connectivity.isOnline).thenAnswer((_) async => true);
+
+        String? received;
+        await helper.executeMutation<String>(
+          remoteCall: () async =>
+              throw const NetworkException(message: 'timeout'),
+          queueCall: (_, key) async => received = key,
+          optimisticResult: () => 'optimistic',
+        );
+
+        expect(received, isNotNull);
+        expect(received, isNotEmpty);
+      },
+    );
+
+    test('void mutation offline: queueCall receives a generated key', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+
+      String? received;
+      await helper.executeVoidMutation(
+        remoteCall: () async => throw StateError('should not be called'),
+        queueCall: (_, key) async => received = key,
+      );
+
+      expect(received, isNotNull);
+      expect(received, isNotEmpty);
     });
   });
 }

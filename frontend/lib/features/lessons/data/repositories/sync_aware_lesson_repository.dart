@@ -60,7 +60,8 @@ class SyncAwareLessonRepository implements LessonRepository {
   @override
   Future<Lesson> createLesson(Lesson lesson) => _queue.executeMutation(
     remoteCall: () => _remote.createLesson(lesson),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'lesson',
       httpMethod: 'POST',
       path: '/lessons',
@@ -73,7 +74,8 @@ class SyncAwareLessonRepository implements LessonRepository {
   @override
   Future<Lesson> updateLesson(Lesson lesson) => _queue.executeMutation(
     remoteCall: () => _remote.updateLesson(lesson),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'lesson',
       httpMethod: 'PUT',
       path: '/lessons/${lesson.id}',
@@ -86,7 +88,8 @@ class SyncAwareLessonRepository implements LessonRepository {
   @override
   Future<void> deleteLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.deleteLesson(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'lesson',
       httpMethod: 'DELETE',
       path: '/lessons/$id',
@@ -98,7 +101,8 @@ class SyncAwareLessonRepository implements LessonRepository {
   @override
   Future<void> cancelLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.cancelLesson(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'lesson',
       httpMethod: 'PATCH',
       path: '/lessons/$id/status',
@@ -110,7 +114,8 @@ class SyncAwareLessonRepository implements LessonRepository {
   @override
   Future<void> archiveLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.archiveLesson(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'lesson',
       httpMethod: 'PATCH',
       path: '/lessons/$id/archive',
@@ -122,7 +127,8 @@ class SyncAwareLessonRepository implements LessonRepository {
   @override
   Future<void> unarchiveLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.unarchiveLesson(id),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'lesson',
       httpMethod: 'PATCH',
       path: '/lessons/$id/unarchive',

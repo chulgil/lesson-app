@@ -84,7 +84,8 @@ class SyncAwareTeacherAvailabilityRepository
     TeacherAvailability availability,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.saveAvailability(availability),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'PUT',
       path: '/schedule/availability',
@@ -98,7 +99,8 @@ class SyncAwareTeacherAvailabilityRepository
   Future<void> deleteAvailability(String teacherId) =>
       _queue.executeVoidMutation(
         remoteCall: () => _remote.deleteAvailability(teacherId),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'schedule',
           httpMethod: 'DELETE',
           path: '/schedule/availability',
@@ -113,7 +115,8 @@ class SyncAwareTeacherAvailabilityRepository
     WeeklySchedule schedule,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.addWeeklySchedule(teacherId, schedule),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'POST',
       path: '/schedule/weekly',
@@ -131,7 +134,8 @@ class SyncAwareTeacherAvailabilityRepository
     WeeklySchedule schedule,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.updateWeeklySchedule(teacherId, schedule),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'PUT',
       path: '/schedule/weekly/${schedule.id}',
@@ -149,7 +153,8 @@ class SyncAwareTeacherAvailabilityRepository
     String scheduleId,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.removeWeeklySchedule(teacherId, scheduleId),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'DELETE',
       path: '/schedule/weekly/$scheduleId',
@@ -167,7 +172,8 @@ class SyncAwareTeacherAvailabilityRepository
     TimeException exception,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.addException(teacherId, exception),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'POST',
       path: '/schedule/exceptions',
@@ -185,7 +191,8 @@ class SyncAwareTeacherAvailabilityRepository
     TimeException exception,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.updateException(teacherId, exception),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'PUT',
       path: '/schedule/exceptions/${exception.id}',
@@ -203,7 +210,8 @@ class SyncAwareTeacherAvailabilityRepository
     String exceptionId,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.removeException(teacherId, exceptionId),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'DELETE',
       path: '/schedule/exceptions/$exceptionId',
@@ -222,7 +230,8 @@ class SyncAwareTeacherAvailabilityRepository
     String studentName,
   ) => _queue.executeMutation(
     remoteCall: () => _remote.bookSlot(slotId, studentId, studentName),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'POST',
       path: '/schedule/slots/$slotId/book',
@@ -238,7 +247,8 @@ class SyncAwareTeacherAvailabilityRepository
   Future<AvailabilitySlot> cancelBooking(String slotId) =>
       _queue.executeMutation(
         remoteCall: () => _remote.cancelBooking(slotId),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'schedule',
           httpMethod: 'DELETE',
           path: '/schedule/slots/$slotId/booking',
@@ -259,7 +269,8 @@ class SyncAwareTeacherAvailabilityRepository
   ) => _queue.executeVoidMutation(
     remoteCall: () =>
         _remote.toggleTimeBlock(teacherId, date, time, isAvailable),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'PATCH',
       path: '/schedule/blocks/toggle',
@@ -282,7 +293,8 @@ class SyncAwareTeacherAvailabilityRepository
   ) => _queue.executeVoidMutation(
     remoteCall: () =>
         _remote.setTimeBlocks(teacherId, date, times, isAvailable),
-    queueCall: (syncService) => syncService.queueMutation(
+    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+      idempotencyKey: idempotencyKey,
       domain: 'schedule',
       httpMethod: 'PATCH',
       path: '/schedule/blocks/set',

@@ -114,6 +114,12 @@ class LessonRequestResponse(BaseModel):
     proposal_id: str | None = None
     decline_reason: str | None = None
     academy_id: str | None = None
+    # Display names (additive, nullable) — remote responses carry the real
+    # student/teacher/academy names so the app shows them instead of its local
+    # fallback map. Null when the id cannot be resolved (client falls back).
+    student_name: str | None = None
+    teacher_name: str | None = None
+    academy_name: str | None = None
     status_updated_at: _dt.datetime | None = None
     confirmed_at: _dt.datetime | None = None
     cancelled_at: _dt.datetime | None = None

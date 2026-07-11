@@ -44,15 +44,14 @@ class AnnouncementHistoryScreen extends ConsumerWidget {
       ),
       body: announcementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => Center(
-              child: Text(
-                AppStrings.errorTryAgain,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-              ),
+        error: (_, __) => Center(
+          child: Text(
+            AppStrings.errorTryAgain,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkTertiary,
             ),
+          ),
+        ),
         data: (announcements) {
           if (announcements.isEmpty) {
             return const EmptyStateWidget(
@@ -79,41 +78,9 @@ class _AnnouncementCard extends ConsumerWidget {
 
   const _AnnouncementCard({required this.announcement});
 
-  void _editAnnouncement(BuildContext context, WidgetRef ref) async {
-    final controller = TextEditingController(text: announcement.message);
-    final result = await showNotebookDialog<String>(
-      context: context,
-      title: AppStrings.announcementEditTitle,
-      content: TextField(
-        controller: controller,
-        maxLines: 4,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          hintText: AppStrings.announcementEditHint,
-        ),
-      ),
-      confirmLabel: AppStrings.save,
-      onConfirm: () => Navigator.pop(context, controller.text.trim()),
-      cancelLabel: AppStrings.cancel,
-      onCancel: () => Navigator.pop(context),
-    );
-    controller.dispose();
-
-    if (result != null && result.isNotEmpty) {
-      final repo = ref.read(teacherAnnouncementRepositoryProvider);
-      await repo.update(
-        TeacherAnnouncement(
-          id: announcement.id,
-          teacherId: announcement.teacherId,
-          type: announcement.type,
-          dates: announcement.dates,
-          message: result,
-          createdAt: announcement.createdAt,
-          affectedLessons: announcement.affectedLessons,
-        ),
-      );
-      ref.invalidate(teacherAnnouncementsProvider(announcement.teacherId));
-    }
+  /// 편집 — 작성 시트를 EDIT 모드로 연다 (시트가 update + 리스트 invalidate 처리).
+  void _editAnnouncement(BuildContext context, WidgetRef ref) {
+    AnnouncementSheet.show(context, ref: ref, existing: announcement);
   }
 
   void _deleteAnnouncement(BuildContext context, WidgetRef ref) async {
@@ -131,19 +98,19 @@ class _AnnouncementCard extends ConsumerWidget {
     if (confirmed == true) {
       final repo = ref.read(teacherAnnouncementRepositoryProvider);
       await repo.delete(announcement.id);
-      ref.invalidate(teacherAnnouncementsProvider(announcement.teacherId));
+      invalidateAnnouncementViews(ref, announcement.teacherId);
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDayOff = announcement.type == AnnouncementType.dayOff;
-    final dateText =
-        announcement.dates.isNotEmpty
-            ? formatDateMD(announcement.dates.first)
-            : '';
+    final dateText = announcement.dates.isNotEmpty
+        ? formatDateMD(announcement.dates.first)
+        : '';
 
-    // swipe 3원칙: destructive 단일 [삭제] + 행 탭 = 편집 시트.
+    // swipe 4원칙: 우→좌 관리 액션 [편집(normal) · 삭제(destructive)].
+    // 행 탭 = 편집 시트 (swipe 편집과 동일 진입점).
     final card = Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
@@ -214,6 +181,11 @@ class _AnnouncementCard extends ConsumerWidget {
     return SwipeActionTile(
       actions: [
         SwipeAction(
+          label: AppStrings.swipeActionEdit,
+          icon: Icons.edit_outlined,
+          onPressed: () => _editAnnouncement(context, ref),
+        ),
+        SwipeAction(
           label: AppStrings.swipeActionDelete,
           icon: Icons.delete_outline,
           tone: SwipeActionTone.destructive,
@@ -254,16 +226,15 @@ class _AnnouncementCard extends ConsumerWidget {
                   border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: InkWell(
-                  onTap:
-                      lesson.subscriptionId != null
-                          ? () => context.push(
-                            AppRoutes.subscriptionDetail.replaceFirst(
-                              ':id',
-                              lesson.subscriptionId!,
-                            ),
-                            extra: {'viewerRole': 'teacher'},
-                          )
-                          : null,
+                  onTap: lesson.subscriptionId != null
+                      ? () => context.push(
+                          AppRoutes.subscriptionDetail.replaceFirst(
+                            ':id',
+                            lesson.subscriptionId!,
+                          ),
+                          extra: {'viewerRole': 'teacher'},
+                        )
+                      : null,
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     child: Row(
@@ -291,14 +262,13 @@ class _AnnouncementCard extends ConsumerWidget {
                         // 스케줄 변경 버튼 (크고 명확)
                         if (lesson.subscriptionId != null)
                           FilledButton.icon(
-                            onPressed:
-                                () => context.push(
-                                  AppRoutes.subscriptionDetail.replaceFirst(
-                                    ':id',
-                                    lesson.subscriptionId!,
-                                  ),
-                                  extra: {'viewerRole': 'teacher'},
-                                ),
+                            onPressed: () => context.push(
+                              AppRoutes.subscriptionDetail.replaceFirst(
+                                ':id',
+                                lesson.subscriptionId!,
+                              ),
+                              extra: {'viewerRole': 'teacher'},
+                            ),
                             icon: const Icon(Icons.swap_horiz, size: 16),
                             label: const Text(
                               AppStrings.announcementScheduleChange,

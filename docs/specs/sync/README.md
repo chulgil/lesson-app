@@ -41,12 +41,12 @@
 
 ### 4.1 큐 엔트리 (`SyncQueueEntry`)
 
-`id`(uuid) · `domain` · `method`+`path`+`payload`(HTTP 재생용) · `status`(pending/syncing/synced/failed) · `retryCount` · `createdAt` · `lastSyncedAt` · `clientUpdatedAt`(LWW용, 선택).
+`id`(uuid) · `domain` · `method`+`path`+`payload`(HTTP 재생용) · `status`(pending/syncing/synced/failed) · `retryCount` · `createdAt` · `lastSyncedAt` · `clientUpdatedAt`(LWW 기준 버전 — 재생 시 `If-Unmodified-Since` 헤더로 전송, [§7](#7-충돌-해결-계약-d4), 선택) · `idempotencyKey`(#1117, 선택 — 클라이언트 생성, 초기 요청·재생에 동일 키 전송해 서버 dedupe. 이전 버전 엔트리는 null → [§4.3](#43-재시도만료) 고아 복구가 legacy 로 취급).
 
 ### 4.2 불변식 (HARD-GATE)
 
 - **INV-1 (도메인-어댑터 정합)**: `queueMutation(domain: X)` 로 큐잉하는 모든 도메인 X는 반드시 `SyncAdapterRegistry`에 등록되어야 한다. 미등록 시 재생이 `NO_ADAPTER`로 영구 실패하고 쓰기가 유실된다. 레지스트리는 실제 큐잉 호출처에서 파생·검증되어야 한다(현재 하드코딩 → [G-01](#g-01) 원인). 큐잉 도메인 전수: `lesson`·`student`·`subscription`·`practice`·`schedule`.
-- **INV-2 (재생 멱등성)**: 재생은 서버가 이미 커밋한 요청을 중복 생성하지 않아야 한다(멱등 키). 현재 미충족 → [G-07](#g-07).
+- **INV-2 (재생 멱등성)**: 재생은 서버가 이미 커밋한 요청을 중복 생성하지 않아야 한다(멱등 키). **충족(#1117)** — 클라이언트가 초기 요청·재생에 동일 `Idempotency-Key`(user_id 스코프)를 보내고, 서버(`idempotency_keys` 테이블 + `IdempotencyMiddleware`)가 reserve-first 로 POST 를 dedupe. → [G-07 해소](#g-07).
 - **INV-3 (무손실 정리)**: 큐 정리(cleanup)는 **미전송(pending) 쓰기를 무통보로 삭제하지 않는다**. 현재 500 초과 시 status 무관 최오래 삭제 → [G-03](#g-03).
 - **INV-4 (사용자 격리)**: 큐는 사용자 경계에서 격리되어야 한다. 로그아웃 시 이전 사용자 pending 쓰기가 다음 사용자 토큰으로 재생되면 안 된다. 현재 로그아웃이 `sync_queue`를 비우지 않음 → [G-02](#g-02).
 
@@ -55,6 +55,7 @@
 - 재시도: 최대 5회, 지수 백오프 1→16s(상한 30s 폴). 소진 시 status=failed.
 - 만료: failed 엔트리 7일 초과 시 삭제. **삭제 시 사용자 알림 필요**(요구안 §8) — 현재 무통보 → [G-03](#g-03).
 - 재생 에러 분류: 비즈니스 4xx(409/422 등)는 재시도 대상이 아니어야 한다(현재 catch-all 재시도 → [G-14](#기타-확인된-갭)).
+- **고아 복구(#1162)**: 재생 중 앱이 강제 종료되면 엔트리가 `syncing` 으로 남는다. 시작 시(`SyncService.initialize`) `syncing` 엔트리를 재분류하며, 이후 플러시는 `syncing` 을 후보에서 제외한다(`_isPending`/`_isProcessable`). 규칙: `idempotencyKey` 있으면 → `pending`(재생이 서버에서 dedupe) · 키 없고 PUT/PATCH/DELETE → `pending`(자연 멱등) · **키 없고 POST(legacy) → `failed`+`ORPHANED_UNSAFE_REPLAY`**(자동 재생 시 중복 위험 → 사용자 판단으로 넘김, 무통보 삭제 금지). 상태 UI 노출은 [G-10](#g-10)/#1120.
 
 ## 5. 읽기 캐시 계약
 
@@ -73,7 +74,7 @@
 | SN-1 | 읽기는 캐시가 있으면 **즉시** last-known-good을 보이고 백그라운드 갱신(stale-while-revalidate) | 구현(#1116) — onRequest 소프트타임아웃 레이스: 빠른망 최신 직행, 느린망 캐시 즉시 서빙 후 백그라운드 갱신 | [G-04](#g-04) |
 | SN-2 | 핵심 사용자 화면 읽기는 전부 캐시 보호(연습·홈·게이미피케이션·알림 포함) | 배치2 확장(#1116) — parents·manual-teachers·practice·gamification 캐시 보호. 배치3~4·알림 미배포 | [G-05](#g-05) |
 | SN-3 | 캐시(stale) 서빙 중이면 무선 상태와 무관하게 "지난 동기화 시각" 표시 | 구현(#1116) — 배너가 캐시-서빙 신호로 게이팅(connectivity 무관), fresh 시 소거, 느린망 문구 분리 | [G-06](#g-06) |
-| SN-4 | 응답 유실된 POST 재생이 서버 중복 생성 금지(멱등 키) | 멱등 키 없음 | [G-07](#g-07) |
+| SN-4 | 응답 유실된 POST 재생이 서버 중복 생성 금지(멱등 키) | 구현(#1117) — 클라이언트 생성 키 + 서버 (user_id,key) 유니크 dedupe | [G-07 해소](#g-07) |
 | SN-5 | 전송 타임아웃 값이 느린망에 합리적(과단축=허위실패, 과장=UI 프리즈) + 업로드 sendTimeout 설정 | connect/receive 30s, sendTimeout 미설정, refresh Dio 무타임아웃 | [G-08](#g-08) |
 | SN-6 | 일시적 읽기 실패(단발 패킷손실)에 요청 단위 재시도(백오프) | 읽기 재시도 없음 | [G-11](#기타-확인된-갭) |
 | SN-7 | 쓰기 탭이 풀 타임아웃 동안 UI를 막지 않음(빠른 큐 폴백) | 온라인 판정 통과 시 remoteCall 완료까지 대기(~30s 프리즈) | [G-12](#기타-확인된-갭) |
@@ -81,19 +82,22 @@
 ## 7. 충돌 해결 계약 (D4)
 
 - 전략 맵: `serverWins`(기본: lesson·subscription·student·schedule) / `lastWriteWins`(practice·settings·notification-settings) / `clientWins`(recording).
-- LWW: `clientUpdatedAt > serverUpdatedAt` 이면 로컬 적용, 아니면 `SyncConflictException(CONFLICT_LWW_REJECTED)`.
-- **거절 SnackBar(D4)**: 재생이 서버에 거절되면 사용자에게 알린다.
-- as-built 결함: LWW가 유일 대상 도메인(practice)에서 `clientUpdatedAt` 미전달로 사실상 무력, `CONFLICT_LWW_REJECTED` 코드가 어디서도 소비되지 않음(거절 SnackBar 미구현), LWW 비교가 요청 전송 **후**에 일어나 거절 불가 구조 → [G-09](#g-09).
+- **LWW = 전송 전 조건부 요청(#1119)**: `lastWriteWins` 도메인 쓰기는 `If-Unmodified-Since` 헤더에 **클라이언트가 편집한 기준 버전**(practice = `PracticeLog.updatedAt`, 큐 엔트리의 `clientUpdatedAt`)을 실어 보낸다. 서버는 리소스 `updated_at`이 그 기준보다 **엄격히 이후**면 `412 CONFLICT_LWW_REJECTED`로 거절한다(그 사이 다른 쓰기가 서버를 갱신 = 서버가 더 최신). 헤더 없으면(기준 버전 미상) 무조건 적용. as-built 였던 "전송 **후** 응답 비교"는 거절이 구조적으로 불가능해 폐기됨 — 어댑터는 이제 모든 전략에서 요청만 보내고, LWW 여부는 헤더 부착으로만 갈린다. 서버 `LastWriteWinsConflictException`(412) ↔ 클라이언트 `conflictLwwRejectedCode`.
+- **거절 = 즉시 terminal + SnackBar(#1119)**: 재생이 `CONFLICT_LWW_REJECTED`로 거절되면 재시도해도 같은 낡은 쓰기라 결정적이다 — `SyncService`가 엔트리를 즉시 `failed`(retryCount 소진, 재시도 없음)로 표시하고 `errorCode`를 보존하며 `rejectionStream`으로 이벤트를 발행한다. 앱 루트가 이를 구독해 전 역할 공통 SnackBar를 띄운다. → [G-09 해소](#g-09).
+- 첫 전송(온라인 직접 호출)도 같은 헤더를 부착하나, 사용자가 화면에서 지켜보는 동기 요청이므로 첫-전송 412는 호출 프로바이더의 일반 에러 경로로 표면화한다(비동기 재생 거절만 SnackBar 스트림 경유).
 
 ## 8. 상태 UI 계약 (요구안 §7)
 
-| 상태 | 목표 | 현재 |
-|------|------|------|
-| 오프라인 | "오프라인 · N개 대기" | 오프라인 배너(부울) + 지난 동기화 시각. **N개 대기 카운트 없음** |
-| 동기화 중 | "N개 동기화 중" | 미구현(`SyncServiceStats.syncing` 소비처 0) |
-| 실패 | "N개 실패" + 재시도 | 교사 대시보드 탭에만 존재(학생/학부모 없음), 재시도 버튼이 소진-실패에 무효 |
+구현(#1120): 쓰기 큐 백로그는 앱 루트 `OfflineBannerWrapper`(전 역할 공통, MaterialApp.builder)가 렌더하는 **`SyncStatusBanner`** 한 줄로 노출한다. 읽기 신선도(오프라인/stale) 배너와 하나의 top `SafeArea`를 공유하며(두 번째 스트립이 상태바 인셋을 이중 적용하지 않도록), 우선순위는 실패 > 동기화중 > 대기.
 
-→ [G-10](#g-10).
+| 상태 | 표시 | 구현 |
+|------|------|------|
+| 대기 | 온라인 "N건 전송 대기 중" / 오프라인 "오프라인 · N건 대기" | `SyncServiceStats.pending` + `.online` |
+| 동기화 중 | "N건 동기화 중" + 스피너 | `SyncServiceStats.syncing` (이전 소비처 0) |
+| 실패 | "N건 전송 실패" (탭 → 인라인 패널: 항목별 재시도/삭제) | `SyncService.failedEntries/retryEntry/deleteEntry` |
+
+- 실패 패널의 항목별 문구는 `errorCode`로 분기: `ORPHANED_UNSAFE_REPLAY`(재시도 = 재전송 동의)·`CONFLICT_LWW_REJECTED`(서버 최신과 충돌)·일반. 재시도는 retryCount를 0으로 리셋해 terminal 엔트리도 사용자 명시 동의로 재전송한다.
+- 교사 대시보드 전용 실패 배너는 전 역할 공통 `SyncStatusBanner`로 대체(중복 제거). → [G-10 해소](#g-10).
 
 ## 9. 갭 레지스터 (2026-07-03 검증)
 
@@ -118,16 +122,16 @@
 **[P1] 느린망 stale 표시 없음(D2 위반).** stale 배너가 무선-오프라인(`isOffline`)일 때만 렌더. 캐시는 무선 살아있는 타임아웃에도 서빙되므로, 느린망 사용자는 몇 시간 지난 레슨/일정을 최신처럼 무표시로 봄. `onCacheServed`/`lastServedFromCacheAtProvider`는 배선됐으나 offline 분기 안에서만 소비. 근거: `offline_banner.dart:28,41-46`. **해소(#1116): 배너 게이팅을 `isOffline || staleMarker≠null` 로 확장(connectivity 무관 캐시-서빙 신호 기반). 라이브 읽기 도달 시 `onFreshServed`→marker 소거로 배너 자동 사라짐. 문구·아이콘 분리(오프라인/느린망).**
 
 ### G-07
-**[P1] 타임아웃 시 멱등 키 없어 중복 생성.** POST가 전달됐으나 응답이 receiveTimeout → 큐잉 후 멱등 키 없이 재생 → 서버가 중복 레슨/구독 생성. 느린망의 대표 실패. 근거: `mutation_queue_helper.dart:37-45`, `error_interceptor.dart:23-31`, `sync_queue_entry.dart`(멱등 필드 없음).
+**[P1] 타임아웃 시 멱등 키 없어 중복 생성.** POST가 전달됐으나 응답이 receiveTimeout → 큐잉 후 멱등 키 없이 재생 → 서버가 중복 레슨/구독 생성. 느린망의 대표 실패. 근거: `mutation_queue_helper.dart:37-45`, `error_interceptor.dart:23-31`, `sync_queue_entry.dart`(멱등 필드 없음). **해소(#1117): FE `IdempotencyInterceptor` 가 초기 mutation 요청에 `Idempotency-Key`(uuid v4)를 부착·`extra` 에 stash → 실패 시 `ErrorInterceptor` 가 예외로 그 키를 실어 큐 엔트리에 동일 키 저장(`SyncQueueEntry.idempotencyKey`) → 재생이 같은 헤더 재부착. BE `idempotency_keys` 테이블 + `IdempotencyMiddleware` 가 reserve-first(유니크 위반 시 저장된 응답 replay / 처리 중이면 409 `CONFLICT_IN_FLIGHT`)로 POST dedupe. PUT/DELETE 는 자연 멱등이라 서버 dedupe 대상 외.**
 
 ### G-08
 **[P1] sendTimeout 미설정 + refresh Dio 무타임아웃.** 본 Dio는 connect/receive만, sendTimeout 없음 → 본문 업로드 정지 시 OS TCP까지 행. `RefreshInterceptor`의 Dio는 타임아웃 전무 + QueuedInterceptor라 정지된 refresh가 전 파이프라인을 분 단위로 동결. 근거: `api_client.dart:143-151`, `refresh_interceptor.dart:29-31`.
 
 ### G-09
-**[P1] D4 LWW/거절 SnackBar 미구현(반쪽 dead code).** `CONFLICT_LWW_REJECTED`가 어디서도 소비 안 됨, `_buildReplayError`가 errorCode를 null로 버림, LWW 비교가 요청 전송 후라 거절 불가, practice가 `clientUpdatedAt` 미전달로 LWW 무력. 근거: `sync_adapter.dart:101-131,192-217`, `sync_service.dart:328-331`, `sync_aware_practice_repository.dart:63-150`.
+**[P1→해소 #1119] D4 LWW/거절 SnackBar.** 이전: `CONFLICT_LWW_REJECTED` 미소비, `_buildReplayError`가 errorCode를 null로 버림, LWW 비교가 전송 후라 거절 불가, practice가 `clientUpdatedAt` 미전달로 LWW 무력. **해소: LWW를 전송 전 `If-Unmodified-Since` 조건부 요청으로 전환(서버 412 `CONFLICT_LWW_REJECTED`), `_buildReplayError`가 errorCode 보존, practice가 기준 버전(`updatedAt`)을 헤더·`clientUpdatedAt`으로 전달, 거절은 즉시 terminal failed + `rejectionStream` → 앱 루트 SnackBar(전 역할).** 상세: [§7](#7-충돌-해결-계약-d4).
 
 ### G-10
-**[P1] 상태 UI 미완 — 대기 카운트/동기화중/역할 커버리지.** pending·syncing 카운트 미표시, 실패 표면이 교사 대시보드 탭 전용(학생/학부모 없음). 느린망에서 쓰기가 조용히 큐에 쌓여도 사용자가 모르고 앱 종료. 근거: `offline_banner.dart:83-86`, `dashboard_tab.dart:576`.
+**[P1→해소 #1120] 상태 UI — 대기 카운트/동기화중/역할 커버리지.** 이전: pending·syncing 카운트 미표시, 실패 표면이 교사 대시보드 탭 전용. **해소: 앱 루트 `OfflineBannerWrapper`가 전 역할 공통 `SyncStatusBanner`(대기/동기화중/실패 카운트 + 실패 항목별 재시도/삭제) 렌더, 교사 전용 배너 제거.** 상세: [§8](#8-상태-ui-계약-요구안-7).
 
 ### 기타 확인된 갭 (P2/P3)
 
@@ -143,7 +147,7 @@
 | G-18 unknown-socket-not-served | P2 | `DioExceptionType.unknown`+SocketException은 캐시 미서빙 | `response_cache_interceptor.dart:119-129` |
 | G-19 no-reconnect-read-revalidation | P2 | 재접속 시 읽기 재검증 없음(쓰기 큐만) | `connectivity_service` 리스너 2곳 |
 | G-20 sibling-endpoints-uncovered | P2 | segment-aware가 형제 경로(`/subscriptions-templates` 등) 제외 | `response_cache_policy.dart:53-68` |
-| G-21 no-dedupe-coalesce | P2 | 동일 엔티티 반복 쓰기 중복 제거 없음(requestFingerprint dead) | `sync_queue_entry.dart:70-71` |
+| G-21 no-dedupe-coalesce | P2 | 동일 엔티티 반복 쓰기 중복 제거 없음. 미배선 `requestFingerprint` getter는 서버측 dedupe(#1117)가 동기를 흡수해 제거함(#1163). 화면단 재진입 가드는 개별 대응 | `sync_queue_entry.dart` |
 | G-22 no-replay-e2e-tests | P2 | 도메인별 재생 e2e/역할별 인증-클리어 행위 테스트 없음(G-01이 이래서 유출) | `sync_service_test.dart` lesson만 |
 | G-23 cache-no-schema-version | P3 | 캐시 payload에 앱/스키마 버전 스탬프 없음(앱 업데이트 후 파싱 실패 가능) | `response_cache_store.dart:26-39` |
 | G-24 inflight-get-dedupe | P3 | 동일 in-flight GET 병합 없음(느린링크 슬롯 낭비) | 없음 |
@@ -157,10 +161,11 @@
 | G-02 로그아웃 교차사용자 재생 | #1114 | 후속 |
 | G-03 큐 정리 미전송 삭제 | #1115 | 후속 |
 | G-04·G-05·G-06 느린망 읽기(SWR·allowlist·stale표시) | #1116 | 수정(SWR 레이스+재검증버스 · 배치2 allowlist · stale배너). 배치3~4 allowlist·전 프로바이더 라이브갱신은 후속 |
-| G-07 타임아웃 중복 생성(멱등키) | #1117 | 후속 |
+| G-07 타임아웃 중복 생성(멱등키) | #1117 | 반영(INV-2 충족) — FE 키 생성·큐 저장·재생 + BE `idempotency_keys` reserve-first dedupe. §4.1·§4.3(고아 복구 #1162) 참조 |
 | G-08 sendTimeout/refresh 타임아웃 | #1118 | 후속 |
-| G-09 D4 LWW/거절 SnackBar dead | #1119 | 후속 |
-| G-10 상태 UI 미완 | #1120 | 후속 |
+| G-09 D4 LWW/거절 SnackBar dead | #1119 | 해소 — 전송 전 `If-Unmodified-Since` 조건부 요청 + 412 거절 즉시 terminal + `rejectionStream` SnackBar. [§7](#7-충돌-해결-계약-d4) |
+| G-10 상태 UI 미완 | #1120 | 해소 — 전 역할 공통 `SyncStatusBanner`(대기/동기화중/실패 + 항목별 재시도/삭제). [§8](#8-상태-ui-계약-요구안-7) |
+| G-21 requestFingerprint dead code | #1163 | 해소 — 미사용 getter 제거(서버측 dedupe #1117이 동기 흡수) |
 | G-11~G-25 P2/P3 잔여 | #1121 | 트래킹 |
 
 > INV-1~INV-4는 신규/변경 코드의 HARD-GATE. 특히 새 도메인 큐잉 추가 시 레지스트리 등록 + 재생 e2e 테스트 필수(G-01 재발 방지, #1113).

@@ -78,6 +78,7 @@ const _teacherRoutes = <String>[
   AppRoutes.followFeed,
   AppRoutes.badgeCollection,
   AppRoutes.announcementHistory,
+  AppRoutes.awaitingFeedback,
   AppRoutes.myProfileCategory,
   AppRoutes.policyNotificationsCategory,
 ];

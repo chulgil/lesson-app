@@ -1,7 +1,6 @@
 // Teacher profile domain entity
 // Moved from lib/features/profile/domain/entities/teacher_profile.dart for Clean Architecture
 
-import 'teacher_settings.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'teacher_profile.g.dart';
@@ -195,24 +194,6 @@ class FeeRange {
   factory FeeRange.fromJson(Map<String, dynamic> json) =>
       _$FeeRangeFromJson(json);
   Map<String, dynamic> toJson() => _$FeeRangeToJson(this);
-
-  String get formatted {
-    final min = _formatCurrency(minFee);
-    final max = _formatCurrency(maxFee);
-    final durationStr = LessonDurations.format(duration);
-    if (minFee == maxFee) {
-      return '$min / $durationStr';
-    }
-    return '$min ~ $max / $durationStr';
-  }
-
-  String _formatCurrency(int amount) {
-    if (amount >= 10000) {
-      final man = amount ~/ 10000;
-      return '$man만원';
-    }
-    return '$amount원';
-  }
 
   FeeRange copyWith({
     int? minFee,

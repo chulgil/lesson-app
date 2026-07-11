@@ -114,6 +114,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -128,6 +129,7 @@ void main() {
       expect(result.id, startsWith('tmp_'));
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'lesson',
           httpMethod: 'POST',
           path: '/lessons',
@@ -144,6 +146,7 @@ void main() {
       ).thenThrow(const NetworkException(message: 'timeout'));
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -171,6 +174,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -198,6 +202,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -209,6 +214,7 @@ void main() {
       await repo.deleteLesson('id-1');
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'lesson',
           httpMethod: 'DELETE',
           path: '/lessons/id-1',
@@ -224,6 +230,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -235,6 +242,7 @@ void main() {
       await repo.cancelLesson('id-1');
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'lesson',
           httpMethod: 'PATCH',
           path: '/lessons/id-1/status',

@@ -348,6 +348,8 @@ class _InputBar extends StatelessWidget {
               onPressed: submitting ? null : onSave,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
+                // 테마 minimumSize=Size(∞,h) 가 Row 의 loose 폭과 충돌하므로 override.
+                minimumSize: const Size(0, AppSpacing.buttonHeight),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space4,
                   vertical: AppSpacing.space3,

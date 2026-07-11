@@ -18,6 +18,7 @@ from app.schemas.teacher_announcement import (
     TeacherAnnouncementCreate,
     TeacherAnnouncementDayOffsResponse,
     TeacherAnnouncementResponse,
+    TeacherAnnouncementUpdate,
 )
 from app.services.announcement_service import AnnouncementService
 
@@ -57,6 +58,38 @@ async def list_teacher_announcements(
     """
     service = AnnouncementService(db)
     return await service.list_announcements(teacher_id=teacher_id, current_user=current_user)
+
+
+@router.put(
+    "/{announcement_id}",
+    response_model=TeacherAnnouncementResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update teacher announcement",
+)
+async def update_teacher_announcement(
+    announcement_id: str,
+    body: TeacherAnnouncementUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherAnnouncementResponse:
+    """Update the message (and dayOff dates). Type is immutable; students are not re-notified."""
+    service = AnnouncementService(db)
+    return await service.update_announcement(announcement_id, body, current_user=current_user)
+
+
+@router.delete(
+    "/{announcement_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete teacher announcement",
+)
+async def delete_teacher_announcement(
+    announcement_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    """Delete an announcement and its day-off date rows (owner only)."""
+    service = AnnouncementService(db)
+    await service.delete_announcement(announcement_id, current_user=current_user)
 
 
 @router.get(

@@ -27,28 +27,31 @@ final List<PracticeTool> fitnessPracticeTools = <PracticeTool>[
   PracticeTool(
     id: FitnessPracticeToolIds.repCounter,
     displayLabel: AppStrings.practiceToolRepCounter,
-    panelBuilder: (context, studentId) => const EmptyStateWidget(
-      icon: Icons.repeat_rounded,
-      title: AppStrings.practiceToolRepCounter,
-      subtitle: AppStrings.practiceToolSkeletonSubtitle,
-    ),
+    panelBuilder:
+        (context, studentId, sectionId) => const EmptyStateWidget(
+          icon: Icons.repeat_rounded,
+          title: AppStrings.practiceToolRepCounter,
+          subtitle: AppStrings.practiceToolSkeletonSubtitle,
+        ),
   ),
   PracticeTool(
     id: FitnessPracticeToolIds.intervalTimer,
     displayLabel: AppStrings.practiceToolIntervalTimer,
-    panelBuilder: (context, studentId) => const EmptyStateWidget(
-      icon: Icons.timer_outlined,
-      title: AppStrings.practiceToolIntervalTimer,
-      subtitle: AppStrings.practiceToolSkeletonSubtitle,
-    ),
+    panelBuilder:
+        (context, studentId, sectionId) => const EmptyStateWidget(
+          icon: Icons.timer_outlined,
+          title: AppStrings.practiceToolIntervalTimer,
+          subtitle: AppStrings.practiceToolSkeletonSubtitle,
+        ),
   ),
   PracticeTool(
     id: FitnessPracticeToolIds.guideMedia,
     displayLabel: AppStrings.practiceToolGuideMedia,
-    panelBuilder: (context, studentId) => const EmptyStateWidget(
-      icon: Icons.ondemand_video_outlined,
-      title: AppStrings.practiceToolGuideMedia,
-      subtitle: AppStrings.practiceToolSkeletonSubtitle,
-    ),
+    panelBuilder:
+        (context, studentId, sectionId) => const EmptyStateWidget(
+          icon: Icons.ondemand_video_outlined,
+          title: AppStrings.practiceToolGuideMedia,
+          subtitle: AppStrings.practiceToolSkeletonSubtitle,
+        ),
   ),
 ];

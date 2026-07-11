@@ -213,14 +213,14 @@ class StudentSubscriptionSection extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '수강권 미등록',
+                  AppStrings.studentSubscriptionMissingTitle,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.paperAccent,
                   ),
                 ),
                 Text(
-                  '학생에게 수강권을 발급해주세요',
+                  AppStrings.studentSubscriptionMissingSubtitle,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -236,6 +236,8 @@ class StudentSubscriptionSection extends ConsumerWidget {
             },
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
+              // 테마 minimumSize=Size(∞,h) 가 Row 의 loose 폭과 충돌하므로 override (R1).
+              minimumSize: const Size(0, AppSpacing.buttonHeight),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space4,
                 vertical: AppSpacing.space2,

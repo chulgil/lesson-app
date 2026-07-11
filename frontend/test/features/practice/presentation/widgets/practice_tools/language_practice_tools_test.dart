@@ -67,7 +67,7 @@ void main() {
         (t) => t.id == LanguagePracticeToolIds.vocabBook,
       );
       expect(
-        vocab.panelBuilder(_StubContext(), null),
+        vocab.panelBuilder(_StubContext(), null, null),
         isNot(isA<EmptyStateWidget>()),
       );
     });
@@ -84,7 +84,7 @@ void main() {
         };
         final ctx = _StubContext();
         for (final tool in skeletonTools) {
-          final panel = tool.panelBuilder(ctx, null) as EmptyStateWidget;
+          final panel = tool.panelBuilder(ctx, null, null) as EmptyStateWidget;
           expect(panel.title, expected[tool.id], reason: tool.id);
         }
       },
@@ -98,7 +98,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: Builder(builder: (c) => tool.panelBuilder(c, null)),
+            body: Builder(builder: (c) => tool.panelBuilder(c, null, null)),
           ),
         ),
       );

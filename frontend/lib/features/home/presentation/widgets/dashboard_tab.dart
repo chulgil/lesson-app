@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/sync/sync_facade.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -89,8 +88,9 @@ class DashboardTab extends ConsumerWidget {
 
                   const SizedBox(height: AppSpacing.space4),
 
-                  // ── Sync failure banner ────
-                  _buildSyncFailureBanner(ref),
+                  // #1120: sync failure surface is now the app-wide
+                  // SyncStatusBanner (all roles), so the teacher-only
+                  // banner here was removed to avoid a duplicate.
 
                   // ── 0순위: 선생님이 즉시 처리해야 하는 학생 연결 요청 ────
                   _buildPendingConnectionRequests(context, ref),
@@ -570,73 +570,6 @@ class DashboardTab extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  /// Sync failure notification banner.
-  /// Watches syncServiceStatsStream and displays warning when failed > 0.
-  /// Uses angular Notebook × Score design (no rounded corners, inkQuaternary border).
-  Widget _buildSyncFailureBanner(WidgetRef ref) {
-    return ref
-        .watch(syncServiceStatsStreamProvider)
-        .when(
-          data: (stats) {
-            if (stats.failed == 0) {
-              return const SizedBox.shrink();
-            }
-
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                border: Border.all(color: AppColors.inkQuaternary, width: 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.warning_outlined,
-                      color: AppColors.paperAccent,
-                      size: 18,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: Text(
-                        AppStrings.syncFailedBanner(stats.failed),
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.ink,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    TextButton(
-                      onPressed: () {
-                        ref.read(syncServiceProvider).retryFailedEntries();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        minimumSize: const Size(0, 28),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        AppStrings.syncRetryAction,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.paperAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-        );
   }
 }
 

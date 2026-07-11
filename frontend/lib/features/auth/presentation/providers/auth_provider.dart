@@ -10,6 +10,7 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/network/cache/response_cache_store.dart';
 import '../../../../core/providers/repository_provider.dart';
+import '../../../../core/sync/data/sync_queue_store.dart';
 import '../../../../core/sync/sync_facade.dart';
 import '../../data/repositories/remote_auth_repository.dart';
 import '../../domain/entities/auth_user.dart';
@@ -367,6 +368,20 @@ class AuthNotifier extends _$AuthNotifier {
       }
     } catch (_) {
       // Best-effort: Hive may not be open during unit tests.
+    }
+    // INV-4 (#1114): drop the previous user's unsent write queue so pending
+    // mutations never replay under the next login's auth token.
+    try {
+      if (Hive.isBoxOpen(SyncQueueStore.defaultBoxName)) {
+        await Hive.box<dynamic>(SyncQueueStore.defaultBoxName).clear();
+      } else if (await Hive.boxExists(SyncQueueStore.defaultBoxName)) {
+        final queueBox = await Hive.openBox<dynamic>(
+          SyncQueueStore.defaultBoxName,
+        );
+        await queueBox.clear();
+      }
+    } catch (_) {
+      // Best-effort: Hive may not be initialized during unit tests.
     }
     await _clearOfflineReadCache();
     state = const AuthUnauthenticated();

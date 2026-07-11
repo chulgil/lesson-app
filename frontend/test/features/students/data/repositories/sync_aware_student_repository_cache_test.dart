@@ -127,6 +127,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -141,6 +142,7 @@ void main() {
       expect(result.id, startsWith('tmp_'));
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'student',
           httpMethod: 'POST',
           path: '/students',
@@ -157,6 +159,7 @@ void main() {
       ).thenThrow(const NetworkException(message: 'timeout'));
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -186,6 +189,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -213,6 +217,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -224,6 +229,7 @@ void main() {
       await repo.deleteStudent('id-1');
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'student',
           httpMethod: 'DELETE',
           path: '/students/id-1',
@@ -239,6 +245,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -255,6 +262,7 @@ void main() {
       );
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'student',
           httpMethod: 'PATCH',
           path: '/students/id-1/status',
@@ -270,6 +278,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -281,6 +290,7 @@ void main() {
       await repo.archiveStudent('id-1');
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'student',
           httpMethod: 'PATCH',
           path: '/students/id-1/archive',
@@ -294,6 +304,7 @@ void main() {
       when(() => connectivity.isOnline).thenAnswer((_) async => false);
       when(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: any(named: 'domain'),
           httpMethod: any(named: 'httpMethod'),
           path: any(named: 'path'),
@@ -305,6 +316,7 @@ void main() {
       await repo.unarchiveStudent('id-1');
       verify(
         () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
           domain: 'student',
           httpMethod: 'PATCH',
           path: '/students/id-1/unarchive',

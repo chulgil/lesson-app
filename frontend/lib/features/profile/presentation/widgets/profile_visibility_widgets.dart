@@ -9,6 +9,7 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
+import '../../../../features/profile/presentation/extensions/fee_range_visuals.dart';
 
 /// Labels for visibility options
 const Map<ProfileVisibility, String> visibilityLabels = {
@@ -624,7 +625,7 @@ class ProfilePreviewContent extends StatelessWidget {
             title: AppStrings.profileVisibilitySectionFee,
             isVisible: settings.feeVisibility == ProfileVisibility.public,
             child: Text(
-              profile.feeRange!.formatted,
+              profile.feeRange!.label,
               style: AppTypography.bodyMedium,
             ),
           ),

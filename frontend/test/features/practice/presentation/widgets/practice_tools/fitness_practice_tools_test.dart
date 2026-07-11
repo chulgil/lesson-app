@@ -54,7 +54,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: Builder(builder: (c) => tool.panelBuilder(c, null)),
+            body: Builder(builder: (c) => tool.panelBuilder(c, null, null)),
           ),
         ),
       );

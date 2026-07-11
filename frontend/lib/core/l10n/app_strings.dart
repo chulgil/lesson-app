@@ -2687,8 +2687,7 @@ class AppStrings {
       '$name · $count건';
 
   /// N시간 전 완료 (completion relative-time suffix; time = '2시간 전')
-  static String awaitingFeedbackCompletedAgo(String relative) =>
-      '$relative 완료';
+  static String awaitingFeedbackCompletedAgo(String relative) => '$relative 완료';
 
   /// 리액션 보내기 (1-tap reaction button tooltip)
   static const awaitingFeedbackReactTooltip = '리액션 보내기';
@@ -3966,6 +3965,9 @@ class AppStrings {
 
   /// 당일 취소 (24시간 이내)
   static const usageNoteLateCancellation = '당일 취소 (24시간 이내)';
+
+  /// 학생 결석 (사전 연락 없음)
+  static const usageNoteStudentAbsent = '학생 결석 (사전 연락 없음)';
 
   // SubscriptionSettings 디폴트 description
   /// 대량 구매 보너스
@@ -7580,6 +7582,8 @@ class AppStrings {
   // -- Practice Notes --
   static const practiceNoteHint = '연습하면서 느낀 점을 기록하세요...';
   static const practiceNoteTitle = '연습노트';
+  static const practiceNoteEditTitle = '연습노트 수정';
+  static const practiceNoteAddTitle = '연습노트 추가';
   static const practiceNoteEmptyTitle = '연습노트가 없습니다';
   static const practiceNoteEmptySubtitle = '연습하면서 느낀 점을 기록해보세요';
   static const practiceNoteAddedSnack = '연습노트가 추가되었습니다';
@@ -7836,6 +7840,7 @@ class AppStrings {
   static const profileBankAccountSaveError = '계좌 저장에 실패했어요. 잠시 후 다시 시도해주세요';
 
   static const profileBankAccountAddFormTitle = '계좌 추가';
+  static const profileBankAccountEditFormTitle = '계좌 수정';
   static const profileBankAccountBankNameLabel = '은행명 *';
   static const profileBankAccountHintBankSelect = '은행 선택';
   static const profileBankAccountHintBankName = '은행명 입력';
@@ -7937,6 +7942,9 @@ class AppStrings {
 
   // ── Cancellation Defaults Settings ──
   static const profileCancellationDefaultsTitle = '취소 정책 기본값';
+
+  /// 취소정책 저장 실패 SnackBar (#1184)
+  static const cancellationDefaultsSaveFailed = '설정 저장에 실패했습니다. 다시 시도해주세요.';
 
   /// 취소 정책 기본값 화면 역할 안내 — #801. 변경권·노쇼는 취소/노쇼 정책 소관 명시.
   static const cancellationDefaultsRoleNote =
@@ -8158,6 +8166,12 @@ class AppStrings {
   static const studentBulkMessageTitleHint = '예) 5월 연휴 일정 안내';
   static const studentSubscriptionStatus = '수강권 현황';
   static const studentSubscriptionIssue = '발급';
+
+  /// 수강권 미등록 (학생 상세 경고 배너 제목)
+  static const studentSubscriptionMissingTitle = '수강권 미등록';
+
+  /// 학생에게 수강권을 발급해주세요 (학생 상세 경고 배너 설명)
+  static const studentSubscriptionMissingSubtitle = '학생에게 수강권을 발급해주세요';
   static const studentLessonNotes = '레슨 노트';
   static const studentWeeklyPractice = '이번 주 연습';
   static const studentPracticeLoadError = '연습 정보를 불러올 수 없습니다';
@@ -8519,6 +8533,22 @@ class AppStrings {
   // ── Sync failures ──
   static String syncFailedBanner(int count) => '$count건의 동기화가 실패했습니다';
   static const syncRetryAction = '재시도';
+
+  // ── Sync status UI (#1120) ──
+  static String syncStatusPending(int count) => '$count건 전송 대기 중';
+  static String syncStatusPendingOffline(int count) => '오프라인 · $count건 대기';
+  static String syncStatusSyncing(int count) => '$count건 동기화 중';
+  static String syncStatusFailed(int count) => '$count건 전송 실패';
+  static const syncQueueSheetTitle = '전송 실패 항목';
+  static const syncQueueEmpty = '전송 실패한 항목이 없습니다';
+  static const syncDeleteAction = '삭제';
+  static const syncEntryFailedDescription = '전송에 실패했습니다. 재시도하거나 삭제하세요.';
+  static const syncOrphanEntryDescription =
+      '앱이 종료되며 전송이 중단된 항목입니다. 재시도하면 서버로 다시 보냅니다.';
+  static const syncConflictEntryDescription = '서버의 최신 변경과 충돌해 반영되지 않았습니다.';
+
+  // ── Sync conflict rejection SnackBar (#1119) ──
+  static const syncConflictRejected = '서버의 최신 변경과 충돌해 반영되지 않았습니다';
 
   // ── Academy announcements ──
   static const announcementsTitle = '공지사항';
@@ -9275,6 +9305,12 @@ class AppStrings {
   /// 회수 버튼.
   static const makeupCreditRevokeButton = '회수';
 
+  /// 보강 크레딧을 회수할까요? (회수 확인 다이얼로그 제목)
+  static const makeupCreditRevokeConfirmTitle = '보강 크레딧을 회수할까요?';
+
+  /// 학생의 보강 크레딧 1회를 회수해요. (회수 확인 다이얼로그 본문)
+  static const makeupCreditRevokeConfirmBody = '학생의 보강 크레딧 1회를 회수해요. 회수 후에는 되돌릴 수 없어요.';
+
   /// 회수 성공 스낵바.
   static const makeupCreditRevokeSuccess = '보강 크레딧을 회수했어요.';
 
@@ -9868,6 +9904,9 @@ class AppStrings {
   /// 메인 홈 5묶음 메뉴 영역 섹션 헤더.
   static const categorySectionTitle = '설정';
 
+  /// 프로필 탭 통계·분석 섹션 헤더 (#1164 — 출석 현황 진입점).
+  static const profileAnalyticsSectionTitle = '통계·분석';
+
   /// 💰 수강권·정산 BottomSheet 제목.
   static const categorySheetSubscriptionBillingTitle = '수강권·정산';
 
@@ -9921,6 +9960,13 @@ class AppStrings {
   /// 학생 안내 메시지 섹션 보조 설명 (빈 입력 → 기본 메시지 fallback 안내).
   static const lessonStyleGuidanceHint =
       '예약 시 학생에게 보내는 안내입니다. 비우면 기본 메시지가 사용됩니다';
+
+  /// 레슨 방식 섹션 헤더 (대면/온라인/방문 다중선택).
+  static const lessonStyleLocationSection = '레슨 방식';
+
+  /// 레슨 방식 섹션 보조 설명 (수강권 등록 장소 선택지 연동 안내).
+  static const lessonStyleLocationHint =
+      '가능한 방식을 모두 선택하세요. 학생에게 표시되고, 수강권 등록 시 장소 선택지가 됩니다';
 
   // ── PriceTableScreen (W3 Task 3.3) ───────────────────────────────
   // spec §6.3 — 악기·레벨별 가격표 (LessonTimeSettingsScreen §6 에서 분리).
@@ -10527,6 +10573,8 @@ class AppStrings {
   static String practiceStartHeader(String name) => '$name의 연습';
   static String practiceStartStreak(int days) => '$days일';
   static const practiceStartButton = '연습 시작';
+  static String practiceStartContinuePiece(String pieceName) =>
+      '이어서: $pieceName';
   static String practiceStartYesterdayMinutes(int minutes) =>
       '어제 $minutes분 했어요';
 

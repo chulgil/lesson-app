@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_exceptions.dart';
 import '../domain/sync_queue_entry.dart';
 import '../data/sync_queue_store.dart';
 import 'connectivity_service.dart';
+import 'sync_adapter.dart';
 import 'sync_adapter_registry.dart';
 
 class SyncServiceStats {
@@ -31,6 +33,22 @@ class SyncServiceStats {
 
   int get queueBacklog => pending + failed;
   bool get hasFailures => failed > 0;
+}
+
+/// #1119 (D4): a queued write the server deterministically rejected (currently
+/// only Last-Write-Wins conflicts). Emitted on [SyncService.rejectionStream] so
+/// the app root can surface a SnackBar — the user is not watching the (async)
+/// replay, so a silent drop would lose their edit without feedback.
+class SyncRejectionEvent {
+  const SyncRejectionEvent({
+    required this.entryId,
+    required this.domain,
+    required this.code,
+  });
+
+  final String entryId;
+  final String domain;
+  final String code;
 }
 
 class SyncService {
@@ -63,6 +81,7 @@ class SyncService {
 
   final _uuid = const Uuid();
   final _statsStream = StreamController<SyncServiceStats>.broadcast();
+  final _rejectionStream = StreamController<SyncRejectionEvent>.broadcast();
   StreamSubscription<SyncConnectivity>? _connectivitySubscription;
   bool _isDisposed = false;
 
@@ -73,6 +92,10 @@ class SyncService {
 
   Stream<SyncServiceStats> get statsStream => _statsStream.stream;
 
+  /// #1119 (D4): deterministic write rejections (LWW conflicts) the app root
+  /// listens to, to show the user a SnackBar for a write that was not applied.
+  Stream<SyncRejectionEvent> get rejectionStream => _rejectionStream.stream;
+
   Future<void> initialize() async {
     if (_isInitialized) {
       return;
@@ -80,6 +103,9 @@ class SyncService {
     _isInitialized = true;
 
     await _queueStore.runMigrations();
+    // #1162: reclassify entries left in `syncing` by an app kill mid-replay
+    // BEFORE any flush, so an orphan is never blindly re-sent.
+    await _recoverOrphanedSyncingEntries();
     await _queueStore.cleanup();
     await _refreshStats();
     await syncPending();
@@ -107,6 +133,9 @@ class SyncService {
     _pollTimer?.cancel();
     if (!_statsStream.isClosed) {
       await _statsStream.close();
+    }
+    if (!_rejectionStream.isClosed) {
+      await _rejectionStream.close();
     }
   }
 
@@ -146,6 +175,7 @@ class SyncService {
     int? maxRetryCount,
     SyncOperationType? operation,
     DateTime? clientUpdatedAt,
+    String? idempotencyKey,
   }) async {
     final now = DateTime.now().toUtc();
     final resolvedOperation =
@@ -163,6 +193,7 @@ class SyncService {
       updatedAt: now,
       maxRetryCount: maxRetryCount ?? defaultMaxRetryCount,
       clientUpdatedAt: clientUpdatedAt,
+      idempotencyKey: idempotencyKey,
     );
 
     await _queueStore.upsert(entry);
@@ -202,16 +233,66 @@ class SyncService {
     await syncPending();
   }
 
+  /// #1120: the failed entries backing the sync status UI's failure list.
+  Future<List<SyncQueueEntry>> failedEntries() {
+    return _queueStore.fetchByStatus(SyncQueueStatus.failed);
+  }
+
+  /// #1120: retry a single entry. Resets the retry budget to 0 so a terminal
+  /// entry (retries exhausted, or a legacy `ORPHANED_UNSAFE_REPLAY` / LWW
+  /// rejection that was failed on purpose) is re-sent — that user tap IS the
+  /// explicit consent to replay. No-op if the entry no longer exists.
+  Future<void> retryEntry(String id) async {
+    final entry = await _queueStore.getById(id);
+    if (entry == null) {
+      return;
+    }
+    final retried = entry.copyWith(
+      status: SyncQueueStatus.pending,
+      retryCount: 0,
+      errorMessage: null,
+      errorCode: null,
+    );
+    await _queueStore.upsert(retried);
+    await _refreshStats(nextAction: 'entry retry requested');
+    await syncPending();
+  }
+
+  /// #1120: permanently drop a single queued entry (user chose to discard it
+  /// from the sync status UI).
+  Future<void> deleteEntry(String id) async {
+    await _queueStore.delete(id);
+    await _refreshStats(nextAction: 'entry deleted');
+  }
+
   Future<SyncServiceStats> currentStats() async {
     return _readStats(nextAction: 'manual status');
   }
 
   Future<void> _flushQueue() async {
     final entries = await _queueStore.fetchAll();
-    final processable = [...entries.where(_isProcessable)]
+    final candidates = [...entries.where(_isPending)]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-    for (final entry in processable) {
+    // S3 — dependency order. Writes to one domain are causally ordered
+    // (create → update → delete). If an earlier write is still waiting on its
+    // backoff, or fails during this pass, every later write to the SAME domain
+    // must wait too — otherwise an update replays before the create that
+    // produced the row (404 → retries exhausted → the write is lost).
+    // Permanently failed entries (retries exhausted) do NOT block, or the queue
+    // would stall forever.
+    final blockedDomains = <String>{};
+
+    for (final entry in candidates) {
+      if (blockedDomains.contains(entry.domain)) {
+        continue;
+      }
+      if (!_isProcessable(entry)) {
+        // Still in backoff — hold the rest of this domain for the next pass.
+        blockedDomains.add(entry.domain);
+        continue;
+      }
+
       final adapter = _adapterRegistry.resolve(entry.domain);
       if (adapter == null) {
         final notHandled = entry.copyWith(
@@ -239,25 +320,103 @@ class SyncService {
         _lastSyncAt = DateTime.now().toUtc();
       } catch (error, stack) {
         final (errorCode, message) = _buildReplayError(error);
+        // #1119 (D4): a Last-Write-Wins rejection is deterministic — retrying
+        // replays the same superseded write, so mark it failed immediately
+        // (terminal) and surface it to the user instead of burning 5 retries.
+        final isConflictRejection = errorCode == conflictLwwRejectedCode;
         final nextRetryCount = syncing.retryCount + 1;
+        final becomesTerminal =
+            isConflictRejection || nextRetryCount >= syncing.maxRetryCount;
 
         final failed = syncing.copyWith(
-          status: nextRetryCount >= syncing.maxRetryCount
+          status: becomesTerminal
               ? SyncQueueStatus.failed
               : SyncQueueStatus.pending,
           lastSyncedAt: DateTime.now().toUtc(),
-          retryCount: nextRetryCount,
+          retryCount: isConflictRejection
+              ? syncing.maxRetryCount
+              : nextRetryCount,
           errorCode: errorCode,
           errorMessage: message,
         );
         await _queueStore.upsert(failed);
+
+        if (isConflictRejection) {
+          _emitRejection(
+            SyncRejectionEvent(
+              entryId: entry.id,
+              domain: entry.domain,
+              code: errorCode!,
+            ),
+          );
+        } else if (failed.status == SyncQueueStatus.pending) {
+          // Retryable failure → later writes to this domain must not overtake it.
+          blockedDomains.add(entry.domain);
+        }
         unawaited(_logReplayError(entry.id, error, stack));
       }
     }
   }
 
+  /// #1162: error code stamped on a legacy `POST` orphan that cannot be safely
+  /// replayed (no idempotency key → replay risks a duplicate). Surfaced to the
+  /// sync status UI (#1120) rather than silently dropped or duplicated.
+  static const String orphanedUnsafeReplayCode = 'ORPHANED_UNSAFE_REPLAY';
+
+  /// #1162: reclassify entries stuck in `syncing` after an app kill mid-replay.
+  ///
+  /// The server-delivery state of an orphan is unknown, so neither blind replay
+  /// (duplicate) nor drop (lost write) is safe on its own:
+  /// - has an idempotency key → `pending`; replay dedupes on the server (#1117).
+  /// - no key, PUT/PATCH/DELETE → `pending`; these are naturally idempotent
+  ///   (they set a target resource's state, they don't create new rows).
+  /// - no key, POST (legacy entry) → `failed` with [orphanedUnsafeReplayCode];
+  ///   a blind replay could duplicate, so hand the decision to the user.
+  Future<void> _recoverOrphanedSyncingEntries() async {
+    final orphans = await _queueStore.fetchByStatus(SyncQueueStatus.syncing);
+    for (final entry in orphans) {
+      final safeToReplay =
+          entry.idempotencyKey != null ||
+          entry.httpMethod.toUpperCase() != 'POST';
+      if (safeToReplay) {
+        await _queueStore.upsert(
+          entry.copyWith(status: SyncQueueStatus.pending),
+        );
+      } else {
+        // Terminal failure (retryCount maxed) so the flush never auto-replays
+        // it — the user decides via the sync status UI (#1120).
+        await _queueStore.upsert(
+          entry.copyWith(
+            status: SyncQueueStatus.failed,
+            retryCount: entry.maxRetryCount,
+            errorCode: orphanedUnsafeReplayCode,
+            errorMessage:
+                'App closed mid-sync; this create request has no idempotency key '
+                'and cannot be safely retried automatically.',
+          ),
+        );
+      }
+    }
+  }
+
+  /// Entries that are candidates for this flush pass (backoff is evaluated
+  /// per-entry by [_isProcessable] so a skipped entry can block its domain).
+  ///
+  /// #1162: `syncing` is NOT a candidate. Within a flush each entry is set to
+  /// `syncing` and processed immediately, so a leftover `syncing` means a prior
+  /// run was killed mid-replay — that orphan is reclassified explicitly at
+  /// startup ([_recoverOrphanedSyncingEntries]), never implicitly re-sent here.
+  bool _isPending(SyncQueueEntry entry) =>
+      entry.status != SyncQueueStatus.synced &&
+      entry.status != SyncQueueStatus.syncing &&
+      entry.isRetryable;
+
   bool _isProcessable(SyncQueueEntry entry) {
     if (entry.status == SyncQueueStatus.synced) {
+      return false;
+    }
+    // #1162: never treat `syncing` as implicitly retryable (see [_isPending]).
+    if (entry.status == SyncQueueStatus.syncing) {
       return false;
     }
 
@@ -341,9 +500,32 @@ class SyncService {
     }
   }
 
+  /// Extracts the server's error `code` and a message from a replay failure.
+  ///
+  /// #1119: the backend wraps typed errors as `{"error": {"code", "detail"}}`
+  /// (see `ErrorInterceptor`), so a 412 Last-Write-Wins rejection arrives as an
+  /// [ApiException] whose `data` carries [conflictLwwRejectedCode]. Preserving
+  /// the code (previously dropped to null) is what lets [_flushQueue] treat the
+  /// rejection as terminal and surface it.
   (String? code, String message) _buildReplayError(Object error) {
     final errorText = '$error';
+    if (error is ApiException) {
+      final data = error.data;
+      if (data is Map && data['error'] is Map) {
+        final code = (data['error'] as Map)['code'];
+        if (code is String && code.isNotEmpty) {
+          return (code, errorText);
+        }
+      }
+    }
     return (null, errorText);
+  }
+
+  void _emitRejection(SyncRejectionEvent event) {
+    if (_rejectionStream.isClosed) {
+      return;
+    }
+    _rejectionStream.add(event);
   }
 
   Duration _backoffDelay(int retryCount) {

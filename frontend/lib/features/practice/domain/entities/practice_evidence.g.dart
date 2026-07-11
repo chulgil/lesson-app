@@ -13,6 +13,7 @@ PracticeEvidence _$PracticeEvidenceFromJson(Map<String, dynamic> json) =>
       occurredAt: DateTime.parse(json['occurred_at'] as String),
       metadata: json['metadata'] as Map<String, dynamic>? ?? const {},
       videoId: json['video_id'] as String?,
+      sectionId: json['section_id'] as String?,
     );
 
 Map<String, dynamic> _$PracticeEvidenceToJson(PracticeEvidence instance) =>
@@ -20,6 +21,7 @@ Map<String, dynamic> _$PracticeEvidenceToJson(PracticeEvidence instance) =>
       'source': _$PracticeSourceEnumMap[instance.source]!,
       'duration_minutes': instance.durationMinutes,
       'video_id': instance.videoId,
+      'section_id': instance.sectionId,
       'metadata': instance.metadata,
       'occurred_at': instance.occurredAt.toIso8601String(),
     };

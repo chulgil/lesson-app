@@ -426,9 +426,7 @@ class UnifiedLessonRequestActions {
         request.status == UnifiedRequestStatus.subscriptionIssued ||
         request.status == UnifiedRequestStatus.inProgress;
     final eventType =
-        isPhase3
-            ? RequestEventType.lessonCancelled
-            : RequestEventType.cancel;
+        isPhase3 ? RequestEventType.lessonCancelled : RequestEventType.cancel;
 
     await _repository.addEvent(
       RequestEvent(
@@ -614,6 +612,12 @@ class UnifiedLessonRequestActions {
     String? message,
   }) async {
     final request = await _repository.getById(requestId);
+    // Idempotency 방어 (#D1) — 이미 수강권이 발행된 요청이면 중복 subscription·
+    // 이벤트를 만들지 않고 조기 반환한다. (UI 더블탭 가드와 이중 안전장치.)
+    if (request != null &&
+        request.status == UnifiedRequestStatus.subscriptionIssued) {
+      return;
+    }
     Subscription? subscription;
     if (request != null) {
       subscription = await _createSubscriptionForRequest(
@@ -645,6 +649,17 @@ class UnifiedLessonRequestActions {
     );
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
+    // A2 — the subscription + confirmation card were created through the
+    // repositories directly, so the subscription read providers must be
+    // invalidated too (contract of invalidateSubscriptionListsForStudent).
+    // Without this the student's list and the teacher's payment-pending
+    // badges keep serving the cached value after a successful issue.
+    invalidateSubscriptionListsForStudentOn(
+      ref,
+      studentId,
+      teacherId: teacherId,
+    );
+    ref.invalidate(pendingScheduleConfirmationCardsProvider(studentId));
   }
 
   Future<Subscription> _createSubscriptionForRequest(

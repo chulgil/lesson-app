@@ -28,12 +28,23 @@ class TeacherAnnouncementCreate(BaseModel):
     message: str
 
     @model_validator(mode="after")
-    def _validate_dayoff_dates(self) -> "TeacherAnnouncementCreate":
+    def _validate_dayoff_dates(self) -> TeacherAnnouncementCreate:
         if self.type == "dayOff" and not self.dates:
             raise ValueError("dates required for dayOff type")
         if self.type == "general" and self.dates:
             raise ValueError("dates must be empty for general type")
         return self
+
+
+class TeacherAnnouncementUpdate(BaseModel):
+    """선생님 공지 수정 요청.
+
+    type 은 불변(수정 불가) — 따라서 dayOff/general 별 dates 검증은 스키마가 아니라
+    서비스에서 기존 announcement 의 type 을 기준으로 수행한다.
+    """
+
+    message: str
+    dates: list[date] = Field(default_factory=list)
 
 
 class TeacherAnnouncementResponse(BaseModel):

@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lessonaza/core/network/api_client.dart';
+import 'package:lessonaza/core/network/api_exceptions.dart';
 import 'package:lessonaza/core/sync/application/connectivity_service.dart';
 import 'package:lessonaza/core/sync/application/sync_adapter_registry.dart';
 import 'package:lessonaza/core/sync/application/sync_service.dart';
@@ -399,5 +400,113 @@ void main() {
 
       expect(invalidated, ['/lessons']);
     });
+
+    test(
+      '#1119 LWW 거절(CONFLICT_LWW_REJECTED) → 즉시 terminal failed + errorCode 보존 + rejection 이벤트',
+      () async {
+        final service = await createService(
+          initialConnectivity: ConnectivityResult.none,
+          pollingInterval: const Duration(days: 1),
+        );
+
+        when(
+          () => apiClient.put<dynamic>(
+            any(),
+            data: any(named: 'data'),
+            queryParameters: any(named: 'queryParameters'),
+            options: any(named: 'options'),
+          ),
+        ).thenThrow(
+          const ApiException(
+            message: '충돌',
+            statusCode: 412,
+            data: {
+              'error': {'code': 'CONFLICT_LWW_REJECTED'},
+            },
+          ),
+        );
+
+        final events = <SyncRejectionEvent>[];
+        final sub = service.rejectionStream.listen(events.add);
+        addTearDown(sub.cancel);
+
+        // Enqueue while offline so it stays pending, then go online and flush.
+        await service.queueMutation(
+          domain: 'practice',
+          httpMethod: 'PUT',
+          path: '/practice-logs/1',
+          payload: const {'x': 1},
+          clientUpdatedAt: DateTime.utc(2026, 6, 1),
+        );
+
+        fakeConnectivity!.setState(ConnectivityResult.wifi, emit: false);
+        await service.syncPending();
+        // Let the broadcast rejection event reach the listener.
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        final entry = (await store.fetchAll()).single;
+        expect(entry.status, SyncQueueStatus.failed);
+        expect(entry.errorCode, 'CONFLICT_LWW_REJECTED');
+        // Terminal: retries are pointless (the write is deterministically stale).
+        expect(entry.retryCount, entry.maxRetryCount);
+        expect(events, hasLength(1));
+        expect(events.single.code, 'CONFLICT_LWW_REJECTED');
+        expect(events.single.domain, 'practice');
+
+        // Only one attempt — no retry storm on a deterministic rejection.
+        verify(
+          () => apiClient.put<dynamic>(
+            any(),
+            data: any(named: 'data'),
+            queryParameters: any(named: 'queryParameters'),
+            options: any(named: 'options'),
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
+      '#1120 failedEntries / deleteEntry / retryEntry (terminal 재전송 동의)',
+      () async {
+        final service = await createService(
+          initialConnectivity: ConnectivityResult.none,
+          pollingInterval: const Duration(days: 1),
+        );
+
+        final now = DateTime.now().toUtc();
+        SyncQueueEntry terminalFailed() => SyncQueueEntry(
+          id: 'f1',
+          domain: 'practice',
+          operation: SyncOperationType.update,
+          httpMethod: 'PUT',
+          path: '/practice-logs/1',
+          payload: const {},
+          status: SyncQueueStatus.failed,
+          createdAt: now,
+          updatedAt: now,
+          retryCount: 5,
+          maxRetryCount: 5,
+          errorCode: 'CONFLICT_LWW_REJECTED',
+          errorMessage: 'stale',
+        );
+
+        await store.upsert(terminalFailed());
+        expect(await service.failedEntries(), hasLength(1));
+
+        await service.deleteEntry('f1');
+        expect(await service.failedEntries(), isEmpty);
+
+        // Retry resets a terminal entry to pending with a fresh retry budget —
+        // the user's tap IS the explicit consent to re-send.
+        await store.upsert(terminalFailed());
+        await service.retryEntry('f1');
+
+        final retried = await store.getById('f1');
+        expect(retried, isNotNull);
+        expect(retried!.status, SyncQueueStatus.pending);
+        expect(retried.retryCount, 0);
+        expect(retried.errorCode, isNull);
+      },
+    );
   });
 }

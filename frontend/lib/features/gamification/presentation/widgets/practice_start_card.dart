@@ -15,6 +15,8 @@ class PracticeStartCard extends StatelessWidget {
   final int yesterdayMinutes;
   final VoidCallback onStartTap;
   final VoidCallback? onMoreTap;
+  final String? continuePieceName;
+  final VoidCallback? onContinueTap;
 
   const PracticeStartCard({
     super.key,
@@ -23,6 +25,8 @@ class PracticeStartCard extends StatelessWidget {
     required this.yesterdayMinutes,
     required this.onStartTap,
     this.onMoreTap,
+    this.continuePieceName,
+    this.onContinueTap,
   });
 
   @override
@@ -71,6 +75,17 @@ class PracticeStartCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (continuePieceName != null && onContinueTap != null) ...[
+              const SizedBox(height: AppSpacing.space2),
+              TextButton(
+                key: const ValueKey('practice_start_continue'),
+                onPressed: onContinueTap,
+                child: Text(
+                  AppStrings.practiceStartContinuePiece(continuePieceName!),
+                  style: AppTypography.bodySmall,
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.space3),
             Text(
               key: const ValueKey('practice_start_card_yesterday'),

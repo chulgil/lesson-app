@@ -8,6 +8,7 @@ import '../../../practice_journal/practice_journal_facade.dart'
     show practiceJournalRepositoryProvider;
 import '../../domain/services/practice_recording_service.dart';
 import '../../domain/services/practice_source_loggers.dart';
+import 'practice_repertoire_repository_provider.dart';
 import 'practice_repository_provider.dart';
 
 part 'practice_recording_provider.g.dart';
@@ -25,6 +26,7 @@ PracticeRecordingService practiceRecordingService(
     questRepository: ref.watch(studentQuestRepositoryProvider),
     journalRepository: ref.watch(practiceJournalRepositoryProvider),
     practiceRepository: ref.watch(practiceRepositoryProvider),
+    repertoireRepository: ref.watch(practiceRepertoireRepositoryProvider),
   );
 }
 

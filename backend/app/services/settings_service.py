@@ -232,6 +232,39 @@ class SettingsService:
         return settings
 
     # -----------------------------------------------------------------------
+    # Cancellation Defaults (#1178)
+    # -----------------------------------------------------------------------
+
+    async def get_cancellation_defaults(self, user_id: str) -> Any:
+        """Get-or-create the teacher's cancellation defaults row.
+
+        The row is keyed by ``teachers.id`` (resolved from the user id) so
+        lesson_service can join straight from ``Lesson.teacher_id``.
+        """
+        from app.models.settings import CancellationDefaults
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        teacher_id = await resolve_teacher_id(self.db, user_id)
+        row = await self.db.scalar(
+            select(CancellationDefaults).where(CancellationDefaults.teacher_id == teacher_id)
+        )
+        if row is None:
+            row = CancellationDefaults(teacher_id=teacher_id)
+            self.db.add(row)
+            await self.db.flush()
+            await self.db.refresh(row)
+        return row
+
+    async def update_cancellation_defaults(self, user_id: str, data: dict) -> Any:
+        """Apply provided fields as-is; None clears the custom message (exclude_unset upstream)."""
+        row = await self.get_cancellation_defaults(user_id)
+        for key, value in data.items():
+            setattr(row, key, value)
+        await self.db.flush()
+        await self.db.refresh(row)
+        return row
+
+    # -----------------------------------------------------------------------
     # Notification Settings (per-relationship)
     # -----------------------------------------------------------------------
 

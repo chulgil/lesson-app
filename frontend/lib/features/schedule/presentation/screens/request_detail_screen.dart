@@ -140,6 +140,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   IconData _eventIcon = Icons.check_circle;
   Timer? _eventTimer;
 
+  /// 입금확인(수강권 발행) 등 비가역 액션의 더블탭 재진입 가드 — 첫 탭이 await
+  /// 하기 전 동기적으로 true 로 세팅되어, 두 번째 탭이 중복 발행하지 못하게 한다
+  /// (Dart 단일스레드, #D1 수강권 중복발급).
+  bool _isProcessing = false;
+
   String get viewerRole => widget.viewerRole;
   String get requestId => widget.requestId;
 
@@ -235,8 +240,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
         final events = eventsAsync.valueOrNull ?? [];
         final studentName =
-            studentNames[request.studentId] ?? AppStrings.student;
-        final academyName = academyNames[request.academyId];
+            request.studentName ??
+            studentNames[request.studentId] ??
+            AppStrings.student;
+        final academyName =
+            request.academyName ?? academyNames[request.academyId];
 
         // Watch teacher templates for Phase 2 proposal display
         final proposalTemplates =
@@ -246,7 +254,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             [];
 
         final teacherName =
-            teacherNames[request.teacherId] ?? AppStrings.teacher;
+            request.teacherName ??
+            teacherNames[request.teacherId] ??
+            AppStrings.teacher;
         final opponentName = viewerRole == 'teacher'
             ? studentName
             : AppStrings.teacherDisplayName(teacherName);
@@ -424,8 +434,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final items = <(IconData, String, VoidCallback)>[
       // #749: only offer "수강권 보기" when a subscription actually exists to
       // view — otherwise it led to a "준비중" dead-end.
-      if (request.hasProposal &&
-          requestDetailSubscriptionRoute(events) != null)
+      if (request.hasProposal && requestDetailSubscriptionRoute(events) != null)
         (
           Icons.receipt_long_outlined,
           AppStrings.viewSubscription,
@@ -850,6 +859,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 수강권을 중복 발행하지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.issueSubscription(
@@ -864,6 +877,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) _showError();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -1056,8 +1071,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         ? request.teacherId
         : request.studentId;
     final fromTeacher = actorRole == ProposerRole.teacher;
-    final opponentId =
-        fromTeacher ? request.studentId : request.teacherId;
+    final opponentId = fromTeacher ? request.studentId : request.teacherId;
 
     // Find the pending proposal's slots and change type
     final events =

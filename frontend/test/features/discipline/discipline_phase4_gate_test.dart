@@ -134,7 +134,7 @@ void main() {
       final ctx = _StubContext();
       for (final tool in fitnessPracticeTools) {
         expect(
-          tool.panelBuilder(ctx, null),
+          tool.panelBuilder(ctx, null, null),
           isA<EmptyStateWidget>(),
           reason: tool.id,
         );
