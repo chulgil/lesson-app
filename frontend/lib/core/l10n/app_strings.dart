@@ -7943,6 +7943,9 @@ class AppStrings {
   // ── Cancellation Defaults Settings ──
   static const profileCancellationDefaultsTitle = '취소 정책 기본값';
 
+  /// 취소정책 저장 실패 SnackBar (#1184)
+  static const cancellationDefaultsSaveFailed = '설정 저장에 실패했습니다. 다시 시도해주세요.';
+
   /// 취소 정책 기본값 화면 역할 안내 — #801. 변경권·노쇼는 취소/노쇼 정책 소관 명시.
   static const cancellationDefaultsRoleNote =
       '지각취소 시 보상·알림의 전역 기본값입니다. 변경 횟수·최소 취소 시간·노쇼·이월은 「취소/노쇼 정책」에서 설정합니다.';

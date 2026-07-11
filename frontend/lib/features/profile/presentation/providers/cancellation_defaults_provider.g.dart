@@ -30,7 +30,7 @@ final cancellationDefaultsRepositoryProvider =
 typedef CancellationDefaultsRepositoryRef
     = ProviderRef<CancellationDefaultsRepository>;
 String _$cancellationDefaultsNotifierHash() =>
-    r'317365fdd45ad0730bb27a9134767fb56c5f4a39';
+    r'10cbc856f70f21ed8e34e53e7ebe4afd3bd54e6e';
 
 /// Async notifier provider for cancellation defaults
 ///
