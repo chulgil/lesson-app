@@ -7,7 +7,7 @@
 
 앱은 "서버 미연결 시 로컬 데이터 표시 + 나중 동기화"를 지향한다. 현재 구현은 **읽기 = HTTP 응답 캐시 인터셉터**(전송 실패 시 last-known-good 서빙), **쓰기 = 뮤테이션 큐**(오프라인/전송실패 시 큐잉 + 낙관적 결과, 재접속 시 재생)로 되어 있다. 뼈대는 동작하나, **완전 오프라인(무선 차단)** 은 부분 처리되고 **느린-연결(무선 살아있고 타임아웃, 미국 셀룰러 전형)** 은 처리 공백이 크다. 또한 **schedule 도메인 쓰기가 어댑터 미등록으로 영구 손실**되는 P0 데이터 유실 버그가 있다.
 
-- 가장 시급: [G-01 schedule NO_ADAPTER 쓰기 유실](#g-01) (데이터 유실), [G-02 로그아웃 시 쓰기 큐 미삭제 교차사용자 재생](#g-02), [G-03 큐 정리 시 미전송 쓰기 무통보 삭제](#g-03).
+- 가장 시급 3건 해소: [G-01](#g-01)(#1113), [G-02](#g-02)·[G-03](#g-03)은 PR #1159(2026-07-10)로 해소 — 유실 시 사용자 통지만 잔여(#1188).
 - 느린 네트워크 핵심: [G-04 SWR 부재(풀 타임아웃 대기)](#g-04), [G-05 읽기 캐시 5개 도메인만](#g-05), [G-06 느린망 stale 표시 없음](#g-06), [G-07 타임아웃 중복 생성](#g-07).
 
 ## 2. 용어
@@ -47,13 +47,13 @@
 
 - **INV-1 (도메인-어댑터 정합)**: `queueMutation(domain: X)` 로 큐잉하는 모든 도메인 X는 반드시 `SyncAdapterRegistry`에 등록되어야 한다. 미등록 시 재생이 `NO_ADAPTER`로 영구 실패하고 쓰기가 유실된다. 레지스트리는 실제 큐잉 호출처에서 파생·검증되어야 한다(현재 하드코딩 → [G-01](#g-01) 원인). 큐잉 도메인 전수: `lesson`·`student`·`subscription`·`practice`·`schedule`.
 - **INV-2 (재생 멱등성)**: 재생은 서버가 이미 커밋한 요청을 중복 생성하지 않아야 한다(멱등 키). **충족(#1117)** — 클라이언트가 초기 요청·재생에 동일 `Idempotency-Key`(user_id 스코프)를 보내고, 서버(`idempotency_keys` 테이블 + `IdempotencyMiddleware`)가 reserve-first 로 POST 를 dedupe. → [G-07 해소](#g-07).
-- **INV-3 (무손실 정리)**: 큐 정리(cleanup)는 **미전송(pending) 쓰기를 무통보로 삭제하지 않는다**. 현재 500 초과 시 status 무관 최오래 삭제 → [G-03](#g-03).
-- **INV-4 (사용자 격리)**: 큐는 사용자 경계에서 격리되어야 한다. 로그아웃 시 이전 사용자 pending 쓰기가 다음 사용자 토큰으로 재생되면 안 된다. 현재 로그아웃이 `sync_queue`를 비우지 않음 → [G-02](#g-02).
+- **INV-3 (무손실 정리)**: 큐 정리(cleanup)는 **미전송(pending) 쓰기를 무통보로 삭제하지 않는다**. 해소(PR #1159): 용량 트리밍은 synced/failed 만 제거, pending/syncing 보존 (`sync_queue_store_cleanup_test.dart`) → [G-03](#g-03).
+- **INV-4 (사용자 격리)**: 큐는 사용자 경계에서 격리되어야 한다. 로그아웃 시 이전 사용자 pending 쓰기가 다음 사용자 토큰으로 재생되면 안 된다. 해소(PR #1159): `logout()` 이 `sync_queue` 를 비움 (`auth_logout_sync_queue_test.dart`). 클리어 시 미전송 통지는 잔여 → #1188 → [G-02](#g-02).
 
 ### 4.3 재시도/만료
 
 - 재시도: 최대 5회, 지수 백오프 1→16s(상한 30s 폴). 소진 시 status=failed.
-- 만료: failed 엔트리 7일 초과 시 삭제. **삭제 시 사용자 알림 필요**(요구안 §8) — 현재 무통보 → [G-03](#g-03).
+- 만료: failed 엔트리 7일 초과 시 삭제. **삭제 시 사용자 알림 필요**(요구안 §8) — 알림은 미구현, #1188 에서 추적 → [G-03](#g-03).
 - 재생 에러 분류: 비즈니스 4xx(409/422 등)는 재시도 대상이 아니어야 한다(현재 catch-all 재시도 → [G-14](#기타-확인된-갭)).
 - **고아 복구(#1162)**: 재생 중 앱이 강제 종료되면 엔트리가 `syncing` 으로 남는다. 시작 시(`SyncService.initialize`) `syncing` 엔트리를 재분류하며, 이후 플러시는 `syncing` 을 후보에서 제외한다(`_isPending`/`_isProcessable`). 규칙: `idempotencyKey` 있으면 → `pending`(재생이 서버에서 dedupe) · 키 없고 PUT/PATCH/DELETE → `pending`(자연 멱등) · **키 없고 POST(legacy) → `failed`+`ORPHANED_UNSAFE_REPLAY`**(자동 재생 시 중복 위험 → 사용자 판단으로 넘김, 무통보 삭제 금지). 상태 UI 노출은 [G-10](#g-10)/#1120.
 
@@ -107,10 +107,10 @@
 **[P0] schedule 도메인 어댑터 미등록 → 큐된 availability 쓰기 영구 유실.** availability 리포 12곳이 `domain: 'schedule'`로 큐잉하나 `SyncAdapterRegistry`는 `'schedule'` 미등록(대신 미사용 `'booking'`). 느린망 타임아웃→큐잉→낙관적 성공 표시 후, 재생이 `NO_ADAPTER`로 즉시 failed → 교사 근무가능시간 저장이 조용히 사라짐. 근거: `sync_adapter_registry.dart:19-41`, `sync_aware_teacher_availability_repository.dart:114-312`(12x), `sync_service.dart:199-208`. **수정: 레지스트리 `'booking'`→`'schedule'` + 도메인별 재생 e2e 테스트.** 즉시 반영 대상.
 
 ### G-02
-**[P0] 로그아웃이 쓰기 큐를 비우지 않아 교차 사용자 재생.** `logout()`은 토큰·`notification_settings`·응답 읽기캐시는 비우나 `sync_queue`는 미삭제. 사용자 A의 pending 쓰기가 계정 전환 후 B 토큰으로 재생. 느린망일수록 큐 적체가 커져 노출 확대. 근거: `auth_provider.dart:355-372`, `sync_queue_store.dart:7`(고정 box명, user-scope 아님).
+**[P0→해소] 로그아웃이 쓰기 큐를 비우지 않아 교차 사용자 재생.** `logout()`은 토큰·`notification_settings`·응답 읽기캐시는 비우나 `sync_queue`는 미삭제였음. 사용자 A의 pending 쓰기가 계정 전환 후 B 토큰으로 재생. **해소(PR #1159, 2026-07-10)**: `logout()` 에 큐 클리어 배선 + `auth_logout_sync_queue_test.dart`. 클리어 시 미전송 쓰기 사용자 통지는 #1188.
 
 ### G-03
-**[P0] 큐 정리 시 미전송 쓰기 무통보 삭제.** `cleanup()`이 500 초과 시 status 무관 최오래 삭제(pending 포함), failed 7일 삭제도 알림 없음. 장기 오프라인/느린망 적체 사용자가 편집을 통보 없이 잃음. 근거: `sync_queue_store.dart:139-203`.
+**[P0→해소(통지 잔여)] 큐 정리 시 미전송 쓰기 무통보 삭제.** `cleanup()`이 500 초과 시 status 무관 최오래 삭제(pending 포함)였음. **해소(PR #1159, 2026-07-10)**: 트리밍은 synced/failed 만, pending/syncing 보존 (`sync_queue_store_cleanup_test.dart`). failed 7일 만료 삭제의 사용자 알림은 미구현 — #1188.
 
 ### G-04
 **[P1] SWR 부재 — 모든 읽기가 풀 타임아웃 대기 후에야 캐시.** 캐시는 `onError`에서만 서빙, `onRequest` cache-first 없음. 고RTT/패킷손실 미국망에서 화면마다 최대 30s 스피너 후 last-known-good. 근거: `response_cache_interceptor.dart:37-93`(onRequest 없음), `api_client.dart:146-151`(30s), `environment.dart:24-27`. **해소(#1116): `onRequest` 캐시-우선 + 단일 백그라운드 재검증을 `swrSoftTimeout`(~2.5s)과 레이스 — 빠른망은 창 안에 최신 직행(무 stale-flash), 느린망은 캐시 즉시 서빙 후 백그라운드가 store 갱신. 서빙 stale 와 다르면 재검증 버스(`RevalidationEvents`/`ref.autoRevalidate`)가 구독 read 프로바이더를 자동 갱신(변경 시에만 emit → 루프 방지).**
@@ -158,8 +158,8 @@
 | 갭 | 이슈 | 상태 |
 |----|------|------|
 | G-01 schedule NO_ADAPTER 유실 | #1113 | 본 PR 수정 |
-| G-02 로그아웃 교차사용자 재생 | #1114 | 후속 |
-| G-03 큐 정리 미전송 삭제 | #1115 | 후속 |
+| G-02 로그아웃 교차사용자 재생 | #1114 | 해소(PR #1159) — 클리어 통지 잔여 #1188 |
+| G-03 큐 정리 미전송 삭제 | #1115 | 해소(PR #1159) — 만료 삭제 알림 잔여 #1188 |
 | G-04·G-05·G-06 느린망 읽기(SWR·allowlist·stale표시) | #1116 | 수정(SWR 레이스+재검증버스 · 배치2 allowlist · stale배너). 배치3~4 allowlist·전 프로바이더 라이브갱신은 후속 |
 | G-07 타임아웃 중복 생성(멱등키) | #1117 | 반영(INV-2 충족) — FE 키 생성·큐 저장·재생 + BE `idempotency_keys` reserve-first dedupe. §4.1·§4.3(고아 복구 #1162) 참조 |
 | G-08 sendTimeout/refresh 타임아웃 | #1118 | 후속 |
