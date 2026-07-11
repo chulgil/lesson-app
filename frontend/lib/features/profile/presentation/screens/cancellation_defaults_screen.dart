@@ -17,6 +17,25 @@ import '../providers/cancellation_defaults_provider.dart';
 class CancellationDefaultsScreen extends ConsumerWidget {
   const CancellationDefaultsScreen({super.key});
 
+  /// Awaits a notifier save; on failure the notifier has already rolled the
+  /// state back (#1184), so this only needs to tell the user.
+  Future<void> _save(
+    BuildContext context,
+    Future<void> Function() action,
+  ) async {
+    try {
+      await action();
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.cancellationDefaultsSaveFailed),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final defaultsAsync = ref.watch(cancellationDefaultsNotifierProvider);
@@ -30,29 +49,44 @@ class CancellationDefaultsScreen extends ConsumerWidget {
             (defaults) => _CancellationDefaultsContent(
               defaults: defaults,
               onDeadlineChanged: (hours) {
-                ref
-                    .read(cancellationDefaultsNotifierProvider.notifier)
-                    .updateDeadlineHours(hours);
+                _save(
+                  context,
+                  () => ref
+                      .read(cancellationDefaultsNotifierProvider.notifier)
+                      .updateDeadlineHours(hours),
+                );
               },
               onCompensationToggle: (enabled) {
-                ref
-                    .read(cancellationDefaultsNotifierProvider.notifier)
-                    .toggleCompensationEnabled(enabled);
+                _save(
+                  context,
+                  () => ref
+                      .read(cancellationDefaultsNotifierProvider.notifier)
+                      .toggleCompensationEnabled(enabled),
+                );
               },
               onIncludeExtraMinutesToggle: (include) {
-                ref
-                    .read(cancellationDefaultsNotifierProvider.notifier)
-                    .toggleIncludeExtraMinutesText(include);
+                _save(
+                  context,
+                  () => ref
+                      .read(cancellationDefaultsNotifierProvider.notifier)
+                      .toggleIncludeExtraMinutesText(include),
+                );
               },
               onCompensationMessageChanged: (message) {
-                ref
-                    .read(cancellationDefaultsNotifierProvider.notifier)
-                    .updateCompensationMessage(message);
+                _save(
+                  context,
+                  () => ref
+                      .read(cancellationDefaultsNotifierProvider.notifier)
+                      .updateCompensationMessage(message),
+                );
               },
               onNotifyOwnerToggle: (notify) {
-                ref
-                    .read(cancellationDefaultsNotifierProvider.notifier)
-                    .toggleNotifyOwnerOnLateCancel(notify);
+                _save(
+                  context,
+                  () => ref
+                      .read(cancellationDefaultsNotifierProvider.notifier)
+                      .toggleNotifyOwnerOnLateCancel(notify),
+                );
               },
             ),
         loading: () => const Center(child: CircularProgressIndicator()),
