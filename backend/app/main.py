@@ -10,9 +10,14 @@ from app.core.config import settings, validate_runtime_configuration
 from app.core.exceptions import register_exception_handlers
 from app.core.i18n import LocaleMiddleware
 from app.core.idempotency import IdempotencyMiddleware  # noqa: F401  add_middleware 에서 사용
+from app.core.logging_config import configure_app_logging
 from app.core.security_headers import (
     SecurityHeadersMiddleware,  # noqa: F401  add_middleware 에서 사용 — ruff 가 데코레이터 인자 detect 못함.
 )
+
+# At import time so every uvicorn worker emits app.* INFO logs (#1180) —
+# uvicorn's log config only wires its own loggers and leaves root at WARNING.
+configure_app_logging()
 
 
 @asynccontextmanager
