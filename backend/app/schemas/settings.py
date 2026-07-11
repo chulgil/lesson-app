@@ -2,7 +2,7 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 # ---------------------------------------------------------------------------
 # Teacher Settings
@@ -312,3 +312,33 @@ class TeachingResourceUpdate(BaseModel):
     external_url: str | None = None
     instrument: str | None = None
     tags: list[str] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Cancellation Defaults (#1178)
+# ---------------------------------------------------------------------------
+
+
+class CancellationDefaultsResponse(BaseModel):
+    """Wire shape mirrors the FE CancellationDefaults entity (snake_case keys)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    cancellation_deadline_hours: int
+    student_compensation_extra_minutes_enabled: bool
+    include_extra_minutes_text_on_late_cancel: bool
+    student_compensation_extra_minutes_message: str | None = None
+    notify_owner_on_late_cancel: bool
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
+
+
+class CancellationDefaultsUpdate(BaseModel):
+    """Partial update; explicit null clears the custom message (exclude_unset)."""
+
+    cancellation_deadline_hours: int | None = Field(default=None, ge=0, le=168)
+    student_compensation_extra_minutes_enabled: bool | None = None
+    include_extra_minutes_text_on_late_cancel: bool | None = None
+    student_compensation_extra_minutes_message: str | None = Field(default=None, max_length=200)
+    notify_owner_on_late_cancel: bool | None = None
