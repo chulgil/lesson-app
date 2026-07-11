@@ -11,6 +11,8 @@ from app.core.deps import get_current_teacher, get_current_user, get_db, get_pag
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.settings import (
+    CancellationDefaultsResponse,
+    CancellationDefaultsUpdate,
     FeedbackPresetCreate,
     FeedbackPresetResponse,
     FeedbackPresetUpdate,
@@ -169,6 +171,44 @@ async def update_proposal_settings(
     service = SettingsService(db)
     result: ProposalSettingsResponse = await service.update_proposal_settings(
         current_user.id, body.model_dump(exclude_none=True)
+    )
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Cancellation Defaults (#1178)
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/cancellation",
+    response_model=CancellationDefaultsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get my cancellation defaults",
+)
+async def get_cancellation_defaults(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> CancellationDefaultsResponse:
+    service = SettingsService(db)
+    result = await service.get_cancellation_defaults(current_user.id)
+    return result
+
+
+@router.put(
+    "/cancellation",
+    response_model=CancellationDefaultsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update my cancellation defaults",
+)
+async def update_cancellation_defaults(
+    body: CancellationDefaultsUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> CancellationDefaultsResponse:
+    service = SettingsService(db)
+    result = await service.update_cancellation_defaults(
+        current_user.id, body.model_dump(exclude_unset=True)
     )
     return result
 

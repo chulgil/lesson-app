@@ -582,9 +582,9 @@ class LessonService:
         """Resolve the compensation policy for a late student cancellation (#1167).
 
         Academy-owned subscriptions snapshot the policy on ``academy_subscriptions``;
-        for all other subscriptions the teacher-default values (matching the
-        ``CancellationDefaults`` FE entity defaults) apply, since those per-teacher
-        defaults are stored client-side only.
+        for all other subscriptions the teacher's persisted ``cancellation_defaults``
+        row applies (#1178), falling back to the enabled defaults when the teacher
+        never saved the settings.
         """
         from app.models.academy import Academy
         from app.models.academy_billing import AcademySubscription
@@ -595,11 +595,27 @@ class LessonService:
                 select(AcademySubscription).where(AcademySubscription.subscription_id == lesson.subscription_id)
             )
         if academy_sub is None:
+            # #1178 — non-academy: use the teacher's persisted defaults when a
+            # row exists (cancellation_defaults.teacher_id == teachers.id);
+            # teachers who never saved the settings keep the enabled defaults.
+            from app.models.settings import CancellationDefaults
+
+            defaults = await self.db.scalar(
+                select(CancellationDefaults).where(CancellationDefaults.teacher_id == lesson.teacher_id)
+            )
+            if defaults is None:
+                return _LateCancelCompensation(
+                    enabled=True,
+                    include_text=True,
+                    message=_DEFAULT_COMPENSATION_MESSAGE,
+                    notify_owner=False,
+                    owner_user_id=None,
+                )
             return _LateCancelCompensation(
-                enabled=True,
-                include_text=True,
-                message=_DEFAULT_COMPENSATION_MESSAGE,
-                notify_owner=False,
+                enabled=defaults.student_compensation_extra_minutes_enabled,
+                include_text=defaults.include_extra_minutes_text_on_late_cancel,
+                message=defaults.student_compensation_extra_minutes_message or _DEFAULT_COMPENSATION_MESSAGE,
+                notify_owner=False,  # owner notification is an academy-only concern
                 owner_user_id=None,
             )
 
