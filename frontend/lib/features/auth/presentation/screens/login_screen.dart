@@ -13,7 +13,6 @@ import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
@@ -261,8 +260,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             child: Text(
               AppStrings.authParentLoginLink,
-              style: AppTypography.buttonSmall.copyWith(
-                fontFamily: AppTypography.fontFamily,
+              // #1186 — match the screen's action texts (social button labels,
+              // Playfair serif); body sans stood out as a third typeface here.
+              style: NotebookTypography.buttonLabelSerif.copyWith(
                 color: AppColors.inkSecondary,
                 decoration: TextDecoration.underline,
                 decorationColor: AppColors.inkSecondary,
