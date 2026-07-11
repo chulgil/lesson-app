@@ -107,6 +107,29 @@ class SmsService:
                     _mask_phone(phone_number),
                 )
                 return False
+            # Solapi send-many/detail returns HTTP 200 even when the individual
+            # message failed to register — per-message failures arrive in
+            # ``failedMessageList`` (#1179). Only errorCode/statusMessage are
+            # logged; never the raw entry (it contains the unmasked number).
+            try:
+                body = response.json()
+            except Exception:
+                logger.warning(
+                    "SMS send response body unparseable (status=%d) — trusting status, phone=%s",
+                    response.status_code,
+                    _mask_phone(phone_number),
+                )
+                return True
+            failed = (body or {}).get("failedMessageList") or []
+            if failed:
+                first = failed[0] if isinstance(failed[0], dict) else {}
+                logger.error(
+                    "SMS registration failed phone=%s error_code=%s status_message=%s",
+                    _mask_phone(phone_number),
+                    first.get("errorCode"),
+                    first.get("statusMessage"),
+                )
+                return False
             logger.info("SMS OTP sent phone=%s", _mask_phone(phone_number))
             return True
         except Exception:
