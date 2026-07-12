@@ -30,6 +30,25 @@ import '../providers/teacher_extended_profile_provider.dart';
 ///
 /// spec §6.2 — 메인 홈 5묶음 카테고리 메뉴의 🎓 수업방식 카드 진입로.
 /// 3 항목을 한 화면에서 라디오 + TextField 로 결정한다.
+/// #1194 — awaits a settings save; the notifiers roll back on failure, so
+/// this only needs to tell the user the change did not land.
+Future<void> _saveSetting(
+  BuildContext context,
+  Future<void> Function() action,
+) async {
+  try {
+    await action();
+  } catch (_) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(AppStrings.settingsSaveFailed),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+}
+
 class LessonStyleSettingsScreen extends ConsumerWidget {
   const LessonStyleSettingsScreen({super.key});
 
@@ -134,9 +153,12 @@ class _LessonTypeSection extends ConsumerWidget {
                                           : selected.contains(o),
                                 )
                                 .toList();
-                        ref
-                            .read(teacherExtendedProfileProvider.notifier)
-                            .updateLessonTypes(next);
+                        _saveSetting(
+                          context,
+                          () => ref
+                              .read(teacherExtendedProfileProvider.notifier)
+                              .updateLessonTypes(next),
+                        );
                       },
                       selectedColor: AppColors.paperAccent,
                       backgroundColor: AppColors.paper,
@@ -187,9 +209,12 @@ class _DurationSection extends ConsumerWidget {
                     title: Text(AppStrings.lessonStyleMinutes(minutes)),
                     onChanged: (value) {
                       if (value == null || value == current) return;
-                      ref
-                          .read(teacherSettingsNotifierProvider.notifier)
-                          .updateDefaultDuration(value);
+                      _saveSetting(
+                        context,
+                        () => ref
+                            .read(teacherSettingsNotifierProvider.notifier)
+                            .updateDefaultDuration(value),
+                      );
                     },
                   ),
                 )
@@ -224,9 +249,12 @@ class _MinBookingSection extends ConsumerWidget {
                     title: Text(_formatHours(hours)),
                     onChanged: (value) {
                       if (value == null || value == current) return;
-                      ref
-                          .read(teacherSettingsNotifierProvider.notifier)
-                          .updateMinBookingHours(value);
+                      _saveSetting(
+                        context,
+                        () => ref
+                            .read(teacherSettingsNotifierProvider.notifier)
+                            .updateMinBookingHours(value),
+                      );
                     },
                   ),
                 )
@@ -320,9 +348,12 @@ class _GuidanceMessageFieldState extends ConsumerState<_GuidanceMessageField> {
         counterText: '',
       ),
       onChanged: (value) {
-        ref
-            .read(teacherSettingsNotifierProvider.notifier)
-            .updateBookingGuidanceMessage(value);
+        _saveSetting(
+          context,
+          () => ref
+              .read(teacherSettingsNotifierProvider.notifier)
+              .updateBookingGuidanceMessage(value),
+        );
       },
     );
   }

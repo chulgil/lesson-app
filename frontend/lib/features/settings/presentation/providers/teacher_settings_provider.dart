@@ -93,13 +93,15 @@ class TeacherSettingsNotifier extends _$TeacherSettingsNotifier {
   /// discard the user's other (already-applied) values. Rolling back to
   /// [previous] keeps the screen usable; if there was no prior value we fall
   /// back to the error state so the first load can still surface failures.
-  /// These callers are fire-and-forget, so we do not rethrow. (#6 / #19)
+  /// #1194: rethrows after rollback so screens can tell the user the save
+  /// failed (silent rollback hid real network failures). (#6 / #19 갱신)
   void _rollbackOrError(TeacherSettings? previous, Object e, StackTrace st) {
     if (previous != null) {
       state = AsyncValue.data(previous);
     } else {
       state = AsyncValue.error(e, st);
     }
+    Error.throwWithStackTrace(e, st);
   }
 
   /// Add an instrument to the list

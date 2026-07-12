@@ -29,7 +29,7 @@ class CancellationDefaultsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(AppStrings.cancellationDefaultsSaveFailed),
+          content: Text(AppStrings.settingsSaveFailed),
           behavior: SnackBarBehavior.floating,
         ),
       );
