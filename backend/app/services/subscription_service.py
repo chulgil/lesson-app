@@ -1406,6 +1406,24 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
+    async def _student_user_id(self, student_id: str) -> str | None:
+        """Resolve a proposal's student_id (Student row id or legacy user id) to a user id."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is not None:
+            return student.user_id
+        return student_id
+
+    async def _teacher_user_id(self, teacher_id: str) -> str | None:
+        """Resolve a proposal's teacher_id (Teacher row id or legacy user id) to a user id."""
+        from app.models.teacher import Teacher
+
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            return teacher.user_id
+        return teacher_id
+
     async def _notify_deposit_received(
         self,
         subscription: Any,
@@ -1769,6 +1787,21 @@ class SubscriptionService:
                 event_type="proposalSent",
             )
 
+        # #1193 — in-app row for the student; the alimtalk/FCM below are
+        # delivery channels only and never persisted for the notification list.
+        recipient = await self._student_user_id(proposal.student_id)
+        if recipient:
+            from app.services.notification_service import NotificationPriority, NotificationService
+
+            await NotificationService(self.db).create_and_send(
+                user_id=recipient,
+                notification_type="proposalReceived",
+                title="수강권 제안 도착",
+                body="선생님이 수강권을 제안했어요. 확인 후 진행해주세요.",
+                priority=NotificationPriority.high,
+                action_url=f"/subscriptions/{proposal.id}",
+            )
+
         # #423 — fire-and-forget alimtalk LNZ_INVOICE. Failure must not break proposal creation.
         try:
             await self._send_alimtalk_invoice(proposal)
@@ -1951,6 +1984,24 @@ class SubscriptionService:
             proposal.status = ProposalStatus.paymentNotified
             proposal.payment_notified_at = datetime.now(UTC)
             proposal.selected_template_id = data.selected_template_id
+
+            # #1193 — the teacher otherwise learns of the acceptance only by
+            # polling the home section (FE local notifications are actor-only).
+            recipient = await self._teacher_user_id(proposal.teacher_id)
+            if recipient:
+                from app.services.notification_service import (
+                    NotificationPriority,
+                    NotificationService,
+                )
+
+                await NotificationService(self.db).create_and_send(
+                    user_id=recipient,
+                    notification_type="proposalAccepted",
+                    title="수강권 제안 수락",
+                    body="학생이 수강권 제안을 수락하고 입금을 알렸어요. 입금 확인 후 발급해주세요.",
+                    priority=NotificationPriority.high,
+                    action_url=f"/subscriptions/{proposal.id}",
+                )
 
             # GAP-6: Sync LessonRequest status → paymentNotified
             if proposal.lesson_request_id:
