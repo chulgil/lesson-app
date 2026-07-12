@@ -100,10 +100,10 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
           label: AppStrings.authTermsOfService,
           value: _termsOfService,
           onChanged: _setTerms,
-          onViewContent: () => _showTermsContent(
+          onViewContent: () => showTermsContentSheet(
             context,
             AppStrings.authTermsOfServiceTitle,
-            _termsOfServiceContent,
+            termsOfServiceContent,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -112,10 +112,10 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
           label: AppStrings.authPrivacyPolicy,
           value: _privacyPolicy,
           onChanged: _setPrivacy,
-          onViewContent: () => _showTermsContent(
+          onViewContent: () => showTermsContentSheet(
             context,
             AppStrings.authPrivacyPolicy,
-            _privacyPolicyContent,
+            privacyPolicyContent,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -124,7 +124,7 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
           label: AppStrings.authMarketingConsent,
           value: _marketingConsent,
           onChanged: _setMarketing,
-          onViewContent: () => _showTermsContent(
+          onViewContent: () => showTermsContentSheet(
             context,
             AppStrings.authMarketingConsent,
             _marketingConsentContent,
@@ -218,48 +218,51 @@ class _TermsAgreementSectionState extends State<TermsAgreementSection> {
     );
   }
 
-  void _showTermsContent(BuildContext context, String title, String content) {
-    showNotebookModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          maxChildSize: 0.9,
-          minChildSize: 0.5,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                const BottomSheetHandle(),
-                Padding(
+}
+
+/// Read-only terms/policy viewer sheet — shared by the signup agreement
+/// flow and the login footer (TERMS / PRIVACY).
+void showTermsContentSheet(BuildContext context, String title, String content) {
+  showNotebookModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (context, scrollController) {
+          return Column(
+            children: [
+              const BottomSheetHandle(),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Text(title, style: NotebookTypography.sectionTitle),
+              ),
+              const ThinRule(),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
                   padding: const EdgeInsets.all(AppSpacing.space4),
-                  child: Text(title, style: NotebookTypography.sectionTitle),
-                ),
-                const ThinRule(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(AppSpacing.space4),
-                    child: Text(
-                      content,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.inkSecondary,
-                        height: 1.6,
-                      ),
+                  child: Text(
+                    content,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                      height: 1.6,
                     ),
                   ),
                 ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
 }
 
-const _termsOfServiceContent = '''
+const termsOfServiceContent = '''
 제1조 (목적)
 이 약관은 Lessonaza(이하 "회사")가 제공하는 음악 레슨 관리 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
 
@@ -319,7 +322,7 @@ const _termsOfServiceContent = '''
 이 약관은 2026년 4월 1일부터 시행합니다.
 ''';
 
-const _privacyPolicyContent = '''
+const privacyPolicyContent = '''
 Lessonaza(이하 "회사")는 개인정보보호법에 따라 이용자의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.
 
 1. 수집하는 개인정보 항목

@@ -21,6 +21,7 @@ import '../extensions/user_role_visuals.dart';
 import '../providers/auth_provider.dart';
 import '../../../home/home_ui_facade.dart' show AppUpdateBanner;
 import '../widgets/dev_login_section.dart';
+import '../widgets/terms_agreement_section.dart';
 import '../widgets/login_bottom_sheets.dart';
 
 const _googleServerClientId = String.fromEnvironment(
@@ -282,17 +283,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           color: AppColors.ink.withValues(alpha: 0.25),
           margin: const EdgeInsets.only(bottom: AppSpacing.space3),
         ),
-        Text(
-          'TERMS · PRIVACY · MMXXVI',
-          style: NotebookTypography.metaMono.copyWith(
-            color: AppColors.inkTertiary,
-            letterSpacing: 1.5,
-          ),
-          textAlign: TextAlign.center,
+        // Footer legal links — same read-only sheets as the signup flow
+        // (운영배포 게이트 감사 2026-07-12: 정적 텍스트였음).
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap:
+                  () => showTermsContentSheet(
+                    context,
+                    AppStrings.authTermsOfServiceTitle,
+                    termsOfServiceContent,
+                  ),
+              behavior: HitTestBehavior.opaque,
+              child: Text('TERMS', style: _footerLinkStyle),
+            ),
+            Text(' · ', style: _footerStyle),
+            GestureDetector(
+              onTap:
+                  () => showTermsContentSheet(
+                    context,
+                    AppStrings.authPrivacyPolicy,
+                    privacyPolicyContent,
+                  ),
+              behavior: HitTestBehavior.opaque,
+              child: Text('PRIVACY', style: _footerLinkStyle),
+            ),
+            Text(' · MMXXVI', style: _footerStyle),
+          ],
         ),
       ],
     );
   }
+
+  TextStyle get _footerStyle => NotebookTypography.metaMono.copyWith(
+    color: AppColors.inkTertiary,
+    letterSpacing: 1.5,
+  );
+
+  TextStyle get _footerLinkStyle => _footerStyle.copyWith(
+    decoration: TextDecoration.underline,
+    decorationColor: AppColors.inkTertiary,
+  );
 
   // ── Login handlers ────────────────────────────────────────────────
 
