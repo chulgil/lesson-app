@@ -79,7 +79,10 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
       state = AsyncValue.data(updated);
       ref.invalidate(currentTeacherProfileProvider);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      // #1194: keep the form usable (no error-view blanking) and let the
+      // screen surface the failure. Sibling methods still swallow — follow-up.
+      state = AsyncValue.data(current);
+      Error.throwWithStackTrace(e, st);
     }
   }
 

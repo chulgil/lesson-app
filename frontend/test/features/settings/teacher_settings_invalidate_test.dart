@@ -158,9 +158,14 @@ void main() {
         teacherSettingsNotifierProvider.future,
       );
 
-      await container
-          .read(teacherSettingsNotifierProvider.notifier)
-          .updateBreakTime(15);
+      // #1194 — the notifier now rethrows after rolling back so screens can
+      // surface the failure; the rollback contract below is unchanged.
+      await expectLater(
+        container
+            .read(teacherSettingsNotifierProvider.notifier)
+            .updateBreakTime(15),
+        throwsException,
+      );
 
       final state = container.read(teacherSettingsNotifierProvider);
       expect(state.hasError, isFalse, reason: 'no full-screen error state');

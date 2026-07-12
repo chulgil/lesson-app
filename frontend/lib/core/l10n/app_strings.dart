@@ -7943,8 +7943,8 @@ class AppStrings {
   // ── Cancellation Defaults Settings ──
   static const profileCancellationDefaultsTitle = '취소 정책 기본값';
 
-  /// 취소정책 저장 실패 SnackBar (#1184)
-  static const cancellationDefaultsSaveFailed = '설정 저장에 실패했습니다. 다시 시도해주세요.';
+  /// 설정 저장 실패 SnackBar (#1184·#1194 — 설정 계열 공용)
+  static const settingsSaveFailed = '설정 저장에 실패했습니다. 다시 시도해주세요.';
 
   /// 취소 정책 기본값 화면 역할 안내 — #801. 변경권·노쇼는 취소/노쇼 정책 소관 명시.
   static const cancellationDefaultsRoleNote =

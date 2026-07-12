@@ -49,7 +49,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text(AppStrings.cancellationDefaultsSaveFailed),
+      find.text(AppStrings.settingsSaveFailed),
       findsOneWidget,
     );
     expect(
