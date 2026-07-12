@@ -361,6 +361,13 @@ class LessonRequestService:
             suggested_slots=[s.model_dump() for s in data.slots],
             message=data.message,
         )
+        await self._notify_counterparty(
+            request,
+            current_user,
+            notification_type="scheduleChangeAlternative",
+            title="대안 시간 제안",
+            body="선생님이 레슨 시간 대안을 제안했어요. 확인 후 선택해주세요.",
+        )
         await self.db.flush()
         await self.db.refresh(request)
         return await self._to_response(request)
@@ -421,6 +428,13 @@ class LessonRequestService:
             suggested_slots=[selected_slot],
             selected_slot_index=data.selected_slot_index,
             message=data.message,
+        )
+        await self._notify_counterparty(
+            request,
+            current_user,
+            notification_type="scheduleChangeApproved",
+            title="제안 시간 수락",
+            body="학생이 제안 시간을 수락했어요. 레슨 시간이 확정되었습니다.",
         )
         await self.db.flush()
         await self.db.refresh(request)
@@ -492,6 +506,13 @@ class LessonRequestService:
             event_type="counterPropose",
             suggested_slots=[s.model_dump() for s in data.slots],
             message=data.message,
+        )
+        await self._notify_counterparty(
+            request,
+            current_user,
+            notification_type="scheduleChangeRequested",
+            title="다른 시간 제안",
+            body="학생이 다른 레슨 시간을 제안했어요. 확인해주세요.",
         )
         await self.db.flush()
         await self.db.refresh(request)
@@ -763,6 +784,44 @@ class LessonRequestService:
                 message=message,
                 subscription_id=subscription_id,
             )
+        )
+
+    async def _notify_counterparty(
+        self,
+        request: Any,
+        current_user: Any,
+        *,
+        notification_type: str,
+        title: str,
+        body: str,
+    ) -> None:
+        """Create an in-app/push notification for the negotiation counterparty (#1193).
+
+        FE local notifications only render on the actor's own device, so the
+        counterpart learns about a transition only through this server row.
+        ``request.student_id`` stores the student *user* id (see
+        ``_can_access_request``); ``request.teacher_id`` may be a Teacher row
+        id or a legacy user id, so resolve via the Teacher row with fallback.
+        """
+        from app.models.teacher import Teacher
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        if actor_type(current_user) == "teacher":
+            recipient_user_id = request.student_id
+        else:
+            teacher = await self.db.get(Teacher, request.teacher_id)
+            recipient_user_id = teacher.user_id if teacher else request.teacher_id
+
+        if not recipient_user_id:
+            return
+
+        await NotificationService(self.db).create_and_send(
+            user_id=recipient_user_id,
+            notification_type=notification_type,
+            title=title,
+            body=body,
+            priority=NotificationPriority.high,
+            action_url=f"/schedule/request/{request.id}",
         )
 
     async def _get_request_for_user(self, request_id: str, current_user: Any) -> Any:
