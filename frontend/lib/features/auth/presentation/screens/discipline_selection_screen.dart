@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/value_objects/discipline.dart';
-import '../../../../core/domain/value_objects/discipline_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -55,7 +54,7 @@ class DisciplineSelectionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final disciplines = DisciplineRegistry.all;
+    final disciplines = selectableDisciplines();
 
     return NotebookScreenScaffold(
       // M7 (0702 감사) — go() 진입이라 스택이 없어 역할을 잘못 고른 사용자가

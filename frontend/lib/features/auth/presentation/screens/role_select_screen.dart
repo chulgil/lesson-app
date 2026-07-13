@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/domain/value_objects/discipline_registry.dart';
+import '../providers/active_discipline_provider.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -77,10 +77,10 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
   }
 
   void _goToOnboarding(UserRole role) {
-    // Multi-discipline gate (#977, live since #979-B): with >1 registered
-    // discipline the user picks a discipline before role onboarding; with a
-    // single discipline this would auto-skip straight to role onboarding.
-    if (DisciplineRegistry.all.length > 1) {
+    // Multi-discipline gate (#977; #1196 prod-exposure gate): remote/prod
+    // builds expose only production-ready disciplines (music today) → single
+    // → auto-skip to role onboarding. Mock/dev sees all registered → picks.
+    if (selectableDisciplines().length > 1) {
       context.go(AppRoutes.disciplineSelection, extra: role);
       return;
     }

@@ -18,6 +18,7 @@ class DisciplineRegistry {
     displayKey: 'discipline.music',
     themeColorSeed: 0xFF9B1B12,
     expertiseCatalogId: 'instruments',
+    productionReady: true,
   );
 
   /// Fitness (헬스 / GX) discipline — Phase 4 (#979-B). The second registered
@@ -52,6 +53,12 @@ class DisciplineRegistry {
   ];
 
   static List<Discipline> get all => _registered;
+
+  /// Production-exposed subset (#1196) — verticals with a real home/tools.
+  /// Pure (no env dep, per flutter-architecture); env gating lives in the
+  /// presentation layer (see selectableDisciplines).
+  static List<Discipline> get productionReady =>
+      _registered.where((d) => d.productionReady).toList();
 
   /// Resolve a discipline by [id]; null if not registered.
   static Discipline? byId(String id) {

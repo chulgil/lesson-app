@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../core/domain/value_objects/discipline.dart';
 import '../../../../core/domain/value_objects/discipline_registry.dart';
 import 'user_role_provider.dart';
@@ -48,4 +49,17 @@ Discipline activeDiscipline(ActiveDisciplineRef ref) {
   final id = ref.watch(selectedDisciplineStorageProvider).valueOrNull;
   return (id != null ? DisciplineRegistry.byId(id) : null) ??
       DisciplineRegistry.fallback;
+}
+
+/// Disciplines shown in the sign-up selection UI (#1196).
+///
+/// Remote/production builds expose only production-ready verticals (music
+/// today) so users never land on an unfinished discipline's home. Mock/dev
+/// builds — and widget tests, which default to mock — still see every
+/// registered discipline so the multi-Discipline path (#979-B/#1102) stays
+/// exercisable. [useMock] defaults to [EnvironmentConfig.useMockData]; pass
+/// it explicitly in tests to exercise the gated (production) branch.
+List<Discipline> selectableDisciplines({bool? useMock}) {
+  final mock = useMock ?? EnvironmentConfig.useMockData;
+  return mock ? DisciplineRegistry.all : DisciplineRegistry.productionReady;
 }
