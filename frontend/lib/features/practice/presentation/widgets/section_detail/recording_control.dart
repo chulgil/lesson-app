@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lessonaza/core/widgets/mic_permission_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
@@ -289,14 +290,8 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                                       );
                                     } else {
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(
+                                        await showMicPermissionDeniedSnackBar(
                                           context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-                                            ),
-                                          ),
                                         );
                                       }
                                     }

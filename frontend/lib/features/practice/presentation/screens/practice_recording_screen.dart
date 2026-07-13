@@ -6,6 +6,7 @@ import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/mic_permission_snackbar.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
@@ -613,12 +614,8 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                                 ref.invalidate(microphonePermissionProvider);
                               } else {
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
-                                      ),
-                                    ),
+                                  await showMicPermissionDeniedSnackBar(
+                                    context,
                                   );
                                 }
                               }

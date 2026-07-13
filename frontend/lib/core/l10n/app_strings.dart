@@ -3164,6 +3164,13 @@ class AppStrings {
   /// 마이크 권한이 필요합니다 (microphone permission needed)
   static const micPermissionNeeded = '마이크 권한이 필요합니다';
 
+  /// 마이크 권한 영구거부 시 설정 유도 SnackBar (#1197)
+  static const micPermissionSettingsGuide =
+      '마이크 권한이 필요합니다. 설정에서 마이크 권한을 허용해주세요.';
+
+  /// SnackBar 액션 — OS 앱 설정 열기 (#1197)
+  static const openSettings = '설정 열기';
+
   // -- Add External Link Sheet --
 
   /// 외부 링크 추가 (add external link sheet title)
