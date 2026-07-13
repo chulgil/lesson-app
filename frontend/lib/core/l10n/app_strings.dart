@@ -6497,6 +6497,9 @@ class AppStrings {
   static const searchNoAcademiesFound = '검색된 학원이 없습니다';
   static const searchNoTeachersFound = '검색된 선생님이 없습니다';
   static const searchTrySuggestion = '다른 검색어나 필터를 시도해보세요';
+
+  /// 검색 0건 대체경로 CTA — 초대 코드로 직접 연결 (#1198)
+  static const searchConnectViaInviteCode = '초대 코드로 연결하기';
   static const searchPreviousTeacher = '이전에 레슨했어요';
   static const searchProfileLoadError = '프로필을 불러올 수 없습니다';
   static const searchProfileNotFound = '선생님 정보를 찾을 수 없습니다';
