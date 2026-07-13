@@ -556,6 +556,7 @@ class SubscriptionService:
         lost: list[LessonBooking] = []
         seen_dates: set[date] = set()
         for booking in targets:
+            old_date, old_time = booking.scheduled_date, booking.scheduled_time
             shift = (new_day_of_week - booking.scheduled_date.weekday()) % 7
             new_date = booking.scheduled_date + timedelta(days=shift)
             # 같은 새 일정에 이미 옮긴 booking 이 있거나 conflict — 손실 처리.
@@ -578,11 +579,28 @@ class SubscriptionService:
             if conflict is not None or new_date in seen_dates:
                 booking.status = BookingStatus.cancelled
                 lost.append(booking)
+                # #1203 — keep the calendar (Lesson SSOT) in sync with the lost booking.
+                await self._sync_lesson_to_booking_change(
+                    subscription_id=subscription_id,
+                    teacher_id=booking.teacher_id,
+                    old_date=old_date,
+                    old_time=old_time,
+                    cancel=True,
+                )
                 continue
             booking.scheduled_date = new_date
             booking.scheduled_time = new_time
             seen_dates.add(new_date)
             rescheduled += 1
+            # #1203 — move the matching Lesson (calendar SSOT) alongside the booking.
+            await self._sync_lesson_to_booking_change(
+                subscription_id=subscription_id,
+                teacher_id=booking.teacher_id,
+                old_date=old_date,
+                old_time=old_time,
+                new_date=new_date,
+                new_time=new_time,
+            )
 
         await self.db.flush()
 
@@ -608,6 +626,44 @@ class SubscriptionService:
             "credits_accrued": credits_accrued,
             "new_expires_at": sub_row.end_date if sub_row is not None else None,
         }
+
+    async def _sync_lesson_to_booking_change(
+        self,
+        *,
+        subscription_id: str,
+        teacher_id: str,
+        old_date: date,
+        old_time: str,
+        new_date: date | None = None,
+        new_time: str | None = None,
+        cancel: bool = False,
+    ) -> None:
+        """#1203 — keep the Lesson (calendar SSOT) in sync when bulk_change moves or
+        cancels a LessonBooking.
+
+        Lesson and LessonBooking are stored separately with no FK, so the calendar
+        (which reads Lesson) drifts unless the matching Lesson is updated too. Match
+        by (subscription_id, teacher_id, date, start_time); no-op if no Lesson row
+        matches (e.g. bookings without a generated Lesson).
+        """
+        from app.models.lesson import Lesson, LessonStatus
+
+        lesson = await self.db.scalar(
+            select(Lesson).where(
+                Lesson.subscription_id == subscription_id,
+                Lesson.teacher_id == teacher_id,
+                Lesson.date == old_date,
+                Lesson.start_time == old_time,
+                Lesson.status == LessonStatus.scheduled,
+            )
+        )
+        if lesson is None:
+            return
+        if cancel:
+            lesson.status = LessonStatus.cancelled
+        elif new_date is not None and new_time is not None:
+            lesson.date = new_date
+            lesson.start_time = new_time
 
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status.
