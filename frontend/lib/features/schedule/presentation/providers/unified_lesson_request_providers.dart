@@ -4,6 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/config/environment.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../lessons/lessons_facade.dart'
+    show
+        lessonsByStudentProvider,
+        lessonsProvider,
+        todayLessonsProvider,
+        upcomingLessonsProvider;
 import '../../../relationship/relationship_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../data/repositories/mock_unified_lesson_request_repository.dart';
@@ -950,6 +956,14 @@ class UnifiedLessonRequestActions {
         createdAt: DateTime.now(),
       ),
     );
+
+    // #1192 — accepting the change moved the confirmed Lesson rows on the
+    // server. The lesson caches are keepAlive, so invalidate them or the
+    // calendar/home keep showing the old time even after both parties agreed.
+    ref.invalidate(lessonsProvider);
+    ref.invalidate(todayLessonsProvider);
+    ref.invalidate(upcomingLessonsProvider);
+    ref.invalidate(lessonsByStudentProvider);
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }

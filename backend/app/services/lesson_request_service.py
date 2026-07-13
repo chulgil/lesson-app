@@ -176,7 +176,7 @@ class LessonRequestService:
                 detail="Event request_id must match path request_id",
             )
 
-        await self._get_request_for_user(request_id, current_user)
+        request = await self._get_request_for_user(request_id, current_user)
         suggested_slots = [slot.model_dump(mode="json") for slot in data.suggested_slots]
         event_type = RequestEventType(data.event_type)
         schedule_change_type = (
@@ -230,7 +230,131 @@ class LessonRequestService:
         self.db.add(event)
         await self.db.flush()
         await self.db.refresh(event)
+        # #1192 — accepting a confirmed-lesson schedule change must move the actual
+        # Lesson rows (calendar SSOT), not just record the timeline event.
+        if event_type == RequestEventType.scheduleChangeAccepted:
+            await self._apply_schedule_change_to_lessons(request, event)
         return RequestEventResponse.model_validate(event)
+
+    @staticmethod
+    def _resolve_schedule_change_slot(event: Any) -> tuple[int | None, str | None]:
+        """Resolve the (day_of_week, start_time) an accepted change moves lessons to.
+
+        Prefers the selected suggested slot; falls back to the proposed day/time.
+        """
+        slots = event.suggested_slots or []
+        index = event.selected_slot_index if event.selected_slot_index is not None else 0
+        if slots and 0 <= index < len(slots):
+            slot = slots[index]
+            day = slot.get("day_of_week") if isinstance(slot, dict) else getattr(slot, "day_of_week", None)
+            time = slot.get("start_time") if isinstance(slot, dict) else getattr(slot, "start_time", None)
+            if day is not None and time:
+                return day, time
+        return event.proposed_day_of_week, event.proposed_time
+
+    async def _apply_schedule_change_to_lessons(self, request: Any, event: Any) -> None:
+        """#1192 — move confirmed Lesson rows when a schedule change is accepted.
+
+        Without this, `add_event` only recorded a timeline event, so the weekly/
+        daily calendar (Lesson SSOT) and conflict ledger (LessonBooking) kept the
+        old time even after both parties agreed → no-show risk.
+
+        - single: the next upcoming confirmed lesson shifts to the new weekday+time
+          within its own week (nearest future occurrence, no past dates).
+        - bulk: every future confirmed lesson shifts to the new weekday+time.
+        - a collision with another booking at the new slot aborts the accept
+          (409) before any row is mutated — safe, per the #1192 design.
+        """
+        import datetime as dt
+
+        from app.models.lesson import Lesson
+        from app.models.request_event import ScheduleChangeType
+        from app.models.schedule import BookingStatus, LessonBooking
+        from app.models.subscription import SubscriptionProposal
+
+        new_day, new_time = self._resolve_schedule_change_slot(event)
+        if new_day is None or not new_time:
+            return
+
+        # request → proposal → subscription_id (the link lives on the proposal).
+        subscription_id = await self.db.scalar(
+            select(SubscriptionProposal.subscription_id)
+            .where(
+                SubscriptionProposal.lesson_request_id == request.id,
+                SubscriptionProposal.subscription_id.is_not(None),
+            )
+            .order_by(SubscriptionProposal.id.desc())
+        )
+        if subscription_id is None:
+            return
+
+        today = dt.date.today()
+        lessons = list(
+            (
+                await self.db.scalars(
+                    select(Lesson)
+                    .where(
+                        Lesson.subscription_id == subscription_id,
+                        Lesson.date >= today,
+                        Lesson.status == "scheduled",
+                        Lesson.is_archived == False,  # noqa: E712
+                    )
+                    .order_by(Lesson.date.asc(), Lesson.start_time.asc())
+                )
+            ).all()
+        )
+        if not lessons:
+            return
+
+        change_type = getattr(event.schedule_change_type, "value", event.schedule_change_type)
+        is_bulk = change_type == ScheduleChangeType.bulkChange.value
+        targets = lessons if is_bulk else lessons[:1]
+
+        moves: list[tuple[Any, dt.date]] = [
+            (lesson, lesson.date + dt.timedelta(days=(new_day - lesson.date.weekday()) % 7)) for lesson in targets
+        ]
+
+        active_booking_statuses = [
+            BookingStatus.pending,
+            BookingStatus.confirmed,
+            BookingStatus.changeRequested,
+        ]
+
+        # Conflict-check every move first so a collision aborts atomically
+        # (reject the accept) before any row is mutated.
+        for lesson, new_date in moves:
+            conflict = await self.db.scalar(
+                select(LessonBooking.id).where(
+                    LessonBooking.teacher_id == lesson.teacher_id,
+                    LessonBooking.scheduled_date == new_date,
+                    LessonBooking.scheduled_time == new_time,
+                    LessonBooking.subscription_id != subscription_id,
+                    LessonBooking.status.in_(active_booking_statuses),
+                )
+            )
+            if conflict is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Schedule change conflicts with an existing booking at the new time.",
+                )
+
+        for lesson, new_date in moves:
+            old_date, old_time = lesson.date, lesson.start_time
+            lesson.date = new_date
+            lesson.start_time = new_time
+            booking = await self.db.scalar(
+                select(LessonBooking).where(
+                    LessonBooking.subscription_id == subscription_id,
+                    LessonBooking.teacher_id == lesson.teacher_id,
+                    LessonBooking.scheduled_date == old_date,
+                    LessonBooking.scheduled_time == old_time,
+                    LessonBooking.status.in_(active_booking_statuses),
+                )
+            )
+            if booking is not None:
+                booking.scheduled_date = new_date
+                booking.scheduled_time = new_time
+        await self.db.flush()
 
     async def update(self, request_id: str, data: LessonRequestUpdate, current_user: Any) -> LessonRequestResponse:
         """Update a lesson request."""
