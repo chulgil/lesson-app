@@ -23,8 +23,6 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import '../services/booking_notification_service.dart';
-import '../../../notifications/notifications_facade.dart';
 import '../extensions/cancel_reason_visuals.dart';
 import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
@@ -1035,22 +1033,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             .toList(),
         message: result.message.isEmpty ? null : result.message,
       );
-      // #541 — 제안 이벤트를 상대에게 알림 (응답 3종과 대칭, 비동기 핸드오프)
-      final fromTeacher = actorRole == ProposerRole.teacher;
-      final opponentId = fromTeacher ? request.studentId : request.teacherId;
-      if (opponentId.isNotEmpty) {
-        unawaited(
-          ref
-              .read(notificationServiceProvider)
-              .showNotification(
-                BookingNotificationService.createScheduleChangeProposed(
-                  userId: opponentId,
-                  fromTeacher: fromTeacher,
-                  data: {'requestId': request.id},
-                ),
-              ),
-        );
-      }
+      // #1191 — 상대 통지는 BE Notification row 가 SSOT (#1200: add_event 에서
+      // scheduleChangeAlternative→학생 emit). FE 로컬 알림은 액터 기기 전용이라
+      // 상대 통지로 쓸 수 없어 제거함 (기존엔 액터 기기에 오발).
       if (context.mounted) {
         _showSuccess(AppStrings.scheduleChangePropose);
       }
@@ -1070,9 +1055,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final actorId = viewerRole == 'teacher'
         ? request.teacherId
         : request.studentId;
-    final fromTeacher = actorRole == ProposerRole.teacher;
-    final opponentId = fromTeacher ? request.studentId : request.teacherId;
-
     // Find the pending proposal's slots and change type
     final events =
         ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
@@ -1112,20 +1094,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             selectedSlotIndex: result.acceptedSlotIndex,
             message: result.message.isEmpty ? null : result.message,
           );
-          // #541 — 협상 응답을 상대에게 알림 (비동기 핸드오프)
-          if (opponentId.isNotEmpty) {
-            unawaited(
-              ref
-                  .read(notificationServiceProvider)
-                  .showNotification(
-                    BookingNotificationService.createScheduleChangeAccepted(
-                      userId: opponentId,
-                      fromTeacher: fromTeacher,
-                      data: {'requestId': request.id},
-                    ),
-                  ),
-            );
-          }
+          // #1191 — 상대 통지는 BE(#1200 scheduleChangeApproved→교사 emit). FE
+          // 로컬 알림은 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
           if (context.mounted) {
             _showSuccess(AppStrings.scheduleChangeConfirmed);
           }
@@ -1139,20 +1109,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.studentId,
             message: result.message.isEmpty ? null : result.message,
           );
-          // #541 — 협상 응답을 상대에게 알림 (비동기 핸드오프)
-          if (opponentId.isNotEmpty) {
-            unawaited(
-              ref
-                  .read(notificationServiceProvider)
-                  .showNotification(
-                    BookingNotificationService.createScheduleChangeRejected(
-                      userId: opponentId,
-                      fromTeacher: fromTeacher,
-                      data: {'requestId': request.id},
-                    ),
-                  ),
-            );
-          }
+          // #1191 — FE 로컬 알림(액터 기기 전용) 오발 제거. reject 상대 통지는
+          // 전용 타입 부재로 BE emit 미구현 잔여(#1193) — 기존에도 상대 미수신.
           if (context.mounted) {
             _showSuccess(AppStrings.scheduleChangeReject);
           }
@@ -1180,20 +1138,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 .toList(),
             message: result.message.isEmpty ? null : result.message,
           );
-          // #541 — 협상 응답을 상대에게 알림 (비동기 핸드오프)
-          if (opponentId.isNotEmpty) {
-            unawaited(
-              ref
-                  .read(notificationServiceProvider)
-                  .showNotification(
-                    BookingNotificationService.createScheduleChangeCountered(
-                      userId: opponentId,
-                      fromTeacher: fromTeacher,
-                      data: {'requestId': request.id},
-                    ),
-                  ),
-            );
-          }
+          // #1191 — 상대 통지는 BE(#1200 scheduleChangeRequested→교사 emit). FE
+          // 로컬 알림은 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
           if (context.mounted) {
             _showSuccess(AppStrings.scheduleChangeCounter);
           }

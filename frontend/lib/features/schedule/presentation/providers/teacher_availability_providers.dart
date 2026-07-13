@@ -18,7 +18,6 @@ import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
 import '../../domain/services/booking_lead_time_service.dart';
 import '../../domain/services/slot_recommendation_service.dart';
-import '../services/booking_notification_service.dart';
 
 part 'teacher_availability_providers.g.dart';
 
@@ -482,20 +481,10 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
       final cancelledSlot = await repository.cancelBooking(slotId);
       state = AsyncValue.data(cancelledSlot);
 
-      // Send cancellation notification if we have the necessary info
-      if (studentId != null && teacherName != null) {
-        final notification =
-            BookingNotificationService.createCancellationNotification(
-              userId: studentId,
-              teacherName: teacherName,
-              lessonDate: cancelledSlot.date,
-              startTime: cancelledSlot.startTime.toFlutterTimeOfDay(),
-              isTeacherInitiated: isTeacherInitiated,
-              reason: reason,
-            );
-        // TODO: Send notification via notification service
-        debugPrint('Cancellation notification created: ${notification.title}');
-      }
+      // #1191 — 취소 상대 통지는 BE Notification row 책임(전용 타입 부재로 emit
+      // 미구현 잔여, #1193). 기존 createCancellationNotification 은 상대 userId 로
+      // 로컬 알림을 만들었으나 flutter_local_notifications 는 액터 기기 전용이라
+      // debugPrint 로 drop 되던 오발 블록이라 제거함. 파라미터는 향후 BE emit 배선용.
 
       // Invalidate related providers to refresh data.
       // #528 — same rationale as bookSlotSimple: refresh the bookings list and
