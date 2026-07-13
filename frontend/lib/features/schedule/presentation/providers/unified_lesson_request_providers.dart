@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../relationship/relationship_facade.dart';
@@ -229,6 +230,9 @@ class UnifiedLessonRequestActions {
     final result = await _workflowService.createRequest(
       request,
       currentUserId: ref.read(currentUserIdProvider),
+      // #1198 — mock.create 는 initialRequest 이벤트를 만들지 않아 여기서
+      // 기록하고, remote 는 BE.create 가 이미 만들므로 skip(중복 말풍선 방지).
+      recordInitialEvent: EnvironmentConfig.useMockData,
     );
 
     _invalidateProviders(

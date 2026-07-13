@@ -10,11 +10,20 @@ class UnifiedLessonRequestWorkflowService {
   Future<UnifiedLessonRequest> createRequest(
     UnifiedLessonRequest request, {
     required String currentUserId,
+    bool recordInitialEvent = true,
   }) async {
     final studentId =
         request.studentId.isNotEmpty ? request.studentId : currentUserId;
     final effectiveRequest = request.copyWith(studentId: studentId);
     final result = await _repository.create(effectiveRequest);
+
+    // #1198 — remote 는 BE.create 가 initialRequest 이벤트를 이미 생성하므로,
+    // FE 가 여기서 또 addEvent 하면 신청 첫 말풍선이 2번 뜬다. mock.create 는
+    // 이벤트를 만들지 않아 mock 에서만 기록한다(presentation 이 useMockData 로
+    // recordInitialEvent 를 게이트).
+    if (!recordInitialEvent) {
+      return result;
+    }
 
     await _repository.addEvent(
       RequestEvent(
