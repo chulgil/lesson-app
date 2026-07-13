@@ -71,7 +71,7 @@ class MyTeachersScreen extends ConsumerWidget {
             // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
             // (§7.17). '앱 선생님' 은 정적 그룹 헤더.
             Text(
-              '앱 선생님',
+              AppStrings.studentHomeAppTeacherSection,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.ink,
               ),
@@ -80,7 +80,7 @@ class MyTeachersScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '앱을 통해 연결된 선생님',
+          AppStrings.studentHomeAppTeacherHint,
           style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -357,20 +357,20 @@ class _AppTeacherCard extends ConsumerWidget {
                   children: [
                     _buildStat(
                       Icons.school_outlined,
-                      '총 레슨',
-                      '${relation.totalLessonCount}회',
+                      AppStrings.studentStatTotalLessons,
+                      '${relation.totalLessonCount}${AppStrings.lessonsUnit}',
                     ),
                     const SizedBox(width: AppSpacing.space6),
                     if (relation.lastLessonAt != null)
                       _buildStat(
                         Icons.calendar_today_outlined,
-                        '마지막 레슨',
+                        AppStrings.studentHomeMyTeacherLastLesson,
                         formatRelativeDay(relation.lastLessonAt!),
                       ),
                     const SizedBox(width: AppSpacing.space6),
                     _buildStat(
                       Icons.access_time_outlined,
-                      '레슨 기간',
+                      AppStrings.studentHomeMyTeacherLessonPeriod,
                       _formatDuration(relation.createdAt),
                     ),
                   ],
@@ -433,12 +433,12 @@ class _AppTeacherCard extends ConsumerWidget {
 
   String _formatDuration(DateTime startDate) {
     final months = DateTime.now().difference(startDate).inDays ~/ 30;
-    if (months < 1) return '1개월 미만';
-    if (months < 12) return '$months개월';
+    if (months < 1) return AppStrings.durationUnderOneMonth;
+    if (months < 12) return AppStrings.monthCount(months);
     final years = months ~/ 12;
     final remainingMonths = months % 12;
-    if (remainingMonths == 0) return '$years년';
-    return '$years년 $remainingMonths개월';
+    if (remainingMonths == 0) return AppStrings.yearCount(years);
+    return AppStrings.yearMonthCount(years, remainingMonths);
   }
 }
 
@@ -538,7 +538,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                           if (teacher.instrument == null &&
                               teacher.phone == null)
                             Text(
-                              '직접 등록',
+                              AppStrings.studentHomeManualTeacherSelfRegistered,
                               style: AppTypography.bodySmall.copyWith(
                                 color: AppColors.inkTertiary,
                               ),
@@ -579,7 +579,7 @@ class _ManualTeacherCard extends ConsumerWidget {
     showNotebookDialog(
       context: context,
       titleWidget: const Text(AppStrings.studentHomeDeleteTeacher),
-      content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
+      content: Text(AppStrings.studentHomeDeleteTeacherConfirmName(teacher.name)),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -595,7 +595,7 @@ class _ManualTeacherCard extends ConsumerWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${teacher.name} 선생님이 삭제되었습니다'),
+                    content: Text(AppStrings.studentHomeTeacherDeletedName(teacher.name)),
                     backgroundColor: AppColors.paperOk,
                   ),
                 );
@@ -614,7 +614,7 @@ class _ManualTeacherCard extends ConsumerWidget {
             }
           },
           child: Text(
-            '삭제',
+            AppStrings.delete,
             style: const TextStyle(color: AppColors.paperAccent),
           ),
         ),

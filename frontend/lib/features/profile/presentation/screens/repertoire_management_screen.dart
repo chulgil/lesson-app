@@ -178,7 +178,7 @@ class _RepertoireManagementScreenState
           if (!mounted) return;
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')));
+          ).showSnackBar(SnackBar(content: Text(AppStrings.profileRepertoirePieceAdded(piece.title))));
         },
       ),
     );
@@ -213,7 +213,7 @@ class _RepertoireManagementScreenState
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('${piece.title}이(가) 삭제되었습니다')));
+          ).showSnackBar(SnackBar(content: Text(AppStrings.profileRepertoirePieceDeleted(piece.title))));
         }
       },
     );
@@ -235,11 +235,11 @@ class _RepertoireManagementScreenState
           final students = ref.read(studentsNotifierProvider).value ?? [];
           final matches = students.where((s) => s.id == studentId);
           final studentName = matches.isEmpty
-              ? '학생'
+              ? AppStrings.student
               : matches.first.name; // #72
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${piece.title}이(가) $studentName에게 할당되었습니다'),
+              content: Text(AppStrings.profileRepertoirePieceAssigned(piece.title, studentName)),
             ),
           );
         }

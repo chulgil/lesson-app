@@ -48,15 +48,15 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           if (result.recovered > 0 || result.cleanedUp > 0) {
             final parts = <String>[];
             if (result.recovered > 0) {
-              parts.add('${result.recovered}개 복구');
+              parts.add(AppStrings.studentHomeRecordingRecoveredCount(result.recovered));
             }
             if (result.cleanedUp > 0) {
-              parts.add('${result.cleanedUp}개 정리');
+              parts.add(AppStrings.studentHomeRecordingCleanedCount(result.cleanedUp));
             }
-            message = '녹음 파일: ${parts.join(', ')} (전체 ${result.total}개)';
+            message = AppStrings.studentHomeRecordingRecoverySummary(parts.join(', '), result.total);
             bgColor = AppColors.paperOk;
           } else {
-            message = '녹음 파일 ${result.total}개 확인됨 (복구 불필요)';
+            message = AppStrings.studentHomeRecordingVerified(result.total);
             bgColor = AppColors.ink;
           }
 

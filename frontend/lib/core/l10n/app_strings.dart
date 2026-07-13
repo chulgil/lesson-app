@@ -10748,4 +10748,78 @@ class AppStrings {
 
   /// 첫 과제 내기 (home empty assignment CTA, #625)
   static const weeklyAssignmentFirstCta = '첫 과제 내기';
+
+  // ── #1198 item4 — C5 하드코딩 한글 추출 ──
+
+  /// {name} (선생님) (teacher detail app bar title)
+  static String searchTeacherDetailTitle(String name) => '$name (선생님)';
+
+  /// {years}년 경력 (teacher detail — experience years)
+  static String searchCareerYears(int years) => '$years년 경력';
+
+  /// 시작 가이드 (getting started card title)
+  static const studentHomeGettingStartedTitle = '시작 가이드';
+
+  /// 아래 단계를 따라 레슨을 시작하세요 (getting started card subtitle)
+  static const studentHomeGettingStartedSubtitle = '아래 단계를 따라 레슨을 시작하세요';
+
+  /// 앱 선생님 (my teachers — app teacher section header)
+  static const studentHomeAppTeacherSection = '앱 선생님';
+
+  /// 앱을 통해 연결된 선생님 (my teachers — app teacher section hint)
+  static const studentHomeAppTeacherHint = '앱을 통해 연결된 선생님';
+
+  /// 마지막 레슨 (my teachers — last lesson stat label)
+  static const studentHomeMyTeacherLastLesson = '마지막 레슨';
+
+  /// 레슨 기간 (my teachers — lesson period stat label)
+  static const studentHomeMyTeacherLessonPeriod = '레슨 기간';
+
+  /// 직접 등록 (manual teacher — no instrument/phone fallback label)
+  static const studentHomeManualTeacherSelfRegistered = '직접 등록';
+
+  /// {name} 선생님을 삭제하시겠습니까? (manual teacher delete confirm — with name)
+  static String studentHomeDeleteTeacherConfirmName(String name) =>
+      '$name 선생님을 삭제하시겠습니까?';
+
+  /// {name} 선생님이 삭제되었습니다 (manual teacher deleted snackbar — with name)
+  static String studentHomeTeacherDeletedName(String name) =>
+      '$name 선생님이 삭제되었습니다';
+
+  /// 1개월 미만 (duration under one month)
+  static const durationUnderOneMonth = '1개월 미만';
+
+  /// {years}년 (duration in years)
+  static String yearCount(int years) => '$years년';
+
+  /// {years}년 {months}개월 (duration in years and months)
+  static String yearMonthCount(int years, int months) => '$years년 $months개월';
+
+  /// {count}개 복구 (startup recording recovery — recovered fragment)
+  static String studentHomeRecordingRecoveredCount(int count) => '$count개 복구';
+
+  /// {count}개 정리 (startup recording recovery — cleaned fragment)
+  static String studentHomeRecordingCleanedCount(int count) => '$count개 정리';
+
+  /// 녹음 파일: {parts} (전체 {total}개) (startup recording recovery summary)
+  static String studentHomeRecordingRecoverySummary(String parts, int total) =>
+      '녹음 파일: $parts (전체 $total개)';
+
+  /// 녹음 파일 {total}개 확인됨 (복구 불필요) (startup recording verified)
+  static String studentHomeRecordingVerified(int total) =>
+      '녹음 파일 $total개 확인됨 (복구 불필요)';
+
+  /// {title}이(가) 추가되었습니다 (repertoire piece added snackbar)
+  static String profileRepertoirePieceAdded(String title) =>
+      '$title이(가) 추가되었습니다';
+
+  /// {title}이(가) 삭제되었습니다 (repertoire piece deleted snackbar)
+  static String profileRepertoirePieceDeleted(String title) =>
+      '$title이(가) 삭제되었습니다';
+
+  /// {title}이(가) {studentName}에게 할당되었습니다 (repertoire piece assigned snackbar)
+  static String profileRepertoirePieceAssigned(
+    String title,
+    String studentName,
+  ) => '$title이(가) $studentName에게 할당되었습니다';
 }

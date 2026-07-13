@@ -60,7 +60,7 @@ class StudentGettingStartedCard extends ConsumerWidget {
               const SizedBox(width: AppSpacing.space2),
               // Notebook × Score: 카드 내부 섹션 제목도 Playfair sectionTitle 로 통일 (§7.17 패턴).
               Text(
-                '시작 가이드',
+                AppStrings.studentHomeGettingStartedTitle,
                 style: NotebookTypography.sectionTitle.copyWith(
                   color: AppColors.ink,
                 ),
@@ -69,7 +69,7 @@ class StudentGettingStartedCard extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '아래 단계를 따라 레슨을 시작하세요',
+            AppStrings.studentHomeGettingStartedSubtitle,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.inkSecondary,
             ),
