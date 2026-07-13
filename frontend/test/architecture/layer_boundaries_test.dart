@@ -509,4 +509,11 @@ const _legacyDomainHivePersistenceExceptions = <String>{};
 
 const _mockDataBranchExceptions = <String>{
   'lib/core/providers/repository_provider.dart',
+  // #1198 — recordInitialEvent 게이트: mock.create 는 initialRequest 이벤트를
+  // 만들지 않고 remote 는 BE.create 가 만든다. 저장소 선택이 아닌 이벤트 기록
+  // 분기라 createRepository 로 중앙화 불가 — 명시적 예외.
+  'lib/features/schedule/presentation/providers/unified_lesson_request_providers.dart',
+  // #1196 — discipline prod 노출 게이트: 저장소 선택이 아닌 분야 노출 필터.
+  // mock/dev=전체 등록 분야, remote/prod=production-ready(music). 명시적 예외.
+  'lib/features/auth/presentation/providers/active_discipline_provider.dart',
 };
