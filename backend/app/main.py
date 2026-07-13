@@ -88,6 +88,29 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             hours=1,
         )
 
+        # Daily KST — pending lesson-request(14d) + subscription-proposal(7d)
+        # expiry. Previously endpoint-only (external cron) → in-process now so
+        # prod never leaves requests/proposals stuck pending (#1198).
+        from app.jobs.pending_expiry_jobs import (
+            JOB_ID_LESSON_REQUEST_EXPIRY,
+            JOB_ID_PROPOSAL_EXPIRY,
+            run_lesson_request_expiry_job,
+            run_proposal_expiry_job,
+        )
+
+        register_daily_kst_job(
+            run_lesson_request_expiry_job,
+            job_id=JOB_ID_LESSON_REQUEST_EXPIRY,
+            hour=0,
+            minute=10,
+        )
+        register_daily_kst_job(
+            run_proposal_expiry_job,
+            job_id=JOB_ID_PROPOSAL_EXPIRY,
+            hour=0,
+            minute=15,
+        )
+
         start_scheduler()
 
     yield

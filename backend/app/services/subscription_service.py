@@ -1972,6 +1972,30 @@ class SubscriptionService:
         await self.db.flush()
         return len(proposals)
 
+    async def expire_stale_proposals_systemwide(self) -> int:
+        """System-wide sweep: mark all past-expiry pending proposals expired.
+
+        Job-only (scheduler / system context). Unlike [expire_old_proposals]
+        there is no teacher_id filter — the #468 1d guard exists to stop a
+        *teacher* from expiring another teacher's proposals via the API; the
+        scheduler may sweep all teachers' stale proposals.
+        """
+        from app.models.subscription import ProposalStatus, SubscriptionProposal
+
+        now = datetime.now(UTC)
+        result = await self.db.scalars(
+            select(SubscriptionProposal).where(
+                SubscriptionProposal.status.in_([ProposalStatus.pending, ProposalStatus.paymentNotified]),
+                SubscriptionProposal.expires_at < now,
+            )
+        )
+        proposals = list(result.all())
+        for proposal in proposals:
+            proposal.status = ProposalStatus.expired
+        if proposals:
+            await self.db.flush()
+        return len(proposals)
+
     async def respond_to_proposal(
         self, proposal_id: str, data: ProposalRespondRequest, current_user: Any
     ) -> SubscriptionProposalResponse:
