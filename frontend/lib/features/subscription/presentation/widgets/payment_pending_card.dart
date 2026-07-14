@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../providers/payment_tracking_provider.dart';
 
@@ -55,7 +56,7 @@ class PaymentPendingCard extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space1),
                   Text(
                     '$count건',
-                    style: NotebookTypography.sectionTitle.copyWith(
+                    style: AppTypography.headingSmall.copyWith(
                       color: AppColors.paperAccent,
                     ),
                   ),
