@@ -33,7 +33,7 @@ class TeacherDetailScreen extends ConsumerWidget {
       appBar: NotebookDetailAppBar(
         title:
             profileAsync.valueOrNull?.displayName != null
-                ? '${profileAsync.valueOrNull!.displayName} (선생님)'
+                ? AppStrings.searchTeacherDetailTitle(profileAsync.valueOrNull!.displayName!)
                 : AppStrings.searchAnonymousTeacher,
       ),
       body: profileAsync.when(
@@ -212,7 +212,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                     icon: Icons.work_outline,
                     title: AppStrings.profileVisibilityCareerTitle,
                     child: Text(
-                      '${profile.experienceYears}년 경력',
+                      AppStrings.searchCareerYears(profile.experienceYears!),
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkSecondary,
                       ),
