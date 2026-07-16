@@ -212,31 +212,43 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               );
               return Row(
                 children: [
-                  Text(
-                    _formatDate(_selectedDate),
-                    style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.inkSecondary,
+                  // 좌: 날짜 + '오늘' 배지. 좁은 폭(375px)에서 우측 그룹(섹션 수 +
+                  // 정렬)을 밀어내며 날짜가 말줄임되도록 Expanded — Spacer 는 고정폭
+                  // 내용을 못 줄여 375px 에서 60px 가로 overflow 를 냈다.
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            _formatDate(_selectedDate),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.headingSmall.copyWith(
+                              color: AppColors.inkSecondary,
+                            ),
+                          ),
+                        ),
+                        if (_isToday()) ...[
+                          const SizedBox(width: AppSpacing.space2),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.paperAccentSoft,
+                            ),
+                            // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard
+                            // italic (README §1.1 4계층, §7.127 Gaegu 회피).
+                            child: Text(
+                              '오늘',
+                              style: NotebookTypography.indicatorLabel,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  if (_isToday()) ...[
-                    const SizedBox(width: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.paperAccentSoft,
-                      ),
-                      // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard
-                      // italic (README §1.1 4계층, §7.127 Gaegu 회피).
-                      child: Text(
-                        '오늘',
-                        style: NotebookTypography.indicatorLabel,
-                      ),
-                    ),
-                  ],
-                  const Spacer(),
                   // Section count
                   Text(
                     '$sectionCount개 섹션',
