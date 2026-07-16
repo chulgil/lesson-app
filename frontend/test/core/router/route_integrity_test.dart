@@ -90,7 +90,6 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.practiceLoopStats,
     AppRoutes.awaitingFeedback,
     AppRoutes.repertoireHistory,
-    AppRoutes.tuner,
     AppRoutes.profile,
     AppRoutes.instrumentManagement,
     AppRoutes.repertoireManagement,
@@ -267,7 +266,6 @@ const _registeredTemplates = <String>{
   '/practice/stats',
   '/practice/loop-stats',
   '/practice/history',
-  '/practice/tuner',
   '/note-access/:requestId',
   // profile_routes.dart
   '/profile/instruments',
@@ -448,7 +446,6 @@ Map<String, String> get _appRoutesMap {
     'practiceLoopStats': AppRoutes.practiceLoopStats,
     'awaitingFeedback': AppRoutes.awaitingFeedback,
     'repertoireHistory': AppRoutes.repertoireHistory,
-    'tuner': AppRoutes.tuner,
     'profile': AppRoutes.profile,
     'instrumentManagement': AppRoutes.instrumentManagement,
     'repertoireManagement': AppRoutes.repertoireManagement,

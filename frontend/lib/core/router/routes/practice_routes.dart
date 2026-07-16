@@ -17,7 +17,6 @@ import '../../../features/practice/presentation/screens/practice_goal_setting_sc
 import '../../../features/practice/presentation/screens/practice_loop_stats_screen.dart';
 import '../../../features/practice/presentation/screens/practice_stats_screen.dart';
 import '../../../features/practice/presentation/screens/repertoire_history_screen.dart';
-import '../../../features/practice/presentation/screens/tuner_screen.dart';
 import '../../../features/practice/presentation/screens/note_access_request_screen.dart';
 import '../../../features/practice/presentation/screens/awaiting_feedback_screen.dart';
 import '../app_routes.dart';
@@ -222,13 +221,6 @@ List<GoRoute> practiceRoutes = [
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return RepertoireHistoryScreen(studentId: studentId);
     },
-  ),
-
-  // Tuner
-  GoRoute(
-    path: AppRoutes.tuner,
-    name: 'tuner',
-    builder: (context, state) => const TunerScreen(),
   ),
 
   // Note Access Request (G21/#402)

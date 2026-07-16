@@ -81,7 +81,6 @@ class AppRoutes {
   // #512 — teacher-side per-student YouTube loop repeat stats.
   static const practiceLoopStats = '/practice/loop-stats';
   static const repertoireHistory = '/practice/history';
-  static const tuner = '/practice/tuner';
   static const awaitingFeedback = '/practice/awaiting-feedback';
 
   // Profile routes
