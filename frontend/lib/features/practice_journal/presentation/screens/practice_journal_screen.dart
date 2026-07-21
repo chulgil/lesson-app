@@ -249,37 +249,48 @@ class _BottomAction extends ConsumerWidget {
       DateTime.now().day,
     );
 
-    switch (role) {
-      case JournalRole.guardian:
-        // Monday of the current week (UTC)
-        final weekday = today.weekday; // Mon=1 … Sun=7
-        final monday = today.subtract(Duration(days: weekday - 1));
-        await repo.addGuardianSeal(
-          childProfileId,
-          GuardianSeal(weekStart: monday, guardianUserId: userId),
-        );
-      case JournalRole.teacher:
-        await repo.addEndorsement(
-          childProfileId,
-          Endorsement(
-            by: EndorsedBy.teacher,
-            date: today,
-            authorUserId: userId,
-            // assignmentRef: real picker not yet implemented — null until Phase 2
-            note: '',
-          ),
-        );
-      case JournalRole.student:
-        await repo.addEndorsement(
-          childProfileId,
-          Endorsement(
-            by: EndorsedBy.self,
-            date: today,
-            authorUserId: userId,
-            note: '',
-          ),
-        );
+    // Guard the write: mock validation (teacher endorsement requires an
+    // assignmentRef the Phase-2 picker doesn't yet supply -> ArgumentError) used
+    // to throw out of this button callback and be swallowed with no UI feedback.
+    // Surface failures and only refresh the grid on real success.
+    try {
+      switch (role) {
+        case JournalRole.guardian:
+          // Monday of the current week (UTC)
+          final weekday = today.weekday; // Mon=1 … Sun=7
+          final monday = today.subtract(Duration(days: weekday - 1));
+          await repo.addGuardianSeal(
+            childProfileId,
+            GuardianSeal(weekStart: monday, guardianUserId: userId),
+          );
+        case JournalRole.teacher:
+          await repo.addEndorsement(
+            childProfileId,
+            Endorsement(
+              by: EndorsedBy.teacher,
+              date: today,
+              authorUserId: userId,
+              // assignmentRef: real picker not yet implemented — null until Phase 2
+              note: '',
+            ),
+          );
+        case JournalRole.student:
+          await repo.addEndorsement(
+            childProfileId,
+            Endorsement(
+              by: EndorsedBy.self,
+              date: today,
+              authorUserId: userId,
+              note: '',
+            ),
+          );
+      }
+      onSuccess();
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.errorTryAgain)),
+      );
     }
-    onSuccess();
   }
 }

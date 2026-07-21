@@ -203,7 +203,18 @@ class _PhoneVerificationScreenState
         ref
             .read(teacherOnboardingNotifierProvider.notifier)
             .completeOnboarding();
-        await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        try {
+          await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        } catch (_) {
+          // Server-side verification already succeeded, but persisting the
+          // onboarding-complete flag (PATCH + getMe) failed, e.g. a network
+          // drop. Surface it instead of leaving the screen frozen with no
+          // spinner, error, or navigation (the button callback would otherwise
+          // swallow the exception).
+          if (!mounted) return;
+          setState(() => _errorMessage = AppStrings.errorTryAgain);
+          return;
+        }
         // Re-check mounted after the async gap before touching context.
         if (!mounted) return;
         context.go(AppRoutes.home);
