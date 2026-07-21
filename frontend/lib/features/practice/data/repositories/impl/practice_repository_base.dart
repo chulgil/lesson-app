@@ -86,15 +86,20 @@ abstract class PracticeRepositoryBase {
         }
       }
 
-      // Remove deleted repertoires from Hive
-      final keysToRemove = <dynamic>[];
-      for (final key in box.keys) {
-        if (!allRepertoireIds.contains(key)) {
-          keysToRemove.add(key);
+      // Orphan-delete removes Hive keys absent from the in-memory map. Skip it
+      // until the initial load has populated `repertoires` (isInitialized),
+      // otherwise a mutation that runs before ensureInitialized() completes
+      // would wipe persisted-but-not-yet-loaded repertoires from Hive.
+      if (isInitialized) {
+        final keysToRemove = <dynamic>[];
+        for (final key in box.keys) {
+          if (!allRepertoireIds.contains(key)) {
+            keysToRemove.add(key);
+          }
         }
-      }
-      for (final key in keysToRemove) {
-        await box.delete(key);
+        for (final key in keysToRemove) {
+          await box.delete(key);
+        }
       }
 
       await box.flush();

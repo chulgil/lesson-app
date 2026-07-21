@@ -248,23 +248,9 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
       // Schedule auto-reminders (24h, 48h, 72h)
       _scheduleReminders(created);
 
-      // 🆕 Send notification to student
-      if (teacherName != null) {
-        try {
-          final notificationService = ref.read(
-            proposalNotificationServiceProvider,
-          );
-          await notificationService.sendProposalReceivedNotification(
-            studentId: studentId,
-            teacherName: teacherName,
-            proposalId: created.id,
-            templateName: templateName ?? AppStrings.subscription,
-            isMultiChoice: isMultiChoice,
-          );
-        } catch (e) {
-          debugPrint('[ProposalNotifier] Failed to send notification: $e');
-        }
-      }
+      // #1191 — 학생 통지는 BE Notification row 가 SSOT (#1200: 제안 도착 emit).
+      // flutter_local_notifications 는 액터(교사) 기기 전용이라 상대 통지로 쓸 수
+      // 없어(기존엔 교사 기기에 오발) FE 로컬 알림 호출을 제거함.
 
       // Invalidate related providers
       ref.invalidate(teacherProposalsProvider(teacherId));
@@ -283,7 +269,6 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
   /// Student notifies payment completion
   Future<SubscriptionProposal> notifyPayment(
     String proposalId, {
-    // 🆕 For notification
     String? studentName,
     String? templateName,
   }) async {
@@ -297,22 +282,8 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
       // Cancel reminders - student has responded
       _cancelReminders(proposalId);
 
-      // 🆕 Send notification to teacher
-      if (studentName != null) {
-        try {
-          final notificationService = ref.read(
-            proposalNotificationServiceProvider,
-          );
-          await notificationService.sendPaymentNotifiedNotification(
-            teacherId: updated.teacherId,
-            studentName: studentName,
-            proposalId: proposalId,
-            templateName: templateName ?? AppStrings.subscription,
-          );
-        } catch (e) {
-          debugPrint('[ProposalNotifier] Failed to send notification: $e');
-        }
-      }
+      // #1191 — 교사 통지는 BE Notification row 가 SSOT (입금통보 emit,
+      // _notify_deposit_received). FE 로컬 알림은 액터(학생) 기기 전용이라 제거함.
 
       // Invalidate related providers
       _invalidateProviders(updated);
@@ -328,7 +299,6 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
   Future<SubscriptionProposal> confirmPayment(
     String proposalId,
     String subscriptionId, {
-    // 🆕 For notification
     String? teacherName,
     String? templateName,
     int? totalLessons,
@@ -343,22 +313,8 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
       );
       state = AsyncValue.data(updated);
 
-      // 🆕 Send notification to student
-      if (teacherName != null) {
-        try {
-          final notificationService = ref.read(
-            proposalNotificationServiceProvider,
-          );
-          await notificationService.sendProposalAcceptedNotification(
-            studentId: updated.studentId,
-            teacherName: teacherName,
-            templateName: templateName ?? AppStrings.subscription,
-            totalLessons: totalLessons ?? 0,
-          );
-        } catch (e) {
-          debugPrint('[ProposalNotifier] Failed to send notification: $e');
-        }
-      }
+      // #1191 — 학생 통지는 BE Notification row 가 SSOT (#1200: 제안 수락/발급
+      // emit). FE 로컬 알림은 액터(교사) 기기 전용이라 오발 호출을 제거함.
 
       // Invalidate related providers
       _invalidateProviders(updated);
