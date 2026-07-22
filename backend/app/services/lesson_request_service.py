@@ -144,6 +144,16 @@ class LessonRequestService:
         )
         await self.db.refresh(request)
 
+        # #1207 — a new request otherwise reaches the teacher only when they refresh
+        # the list. Emit the teacher's inbox row (new type lessonRequestReceived).
+        await self._notify_counterparty(
+            request,
+            current_user,
+            notification_type="lessonRequestReceived",
+            title="새 레슨 신청",
+            body="학생이 레슨을 신청했어요. 확인 후 시간을 조율해주세요.",
+        )
+
         # Auto-create subscription proposal if teacher has auto_proposal_enabled
         if request.request_type != "trial":
             await self._try_auto_proposal(request, current_user)
@@ -234,6 +244,16 @@ class LessonRequestService:
         # Lesson rows (calendar SSOT), not just record the timeline event.
         if event_type == RequestEventType.scheduleChangeAccepted:
             await self._apply_schedule_change_to_lessons(request, event)
+            # #1207 — the Lesson rows move, but the proposer (counterparty) only
+            # learned via a same-device local notification. Notify them the change
+            # was accepted. Placed after the move so a 409 conflict skips the emit.
+            await self._notify_counterparty(
+                request,
+                current_user,
+                notification_type="scheduleChangeApproved",
+                title="일정 변경 수락",
+                body="상대방이 일정 변경을 수락했어요. 레슨 시간이 변경되었습니다.",
+            )
         return RequestEventResponse.model_validate(event)
 
     @staticmethod
@@ -414,6 +434,25 @@ class LessonRequestService:
             message=data.decline_reason,
             subscription_id=(data.proposal_id if canonical_status in ("proposalSent", "subscriptionIssued") else None),
         )
+        # #1207 — teacher approve/reject is the happy-path confirmation the student
+        # otherwise never actively learns about (FE local notifications render only
+        # on the actor's own device). Emit the counterpart row on these two.
+        if canonical_status == "timeConfirmed":
+            await self._notify_counterparty(
+                request,
+                current_user,
+                notification_type="scheduleChangeApproved",
+                title="레슨 신청 승인",
+                body="선생님이 레슨 신청을 승인했어요. 레슨 시간이 확정되었습니다.",
+            )
+        elif canonical_status == "rejected":
+            await self._notify_counterparty(
+                request,
+                current_user,
+                notification_type="scheduleChangeRejected",
+                title="레슨 신청 거절",
+                body="선생님이 레슨 신청을 거절했어요. 다른 시간을 제안해보세요.",
+            )
         await self.db.flush()
         await self.db.refresh(request)
         return await self._to_response(request)
@@ -927,14 +966,20 @@ class LessonRequestService:
         ``_can_access_request``); ``request.teacher_id`` may be a Teacher row
         id or a legacy user id, so resolve via the Teacher row with fallback.
         """
-        from app.models.teacher import Teacher
+        from app.services.notification_recipient import (
+            resolve_student_user_id,
+            resolve_teacher_user_id,
+        )
         from app.services.notification_service import NotificationPriority, NotificationService
 
+        # Resolve to a real recipient User.id (FK-safe). ``request.student_id`` is a
+        # user id; ``request.teacher_id`` may be a Teacher profile id. A recipient
+        # that no longer maps to a real user yields None → skip emit rather than
+        # break the primary transition on a Notification.user_id FK violation.
         if actor_type(current_user) == "teacher":
-            recipient_user_id = request.student_id
+            recipient_user_id = await resolve_student_user_id(self.db, request.student_id)
         else:
-            teacher = await self.db.get(Teacher, request.teacher_id)
-            recipient_user_id = teacher.user_id if teacher else request.teacher_id
+            recipient_user_id = await resolve_teacher_user_id(self.db, request.teacher_id)
 
         if not recipient_user_id:
             return

@@ -248,6 +248,7 @@ class NotificationItem extends StatelessWidget {
       // Management
       case NotificationType.newStudentRegistered:
       case NotificationType.trialBookingRequest:
+      case NotificationType.lessonRequestReceived:
         return Icons.person_add_outlined;
       case NotificationType.studentPracticeReport:
         return Icons.bar_chart_outlined;

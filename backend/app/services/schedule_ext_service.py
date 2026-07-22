@@ -301,6 +301,30 @@ class ScheduleExtService:
         await self.db.refresh(booking)
         return booking
 
+    async def _notify_group_student(self, booking: Any, *, notification_type: str, title: str, body: str) -> None:
+        """#1207 — notify a group-class booking's student (waitlist promotion / auto-cancel).
+
+        FE local notifications render only on the actor's device, so the affected
+        student learns of a promotion/auto-cancel only through this server row.
+        ``GroupClassBooking.student_id`` may be a Student profile id or a User id;
+        resolution is FK-safe so a missing recipient skips the emit rather than
+        breaking the booking mutation.
+        """
+        from app.services.notification_recipient import resolve_student_user_id
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        recipient_user_id = await resolve_student_user_id(self.db, booking.student_id)
+        if not recipient_user_id:
+            return
+        await NotificationService(self.db).create_and_send(
+            user_id=recipient_user_id,
+            notification_type=notification_type,
+            title=title,
+            body=body,
+            priority=NotificationPriority.high,
+            action_url="/schedule",
+        )
+
     async def _promote_from_waitlist(self, schedule_id: str) -> None:
         from app.models.schedule_ext import GroupBookingStatus, GroupClassBooking, GroupClassSchedule
 
@@ -322,6 +346,12 @@ class ScheduleExtService:
             if schedule:
                 schedule.current_bookings += 1
                 schedule.waitlist_count = max(0, schedule.waitlist_count - 1)
+            await self._notify_group_student(
+                first,
+                notification_type="lessonBooked",
+                title="대기 확정",
+                body="대기하던 그룹 수업 자리가 확정되었어요.",
+            )
 
     async def mark_attendance(self, booking_id: str, attended: bool, current_user: Any) -> Any:
         from app.models.schedule_ext import GroupBookingStatus
@@ -432,6 +462,12 @@ class ScheduleExtService:
         first.promoted_at = datetime.now(UTC)
         await self.db.flush()
         await self.db.refresh(first)
+        await self._notify_group_student(
+            first,
+            notification_type="lessonBooked",
+            title="대기 확정",
+            body="대기하던 그룹 수업 자리가 확정되었어요.",
+        )
         return first
 
     async def auto_cancel_waitlist(self, schedule_id: str, current_user: Any) -> list[Any]:
@@ -454,6 +490,12 @@ class ScheduleExtService:
         await self.db.flush()
         for b in cancelled:
             await self.db.refresh(b)
+            await self._notify_group_student(
+                b,
+                notification_type="lessonCancelled",
+                title="그룹 수업 취소",
+                body="대기하던 그룹 수업이 취소되었어요.",
+            )
         return cancelled
 
     async def batch_mark_attendance(self, attendance_list: list[dict], current_user: Any) -> list[Any]:

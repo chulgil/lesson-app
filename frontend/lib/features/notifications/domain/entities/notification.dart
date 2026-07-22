@@ -36,6 +36,7 @@ enum NotificationType {
   // Management notifications (for teachers)
   newStudentRegistered,
   trialBookingRequest,
+  lessonRequestReceived, // #1207 — 학생이 레슨을 신청함 (교사 인박스)
   studentPracticeReport,
   reviewReceived,
 
@@ -176,6 +177,7 @@ extension NotificationTypeExtension on NotificationType {
       // Teacher-only notifications
       case NotificationType.newStudentRegistered:
       case NotificationType.trialBookingRequest:
+      case NotificationType.lessonRequestReceived:
       case NotificationType.studentPracticeReport:
       case NotificationType.reviewReceived:
       case NotificationType.paymentReceived:

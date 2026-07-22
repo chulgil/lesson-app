@@ -56,6 +56,7 @@ extension NotificationTypeCategory on NotificationType {
 
       case NotificationType.newStudentRegistered:
       case NotificationType.trialBookingRequest:
+      case NotificationType.lessonRequestReceived:
       case NotificationType.reviewReceived:
       case NotificationType.connectionRequestReceived:
       case NotificationType.connectionRequestAccepted:
