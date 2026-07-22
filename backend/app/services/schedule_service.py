@@ -1183,7 +1183,41 @@ class ScheduleService:
         booking.notes = reason
         await self.db.flush()
         await self.db.refresh(booking)
+        await self._notify_booking_cancelled(booking, current_user)
         return await self._to_booking_response(booking)
+
+    async def _notify_booking_cancelled(self, booking: Any, current_user: Any | None) -> None:
+        """#1207 — notify the OTHER party that a booking was cancelled.
+
+        FE local notifications render only on the actor's device, so the counterpart
+        learns of the cancellation only through this server row. Recipient resolution
+        is FK-safe (skip when it is not a real user) so a cancellation is never
+        blocked by a notification failure.
+        """
+        if current_user is None:
+            return
+        from app.services.actor import actor_type
+        from app.services.notification_recipient import (
+            resolve_student_user_id,
+            resolve_teacher_user_id,
+        )
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        if actor_type(current_user) == "teacher":
+            recipient_user_id = await resolve_student_user_id(self.db, booking.student_id)
+        else:
+            recipient_user_id = await resolve_teacher_user_id(self.db, booking.teacher_id)
+        if not recipient_user_id:
+            return
+
+        await NotificationService(self.db).create_and_send(
+            user_id=recipient_user_id,
+            notification_type="lessonCancelled",
+            title="레슨 취소",
+            body="예약된 레슨이 취소되었어요.",
+            priority=NotificationPriority.high,
+            action_url="/schedule",
+        )
 
     async def change_booking(self, booking_id: str, data: BookingChangeRequest, current_user: Any) -> BookingResponse:
         """Request a change to booking date/time.

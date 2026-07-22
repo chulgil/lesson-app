@@ -25,6 +25,8 @@ TEACHER_NOTIFICATION_TYPES = frozenset(
     {
         "newStudentRegistered",
         "trialBookingRequest",
+        # #1207 — 학생이 레슨을 신청하면 교사 인박스에 도착 (전용 타입).
+        "lessonRequestReceived",
         "studentPracticeReport",
         "reviewReceived",
         "paymentReceived",
