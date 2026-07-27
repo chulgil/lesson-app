@@ -807,10 +807,20 @@ class ScheduleService:
         scheduled_time: str,
         duration: int,
     ) -> None:
-        """Raise 409 if the slot overlaps with existing bookings (#237)."""
+        """Raise 409 if the slot overlaps with existing bookings (#237).
+
+        Locks the teacher row first so two concurrent requests for the same
+        slot can't both read zero overlapping bookings and both insert —
+        without this, the SELECT above finds no conflicting rows for either
+        transaction (nothing to lock via with_for_update on the booking table
+        itself), so the second insert would silently double-book.
+        """
         from datetime import datetime, timedelta
 
         from app.models.schedule import LessonBooking
+        from app.models.teacher import Teacher
+
+        await self.db.scalar(select(Teacher.id).where(Teacher.user_id == teacher_id).with_for_update())
 
         new_start = datetime.strptime(scheduled_time, "%H:%M")
         new_end = new_start + timedelta(minutes=duration)
