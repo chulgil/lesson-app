@@ -982,6 +982,7 @@ class ParentService:
             select(ParentChildRelation.id).where(
                 ParentChildRelation.parent_id == parent.id,
                 ParentChildRelation.student_id == student_id,
+                ParentChildRelation.status == "active",
             )
         )
         return relation is not None

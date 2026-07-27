@@ -234,3 +234,56 @@ async def test_parent_child_lessons_respect_teacher_schedule_visibility(
 
     assert response.status_code == 200
     assert [item["id"] for item in response.json()] == ["visible-lesson"]
+
+
+@pytest.mark.asyncio
+async def test_parent_with_inactive_relation_cannot_read_visibility_settings(
+    client: AsyncClient,
+    create_test_user,
+    db_session,
+):
+    """A parent whose ParentChildRelation was deactivated (unlinked) must not
+    still be able to read visibility settings for that child — the read path
+    was missing the ParentChildRelation.status == active check present on the
+    sibling _assert_parent_can_access_child used elsewhere.
+    """
+    await create_test_user(user_id="teacher-user-id-2", role="teacher")
+    await create_test_user(
+        user_id="student-user-id-2",
+        role="student",
+        name="Student",
+        email="student2@test.com",
+    )
+    await create_test_user(
+        user_id="parent-user-id-2",
+        role="parent",
+        name="Parent",
+        email="parent2@test.com",
+    )
+
+    from app.models.parent import Parent, ParentChildRelation, ParentChildRelationStatus, ParentVisibilitySettings
+
+    db_session.add_all(
+        [
+            Parent(id="parent-profile-id-2", user_id="parent-user-id-2", name="Parent"),
+            ParentChildRelation(
+                parent_id="parent-profile-id-2",
+                student_id="student-user-id-2",
+                status=ParentChildRelationStatus.inactive,
+            ),
+            ParentVisibilitySettings(
+                teacher_id="teacher-user-id-2-prof",
+                student_id="student-user-id-2",
+                can_view_recordings=True,
+            ),
+        ]
+    )
+    await db_session.flush()
+
+    response = await client.get(
+        "/api/v1/parents/visibility-settings",
+        headers=_headers("parent-user-id-2"),
+        params={"teacher_id": "teacher-user-id-2-prof", "student_id": "student-user-id-2"},
+    )
+
+    assert response.status_code == 403
