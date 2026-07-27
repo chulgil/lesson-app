@@ -345,4 +345,4 @@ class NotificationService:
 
                 # Clean up invalid tokens
                 for token in failed_tokens:
-                    await token_service.unregister(token)
+                    await token_service.unregister(token, user_id)
