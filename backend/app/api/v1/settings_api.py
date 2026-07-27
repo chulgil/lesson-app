@@ -207,9 +207,7 @@ async def update_cancellation_defaults(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> CancellationDefaultsResponse:
     service = SettingsService(db)
-    result = await service.update_cancellation_defaults(
-        current_user.id, body.model_dump(exclude_unset=True)
-    )
+    result = await service.update_cancellation_defaults(current_user.id, body.model_dump(exclude_unset=True))
     return result
 
 
@@ -284,9 +282,7 @@ async def create_feedback_preset(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> FeedbackPresetResponse:
     service = SettingsService(db)
-    result: FeedbackPresetResponse = await service.create_feedback_preset(
-        current_user.id, body.text, body.sort_order
-    )
+    result: FeedbackPresetResponse = await service.create_feedback_preset(current_user.id, body.text, body.sort_order)
     return result
 
 
@@ -304,7 +300,7 @@ async def update_feedback_preset(
 ) -> FeedbackPresetResponse:
     service = SettingsService(db)
     result: FeedbackPresetResponse = await service.update_feedback_preset(
-        preset_id, body.model_dump(exclude_none=True)
+        preset_id, body.model_dump(exclude_none=True), current_user.id
     )
     return result
 
@@ -320,7 +316,7 @@ async def delete_feedback_preset(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> None:
     service = SettingsService(db)
-    await service.delete_feedback_preset(preset_id)
+    await service.delete_feedback_preset(preset_id, current_user.id)
 
 
 # ---------------------------------------------------------------------------
@@ -604,9 +600,7 @@ async def create_teaching_resource(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> TeachingResourceResponse:
     service = SettingsService(db)
-    result: TeachingResourceResponse = await service.create_teaching_resource(
-        current_user.id, body.model_dump()
-    )
+    result: TeachingResourceResponse = await service.create_teaching_resource(current_user.id, body.model_dump())
     return result
 
 
@@ -622,9 +616,7 @@ async def get_teaching_resource(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> TeachingResourceResponse:
     service = SettingsService(db)
-    result: TeachingResourceResponse = await service.get_teaching_resource(
-        resource_id, current_user.id
-    )
+    result: TeachingResourceResponse = await service.get_teaching_resource(resource_id, current_user.id)
     return result
 
 
@@ -642,7 +634,7 @@ async def update_teaching_resource(
 ) -> TeachingResourceResponse:
     service = SettingsService(db)
     result: TeachingResourceResponse = await service.update_teaching_resource(
-        resource_id, body.model_dump(exclude_none=True)
+        resource_id, body.model_dump(exclude_none=True), current_user.id
     )
     return result
 
@@ -658,4 +650,4 @@ async def delete_teaching_resource(
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> None:
     service = SettingsService(db)
-    await service.delete_teaching_resource(resource_id)
+    await service.delete_teaching_resource(resource_id, current_user.id)

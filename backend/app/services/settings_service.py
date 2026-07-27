@@ -245,9 +245,7 @@ class SettingsService:
         from app.services.teacher_id_resolver import resolve_teacher_id
 
         teacher_id = await resolve_teacher_id(self.db, user_id)
-        row = await self.db.scalar(
-            select(CancellationDefaults).where(CancellationDefaults.teacher_id == teacher_id)
-        )
+        row = await self.db.scalar(select(CancellationDefaults).where(CancellationDefaults.teacher_id == teacher_id))
         if row is None:
             row = CancellationDefaults(teacher_id=teacher_id)
             self.db.add(row)
@@ -352,11 +350,11 @@ class SettingsService:
         await self.db.refresh(preset)
         return preset
 
-    async def update_feedback_preset(self, preset_id: str, data: dict) -> Any:
+    async def update_feedback_preset(self, preset_id: str, data: dict, teacher_id: str) -> Any:
         from app.models.settings import FeedbackPreset
 
         preset = await self.db.get(FeedbackPreset, preset_id)
-        if preset is None:
+        if preset is None or (preset.teacher_id is not None and preset.teacher_id != teacher_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preset not found")
         for key, value in data.items():
             if value is not None:
@@ -365,11 +363,11 @@ class SettingsService:
         await self.db.refresh(preset)
         return preset
 
-    async def delete_feedback_preset(self, preset_id: str) -> None:
+    async def delete_feedback_preset(self, preset_id: str, teacher_id: str) -> None:
         from app.models.settings import FeedbackPreset
 
         preset = await self.db.get(FeedbackPreset, preset_id)
-        if preset is None:
+        if preset is None or (preset.teacher_id is not None and preset.teacher_id != teacher_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preset not found")
         if preset.is_default:
             preset.is_hidden = True
@@ -737,11 +735,11 @@ class SettingsService:
         await self.db.refresh(resource)
         return await self._teaching_resource_response(resource)
 
-    async def update_teaching_resource(self, resource_id: str, data: dict) -> Any:
+    async def update_teaching_resource(self, resource_id: str, data: dict, teacher_id: str) -> Any:
         from app.models.settings import TeachingResource
 
         resource = await self.db.get(TeachingResource, resource_id)
-        if resource is None:
+        if resource is None or resource.teacher_id != teacher_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
         tags = data.pop("tags", None)
         for key, value in data.items():
@@ -753,11 +751,11 @@ class SettingsService:
         await self.db.refresh(resource)
         return await self._teaching_resource_response(resource)
 
-    async def delete_teaching_resource(self, resource_id: str) -> None:
+    async def delete_teaching_resource(self, resource_id: str, teacher_id: str) -> None:
         from app.models.settings import TeachingResource
 
         resource = await self.db.get(TeachingResource, resource_id)
-        if resource is None:
+        if resource is None or resource.teacher_id != teacher_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
         await self.db.delete(resource)
         await self.db.flush()
