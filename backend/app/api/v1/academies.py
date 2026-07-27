@@ -221,7 +221,6 @@ async def list_students(
     academy_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-    context: ActiveContext,
     status_filter: Annotated[AcademyStudentStatus | None, Query(alias="status")] = None,
 ) -> AcademyStudentListResponse:
     service = AcademyService(db)
@@ -231,8 +230,15 @@ async def list_students(
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
     # AC-M2 §6.2: 강사 모드 격리 — 본인 매칭 학생만 반환.
-    active_context, _, _ = context
-    teacher_user_id_filter = current_user.id if active_context == "teacher" else None
+    #
+    # active_context 문자열만으로는 판단하지 않는다 — JWT 의 active_context 는
+    # 마지막으로 전환한 학원 기준이라, 이 학원(academy_id)과 다른 학원에서
+    # 전환된 채로 남아있을 수 있다(예: 학원 A 의 owner + 학원 B 의 teacher 겸직).
+    # 대신 이 academy_id 에서 실제로 teacher 역할을 갖는지 새로 조회한다.
+    is_teacher_here = (
+        await service.get_teacher_member_id_for_user(academy_id=academy_id, user_id=current_user.id) is not None
+    )
+    teacher_user_id_filter = current_user.id if is_teacher_here else None
     students, total = await service.list_students(
         academy_id=academy_id,
         status_filter=status_filter,
@@ -265,10 +271,15 @@ async def get_student(
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
     # AC-M2 §6.2: 강사 모드 + 본인 매칭이 아닌 학생 → 403 FORBIDDEN_NOT_YOUR_STUDENT + audit (§9).
+    #
+    # active_context 문자열이 아니라 이 academy_id 에서 실제로 teacher 역할을
+    # 갖는지로 판단한다 — JWT 의 active_context 는 다른 학원에서 전환된 채로
+    # 남아있을 수 있어(예: 학원 A owner + 학원 B teacher 겸직), 문자열만 보면
+    # 이 학원에서의 강사 격리를 우회할 수 있다.
     active_context, _, _ = context
-    if active_context == "teacher":
-        member_id = await service.get_teacher_member_id_for_user(academy_id=student.academy_id, user_id=current_user.id)
-        if member_id is None or student.teacher_member_id != member_id:
+    member_id = await service.get_teacher_member_id_for_user(academy_id=student.academy_id, user_id=current_user.id)
+    if member_id is not None:
+        if student.teacher_member_id != member_id:
             from fastapi import HTTPException
 
             audit_id = await record_access_denial(
