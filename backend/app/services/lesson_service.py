@@ -171,7 +171,8 @@ class LessonService:
 
         # Notify student about new lesson
         if student and student.user_id:
-            from app.services.notification_service import NotificationService, NotificationPriority
+            from app.services.notification_service import NotificationPriority, NotificationService
+
             notification_service = NotificationService(self.db)
             await notification_service.create_and_send(
                 user_id=student.user_id,
@@ -198,9 +199,7 @@ class LessonService:
                 detail="subscription_id does not belong to student_id",
             )
 
-    async def _find_or_create_subscription(
-        self, *, teacher_id: str, student_id: str, lesson_date: date | None
-    ) -> str:
+    async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Find active subscription for the student or create a trial one.
 
         If the active subscription has no remaining lessons (used >= total),
@@ -237,11 +236,9 @@ class LessonService:
             lesson_date=lesson_date,
         )
 
-    async def _create_trial_subscription(
-        self, *, teacher_id: str, student_id: str, lesson_date: date | None
-    ) -> str:
+    async def _create_trial_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Create a 1-lesson trial subscription for auto-assignment."""
-        from app.models.subscription import Subscription, SubscriptionType, SubscriptionStatus
+        from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
 
         membership_id = await self._find_or_create_class_membership(teacher_id, student_id)
 
@@ -322,9 +319,7 @@ class LessonService:
         if max_session is not None:
             return int(max_session) + 1
 
-        existing_count = await self.db.scalar(
-            select(func.count()).where(Lesson.subscription_id == subscription_id)
-        )
+        existing_count = await self.db.scalar(select(func.count()).where(Lesson.subscription_id == subscription_id))
         return int(existing_count or 0) + 1
 
     async def get_by_id(self, lesson_id: str, current_user: Any) -> LessonResponse:
@@ -375,9 +370,7 @@ class LessonService:
             return
         from app.services.subscription_service import SubscriptionService
 
-        await SubscriptionService(self.db).deduct_for_completed_lesson(
-            lesson.id, lesson.subscription_id
-        )
+        await SubscriptionService(self.db).deduct_for_completed_lesson(lesson.id, lesson.subscription_id)
 
     async def delete(self, lesson_id: str, current_user: Any) -> None:
         """Delete a lesson."""
@@ -449,11 +442,52 @@ class LessonService:
         await self.db.refresh(lesson)
 
         # Unified completion deduction (product-approved 2026-06-04): manual and
-        # auto completion both deduct one session. Idempotent; 휴강/취소 do not.
+        # auto completion both deduct one session.
         if new_status == LessonStatus.completed.value:
             await self._deduct_if_completed(lesson)
+        elif new_status in (LessonStatus.noShow.value, LessonStatus.cancelledByStudentLate.value):
+            # LessonPolicy.no_show_deducts_lesson / late_cancel_deducts_lesson: the
+            # cancellation/no-show itself is never blocked, but a configured penalty
+            # deducts a session. No LessonPolicy row for the teacher -> no deduction
+            # (safe default, no behavior change for teachers who never configured one).
+            await self._deduct_if_policy_penalty(lesson, new_status)
 
         return LessonResponse.model_validate(lesson)
+
+    async def _deduct_if_policy_penalty(self, lesson: Any, new_status: str) -> None:
+        """Deduct one subscription session for a no-show/late-cancel penalty.
+
+        Reuses the same idempotent, user-agnostic deduction path as completion
+        (SubscriptionService.deduct_for_completed_lesson) — it locks the
+        subscription row and skips if a usage row already exists for this
+        lesson_id, so re-saving the same status never double-deducts.
+        """
+        from app.models.lesson import LessonStatus
+        from app.models.policy import LessonPolicy
+
+        if not lesson.subscription_id or not lesson.teacher_id:
+            return
+
+        policy = await self.db.scalar(
+            select(LessonPolicy).where(
+                LessonPolicy.teacher_id == lesson.teacher_id,
+                LessonPolicy.lesson_class_id.is_(None),
+            )
+        )
+        if policy is None:
+            return
+
+        penalty_enabled = (
+            policy.no_show_deducts_lesson
+            if new_status == LessonStatus.noShow.value
+            else policy.late_cancel_deducts_lesson
+        )
+        if not penalty_enabled:
+            return
+
+        from app.services.subscription_service import SubscriptionService
+
+        await SubscriptionService(self.db).deduct_for_completed_lesson(lesson.id, lesson.subscription_id)
 
     async def archive(self, lesson_id: str, current_user: Any) -> LessonResponse:
         """Archive a lesson from active lesson lists."""
@@ -473,9 +507,7 @@ class LessonService:
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)
 
-    async def update_feedback(
-        self, lesson_id: str, data: LessonFeedbackUpdate, current_user: Any
-    ) -> LessonResponse:
+    async def update_feedback(self, lesson_id: str, data: LessonFeedbackUpdate, current_user: Any) -> LessonResponse:
         """Write or update feedback for a lesson."""
         from app.models.request_event import RequestEvent, RequestEventType
         from app.services.user_service import UserService
@@ -506,7 +538,8 @@ class LessonService:
         # Notify student about new feedback
         if lesson.student_id:
             from app.models.student import Student
-            from app.services.notification_service import NotificationService, NotificationPriority
+            from app.services.notification_service import NotificationPriority, NotificationService
+
             student = await self.db.get(Student, lesson.student_id)
             if student and student.user_id:
                 notification_service = NotificationService(self.db)
@@ -742,9 +775,7 @@ class LessonService:
         lc = await self._get_accessible_class(class_id, current_user)
         return LessonClassResponse.model_validate(lc)
 
-    async def update_class(
-        self, class_id: str, data: LessonClassUpdate, current_user: Any
-    ) -> LessonClassResponse:
+    async def update_class(self, class_id: str, data: LessonClassUpdate, current_user: Any) -> LessonClassResponse:
         """Update a lesson class."""
         lc = await self._get_accessible_class(class_id, current_user)
 
@@ -874,16 +905,12 @@ class LessonService:
             ]
         return response
 
-    async def get_memberships_by_class(
-        self, class_id: str, current_user: Any
-    ) -> list[MembershipResponse]:
+    async def get_memberships_by_class(self, class_id: str, current_user: Any) -> list[MembershipResponse]:
         """List all memberships in a class."""
         from app.models.lesson import ClassMembership
 
         await self._get_accessible_class(class_id, current_user)
-        result = await self.db.scalars(
-            select(ClassMembership).where(ClassMembership.lesson_class_id == class_id)
-        )
+        result = await self.db.scalars(select(ClassMembership).where(ClassMembership.lesson_class_id == class_id))
         return [self._membership_response(m) for m in result.all()]
 
     async def get_memberships(
@@ -948,9 +975,7 @@ class LessonService:
         await self._assert_membership_access(m, current_user)
         return self._membership_response(m)
 
-    async def add_membership(
-        self, class_id: str, data: MembershipCreate, current_user: Any
-    ) -> MembershipResponse:
+    async def add_membership(self, class_id: str, data: MembershipCreate, current_user: Any) -> MembershipResponse:
         """Add a student to a class."""
         from app.models.lesson import ClassMembership
 
