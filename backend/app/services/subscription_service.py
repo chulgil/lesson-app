@@ -771,7 +771,7 @@ class SubscriptionService:
         self.db.add(usage)
 
         if usage.deducted:
-            sub = await self.db.get(Subscription, subscription_id)
+            sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
             if sub is not None:
                 self._apply_deduction_counter(sub)
 
