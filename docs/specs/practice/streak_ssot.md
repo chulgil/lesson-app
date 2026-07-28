@@ -14,7 +14,7 @@
 - analytics `practiceStreakDays` — mock 하드코딩 12, remote 는 로그 재계산
 - `GrowthHeatmap.streakDays` — 별도 Hive, **UTC 일경계**
 - 뱃지 `badge_point_bridge` — 포인트내역 설명 정규식 `(\d+)일`
-- `effectiveStreakProvider`(freeze 적용, 의도된 SSOT) — **표시 소비처 0 = dead**
+- `effectiveStreakProvider`(freeze 적용, 의도된 SSOT) — ~~표시 소비처 0 = dead~~ → Phase 3(#1214)에서 표시 SSOT 로 배선 완료. §7 참조
 
 BE 도 3중: ① `practice_streaks` counter(비자가치유) ② AnalyticsService 로그 재계산 ③ `/students/{id}/stats` 하드코딩 0.
 
@@ -31,7 +31,7 @@ BE 도 3중: ① `practice_streaks` counter(비자가치유) ② AnalyticsServic
 | longest_streak | 전체 이력에서 최대 연속 run 길이 |
 | last_practice_date | 가장 최근 연습일(KST date) |
 | total_practice_days | distinct 연습일 수 |
-| freeze(보호권) | **이번 범위(Phase 1+2)에서는 미적용** — 표시 숫자에 영향 없음. Phase 3 별도 |
+| freeze(동결) | **Phase 3 적용됨(#1214)** — 위 current_streak 을 계산한 뒤, 차감된 결석일이 공백을 **이어준다**. 상세 §7 |
 
 ### 알고리즘 (의사코드)
 
@@ -77,7 +77,7 @@ total = len(days); last_date = last
 - **PR-A (BE foundation)** — `compute_streak` 신설(엄격 달력+KST), 4개 엔드포인트 배선, `/students/{id}/stats` 스텁 제거. pytest(KST 경계·공백 리셋·longest·empty·minutes 게이트). **beta 배포**. prod 는 별도 윈도우(숫자 변동 가시).
 - **PR-B (FE mock+provider)** — mock 단일 알고리즘, `currentStreakProvider` SSOT, 하드코딩 mock 제거. 단위 테스트.
 - **PR-C (FE consumers)** — 7 화면 SSOT 위임, 인라인/heatmap/정규식 제거. 위젯 회귀 "동일 학생=동일 숫자".
-- **PR-D (cleanup)** — counter 테이블 비활성/제거. freeze(Phase 3)는 분리 보류.
+- **PR-D (cleanup)** — counter 테이블 비활성/제거. ~~freeze(Phase 3)는 분리 보류.~~ → Phase 3 완료(#1214), §7 참조.
 
 ## 5. 검증
 
@@ -91,3 +91,33 @@ total = len(days); last_date = last
 - KST off-by-one — BE naive date.today() 전수 교체가 핵심.
 - offline(SyncAware getStreak online-only) — Phase 1 범위 밖, 현행 유지.
 - mock-BE 알고리즘 패리티 — 테스트로 의도 고정(에이전트 self-test Oracle 주의: 소비자 계약으로 검증).
+
+## 7. Phase 3 — freeze(동결) 표시 적용 (#1214, 2026-07-28)
+
+§1 의 정규 스트릭은 공백 하루에 0 으로 끊긴다(guilt-based). Phase 3 은 그 위에
+**동결(freeze)** 을 얹어 표시값을 보정한다. 근거 시맨틱 = `.harness/spec/2026-06-11-student-gamification.md` §14.1/§14.2/§14.3.
+
+### 7.1 표시 SSOT 이동
+
+**표시 스트릭의 SSOT 는 `effectiveStreakProvider` 다.** 학생 화면은 `practiceStreakProvider`
+(정규값)를 직접 표시하지 않는다. 배선된 표시 지점:
+
+`PracticeStartCard`(홈 카드) · `PracticeSummarySection`(연습 요약) · 학생 홈 시간대 배너 ·
+`PracticeCelebrationOverlay`(연습 직후). 같은 화면에 서로 다른 숫자가 뜨지 않게 **일괄** 이동.
+
+### 7.2 규칙
+
+| 항목 | 규칙 |
+|---|---|
+| 발급 | 일요일 00:00 KST 기준 주 1회 +2, 최대 보유 4 (§14.1). `lastGrantedAt` 게이트로 멱등 |
+| 차감 | 결석일 1일당 freeze 1개 (§14.2). 오늘은 아직 끝나지 않았으므로 결석 판정 제외 |
+| 커버 판정 | **미차감 결석일 수 <= 잔여 balance** 일 때만 유지. 초과하면 끊김 + 차감 안 함(낭비 방지) |
+| 표시값 | 마지막 연습일에서 역방향 카운트. 차감된 결석일은 체인을 **잇되 일수에 더하지 않는다** ("유지" ≠ "증가") |
+| 시험 모드 | 활성 중 차감 0 + 스트릭 동결 (§14.3) |
+| 멱등 | 같은 날짜 재차감 금지 (`usedAt` 가드) — 화면 재빌드가 잔량을 갉아먹지 않는다 |
+
+### 7.3 BE 와의 관계
+
+freeze 는 **표시 계층 보정**이다. §1~§2 의 BE `compute_streak` 는 변경 없이 정규값을 계속
+반환하며, freeze 상태는 현재 **기기 로컬(Hive)** 이다 → 기기 변경 시 소멸. 서버 영속은
+범위 밖(후속). 따라서 BE 가 돌려주는 숫자와 앱 표시값이 다를 수 있고, **표시값이 우선**이다.

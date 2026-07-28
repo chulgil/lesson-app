@@ -7,10 +7,12 @@ import '../../../practice/practice_facade.dart'
     show
         PracticeRepertoire,
         PracticeSection,
+        practiceLogsProvider,
         practiceStreakProvider,
         studentRepertoiresProvider;
 import '../../../practice/practice_ui_facade.dart' show PracticeToolsModal;
 import '../../../students/students_facade.dart' show studentProvider;
+import '../providers/effective_streak_provider.dart';
 import '../providers/growth_heatmap_provider.dart';
 import 'practice_celebration_overlay.dart';
 import 'practice_start_card.dart';
@@ -31,7 +33,7 @@ class PracticeStartSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final studentAsync = ref.watch(studentProvider(studentId));
     final heatmapAsync = ref.watch(growthHeatmapProvider(studentId));
-    final streakAsync = ref.watch(practiceStreakProvider(studentId));
+    final streakAsync = ref.watch(effectiveStreakProvider(studentId));
 
     final name = studentAsync.value?.nickname ?? studentAsync.value?.name ?? '';
     final heatmap = heatmapAsync.value;
@@ -39,8 +41,10 @@ class PracticeStartSection extends ConsumerWidget {
     final today = DateTime.utc(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final yesterdayMinutes = heatmap?.days[yesterday]?.totalMinutes ?? 0;
-    // 표시 streak 은 SSOT(practiceStreakProvider) — KST/grace, 전 화면 일치 (G3 PR-C2).
-    final streakDays = streakAsync.value?.currentStreak ?? 0;
+    // 표시 streak 은 SSOT(effectiveStreakProvider) — freeze 로 이어진 공백을
+    // 건너뛴 값. 전 학생 화면 일치 (#1214 Phase 3).
+    final streakDays = streakAsync.value?.effectiveCurrentStreak ?? 0;
+    final freezeRemaining = streakAsync.value?.freezeBalance ?? 0;
 
     // Slice 2 — 가장 최근 연습한 곡을 선택적 "이어서" 칩으로 노출. 없으면 null.
     final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
@@ -51,6 +55,7 @@ class PracticeStartSection extends ConsumerWidget {
     return PracticeStartCard(
       studentName: name,
       streakDays: streakDays,
+      freezeRemaining: freezeRemaining,
       yesterdayMinutes: yesterdayMinutes,
       onStartTap: () => _practice(context, ref),
       onMoreTap: () => _onMoreTap(context),
@@ -78,21 +83,24 @@ class PracticeStartSection extends ConsumerWidget {
     if (!context.mounted) return;
     if (practicedMinutes == null || practicedMinutes <= 0) return;
 
-    // recordPractice hub 가 heatmap+practice-logs 양쪽을 갱신 → 두 provider 무효화.
-    // 표시 streak 은 SSOT(practiceStreakProvider), heatmap 은 viz 갱신용. (G3 PR-C2)
+    // recordPractice hub 가 heatmap+practice-logs 양쪽을 갱신 → 관련 provider 무효화.
+    // 표시 streak 은 SSOT(effectiveStreakProvider) — raw streak + 연습 로그를
+    // 재료로 쓰므로 둘 다 무효화해야 브리지 계산이 최신이 된다. heatmap 은 viz 갱신용.
     ref.invalidate(growthHeatmapProvider(studentId));
     ref.invalidate(practiceStreakProvider(studentId));
+    ref.invalidate(practiceLogsProvider(studentId));
+    ref.invalidate(effectiveStreakProvider(studentId));
     // 특정 곡에서 연습했으면 그 곡의 lastPracticedAt/차감이 반영되도록 목록도 무효화.
     if (sectionId != null) {
       ref.invalidate(studentRepertoiresProvider(studentId));
     }
-    final streak = await ref.read(practiceStreakProvider(studentId).future);
+    final streak = await ref.read(effectiveStreakProvider(studentId).future);
 
     if (!context.mounted) return;
     await _showCelebration(
       context,
       practiceMinutes: practicedMinutes,
-      streakDays: streak.currentStreak,
+      streakDays: streak.effectiveCurrentStreak,
     );
   }
 

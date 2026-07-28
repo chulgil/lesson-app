@@ -8,6 +8,8 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
+import '../../../../gamification/gamification_facade.dart'
+    show effectiveStreakProvider;
 import '../../../../practice/practice_facade.dart';
 
 /// Practice summary section showing streak, weekly stats, and chart.
@@ -19,9 +21,10 @@ class PracticeSummarySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
-    // Streak comes from the single source of truth (practiceStreakProvider) —
-    // never recomputed here. See docs/specs/practice/streak_ssot.md.
-    final streakAsync = ref.watch(practiceStreakProvider(studentId));
+    // Streak comes from the single source of truth (effectiveStreakProvider) —
+    // never recomputed here. Freeze bridges a covered gap so one missed day does
+    // not reset to 0. See docs/specs/practice/streak_ssot.md §1 Phase 3.
+    final streakAsync = ref.watch(effectiveStreakProvider(studentId));
 
     final now = DateTime.now();
     // Monday of current week
@@ -31,7 +34,7 @@ class PracticeSummarySection extends ConsumerWidget {
 
     // Default values
     final streakDays = streakAsync.maybeWhen(
-      data: (streak) => streak.currentStreak,
+      data: (streak) => streak.effectiveCurrentStreak,
       orElse: () => 0,
     );
     var weeklyTotalMinutes = 0;

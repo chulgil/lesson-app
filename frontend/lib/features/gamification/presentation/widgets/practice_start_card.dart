@@ -12,6 +12,9 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 class PracticeStartCard extends StatelessWidget {
   final String studentName;
   final int streakDays;
+
+  /// 잔여 스트릭 동결 개수 (스펙 §14.1). 0 이면 배지를 숨긴다.
+  final int freezeRemaining;
   final int yesterdayMinutes;
   final VoidCallback onStartTap;
   final VoidCallback? onMoreTap;
@@ -22,6 +25,7 @@ class PracticeStartCard extends StatelessWidget {
     super.key,
     required this.studentName,
     required this.streakDays,
+    this.freezeRemaining = 0,
     required this.yesterdayMinutes,
     required this.onStartTap,
     this.onMoreTap,
@@ -55,6 +59,20 @@ class PracticeStartCard extends StatelessWidget {
                   AppStrings.practiceStartStreak(streakDays),
                   style: AppTypography.bodySmall,
                 ),
+                if (freezeRemaining > 0) ...[
+                  const SizedBox(width: AppSpacing.space2),
+                  const Icon(Icons.ac_unit, size: 14),
+                  const SizedBox(width: 2),
+                  Flexible(
+                    child: Text(
+                      key: const ValueKey('practice_start_card_freeze'),
+                      AppStrings.streakFreezeBadge(freezeRemaining),
+                      style: AppTypography.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: AppSpacing.space5),

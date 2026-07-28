@@ -10571,6 +10571,9 @@ class AppStrings {
   // PracticeStartCard
   static String practiceStartHeader(String name) => '$name의 연습';
   static String practiceStartStreak(int days) => '$days일';
+
+  /// 스트릭 동결(freeze) 잔여 개수 배지 — 결석일 자동 보호 (스펙 §14.1/§14.2).
+  static String streakFreezeBadge(int remaining) => '동결 $remaining개';
   static const practiceStartButton = '연습 시작';
   static String practiceStartContinuePiece(String pieceName) =>
       '이어서: $pieceName';

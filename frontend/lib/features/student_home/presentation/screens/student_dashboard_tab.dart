@@ -10,9 +10,10 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
+import '../../../gamification/gamification_facade.dart'
+    show effectiveStreakProvider;
 import '../../../gamification/gamification_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
-import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
 import '../../../students/students_facade.dart';
@@ -301,11 +302,15 @@ class _StudentTimeBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Streak from the single source of truth (practiceStreakProvider) — never
-    // recomputed here. See docs/specs/practice/streak_ssot.md.
+    // Streak from the single source of truth (effectiveStreakProvider) — never
+    // recomputed here. Freeze bridges a covered gap so one missed day does not
+    // reset to 0. See docs/specs/practice/streak_ssot.md §1 Phase 3.
     final streakDays = ref
-        .watch(practiceStreakProvider(studentId))
-        .maybeWhen(data: (streak) => streak.currentStreak, orElse: () => 0);
+        .watch(effectiveStreakProvider(studentId))
+        .maybeWhen(
+          data: (streak) => streak.effectiveCurrentStreak,
+          orElse: () => 0,
+        );
 
     return TimeContextBanner(
       todayLessons: const <Lesson>[],
@@ -313,7 +318,6 @@ class _StudentTimeBanner extends ConsumerWidget {
       streakDays: streakDays,
     );
   }
-
 }
 
 /// 학생용 이벤트 그룹.

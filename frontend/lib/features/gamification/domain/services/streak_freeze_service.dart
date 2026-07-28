@@ -74,6 +74,28 @@ class StreakFreezeService {
     return repository.apply(studentId, missedDate);
   }
 
+  /// 결석일 목록에 freeze 를 순차 차감 — 이미 차감된 날짜는 건너뛴다.
+  ///
+  /// 스펙 §14.2 (freeze 1개 = 결석 1일). 화면 재빌드마다 호출돼도 같은 날짜를
+  /// 두 번 차감하지 않는다 (`usedAt` 멱등 가드). balance 소진 또는 시험 모드
+  /// 진입 시 즉시 중단.
+  Future<StreakFreeze> applyForAbsences({
+    required String studentId,
+    required List<DateTime> missedDates,
+  }) async {
+    var current = await repository.getOrCreate(studentId);
+    for (final date in missedDates) {
+      final alreadyUsed = current.usedAt.any((used) => _isSameDay(used, date));
+      if (alreadyUsed) continue;
+      if (!current.canApply(asOf: date)) break;
+      current = await repository.apply(studentId, date);
+    }
+    return current;
+  }
+
+  static bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
   /// 시험 모드 발급/해제. 학부모/선생님 발급 (스펙 §14.3).
   Future<StreakFreeze> setExamMode({
     required String studentId,

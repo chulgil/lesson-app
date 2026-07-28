@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/features/gamification/domain/services/streak_with_freeze_calculator.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/effective_streak_provider.dart';
 import 'package:lessonaza/features/practice/domain/entities/practice_log.dart';
-import 'package:lessonaza/features/practice/domain/entities/practice_streak.dart';
 import 'package:lessonaza/features/practice/presentation/providers/practice_crud_provider.dart';
-import 'package:lessonaza/features/practice/presentation/providers/practice_streak_provider.dart';
 import 'package:lessonaza/features/student_home/presentation/widgets/dashboard/practice_summary_section.dart';
 
 void main() {
-  testWidgets('streak comes from practiceStreakProvider (SSOT), not the logs', (
+  testWidgets('streak comes from effectiveStreakProvider (SSOT), not the logs', (
     tester,
   ) async {
     const studentId = 'student_1';
@@ -41,14 +41,13 @@ void main() {
       ProviderScope(
         overrides: [
           practiceLogsProvider(studentId).overrideWith((ref) async => logs),
-          practiceStreakProvider(studentId).overrideWith(
-            (ref) async => PracticeStreak(
-              id: 'streak_$studentId',
-              studentId: studentId,
-              currentStreak: 5,
-              longestStreak: 9,
-              lastPracticeDate: today,
-              updatedAt: now,
+          effectiveStreakProvider(studentId).overrideWith(
+            (ref) async => const StreakWithFreezeResult(
+              effectiveCurrentStreak: 5,
+              freezeShouldApply: false,
+              absenceDate: null,
+              streakBroken: false,
+              examModeDormant: false,
             ),
           ),
         ],
