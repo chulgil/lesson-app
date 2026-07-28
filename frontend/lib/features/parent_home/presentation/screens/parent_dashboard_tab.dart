@@ -16,6 +16,8 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
+import '../../../gamification/gamification_facade.dart'
+    show effectiveStreakProvider;
 import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
@@ -602,7 +604,9 @@ class _QuickStatsSection extends ConsumerWidget {
 
     final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
     final weeklyItemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
-    final streakAsync = ref.watch(practiceStreakProvider(studentId));
+    // 표시 숫자는 학생 화면과 같은 SSOT — 학부모가 보는 자녀 스트릭이
+    // 학생 본인 화면과 달라지지 않게 (streak_ssot.md §7.1).
+    final streakAsync = ref.watch(effectiveStreakProvider(studentId));
 
     final weeklyLessonCount = lessonsAsync.maybeWhen(
       data: (lessons) {
@@ -635,7 +639,8 @@ class _QuickStatsSection extends ConsumerWidget {
     );
 
     final streakLabel = streakAsync.maybeWhen(
-      data: (streak) => AppStrings.parentHomeDaysFormat(streak.currentStreak),
+      data: (streak) =>
+          AppStrings.parentHomeDaysFormat(streak.effectiveCurrentStreak),
       orElse: () => null,
     );
 
@@ -801,6 +806,8 @@ class _PracticeStreakSection extends ConsumerWidget {
       );
     }
 
+    // 여기는 "어느 요일에 실제로 연습했는가" 를 그리므로 raw SSOT 를 쓴다 —
+    // 동결된 날은 연습한 날이 아니라 practiced 로 칠하면 안 된다 (§7).
     final streakAsync = ref.watch(practiceStreakProvider(studentId));
     final today = DateTime.now();
     final monday = DateTime(
