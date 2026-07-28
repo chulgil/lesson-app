@@ -172,9 +172,15 @@ enum RiskLevel { high, medium, low }
 class AtRiskStudent {
   final String studentId;
   final String studentName;
-  final int daysUntilExpiry;
+
+  /// Null when the student has no live subscription (no expiry date exists).
+  final int? daysUntilExpiry;
+
+  /// Negative means practice volume declined.
   final double practiceDropPercent;
-  final DateTime lastLessonDate;
+
+  /// Null when the student has no lesson history yet.
+  final DateTime? lastLessonDate;
   final RiskLevel riskLevel;
 
   const AtRiskStudent({

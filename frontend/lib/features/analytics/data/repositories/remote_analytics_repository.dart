@@ -82,12 +82,15 @@ class RemoteAnalyticsRepository implements AnalyticsRepository {
 
   @override
   Future<RetentionAnalyticsData> getRetentionAnalytics() async {
-    return const RetentionAnalyticsData(
-      renewalRate: 0,
-      avgSubscriptionMonths: 0,
-      atRiskStudents: [],
-      renewalTrend: [],
-      tenureDistribution: [],
+    final response = await _apiClient.get('/analytics/retention');
+    final data = response.data as Map<String, dynamic>;
+    return RetentionAnalyticsData(
+      renewalRate: ((data['renewal_rate'] as num?) ?? 0).toDouble(),
+      avgSubscriptionMonths:
+          ((data['avg_subscription_months'] as num?) ?? 0).toDouble(),
+      atRiskStudents: _mapList(data['at_risk_students'], _atRiskStudent),
+      renewalTrend: _mapList(data['renewal_trend'], _renewalTrend),
+      tenureDistribution: _mapList(data['tenure_distribution'], _tenureBucket),
     );
   }
 
@@ -96,3 +99,46 @@ class RemoteAnalyticsRepository implements AnalyticsRepository {
     return const [];
   }
 }
+
+List<T> _mapList<T>(
+  dynamic raw,
+  T Function(Map<String, dynamic> json) map,
+) {
+  if (raw is! List) return const [];
+  return raw
+      .whereType<Map<String, dynamic>>()
+      .map(map)
+      .toList(growable: false);
+}
+
+AtRiskStudent _atRiskStudent(Map<String, dynamic> json) {
+  final lastLesson = json['last_lesson_date'] as String?;
+  return AtRiskStudent(
+    studentId: json['student_id'] as String? ?? '',
+    studentName: json['student_name'] as String? ?? '',
+    daysUntilExpiry: (json['days_until_expiry'] as num?)?.toInt(),
+    practiceDropPercent:
+        ((json['practice_drop_percent'] as num?) ?? 0).toDouble(),
+    lastLessonDate: lastLesson == null ? null : DateTime.tryParse(lastLesson),
+    riskLevel: _riskLevel(json['risk_level'] as String?),
+  );
+}
+
+RiskLevel _riskLevel(String? raw) => switch (raw) {
+  'high' => RiskLevel.high,
+  'medium' => RiskLevel.medium,
+  _ => RiskLevel.low,
+};
+
+MonthlyRenewalTrend _renewalTrend(Map<String, dynamic> json) =>
+    MonthlyRenewalTrend(
+      month: DateTime.tryParse(json['month'] as String? ?? '') ?? DateTime(0),
+      expired: (json['expired'] as num?)?.toInt() ?? 0,
+      renewed: (json['renewed'] as num?)?.toInt() ?? 0,
+    );
+
+TenureDistribution _tenureBucket(Map<String, dynamic> json) =>
+    TenureDistribution(
+      bucketLabel: json['label'] as String? ?? '',
+      count: (json['count'] as num?)?.toInt() ?? 0,
+    );

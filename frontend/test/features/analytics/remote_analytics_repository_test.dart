@@ -67,21 +67,98 @@ void main() {
   });
 
   test(
-    'unsupported remote analytics sections return empty aggregates without HTTP',
+    'getStudentSummaryList returns an empty aggregate without HTTP',
     () async {
-      // §589 — getRetentionAnalytics / getStudentSummaryList 는 BE 미지원이므로
-      // 빈 집계 스텁만 반환해야 한다 (네트워크 호출 없음).
-      // getStudentProgress 는 BE 지원 (/analytics/students/{id}/progress) — 별도 테스트.
+      // §589 — getStudentSummaryList 는 BE 미지원이므로 빈 집계 스텁만 반환한다.
+      // getRetentionAnalytics / getStudentProgress 는 BE 지원 — 별도 테스트.
       final requests = <RequestOptions>[];
       final repository = repositoryWithMonthlyStats(requests: requests);
 
-      final retention = await repository.getRetentionAnalytics();
       final summary = await repository.getStudentSummaryList(DateTime(2026, 5));
 
-      expect(retention.atRiskStudents, isEmpty);
-      expect(retention.renewalTrend, isEmpty);
       expect(summary, isEmpty);
       expect(requests, isEmpty);
+    },
+  );
+
+  test(
+    'getRetentionAnalytics calls /analytics/retention and maps at-risk students',
+    () async {
+      // #1216 — BE 지원 (analytics.py get_retention_analytics).
+      final requests = <RequestOptions>[];
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requests.add(options);
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                statusCode: 200,
+                data: {
+                  'renewal_rate': 0.76,
+                  'avg_subscription_months': 14.2,
+                  'at_risk_students': [
+                    {
+                      'student_id': 's005',
+                      'student_name': '정하준',
+                      'days_until_expiry': 7,
+                      'practice_drop_percent': -40.0,
+                      'last_lesson_date': '2026-04-28',
+                      'risk_level': 'high',
+                    },
+                    {
+                      'student_id': 's006',
+                      'student_name': '무수강권학생',
+                      'days_until_expiry': null,
+                      'practice_drop_percent': 0.0,
+                      'last_lesson_date': null,
+                      'risk_level': 'low',
+                    },
+                  ],
+                  'renewal_trend': [
+                    {
+                      'month': '2026-04-01T00:00:00',
+                      'expired': 3,
+                      'renewed': 2,
+                    },
+                  ],
+                  'tenure_distribution': [
+                    {'label': '0-3개월', 'count': 2},
+                  ],
+                },
+              ),
+            );
+          },
+        ),
+      );
+      final repository = RemoteAnalyticsRepository(ApiClient(dio));
+
+      final retention = await repository.getRetentionAnalytics();
+
+      expect(requests.single.path, '/analytics/retention');
+      expect(retention.renewalRate, 0.76);
+      expect(retention.avgSubscriptionMonths, 14.2);
+      expect(retention.atRiskStudents, hasLength(2));
+
+      final first = retention.atRiskStudents.first;
+      expect(first.studentId, 's005');
+      expect(first.studentName, '정하준');
+      expect(first.daysUntilExpiry, 7);
+      expect(first.practiceDropPercent, -40.0);
+      expect(first.lastLessonDate, DateTime(2026, 4, 28));
+      expect(first.riskLevel, RiskLevel.high);
+
+      // 유효 수강권/레슨 이력이 없으면 null 로 매핑된다 (센티널 값 금지).
+      final second = retention.atRiskStudents.last;
+      expect(second.daysUntilExpiry, isNull);
+      expect(second.lastLessonDate, isNull);
+      expect(second.riskLevel, RiskLevel.low);
+
+      expect(retention.renewalTrend.single.expired, 3);
+      expect(retention.renewalTrend.single.renewed, 2);
+      expect(retention.tenureDistribution.single.bucketLabel, '0-3개월');
+      expect(retention.tenureDistribution.single.count, 2);
     },
   );
 

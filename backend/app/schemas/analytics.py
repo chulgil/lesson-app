@@ -50,6 +50,39 @@ class StudentProgressResponse(BaseModel):
     attendance_calendar: list[AttendanceCalendarEntry]
 
 
+class AtRiskStudentResponse(BaseModel):
+    """이탈 위험 학생 1건. 신호는 결석 패턴 / 만료 임박 / 연습량 급감."""
+
+    student_id: str
+    student_name: str
+    # 유효 수강권이 없으면 null (만료일 자체가 존재하지 않는 상태).
+    days_until_expiry: int | None
+    practice_drop_percent: float  # 음수 = 감소
+    last_lesson_date: _dt.date | None  # 레슨 이력이 없으면 null
+    risk_level: str  # "high" | "medium" | "low"
+
+
+class MonthlyRenewalTrendResponse(BaseModel):
+    month: _dt.datetime
+    expired: int
+    renewed: int
+
+
+class TenureDistributionResponse(BaseModel):
+    label: str
+    count: int
+
+
+class RetentionAnalyticsResponse(BaseModel):
+    """리텐션 분석. ``renewal_rate`` 의 의미는 재구매율 (자동 갱신 없음)."""
+
+    renewal_rate: float  # 0.0 ~ 1.0
+    avg_subscription_months: float
+    at_risk_students: list[AtRiskStudentResponse]
+    renewal_trend: list[MonthlyRenewalTrendResponse]
+    tenure_distribution: list[TenureDistributionResponse]
+
+
 class TeacherMonthlyStatsResponse(BaseModel):
     month: _dt.datetime
     total_lessons: int

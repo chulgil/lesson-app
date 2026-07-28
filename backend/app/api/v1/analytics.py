@@ -14,8 +14,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_db
 from app.models.user import User
-from app.schemas.analytics import StudentProgressResponse, TeacherMonthlyStatsResponse
+from app.schemas.analytics import (
+    RetentionAnalyticsResponse,
+    StudentProgressResponse,
+    TeacherMonthlyStatsResponse,
+)
 from app.services.analytics_service import AnalyticsService
+from app.services.retention_service import RetentionService
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 router = APIRouter()
@@ -35,6 +40,22 @@ async def get_monthly_stats(
 ) -> TeacherMonthlyStatsResponse:
     service = AnalyticsService(db)
     return await service.get_monthly_stats(current_user, month)
+
+
+@router.get(
+    "/retention",
+    response_model=RetentionAnalyticsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get re-purchase rate and at-risk students",
+)
+async def get_retention_analytics(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> RetentionAnalyticsResponse:
+    """Return retention aggregates for the authenticated teacher's own students."""
+    teacher_id = await resolve_teacher_id(db, current_user.id)
+    service = RetentionService(db)
+    return await service.get_retention_analytics(teacher_id=teacher_id)
 
 
 @router.get(
