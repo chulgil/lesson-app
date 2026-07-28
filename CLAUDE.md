@@ -50,10 +50,13 @@ Phase 0: brownfield-scan → Phase 1: interview → Phase 2: spec
 ```bash
 cd frontend
 flutter pub get                                              # 의존성
-flutter run                                                  # 실행
-dart run build_runner build --delete-conflicting-outputs      # 코드 생성
+flutter run                                                  # 실행 (AI 검증 루프: flutter run -d web-server)
+dart run build_runner build --delete-conflicting-outputs      # 코드 생성 (1회)
+dart run build_runner watch --delete-conflicting-outputs      # 코드 생성 (상시 — 개발 표준, 매번 전체빌드 대기 제거)
 flutter analyze                                              # 분석
 ```
+
+> AI 개발/검증 루프: `.mcp.json` 의 **dart** MCP(위젯트리·런타임에러·핫리로드) + web-server + chrome MCP 스크린샷. 전략·셋업: 옵시디언 `40-Flutter-AI-개발속도-전략`, 룰: `.claude/rules/frontend-verify.md` §Agentic 검증 루프. (MCP 등록은 세션 재시작 후 활성.)
 
 ## 핵심 규칙
 
