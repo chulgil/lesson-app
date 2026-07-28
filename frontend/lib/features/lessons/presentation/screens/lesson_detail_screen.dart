@@ -478,6 +478,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               icon: Icons.edit_note,
             ),
             const SizedBox(height: AppSpacing.space3),
+            // #1215: 이번 노트를 쓰는 동안 같은 학생의 지난 노트를 참조.
+            PreviousLessonNotesCard(lesson: lesson),
             LessonNoteEditor(
               initialText: lesson.feedback,
               onChanged: (text) => _saveFeedbackDebounced(lesson, text),

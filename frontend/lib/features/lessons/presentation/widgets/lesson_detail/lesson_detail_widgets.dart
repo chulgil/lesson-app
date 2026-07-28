@@ -9,3 +9,4 @@ export 'attendance_status_banners.dart';
 export 'lesson_header_card.dart';
 export 'lesson_notes_widgets.dart';
 export 'lesson_recording_card.dart';
+export 'previous_lesson_notes_card.dart';

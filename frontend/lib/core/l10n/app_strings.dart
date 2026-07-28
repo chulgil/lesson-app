@@ -2428,6 +2428,9 @@ class AppStrings {
   /// 레슨 노트 (lesson note history AppBar)
   static const lessonNotesTitle = '레슨 노트';
 
+  /// 지난 노트 (#1215 노트 편집기 위 이전 레슨 노트 참조 헤더)
+  static const previousLessonNotesTitle = '지난 노트';
+
   /// 노트 검색... (search hint)
   static const noteSearchHint = '노트 검색...';
 
