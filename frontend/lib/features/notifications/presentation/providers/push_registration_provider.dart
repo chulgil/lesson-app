@@ -16,6 +16,15 @@ PushInitializer pushInitializer(Ref ref) {
   return ref.read(fcmServiceProvider).initialize;
 }
 
+/// The FCM token-unregistration entry point, indirected for the same reason as
+/// [PushInitializer].
+typedef PushUnregistrar = Future<void> Function();
+
+@Riverpod(keepAlive: true)
+PushUnregistrar pushUnregistrar(Ref ref) {
+  return ref.read(fcmServiceProvider).unregisterToken;
+}
+
 /// Registers the device for push once the user finishes onboarding (#475).
 ///
 /// Wired in `main.dart` to fire when auth reaches [AuthAuthenticated], so the

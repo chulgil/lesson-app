@@ -7,6 +7,7 @@ import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart'
     show
         lessonsByStudentProvider,
+        lessonsNotifierProvider,
         lessonsProvider,
         todayLessonsProvider,
         upcomingLessonsProvider;
@@ -964,6 +965,9 @@ class UnifiedLessonRequestActions {
     ref.invalidate(todayLessonsProvider);
     ref.invalidate(upcomingLessonsProvider);
     ref.invalidate(lessonsByStudentProvider);
+    // #1211 — the weekly grid reads through lessonsNotifierProvider, not the
+    // list providers above, so it stayed on the old time without this.
+    ref.invalidate(lessonsNotifierProvider);
 
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }

@@ -21,6 +21,21 @@ final pushInitializerProvider = Provider<PushInitializer>.internal(
 );
 
 typedef PushInitializerRef = ProviderRef<PushInitializer>;
+String _$pushUnregistrarHash() => r'13e3abdbc3eb74f35ec08883f8c4be985c8fc54a';
+
+/// See also [pushUnregistrar].
+@ProviderFor(pushUnregistrar)
+final pushUnregistrarProvider = Provider<PushUnregistrar>.internal(
+  pushUnregistrar,
+  name: r'pushUnregistrarProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$pushUnregistrarHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef PushUnregistrarRef = ProviderRef<PushUnregistrar>;
 String _$pushRegistrationHash() => r'05de5867420a91656e81133d56c66cf8fc910884';
 
 /// Registers the device for push once the user finishes onboarding (#475).

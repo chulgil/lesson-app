@@ -12,6 +12,7 @@ import '../../../../core/network/cache/response_cache_store.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/sync/data/sync_queue_store.dart';
 import '../../../../core/sync/sync_facade.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../data/repositories/remote_auth_repository.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/entities/user_role.dart';
@@ -354,6 +355,14 @@ class AuthNotifier extends _$AuthNotifier {
 
   /// Logout and clear tokens.
   Future<void> logout() async {
+    // Drop this device's push token first, while the access token is still
+    // valid. Otherwise the signed-out user keeps receiving push on a shared
+    // device (privacy: data-privacy.md §Level-2).
+    try {
+      await ref.read(pushUnregistrarProvider)();
+    } catch (_) {
+      // Best-effort: Firebase may be unconfigured or absent (tests, web).
+    }
     try {
       await _authRepository.logout();
     } catch (_) {

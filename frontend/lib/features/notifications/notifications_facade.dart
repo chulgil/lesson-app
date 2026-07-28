@@ -16,5 +16,8 @@ export 'domain/services/practice_reminder_scheduler.dart'
 export 'presentation/providers/subscription_expiry_providers.dart'
     show subscriptionExpiryReminderSettingsNotifierProvider;
 export 'presentation/providers/push_registration_provider.dart'
-    show pushRegistrationProvider, pushInitializerProvider;
+    show
+        pushRegistrationProvider,
+        pushInitializerProvider,
+        pushUnregistrarProvider;
 export 'presentation/widgets/context_switch_toast.dart' show ContextSwitchToast;

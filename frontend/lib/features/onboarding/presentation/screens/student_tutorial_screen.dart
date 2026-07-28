@@ -91,7 +91,23 @@ class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
   Future<void> _navigateToHome() async {
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
     if (!ref.read(mockDataModeProvider)) {
-      await ref.read(authNotifierProvider.notifier).completeOnboarding();
+      try {
+        await ref.read(authNotifierProvider.notifier).completeOnboarding();
+      } catch (_) {
+        // Persisting the onboarding-complete flag (PATCH + getMe) failed, e.g.
+        // a network drop. Surface it instead of leaving the screen frozen with
+        // no error or navigation (the button callback would otherwise swallow
+        // the exception), and let the user retry.
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.errorTryAgain),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.paperAccent,
+          ),
+        );
+        return;
+      }
     }
     if (!mounted) return;
     context.go(AppRoutes.studentHome);
