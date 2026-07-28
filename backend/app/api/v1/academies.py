@@ -221,6 +221,7 @@ async def list_students(
     academy_id: str,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
+    context: ActiveContext,
     status_filter: Annotated[AcademyStudentStatus | None, Query(alias="status")] = None,
 ) -> AcademyStudentListResponse:
     service = AcademyService(db)
@@ -231,13 +232,21 @@ async def list_students(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
     # AC-M2 §6.2: 강사 모드 격리 — 본인 매칭 학생만 반환.
     #
-    # active_context 문자열만으로는 판단하지 않는다 — JWT 의 active_context 는
-    # 마지막으로 전환한 학원 기준이라, 이 학원(academy_id)과 다른 학원에서
-    # 전환된 채로 남아있을 수 있다(예: 학원 A 의 owner + 학원 B 의 teacher 겸직).
-    # 대신 이 academy_id 에서 실제로 teacher 역할을 갖는지 새로 조회한다.
-    is_teacher_here = (
-        await service.get_teacher_member_id_for_user(academy_id=academy_id, user_id=current_user.id) is not None
-    )
+    # active_context 가 "지금 이 academy_id" 를 위해 명시적으로 설정된 경우
+    # (JWT 의 academy_id 가 요청 경로와 일치) 에만 그 값을 신뢰한다 — 1인 학원
+    # 대표(owner+teacher 겸직)가 의도적으로 "강사로 보기" 전환한 경우를 위함.
+    # JWT 의 academy_id 가 다르거나(다른 학원에서 전환된 채 남음) 아예 없으면
+    # (AC-M1 호환 토큰) 이 academy_id 에서의 실제 역할로 새로 판단한다 —
+    # owner 우선(같은 학원 owner+teacher 겸직이면 기본은 owner 전체 접근).
+    active_context, jwt_academy_id, _ = context
+    if active_context is not None and jwt_academy_id == academy_id:
+        is_teacher_here = active_context == "teacher"
+    else:
+        is_owner_here = await service.is_owner_at_academy(academy_id=academy_id, user_id=current_user.id)
+        is_teacher_here = (
+            not is_owner_here
+            and await service.get_teacher_member_id_for_user(academy_id=academy_id, user_id=current_user.id) is not None
+        )
     teacher_user_id_filter = current_user.id if is_teacher_here else None
     students, total = await service.list_students(
         academy_id=academy_id,
@@ -272,12 +281,22 @@ async def get_student(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not a member")
     # AC-M2 §6.2: 강사 모드 + 본인 매칭이 아닌 학생 → 403 FORBIDDEN_NOT_YOUR_STUDENT + audit (§9).
     #
-    # active_context 문자열이 아니라 이 academy_id 에서 실제로 teacher 역할을
-    # 갖는지로 판단한다 — JWT 의 active_context 는 다른 학원에서 전환된 채로
-    # 남아있을 수 있어(예: 학원 A owner + 학원 B teacher 겸직), 문자열만 보면
-    # 이 학원에서의 강사 격리를 우회할 수 있다.
-    active_context, _, _ = context
-    member_id = await service.get_teacher_member_id_for_user(academy_id=student.academy_id, user_id=current_user.id)
+    # active_context 가 이 academy_id 를 위해 명시적으로 설정된 경우에만
+    # 신뢰한다(1인 학원 대표의 의도적 "강사로 보기" 전환 지원). JWT 의
+    # academy_id 가 다르거나 없으면 이 academy_id 에서의 실제 역할로 새로
+    # 판단한다 — 다른 학원에서 전환된 채 남은 문자열로 이 학원의 강사
+    # 격리를 우회하지 못하게 한다. owner 우선(겸직 시 기본은 전체 접근).
+    active_context, jwt_academy_id, _ = context
+    if active_context is not None and jwt_academy_id == student.academy_id:
+        trust_teacher_mode = active_context == "teacher"
+    else:
+        is_owner_here = await service.is_owner_at_academy(academy_id=student.academy_id, user_id=current_user.id)
+        trust_teacher_mode = not is_owner_here
+    member_id = (
+        await service.get_teacher_member_id_for_user(academy_id=student.academy_id, user_id=current_user.id)
+        if trust_teacher_mode
+        else None
+    )
     if member_id is not None:
         if student.teacher_member_id != member_id:
             from fastapi import HTTPException
