@@ -6,7 +6,7 @@ from datetime import UTC, date, datetime, timedelta
 from typing import Any, NamedTuple
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.date_utils import to_date
@@ -373,8 +373,16 @@ class LessonService:
         await SubscriptionService(self.db).deduct_for_completed_lesson(lesson.id, lesson.subscription_id)
 
     async def delete(self, lesson_id: str, current_user: Any) -> None:
-        """Delete a lesson."""
+        """Delete a lesson.
+
+        LessonPiece/LessonRecording have no FK on lesson_id (so no ON DELETE
+        CASCADE), so they're explicitly cleaned up here to avoid orphaned rows.
+        """
+        from app.models.lesson import LessonPiece, LessonRecording
+
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        await self.db.execute(delete(LessonPiece).where(LessonPiece.lesson_id == lesson_id))
+        await self.db.execute(delete(LessonRecording).where(LessonRecording.lesson_id == lesson_id))
         await self.db.delete(lesson)
         await self.db.flush()
 
