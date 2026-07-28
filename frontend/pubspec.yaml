@@ -55,6 +55,9 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   timezone: ^0.10.0
 
+  # Analytics (#1209 — 수익화 퍼널 계측)
+  firebase_analytics: ^11.6.0
+
   # Utilities
   intl: ^0.20.2
   uuid: ^4.4.2

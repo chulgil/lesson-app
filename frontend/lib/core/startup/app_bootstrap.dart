@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -16,6 +18,7 @@ import '../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../features/practice/domain/entities/recording.dart';
 import '../../features/student_home/data/models/manual_teacher_hive_model.dart';
 import '../../firebase_options.dart';
+import '../analytics/analytics_provider.dart';
 import '../audio/audio_session_manager.dart';
 import '../network/cache/response_cache_store.dart';
 import 'startup_recovery.dart';
@@ -95,6 +98,12 @@ Future<StartupRecoveryResult> bootstrapApp() async {
       DeviceOrientation.portraitDown,
     ]);
   }
+
+  // #1209 — cold start. Fire-and-forget after init succeeded; the analytics
+  // sink swallows its own failures and is a no-op wherever Firebase is not
+  // configured (web), so this can never block or fail boot. The role is not
+  // known yet at this point (auth resolves later), so it is omitted.
+  unawaited(analytics.logAppOpened());
 
   return recoveryResult;
 }

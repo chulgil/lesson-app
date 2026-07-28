@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/analytics/analytics_provider.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../domain/repositories/student_repository.dart';
 import 'student_repository_provider.dart';
@@ -82,6 +85,9 @@ class StudentsNotifier extends _$StudentsNotifier {
       state = await AsyncValue.guard(() => _repository.getStudents());
       ref.invalidate(studentsProvider);
       ref.invalidate(filteredStudentsProvider);
+      // #1209 — 학생 생성 성공. 진입점(수동 등록/온보딩)은 이 notifier 에서
+      // 구분되지 않으므로 method 는 생략한다.
+      unawaited(ref.read(analyticsServiceProvider).logStudentAdded());
       return newStudent;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
