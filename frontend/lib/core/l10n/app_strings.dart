@@ -1668,23 +1668,8 @@ class AppStrings {
   /// 입금 알림을 보냈습니다
   static const paymentReminderSent = '입금 알림을 보냈습니다';
 
-  /// 입금 알림 발송에 실패했어요
-  static const paymentReminderSendFailed = '입금 알림 발송에 실패했어요';
-
-  /// 수강료 입금 안내
-  static const paymentReminderTitle = '수강료 입금 안내';
-
-  /// 수강료 %s원 입금 부탁드려요 (bodyFor 함수로 포맷)
-  static String paymentReminderBody({
-    required String teacherName,
-    required int amount,
-  }) {
-    final formatted = amount.toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-    return '$teacherName 선생님: 수강료 $formatted원 입금을 부탁드려요';
-  }
+  // #1212 미수금 리마인더 발송 문구(title/body/실패)는 FE 로컬 알림 제거와 함께
+  // 삭제됨. 재도입 시 BE Notification emit 쪽에서 문구를 정의한다.
 
   // ── Booking Cancel (예약 취소 화면) ─────────────────────────
   /// 예약 취소 (AppBar)
@@ -8028,6 +8013,9 @@ class AppStrings {
   static const profileOutstandingEmpty = '미수금 항목이 없습니다';
   static const profileOutstandingListTitle = '미수금 목록';
   static const profileOutstandingSendReminder = '알림 보내기';
+  // #1212 학생에게 실제로 도달하는 발송 경로(BE)가 없어 버튼 비활성 + 준비중 표기.
+  static const profileOutstandingSendReminderPreparing =
+      '$profileOutstandingSendReminder ($authComingSoonBadge)';
   static const profileOutstandingConfirmPayment = '입금 확인';
   static const profileOutstandingPaymentConfirmed = '입금이 확인되었습니다';
   // #426 입금 확인 24h Undo
