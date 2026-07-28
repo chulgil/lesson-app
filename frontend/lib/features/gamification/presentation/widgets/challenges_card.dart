@@ -71,7 +71,7 @@ class ChallengesCard extends ConsumerWidget {
                     TextButton(
                       onPressed: onViewAll,
                       child: Text(
-                        '전체 보기',
+                        AppStrings.studentViewAll,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.paperAccent,
                         ),

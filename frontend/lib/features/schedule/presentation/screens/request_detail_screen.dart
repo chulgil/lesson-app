@@ -498,6 +498,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     int selectedSlotIndex,
     String message,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       final msg = message.isEmpty ? null : message;
@@ -522,6 +526,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       if (context.mounted) {
         _showError(AppStrings.acceptError);
       }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -545,20 +551,27 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     );
     if (result == null || !context.mounted) return;
 
+    // Approve directly from schedule comparison (inline completion).
+    // _handleAccept owns the #D1 guard for this path.
+    if (result.acceptedSlotIndex != null) {
+      await _handleAccept(
+        context,
+        ref,
+        request,
+        result.acceptedSlotIndex!,
+        result.message,
+      );
+      return;
+    }
+
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
 
-      if (result.acceptedSlotIndex != null) {
-        // Approve directly from schedule comparison (inline completion)
-        await _handleAccept(
-          context,
-          ref,
-          request,
-          result.acceptedSlotIndex!,
-          result.message,
-        );
-        return;
-      } else if (result.slots.isEmpty) {
+      if (result.slots.isEmpty) {
         // Reject (from reject bottom sheet inside schedule screen)
         await actions.rejectRequest(
           request.id,
@@ -598,6 +611,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       if (context.mounted) {
         _showError();
       }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -886,6 +901,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
     String? selectedTemplateId,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.acceptProposal(
@@ -899,6 +918,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) _showError();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -908,6 +929,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
     String? reason,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.rejectProposal(
@@ -921,6 +946,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) _showError();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 

@@ -72,7 +72,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           ...overview.studentRates.map(
             (sr) => _buildStudentRow(
               sr,
-              studentNames[sr.studentId] ?? sr.studentId,
+              studentNames[sr.studentId] ?? AppStrings.unknownStudent,
             ),
           ),
 
@@ -89,7 +89,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
             ...overview.recentAbsences.map(
               (ar) => _buildAbsenceRow(
                 ar,
-                studentNames[ar.studentId] ?? ar.studentId,
+                studentNames[ar.studentId] ?? AppStrings.unknownStudent,
               ),
             ),
           ],
