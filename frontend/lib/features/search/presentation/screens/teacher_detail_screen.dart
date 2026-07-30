@@ -16,6 +16,8 @@ import '../../../../features/schedule/schedule_ui_facade.dart';
 import '../../../profile/domain/entities/invite.dart';
 import '../../../profile/presentation/extensions/lesson_type_option_visuals.dart';
 import '../../../profile/profile_facade.dart';
+import '../../../students/students_facade.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../search_facade.dart';
 
 /// Teacher public profile detail screen
@@ -33,7 +35,9 @@ class TeacherDetailScreen extends ConsumerWidget {
       appBar: NotebookDetailAppBar(
         title:
             profileAsync.valueOrNull?.displayName != null
-                ? AppStrings.searchTeacherDetailTitle(profileAsync.valueOrNull!.displayName!)
+                ? AppStrings.searchTeacherDetailTitle(
+                  profileAsync.valueOrNull!.displayName!,
+                )
                 : AppStrings.searchAnonymousTeacher,
       ),
       body: profileAsync.when(
@@ -117,6 +121,21 @@ class _TeacherDetailContent extends ConsumerWidget {
         disconnectedConnectionsAsync.valueOrNull
             ?.where((c) => c.teacherId == profile.id)
             .firstOrNull;
+    // #1219 — 수강권 보유 학생은 선착순 직접 예약을 우선 노출한다
+    // (student_direct_booking_spec §8). 학생 id 는 currentStudent(getMyProfile)
+    // SSOT 에서 얻는다 — auth userId 는 Student.id 가 아니다.
+    final currentStudent = ref.watch(currentStudentProvider).valueOrNull;
+    final activeSubscription =
+        currentStudent == null
+            ? null
+            : ref
+                .watch(
+                  activeSubscriptionBetweenProvider(
+                    studentId: currentStudent.id,
+                    teacherId: profile.id,
+                  ),
+                )
+                .valueOrNull;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,6 +435,41 @@ class _TeacherDetailContent extends ConsumerWidget {
                 if (isPreviousTeacher) ...[
                   // Previous teacher - show "다시 시작하기" button
                   _buildReconnectSection(context, ref, disconnectedConnection),
+                ] else if (activeSubscription != null &&
+                    currentStudent != null) ...[
+                  // #1219 Active subscription - first-come direct slot booking
+                  // (no teacher approval needed).
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.lessonDirectBooking,
+                          extra: LessonBookingParams(
+                            teacherId: profile.id,
+                            teacherName: profile.displayName ?? '',
+                            studentId: currentStudent.id,
+                            studentName: currentStudent.name,
+                            instrument:
+                                profile.instruments.isNotEmpty
+                                    ? profile.instruments.first
+                                    : null,
+                            subscriptionId: activeSubscription.id,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.event_available),
+                      label: const Text(AppStrings.bookAction),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.paperAccent,
+                        foregroundColor: AppColors.paper,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.space3,
+                        ),
+                        shape: const RoundedRectangleBorder(),
+                      ),
+                    ),
+                  ),
                 ] else ...[
                   // New teacher - single "레슨 신청" button
                   SizedBox(

@@ -5,6 +5,8 @@ export 'presentation/screens/suggest_alternative_screen.dart'
     show SuggestAlternativeResult, SuggestAlternativeScreen;
 export 'presentation/screens/unified_lesson_request_screen.dart'
     show UnifiedLessonRequestParams, UnifiedLessonRequestScreen;
+export 'presentation/screens/lesson_booking_screen.dart'
+    show LessonBookingParams, LessonBookingScreen;
 export 'presentation/screens/schedule_tab.dart' show ScheduleTab;
 export 'presentation/widgets/request_list_item.dart' show RequestListItem;
 export 'presentation/widgets/schedule_change_slot_bottom_sheet.dart'
