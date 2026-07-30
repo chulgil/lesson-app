@@ -181,8 +181,10 @@ async def test_repurchase_rate_counts_confirmed_payment_within_window(
                 end_date=today + timedelta(days=60),
                 confirmed_at=datetime.combine(expired_on + timedelta(days=10), datetime.min.time(), tzinfo=UTC),
             ),
-            # Expired and never bought again.
-            _subscription("churned", end_date=today - timedelta(days=60)),
+            # Expired and never bought again. Kept >=32 days from `expired_on`
+            # (today-90) so the two never share a calendar-month bucket on any
+            # run date — a 30-day gap collided (both in one month) on some dates.
+            _subscription("churned", end_date=today - timedelta(days=55)),
         ]
     )
     await db_session.flush()
