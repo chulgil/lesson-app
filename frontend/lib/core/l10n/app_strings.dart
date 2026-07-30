@@ -8786,6 +8786,32 @@ class AppStrings {
   /// 공개 학생 요약 — 토큰 정보 부가 설명
   static const studentSummaryTokenLabel = '공유 링크';
 
+  // ── Public Child Growth Report (#1217) ────────────────────
+
+  /// 공개 성장 리포트 — 화면 제목
+  static const growthReportAppBarTitle = '성장 리포트';
+
+  /// 공개 성장 리포트 — 연속 연습일 지표 라벨
+  static const growthReportStreakLabel = '연속 연습';
+
+  /// 공개 성장 리포트 — 최근 30일 레슨 수 지표 라벨
+  static const growthReportRecentLessonsLabel = '최근 30일 레슨';
+
+  /// 공개 성장 리포트 — 토큰 정보 부가 설명 (studentSummaryTokenLabel 과 동일 의미, 화면 분리)
+  static const growthReportTokenLabel = '공유 링크';
+
+  /// 학생 상세 화면 더보기 시트 — 성장 리포트 공유 메뉴 항목
+  static const growthReportShareMenuLabel = '리포트 공유';
+
+  /// 학생 상세 화면 더보기 시트 — 성장 리포트 공유 메뉴 부가 설명
+  static const growthReportShareMenuHint = '무가입 학부모에게 보낼 읽기전용 링크';
+
+  /// 성장 리포트 공유 링크 복사 성공 토스트
+  static const growthReportShareCopied = '리포트 공유 링크가 복사되었습니다';
+
+  /// 성장 리포트 공유 링크 생성 실패 토스트 (lessonSummaryShareError 와 동일 문구, 화면 분리)
+  static const growthReportShareError = '공유 링크 생성에 실패했습니다. 다시 시도해주세요.';
+
   // ── Paywall (R4 #415) ────────────────────────────────────
   // spec/paywall_spec.md §6.3.
 

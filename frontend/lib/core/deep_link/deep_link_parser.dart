@@ -22,6 +22,7 @@ class DeepLinkRoute {
 /// 지원 형식:
 ///   - `lessonapp://invite/{code}` (code 는 숫자 6자리)
 ///   - `lessonapp://student/summary/{token}`
+///   - `lessonapp://growth-report/{token}` (#1217 무가입 자녀 성장 리포트 프리뷰)
 ///   - `lessonapp://lessons/{id}` → `/lessons/{id}` (레슨 상세, 알림 딥링크)
 ///
 /// 그 외 형식은 모두 null (silent ignore — 잘못된 링크로 앱이 깨지지 않게).
@@ -50,6 +51,13 @@ class DeepLinkParser {
       final token = segments[1];
       if (token.isEmpty) return null;
       return DeepLinkRoute(path: '/student/summary/$token', token: token);
+    }
+
+    if (host == 'growth-report') {
+      if (segments.length != 1) return null;
+      final token = segments[0];
+      if (token.isEmpty) return null;
+      return DeepLinkRoute(path: '/growth-report/$token', token: token);
     }
 
     if (host == 'lessons') {

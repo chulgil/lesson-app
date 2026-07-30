@@ -28,6 +28,7 @@ import '../../../../features/students/students_facade.dart'
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
+import '../../../share/share_facade.dart' show growthReportShareRepositoryProvider;
 import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 import '../../../lessons/lessons_facade.dart';
@@ -279,6 +280,15 @@ class _StudentDetailContent extends ConsumerWidget {
                   _showInviteCodeDialog(context, student.name, ref);
                 },
               ),
+              _MoreOptionTile(
+                icon: Icons.ios_share,
+                title: AppStrings.growthReportShareMenuLabel,
+                hint: AppStrings.growthReportShareMenuHint,
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareGrowthReport(context, ref);
+                },
+              ),
               const _MoreSectionLabel(
                 title: AppStrings.studentStatusChangeSection,
               ),
@@ -392,6 +402,33 @@ class _StudentDetailContent extends ConsumerWidget {
           ),
         );
       }
+    }
+  }
+
+  /// #1217 — 무가입 자녀 성장 리포트 프리뷰 공유: 서버 토큰 생성 → 공유 URL
+  /// 클립보드 복사 + 토스트. 토큰 발급만 서버, 발급된 URL 은 그대로 복사
+  /// (랜딩=공개 성장 리포트 화면, 로그인 불필요).
+  Future<void> _shareGrowthReport(BuildContext context, WidgetRef ref) async {
+    try {
+      final share = await ref
+          .read(growthReportShareRepositoryProvider)
+          .createGrowthReportShare(student.id);
+      await Clipboard.setData(ClipboardData(text: share.url));
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.growthReportShareCopied),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.growthReportShareError),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 

@@ -254,4 +254,7 @@ class AppRoutes {
 
   // Public sharing routes (R2 #318 — 토큰 기반 읽기 전용 요약)
   static const studentSummary = '/student/summary/:token';
+
+  // Public sharing routes (#1217 — 무가입 자녀 성장 리포트 프리뷰)
+  static const growthReport = '/growth-report/:token';
 }

@@ -40,7 +40,8 @@ export 'app_routes.dart';
 const _publicPaths = [AppRoutes.login, '/login'];
 
 /// Public path prefixes (token-based shares, no auth required) — R2 #318.
-const _publicPathPrefixes = ['/student/summary/'];
+/// #1217 — 무가입 자녀 성장 리포트 프리뷰도 동일한 미인증 접근 정책을 따른다.
+const _publicPathPrefixes = ['/student/summary/', '/growth-report/'];
 
 const _roleSelectPath = AppRoutes.roleSelect;
 

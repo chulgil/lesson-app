@@ -39,6 +39,7 @@ PUBLIC_API_OPERATIONS = {
     ("GET", "/api/v1/address/search"),
     ("GET", "/api/v1/app/version"),
     ("GET", "/api/v1/public/academies/invites/{token}/preview"),
+    ("GET", "/api/v1/public/growth-reports/{token}"),
     ("GET", "/api/v1/public/invites/{code}/landing"),
     ("GET", "/api/v1/public/student-summaries/{token}"),
     ("GET", "/api/v1/teachers/public/{teacher_id}"),
