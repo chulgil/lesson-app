@@ -16,7 +16,9 @@ from app.schemas.gamification import (
     PointHistoryResponse,
     StudentGamificationResponse,
 )
+from app.schemas.journey_sticker import JourneyStickerCatalogResponse
 from app.services.gamification_service import GamificationService
+from app.services.journey_sticker_service import JourneyStickerService
 
 router = APIRouter()
 
@@ -35,6 +37,22 @@ async def get_student_gamification(
     service = GamificationService(db)
     data = await service.get_student_gamification(student_id, current_user)
     return StudentGamificationResponse.model_validate(data)
+
+
+@router.get(
+    "/{student_id}/journey-stickers",
+    response_model=JourneyStickerCatalogResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get journey sticker catalog (computed, no accrual table)",
+)
+async def get_journey_sticker_catalog(
+    student_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> JourneyStickerCatalogResponse:
+    service = JourneyStickerService(db)
+    data = await service.get_catalog(student_id, current_user)
+    return JourneyStickerCatalogResponse.model_validate(data)
 
 
 @router.post(
