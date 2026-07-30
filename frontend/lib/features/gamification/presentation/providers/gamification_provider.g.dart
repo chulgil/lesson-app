@@ -24,7 +24,7 @@ final gamificationRepositoryProvider =
 
 typedef GamificationRepositoryRef = ProviderRef<GamificationRepository>;
 String _$studentGamificationHash() =>
-    r'd11d27a1c9113a3aebeb0ec000cf792174ee491f';
+    r'06a172db737198cbfc08e47b96bf652274c57acd';
 
 /// Copied from Dart SDK
 class _SystemHash {

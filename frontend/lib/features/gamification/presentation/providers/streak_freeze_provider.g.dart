@@ -7,7 +7,7 @@ part of 'streak_freeze_provider.dart';
 // **************************************************************************
 
 String _$streakFreezeRepositoryHash() =>
-    r'aa48e01a49a169b611cbf9c7c23e0276f7e5d1dc';
+    r'0f04a57fe2045cc0d0e06034116a200e9c69d8b5';
 
 /// P2: Mock 우선 (P1 패턴 일관). HiveStreakFreezeRepository 운영 통합은 Job 5
 /// D-day 마이그레이션 + Job 10 e2e 단계에서 환경 분기 추가.

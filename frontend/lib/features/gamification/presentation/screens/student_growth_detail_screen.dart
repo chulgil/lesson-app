@@ -7,8 +7,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/daily_practice.dart';
+import '../providers/daily_practice_goal_provider.dart';
 import '../providers/gamification_provider.dart';
 import '../providers/growth_heatmap_provider.dart';
+import '../providers/streak_freeze_provider.dart';
 import '../widgets/heatmap_day_detail_sheet.dart';
 import '../widgets/trophy_collection_card.dart';
 import '../widgets/year_heatmap_grid.dart';
@@ -32,6 +34,17 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
     final gamificationAsync = ref.watch(studentGamificationProvider(studentId));
     final earnedBadges =
         gamificationAsync.valueOrNull?.earnedBadges ?? const [];
+    // doc 46 §4 (데일리 만족 루프 P2) — 오늘의 목표 대비 잔디 강도 + freeze 로
+    // 지킨 날짜 표시. 값이 없으면 YearHeatmapGrid 는 기존 정적 5단계로 폴백.
+    final goalMinutes = ref
+        .watch(dailyPracticeGoalProvider(studentId))
+        .valueOrNull;
+    final frozenDates = ref
+        .watch(studentStreakFreezeProvider(studentId))
+        .valueOrNull
+        ?.usedAt
+        .map((d) => DateTime.utc(d.year, d.month, d.day))
+        .toSet();
 
     return NotebookScreenScaffold(
       appBarTitle: AppStrings.growthDetailScreenTitle,
@@ -51,6 +64,8 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
                   (heatmap) => YearHeatmapGrid(
                     heatmap: heatmap,
                     asOf: DateTime.now().toUtc(),
+                    goalMinutes: goalMinutes,
+                    frozenDates: frozenDates,
                     onDayTap: (date) {
                       final daily = heatmap.days[date];
                       showNotebookBottomSheet<void>(

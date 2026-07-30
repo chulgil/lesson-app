@@ -7,7 +7,7 @@ part of 'student_quest_provider.dart';
 // **************************************************************************
 
 String _$studentQuestRepositoryHash() =>
-    r'ff123b0ec02c78d15729b9b01a121cf2ce553de3';
+    r'95e6d379440ad61a15325e8c99bb85996d9d07c8';
 
 /// P1: Mock 만 사용. P2 에서 BE 구현체 도입 시 환경 분기 추가 (O1 결정).
 ///

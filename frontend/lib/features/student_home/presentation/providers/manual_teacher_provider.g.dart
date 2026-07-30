@@ -26,7 +26,7 @@ final manualTeacherRepositoryProvider =
 
 typedef ManualTeacherRepositoryRef = ProviderRef<ManualTeacherRepository>;
 String _$manualTeacherNotifierHash() =>
-    r'e7362e2d047cf27c87ec968fe1c786a02438e1b4';
+    r'1a4ed0097c9ff11a5c0454449cf96410d583da37';
 
 /// AsyncNotifier for manual teacher CRUD operations.
 ///

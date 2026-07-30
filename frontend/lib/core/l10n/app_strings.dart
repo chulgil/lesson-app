@@ -6917,6 +6917,18 @@ class AppStrings {
   static const growthDetailScreenTitle = '내 성장';
   static const growthDetailYearLabel = '1년 동안';
 
+  // ── Daily Practice Goal (P2 Daily Satisfaction — doc 46 §4) ──
+  // 잔디(성장 히트맵) 연동 오늘의 목표 카드. ESL 앱 관행처럼 "오늘 목표"만
+  // 다루고 밀린 목표를 누적 표시하지 않는다 (100% 상한).
+  static const dailyGoalCardTitle = '오늘의 연습 목표';
+  static const dailyGoalAchievedLabel = '오늘 목표 달성';
+  static const dailyGoalStartPrompt = '지금 연습을 시작해 볼까요';
+  static const dailyGoalAdjustSheetTitle = '오늘의 목표 조절';
+  static const dailyGoalAdjustSheetHint = '5분 단위로 조절할 수 있어요';
+  static String dailyGoalProgressLabel(int current, int goal) =>
+      '$current/$goal분';
+  static String dailyGoalRemainingLabel(int minutes) => '목표까지 $minutes분 남음';
+
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
   static const practiceBadgeUnlockedSection = '획득한 뱃지';

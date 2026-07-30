@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lessonaza/features/gamification/domain/entities/daily_practice.dart';
 import 'package:lessonaza/features/gamification/domain/entities/gamification.dart';
 import 'package:lessonaza/features/gamification/domain/entities/growth_heatmap.dart';
@@ -77,6 +80,25 @@ Future<void> _pump(
 }
 
 void main() {
+  // doc 46 §4 (P2) — 화면이 dailyPracticeGoalProvider 를 watch 하면서 Hive box
+  // 를 연다. 미초기화 상태에서는 HiveError 가 try/catch 를 우회해 zone 레벨
+  // uncaught error 로 보고된다 (student_dashboard_layout_test.dart 와 동일 패턴).
+  late Directory tempDir;
+
+  setUpAll(() {
+    tempDir = Directory.systemTemp.createTempSync(
+      'student_growth_detail_screen_',
+    );
+    Hive.init(tempDir.path);
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    if (tempDir.existsSync()) {
+      tempDir.deleteSync(recursive: true);
+    }
+  });
+
   group('StudentGrowthDetailScreen — Job 9 Task 9.1 / AC-6.4', () {
     testWidgets('widget smoke test (HARD-GATE) — render exception 0', (
       tester,
