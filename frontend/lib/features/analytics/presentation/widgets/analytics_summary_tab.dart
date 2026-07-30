@@ -14,6 +14,7 @@ import '../../../../core/widgets/stat_card.dart';
 import '../../domain/entities/teacher_stats.dart';
 import '../providers/analytics_providers.dart';
 import 'analytics_error_view.dart';
+import 'at_risk_students_section.dart';
 import 'monthly_trend_chart.dart';
 import 'practice_ranking_list.dart';
 
@@ -48,6 +49,8 @@ class AnalyticsSummaryTab extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           children: [
             _buildStatCards(stats),
+            const SizedBox(height: AppSpacing.space5),
+            const AtRiskStudentsSection(),
             const SizedBox(height: AppSpacing.space5),
             MonthlyTrendChart(trendData: stats.lessonTrend),
             const SizedBox(height: AppSpacing.space5),

@@ -5496,6 +5496,34 @@ class AppStrings {
   /// 레퍼토리 진도 상태 라벨 — 예정
   static const analyticsRepertoireStatusPlanned = '예정';
 
+  // ── Analytics: 이탈 위험 학생 (Retention read-only surfacing — #1216) ────
+  /// 이탈 위험 학생 (월간요약 탭 섹션 헤더)
+  static const analyticsAtRiskSectionTitle = '이탈 위험 학생';
+
+  /// 이탈 위험 학생이 없습니다 (빈 상태 제목)
+  static const analyticsAtRiskEmptyTitle = '이탈 위험 학생이 없습니다';
+
+  /// 위험 높음 (RiskLevel.high 배지 라벨)
+  static const analyticsRiskLevelHigh = '위험 높음';
+
+  /// 위험 보통 (RiskLevel.medium 배지 라벨)
+  static const analyticsRiskLevelMedium = '위험 보통';
+
+  /// 위험 낮음 (RiskLevel.low 배지 라벨)
+  static const analyticsRiskLevelLow = '위험 낮음';
+
+  /// 만료일 없음 (daysUntilExpiry 가 null 인 경우 신호 텍스트)
+  static const analyticsAtRiskNoExpiry = '만료일 없음';
+
+  /// 레슨 기록 없음 (lastLessonDate 가 null 인 경우 신호 텍스트)
+  static const analyticsAtRiskNoLessonHistory = '레슨 기록 없음';
+
+  /// 연습량 N% 감소/증가 (practiceDropPercent 신호 포매터 — 음수=감소)
+  static String analyticsAtRiskPracticeDropFormat(double percent) {
+    final abs = percent.abs().toStringAsFixed(0);
+    return percent < 0 ? '연습량 $abs% 감소' : '연습량 $abs% 증가';
+  }
+
   // ── Edit Repertoire Screen (레퍼토리 편집 5-3b-26) ──────────────────────
   /// 레퍼토리 편집 (AppBar 타이틀)
   static const editRepertoireAppBarTitle = '레퍼토리 편집';
