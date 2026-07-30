@@ -21,3 +21,6 @@ export 'presentation/providers/daily_practice_goal_provider.dart'
         todayPracticeMinutesProvider;
 export 'presentation/providers/student_quest_provider.dart'
     show studentQuestRepositoryProvider;
+// 학생 P3a — 오늘의 미션(고정1+로테이션2, doc 46 §4④).
+export 'presentation/providers/daily_missions_provider.dart'
+    show dailyMissionsProvider;

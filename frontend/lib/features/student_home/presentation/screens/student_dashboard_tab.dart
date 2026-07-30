@@ -107,6 +107,11 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
+          // ── Student gamification P3a: 오늘의 미션(고정1+로테이션2, doc 46 §4④) ──
+          DailyMissionsCard(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // ── Student gamification P1: [연습 시작] 단일 진입점 (스펙 §4.1) ──
           PracticeStartSection(studentId: currentStudentId),
 

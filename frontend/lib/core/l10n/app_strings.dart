@@ -6945,6 +6945,19 @@ class AppStrings {
       '$current/$goal분';
   static String dailyGoalRemainingLabel(int minutes) => '목표까지 $minutes분 남음';
 
+  // ── Daily Missions (P3a Daily Satisfaction — doc 46 §4④) ──
+  // ESL 스타일 "오늘의 미션" — 고정1(오늘의 연습 목표) + 로테이션2(메트로놈/
+  // 튜너/녹음 중 2개, KST 자정 리셋). StudentQuest 와 별개 — 서버 없이
+  // 로컬 관측 신호만으로 진행을 계산한다.
+  static const dailyMissionsCardTitle = '오늘의 미션';
+  static String dailyMissionsProgressLabel(int done, int total) =>
+      '$done/$total';
+  static const dailyMissionsAllDoneBonus = '미션 3개 모두 완료! 오늘도 최고예요';
+  static const dailyMissionPracticeTitle = '오늘의 연습 목표 채우기';
+  static const dailyMissionMetronomeTitle = '메트로놈과 함께 연습하기';
+  static const dailyMissionTunerTitle = '튜너로 음정 확인하기';
+  static const dailyMissionRecordingTitle = '연습 녹음 남기기';
+
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
   static const practiceBadgeUnlockedSection = '획득한 뱃지';
