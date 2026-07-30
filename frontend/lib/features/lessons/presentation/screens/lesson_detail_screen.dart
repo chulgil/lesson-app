@@ -20,8 +20,6 @@ import '../providers/lesson_crud_provider.dart';
 import '../../../share/share_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
-import '../widgets/practice_items_section.dart';
-import '../widgets/weekly_focus_card.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../settings/settings_facade.dart';
 
@@ -40,19 +38,11 @@ class LessonDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<LessonDetailScreen> createState() => _LessonDetailScreenState();
 }
 
-class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
   Timer? _feedbackDebounce;
   bool _isSharingSummary = false;
   String? _pendingFeedbackText;
   // _proposalBannerDismissed removed — 정규레슨 제안은 학생 상세 수강권 현황에서 표시
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
 
   @override
   void dispose() {
@@ -62,7 +52,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       _flushPendingFeedback();
     }
     _feedbackDebounce?.cancel();
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -176,20 +165,50 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           child: Column(
             children: [
               LessonHeaderCard(lesson: lesson, isTeacher: widget.isTeacher),
-              _buildTabBar(),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildNotesTab(lesson),
-                    _buildAssignmentsTab(lesson),
-                  ],
-                ),
-              ),
+              Expanded(child: _buildSingleScroll(lesson)),
             ],
           ),
         ),
         // Recording FAB removed — will be re-enabled with teaching resources feature (#172)
+      ),
+    );
+  }
+
+  /// 2탭(레슨 노트/과제) → 단일 스크롤 통합 (doc 41 §6.1). 노트 섹션 다음
+  /// 구분선 + 과제 섹션을 이어 붙여 탭 전환 없이 한 화면에서 보고 입력한다.
+  Widget _buildSingleScroll(Lesson lesson) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LessonNotesSection(
+            lesson: lesson,
+            isTeacher: widget.isTeacher,
+            onAttendanceCompleted: () => _tryAutoProposal(lesson),
+            onFeedbackChanged: (text) => _saveFeedbackDebounced(lesson, text),
+            onStudentMemoSave: (memo) => _saveStudentMemo(lesson, memo),
+            onAddKeyPoint: () => _showAddKeyPointDialog(lesson),
+            onRemoveKeyPoint: (index) => _removeKeyPoint(lesson, index),
+            onAddPracticeTip: () => _showAddPracticeTipDialog(lesson),
+            onEditPracticeTip: () => _showEditPracticeTipDialog(lesson),
+          ),
+
+          const SizedBox(height: AppSpacing.space5),
+          const StaffDivider(),
+          const SizedBox(height: AppSpacing.space5),
+
+          LessonAssignmentsSection(
+            lessonId: lesson.id,
+            studentId: lesson.studentId,
+            isTeacher: widget.isTeacher,
+          ),
+
+          // Notebook × Score: "Fine." 종지부
+          const SizedBox(height: AppSpacing.space6),
+          Center(child: Text('Fine.', style: NotebookTypography.fine)),
+          const SizedBox(height: AppSpacing.space8),
+        ],
       ),
     );
   }
@@ -237,53 +256,50 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           onSelected: (value) => _handleAppBarAction(value, lesson),
-          itemBuilder:
-              (context) => [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: Text(
-                    lesson.subscriptionId != null
-                        ? AppStrings.editContent
-                        : AppStrings.editManual,
-                  ),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'edit',
+              child: Text(
+                lesson.subscriptionId != null
+                    ? AppStrings.editContent
+                    : AppStrings.editManual,
+              ),
+            ),
+            if (lesson.displayStatus == LessonStatus.scheduled)
+              const PopupMenuItem(
+                value: 'complete',
+                child: Text(AppStrings.attendanceConfirmAction),
+              ),
+            if (lesson.displayStatus == LessonStatus.scheduled)
+              PopupMenuItem(
+                value: 'cancel',
+                child: Text(
+                  lesson.subscriptionId != null
+                      ? AppStrings.cancelViaSubscription
+                      : AppStrings.cancel,
                 ),
-                if (lesson.displayStatus == LessonStatus.scheduled)
-                  const PopupMenuItem(
-                    value: 'complete',
-                    child: Text(AppStrings.attendanceConfirmAction),
-                  ),
-                if (lesson.displayStatus == LessonStatus.scheduled)
-                  PopupMenuItem(
-                    value: 'cancel',
-                    child: Text(
-                      lesson.subscriptionId != null
-                          ? AppStrings.cancelViaSubscription
-                          : AppStrings.cancel,
-                    ),
-                  ),
-                // Show for subscription lessons OR manual lessons with an active subscription
-                if (lesson.subscriptionId != null ||
-                    ref
-                            .watch(
-                              activeStudentSubscriptionsProvider(
-                                lesson.studentId,
-                              ),
-                            )
-                            .valueOrNull
-                            ?.isNotEmpty ==
-                        true)
-                  PopupMenuItem(
-                    value: 'schedule_change',
-                    child: Text(AppStrings.announcementScheduleChange),
-                  ),
-                PopupMenuItem(
-                  value: 'archive',
-                  child: Text(
-                    AppStrings.archive,
-                    style: TextStyle(color: AppColors.paperAccent),
-                  ),
-                ),
-              ],
+              ),
+            // Show for subscription lessons OR manual lessons with an active subscription
+            if (lesson.subscriptionId != null ||
+                ref
+                        .watch(
+                          activeStudentSubscriptionsProvider(lesson.studentId),
+                        )
+                        .valueOrNull
+                        ?.isNotEmpty ==
+                    true)
+              PopupMenuItem(
+                value: 'schedule_change',
+                child: Text(AppStrings.announcementScheduleChange),
+              ),
+            PopupMenuItem(
+              value: 'archive',
+              child: Text(
+                AppStrings.archive,
+                style: TextStyle(color: AppColors.paperAccent),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -397,220 +413,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     }
   }
 
-  Widget _buildTabBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        tabs: const [
-          Tab(text: AppStrings.lessonNotesTab),
-          Tab(text: AppStrings.assignmentsTab),
-        ],
-        labelColor: AppColors.paperAccent,
-        unselectedLabelColor: AppColors.inkSecondary,
-        indicatorColor: AppColors.paperAccent,
-      ),
-    );
-  }
-
-  Widget _buildNotesTab(Lesson lesson) {
-    // #796: 피드백 프롬프트는 출석 확인(실제 status == completed) 후에만 노출.
-    // displayStatus(과거 미확인 레슨을 completed 로 투영)를 쓰면 출석 확인 전에
-    // 프롬프트가 떠 출석 액션 위를 가린다. 출석 섹션을 프롬프트 위에 배치.
-    final needsFeedback = widget.isTeacher && lesson.awaitsTeacherFeedback;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // #473: 미확인 레슨 액션(출석 확인/휴강) + 사전 안내 배너 + 차감 결과
-          AttendanceSection(
-            lesson: lesson,
-            isTeacher: widget.isTeacher,
-            onCompleted: () => _tryAutoProposal(lesson),
-          ),
-
-          // 출석 확인 후 피드백 작성 유도 프롬프트 (#796: 출석 섹션 아래)
-          if (needsFeedback) ...[
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                border: Border.all(color: AppColors.paperAccent),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.edit_note, color: AppColors.paperAccent, size: 20),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      AppStrings.lessonNeedsFeedbackPrompt,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.paperAccent,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-          ],
-
-          // 스케줄 변경(챗) 바로가기 — 수강권 연동 레슨 또는 활성 수강권이 있는 수동 레슨
-          _buildScheduleChangeButton(lesson),
-
-          // #1106: 이번 주 집중 카드 (학생 뷰 · 피드백→연습 연결)
-          if (!widget.isTeacher &&
-              WeeklyFocusCard.focusContentOf(lesson) != null) ...[
-            WeeklyFocusCard(lesson: lesson, isTeacher: widget.isTeacher),
-            const SizedBox(height: AppSpacing.space5),
-          ],
-
-          // Teacher notes section
-          if (widget.isTeacher) ...[
-            LessonDetailSectionHeader(
-              title: AppStrings.lessonFeedbackHeader,
-              icon: Icons.edit_note,
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            // #1215: 이번 노트를 쓰는 동안 같은 학생의 지난 노트를 참조.
-            PreviousLessonNotesCard(lesson: lesson),
-            LessonNoteEditor(
-              initialText: lesson.feedback,
-              onChanged: (text) => _saveFeedbackDebounced(lesson, text),
-            ),
-          ] else ...[
-            LessonDetailSectionHeader(
-              title: AppStrings.teacherFeedbackHeader,
-              icon: Icons.school,
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            TeacherFeedbackCard(lesson: lesson),
-          ],
-
-          // Student memo section (shown after feedback for student view)
-          if (!widget.isTeacher) ...[
-            const SizedBox(height: AppSpacing.space6),
-            StudentMemoCard(
-              initialMemo: lesson.studentNote,
-              onSave: (memo) => _saveStudentMemo(lesson, memo),
-            ),
-          ],
-
-          const SizedBox(height: AppSpacing.space5),
-          const StaffDivider(),
-          const SizedBox(height: AppSpacing.space5),
-
-          // Key points
-          LessonDetailSectionHeader(
-            title: AppStrings.keyPointsSection,
-            icon: Icons.lightbulb_outline,
-            showAddButton: widget.isTeacher,
-            onAdd: () => _showAddKeyPointDialog(lesson),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          KeyPointsList(
-            lesson: lesson,
-            isTeacher: widget.isTeacher,
-            onRemove: (index) => _removeKeyPoint(lesson, index),
-          ),
-
-          const SizedBox(height: AppSpacing.space5),
-          const StaffDivider(),
-          const SizedBox(height: AppSpacing.space5),
-
-          // Practice tips
-          LessonDetailSectionHeader(
-            title: AppStrings.practiceTipsSection,
-            icon: Icons.tips_and_updates_outlined,
-            showAddButton: widget.isTeacher,
-            onAdd: () => _showAddPracticeTipDialog(lesson),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          PracticeTipsCard(
-            lesson: lesson,
-            isTeacher: widget.isTeacher,
-            onEdit: () => _showEditPracticeTipDialog(lesson),
-          ),
-
-          // Notebook × Score: "Fine." 종지부
-          const SizedBox(height: AppSpacing.space6),
-          Center(child: Text('Fine.', style: NotebookTypography.fine)),
-          const SizedBox(height: AppSpacing.space8),
-        ],
-      ),
-    );
-  }
-
-  /// Schedule-change button — shows for subscription lessons or manual lessons
-  /// that have an active subscription with the same student.
-  /// Hidden for completed/cancelled/past lessons (§15 스펙).
-  Widget _buildScheduleChangeButton(Lesson lesson) {
-    // §15: 완료/취소/과거 레슨에는 스케줄 변경 불필요
-    if (lesson.status == LessonStatus.completed ||
-        lesson.status == LessonStatus.cancelled ||
-        !lesson.isUpcoming) {
-      return const SizedBox.shrink();
-    }
-
-    // Case 1: lesson is directly linked to a subscription
-    if (lesson.subscriptionId != null) {
-      return _scheduleChangeButton(
-        subscriptionId: lesson.subscriptionId!,
-        label: AppStrings.announcementScheduleChange,
-        focusLessonId: lesson.id,
-      );
-    }
-
-    // Case 2: manual lesson — check whether an active subscription exists
-    final subsAsync = ref.watch(
-      activeStudentSubscriptionsProvider(lesson.studentId),
-    );
-    return subsAsync.maybeWhen(
-      data: (subs) {
-        if (subs.isEmpty) return const SizedBox.shrink();
-        final activeSub = subs.first;
-        return _scheduleChangeButton(
-          subscriptionId: activeSub.id,
-          label:
-              '${AppStrings.announcementScheduleChange} (${activeSub.typeLabel})',
-          focusLessonId: lesson.id,
-        );
-      },
-      orElse: () => const SizedBox.shrink(),
-    );
-  }
-
-  Widget _scheduleChangeButton({
-    required String subscriptionId,
-    required String label,
-    String? focusLessonId,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-      child: OutlinedButton.icon(
-        onPressed:
-            () => context.push(
-              AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId),
-              extra: {
-                'viewerRole': widget.isTeacher ? 'teacher' : 'student',
-                if (focusLessonId != null) 'focusLessonId': focusLessonId,
-              },
-            ),
-        icon: const Icon(Icons.swap_horiz_rounded, size: 18),
-        label: Text(label),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonHeight),
-        ),
-      ),
-    );
-  }
-
   /// Fire-and-forget auto-proposal trigger after lesson completion.
   /// Handles both trial (no subscription) and renewal (low subscription) cases.
   void _tryAutoProposal(Lesson lesson) async {
@@ -647,37 +449,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     }
   }
 
-  Widget _buildAssignmentsTab(Lesson lesson) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      child: Column(
-        children: [
-          PracticeItemsSection(
-            lessonId: lesson.id,
-            studentId: lesson.studentId,
-            isTeacher: widget.isTeacher,
-          ),
-
-          // Notebook × Score: "Fine." 종지부
-          const SizedBox(height: AppSpacing.space6),
-          Center(child: Text('Fine.', style: NotebookTypography.fine)),
-          const SizedBox(height: AppSpacing.space8),
-        ],
-      ),
-    );
-  }
-
   void _showAddKeyPointDialog(Lesson lesson) {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => AddTipBottomSheet(
-            title: AppStrings.addKeyPointTitle,
-            instrument: lesson.instrument,
-            initialCategory: TipCategory.technique,
-            onSubmit: (content) => _addKeyPoint(lesson, content),
-          ),
+      builder: (context) => AddTipBottomSheet(
+        title: AppStrings.addKeyPointTitle,
+        instrument: lesson.instrument,
+        initialCategory: TipCategory.technique,
+        onSubmit: (content) => _addKeyPoint(lesson, content),
+      ),
     );
   }
 
@@ -685,13 +466,12 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (context) => AddTipBottomSheet(
-            title: AppStrings.addPracticeTipTitle,
-            instrument: lesson.instrument,
-            initialCategory: TipCategory.practice,
-            onSubmit: (content) => _setPracticeTip(lesson, content),
-          ),
+      builder: (context) => AddTipBottomSheet(
+        title: AppStrings.addPracticeTipTitle,
+        instrument: lesson.instrument,
+        initialCategory: TipCategory.practice,
+        onSubmit: (content) => _setPracticeTip(lesson, content),
+      ),
     );
   }
 
