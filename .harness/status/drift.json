@@ -1,6 +1,6 @@
 {
-  "updated_at": 1781668104,
-  "updated_at_iso": "2026-06-17T03:48:24Z",
+  "updated_at": 1785400160,
+  "updated_at_iso": "2026-07-30T08:29:20Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -14,17 +14,64 @@
     "spec/2026-06-11-teacher-settings-redesign.md": "c0b9d0ed03924d0c71e529c46981cba11ed7f4c8",
     "spec/2026-06-16-practice-journal-p2-binding.md": "58befd08b6f588e5bba3092fecb628d0adbd1fee",
     "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md": "b163a2262d679d86141efeb402468c9e63bc861b",
-    "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md": "1b42fab61adc238205e27df6fb1ddbd206a899a8"
+    "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md": "1b42fab61adc238205e27df6fb1ddbd206a899a8",
+    "spec/constitution.md": "79678f8231c9c6e5fa6481124168cd8289e33b5e"
   },
-  "changed": [],
-  "added": [],
-  "removed": [],
+  "changed": [
+    "spec/2026-05-04-chat-message-visual-contract.md",
+    "spec/2026-05-04-notebook-surface-ssot.md",
+    "spec/2026-05-07-backend-loop-verification-contract.md",
+    "spec/2026-05-08-action-priority-contract.md",
+    "spec/2026-05-09-offline-sync-verification.md",
+    "spec/2026-05-10-r6-trust-building.md",
+    "spec/2026-06-08-teacher-quest-system.md",
+    "spec/2026-06-11-student-gamification.md",
+    "spec/2026-06-11-teacher-settings-redesign.md",
+    "spec/2026-06-16-practice-journal-p2-binding.md",
+    "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md",
+    "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md",
+    "spec/constitution.md"
+  ],
+  "added": [
+    "spec/2026-05-04-chat-message-visual-contract.md",
+    "spec/2026-05-04-notebook-surface-ssot.md",
+    "spec/2026-05-07-backend-loop-verification-contract.md",
+    "spec/2026-05-08-action-priority-contract.md",
+    "spec/2026-05-09-offline-sync-verification.md",
+    "spec/2026-05-10-r6-trust-building.md",
+    "spec/2026-06-08-teacher-quest-system.md",
+    "spec/2026-06-11-student-gamification.md",
+    "spec/2026-06-11-teacher-settings-redesign.md",
+    "spec/2026-06-16-practice-journal-p2-binding.md",
+    "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md",
+    "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md",
+    "spec/constitution.md"
+  ],
+  "removed": [
+    ".harness/harness/current.md",
+    ".harness/spec/2026-05-04-chat-message-visual-contract.md",
+    ".harness/spec/2026-05-04-notebook-surface-ssot.md",
+    ".harness/spec/2026-05-07-backend-loop-verification-contract.md",
+    ".harness/spec/2026-05-08-action-priority-contract.md",
+    ".harness/spec/2026-05-09-offline-sync-verification.md",
+    ".harness/spec/2026-05-10-r6-trust-building.md",
+    ".harness/spec/2026-06-08-teacher-quest-system.md",
+    ".harness/spec/2026-06-11-student-gamification.md",
+    ".harness/spec/2026-06-11-teacher-settings-redesign.md",
+    ".harness/spec/2026-06-16-practice-journal-p2-binding.md",
+    ".harness/spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md",
+    ".harness/spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md",
+    ".harness/spec/constitution.md"
+  ],
+  "findings": [],
   "summary": {
-    "changed_total": 0,
-    "added": 0,
-    "removed": 0,
+    "changed_total": 13,
+    "added": 13,
+    "removed": 14,
     "domains_touched": [],
     "domain_counts": {},
-    "warnings": []
+    "warnings": [],
+    "blocking_total": 0,
+    "advisory_total": 0
   }
 }

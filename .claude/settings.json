@@ -40,6 +40,11 @@
                         "type": "command",
                         "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/keyword-detector.py\"",
                         "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/signal-capture.py\"",
+                        "timeout": 5
                     }
                 ]
             }
@@ -213,6 +218,29 @@
                         "type": "command",
                         "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/subagent-stop-log.py\"",
                         "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "Notification": [
+            {
+                "matcher": "permission_prompt|idle_prompt|agent_needs_input|agent_completed",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/notification-relay.py\"",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "TaskCompleted": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/task-completed-journal.py\"",
+                        "timeout": 3
                     }
                 ]
             }
