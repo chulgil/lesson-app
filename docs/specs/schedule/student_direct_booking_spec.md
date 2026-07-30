@@ -127,7 +127,8 @@ LessonBookingParams {
 
 | 진입 | 위치 | 비고 |
 |------|------|------|
-| 선생님 상세 | `TeacherDetailScreen` 하단 CTA | 기존 "레슨 신청"과 별개 또는 통합 — 수강권 보유 시 직접 예약 우선 |
+| 선생님 상세 | `TeacherDetailScreen` 하단 CTA | **구현됨 (#1219)** — 수강권 보유 시 직접 예약 우선. `activeSubscriptionBetweenProvider(studentId:, teacherId:)` 가 활성 수강권(잔여>0)을 반환하면 CTA 가 `AppStrings.bookAction`(예약하기) → `lessonDirectBooking`, 아니면 기존 `레슨 신청` → `lessonBooking`. 학생 id 는 `currentStudentProvider`(getMyProfile SSOT). 재연결(이전 선생님) 분기는 대상 아님 — 연결 해제 상태에서 활성 수강권은 성립하지 않음 |
+| 내 예약 | `MyBookingsScreen` 빈 상태 CTA | 예약 0건일 때 `AppStrings.bookAction` → `lessonDirectBooking` |
 | 수강권 발급 완료 | `ProposalDetailScreen` 의 `ProposalStatus.confirmed` 상태 하단 액션바 | audit C2-F02. `ProposalIssuedActionBar` 가 "내 수강권 보고 첫 레슨 잡기" CTA 노출 → `/subscriptions/:id` (SubscriptionDetail) 로 이동. 거기서 학생이 선생님과 일정 협의 |
 | (옵션) 학생 GettingStarted Step3 | 첫 레슨 예약 퀘스트 | subscription 보유 학생 한정 |
 
@@ -135,7 +136,7 @@ LessonBookingParams {
 
 ## 9. 성공 기준
 
-- [ ] 학생이 선생님 상세에서 [레슨 예약하기] → 슬롯 화면 진입
+- [x] 학생이 선생님 상세에서 [예약하기] → 슬롯 화면 진입 (#1219 — `teacher_detail_direct_booking_entry_test.dart` 가 보유/미보유 2분기 검증)
 - [ ] 날짜 네비로 가용일 이동, 슬롯 칩 표시 (오전/오후 구분)
 - [ ] 슬롯 탭 → 강조 → [예약하기] 활성
 - [ ] 확인 다이얼로그 → `bookSlot` 즉시 확정 → 성공 스낵바 → MyBookings 이동
