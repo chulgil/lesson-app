@@ -295,6 +295,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           CompletionToggle(
             section: section,
             onToggle: () => _toggleCompletion(section),
+            studentId: widget.studentId,
             selectedDate: widget.selectedDate,
           ),
 

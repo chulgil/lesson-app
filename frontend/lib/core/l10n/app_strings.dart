@@ -10640,12 +10640,20 @@ class AppStrings {
   static const practiceCompleteUndoLabel = '탭하여 완료 취소';
   static const practiceCompleteHintLabel = '탭하여 이 섹션을 완료로 표시하세요';
 
+  // ScratchStampSheet — 연습 도장 스크래치 인터랙션 (P1, daily-satisfaction gamification)
+  static String practiceStampSheetTitle(int n) => '오늘 $n번째 연습!';
+  static const practiceStampSheetHint = '문질러서 도장을 채워보세요';
+  static const practiceStampSheetComplete = '완성!';
+  static const practiceStampQuickModeCheckbox = '다음부터 빠르게 체크';
+  static const practiceStampResetConfirmTitle = '도장 기록을 초기화할까요?';
+  static const practiceStampResetConfirmMessage = '오늘 채운 도장이 모두 지워집니다.';
+
   // CompletionToggle (N회 반복 mode)
   static String practiceRepeatAllDone(int done, int total) =>
       '오늘 연습 완료! ($done/$total회)';
   static String practiceRepeatTap(int done, int total) =>
       '탭하여 연습 기록 ($done/$total회)';
-  static const practiceRepeatReset = '탭하여 초기화';
+  static const practiceRepeatReset = '길게 눌러 초기화';
   static String practiceRepeatDailyCount(int total) => '하루 $total회 반복';
 
   // BadgeCollectionScreen

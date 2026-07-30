@@ -17,6 +17,7 @@ import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../extensions/practice_section_visuals.dart';
 import '../providers/repertoire_archive_provider.dart';
+import '../widgets/practice_stamp/practice_stamp_gesture.dart';
 
 /// Main practice repertoire screen showing all repertoires and sections
 class PracticeRepertoireScreen extends ConsumerWidget {
@@ -414,10 +415,11 @@ class _SectionListItem extends ConsumerWidget {
 
             // Completion indicator: 🐾 paw stamps for N회 반복, checkbox otherwise
             if (hasRepeatCount)
-              _PawStampRow(
-                totalCount: section.repeatCount!,
+              PracticeStampGesture(
+                studentId: studentId,
                 completedCount: completedCount,
-                onTap: () async {
+                totalCount: section.repeatCount!,
+                onIncrement: () async {
                   await ref
                       .read(sectionCrudProvider.notifier)
                       .toggleDailyCompletion(
@@ -428,6 +430,10 @@ class _SectionListItem extends ConsumerWidget {
                       );
                   ref.invalidate(studentRepertoiresProvider(studentId));
                 },
+                child: _PawStampRow(
+                  totalCount: section.repeatCount!,
+                  completedCount: completedCount,
+                ),
               )
             else
               // Notebook × Score: 섹션 완료를 연필 사각 체크박스로 표시. 체크 색은 paperOk(녹색 펜).
@@ -466,39 +472,33 @@ class _SectionListItem extends ConsumerWidget {
   }
 }
 
-/// 🐾 Paw stamp row for N회 반복 feature
+/// 🐾 Paw stamp row for N회 반복 feature. Pure display — gesture
+/// handling (tap to open [ScratchStampSheet], long-press to reset) lives in
+/// [PracticeStampGesture], which wraps this widget.
 class _PawStampRow extends StatelessWidget {
   final int totalCount;
   final int completedCount;
-  final VoidCallback onTap;
 
-  const _PawStampRow({
-    required this.totalCount,
-    required this.completedCount,
-    required this.onTap,
-  });
+  const _PawStampRow({required this.totalCount, required this.completedCount});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(totalCount, (index) {
-          final isCompleted = index < completedCount;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1),
-            child: Opacity(
-              opacity: isCompleted ? 1.0 : 0.3,
-              child: Icon(
-                Icons.pets,
-                size: totalCount <= 5 ? AppSpacing.iconXS : 12,
-                color: AppColors.ink,
-              ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(totalCount, (index) {
+        final isCompleted = index < completedCount;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 1),
+          child: Opacity(
+            opacity: isCompleted ? 1.0 : 0.3,
+            child: Icon(
+              Icons.pets,
+              size: totalCount <= 5 ? AppSpacing.iconXS : 12,
+              color: AppColors.ink,
             ),
-          );
-        }),
-      ),
+          ),
+        );
+      }),
     );
   }
 }
