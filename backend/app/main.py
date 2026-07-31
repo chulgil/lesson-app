@@ -82,6 +82,28 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             hours=1,
         )
 
+        # 그룹 수업 리마인더 (P2-2). 전일은 저녁에 (다음날 일정을 확인하는 시간대),
+        # 당일은 아침에 보낸다.
+        from app.jobs.group_lesson_reminder_jobs import (
+            JOB_ID_DAY_BEFORE,
+            JOB_ID_DAY_OF,
+            run_group_lesson_reminder_day_before,
+            run_group_lesson_reminder_day_of,
+        )
+
+        register_daily_kst_job(
+            run_group_lesson_reminder_day_before,
+            job_id=JOB_ID_DAY_BEFORE,
+            hour=20,
+            minute=0,
+        )
+        register_daily_kst_job(
+            run_group_lesson_reminder_day_of,
+            job_id=JOB_ID_DAY_OF,
+            hour=8,
+            minute=0,
+        )
+
         start_scheduler()
 
     yield

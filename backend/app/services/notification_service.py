@@ -60,6 +60,12 @@ STUDENT_NOTIFICATION_TYPES = frozenset(
         "teacherNoshow",
         "compensationApplied",
         "lessonNoteShared",
+        # P2-2 — 그룹 수업 5종. 학생/학부모 인박스 대상 (교사는 출석부에서 직접 본다).
+        "groupBookingConfirmed",
+        "groupLessonReminderDayBefore",
+        "groupLessonReminderDayOf",
+        "groupDropInOpened",
+        "groupNoShowWarning",
     }
 )
 BOTH_ROLE_NOTIFICATION_TYPES = frozenset(

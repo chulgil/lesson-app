@@ -148,6 +148,10 @@ class GroupClassBooking(UUIDMixin, TimestampMixin, Base):
     cancel_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     promoted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # P2-2 리마인더 멱등 키 — payment_reminder_jobs 의 reminder_d{1,3,7}_sent_at 과 같은 규약.
+    # 배치가 재실행돼도 NULL 인 행만 발송하므로 중복 알림이 나가지 않는다.
+    reminder_day_before_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reminder_day_of_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("uk_gcb_schedule_student", "schedule_id", "student_id", unique=True),

@@ -443,6 +443,17 @@ class ScheduleExtService:
         self.db.add(schedule)
         await self.db.flush()
         await self.db.refresh(schedule)
+        # P2-2 — 드롭인 회차 오픈은 교사가 여는 1회성 이벤트라 학생에게 알린다. 반(regular)
+        # 회차는 반복 생성으로 매주 깔리므로 브로드캐스트하면 스팸이 된다.
+        from app.models.schedule import GroupClassType
+
+        if group_class.type == GroupClassType.dropIn:
+            from app.services.group_notification_service import GroupNotificationService
+
+            await GroupNotificationService(self.db).notify_dropin_opened(
+                schedule=schedule,
+                group_class=group_class,
+            )
         return schedule
 
     async def cancel_group_schedule(self, schedule_id: str, reason: str | None, current_user: Any) -> Any:
@@ -503,6 +514,15 @@ class ScheduleExtService:
         self.db.add(booking)
         await self.db.flush()
         await self.db.refresh(booking)
+        # P2-2 — 확정 예약만 통지한다. 대기 등록은 자리가 났을 때 #1207 의 승격 알림이 낸다.
+        if booking.status == "confirmed" and group_class is not None:
+            from app.services.group_notification_service import GroupNotificationService
+
+            await GroupNotificationService(self.db).notify_booking_confirmed(
+                booking=booking,
+                schedule=schedule,
+                group_class=group_class,
+            )
         return booking
 
     async def cancel_group_booking(self, booking_id: str, reason: str | None, current_user: Any) -> Any:
@@ -564,6 +584,20 @@ class ScheduleExtService:
             booking.attended_at = datetime.now(UTC)
         await self.db.flush()
         await self.db.refresh(booking)
+        # P2-2 — 노쇼는 학생 본인이 모르는 채 차감될 수 있어 학부모까지 통지한다.
+        # 정책별 차감 결과 문구는 J5b(노쇼 4값 분기) 소관.
+        if not attended:
+            from app.models.schedule_ext import GroupClassSchedule
+            from app.services.group_notification_service import GroupNotificationService
+
+            schedule = await self.db.get(GroupClassSchedule, booking.schedule_id)
+            group_class = await self._get_group_class(schedule.group_class_id) if schedule else None
+            if schedule is not None and group_class is not None:
+                await GroupNotificationService(self.db).notify_no_show_warning(
+                    booking=booking,
+                    schedule=schedule,
+                    group_class=group_class,
+                )
         return booking
 
     async def get_bookings_for_schedule(self, schedule_id: str, current_user: Any) -> list[Any]:
