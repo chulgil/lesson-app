@@ -1,9 +1,13 @@
 """Extended schedule schemas (exceptions, group schedules, no-show, changes)."""
 
 import datetime as _dt
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+
+GroupClassTypeLiteral = Literal["regular", "dropIn"]
+# #239 SSOT 4값 — 1:1 과 그룹이 같은 정책 enum 을 공유한다.
+NoShowPolicyLiteral = Literal["deductCredit", "halfCredit", "noDeduction", "reschedule"]
 
 # ---------------------------------------------------------------------------
 # Schedule Exceptions
@@ -41,6 +45,103 @@ class ScheduleExceptionResponse(BaseModel):
     end_time: str | None = None
     reason: str | None = None
     created_at: _dt.datetime
+
+
+# ---------------------------------------------------------------------------
+# Group Class (definition)
+#
+# Wire keys mirror the FE entity `features/schedule/domain/entities/group_class.dart`
+# one-for-one. ``repeat_days_of_week`` / ``repeat_time_of_day`` are the consumer
+# contract; the ORM columns behind them are ``repeat_days`` / ``repeat_time``.
+# ---------------------------------------------------------------------------
+
+
+def _validate_repeat_days(value: list[int] | None) -> list[int] | None:
+    """1=Mon … 7=Sun (FE contract). Reject anything outside that range."""
+    if value is None:
+        return None
+    for day in value:
+        if day < 1 or day > 7:
+            raise ValueError("repeat_days_of_week must be between 1 (Mon) and 7 (Sun)")
+    return sorted(set(value))
+
+
+def _validate_repeat_time(value: str | None) -> str | None:
+    """ "HH:MM" 24h wall clock (KST)."""
+    if value is None:
+        return None
+    try:
+        _dt.time.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError("repeat_time_of_day must be HH:MM") from exc
+    return value
+
+
+class GroupClassCreate(BaseModel):
+    name: str
+    type: GroupClassTypeLiteral = "regular"
+    description: str | None = None
+    organization_id: str | None = None
+    max_capacity: int = 10
+    waitlist_capacity: int | None = None
+    duration_minutes: int = 60
+    booking_deadline_minutes: int = 60
+    cancel_deadline_minutes: int = 1440
+    no_show_policy: NoShowPolicyLiteral = "deductCredit"
+    max_no_show_count: int | None = None
+    repeat_days_of_week: list[int] | None = None
+    repeat_time_of_day: str | None = None
+    instrument: str | None = None
+    price_per_session: int | None = None
+    # 반복 회차 생성의 기준일. 저장하지 않고 생성에만 쓴다 (생략 시 오늘, KST).
+    start_date: _dt.date | None = None
+
+    _check_days = field_validator("repeat_days_of_week")(_validate_repeat_days)
+    _check_time = field_validator("repeat_time_of_day")(_validate_repeat_time)
+
+
+class GroupClassUpdate(BaseModel):
+    name: str | None = None
+    type: GroupClassTypeLiteral | None = None
+    description: str | None = None
+    max_capacity: int | None = None
+    waitlist_capacity: int | None = None
+    duration_minutes: int | None = None
+    booking_deadline_minutes: int | None = None
+    cancel_deadline_minutes: int | None = None
+    no_show_policy: NoShowPolicyLiteral | None = None
+    max_no_show_count: int | None = None
+    repeat_days_of_week: list[int] | None = None
+    repeat_time_of_day: str | None = None
+    instrument: str | None = None
+    price_per_session: int | None = None
+    is_active: bool | None = None
+
+    _check_days = field_validator("repeat_days_of_week")(_validate_repeat_days)
+    _check_time = field_validator("repeat_time_of_day")(_validate_repeat_time)
+
+
+class GroupClassResponse(BaseModel):
+    id: str
+    teacher_id: str
+    organization_id: str | None = None
+    name: str
+    description: str | None = None
+    type: str
+    max_capacity: int
+    waitlist_capacity: int | None = None
+    duration_minutes: int
+    booking_deadline_minutes: int
+    cancel_deadline_minutes: int
+    no_show_policy: str
+    max_no_show_count: int | None = None
+    repeat_days_of_week: list[int] | None = None
+    repeat_time_of_day: str | None = None
+    instrument: str | None = None
+    price_per_session: int | None = None
+    is_active: bool
+    created_at: _dt.datetime
+    updated_at: _dt.datetime | None = None
 
 
 # ---------------------------------------------------------------------------
