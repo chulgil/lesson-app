@@ -1933,6 +1933,42 @@ class AppStrings {
   /// 저장 실패 (스낵바)
   static const groupClassFormSaveFailed = '저장하지 못했습니다. 다시 시도해주세요';
 
+  // ── Group Classes (교사 내 클래스 목록) ─────────────────────
+  /// 내 클래스 (목록 화면 제목)
+  static const groupClassesTitle = '내 클래스';
+
+  /// 클래스 없음 (빈 상태 제목)
+  static const groupClassesEmptyTitle = '아직 만든 클래스가 없습니다';
+
+  /// 빈 상태 부연
+  static const groupClassesEmptySubtitle = '여러 학생을 함께 지도하는 반이나 드롭인 특강을 만들어보세요';
+
+  /// 매주 $days · $time (반 반복 일정 요약)
+  static String groupClassesRepeatSummary(String days, String time) =>
+      '매주 $days · $time';
+
+  /// 정원 $max명 (목록 행 요약)
+  static String groupClassesCapacitySummary(int max) => '정원 $max명';
+
+  /// 내려둔 클래스 (비활성 배지)
+  static const groupClassesInactiveBadge = '내려둔 클래스';
+
+  /// 내리기 (스와이프 액션 라벨 — soft delete)
+  static const groupClassesDeactivateAction = '내리기';
+
+  /// 클래스를 내릴까요? (확인 다이얼로그 제목)
+  static const groupClassesDeactivateTitle = '클래스를 내릴까요?';
+
+  /// $name 내리기 확인 메시지 (예약·출석 이력 보존 명시)
+  static String groupClassesDeactivateMessage(String name) =>
+      '$name 은(는) 학생에게 더 이상 보이지 않습니다. 지난 예약·출석 기록은 그대로 남습니다.';
+
+  /// 클래스를 내렸습니다 (스낵바)
+  static const groupClassesDeactivated = '클래스를 내렸습니다';
+
+  /// 내리기 실패 (스낵바)
+  static const groupClassesDeactivateFailed = '클래스를 내리지 못했습니다. 다시 시도해주세요';
+
   /// 그룹 수강권 (반 미지정 그룹 수강권의 표시 라벨 — 개인레슨 폴백 금지)
   static const subscriptionGroupTicketLabel = '그룹 수강권';
 
