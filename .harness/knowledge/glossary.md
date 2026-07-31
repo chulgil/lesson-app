@@ -593,10 +593,24 @@
 
 > 비고: ScheduleChange 도메인 개념(스케줄 변경)은 변경 없음 — 위 "시간 변경 요청"은 알림 설정 카테고리 라벨에 한정.
 
+## 18. 그룹레슨 (Group Lesson) — 2026-07-31 (스펙 `.harness/spec/2026-07-31-group-lesson.md`)
+
+| 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
+|------|------|-----------|-----------|------|
+| 그룹 클래스 | Group Class | `GroupClass` | `GroupClass` | 정원·노쇼정책을 보유한 클래스 정의. 반/드롭인 2유형. `GroupClassSchedule` 의 실참조 대상 (P1-0 배선 정합 — `LessonClass` 오참조 해소) |
+| 반 (코호트) | Cohort Class | `GroupClassType.regular` | `regular` | 고정 멤버 반 — 예약 경쟁 없음, 매주 자동 스케줄, 학기 단위. 음악 카테고리 기본 유형. 사용하지 않는 표현: 정규 그룹, 고정반 |
+| 드롭인 | Drop-in | `GroupClassType.dropin` | `dropin` | 선착 예약 + 정원 경쟁. 특강·원데이·마스터클래스용 보조 유형 |
+| 코호트 멤버 | Cohort Member | `GroupClass` 멤버 목록 | `/group-classes/{id}/members` | 반 고정 로스터. 교사 직접 배정 또는 학생 신청→챗형 승인. 정원 검증 |
+| 그룹 예약 | Group Booking | `GroupClassBooking` | `GroupClassBooking` | 드롭인 회차 예약. `GroupBookingStatus.autoCancelled` 포함 (스펙 역반영) |
+| 대기열 자동승격 | Waitlist Auto-Promotion | `group_class_booking_providers` | `schedule_ext_service` | 정원 취소 발생 시 대기 1순위 자동 확정 + 즉시 알림 (기존 구현 자산) |
+| 적용 범위 | Applies To | `Subscription.appliesTo` | `applies_to` | 수강권 사용처 스코프: `oneToOne`/`group`/`universal` (null=universal 비파괴). 사용하지 않는 표현: 별도 그룹 수강권, 그룹 지갑 |
+| 반 공지 | Class Announcement | `TeacherAnnouncement` (scope=class) | `TeacherAnnouncement` | 반 전체 공지 — 기존 공지 엔티티에 대상 스코프 확장. 사용하지 않는 표현: ClassNote (신설 금지) |
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-07-31 | §18 그룹레슨 신설 — D1~D8 확정(옵시디언 45 §9) 반영. GroupClass 배선 정합·appliesTo·코호트/드롭인·반 공지 용어 등록 |
 | 2026-06-19 | 일괄 처리(Batch Action) 신설 — 스케줄 다중선택 일괄 완료/휴강(#768 ①). 리스트 long-press 진입 + 탭 토글 → 선택 N건 일괄 완료(레슨당 `confirmLessonCompleted` 1회씩 정확히 N회 차감)/휴강(차감 0). `LessonSelection` 선택 상태 + 하단 액션바. 기존 스와이프(단건 완료/취소) 불변. |
 | 2026-06-19 | 휴가 구간(`VacationSegment`) 신설 — 다구간 휴가(#768 ②). 한 번에 여러 비겹침 기간을 등록(구간별 보상옵션 / 사유·학생별 예외 공통). BE 배치 계약 `POST /teacher/vacation/batch`(구간마다 기존 `register_vacation` 재사용, 원자적). 겹침 구간 거부(이중 차감/연장 방지). 기존 단일 등록 경로 불변. |
 | 2026-06-18 | 학생 상세 전화/문자 상단 승격 + 메뉴 그룹핑 (검토 #28) — 매일 쓰는 전화·문자를 more(...) 메뉴(2탭) → 신원 스트립(1탭, `StudentContactActions`). more 메뉴를 관리/상태 변경 섹션(`_MoreSectionLabel`)으로 그룹핑 + 학생 보관 맨 아래 분리. 데이터·플로우 불변(UI/IA만). |
