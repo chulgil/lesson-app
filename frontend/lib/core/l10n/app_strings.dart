@@ -1851,6 +1851,88 @@ class AppStrings {
   /// 그룹 클래스 정보를 불러올 수 없습니다 (route extra 누락 placeholder)
   static const groupClassInfoUnavailable = '그룹 클래스 정보를 불러올 수 없습니다.';
 
+  // ── Group Class Form (그룹 클래스 생성·수정) ────────────────
+  /// 클래스 만들기 (생성 화면 제목)
+  static const groupClassFormCreateTitle = '클래스 만들기';
+
+  /// 클래스 수정 (수정 화면 제목)
+  static const groupClassFormEditTitle = '클래스 수정';
+
+  /// 클래스 이름 (필드 라벨)
+  static const groupClassFormNameLabel = '클래스 이름';
+
+  /// 클래스 이름 입력 힌트
+  static const groupClassFormNameHint = '예: 목요일 앙상블반';
+
+  /// 클래스 이름 미입력 검증 메시지
+  static const groupClassFormNameRequired = '클래스 이름을 입력해주세요';
+
+  /// 수업 소개 (선택 필드 라벨)
+  static const groupClassFormDescriptionLabel = '수업 소개 (선택)';
+
+  /// 수업 소개 입력 힌트
+  static const groupClassFormDescriptionHint = '어떤 수업인지 간단히 적어주세요';
+
+  /// 드롭인으로 열기 (폼 내 전환 스위치 — 별도 화면 분기 금지)
+  static const groupClassFormDropInToggleTitle = '드롭인으로 열기';
+
+  /// 드롭인 전환 부연
+  static const groupClassFormDropInToggleSubtitle = '매주 반복하지 않고 한 번만 여는 특강입니다';
+
+  /// 정원 (섹션·필드 라벨)
+  static const groupClassFormCapacityLabel = '정원';
+
+  /// $n명 (정원 값)
+  static String groupClassFormCapacityValue(int n) => '$n명';
+
+  /// 반복 요일 (필드 라벨)
+  static const groupClassFormRepeatDaysLabel = '반복 요일';
+
+  /// 반복 요일 미선택 검증 메시지
+  static const groupClassFormRepeatDaysRequired = '반복 요일을 하나 이상 선택해주세요';
+
+  /// 시작 시각 (필드 라벨)
+  static const groupClassFormStartTimeLabel = '시작 시각';
+
+  /// 수업 날짜 (드롭인 단일 일시 라벨)
+  static const groupClassFormDropInDateLabel = '수업 날짜';
+
+  /// 수업 시간 (진행 시간 라벨)
+  static const groupClassFormDurationLabel = '수업 시간';
+
+  /// 예약·노쇼 정책 (섹션)
+  static const groupClassFormSectionPolicy = '예약·노쇼 정책';
+
+  /// 노쇼 정책 (필드 라벨)
+  static const groupClassFormNoShowPolicyLabel = '노쇼 정책';
+
+  /// 예약 마감 (필드 라벨)
+  static const groupClassFormBookingDeadlineLabel = '예약 마감';
+
+  /// 취소 마감 (필드 라벨)
+  static const groupClassFormCancelDeadlineLabel = '취소 마감';
+
+  /// $hours시간 전 (마감 시각 값)
+  static String groupClassFormDeadlineHours(int hours) => '$hours시간 전';
+
+  /// 제한 없음 (마감 시각 0)
+  static const groupClassFormDeadlineNone = '제한 없음';
+
+  /// 회당 수강료 (선택 필드 라벨)
+  static const groupClassFormPriceLabel = '회당 수강료 (선택)';
+
+  /// 회당 수강료 입력 힌트
+  static const groupClassFormPriceHint = '예: 35000';
+
+  /// 클래스를 만들었습니다 (스낵바)
+  static const groupClassFormCreated = '클래스를 만들었습니다';
+
+  /// 클래스를 수정했습니다 (스낵바)
+  static const groupClassFormUpdated = '클래스를 수정했습니다';
+
+  /// 저장 실패 (스낵바)
+  static const groupClassFormSaveFailed = '저장하지 못했습니다. 다시 시도해주세요';
+
   /// 그룹 수강권 (반 미지정 그룹 수강권의 표시 라벨 — 개인레슨 폴백 금지)
   static const subscriptionGroupTicketLabel = '그룹 수강권';
 
