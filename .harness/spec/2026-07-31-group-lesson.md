@@ -16,6 +16,7 @@
 - [ ] **P1-1 클래스 CRUD**: BE `POST/PATCH/GET /group-classes` (+비활성화) + 교사 클래스 생성·수정 화면. 생성 폼은 **반(코호트) 기본, 드롭인은 폼 내 옵션** (분기 질문 금지 — D1)
 - [ ] **P1-2 진입점 배선**: 교사 홈→"내 클래스" 진입 + 학생 레슨탭 아젠다에 등록된 반 행 표시 + 교사 상세에 개설 클래스 섹션(탐색 표면 — D3) + 기존 상세·출석 화면 라우트 연결 (고아 0)
 - [ ] **P1-3 실차감**: 출석 확정 시 기존 `add_usage`(row lock·idempotent) 경로로 실제 차감. pytest: 잔여 감소 + 중복 차감 멱등 + `subscription_deducted` flag-only 경로 제거
+  - 차감 대상 선택 규칙 (Phase 3 시각화에서 발견된 갭): 학생이 복수 수강권 보유 시 `appliesTo=group` **우선** → `universal` 폴백, 동순위면 만료 임박 우선. 기존 1:1 차감 호출부의 선택 로직이 있으면 그 규칙에 정렬(이중 규칙 금지) — 구현 시 확인 후 pytest 케이스 포함
 - [ ] **P1-4 적용범위 필드**: `Subscription.appliesTo`(oneToOne/group/universal, **null=universal 비파괴 마이그레이션** — `disciplineId` 선례) + 차감 시 범위 검증(그룹 수업에 1:1 전용권 사용 시 4xx) + 그룹 전용 `SubscriptionTemplate` (가격 앵커: 1:1 의 60~70%, D8)
 - [ ] **P1-5 표시 정합**: 학부모 결제 탭·수강권 목록에서 그룹 수강권이 **클래스명 + 그룹 배지**로 표시 ("개인레슨" 폴백 0건 — `subscription_membership_card`·`parent_payments_tab` 회귀 테스트)
 - [ ] **P1-6 이모지 정리 (선행)**: `group_class_detail_screen.dart`(`_getInstrumentEmoji`)·`group_class_attendance_screen.dart` 이모지 0건 → `InstrumentColors`/Material Icons (HARD-GATE)
