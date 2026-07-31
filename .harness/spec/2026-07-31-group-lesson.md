@@ -65,7 +65,7 @@ Subscription        += appliesTo: enum(oneToOne|group|universal)?  # null=univer
 Subscription        += groupClassId?                               # 그룹 발급 시 대상 반 지정(선택).
                                                                    # 표시 규칙: groupClassId 有→클래스명+그룹 배지 /
                                                                    # 無+appliesTo=group→"그룹 수강권" 라벨 (개인레슨 폴백 금지)
-SubscriptionTemplate += appliesTo (동일)                            # 그룹 전용 템플릿 행
+SubscriptionTemplate += appliesTo + groupClassId (동일)             # 그룹 전용 템플릿 행 — 템플릿이 반을 지정하면 발급 시 전파 (J2 구현 반영)
 GroupClassSchedule  .group_class_id → GroupClass FK 정합 (마이그레이션)
 GroupClass          += cohort 멤버 목록 (교사 배정/승인)             # 반=고정 로스터
 TeacherAnnouncement += scope: enum(all|class) + classId?           # 반 공지
@@ -76,9 +76,9 @@ NotificationType    += 그룹 6종 (BE enum + FE 매핑)
 ### API (BE FastAPI — 기존 schedule_ext 라우터 확장)
 | Method | Path | 용도 |
 |---|---|---|
-| POST/PATCH/DELETE | `/group-classes` | 클래스 정의 CRUD (교사) |
-| GET | `/group-classes?teacher_id=` | 교사 상세·내 클래스 목록 |
-| POST/DELETE | `/group-classes/{id}/members` | 코호트 배정/제외 (정원 검증) |
+| POST/PATCH/DELETE | `/groups/classes` | 클래스 정의 CRUD (교사) — 기존 FE `/groups/*` prefix 승계 (J3 확정) |
+| GET | `/groups/classes?teacher_id=` | 교사 상세·내 클래스 목록 |
+| POST/DELETE | `/groups/classes/{id}/members` | 코호트 배정/제외 (정원 검증) |
 | 기존 | booking/attendance/waitlist | 재사용 (§2.1 구현 자산) — 차감만 add_usage 로 교체 |
 
 - 라우터에 DB 쿼리 직접 금지(서비스 레이어) · ownership 은 서비스 raise → 라우터 403

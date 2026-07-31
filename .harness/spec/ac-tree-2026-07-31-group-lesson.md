@@ -8,12 +8,12 @@
 - **만족 조건**: 모든 자식 AC passed
 - **담당 job**: —
 
-  ### AC-1 [BE 코어] GroupClass 배선 정합 (pending)
+  ### AC-1 [BE 코어] GroupClass 배선 정합 (passed)
   - **만족 조건**: GroupClassSchedule→GroupClass 실참조 + alembic 실PG + 기존 회귀 0
   - **담당 job**: J1
   - **관련 테스트**: `backend/tests/test_group_class_wiring.py`
 
-  ### AC-2 [구독] appliesTo + groupClassId (pending)
+  ### AC-2 [구독] appliesTo + groupClassId (in_progress — J2 passed, 자식 AC-2.1 은 J5a 대기)
   - **만족 조건**: 필드 추가(null=universal 비파괴) + 그룹 템플릿 발급 가능
   - **담당 job**: J2
   - **관련 테스트**: `backend/tests/test_group_lesson_deduction.py::test_applies_to_migration_nondestructive` + `backend/tests/test_group_class_crud.py::test_issue_group_template`
@@ -23,7 +23,7 @@
     - **담당 job**: J5a
     - **관련 테스트**: `test_group_lesson_deduction.py::test_one_to_one_only_rejected`
 
-  ### AC-3 [클래스 CRUD] 생성·수정·비활성 + 반복 스케줄 (pending)
+  ### AC-3 [클래스 CRUD] 생성·수정·비활성 + 반복 스케줄 (passed — BE 15/15 + FE 폼·목록 12/12)
   - **만족 조건**: API + ownership(타 교사 403) + 폼 화면(반 기본·드롭인 옵션) + **반 생성 시 N주 스케줄 자동 생성·수정 시 미래 회차 갱신**
   - **담당 job**: J3, J9a, J9b
   - **관련 테스트**: `backend/tests/test_group_class_crud.py` (`::test_regular_creates_recurring_schedules` 포함) + `frontend/test/features/schedule/group_class_form_screen_test.dart` (smoke)
@@ -38,12 +38,12 @@
   - **담당 job**: J5a(차감 코어), J5b(노쇼 4분기)
   - **관련 테스트**: `backend/tests/test_group_lesson_deduction.py` (노쇼 4분기 케이스 포함)
 
-  ### AC-6 [표시 정합] 개인레슨 폴백 0 (pending)
+  ### AC-6 [표시 정합] 개인레슨 폴백 0 (passed — branch ① 클래스명 실주입 한 줄은 J12 에서)
   - **만족 조건**: `groupClassId` 有→클래스명+그룹 배지 / 無+group→"그룹 수강권" 라벨. "개인레슨" 폴백 0건. **만료 임박 알림·카드에 수강권 종류 명시** (rev2 잔여이슈 1 해소)
   - **담당 job**: J13
   - **관련 테스트**: `frontend/test/features/subscription/group_subscription_display_test.dart` (두 표시 규칙 + 폴백 부재 + 만료 임박 종류 명시 케이스)
 
-  ### AC-7 [DS 정리] 이모지 0건 (pending)
+  ### AC-7 [DS 정리] 이모지 0건 (passed)
   - **만족 조건**: 그룹 화면 2종 이모지 0 (C8 raw alpha 는 범위 외 — 별도 백로그)
   - **담당 job**: J8
   - **관련 테스트**: eval `p1-6-no-emoji-in-group-screens` (rg 게이트)
@@ -53,7 +53,7 @@
   - **담당 job**: J6
   - **관련 테스트**: `backend/tests/test_group_deadline_enforcement.py`
 
-  ### AC-9 [알림] 그룹 6종 BE emit (pending)
+  ### AC-9 [알림] 그룹 6종 BE emit (in_progress — 5종(J10) passed, 반 공지(J11a)·FE 타입 매핑(J12 편입) 대기)
   - **만족 조건**: 예약확정·리마인더(전일/당일)·오픈·노쇼경고(J10) + 반 공지 발행(J11a)
   - **담당 job**: J10, J11a
   - **관련 테스트**: `backend/tests/test_group_notifications.py`
@@ -63,7 +63,7 @@
     - **담당 job**: J10, J12
     - **관련 테스트**: eval `p2-2-no-fe-local-notification` (rg 게이트)
 
-  ### AC-10 [노쇼 정합] 4값 SSOT (pending)
+  ### AC-10 [노쇼 정합] 4값 SSOT (passed — BE 실집행 증명은 AC-5/J5b 에서)
   - **만족 조건**: FE NoShowPolicy = BE 4값, 출석 화면서 정책별 동작
   - **담당 job**: J7
   - **관련 테스트**: `frontend/test/features/schedule/no_show_policy_test.dart`
