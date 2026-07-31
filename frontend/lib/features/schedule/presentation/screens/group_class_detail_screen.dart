@@ -11,6 +11,7 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../extensions/group_class_booking_visuals.dart';
+import '../extensions/no_show_policy_visuals.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
@@ -555,8 +556,7 @@ class _GroupClassDetailScreenState
                   widget.groupClass.bookingDeadlineMinutes ~/ 60,
               cancelDeadlineHours:
                   widget.groupClass.cancelDeadlineMinutes ~/ 60,
-              deductOnNoShow:
-                  widget.groupClass.noShowPolicy == NoShowPolicy.deduct,
+              noShowText: widget.groupClass.noShowPolicy.label,
             ),
             style: AppTypography.caption.copyWith(
               color: AppColors.inkSecondary,

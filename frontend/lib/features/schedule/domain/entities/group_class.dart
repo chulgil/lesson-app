@@ -12,11 +12,18 @@ enum GroupClassType {
   dropIn, // Drop-in class (one-time)
 }
 
-/// No-show policy for group classes
+/// No-show policy for group classes.
+///
+/// Wire values mirror the backend SSOT (#239, `app.models.schedule.NoShowPolicy`)
+/// one-for-one — the same 4 values drive 1:1 and group no-show handling.
 enum NoShowPolicy {
-  deduct, // Deduct lesson from subscription
+  deductCredit, // Deduct 1 lesson from the subscription
 
-  noDeduct, // No deduction (mercy policy)
+  halfCredit, // Deduct 0.5 lesson
+
+  noDeduction, // No deduction (mercy policy)
+
+  reschedule, // No deduction, converted into a makeup credit
 }
 
 /// Group class definition
@@ -75,7 +82,7 @@ class GroupClass {
     required this.durationMinutes,
     this.bookingDeadlineMinutes = 60, // Default 1 hour
     this.cancelDeadlineMinutes = 1440, // Default 24 hours
-    this.noShowPolicy = NoShowPolicy.deduct,
+    this.noShowPolicy = NoShowPolicy.deductCredit,
     this.maxNoShowCount,
     this.repeatDaysOfWeek,
     this.repeatTimeOfDay,

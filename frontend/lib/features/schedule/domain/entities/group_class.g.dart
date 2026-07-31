@@ -22,7 +22,7 @@ GroupClass _$GroupClassFromJson(Map<String, dynamic> json) => GroupClass(
           (json['cancel_deadline_minutes'] as num?)?.toInt() ?? 1440,
       noShowPolicy:
           $enumDecodeNullable(_$NoShowPolicyEnumMap, json['no_show_policy']) ??
-              NoShowPolicy.deduct,
+              NoShowPolicy.deductCredit,
       maxNoShowCount: (json['max_no_show_count'] as num?)?.toInt(),
       repeatDaysOfWeek: (json['repeat_days_of_week'] as List<dynamic>?)
           ?.map((e) => (e as num).toInt())
@@ -67,6 +67,8 @@ const _$GroupClassTypeEnumMap = {
 };
 
 const _$NoShowPolicyEnumMap = {
-  NoShowPolicy.deduct: 'deduct',
-  NoShowPolicy.noDeduct: 'noDeduct',
+  NoShowPolicy.deductCredit: 'deductCredit',
+  NoShowPolicy.halfCredit: 'halfCredit',
+  NoShowPolicy.noDeduction: 'noDeduction',
+  NoShowPolicy.reschedule: 'reschedule',
 };

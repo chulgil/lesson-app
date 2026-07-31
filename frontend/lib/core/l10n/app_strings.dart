@@ -1940,12 +1940,11 @@ class AppStrings {
   static String bookingPolicyText({
     required int bookingDeadlineHours,
     required int cancelDeadlineHours,
-    required bool deductOnNoShow,
+    required String noShowText,
   }) {
-    final noShow = deductOnNoShow ? '수강권 차감' : '수강권 미차감';
     return '• 예약 마감: 수업 $bookingDeadlineHours시간 전\n'
         '• 취소 마감: 수업 $cancelDeadlineHours시간 전\n'
-        '• 미참석 시: $noShow';
+        '• 미참석 시: $noShowText';
   }
 
   /// 대기 N번으로 등록되었습니다

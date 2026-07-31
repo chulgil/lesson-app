@@ -15,6 +15,7 @@ import '../../../students/students_facade.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/entities/group_class_schedule.dart';
+import '../extensions/no_show_policy_visuals.dart';
 import '../providers/group_class_booking_providers.dart';
 
 /// Attendance screen for teachers to mark attendance
@@ -454,6 +455,17 @@ class _GroupClassAttendanceScreenState
                   ),
                   style: AppTypography.bodyMedium,
                 ),
+                // Absences are settled by the class no-show policy (BE SSOT
+                // #239) — spell out which of the 4 outcomes applies.
+                if (_attendanceState.length - _getAttendedCount() > 0) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    widget.groupClass.noShowPolicy.description,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   AppStrings.finishClassConfirm,
