@@ -7,6 +7,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Enum,
+    ForeignKey,
     Index,
     Integer,
     String,
@@ -93,11 +94,20 @@ class ScheduleException(UUIDMixin, Base):
 
 
 class GroupClassSchedule(UUIDMixin, TimestampMixin, Base):
-    """Individual session/schedule of a group class."""
+    """Individual session/schedule of a group class.
+
+    ``group_class_id`` references ``schedule.GroupClass`` — the model that owns
+    capacity and the no-show policy. It used to be read as ``lesson.LessonClass``
+    (an academy org unit, a different concept), which left GroupClass dead.
+    """
 
     __tablename__ = "group_class_schedules"
 
-    group_class_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    group_class_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("group_classes.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[GroupScheduleStatus] = mapped_column(

@@ -1007,18 +1007,23 @@ async def test_contract_group_bookings_frontend_shapes_and_body_actions(
     """RemoteGroupClassBookingRepository expects paginated /groups/bookings and body actions."""
     from sqlalchemy import select
 
-    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.schedule import GroupClass, GroupClassType
     from app.models.teacher import Teacher
 
     await create_test_user(user_id="test-user-id", role="teacher")
-    # Group class ownership 검증 — 실제 LessonClass 가 있어야 schedule 생성 가능.
+    # Group class ownership 검증 — 실제 GroupClass 가 있어야 schedule 생성 가능.
     teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == "test-user-id"))
     db_session.add(
-        LessonClass(
+        GroupClass(
             id="group-001",
             teacher_id=teacher_profile_id or "test-user-id",
             name="Test Group",
-            type=LessonClassType.private,
+            type=GroupClassType.regular,
+            max_capacity=1,
+            duration_minutes=60,
+            booking_deadline_minutes=60,
+            cancel_deadline_minutes=1440,
+            is_active=True,
         )
     )
     await db_session.flush()

@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 # Schedule Exceptions
 # ---------------------------------------------------------------------------
 
+
 class ScheduleExceptionCreate(BaseModel):
     type: str  # holiday, vacation, additionalSlot
     start_date: _dt.date
@@ -46,11 +47,13 @@ class ScheduleExceptionResponse(BaseModel):
 # Group Class Schedule
 # ---------------------------------------------------------------------------
 
+
 class GroupClassScheduleCreate(BaseModel):
     group_class_id: str
     start_time: _dt.datetime
     end_time: _dt.datetime
-    max_capacity: int
+    # None 이면 GroupClass 의 정원을 상속 (정원 SSOT). 회차별 예외만 명시.
+    max_capacity: int | None = None
     waitlist_capacity: int | None = None
     notes: str | None = None
 
@@ -76,6 +79,7 @@ class GroupClassScheduleResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Group Class Booking
 # ---------------------------------------------------------------------------
+
 
 class GroupClassBookingCreate(BaseModel):
     schedule_id: str
@@ -125,6 +129,7 @@ class GroupBookingActionRequest(BaseModel):
 # No-Show Records
 # ---------------------------------------------------------------------------
 
+
 class NoShowRecordCreate(BaseModel):
     lesson_id: str
     student_id: str
@@ -154,6 +159,7 @@ class NoShowRecordResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Lesson Schedule Changes
 # ---------------------------------------------------------------------------
+
 
 class LessonScheduleChangeCreate(BaseModel):
     student_id: str

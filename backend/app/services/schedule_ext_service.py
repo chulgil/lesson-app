@@ -117,30 +117,41 @@ class ScheduleExtService:
     # Group ownership assertions — IDOR 방어용 헬퍼.
     # -----------------------------------------------------------------------
 
-    async def _assert_group_class_teacher(self, group_class_id: str, current_user: Any) -> None:
-        """LessonClass.teacher_id 가 current_user 의 강사 ID 와 일치하는지 검증."""
-        from app.models.lesson import LessonClass
+    async def _get_group_class(self, group_class_id: str) -> Any | None:
+        """group_class_id → GroupClass row (정원·노쇼정책 SSOT). 없으면 None."""
+        from app.models.schedule import GroupClass
 
-        lc_teacher_id = await self.db.scalar(select(LessonClass.teacher_id).where(LessonClass.id == group_class_id))
-        if lc_teacher_id is None:
+        return await self.db.get(GroupClass, group_class_id)
+
+    async def get_group_class_for_schedule(self, schedule_id: str) -> Any | None:
+        """schedule → 소속 GroupClass. 정원·마감·노쇼정책 조회의 단일 진입점."""
+        from app.models.schedule_ext import GroupClassSchedule
+
+        schedule = await self.db.get(GroupClassSchedule, schedule_id)
+        if schedule is None:
+            return None
+        return await self._get_group_class(schedule.group_class_id)
+
+    async def _assert_group_class_teacher(self, group_class_id: str, current_user: Any) -> Any:
+        """GroupClass.teacher_id 가 current_user 의 강사 ID 와 일치하는지 검증. row 반환."""
+        group_class = await self._get_group_class(group_class_id)
+        if group_class is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group class not found")
         teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
-        if lc_teacher_id not in teacher_ids:
+        if group_class.teacher_id not in teacher_ids:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not the owning teacher")
+        return group_class
 
     async def _assert_schedule_teacher(self, schedule_id: str, current_user: Any) -> Any:
-        """GroupClassSchedule → LessonClass → teacher_id 검증. schedule row 반환."""
-        from app.models.lesson import LessonClass
+        """GroupClassSchedule → GroupClass → teacher_id 검증. schedule row 반환."""
         from app.models.schedule_ext import GroupClassSchedule
 
         schedule = await self.db.get(GroupClassSchedule, schedule_id)
         if schedule is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
-        lc_teacher_id = await self.db.scalar(
-            select(LessonClass.teacher_id).where(LessonClass.id == schedule.group_class_id)
-        )
+        group_class = await self._get_group_class(schedule.group_class_id)
         teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
-        if lc_teacher_id is None or lc_teacher_id not in teacher_ids:
+        if group_class is None or group_class.teacher_id not in teacher_ids:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not the owning teacher")
         return schedule
 
@@ -150,7 +161,6 @@ class ScheduleExtService:
         - 강사 모드: schedule → group_class → teacher_id 가 current_user 와 일치하면 OK.
         - 학생 모드: booking.student_id 가 current_user.id (또는 매핑된 student.id) 와 일치하면 OK.
         """
-        from app.models.lesson import LessonClass
         from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
 
         booking = await self.db.get(GroupClassBooking, booking_id)
@@ -159,11 +169,9 @@ class ScheduleExtService:
         # 강사 검증.
         schedule = await self.db.get(GroupClassSchedule, booking.schedule_id)
         if schedule is not None:
-            lc_teacher_id = await self.db.scalar(
-                select(LessonClass.teacher_id).where(LessonClass.id == schedule.group_class_id)
-            )
+            group_class = await self._get_group_class(schedule.group_class_id)
             teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
-            if lc_teacher_id is not None and lc_teacher_id in teacher_ids:
+            if group_class is not None and group_class.teacher_id in teacher_ids:
                 return booking
         # 학생 검증 (자기 booking).
         if booking.student_id == current_user.id:
@@ -204,7 +212,12 @@ class ScheduleExtService:
         group_class_id = data.get("group_class_id")
         if not group_class_id:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="group_class_id is required")
-        await self._assert_group_class_teacher(group_class_id, current_user)
+        group_class = await self._assert_group_class_teacher(group_class_id, current_user)
+        # 정원 SSOT = GroupClass. 회차별 예외가 필요할 때만 명시값이 덮어쓴다.
+        if data.get("max_capacity") is None:
+            data["max_capacity"] = group_class.max_capacity
+        if data.get("waitlist_capacity") is None:
+            data["waitlist_capacity"] = group_class.waitlist_capacity
         schedule = GroupClassSchedule(**data)
         self.db.add(schedule)
         await self.db.flush()
@@ -226,7 +239,6 @@ class ScheduleExtService:
     # -----------------------------------------------------------------------
 
     async def create_group_booking(self, data: dict, current_user: Any) -> Any:
-        from app.models.lesson import LessonClass
         from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule, GroupScheduleStatus
         from app.models.student import Student
 
@@ -234,11 +246,9 @@ class ScheduleExtService:
         if schedule is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule not found")
         # 호출자가 강사 본인 (해당 클래스 소유자) 이거나 학생 본인이어야 한다.
-        lc_teacher_id = await self.db.scalar(
-            select(LessonClass.teacher_id).where(LessonClass.id == schedule.group_class_id)
-        )
+        group_class = await self._get_group_class(schedule.group_class_id)
         teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
-        is_owning_teacher = lc_teacher_id is not None and lc_teacher_id in teacher_ids
+        is_owning_teacher = group_class is not None and group_class.teacher_id in teacher_ids
         student_profile_id = await self.db.scalar(select(Student.id).where(Student.user_id == current_user.id))
         is_self_student = (
             data.get("student_id") in {current_user.id, student_profile_id} if data.get("student_id") else False
@@ -358,7 +368,7 @@ class ScheduleExtService:
         upcoming: bool | None = None,
     ) -> list[Any]:
         """List group bookings with flexible filters — caller 권한으로 자동 스코프."""
-        from app.models.lesson import LessonClass
+        from app.models.schedule import GroupClass
         from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
         from app.models.student import Student
 
@@ -372,7 +382,7 @@ class ScheduleExtService:
                 GroupClassSchedule,
                 GroupClassBooking.schedule_id == GroupClassSchedule.id,
             )
-            .join(LessonClass, GroupClassSchedule.group_class_id == LessonClass.id)
+            .join(GroupClass, GroupClassSchedule.group_class_id == GroupClass.id)
         )
 
         if student_profile_id is not None:
@@ -380,7 +390,7 @@ class ScheduleExtService:
             query = query.where(GroupClassBooking.student_id == student_profile_id)
         else:
             # 강사: 본인 클래스 스코프 + (선택적) student_id 필터.
-            query = query.where(LessonClass.teacher_id.in_(teacher_ids))
+            query = query.where(GroupClass.teacher_id.in_(teacher_ids))
             if student_id:
                 query = query.where(GroupClassBooking.student_id == student_id)
 
