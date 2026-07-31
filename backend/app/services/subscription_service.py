@@ -189,6 +189,9 @@ class SubscriptionService:
             student_id=data.student_id,
             membership_id=membership_id,
             type=data.type or "monthly",
+            # P1-4 — omitted stays NULL (= universal), never coerced to oneToOne.
+            applies_to=data.applies_to,
+            group_class_id=data.group_class_id,
             total_lessons=data.total_lessons,
             used_lessons=data.used_lessons,
             amount=data.amount or 0,
@@ -1534,6 +1537,8 @@ class SubscriptionService:
             display_order=data.display_order,
             reschedule_allowance=data.reschedule_allowance,
             is_auto_proposal_enabled=data.is_auto_proposal_enabled,
+            applies_to=data.applies_to,
+            group_class_id=data.group_class_id,
         )
         self.db.add(template)
         await self.db.flush()
@@ -2062,6 +2067,10 @@ class SubscriptionService:
                 student_id=proposal.student_id,
                 membership_id=membership_id,
                 type=template.type if template else "monthly",
+                # P1-4 — the template carries the scope; a proposal without a
+                # template keeps NULL (= universal), matching pre-group rows.
+                applies_to=template.applies_to if template else None,
+                group_class_id=template.group_class_id if template else None,
                 total_lessons=template.lessons_count if template else None,
                 lessons_per_month=template.lessons_per_month if template else None,
                 amount=original_amount - discount_amount,
