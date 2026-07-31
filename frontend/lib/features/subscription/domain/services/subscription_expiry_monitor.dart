@@ -76,7 +76,10 @@ class SubscriptionExpiryMonitor {
               ? NotificationPriority.urgent
               : NotificationPriority.high,
       title: _copy.expiringTitle(daysLeft),
-      body: _copy.expiringBody(sub.remainingLessons ?? 0),
+      body: _copy.expiringBody(
+        _copy.subscriptionKindLabel(sub),
+        sub.remainingLessons ?? 0,
+      ),
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
@@ -97,7 +100,7 @@ class SubscriptionExpiryMonitor {
       priority: NotificationPriority.high,
       title:
           remaining == 0 ? _copy.lessonsExhaustedTitle : _copy.lastLessonTitle,
-      body: _copy.renewalRequestBody,
+      body: _copy.renewalRequestBody(_copy.subscriptionKindLabel(sub)),
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
@@ -127,7 +130,7 @@ class SubscriptionExpiryMonitor {
       type: NotificationType.subscriptionExpired,
       priority: NotificationPriority.high,
       title: _copy.expiredTitle,
-      body: _copy.renewalRequestBody,
+      body: _copy.renewalRequestBody(_copy.subscriptionKindLabel(sub)),
       createdAt: DateTime.now(),
       sentAt: DateTime.now(),
       actionUrl: '/subscriptions/${sub.id}',
@@ -139,13 +142,17 @@ class SubscriptionExpiryMonitor {
 
 class SubscriptionExpiryCopy {
   final String Function(int daysLeft) expiringTitle;
-  final String Function(int remaining) expiringBody;
+  final String Function(String kind, int remaining) expiringBody;
   final String viewActionLabel;
   final String lessonsExhaustedTitle;
   final String lastLessonTitle;
-  final String renewalRequestBody;
+  final String Function(String kind) renewalRequestBody;
   final String renewalActionLabel;
   final String expiredTitle;
+
+  /// 어느 수강권인지 밝히는 종류 라벨 (그룹=클래스명/그룹 라벨, 1:1=수강권 종류).
+  /// 표시 문구는 presentation 이 주입한다 — domain 은 문자열을 만들지 않는다.
+  final String Function(Subscription subscription) subscriptionKindLabel;
 
   const SubscriptionExpiryCopy({
     required this.expiringTitle,
@@ -156,5 +163,6 @@ class SubscriptionExpiryCopy {
     required this.renewalRequestBody,
     required this.renewalActionLabel,
     required this.expiredTitle,
+    required this.subscriptionKindLabel,
   });
 }

@@ -1851,6 +1851,12 @@ class AppStrings {
   /// 그룹 클래스 정보를 불러올 수 없습니다 (route extra 누락 placeholder)
   static const groupClassInfoUnavailable = '그룹 클래스 정보를 불러올 수 없습니다.';
 
+  /// 그룹 수강권 (반 미지정 그룹 수강권의 표시 라벨 — 개인레슨 폴백 금지)
+  static const subscriptionGroupTicketLabel = '그룹 수강권';
+
+  /// 그룹 (수강권 카드 그룹 배지 라벨)
+  static const subscriptionGroupBadge = '그룹';
+
   /// 오류가 발생했습니다. 다시 시도해주세요.
   static const errorTryAgain = '오류가 발생했습니다. 다시 시도해주세요.';
 
@@ -3314,9 +3320,9 @@ class AppStrings {
   static String subscriptionExpiringTitle(int daysLeft) =>
       '수강권이 $daysLeft일 후 만료됩니다';
 
-  /// 수강권 만료 임박 본문 (남은 횟수 안내 + CTA)
-  static String subscriptionExpiringBody(int remaining) =>
-      '남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
+  /// 수강권 만료 임박 본문 (수강권 종류 + 남은 횟수 안내 + CTA)
+  static String subscriptionExpiringBody(String kind, int remaining) =>
+      '$kind · 남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
 
   /// 수강권 확인 (액션 라벨)
   static const subscriptionViewAction = '수강권 확인';
@@ -3327,8 +3333,9 @@ class AppStrings {
   /// 수강권 1회 남음 (low lessons 알림 제목)
   static const subscriptionLastLessonTitle = '수강권이 마지막 1회 남았습니다';
 
-  /// 갱신 요청 안내 본문 (low lessons / expired 공용)
-  static const subscriptionRenewalRequestBody = '갱신 요청을 보내 레슨을 이어가세요';
+  /// 갱신 요청 안내 본문 (수강권 종류 + low lessons / expired 공용)
+  static String subscriptionRenewalRequestBody(String kind) =>
+      '$kind · 갱신 요청을 보내 레슨을 이어가세요';
 
   /// 갱신 요청 (액션 라벨)
   static const subscriptionRenewalAction = '갱신 요청';

@@ -7,6 +7,7 @@ import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/services/auto_proposal_service.dart';
 import '../../domain/services/subscription_expiry_monitor.dart';
 import '../../domain/services/subscription_renewal_service.dart';
+import '../extensions/subscription_scope_visuals.dart';
 import 'proposal_settings_providers.dart';
 import 'subscription_issue_flow_provider.dart';
 import 'subscription_proposal_providers.dart';
@@ -179,6 +180,7 @@ SubscriptionExpiryMonitor subscriptionExpiryMonitor(
       renewalRequestBody: AppStrings.subscriptionRenewalRequestBody,
       renewalActionLabel: AppStrings.subscriptionRenewalAction,
       expiredTitle: AppStrings.subscriptionExpiredTitle,
+      subscriptionKindLabel: (subscription) => subscription.expiryKindLabel(),
     ),
   );
 }
