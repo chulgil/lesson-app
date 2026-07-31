@@ -9,6 +9,7 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/group_class.dart';
@@ -121,6 +122,19 @@ class _GroupClassAttendanceScreenState
     );
   }
 
+  /// Instrument color chip for the class icon tile. Falls back to the paper
+  /// accent chip when the class has no instrument tag.
+  InstrumentColorPair get _instrumentColors {
+    final instrument = widget.groupClass.instrument;
+    if (instrument == null || instrument.trim().isEmpty) {
+      return const InstrumentColorPair(
+        AppColors.paperAccentSoft,
+        AppColors.paperAccent,
+      );
+    }
+    return InstrumentColors.getColor(instrument);
+  }
+
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -134,9 +148,13 @@ class _GroupClassAttendanceScreenState
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
-            child: const Center(
-              child: Text('🎻', style: AppTypography.headingLarge),
+            decoration: BoxDecoration(color: _instrumentColors.background),
+            child: Center(
+              child: Icon(
+                Icons.music_note,
+                size: 24,
+                color: _instrumentColors.accent,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
