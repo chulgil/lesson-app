@@ -47,6 +47,11 @@ name = "p2-2-notifications-emit"
 cmd = "cd backend && python -m pytest tests/test_group_notifications.py -q"
 expect_exit = 0               # 6종 전이 emit (#1207 패턴)
 
+[[case]]
+name = "p2-2-no-fe-local-notification"
+cmd = "rg -n 'flutter_local_notifications|LocalNotification|scheduleNotification' frontend/lib/features/schedule/presentation --iglob '*group*'"
+expect_exit = 1               # 그룹 FE 코드에 로컬 알림 스케줄링 0건 (#1191 — BE emit 만)
+
 # ---------- 공통 게이트 ----------
 
 [[case]]

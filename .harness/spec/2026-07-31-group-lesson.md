@@ -14,11 +14,13 @@
 ### P1 — MVP
 - [ ] **P1-0 배선 정합**: `GroupClassSchedule.group_class_id` 가 정원·노쇼정책을 보유한 `GroupClass` 를 실참조 (현재 `LessonClass` 오참조 = 죽은 모델). 마이그레이션 + pytest 로 FK 정합 검증
 - [ ] **P1-1 클래스 CRUD**: BE `POST/PATCH/GET /group-classes` (+비활성화) + 교사 클래스 생성·수정 화면. 생성 폼은 **반(코호트) 기본, 드롭인은 폼 내 옵션** (분기 질문 금지 — D1)
+  - 반(regular) 생성·수정 시 **반복 `GroupClassSchedule` 자동 생성·연장** 포함 (시나리오 1 "매주 자동 스케줄" 의 담당 — plan-check 반영). pytest: 생성 후 N주 스케줄 존재
 - [ ] **P1-2 진입점 배선**: 교사 홈→"내 클래스" 진입 + 학생 레슨탭 아젠다에 등록된 반 행 표시 + 교사 상세에 개설 클래스 섹션(탐색 표면 — D3) + 기존 상세·출석 화면 라우트 연결 (고아 0)
 - [ ] **P1-3 실차감**: 출석 확정 시 기존 `add_usage`(row lock·idempotent) 경로로 실제 차감. pytest: 잔여 감소 + 중복 차감 멱등 + `subscription_deducted` flag-only 경로 제거
   - 차감 대상 선택 규칙 (Phase 3 시각화에서 발견된 갭): 학생이 복수 수강권 보유 시 `appliesTo=group` **우선** → `universal` 폴백, 동순위면 만료 임박 우선. 기존 1:1 차감 호출부의 선택 로직이 있으면 그 규칙에 정렬(이중 규칙 금지) — 구현 시 확인 후 pytest 케이스 포함
+  - **노쇼 4값 BE 집행** (plan-check 반영): 노쇼 처리 시 클래스 노쇼정책 4값 분기 — `deductCredit`(1회 차감)/`halfCredit`/`noDeduction`/`reschedule`(MakeupCredit 적립 경로 재사용). **기존 1:1 노쇼 SSOT(#239) 분기 시맨틱 재사용, 신규 발명 금지**. pytest 4분기 전부
 - [ ] **P1-4 적용범위 필드**: `Subscription.appliesTo`(oneToOne/group/universal, **null=universal 비파괴 마이그레이션** — `disciplineId` 선례) + 차감 시 범위 검증(그룹 수업에 1:1 전용권 사용 시 4xx) + 그룹 전용 `SubscriptionTemplate` (가격 앵커: 1:1 의 60~70%, D8)
-- [ ] **P1-5 표시 정합**: 학부모 결제 탭·수강권 목록에서 그룹 수강권이 **클래스명 + 그룹 배지**로 표시 ("개인레슨" 폴백 0건 — `subscription_membership_card`·`parent_payments_tab` 회귀 테스트)
+- [ ] **P1-5 표시 정합**: 학부모 결제 탭·수강권 목록에서 그룹 수강권이 **클래스명 + 그룹 배지**로 표시 ("개인레슨" 폴백 0건 — `subscription_membership_card`·`parent_payments_tab` 회귀 테스트). **만료 임박 알림·카드에도 수강권 종류(클래스명/그룹 라벨) 명시** (시나리오 2 Then 정합 — plan-check rev2)
 - [ ] **P1-6 이모지 정리 (선행)**: `group_class_detail_screen.dart`(`_getInstrumentEmoji`)·`group_class_attendance_screen.dart` 이모지 0건 → `InstrumentColors`/Material Icons (HARD-GATE)
 
 ### P2 — 운영 완성
@@ -60,6 +62,9 @@
 ### 변경 엔티티 (신규 발명 금지 — 기존 확장)
 ```
 Subscription        += appliesTo: enum(oneToOne|group|universal)?  # null=universal, 비파괴
+Subscription        += groupClassId?                               # 그룹 발급 시 대상 반 지정(선택).
+                                                                   # 표시 규칙: groupClassId 有→클래스명+그룹 배지 /
+                                                                   # 無+appliesTo=group→"그룹 수강권" 라벨 (개인레슨 폴백 금지)
 SubscriptionTemplate += appliesTo (동일)                            # 그룹 전용 템플릿 행
 GroupClassSchedule  .group_class_id → GroupClass FK 정합 (마이그레이션)
 GroupClass          += cohort 멤버 목록 (교사 배정/승인)             # 반=고정 로스터
@@ -113,7 +118,7 @@ NotificationType    += 그룹 6종 (BE enum + FE 매핑)
 
 | 위험 | 영향도 | 완화 |
 |---|---|---|
-| **실차감이 알림보다 먼저 릴리스** → 자동승격 학생이 모른 채 결석·차감 | HIGH | **머지 순서 제약: P1-3 은 P2-2 와 같은 릴리스 이전 배포 금지** (DAG 의존성으로 강제) |
+| **실차감이 알림보다 먼저 릴리스** → 자동승격 학생이 모른 채 결석·차감 | HIGH | **머지 순서 제약: P1-3 은 예약·승격 알림 5종(J10)과 같은 릴리스 이전 배포 금지** (반 공지 발행 알림은 제외 — 리스크 메커니즘 무관. DAG J5←J10 으로 강제) |
 | appliesTo 마이그레이션이 기존 수강권 파괴 | HIGH | null=universal 비파괴 + alembic 실PG 검증(throwaway PG — SQLite 은폐 함정) |
 | GroupClass 배선 정합이 기존 대기열·출석 API 를 깸 | MED | P1-0 을 최우선 단독 job 으로, 기존 pytest 회귀 전체 실행 |
 | 출시 인프라 일정(11~12월 OAuth·IAP·prod)과 경합 | MED | **사용자 인지·수용 완료(D7 §9)** — P0 게이트 작업 요청 시 그룹레슨 중단하고 양보 |
