@@ -55,6 +55,10 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   final String? lessonRequestId;
   final List<String> lessonRequestIds;
 
+  /// §2.6.3 발급 연속 플로우 — 'addLesson' 이면 발급 성공 시 정기 스케줄 등록
+  /// 리다이렉트를 건너뛰고 호출 화면(레슨 추가)으로 복귀한다.
+  final String? returnTo;
+
   const IssueSubscriptionScreen({
     super.key,
     required this.studentIds,
@@ -63,6 +67,7 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
     this.renewFromSubscriptionId,
     this.lessonRequestId,
     this.lessonRequestIds = const [],
+    this.returnTo,
   });
 
   /// Whether this is a batch issuance (multiple students)
@@ -132,6 +137,8 @@ class _IssueSubscriptionScreenState
   String? get lessonRequestId => widget.lessonRequestId;
   @override
   List<String> get lessonRequestIds => widget.lessonRequestIds;
+  @override
+  String? get returnTo => widget.returnTo;
   @override
   GlobalKey<FormState> get formKey => _formKey;
   @override

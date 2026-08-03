@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../extensions/subscription_template_visuals.dart';
 import '../providers/subscription_proposal_providers.dart';
@@ -498,11 +499,25 @@ class _UnifiedSubscriptionSheetState
     return 120;
   }
 
+  /// §2.7 (AC-5.1) — 미가입(수기) 단일 학생은 제안을 받을 수 없다 (respond API
+  /// 가 학생 계정 전제). 제안 버튼을 숨기고 즉시 발급만 노출한다.
+  /// 배치(복수 학생)·조회 실패는 기존 동작 유지 (connected 가정).
+  bool get _proposalAvailable {
+    if (widget.studentIds.length != 1) return true;
+    final students = ref.read(studentsProvider).valueOrNull ?? [];
+    final match = students.where((s) => s.id == widget.studentIds.first);
+    return match.isEmpty || match.first.isAppConnected;
+  }
+
   Widget _buildBottomButtons() {
     final canSubmit =
         (_selectedTemplateIds.isNotEmpty || _hasValidDirectInput) &&
         !_isSubmitting;
-    final isSingleSelect = _selectedTemplateIds.length <= 1;
+    final proposalAvailable = _proposalAvailable;
+    // 제안 불가(미가입) 시 즉시 발급 단독 노출 — 다중 템플릿 선택은 제안 전용
+    // 이므로 이 경우에도 발급 버튼을 유지한다.
+    final isSingleSelect =
+        _selectedTemplateIds.length <= 1 || !proposalAvailable;
 
     return Container(
       padding: EdgeInsets.only(
@@ -548,41 +563,43 @@ class _UnifiedSubscriptionSheetState
                     ),
                   ),
                 ),
-              if (isSingleSelect) const SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: canSubmit ? _onSendProposal : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.paperAccent,
-                    foregroundColor: AppColors.paper,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.space3,
+              if (isSingleSelect && proposalAvailable)
+                const SizedBox(width: AppSpacing.space2),
+              if (proposalAvailable)
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: canSubmit ? _onSendProposal : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.paperAccent,
+                      foregroundColor: AppColors.paper,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.space3,
+                      ),
+                      shape: RoundedRectangleBorder(),
+                      disabledBackgroundColor: AppColors.paperAccentSoft,
                     ),
-                    shape: RoundedRectangleBorder(),
-                    disabledBackgroundColor: AppColors.paperAccentSoft,
+                    child:
+                        _isSubmitting
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.paper,
+                              ),
+                            )
+                            : Text(
+                              _selectedTemplateIds.length > 1
+                                  ? AppStrings.unifiedSubscriptionMultiSendFormat(
+                                    _selectedTemplateIds.length,
+                                  )
+                                  : AppStrings.proposalSend,
+                              style: AppTypography.buttonSmall.copyWith(
+                                color: AppColors.paper,
+                              ),
+                            ),
                   ),
-                  child:
-                      _isSubmitting
-                          ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                          : Text(
-                            _selectedTemplateIds.length > 1
-                                ? AppStrings.unifiedSubscriptionMultiSendFormat(
-                                  _selectedTemplateIds.length,
-                                )
-                                : AppStrings.proposalSend,
-                            style: AppTypography.buttonSmall.copyWith(
-                              color: AppColors.paper,
-                            ),
-                          ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: AppSpacing.space1),
@@ -602,15 +619,16 @@ class _UnifiedSubscriptionSheetState
                 ),
                 const SizedBox(width: AppSpacing.space2),
               ],
-              Expanded(
-                child: Text(
-                  AppStrings.unifiedSubscriptionProposalCaption,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkTertiary,
+              if (proposalAvailable)
+                Expanded(
+                  child: Text(
+                    AppStrings.unifiedSubscriptionProposalCaption,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ],

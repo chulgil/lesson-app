@@ -334,7 +334,29 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         if (matches.isEmpty) return; // #72 선택이 목록에서 사라진 race 무시
         _onStudentChosen(matches.first);
       },
+      onAddStudentRequested: _addNewStudentAndSelect,
     );
+  }
+
+  /// 경로 4 (§2.6.4) — 신규 학생 인라인 등록 후 방금 학생 자동 선택.
+  /// 등록 화면은 returnTo=addLesson 으로 발급 다이얼로그를 건너뛰고
+  /// 생성된 학생 id 를 반환한다.
+  Future<void> _addNewStudentAndSelect() async {
+    final result = await context.push(
+      '${AppRoutes.addStudent}?returnTo=addLesson',
+    );
+    if (!mounted || result is! String) return;
+    ref.invalidate(studentsProvider);
+    try {
+      final students = await ref.read(studentsProvider.future);
+      if (!mounted) return;
+      final matches = students.where((s) => s.id == result);
+      if (matches.isNotEmpty) {
+        _onStudentChosen(matches.first);
+      }
+    } catch (_) {
+      // 목록 재조회 실패 시 선택만 생략 — 선생님이 시트에서 다시 고를 수 있다.
+    }
   }
 
   /// Unified student-selection flow: set student, reset subscription, auto-fill
@@ -837,12 +859,20 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     );
   }
 
-  /// S5/S6 — route to the issue-subscription flow with the student prefilled.
-  /// PR-C(J8) adds returnTo continuity; until then this is a plain push.
-  void _openIssueSubscription() {
+  /// S5/S6 — route to the issue-subscription flow with the student prefilled
+  /// (§2.6.3 returnTo continuity). On direct-issue success the form resumes
+  /// with the new subscription auto-attached (S1 state).
+  Future<void> _openIssueSubscription() async {
     final studentId = _selectedStudent?.id;
     if (studentId == null) return;
-    context.push('${AppRoutes.issueSubscription}?studentId=$studentId');
+    final issued = await context.push(
+      '${AppRoutes.issueSubscription}?studentId=$studentId&returnTo=addLesson',
+    );
+    if (!mounted || issued != true || _selectedStudent?.id != studentId) {
+      return;
+    }
+    ref.invalidate(activeStudentSubscriptionsProvider(studentId));
+    await _resolveSubscriptionForStudent(studentId);
   }
 
   Future<void> _showTrialAlreadyUsedDialog() async {
