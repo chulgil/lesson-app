@@ -138,7 +138,15 @@ class LessonService:
                 subscription_id=subscription_id,
                 student_id=data.student_id,
             )
-        else:
+
+        is_preview = False
+        if data.overflow_mode is not None:
+            subscription_id, is_preview = await self._apply_overflow_mode(
+                mode=data.overflow_mode,
+                subscription_id=subscription_id,
+                student_id=data.student_id,
+            )
+        elif not subscription_id:
             # Auto-find or create subscription
             subscription_id = await self._find_or_create_subscription(
                 teacher_id=tid,
@@ -147,7 +155,8 @@ class LessonService:
             )
 
         session_number = data.session_number
-        if subscription_id:
+        # Preview lessons get their session number on renewal confirmation, not here.
+        if subscription_id and not is_preview:
             if session_number is None:
                 session_number = await self._next_subscription_session_number(subscription_id)
 
@@ -163,14 +172,16 @@ class LessonService:
             session_number=session_number,
             location_name=data.location_name,
             lesson_source=LessonSource.manual,
+            is_preview=is_preview,
         )
         self.db.add(lesson)
         await self.db.flush()
         await self.db.refresh(lesson)
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstLesson")
 
-        # Notify student about new lesson
-        if student and student.user_id:
+        # Notify student about new lesson. Preview lessons stay silent — the
+        # renewal proposal is the student-facing message for that flow.
+        if student and student.user_id and not is_preview:
             from app.services.notification_service import NotificationPriority, NotificationService
 
             notification_service = NotificationService(self.db)
@@ -198,6 +209,63 @@ class LessonService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="subscription_id does not belong to student_id",
             )
+
+    async def _apply_overflow_mode(
+        self, *, mode: str, subscription_id: str | None, student_id: str
+    ) -> tuple[str, bool]:
+        """Resolve the target subscription for an explicit overflow mode.
+
+        subscription_required_spec §2.6.2 — called only when the FE sent
+        ``overflow_mode`` (S3 sheet / S4 toggle). The legacy silent path
+        (auto bonus in ``_find_or_create_subscription``) stays untouched.
+        Returns ``(subscription_id, is_preview)``.
+        """
+        from app.models.subscription import Subscription, SubscriptionStatus
+
+        if subscription_id:
+            sub = await self.db.get(Subscription, subscription_id)
+        else:
+            sub = (
+                await self.db.execute(
+                    select(Subscription)
+                    .where(
+                        Subscription.student_id == student_id,
+                        Subscription.status == SubscriptionStatus.active,
+                    )
+                    .order_by(Subscription.created_at.desc())
+                    .limit(1)
+                )
+            ).scalar_one_or_none()
+        if sub is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="overflow_mode requires an active subscription",
+            )
+
+        if mode == "makeup_credit":
+            # J2 lands the credit consumption path in this PR series.
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="makeup_credit mode is not supported yet",
+            )
+
+        remaining = (sub.total_lessons or 0) - (sub.used_lessons or 0)
+        if remaining > 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="overflow_mode requires an exhausted subscription",
+            )
+
+        if mode == "bonus":
+            sub.total_lessons = (sub.total_lessons or 0) + 1
+            sub.bonus_count = (sub.bonus_count or 0) + 1
+            if not sub.bonus_reason:
+                sub.bonus_reason = "teacher_goodwill"
+            await self.db.flush()
+            return sub.id, False
+
+        # renewal_pending: preview lesson only — no counter mutation.
+        return sub.id, True
 
     async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Find active subscription for the student or create a trial one.

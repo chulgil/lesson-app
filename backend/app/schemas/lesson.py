@@ -1,12 +1,14 @@
 """Lesson and lesson-class schemas."""
 
 import datetime as _dt
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 # ---------------------------------------------------------------------------
 # Lesson class (group / academy)
 # ---------------------------------------------------------------------------
+
 
 class LessonClassResponse(BaseModel):
     """Lesson class (e.g. academy, private group)."""
@@ -120,6 +122,7 @@ class MembershipResponse(BaseModel):
 # Lesson piece (embedded in lesson)
 # ---------------------------------------------------------------------------
 
+
 class LessonPieceCreate(BaseModel):
     """A musical piece covered in a lesson."""
 
@@ -141,6 +144,7 @@ class LessonPieceResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Lesson
 # ---------------------------------------------------------------------------
+
 
 class LessonResponse(BaseModel):
     """Full lesson representation."""
@@ -167,6 +171,7 @@ class LessonResponse(BaseModel):
     session_number: int | None = Field(default=None, ge=1)
     location_name: str | None = None
     location_address: str | None = None
+    is_preview: bool = False
     is_archived: bool = False
     archived_at: _dt.datetime | None = None
     created_at: _dt.datetime | None = None
@@ -185,6 +190,9 @@ class LessonCreate(BaseModel):
     location_name: str | None = None
     subscription_id: str | None = None
     session_number: int | None = Field(default=None, ge=1)
+    # subscription_required_spec §2.6.2 — explicit handling when the target
+    # subscription has no remaining sessions (S3 sheet / S4 toggle).
+    overflow_mode: Literal["bonus", "makeup_credit", "renewal_pending"] | None = None
 
 
 class LessonUpdate(BaseModel):
