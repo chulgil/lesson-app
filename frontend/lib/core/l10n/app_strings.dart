@@ -2971,6 +2971,37 @@ class AppStrings {
       '이 레슨은 1회 체험 수강권으로 자동 연결됩니다.\n'
       '수강권을 발급하면 이후 레슨 횟수와 이동시간이\n'
       '자동으로 관리됩니다.';
+
+  /// S5 보조 버튼 — 체험 자동발급 대신 정식 수강권부터 발급 (spec §2.6.1)
+  static const manualLessonIssueFirstButton = '정식 수강권 먼저 발급';
+
+  /// S6 — 체험권 재사용 차단(trial_already_used) 안내 다이얼로그 (spec §2.6.5)
+  static const trialAlreadyUsedTitle = '체험 수강권을 이미 사용했어요';
+  static const trialAlreadyUsedMessage =
+      '이 학생은 무료 체험 수강권을 이미 사용했습니다.\n'
+      '정식 수강권을 발급하면 이 레슨부터 자동으로\n'
+      '연결·관리됩니다.';
+  static const issueSubscriptionAction = '수강권 발급하기';
+
+  /// S3 — 잔여 0 처리 방식 시트 (spec §2.6.2)
+  static const overflowSheetTitle = '처리 방식 선택';
+  static String overflowSheetSubtitle(String student, String subscription) =>
+      '$student · $subscription (0회 남음)';
+  static const overflowOptionMakeup = '보강 레슨';
+  static String overflowOptionMakeupDesc(int credits) =>
+      '보강 크레딧 $credits개 보유 · 1개를 사용합니다';
+  static const overflowOptionBonus = '보너스 레슨 (무료 추가)';
+  static const overflowOptionBonusDesc = '수강권에 +1회 무료 추가됩니다';
+  static const overflowOptionRenewal = '수강권 갱신 제안 보내기';
+  static const overflowOptionRenewalDesc = '갱신 후 이 시간으로 예약됩니다';
+  static const overflowOptionRenewalIssue = '수강권 갱신 발급';
+  static const overflowOptionRenewalIssueDesc = '발급 화면에서 입금 확인 후 바로 발급합니다';
+  static const overflowRenewalPreviewSnack = '갱신 대기 레슨으로 등록했습니다. 발급 화면으로 이동합니다';
+
+  /// S4 — 보강 크레딧 소비 토글 (spec §2.6.1, makeup_credit_spec §5.4)
+  static const makeupToggleLabel = '보강으로 처리';
+  static String makeupToggleCredits(int credits) => '보강 크레딧 $credits개 보유';
+  static const lessonMakeupBadge = '보강 크레딧 사용';
   static String activeSubscriptionBanner(int remaining, int total) =>
       '수강권 $remaining/$total회 남음 · 이 레슨은 1회차로 차감됩니다.';
 

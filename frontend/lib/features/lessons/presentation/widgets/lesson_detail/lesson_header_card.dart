@@ -14,10 +14,14 @@ class LessonHeaderCard extends StatelessWidget {
   final Lesson lesson;
   final bool isTeacher;
 
+  /// Optional badge next to the status badge (e.g. 보강 배지 — §2.6.6).
+  final Widget? extraBadge;
+
   const LessonHeaderCard({
     super.key,
     required this.lesson,
     required this.isTeacher,
+    this.extraBadge,
   });
 
   @override
@@ -87,6 +91,7 @@ class LessonHeaderCard extends StatelessWidget {
                         const Spacer(),
                         // Status badge
                         _StatusBadge(status: lesson.displayStatus),
+                        if (extraBadge != null) extraBadge!,
                       ],
                     ),
                     const SizedBox(height: AppSpacing.space1),

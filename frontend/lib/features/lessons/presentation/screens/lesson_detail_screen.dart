@@ -164,7 +164,18 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
           },
           child: Column(
             children: [
-              LessonHeaderCard(lesson: lesson, isTeacher: widget.isTeacher),
+              LessonHeaderCard(
+                lesson: lesson,
+                isTeacher: widget.isTeacher,
+                // 보강 배지 — teacher-scoped credit lookup (§2.6.6)
+                extraBadge:
+                    widget.isTeacher
+                        ? MakeupLessonBadge(
+                          lessonId: lesson.id,
+                          studentId: lesson.studentId,
+                        )
+                        : null,
+              ),
               Expanded(child: _buildSingleScroll(lesson)),
             ],
           ),
@@ -256,50 +267,53 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           onSelected: (value) => _handleAppBarAction(value, lesson),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'edit',
-              child: Text(
-                lesson.subscriptionId != null
-                    ? AppStrings.editContent
-                    : AppStrings.editManual,
-              ),
-            ),
-            if (lesson.displayStatus == LessonStatus.scheduled)
-              const PopupMenuItem(
-                value: 'complete',
-                child: Text(AppStrings.attendanceConfirmAction),
-              ),
-            if (lesson.displayStatus == LessonStatus.scheduled)
-              PopupMenuItem(
-                value: 'cancel',
-                child: Text(
-                  lesson.subscriptionId != null
-                      ? AppStrings.cancelViaSubscription
-                      : AppStrings.cancel,
+          itemBuilder:
+              (context) => [
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(
+                    lesson.subscriptionId != null
+                        ? AppStrings.editContent
+                        : AppStrings.editManual,
+                  ),
                 ),
-              ),
-            // Show for subscription lessons OR manual lessons with an active subscription
-            if (lesson.subscriptionId != null ||
-                ref
-                        .watch(
-                          activeStudentSubscriptionsProvider(lesson.studentId),
-                        )
-                        .valueOrNull
-                        ?.isNotEmpty ==
-                    true)
-              PopupMenuItem(
-                value: 'schedule_change',
-                child: Text(AppStrings.announcementScheduleChange),
-              ),
-            PopupMenuItem(
-              value: 'archive',
-              child: Text(
-                AppStrings.archive,
-                style: TextStyle(color: AppColors.paperAccent),
-              ),
-            ),
-          ],
+                if (lesson.displayStatus == LessonStatus.scheduled)
+                  const PopupMenuItem(
+                    value: 'complete',
+                    child: Text(AppStrings.attendanceConfirmAction),
+                  ),
+                if (lesson.displayStatus == LessonStatus.scheduled)
+                  PopupMenuItem(
+                    value: 'cancel',
+                    child: Text(
+                      lesson.subscriptionId != null
+                          ? AppStrings.cancelViaSubscription
+                          : AppStrings.cancel,
+                    ),
+                  ),
+                // Show for subscription lessons OR manual lessons with an active subscription
+                if (lesson.subscriptionId != null ||
+                    ref
+                            .watch(
+                              activeStudentSubscriptionsProvider(
+                                lesson.studentId,
+                              ),
+                            )
+                            .valueOrNull
+                            ?.isNotEmpty ==
+                        true)
+                  PopupMenuItem(
+                    value: 'schedule_change',
+                    child: Text(AppStrings.announcementScheduleChange),
+                  ),
+                PopupMenuItem(
+                  value: 'archive',
+                  child: Text(
+                    AppStrings.archive,
+                    style: TextStyle(color: AppColors.paperAccent),
+                  ),
+                ),
+              ],
         ),
       ],
     );
@@ -453,12 +467,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => AddTipBottomSheet(
-        title: AppStrings.addKeyPointTitle,
-        instrument: lesson.instrument,
-        initialCategory: TipCategory.technique,
-        onSubmit: (content) => _addKeyPoint(lesson, content),
-      ),
+      builder:
+          (context) => AddTipBottomSheet(
+            title: AppStrings.addKeyPointTitle,
+            instrument: lesson.instrument,
+            initialCategory: TipCategory.technique,
+            onSubmit: (content) => _addKeyPoint(lesson, content),
+          ),
     );
   }
 
@@ -466,12 +481,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => AddTipBottomSheet(
-        title: AppStrings.addPracticeTipTitle,
-        instrument: lesson.instrument,
-        initialCategory: TipCategory.practice,
-        onSubmit: (content) => _setPracticeTip(lesson, content),
-      ),
+      builder:
+          (context) => AddTipBottomSheet(
+            title: AppStrings.addPracticeTipTitle,
+            instrument: lesson.instrument,
+            initialCategory: TipCategory.practice,
+            onSubmit: (content) => _setPracticeTip(lesson, content),
+          ),
     );
   }
 

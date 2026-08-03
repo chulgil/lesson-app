@@ -21,6 +21,7 @@ class ManualLessonSubscriptionSection extends ConsumerWidget {
     required this.studentInstrument,
     required this.selectedSubscription,
     required this.onPickRequested,
+    this.onIssueRequested,
   });
 
   final String studentId;
@@ -29,6 +30,10 @@ class ManualLessonSubscriptionSection extends ConsumerWidget {
 
   /// Open the picker sheet (used by the select prompt and the 변경 affordance).
   final VoidCallback onPickRequested;
+
+  /// S5 (spec §2.6.1) — open the issue-subscription flow instead of relying on
+  /// the auto trial. Shown only in the no-subscription banner when provided.
+  final VoidCallback? onIssueRequested;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,6 +55,7 @@ class ManualLessonSubscriptionSection extends ConsumerWidget {
           studentInstrument: studentInstrument,
           showChange: count >= 2,
           onChange: onPickRequested,
+          onIssueRequested: onIssueRequested,
         );
       },
     );
@@ -79,12 +85,14 @@ class _ResolvedBanner extends StatelessWidget {
     required this.studentInstrument,
     required this.showChange,
     required this.onChange,
+    this.onIssueRequested,
   });
 
   final Subscription? subscription;
   final String studentInstrument;
   final bool showChange;
   final VoidCallback onChange;
+  final VoidCallback? onIssueRequested;
 
   @override
   Widget build(BuildContext context) {
@@ -94,18 +102,16 @@ class _ResolvedBanner extends StatelessWidget {
       studentInstrument: studentInstrument,
     );
 
-    final message =
-        hasSub
-            ? AppStrings.activeSubscriptionBanner(
-              subscription!.remainingLessons ?? 0,
-              subscription!.totalLessonsForDisplay ?? 0,
-            )
-            : AppStrings.noActiveSubscriptionBanner;
+    final message = hasSub
+        ? AppStrings.activeSubscriptionBanner(
+            subscription!.remainingLessons ?? 0,
+            subscription!.totalLessonsForDisplay ?? 0,
+          )
+        : AppStrings.noActiveSubscriptionBanner;
     final icon = hasSub ? Icons.check_circle_outline : Icons.info_outline;
-    final bgColor =
-        hasSub
-            ? AppColors.paperOk.withValues(alpha: 0.08)
-            : AppColors.paperDark;
+    final bgColor = hasSub
+        ? AppColors.paperOk.withValues(alpha: 0.08)
+        : AppColors.paperDark;
     final iconColor = hasSub ? AppColors.paperOk : AppColors.ink;
 
     return Padding(
@@ -115,10 +121,9 @@ class _ResolvedBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           border: Border.all(
-            color:
-                hasSub
-                    ? AppColors.paperOk.withValues(alpha: 0.3)
-                    : AppColors.inkQuaternary,
+            color: hasSub
+                ? AppColors.paperOk.withValues(alpha: 0.3)
+                : AppColors.inkQuaternary,
           ),
         ),
         child: Column(
@@ -152,6 +157,27 @@ class _ResolvedBanner extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             _InstrumentChip(instrument: effectiveInstrument, inherited: hasSub),
+            if (!hasSub && onIssueRequested != null) ...[
+              const SizedBox(height: AppSpacing.space2),
+              Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton(
+                  onPressed: onIssueRequested,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space3,
+                    ),
+                  ),
+                  child: Text(
+                    AppStrings.manualLessonIssueFirstButton,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -214,10 +240,9 @@ class _InstrumentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pair = InstrumentColors.getColor(instrument);
-    final label =
-        inherited
-            ? AppStrings.manualLessonInstrumentInherited(instrument)
-            : AppStrings.manualLessonInstrumentFromStudent(instrument);
+    final label = inherited
+        ? AppStrings.manualLessonInstrumentInherited(instrument)
+        : AppStrings.manualLessonInstrumentFromStudent(instrument);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,

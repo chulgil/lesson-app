@@ -9,7 +9,11 @@ abstract class LessonRepository {
   Future<List<Lesson>> getUpcomingLessons({int limit = 10});
   Future<List<Lesson>> getRecentLessons({int limit = 10});
   Future<Lesson?> getLesson(String id);
-  Future<Lesson> createLesson(Lesson lesson);
+
+  /// [overflowMode] — subscription_required_spec §2.6.2 explicit handling when
+  /// the target subscription has no remaining sessions:
+  /// 'bonus' | 'makeup_credit' | 'renewal_pending'. null = legacy behavior.
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode});
   Future<Lesson> updateLesson(Lesson lesson);
   Future<void> deleteLesson(String id);
   Future<void> cancelLesson(String id);
