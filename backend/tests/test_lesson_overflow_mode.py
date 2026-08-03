@@ -139,12 +139,34 @@ async def test_overflow_mode_requires_subscription(teacher, client: AsyncClient,
     assert r.status_code == 422, r.text
 
 
+async def _grant_credit(
+    client: AsyncClient, auth_headers: dict, sid: str, *, source_subscription_id: str | None = None
+) -> str:
+    r = await client.post(
+        "/api/v1/teachers/me/makeup-credits",
+        headers=auth_headers,
+        json={"student_id": sid, "source_subscription_id": source_subscription_id},
+    )
+    assert r.status_code == 201, r.text
+    return r.json()["id"]
+
+
+async def _list_credits(client: AsyncClient, auth_headers: dict, sid: str) -> list[dict]:
+    r = await client.get(
+        "/api/v1/teachers/me/makeup-credits",
+        headers=auth_headers,
+        params={"student_id": sid},
+    )
+    assert r.status_code == 200, r.text
+    return r.json()["credits"]
+
+
 @pytest.mark.asyncio
-async def test_makeup_credit_mode_not_supported_in_j1(teacher, client: AsyncClient, auth_headers: dict):
-    """J2 에서 크레딧 소비가 붙기 전까지 makeup_credit 은 422 — J2 가 이 테스트를 대체한다."""
-    sid = await teacher.create_student("보강대기학생")
-    sub_id = await teacher.create_subscription(sid, total_lessons=1, amount=100000)
-    await _exhaust_single_lesson_subscription(teacher, client, auth_headers, sid, sub_id)
+async def test_makeup_credit_mode_consumes_credit_any_remaining(teacher, client: AsyncClient, auth_headers: dict):
+    """S4 — 잔여 무관 크레딧 소비: 정규 카운터 불변 + 회차 미부여 + 크레딧 used 연결 (§5.4)."""
+    sid = await teacher.create_student("보강소비학생")
+    sub_id = await teacher.create_subscription(sid, total_lessons=10, amount=500000)
+    credit_id = await _grant_credit(client, auth_headers, sid)
 
     r = await _create_lesson(
         client,
@@ -155,7 +177,83 @@ async def test_makeup_credit_mode_not_supported_in_j1(teacher, client: AsyncClie
         subscription_id=sub_id,
         overflow_mode="makeup_credit",
     )
+    assert r.status_code == 201, r.text
+    lesson = r.json()
+    assert lesson["subscription_id"] == sub_id
+    assert lesson["session_number"] is None
+    assert lesson["is_preview"] is False
+
+    sub = await _get_subscription(client, auth_headers, sub_id)
+    assert sub["total_lessons"] == 10
+    assert sub["used_lessons"] == 0
+    assert sub["bonus_count"] == 0
+
+    credits = await _list_credits(client, auth_headers, sid)
+    used = [c for c in credits if c["id"] == credit_id][0]
+    assert used["used_lesson_id"] == lesson["id"]
+
+
+@pytest.mark.asyncio
+async def test_makeup_credit_completion_skips_regular_deduction(teacher, client: AsyncClient, auth_headers: dict):
+    """§5.3 — 크레딧 레슨 완료는 정규 used_lessons 를 차감하지 않는다."""
+    sid = await teacher.create_student("보강완료학생")
+    sub_id = await teacher.create_subscription(sid, total_lessons=10, amount=500000)
+    await _grant_credit(client, auth_headers, sid)
+
+    r = await _create_lesson(
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-16",
+        start_time="12:00",
+        subscription_id=sub_id,
+        overflow_mode="makeup_credit",
+    )
+    assert r.status_code == 201, r.text
+    await teacher.complete_lesson(r.json()["id"])
+
+    sub = await _get_subscription(client, auth_headers, sub_id)
+    assert sub["used_lessons"] == 0, "credit-funded lesson must not deduct the regular counter"
+
+
+@pytest.mark.asyncio
+async def test_makeup_credit_mode_without_credit_rejected(teacher, client: AsyncClient, auth_headers: dict):
+    sid = await teacher.create_student("크레딧없음학생")
+    sub_id = await teacher.create_subscription(sid, total_lessons=10, amount=500000)
+
+    r = await _create_lesson(
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-16",
+        start_time="14:00",
+        subscription_id=sub_id,
+        overflow_mode="makeup_credit",
+    )
     assert r.status_code == 422, r.text
+
+
+@pytest.mark.asyncio
+async def test_makeup_credit_attaches_to_source_subscription(teacher, client: AsyncClient, auth_headers: dict):
+    """§5.4 — subscription_id 미지정 시 크레딧의 source 수강권에 우선 귀속."""
+    sid = await teacher.create_student("보강귀속학생")
+    old_sub = await teacher.create_subscription(sid, total_lessons=1, amount=100000)
+    await _exhaust_single_lesson_subscription(teacher, client, auth_headers, sid, old_sub)
+    new_sub = await teacher.create_subscription(sid, total_lessons=10, amount=500000)
+    await _grant_credit(client, auth_headers, sid, source_subscription_id=old_sub)
+
+    r = await _create_lesson(
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-16",
+        start_time="16:00",
+        overflow_mode="makeup_credit",
+    )
+    assert r.status_code == 201, r.text
+    assert r.json()["subscription_id"] == old_sub, (
+        f"expected credit source {old_sub}, got {r.json()['subscription_id']} (latest active={new_sub})"
+    )
 
 
 @pytest.mark.asyncio

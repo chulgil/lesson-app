@@ -140,11 +140,13 @@ class LessonService:
             )
 
         is_preview = False
+        makeup_credit_id: str | None = None
         if data.overflow_mode is not None:
-            subscription_id, is_preview = await self._apply_overflow_mode(
+            subscription_id, is_preview, makeup_credit_id = await self._apply_overflow_mode(
                 mode=data.overflow_mode,
                 subscription_id=subscription_id,
                 student_id=data.student_id,
+                teacher_id=tid,
             )
         elif not subscription_id:
             # Auto-find or create subscription
@@ -155,8 +157,10 @@ class LessonService:
             )
 
         session_number = data.session_number
-        # Preview lessons get their session number on renewal confirmation, not here.
-        if subscription_id and not is_preview:
+        # Preview lessons get their session number on renewal confirmation; credit
+        # lessons never get one — makeup sessions stay outside the regular count
+        # (makeup_credit_spec §2 "보강 회차는 정규 수강권에서 분리").
+        if subscription_id and not is_preview and makeup_credit_id is None:
             if session_number is None:
                 session_number = await self._next_subscription_session_number(subscription_id)
 
@@ -177,6 +181,20 @@ class LessonService:
         self.db.add(lesson)
         await self.db.flush()
         await self.db.refresh(lesson)
+
+        if makeup_credit_id is not None:
+            # §5.3 side-effects: stamp used_at / used_lesson_id. The completion
+            # deduction path skips credit-funded lessons (see _deduct_if_completed).
+            from app.services.makeup_credit_service import MakeupCreditService
+
+            try:
+                await MakeupCreditService(self.db).use_credit(credit_id=makeup_credit_id, lesson_id=lesson.id)
+            except ValueError as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=str(exc),
+                ) from exc
+
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstLesson")
 
         # Notify student about new lesson. Preview lessons stay silent — the
@@ -211,21 +229,21 @@ class LessonService:
             )
 
     async def _apply_overflow_mode(
-        self, *, mode: str, subscription_id: str | None, student_id: str
-    ) -> tuple[str, bool]:
+        self, *, mode: str, subscription_id: str | None, student_id: str, teacher_id: str
+    ) -> tuple[str, bool, str | None]:
         """Resolve the target subscription for an explicit overflow mode.
 
         subscription_required_spec §2.6.2 — called only when the FE sent
         ``overflow_mode`` (S3 sheet / S4 toggle). The legacy silent path
         (auto bonus in ``_find_or_create_subscription``) stays untouched.
-        Returns ``(subscription_id, is_preview)``.
+        Returns ``(subscription_id, is_preview, makeup_credit_id)`` —
+        ``makeup_credit_id`` is consumed by the caller after the lesson row
+        exists (``use_credit`` needs the lesson id).
         """
         from app.models.subscription import Subscription, SubscriptionStatus
 
-        if subscription_id:
-            sub = await self.db.get(Subscription, subscription_id)
-        else:
-            sub = (
+        async def _latest_active_subscription() -> Any:
+            return (
                 await self.db.execute(
                     select(Subscription)
                     .where(
@@ -236,17 +254,42 @@ class LessonService:
                     .limit(1)
                 )
             ).scalar_one_or_none()
+
+        if mode == "makeup_credit":
+            # S4 — allowed regardless of remaining sessions (§5.4). FIFO credit,
+            # lesson attaches to the credit's source subscription first.
+            from app.services.makeup_credit_service import MakeupCreditService
+
+            credits = await MakeupCreditService(self.db).list_active_credits(
+                student_id=student_id,
+                teacher_id=teacher_id,
+                limit=1,
+            )
+            if not credits:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="No active makeup credit available",
+                )
+            credit = credits[0]
+
+            sub_id = subscription_id or credit.source_subscription_id
+            if sub_id is None:
+                latest = await _latest_active_subscription()
+                sub_id = latest.id if latest else None
+            if sub_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="overflow_mode requires a subscription to attach the lesson to",
+                )
+            return sub_id, False, credit.id
+
+        sub = (
+            await self.db.get(Subscription, subscription_id) if subscription_id else await _latest_active_subscription()
+        )
         if sub is None:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="overflow_mode requires an active subscription",
-            )
-
-        if mode == "makeup_credit":
-            # J2 lands the credit consumption path in this PR series.
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail="makeup_credit mode is not supported yet",
             )
 
         remaining = (sub.total_lessons or 0) - (sub.used_lessons or 0)
@@ -262,10 +305,10 @@ class LessonService:
             if not sub.bonus_reason:
                 sub.bonus_reason = "teacher_goodwill"
             await self.db.flush()
-            return sub.id, False
+            return sub.id, False, None
 
         # renewal_pending: preview lesson only — no counter mutation.
-        return sub.id, True
+        return sub.id, True, None
 
     async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Find active subscription for the student or create a trial one.
@@ -435,6 +478,16 @@ class LessonService:
         ``completed`` deducts; 휴강/취소 statuses do not call this.
         """
         if not lesson.subscription_id:
+            return
+        # makeup_credit_spec §5.3 — a credit-funded lesson already consumed a
+        # MakeupCredit; completing it must not touch the regular counter. The
+        # credit link (used_lesson_id) is the marker (§2.6.6 — no lesson-type enum).
+        from app.models.makeup_credit import MakeupCredit
+
+        credit_funded = await self.db.scalar(
+            select(MakeupCredit.id).where(MakeupCredit.used_lesson_id == lesson.id).limit(1)
+        )
+        if credit_funded:
             return
         from app.services.subscription_service import SubscriptionService
 
