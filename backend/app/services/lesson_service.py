@@ -511,6 +511,12 @@ class LessonService:
         """
         if not lesson.subscription_id:
             return
+        # §2.6.2 — a preview lesson is not a real session until renewal
+        # confirmation promotes it; completing it early must never deduct.
+        # (Without this, a bonus expansion reviving the exhausted subscription
+        # opens a mis-deduction path.)
+        if getattr(lesson, "is_preview", False):
+            return
         # makeup_credit_spec §5.3 — a credit-funded lesson already consumed a
         # MakeupCredit; completing it must not touch the regular counter. The
         # credit link (used_lesson_id) is the marker (§2.6.6 — no lesson-type enum).
