@@ -18,6 +18,7 @@ import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 import '../widgets/lesson_form/lesson_location_section.dart';
 import '../widgets/lesson_form/lesson_overflow_mode_sheet.dart';
+import '../widgets/lesson_form/makeup_credit_toggle.dart';
 import '../widgets/lesson_form/manual_lesson_subscription_section.dart';
 
 /// Screen for adding a new lesson
@@ -55,6 +56,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   int _lessonDuration = 60;
   bool _isRecurring = false;
   bool _isSaving = false;
+
+  /// S4 (spec §2.6.1, D3) — spend a makeup credit for this lesson. Default OFF.
+  bool _useMakeupCredit = false;
   final Set<int> _recurringDays = {};
   bool _enableReminder = true;
   int _reminderMinutes = 30;
@@ -166,6 +170,15 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   onPickRequested:
                       () => _openSubscriptionPicker(_selectedStudent!.id),
                   onIssueRequested: _openIssueSubscription,
+                ),
+
+              // S4 — makeup credit spend toggle (hidden when no credits)
+              if (_selectedStudent != null)
+                MakeupCreditToggle(
+                  studentId: _selectedStudent!.id,
+                  value: _useMakeupCredit,
+                  onChanged:
+                      (value) => setState(() => _useMakeupCredit = value),
                 ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -330,6 +343,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     setState(() {
       _selectedStudent = _studentToInfo(student);
       _selectedSubscription = null;
+      _useMakeupCredit = false;
     });
     _autoFillFromStudent(student);
     _resolveSubscriptionForStudent(student.id);
@@ -598,7 +612,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     // defined by the spec; regular students renew instead).
     String? overflowMode;
     var routeToIssueAfterSave = false;
-    if (shouldPromptOverflowMode(
+    if (_useMakeupCredit && !_isRecurring) {
+      // S4 toggle ON — credit-funded lesson regardless of remaining sessions
+      // (§5.4). The S3 sheet is skipped: the accounting choice is already made.
+      overflowMode = LessonOverflowChoice.makeupCredit.wireValue;
+    } else if (shouldPromptOverflowMode(
       subscription: _selectedSubscription,
       isRecurring: _isRecurring,
     )) {
