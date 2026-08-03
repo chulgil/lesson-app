@@ -58,82 +58,93 @@ class SyncAwareLessonRepository implements LessonRepository {
   // --------------------------------------------------------------------------
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) => _queue.executeMutation(
-    remoteCall: () => _remote.createLesson(lesson),
-    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-      idempotencyKey: idempotencyKey,
-      domain: 'lesson',
-      httpMethod: 'POST',
-      path: '/lessons',
-      payload: lesson.toJson(),
-      clientUpdatedAt: DateTime.now().toUtc(),
-    ),
-    optimisticResult: () => lesson.copyWith(id: 'tmp_${const Uuid().v4()}'),
-  );
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) =>
+      _queue.executeMutation(
+        remoteCall:
+            () => _remote.createLesson(lesson, overflowMode: overflowMode),
+        queueCall:
+            (syncService, idempotencyKey) => syncService.queueMutation(
+              idempotencyKey: idempotencyKey,
+              domain: 'lesson',
+              httpMethod: 'POST',
+              path: '/lessons',
+              payload: {
+                ...lesson.toJson(),
+                if (overflowMode != null) 'overflow_mode': overflowMode,
+              },
+              clientUpdatedAt: DateTime.now().toUtc(),
+            ),
+        optimisticResult: () => lesson.copyWith(id: 'tmp_${const Uuid().v4()}'),
+      );
 
   @override
   Future<Lesson> updateLesson(Lesson lesson) => _queue.executeMutation(
     remoteCall: () => _remote.updateLesson(lesson),
-    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-      idempotencyKey: idempotencyKey,
-      domain: 'lesson',
-      httpMethod: 'PUT',
-      path: '/lessons/${lesson.id}',
-      payload: lesson.toJson(),
-      clientUpdatedAt: DateTime.now().toUtc(),
-    ),
+    queueCall:
+        (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'lesson',
+          httpMethod: 'PUT',
+          path: '/lessons/${lesson.id}',
+          payload: lesson.toJson(),
+          clientUpdatedAt: DateTime.now().toUtc(),
+        ),
     optimisticResult: () => lesson,
   );
 
   @override
   Future<void> deleteLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.deleteLesson(id),
-    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-      idempotencyKey: idempotencyKey,
-      domain: 'lesson',
-      httpMethod: 'DELETE',
-      path: '/lessons/$id',
-      payload: {},
-      clientUpdatedAt: DateTime.now().toUtc(),
-    ),
+    queueCall:
+        (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'lesson',
+          httpMethod: 'DELETE',
+          path: '/lessons/$id',
+          payload: {},
+          clientUpdatedAt: DateTime.now().toUtc(),
+        ),
   );
 
   @override
   Future<void> cancelLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.cancelLesson(id),
-    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-      idempotencyKey: idempotencyKey,
-      domain: 'lesson',
-      httpMethod: 'PATCH',
-      path: '/lessons/$id/status',
-      payload: {'status': 'cancelled'},
-      clientUpdatedAt: DateTime.now().toUtc(),
-    ),
+    queueCall:
+        (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'lesson',
+          httpMethod: 'PATCH',
+          path: '/lessons/$id/status',
+          payload: {'status': 'cancelled'},
+          clientUpdatedAt: DateTime.now().toUtc(),
+        ),
   );
 
   @override
   Future<void> archiveLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.archiveLesson(id),
-    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-      idempotencyKey: idempotencyKey,
-      domain: 'lesson',
-      httpMethod: 'PATCH',
-      path: '/lessons/$id/archive',
-      payload: {},
-      clientUpdatedAt: DateTime.now().toUtc(),
-    ),
+    queueCall:
+        (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'lesson',
+          httpMethod: 'PATCH',
+          path: '/lessons/$id/archive',
+          payload: {},
+          clientUpdatedAt: DateTime.now().toUtc(),
+        ),
   );
 
   @override
   Future<void> unarchiveLesson(String id) => _queue.executeVoidMutation(
     remoteCall: () => _remote.unarchiveLesson(id),
-    queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-      idempotencyKey: idempotencyKey,
-      domain: 'lesson',
-      httpMethod: 'PATCH',
-      path: '/lessons/$id/unarchive',
-      payload: {},
-      clientUpdatedAt: DateTime.now().toUtc(),
-    ),
+    queueCall:
+        (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'lesson',
+          httpMethod: 'PATCH',
+          path: '/lessons/$id/unarchive',
+          payload: {},
+          clientUpdatedAt: DateTime.now().toUtc(),
+        ),
   );
 }

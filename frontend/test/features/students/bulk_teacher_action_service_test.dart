@@ -60,7 +60,7 @@ class _FakeLessonRepository implements LessonRepository {
   Future<Lesson?> getLesson(String id) async => _lessons[id];
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
     _lessons[lesson.id] = lesson;
     return lesson;
   }

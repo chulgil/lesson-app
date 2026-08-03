@@ -83,7 +83,7 @@ class _FakeLessonRepository implements LessonRepository {
   }
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
     _lessons.add(lesson);
     return lesson;
   }

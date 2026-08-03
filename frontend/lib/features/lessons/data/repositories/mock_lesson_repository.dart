@@ -14,7 +14,11 @@ class MockLessonRepository implements LessonRepository {
 
   DateTime _nextWeekday(DateTime from, int targetWeekday) {
     final daysAhead = (targetWeekday - from.weekday + 7) % 7;
-    return DateTime(from.year, from.month, from.day + (daysAhead == 0 ? 7 : daysAhead));
+    return DateTime(
+      from.year,
+      from.month,
+      from.day + (daysAhead == 0 ? 7 : daysAhead),
+    );
   }
 
   void _initMockData() {
@@ -44,17 +48,14 @@ class MockLessonRepository implements LessonRepository {
             opus: 'RV 356',
             movement: '1악장',
           ),
-          LessonPiece(
-            id: 'piece_002',
-            name: '가보트',
-            composer: 'Gossec',
-          ),
+          LessonPiece(id: 'piece_002', name: '가보트', composer: 'Gossec'),
         ],
         location: const LessonLocationInfo(
           name: '하모니 음악학원',
           address: '서울시 강남구 테헤란로 123',
         ),
-        feedback: '활 잡는 자세가 많이 좋아졌어요. 비발디 1악장 카덴차 부분 음정이 불안정하니 천천히 반복 연습해오세요. 가보트는 리듬감이 좋아졌습니다.',
+        feedback:
+            '활 잡는 자세가 많이 좋아졌어요. 비발디 1악장 카덴차 부분 음정이 불안정하니 천천히 반복 연습해오세요. 가보트는 리듬감이 좋아졌습니다.',
         keyPoints: ['카덴차 음정 정확도', '보잉 방향 전환', '가보트 리듬 안정'],
         practiceTips: '메트로놈 72 템포에서 카덴차 구간 10회 반복 후, 템포를 4씩 올려보세요.',
         assignments: ['비발디 1악장 전체 암보', '가보트 p.12~14 반복'],
@@ -110,11 +111,7 @@ class MockLessonRepository implements LessonRepository {
             composer: 'Mozart',
             notes: '스즈키 교본 1권',
           ),
-          LessonPiece(
-            id: 'piece_005',
-            name: '긴긴밤',
-            notes: '한국 동요, 활 연습용',
-          ),
+          LessonPiece(id: 'piece_005', name: '긴긴밤', notes: '한국 동요, 활 연습용'),
         ],
         location: const LessonLocationInfo(
           name: '하모니 음악학원',
@@ -265,9 +262,11 @@ class MockLessonRepository implements LessonRepository {
           name: '하모니 음악학원',
           address: '서울시 강남구 테헤란로 123',
         ),
-        feedback: '베토벤 소나타 1악장 전개부 진입이 매끄러워졌어요. 왼손 포지션 이동 시 음이 끊기지 않도록 주의하세요. 백조는 레가토 표현이 아름다웠습니다.',
+        feedback:
+            '베토벤 소나타 1악장 전개부 진입이 매끄러워졌어요. 왼손 포지션 이동 시 음이 끊기지 않도록 주의하세요. 백조는 레가토 표현이 아름다웠습니다.',
         keyPoints: ['포지션 이동 매끄럽게', '전개부 다이내믹 대비', '백조 레가토 보잉'],
-        practiceTips: '포지션 이동 구간(마디 34~42)을 느린 템포로 매일 5회 연습. 백조는 보잉 한 활에 4박 유지 연습.',
+        practiceTips:
+            '포지션 이동 구간(마디 34~42)을 느린 템포로 매일 5회 연습. 백조는 보잉 한 활에 4박 유지 연습.',
         assignments: ['베토벤 소나타 1악장 전체 통주', '백조 암보'],
         createdAt: today.subtract(const Duration(days: 10)),
       ),
@@ -296,7 +295,8 @@ class MockLessonRepository implements LessonRepository {
           name: '하모니 음악학원',
           address: '서울시 강남구 테헤란로 123',
         ),
-        feedback: '체험 레슨 진행했습니다. 호흡 기초가 잘 되어 있고 음감이 좋습니다. 저음역 톤이 안정적이며 정규 수업 진행 시 빠른 성장이 기대됩니다.',
+        feedback:
+            '체험 레슨 진행했습니다. 호흡 기초가 잘 되어 있고 음감이 좋습니다. 저음역 톤이 안정적이며 정규 수업 진행 시 빠른 성장이 기대됩니다.',
         createdAt: today.subtract(const Duration(days: 3)),
       ),
 
@@ -332,9 +332,11 @@ class MockLessonRepository implements LessonRepository {
           name: '학생 자택 방문',
           address: '서울시 서초구 반포동 45-7',
         ),
-        feedback: '비창 1악장 서주부 Grave 표현이 깊어졌어요. 알레그로 진입 시 템포가 불안정하니 메트로놈과 함께 연습하세요. 녹턴은 루바토 감각이 좋습니다.',
+        feedback:
+            '비창 1악장 서주부 Grave 표현이 깊어졌어요. 알레그로 진입 시 템포가 불안정하니 메트로놈과 함께 연습하세요. 녹턴은 루바토 감각이 좋습니다.',
         keyPoints: ['서주부-알레그로 전환 안정', '왼손 옥타브 정확도', '녹턴 페달링'],
-        practiceTips: '비창 마디 11~15 구간 메트로놈 108에서 시작, 4씩 올려 132까지. 녹턴 페달은 하프 페달 연습.',
+        practiceTips:
+            '비창 마디 11~15 구간 메트로놈 108에서 시작, 4씩 올려 132까지. 녹턴 페달은 하프 페달 연습.',
         createdAt: today.subtract(const Duration(days: 14)),
       ),
 
@@ -391,7 +393,8 @@ class MockLessonRepository implements LessonRepository {
           name: '하모니 음악학원',
           address: '서울시 강남구 테헤란로 123',
         ),
-        feedback: '비발디 1악장 진도를 나갔습니다. 제시부 보잉 패턴은 안정적이나 전개부 진입 시 음정이 흔들려요. 포지션 이동 연습이 필요합니다.',
+        feedback:
+            '비발디 1악장 진도를 나갔습니다. 제시부 보잉 패턴은 안정적이나 전개부 진입 시 음정이 흔들려요. 포지션 이동 연습이 필요합니다.',
         keyPoints: ['제시부 보잉 패턴 유지', '전개부 포지션 이동'],
         practiceTips: '3포지션 이동 구간 슬로우 연습 매일 10분.',
         createdAt: today.subtract(const Duration(days: 21)),
@@ -421,7 +424,8 @@ class MockLessonRepository implements LessonRepository {
           name: '하모니 음악학원',
           address: '서울시 강남구 테헤란로 123',
         ),
-        feedback: '유머레스크 전반적으로 잘 진행했어요. 중간부 스타카토 구간에서 활의 탄력을 더 살려주세요. 피아노 레슨과 병행하니 음악적 표현이 풍부해지고 있어요.',
+        feedback:
+            '유머레스크 전반적으로 잘 진행했어요. 중간부 스타카토 구간에서 활의 탄력을 더 살려주세요. 피아노 레슨과 병행하니 음악적 표현이 풍부해지고 있어요.',
         keyPoints: ['스타카토 활 탄력', '중간부 다이내믹 변화'],
         practiceTips: '스타카토 구간 활 상단 1/3 지점에서 연습. 거울 보며 활 위치 확인.',
         createdAt: today.subtract(const Duration(days: 14)),
@@ -715,11 +719,7 @@ class MockLessonRepository implements LessonRepository {
         duration: 45,
         status: LessonStatus.completed,
         pieces: const [
-          LessonPiece(
-            id: 'piece_026',
-            name: '화성학 기초',
-            notes: '3화음 전위, 연결법',
-          ),
+          LessonPiece(id: 'piece_026', name: '화성학 기초', notes: '3화음 전위, 연결법'),
         ],
         location: const LessonLocationInfo(
           name: '뮤직아트 스튜디오',
@@ -743,11 +743,7 @@ class MockLessonRepository implements LessonRepository {
         duration: 45,
         status: LessonStatus.scheduled,
         pieces: const [
-          LessonPiece(
-            id: 'piece_027',
-            name: '음악 이론',
-            notes: '조성 분석 - 소나타 형식',
-          ),
+          LessonPiece(id: 'piece_027', name: '음악 이론', notes: '조성 분석 - 소나타 형식'),
         ],
         location: const LessonLocationInfo(
           name: '뮤직아트 스튜디오',
@@ -767,7 +763,10 @@ class MockLessonRepository implements LessonRepository {
           teacherId: 'teacher_1',
           teacherName: '김지수',
           instrument: '바이올린',
-          date: _nextWeekday(today, DateTime.monday).add(Duration(days: 7 * week)),
+          date: _nextWeekday(
+            today,
+            DateTime.monday,
+          ).add(Duration(days: 7 * week)),
           startTime: '10:00',
           duration: 60,
           status: LessonStatus.scheduled,
@@ -781,7 +780,10 @@ class MockLessonRepository implements LessonRepository {
           teacherId: 'teacher_1',
           teacherName: '김지수',
           instrument: '피아노',
-          date: _nextWeekday(today, DateTime.wednesday).add(Duration(days: 7 * week)),
+          date: _nextWeekday(
+            today,
+            DateTime.wednesday,
+          ).add(Duration(days: 7 * week)),
           startTime: '14:00',
           duration: 60,
           status: LessonStatus.scheduled,
@@ -809,21 +811,23 @@ class MockLessonRepository implements LessonRepository {
   Future<List<Lesson>> getLessonsByDate(DateTime date) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _lessons.where((l) {
-      return l.date.year == date.year &&
-          l.date.month == date.month &&
-          l.date.day == date.day;
-    }).toList()
+        return l.date.year == date.year &&
+            l.date.month == date.month &&
+            l.date.day == date.day;
+      }).toList()
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
   }
 
   @override
   Future<List<Lesson>> getLessonsByDateRange(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 200));
     return _lessons.where((l) {
-      return l.date.isAfter(start.subtract(const Duration(days: 1))) &&
-          l.date.isBefore(end.add(const Duration(days: 1)));
-    }).toList()
+        return l.date.isAfter(start.subtract(const Duration(days: 1))) &&
+            l.date.isBefore(end.add(const Duration(days: 1)));
+      }).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
   }
 
@@ -832,9 +836,11 @@ class MockLessonRepository implements LessonRepository {
     await Future.delayed(const Duration(milliseconds: 200));
     final now = DateTime.now();
     return _lessons
-        .where((l) =>
-            l.status == LessonStatus.scheduled &&
-            l.date.isAfter(now.subtract(const Duration(hours: 2))))
+        .where(
+          (l) =>
+              l.status == LessonStatus.scheduled &&
+              l.date.isAfter(now.subtract(const Duration(hours: 2))),
+        )
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date))
       ..take(limit);
@@ -845,9 +851,9 @@ class MockLessonRepository implements LessonRepository {
     await Future.delayed(const Duration(milliseconds: 200));
     final now = DateTime.now();
     return _lessons
-        .where((l) =>
-            l.status == LessonStatus.completed &&
-            l.date.isBefore(now))
+        .where(
+          (l) => l.status == LessonStatus.completed && l.date.isBefore(now),
+        )
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date))
       ..take(limit);
@@ -864,7 +870,8 @@ class MockLessonRepository implements LessonRepository {
   }
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
+    // overflowMode is a BE accounting concern (§2.6.2); mock just creates.
     await Future.delayed(const Duration(milliseconds: 300));
     final newLesson = lesson.copyWith(
       id: _uuid.v4(),

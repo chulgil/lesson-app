@@ -17,6 +17,7 @@ import '../../lessons_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 import '../widgets/lesson_form/lesson_location_section.dart';
+import '../widgets/lesson_form/lesson_overflow_mode_sheet.dart';
 import '../widgets/lesson_form/manual_lesson_subscription_section.dart';
 
 /// Screen for adding a new lesson
@@ -591,6 +592,24 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       }
     }
 
+    // S3 (spec §2.6.1~2.6.2) — explicit accounting when the target subscription
+    // is exhausted: the silent bonus expansion is promoted to a choice sheet.
+    // Recurring keeps the legacy path (multi-lesson overflow semantics are not
+    // defined by the spec; regular students renew instead).
+    String? overflowMode;
+    var routeToIssueAfterSave = false;
+    if (shouldPromptOverflowMode(
+      subscription: _selectedSubscription,
+      isRecurring: _isRecurring,
+    )) {
+      final choice = await _resolveOverflowChoice(_selectedSubscription!);
+      if (choice == null) return; // sheet dismissed — abort save
+      overflowMode = choice.wireValue;
+      routeToIssueAfterSave =
+          choice == LessonOverflowChoice.renewalProposal ||
+          choice == LessonOverflowChoice.renewalIssue;
+    }
+
     // Create lesson pieces from input
     final pieces = <LessonPiece>[];
     if (_pieceController.text.isNotEmpty) {
@@ -698,10 +717,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         // assigned id is used for subscription usage (not the local empty id).
         final savedLesson = await ref
             .read(lessonsNotifierProvider.notifier)
-            .addLesson(lesson);
+            .addLesson(lesson, overflowMode: overflowMode);
 
-        // If past lesson (record mode), auto-deduct subscription
-        if (isPastLesson) {
+        // If past lesson (record mode), auto-deduct subscription.
+        // makeup_credit lessons are credit-funded — the BE consumed the credit
+        // and the regular counter must stay untouched (makeup_credit_spec §5.3).
+        if (isPastLesson && overflowMode != 'makeup_credit') {
           await _recordSubscriptionUsage(savedLesson);
         }
 
@@ -709,6 +730,23 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         ref.invalidate(lessonsProvider);
 
         if (!mounted) return;
+
+        if (routeToIssueAfterSave) {
+          // §2.6.2 renewal — the lesson is a preview until the renewal is
+          // issued (BE promotes it on deposit confirmation). Continue straight
+          // into the issue flow with the student prefilled.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.overflowRenewalPreviewSnack),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: AppColors.paperOk,
+            ),
+          );
+          context.pushReplacement(
+            '${AppRoutes.issueSubscription}?studentId=${_selectedStudent!.id}',
+          );
+          return;
+        }
 
         final message =
             isPastLesson
@@ -742,6 +780,43 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         ),
       );
     }
+  }
+
+  /// S3 (spec §2.6.2) — resolve the overflow choice for an exhausted
+  /// subscription via the bottom sheet. Returns null when dismissed.
+  Future<LessonOverflowChoice?> _resolveOverflowChoice(
+    Subscription subscription,
+  ) async {
+    final studentId = _selectedStudent!.id;
+
+    // Available makeup credits gate the first sheet option (S4 source).
+    var availableCredits = 0;
+    try {
+      final credits = await ref.read(
+        teacherMakeupCreditsProvider(studentId).future,
+      );
+      final now = DateTime.now();
+      availableCredits = credits.where((c) => c.isAvailable(now)).length;
+    } catch (_) {
+      // Credit lookup failure just hides the option — save is not blocked.
+    }
+
+    // §2.7 — unconnected (manual) students can't receive proposals; the sheet
+    // swaps the renewal option for direct issuance. Unknown → assume connected.
+    final students = ref.read(studentsProvider).valueOrNull ?? [];
+    final match = students.where((s) => s.id == studentId);
+    final isConnected = match.isEmpty || match.first.isAppConnected;
+
+    if (!mounted) return null;
+    return showLessonOverflowModeSheet(
+      context: context,
+      studentName: _selectedStudent!.name,
+      subscriptionName: subscription.typeLabel,
+      availableCredits: availableCredits,
+      isConnectedStudent: isConnected,
+      // Record mode saves as completed — it can't wait for a renewal.
+      allowRenewal: !_isRecordMode,
+    );
   }
 
   /// S5/S6 — route to the issue-subscription flow with the student prefilled.

@@ -39,7 +39,7 @@ class _CountingLessonRepo implements LessonRepository {
   }
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
     final saved = lesson.copyWith(id: 'srv_${_lessons.length}');
     _lessons.add(saved);
     return saved;
