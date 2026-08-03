@@ -1,6 +1,6 @@
 # AC Tree — lesson-add-intent
 
-> 최종 갱신: 2026-08-03 16:00 (PR-A 머지 #1227 / PR-B OPEN #1228 — AC-2 passed)
+> 최종 갱신: 2026-08-03 20:10 — PR-A~D+후속 2건 전부 머지(#1227/#1228/#1229/#1230/#1231/#1232). AC-6.3 만 partial(mock 데이터 상태 한계)
 > Spec: `docs/specs/subscription/subscription_required_spec.md` §2.6~2.7 (origin/main `5455a3b4`)
 > DAG: `decomposition-2026-08-03-lesson-add-intent.md`
 
@@ -52,30 +52,30 @@
     - **담당 job**: J7
     - **관련 테스트**: frontend/test/ — 토글 3분기 + 배지
 
-  ### AC-3 [FE 플로우] 발급·등록 연속 (pending)
+  ### AC-3 [FE 플로우] 발급·등록 연속 (passed)
   - **만족 조건**: 자식 AC passed
   - **담당 job**: —
 
-    #### AC-3.1 [returnTo] 발급 왕복 (pending)
+    #### AC-3.1 [returnTo] 발급 왕복 (passed)
     - **만족 조건**: 즉시 발급 → add_lesson 복귀 + 새 수강권 자동 귀속 / 제안 경로 복귀 없음 + 안내 / 레슨 선생성 0
     - **담당 job**: J8
     - **관련 테스트**: frontend/test/ — spy-mock 라우팅 왕복
 
-    #### AC-3.2 [새 학생] 인라인 등록 (pending)
+    #### AC-3.2 [새 학생] 인라인 등록 (passed)
     - **만족 조건**: 시트 최상단 항목 / 등록 복귀 자동 선택 / 발급 다이얼로그 스킵
     - **담당 job**: J9
     - **관련 테스트**: frontend/test/ — spy-mock 등록 왕복
 
-  ### AC-4 [배선] 다음 회차 예약 CTA (pending)
+  ### AC-4 [배선] 다음 회차 예약 CTA (passed)
   - **만족 조건**: 미정 회차 시 CTA(死문자열 재사용) / 정규권 비노출 / subscriptionId 프리필 귀속 / 학생측 직접예약 라우팅
   - **담당 job**: J10
   - **관련 테스트**: frontend/test/ — CTA 3분기 + 프리필
 
-  ### AC-5 [미가입 특칙] 수기 학생 경계 (in_progress)
+  ### AC-5 [미가입 특칙] 수기 학생 경계 (passed)
   - **만족 조건**: 자식 AC passed
   - **담당 job**: —
 
-    #### AC-5.1 [즉시발급만] 제안 UI 숨김 (pending)
+    #### AC-5.1 [즉시발급만] 제안 UI 숨김 (passed)
     - **만족 조건**: 미가입 학생 발급 화면에서 제안 버튼 비노출, 즉시 발급만
     - **담당 job**: J8
     - **관련 테스트**: frontend/test/ — 미가입 분기 위젯
@@ -85,26 +85,28 @@
     - **담당 job**: J4
     - **관련 테스트**: backend/tests/ — 카드 생성 분기
 
-    #### AC-5.3 [단독 일정 변경] 편집 잠금 해제 (pending)
+    #### AC-5.3 [단독 일정 변경] 편집 잠금 해제 (passed)
     - **만족 조건**: 미가입 학생 수강권 레슨 날짜/시간 편집 허용 + 액션 시트 "일정 수정(직접)" 대체 / 가입 학생 잠금 회귀
     - **담당 job**: J11
     - **관련 테스트**: frontend/test/ — 편집 분기 + 액션 시트
 
-  ### AC-6 [검증] 회귀·평가 (pending)
+  ### AC-6 [검증] 회귀·평가 (in_progress)
   - **만족 조건**: 자식 AC passed
   - **담당 job**: —
 
-    #### AC-6.1 [스위트] 전체 회귀 (pending)
+    #### AC-6.1 [스위트] 전체 회귀 (passed)
     - **만족 조건**: FE 전체 + architecture + BE 전체 0 신규 실패 (main 기존 실패 4건 baseline 대조)
     - **담당 job**: J12
     - **관련 테스트**: 전체 스위트
 
-    #### AC-6.2 [critic] code + test critic (pending)
+    #### AC-6.2 [critic] code + test critic (passed)
     - **만족 조건**: code critic 스펙 준수 PASS + test critic(코드 미열람) PASS
     - **담당 job**: J13, J14
     - **관련 테스트**: — (eval)
 
-    #### AC-6.3 [실기] UI 시나리오 6종 (pending)
+    #### AC-6.3 [실기] UI 시나리오 6종 (in_progress)
     - **만족 조건**: web-server + 375/1440 뷰포트에서 시나리오 6종 시각 확인 (frontend-verify)
     - **담당 job**: J15
     - **관련 테스트**: — (eval, 스크린샷 증거)
+    - **커버 (2026-08-03 실기, mock 웹)**: 새 학생 등록 시트 항목 / S1·S2 배너+선택 시트+자동완성 / S4 토글 조건부 비노출 / G8 CTA("3회차 예약 필요"+예약하기)→AddLesson subscriptionId 프리필 왕복 / 1440 레이아웃 / 콘솔 에러 0
+    - **잔여 (mock 에 상태 부재 — 베타 실기 or mock 시나리오 보강 후)**: S3 잔여0 시트 / S4 토글 ON 저장 / S5·S6 무수강권·체험 재사용 / 미가입 편집·발급 시트 / 제안 경로 레슨 미선생성 부정 확인(test critic 요구)
