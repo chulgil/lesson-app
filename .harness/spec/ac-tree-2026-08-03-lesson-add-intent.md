@@ -1,34 +1,34 @@
 # AC Tree — lesson-add-intent
 
-> 최종 갱신: 2026-08-03 11:48
+> 최종 갱신: 2026-08-03 14:26 (PR-A BE passed — PR #1227)
 > Spec: `docs/specs/subscription/subscription_required_spec.md` §2.6~2.7 (origin/main `5455a3b4`)
 > DAG: `decomposition-2026-08-03-lesson-add-intent.md`
 
-## AC-0 [lesson-add-intent] 레슨 추가 인텐트 분기 + 수기(미가입) 경계 (pending)
+## AC-0 [lesson-add-intent] 레슨 추가 인텐트 분기 + 수기(미가입) 경계 (in_progress)
 - **설명**: 레슨 추가의 회계 영향 자동 처리 3종(잔여 0 보너스·크레딧 미소비·체험권 발급)을 명시적 선택/안내로 승격하고, 미가입 학생 특칙과 다음 회차 배선을 구현
 - **만족 조건**: 모든 자식 AC passed
 - **담당 job**: —
 
-  ### AC-1 [BE 회계] 레슨 생성 회계 모드 (pending)
+  ### AC-1 [BE 회계] 레슨 생성 회계 모드 (passed)
   - **만족 조건**: 자식 AC passed + 레거시 호출(파라미터 없음) 동작 불변
   - **담당 job**: —
 
-    #### AC-1.1 [overflow_mode] 파라미터 분기 (pending)
+    #### AC-1.1 [overflow_mode] 파라미터 분기 (passed)
     - **만족 조건**: `bonus`(명시 보너스) / `renewal_pending`(isPreview, 카운터 불변) / `None`(레거시 §2.3 회귀) 분기 테스트 통과
     - **담당 job**: J1
     - **관련 테스트**: backend/tests/ — overflow_mode 분기 3종 + 레거시 회귀
 
-    #### AC-1.2 [크레딧 소비] makeup_credit 모드 (pending)
-    - **만족 조건**: 잔여>0 에서도 크레딧 차감·정규 카운터 불변 / usedLessonId 연결 / 크레딧 0개 409
+    #### AC-1.2 [크레딧 소비] makeup_credit 모드 (passed)
+    - **만족 조건**: 잔여>0 에서도 크레딧 차감·정규 카운터 불변 / usedLessonId 연결 / 크레딧 0개 422 (booking 경로와 동일 시맨틱 — 구현 시 409 계획을 정정)
     - **담당 job**: J2
     - **관련 테스트**: backend/tests/ — makeup_credit 소비 3종
 
-    #### AC-1.3 [체험 가드] trial_already_used (pending)
+    #### AC-1.3 [체험 가드] trial_already_used (passed)
     - **만족 조건**: 가입 학생 자동 체험권 2회째 차단 / 미가입 학생 무제한 / 첫 생성 회귀
     - **담당 job**: J3
     - **관련 테스트**: backend/tests/ — 가드 3분기
 
-    #### AC-1.4 [preview 전환] 갱신 입금 확인 시 정식 회차 (pending)
+    #### AC-1.4 [preview 전환] 갱신 입금 확인 시 정식 회차 (passed)
     - **만족 조건**: 입금 확인 → `is_preview=False` + 신규 수강권 재귀속 + 회차 카운터 정합 / 갱신 거절·만료 시 preview 처리 정의·테스트
     - **담당 job**: J16
     - **관련 테스트**: backend/tests/ — preview 전환 2분기
@@ -71,7 +71,7 @@
   - **담당 job**: J10
   - **관련 테스트**: frontend/test/ — CTA 3분기 + 프리필
 
-  ### AC-5 [미가입 특칙] 수기 학생 경계 (pending)
+  ### AC-5 [미가입 특칙] 수기 학생 경계 (in_progress)
   - **만족 조건**: 자식 AC passed
   - **담당 job**: —
 
@@ -80,7 +80,7 @@
     - **담당 job**: J8
     - **관련 테스트**: frontend/test/ — 미가입 분기 위젯
 
-    #### AC-5.2 [확인 카드 스킵] 고아 카드 방지 (pending)
+    #### AC-5.2 [확인 카드 스킵] 고아 카드 방지 (passed)
     - **만족 조건**: 미가입 학생 즉시발급 → 확인 카드 0건 + 알림 발송 0건 (이미 스킵이면 회귀 테스트로 고정)
     - **담당 job**: J4
     - **관련 테스트**: backend/tests/ — 카드 생성 분기

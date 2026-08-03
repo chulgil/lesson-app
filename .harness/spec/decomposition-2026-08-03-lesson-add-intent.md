@@ -81,9 +81,9 @@ graph TD
 
 ### J2: BE 보강 크레딧 소비 모드
 - **내용**: `overflow_mode=makeup_credit` 을 잔여 무관(S4)으로 허용. `makeup_credit_service` 재사용 —
-  §5.3 처리(usedAt/usedLessonId 기록, 정규 미차감, scheduledLessons+=1). 크레딧 0개면 409.
+  §5.3 처리(usedAt/usedLessonId 기록, 정규 미차감, scheduledLessons+=1). 크레딧 0개면 422 (booking 경로 _consume_makeup_credit_for_booking 과 동일 시맨틱 — 계획의 409 를 구현 시 정정).
   레슨은 크레딧 `source_subscription_id` 수강권에 우선 귀속.
-- **인수 기준**: 잔여>0 + 크레딧 사용 시 정규 카운터 불변 / 크레딧 0개 409 / usedLessonId 연결 테스트
+- **인수 기준**: 잔여>0 + 크레딧 사용 시 정규 카운터 불변 / 크레딧 0개 422 / usedLessonId 연결 테스트
 - **산출물**: `lesson_service.py` + 테스트
 
 ### J3: BE 체험권 재생성 가드
