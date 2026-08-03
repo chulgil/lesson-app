@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -127,14 +129,16 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: NotebookDetailAppBar(
-        title: _isRecordMode
-            ? AppStrings.lessonRecordTitle
-            : AppStrings.lessonAddTitle,
-        onLeadingTap: () => showLessonExitConfirmation(
-          context: context,
-          hasData: _hasFormData(),
-          onExit: () => context.pop(),
-        ),
+        title:
+            _isRecordMode
+                ? AppStrings.lessonRecordTitle
+                : AppStrings.lessonAddTitle,
+        onLeadingTap:
+            () => showLessonExitConfirmation(
+              context: context,
+              hasData: _hasFormData(),
+              onExit: () => context.pop(),
+            ),
       ),
       body: Form(
         key: _formKey,
@@ -158,8 +162,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   studentId: _selectedStudent!.id,
                   studentInstrument: _selectedStudent!.instrument,
                   selectedSubscription: _selectedSubscription,
-                  onPickRequested: () =>
-                      _openSubscriptionPicker(_selectedStudent!.id),
+                  onPickRequested:
+                      () => _openSubscriptionPicker(_selectedStudent!.id),
+                  onIssueRequested: _openIssueSubscription,
                 ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -564,9 +569,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           existingLessons,
         );
         if (conflict != null) {
-          final dayLabel = dayIndex < dayNames.length
-              ? dayNames[dayIndex]
-              : '?';
+          final dayLabel =
+              dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
           conflictDays.add(AppStrings.recurringConflictDay(dayLabel, conflict));
         }
       }
@@ -594,18 +598,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         LessonPiece(
           id: 'piece_${DateTime.now().millisecondsSinceEpoch}',
           name: _pieceController.text,
-          notes: _notesController.text.isNotEmpty
-              ? _notesController.text
-              : null,
+          notes:
+              _notesController.text.isNotEmpty ? _notesController.text : null,
         ),
       );
     }
 
     // Past date → completed status (record mode), future → scheduled
     final isPastLesson = isLessonDateTimeInPast(_selectedDate, _selectedTime);
-    final lessonStatus = isPastLesson && !_isRecurring
-        ? LessonStatus.completed
-        : LessonStatus.scheduled;
+    final lessonStatus =
+        isPastLesson && !_isRecurring
+            ? LessonStatus.completed
+            : LessonStatus.scheduled;
 
     // Create the lesson object
     // Instrument: subscription (membership) is the SSOT; fall back to the
@@ -632,12 +636,13 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       duration: _lessonDuration,
       status: lessonStatus,
       pieces: pieces,
-      location: _selectedLocation == null
-          ? null
-          : LessonLocationInfo(
-              name: _selectedLocation!.name,
-              address: _selectedLocation!.address,
-            ),
+      location:
+          _selectedLocation == null
+              ? null
+              : LessonLocationInfo(
+                name: _selectedLocation!.name,
+                address: _selectedLocation!.address,
+              ),
       createdAt: DateTime.now(),
     );
 
@@ -705,9 +710,10 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
         if (!mounted) return;
 
-        final message = isPastLesson
-            ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
-            : AppStrings.lessonAddedFor(_selectedStudent!.name);
+        final message =
+            isPastLesson
+                ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
+                : AppStrings.lessonAddedFor(_selectedStudent!.name);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -722,6 +728,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       context.pop();
     } catch (e) {
       if (!mounted) return;
+      // S6 (spec §2.6.5) — the free auto trial was already used for this
+      // connected student; guide the teacher to issue a real subscription.
+      if (e is ValidationException && e.message == 'trial_already_used') {
+        await _showTrialAlreadyUsedDialog();
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(AppStrings.addLessonFailed),
@@ -729,6 +741,35 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           backgroundColor: AppColors.paperAccent,
         ),
       );
+    }
+  }
+
+  /// S5/S6 — route to the issue-subscription flow with the student prefilled.
+  /// PR-C(J8) adds returnTo continuity; until then this is a plain push.
+  void _openIssueSubscription() {
+    final studentId = _selectedStudent?.id;
+    if (studentId == null) return;
+    context.push('${AppRoutes.issueSubscription}?studentId=$studentId');
+  }
+
+  Future<void> _showTrialAlreadyUsedDialog() async {
+    final issue = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.trialAlreadyUsedTitle,
+      content: const Text(AppStrings.trialAlreadyUsedMessage),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text(AppStrings.issueSubscriptionAction),
+        ),
+      ],
+    );
+    if (issue == true && mounted) {
+      _openIssueSubscription();
     }
   }
 

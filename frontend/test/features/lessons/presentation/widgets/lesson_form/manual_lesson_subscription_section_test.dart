@@ -25,6 +25,7 @@ Future<void> _pump(
   required List<Subscription> actives,
   Subscription? selected,
   VoidCallback? onPick,
+  VoidCallback? onIssue,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -40,6 +41,7 @@ Future<void> _pump(
             studentInstrument: '바이올린',
             selectedSubscription: selected,
             onPickRequested: onPick ?? () {},
+            onIssueRequested: onIssue,
           ),
         ),
       ),
@@ -129,5 +131,35 @@ void main() {
       find.text(AppStrings.manualLessonChangeSubscription),
       findsOneWidget,
     );
+  });
+
+  testWidgets('S5 — 0개 + 콜백 제공: [정식 수강권 먼저 발급] 버튼 노출 + 탭 (spec §2.6.1)', (
+    tester,
+  ) async {
+    var issueRequested = false;
+    await _pump(tester, actives: [], onIssue: () => issueRequested = true);
+
+    expect(tester.takeException(), isNull);
+    final button = find.text(AppStrings.manualLessonIssueFirstButton);
+    expect(button, findsOneWidget);
+
+    await tester.tap(button);
+    expect(issueRequested, isTrue);
+  });
+
+  testWidgets('S1 — 수강권 있으면 발급 버튼 숨김 (콜백 있어도)', (tester) async {
+    await _pump(
+      tester,
+      actives: [_sub(id: 's1', instrument: '피아노')],
+      onIssue: () {},
+    );
+
+    expect(find.text(AppStrings.manualLessonIssueFirstButton), findsNothing);
+  });
+
+  testWidgets('S5 — 콜백 미제공(레거시 호출부)이면 버튼 없음', (tester) async {
+    await _pump(tester, actives: []);
+
+    expect(find.text(AppStrings.manualLessonIssueFirstButton), findsNothing);
   });
 }
