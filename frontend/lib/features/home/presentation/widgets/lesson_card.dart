@@ -108,9 +108,8 @@ class LessonCard extends ConsumerWidget {
                     width: 40,
                     child: Text(
                       _getStatusLabel(),
-                      style: NotebookTypography.sectionLabel.copyWith(
+                      style: NotebookTypography.sectionLabelSmall.copyWith(
                         color: lesson.displayStatus.color,
-                        fontSize: 10,
                       ),
                       textAlign: TextAlign.end,
                     ),

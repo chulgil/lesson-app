@@ -76,6 +76,10 @@ class NotebookTypography {
   static TextStyle get romanActive =>
       roman.copyWith(color: AppColors.paperAccent);
 
+  /// 로마숫자 — 큰 크기 (하단 네비게이션 마커 I~IV).
+  /// `roman` 과 값이 동일하고 fontSize 만 18. 색·굵기는 호출부에서 상태별로 덮어쓴다.
+  static TextStyle get romanLarge => roman.copyWith(fontSize: 18);
+
   /// 곡명·레슨 제목.
   static TextStyle get pieceTitle => GoogleFonts.playfairDisplay(
     fontSize: 16,
@@ -159,6 +163,10 @@ class NotebookTypography {
     color: AppColors.inkSecondary,
     letterSpacing: 1.0,
   );
+
+  /// 섹션 라벨 — 작은 크기 (하단 네비게이션 라벨, 카드 상태 라벨).
+  /// `sectionLabel` 과 값이 동일하고 fontSize 만 10. 색·굵기는 호출부에서 덮어쓴다.
+  static TextStyle get sectionLabelSmall => sectionLabel.copyWith(fontSize: 10);
 
   /// 손글씨 본문 — Gaegu.
   static TextStyle get hand => GoogleFonts.gaegu(

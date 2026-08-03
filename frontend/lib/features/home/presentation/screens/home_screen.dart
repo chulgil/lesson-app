@@ -280,8 +280,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Text(
               roman,
-              style: NotebookTypography.roman.copyWith(
-                fontSize: 18,
+              style: NotebookTypography.romanLarge.copyWith(
                 color: accentColor,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
               ),
@@ -289,8 +288,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 2),
             Text(
               label,
-              style: NotebookTypography.sectionLabel.copyWith(
-                fontSize: 10,
+              style: NotebookTypography.sectionLabelSmall.copyWith(
                 color: accentColor,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
