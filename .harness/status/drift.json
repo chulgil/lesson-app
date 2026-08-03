@@ -1,6 +1,6 @@
 {
-  "updated_at": 1785725483,
-  "updated_at_iso": "2026-08-03T02:51:23Z",
+  "updated_at": 1785725582,
+  "updated_at_iso": "2026-08-03T02:53:02Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
