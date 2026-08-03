@@ -46,6 +46,13 @@ def _utcnow() -> datetime:
     return datetime.now(UTC)
 
 
+def _ensure_aware(dt: datetime) -> datetime:
+    """SQLite returns naive datetimes even for DateTime(timezone=True) columns."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt
+
+
 class MakeupCreditService:
     """CRUD + lifecycle for MakeupCredit; helpers for scheduled_lessons track."""
 
@@ -210,7 +217,7 @@ class MakeupCreditService:
             raise ValueError(f"MakeupCredit not found: {credit_id}")
         if credit.used_at is not None:
             raise ValueError(f"MakeupCredit {credit_id} already used at {credit.used_at}")
-        if credit.expires_at < moment:
+        if _ensure_aware(credit.expires_at) < moment:
             raise ValueError(f"MakeupCredit {credit_id} expired at {credit.expires_at} (now={moment})")
 
         credit.used_at = moment
