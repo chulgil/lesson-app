@@ -1,6 +1,6 @@
 # AC Tree — lesson-add-intent
 
-> 최종 갱신: 2026-08-03 14:26 (PR-A BE passed — PR #1227)
+> 최종 갱신: 2026-08-03 16:00 (PR-A 머지 #1227 / PR-B OPEN #1228 — AC-2 passed)
 > Spec: `docs/specs/subscription/subscription_required_spec.md` §2.6~2.7 (origin/main `5455a3b4`)
 > DAG: `decomposition-2026-08-03-lesson-add-intent.md`
 
@@ -33,21 +33,21 @@
     - **담당 job**: J16
     - **관련 테스트**: backend/tests/ — preview 전환 2분기
 
-  ### AC-2 [FE 인텐트] 레슨 추가 상태별 UI (pending)
+  ### AC-2 [FE 인텐트] 레슨 추가 상태별 UI (passed)
   - **만족 조건**: 자식 AC passed + S1/S2 흔한 경우 탭 수·동작 불변 (회귀)
   - **담당 job**: —
 
-    #### AC-2.1 [S5/S6 배너] 체험 자동발급 명시 + 발급 유도 (pending)
+    #### AC-2.1 [S5/S6 배너] 체험 자동발급 명시 + 발급 유도 (passed)
     - **만족 조건**: S5 배너+보조 버튼 / S6 `trial_already_used` 발급 유도 다이얼로그 / smoke test / AppStrings
     - **담당 job**: J5
     - **관련 테스트**: frontend/test/ — 배너 상태 3종 + smoke
 
-    #### AC-2.2 [S3 시트] 잔여 0 처리 방식 (pending)
+    #### AC-2.2 [S3 시트] 잔여 0 처리 방식 (passed)
     - **만족 조건**: 잔여 0 저장 시 시트 / 기본 강조=갱신(D1) / 크레딧 0개면 보강 항목 숨김 / 미가입=갱신 발급 분기 / 항목별 overflow_mode 전송 / **S1·S2(잔여>0) 시트 미노출·즉시 저장 회귀**
     - **담당 job**: J6
     - **관련 테스트**: frontend/test/ — 시트 4분기 + S1/S2 회귀 + smoke
 
-    #### AC-2.3 [S4 토글] 보강 처리 + 배지 (pending)
+    #### AC-2.3 [S4 토글] 보강 처리 + 배지 (passed)
     - **만족 조건**: 크레딧>0 에만 토글 노출 / 기본 OFF(D3) / ON 시 makeup_credit 전송 / 보강 배지=MakeupCredit 연결 표시(신규 enum 0) / 체험 배지(`type==trial`) 기존 구현 확인 후 회귀 또는 추가
     - **담당 job**: J7
     - **관련 테스트**: frontend/test/ — 토글 3분기 + 배지
