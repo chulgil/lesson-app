@@ -37,6 +37,7 @@ List<GoRoute> lessonRoutes = [
         preselectedDate: params['date'],
         preselectedHour: hour,
         preselectedMinute: minute,
+        preselectedSubscriptionId: params['subscriptionId'],
       );
     },
   ),

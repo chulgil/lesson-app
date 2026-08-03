@@ -28,12 +28,17 @@ class AddLessonScreen extends ConsumerStatefulWidget {
   final int? preselectedHour; // 0-23
   final int? preselectedMinute; // 0-59
 
+  /// §8 다음 회차 CTA — 수강권 상세에서 진입 시 해당 수강권을 §2.5 자동
+  /// 귀속보다 우선 선택한다 (활성 목록에 있을 때만).
+  final String? preselectedSubscriptionId;
+
   const AddLessonScreen({
     super.key,
     this.preselectedStudentId,
     this.preselectedDate,
     this.preselectedHour,
     this.preselectedMinute,
+    this.preselectedSubscriptionId,
   });
 
   @override
@@ -395,6 +400,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       );
       if (!mounted || _selectedStudent?.id != studentId) return;
       final sorted = sortSubscriptionsForPicker(actives);
+
+      // §8 다음 회차 CTA — 프리필 수강권이 활성 목록에 있으면 최우선 선택
+      // (선택 시트 생략). 목록에 없으면(만료 등) 일반 분기로 폴백.
+      final preselectedId = widget.preselectedSubscriptionId;
+      if (preselectedId != null) {
+        final match = sorted.where((s) => s.id == preselectedId);
+        if (match.isNotEmpty) {
+          setState(() => _selectedSubscription = match.first);
+          return;
+        }
+      }
+
       if (sorted.length == 1) {
         setState(() => _selectedSubscription = sorted.first);
       } else if (sorted.length >= 2) {
