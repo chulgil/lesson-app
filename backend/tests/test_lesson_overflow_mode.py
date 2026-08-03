@@ -272,23 +272,55 @@ async def test_invalid_overflow_mode_rejected(teacher, client: AsyncClient, auth
 
 
 @pytest.mark.asyncio
-async def test_preview_lesson_skips_student_notification(teacher, client: AsyncClient, auth_headers: dict):
-    """미리보기 레슨은 '새 레슨 등록' 알림을 보내지 않는다 — 갱신 제안 알림이 별도 채널."""
-    sid = await teacher.create_student("알림검증학생")
-    sub_id = await teacher.create_subscription(sid, total_lessons=1, amount=100000)
-    await _exhaust_single_lesson_subscription(teacher, client, auth_headers, sid, sub_id)
+async def test_preview_lesson_skips_student_notification(
+    teacher, client: AsyncClient, auth_headers: dict, create_test_user, db_session
+):
+    """미리보기 레슨은 '새 레슨 등록' 알림을 보내지 않는다 — 갱신 제안 알림이 별도 채널.
 
+    user 연결 학생(알림 수신 가능 상태)으로 만들어 놓고, 일반 레슨은 알림이
+    발생하고 preview 레슨은 발생하지 않음을 카운트로 고정한다.
+    """
+    from sqlalchemy import func, select
+
+    from app.models.notification import Notification
+    from app.models.student import Student
+
+    sid = await teacher.create_student("알림검증학생")
+    student_user = await create_test_user(
+        user_id="notif-target-user", role="student", name="알림검증학생", email="notif-target@test.com"
+    )
+    row = await db_session.get(Student, sid)
+    row.user_id = student_user.id
+    await db_session.flush()
+
+    sub_id = await teacher.create_subscription(sid, total_lessons=2, amount=100000)
+
+    # 일반 레슨 → lessonBooked 알림 1건 (알림 경로 자체가 살아있음을 고정)
     r = await _create_lesson(
-        client,
-        auth_headers,
-        sid,
-        date="2026-08-18",
-        start_time="14:00",
-        subscription_id=sub_id,
-        overflow_mode="renewal_pending",
+        client, auth_headers, sid,
+        date="2026-08-17", start_time="10:00", subscription_id=sub_id,
     )
     assert r.status_code == 201, r.text
-    # 학생 user 미연결 시 알림 자체가 없으므로, 이 테스트는 생성 성공 + preview 플래그만
-    # 고정한다. (user 연결 학생의 알림 스킵 분기는 아래 서비스 단위 검증으로 충분 —
-    # create() 는 is_preview 일 때 notify 블록을 건너뛴다.)
-    assert r.json()["is_preview"] is True
+    baseline = await db_session.scalar(select(func.count(Notification.id)))
+    assert baseline and baseline >= 1
+
+    # 잔여 소진 후 preview 레슨 → 알림 카운트 불변
+    await teacher.complete_lesson(r.json()["id"])
+    r2 = await _create_lesson(
+        client, auth_headers, sid,
+        date="2026-08-18", start_time="14:00", subscription_id=sub_id,
+    )
+    assert r2.status_code == 201, r2.text
+    await teacher.complete_lesson(r2.json()["id"])
+    before_preview = await db_session.scalar(select(func.count(Notification.id)))
+
+    r3 = await _create_lesson(
+        client, auth_headers, sid,
+        date="2026-08-19", start_time="14:00",
+        subscription_id=sub_id, overflow_mode="renewal_pending",
+    )
+    assert r3.status_code == 201, r3.text
+    assert r3.json()["is_preview"] is True
+
+    after_preview = await db_session.scalar(select(func.count(Notification.id)))
+    assert after_preview == before_preview, "preview 레슨은 lessonBooked 알림을 보내지 않는다"

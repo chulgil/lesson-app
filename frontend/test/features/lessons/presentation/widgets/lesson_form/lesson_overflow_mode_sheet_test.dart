@@ -57,7 +57,7 @@ Future<LessonOverflowChoice? Function()> _open(
 
 void main() {
   testWidgets('가입 학생 + 크레딧 0: 보강 숨김, 갱신 제안이 기본 강조(D1)', (tester) async {
-    await _open(tester);
+    final getResult = await _open(tester);
 
     expect(find.text(AppStrings.overflowOptionMakeup), findsNothing);
     expect(find.text(AppStrings.overflowOptionBonus), findsOneWidget);
@@ -71,6 +71,7 @@ void main() {
     // D1 — 갱신 제안이 기본 선택 (계속하기 즉시 탭 시 renewal 반환)
     await tester.tap(find.text(AppStrings.continueAction));
     await tester.pumpAndSettle();
+    expect(getResult(), LessonOverflowChoice.renewalProposal);
   });
 
   testWidgets('크레딧 보유: 보강 항목 + 잔량 설명 노출', (tester) async {
