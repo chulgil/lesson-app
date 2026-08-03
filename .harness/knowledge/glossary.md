@@ -43,6 +43,7 @@
 | 체험 레슨 | Trial Lesson | `LessonBooking(type: trial)` | `LessonBooking(lesson_type: trial)` | 정규 등록 전 시험 레슨. **수강권 필수** (유료 기본, 선생님 설정으로 무료 전환 가능). 변경/취소 정책 동일 적용 |
 | 정기 레슨 | Regular Lesson | `LessonBooking(type: regular)` | `LessonBooking(lesson_type: regular)` | 수강권 기반 정기 수업 |
 | 보강 레슨 | Makeup Lesson | `LessonBooking(type: makeup)` | `LessonBooking(lesson_type: makeup)` | 노쇼/취소 보충 |
+| 수기 레슨 | Manual Lesson | `Lesson` (`LessonSource.manual`) | `Lesson(lesson_source=manual)` | 선생님이 레슨 추가 화면에서 직접 등록한 레슨. **수강권 미귀속을 의미하지 않음** — 활성 수강권 자동 귀속, 없으면 체험 1회권 자동 생성 (`subscription_required_spec.md` §2.1~2.7). 사용하지 않는 표현: 기록용 레슨, 무귀속 레슨 (2026-08-03 재정의) |
 | 레슨 노트 | Lesson Note | `Lesson.teacherNotes` | `Lesson.teacher_notes` | 선생님 수업 기록 |
 | 곡 | Piece | `LessonPiece` | `LessonPiece` | 레슨에서 다루는 곡 |
 | 레슨 요약 공유 | Lesson Summary Share | `LessonSummaryShare` / `lessonSummaryShareRepositoryProvider` | `ShareTokenService.issue_lesson_summary_share` | 교사가 레슨 상세에서 공개 요약 공유 토큰 발급(`POST /lesson-summaries/{id}/share`) → 학생 요약 랜딩(`StudentSummaryScreen`, `/student/summary/:token`) 연결. 서버가 URL·공유텍스트 생성, FE는 복사/공유만. #808 |
@@ -123,6 +124,7 @@
 | 초대 코드 (학생·동료) | Invite Code | `InviteCode` | `InviteCode` | 학생/동료 초대용 6자리 코드 + QR + URL. **유효기간 7일** (#799 명시) |
 | 학부모 초대 코드 | Parent Invite Code | `ParentInvitation` | `ParentInvitation` | 자녀-학부모 연결용 6자리 코드 (교사: 학생 상세 / 학생: 프로필에서 생성). **유효기간 24시간** — 학생/동료(7일)와 차등 유지. 모든 초대 생성·공유·입력 면에 유효기간 병기 (#799) |
 | 초대 대기 | Invite Pending | `RelationshipStatus.invitePending` | `invite_pending` | 초대 전송 후 학생 미진입 상태. 학생 리스트에서 별도 그룹 표시 |
+| 수기 학생 | Manual Student | `TeacherStudentRelation.isManuallyRegistered` / `Student.isAppConnected == false` | `Student(user_id=None)` | 앱 미가입 상태로 선생님이 직접 등록·관리하는 학생. 항상 active, 데이터 경로는 가입 학생과 동일(수강권 귀속) — 차이는 **학생 확인 절차의 생략**뿐 (즉시 발급만, 제안 불가). 앱 연결 시 전화번호 매칭으로 이력 인계. 사용하지 않는 표현: 오프라인 학생(표시명 외), 로컬 학생 (`subscription_required_spec.md` §2.7) |
 | 팔로우 | Follow | `Follow` | `Follow` | 소식 구독 (레슨 무관) |
 | 학급 | Class | `LessonClass` | `LessonClass` | 선생님의 레슨 그룹 |
 | 소속 | Membership | `ClassMembership` | `ClassMembership` | 학생의 학급 소속 |
@@ -597,6 +599,7 @@
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-08-03 | §2 "수기 레슨" · §6 "수기 학생" 등재/재정의 — 수기 = 수강권 미귀속이 아니라 (레슨) 선생님 직접 등록 + (학생) 미가입·학생 확인 생략. 데이터 경로는 수강권 귀속으로 단일. 근거: `subscription_required_spec.md` §2.6~2.7 + `docs/proposal/lesson_add_intent_redesign.md` (D5) |
 | 2026-06-19 | 일괄 처리(Batch Action) 신설 — 스케줄 다중선택 일괄 완료/휴강(#768 ①). 리스트 long-press 진입 + 탭 토글 → 선택 N건 일괄 완료(레슨당 `confirmLessonCompleted` 1회씩 정확히 N회 차감)/휴강(차감 0). `LessonSelection` 선택 상태 + 하단 액션바. 기존 스와이프(단건 완료/취소) 불변. |
 | 2026-06-19 | 휴가 구간(`VacationSegment`) 신설 — 다구간 휴가(#768 ②). 한 번에 여러 비겹침 기간을 등록(구간별 보상옵션 / 사유·학생별 예외 공통). BE 배치 계약 `POST /teacher/vacation/batch`(구간마다 기존 `register_vacation` 재사용, 원자적). 겹침 구간 거부(이중 차감/연장 방지). 기존 단일 등록 경로 불변. |
 | 2026-06-18 | 학생 상세 전화/문자 상단 승격 + 메뉴 그룹핑 (검토 #28) — 매일 쓰는 전화·문자를 more(...) 메뉴(2탭) → 신원 스트립(1탭, `StudentContactActions`). more 메뉴를 관리/상태 변경 섹션(`_MoreSectionLabel`)으로 그룹핑 + 학생 보관 맨 아래 분리. 데이터·플로우 불변(UI/IA만). |
