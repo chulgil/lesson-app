@@ -236,8 +236,11 @@ scheduledLessons <= remainingLessons + usedLessons
 선생님이 레슨 추가(AddLessonScreen)에서 보강 크레딧 보유 학생을 선택하면
 수강권 배너에 크레딧 잔량을 노출하고 **"보강으로 처리" 토글**을 표시한다 (기본 OFF).
 
-- 토글 ON 저장 시: §5.3 과 동일 처리 (크레딧 차감, 정규 회차 미차감). 레슨은 크레딧의
-  `sourceSubscriptionId` 수강권에 우선 귀속.
+- 토글 ON 저장 시: §5.3 과 동일 처리 (크레딧 차감, 정규 회차 미차감).
+- 레슨 귀속 우선순위 (2026-08-03 구현 정합 정정 — code critic 대조): **선생님이 명시
+  선택한 수강권 > 크레딧의 `sourceSubscriptionId` > 최신 활성 수강권**. 선생님의 명시
+  선택이 크레딧 출처보다 우선한다 (선택 UI 가 이미 열린 의도를 존중). 어느 쪽이든
+  크레딧 차감·정규 회차 미차감 회계는 동일.
 - 잔여 0 상태(S3)에서는 처리 방식 시트의 "보강 레슨" 항목이 이 토글을 대신한다.
 - 상태 분기 전체: [subscription_required_spec.md §2.6](subscription_required_spec.md) (S3/S4)
 
