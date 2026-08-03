@@ -219,6 +219,10 @@ class SubscriptionService:
         await self.db.flush()
         await self.db.refresh(sub)
 
+        # §2.6.2 — direct issuance (offline-student renewal path) promotes any
+        # pending preview lessons onto the new subscription.
+        await self._promote_preview_lessons(student_id=data.student_id, new_subscription_id=sub.id)
+
         # Notify student about new subscription
         from app.models.student import Student
 
@@ -239,6 +243,67 @@ class SubscriptionService:
             )
 
         return await self._subscription_response(sub)
+
+    async def _promote_preview_lessons(self, *, student_id: str, new_subscription_id: str) -> int:
+        """subscription_required_spec §2.6.2 — 갱신 발급 시 preview 레슨 정식 전환.
+
+        Re-attach the student's scheduled ``is_preview`` lessons to the newly
+        issued subscription, clear the flag, and assign session numbers so the
+        normal completion-deduction path applies from here on. Runs on both
+        issuance paths — direct ``create`` (offline-student renewal) and
+        ``confirm_proposal`` (renewal proposal deposit confirmation).
+        """
+        from app.models.lesson import Lesson, LessonStatus
+        from app.services.lesson_service import LessonService
+
+        previews = (
+            await self.db.scalars(
+                select(Lesson)
+                .where(
+                    Lesson.student_id == student_id,
+                    Lesson.is_preview.is_(True),
+                    Lesson.status == LessonStatus.scheduled,
+                )
+                .order_by(Lesson.date.asc(), Lesson.start_time.asc())
+            )
+        ).all()
+        if not previews:
+            return 0
+
+        lesson_service = LessonService(self.db)
+        for lesson in previews:
+            # Number first, then re-attach — autoflush would otherwise count the
+            # promoted row itself and skip a number. SSOT stays in LessonService;
+            # flushing inside the loop keeps consecutive previews consecutive.
+            next_number = await lesson_service._next_subscription_session_number(new_subscription_id)
+            lesson.subscription_id = new_subscription_id
+            lesson.is_preview = False
+            lesson.session_number = next_number
+            await self.db.flush()
+        return len(previews)
+
+    async def _cancel_preview_lessons(self, *, student_id: str) -> int:
+        """§2.6.2 — 갱신 제안 거절/취소/만료 시 preview 레슨 취소 (영구 잔존 방지).
+
+        ``is_preview`` stays True on the cancelled row — the marker that the
+        lesson never became a real session.
+        """
+        from app.models.lesson import Lesson, LessonStatus
+
+        previews = (
+            await self.db.scalars(
+                select(Lesson).where(
+                    Lesson.student_id == student_id,
+                    Lesson.is_preview.is_(True),
+                    Lesson.status == LessonStatus.scheduled,
+                )
+            )
+        ).all()
+        for lesson in previews:
+            lesson.status = LessonStatus.cancelled
+        if previews:
+            await self.db.flush()
+        return len(previews)
 
     async def get_by_id(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Return a subscription by ID."""
@@ -2030,6 +2095,8 @@ class SubscriptionService:
         proposals = list(result.all())
         for proposal in proposals:
             proposal.status = ProposalStatus.expired
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         await self.db.flush()
         return len(proposals)
 
@@ -2053,6 +2120,8 @@ class SubscriptionService:
         proposals = list(result.all())
         for proposal in proposals:
             proposal.status = ProposalStatus.expired
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         if proposals:
             await self.db.flush()
         return len(proposals)
@@ -2101,8 +2170,12 @@ class SubscriptionService:
         elif data.action == "reject":
             proposal.status = ProposalStatus.rejected
             proposal.rejection_reason = data.rejection_reason
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         elif data.action == "cancel":
             proposal.status = ProposalStatus.cancelled
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid action")
 
@@ -2242,6 +2315,14 @@ class SubscriptionService:
                 actor_id=proposal.teacher_id,
                 event_type="subscriptionIssued",
                 subscription_id=proposal.subscription_id,
+            )
+
+        # §2.6.2 — deposit confirmation promotes pending preview lessons onto
+        # the issued subscription (covers both the minted and hint-linked branches).
+        if proposal.subscription_id:
+            await self._promote_preview_lessons(
+                student_id=proposal.student_id,
+                new_subscription_id=proposal.subscription_id,
             )
 
         proposal.status = ProposalStatus.confirmed
