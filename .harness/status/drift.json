@@ -1,6 +1,6 @@
 {
-  "updated_at": 1785400160,
-  "updated_at_iso": "2026-07-30T08:29:20Z",
+  "updated_at": 1785725483,
+  "updated_at_iso": "2026-08-03T02:51:23Z",
   "spec_dir": ".harness/spec",
   "hashes": {
     "spec/2026-05-04-chat-message-visual-contract.md": "abffd6aca8cdfcefe93595162d9b168915e419e5",
@@ -13,9 +13,11 @@
     "spec/2026-06-11-student-gamification.md": "4c166ebe8f1660152dd7a882e0b1e63563a45321",
     "spec/2026-06-11-teacher-settings-redesign.md": "c0b9d0ed03924d0c71e529c46981cba11ed7f4c8",
     "spec/2026-06-16-practice-journal-p2-binding.md": "58befd08b6f588e5bba3092fecb628d0adbd1fee",
+    "spec/2026-07-31-group-lesson.md": "e5e950c08f58d8053a0641654bc657aab1853a53",
     "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md": "b163a2262d679d86141efeb402468c9e63bc861b",
     "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md": "1b42fab61adc238205e27df6fb1ddbd206a899a8",
-    "spec/constitution.md": "79678f8231c9c6e5fa6481124168cd8289e33b5e"
+    "spec/ac-tree-2026-07-31-group-lesson.md": "7e8a2b27375162029423c22ea5520db7e7b51eb3",
+    "spec/decomposition-2026-07-31-group-lesson.md": "98b37bb58a2e4b822f6cc06510cb332f318327c5"
   },
   "changed": [
     "spec/2026-05-04-chat-message-visual-contract.md",
@@ -28,9 +30,11 @@
     "spec/2026-06-11-student-gamification.md",
     "spec/2026-06-11-teacher-settings-redesign.md",
     "spec/2026-06-16-practice-journal-p2-binding.md",
+    "spec/2026-07-31-group-lesson.md",
     "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md",
     "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md",
-    "spec/constitution.md"
+    "spec/ac-tree-2026-07-31-group-lesson.md",
+    "spec/decomposition-2026-07-31-group-lesson.md"
   ],
   "added": [
     "spec/2026-05-04-chat-message-visual-contract.md",
@@ -43,9 +47,11 @@
     "spec/2026-06-11-student-gamification.md",
     "spec/2026-06-11-teacher-settings-redesign.md",
     "spec/2026-06-16-practice-journal-p2-binding.md",
+    "spec/2026-07-31-group-lesson.md",
     "spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md",
     "spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md",
-    "spec/constitution.md"
+    "spec/ac-tree-2026-07-31-group-lesson.md",
+    "spec/decomposition-2026-07-31-group-lesson.md"
   ],
   "removed": [
     ".harness/harness/current.md",
@@ -59,15 +65,17 @@
     ".harness/spec/2026-06-11-student-gamification.md",
     ".harness/spec/2026-06-11-teacher-settings-redesign.md",
     ".harness/spec/2026-06-16-practice-journal-p2-binding.md",
+    ".harness/spec/2026-07-31-group-lesson.md",
     ".harness/spec/ac-tree-2026-06-11-student-gamification-p2-visual-growth.md",
     ".harness/spec/ac-tree-2026-06-12-student-gamification-p3-spotlight.md",
-    ".harness/spec/constitution.md"
+    ".harness/spec/ac-tree-2026-07-31-group-lesson.md",
+    ".harness/spec/decomposition-2026-07-31-group-lesson.md"
   ],
   "findings": [],
   "summary": {
-    "changed_total": 13,
-    "added": 13,
-    "removed": 14,
+    "changed_total": 15,
+    "added": 15,
+    "removed": 16,
     "domains_touched": [],
     "domain_counts": {},
     "warnings": [],
