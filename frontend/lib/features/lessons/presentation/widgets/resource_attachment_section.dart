@@ -82,10 +82,14 @@ class _ResourceChip extends StatelessWidget {
               ),
               if (resource.timestampText != null) ...[
                 const SizedBox(width: AppSpacing.space1),
-                Text(
-                  '(${resource.timestampText})',
-                  style: AppTypography.captionSmall.copyWith(
-                    color: _chipColor.withValues(alpha: 0.7),
+                Flexible(
+                  child: Text(
+                    '(${resource.timestampText})',
+                    style: AppTypography.captionSmall.copyWith(
+                      color: _chipColor.withValues(alpha: 0.7),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -235,8 +239,11 @@ class _AttachedResourceList extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(resource.type.icon,
-              size: AppSpacing.iconMD, color: AppColors.ink),
+          Icon(
+            resource.type.icon,
+            size: AppSpacing.iconMD,
+            color: AppColors.ink,
+          ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -495,8 +502,7 @@ class _AddResourceButton extends ConsumerWidget {
     showNotebookModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (_) => YoutubeSearchSheet(onResourceCreated: onResourceSelected),
+      builder: (_) => YoutubeSearchSheet(onResourceCreated: onResourceSelected),
     );
   }
 

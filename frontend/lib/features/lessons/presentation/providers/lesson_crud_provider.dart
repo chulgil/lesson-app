@@ -73,6 +73,9 @@ class LessonsNotifier extends _$LessonsNotifier {
     try {
       final newLesson = await _repository.createLesson(lesson);
       state = await AsyncValue.guard(() => _repository.getLessons());
+      // keepAlive lessonsProvider(홈 대시보드)/lessonProvider(id)(상세) stale 방지 —
+      // lesson_confirmation_provider 와 동일 패턴. weekLessons 는 notifier watch(#1141).
+      ref.invalidate(lessonsProvider);
       return newLesson;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -85,6 +88,8 @@ class LessonsNotifier extends _$LessonsNotifier {
     try {
       final updated = await _repository.updateLesson(lesson);
       state = await AsyncValue.guard(() => _repository.getLessons());
+      ref.invalidate(lessonsProvider);
+      ref.invalidate(lessonProvider(lesson.id));
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -97,6 +102,8 @@ class LessonsNotifier extends _$LessonsNotifier {
     try {
       await _repository.deleteLesson(id);
       state = await AsyncValue.guard(() => _repository.getLessons());
+      ref.invalidate(lessonsProvider);
+      ref.invalidate(lessonProvider(id));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -108,6 +115,8 @@ class LessonsNotifier extends _$LessonsNotifier {
     try {
       await _repository.archiveLesson(id);
       state = await AsyncValue.guard(() => _repository.getLessons());
+      ref.invalidate(lessonsProvider);
+      ref.invalidate(lessonProvider(id));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -119,6 +128,8 @@ class LessonsNotifier extends _$LessonsNotifier {
     try {
       await _repository.cancelLesson(id);
       state = await AsyncValue.guard(() => _repository.getLessons());
+      ref.invalidate(lessonsProvider);
+      ref.invalidate(lessonProvider(id));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;

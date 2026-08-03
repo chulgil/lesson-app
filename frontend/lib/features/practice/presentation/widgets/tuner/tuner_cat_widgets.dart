@@ -41,7 +41,7 @@ class StatusBubble extends StatelessWidget {
       backgroundColor = AppColors.bubbleIdleBackground;
       textColor = AppColors.bubbleIdleText;
     } else if (isPerfect) {
-      message = '완벽해요! 🎵';
+      message = '완벽해요!';
       backgroundColor = AppColors.bubbleSuccessBackground;
       textColor = AppColors.bubbleSuccessText;
     } else {
@@ -108,7 +108,7 @@ class CatSpeechBubble extends StatelessWidget {
       textColor = AppColors.bubbleIdleText;
     } else if (isPerfect) {
       // Use combo message if available
-      message = comboTier != ComboTier.none ? comboTier.message : '완벽해요! 🎵';
+      message = comboTier != ComboTier.none ? comboTier.message : '완벽해요!';
       backgroundColor = AppColors.bubbleSuccessBackground;
       textColor = AppColors.bubbleSuccessText;
     } else {

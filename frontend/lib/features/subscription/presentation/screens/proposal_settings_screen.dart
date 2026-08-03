@@ -114,7 +114,7 @@ class _ProposalSettingsScreenState
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: _autoProposalEnabled
-            ? AppColors.paperOk.withValues(alpha: 0.1)
+            ? AppColors.paperOkSoft
             : AppColors.paper,
         border: Border.all(
           color: _autoProposalEnabled

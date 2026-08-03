@@ -134,7 +134,11 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
                   key: const ValueKey('celebration_content'),
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('✨', style: TextStyle(fontSize: 64)),
+                    const Icon(
+                      Icons.auto_awesome,
+                      size: AppSpacing.icon2XL,
+                      color: AppColors.paper,
+                    ),
                     const SizedBox(height: AppSpacing.space4),
                     Text(
                       '${widget.practiceMinutes}분 했어요!',
@@ -145,7 +149,7 @@ class _PracticeCelebrationOverlayState extends State<PracticeCelebrationOverlay>
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
-                      '🔥 ${widget.streakDays}일 연속',
+                      '${widget.streakDays}일 연속',
                       key: const ValueKey('celebration_streak'),
                       style: AppTypography.headingMedium.copyWith(
                         color: AppColors.paper,

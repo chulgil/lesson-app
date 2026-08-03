@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
+import 'package:lessonaza/features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import 'package:lessonaza/features/students/domain/entities/student.dart';
 import 'package:lessonaza/features/student_home/presentation/providers/student_home_profile_edit_provider.dart';
 import 'package:lessonaza/features/student_home/presentation/screens/student_profile_edit_screen.dart';
@@ -31,6 +34,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          // #1072: the edit screen now reads the active discipline's
+          // expertise catalog — pin music so the picker matches and no
+          // Hive box opens under a bare test ProviderScope.
+          activeDisciplineProvider.overrideWith(
+            (ref) => DisciplineRegistry.music,
+          ),
           studentHomeProfileEditStudentProvider.overrideWith(
             (ref) async => student,
           ),

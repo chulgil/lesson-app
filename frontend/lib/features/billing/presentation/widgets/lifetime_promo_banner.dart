@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 
 /// Lifetime 얼리어답터 한정 1회 결제 프로모 배너.
 class LifetimePromoBanner extends StatelessWidget {
@@ -68,8 +69,7 @@ class LifetimePromoBanner extends StatelessWidget {
                     '{days}',
                     _daysLeft.toString(),
                   ),
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: AppTypography.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.paper,
                     letterSpacing: 0.5,
@@ -96,19 +96,17 @@ class LifetimePromoBanner extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
-            const Text(
+            Text(
               AppStrings.paywallLifetimePromoTitle,
-              style: TextStyle(
-                fontSize: 18,
+              style: AppTypography.headingSmall.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.paper,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
-            const Text(
+            Text(
               AppStrings.paywallLifetimePromoSubtitle,
-              style: TextStyle(
-                fontSize: 13,
+              style: AppTypography.bodySmall.copyWith(
                 color: AppColors.paper,
                 height: 1.45,
               ),
@@ -153,8 +151,7 @@ class _EyebrowChip extends StatelessWidget {
       decoration: const BoxDecoration(color: AppColors.paper),
       child: Text(
         label,
-        style: const TextStyle(
-          fontSize: 11,
+        style: AppTypography.caption.copyWith(
           fontWeight: FontWeight.w700,
           color: AppColors.paperAccent,
           letterSpacing: 0.5,

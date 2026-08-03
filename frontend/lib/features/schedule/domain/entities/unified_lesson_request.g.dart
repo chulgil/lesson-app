@@ -123,6 +123,9 @@ UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
       proposalId: json['proposal_id'] as String?,
       academyId: json['academy_id'] as String?,
       preferredLocationType: json['preferred_location_type'] as String?,
+      studentName: json['student_name'] as String?,
+      teacherName: json['teacher_name'] as String?,
+      academyName: json['academy_name'] as String?,
     );
 
 Map<String, dynamic> _$UnifiedLessonRequestToJson(
@@ -153,6 +156,9 @@ Map<String, dynamic> _$UnifiedLessonRequestToJson(
       'proposal_id': instance.proposalId,
       'academy_id': instance.academyId,
       'preferred_location_type': instance.preferredLocationType,
+      'student_name': instance.studentName,
+      'teacher_name': instance.teacherName,
+      'academy_name': instance.academyName,
     };
 
 const _$LessonRequestTypeEnumMap = {

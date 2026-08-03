@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -17,8 +18,8 @@ import '../../../../core/utils/image_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/auth/auth_facade.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
-import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/onboarding/onboarding_facade.dart';
+import '../../../../core/widgets/onboarding_step_header.dart';
 
 typedef OnboardingProfileImageSaver =
     Future<String> Function(String sourcePath, String fileName);
@@ -216,6 +217,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   void _showInstrumentSelector() {
+    // #1071: list the active discipline's expertise catalog (music =
+    // instruments, byte-identical), not a hardcoded music list.
+    final items =
+        ExpertiseCatalogRegistry.forDiscipline(
+          ref.read(activeDisciplineProvider),
+        ).items;
     showNotebookBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -223,6 +230,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       padding: EdgeInsets.zero,
       builder:
           (context) => _InstrumentSelectorSheet(
+            items: items,
             selectedInstruments: _selectedInstruments,
             onSelectionChanged: (instruments) {
               setState(() => _selectedInstruments = instruments);
@@ -247,8 +255,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Progress indicator
-                    _buildProgressIndicator(),
+                    // Progress indicator (#1104 — shared 4-step teacher header,
+                    // 프로필=3/4). Replaces the former local 2-step indicator.
+                    const OnboardingStepHeader(
+                      steps: OnboardingStepHeader.teacherSteps,
+                      currentStep: 3,
+                    ),
 
                     const SizedBox(height: AppSpacing.space6),
 
@@ -353,24 +365,6 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Row(
-      children: [
-        _ProgressStep(
-          step: 1,
-          label: AppStrings.onboardingProfileSetup,
-          isActive: true,
-        ),
-        _ProgressDivider(isActive: false),
-        _ProgressStep(
-          step: 2,
-          label: AppStrings.onboardingContinueWithQuest,
-          isActive: false,
-        ),
-      ],
     );
   }
 
@@ -568,74 +562,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 }
 
-class _ProgressStep extends StatelessWidget {
-  final int step;
-  final String label;
-  final bool isActive;
-
-  const _ProgressStep({
-    required this.step,
-    required this.label,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-              borderRadius: BorderRadius.zero,
-            ),
-            child: Center(
-              child: Text(
-                '$step',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isActive ? AppColors.paper : AppColors.inkTertiary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space1),
-          Text(
-            label,
-            style: AppTypography.caption.copyWith(
-              color: isActive ? AppColors.ink : AppColors.inkTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProgressDivider extends StatelessWidget {
-  final bool isActive;
-
-  const _ProgressDivider({required this.isActive});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 24,
-      height: 2,
-      margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-    );
-  }
-}
-
 class _InstrumentSelectorSheet extends StatefulWidget {
+  final List<String> items;
   final List<String> selectedInstruments;
   final ValueChanged<List<String>> onSelectionChanged;
 
   const _InstrumentSelectorSheet({
+    required this.items,
     required this.selectedInstruments,
     required this.onSelectionChanged,
   });
@@ -700,9 +633,9 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
           // Instrument list
           Expanded(
             child: ListView.builder(
-              itemCount: InstrumentList.all.length,
+              itemCount: widget.items.length,
               itemBuilder: (context, index) {
-                final instrument = InstrumentList.all[index];
+                final instrument = widget.items[index];
                 final isSelected = _selected.contains(instrument);
 
                 return ListTile(

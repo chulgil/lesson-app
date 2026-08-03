@@ -227,20 +227,6 @@ class PracticeGoal(UUIDMixin, TimestampMixin, Base):
     __table_args__ = (Index("uk_goal_student", "student_id", unique=True),)
 
 
-class PracticeStreak(UUIDMixin, TimestampMixin, Base):
-    """Student practice streak statistics."""
-
-    __tablename__ = "practice_streaks"
-
-    student_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    current_streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    longest_streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    last_practice_date: Mapped[date | None] = mapped_column(Date, nullable=True)
-    total_practice_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-
-    __table_args__ = (Index("uk_streak_student", "student_id", unique=True),)
-
-
 class PracticeItem(UUIDMixin, TimestampMixin, Base):
     """Teacher-assigned practice item from a lesson."""
 

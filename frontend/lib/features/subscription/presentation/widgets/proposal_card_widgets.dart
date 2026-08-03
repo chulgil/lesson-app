@@ -35,7 +35,7 @@ class ProposalStatusBanner extends StatelessWidget {
         message = AppStrings.proposalPaymentPendingBannerBody;
         break;
       case ProposalStatus.confirmed:
-        backgroundColor = AppColors.paperOk.withValues(alpha: 0.1);
+        backgroundColor = AppColors.paperOkSoft;
         textColor = AppColors.paperOk;
         icon = Icons.check_circle;
         message = AppStrings.proposalBannerConfirmed;

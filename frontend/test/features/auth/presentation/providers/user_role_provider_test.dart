@@ -32,6 +32,47 @@ ProviderContainer _container({required bool mock, AuthState? auth}) {
 }
 
 void main() {
+  group('currentUserRole (M2/#608)', () {
+    test('remote + AuthNeedsOnboarding(student) → student (teacher 폴백 아님)', () {
+      final container = _container(
+        mock: false,
+        auth: const AuthNeedsOnboarding(
+          userId: 'u-onb-1',
+          name: '온보딩중',
+          email: 'o@test.com',
+          role: UserRole.student,
+        ),
+      );
+      expect(container.read(currentUserRoleProvider), UserRole.student);
+    });
+
+    test('remote + AuthNeedsOnboarding(parent) → parent', () {
+      final container = _container(
+        mock: false,
+        auth: const AuthNeedsOnboarding(
+          userId: 'u-onb-2',
+          name: '온보딩중',
+          email: 'p@test.com',
+          role: UserRole.parent,
+        ),
+      );
+      expect(container.read(currentUserRoleProvider), UserRole.parent);
+    });
+
+    test('remote + AuthAuthenticated(parent) → parent (기존 동작 유지)', () {
+      final container = _container(
+        mock: false,
+        auth: const AuthAuthenticated(
+          userId: 'u-auth-1',
+          name: '인증완료',
+          email: 'a@test.com',
+          role: UserRole.parent,
+        ),
+      );
+      expect(container.read(currentUserRoleProvider), UserRole.parent);
+    });
+  });
+
   group('currentUserId', () {
     test('remote + AuthNeedsOnboarding → 실제 userId (mock 폴백 아님)', () {
       final container = _container(

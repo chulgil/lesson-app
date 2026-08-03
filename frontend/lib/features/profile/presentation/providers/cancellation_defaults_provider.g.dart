@@ -7,12 +7,12 @@ part of 'cancellation_defaults_provider.dart';
 // **************************************************************************
 
 String _$cancellationDefaultsRepositoryHash() =>
-    r'85fceb0a221a42feb25b5aea28150df5f8d2ed09';
+    r'52ec02512801d6c39f2661cfae779e3a12fd9039';
 
 /// Repository provider for cancellation defaults.
 ///
-/// No backend endpoint exists yet, so remote mode persists locally
-/// (user-scoped) instead of returning seeded mock data (#5 D-G3).
+/// Remote mode targets GET/PUT /settings/cancellation (#1178) — the server
+/// row is what drives late-cancel compensation notifications.
 ///
 /// Copied from [cancellationDefaultsRepository].
 @ProviderFor(cancellationDefaultsRepository)
@@ -30,7 +30,7 @@ final cancellationDefaultsRepositoryProvider =
 typedef CancellationDefaultsRepositoryRef
     = ProviderRef<CancellationDefaultsRepository>;
 String _$cancellationDefaultsNotifierHash() =>
-    r'317365fdd45ad0730bb27a9134767fb56c5f4a39';
+    r'10cbc856f70f21ed8e34e53e7ebe4afd3bd54e6e';
 
 /// Async notifier provider for cancellation defaults
 ///

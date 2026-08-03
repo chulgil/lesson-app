@@ -90,7 +90,7 @@ class ChildProfilesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요',
+              AppStrings.parentHomeChildrenEmptySubtitle,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -134,7 +134,6 @@ class ChildProfilesScreen extends ConsumerWidget {
       builder:
           (sheetContext) => ChildProfileActionsBottomSheet(
             profile: profile,
-            onSwitchToChild: () => _switchToChildView(context, ref, profile),
             onEditProfile: () => _navigateToEditChild(context, profile, pid),
           ),
     );
@@ -164,23 +163,6 @@ class ChildProfilesScreen extends ConsumerWidget {
     );
   }
 
-  void _switchToChildView(
-    BuildContext context,
-    WidgetRef ref,
-    ChildProfile profile,
-  ) {
-    // Set selected child profile
-    ref.read(selectedChildProfileProvider.notifier).select(profile);
-
-    // Navigate to student home with child profile context
-    // For now, show a message - full implementation would switch UI mode
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("${profile.name}의 화면으로 전환합니다")));
-
-    // TODO: Implement proper view switching
-    // This would typically navigate to StudentHomeScreen with the child profile
-  }
 }
 
 class _ChildProfileCard extends StatelessWidget {
@@ -224,10 +206,14 @@ class _ChildProfileCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          profile.name,
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
+                        Flexible(
+                          child: Text(
+                            profile.name,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space2),
@@ -243,7 +229,7 @@ class _ChildProfileCard extends StatelessWidget {
                             borderRadius: BorderRadius.zero,
                           ),
                           child: Text(
-                            '만 ${profile.age}세',
+                            AppStrings.parentHomeAgeFormat(profile.age),
                             style: AppTypography.caption.copyWith(
                               color: AppColors.paperAccent,
                               fontWeight: FontWeight.w500,
@@ -279,10 +265,14 @@ class _ChildProfileCard extends StatelessWidget {
                             color: AppColors.inkTertiary,
                           ),
                           const SizedBox(width: AppSpacing.space1),
-                          Text(
-                            profile.teacherName!,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.inkTertiary,
+                          Flexible(
+                            child: Text(
+                              profile.teacherName!,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.inkTertiary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],

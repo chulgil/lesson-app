@@ -134,7 +134,7 @@ class _AcademyInquiryDetailScreenState
                 SizedBox(height: AppSpacing.space3),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: FilledButton(
                     onPressed: _isReplying ? null : _submitReply,
                     child: _isReplying
                         ? const SizedBox(
@@ -175,7 +175,7 @@ class _AcademyInquiryDetailScreenState
                     vertical: AppSpacing.space1,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.paperAccent.withValues(alpha: 0.1),
+                    color: AppColors.paperAccentSoft,
                   ),
                   child: Text(
                     inquiry.senderRole == InquirySenderRole.student

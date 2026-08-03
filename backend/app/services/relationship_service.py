@@ -10,6 +10,7 @@ from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
+from app.services.student_id_resolver import resolve_student_id
 from app.services.teacher_id_resolver import resolve_teacher_id, try_resolve_teacher_id
 
 
@@ -56,6 +57,13 @@ class RelationshipService:
                 detail="Invalid or expired invite code",
             )
 
+        student_id = await resolve_student_id(self.db, current_user.id)
+        if relation.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Invalid or expired invite code",
+            )
+
         relation.status = "active"  # type: ignore[assignment]
         await self.db.flush()
         await self.db.refresh(relation)
@@ -78,8 +86,7 @@ class RelationshipService:
 
         tid = await try_resolve_teacher_id(self.db, user.id)
         query = select(TeacherStudentRelation).where(
-            (TeacherStudentRelation.teacher_id == (tid or user.id))
-            | (TeacherStudentRelation.student_id == user.id)
+            (TeacherStudentRelation.teacher_id == (tid or user.id)) | (TeacherStudentRelation.student_id == user.id)
         )
         if teacher_id is not None:
             query = query.where(TeacherStudentRelation.teacher_id == teacher_id)
@@ -112,9 +119,15 @@ class RelationshipService:
         return relation
 
     async def update_status(
-        self, relationship_id: str, new_status: str | None, current_user: Any,
-        *, subscription_id: str | None = None, booking_id: str | None = None,
-        last_lesson_day: int | None = None, last_lesson_time: str | None = None,
+        self,
+        relationship_id: str,
+        new_status: str | None,
+        current_user: Any,
+        *,
+        subscription_id: str | None = None,
+        booking_id: str | None = None,
+        last_lesson_day: int | None = None,
+        last_lesson_time: str | None = None,
         last_lesson_duration: int | None = None,
         can_view_practice: bool | None = None,
         can_comment: bool | None = None,
@@ -217,9 +230,7 @@ class RelationshipService:
         elif role == "student":
             from app.models.student import Student
 
-            student_id = await self.db.scalar(
-                select(Student.id).where(Student.user_id == current_user.id)
-            )
+            student_id = await self.db.scalar(select(Student.id).where(Student.user_id == current_user.id))
             if student_id is not None and student_id == relation.student_id:
                 return
 
@@ -316,9 +327,7 @@ class RelationshipService:
         """List follows involving the current user."""
         from app.models.relationship import Follow
 
-        query = select(Follow).where(
-            (Follow.follower_id == user.id) | (Follow.following_id == user.id)
-        )
+        query = select(Follow).where((Follow.follower_id == user.id) | (Follow.following_id == user.id))
         if direction == "following":
             query = query.where(Follow.follower_id == user.id)
         elif direction == "followers":
@@ -343,9 +352,7 @@ class RelationshipService:
             from app.models.user import User
 
             following_ids = [f.following_id for f in follows]
-            users_result = await self.db.scalars(
-                select(User).where(User.id.in_(following_ids))
-            )
+            users_result = await self.db.scalars(select(User).where(User.id.in_(following_ids)))
             name_map = {u.id: u.name for u in users_result.all()}
             for f in follows:
                 f.following_name = name_map.get(f.following_id)

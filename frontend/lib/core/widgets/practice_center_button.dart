@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../features/auth/auth_facade.dart' show currentUserIdProvider;
+import '../../features/gamification/gamification_facade.dart'
+    show growthHeatmapProvider;
+import '../../features/practice/practice_facade.dart'
+    show practiceStreakProvider;
 import '../../features/practice/presentation/widgets/practice_tools_modal.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -46,17 +52,30 @@ class _PracticeCenterButtonState extends ConsumerState<PracticeCenterButton> {
   void _onTap() {
     HapticFeedback.mediumImpact();
     // Open modal with Metronome tab (index 0).
-    // studentId 전달 — stop 시 logMetronome 실행 (#932)
-    final studentId = ref.read(currentUserIdProvider);
-    PracticeToolsModal.show(context, initialTab: 0, studentId: studentId);
+    unawaited(_openPracticeModal(0));
   }
 
   void _onLongPress() {
     HapticFeedback.heavyImpact();
     // Open modal with Tuner tab (index 1).
-    // studentId 전달 — stop 시 logMetronome 실행 (#932)
+    unawaited(_openPracticeModal(1));
+  }
+
+  /// 모달을 열고, 연습 minutes 가 기록되면 heatmap/streak provider 를 무효화해
+  /// 대시보드가 stale 되지 않게 한다 (practice_start_section 과 동일 — A4).
+  /// studentId 전달 — stop 시 logMetronome 실행 (#932).
+  Future<void> _openPracticeModal(int initialTab) async {
     final studentId = ref.read(currentUserIdProvider);
-    PracticeToolsModal.show(context, initialTab: 1, studentId: studentId);
+    final minutes = await PracticeToolsModal.show(
+      context,
+      initialTab: initialTab,
+      studentId: studentId,
+    );
+    if (!mounted || minutes == null || minutes <= 0) {
+      return;
+    }
+    ref.invalidate(growthHeatmapProvider(studentId));
+    ref.invalidate(practiceStreakProvider(studentId));
   }
 
   @override

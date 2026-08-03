@@ -514,13 +514,17 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                 color: AppColors.paper,
               ),
               label: Text(
-                _playingA || _playingB ? '정지' : '동시 재생',
+                _playingA || _playingB
+                    ? AppStrings.recordingComparisonStop
+                    : AppStrings.recordingComparisonPlayBoth,
                 style: AppTypography.buttonSmall.copyWith(
                   color: AppColors.paper,
                 ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
+                // 테마 minimumSize=Size(∞,h) 가 Row(center) 의 loose 폭과 충돌하므로 override.
+                minimumSize: const Size(0, AppSpacing.buttonHeight),
                 shape: const RoundedRectangleBorder(),
               ),
             ),

@@ -144,7 +144,6 @@ class _RegisterRegularLessonScreenState
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.scheduleMutedBackground,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 AppStrings.flexibleScheduleGuide,
@@ -417,6 +416,19 @@ class _RegisterRegularLessonScreenState
   }
 
   Future<void> _submitRegistration() async {
+    // M3 (#1074) — studentId 없이 등록하면 가짜 ID('new_student') 레코드가
+    // 생겨 remote 에서 고아 레슨이 된다. 등록은 학생 특정이 전제.
+    final studentId = widget.studentId;
+    if (studentId == null || studentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.selectStudentValidation),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     if (_scheduleType == ScheduleType.fixed) {
       if (_selectedDays.length != _lessonsPerWeek) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -463,7 +475,7 @@ class _RegisterRegularLessonScreenState
           }).toList();
 
       final registration = RegularLessonRegistration(
-        studentId: widget.studentId ?? 'new_student',
+        studentId: studentId,
         scheduleType: _scheduleType,
         fixedTimeSlots: fixedSlots,
         lessonsPerWeek: _lessonsPerWeek,
@@ -478,7 +490,7 @@ class _RegisterRegularLessonScreenState
           .registerRegularLesson(
             teacherId: widget.teacherId,
             teacherName: widget.teacherName,
-            studentId: widget.studentId ?? 'new_student',
+            studentId: studentId,
             studentName: widget.studentName ?? AppStrings.newStudentDefault,
             registration: registration,
           );

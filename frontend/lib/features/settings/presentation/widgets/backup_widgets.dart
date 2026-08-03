@@ -8,6 +8,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_alert_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -492,21 +493,9 @@ class BackupListSection extends ConsumerWidget {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(color: AppColors.paperDark),
-                child: const Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.folder_open,
-                        size: 48,
-                        color: AppColors.inkTertiary,
-                      ),
-                      SizedBox(height: AppSpacing.space3),
-                      Text(
-                        '저장된 백업이 없습니다',
-                        style: TextStyle(color: AppColors.inkSecondary),
-                      ),
-                    ],
-                  ),
+                child: const EmptyStateWidget(
+                  icon: Icons.folder_open,
+                  title: AppStrings.settingsBackupEmpty,
                 ),
               );
             }

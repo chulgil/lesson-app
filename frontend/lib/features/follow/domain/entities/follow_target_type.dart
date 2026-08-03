@@ -9,16 +9,3 @@ enum FollowTargetType {
   /// Academy - academy news/events
   academy,
 }
-
-/// Extension methods for FollowTargetType
-extension FollowTargetTypeExtension on FollowTargetType {
-  /// Display name in Korean
-  String get displayName {
-    switch (this) {
-      case FollowTargetType.teacher:
-        return '선생님';
-      case FollowTargetType.academy:
-        return '학원';
-    }
-  }
-}

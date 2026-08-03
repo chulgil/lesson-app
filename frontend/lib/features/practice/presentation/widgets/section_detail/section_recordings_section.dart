@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
 import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
 import 'section_recording_list_item.dart';
@@ -73,24 +74,10 @@ class SectionRecordingsSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paperDark,
         ),
-      child: Column(
-        children: [
-          Icon(Icons.mic_none, size: 48, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            '아직 녹음이 없습니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space1),
-          Text(
-            '위의 녹음 버튼을 눌러 연습을 기록해보세요',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-        ],
+      child: const EmptyStateWidget(
+        icon: Icons.mic_none,
+        title: AppStrings.sectionRecordingEmptyTitle,
+        subtitle: AppStrings.sectionRecordingEmptyHint,
       ),
     );
   }

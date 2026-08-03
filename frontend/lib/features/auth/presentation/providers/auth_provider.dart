@@ -8,8 +8,11 @@ import '../../../../core/auth/auth_state.dart';
 import '../../../../core/auth/token_storage.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
+import '../../../../core/network/cache/response_cache_store.dart';
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../core/sync/presentation/providers/initial_pull_provider.dart';
+import '../../../../core/sync/data/sync_queue_store.dart';
+import '../../../../core/sync/sync_facade.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../data/repositories/remote_auth_repository.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/entities/user_role.dart';
@@ -118,6 +121,7 @@ class AuthNotifier extends _$AuthNotifier {
       // Token is invalid/expired and refresh also failed — must re-login
       debugPrint('[Auth] Token invalid (401), clearing tokens');
       await _tokenStorage.clearTokens();
+      await _clearOfflineReadCache();
       state = const AuthUnauthenticated();
     } on NetworkException catch (e) {
       // Network error — preserve tokens for next auto-login attempt
@@ -130,9 +134,10 @@ class AuthNotifier extends _$AuthNotifier {
       debugPrint(
         '[Auth] Auto-login failed (API ${e.statusCode}): ${e.message}',
       );
-      final reason = (e.statusCode != null && e.statusCode! >= 500)
-          ? AuthUnauthenticatedReason.serverError
-          : AuthUnauthenticatedReason.none;
+      final reason =
+          (e.statusCode != null && e.statusCode! >= 500)
+              ? AuthUnauthenticatedReason.serverError
+              : AuthUnauthenticatedReason.none;
       state = AuthUnauthenticated(reason: reason);
     } catch (e) {
       // Unexpected error — preserve tokens
@@ -150,6 +155,21 @@ class AuthNotifier extends _$AuthNotifier {
     if (isMock) return;
     final service = ref.read(initialPullServiceProvider);
     unawaited(service.runIfNeeded(userId));
+  }
+
+  /// Clears the offline HTTP response cache so cached reads from a previous
+  /// user are never served to a different identity (offline-first plan D2;
+  /// privacy: data-privacy.md §Level-2). Called on explicit login, logout and
+  /// session expiry — NOT on auto-login (same-user restore keeps its cache for
+  /// offline launch) nor token refresh (same user).
+  Future<void> _clearOfflineReadCache() async {
+    try {
+      if (Hive.isBoxOpen(ResponseCacheStore.boxName)) {
+        await Hive.box<String>(ResponseCacheStore.boxName).clear();
+      }
+    } catch (_) {
+      // Best-effort: Hive may not be open during unit tests.
+    }
   }
 
   /// Build the appropriate auth state based on user's role and onboarding status.
@@ -211,6 +231,8 @@ class AuthNotifier extends _$AuthNotifier {
         accessToken: tokenPair.accessToken,
         refreshToken: tokenPair.refreshToken,
       );
+      // New identity established — drop any prior user's offline read cache.
+      await _clearOfflineReadCache();
 
       final user = await _authRepository.getMe();
       state = _stateFromUser(user);
@@ -319,6 +341,8 @@ class AuthNotifier extends _$AuthNotifier {
         accessToken: result.tokens.accessToken,
         refreshToken: result.tokens.refreshToken,
       );
+      // New identity established — drop any prior user's offline read cache.
+      await _clearOfflineReadCache();
 
       final user = result.user;
       state = _stateFromUser(user);
@@ -331,6 +355,14 @@ class AuthNotifier extends _$AuthNotifier {
 
   /// Logout and clear tokens.
   Future<void> logout() async {
+    // Drop this device's push token first, while the access token is still
+    // valid. Otherwise the signed-out user keeps receiving push on a shared
+    // device (privacy: data-privacy.md §Level-2).
+    try {
+      await ref.read(pushUnregistrarProvider)();
+    } catch (_) {
+      // Best-effort: Firebase may be unconfigured or absent (tests, web).
+    }
     try {
       await _authRepository.logout();
     } catch (_) {
@@ -346,6 +378,21 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (_) {
       // Best-effort: Hive may not be open during unit tests.
     }
+    // INV-4 (#1114): drop the previous user's unsent write queue so pending
+    // mutations never replay under the next login's auth token.
+    try {
+      if (Hive.isBoxOpen(SyncQueueStore.defaultBoxName)) {
+        await Hive.box<dynamic>(SyncQueueStore.defaultBoxName).clear();
+      } else if (await Hive.boxExists(SyncQueueStore.defaultBoxName)) {
+        final queueBox = await Hive.openBox<dynamic>(
+          SyncQueueStore.defaultBoxName,
+        );
+        await queueBox.clear();
+      }
+    } catch (_) {
+      // Best-effort: Hive may not be initialized during unit tests.
+    }
+    await _clearOfflineReadCache();
     state = const AuthUnauthenticated();
   }
 

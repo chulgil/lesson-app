@@ -153,6 +153,27 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('#1194 저장 실패 → SnackBar 안내 (silent rollback 금지)', (
+      tester,
+    ) async {
+      final repo = _FakeSettingsRepository(settings(instruments: ['피아노']))
+        ..throwOnMutation = true;
+      await tester.pumpWidget(
+        wrap(const PriceTableScreen(), repo: repo, instruments: ['피아노']),
+      );
+      await tester.pumpAndSettle();
+
+      // 가격 셀('—') 탭 → 다이얼로그 → 값 입력 → 저장.
+      await tester.tap(find.text('—').first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '50000');
+      await tester.tap(find.byType(FilledButton).last);
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.settingsSaveFailed), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }
 
@@ -164,6 +185,13 @@ class _FakeSettingsRepository implements SettingsRepository {
   _FakeSettingsRepository(this._settings);
 
   TeacherSettings _settings;
+
+  /// #1194 — 저장 실패 UX 테스트용: 켜면 모든 update가 throw.
+  bool throwOnMutation = false;
+
+  void _maybeThrow() {
+    if (throwOnMutation) throw Exception('network down');
+  }
 
   TeacherSettings get last => _settings;
 
@@ -178,6 +206,7 @@ class _FakeSettingsRepository implements SettingsRepository {
   Future<void> updatePriceTable(
     Map<String, Map<String, int>> priceTable,
   ) async {
+    _maybeThrow();
     _settings = _settings.copyWith(lessonPriceTable: priceTable);
   }
 

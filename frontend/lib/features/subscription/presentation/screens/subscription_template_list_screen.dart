@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -239,7 +240,7 @@ class _TemplateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NotebookCard(
+    final card = NotebookCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -342,70 +343,6 @@ class _TemplateCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Menu button
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'edit':
-                          onEdit();
-                          break;
-                        case 'toggle':
-                          onToggleActive();
-                          break;
-                        case 'delete':
-                          onDelete();
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit_outlined, size: 20),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(AppStrings.modify),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'toggle',
-                        child: Row(
-                          children: [
-                            Icon(
-                              template.isActive
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 20,
-                            ),
-                            const SizedBox(width: AppSpacing.space2),
-                            Text(
-                              template.isActive
-                                  ? AppStrings.templateMenuDeactivate
-                                  : AppStrings.templateMenuActivate,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.delete_outline,
-                              size: 20,
-                              color: AppColors.paperAccent,
-                            ),
-                            SizedBox(width: AppSpacing.space2),
-                            Text(
-                              AppStrings.delete,
-                              style: TextStyle(color: AppColors.paperAccent),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
 
@@ -442,7 +379,7 @@ class _TemplateCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.paperAccent.withValues(alpha: 0.1),
+                        color: AppColors.paperAccentSoft,
                       ),
                       child: Text(
                         template.formattedDiscountRate,
@@ -499,6 +436,36 @@ class _TemplateCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    // C6: 편집·삭제 = 우→좌 / 활성토글(편의) = 좌→우 스와이프 (trailing 메뉴 대체).
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.modify,
+          icon: Icons.edit_outlined,
+          onPressed: onEdit,
+        ),
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: onDelete,
+        ),
+      ],
+      startActions: [
+        SwipeAction(
+          label: template.isActive
+              ? AppStrings.templateMenuDeactivate
+              : AppStrings.templateMenuActivate,
+          icon: template.isActive
+              ? Icons.visibility_off_outlined
+              : Icons.visibility_outlined,
+          tone: SwipeActionTone.convenience,
+          onPressed: onToggleActive,
+        ),
+      ],
+      child: card,
     );
   }
 }

@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
+import 'package:lessonaza/features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import 'package:lessonaza/features/students/presentation/screens/add_student_screen.dart';
+
+// #1072: AddStudentScreen's InstrumentSelector now reads the active
+// discipline; pin music so the picker matches and no Hive box opens.
+List<Override> _musicOverrides() => [
+  activeDisciplineProvider.overrideWith((ref) => DisciplineRegistry.music),
+];
 
 void main() {
   group('AddStudentScreen', () {
@@ -16,6 +25,7 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
+            overrides: _musicOverrides(),
             child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
           ),
         );
@@ -41,7 +51,8 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        const ProviderScope(
+        ProviderScope(
+          overrides: _musicOverrides(),
           child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
         ),
       );
@@ -62,7 +73,8 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         await tester.pumpWidget(
-          const ProviderScope(
+          ProviderScope(
+            overrides: _musicOverrides(),
             child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
           ),
         );
@@ -81,7 +93,8 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         await tester.pumpWidget(
-          const ProviderScope(
+          ProviderScope(
+            overrides: _musicOverrides(),
             child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
           ),
         );
@@ -110,7 +123,8 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         await tester.pumpWidget(
-          const ProviderScope(
+          ProviderScope(
+            overrides: _musicOverrides(),
             child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
           ),
         );
@@ -138,7 +152,8 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        const ProviderScope(
+        ProviderScope(
+          overrides: _musicOverrides(),
           child: MaterialApp(home: Scaffold(body: AddStudentScreen())),
         ),
       );

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../providers/active_discipline_provider.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -76,18 +77,14 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
   }
 
   void _goToOnboarding(UserRole role) {
-    switch (role) {
-      case UserRole.teacher:
-        context.go(AppRoutes.teacherProfileSetup);
-      case UserRole.student:
-        // 임시 안전망 — 만 14세 검증용 통신사 본인인증(PASS) 통합 전까지
-        // 학생 직접 가입은 차단 화면으로 안내한다.
-        // 정책: phone_verification_policy.md §3.2.
-        // PASS 통합 시 학생용 전화인증 화면 라우트로 교체.
-        context.go(AppRoutes.studentSignupBlocked);
-      case UserRole.parent:
-        context.go(AppRoutes.parentInviteCode);
+    // Multi-discipline gate (#977; #1196 prod-exposure gate): remote/prod
+    // builds expose only production-ready disciplines (music today) → single
+    // → auto-skip to role onboarding. Mock/dev sees all registered → picks.
+    if (selectableDisciplines().length > 1) {
+      context.go(AppRoutes.disciplineSelection, extra: role);
+      return;
     }
+    context.go(role.onboardingRoute);
   }
 
   @override
@@ -136,6 +133,15 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 AppStrings.roleSelectSubtitle,
                 style: AppTypography.bodyLarge.copyWith(
                   color: AppColors.inkSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              // #1104 — reassure the user the onboarding is short.
+              Text(
+                AppStrings.onboardingDurationCaption,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.inkTertiary,
                 ),
                 textAlign: TextAlign.center,
               ),

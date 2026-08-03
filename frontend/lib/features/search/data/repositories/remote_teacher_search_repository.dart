@@ -221,6 +221,7 @@ class RemoteTeacherSearchRepository implements TeacherSearchRepository {
       id: json['id'] as String,
       userId: userId,
       name: name,
+      nickname: json['nickname'] as String?,
       profileImage: profileImage,
       instruments: instruments,
       introduction: json['introduction'] as String? ?? '',

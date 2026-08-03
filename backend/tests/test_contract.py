@@ -1452,6 +1452,41 @@ async def test_contract_practice_streak_update_and_record(client, auth_headers, 
 
 
 @pytest.mark.asyncio
+async def test_record_practice_writes_ssot_so_get_agrees(client, auth_headers, create_test_user):
+    """G3 PR-D: record_practice writes the practice into the SSOT (``practice_logs``),
+    so GET /practice/streak (compute_streak) agrees with the recorded value.
+
+    The legacy ``practice_streaks`` counter is gone: previously record_practice wrote a
+    counter row (current_streak=1) but no log, so GET — which recomputes from logs —
+    returned 0 (the divergence bug). Now record writes a log, so both read 1.
+    """
+    await create_test_user(user_id="test-user-id", role="teacher")
+    sid = "student-ssot-1"
+
+    record_resp = await client.post(
+        f"/api/v1/practice/streak/record?student_id={sid}",
+        headers=auth_headers,
+    )
+    assert record_resp.status_code == 200
+    assert record_resp.json()["current_streak"] == 1
+
+    # GET recomputes from logs (SSOT) and must agree — no counter divergence.
+    get_resp = await client.get(
+        f"/api/v1/practice/streak?student_id={sid}",
+        headers=auth_headers,
+    )
+    assert get_resp.status_code == 200
+    assert get_resp.json()["current_streak"] == 1
+
+    # Idempotent per KST day — a second record does not double-count.
+    record2 = await client.post(
+        f"/api/v1/practice/streak/record?student_id={sid}",
+        headers=auth_headers,
+    )
+    assert record2.json()["current_streak"] == 1
+
+
+@pytest.mark.asyncio
 async def test_contract_teaching_resource_get_by_id(client, auth_headers, create_test_user):
     """Frontend teaching resource repository calls GET /settings/teaching-resources/{id}."""
     await create_test_user(user_id="test-user-id", role="teacher")

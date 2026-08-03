@@ -194,6 +194,10 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
       // Single atomic save: all fields in one API call
       final nicknameText = _nicknameController.text.trim();
+      // #1144: 사진 effective ref(서버 URL 또는 로컬경로)를 함께 저장해 엔티티가
+      // 진원지가 되게 한다 — preview·완성도 게이지·타 화면 반영.
+      final profileImageRef =
+          ref.read(profileImageNotifierProvider(_userId)).valueOrNull;
       await notifier.updateBasicInfoAll(
         name: _nameController.text.trim(),
         nickname: nicknameText.isNotEmpty ? nicknameText : null,
@@ -204,6 +208,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         postalCode: _postalCode,
         address: _address,
         addressDetail: _addressDetail,
+        profileImage: profileImageRef,
       );
 
       if (mounted) {

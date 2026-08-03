@@ -15,37 +15,6 @@ enum RepertoireSortType {
   custom,
 }
 
-/// Extension for RepertoireSortType display
-extension RepertoireSortTypeExtension on RepertoireSortType {
-  /// Get display name in Korean
-  String get displayName {
-    switch (this) {
-      case RepertoireSortType.createdDesc:
-        return '최신순';
-      case RepertoireSortType.createdAsc:
-        return '오래된순';
-      case RepertoireSortType.nameAsc:
-        return '이름순';
-      case RepertoireSortType.custom:
-        return '사용자지정';
-    }
-  }
-
-  /// Get icon for the sort type
-  String get iconName {
-    switch (this) {
-      case RepertoireSortType.createdDesc:
-        return 'arrow_downward';
-      case RepertoireSortType.createdAsc:
-        return 'arrow_upward';
-      case RepertoireSortType.nameAsc:
-        return 'sort_by_alpha';
-      case RepertoireSortType.custom:
-        return 'drag_handle';
-    }
-  }
-}
-
 /// Extension for sorting practice repertoires
 extension RepertoireSorting on List<PracticeRepertoire> {
   /// Sort repertoires by the given sort type

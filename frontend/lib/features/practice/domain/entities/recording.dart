@@ -79,6 +79,16 @@ class Recording {
   /// Whether local file exists (check by path not being empty).
   bool get hasLocalFile => localPath.isNotEmpty;
 
+  /// The recording that should inherit representative status when the current
+  /// representative is removed: the most recent by [recordedAt]. Null if empty.
+  /// (#749 — never leave a repertoire without a representative.)
+  static Recording? pickRepresentativeHeir(Iterable<Recording> candidates) {
+    if (candidates.isEmpty) return null;
+    final sorted = candidates.toList()
+      ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
+    return sorted.first;
+  }
+
   Recording copyWith({
     String? id,
     String? repertoireId,

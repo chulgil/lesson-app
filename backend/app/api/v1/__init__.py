@@ -21,6 +21,8 @@ from app.api.v1 import (
     device_tokens,
     gamification,
     groups,
+    growth_report_public,
+    growth_reports,
     help,
     invite_landing,
     invites,
@@ -113,6 +115,8 @@ api_router.include_router(teacher_availability.router, prefix="/teacher", tags=[
 api_router.include_router(students.router, prefix="/students", tags=["students"])
 api_router.include_router(lessons.router, prefix="/lessons", tags=["lessons"])
 api_router.include_router(lesson_summaries.router, prefix="/lesson-summaries", tags=["lesson-summaries"])
+# Issue #1217 — 무가입 자녀 성장 리포트 프리뷰 mint(auth) endpoint.
+api_router.include_router(growth_reports.router, prefix="/growth-reports", tags=["growth-reports"])
 api_router.include_router(memberships.router, prefix="/memberships", tags=["memberships"])
 api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["subscriptions"])
 api_router.include_router(subscription_settings.router, prefix="/subscription-settings", tags=["subscription-settings"])
@@ -183,6 +187,11 @@ api_router.include_router(
 )
 api_router.include_router(
     student_summary.router,
+    tags=["public-sharing"],
+)
+# Issue #1217 — 무가입 자녀 성장 리포트 프리뷰 public(no-auth) endpoint.
+api_router.include_router(
+    growth_report_public.router,
     tags=["public-sharing"],
 )
 api_router.include_router(

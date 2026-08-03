@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../data/repositories/mock_manual_teacher_repository.dart';
 import '../../data/repositories/remote_manual_teacher_repository.dart';
 import '../../domain/entities/manual_teacher.dart';
@@ -12,18 +13,18 @@ part 'manual_teacher_provider.g.dart';
 @Riverpod(keepAlive: true)
 ManualTeacherRepository manualTeacherRepository(
   ManualTeacherRepositoryRef ref,
-) =>
-    createRepository<ManualTeacherRepository>(
-      ref: ref,
-      mock: () => MockManualTeacherRepository(),
-      remote: (api) => RemoteManualTeacherRepository(api),
-    );
+) => createRepository<ManualTeacherRepository>(
+  ref: ref,
+  mock: () => MockManualTeacherRepository(),
+  remote: (api) => RemoteManualTeacherRepository(api),
+);
 
 /// AsyncNotifier for manual teacher CRUD operations.
 @Riverpod(keepAlive: true)
 class ManualTeacherNotifier extends _$ManualTeacherNotifier {
   @override
   Future<List<ManualTeacher>> build() async {
+    ref.autoRevalidate('/manual-teachers');
     final repository = ref.read(manualTeacherRepositoryProvider);
     return repository.getAll();
   }

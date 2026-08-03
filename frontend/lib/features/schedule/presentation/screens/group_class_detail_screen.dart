@@ -157,8 +157,8 @@ class _GroupClassDetailScreenState
             decoration: BoxDecoration(color: _instrumentColors.background),
             child: Center(
               child: Icon(
-                Icons.music_note,
-                size: 32,
+                _getInstrumentIcon(),
+                size: AppSpacing.iconLG,
                 color: _instrumentColors.accent,
               ),
             ),
@@ -578,6 +578,16 @@ class _GroupClassDetailScreenState
       );
     }
     return InstrumentColors.getColor(instrument);
+  }
+
+  IconData _getInstrumentIcon() {
+    switch (widget.groupClass.instrument?.toLowerCase()) {
+      case 'piano':
+      case '피아노':
+        return Icons.piano;
+      default:
+        return Icons.music_note;
+    }
   }
 
   String _formatPrice(int price) => price.toKoreanWon;

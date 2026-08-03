@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
@@ -286,47 +287,15 @@ class StudentLessonsTab extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space6),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // §7.132: round → 사각 empty state 아이콘 컨테이너.
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              decoration: BoxDecoration(color: AppColors.paperDark),
-              child: Icon(
-                Icons.event_available,
-                size: 48,
-                color: AppColors.inkTertiary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              AppStrings.studentHomeNoUpcomingLesson,
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.studentHomeBookNewLesson,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            OutlinedButton.icon(
-              onPressed: () => context.push(AppRoutes.teacherSearch),
-              icon: const Icon(Icons.search, size: 18),
-              label: const Text(AppStrings.studentHomeFindTeacher),
-              style: OutlinedButton.styleFrom(
-                minimumSize: Size(0, AppSpacing.buttonHeight),
-              ),
-            ),
-          ],
-        ),
+    return SizedBox(
+      height: 240,
+      child: EmptyStateWidget(
+        icon: Icons.event_available,
+        title: AppStrings.studentHomeNoUpcomingLesson,
+        subtitle: AppStrings.studentHomeBookNewLesson,
+        actionLabel: AppStrings.studentHomeFindTeacher,
+        actionIcon: Icons.search,
+        onAction: () => context.push(AppRoutes.teacherSearch),
       ),
     );
   }

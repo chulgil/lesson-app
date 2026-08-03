@@ -12,6 +12,7 @@ import '../../domain/repositories/recording_repository.dart';
 import '../../../../core/audio/audio_recorder_service.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../gamification/gamification_facade.dart';
+import 'practice_recording_provider.dart' show practiceSourceLoggersProvider;
 
 part 'recording_provider.g.dart';
 
@@ -343,7 +344,9 @@ class RecordingNotifier extends _$RecordingNotifier {
         durationSeconds: durationSeconds,
         recordedAt: DateTime.now(),
         isRepresentative:
-            state.recordings.isEmpty, // First recording is representative
+            // #749: representative if none currently holds it (covers both the
+            // first recording and a list whose representative was deleted).
+            state.recordings.every((r) => !r.isRepresentative),
       );
 
       // Save to repository
@@ -353,6 +356,18 @@ class RecordingNotifier extends _$RecordingNotifier {
       ref
           .read(pointAwardNotifierProvider.notifier)
           .awardRecordingSaved(_studentId);
+
+      // #1129: count the recording in the growth heatmap (recordingCount += 1)
+      // then refresh the heatmap viz so the "녹음 N개" cell updates immediately.
+      unawaited(
+        ref
+            .read(practiceSourceLoggersProvider)
+            .logRecording(
+              studentId: _studentId,
+              occurredAt: recording.recordedAt,
+            ),
+      );
+      ref.invalidate(growthHeatmapProvider(_studentId));
 
       // Update state
       state = state.copyWith(
@@ -474,10 +489,27 @@ class RecordingNotifier extends _$RecordingNotifier {
         await stopPlayback();
       }
 
+      final wasRepresentative = state.recordings.any(
+        (r) => r.id == recordingId && r.isRepresentative,
+      );
+
       await _repository.deleteRecording(recordingId);
 
-      final updatedRecordings =
+      var updatedRecordings =
           state.recordings.where((r) => r.id != recordingId).toList();
+
+      // #749: if the representative was deleted, promote the most recent
+      // remaining recording so the list never loses its representative.
+      if (wasRepresentative) {
+        final heir = Recording.pickRepresentativeHeir(updatedRecordings);
+        if (heir != null) {
+          await _repository.setRepresentative(heir.id);
+          updatedRecordings = [
+            for (final r in updatedRecordings)
+              r.copyWith(isRepresentative: r.id == heir.id),
+          ];
+        }
+      }
 
       state = state.copyWith(recordings: updatedRecordings);
     } catch (e) {

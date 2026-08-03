@@ -5,8 +5,6 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/auth/presentation/providers/user_role_provider.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
 import 'package:lessonaza/features/lessons/domain/repositories/lesson_repository.dart';
-import 'package:lessonaza/features/notifications/domain/entities/notification.dart';
-import 'package:lessonaza/features/notifications/domain/services/notification_service.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/schedule/domain/repositories/unified_lesson_request_repository.dart';
@@ -61,29 +59,6 @@ class _StubLessonRepository implements LessonRepository {
 
   @override
   Future<void> cancelLesson(String id) async {}
-}
-
-class _StubNotificationService implements NotificationService {
-  @override
-  Future<void> initialize() async {}
-
-  @override
-  Future<bool> requestPermission() async => true;
-
-  @override
-  Future<void> showNotification(AppNotification n) async {}
-
-  @override
-  Future<void> scheduleNotification(AppNotification n) async {}
-
-  @override
-  Future<void> cancelNotification(String id) async {}
-
-  @override
-  Future<void> cancelAllNotifications() async {}
-
-  @override
-  Stream<AppNotification> get onNotificationTapped => const Stream.empty();
 }
 
 class _StubRequestRepository implements UnifiedLessonRequestRepository {
@@ -141,8 +116,7 @@ class _StubRequestRepository implements UnifiedLessonRequestRepository {
 
 class _StubSubscriptionRepository implements SubscriptionRepository {
   @override
-  Future<List<Subscription>> getByStudentId(String studentId) async =>
-      const [];
+  Future<List<Subscription>> getByStudentId(String studentId) async => const [];
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -151,7 +125,6 @@ List<Override> _commonOverrides() => [
   bulkTeacherActionServiceProvider.overrideWithValue(
     BulkTeacherActionService(
       lessonRepository: _StubLessonRepository(),
-      notificationService: _StubNotificationService(),
       requestRepository: _StubRequestRepository(),
       subscriptionRepository: _StubSubscriptionRepository(),
     ),

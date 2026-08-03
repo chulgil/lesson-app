@@ -55,6 +55,7 @@ from app.models.base import Base  # noqa: F401
 from app.models.device_token import DeviceToken  # noqa: F401
 from app.models.gamification import GamificationBadge, GamificationPoint  # noqa: F401
 from app.models.i18n import I18nTranslation, SupportedLocale  # noqa: F401
+from app.models.idempotency_key import IdempotencyKey  # noqa: F401
 from app.models.invite import Connection, ConnectionRequest, Invite  # noqa: F401
 from app.models.lesson import (  # noqa: F401
     ClassMembership,
@@ -92,7 +93,6 @@ from app.models.practice import (  # noqa: F401
     PracticeRecording,
     PracticeRepertoire,
     PracticeSection,
-    PracticeStreak,
     RecordingFeedback,
     StudentPracticePiece,
 )
@@ -127,6 +127,7 @@ from app.models.schedule_ext import (  # noqa: F401
     ScheduleException,
 )
 from app.models.settings import (  # noqa: F401
+    CancellationDefaults,
     FeedbackCategory,
     FeedbackPreset,
     FeedbackTemplate,

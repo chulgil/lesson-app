@@ -6,8 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../notifications/notifications_facade.dart';
-import '../../../notifications/domain/entities/notification.dart';
 import '../../data/repositories/mock_group_class_booking_repository.dart';
 import '../../data/repositories/remote_group_class_booking_repository.dart';
 import '../../domain/entities/group_class_booking.dart';
@@ -23,38 +21,9 @@ part 'group_class_booking_providers.g.dart';
 GroupClassBookingRepository groupClassBookingRepository(Ref ref) {
   return createRepository<GroupClassBookingRepository>(
     ref: ref,
-    mock:
-        () => MockGroupClassBookingRepository(
-          onWaitlistPromotion: (promoted) {
-            _sendWaitlistPromotionNotification(ref, promoted);
-          },
-        ),
+    mock: () => MockGroupClassBookingRepository(),
     remote: (api) => RemoteGroupClassBookingRepository(api),
   );
-}
-
-void _sendWaitlistPromotionNotification(Ref ref, GroupClassBooking promoted) {
-  try {
-    final notificationService = ref.read(notificationServiceProvider);
-    final notification = AppNotification(
-      id: 'waitlist_promoted_${DateTime.now().millisecondsSinceEpoch}',
-      userId: promoted.studentId,
-      type: NotificationType.lessonBooked,
-      priority: NotificationPriority.high,
-      title: '🎉 대기 → 예약 확정!',
-      body: '취소로 인해 예약이 확정되었습니다.',
-      createdAt: DateTime.now(),
-      actionLabel: '확인하기',
-      data: {
-        'bookingId': promoted.id,
-        'scheduleId': promoted.scheduleId,
-        'type': 'waitlist_promotion',
-      },
-    );
-    notificationService.showNotification(notification);
-  } catch (e) {
-    debugPrint('[GroupClassBooking] Failed to send promotion notification: $e');
-  }
 }
 
 // ============================================================
@@ -294,11 +263,6 @@ class GroupClassBookingNotifier extends _$GroupClassBookingNotifier {
       ref.invalidate(scheduleWaitlistProvider(scheduleId));
       ref.invalidate(scheduleWaitlistCountProvider(scheduleId));
 
-      // Send notifications to cancelled students
-      for (final booking in cancelled) {
-        _sendAutoCancelNotification(booking);
-      }
-
       return cancelled;
     } catch (e) {
       debugPrint(
@@ -308,28 +272,4 @@ class GroupClassBookingNotifier extends _$GroupClassBookingNotifier {
     }
   }
 
-  void _sendAutoCancelNotification(GroupClassBooking booking) {
-    try {
-      final notificationService = ref.read(notificationServiceProvider);
-      final notification = AppNotification(
-        id: 'waitlist_autocancelled_${DateTime.now().millisecondsSinceEpoch}',
-        userId: booking.studentId,
-        type: NotificationType.lessonCancelled,
-        priority: NotificationPriority.normal,
-        title: '⏳ 대기 자동 취소',
-        body: '수업이 시작되어 대기가 자동 취소되었습니다. 다음 기회를 기다려주세요.',
-        createdAt: DateTime.now(),
-        data: {
-          'bookingId': booking.id,
-          'scheduleId': booking.scheduleId,
-          'type': 'waitlist_auto_cancel',
-        },
-      );
-      notificationService.showNotification(notification);
-    } catch (e) {
-      debugPrint(
-        '[GroupClassBookingNotifier] Failed to send auto-cancel notification: $e',
-      );
-    }
-  }
 }

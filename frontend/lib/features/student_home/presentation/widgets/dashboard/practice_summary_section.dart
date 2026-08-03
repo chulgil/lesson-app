@@ -8,6 +8,8 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/notebook_typography.dart';
+import '../../../../gamification/gamification_facade.dart'
+    show effectiveStreakProvider;
 import '../../../../practice/practice_facade.dart';
 
 /// Practice summary section showing streak, weekly stats, and chart.
@@ -19,6 +21,10 @@ class PracticeSummarySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
+    // Streak comes from the single source of truth (effectiveStreakProvider) —
+    // never recomputed here. Freeze bridges a covered gap so one missed day does
+    // not reset to 0. See docs/specs/practice/streak_ssot.md §1 Phase 3.
+    final streakAsync = ref.watch(effectiveStreakProvider(studentId));
 
     final now = DateTime.now();
     // Monday of current week
@@ -27,34 +33,16 @@ class PracticeSummarySection extends ConsumerWidget {
     final sundayDate = mondayDate.add(const Duration(days: 6));
 
     // Default values
-    var streakDays = 0;
+    final streakDays = streakAsync.maybeWhen(
+      data: (streak) => streak.effectiveCurrentStreak,
+      orElse: () => 0,
+    );
     var weeklyTotalMinutes = 0;
     var weeklyPracticedDays = 0;
     var weeklyProgress = List.filled(7, 0.0);
 
     final logs = practiceLogsAsync.valueOrNull;
     if (logs != null && logs.isNotEmpty) {
-      // Calculate streak: consecutive days from today going backwards
-      final sortedLogs = [...logs]..sort((a, b) => b.date.compareTo(a.date));
-      final practicedDates = <String>{};
-      for (final log in sortedLogs) {
-        if (log.totalMinutes > 0) {
-          final d = log.date;
-          practicedDates.add('${d.year}-${d.month}-${d.day}');
-        }
-      }
-
-      var checkDate = DateTime(now.year, now.month, now.day);
-      for (var i = 0; i < 100; i++) {
-        final key = '${checkDate.year}-${checkDate.month}-${checkDate.day}';
-        if (practicedDates.contains(key)) {
-          streakDays++;
-          checkDate = checkDate.subtract(const Duration(days: 1));
-        } else {
-          break;
-        }
-      }
-
       // Weekly stats
       for (final log in logs) {
         final logDate = DateTime(log.date.year, log.date.month, log.date.day);

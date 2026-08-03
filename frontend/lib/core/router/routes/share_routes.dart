@@ -6,6 +6,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../../features/share/presentation/screens/growth_report_screen.dart';
 import '../../../features/share/presentation/screens/student_summary_screen.dart';
 import '../app_routes.dart';
 
@@ -17,6 +18,15 @@ List<GoRoute> shareRoutes = [
     builder: (context, state) {
       final token = state.pathParameters['token'] ?? '';
       return StudentSummaryScreen(token: token);
+    },
+  ),
+  // #1217 — 무가입 자녀 성장 리포트 프리뷰 (읽기 전용, 인증 불필요).
+  GoRoute(
+    path: AppRoutes.growthReport,
+    name: 'growthReport',
+    builder: (context, state) {
+      final token = state.pathParameters['token'] ?? '';
+      return GrowthReportScreen(token: token);
     },
   ),
 ];

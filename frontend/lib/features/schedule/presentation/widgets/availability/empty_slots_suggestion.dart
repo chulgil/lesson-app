@@ -28,7 +28,11 @@ class EmptySlotsSuggestion extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Empty state icon
-        Text('😢', style: AppTypography.displayLarge.copyWith(fontSize: 48)),
+        Icon(
+          Icons.sentiment_dissatisfied,
+          size: AppSpacing.iconXL,
+          color: AppColors.inkTertiary,
+        ),
 
         const SizedBox(height: AppSpacing.space3),
 

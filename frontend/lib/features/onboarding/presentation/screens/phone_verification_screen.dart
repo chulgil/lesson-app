@@ -203,7 +203,18 @@ class _PhoneVerificationScreenState
         ref
             .read(teacherOnboardingNotifierProvider.notifier)
             .completeOnboarding();
-        await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        try {
+          await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        } catch (_) {
+          // Server-side verification already succeeded, but persisting the
+          // onboarding-complete flag (PATCH + getMe) failed, e.g. a network
+          // drop. Surface it instead of leaving the screen frozen with no
+          // spinner, error, or navigation (the button callback would otherwise
+          // swallow the exception).
+          if (!mounted) return;
+          setState(() => _errorMessage = AppStrings.errorTryAgain);
+          return;
+        }
         // Re-check mounted after the async gap before touching context.
         if (!mounted) return;
         context.go(AppRoutes.home);
@@ -239,11 +250,6 @@ class _PhoneVerificationScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: AppSpacing.space4),
-
-                // Progress indicator
-                _buildProgressIndicator(),
-
-                const SizedBox(height: AppSpacing.space6),
 
                 // Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-h).
                 Text(
@@ -314,30 +320,6 @@ class _PhoneVerificationScreenState
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Row(
-      children: [
-        _ProgressStep(
-          step: 1,
-          label: AppStrings.onboardingPhoneVerification,
-          isActive: true,
-        ),
-        _ProgressDivider(isActive: false),
-        _ProgressStep(
-          step: 2,
-          label: AppStrings.onboardingProfileSetup,
-          isActive: false,
-        ),
-        _ProgressDivider(isActive: false),
-        _ProgressStep(
-          step: 3,
-          label: AppStrings.onboardingTutorial,
-          isActive: false,
-        ),
-      ],
     );
   }
 
@@ -470,69 +452,6 @@ class _PhoneVerificationScreenState
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ProgressStep extends StatelessWidget {
-  final int step;
-  final String label;
-  final bool isActive;
-
-  const _ProgressStep({
-    required this.step,
-    required this.label,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
-              borderRadius: BorderRadius.zero,
-            ),
-            child: Center(
-              child: Text(
-                '$step',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isActive ? AppColors.paper : AppColors.inkTertiary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space1),
-          Text(
-            label,
-            style: AppTypography.caption.copyWith(
-              color: isActive ? AppColors.ink : AppColors.inkTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProgressDivider extends StatelessWidget {
-  final bool isActive;
-
-  const _ProgressDivider({required this.isActive});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 24,
-      height: 2,
-      margin: const EdgeInsets.only(bottom: AppSpacing.space5),
-      color: isActive ? AppColors.paperAccent : AppColors.inkQuaternary,
     );
   }
 }

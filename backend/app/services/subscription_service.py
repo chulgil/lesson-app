@@ -559,6 +559,7 @@ class SubscriptionService:
         lost: list[LessonBooking] = []
         seen_dates: set[date] = set()
         for booking in targets:
+            old_date, old_time = booking.scheduled_date, booking.scheduled_time
             shift = (new_day_of_week - booking.scheduled_date.weekday()) % 7
             new_date = booking.scheduled_date + timedelta(days=shift)
             # 같은 새 일정에 이미 옮긴 booking 이 있거나 conflict — 손실 처리.
@@ -581,11 +582,28 @@ class SubscriptionService:
             if conflict is not None or new_date in seen_dates:
                 booking.status = BookingStatus.cancelled
                 lost.append(booking)
+                # #1203 — keep the calendar (Lesson SSOT) in sync with the lost booking.
+                await self._sync_lesson_to_booking_change(
+                    subscription_id=subscription_id,
+                    teacher_id=booking.teacher_id,
+                    old_date=old_date,
+                    old_time=old_time,
+                    cancel=True,
+                )
                 continue
             booking.scheduled_date = new_date
             booking.scheduled_time = new_time
             seen_dates.add(new_date)
             rescheduled += 1
+            # #1203 — move the matching Lesson (calendar SSOT) alongside the booking.
+            await self._sync_lesson_to_booking_change(
+                subscription_id=subscription_id,
+                teacher_id=booking.teacher_id,
+                old_date=old_date,
+                old_time=old_time,
+                new_date=new_date,
+                new_time=new_time,
+            )
 
         await self.db.flush()
 
@@ -611,6 +629,44 @@ class SubscriptionService:
             "credits_accrued": credits_accrued,
             "new_expires_at": sub_row.end_date if sub_row is not None else None,
         }
+
+    async def _sync_lesson_to_booking_change(
+        self,
+        *,
+        subscription_id: str,
+        teacher_id: str,
+        old_date: date,
+        old_time: str,
+        new_date: date | None = None,
+        new_time: str | None = None,
+        cancel: bool = False,
+    ) -> None:
+        """#1203 — keep the Lesson (calendar SSOT) in sync when bulk_change moves or
+        cancels a LessonBooking.
+
+        Lesson and LessonBooking are stored separately with no FK, so the calendar
+        (which reads Lesson) drifts unless the matching Lesson is updated too. Match
+        by (subscription_id, teacher_id, date, start_time); no-op if no Lesson row
+        matches (e.g. bookings without a generated Lesson).
+        """
+        from app.models.lesson import Lesson, LessonStatus
+
+        lesson = await self.db.scalar(
+            select(Lesson).where(
+                Lesson.subscription_id == subscription_id,
+                Lesson.teacher_id == teacher_id,
+                Lesson.date == old_date,
+                Lesson.start_time == old_time,
+                Lesson.status == LessonStatus.scheduled,
+            )
+        )
+        if lesson is None:
+            return
+        if cancel:
+            lesson.status = LessonStatus.cancelled
+        elif new_date is not None and new_time is not None:
+            lesson.date = new_date
+            lesson.start_time = new_time
 
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status.
@@ -718,7 +774,7 @@ class SubscriptionService:
         self.db.add(usage)
 
         if usage.deducted:
-            sub = await self.db.get(Subscription, subscription_id)
+            sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
             if sub is not None:
                 self._apply_deduction_counter(sub)
 
@@ -1409,6 +1465,24 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
+    async def _student_user_id(self, student_id: str) -> str | None:
+        """Resolve a proposal's student_id (Student row id or legacy user id) to a user id."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is not None:
+            return student.user_id
+        return student_id
+
+    async def _teacher_user_id(self, teacher_id: str) -> str | None:
+        """Resolve a proposal's teacher_id (Teacher row id or legacy user id) to a user id."""
+        from app.models.teacher import Teacher
+
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            return teacher.user_id
+        return teacher_id
+
     async def _notify_deposit_received(
         self,
         subscription: Any,
@@ -1774,6 +1848,21 @@ class SubscriptionService:
                 event_type="proposalSent",
             )
 
+        # #1193 — in-app row for the student; the alimtalk/FCM below are
+        # delivery channels only and never persisted for the notification list.
+        recipient = await self._student_user_id(proposal.student_id)
+        if recipient:
+            from app.services.notification_service import NotificationPriority, NotificationService
+
+            await NotificationService(self.db).create_and_send(
+                user_id=recipient,
+                notification_type="proposalReceived",
+                title="수강권 제안 도착",
+                body="선생님이 수강권을 제안했어요. 확인 후 진행해주세요.",
+                priority=NotificationPriority.high,
+                action_url=f"/subscriptions/{proposal.id}",
+            )
+
         # #423 — fire-and-forget alimtalk LNZ_INVOICE. Failure must not break proposal creation.
         try:
             await self._send_alimtalk_invoice(proposal)
@@ -1944,6 +2033,30 @@ class SubscriptionService:
         await self.db.flush()
         return len(proposals)
 
+    async def expire_stale_proposals_systemwide(self) -> int:
+        """System-wide sweep: mark all past-expiry pending proposals expired.
+
+        Job-only (scheduler / system context). Unlike [expire_old_proposals]
+        there is no teacher_id filter — the #468 1d guard exists to stop a
+        *teacher* from expiring another teacher's proposals via the API; the
+        scheduler may sweep all teachers' stale proposals.
+        """
+        from app.models.subscription import ProposalStatus, SubscriptionProposal
+
+        now = datetime.now(UTC)
+        result = await self.db.scalars(
+            select(SubscriptionProposal).where(
+                SubscriptionProposal.status.in_([ProposalStatus.pending, ProposalStatus.paymentNotified]),
+                SubscriptionProposal.expires_at < now,
+            )
+        )
+        proposals = list(result.all())
+        for proposal in proposals:
+            proposal.status = ProposalStatus.expired
+        if proposals:
+            await self.db.flush()
+        return len(proposals)
+
     async def respond_to_proposal(
         self, proposal_id: str, data: ProposalRespondRequest, current_user: Any
     ) -> SubscriptionProposalResponse:
@@ -1956,6 +2069,24 @@ class SubscriptionService:
             proposal.status = ProposalStatus.paymentNotified
             proposal.payment_notified_at = datetime.now(UTC)
             proposal.selected_template_id = data.selected_template_id
+
+            # #1193 — the teacher otherwise learns of the acceptance only by
+            # polling the home section (FE local notifications are actor-only).
+            recipient = await self._teacher_user_id(proposal.teacher_id)
+            if recipient:
+                from app.services.notification_service import (
+                    NotificationPriority,
+                    NotificationService,
+                )
+
+                await NotificationService(self.db).create_and_send(
+                    user_id=recipient,
+                    notification_type="proposalAccepted",
+                    title="수강권 제안 수락",
+                    body="학생이 수강권 제안을 수락하고 입금을 알렸어요. 입금 확인 후 발급해주세요.",
+                    priority=NotificationPriority.high,
+                    action_url=f"/subscriptions/{proposal.id}",
+                )
 
             # GAP-6: Sync LessonRequest status → paymentNotified
             if proposal.lesson_request_id:

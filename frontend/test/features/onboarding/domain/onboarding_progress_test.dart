@@ -8,12 +8,12 @@ void main() {
 
       expect(progress.userId, 'teacher_1');
       expect(progress.quests, hasLength(5));
-      expect(progress.quests.map((quest) => quest.title).toList(), <String>[
-        '프로필 생성',
-        '첫 학생 추가',
-        '첫 레슨 등록',
-        '첫 레슨 노트 작성',
-        '전화번호 인증',
+      expect(progress.quests.map((quest) => quest.id).toList(), <String>[
+        'profile-created',
+        'first-student',
+        'first-lesson',
+        'first-note',
+        'phone-verified',
       ]);
       expect(progress.completedRequiredQuestCount, 0);
       expect(progress.totalRequiredQuestCount, 5);

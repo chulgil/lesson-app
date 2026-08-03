@@ -4,7 +4,17 @@ class ApiException implements Exception {
   final int? statusCode;
   final dynamic data;
 
-  const ApiException({required this.message, this.statusCode, this.data});
+  /// #1117: the ``Idempotency-Key`` attached to the failed attempt (set by
+  /// `ErrorInterceptor` from the request's `extra`). Lets the mutation queue
+  /// replay with the SAME key so the server dedupes a write it already got.
+  final String? idempotencyKey;
+
+  const ApiException({
+    required this.message,
+    this.statusCode,
+    this.data,
+    this.idempotencyKey,
+  });
 
   @override
   String toString() => 'ApiException($statusCode): $message';
@@ -12,7 +22,8 @@ class ApiException implements Exception {
 
 /// Network-level exception (no connectivity, timeout, etc.)
 class NetworkException extends ApiException {
-  const NetworkException({required super.message}) : super(statusCode: null);
+  const NetworkException({required super.message, super.idempotencyKey})
+    : super(statusCode: null);
 }
 
 /// Authentication error (401 after refresh attempt).
@@ -43,8 +54,10 @@ class ValidationException extends ApiException {
 
 /// Server error (500+).
 class ServerException extends ApiException {
-  const ServerException({super.message = '서버 오류가 발생했습니다.'})
-    : super(statusCode: 500);
+  const ServerException({
+    super.message = '서버 오류가 발생했습니다.',
+    super.idempotencyKey,
+  }) : super(statusCode: 500);
 }
 
 /// Phone verification required (409 with code ``phone_verification_required``).

@@ -4,6 +4,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/address_search_field.dart';
 import 'student_form_helpers.dart';
 
 /// Address form fields for student location.
@@ -47,15 +48,14 @@ class AddressFields extends StatelessWidget {
               child: SizedBox(
                 height: AppSpacing.buttonHeight,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          AppStrings.studentAddressSearchComingSoon,
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
+                  onPressed: () async {
+                    // #749: reuse the shared address-search sheet (same mock as
+                    // basic_info_edit) and fill the form controllers.
+                    final result = await showAddressSearchSheet(context);
+                    if (result != null) {
+                      postalCodeController.text = result.postalCode ?? '';
+                      addressController.text = result.address ?? '';
+                    }
                   },
                   icon: const Icon(Icons.search, size: AppSpacing.iconSM),
                   label: const Text(AppStrings.studentAddressSearchLabel),

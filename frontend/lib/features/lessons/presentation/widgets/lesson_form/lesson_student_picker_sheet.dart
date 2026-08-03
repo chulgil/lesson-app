@@ -35,7 +35,7 @@ void showLessonStudentPicker({
           Padding(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-            child: Text('학생 선택', style: NotebookTypography.sectionTitle),
+            child: Text(AppStrings.lessonStudentPickerTitle, style: NotebookTypography.sectionTitle),
           ),
           Expanded(
             child: students.isEmpty

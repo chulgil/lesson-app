@@ -23,21 +23,6 @@ class GrowthHeatmap {
     return sum;
   }
 
-  /// [asOf] 부터 거꾸로 연속해서 `totalMinutes > 0` 인 날 카운트.
-  /// 한 날이라도 빠지거나 0 분이면 즉시 종료.
-  int streakDays(DateTime asOf) {
-    var count = 0;
-    var cursor = asOf;
-    while (true) {
-      final entry = days[cursor];
-      if (entry == null || entry.totalMinutes <= 0) {
-        return count;
-      }
-      count++;
-      cursor = cursor.subtract(const Duration(days: 1));
-    }
-  }
-
   GrowthHeatmap copyWith({Map<DateTime, DailyPractice>? days}) =>
       GrowthHeatmap(studentId: studentId, days: days ?? this.days);
 

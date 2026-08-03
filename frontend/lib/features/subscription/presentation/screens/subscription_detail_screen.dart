@@ -14,7 +14,6 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../lessons/lessons_facade.dart';
 import '../../../schedule/schedule_facade.dart';
-import '../../../notifications/notifications_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/schedule_ui_facade.dart';
@@ -458,6 +457,9 @@ class _SubscriptionDetailBodyState
             selectedSession: _selectedSession,
             onScheduleChange: () => _handleScheduleChange(context),
             onAcceptScheduleChoice: _handleAcceptScheduleChoice,
+            onRejectScheduleChoice:
+                (event, message) =>
+                    _handleRejectScheduleChoice(context, event, message),
             onCompareSchedule:
                 (event) => _handleCompareSchedule(context, event),
             onWithdrawScheduleDecision:
@@ -499,15 +501,6 @@ class _SubscriptionDetailBodyState
   // ═══════════════════════════════════════════════════════════════
 
   /// 협상 상대(알림 받는 사람) userId. 내가 선생이면 학생, 학생이면 선생.
-  String _scheduleOpponentId() =>
-      _isTeacher ? subscription.studentId : (_getTeacherId() ?? '');
-
-  /// 협상 알림 data 페이로드 (알림 탭 시 이 수강권/회차로 이동).
-  Map<String, dynamic> _scheduleChangeData() => {
-    'subscriptionId': subscription.id,
-    'sessionNumber': _selectedSession,
-  };
-
   /// Accept a proposed schedule slot.
   void _handleAcceptScheduleChoice(
     RequestEvent event,
@@ -534,22 +527,52 @@ class _SubscriptionDetailBodyState
       _selectedSession,
       acceptEvent,
     );
-    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
-    final opp = _scheduleOpponentId();
-    if (opp.isNotEmpty) {
-      unawaited(
-        ref
-            .read(notificationServiceProvider)
-            .showNotification(
-              BookingNotificationService.createScheduleChangeAccepted(
-                userId: opp,
-                fromTeacher: _isTeacher,
-                data: _scheduleChangeData(),
-              ),
-            ),
-      );
-    }
+    // #1191 — 상대 통지는 BE Notification row 가 SSOT (#1200). FE 로컬 알림은
+    // 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
     if (mounted) _showSuccess(AppStrings.scheduleChangeAccepted);
+  }
+
+  /// N8 (0702 감사) — reject the opponent's schedule proposal. Mirrors
+  /// request_detail's 3-action response set; destructive → confirm dialog.
+  Future<void> _handleRejectScheduleChoice(
+    BuildContext context,
+    RequestEvent event,
+    String message,
+  ) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.scheduleChangeRejectConfirmTitle,
+      message: AppStrings.scheduleChangeRejectConfirmBody,
+      confirmLabel: AppStrings.scheduleChangeReject,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final rejectEvent = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
+      actorId: _isTeacher
+          ? (_getTeacherId() ?? subscription.studentId)
+          : subscription.studentId,
+      eventType: RequestEventType.scheduleChangeRejected,
+      suggestedSlots: event.suggestedSlots,
+      message: message.isEmpty ? null : message,
+      sessionNumber: _selectedSession,
+      createdAt: DateTime.now(),
+    );
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      rejectEvent,
+    );
+    // #1191 — FE 로컬 알림(액터 기기 전용) 오발 제거. reject 상대 통지는 전용
+    // 타입 부재로 BE emit 미구현 잔여(#1193) — 기존에도 상대 미수신.
+    if (mounted) _showSuccess(AppStrings.scheduleChangeReject);
   }
 
   /// Open schedule comparison screen to counter-propose.
@@ -606,21 +629,8 @@ class _SubscriptionDetailBodyState
       _selectedSession,
       counterEvent,
     );
-    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
-    final opp = _scheduleOpponentId();
-    if (opp.isNotEmpty) {
-      unawaited(
-        ref
-            .read(notificationServiceProvider)
-            .showNotification(
-              BookingNotificationService.createScheduleChangeCountered(
-                userId: opp,
-                fromTeacher: _isTeacher,
-                data: _scheduleChangeData(),
-              ),
-            ),
-      );
-    }
+    // #1191 — 상대 통지는 BE(#1200 scheduleChangeRequested→교사 emit). FE 로컬
+    // 알림은 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
     if (mounted) _showSuccess(AppStrings.alternativeProposeSent);
   }
 
@@ -735,21 +745,8 @@ class _SubscriptionDetailBodyState
 
     addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
 
-    // #541 — 협상 이벤트를 상대에게 알림 (비동기 핸드오프)
-    final opp = _scheduleOpponentId();
-    if (opp.isNotEmpty) {
-      unawaited(
-        ref
-            .read(notificationServiceProvider)
-            .showNotification(
-              BookingNotificationService.createScheduleChangeProposed(
-                userId: opp,
-                fromTeacher: _isTeacher,
-                data: _scheduleChangeData(),
-              ),
-            ),
-      );
-    }
+    // #1191 — 상대 통지는 BE Notification row 가 SSOT (#1200). FE 로컬 알림은
+    // 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
 
     if (mounted) {
       _showSuccess(AppStrings.scheduleChangePropose);

@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/center_action_slot.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart'
     show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../../../../core/widgets/practice_center_button.dart';
 import '../providers/student_home_session_provider.dart';
+import '../providers/student_home_tab_request_provider.dart';
 import 'student_dashboard_tab.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
@@ -46,15 +48,15 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           if (result.recovered > 0 || result.cleanedUp > 0) {
             final parts = <String>[];
             if (result.recovered > 0) {
-              parts.add('${result.recovered}개 복구');
+              parts.add(AppStrings.studentHomeRecordingRecoveredCount(result.recovered));
             }
             if (result.cleanedUp > 0) {
-              parts.add('${result.cleanedUp}개 정리');
+              parts.add(AppStrings.studentHomeRecordingCleanedCount(result.cleanedUp));
             }
-            message = '녹음 파일: ${parts.join(', ')} (전체 ${result.total}개)';
+            message = AppStrings.studentHomeRecordingRecoverySummary(parts.join(', '), result.total);
             bgColor = AppColors.paperOk;
           } else {
-            message = '녹음 파일 ${result.total}개 확인됨 (복구 불필요)';
+            message = AppStrings.studentHomeRecordingVerified(result.total);
             bgColor = AppColors.ink;
           }
 
@@ -73,6 +75,14 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // #749: descendant widgets request a tab switch (e.g. trial "더보기" →
+    // Lessons) via studentHomeTabRequestProvider; consume and reset it here.
+    ref.listen<int?>(studentHomeTabRequestProvider, (_, next) {
+      if (next != null) {
+        setState(() => _currentIndex = next);
+        ref.read(studentHomeTabRequestProvider.notifier).state = null;
+      }
+    });
     return DebugWrapper(
       child: NotebookScreenScaffold(
         body: SafeArea(
@@ -108,8 +118,12 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
             children: [
               _buildNavItem(0, 'I', AppStrings.navHome),
               _buildNavItem(1, 'II', AppStrings.navLessons),
-              // Center practice button (same level as other items)
-              const PracticeCenterButton(size: 48),
+              // Center practice button via discipline-neutral slot (#975).
+              // Music injects the action; null slots stay unwrapped (see
+              // CenterActionSlot doc) so non-music shells do not shift.
+              const CenterActionSlot(
+                centerAction: PracticeCenterButton(size: 48),
+              ),
               _buildNavItem(2, 'III', AppStrings.navPractice),
               _buildNavItem(3, 'IV', AppStrings.navProfile),
             ],

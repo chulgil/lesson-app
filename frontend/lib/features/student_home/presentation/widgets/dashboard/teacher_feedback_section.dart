@@ -22,62 +22,41 @@ class TeacherFeedbackSection extends ConsumerWidget {
     final feedbackAsync = ref.watch(
       studentHomeLatestTeacherFeedbackProvider(studentId),
     );
-    final feedbackLessonId = feedbackAsync.valueOrNull?.id;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // C7 — secondary 섹션: 피드백 없음/로딩/에러 시 헤더 포함 전체 숨김 (가시성 일치).
+    return feedbackAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (feedbackLesson) {
+        if (feedbackLesson == null) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
-            Text(
-              AppStrings.studentHomeRecentFeedback,
-              style: NotebookTypography.sectionTitle,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Notebook × Score: 섹션 헤더는 Playfair sectionTitle (§7.87-f).
+                Text(
+                  AppStrings.studentHomeRecentFeedback,
+                  style: NotebookTypography.sectionTitle,
+                ),
+                TextButton(
+                  onPressed: () => context.push(
+                    AppRoutes.lessonDetail
+                        .replaceFirst(':id', feedbackLesson.id),
+                  ),
+                  child: const Text(AppStrings.showMore),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: feedbackLessonId == null
-                  ? null
-                  : () => context.push(
-                      AppRoutes.lessonDetail.replaceFirst(':id', feedbackLessonId),
-                    ),
-              child: const Text(AppStrings.showMore),
-            ),
+            const SizedBox(height: AppSpacing.space3),
+            _buildTeacherFeedback(feedbackLesson),
           ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-        feedbackAsync.when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (feedbackLesson) {
-            if (feedbackLesson == null) {
-              return _buildEmptyState();
-            }
-
-            return _buildTeacherFeedback(feedbackLesson);
-          },
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _buildEmptyState() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.paper,
-        border: Border.all(color: AppColors.inkQuaternary),
-      ),
-      child: Center(
-        child: Text(
-          '아직 피드백이 없습니다',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.inkTertiary,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildTeacherFeedback(Lesson lesson) {
     final teacherName = lesson.teacherName ?? '선생님';
@@ -108,10 +87,14 @@ class TeacherFeedbackSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                teacherName,
-                style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  teacherName,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const Spacer(),

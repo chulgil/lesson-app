@@ -14,6 +14,7 @@ class _StatefulMockMetronome extends Notifier<MetronomeState>
   bool stopCalled = false;
   String? capturedStudentId;
   int? capturedMinutes;
+  String? capturedSectionId;
 
   @override
   MetronomeState build() => const MetronomeState(isReady: true);
@@ -27,11 +28,16 @@ class _StatefulMockMetronome extends Notifier<MetronomeState>
   }
 
   @override
-  void stop({String? studentId, int? practiceMinutesElapsed}) {
+  void stop({
+    String? studentId,
+    int? practiceMinutesElapsed,
+    String? sectionId,
+  }) {
     state = state.copyWith(isPlaying: false);
     stopCalled = true;
     capturedStudentId = studentId;
     capturedMinutes = practiceMinutesElapsed;
+    capturedSectionId = sectionId;
   }
 
   @override
@@ -77,13 +83,16 @@ class _StatefulMockMetronome extends Notifier<MetronomeState>
 Future<_StatefulMockMetronome> _pumpPanel(
   WidgetTester tester, {
   String? studentId,
+  String? sectionId,
 }) async {
   final mock = _StatefulMockMetronome();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [metronomeProvider.overrideWith(() => mock)],
       child: MaterialApp(
-        home: Scaffold(body: MetronomePanel(studentId: studentId)),
+        home: Scaffold(
+          body: MetronomePanel(studentId: studentId, sectionId: sectionId),
+        ),
       ),
     ),
   );
@@ -134,5 +143,41 @@ void main() {
     // 짧은 테스트 — 정확한 값까지 검증하지 않고 분 단위 (>= 0) 만 확인.
     expect(mock.capturedMinutes, isNotNull);
     expect(mock.capturedMinutes! >= 0, isTrue);
+  });
+
+  testWidgets('sectionId 주입 시 stop 인자에 sectionId 전달 (선택적 곡 연결)', (
+    tester,
+  ) async {
+    final mock = await _pumpPanel(
+      tester,
+      studentId: 'student-1',
+      sectionId: 'sec-1',
+    );
+    final playPause = find.byKey(const ValueKey('metronome_play_pause_button'));
+
+    await tester.tap(playPause);
+    await tester.pump();
+    await tester.tap(playPause);
+    await tester.pump();
+
+    expect(mock.stopCalled, isTrue);
+    // 곡 상세에서 연 메트로놈은 sectionId 를 stop → logMetronome 으로 전달해
+    // 그 섹션 연습시간에 크레딧되게 한다 (practice_master §1.2).
+    expect(mock.capturedSectionId, 'sec-1');
+  });
+
+  testWidgets('sectionId 없이 열면 stop 인자의 sectionId 는 null (무마찰 홈 시작)', (
+    tester,
+  ) async {
+    final mock = await _pumpPanel(tester, studentId: 'student-1');
+    final playPause = find.byKey(const ValueKey('metronome_play_pause_button'));
+
+    await tester.tap(playPause);
+    await tester.pump();
+    await tester.tap(playPause);
+    await tester.pump();
+
+    expect(mock.stopCalled, isTrue);
+    expect(mock.capturedSectionId, isNull);
   });
 }

@@ -87,7 +87,7 @@ class _ParentInviteCodeScreenState
 
                       // Description
                       Text(
-                        '자녀의 선생님으로부터 받은\n초대 코드를 입력해주세요',
+                        AppStrings.authParentInviteCodeDesc,
                         style: AppTypography.bodyLarge.copyWith(
                           color: AppColors.inkSecondary,
                         ),
@@ -144,7 +144,7 @@ class _ParentInviteCodeScreenState
                           textCapitalization: TextCapitalization.characters,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '초대 코드를 입력해주세요';
+                              return AppStrings.inviteCodeValidationEmpty;
                             }
                             return null;
                           },
@@ -180,22 +180,21 @@ class _ParentInviteCodeScreenState
                             foregroundColor: AppColors.paper,
                             shape: RoundedRectangleBorder(),
                           ),
-                          child:
-                              _isLoading
-                                  ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.paper,
-                                      ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.paper,
                                     ),
-                                  )
-                                  : Text(
-                                    '코드 확인하기',
-                                    style: AppTypography.button,
                                   ),
+                                )
+                              : Text(
+                                  AppStrings.inviteCodeSubmitButton,
+                                  style: AppTypography.button,
+                                ),
                         ),
                       ),
 
@@ -204,23 +203,19 @@ class _ParentInviteCodeScreenState
                       // Divider
                       Row(
                         children: [
-                          Expanded(
-                            child: ThinRule(),
-                          ),
+                          Expanded(child: ThinRule()),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.space3,
                             ),
                             child: Text(
-                              '또는',
+                              AppStrings.authInviteOrDivider,
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.inkTertiary,
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: ThinRule(),
-                          ),
+                          Expanded(child: ThinRule()),
                         ],
                       ),
 
@@ -232,7 +227,7 @@ class _ParentInviteCodeScreenState
                         child: Column(
                           children: [
                             Text(
-                              '코드가 없어도 괜찮아요',
+                              AppStrings.authParentSkipTitle,
                               style: AppTypography.bodyMedium.copyWith(
                                 color: AppColors.ink,
                                 fontWeight: FontWeight.w600,
@@ -240,7 +235,7 @@ class _ParentInviteCodeScreenState
                             ),
                             const SizedBox(height: AppSpacing.space1),
                             Text(
-                              '나중에 프로필에서 자녀를 등록할 수 있습니다',
+                              AppStrings.authParentSkipSubtitle,
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.inkTertiary,
                               ),
@@ -307,6 +302,8 @@ class _ParentInviteCodeScreenState
 
       // Set role + complete onboarding so the auth gate lets /parent-home
       // through (otherwise AuthNeedsOnboarding bounces to roleSelect, #582).
+      // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
+      // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
       ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
       await _completeParentOnboarding();
       if (!mounted) return;
@@ -337,6 +334,8 @@ class _ParentInviteCodeScreenState
     if (_isSkipping) return;
     setState(() => _isSkipping = true);
     // Set role to parent and navigate to empty home.
+    // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
+    // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
     ref.read(currentUserRoleProvider.notifier).state = UserRole.parent;
     try {
       await _completeParentOnboarding();

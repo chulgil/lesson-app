@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../auth/auth_facade.dart';
 import '../../data/repositories/mock_teaching_resource_repository.dart';
 import '../../data/repositories/remote_teaching_resource_repository.dart';
 import '../../domain/entities/teaching_resource.dart';
@@ -45,12 +46,14 @@ class TeachingResourceNotifier extends _$TeachingResourceNotifier {
   TeachingResourceRepository get _repository =>
       ref.read(teachingResourceRepositoryProvider);
 
-  // Default teacher ID - will be replaced with auth provider
-  String get _teacherId => 'teacher_1';
+  // Owner scope for reads/writes — the signed-in teacher, not a fixed id.
+  String get _teacherId => ref.read(currentUserIdProvider);
 
   @override
   Future<List<TeachingResource>> build() async {
-    return _repository.getByTeacherId(_teacherId);
+    // watch (not read) so the list reloads when the signed-in user changes.
+    final teacherId = ref.watch(currentUserIdProvider);
+    return _repository.getByTeacherId(teacherId);
   }
 
   /// Create a new YouTube resource

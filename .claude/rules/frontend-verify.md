@@ -64,6 +64,23 @@ auto verify --viewport mobile
 
 3단계는 CLAUDE.md 상위 지침("UI 변경은 브라우저에서 실기 확인") 과 일치.
 
+### Agentic 검증 루프 (권장 기본 — Dart/Flutter MCP + web + chrome MCP)
+
+> 전략 SSOT: 옵시디언 `10 Projects/레슨앱/40-Flutter-AI-개발속도-전략`. 사람이 매번 chrome 을 수동으로 여는 의식을 에이전트가 스스로 도는 루프로 대체한다.
+
+`.mcp.json` 에 **dart** MCP 서버 등록됨(공식 Dart & Flutter MCP). UI 변경 시 이 루프를 우선 사용:
+
+1. `flutter run -d web-server --dart-define=...` 로 앱 기동 (`-d chrome` 아님 — 그 경우 Flutter 가 띄운 창에만 핫리로드가 가서 에이전트가 모는 브라우저와 어긋남).
+2. 코드 편집 후 Dart MCP `hot_reload` → 초 단위 반영.
+3. Dart MCP `get_runtime_errors` / `get_widget_tree` 로 런타임 에러·위젯트리를 **에이전트가 직접** 확인(로그 수동 판독 대체).
+4. 픽셀 스크린샷은 **chrome-devtools MCP** 로 375 / tall 뷰포트 촬영 — flutter_driver 스크린샷은 web 빌드 미지원이므로 브라우저 MCP 와 페어링.
+5. golden test 가 있는 화면은 golden 회귀로 실폰트 오버플로우까지 기계 검출(§아래 "실폰트" 항목).
+
+한계·주의:
+- web 빌드에서 flutter_driver 의 탭/입력/스크린샷은 미지원 → 픽셀 검증은 chrome MCP 담당, 상태·에러·핫리로드는 Dart MCP(DTD) 담당으로 역할 분리.
+- 모바일 실기 렌더(노치·키보드·시스템바)는 이 루프로 못 잡음 → 그 클래스는 여전히 실기/시뮬레이터. web 루프는 레이아웃·오버플로우·상태 회귀용.
+- MCP 등록 변경은 세션 재시작 후 활성.
+
 ## 뷰포트 커버리지
 
 한 번의 검증에 최소 2개 뷰포트:

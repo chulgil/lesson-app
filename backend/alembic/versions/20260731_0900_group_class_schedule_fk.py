@@ -1,7 +1,7 @@
 """group_class_schedules.group_class_id → group_classes FK 정합 (P1-0)
 
 Revision ID: group_class_schedule_fk
-Revises: add_practice_journal
+Revises: add_growth_report_share
 Create Date: 2026-07-31 09:00:00.000000
 
 배경
@@ -40,7 +40,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "group_class_schedule_fk"
-down_revision: str | None = "add_practice_journal"
+down_revision: str | None = "add_growth_report_share"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

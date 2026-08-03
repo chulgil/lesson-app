@@ -1,23 +1,32 @@
 {
-  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/.mcp.schema.json",
-  "mcpServers": {
-    "context7": {
-      "$comment": "Up-to-date documentation and code examples via Context7",
-      "args": [
-        "-l",
-        "-c",
-        "exec npx -y @upstash/context7-mcp@latest"
-      ],
-      "command": "/bin/bash"
-    },
-    "sequential-thinking": {
-      "$comment": "Step-by-step reasoning for complex problems (--think flag)",
-      "args": [
-        "-l",
-        "-c",
-        "exec npx -y @modelcontextprotocol/server-sequential-thinking"
-      ],
-      "command": "/bin/bash"
+    "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/.mcp.schema.json",
+    "mcpServers": {
+        "context7": {
+            "$comment": "Up-to-date documentation and code examples via Context7",
+            "args": [
+                "-l",
+                "-c",
+                "exec npx -y @upstash/context7-mcp@latest"
+            ],
+            "command": "/bin/bash"
+        },
+        "sequential-thinking": {
+            "$comment": "Step-by-step reasoning for complex problems (--think flag)",
+            "args": [
+                "-l",
+                "-c",
+                "exec npx -y @modelcontextprotocol/server-sequential-thinking"
+            ],
+            "command": "/bin/bash"
+        },
+        "dart": {
+            "$comment": "Dart & Flutter MCP (official) \u2014 \uc2e4\ud589 \uc911\uc778 \uc571 \uc704\uc82f\ud2b8\ub9ac\u00b7\ub7f0\ud0c0\uc784\uc5d0\ub7ec\u00b7\ud56b\ub9ac\ub85c\ub4dc\u00b7\uc2a4\ud06c\ub9b0\uc0f7 + analyze/test/pub/format CLI. \uc5f0\uacb0: `flutter run --print-dtd` \ud6c4 DTD attach. \uc571 \uad6c\ub3d9(\ud0ed/\uc785\ub825)\uc740 enableFlutterDriverExtension() \uc744 --dart-define \uac8c\uc774\ud2b8 \ub4a4\uc5d0. Flutter 3.35+/Dart 3.9+ (\ud604\uc7ac 3.41.6/3.11.4 \ucda9\uc871). docs.flutter.dev/ai/mcp-server",
+            "args": [
+                "-l",
+                "-c",
+                "exec dart mcp-server"
+            ],
+            "command": "/bin/bash"
+        }
     }
-  }
 }

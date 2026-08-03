@@ -82,15 +82,15 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           const SizedBox(height: AppSpacing.space6),
           // Notebook × Score: 연결 실패 상태 헤드라인 Playfair sectionTitle (§7.89).
           Text(
-            '연결할 수 없습니다',
+            AppStrings.inviteCannotConnect,
             style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             currentUserRole == InviteUserRole.teacher
-                ? '선생님은 선생님의 초대 코드를 사용할 수 없습니다.\n학생의 초대 코드를 사용해주세요.'
-                : '학생은 학생의 초대 코드를 사용할 수 없습니다.\n선생님의 초대 코드를 사용해주세요.',
+                ? AppStrings.inviteSelfCodeTeacher
+                : AppStrings.inviteSelfCodeStudent,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -120,7 +120,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: AppColors.paperOk.withValues(alpha: 0.1),
+              color: AppColors.paperOkSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.link, size: 48, color: AppColors.paperOk),
@@ -132,7 +132,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           // (§7.17 / §7.87-h). creatorRoleLabel은 enum 라벨(선생님/학생)로
           // 유한 집합이므로 §7.30 예외 아님.
           Text(
-            '$creatorRoleLabel과 연결하기',
+            AppStrings.inviteConnectWithRoleFormat(creatorRoleLabel),
             style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
@@ -140,7 +140,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           const SizedBox(height: AppSpacing.space2),
 
           Text(
-            '연결 요청을 보내시겠습니까?',
+            AppStrings.inviteConnectRequestPrompt,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -200,7 +200,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '메시지 (선택)',
+                  AppStrings.proposalCreateMessageOptional,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                     fontWeight: FontWeight.w600,
@@ -270,7 +270,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           TextButton(
             onPressed: () => context.pop(),
             child: Text(
-              '취소',
+              AppStrings.cancel,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.inkSecondary,
               ),
@@ -392,13 +392,13 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 중복 연결 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
           Text(
-            '이미 연결되어 있습니다',
+            AppStrings.inviteAlreadyConnected,
             style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '해당 $targetRoleLabel과 이미\n연결되어 있습니다.',
+            AppStrings.inviteAlreadyConnectedBodyFormat(targetRoleLabel),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -451,7 +451,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.paperOk.withValues(alpha: 0.1),
+              color: AppColors.paperOkSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Icon(
@@ -463,13 +463,13 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 연결 성공 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
           Text(
-            '연결 요청이 전송되었습니다!',
+            AppStrings.inviteRequestSent,
             style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '$targetRoleLabel이 요청을 수락하면\n연결이 완료됩니다.',
+            AppStrings.inviteRequestSentBodyFormat(targetRoleLabel),
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -493,7 +493,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '지금 바로 체험레슨을 예약할 수 있어요!',
+                      AppStrings.inviteTrialBookingHint,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.ink,
                       ),
@@ -536,9 +536,9 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                       AppRoutes.lessonBooking,
                       extra: {
                         'teacherId': invite.creatorId,
-                        'teacherName': invite.creatorName ?? '선생님',
+                        'teacherName': invite.creatorName ?? AppStrings.teacher,
                         'instrument':
-                            '악기', // Will be selected in booking screen
+                            AppStrings.instrumentFallback, // Will be selected in booking screen
                         'studentId': userProfile.userId,
                         'studentName': userProfile.userName,
                         'isTrialLesson': true,

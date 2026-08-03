@@ -52,7 +52,7 @@ class AcademyAnnouncementsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('오류: $error')),
+        error: (error, stack) => Center(child: Text(AppStrings.announcementsLoadErrorWith(error))),
       ),
     );
   }
@@ -89,14 +89,12 @@ class _AnnouncementCard extends ConsumerWidget {
                     ),
                   ),
                   if (!announcement.isRead)
+                    // #991 — unread 마커 통일: notification_item 표준 6x6 사각(각진).
                     Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.only(left: AppSpacing.space2),
-                      decoration: BoxDecoration(
-                        color: AppColors.paperAccent,
-                        shape: BoxShape.circle,
-                      ),
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.only(left: AppSpacing.space2),
+                      color: AppColors.paperAccent,
                     ),
                 ],
               ),

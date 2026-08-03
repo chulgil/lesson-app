@@ -117,9 +117,14 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
         ],
       ),
       bottomNavigationBar: MetronomeControllerBar(
-        // studentId 전달 — stop 시 logMetronome 실행 (#932)
+        // studentId + sectionId 전달 — stop 시 logMetronome 실행 + 그 곡에 시간
+        // 크레딧 (#932, 선택적 곡 연결 practice_master §1.2)
         onExpand:
-            () => PracticeToolsModal.show(context, studentId: widget.studentId),
+            () => PracticeToolsModal.show(
+              context,
+              studentId: widget.studentId,
+              sectionId: widget.sectionId,
+            ),
       ),
       body: sectionAsync.when(
         data: (section) {
@@ -290,6 +295,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           CompletionToggle(
             section: section,
             onToggle: () => _toggleCompletion(section),
+            studentId: widget.studentId,
             selectedDate: widget.selectedDate,
           ),
 

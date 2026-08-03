@@ -397,11 +397,12 @@ class _AcademyTeacherCard extends StatelessWidget {
                 ),
               ),
               // Action button
-              ElevatedButton(
+              FilledButton(
                 onPressed: onTrialTap,
-                style: ElevatedButton.styleFrom(
+                style: FilledButton.styleFrom(
                   backgroundColor: AppColors.paperAccent,
                   foregroundColor: AppColors.paper,
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space3,
                     vertical: AppSpacing.space2,

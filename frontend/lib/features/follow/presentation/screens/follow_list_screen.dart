@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
@@ -67,6 +70,7 @@ class _FollowTab extends ConsumerWidget {
       error: (_, __) => const Center(child: Text(AppStrings.errorOccurred)),
       data: (follows) {
         if (follows.isEmpty) {
+          final isAcademyTab = filterType == FollowTargetType.academy;
           return EmptyStateWidget(
             icon: Icons.person_add_outlined,
             title:
@@ -76,6 +80,11 @@ class _FollowTab extends ConsumerWidget {
                     ? AppStrings.followEmptyTeacher
                     : AppStrings.followEmptyAcademy,
             subtitle: AppStrings.followEmptySubtitle,
+            actionLabel: isAcademyTab ? null : AppStrings.teacherSearchButton,
+            actionIcon: isAcademyTab ? null : Icons.search,
+            onAction: isAcademyTab
+                ? null
+                : () => context.push(AppRoutes.teacherSearch),
           );
         }
 

@@ -23,8 +23,6 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import '../services/booking_notification_service.dart';
-import '../../../notifications/notifications_facade.dart';
 import '../extensions/cancel_reason_visuals.dart';
 import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
@@ -140,6 +138,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   IconData _eventIcon = Icons.check_circle;
   Timer? _eventTimer;
 
+  /// 입금확인(수강권 발행) 등 비가역 액션의 더블탭 재진입 가드 — 첫 탭이 await
+  /// 하기 전 동기적으로 true 로 세팅되어, 두 번째 탭이 중복 발행하지 못하게 한다
+  /// (Dart 단일스레드, #D1 수강권 중복발급).
+  bool _isProcessing = false;
+
   String get viewerRole => widget.viewerRole;
   String get requestId => widget.requestId;
 
@@ -235,8 +238,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
         final events = eventsAsync.valueOrNull ?? [];
         final studentName =
-            studentNames[request.studentId] ?? AppStrings.student;
-        final academyName = academyNames[request.academyId];
+            request.studentName ??
+            studentNames[request.studentId] ??
+            AppStrings.student;
+        final academyName =
+            request.academyName ?? academyNames[request.academyId];
 
         // Watch teacher templates for Phase 2 proposal display
         final proposalTemplates =
@@ -246,7 +252,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             [];
 
         final teacherName =
-            teacherNames[request.teacherId] ?? AppStrings.teacher;
+            request.teacherName ??
+            teacherNames[request.teacherId] ??
+            AppStrings.teacher;
         final opponentName = viewerRole == 'teacher'
             ? studentName
             : AppStrings.teacherDisplayName(teacherName);
@@ -419,15 +427,17 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   }
 
   void _showMoreMenu(BuildContext context, UnifiedLessonRequest request) {
+    final events =
+        ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
     final items = <(IconData, String, VoidCallback)>[
-      if (request.hasProposal)
+      // #749: only offer "수강권 보기" when a subscription actually exists to
+      // view — otherwise it led to a "준비중" dead-end.
+      if (request.hasProposal && requestDetailSubscriptionRoute(events) != null)
         (
           Icons.receipt_long_outlined,
           AppStrings.viewSubscription,
           () {
             Navigator.pop(context);
-            final events =
-                ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
             _handleViewSubscription(context, events);
           },
         ),
@@ -488,6 +498,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     int selectedSlotIndex,
     String message,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       final msg = message.isEmpty ? null : message;
@@ -512,6 +526,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       if (context.mounted) {
         _showError(AppStrings.acceptError);
       }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -535,20 +551,27 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     );
     if (result == null || !context.mounted) return;
 
+    // Approve directly from schedule comparison (inline completion).
+    // _handleAccept owns the #D1 guard for this path.
+    if (result.acceptedSlotIndex != null) {
+      await _handleAccept(
+        context,
+        ref,
+        request,
+        result.acceptedSlotIndex!,
+        result.message,
+      );
+      return;
+    }
+
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
 
-      if (result.acceptedSlotIndex != null) {
-        // Approve directly from schedule comparison (inline completion)
-        await _handleAccept(
-          context,
-          ref,
-          request,
-          result.acceptedSlotIndex!,
-          result.message,
-        );
-        return;
-      } else if (result.slots.isEmpty) {
+      if (result.slots.isEmpty) {
         // Reject (from reject bottom sheet inside schedule screen)
         await actions.rejectRequest(
           request.id,
@@ -588,6 +611,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       if (context.mounted) {
         _showError();
       }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -847,6 +872,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 수강권을 중복 발행하지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.issueSubscription(
@@ -861,6 +890,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) _showError();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -870,6 +901,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
     String? selectedTemplateId,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.acceptProposal(
@@ -883,6 +918,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) _showError();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -892,6 +929,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
     String? reason,
   ) async {
+    // 더블탭 재진입 가드 (#D1) — 첫 탭이 await 전 동기적으로 플래그를 세워
+    // 두 번째 탭이 중복 이벤트를 만들지 못하게 한다.
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.rejectProposal(
@@ -905,6 +946,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) _showError();
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -1017,6 +1060,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             .toList(),
         message: result.message.isEmpty ? null : result.message,
       );
+      // #1191 — 상대 통지는 BE Notification row 가 SSOT (#1200: add_event 에서
+      // scheduleChangeAlternative→학생 emit). FE 로컬 알림은 액터 기기 전용이라
+      // 상대 통지로 쓸 수 없어 제거함 (기존엔 액터 기기에 오발).
       if (context.mounted) {
         _showSuccess(AppStrings.scheduleChangePropose);
       }
@@ -1036,10 +1082,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final actorId = viewerRole == 'teacher'
         ? request.teacherId
         : request.studentId;
-    final fromTeacher = actorRole == ProposerRole.teacher;
-    final opponentId =
-        fromTeacher ? request.studentId : request.teacherId;
-
     // Find the pending proposal's slots and change type
     final events =
         ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
@@ -1079,20 +1121,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             selectedSlotIndex: result.acceptedSlotIndex,
             message: result.message.isEmpty ? null : result.message,
           );
-          // #541 — 협상 응답을 상대에게 알림 (비동기 핸드오프)
-          if (opponentId.isNotEmpty) {
-            unawaited(
-              ref
-                  .read(notificationServiceProvider)
-                  .showNotification(
-                    BookingNotificationService.createScheduleChangeAccepted(
-                      userId: opponentId,
-                      fromTeacher: fromTeacher,
-                      data: {'requestId': request.id},
-                    ),
-                  ),
-            );
-          }
+          // #1191 — 상대 통지는 BE(#1200 scheduleChangeApproved→교사 emit). FE
+          // 로컬 알림은 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
           if (context.mounted) {
             _showSuccess(AppStrings.scheduleChangeConfirmed);
           }
@@ -1106,20 +1136,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.studentId,
             message: result.message.isEmpty ? null : result.message,
           );
-          // #541 — 협상 응답을 상대에게 알림 (비동기 핸드오프)
-          if (opponentId.isNotEmpty) {
-            unawaited(
-              ref
-                  .read(notificationServiceProvider)
-                  .showNotification(
-                    BookingNotificationService.createScheduleChangeRejected(
-                      userId: opponentId,
-                      fromTeacher: fromTeacher,
-                      data: {'requestId': request.id},
-                    ),
-                  ),
-            );
-          }
+          // #1191 — FE 로컬 알림(액터 기기 전용) 오발 제거. reject 상대 통지는
+          // 전용 타입 부재로 BE emit 미구현 잔여(#1193) — 기존에도 상대 미수신.
           if (context.mounted) {
             _showSuccess(AppStrings.scheduleChangeReject);
           }
@@ -1147,20 +1165,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 .toList(),
             message: result.message.isEmpty ? null : result.message,
           );
-          // #541 — 협상 응답을 상대에게 알림 (비동기 핸드오프)
-          if (opponentId.isNotEmpty) {
-            unawaited(
-              ref
-                  .read(notificationServiceProvider)
-                  .showNotification(
-                    BookingNotificationService.createScheduleChangeCountered(
-                      userId: opponentId,
-                      fromTeacher: fromTeacher,
-                      data: {'requestId': request.id},
-                    ),
-                  ),
-            );
-          }
+          // #1191 — 상대 통지는 BE(#1200 scheduleChangeRequested→교사 emit). FE
+          // 로컬 알림은 액터 기기 전용이라 상대 통지로 쓸 수 없어 제거함.
           if (context.mounted) {
             _showSuccess(AppStrings.scheduleChangeCounter);
           }

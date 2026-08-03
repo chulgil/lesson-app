@@ -59,7 +59,7 @@ void main() {
       expect(find.text('하농 1번'), findsOneWidget);
     });
 
-    testWidgets('과제 0건이면 빈 상태 안내 노출', (tester) async {
+    testWidgets('과제 0건이면 섹션 전체 숨김 (C7 secondary)', (tester) async {
       await tester.binding.setSurfaceSize(const Size(375, 667));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -81,7 +81,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(find.text('이번 주 과제가 없습니다'), findsOneWidget);
+      // C7 — secondary: 미완료 과제 0건이면 헤더 포함 섹션 전체 숨김.
+      expect(find.text('이번 주 과제'), findsNothing);
+      expect(find.text('이번 주 과제가 없습니다'), findsNothing);
     });
 
     testWidgets('완료된 항목은 미리보기에서 제외', (tester) async {

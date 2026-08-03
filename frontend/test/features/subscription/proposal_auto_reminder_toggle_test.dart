@@ -7,8 +7,13 @@ import 'package:lessonaza/features/subscription/domain/services/proposal_reminde
 import 'package:lessonaza/features/subscription/presentation/providers/proposal_settings_providers.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_proposal_providers.dart';
 
-/// #203: 교사의 "자동 리마인더" 토글(autoReminderEnabled)이 꺼져 있으면 제안 생성 시
-/// 24/48/72h 리마인더를 예약하지 않아야 한다. (이전: 토글 무시하고 무조건 예약)
+/// #1212: 제안 생성 시 24/48/72h 리마인더를 FE 로컬로 예약하지 않아야 한다.
+///
+/// 리마인더 대상은 학생인데 예약은 교사 기기에서 일어나 교사에게 오발했다
+/// (flutter_local_notifications 는 액터 기기 전용). 리마인더 발송은 BE 스케줄러
+/// 소관이므로 FE 예약 경로를 제거했고, 이 테스트는 재도입을 막는 회귀 가드다.
+/// 교사 설정 토글(autoReminderEnabled) 값과 무관하게 0 이어야 한다.
+/// (이전 #203 계약: 토글 ON 이면 1회 예약 — 지금은 폐기)
 
 const _emptyCopy = ProposalReminderCopy(
   reminder24hTitle: '',
@@ -68,18 +73,19 @@ Future<int> _scheduleCallsAfterCreate({
         templateId: 'tmpl-1',
       );
 
-  // _scheduleReminders 는 fire-and-forget(.then) — 설정 future 해소 + 마이크로태스크 배수.
+  // 과거 예약 경로는 fire-and-forget(.then) 이었다 — 설정 future 해소 + 마이크로태스크
+  // 배수까지 기다려야 "예약이 늦게 일어나는" 케이스도 잡을 수 있다.
   await container.read(teacherProposalSettingsProvider(teacherId).future);
   await Future<void>.delayed(Duration.zero);
   return spy.scheduleCalls;
 }
 
 void main() {
-  test('#203 자동 리마인더 OFF → 제안 생성 시 리마인더 예약 안 함', () async {
+  test('#1212 자동 리마인더 OFF → 제안 생성 시 FE 로컬 예약 안 함', () async {
     expect(await _scheduleCallsAfterCreate(autoReminderEnabled: false), 0);
   });
 
-  test('#203 자동 리마인더 ON → 제안 생성 시 리마인더 예약함', () async {
-    expect(await _scheduleCallsAfterCreate(autoReminderEnabled: true), 1);
+  test('#1212 자동 리마인더 ON 이어도 → 제안 생성 시 FE 로컬 예약 안 함', () async {
+    expect(await _scheduleCallsAfterCreate(autoReminderEnabled: true), 0);
   });
 }

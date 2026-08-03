@@ -12,3 +12,12 @@ abstract class NotificationService {
   Future<void> cancelAllNotifications();
   Stream<AppNotification> get onNotificationTapped;
 }
+
+/// Weekly-recurring scheduling surface on top of [NotificationService].
+///
+/// Separate interface (ISP) so existing [NotificationService] test fakes
+/// stay unaffected. [scheduleWeeklyNotification] repeats every week at the
+/// weekday+time of the notification's `scheduledAt`.
+abstract class RecurringNotificationService implements NotificationService {
+  Future<void> scheduleWeeklyNotification(AppNotification notification);
+}

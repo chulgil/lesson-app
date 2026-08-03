@@ -14,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../schedule/data/services/teacher_availability_onboarding_api.dart';
 import '../../../settings/settings_facade.dart';
 import '../widgets/first_availability_celebration_sheet.dart';
+import '../../../../core/widgets/onboarding_step_header.dart';
 
 /// First availability setup screen for teacher onboarding (#422).
 ///
@@ -51,6 +52,12 @@ class _FirstAvailabilitySetupScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // #1104 — shared teacher step header (첫 가용시간=4/4).
+              const OnboardingStepHeader(
+                steps: OnboardingStepHeader.teacherSteps,
+                currentStep: 4,
+              ),
+              const SizedBox(height: AppSpacing.space6),
               _buildDaysSection(),
               const SizedBox(height: AppSpacing.space6),
               _buildHoursSection(context),

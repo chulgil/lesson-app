@@ -9,8 +9,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../auth/auth_facade.dart';
-import '../../../notifications/domain/entities/notification.dart';
-import '../../../notifications/notifications_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 
@@ -233,11 +231,14 @@ class _UnpaidCard extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
+                    // #1212 — 학생에게 도달하는 발송 경로(BE)가 없어 비활성.
+                    // 기존 구현은 교사 기기에만 로컬 알림을 띄우고 "전송됨" 을 보여
+                    // 허위 성공이었다.
                     child: OutlinedButton.icon(
-                      onPressed: () => _sendReminder(context, ref),
+                      onPressed: null,
                       icon: const Icon(Icons.notifications_outlined, size: 18),
                       label: const Text(
-                        AppStrings.profileOutstandingSendReminder,
+                        AppStrings.profileOutstandingSendReminderPreparing,
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.inkSecondary,
@@ -306,45 +307,6 @@ class _UnpaidCard extends ConsumerWidget {
         return '월정액';
       case SubscriptionType.trial:
         return '체험';
-    }
-  }
-
-  Future<void> _sendReminder(BuildContext context, WidgetRef ref) async {
-    final notificationService = ref.read(notificationServiceProvider);
-    final notification = AppNotification(
-      id: 'payment_reminder_${subscription.id}_${DateTime.now().millisecondsSinceEpoch}',
-      userId: subscription.studentId,
-      type: NotificationType.paymentReminder,
-      priority: NotificationPriority.high,
-      title: AppStrings.paymentReminderTitle,
-      body: AppStrings.paymentReminderBody(
-        teacherName: '선생님',
-        amount: subscription.amount,
-      ),
-      createdAt: DateTime.now(),
-      sentAt: DateTime.now(),
-      actionUrl: '/subscriptions/${subscription.id}',
-      actionLabel: AppStrings.viewDetail,
-      data: {
-        'subscriptionId': subscription.id,
-        'studentId': subscription.studentId,
-        'amount': subscription.amount,
-      },
-    );
-
-    try {
-      await notificationService.showNotification(notification);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.paymentReminderSent)),
-        );
-      }
-    } catch (_) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.paymentReminderSendFailed)),
-        );
-      }
     }
   }
 

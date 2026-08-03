@@ -1,18 +1,19 @@
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_test/hive_test.dart';
+import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
 import 'package:lessonaza/core/network/api_exceptions.dart';
 import 'package:lessonaza/core/sync/application/connectivity_service.dart';
 import 'package:lessonaza/core/sync/application/mutation_queue_helper.dart';
 import 'package:lessonaza/core/sync/application/sync_service.dart';
 import 'package:lessonaza/core/sync/domain/sync_queue_entry.dart';
-import 'package:lessonaza/features/schedule/data/local/teacher_availability_cache_store.dart';
 import 'package:lessonaza/features/schedule/data/repositories/remote_teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/data/repositories/sync_aware_teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
 import 'package:mocktail/mocktail.dart';
+
+/// Batch 1e (일원화): the SyncAware teacher-availability repository no longer
+/// owns a Hive read-through cache. Reads delegate straight to remote (offline
+/// fallback is the HTTP response cache — see teacher_availability_offline_read_test.dart);
+/// writes keep the offline mutation queue. These tests cover both.
 
 class MockRemoteTeacherAvailabilityRepository extends Mock
     implements RemoteTeacherAvailabilityRepository {}
@@ -36,6 +37,26 @@ TeacherAvailability _testAvailability({String teacherId = 'teacher-1'}) {
   );
 }
 
+WeeklySchedule _testSchedule({String id = 'sched-1'}) {
+  return WeeklySchedule(
+    id: id,
+    dayOfWeek: 1,
+    startTime: '10:00',
+    endTime: '12:00',
+    createdAt: DateTime(2026, 5, 9),
+  );
+}
+
+TimeException _testException({String id = 'exc-1'}) {
+  return TimeException(
+    id: id,
+    type: ExceptionType.holiday,
+    startDate: DateTime(2026, 5, 9),
+    endDate: DateTime(2026, 5, 9),
+    createdAt: DateTime(2026, 5, 9),
+  );
+}
+
 SyncQueueEntry _fakeEntry() {
   final now = DateTime.now().toUtc();
   return SyncQueueEntry(
@@ -56,8 +77,6 @@ void main() {
   late MockRemoteTeacherAvailabilityRepository remote;
   late MockConnectivityService connectivity;
   late MockSyncService syncService;
-  late Box<String> hiveBox;
-  late TeacherAvailabilityCacheStore cacheStore;
   late SyncAwareTeacherAvailabilityRepository repo;
 
   setUpAll(() {
@@ -65,14 +84,10 @@ void main() {
     registerFallbackValue(_testAvailability());
   });
 
-  setUp(() async {
-    await setUpTestHive();
-    hiveBox = await Hive.openBox<String>('teacher_avail_cache_test');
-
+  setUp(() {
     remote = MockRemoteTeacherAvailabilityRepository();
     connectivity = MockConnectivityService();
     syncService = MockSyncService();
-    cacheStore = TeacherAvailabilityCacheStore(box: hiveBox);
 
     repo = SyncAwareTeacherAvailabilityRepository(
       remote: remote,
@@ -80,198 +95,417 @@ void main() {
         connectivity: connectivity,
         syncService: syncService,
       ),
-      cache: cacheStore,
     );
   });
 
-  tearDown(() async {
-    await tearDownTestHive();
-  });
+  void stubQueue() {
+    when(
+      () => syncService.queueMutation(
+        idempotencyKey: any(named: 'idempotencyKey'),
+        domain: any(named: 'domain'),
+        httpMethod: any(named: 'httpMethod'),
+        path: any(named: 'path'),
+        payload: any(named: 'payload'),
+        clientUpdatedAt: any(named: 'clientUpdatedAt'),
+      ),
+    ).thenAnswer((_) async => _fakeEntry());
+  }
 
   // --------------------------------------------------------------------------
-  // getAvailability — read-through cache
+  // Read methods delegate to remote (no own cache)
   // --------------------------------------------------------------------------
 
-  group('getAvailability — cache read-through', () {
-    test('online success: result is written to cache', () async {
+  group('read methods delegate to remote', () {
+    test('getAvailability', () async {
       final availability = _testAvailability();
       when(
         () => remote.getAvailability('teacher-1'),
       ).thenAnswer((_) async => availability);
 
       final result = await repo.getAvailability('teacher-1');
-      expect(result, isNotNull);
-      expect(result!.teacherId, equals('teacher-1'));
-
-      final key = TeacherAvailabilityCacheStore.keyAvailability('teacher-1');
-      expect(cacheStore.getAvailability(key), isNotNull);
-      expect(cacheStore.getAvailability(key)!.teacherId, equals('teacher-1'));
+      expect(result, same(availability));
+      verify(() => remote.getAvailability('teacher-1')).called(1);
     });
 
-    test('online returns null (404): null is cached', () async {
+    test('getAvailability returns null straight from remote', () async {
       when(
         () => remote.getAvailability('teacher-new'),
       ).thenAnswer((_) async => null);
 
       final result = await repo.getAvailability('teacher-new');
       expect(result, isNull);
-
-      // null cached — key exists in box with data: null
-      final key = TeacherAvailabilityCacheStore.keyAvailability('teacher-new');
-      final raw = hiveBox.get(key);
-      expect(raw, isNotNull); // entry written
     });
 
     test(
-      'NetworkException with cached data: returns cached availability',
+      'getAvailability rethrows remote network error (no fallback)',
       () async {
-        final cached = _testAvailability(teacherId: 'teacher-1');
-        final key = TeacherAvailabilityCacheStore.keyAvailability('teacher-1');
-        await cacheStore.putAvailability(key, cached);
-
         when(
-          () => remote.getAvailability('teacher-1'),
+          () => remote.getAvailability('teacher-x'),
         ).thenThrow(const NetworkException(message: 'timeout'));
 
-        final result = await repo.getAvailability('teacher-1');
-        expect(result, isNotNull);
-        expect(result!.teacherId, equals('teacher-1'));
+        expect(
+          () => repo.getAvailability('teacher-x'),
+          throwsA(isA<NetworkException>()),
+        );
       },
     );
 
-    test('NetworkException with no cache: rethrows', () async {
+    test('getAvailableSlotsForDate', () async {
+      final date = DateTime(2026, 5, 9);
       when(
-        () => remote.getAvailability('teacher-x'),
-      ).thenThrow(const NetworkException(message: 'no internet'));
+        () => remote.getAvailableSlotsForDate(
+          'teacher-1',
+          date,
+          currentStudentId: null,
+        ),
+      ).thenAnswer((_) async => []);
 
-      expect(
-        () => repo.getAvailability('teacher-x'),
-        throwsA(isA<NetworkException>()),
-      );
+      final result = await repo.getAvailableSlotsForDate('teacher-1', date);
+      expect(result, isEmpty);
+      verify(
+        () => remote.getAvailableSlotsForDate(
+          'teacher-1',
+          date,
+          currentStudentId: null,
+        ),
+      ).called(1);
     });
 
-    test('ServerException with cached data: returns cached', () async {
-      final cached = _testAvailability(teacherId: 'teacher-2');
-      final key = TeacherAvailabilityCacheStore.keyAvailability('teacher-2');
-      await cacheStore.putAvailability(key, cached);
-
+    test('getAvailableSlotsForDateRange', () async {
+      final start = DateTime(2026, 5, 9);
+      final end = DateTime(2026, 5, 16);
       when(
-        () => remote.getAvailability('teacher-2'),
-      ).thenThrow(const ServerException(message: 'server error'));
+        () => remote.getAvailableSlotsForDateRange(
+          'teacher-1',
+          start,
+          end,
+          currentStudentId: 's1',
+        ),
+      ).thenAnswer((_) async => []);
 
-      final result = await repo.getAvailability('teacher-2');
-      expect(result!.teacherId, equals('teacher-2'));
+      final result = await repo.getAvailableSlotsForDateRange(
+        'teacher-1',
+        start,
+        end,
+        currentStudentId: 's1',
+      );
+      expect(result, isEmpty);
     });
 
-    test('NotFoundException (non-network) is NOT caught by cache', () async {
-      final cached = _testAvailability();
-      final key = TeacherAvailabilityCacheStore.keyAvailability('teacher-1');
-      await cacheStore.putAvailability(key, cached);
-
+    test('getNextAvailableDates', () async {
+      final from = DateTime(2026, 5, 9);
       when(
-        () => remote.getAvailability('teacher-1'),
-      ).thenThrow(const NotFoundException(message: '404'));
+        () =>
+            remote.getNextAvailableDates('teacher-1', fromDate: from, limit: 3),
+      ).thenAnswer((_) async => [DateTime(2026, 5, 10)]);
 
-      expect(
-        () => repo.getAvailability('teacher-1'),
-        throwsA(isA<NotFoundException>()),
+      final result = await repo.getNextAvailableDates(
+        'teacher-1',
+        fromDate: from,
       );
+      expect(result, hasLength(1));
+    });
+
+    test('getRecommendedSlots', () async {
+      final start = DateTime(2026, 5, 9);
+      final end = DateTime(2026, 5, 16);
+      when(
+        () => remote.getRecommendedSlots('teacher-1', 's1', start, end),
+      ).thenAnswer((_) async => []);
+
+      final result = await repo.getRecommendedSlots(
+        'teacher-1',
+        's1',
+        start,
+        end,
+      );
+      expect(result, isEmpty);
     });
   });
 
   // --------------------------------------------------------------------------
-  // Cache key isolation
+  // saveAvailability — write-queue
   // --------------------------------------------------------------------------
 
-  group('cache key isolation — different teacherIds', () {
-    test('separate teachers produce separate cache entries', () async {
-      final a1 = _testAvailability(teacherId: 'ta');
-      final a2 = _testAvailability(teacherId: 'tb');
-
-      when(() => remote.getAvailability('ta')).thenAnswer((_) async => a1);
-      when(() => remote.getAvailability('tb')).thenAnswer((_) async => a2);
-
-      await repo.getAvailability('ta');
-      await repo.getAvailability('tb');
-
-      expect(
-        cacheStore
-            .getAvailability(
-              TeacherAvailabilityCacheStore.keyAvailability('ta'),
-            )!
-            .teacherId,
-        equals('ta'),
-      );
-      expect(
-        cacheStore
-            .getAvailability(
-              TeacherAvailabilityCacheStore.keyAvailability('tb'),
-            )!
-            .teacherId,
-        equals('tb'),
-      );
-    });
-  });
-
-  // --------------------------------------------------------------------------
-  // write→read integration (no read override)
-  // --------------------------------------------------------------------------
-
-  group('write→read integration (no read override)', () {
-    test('online read then offline read returns same availability', () async {
-      final availability = _testAvailability(teacherId: 'int-teacher');
-
-      // Step 1: Online read writes to cache
-      when(
-        () => remote.getAvailability('int-teacher'),
-      ).thenAnswer((_) async => availability);
-      final online = await repo.getAvailability('int-teacher');
-      expect(online!.teacherId, equals('int-teacher'));
-
-      // Step 2: Subsequent offline read returns cached data
-      when(
-        () => remote.getAvailability('int-teacher'),
-      ).thenThrow(const NetworkException(message: 'offline'));
-      final offline = await repo.getAvailability('int-teacher');
-      expect(offline!.teacherId, equals('int-teacher'));
-    });
-  });
-
-  // --------------------------------------------------------------------------
-  // TeacherAvailabilityCacheStore — raw JSON roundtrip
-  // --------------------------------------------------------------------------
-
-  group('TeacherAvailabilityCacheStore — raw JSON roundtrip', () {
-    test('putAvailability / getAvailability roundtrip', () async {
+  group('saveAvailability', () {
+    test('online: returns server entity', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
       final availability = _testAvailability();
-      await cacheStore.putAvailability('rt-key', availability);
-      final retrieved = cacheStore.getAvailability('rt-key');
-      expect(retrieved, isNotNull);
-      expect(retrieved!.teacherId, equals('teacher-1'));
+      final server = _testAvailability(teacherId: 'server');
+      when(
+        () => remote.saveAvailability(availability),
+      ).thenAnswer((_) async => server);
+
+      final result = await repo.saveAvailability(availability);
+      expect(result.teacherId, equals('server'));
     });
 
-    test('getAvailability on missing key returns null', () {
-      expect(cacheStore.getAvailability('no-such-key'), isNull);
+    test('offline: queues PUT and returns optimistic input', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+      stubQueue();
+
+      final availability = _testAvailability();
+      final result = await repo.saveAvailability(availability);
+      expect(result.teacherId, equals('teacher-1'));
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'PUT',
+          path: '/schedule/availability',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
     });
 
-    test('getAvailability on corrupt JSON returns null', () async {
-      await hiveBox.put('corrupt', 'not-valid-json{{{');
-      expect(cacheStore.getAvailability('corrupt'), isNull);
+    test('NetworkException: falls back to queue', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(
+        () => remote.saveAvailability(any()),
+      ).thenThrow(const NetworkException(message: 'timeout'));
+      stubQueue();
+
+      final result = await repo.saveAvailability(_testAvailability());
+      expect(result.teacherId, equals('teacher-1'));
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // deleteAvailability — void write-queue
+  // --------------------------------------------------------------------------
+
+  group('deleteAvailability', () {
+    test('online: delegates to remote', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => true);
+      when(
+        () => remote.deleteAvailability('teacher-1'),
+      ).thenAnswer((_) async {});
+
+      await repo.deleteAvailability('teacher-1');
+      verify(() => remote.deleteAvailability('teacher-1')).called(1);
     });
 
-    test('cachedAt field is present in stored JSON', () async {
-      await cacheStore.putAvailability('ts-key', _testAvailability());
-      final raw = hiveBox.get('ts-key')!;
-      final map = jsonDecode(raw) as Map<String, dynamic>;
-      expect(map['cachedAt'], isA<String>());
+    test('offline: queues DELETE without throw', () async {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+      stubQueue();
+
+      await repo.deleteAvailability('teacher-1');
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'DELETE',
+          path: '/schedule/availability',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Weekly schedule CRUD — write-queue paths
+  // --------------------------------------------------------------------------
+
+  group('weekly schedule writes queue correct paths offline', () {
+    setUp(() {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+      stubQueue();
     });
 
-    test('putAvailability with null stores null data field', () async {
-      await cacheStore.putAvailability('null-key', null);
-      final raw = hiveBox.get('null-key')!;
-      final map = jsonDecode(raw) as Map<String, dynamic>;
-      expect(map['data'], isNull);
-      expect(cacheStore.getAvailability('null-key'), isNull);
+    test('addWeeklySchedule queues POST /schedule/weekly', () async {
+      // Optimistic result is unsupported offline → the queue helper throws.
+      await expectLater(
+        repo.addWeeklySchedule('teacher-1', _testSchedule()),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'POST',
+          path: '/schedule/weekly',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('updateWeeklySchedule queues PUT /schedule/weekly/{id}', () async {
+      await expectLater(
+        repo.updateWeeklySchedule('teacher-1', _testSchedule(id: 's9')),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'PUT',
+          path: '/schedule/weekly/s9',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('removeWeeklySchedule queues DELETE /schedule/weekly/{id}', () async {
+      await expectLater(
+        repo.removeWeeklySchedule('teacher-1', 's9'),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'DELETE',
+          path: '/schedule/weekly/s9',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Exception CRUD — write-queue paths
+  // --------------------------------------------------------------------------
+
+  group('exception writes queue correct paths offline', () {
+    setUp(() {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+      stubQueue();
+    });
+
+    test('addException queues POST /schedule/exceptions', () async {
+      await expectLater(
+        repo.addException('teacher-1', _testException()),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'POST',
+          path: '/schedule/exceptions',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('updateException queues PUT /schedule/exceptions/{id}', () async {
+      await expectLater(
+        repo.updateException('teacher-1', _testException(id: 'e9')),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'PUT',
+          path: '/schedule/exceptions/e9',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('removeException queues DELETE /schedule/exceptions/{id}', () async {
+      await expectLater(
+        repo.removeException('teacher-1', 'e9'),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'DELETE',
+          path: '/schedule/exceptions/e9',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Booking + block grid — write-queue paths
+  // --------------------------------------------------------------------------
+
+  group('booking + block writes queue correct paths offline', () {
+    setUp(() {
+      when(() => connectivity.isOnline).thenAnswer((_) async => false);
+      stubQueue();
+    });
+
+    test('bookSlot queues POST /schedule/slots/{id}/book', () async {
+      await expectLater(
+        repo.bookSlot('slot-1', 's1', 'Alice'),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'POST',
+          path: '/schedule/slots/slot-1/book',
+          payload: {'student_id': 's1', 'student_name': 'Alice'},
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('cancelBooking queues DELETE /schedule/slots/{id}/booking', () async {
+      await expectLater(
+        repo.cancelBooking('slot-1'),
+        throwsA(isA<UnimplementedError>()),
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'DELETE',
+          path: '/schedule/slots/slot-1/booking',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('toggleTimeBlock queues PATCH /schedule/blocks/toggle', () async {
+      await repo.toggleTimeBlock(
+        'teacher-1',
+        DateTime.utc(2026, 5, 9),
+        const ClockTime(hour: 10, minute: 0),
+        false,
+      );
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'PATCH',
+          path: '/schedule/blocks/toggle',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
+    });
+
+    test('setTimeBlocks queues PATCH /schedule/blocks/set', () async {
+      await repo.setTimeBlocks('teacher-1', DateTime.utc(2026, 5, 9), const [
+        ClockTime(hour: 10, minute: 0),
+      ], false);
+      verify(
+        () => syncService.queueMutation(
+          idempotencyKey: any(named: 'idempotencyKey'),
+          domain: 'schedule',
+          httpMethod: 'PATCH',
+          path: '/schedule/blocks/set',
+          payload: any(named: 'payload'),
+          clientUpdatedAt: any(named: 'clientUpdatedAt'),
+        ),
+      ).called(1);
     });
   });
 }

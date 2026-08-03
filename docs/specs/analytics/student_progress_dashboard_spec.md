@@ -931,8 +931,25 @@ GET /api/v1/analytics/teacher/revenue?period=6months
 ### 4.6 리텐션 분석
 
 ```
-GET /api/v1/analytics/teacher/retention
+GET /api/v1/analytics/retention
 ```
+
+구현 기준 (#1216). 이탈 위험 판정은 새 기준을 만들지 않고 기존 신호를 재사용한다.
+
+| 신호 | 기준 | 출처 |
+|------|------|------|
+| 결석 패턴 | 최근 14일 결석 2회 이상 | `attendance_scheduler_service` (선생님 알림과 동일 임계) |
+| 만료 임박 | 잔여 D-7 이하 | `subscription_expiry_service.EXPIRING_THRESHOLD_DAYS` |
+| 연습량 급감 | 최근 14일 연습량이 직전 14일 대비 30% 이상 감소 | #1216 기본값 (기존 임계 없음) |
+
+`risk_level` 은 점화된 신호 수 — 3개 `high`, 2개 `medium`, 1개 `low`.
+
+`renewal_rate` 의 의미는 **재구매율** ([event_instrumentation.md §5.2](./event_instrumentation.md)) 이며,
+필드명은 기존 FE 계약 유지를 위해 그대로 둔다. 만료 시점은 `end_date` 기준이다 — 횟수
+소진(exhausted)에는 별도 타임스탬프가 없어 소진 시각을 복원할 수 없다.
+
+`days_until_expiry` 와 `last_lesson_date` 는 각각 유효 수강권·레슨 이력이 없을 때 `null`
+이다 (센티널 값 대신 null).
 
 **Response 200**
 

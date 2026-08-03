@@ -24,6 +24,20 @@ class PhoneVerificationRequiredException(AppException):
         super().__init__(409, message, "phone_verification_required")
 
 
+class LastWriteWinsConflictException(AppException):
+    """Last-Write-Wins conflict — the resource is newer than the client's base.
+
+    Raised on an ``If-Unmodified-Since`` precondition failure (D4, #1119): the
+    resource was modified after the timestamp the client edited from, so the
+    write is rejected instead of clobbering the newer server state. The client
+    (sync queue) marks the entry failed and surfaces a rejection SnackBar.
+    Spec: docs/specs/sync/README.md §7.
+    """
+
+    def __init__(self, message: str = "서버의 최신 변경과 충돌해 반영되지 않았습니다"):
+        super().__init__(412, message, "CONFLICT_LWW_REJECTED")
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """Register custom exception handlers on the FastAPI app."""
 

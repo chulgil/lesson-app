@@ -88,7 +88,10 @@ def test_fk_migration_is_chained_and_documents_backfill() -> None:
     script = _script()
     rev = script.get_revision(_MIGRATION_REVISION)
     assert rev is not None
-    assert rev.down_revision == "add_practice_journal"
+    # 부모 리비전 id 를 고정하지 않는다 — base 머지 때마다 head 가 바뀌므로,
+    # "새 루트가 아니라 기존 체인에 붙었고 head 가 하나뿐" 이라는 의도만 검증한다.
+    assert rev.down_revision is not None, "체인에 붙지 않은 고아 리비전이다"
+    assert len(script.get_heads()) == 1, f"head 가 분기했다: {script.get_heads()}"
 
     source = Path(rev.module.__file__).read_text()
     assert "fk_group_class_schedules_group_class_id_group_classes" in source

@@ -8,20 +8,24 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
+import '../practice_stamp/practice_stamp_gesture.dart';
 
 /// Completion toggle widget for marking section as complete
 /// Supports:
 /// - Standard toggle mode (simple on/off)
-/// - N회 반복 mode (tap to increment paw stamps, shows progress x/n)
+/// - N회 반복 mode (tap opens `ScratchStampSheet` — see [PracticeStampGesture]
+///   — long-press resets when fully filled, progress shown as x/n)
 class CompletionToggle extends StatelessWidget {
   final PracticeSection section;
   final VoidCallback onToggle;
+  final String studentId;
   final DateTime? selectedDate; // For date-specific completion tracking
 
   const CompletionToggle({
     super.key,
     required this.section,
     required this.onToggle,
+    required this.studentId,
     this.selectedDate,
   });
 
@@ -49,7 +53,7 @@ class CompletionToggle extends StatelessWidget {
     final isCompleted = section.isCompletedForDate(date);
 
     return NotebookCard(
-      color: isCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
+      color: isCompleted ? AppColors.paperOkSoft : null,
       child: InkWell(
         onTap: onToggle,
         child: Padding(
@@ -108,9 +112,12 @@ class CompletionToggle extends StatelessWidget {
     final isAllCompleted = completedCount >= totalCount;
 
     return NotebookCard(
-      color: isAllCompleted ? AppColors.paperOk.withValues(alpha: 0.1) : null,
-      child: InkWell(
-        onTap: onToggle,
+      color: isAllCompleted ? AppColors.paperOkSoft : null,
+      child: PracticeStampGesture(
+        studentId: studentId,
+        completedCount: completedCount,
+        totalCount: totalCount,
+        onIncrement: onToggle,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(

@@ -15,12 +15,16 @@ import 'bpm_controls.dart';
 
 /// Metronome panel content with tap tempo support.
 class MetronomePanel extends ConsumerStatefulWidget {
-  const MetronomePanel({super.key, this.studentId});
+  const MetronomePanel({super.key, this.studentId, this.sectionId});
 
   /// 학생 컨텍스트. 주어지면 메트로놈 stop 시 시작-종료 차이를 분 단위로
   /// 계산해 [PracticeSourceLoggers.logMetronome] 으로 자동 기록한다.
   /// 학생 게이미피케이션 P1 — Job 7.
   final String? studentId;
+
+  /// 곡/섹션 컨텍스트(곡 상세에서 연 경우). 주어지면 메트로놈 연습시간이 그
+  /// 섹션에도 크레딧된다(선택적 곡 연결, practice_master §1.2).
+  final String? sectionId;
 
   @override
   ConsumerState<MetronomePanel> createState() => _MetronomePanelState();
@@ -70,16 +74,12 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation =
-        TweenSequence<double>([
-          TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
-          TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
-        ]).animate(
-          CurvedAnimation(
-            parent: _tapAnimationController,
-            curve: Curves.easeOut,
-          ),
-        );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
+    ]).animate(
+      CurvedAnimation(parent: _tapAnimationController, curve: Curves.easeOut),
+    );
 
     _tapAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -162,7 +162,11 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
     final studentId = widget.studentId;
     if (studentId != null && startedAt != null) {
       final minutes = DateTime.now().difference(startedAt).inMinutes;
-      notifier.stop(studentId: studentId, practiceMinutesElapsed: minutes);
+      notifier.stop(
+        studentId: studentId,
+        practiceMinutesElapsed: minutes,
+        sectionId: widget.sectionId,
+      );
       _metronomeStartedAt = null;
       // 1분 이상 연습한 경우 modal 을 자동으로 닫고 minutes 반환 — 호출처가
       // PracticeCelebrationOverlay 를 표시할 수 있도록. PracticeToolsModal.show
@@ -306,9 +310,10 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     top: 0,
                     child: TapTempoSpeechBubble(
                       tapCount: _tapTimestamps.length,
-                      tempoExplanation: _showTempoExplanation
-                          ? _getTempoExplanation(state.settings.bpm)
-                          : null,
+                      tempoExplanation:
+                          _showTempoExplanation
+                              ? _getTempoExplanation(state.settings.bpm)
+                              : null,
                       audioError: state.audioError,
                     ),
                   ),
@@ -371,20 +376,21 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                 shape: const CircleBorder(),
                 padding: EdgeInsets.zero,
               ),
-              child: state.isPlaying && state.currentBeat > 0
-                  ? Text(
-                      '${state.currentBeat}',
-                      style: AppTypography.displayLarge.copyWith(
-                        fontWeight: FontWeight.bold,
+              child:
+                  state.isPlaying && state.currentBeat > 0
+                      ? Text(
+                        '${state.currentBeat}',
+                        style: AppTypography.displayLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.paperAccent,
+                          fontSize: 36,
+                        ),
+                      )
+                      : Icon(
+                        state.isPlaying ? Icons.pause : Icons.play_arrow,
+                        size: 48,
                         color: AppColors.paperAccent,
-                        fontSize: 36,
                       ),
-                    )
-                  : Icon(
-                      state.isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 48,
-                      color: AppColors.paperAccent,
-                    ),
             ),
           ),
           SizedBox(height: AppSpacing.space8),
@@ -673,7 +679,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
       textColor = AppColors.bubbleWarningText;
     } else {
       // Success state
-      message = '좋다냥! 🎵';
+      message = '좋다냥!';
       backgroundColor = AppColors.bubbleSuccessBackground;
       textColor = AppColors.bubbleSuccessText;
     }

@@ -1,40 +1,34 @@
 /// Onboarding quest progress for the teacher onboarding phase.
+///
+/// Pure domain value: only the quest [id] and completion flags live here. The
+/// user-facing title/description are resolved in the presentation layer via
+/// `presentation/extensions/onboarding_quest_visuals.dart` (#602).
 class OnboardingQuest {
   final String id;
-  final String title;
-  final String description;
   final bool isRequired;
   final bool isComplete;
   final DateTime? completedAt;
 
   const OnboardingQuest.required({
     required this.id,
-    required this.title,
-    required this.description,
     this.isComplete = false,
     this.completedAt,
   }) : isRequired = true;
 
   const OnboardingQuest.optional({
     required this.id,
-    required this.title,
-    required this.description,
     this.isComplete = false,
     this.completedAt,
   }) : isRequired = false;
 
   OnboardingQuest copyWith({
     String? id,
-    String? title,
-    String? description,
     bool? isRequired,
     bool? isComplete,
     DateTime? completedAt,
   }) {
     return OnboardingQuest._(
       id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
       isRequired: isRequired ?? this.isRequired,
       isComplete: isComplete ?? this.isComplete,
       completedAt: completedAt ?? this.completedAt,
@@ -43,8 +37,6 @@ class OnboardingQuest {
 
   const OnboardingQuest._({
     required this.id,
-    required this.title,
-    required this.description,
     required this.isRequired,
     required this.isComplete,
     required this.completedAt,
@@ -54,31 +46,11 @@ class OnboardingQuest {
 /// Derived onboarding progress for the teacher quest board.
 class OnboardingProgress {
   static const List<OnboardingQuest> teacherRequiredQuests = [
-    OnboardingQuest.required(
-      id: 'profile-created',
-      title: '프로필 생성',
-      description: '선생님 프로필을 최소 정보로 완성합니다.',
-    ),
-    OnboardingQuest.required(
-      id: 'first-student',
-      title: '첫 학생 추가',
-      description: '첫 학생을 등록합니다.',
-    ),
-    OnboardingQuest.required(
-      id: 'first-lesson',
-      title: '첫 레슨 등록',
-      description: '첫 레슨 일정을 등록합니다.',
-    ),
-    OnboardingQuest.required(
-      id: 'first-note',
-      title: '첫 레슨 노트 작성',
-      description: '첫 레슨 피드백을 남깁니다.',
-    ),
-    OnboardingQuest.required(
-      id: 'phone-verified',
-      title: '전화번호 인증',
-      description: '전화번호 인증을 완료합니다.',
-    ),
+    OnboardingQuest.required(id: 'profile-created'),
+    OnboardingQuest.required(id: 'first-student'),
+    OnboardingQuest.required(id: 'first-lesson'),
+    OnboardingQuest.required(id: 'first-note'),
+    OnboardingQuest.required(id: 'phone-verified'),
   ];
 
   final String userId;
@@ -113,10 +85,9 @@ class OnboardingProgress {
       totalRequiredQuestCount > 0 &&
       completedRequiredQuestCount == totalRequiredQuestCount;
 
-  double get progressFraction =>
-      totalRequiredQuestCount == 0
-          ? 0
-          : completedRequiredQuestCount / totalRequiredQuestCount;
+  double get progressFraction => totalRequiredQuestCount == 0
+      ? 0
+      : completedRequiredQuestCount / totalRequiredQuestCount;
 
   int get progressPercentage => (progressFraction * 100).round();
 

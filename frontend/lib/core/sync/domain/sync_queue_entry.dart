@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 enum SyncOperationType { create, update, delete, custom }
 
 enum SyncQueueStatus { pending, syncing, synced, failed }
@@ -22,6 +20,7 @@ class SyncQueueEntry {
     this.errorCode,
     this.lastSyncedAt,
     this.clientUpdatedAt,
+    this.idempotencyKey,
   });
 
   factory SyncQueueEntry.fromMap(Map<String, dynamic> map) {
@@ -46,6 +45,9 @@ class SyncQueueEntry {
       errorCode: map['errorCode'] as String?,
       lastSyncedAt: _parseDateTime(map['lastSyncedAt'] as String?),
       clientUpdatedAt: _parseDateTime(map['clientUpdatedAt'] as String?),
+      // #1117: absent on entries persisted before idempotency support — the
+      // ``as String?`` cast yields null, which orphan recovery treats as legacy.
+      idempotencyKey: map['idempotencyKey'] as String?,
     );
   }
 
@@ -66,9 +68,11 @@ class SyncQueueEntry {
   final DateTime? lastSyncedAt;
   final DateTime? clientUpdatedAt;
 
+  /// #1117: client-generated ``Idempotency-Key`` sent with the initial request
+  /// and re-sent on replay so the server dedupes a write it already committed.
+  final String? idempotencyKey;
+
   bool get isRetryable => retryCount < maxRetryCount;
-  String get requestFingerprint =>
-      '$httpMethod $path ${jsonEncode(queryParameters)}';
 
   SyncQueueEntry copyWith({
     SyncOperationType? operation,
@@ -99,6 +103,9 @@ class SyncQueueEntry {
       errorCode: errorCode,
       lastSyncedAt: lastSyncedAt,
       clientUpdatedAt: clientUpdatedAt ?? this.clientUpdatedAt,
+      // Always preserved — the key is immutable for the life of the entry, so
+      // status transitions (syncing → pending on orphan recovery) keep it.
+      idempotencyKey: idempotencyKey,
     );
   }
 
@@ -120,6 +127,7 @@ class SyncQueueEntry {
       'errorCode': errorCode,
       'lastSyncedAt': lastSyncedAt?.toIso8601String(),
       'clientUpdatedAt': clientUpdatedAt?.toIso8601String(),
+      'idempotencyKey': idempotencyKey,
     };
   }
 

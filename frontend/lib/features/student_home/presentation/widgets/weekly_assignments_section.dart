@@ -31,6 +31,8 @@ class WeeklyAssignmentsSection extends ConsumerWidget {
           ..sort(
             (a, b) => a.priority.sortOrder.compareTo(b.priority.sortOrder),
           );
+        // C7 — secondary 섹션: 미완료 과제 없으면 헤더 포함 전체 숨김 (가시성 일치).
+        if (incomplete.isEmpty) return const SizedBox.shrink();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,38 +65,10 @@ class WeeklyAssignmentsSection extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
-            if (incomplete.isEmpty)
-              _EmptyState()
-            else
-              _AssignmentList(items: incomplete),
+            _AssignmentList(items: incomplete),
           ],
         );
       },
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.assignment_turned_in_outlined,
-            size: 20,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(width: AppSpacing.space2),
-          Text(
-            AppStrings.weeklyAssignmentEmpty,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

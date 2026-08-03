@@ -118,7 +118,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
       initialDate: _startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      helpText: '시작일 선택',
+      helpText: AppStrings.selectStartDate,
     );
     if (picked != null) {
       setState(() {
@@ -137,7 +137,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
       initialDate: _endDate ?? _startDate,
       firstDate: _startDate,
       lastDate: DateTime(2030),
-      helpText: '종료일 선택',
+      helpText: AppStrings.selectEndDate,
     );
     if (picked != null) {
       setState(() => _endDate = picked);
@@ -171,14 +171,14 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 controller: _nameController,
                 focusNode: _nameFocusNode,
                 decoration: const InputDecoration(
-                  labelText: '레퍼토리 이름 *',
+                  labelText: AppStrings.repertoireNameLabel,
                   hintText: AppStrings.editRepertoireNameHint,
                   prefixIcon: Icon(Icons.library_music),
                 ),
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return '레퍼토리 이름을 입력해주세요';
+                    return AppStrings.repertoireNameRequired;
                   }
                   return null;
                 },
@@ -190,7 +190,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
-                  labelText: '설명 (선택)',
+                  labelText: AppStrings.descriptionOptional,
                   hintText: AppStrings.repertoireDescriptionHint,
                   prefixIcon: Icon(Icons.description),
                 ),
@@ -225,7 +225,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 onStartDateTap: _selectStartDate,
                 onEndDateTap: _selectEndDate,
                 onEndDateClear: _clearEndDate,
-                endDatePlaceholder: '설정 안함 (매일 반복)',
+                endDatePlaceholder: AppStrings.endDateNotSetDaily,
                 showHintMessage: true,
               ),
 
@@ -264,7 +264,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
-                '레퍼토리 저장 후 섹션 추가 화면으로 이동합니다',
+                AppStrings.practiceSaveThenAddSectionHint,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),

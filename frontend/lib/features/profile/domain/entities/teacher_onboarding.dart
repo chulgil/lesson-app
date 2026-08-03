@@ -66,82 +66,6 @@ class PhoneVerification {
   }
 }
 
-/// Tutorial steps for onboarding
-enum TutorialStep {
-  welcome, // "Welcome to Lessonaza!"
-  inviteStudent, // "How to invite students"
-  createLesson, // "Create lesson schedule"
-  writeFeedback, // "Write lesson notes"
-  completed, // "All set!"
-}
-
-/// Tutorial progress tracking
-class TutorialProgress {
-  final List<TutorialStep> completedSteps;
-  final bool isSkipped;
-  final DateTime? completedAt;
-
-  const TutorialProgress({
-    this.completedSteps = const [],
-    this.isSkipped = false,
-    this.completedAt,
-  });
-
-  bool get isCompleted =>
-      isSkipped || completedSteps.contains(TutorialStep.completed);
-
-  TutorialStep? get currentStep {
-    if (isCompleted) return null;
-
-    for (final step in TutorialStep.values) {
-      if (!completedSteps.contains(step)) {
-        return step;
-      }
-    }
-    return null;
-  }
-
-  int get progressPercentage {
-    if (isCompleted) return 100;
-    // Exclude 'completed' step from calculation
-    final totalSteps = TutorialStep.values.length - 1;
-    final completedCount = completedSteps
-        .where((s) => s != TutorialStep.completed)
-        .length;
-    return ((completedCount / totalSteps) * 100).round();
-  }
-
-  TutorialProgress copyWith({
-    List<TutorialStep>? completedSteps,
-    bool? isSkipped,
-    DateTime? completedAt,
-  }) {
-    return TutorialProgress(
-      completedSteps: completedSteps ?? this.completedSteps,
-      isSkipped: isSkipped ?? this.isSkipped,
-      completedAt: completedAt ?? this.completedAt,
-    );
-  }
-
-  TutorialProgress markStepCompleted(TutorialStep step) {
-    if (completedSteps.contains(step)) return this;
-
-    final newSteps = [...completedSteps, step];
-    final isNowCompleted =
-        step == TutorialStep.completed ||
-        newSteps.length >= TutorialStep.values.length;
-
-    return copyWith(
-      completedSteps: newSteps,
-      completedAt: isNowCompleted ? DateTime.now() : null,
-    );
-  }
-
-  TutorialProgress skip() {
-    return copyWith(isSkipped: true, completedAt: DateTime.now());
-  }
-}
-
 /// Onboarding step
 enum OnboardingStep {
   roleSelect, // Select teacher/student role
@@ -157,7 +81,6 @@ class TeacherOnboardingState {
   final OnboardingStep currentStep;
   final PhoneVerification? phoneVerification;
   final TeacherOnboardingProfile? profile;
-  final TutorialProgress tutorialProgress;
   final DateTime? startedAt;
   final DateTime? completedAt;
 
@@ -166,7 +89,6 @@ class TeacherOnboardingState {
     this.currentStep = OnboardingStep.roleSelect,
     this.phoneVerification,
     this.profile,
-    this.tutorialProgress = const TutorialProgress(),
     this.startedAt,
     this.completedAt,
   });
@@ -193,7 +115,6 @@ class TeacherOnboardingState {
     OnboardingStep? currentStep,
     PhoneVerification? phoneVerification,
     TeacherOnboardingProfile? profile,
-    TutorialProgress? tutorialProgress,
     DateTime? startedAt,
     DateTime? completedAt,
   }) {
@@ -202,7 +123,6 @@ class TeacherOnboardingState {
       currentStep: currentStep ?? this.currentStep,
       phoneVerification: phoneVerification ?? this.phoneVerification,
       profile: profile ?? this.profile,
-      tutorialProgress: tutorialProgress ?? this.tutorialProgress,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
     );

@@ -44,9 +44,9 @@
 | 카테고리 키 | 표시명 | 포함 알림 타입 | 기본값 | DND 우회 허용 |
 |-------------|--------|---------------|--------|--------------|
 | `lesson` | 레슨 알림 | `lessonBooked`, `lessonReminder`, `lessonStarting`, `lessonCompleted`, `lessonCancelled`, `lessonRescheduled`, `lessonNoteShared`, `noshowWarning`, `noshowConfirmed`, `teacherNoshow`, `compensationApplied`, `cancellationDeadline` | ON | 일부 (lessonStarting, lessonCancelled) |
-| `schedule` | 스케줄 변경 | `scheduleChangeRequested`, `scheduleChangeApproved`, `scheduleChangeRejected`, `scheduleChangeAlternative`, `makeupLessonCreated`, `makeupLessonExpiring`, `makeupLessonExpired`, `rescheduleAllowanceUsed`, `rescheduleAllowanceDepleted` | ON | 없음 |
-| `subscription` | 수강권 | `paymentRequested`, `paymentReminder`, `paymentReceived`, `paymentConfirmed`, `lessonsRunningLow`, `subscriptionExpiringSoon`, `subscriptionExpired`, `proposalReceived`, `proposalReminder24h`, `proposalReminder48h`, `proposalReminder72h`, `proposalAccepted`, `proposalExpired` | ON | 없음 |
-| `announcement` | 공지 | `newStudentRegistered`, `trialBookingRequest`, `reviewReceived`, `connectionRequestReceived`, `connectionRequestAccepted`, `connectionRequestRejected`, `connectionEstablished`, `connectionDisconnected`, `generalAnnouncement`, `studentPracticeReport` | ON | 없음 |
+| `schedule` | 스케줄 변경 | `scheduleChangeRequested`, `scheduleChangeApproved`, `scheduleChangeRejected`, `scheduleChangeAlternative`, `makeupLessonCreated`, `makeupLessonExpiring`, `makeupLessonExpired`, `rescheduleAllowanceUsed`, `rescheduleAllowanceDepleted`, `scheduleConfirmationRequired` | ON | 없음 |
+| `subscription` | 수강권 | `paymentRequested`, `paymentReminder`, `paymentReceived`, `paymentConfirmed`, `lessonsRunningLow`, `subscriptionExpiringSoon`, `subscriptionExpired`, `proposalReceived`, `proposalReminder24h`, `proposalReminder48h`, `proposalReminder72h`, `proposalAccepted`, `proposalExpired`, `paymentReminderSentNotice`, `renewalReminderSentNotice`, `paymentPendingD1`, `paymentPendingD3`, `paymentPendingD7Final` | ON | 없음 |
+| `announcement` | 공지 | `newStudentRegistered`, `trialBookingRequest`, `reviewReceived`, `connectionRequestReceived`, `connectionRequestAccepted`, `connectionRequestRejected`, `connectionEstablished`, `connectionDisconnected`, `generalAnnouncement`, `studentPracticeReport`, `profileReminder24h`, `profileReminder3d`, `profileReminder7d` | ON | 없음 |
 | `practice` | 연습 리마인더 | `practiceReminder`, `practiceAssigned`, `streakWarning`, `streakMilestone`, `weeklyGoalAchieved`, `recordingFeedbackReceived`, `inactivityReminder7d`, `inactivityReminder14d` | ON | 없음 |
 | `marketing` | 마케팅 | `winBackOffer30d`, 신규 기능 안내, 이벤트 알림 | **OFF** | 없음 |
 
@@ -61,6 +61,7 @@
 |-----------|------|
 | `lessonStarting` | 실시간 알림, 놓치면 레슨 시작 불가 |
 | `lessonCancelled` | 헛걸음 방지, 이동 중 취소 전달 필수 |
+| `lessonRescheduled` | 헛걸음 방지 — 변경된 시간 전달 필수 (코드 `bypassDnd` 기준) |
 | `noshowWarning` | 노쇼 확정 전 마지막 경고 |
 | `noshowConfirmed` | 패널티 발생 전 알림 |
 
@@ -714,6 +715,14 @@ static const notifCategoryMarketingDesc = '새 기능 안내, 이벤트';
 | DND/방해금지 시간대 직접 지정 | Phase 2 | 마스터+카테고리 토글과 분리하여 후속 구현 |
 | 알림 빈도 조절 (단계별 슬라이더) | Phase 2 | |
 | 카테고리별 리마인더 시간 세부 조정 | Phase 2 | |
+
+### 구현 현황 — FE 로컬 디스패치 게이트 (2026-07-02, 0629 감사 #501)
+
+FE 로컬 알림 경로의 설정 게이팅은 구현 완료:
+
+- `notification_delivery_gate.dart` — `NotificationType.category` 전수 매핑(§2.1) + `shouldDeliverNotification()` 순수 판정 (마스터 → 크리티컬 우회 → 카테고리 → 방해금지 순)
+- `LocalNotificationService` 생성자 주입 게이트 — `showNotification`/`scheduleNotification` 진입점에서 차단. FCM 도입 시 foreground 전달(`FcmService(notificationDelivery:)`)과 스케줄러 계열 서비스가 같은 지점을 경유하므로 그대로 적용된다
+- BE `should_send_push()` 서버측 필터는 여전히 별도 (아래 체크리스트)
 
 ### Phase 1.5 구현 단계 — 백엔드 (1-2일)
 

@@ -1,158 +1,62 @@
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/sync/application/mutation_queue_helper.dart';
 import '../../domain/entities/pending_payment.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
-import '../local/subscription_cache_store.dart';
 import 'remote_subscription_repository.dart';
 
-/// Decorator that wraps [RemoteSubscriptionRepository] with:
-///   1. Hive read-through cache — successful remote reads are persisted.
-///   2. Offline queue support for mutations.
+/// Decorator that wraps [RemoteSubscriptionRepository] with offline
+/// **write-queue** support ([MutationQueueHelper]).
 ///
-/// Read behaviour:
-///   - Online success → write to cache, return result.
-///   - Network failure ([NetworkException] / [ServerException] / 5xx) →
-///     return cached last-known-good if available, otherwise rethrow.
-///   - Cache miss + network failure → rethrow original error.
-///
-/// Streams and online-only operations delegate directly to [_remote].
+/// Reads delegate straight to the remote repository — offline read fallback is
+/// provided transparently at the HTTP layer by `ResponseCacheInterceptor`
+/// (offline-first plan §3 option A; batch 1d 일원화 — the previous Hive
+/// read-through cache layer was removed in favour of the single HTTP response
+/// cache). Writes are queued when offline and replayed on reconnect.
 class SyncAwareSubscriptionRepository implements SubscriptionRepository {
-  final RemoteSubscriptionRepository _remote;
-  final MutationQueueHelper _queue;
-  final SubscriptionCacheStore? _cache;
-
   SyncAwareSubscriptionRepository({
     required RemoteSubscriptionRepository remote,
     required MutationQueueHelper queue,
-    SubscriptionCacheStore? cache,
   }) : _remote = remote,
-       _queue = queue,
-       _cache = cache;
+       _queue = queue;
 
-  // ═══════════════════════════════════════════════════════════════════
-  // Private cache helpers
-  // ═══════════════════════════════════════════════════════════════════
+  final RemoteSubscriptionRepository _remote;
+  final MutationQueueHelper _queue;
 
-  bool _isNetworkFailure(Exception e) {
-    if (e is NetworkException) return true;
-    if (e is ServerException) return true;
-    if (e is ApiException && e.statusCode != null && e.statusCode! >= 500) {
-      return true;
-    }
-    return false;
-  }
-
-  Future<List<Subscription>> _readListWithCache(
-    String key,
-    Future<List<Subscription>> Function() fetch,
-  ) async {
-    try {
-      final result = await fetch();
-      await _cache?.putSubscriptions(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache?.getSubscriptions(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
-
-  Future<Subscription?> _readNullableWithCache(
-    String key,
-    Future<Subscription?> Function() fetch,
-  ) async {
-    try {
-      final result = await fetch();
-      await _cache?.putSubscription(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        // getSubscription returns null on cache miss — both safe to fallback
-        return _cache?.getSubscription(key);
-      }
-      rethrow;
-    }
-  }
-
-  Future<List<SubscriptionUsage>> _readUsageListWithCache(
-    String key,
-    Future<List<SubscriptionUsage>> Function() fetch,
-  ) async {
-    try {
-      final result = await fetch();
-      await _cache?.putUsageHistory(key, result);
-      return result;
-    } on Exception catch (e) {
-      if (_isNetworkFailure(e)) {
-        final cached = _cache?.getUsageHistory(key);
-        if (cached != null) return cached;
-      }
-      rethrow;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════
-  // Read methods — with cache fallback
-  // ═══════════════════════════════════════════════════════════════════
+  // --------------------------------------------------------------------------
+  // Read methods — delegate to remote; HTTP response cache handles offline.
+  // --------------------------------------------------------------------------
 
   @override
   Future<List<Subscription>> getByStudentId(String studentId) =>
-      _readListWithCache(
-        SubscriptionCacheStore.keyStudent(studentId),
-        () => _remote.getByStudentId(studentId),
-      );
+      _remote.getByStudentId(studentId);
 
   @override
   Future<Subscription?> getActiveByMembershipId(String membershipId) =>
-      _readNullableWithCache(
-        SubscriptionCacheStore.keyMembership(membershipId),
-        () => _remote.getActiveByMembershipId(membershipId),
-      );
+      _remote.getActiveByMembershipId(membershipId);
 
   @override
-  Future<Subscription?> getById(String id) => _readNullableWithCache(
-    SubscriptionCacheStore.keySub(id),
-    () => _remote.getById(id),
-  );
+  Future<Subscription?> getById(String id) => _remote.getById(id);
 
   @override
-  Future<List<Subscription>> getExpiringSoon() => _readListWithCache(
-    SubscriptionCacheStore.keyExpiringSoon(),
-    _remote.getExpiringSoon,
-  );
+  Future<List<Subscription>> getExpiringSoon() => _remote.getExpiringSoon();
 
   @override
-  Future<List<Subscription>> getExpired() => _readListWithCache(
-    SubscriptionCacheStore.keyExpired(),
-    _remote.getExpired,
-  );
+  Future<List<Subscription>> getExpired() => _remote.getExpired();
 
   @override
   Future<List<Subscription>> getByTeacherId(String teacherId) =>
-      _readListWithCache(
-        SubscriptionCacheStore.keyTeacher(teacherId),
-        () => _remote.getByTeacherId(teacherId),
-      );
+      _remote.getByTeacherId(teacherId);
 
   @override
   Future<List<Subscription>> getUnpaidSubscriptions(String teacherId) =>
-      _readListWithCache(
-        SubscriptionCacheStore.keyUnpaid(teacherId),
-        () => _remote.getUnpaidSubscriptions(teacherId),
-      );
+      _remote.getUnpaidSubscriptions(teacherId);
 
   @override
   Future<List<SubscriptionUsage>> getUsageHistory(String subscriptionId) =>
-      _readUsageListWithCache(
-        SubscriptionCacheStore.keyUsage(subscriptionId),
-        () => _remote.getUsageHistory(subscriptionId),
-      );
+      _remote.getUsageHistory(subscriptionId);
 
   // ═══════════════════════════════════════════════════════════════════
   // Streams — delegate directly (stream-based caching is out of scope)
@@ -174,28 +78,28 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<Subscription> create(Subscription subscription) =>
       _queue.executeMutation<Subscription>(
         remoteCall: () => _remote.create(subscription),
-        queueCall:
-            (syncService) => syncService.queueMutation(
-              domain: 'subscription',
-              httpMethod: 'POST',
-              path: '/subscriptions',
-              payload: subscription.toJson(),
-            ),
-        optimisticResult:
-            () => subscription.copyWith(id: 'tmp_${const Uuid().v4()}'),
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'subscription',
+          httpMethod: 'POST',
+          path: '/subscriptions',
+          payload: subscription.toJson(),
+        ),
+        optimisticResult: () =>
+            subscription.copyWith(id: 'tmp_${const Uuid().v4()}'),
       );
 
   @override
   Future<Subscription> update(Subscription subscription) =>
       _queue.executeMutation<Subscription>(
         remoteCall: () => _remote.update(subscription),
-        queueCall:
-            (syncService) => syncService.queueMutation(
-              domain: 'subscription',
-              httpMethod: 'PUT',
-              path: '/subscriptions/${subscription.id}',
-              payload: subscription.toJson(),
-            ),
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'subscription',
+          httpMethod: 'PUT',
+          path: '/subscriptions/${subscription.id}',
+          payload: subscription.toJson(),
+        ),
         optimisticResult: () => subscription,
       );
 
@@ -206,30 +110,30 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
     String? teacherName,
     String? instrument,
   }) =>
-  // Online-only: requires current subscription state for optimistic result
-  _remote.useLesson(
-    id,
-    lessonId: lessonId,
-    teacherName: teacherName,
-    instrument: instrument,
-  );
+      // Online-only: requires current subscription state for optimistic result
+      _remote.useLesson(
+        id,
+        lessonId: lessonId,
+        teacherName: teacherName,
+        instrument: instrument,
+      );
 
   @override
   Future<Subscription> useReschedule(String id) =>
-  // Online-only: requires current subscription state for optimistic result
-  _remote.useReschedule(id);
+      // Online-only: requires current subscription state for optimistic result
+      _remote.useReschedule(id);
 
   @override
   Future<void> updateStatus(String id, SubscriptionStatus status) =>
       _queue.executeVoidMutation(
         remoteCall: () => _remote.updateStatus(id, status),
-        queueCall:
-            (syncService) => syncService.queueMutation(
-              domain: 'subscription',
-              httpMethod: 'PATCH',
-              path: '/subscriptions/$id/status',
-              payload: {'status': status.name},
-            ),
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'subscription',
+          httpMethod: 'PATCH',
+          path: '/subscriptions/$id/status',
+          payload: {'status': status.name},
+        ),
       );
 
   @override
@@ -237,13 +141,13 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
     String id, {
     SubscriptionPaymentMethod? paymentMethod,
   }) =>
-  // Online-only: payment operations require immediate server confirmation
-  _remote.confirmPayment(id, paymentMethod: paymentMethod);
+      // Online-only: payment operations require immediate server confirmation
+      _remote.confirmPayment(id, paymentMethod: paymentMethod);
 
   @override
   Future<Subscription> undoConfirmPayment(String id) =>
-  // Online-only: payment operations require immediate server confirmation
-  _remote.undoConfirmPayment(id);
+      // Online-only: payment operations require immediate server confirmation
+      _remote.undoConfirmPayment(id);
 
   // ═══════════════════════════════════════════════════════════════════
   // Payment-pending dashboard — #424 (online-only, no offline queue)
@@ -272,13 +176,13 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) =>
       _queue.executeMutation<SubscriptionUsage>(
         remoteCall: () => _remote.addUsage(usage),
-        queueCall:
-            (syncService) => syncService.queueMutation(
-              domain: 'subscription',
-              httpMethod: 'POST',
-              path: '/subscriptions/${usage.subscriptionId}/usage',
-              payload: usage.toJson(),
-            ),
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'subscription',
+          httpMethod: 'POST',
+          path: '/subscriptions/${usage.subscriptionId}/usage',
+          payload: usage.toJson(),
+        ),
         optimisticResult: () => usage,
       );
 }

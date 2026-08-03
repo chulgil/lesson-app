@@ -1,14 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_test/hive_test.dart';
 import 'package:lessonaza/core/sync/application/connectivity_service.dart';
 import 'package:lessonaza/core/sync/application/initial_pull_service.dart';
-import 'package:lessonaza/features/lessons/data/local/lesson_cache_store.dart';
 import 'package:lessonaza/features/lessons/data/repositories/remote_lesson_repository.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
-import 'package:lessonaza/features/schedule/data/local/teacher_availability_cache_store.dart';
 import 'package:lessonaza/features/schedule/data/repositories/remote_teacher_availability_repository.dart';
-import 'package:lessonaza/features/students/data/local/student_cache_store.dart';
 import 'package:lessonaza/features/students/data/repositories/remote_student_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -47,6 +43,12 @@ Lesson _testLesson({String id = 'lesson-1'}) {
 
 // ---------------------------------------------------------------------------
 // Tests
+//
+// The service warms the HTTP response cache by calling the remote repository
+// methods (ApiClient's ResponseCacheInterceptor persists the responses — see
+// test/features/*/data/repositories/*_offline_read_test.dart for that path).
+// These tests cover the service's own semantics: the user-scoped flag and
+// the offline guard.
 // ---------------------------------------------------------------------------
 
 void main() {
@@ -54,36 +56,22 @@ void main() {
   late MockRemoteStudentRepository remoteStudents;
   late MockRemoteTeacherAvailabilityRepository remoteAvailability;
   late MockConnectivityService connectivity;
-  late LessonCacheStore cache;
-  late StudentCacheStore studentCache;
-  late TeacherAvailabilityCacheStore availabilityCache;
   late InitialPullService service;
   const userId = 'teacher_test_001';
 
   setUp(() async {
+    // Hive is still required for the user-scoped initial-pull flag box.
     await setUpTestHive();
-    final box = await Hive.openBox<String>(LessonCacheStore.boxName);
-    final studentBox = await Hive.openBox<String>(StudentCacheStore.boxName);
-    final availabilityBox = await Hive.openBox<String>(
-      TeacherAvailabilityCacheStore.boxName,
-    );
 
     remote = MockRemoteLessonRepository();
     remoteStudents = MockRemoteStudentRepository();
     remoteAvailability = MockRemoteTeacherAvailabilityRepository();
     connectivity = MockConnectivityService();
 
-    cache = LessonCacheStore(box: box);
-    studentCache = StudentCacheStore(box: studentBox);
-    availabilityCache = TeacherAvailabilityCacheStore(box: availabilityBox);
-
     service = InitialPullService(
       remoteLessons: remote,
-      lessonCache: cache,
       remoteStudents: remoteStudents,
-      studentCache: studentCache,
       remoteAvailability: remoteAvailability,
-      availabilityCache: availabilityCache,
       connectivity: connectivity,
     );
   });
@@ -93,28 +81,21 @@ void main() {
   });
 
   group('InitialPullService', () {
-    test('첫 로그인 시 lessons를 pull하여 캐시에 시드한다', () async {
+    test('첫 로그인 시 lessons를 pull하여 응답 캐시를 웜업한다', () async {
       // Arrange — first login: no flag, online
-      final lessons = [_testLesson(id: 'l1'), _testLesson(id: 'l2')];
       when(() => connectivity.isOnline).thenAnswer((_) async => true);
-      when(() => remote.getLessons()).thenAnswer((_) async => lessons);
+      when(
+        () => remote.getLessons(),
+      ).thenAnswer((_) async => [_testLesson(id: 'l1'), _testLesson(id: 'l2')]);
       when(() => remoteStudents.getStudents()).thenAnswer((_) async => []);
       when(
         () => remoteAvailability.getAvailability(userId),
       ).thenAnswer((_) async => null);
 
-      // Pre-condition: cache is empty
-      expect(cache.getLessons(LessonCacheStore.keyAll()), isNull);
-
       // Act
       await service.runIfNeeded(userId);
 
-      // Assert — cache seeded with server lessons
-      final cached = cache.getLessons(LessonCacheStore.keyAll());
-      expect(cached, isNotNull);
-      expect(cached!.length, 2);
-      expect(cached.map((l) => l.id).toList(), containsAll(['l1', 'l2']));
-
+      // Assert — the repository call went out (interceptor caches it)
       verify(() => remote.getLessons()).called(1);
     });
 
@@ -144,9 +125,10 @@ void main() {
       // Act
       await service.runIfNeeded(userId);
 
-      // Assert — remote never called, cache still empty
+      // Assert — remote never called
       verifyNever(() => remote.getLessons());
-      expect(cache.getLessons(LessonCacheStore.keyAll()), isNull);
+      verifyNever(() => remoteStudents.getStudents());
+      verifyNever(() => remoteAvailability.getAvailability(any()));
     });
 
     test('오프라인 skip 후 다음 온라인 로그인에서 pull이 실행된다', () async {
@@ -167,9 +149,6 @@ void main() {
 
       await service.runIfNeeded(userId);
 
-      final cached = cache.getLessons(LessonCacheStore.keyAll());
-      expect(cached, isNotNull);
-      expect(cached!.first.id, 'l-retry');
       verify(() => remote.getLessons()).called(1);
     });
 
@@ -201,16 +180,15 @@ void main() {
       // Act — should not throw
       await expectLater(service.runIfNeeded(userId), completes);
 
-      // Assert — flag not set (lessons failed), so retry will happen on next call
+      // Assert — flag not set (lessons failed), so retry happens on next call
       when(
         () => remote.getLessons(),
       ).thenAnswer((_) async => [_testLesson(id: 'l-recovered')]);
 
       await service.runIfNeeded(userId);
 
-      final cached = cache.getLessons(LessonCacheStore.keyAll());
-      expect(cached, isNotNull);
-      expect(cached!.first.id, 'l-recovered');
+      // First (failed) attempt + retry = 2 calls in total
+      verify(() => remote.getLessons()).called(2);
     });
   });
 }

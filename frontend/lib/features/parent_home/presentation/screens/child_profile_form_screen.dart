@@ -45,6 +45,9 @@ class _ChildProfileFormScreenState
   late String _selectedLevel;
   late Color _selectedColor;
   bool _isLoading = false;
+  // #1072: true once the user explicitly picks an instrument, so build
+  // stops re-deriving the default when the active discipline resolves.
+  bool _instrumentTouched = false;
 
   bool get isEditing => widget.existingProfile != null;
 
@@ -60,21 +63,12 @@ class _ChildProfileFormScreenState
     AppColors.profileIndigo,
   ];
 
-  // Instruments
-  static const _instruments = [
-    ('violin', '바이올린'),
-    ('piano', '피아노'),
-    ('cello', '첼로'),
-    ('viola', '비올라'),
-    ('flute', '플루트'),
-  ];
-
   // Levels
   static const _levels = [
-    ('beginner', '입문'),
-    ('elementary', '초급'),
-    ('intermediate', '중급'),
-    ('advanced', '고급'),
+    ('beginner', AppStrings.studentLevelBeginner),
+    ('elementary', AppStrings.studentLevelElementary),
+    ('intermediate', AppStrings.studentLevelIntermediate),
+    ('advanced', AppStrings.studentLevelAdvanced),
   ];
 
   @override
@@ -83,7 +77,9 @@ class _ChildProfileFormScreenState
     final profile = widget.existingProfile;
     _nameController = TextEditingController(text: profile?.name ?? '');
     _selectedBirthYear = profile?.birthYear ?? DateTime.now().year - 7;
-    _selectedInstrument = profile?.instrument ?? 'violin';
+    // New profiles default in build once the active discipline resolves
+    // (see build); '' is the not-yet-derived sentinel. Edits keep their value.
+    _selectedInstrument = profile?.instrument ?? '';
     _selectedLevel = profile?.level ?? 'beginner';
     _selectedColor = profile?.profileColor ?? _profileColors[0];
   }
@@ -126,7 +122,7 @@ class _ChildProfileFormScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? '자녀 정보가 수정되었습니다' : '자녀 프로필이 추가되었습니다'),
+            content: Text(isEditing ? AppStrings.parentHomeChildUpdated : AppStrings.parentHomeChildAdded),
             backgroundColor: AppColors.paperOk,
           ),
         );
@@ -154,6 +150,30 @@ class _ChildProfileFormScreenState
     final minYear = currentYear - 18; // Max 18 years old
     final maxYear = currentYear - 3; // Min 3 years old
 
+    // #1072: expertise options follow the active discipline (music keeps its
+    // curated key-space, byte-identical; fitness surfaces its specialties).
+    final catalogOptions = childInstrumentOptionsFor(
+      ref.watch(activeDisciplineProvider),
+    );
+    // A new, untouched profile defaults to the active discipline's first
+    // option. Derived here, not in initState: activeDisciplineProvider first
+    // emits the music fallback while its Hive storage loads, then the resolved
+    // discipline — deriving in build re-snaps the default once it resolves,
+    // instead of leaking 'violin' onto a fitness child. Edits keep their value.
+    if (!isEditing && !_instrumentTouched && catalogOptions.isNotEmpty) {
+      _selectedInstrument = catalogOptions.first.$1;
+    }
+    // Preserve a saved value outside the active catalog (e.g. a music child
+    // viewed under a switched discipline) so the dropdown never asserts /
+    // silently reverts - mirrors the StudentProfileEdit fix (#1098).
+    final instrumentOptions =
+        catalogOptions.any((o) => o.$1 == _selectedInstrument)
+            ? catalogOptions
+            : [
+              (_selectedInstrument, childInstrumentLabel(_selectedInstrument)),
+              ...catalogOptions,
+            ];
+
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: isEditing
@@ -178,7 +198,7 @@ class _ChildProfileFormScreenState
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      '만 14세 미만 자녀는 별도 계정 없이 학부모 계정에서 관리됩니다.',
+                      AppStrings.parentHomeUnder14Notice,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.ink,
                       ),
@@ -191,7 +211,7 @@ class _ChildProfileFormScreenState
 
             // Profile color selector
             Text(
-              '프로필 색상',
+              AppStrings.parentHomeProfileColorLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -233,7 +253,7 @@ class _ChildProfileFormScreenState
 
             // Name field
             Text(
-              '이름/별명',
+              AppStrings.parentHomeChildNameLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -256,10 +276,10 @@ class _ChildProfileFormScreenState
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '이름을 입력해주세요';
+                  return AppStrings.parentHomeChildNameRequired;
                 }
                 if (value.trim().length < 2) {
-                  return '2글자 이상 입력해주세요';
+                  return AppStrings.parentHomeChildNameMinLength;
                 }
                 return null;
               },
@@ -268,7 +288,7 @@ class _ChildProfileFormScreenState
 
             // Birth year selector
             Text(
-              '출생년도',
+              AppStrings.parentHomeBirthYearLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -292,7 +312,7 @@ class _ChildProfileFormScreenState
                     final age = currentYear - year;
                     return DropdownMenuItem(
                       value: year,
-                      child: Text('$year년 (만 $age세)'),
+                      child: Text(AppStrings.parentHomeBirthYearAgeFormat(year, age)),
                     );
                   }),
                   onChanged: (value) {
@@ -322,7 +342,7 @@ class _ChildProfileFormScreenState
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
-                        '만 14세 이상은 별도 계정 등록이 가능합니다.',
+                        AppStrings.parentHomeOver14Notice,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
                         ),
@@ -336,7 +356,7 @@ class _ChildProfileFormScreenState
 
             // Instrument selector
             Text(
-              '악기',
+              AppStrings.instrumentLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -356,7 +376,7 @@ class _ChildProfileFormScreenState
                   value: _selectedInstrument,
                   isExpanded: true,
                   items:
-                      _instruments.map((item) {
+                      instrumentOptions.map((item) {
                         return DropdownMenuItem(
                           value: item.$1,
                           child: Text(item.$2),
@@ -364,7 +384,10 @@ class _ChildProfileFormScreenState
                       }).toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      setState(() => _selectedInstrument = value);
+                      setState(() {
+                        _selectedInstrument = value;
+                        _instrumentTouched = true;
+                      });
                     }
                   },
                 ),
@@ -374,7 +397,7 @@ class _ChildProfileFormScreenState
 
             // Level selector
             Text(
-              '수준',
+              AppStrings.parentHomeLevelLabel,
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -435,7 +458,7 @@ class _ChildProfileFormScreenState
                           ),
                         )
                         : Text(
-                          isEditing ? '저장' : '자녀 추가',
+                          isEditing ? AppStrings.save : AppStrings.parentHomeChildAdd,
                           style: AppTypography.button.copyWith(
                             color: AppColors.paper,
                           ),
@@ -449,7 +472,7 @@ class _ChildProfileFormScreenState
               TextButton(
                 onPressed: _isLoading ? null : _showDeleteConfirmation,
                 child: Text(
-                  '자녀 프로필 삭제',
+                  AppStrings.parentHomeDeleteChildProfile,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.paperAccent,
                   ),
@@ -465,9 +488,9 @@ class _ChildProfileFormScreenState
   Future<void> _showDeleteConfirmation() async {
     final confirmed = await showNotebookDialog(
       context: context,
-      title: '자녀 프로필 삭제',
+      title: AppStrings.parentHomeDeleteChildProfile,
       message:
-          "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
+          AppStrings.parentHomeChildDeleteConfirmFormat(widget.existingProfile!.name),
       confirmLabel: AppStrings.delete,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,

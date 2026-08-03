@@ -52,42 +52,37 @@ class _AllLessonRequestsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final requestsAsync =
-        widget.viewerRole == 'teacher'
-            ? ref.watch(teacherUnifiedRequestsProvider(widget.subjectId))
-            : ref.watch(studentUnifiedRequestsProvider(widget.subjectId));
+    final requestsAsync = widget.viewerRole == 'teacher'
+        ? ref.watch(teacherUnifiedRequestsProvider(widget.subjectId))
+        : ref.watch(studentUnifiedRequestsProvider(widget.subjectId));
     final studentNames = ref.watch(studentNameMapProvider);
     final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: NotebookDetailAppBar(
-        title: AppStrings.lessonRequestTitle,
-      ),
+      appBar: NotebookDetailAppBar(title: AppStrings.lessonRequestTitle),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (_, __) => Center(
-              child: Text(
-                AppStrings.requestLoadError,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
+        error: (_, __) => Center(
+          child: Text(
+            AppStrings.requestLoadError,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
             ),
+          ),
+        ),
         data: (allRequests) {
           final filtered = _filter.apply(allRequests);
-          final requestDates =
-              allRequests
-                  .map(
-                    (r) => DateTime(
-                      r.createdAt.year,
-                      r.createdAt.month,
-                      r.createdAt.day,
-                    ),
-                  )
-                  .toSet();
+          final requestDates = allRequests
+              .map(
+                (r) => DateTime(
+                  r.createdAt.year,
+                  r.createdAt.month,
+                  r.createdAt.day,
+                ),
+              )
+              .toSet();
 
           return Column(
             children: [
@@ -117,54 +112,56 @@ class _AllLessonRequestsScreenState
 
               // 4. Request list
               Expanded(
-                child:
-                    filtered.isEmpty
-                        ? Center(
-                          child: Text(
-                            AppStrings.noHistory,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.inkTertiary,
-                            ),
+                child: filtered.isEmpty
+                    ? Center(
+                        child: Text(
+                          AppStrings.noHistory,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.inkTertiary,
                           ),
-                        )
-                        : ListView.separated(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.screenPadding,
-                            vertical: AppSpacing.space3,
-                          ),
-                          itemCount: filtered.length,
-                          separatorBuilder:
-                              (_, __) =>
-                                  const SizedBox(height: AppSpacing.space2),
-                          itemBuilder: (context, index) {
-                            final request = filtered[index];
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.paper,
-                                border: Border.all(
-                                  color: AppColors.inkQuaternary,
-                                ),
-                              ),
-                              child: RequestListItem(
-                                request: request,
-                                studentName:
-                                    studentNames[request.studentId] ??
-                                    AppStrings.student,
-                                teacherName: teacherNames[request.teacherId],
-                                academyName: academyNames[request.academyId],
-                                viewerRole: widget.viewerRole,
-                                onTap:
-                                    () => context.push(
-                                      AppRoutes.requestDetail.replaceFirst(
-                                        ':id',
-                                        request.id,
-                                      ),
-                                      extra: {'viewerRole': widget.viewerRole},
-                                    ),
-                              ),
-                            );
-                          },
                         ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.screenPadding,
+                          vertical: AppSpacing.space3,
+                        ),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppSpacing.space2),
+                        itemBuilder: (context, index) {
+                          final request = filtered[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.paper,
+                              border: Border.all(
+                                color: AppColors.inkQuaternary,
+                              ),
+                            ),
+                            child: RequestListItem(
+                              request: request,
+                              studentName:
+                                  request.studentName ??
+                                  studentNames[request.studentId] ??
+                                  AppStrings.student,
+                              teacherName:
+                                  request.teacherName ??
+                                  teacherNames[request.teacherId],
+                              academyName:
+                                  request.academyName ??
+                                  academyNames[request.academyId],
+                              viewerRole: widget.viewerRole,
+                              onTap: () => context.push(
+                                AppRoutes.requestDetail.replaceFirst(
+                                  ':id',
+                                  request.id,
+                                ),
+                                extra: {'viewerRole': widget.viewerRole},
+                              ),
+                            ),
+                          );
+                        },
+                      ),
               ),
             ],
           );
@@ -269,10 +266,9 @@ class _AllLessonRequestsScreenState
               color: isSelected ? AppColors.paperAccent : Colors.transparent,
               border: Border.all(color: color, width: isSelected ? 2 : 1.5),
             ),
-            child:
-                isSelected
-                    ? const Icon(Icons.check, size: 12, color: AppColors.paper)
-                    : null,
+            child: isSelected
+                ? const Icon(Icons.check, size: 12, color: AppColors.paper)
+                : null,
           ),
           const SizedBox(height: AppSpacing.space1),
           // Label
@@ -400,18 +396,16 @@ class _AllLessonRequestsScreenState
 
   Widget _buildSortChip() {
     return _buildUnifiedChip(
-      label:
-          _sortBy == RequestSortBy.createdAtDesc
-              ? AppStrings.sortByTime
-              : AppStrings.sortByName,
+      label: _sortBy == RequestSortBy.createdAtDesc
+          ? AppStrings.sortByTime
+          : AppStrings.sortByName,
       selected: false,
       icon: Icons.swap_vert,
       onTap: () {
         setState(() {
-          _sortBy =
-              _sortBy == RequestSortBy.createdAtDesc
-                  ? RequestSortBy.studentNameAsc
-                  : RequestSortBy.createdAtDesc;
+          _sortBy = _sortBy == RequestSortBy.createdAtDesc
+              ? RequestSortBy.studentNameAsc
+              : RequestSortBy.createdAtDesc;
           _filter = _filter.copyWith(sortBy: _sortBy);
         });
       },

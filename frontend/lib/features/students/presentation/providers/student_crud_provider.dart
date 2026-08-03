@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/analytics/analytics_provider.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../domain/repositories/student_repository.dart';
 import 'student_repository_provider.dart';
@@ -82,6 +85,9 @@ class StudentsNotifier extends _$StudentsNotifier {
       state = await AsyncValue.guard(() => _repository.getStudents());
       ref.invalidate(studentsProvider);
       ref.invalidate(filteredStudentsProvider);
+      // #1209 — 학생 생성 성공. 진입점(수동 등록/온보딩)은 이 notifier 에서
+      // 구분되지 않으므로 method 는 생략한다.
+      unawaited(ref.read(analyticsServiceProvider).logStudentAdded());
       return newStudent;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -94,6 +100,10 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       final updated = await _repository.updateStudent(student);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      // keepAlive studentsProvider/filteredStudentsProvider 를 watch 하는 화면
+      // (레슨추가 피커·홈·분석)이 stale 되지 않도록 addStudent 와 동일하게 무효화.
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -106,6 +116,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       await _repository.deleteStudent(id);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -117,6 +129,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       await _repository.archiveStudent(id);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -137,6 +151,8 @@ class StudentsNotifier extends _$StudentsNotifier {
     try {
       final updated = await _repository.updateStudentStatus(studentId, status);
       state = await AsyncValue.guard(() => _repository.getStudents());
+      ref.invalidate(studentsProvider);
+      ref.invalidate(filteredStudentsProvider);
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);

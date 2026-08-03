@@ -120,6 +120,10 @@ class Settings(BaseSettings):
     SMS_API_KEY: str = ""
     SMS_API_SECRET: str = ""
     SMS_SENDER_NUMBER: str = ""
+    # Beta/QA only (#1142). When SMS_USE_MOCK is also True, log the issued OTP to the
+    # server log so QA can read it (beta sends no real SMS). Default OFF. Never consulted
+    # on the real-send path — production must leave this False so codes never hit logs.
+    SMS_MOCK_LOG_CODES: bool = False
 
     # CSP report-only mode (Phase 17). 빈 문자열이면 위반 신고 endpoint 명시 없이 정책만 전송 —
     # 브라우저 콘솔에서만 위반 가시. URL 설정 시 신고 페이로드가 그 endpoint 로 POST 된다.
@@ -148,6 +152,14 @@ def validate_runtime_configuration() -> None:
         raise RuntimeError("JWT_SECRET_KEY must be set to a strong secret in production-like environments")
     if settings.DEBUG:
         raise RuntimeError("DEBUG must be False in production-like environments (stack trace exposure risk)")
+    if not settings.SMS_USE_MOCK and not (
+        settings.SMS_API_KEY and settings.SMS_API_SECRET and settings.SMS_SENDER_NUMBER
+    ):
+        # #1179 — fail at boot instead of 502ing every OTP request at runtime.
+        raise RuntimeError(
+            "SMS_USE_MOCK=false requires SMS_API_KEY / SMS_API_SECRET / SMS_SENDER_NUMBER "
+            "in production-like environments"
+        )
     origins = settings.CORS_ORIGINS or []
     if not origins:
         raise RuntimeError("CORS_ORIGINS must be set explicitly in production-like environments")

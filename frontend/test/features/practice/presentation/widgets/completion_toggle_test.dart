@@ -28,7 +28,11 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: CompletionToggle(section: section, onToggle: () {}),
+          body: CompletionToggle(
+            section: section,
+            onToggle: () {},
+            studentId: 'student-1',
+          ),
         ),
       ),
     );

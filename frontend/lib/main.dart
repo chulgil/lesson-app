@@ -8,18 +8,22 @@ import 'package:go_router/go_router.dart';
 
 import 'core/auth/auth_state.dart';
 import 'core/deep_link/deep_link_handler.dart';
+import 'core/l10n/app_strings.dart';
 import 'core/l10n/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/startup/app_bootstrap.dart';
 import 'core/startup/startup_provider_observer.dart';
 import 'core/startup/startup_recovery.dart' as startup_recovery;
 import 'core/theme/app_theme.dart';
+import 'core/sync/application/sync_service.dart';
 import 'core/sync/presentation/providers/sync_provider.dart';
 import 'core/widgets/offline_banner.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/notifications/notifications_facade.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
 import 'features/practice/presentation/providers/recording_provider.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
+import 'features/settings/presentation/widgets/force_update_gate.dart';
 
 /// Get the startup recovery result.
 startup_recovery.StartupRecoveryResult? getStartupRecoveryResult() =>
@@ -60,6 +64,11 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
   StreamController<AuthState>? _authRefreshController;
   GoRouterRefreshStream? _authRefresh;
 
+  /// #1119 (D4): app-root messenger so a sync write rejected by the server
+  /// (LWW conflict) surfaces a SnackBar for any role, from above the router.
+  final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  StreamSubscription<SyncRejectionEvent>? _rejectionSubscription;
+
   /// Builds the router exactly once, wiring auth-state changes to the router's
   /// [refreshListenable] instead of recreating the router.
   GoRouter _ensureRouter() {
@@ -74,6 +83,11 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     // Bridge the Riverpod auth state into a stream the router can listen to.
     ref.listenManual<AuthState>(authNotifierProvider, (_, next) {
       _authRefreshController?.add(next);
+      // #475 — register for push once onboarding lands the user in the
+      // authenticated state (permission prompt appears post-onboarding).
+      if (next is AuthAuthenticated) {
+        unawaited(ref.read(pushRegistrationProvider.notifier).ensureStarted());
+      }
     });
     _authRefresh = GoRouterRefreshStream(_authRefreshController!.stream);
     _router = AppRouter.createRouter(ref, refreshListenable: _authRefresh);
@@ -87,6 +101,12 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     // Pre-initialize engines at app startup to eliminate first-use delay
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
+      // Returning users are already authenticated before the auth listener is
+      // wired, so the transition above never fires — kick push registration
+      // here too (ensureStarted is idempotent per session).
+      if (ref.read(authNotifierProvider) is AuthAuthenticated) {
+        unawaited(ref.read(pushRegistrationProvider.notifier).ensureStarted());
+      }
       // Tuner warm-up is intentionally deferred until user opens tuner.
       // Keeping it running globally can hold the microphone active in background.
       unawaited(_initializeSyncService());
@@ -99,6 +119,7 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     unawaited(_deepLinkHandler?.dispose());
     _authRefresh?.dispose();
     unawaited(_authRefreshController?.close());
+    unawaited(_rejectionSubscription?.cancel());
     unawaited(ref.read(syncServiceProvider).dispose());
     super.dispose();
   }
@@ -129,6 +150,13 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
 
   Future<void> _initializeSyncService() async {
     final syncService = ref.read(syncServiceProvider);
+    // #1119 (D4): surface deterministic write rejections (LWW conflicts) the
+    // user is not watching (async replay) as a SnackBar.
+    _rejectionSubscription ??= syncService.rejectionStream.listen((_) {
+      _scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(content: Text(AppStrings.syncConflictRejected)),
+      );
+    });
     await syncService.initialize();
   }
 
@@ -151,6 +179,7 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
       child: MaterialApp.router(
         title: 'Lessonaza',
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: _scaffoldMessengerKey,
 
         // Localization
         localizationsDelegates: const [
@@ -170,9 +199,13 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
         // Router
         routerConfig: routerConfig,
 
-        // Global offline banner injected above every screen.
-        builder: (context, child) =>
-            OfflineBannerWrapper(child: child ?? const SizedBox.shrink()),
+        // Force-update gate wraps the whole shell: when the running version is
+        // below the server min_version it swaps in ForceUpdateScreen. Fails
+        // open while the version check is loading/errored (never locks out).
+        // Inside the gate, the global offline banner sits above every screen.
+        builder: (context, child) => ForceUpdateGate(
+          child: OfflineBannerWrapper(child: child ?? const SizedBox.shrink()),
+        ),
       ),
     );
   }

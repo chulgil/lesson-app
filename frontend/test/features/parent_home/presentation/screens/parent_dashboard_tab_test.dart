@@ -6,6 +6,8 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/lessons/lessons_facade.dart';
+import 'package:lessonaza/features/gamification/domain/services/streak_with_freeze_calculator.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/effective_streak_provider.dart';
 import 'package:lessonaza/features/parent_home/domain/entities/child_profile.dart';
 import 'package:lessonaza/features/parent_home/presentation/providers/child_profile_provider.dart';
 import 'package:lessonaza/features/parent_home/presentation/screens/parent_dashboard_tab.dart';
@@ -68,6 +70,17 @@ List<Override> _baseOverrides({
     ),
     lessonsByStudentProvider(studentId).overrideWith((_) async => const []),
     practiceStreakProvider(studentId).overrideWith((_) async => _streak()),
+    // 표시 숫자 SSOT (#1214). raw 는 요일 칠하기용으로 계속 필요.
+    effectiveStreakProvider(studentId).overrideWith(
+      (_) async => const StreakWithFreezeResult(
+        effectiveCurrentStreak: 3,
+        freezeShouldApply: false,
+        absenceDate: null,
+        streakBroken: false,
+        examModeDormant: false,
+        freezeBalance: 2,
+      ),
+    ),
     weeklyPracticeItemsProvider(
       studentId,
     ).overrideWith((_) async => weeklyItems),

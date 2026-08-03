@@ -11,7 +11,15 @@ import '../../domain/services/notification_service.dart';
 ///
 /// Uses flutter_local_notifications for local scheduling. The domain layer only
 /// depends on [NotificationService]; this adapter owns the platform plugin.
-class LocalNotificationService implements NotificationService {
+class LocalNotificationService implements RecurringNotificationService {
+  /// [shouldDeliver] is the preference gate injected by the provider layer
+  /// (0629 audit #501). Null (e.g. bare constructions) delivers everything.
+  LocalNotificationService({
+    bool Function(AppNotification notification)? shouldDeliver,
+  }) : _shouldDeliver = shouldDeliver;
+
+  final bool Function(AppNotification notification)? _shouldDeliver;
+
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -120,6 +128,8 @@ class LocalNotificationService implements NotificationService {
 
   @override
   Future<void> showNotification(AppNotification notification) async {
+    final gate = _shouldDeliver;
+    if (gate != null && !gate(notification)) return;
     if (!_isInitialized) {
       await initialize();
     }
@@ -137,6 +147,8 @@ class LocalNotificationService implements NotificationService {
 
   @override
   Future<void> scheduleNotification(AppNotification notification) async {
+    final gate = _shouldDeliver;
+    if (gate != null && !gate(notification)) return;
     if (!_isInitialized) {
       await initialize();
     }
@@ -166,6 +178,34 @@ class LocalNotificationService implements NotificationService {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: null,
+      payload: _encodePayload(notification),
+    );
+  }
+
+  @override
+  Future<void> scheduleWeeklyNotification(AppNotification notification) async {
+    final gate = _shouldDeliver;
+    if (gate != null && !gate(notification)) return;
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    final scheduledAt = notification.scheduledAt;
+    if (scheduledAt == null) return;
+
+    final scheduledDate = tz.TZDateTime.from(scheduledAt, tz.local);
+    final details = _getNotificationDetails(notification);
+
+    await _localNotifications.zonedSchedule(
+      notification.id.hashCode,
+      notification.title,
+      notification.body,
+      scheduledDate,
+      details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
       payload: _encodePayload(notification),
     );
   }

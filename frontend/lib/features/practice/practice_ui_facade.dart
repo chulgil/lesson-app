@@ -19,6 +19,9 @@ export 'presentation/widgets/practice_tools_modal.dart' show PracticeToolsModal;
 // #405 — 수동 연습 기록 입력 시트 (학생 연습 탭 진입점).
 export 'presentation/widgets/manual_practice_entry_sheet.dart'
     show ManualPracticeEntrySheet;
+// #1128 — 선생님 홈 [피드백 대기] 배지 카드 (껍데기 감사 #415).
+export 'presentation/widgets/awaiting_feedback_card.dart'
+    show AwaitingFeedbackCard;
 // #966 — PracticeSection 범위 표시 (마디/줄/전체). 학생 연습 탭 등 cross-feature 가
 // facade 를 통해 PracticeSection.rangeText 확장에 접근한다.
 export 'presentation/extensions/practice_section_visuals.dart'

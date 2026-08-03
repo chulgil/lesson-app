@@ -87,7 +87,6 @@ class MockAnalyticsRepository implements AnalyticsRepository {
       totalLessons: 24,
       practiceAchievementRate: 0.78,
       totalPracticeMinutes: 2040,
-      practiceStreakDays: 12,
       weeklyPractice: [
         WeeklyPracticePoint(
           weekStart: DateTime(2026, 3, 4),

@@ -224,3 +224,23 @@ class TeachingResourceTag(UUIDMixin, Base):
         Index("uk_teaching_resource_tag", "resource_id", "tag", unique=True),
         Index("idx_teaching_resource_tag_tag", "tag"),
     )
+
+
+class CancellationDefaults(UUIDMixin, TimestampMixin, Base):
+    """Teacher cancellation-policy defaults — #1178 (FE entity: CancellationDefaults).
+
+    NOTE: ``teacher_id`` stores **teachers.id** (unlike the sibling settings
+    tables above, which historically store the user id) so late-cancel
+    resolution can join straight from ``Lesson.teacher_id``.
+    """
+
+    __tablename__ = "cancellation_defaults"
+
+    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    cancellation_deadline_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
+    student_compensation_extra_minutes_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    include_extra_minutes_text_on_late_cancel: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    student_compensation_extra_minutes_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notify_owner_on_late_cancel: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    __table_args__ = (Index("uk_cancellation_defaults_teacher", "teacher_id", unique=True),)

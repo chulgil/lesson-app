@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/value_objects/discipline.dart';
+import '../../../../core/domain/value_objects/discipline_registry.dart';
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/child_profile.dart';
@@ -7,6 +10,62 @@ import '../../domain/entities/parent.dart';
 import '../../domain/entities/parent_child_relation.dart';
 import '../../domain/entities/parent_notification_settings.dart';
 import '../../domain/entities/user_profile.dart';
+
+/// Canonical child-profile instrument key-space (English keys -> label / icon).
+/// SSOT shared by the form dropdown and [ChildProfileVisuals]; eliminates the
+/// former domain-entity display getters (flutter-architecture).
+const kChildInstrumentKeys = <String>[
+  'violin',
+  'piano',
+  'cello',
+  'viola',
+  'flute',
+];
+
+const _kChildInstrumentLabels = <String, String>{
+  'violin': AppStrings.instrumentViolin,
+  'piano': AppStrings.instrumentPiano,
+  'cello': AppStrings.instrumentCello,
+  'viola': AppStrings.instrumentViola,
+  'flute': AppStrings.instrumentFlute,
+};
+
+const _kChildInstrumentIcons = <String, IconData>{
+  'violin': Icons.music_note,
+  'piano': Icons.piano,
+  'cello': Icons.music_note,
+  'viola': Icons.music_note,
+  'flute': Icons.music_note,
+};
+
+const _kChildLevelLabels = <String, String>{
+  'beginner': AppStrings.studentLevelBeginner,
+  'elementary': AppStrings.studentLevelElementary,
+  'intermediate': AppStrings.studentLevelIntermediate,
+  'advanced': AppStrings.studentLevelAdvanced,
+};
+
+/// Resolve a child-profile instrument key to its display label (raw key fallback).
+String childInstrumentLabel(String key) =>
+    _kChildInstrumentLabels[key.toLowerCase()] ?? key;
+
+/// Child-profile expertise options for [discipline] as (storedKey, label).
+///
+/// Music keeps its curated English key-space (`kChildInstrumentKeys` + the
+/// icon map), byte-identical to before. Every other discipline derives from
+/// `ExpertiseCatalogRegistry.forDiscipline` with the label used as both the
+/// stored value and the display - mirroring the discipline-aware pickers
+/// (#1071/#1072). This is a music-vs-rest split (music alone has the legacy
+/// key/icon space), not a per-discipline enum switch.
+List<(String, String)> childInstrumentOptionsFor(Discipline discipline) {
+  if (discipline.id == DisciplineRegistry.music.id) {
+    return [for (final k in kChildInstrumentKeys) (k, childInstrumentLabel(k))];
+  }
+  return [
+    for (final item in ExpertiseCatalogRegistry.forDiscipline(discipline).items)
+      (item, item),
+  ];
+}
 
 Color _colorForKey(String key) {
   switch (key) {
@@ -38,29 +97,6 @@ String parentHomeColorKeyForColor(Color color) {
   if (color == AppColors.profilePink) return 'profilePink';
   if (color == AppColors.profileGreen) return 'profileGreen';
   return 'paperAccent';
-}
-
-IconData _iconForKey(String key) {
-  switch (key) {
-    case 'familyRestroom':
-      return Icons.family_restroom;
-    case 'school':
-      return Icons.school;
-    case 'childCare':
-      return Icons.child_care;
-    case 'link':
-      return Icons.link;
-    case 'hourglassEmpty':
-      return Icons.hourglass_empty;
-    case 'linkOff':
-      return Icons.link_off;
-    case 'piano':
-      return Icons.piano;
-    case 'musicNote':
-      return Icons.music_note;
-    default:
-      return Icons.music_note;
-  }
 }
 
 extension ParentStatusVisuals on ParentStatus {
@@ -298,5 +334,8 @@ extension ChildProfileStatusVisuals on ChildProfileStatus {
 
 extension ChildProfileVisuals on ChildProfile {
   Color get profileColor => _colorForKey(profileColorKey);
-  IconData get instrumentIcon => _iconForKey(instrumentIconKey);
+  IconData get instrumentIcon =>
+      _kChildInstrumentIcons[instrument.toLowerCase()] ?? Icons.music_note;
+  String get instrumentLabel => childInstrumentLabel(instrument);
+  String get levelLabel => _kChildLevelLabels[level.toLowerCase()] ?? level;
 }

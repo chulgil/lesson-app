@@ -10,6 +10,8 @@ Future<void> _pump(
   required GrowthHeatmap heatmap,
   DateTime? asOf,
   ValueChanged<DateTime>? onDayTap,
+  int? goalMinutes,
+  Set<DateTime>? frozenDates,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -18,6 +20,8 @@ Future<void> _pump(
           heatmap: heatmap,
           asOf: asOf ?? DateTime.utc(2026, 6, 12),
           onDayTap: onDayTap,
+          goalMinutes: goalMinutes,
+          frozenDates: frozenDates,
         ),
       ),
     ),
@@ -44,6 +48,29 @@ void main() {
       expect(YearHeatmapGrid.levelToColor(2), AppColors.heatmapL2);
       expect(YearHeatmapGrid.levelToColor(3), AppColors.heatmapL3);
       expect(YearHeatmapGrid.levelToColor(4), AppColors.heatmapL4);
+    });
+
+    // doc 46 §4 (데일리 만족 루프 P2) — 목표 대비 4단계.
+    test('goalRelativeLevel maps 0/49%/50%/100%/150% correctly', () {
+      expect(YearHeatmapGrid.goalRelativeLevel(0, 15), 0);
+      expect(YearHeatmapGrid.goalRelativeLevel(49, 100), 1); // 49% → <50%
+      expect(YearHeatmapGrid.goalRelativeLevel(50, 100), 2); // 50% → 경계 포함
+      expect(YearHeatmapGrid.goalRelativeLevel(100, 100), 3); // 100% 달성
+      expect(YearHeatmapGrid.goalRelativeLevel(150, 100), 3); // 150% → 상한 3
+    });
+
+    test('goalRelativeLevel falls back to static 5단계 when goalMinutes<=0', () {
+      expect(
+        YearHeatmapGrid.goalRelativeLevel(90, 0),
+        YearHeatmapGrid.minutesToLevel(90),
+      );
+    });
+
+    test('goalRelativeLevelToColor maps to heatmap palette (L2 skip)', () {
+      expect(YearHeatmapGrid.goalRelativeLevelToColor(0), AppColors.heatmapL0);
+      expect(YearHeatmapGrid.goalRelativeLevelToColor(1), AppColors.heatmapL1);
+      expect(YearHeatmapGrid.goalRelativeLevelToColor(2), AppColors.heatmapL3);
+      expect(YearHeatmapGrid.goalRelativeLevelToColor(3), AppColors.heatmapL4);
     });
 
     testWidgets('widget smoke test — render exception 0 (HARD-GATE)', (
@@ -162,6 +189,47 @@ void main() {
         count,
         inInclusiveRange(360, 372),
         reason: '7×52 그리드 = 364, ±몇 셀 시작 요일 보정',
+      );
+    });
+
+    // doc 46 §4 (데일리 만족 루프 P2) — goalMinutes 전달 시 목표 대비 색상.
+    testWidgets('goalMinutes 전달 시 오늘 셀이 목표 대비 색으로 렌더', (tester) async {
+      final today = DateTime.utc(2026, 6, 12);
+      final heatmap = GrowthHeatmap(
+        studentId: 's1',
+        days: {today: const DailyPractice(metronomeMinutes: 15)}, // 목표=15 달성
+      );
+      await _pump(tester, heatmap: heatmap, asOf: today, goalMinutes: 15);
+
+      final cellKey = ValueKey('heatmap_cell_${today.toIso8601String()}');
+      final container = tester.widget<Container>(find.byKey(cellKey));
+      final decoration = container.decoration as BoxDecoration;
+      expect(
+        decoration.color,
+        AppColors.heatmapL4,
+        reason: '100% 달성 → goalRelativeLevelToColor(3) = heatmapL4',
+      );
+    });
+
+    testWidgets('frozenDates 의 0분 날짜는 paperTrial 계열로 표시', (tester) async {
+      final today = DateTime.utc(2026, 6, 12);
+      final heatmap = GrowthHeatmap(studentId: 's1', days: const {});
+      await _pump(tester, heatmap: heatmap, asOf: today, frozenDates: {today});
+
+      final cellKey = ValueKey('heatmap_cell_${today.toIso8601String()}');
+      final container = tester.widget<Container>(find.byKey(cellKey));
+      final decoration = container.decoration as BoxDecoration;
+      expect(
+        decoration.color,
+        AppColors.paperTrial,
+        reason: 'freeze 로 지킨 0분 날은 practiceFill 과 구분되는 앰버',
+      );
+
+      final dotKey = ValueKey('heatmap_dot_${today.toIso8601String()}');
+      expect(
+        find.byKey(dotKey),
+        findsOneWidget,
+        reason: 'freeze-보호일도 L3+ 와 동일하게 inset dot 마커 표시',
       );
     });
   });

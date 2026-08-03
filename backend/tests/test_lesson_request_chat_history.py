@@ -771,6 +771,128 @@ async def test_lesson_request_expire_endpoint_expires_pending_and_negotiating_re
 
 
 @pytest.mark.asyncio
+async def test_lesson_request_response_includes_display_names(
+    client: AsyncClient,
+    create_test_user,
+) -> None:
+    """List/detail responses carry real student/teacher names for remote mode."""
+    await create_test_user(user_id="name-teacher", role="teacher", name="이름 선생님")
+    await create_test_user(
+        user_id="name-student",
+        role="student",
+        name="이름 학생",
+        email="name-student@test.com",
+    )
+
+    student_headers = _headers("name-student", "student")
+    teacher_headers = _headers("name-teacher", "teacher")
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=student_headers,
+        json={
+            "teacher_id": "name-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    created = create_response.json()
+    assert created["student_name"] == "이름 학생"
+    assert created["teacher_name"] == "이름 선생님"
+    assert created["academy_name"] is None
+    request_id = created["id"]
+
+    detail = await client.get(
+        f"/api/v1/schedule/lesson-requests/{request_id}",
+        headers=teacher_headers,
+    )
+    assert detail.status_code == 200
+    assert detail.json()["student_name"] == "이름 학생"
+    assert detail.json()["teacher_name"] == "이름 선생님"
+
+    listing = await client.get(
+        "/api/v1/schedule/lesson-requests",
+        headers=teacher_headers,
+        params={"teacher_id": "name-teacher"},
+    )
+    assert listing.status_code == 200
+    items = listing.json()["items"]
+    assert len(items) == 1
+    assert items[0]["student_name"] == "이름 학생"
+    assert items[0]["teacher_name"] == "이름 선생님"
+
+
+@pytest.mark.asyncio
+async def test_lesson_request_teacher_name_prefers_nickname_and_resolves_academy(
+    client: AsyncClient,
+    create_test_user,
+    db_session: AsyncSession,
+) -> None:
+    """teacher_name uses nickname when present; academy_name resolves by academy_id."""
+    from app.models.academy import Academy
+    from app.models.schedule import LessonRequest
+    from app.models.teacher import Teacher
+
+    await create_test_user(user_id="nick-teacher", role="teacher", name="본명 선생님")
+    await create_test_user(
+        user_id="nick-student",
+        role="student",
+        name="닉넴 학생",
+        email="nick-student@test.com",
+    )
+    await create_test_user(user_id="academy-owner", role="teacher", name="원장", email="owner@test.com")
+
+    # Give the teacher a nickname — display name must prefer it over User.name.
+    teacher_row = await db_session.get(Teacher, "nick-teacher-prof")
+    assert teacher_row is not None
+    teacher_row.nickname = "피아노쌤"
+
+    academy = Academy(
+        id="academy-1",
+        slug="academy-1",
+        name="하모니 음악학원",
+        owner_user_id="academy-owner",
+    )
+    db_session.add(academy)
+    await db_session.flush()
+
+    create_response = await client.post(
+        "/api/v1/schedule/lesson-requests",
+        headers=_headers("nick-student", "student"),
+        json={
+            "teacher_id": "nick-teacher",
+            "request_type": "regular",
+            "instrument": "piano",
+            "goal": "hobby",
+            "experience_level": "beginner",
+            "preferred_duration": 60,
+        },
+    )
+    assert create_response.status_code == 201
+    request_id = create_response.json()["id"]
+
+    # Link the request to the academy (academy_id is set server-side elsewhere).
+    request_row = await db_session.get(LessonRequest, request_id)
+    assert request_row is not None
+    request_row.academy_id = "academy-1"
+    await db_session.flush()
+
+    detail = await client.get(
+        f"/api/v1/schedule/lesson-requests/{request_id}",
+        headers=_headers("nick-teacher", "teacher"),
+    )
+    assert detail.status_code == 200
+    body = detail.json()
+    assert body["teacher_name"] == "피아노쌤"
+    assert body["student_name"] == "닉넴 학생"
+    assert body["academy_name"] == "하모니 음악학원"
+
+
+@pytest.mark.asyncio
 async def test_lesson_request_calendar_counts_accessible_requests(
     client: AsyncClient,
     create_test_user,

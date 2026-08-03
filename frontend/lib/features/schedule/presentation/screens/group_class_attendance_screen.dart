@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -153,7 +154,7 @@ class _GroupClassAttendanceScreenState
             child: Center(
               child: Icon(
                 Icons.music_note,
-                size: 24,
+                size: AppSpacing.iconMD,
                 color: _instrumentColors.accent,
               ),
             ),
@@ -230,20 +231,9 @@ class _GroupClassAttendanceScreenState
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.people_outline, size: 64, color: AppColors.inkSecondary),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            AppStrings.noBookedStudents,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.people_outline,
+      title: AppStrings.noBookedStudents,
     );
   }
 
@@ -295,7 +285,7 @@ class _GroupClassAttendanceScreenState
                   decoration: BoxDecoration(
                     color:
                         isAttended
-                            ? AppColors.paperOk.withValues(alpha: 0.1)
+                            ? AppColors.paperOkSoft
                             : AppColors.paperAccentSoft,
                   ),
                   child: Center(

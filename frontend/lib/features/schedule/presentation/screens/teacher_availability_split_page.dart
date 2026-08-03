@@ -14,6 +14,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../domain/entities/teacher_availability.dart';
+import '../extensions/exception_type_visuals.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../../../settings/settings_facade.dart';
 import '../widgets/availability/availability_preview_grid.dart';
@@ -780,36 +781,49 @@ class _ExceptionsPanel extends StatelessWidget {
         else
           ...upcoming.map((exc) => _ExceptionTile(exception: exc)),
         const SizedBox(height: AppSpacing.space2),
-        OutlinedButton.icon(
-          onPressed:
-              () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const TimeExceptionScreen()),
+        // M14 (0702 감사) — 휴가모드가 2단 스택 하단에 매장돼 특수일정과
+        // 혼동됐다(#727 후속). 두 진입점을 좌우 동격으로 배치한다.
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed:
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const TimeExceptionScreen(),
+                      ),
+                    ),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text(AppStrings.manageSpecialSchedules),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                  ),
+                  side: BorderSide(
+                    color: AppColors.paperAccent.withValues(alpha: 0.3),
+                  ),
+                  shape: const RoundedRectangleBorder(),
+                ),
               ),
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text(AppStrings.manageSpecialSchedules),
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(0, AppSpacing.buttonHeight),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
-            side: BorderSide(
-              color: AppColors.paperAccent.withValues(alpha: 0.3),
             ),
-            shape: const RoundedRectangleBorder(),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        // #727 — vacation mode entry point (GoRoute /schedule/vacation exists but
-        // had no discoverable CTA). Placed alongside special-schedule management
-        // since vacation is a type of schedule exception.
-        OutlinedButton.icon(
-          onPressed: () => context.push(AppRoutes.teacherVacationMode),
-          icon: const Icon(Icons.beach_access_outlined, size: 18),
-          label: const Text(AppStrings.vacationModeEntry),
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(0, AppSpacing.buttonHeight),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
-            side: BorderSide(color: AppColors.inkQuaternary),
-            shape: const RoundedRectangleBorder(),
-          ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => context.push(AppRoutes.teacherVacationMode),
+                icon: const Icon(Icons.beach_access_outlined, size: 18),
+                label: const Text(AppStrings.vacationModeEntry),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                  ),
+                  side: BorderSide(color: AppColors.inkQuaternary),
+                  shape: const RoundedRectangleBorder(),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
