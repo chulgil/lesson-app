@@ -17,7 +17,7 @@
 | 뷰 모드 | `ScheduleViewMode` (`schedule_view_mode_provider.dart`) — list/timeline/weeklyGrid. 구 `CalendarViewType`(month/week/day) 대체 |
 | 날짜 선택/정렬 상태 | `schedule_tab_state_provider.dart` — 구 `teacherSelectedDateProvider`/`teacherLessonSortTypeProvider` 대체 |
 | 레슨 카드 / 상태 색상 바 / 컨텍스트 배지(학원·개인) / 수강권 배지 | schedule_master.md (주간 그리드·타임라인·블록 인터랙션 섹션) |
-| 레슨 추가 네비게이션(`/lessons/add?date=&hour=`) | schedule_master.md (가용 시간 탭 → 예약 추가) |
+| 레슨 추가 네비게이션(`/lessons/add?date=&hour=`) | [quick_add_lesson.md](../lesson/quick_add_lesson.md) (진입점·폼) + [subscription_required_spec.md §2.5~2.6](../subscription/subscription_required_spec.md) (수강권 귀속·인텐트 분기) — 2026-08-03 정정: 종전 "schedule_master.md 소관" 표기는 끊긴 포인터였음 (해당 문서에 `/lessons/add` 무언급) |
 | `CalendarEventType` enum (lesson/practice/break_) | ❌ 코드에서 제거됨 (미사용) |
 
 ## 관련 스펙
