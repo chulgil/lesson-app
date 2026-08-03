@@ -310,6 +310,36 @@ class LessonService:
         # renewal_pending: preview lesson only — no counter mutation.
         return sub.id, True, None
 
+    async def _assert_trial_regeneration_allowed(self, student_id: str) -> None:
+        """§2.6.5 (D2) — an app-connected student gets exactly one auto trial.
+
+        A prior zero-amount trial subscription for this student means the free
+        pass was already used; the FE shows the issue-subscription CTA instead
+        (S6). Unconnected (manual) students are exempt (§2.7, D4) — lightweight
+        schedule-keeping stays possible without forcing a paid subscription.
+        Students are teacher-owned rows, so student_id already scopes the check.
+        """
+        from app.models.student import Student
+        from app.models.subscription import Subscription, SubscriptionType
+
+        prior_trial = await self.db.scalar(
+            select(Subscription.id)
+            .where(
+                Subscription.student_id == student_id,
+                Subscription.type == SubscriptionType.trial,
+                Subscription.amount == 0,
+            )
+            .limit(1)
+        )
+        if prior_trial is None:
+            return
+        student = await self.db.get(Student, student_id)
+        if student is not None and student.connected_at is not None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="trial_already_used",
+            )
+
     async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Find active subscription for the student or create a trial one.
 
@@ -340,6 +370,8 @@ class LessonService:
                     active_sub.bonus_reason = "teacher_goodwill"
                 await self.db.flush()
             return active_sub.id
+
+        await self._assert_trial_regeneration_allowed(student_id)
 
         return await self._create_trial_subscription(
             teacher_id=teacher_id,
