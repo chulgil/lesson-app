@@ -3001,6 +3001,9 @@ class AppStrings {
   /// 경로 4 (quick_add_lesson) — 학생 선택 시트 신규 학생 인라인 등록
   static const lessonPickerAddStudentAction = '새 학생 등록';
 
+  /// §2.7 미가입 특칙 — 수강권 레슨도 선생님 단독 일정 수정 (챗 협상 생략)
+  static const scheduleEditDirectLabel = '일정 수정 (직접)';
+
   /// S4 — 보강 크레딧 소비 토글 (spec §2.6.1, makeup_credit_spec §5.4)
   static const makeupToggleLabel = '보강으로 처리';
   static String makeupToggleCredits(int credits) => '보강 크레딧 $credits개 보유';

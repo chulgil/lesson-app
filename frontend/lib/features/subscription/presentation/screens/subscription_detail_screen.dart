@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -24,6 +26,7 @@ import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 import '../utils/expiry_streak_detector.dart';
 import '../widgets/expiry_streak_banner.dart';
+import '../widgets/next_session_booking_cta.dart';
 import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
 import '../widgets/subscription_bottom_input_bar.dart';
@@ -242,6 +245,33 @@ class _SubscriptionDetailBodyState
     icon: Icons.check_circle,
   );
 
+  /// §8 — 미정 회차 예약: 선생님은 레슨 추가(수강권 프리필), 학생은 직접 예약.
+  void _openNextSessionBooking({
+    required String studentName,
+    required String teacherName,
+  }) {
+    if (_isTeacher) {
+      context.push(
+        '${AppRoutes.addLesson}?studentId=${subscription.studentId}'
+        '&subscriptionId=${subscription.id}',
+      );
+      return;
+    }
+    final teacherId = _getTeacherId();
+    if (teacherId == null) return;
+    context.push(
+      AppRoutes.lessonDirectBooking,
+      extra: LessonBookingParams(
+        teacherId: teacherId,
+        teacherName: teacherName,
+        studentId: subscription.studentId,
+        studentName: studentName,
+        instrument: subscription.instrument,
+        subscriptionId: subscription.id,
+      ),
+    );
+  }
+
   /// Resolve teacherId from membership.
   /// Called in handlers that cannot access local build() variables.
   String? _getTeacherId() {
@@ -410,6 +440,16 @@ class _SubscriptionDetailBodyState
                 viewerRole: widget.viewerRole,
               ),
 
+              // §8 — 미정 회차 예약 진입점 (회차권 전용, 정규권 비노출)
+              NextSessionBookingCta(
+                subscription: subscription,
+                onBook:
+                    (nextSession) => _openNextSessionBooking(
+                      studentName: studentName,
+                      teacherName: teacherName,
+                    ),
+              ),
+
               // §7.119 v2.2: 휴강 상단 배너 (선생님+학생 모두 표시)
               _TeacherCancelBanner(subscriptionId: subscription.id),
 
@@ -511,9 +551,10 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: _isTeacher
-          ? (_getTeacherId() ?? subscription.studentId)
-          : subscription.studentId,
+      actorId:
+          _isTeacher
+              ? (_getTeacherId() ?? subscription.studentId)
+              : subscription.studentId,
       eventType: RequestEventType.scheduleChangeAccepted,
       suggestedSlots: event.suggestedSlots,
       selectedSlotIndex: slotIndex,
@@ -555,9 +596,10 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: _isTeacher
-          ? (_getTeacherId() ?? subscription.studentId)
-          : subscription.studentId,
+      actorId:
+          _isTeacher
+              ? (_getTeacherId() ?? subscription.studentId)
+              : subscription.studentId,
       eventType: RequestEventType.scheduleChangeRejected,
       suggestedSlots: event.suggestedSlots,
       message: message.isEmpty ? null : message,
@@ -614,9 +656,10 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: _isTeacher
-          ? (_getTeacherId() ?? subscription.studentId)
-          : subscription.studentId,
+      actorId:
+          _isTeacher
+              ? (_getTeacherId() ?? subscription.studentId)
+              : subscription.studentId,
       eventType: RequestEventType.scheduleChangeCountered,
       suggestedSlots: suggestedSlots,
       message: result.message.isEmpty ? null : result.message,
@@ -732,9 +775,10 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
-      actorId: _isTeacher
-          ? (_getTeacherId() ?? subscription.studentId)
-          : subscription.studentId,
+      actorId:
+          _isTeacher
+              ? (_getTeacherId() ?? subscription.studentId)
+              : subscription.studentId,
       eventType: RequestEventType.scheduleChangeProposed,
       scheduleChangeType: changeType,
       suggestedSlots: suggestedSlots,
@@ -775,9 +819,10 @@ class _SubscriptionDetailBodyState
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: subscription.id,
       actorType: ProposerRole.teacher,
-      actorId: _isTeacher
-          ? (_getTeacherId() ?? subscription.studentId)
-          : subscription.studentId,
+      actorId:
+          _isTeacher
+              ? (_getTeacherId() ?? subscription.studentId)
+              : subscription.studentId,
       eventType: RequestEventType.cancellationCreditRefunded,
       changeCreditUsed: 0,
       changeCreditRemainingAfter:
