@@ -5122,6 +5122,10 @@ class AppStrings {
   /// #769: 발급 방식 차이 캡션 — 교사 즉시 발급.
   static const unifiedSubscriptionDirectIssueCaption = '교사가 즉시 발급';
 
+  /// 직접 발급 x 다중 템플릿 가드 — 발급 화면은 템플릿 1개만 받는다.
+  static const unifiedSubscriptionDirectIssueSingleTemplateOnly =
+      '바로 발급은 템플릿 1개만 선택할 수 있어요. 여러 개는 제안으로 보내주세요.';
+
   /// #769: 발급 방식 차이 캡션 — 학생 수락·입금 후 발급(제안).
   static const unifiedSubscriptionProposalCaption = '학생 수락·입금 후 발급';
 
