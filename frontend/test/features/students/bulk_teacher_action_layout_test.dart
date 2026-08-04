@@ -43,7 +43,7 @@ class _StubLessonRepository implements LessonRepository {
   Future<Lesson?> getLesson(String id) async => null;
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async => lesson;
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async => lesson;
 
   @override
   Future<Lesson> updateLesson(Lesson lesson) async => lesson;

@@ -25,7 +25,9 @@ List<GoRoute> studentRoutes = [
   GoRoute(
     path: AppRoutes.addStudent,
     name: 'addStudent',
-    builder: (context, state) => const AddStudentScreen(),
+    builder:
+        (context, state) =>
+            AddStudentScreen(returnTo: state.uri.queryParameters['returnTo']),
   ),
 
   // Announcement History

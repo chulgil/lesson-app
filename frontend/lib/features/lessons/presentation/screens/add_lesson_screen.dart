@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -15,6 +17,8 @@ import '../../lessons_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 import '../widgets/lesson_form/lesson_location_section.dart';
+import '../widgets/lesson_form/lesson_overflow_mode_sheet.dart';
+import '../widgets/lesson_form/makeup_credit_toggle.dart';
 import '../widgets/lesson_form/manual_lesson_subscription_section.dart';
 
 /// Screen for adding a new lesson
@@ -24,12 +28,17 @@ class AddLessonScreen extends ConsumerStatefulWidget {
   final int? preselectedHour; // 0-23
   final int? preselectedMinute; // 0-59
 
+  /// §8 다음 회차 CTA — 수강권 상세에서 진입 시 해당 수강권을 §2.5 자동
+  /// 귀속보다 우선 선택한다 (활성 목록에 있을 때만).
+  final String? preselectedSubscriptionId;
+
   const AddLessonScreen({
     super.key,
     this.preselectedStudentId,
     this.preselectedDate,
     this.preselectedHour,
     this.preselectedMinute,
+    this.preselectedSubscriptionId,
   });
 
   @override
@@ -52,6 +61,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   int _lessonDuration = 60;
   bool _isRecurring = false;
   bool _isSaving = false;
+
+  /// S4 (spec §2.6.1, D3) — spend a makeup credit for this lesson. Default OFF.
+  bool _useMakeupCredit = false;
   final Set<int> _recurringDays = {};
   bool _enableReminder = true;
   int _reminderMinutes = 30;
@@ -127,14 +139,16 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
       appBar: NotebookDetailAppBar(
-        title: _isRecordMode
-            ? AppStrings.lessonRecordTitle
-            : AppStrings.lessonAddTitle,
-        onLeadingTap: () => showLessonExitConfirmation(
-          context: context,
-          hasData: _hasFormData(),
-          onExit: () => context.pop(),
-        ),
+        title:
+            _isRecordMode
+                ? AppStrings.lessonRecordTitle
+                : AppStrings.lessonAddTitle,
+        onLeadingTap:
+            () => showLessonExitConfirmation(
+              context: context,
+              hasData: _hasFormData(),
+              onExit: () => context.pop(),
+            ),
       ),
       body: Form(
         key: _formKey,
@@ -158,8 +172,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   studentId: _selectedStudent!.id,
                   studentInstrument: _selectedStudent!.instrument,
                   selectedSubscription: _selectedSubscription,
-                  onPickRequested: () =>
-                      _openSubscriptionPicker(_selectedStudent!.id),
+                  onPickRequested:
+                      () => _openSubscriptionPicker(_selectedStudent!.id),
+                  onIssueRequested: _openIssueSubscription,
+                ),
+
+              // S4 — makeup credit spend toggle (hidden when no credits)
+              if (_selectedStudent != null)
+                MakeupCreditToggle(
+                  studentId: _selectedStudent!.id,
+                  value: _useMakeupCredit,
+                  onChanged:
+                      (value) => setState(() => _useMakeupCredit = value),
                 ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -315,7 +339,29 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         if (matches.isEmpty) return; // #72 선택이 목록에서 사라진 race 무시
         _onStudentChosen(matches.first);
       },
+      onAddStudentRequested: _addNewStudentAndSelect,
     );
+  }
+
+  /// 경로 4 (§2.6.4) — 신규 학생 인라인 등록 후 방금 학생 자동 선택.
+  /// 등록 화면은 returnTo=addLesson 으로 발급 다이얼로그를 건너뛰고
+  /// 생성된 학생 id 를 반환한다.
+  Future<void> _addNewStudentAndSelect() async {
+    final result = await context.push(
+      '${AppRoutes.addStudent}?returnTo=addLesson',
+    );
+    if (!mounted || result is! String) return;
+    ref.invalidate(studentsProvider);
+    try {
+      final students = await ref.read(studentsProvider.future);
+      if (!mounted) return;
+      final matches = students.where((s) => s.id == result);
+      if (matches.isNotEmpty) {
+        _onStudentChosen(matches.first);
+      }
+    } catch (_) {
+      // 목록 재조회 실패 시 선택만 생략 — 선생님이 시트에서 다시 고를 수 있다.
+    }
   }
 
   /// Unified student-selection flow: set student, reset subscription, auto-fill
@@ -324,6 +370,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     setState(() {
       _selectedStudent = _studentToInfo(student);
       _selectedSubscription = null;
+      _useMakeupCredit = false;
     });
     _autoFillFromStudent(student);
     _resolveSubscriptionForStudent(student.id);
@@ -353,6 +400,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       );
       if (!mounted || _selectedStudent?.id != studentId) return;
       final sorted = sortSubscriptionsForPicker(actives);
+
+      // §8 다음 회차 CTA — 프리필 수강권이 활성 목록에 있으면 최우선 선택
+      // (선택 시트 생략). 목록에 없으면(만료 등) 일반 분기로 폴백.
+      final preselectedId = widget.preselectedSubscriptionId;
+      if (preselectedId != null) {
+        final match = sorted.where((s) => s.id == preselectedId);
+        if (match.isNotEmpty) {
+          setState(() => _selectedSubscription = match.first);
+          return;
+        }
+      }
+
       if (sorted.length == 1) {
         setState(() => _selectedSubscription = sorted.first);
       } else if (sorted.length >= 2) {
@@ -564,9 +623,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           existingLessons,
         );
         if (conflict != null) {
-          final dayLabel = dayIndex < dayNames.length
-              ? dayNames[dayIndex]
-              : '?';
+          final dayLabel =
+              dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
           conflictDays.add(AppStrings.recurringConflictDay(dayLabel, conflict));
         }
       }
@@ -587,6 +645,28 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       }
     }
 
+    // S3 (spec §2.6.1~2.6.2) — explicit accounting when the target subscription
+    // is exhausted: the silent bonus expansion is promoted to a choice sheet.
+    // Recurring keeps the legacy path (multi-lesson overflow semantics are not
+    // defined by the spec; regular students renew instead).
+    String? overflowMode;
+    var routeToIssueAfterSave = false;
+    if (_useMakeupCredit && !_isRecurring) {
+      // S4 toggle ON — credit-funded lesson regardless of remaining sessions
+      // (§5.4). The S3 sheet is skipped: the accounting choice is already made.
+      overflowMode = LessonOverflowChoice.makeupCredit.wireValue;
+    } else if (shouldPromptOverflowMode(
+      subscription: _selectedSubscription,
+      isRecurring: _isRecurring,
+    )) {
+      final choice = await _resolveOverflowChoice(_selectedSubscription!);
+      if (choice == null) return; // sheet dismissed — abort save
+      overflowMode = choice.wireValue;
+      routeToIssueAfterSave =
+          choice == LessonOverflowChoice.renewalProposal ||
+          choice == LessonOverflowChoice.renewalIssue;
+    }
+
     // Create lesson pieces from input
     final pieces = <LessonPiece>[];
     if (_pieceController.text.isNotEmpty) {
@@ -594,18 +674,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         LessonPiece(
           id: 'piece_${DateTime.now().millisecondsSinceEpoch}',
           name: _pieceController.text,
-          notes: _notesController.text.isNotEmpty
-              ? _notesController.text
-              : null,
+          notes:
+              _notesController.text.isNotEmpty ? _notesController.text : null,
         ),
       );
     }
 
     // Past date → completed status (record mode), future → scheduled
     final isPastLesson = isLessonDateTimeInPast(_selectedDate, _selectedTime);
-    final lessonStatus = isPastLesson && !_isRecurring
-        ? LessonStatus.completed
-        : LessonStatus.scheduled;
+    final lessonStatus =
+        isPastLesson && !_isRecurring
+            ? LessonStatus.completed
+            : LessonStatus.scheduled;
 
     // Create the lesson object
     // Instrument: subscription (membership) is the SSOT; fall back to the
@@ -632,12 +712,13 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       duration: _lessonDuration,
       status: lessonStatus,
       pieces: pieces,
-      location: _selectedLocation == null
-          ? null
-          : LessonLocationInfo(
-              name: _selectedLocation!.name,
-              address: _selectedLocation!.address,
-            ),
+      location:
+          _selectedLocation == null
+              ? null
+              : LessonLocationInfo(
+                name: _selectedLocation!.name,
+                address: _selectedLocation!.address,
+              ),
       createdAt: DateTime.now(),
     );
 
@@ -693,10 +774,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         // assigned id is used for subscription usage (not the local empty id).
         final savedLesson = await ref
             .read(lessonsNotifierProvider.notifier)
-            .addLesson(lesson);
+            .addLesson(lesson, overflowMode: overflowMode);
 
-        // If past lesson (record mode), auto-deduct subscription
-        if (isPastLesson) {
+        // If past lesson (record mode), auto-deduct subscription.
+        // makeup_credit lessons are credit-funded — the BE consumed the credit
+        // and the regular counter must stay untouched (makeup_credit_spec §5.3).
+        if (isPastLesson && overflowMode != 'makeup_credit') {
           await _recordSubscriptionUsage(savedLesson);
         }
 
@@ -705,9 +788,27 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
         if (!mounted) return;
 
-        final message = isPastLesson
-            ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
-            : AppStrings.lessonAddedFor(_selectedStudent!.name);
+        if (routeToIssueAfterSave) {
+          // §2.6.2 renewal — the lesson is a preview until the renewal is
+          // issued (BE promotes it on deposit confirmation). Continue straight
+          // into the issue flow with the student prefilled.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.overflowRenewalPreviewSnack),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: AppColors.paperOk,
+            ),
+          );
+          context.pushReplacement(
+            '${AppRoutes.issueSubscription}?studentId=${_selectedStudent!.id}',
+          );
+          return;
+        }
+
+        final message =
+            isPastLesson
+                ? AppStrings.lessonRecordedFor(_selectedStudent!.name)
+                : AppStrings.lessonAddedFor(_selectedStudent!.name);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -722,6 +823,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       context.pop();
     } catch (e) {
       if (!mounted) return;
+      // S6 (spec §2.6.5) — the free auto trial was already used for this
+      // connected student; guide the teacher to issue a real subscription.
+      if (e is ValidationException && e.message == 'trial_already_used') {
+        await _showTrialAlreadyUsedDialog();
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(AppStrings.addLessonFailed),
@@ -729,6 +836,80 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           backgroundColor: AppColors.paperAccent,
         ),
       );
+    }
+  }
+
+  /// S3 (spec §2.6.2) — resolve the overflow choice for an exhausted
+  /// subscription via the bottom sheet. Returns null when dismissed.
+  Future<LessonOverflowChoice?> _resolveOverflowChoice(
+    Subscription subscription,
+  ) async {
+    final studentId = _selectedStudent!.id;
+
+    // Available makeup credits gate the first sheet option (S4 source).
+    var availableCredits = 0;
+    try {
+      final credits = await ref.read(
+        teacherMakeupCreditsProvider(studentId).future,
+      );
+      final now = DateTime.now();
+      availableCredits = credits.where((c) => c.isAvailable(now)).length;
+    } catch (_) {
+      // Credit lookup failure just hides the option — save is not blocked.
+    }
+
+    // §2.7 — unconnected (manual) students can't receive proposals; the sheet
+    // swaps the renewal option for direct issuance. Unknown → assume connected.
+    final students = ref.read(studentsProvider).valueOrNull ?? [];
+    final match = students.where((s) => s.id == studentId);
+    final isConnected = match.isEmpty || match.first.isAppConnected;
+
+    if (!mounted) return null;
+    return showLessonOverflowModeSheet(
+      context: context,
+      studentName: _selectedStudent!.name,
+      subscriptionName: subscription.typeLabel,
+      availableCredits: availableCredits,
+      isConnectedStudent: isConnected,
+      // Record mode saves as completed — it can't wait for a renewal.
+      allowRenewal: !_isRecordMode,
+    );
+  }
+
+  /// S5/S6 — route to the issue-subscription flow with the student prefilled
+  /// (§2.6.3 returnTo continuity). On direct-issue success the form resumes
+  /// with the new subscription auto-attached (S1 state).
+  Future<void> _openIssueSubscription() async {
+    final studentId = _selectedStudent?.id;
+    if (studentId == null) return;
+    final issued = await context.push(
+      '${AppRoutes.issueSubscription}?studentId=$studentId&returnTo=addLesson',
+    );
+    if (!mounted || issued != true || _selectedStudent?.id != studentId) {
+      return;
+    }
+    ref.invalidate(activeStudentSubscriptionsProvider(studentId));
+    await _resolveSubscriptionForStudent(studentId);
+  }
+
+  Future<void> _showTrialAlreadyUsedDialog() async {
+    final issue = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.trialAlreadyUsedTitle,
+      content: const Text(AppStrings.trialAlreadyUsedMessage),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text(AppStrings.issueSubscriptionAction),
+        ),
+      ],
+    );
+    if (issue == true && mounted) {
+      _openIssueSubscription();
     }
   }
 

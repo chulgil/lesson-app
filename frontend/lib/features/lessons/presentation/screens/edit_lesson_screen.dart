@@ -102,23 +102,41 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return NotebookScreenScaffold(
-        appBar: const NotebookDetailAppBar(
-          title: AppStrings.editLessonTitle,
-        ),
+        appBar: const NotebookDetailAppBar(title: AppStrings.editLessonTitle),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    final isSubscriptionLesson = _originalLesson?.subscriptionId != null;
+    // §14 잠금은 "학생과 주고받는" 수강권 레슨 전제 — §2.7 미가입(수기) 학생은
+    // 협상 상대가 없으므로 수강권 레슨도 선생님 단독 전체 편집을 허용한다.
+    // 단, plain-cancel 가드(#766)는 수강권 귀속이면 연결 여부와 무관하게 유지 —
+    // 취소는 항상 수강권 회계(차감 되돌림)를 경유해야 한다.
+    // 조회 실패/미로딩은 connected 가정 (기존 잠금 유지가 안전 기본값).
+    // 수동 레슨은 연결 여부가 무관하므로 studentsProvider 를 건드리지 않는다.
+    final hasSubscriptionId = _originalLesson?.subscriptionId != null;
+    var isConnectedStudent = true;
+    if (hasSubscriptionId) {
+      final students = ref.watch(studentsProvider).valueOrNull ?? [];
+      final studentMatch = students.where(
+        (s) => s.id == _originalLesson?.studentId,
+      );
+      isConnectedStudent =
+          studentMatch.isEmpty || studentMatch.first.isAppConnected;
+    }
+    // 필드 잠금 (§14 표) — 미가입이면 해제.
+    final isSubscriptionLesson = hasSubscriptionId && isConnectedStudent;
+    // 취소 가드 (#766) — 수강권 귀속이면 항상 유지.
+    final blocksPlainCancel = hasSubscriptionId;
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.editLessonTitle,
-        onLeadingTap: () => showEditLessonExitConfirmation(
-          context: context,
-          hasChanges: _hasChanges,
-          onExit: () => context.pop(),
-        ),
+        onLeadingTap:
+            () => showEditLessonExitConfirmation(
+              context: context,
+              hasChanges: _hasChanges,
+              onExit: () => context.pop(),
+            ),
         customActions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -135,7 +153,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 (context) => [
                   // #766 후속: 수강권 레슨은 plain-cancel 메뉴 비노출 — 취소/휴강은
                   // 수강권 배너 → 구독 플로우로만.
-                  if (!isSubscriptionLesson)
+                  if (!blocksPlainCancel)
                     PopupMenuItem(
                       value: 'cancel',
                       child: Row(
@@ -376,7 +394,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
               // Cancel/Delete buttons
               LessonActionButtons(
                 // #766 후속: 수강권 레슨은 취소 버튼 비노출(plain cancel 우회 차단).
-                onCancel: isSubscriptionLesson ? null : _showCancelDialog,
+                onCancel: blocksPlainCancel ? null : _showCancelDialog,
                 onDelete: _showDeleteDialog,
               ),
 

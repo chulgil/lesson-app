@@ -56,6 +56,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   String? get lessonRequestId;
   List<String> get lessonRequestIds;
 
+  /// §2.6.3 — 'addLesson' 이면 발급 성공 시 레슨 추가 화면으로 복귀 (스케줄
+  /// 확정은 호출 화면 몫이므로 정기 스케줄 등록 리다이렉트 생략).
+  String? get returnTo;
+
   GlobalKey<FormState> get formKey;
   SubscriptionType get selectedType;
   String? get selectedMembershipId;
@@ -245,6 +249,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             backgroundColor: AppColors.paperAccent,
           ),
         );
+
+        // §2.6.3 returnTo=addLesson — the add-lesson form owns the schedule
+        // step; pop back with the issuance result so it re-resolves S1.
+        if (returnTo == 'addLesson') {
+          context.pop(true);
+          return;
+        }
 
         // Navigate to schedule registration for quick setup (Issue #59)
         if (teacherId != null) {
@@ -619,14 +630,18 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         }
       }
 
-      final skippedNames = skippedStudentIds.isEmpty
-          ? ''
-          : (await Future.wait(skippedStudentIds.map(flow.studentName)))
-                .join(', ');
-      final failedNames = failedStudentIds.isEmpty
-          ? ''
-          : (await Future.wait(failedStudentIds.map(flow.studentName)))
-                .join(', ');
+      final skippedNames =
+          skippedStudentIds.isEmpty
+              ? ''
+              : (await Future.wait(
+                skippedStudentIds.map(flow.studentName),
+              )).join(', ');
+      final failedNames =
+          failedStudentIds.isEmpty
+              ? ''
+              : (await Future.wait(
+                failedStudentIds.map(flow.studentName),
+              )).join(', ');
       if (mounted) {
         if (skippedStudentIds.isEmpty && failedStudentIds.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(

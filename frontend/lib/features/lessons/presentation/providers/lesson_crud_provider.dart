@@ -68,10 +68,13 @@ class LessonsNotifier extends _$LessonsNotifier {
     return _repository.getLessons();
   }
 
-  Future<Lesson> addLesson(Lesson lesson) async {
+  Future<Lesson> addLesson(Lesson lesson, {String? overflowMode}) async {
     state = const AsyncValue.loading();
     try {
-      final newLesson = await _repository.createLesson(lesson);
+      final newLesson = await _repository.createLesson(
+        lesson,
+        overflowMode: overflowMode,
+      );
       state = await AsyncValue.guard(() => _repository.getLessons());
       // keepAlive lessonsProvider(홈 대시보드)/lessonProvider(id)(상세) stale 방지 —
       // lesson_confirmation_provider 와 동일 패턴. weekLessons 는 notifier watch(#1141).

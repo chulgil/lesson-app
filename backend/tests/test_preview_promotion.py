@@ -110,3 +110,37 @@ async def test_renewal_cancel_cancels_preview(teacher, client: AsyncClient, auth
     lesson = await _get_lesson(client, auth_headers, preview_id)
     assert lesson["status"] == "cancelled"
     assert lesson["is_preview"] is True, "취소된 preview 는 '정식이 된 적 없음' 마커를 유지한다"
+
+@pytest.mark.asyncio
+async def test_completing_preview_lesson_never_deducts(teacher, client: AsyncClient, auth_headers: dict):
+    """critic 관찰 — 승격 전 preview 완료가 정규 카운터를 차감하면 안 된다.
+
+    소진 수강권은 remaining<=0 bail 로 우연히 안전하지만, 보너스 확장으로
+    remaining>0 이 된 뒤 preview 를 완료하면 오차감 경로가 열린다. is_preview
+    명시 가드로 고정한다.
+    """
+    sid, old_sub, preview_id = await _issue_exhausted_with_preview(teacher, client, auth_headers, "프리뷰완료학생")
+
+    # 보너스 레슨으로 수강권을 되살린다 (remaining > 0 상태 재현)
+    r = await client.post(
+        "/api/v1/lessons",
+        headers=auth_headers,
+        json={
+            "student_id": sid,
+            "date": "2026-09-15",
+            "start_time": "09:00",
+            "duration": 60,
+            "subscription_id": old_sub,
+            "overflow_mode": "bonus",
+        },
+    )
+    assert r.status_code == 201, r.text
+
+    before = await client.get(f"/api/v1/subscriptions/{old_sub}", headers=auth_headers)
+    used_before = before.json()["used_lessons"]
+
+    # preview 레슨 완료 — 정규 카운터 불변이어야 한다
+    await teacher.complete_lesson(preview_id)
+
+    after = await client.get(f"/api/v1/subscriptions/{old_sub}", headers=auth_headers)
+    assert after.json()["used_lessons"] == used_before, "preview 완료는 정규 차감을 발생시키지 않는다"

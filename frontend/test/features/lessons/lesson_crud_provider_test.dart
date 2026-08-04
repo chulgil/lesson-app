@@ -50,6 +50,23 @@ void main() {
     );
   });
 
+  test('addLesson 이 overflowMode 를 repository 까지 전달한다 (§2.6.2 배선)', () async {
+    final repo = _FakeLessonRepository();
+    final container = ProviderContainer(
+      overrides: [lessonRepositoryProvider.overrideWithValue(repo)],
+    );
+    addTearDown(container.dispose);
+
+    await container
+        .read(lessonsNotifierProvider.notifier)
+        .addLesson(_lesson(id: 'l1'), overflowMode: 'makeup_credit');
+    expect(repo.lastOverflowMode, 'makeup_credit');
+
+    // 레거시 호출(파라미터 없음) → null 유지 (무언 보너스 하위 호환)
+    await container.read(lessonsNotifierProvider.notifier).addLesson(_lesson(id: 'l2'));
+    expect(repo.lastOverflowMode, isNull);
+  });
+
   test('deleteLesson 후 keepAlive lessonsProvider 가 갱신된다 (A2)', () async {
     final repo = _FakeLessonRepository()..seed(_lesson(id: 'l1'));
     final container = ProviderContainer(
@@ -69,6 +86,7 @@ void main() {
 
 class _FakeLessonRepository implements LessonRepository {
   final List<Lesson> _lessons = [];
+  String? lastOverflowMode;
   void seed(Lesson l) => _lessons.add(l);
 
   @override
@@ -83,7 +101,8 @@ class _FakeLessonRepository implements LessonRepository {
   }
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
+    lastOverflowMode = overflowMode;
     _lessons.add(lesson);
     return lesson;
   }

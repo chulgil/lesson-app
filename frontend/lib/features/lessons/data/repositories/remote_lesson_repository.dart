@@ -109,8 +109,14 @@ class RemoteLessonRepository implements LessonRepository {
   }
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
-    final response = await _apiClient.post('/lessons', data: lesson.toJson());
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
+    final response = await _apiClient.post(
+      '/lessons',
+      data: {
+        ...lesson.toJson(),
+        if (overflowMode != null) 'overflow_mode': overflowMode,
+      },
+    );
     return Lesson.fromJson(response.data as Map<String, dynamic>);
   }
 

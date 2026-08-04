@@ -21,7 +21,11 @@ import '../widgets/student_form_widgets.dart';
 
 /// Screen for adding a new student
 class AddStudentScreen extends ConsumerStatefulWidget {
-  const AddStudentScreen({super.key});
+  /// §2.6.4 (quick_add 경로 4) — 'addLesson' 이면 등록 완료 시 수강권 발급
+  /// 다이얼로그를 건너뛰고 생성된 학생 id 로 복귀한다 (체험 자동발급이 담당).
+  final String? returnTo;
+
+  const AddStudentScreen({super.key, this.returnTo});
 
   @override
   ConsumerState<AddStudentScreen> createState() => _AddStudentScreenState();
@@ -77,11 +81,12 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
         title: AppStrings.studentFormTitle,
-        onLeadingTap: () => showExitConfirmation(
-          context,
-          hasChanges: _hasFormData(),
-          onExit: () => context.pop(),
-        ),
+        onLeadingTap:
+            () => showExitConfirmation(
+              context,
+              hasChanges: _hasFormData(),
+              onExit: () => context.pop(),
+            ),
       ),
       body: Form(
         key: _formKey,
@@ -113,9 +118,10 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               const SizedBox(height: AppSpacing.space3),
               InstrumentSelector(
                 selectedInstrument: _selectedInstrument,
-                instruments: ExpertiseCatalogRegistry.forDiscipline(
-                  ref.watch(activeDisciplineProvider),
-                ).items,
+                instruments:
+                    ExpertiseCatalogRegistry.forDiscipline(
+                      ref.watch(activeDisciplineProvider),
+                    ).items,
                 onChanged: (value) {
                   setState(() => _selectedInstrument = value);
                 },
@@ -185,16 +191,16 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               // --- Additional info (collapsible) ---
               // Guardian, address, notes are supplementary — collapsed by default.
               Theme(
-                data: Theme.of(context).copyWith(
-                  dividerColor: Colors.transparent,
-                ),
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   key: const Key('additionalInfoExpansionTile'),
                   title: Text(
                     AppStrings.studentFormAdditionalInfo,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
+                      color: AppColors.inkSecondary,
+                    ),
                   ),
                   tilePadding: EdgeInsets.zero,
                   childrenPadding: EdgeInsets.zero,
@@ -204,7 +210,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
                     // Parent/Guardian info section
                     const FormSectionTitle(AppStrings.formSectionGuardianInfo),
-                    const FormSectionSubtitle(AppStrings.formSectionGuardianHint),
+                    const FormSectionSubtitle(
+                      AppStrings.formSectionGuardianHint,
+                    ),
                     const SizedBox(height: AppSpacing.space3),
                     ParentInfoFields(
                       parentNameController: _parentNameController,
@@ -215,9 +223,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
                     // Address section
                     const FormSectionTitle(AppStrings.formSectionAddress),
-                    const FormSectionSubtitle(
-                      '레슨 장소가 학생 집인 경우 자동으로 사용됩니다',
-                    ),
+                    const FormSectionSubtitle('레슨 장소가 학생 집인 경우 자동으로 사용됩니다'),
                     const SizedBox(height: AppSpacing.space3),
                     AddressFields(
                       postalCodeController: _postalCodeController,
@@ -305,11 +311,12 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
         _selectedLevel.defaultMonthlyFee;
 
     final sortedDays = _selectedDays.toList()..sort();
-    final lessonSlots = sortedDays.map((d) {
-      final time = _dayTimeMap[d] ?? _lessonTime;
-      final startTime = formatTime(time);
-      return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
-    }).toList();
+    final lessonSlots =
+        sortedDays.map((d) {
+          final time = _dayTimeMap[d] ?? _lessonTime;
+          final startTime = formatTime(time);
+          return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
+        }).toList();
 
     // Generate random semantic profile color.
     const profileColorKeys = [
@@ -332,36 +339,45 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       status: StudentStatus.trial,
       monthlyFee: monthlyFee,
       lessonsPerWeek: _lessonsPerWeek,
-      phone: _phoneController.text.isNotEmpty
-          ? _phoneController.text.trim()
-          : null,
-      parentName: _parentNameController.text.isNotEmpty
-          ? _parentNameController.text.trim()
-          : null,
-      parentPhone: _parentPhoneController.text.isNotEmpty
-          ? _parentPhoneController.text.trim()
-          : null,
-      email: _emailController.text.isNotEmpty
-          ? _emailController.text.trim()
-          : null,
+      phone:
+          _phoneController.text.isNotEmpty
+              ? _phoneController.text.trim()
+              : null,
+      parentName:
+          _parentNameController.text.isNotEmpty
+              ? _parentNameController.text.trim()
+              : null,
+      parentPhone:
+          _parentPhoneController.text.isNotEmpty
+              ? _parentPhoneController.text.trim()
+              : null,
+      email:
+          _emailController.text.isNotEmpty
+              ? _emailController.text.trim()
+              : null,
       profileColorKey: profileColorKey,
       lessonSlots: lessonSlots,
       lessonDuration: _lessonDuration,
-      notes: _notesController.text.isNotEmpty
-          ? _notesController.text.trim()
-          : null,
-      postalCode: _postalCodeController.text.isNotEmpty
-          ? _postalCodeController.text.trim()
-          : null,
-      address: _addressController.text.isNotEmpty
-          ? _addressController.text.trim()
-          : null,
-      addressDetail: _addressDetailController.text.isNotEmpty
-          ? _addressDetailController.text.trim()
-          : null,
-      district: _addressController.text.isNotEmpty
-          ? _extractDistrict(_addressController.text.trim())
-          : null,
+      notes:
+          _notesController.text.isNotEmpty
+              ? _notesController.text.trim()
+              : null,
+      postalCode:
+          _postalCodeController.text.isNotEmpty
+              ? _postalCodeController.text.trim()
+              : null,
+      address:
+          _addressController.text.isNotEmpty
+              ? _addressController.text.trim()
+              : null,
+      addressDetail:
+          _addressDetailController.text.isNotEmpty
+              ? _addressDetailController.text.trim()
+              : null,
+      district:
+          _addressController.text.isNotEmpty
+              ? _extractDistrict(_addressController.text.trim())
+              : null,
       createdAt: DateTime.now(),
     );
 
@@ -370,6 +386,12 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       await ref.read(studentsNotifierProvider.notifier).addStudent(student);
 
       if (!mounted) return;
+
+      // 경로 4 (§2.6.4) — add-lesson 복귀: 발급 다이얼로그 스킵, 학생 id 반환.
+      if (widget.returnTo == 'addLesson') {
+        context.pop(student.id);
+        return;
+      }
 
       // Ask about subscription
       final issueSubscription = await showNotebookDialog(
