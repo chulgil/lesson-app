@@ -292,15 +292,18 @@ class LessonService:
                 detail="overflow_mode requires an active subscription",
             )
 
-        remaining = (sub.total_lessons or 0) - (sub.used_lessons or 0)
-        if remaining > 0:
+        from app.services.subscription_service import remaining_lessons
+
+        remaining = remaining_lessons(sub)
+        if remaining is None or remaining > 0:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="overflow_mode requires an exhausted subscription",
             )
 
         if mode == "bonus":
-            sub.total_lessons = (sub.total_lessons or 0) + 1
+            # bonus_count only — total_lessons stays the paid base. Bumping both
+            # double-counted the bonus in remaining (= total + bonus - used).
             sub.bonus_count = (sub.bonus_count or 0) + 1
             if not sub.bonus_reason:
                 sub.bonus_reason = "teacher_goodwill"
@@ -343,10 +346,11 @@ class LessonService:
     async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Find active subscription for the student or create a trial one.
 
-        If the active subscription has no remaining lessons (used >= total),
-        auto-expand it as a bonus lesson (total_lessons += 1, bonus_count += 1).
+        If the active subscription has no remaining lessons (bonus included),
+        auto-expand it as a bonus lesson (bonus_count += 1).
         """
         from app.models.subscription import Subscription, SubscriptionStatus
+        from app.services.subscription_service import remaining_lessons
 
         active_sub = (
             await self.db.execute(
@@ -361,10 +365,10 @@ class LessonService:
         ).scalar_one_or_none()
 
         if active_sub:
-            remaining = (active_sub.total_lessons or 0) - (active_sub.used_lessons or 0)
-            if remaining <= 0:
-                # Bonus lesson: expand subscription
-                active_sub.total_lessons = (active_sub.total_lessons or 0) + 1
+            remaining = remaining_lessons(active_sub)
+            if remaining is not None and remaining <= 0:
+                # Bonus lesson: bonus_count only — total_lessons stays the paid
+                # base (bumping both double-counted the bonus in remaining).
                 active_sub.bonus_count = (active_sub.bonus_count or 0) + 1
                 if not active_sub.bonus_reason:
                     active_sub.bonus_reason = "teacher_goodwill"

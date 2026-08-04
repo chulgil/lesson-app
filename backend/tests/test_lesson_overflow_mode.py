@@ -46,8 +46,12 @@ async def test_legacy_no_mode_keeps_silent_bonus_expansion(teacher, client: Asyn
     assert r.json()["subscription_id"] == sub_id
 
     sub = await _get_subscription(client, auth_headers, sub_id)
-    assert sub["total_lessons"] == 2
+    # One bonus lesson must inflate remaining by exactly +1: bonus_count is
+    # additive to total_lessons everywhere (DB constraint, remaining_lessons),
+    # so total_lessons must stay untouched (legacy double-increment inflated +2).
+    assert sub["total_lessons"] == 1
     assert sub["bonus_count"] == 1
+    assert sub["remaining_lessons"] == 1
 
 
 @pytest.mark.asyncio
@@ -71,8 +75,44 @@ async def test_bonus_mode_expands_target_subscription(teacher, client: AsyncClie
     assert lesson["is_preview"] is False
 
     sub = await _get_subscription(client, auth_headers, sub_id)
-    assert sub["total_lessons"] == 2
+    assert sub["total_lessons"] == 1
     assert sub["bonus_count"] == 1
+    assert sub["remaining_lessons"] == 1
+
+
+@pytest.mark.asyncio
+async def test_legacy_attaches_without_expansion_when_bonus_remaining(teacher, client: AsyncClient, auth_headers: dict):
+    """잔여 판정은 bonus 포함 (total + bonus - used) — 보너스 잔여가 있으면 확장 금지."""
+    sid = await teacher.create_student("보너스잔여학생")
+    sub_id = await teacher.create_subscription(sid, total_lessons=1, amount=100000, bonus_count=1)
+    await _exhaust_single_lesson_subscription(teacher, client, auth_headers, sid, sub_id)
+
+    r = await _create_lesson(client, auth_headers, sid, date="2026-08-11", start_time="12:00")
+    assert r.status_code == 201, r.text
+    assert r.json()["subscription_id"] == sub_id
+
+    sub = await _get_subscription(client, auth_headers, sub_id)
+    assert sub["total_lessons"] == 1
+    assert sub["bonus_count"] == 1, "existing bonus remaining must not trigger another expansion"
+
+
+@pytest.mark.asyncio
+async def test_bonus_mode_rejected_when_bonus_remaining(teacher, client: AsyncClient, auth_headers: dict):
+    """명시 bonus 모드도 bonus 포함 잔여로 소진 판정 — FE remaining 계약과 동일."""
+    sid = await teacher.create_student("보너스잔여명시학생")
+    sub_id = await teacher.create_subscription(sid, total_lessons=1, amount=100000, bonus_count=1)
+    await _exhaust_single_lesson_subscription(teacher, client, auth_headers, sid, sub_id)
+
+    r = await _create_lesson(
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-11",
+        start_time="13:00",
+        subscription_id=sub_id,
+        overflow_mode="bonus",
+    )
+    assert r.status_code == 422, r.text
 
 
 @pytest.mark.asyncio
@@ -217,6 +257,38 @@ async def test_makeup_credit_completion_skips_regular_deduction(teacher, client:
 
 
 @pytest.mark.asyncio
+async def test_manual_credit_lesson_leaves_scheduled_lessons_untouched(
+    teacher, client: AsyncClient, auth_headers: dict, db_session
+):
+    """scheduled_lessons 는 활성 LessonBooking 카운트 (§3.2, 재계산 SSOT).
+
+    선생님 수동 크레딧 레슨(POST /lessons)은 booking 행이 없으므로 카운터 밖 —
+    여기서 +1 하면 다음 recalculate 가 지우는 진짜 드리프트가 된다 (J1 관찰 확정).
+    """
+    from app.models.subscription import Subscription
+    from app.services.makeup_credit_service import MakeupCreditService
+
+    sid = await teacher.create_student("스케줄카운터학생")
+    sub_id = await teacher.create_subscription(sid, total_lessons=10, amount=500000)
+    await _grant_credit(client, auth_headers, sid)
+
+    r = await _create_lesson(
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-16",
+        start_time="18:00",
+        subscription_id=sub_id,
+        overflow_mode="makeup_credit",
+    )
+    assert r.status_code == 201, r.text
+
+    sub = await db_session.get(Subscription, sub_id)
+    assert sub.scheduled_lessons == 0, "manual lesson must not touch the booking-count mirror"
+    assert await MakeupCreditService(db_session).recalculate_scheduled_lessons(sub_id) == 0
+
+
+@pytest.mark.asyncio
 async def test_makeup_credit_mode_without_credit_rejected(teacher, client: AsyncClient, auth_headers: dict):
     sid = await teacher.create_student("크레딧없음학생")
     sub_id = await teacher.create_subscription(sid, total_lessons=10, amount=500000)
@@ -297,8 +369,12 @@ async def test_preview_lesson_skips_student_notification(
 
     # 일반 레슨 → lessonBooked 알림 1건 (알림 경로 자체가 살아있음을 고정)
     r = await _create_lesson(
-        client, auth_headers, sid,
-        date="2026-08-17", start_time="10:00", subscription_id=sub_id,
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-17",
+        start_time="10:00",
+        subscription_id=sub_id,
     )
     assert r.status_code == 201, r.text
     baseline = await db_session.scalar(select(func.count(Notification.id)))
@@ -307,17 +383,25 @@ async def test_preview_lesson_skips_student_notification(
     # 잔여 소진 후 preview 레슨 → 알림 카운트 불변
     await teacher.complete_lesson(r.json()["id"])
     r2 = await _create_lesson(
-        client, auth_headers, sid,
-        date="2026-08-18", start_time="14:00", subscription_id=sub_id,
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-18",
+        start_time="14:00",
+        subscription_id=sub_id,
     )
     assert r2.status_code == 201, r2.text
     await teacher.complete_lesson(r2.json()["id"])
     before_preview = await db_session.scalar(select(func.count(Notification.id)))
 
     r3 = await _create_lesson(
-        client, auth_headers, sid,
-        date="2026-08-19", start_time="14:00",
-        subscription_id=sub_id, overflow_mode="renewal_pending",
+        client,
+        auth_headers,
+        sid,
+        date="2026-08-19",
+        start_time="14:00",
+        subscription_id=sub_id,
+        overflow_mode="renewal_pending",
     )
     assert r3.status_code == 201, r3.text
     assert r3.json()["is_preview"] is True
