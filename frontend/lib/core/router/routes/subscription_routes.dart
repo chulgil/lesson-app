@@ -124,6 +124,7 @@ List<RouteBase> subscriptionRoutes = [
           lessonRequestId: lessonRequestId,
           lessonRequestIds: lessonRequestIds,
           returnTo: state.uri.queryParameters['returnTo'],
+          previewLessonId: state.uri.queryParameters['previewLessonId'],
         ),
       );
     },
