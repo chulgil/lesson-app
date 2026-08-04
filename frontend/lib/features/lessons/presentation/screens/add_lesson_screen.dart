@@ -645,6 +645,27 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       }
     }
 
+    // §2.6.3 edge ② — a dismissed 2+ picker must not save without an
+    // attribution (BE legacy silent-bonus path). Re-prompt; still no pick →
+    // abort. Lookup failure falls through (banner surfaces it, save allowed).
+    if (_selectedSubscription == null && !_isRecurring) {
+      var actives = const <Subscription>[];
+      try {
+        actives = await ref.read(
+          activeStudentSubscriptionsProvider(_selectedStudent!.id).future,
+        );
+      } catch (_) {}
+      if (!mounted) return;
+      if (mustPickSubscriptionBeforeSave(
+        selected: _selectedSubscription,
+        actives: actives,
+        isRecurring: _isRecurring,
+      )) {
+        await _openSubscriptionPicker(_selectedStudent!.id);
+        if (!mounted || _selectedSubscription == null) return;
+      }
+    }
+
     // S3 (spec §2.6.1~2.6.2) — explicit accounting when the target subscription
     // is exhausted: the silent bonus expansion is promoted to a choice sheet.
     // Recurring keeps the legacy path (multi-lesson overflow semantics are not

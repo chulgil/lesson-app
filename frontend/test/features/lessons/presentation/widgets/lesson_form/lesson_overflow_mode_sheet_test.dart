@@ -56,6 +56,52 @@ Future<LessonOverflowChoice? Function()> _open(
 }
 
 void main() {
+  group('mustPickSubscriptionBeforeSave — 시트 dismiss 가드 (§2.6.3 엣지 ②)', () {
+    test('활성 수강권 있음 + 미선택 + 단건: 저장 전 선택 강제', () {
+      expect(
+        mustPickSubscriptionBeforeSave(
+          selected: null,
+          actives: [_sub(total: 10, used: 10)],
+          isRecurring: false,
+        ),
+        isTrue,
+      );
+    });
+
+    test('이미 선택됨: 가드 미발동', () {
+      expect(
+        mustPickSubscriptionBeforeSave(
+          selected: _sub(total: 10, used: 0),
+          actives: [_sub(total: 10, used: 0)],
+          isRecurring: false,
+        ),
+        isFalse,
+      );
+    });
+
+    test('활성 수강권 0개: 가드 미발동 — 체험 자동생성 경로 유지', () {
+      expect(
+        mustPickSubscriptionBeforeSave(
+          selected: null,
+          actives: const [],
+          isRecurring: false,
+        ),
+        isFalse,
+      );
+    });
+
+    test('정규(반복) 저장: 가드 미발동 — 레거시 경로 유지 계약', () {
+      expect(
+        mustPickSubscriptionBeforeSave(
+          selected: null,
+          actives: [_sub(total: 10, used: 10)],
+          isRecurring: true,
+        ),
+        isFalse,
+      );
+    });
+  });
+
   testWidgets('가입 학생 + 크레딧 0: 보강 숨김, 갱신 제안이 기본 강조(D1)', (tester) async {
     final getResult = await _open(tester);
 

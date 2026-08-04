@@ -18,6 +18,17 @@ bool shouldPromptOverflowMode({
     subscription != null &&
     (subscription.remainingLessons ?? 1) <= 0;
 
+/// §2.6.3 known edge ② — dismissing the 2+ subscription picker leaves the
+/// save without an attribution, which reaches the BE legacy silent-bonus
+/// expansion (the S3 sheet never fires on a null subscription). With active
+/// subscriptions present, the save must re-prompt for a pick instead.
+/// Zero actives (trial auto-issue) and the recurring path stay untouched.
+bool mustPickSubscriptionBeforeSave({
+  required Subscription? selected,
+  required List<Subscription> actives,
+  required bool isRecurring,
+}) => !isRecurring && selected == null && actives.isNotEmpty;
+
 /// How to account for a lesson on an exhausted subscription
 /// (subscription_required_spec §2.6.2 — wire values of `overflow_mode`).
 enum LessonOverflowChoice {
