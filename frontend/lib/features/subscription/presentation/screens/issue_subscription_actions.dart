@@ -86,6 +86,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   /// #695 — template applied to the form (saved into the proposal draft).
   String? get appliedTemplateId;
 
+  /// §2.6.3 edge ① — called on successful issuance so the pop-time preview
+  /// lesson cleanup stands down (the subscription lifecycle owns it now).
+  void markPreviewLessonHandled();
+
   Future<void> issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
     if (selectedMembershipId == null) {
@@ -236,6 +240,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
               status: lessonRequestStatusForIssuedSubscription(),
             );
       }
+
+      // Issuance fully succeeded — the preview lesson (renewal flow) now
+      // belongs to the subscription lifecycle; pop cleanup must stand down.
+      markPreviewLessonHandled();
 
       if (mounted) {
         final isPostpaid = !isFreeIssue && !isPaymentConfirmed;

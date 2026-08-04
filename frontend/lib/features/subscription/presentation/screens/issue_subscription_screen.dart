@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +16,7 @@ import '../../../../core/utils/price_input.dart';
 import '../../../analytics/analytics_facade.dart'
     show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
+import '../../../lessons/lessons_facade.dart' show lessonsNotifierProvider;
 import '../../../onboarding/onboarding_facade.dart'
     show currentTeacherProfileProvider;
 import '../../../students/domain/entities/class_membership.dart';
@@ -59,6 +62,12 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   /// 리다이렉트를 건너뛰고 호출 화면(레슨 추가)으로 복귀한다.
   final String? returnTo;
 
+  /// §2.6.3 known edge ① — the add-lesson renewal flow saved this preview
+  /// lesson, then pushReplacement'd here (the caller is gone). This screen
+  /// owns the preview until a subscription is issued: leaving without issuing
+  /// deletes it, since no proposal exists for the BE cancel hook to cover.
+  final String? previewLessonId;
+
   const IssueSubscriptionScreen({
     super.key,
     required this.studentIds,
@@ -68,6 +77,7 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
     this.lessonRequestId,
     this.lessonRequestIds = const [],
     this.returnTo,
+    this.previewLessonId,
   });
 
   /// Whether this is a batch issuance (multiple students)
@@ -118,6 +128,10 @@ class _IssueSubscriptionScreenState
   /// In-flight guard: prevents double-tap from issuing twice.
   bool _submitting = false;
 
+  /// §2.6.3 edge ① — set once the issued subscription owns the preview
+  /// lesson's lifecycle (promotion/cancel), so the pop cleanup stands down.
+  bool _previewLessonHandled = false;
+
   final _amountController = TextEditingController();
   final _lessonsController = TextEditingController();
   final _validityController = TextEditingController();
@@ -139,6 +153,8 @@ class _IssueSubscriptionScreenState
   List<String> get lessonRequestIds => widget.lessonRequestIds;
   @override
   String? get returnTo => widget.returnTo;
+  @override
+  void markPreviewLessonHandled() => _previewLessonHandled = true;
   @override
   GlobalKey<FormState> get formKey => _formKey;
   @override
@@ -317,51 +333,75 @@ class _IssueSubscriptionScreenState
       });
     }
 
-    return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
-        title:
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _cleanupOrphanPreviewLesson();
+      },
+      child: NotebookScreenScaffold(
+        appBar: NotebookDetailAppBar(
+          title:
+              widget.isBatchMode
+                  ? AppStrings.batchSubscriptionAppBarTitle(
+                    widget.studentIds.length,
+                  )
+                  : AppStrings.proposalTitle,
+        ),
+        body:
             widget.isBatchMode
-                ? AppStrings.batchSubscriptionAppBarTitle(
-                  widget.studentIds.length,
-                )
-                : AppStrings.proposalTitle,
-      ),
-      body:
-          widget.isBatchMode
-              ? _buildBatchForm()
-              : membershipsAsync.when(
-                data: (memberships) {
-                  if (memberships.isEmpty) {
-                    return const NoMembershipState();
-                  }
+                ? _buildBatchForm()
+                : membershipsAsync.when(
+                  data: (memberships) {
+                    if (memberships.isEmpty) {
+                      return const NoMembershipState();
+                    }
 
-                  // Auto-select first membership if none selected
-                  if (_selectedMembershipId == null && memberships.isNotEmpty) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      setState(() {
-                        _selectedMembershipId = memberships.first.id;
+                    // Auto-select first membership if none selected
+                    if (_selectedMembershipId == null &&
+                        memberships.isNotEmpty) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _selectedMembershipId = memberships.first.id;
+                        });
+                        _applyPolicyDefaults(memberships.first);
                       });
-                      _applyPolicyDefaults(memberships.first);
-                    });
-                  } else if (_selectedMembershipId != null &&
-                      _appliedPolicyMembershipId != _selectedMembershipId) {
-                    final selected = memberships.firstWhere(
-                      (m) => m.id == _selectedMembershipId,
-                      orElse: () => memberships.first,
-                    );
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _applyPolicyDefaults(selected);
-                    });
-                  }
+                    } else if (_selectedMembershipId != null &&
+                        _appliedPolicyMembershipId != _selectedMembershipId) {
+                      final selected = memberships.firstWhere(
+                        (m) => m.id == _selectedMembershipId,
+                        orElse: () => memberships.first,
+                      );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _applyPolicyDefaults(selected);
+                      });
+                    }
 
-                  return _buildForm(memberships);
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (error, _) =>
-                        SubscriptionErrorState(error: error.toString()),
-              ),
-      bottomNavigationBar: _buildBottomBar(),
+                    return _buildForm(memberships);
+                  },
+                  loading:
+                      () => const Center(child: CircularProgressIndicator()),
+                  error:
+                      (error, _) =>
+                          SubscriptionErrorState(error: error.toString()),
+                ),
+        bottomNavigationBar: _buildBottomBar(),
+      ),
+    );
+  }
+
+  /// §2.6.3 edge ① — the teacher left without issuing: the renewal intent is
+  /// dead, so the preview lesson saved by the add-lesson flow is deleted.
+  /// Fire-and-forget: the route is already popping, failures are swallowed
+  /// (the BE proposal hooks never cover the no-proposal path; a re-entered
+  /// renewal simply saves a fresh preview).
+  void _cleanupOrphanPreviewLesson() {
+    final id = widget.previewLessonId;
+    if (id == null || _previewLessonHandled) return;
+    _previewLessonHandled = true;
+    unawaited(
+      ref
+          .read(lessonsNotifierProvider.notifier)
+          .deleteLesson(id)
+          .catchError((_) {}),
     );
   }
 

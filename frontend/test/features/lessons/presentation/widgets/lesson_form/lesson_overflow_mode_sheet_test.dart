@@ -56,6 +56,13 @@ Future<LessonOverflowChoice? Function()> _open(
 }
 
 void main() {
+  test('renewalIssueLocation — previewLessonId 를 발급 라우트에 배선 (§2.6.3 엣지 ①)', () {
+    expect(
+      renewalIssueLocation(studentId: 'stu-1', previewLessonId: 'L9'),
+      '/subscriptions/issue?studentId=stu-1&previewLessonId=L9',
+    );
+  });
+
   group('mustPickSubscriptionBeforeSave — 시트 dismiss 가드 (§2.6.3 엣지 ②)', () {
     test('활성 수강권 있음 + 미선택 + 단건: 저장 전 선택 강제', () {
       expect(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -28,6 +29,16 @@ bool mustPickSubscriptionBeforeSave({
   required List<Subscription> actives,
   required bool isRecurring,
 }) => !isRecurring && selected == null && actives.isNotEmpty;
+
+/// §2.6.3 renewal continuation route. The preview lesson id rides along so the
+/// issue screen can delete the orphan when the teacher leaves without issuing
+/// (known edge ① — the add-lesson caller is gone after pushReplacement).
+String renewalIssueLocation({
+  required String studentId,
+  required String previewLessonId,
+}) =>
+    '${AppRoutes.issueSubscription}?studentId=$studentId'
+    '&previewLessonId=$previewLessonId';
 
 /// How to account for a lesson on an exhausted subscription
 /// (subscription_required_spec §2.6.2 — wire values of `overflow_mode`).

@@ -820,8 +820,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               backgroundColor: AppColors.paperOk,
             ),
           );
+          // §2.6.3 edge ① — hand the preview lesson id to the issue screen so
+          // it can delete the orphan if the teacher leaves without issuing
+          // (pushReplacement discards this screen, so it cannot observe that).
           context.pushReplacement(
-            '${AppRoutes.issueSubscription}?studentId=${_selectedStudent!.id}',
+            renewalIssueLocation(
+              studentId: _selectedStudent!.id,
+              previewLessonId: savedLesson.id,
+            ),
           );
           return;
         }
