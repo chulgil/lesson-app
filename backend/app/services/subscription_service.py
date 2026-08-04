@@ -35,6 +35,25 @@ from app.services.subscription_access_service import SubscriptionAccessService
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 
+def remaining_lessons(sub: Any) -> int | None:
+    """Remaining-session formula shared with the API/FE contract.
+
+    ``bonus_count`` is additive to the paid base (``total_lessons`` /
+    ``lessons_per_month``) — mirrors ``SubscriptionResponse.remaining_lessons``
+    and the DB constraint ``used_lessons <= total + bonus``. Every exhaustion
+    check must use this instead of ``total - used`` or bonuses get miscounted.
+    """
+    type_value = getattr(sub.type, "value", sub.type)
+    if type_value == "trial":
+        return 1 + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+    base = sub.total_lessons
+    if base is None and type_value == "monthly":
+        base = sub.lessons_per_month
+    if base is None:
+        return None
+    return base + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+
+
 class SubscriptionService:
     """Handle subscription lifecycle, templates, and proposals."""
 
@@ -1209,15 +1228,7 @@ class SubscriptionService:
         return response
 
     def _remaining_lessons(self, sub: Any) -> int | None:
-        type_value = getattr(sub.type, "value", sub.type)
-        if type_value == "trial":
-            return 1 + (sub.bonus_count or 0) - (sub.used_lessons or 0)
-        base = sub.total_lessons
-        if base is None and type_value == "monthly":
-            base = sub.lessons_per_month
-        if base is None:
-            return None
-        return base + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+        return remaining_lessons(sub)
 
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any

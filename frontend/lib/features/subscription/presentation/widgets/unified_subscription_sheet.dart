@@ -646,6 +646,20 @@ class _UnifiedSubscriptionSheetState
     if (widget.studentIds.isEmpty) return; // #72 빈 학생 목록 .first StateError 방지
     if (_selectedTemplateIds.isEmpty && !_hasValidDirectInput) return;
 
+    // The issue screen takes exactly one template — routing `.first` here
+    // silently dropped the other selections. Guard instead of dropping.
+    if (_selectedTemplateIds.length > 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            AppStrings.unifiedSubscriptionDirectIssueSingleTemplateOnly,
+          ),
+          backgroundColor: AppColors.paperAccent,
+        ),
+      );
+      return;
+    }
+
     if (_selectedTemplateIds.isNotEmpty) {
       final templateId = _selectedTemplateIds.first;
       final studentId = widget.studentIds.first;
