@@ -470,6 +470,38 @@ class SubscriptionService:
         await self.db.flush()
         return True
 
+    async def release_lesson_usage(self, *, lesson_id: str, subscription_id: str) -> bool:
+        """Undo the deduction a lesson made (#1240).
+
+        The mirror of ``deduct_for_completed_lesson``: locks the subscription
+        row, removes the deducting usage rows tied to this lesson, and gives the
+        counter back (floored at 0 so a double release can never go negative).
+        Non-deducting history rows are left in place. Returns ``True`` when a
+        session was actually released.
+        """
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            return False
+
+        rows = (
+            await self.db.scalars(
+                select(SubscriptionUsage).where(
+                    SubscriptionUsage.lesson_id == lesson_id,
+                    SubscriptionUsage.deducted.is_(True),
+                )
+            )
+        ).all()
+        if not rows:
+            return False
+
+        for row in rows:
+            await self.db.delete(row)
+        sub.used_lessons = max(0, (sub.used_lessons or 0) - len(rows))
+        await self.db.flush()
+        return True
+
     async def use_reschedule(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Use a reschedule credit from a subscription.
 

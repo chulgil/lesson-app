@@ -86,3 +86,46 @@ Future<void> markDayOff(
     }
   }
 }
+
+/// #1240 — 출결 처리 되돌리기. 완료/노쇼로 차감된 회차를 백엔드가 복구한다.
+///
+/// 오탭으로 완료 처리하면 앱 안에 복구 진입점이 없어 학생이 회차를 영구히
+/// 잃었다. 상태 전이 엔드포인트가 차감 해제까지 수행하므로 여기서는 예정
+/// 상태로 되돌리기만 하면 된다.
+Future<void> revertAttendance(
+  BuildContext context,
+  WidgetRef ref,
+  Lesson lesson,
+) async {
+  final confirmed = await showNotebookDialog<bool>(
+    context: context,
+    title: AppStrings.attendanceRevertDialogTitle,
+    message:
+        lesson.status.isDeducted
+            ? AppStrings.attendanceRevertDialogMessage
+            : AppStrings.attendanceRevertDialogMessageNoDeduction,
+    confirmLabel: AppStrings.attendanceRevertAction,
+    cancelLabel: AppStrings.cancel,
+  );
+  if (confirmed != true || !context.mounted) return;
+
+  try {
+    await ref
+        .read(lessonsNotifierProvider.notifier)
+        .updateLessonStatus(lesson, LessonStatus.scheduled);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.attendanceRevertedSnack)),
+      );
+    }
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(AppStrings.attendanceActionFailed),
+          backgroundColor: AppColors.paperAccent,
+        ),
+      );
+    }
+  }
+}
