@@ -3312,6 +3312,13 @@ class AppStrings {
   /// 미리듣기 재생 실패 안내 (#1243).
   static const cannotPlayRecording = '재생할 수 없는 파일입니다';
 
+  /// 취소 마감 경과 안내 (#1241) — 서버가 지각 취소로 확정한다.
+  static const cancelDeadlinePassedHint = '취소 마감이 지났습니다 — 사전 취소를 선택해도 지각 취소로 처리됩니다';
+
+  /// 취소 마감 이전 안내 (#1241).
+  static String cancelDeadlineRemainingHint(int hours) =>
+      '레슨 $hours시간 전까지는 차감 없이 취소할 수 있습니다';
+
   /// 마이크 권한이 필요합니다 (microphone permission needed)
   static const micPermissionNeeded = '마이크 권한이 필요합니다';
 

@@ -563,6 +563,16 @@ class LessonService:
         # transition can release the session the old status consumed.
         previous_status = getattr(lesson.status, "value", lesson.status)
         try:
+            LessonStatus(new_status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Invalid lesson status: {new_status}",
+            )
+        # #1241 — the deadline is enforced here, not merely displayed: a client
+        # can pick who cancelled, but not whether it beat the clock.
+        new_status = await self._apply_cancel_deadline_verdict(lesson, new_status)
+        try:
             lesson.status = LessonStatus(new_status)
         except ValueError:
             raise HTTPException(
@@ -636,6 +646,111 @@ class LessonService:
             await self._deduct_if_policy_penalty(lesson, new_status)
 
         return LessonResponse.model_validate(lesson)
+
+    async def _effective_cancel_deadline_hours(self, lesson: Any) -> int | None:
+        """Deadline in force for this lesson, or None when unconfigured.
+
+        Subscription override wins over the teacher default (§ cancel policy);
+        a teacher with no policy row keeps the legacy behaviour — the server
+        must not invent a penalty nobody configured.
+        """
+        from app.models.policy import LessonPolicy
+        from app.models.subscription import Subscription
+
+        if lesson.subscription_id:
+            sub = await self.db.get(Subscription, lesson.subscription_id)
+            override = getattr(sub, "override_cancel_deadline_hours", None) if sub else None
+            if override is not None:
+                return int(override)
+
+        if not lesson.teacher_id:
+            return None
+        policy = await self.db.scalar(
+            select(LessonPolicy).where(
+                LessonPolicy.teacher_id == lesson.teacher_id,
+                LessonPolicy.lesson_class_id.is_(None),
+            )
+        )
+        if policy is None:
+            return None
+        return int(policy.cancellation_deadline_hours)
+
+    async def _apply_cancel_deadline_verdict(self, lesson: Any, new_status: str) -> str:
+        """Return the status the deadline actually supports (#1241).
+
+        Only the advance/late student-cancel pair is rewritten — that split is a
+        pure timing question the server can settle from timestamps. No-show,
+        teacher cancel and mutual cancel describe *who and why*, so they stay
+        exactly as the teacher recorded them.
+        """
+        from app.services.cancellation_policy import (
+            ADVANCE_CANCEL_STATUS,
+            LATE_CANCEL_STATUS,
+            TIMING_DECIDED_STATUSES,
+            resolve_cancel_timing,
+        )
+
+        if new_status not in TIMING_DECIDED_STATUSES:
+            return new_status
+
+        deadline_hours = await self._effective_cancel_deadline_hours(lesson)
+        if deadline_hours is None:
+            return new_status
+
+        # Retroactive bookkeeping: once the lesson start has passed, "now" is no
+        # longer the moment the student gave notice (the teacher may be
+        # recording a cancellation from days ago). The server has no evidence
+        # then, so the teacher's record stands — a fabricated penalty would be
+        # worse than an unenforced one. Live decisions (before the start) are
+        # still judged by the server, which is what closes the bypass.
+        from app.services.cancellation_policy import KST, lesson_start_kst
+
+        start = lesson_start_kst(lesson.date, lesson.start_time)
+        if start is not None and datetime.now(UTC).astimezone(KST) > start:
+            return new_status
+
+        is_late = resolve_cancel_timing(
+            lesson_date=lesson.date,
+            start_time=lesson.start_time,
+            deadline_hours=deadline_hours,
+            at=datetime.now(UTC),
+        )
+        return LATE_CANCEL_STATUS if is_late else ADVANCE_CANCEL_STATUS
+
+    async def cancellation_policy(self, lesson_id: str, current_user: Any) -> dict[str, Any]:
+        """Deadline facts for the client hint — same numbers the server judges by."""
+        from app.services.cancellation_policy import (
+            DEFAULT_CANCEL_DEADLINE_HOURS,
+            cancel_deadline_at,
+            resolve_cancel_timing,
+        )
+        from app.models.subscription import Subscription
+
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        configured = await self._effective_cancel_deadline_hours(lesson)
+        hours = DEFAULT_CANCEL_DEADLINE_HOURS if configured is None else configured
+
+        source = "default"
+        if configured is not None:
+            source = "policy"
+            if lesson.subscription_id:
+                sub = await self.db.get(Subscription, lesson.subscription_id)
+                if sub is not None and getattr(sub, "override_cancel_deadline_hours", None) is not None:
+                    source = "subscription"
+
+        deadline = cancel_deadline_at(lesson.date, lesson.start_time, hours)
+        return {
+            "deadline_hours": hours,
+            "deadline_at": deadline.isoformat() if deadline else None,
+            "is_late_now": resolve_cancel_timing(
+                lesson_date=lesson.date,
+                start_time=lesson.start_time,
+                deadline_hours=hours,
+                at=datetime.now(UTC),
+            ),
+            "enforced": configured is not None,
+            "source": source,
+        }
 
     async def _release_deduction(self, lesson: Any) -> None:
         """Give back the session this lesson consumed (#1240).

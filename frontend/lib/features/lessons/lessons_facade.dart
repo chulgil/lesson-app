@@ -1,6 +1,7 @@
 // 레슨 기능의 공개 조회 및 액션 provider 진입점입니다.
 library;
 
+export 'domain/entities/cancellation_policy_hint.dart';
 export 'domain/entities/lesson.dart';
 export 'domain/entities/teaching_resource.dart'
     show TeachingResource, TeachingResourceType;

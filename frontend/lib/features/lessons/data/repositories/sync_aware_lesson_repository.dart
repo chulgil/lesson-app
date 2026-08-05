@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/sync/application/mutation_queue_helper.dart';
+import '../../domain/entities/cancellation_policy_hint.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/lesson_repository.dart';
 import 'lesson_update_payload.dart';
@@ -53,6 +54,10 @@ class SyncAwareLessonRepository implements LessonRepository {
 
   @override
   Future<Lesson?> getLesson(String id) => _remote.getLesson(id);
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) =>
+      _remote.getCancellationPolicy(lessonId);
 
   // --------------------------------------------------------------------------
   // Mutation methods — use MutationQueueHelper for offline support

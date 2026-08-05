@@ -173,9 +173,23 @@ class _UrgentAlertZoneState extends ConsumerState<UrgentAlertZone> {
     WidgetRef ref,
     Lesson lesson,
   ) async {
+    // #1241 — fetch the deadline facts first so the sheet can warn before the
+    // teacher picks a reason. A lookup failure just drops the hint; the server
+    // still applies the same rule on save.
+    CancellationPolicyHint? hint;
+    try {
+      hint = await ref
+          .read(lessonRepositoryProvider)
+          .getCancellationPolicy(lesson.id);
+    } catch (_) {
+      hint = null;
+    }
+    if (!context.mounted) return;
+
     final result = await AttendanceConfirmationSheet.show(
       context,
       lesson: lesson,
+      cancellationHint: hint,
     );
     if (result != null) {
       final notifier = ref.read(lessonConfirmationNotifierProvider.notifier);
