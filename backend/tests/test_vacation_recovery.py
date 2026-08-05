@@ -9,7 +9,7 @@ Adds two endpoints to /api/v1/teacher/vacation:
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
@@ -205,6 +205,16 @@ async def test_list_other_teacher_excluded(
     assert response.json()["total_count"] == 1
 
 
+# 취소 가드는 "이미 시작된 휴가" 를 KST 오늘 기준으로 막는다. 고정 날짜를 쓰면
+# 그 날이 지나는 순간 테스트가 가드에 걸려 썩는다 — 항상 미래로 잡는다.
+_KST_TZ = timezone(timedelta(hours=9))
+
+
+def _future_vacation_window(days: int = 5) -> tuple[date, date]:
+    start = datetime.now(_KST_TZ).date() + timedelta(days=1)
+    return start, start + timedelta(days=days - 1)
+
+
 @pytest.mark.asyncio
 async def test_cancel_within_24h_reverts_auto_extended_days(
     client: AsyncClient,
@@ -215,14 +225,17 @@ async def test_cancel_within_24h_reverts_auto_extended_days(
     user = await create_test_user(user_id="t-revert", role="teacher", email="tr@test.com")
     teacher_id = f"{user.id}-prof"
     lesson_class_id = await _seed_lesson_class(db_session, teacher_id)
-    _, sub_id = await _seed_booking_with_subscription(db_session, teacher_id, lesson_class_id, date(2026, 8, 2))
+    vac_start, vac_end = _future_vacation_window()
+    _, sub_id = await _seed_booking_with_subscription(
+        db_session, teacher_id, lesson_class_id, vac_start + timedelta(days=1)
+    )
 
     register = await client.post(
         "/api/v1/teacher/vacation",
         headers=_headers("t-revert"),
         json={
-            "start_date": "2026-08-01",
-            "end_date": "2026-08-05",
+            "start_date": vac_start.isoformat(),
+            "end_date": vac_end.isoformat(),
             "default_disposition": "rollForward",
         },
     )
@@ -257,11 +270,14 @@ async def test_cancel_after_24h_returns_409(
     user = await create_test_user(user_id="t-late", role="teacher", email="tt@test.com")
     teacher_id = f"{user.id}-prof"
 
+    # 미래 휴가로 잡아, 409 가 "24시간 경과" 때문임을 보장한다 (시작-경과
+    # 가드에 걸려 우연히 통과하면 이 테스트는 아무것도 검증하지 못한다).
+    guard_start, guard_end = _future_vacation_window()
     period_id = await _seed_vacation(
         db_session,
         teacher_id,
-        start=date(2026, 8, 1),
-        end=date(2026, 8, 5),
+        start=guard_start,
+        end=guard_end,
         created_hours_ago=25,
     )
     await db_session.commit()
