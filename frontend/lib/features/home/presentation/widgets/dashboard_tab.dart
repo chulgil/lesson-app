@@ -409,12 +409,6 @@ class DashboardTab extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        // 로마숫자 카운트 — Notebook × Score 4대 시그니처 (Roman numerals)
-        Text(
-          lessonCount > 0 ? romanOf(lessonCount - 1) : '—',
-          style: NotebookTypography.roman,
-        ),
-        const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
             AppStrings.dashboardTodayLessonsSection,
