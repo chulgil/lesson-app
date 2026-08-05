@@ -28,6 +28,11 @@
                         "type": "command",
                         "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/session-start.py\"",
                         "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/figma-drift-check.py\"",
+                        "timeout": 10
                     }
                 ]
             }

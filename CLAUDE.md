@@ -102,6 +102,7 @@ flutter analyze                                              # 분석
 | **UI/UX** | |
 | `ux-rules.md` | UX 위반 방지 + HARD-GATE + grep 패턴 |
 | `frontend-verify.md` | Playwright 스크린샷 기반 회귀 검증 |
+| `figma-mirror-sync.md` | Figma 미러 단방향 동기화 + 드리프트 훅 (SessionStart 경고) |
 
 ### 공통 UI 패턴
 
