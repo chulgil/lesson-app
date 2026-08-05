@@ -45,7 +45,11 @@ class TeacherFeedbackSection extends ConsumerWidget {
                     AppRoutes.lessonDetail
                         .replaceFirst(':id', feedbackLesson.id),
                   ),
-                  child: const Text(AppStrings.showMore),
+                  // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
+                  child: const Text(
+                    AppStrings.showMore,
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ),
                 ),
               ],
             ),

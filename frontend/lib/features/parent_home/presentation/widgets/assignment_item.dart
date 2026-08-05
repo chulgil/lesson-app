@@ -52,7 +52,11 @@ class AssignmentItem extends StatelessWidget {
                   title,
                   style: AppTypography.bodyMedium.copyWith(
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color: isCompleted ? AppColors.inkTertiary : AppColors.ink,
+                    // H7 — 완료 항목은 잉크가 바랜 것처럼 물러난다. 체크박스와
+                    // 완료 라벨(paperOk)은 "채워진" 게이지로 남는다.
+                    decorationColor:
+                        isCompleted ? AppColors.inkQuaternary : null,
+                    color: isCompleted ? AppColors.inkQuaternary : AppColors.ink,
                   ),
                 ),
                 Text(

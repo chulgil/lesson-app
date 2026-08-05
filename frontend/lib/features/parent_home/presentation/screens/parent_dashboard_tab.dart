@@ -13,6 +13,7 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
@@ -204,6 +205,8 @@ class ParentDashboardTab extends ConsumerWidget {
   Widget _buildMasthead(BuildContext context, WidgetRef ref, String parentId) {
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
+      // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+      eyebrowStyle: NotebookTypography.wordmark,
       meta: 'VOL. ${DateTime.now().month} · NO. ${DateTime.now().day}',
       trailing: IconButton(
         onPressed: () => _showChildSelector(context, ref, parentId),
@@ -232,7 +235,8 @@ class ParentDashboardTab extends ConsumerWidget {
           Text(AppStrings.parentHomeChildLessonsTitleFormat(profile.name), style: NotebookTypography.masthead),
           const SizedBox(height: 6),
           Text(
-            '${now.month}月 ${now.day}日  ·  ${profile.instrumentLabel}',
+            // H3 — 한자식 날짜(8月 5日)를 한글 표기로 통일. 날짜는 이 줄에서 1회만.
+            '${formatDateMDKorean(now)}  ·  ${profile.instrumentLabel}',
             style: NotebookTypography.mastheadDate,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -727,7 +731,7 @@ class _UpcomingLessonSection extends ConsumerWidget {
               )
               .inDays;
           final teacherName = next.teacherName ?? profile.teacherName;
-          return ListTile(
+          final tile = ListTile(
             contentPadding: EdgeInsets.zero,
             leading: Container(
               width: 48,
@@ -781,6 +785,16 @@ class _UpcomingLessonSection extends ConsumerWidget {
                 ),
               ),
             ),
+          );
+          // H5 — 다음 레슨은 시간에 민감한 정보라 종이 위에서 먼저 잡혀야 한다.
+          // 세피아 앰버로 채우고 테두리를 둘러 다른 섹션과 구분한다.
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.amberLight,
+              border: Border.all(color: AppColors.paperTrial),
+            ),
+            child: tile,
           );
         },
       ),

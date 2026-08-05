@@ -60,7 +60,11 @@ class StudentSubscriptionSummary extends ConsumerWidget {
             if (onViewAll != null)
               TextButton(
                 onPressed: onViewAll,
-                child: const Text(AppStrings.viewAll),
+                // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
+                child: const Text(
+                  AppStrings.viewAll,
+                  style: TextStyle(decoration: TextDecoration.underline),
+                ),
               ),
           ],
         ),

@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
@@ -85,6 +86,13 @@ class StudentDashboardTab extends ConsumerWidget {
           // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
           const NoteAccessActiveBanner(),
 
+          // ── H4: 대응 필요 이벤트 그룹 (신청·제안·결제·일정확정 대기) ──
+          // 처리하면 사라지는 일시적 항목이라 콘텐츠 최상단에 둔다.
+          // 대기 항목이 없으면 스스로 숨으므로 평상시 레이아웃은 그대로.
+          _StudentEventsGroup(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // ── 1순위: 다음 레슨 (가장 궁금한 것) ──────────
           NextLessonCard(studentId: currentStudentId),
 
@@ -155,11 +163,6 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
-          // ── 3순위: 이벤트 그룹 (대응 필요, 4개 배너 통합) ──
-          _StudentEventsGroup(studentId: currentStudentId),
-
-          const SizedBox(height: AppSpacing.space4),
-
           // ── 4순위: 학습 기록 그룹 (피드백 + 연습요약 + 체험) ──
           LearningRecordGroup(studentId: currentStudentId),
 
@@ -180,6 +183,8 @@ class StudentDashboardTab extends ConsumerWidget {
   Widget _buildMasthead(BuildContext context) {
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
+      // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+      eyebrowStyle: NotebookTypography.wordmark,
       meta: volNoLabel(DateTime.now()),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -231,8 +236,8 @@ class StudentDashboardTab extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${AppStrings.studentHomeMastheadHanjaDate(now.month, now.day)}'
-            '  ·  ${AppStrings.studentHomeGreeting}',
+            // H3 — 한자식 날짜(7月 27日)를 한글 표기로 통일. 날짜는 이 줄에서 1회만.
+            '${formatDateMDKorean(now)}  ·  ${AppStrings.studentHomeGreeting}',
             style: NotebookTypography.mastheadDate,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

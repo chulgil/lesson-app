@@ -50,12 +50,17 @@ class _InfoColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mutedInk = _mutedInkFor(item.priority);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           item.title,
-          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+            color: mutedInk,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -63,7 +68,7 @@ class _InfoColumn extends StatelessWidget {
         Text(
           item.subtitle,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
+            color: mutedInk ?? AppColors.inkSecondary,
           ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -108,7 +113,9 @@ class _RightColumn extends StatelessWidget {
           formatRelativeTime(item.createdAt),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+          style: AppTypography.caption.copyWith(
+            color: _mutedInkFor(item.priority) ?? AppColors.inkTertiary,
+          ),
         ),
       ],
     );
@@ -145,6 +152,14 @@ IconData _iconFor(StudentLessonProgressKind kind) {
     StudentLessonProgressKind.scheduleChange => Icons.update_outlined,
     StudentLessonProgressKind.renewal => Icons.autorenew,
   };
+}
+
+/// H7 — 처리가 끝난 항목은 잉크가 바랜 것처럼 물러난다. 좌측 아이콘 박스와
+/// 완료 배지는 그대로 둬서 "채워진" 상태 표시가 남는다.
+Color? _mutedInkFor(StudentLessonProgressPriority priority) {
+  return priority == StudentLessonProgressPriority.completed
+      ? AppColors.inkQuaternary
+      : null;
 }
 
 Color _priorityColor(StudentLessonProgressPriority priority) {

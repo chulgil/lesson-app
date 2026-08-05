@@ -70,7 +70,13 @@ class TrialBookingsSection extends ConsumerWidget {
                   onPressed: () => ref
                       .read(studentHomeTabRequestProvider.notifier)
                       .state = 1,
-                  child: Text('${trialBookings.length - 2}개 더보기'),
+                  // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
+                  child: Text(
+                    '${trialBookings.length - 2}개 더보기',
+                    style: const TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
                 ),
               ),
           ],

@@ -82,7 +82,11 @@ class PracticeSummarySection extends ConsumerWidget {
               onPressed: () {
                 context.push('${AppRoutes.practiceStats}?studentId=$studentId');
               },
-              child: const Text(AppStrings.studentHomePracticeSummaryDetail),
+              // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
+              child: const Text(
+                AppStrings.studentHomePracticeSummaryDetail,
+                style: TextStyle(decoration: TextDecoration.underline),
+              ),
             ),
           ],
         ),
