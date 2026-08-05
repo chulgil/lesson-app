@@ -137,6 +137,9 @@ class AppTheme {
         hoverElevation: 0,
         highlightElevation: 0,
         disabledElevation: 0,
+        // Hyen 표준 H8 — 터치 타깃 44px. M3 기본 56 은 크림 종이 위에서 과하게 무겁다.
+        // .extended FAB 은 extendedSizeConstraints 를 쓰므로 영향 없음.
+        sizeConstraints: const BoxConstraints.tightFor(width: 44, height: 44),
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         extendedTextStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w600,
@@ -617,6 +620,9 @@ class AppTheme {
         hoverElevation: 0,
         highlightElevation: 0,
         disabledElevation: 0,
+        // Hyen 표준 H8 — 터치 타깃 44px. M3 기본 56 은 크림 종이 위에서 과하게 무겁다.
+        // .extended FAB 은 extendedSizeConstraints 를 쓰므로 영향 없음.
+        sizeConstraints: const BoxConstraints.tightFor(width: 44, height: 44),
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         extendedTextStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w600,

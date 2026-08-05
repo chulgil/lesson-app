@@ -131,7 +131,9 @@ class AppColors {
   // Notebook × Score 팔레트 (docs/specs/design/notebook/README.md)
   // 음악 악보 + 노트 필기 컨셉. Phase 1: 선생님 홈화면부터 적용.
   // ─────────────────────────────────────────────────────────────
-  static const paper = Color(0xFFF2ECDD); // 크림색 종이 배경
+  static const paper = Color(0xFFFFFDF8); // 밝은 종이 배경 (Hyen 표준 H1)
+  static const paperNav = Color(0xFFFFFAEE); // 하단 네비 배경 (Hyen 표준 H1)
+  static const paperWordmark = Color(0x33867F6F); // 워드마크 뮤트 20% (Hyen 표준 H2)
   static const paperDark = Color(0xFFE8DFC7); // 강조 영역
   static const ink = Color(0xFF14161C); // 본문 (딥 블루-블랙)
   static const inkSecondary = Color(0xBF14161C); // 75% alpha

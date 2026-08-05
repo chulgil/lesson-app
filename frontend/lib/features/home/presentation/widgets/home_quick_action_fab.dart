@@ -23,7 +23,8 @@ class HomeQuickActionFab extends StatelessWidget {
       foregroundColor: AppColors.paper,
       shape: const CircleBorder(),
       onPressed: () => _showQuickActionSheet(context),
-      child: const Icon(Icons.add, size: 28),
+      // 44px FAB (Hyen 표준 H8) 에 맞춘 비례 아이콘.
+      child: const Icon(Icons.add, size: 22),
     );
   }
 

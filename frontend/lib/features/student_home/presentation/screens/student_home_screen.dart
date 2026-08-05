@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/center_action_slot.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_nav.dart';
 import '../../../../main.dart'
     show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
@@ -48,12 +48,19 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           if (result.recovered > 0 || result.cleanedUp > 0) {
             final parts = <String>[];
             if (result.recovered > 0) {
-              parts.add(AppStrings.studentHomeRecordingRecoveredCount(result.recovered));
+              parts.add(
+                AppStrings.studentHomeRecordingRecoveredCount(result.recovered),
+              );
             }
             if (result.cleanedUp > 0) {
-              parts.add(AppStrings.studentHomeRecordingCleanedCount(result.cleanedUp));
+              parts.add(
+                AppStrings.studentHomeRecordingCleanedCount(result.cleanedUp),
+              );
             }
-            message = AppStrings.studentHomeRecordingRecoverySummary(parts.join(', '), result.total);
+            message = AppStrings.studentHomeRecordingRecoverySummary(
+              parts.join(', '),
+              result.total,
+            );
             bgColor = AppColors.paperOk;
           } else {
             message = AppStrings.studentHomeRecordingVerified(result.total);
@@ -104,66 +111,37 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
   }
 
   Widget _buildBottomNavigationWithCenterButton() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
+    return NotebookBottomNav(
+      currentIndex: _currentIndex,
+      onTap: (index) => setState(() => _currentIndex = index),
+      // Center practice button via discipline-neutral slot (#975).
+      // Music injects the action; null slots stay unwrapped (see
+      // CenterActionSlot doc) so non-music shells do not shift.
+      centerAction: const CenterActionSlot(
+        centerAction: PracticeCenterButton(size: 48),
       ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, 'I', AppStrings.navHome),
-              _buildNavItem(1, 'II', AppStrings.navLessons),
-              // Center practice button via discipline-neutral slot (#975).
-              // Music injects the action; null slots stay unwrapped (see
-              // CenterActionSlot doc) so non-music shells do not shift.
-              const CenterActionSlot(
-                centerAction: PracticeCenterButton(size: 48),
-              ),
-              _buildNavItem(2, 'III', AppStrings.navPractice),
-              _buildNavItem(3, 'IV', AppStrings.navProfile),
-            ],
-          ),
+      items: const [
+        NotebookBottomNavItem(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home,
+          label: AppStrings.navHome,
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, String roman, String label) {
-    final isSelected = _currentIndex == index;
-    final accentColor =
-        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
-
-    return InkWell(
-      onTap: () => setState(() => _currentIndex = index),
-      child: SizedBox(
-        width: 64,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              roman,
-              style: NotebookTypography.romanLarge.copyWith(
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: NotebookTypography.sectionLabelSmall.copyWith(
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+        NotebookBottomNavItem(
+          icon: Icons.event_note_outlined,
+          activeIcon: Icons.event_note,
+          label: AppStrings.navLessons,
         ),
-      ),
+        NotebookBottomNavItem(
+          icon: Icons.music_note_outlined,
+          activeIcon: Icons.music_note,
+          label: AppStrings.navPractice,
+        ),
+        NotebookBottomNavItem(
+          icon: Icons.person_outline,
+          activeIcon: Icons.person,
+          label: AppStrings.navProfile,
+        ),
+      ],
     );
   }
 }

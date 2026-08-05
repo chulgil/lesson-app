@@ -24,6 +24,8 @@ class NotebookBanner extends StatelessWidget {
     this.messageStyle,
     this.leadingIcon,
     this.accent = AppColors.paperAccent,
+    this.background,
+    this.border,
     this.trailing,
     this.margin = const EdgeInsets.only(bottom: AppSpacing.space4),
     this.padding = const EdgeInsets.all(AppSpacing.space3),
@@ -41,6 +43,12 @@ class NotebookBanner extends StatelessWidget {
   /// 좌측 3px 세로선 색. 기본 Vermillion ([AppColors.paperAccent]).
   final Color accent;
 
+  /// 채움 배경. null 이면 종이(투명) 그대로.
+  final Color? background;
+
+  /// 테두리 override. 주면 기본 좌측 3px 세로선 대신 이 테두리를 쓴다.
+  final BoxBorder? border;
+
   /// 우측 인라인 액션/닫기 위젯 (옵션).
   final Widget? trailing;
 
@@ -57,7 +65,8 @@ class NotebookBanner extends StatelessWidget {
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: accent, width: 3)),
+        color: background,
+        border: border ?? Border(left: BorderSide(color: accent, width: 3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

@@ -35,7 +35,9 @@ class LessonCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dimAlpha = _isDimmed ? 0.45 : 1.0;
+    // H7 — 완료/취소 행은 잉크가 바랜 것처럼 물러난다. 좌측 상태 바는 그대로 둬서
+    // 게이지처럼 "채워진" 상태가 남는다 (디자이너 주석: 완료는 게이지 바처럼).
+    final mutedInk = _isDimmed ? AppColors.inkQuaternary : null;
 
     return Material(
       color: Colors.transparent,
@@ -48,80 +50,82 @@ class LessonCard extends ConsumerWidget {
               bottom: const BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
-          child: Opacity(
-            opacity: dimAlpha,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.space3,
-                AppSpacing.space3,
-                AppSpacing.space2,
-                AppSpacing.space3,
-              ),
-              child: Row(
-                children: [
-                  // Time column — Plex Mono (악보 템포 라벨)
-                  SizedBox(
-                    width: 52,
-                    child: Text(
-                      lesson.startTime,
-                      style: GoogleFonts.ibmPlexMono(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.ink,
-                        letterSpacing: 0.5,
-                      ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.space3,
+              AppSpacing.space3,
+              AppSpacing.space2,
+              AppSpacing.space3,
+            ),
+            child: Row(
+              children: [
+                // Time column — Plex Mono (악보 템포 라벨)
+                SizedBox(
+                  width: 52,
+                  child: Text(
+                    lesson.startTime,
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: mutedInk ?? AppColors.ink,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.space3),
-                  // Info section
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${lesson.studentName} · ${lesson.instrument}',
-                          style: NotebookTypography.pieceTitle.copyWith(
-                            decoration:
-                                _isDimmed ? TextDecoration.lineThrough : null,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                // Info section
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${lesson.studentName} · ${lesson.instrument}',
+                        style: NotebookTypography.pieceTitle.copyWith(
+                          color: mutedInk,
+                          decoration:
+                              _isDimmed ? TextDecoration.lineThrough : null,
+                          decorationColor: mutedInk,
                         ),
-                        _buildBadgesRow(ref),
-                        if (lesson.pieces.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              lesson.pieces.first.displayName,
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.inkSecondary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // Status label — uppercase sans, 스탬프 느낌
-                  SizedBox(
-                    width: 40,
-                    child: Text(
-                      _getStatusLabel(),
-                      style: NotebookTypography.sectionLabelSmall.copyWith(
-                        color: lesson.displayStatus.color,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      textAlign: TextAlign.end,
+                      if (_isDimmed)
+                        Opacity(opacity: 0.45, child: _buildBadgesRow(ref))
+                      else
+                        _buildBadgesRow(ref),
+                      if (lesson.pieces.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            lesson.pieces.first.displayName,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: mutedInk ?? AppColors.inkSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                // Status label — uppercase sans, 스탬프 느낌
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    _getStatusLabel(),
+                    style: NotebookTypography.sectionLabelSmall.copyWith(
+                      color: mutedInk ?? lesson.displayStatus.color,
                     ),
+                    textAlign: TextAlign.end,
                   ),
-                  const SizedBox(width: AppSpacing.space1),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.inkTertiary,
-                    size: 18,
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                Icon(
+                  Icons.chevron_right,
+                  color: mutedInk ?? AppColors.inkTertiary,
+                  size: 18,
+                ),
+              ],
             ),
           ),
         ),
@@ -147,7 +151,6 @@ class LessonCard extends ConsumerWidget {
         return AppStrings.statusAbsent;
     }
   }
-
 
   /// Build context badge and subscription badge row.
   Widget _buildBadgesRow(WidgetRef ref) {

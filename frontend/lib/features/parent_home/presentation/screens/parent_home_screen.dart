@@ -3,9 +3,8 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_nav.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../features/parent_home/parent_home_facade.dart';
 import 'parent_dashboard_tab.dart';
@@ -56,61 +55,36 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
   }
 
   Widget _buildBottomNavigation() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, 'I', AppStrings.navHome),
-              _buildNavItem(1, 'II', AppStrings.navLessons),
-              _buildNavItem(2, 'III', AppStrings.navAssignments),
-              _buildNavItem(3, 'IV', AppStrings.navPayments),
-              _buildNavItem(4, 'V', AppStrings.navProfile),
-            ],
-          ),
+    return NotebookBottomNav(
+      currentIndex: _currentIndex,
+      onTap: (index) => setState(() => _currentIndex = index),
+      items: const [
+        NotebookBottomNavItem(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home,
+          label: AppStrings.navHome,
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, String roman, String label) {
-    final isSelected = _currentIndex == index;
-    final accentColor =
-        isSelected ? AppColors.paperAccent : AppColors.inkTertiary;
-
-    return InkWell(
-      onTap: () => setState(() => _currentIndex = index),
-      child: SizedBox(
-        width: 60,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              roman,
-              style: NotebookTypography.romanLarge.copyWith(
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: NotebookTypography.sectionLabelSmall.copyWith(
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+        NotebookBottomNavItem(
+          icon: Icons.event_note_outlined,
+          activeIcon: Icons.event_note,
+          label: AppStrings.navLessons,
         ),
-      ),
+        NotebookBottomNavItem(
+          icon: Icons.assignment_outlined,
+          activeIcon: Icons.assignment,
+          label: AppStrings.navAssignments,
+        ),
+        NotebookBottomNavItem(
+          icon: Icons.account_balance_wallet_outlined,
+          activeIcon: Icons.account_balance_wallet,
+          label: AppStrings.navPayments,
+        ),
+        NotebookBottomNavItem(
+          icon: Icons.person_outline,
+          activeIcon: Icons.person,
+          label: AppStrings.navProfile,
+        ),
+      ],
     );
   }
 

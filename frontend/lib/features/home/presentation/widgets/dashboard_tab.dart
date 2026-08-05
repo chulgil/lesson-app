@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
@@ -202,6 +203,8 @@ class DashboardTab extends ConsumerWidget {
     final unreadCount = ref.watch(unreadNotificationCountProvider);
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
+      // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+      eyebrowStyle: NotebookTypography.wordmark,
       meta: _volumeIssueString(DateTime.now()),
       trailing: IconButton(
         onPressed: () => context.push(AppRoutes.notifications),
@@ -259,8 +262,9 @@ class DashboardTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // H3 — 날짜는 위 한 줄에서만. 제목·부제와 중복되지 않게 '레슨' 제거.
           Text(
-            '${now.month}월 ${now.day}일 레슨',
+            formatDateMDKorean(now),
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
@@ -270,7 +274,7 @@ class DashboardTab extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${now.month}月 ${now.day}日  ·  ${AppStrings.dashboardLessonCountFormat(lessonCount)}',
+            AppStrings.dashboardLessonCountFormat(lessonCount),
             style: NotebookTypography.mastheadDate,
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -427,9 +431,12 @@ class DashboardTab extends ConsumerWidget {
             ),
             child: Text(
               AppStrings.bulkFeedbackTitle,
+              // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.paperAccent,
               ),
             ),
           ),

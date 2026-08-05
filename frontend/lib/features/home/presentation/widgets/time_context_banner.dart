@@ -36,16 +36,15 @@ class TimeContextBanner extends StatelessWidget {
 
     if (message == null) return const SizedBox.shrink();
 
-    // Notebook × Score: 크림 종이 위의 "마지널리아" 메타포.
-    // 시각 셸은 공통 NotebookBanner(좌측 3px vermillion + Gaegu) 사용.
-    // 이 위젯은 시간대 메시지 로직만 소유.
+    // H5 — 다음 레슨은 시간에 민감한 정보라 종이 위에서 가장 먼저 잡혀야 한다.
+    // 세피아 앰버로 채우고 등폭 서체로 시각을 읽히게 한다.
+    // 이 위젯은 시간대 메시지 로직만 소유하고, 시각 셸은 공통 NotebookBanner 사용.
     return NotebookBanner(
       leadingIcon: _iconForHour(hour),
       message: message,
-      messageStyle: NotebookTypography.hand.copyWith(
-        fontSize: 18,
-        color: AppColors.ink,
-      ),
+      background: AppColors.amberLight,
+      border: Border.all(color: AppColors.paperTrial),
+      messageStyle: NotebookTypography.bannerMono,
     );
   }
 

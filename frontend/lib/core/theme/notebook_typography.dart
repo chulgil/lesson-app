@@ -55,6 +55,11 @@ class NotebookTypography {
     letterSpacing: 5,
   );
 
+  /// 브랜드 워드마크 — eyebrow 를 배경 톤으로 뮤트 (Hyen 표준 H2).
+  /// 로고가 본문 글자보다 먼저 읽히지 않도록 20% 잉크로 물러난다.
+  static TextStyle get wordmark =>
+      eyebrow.copyWith(color: AppColors.paperWordmark);
+
   /// VOL·NO·DATE 메타 — 매스트헤드 우측.
   /// 예: "VOL. IV · NO. 18 · APR MMXXVI"
   static TextStyle get metaMono => GoogleFonts.ibmPlexMono(
@@ -230,6 +235,15 @@ class NotebookTypography {
     color: AppColors.paperAccent,
     letterSpacing: 0.8,
     height: 1.2,
+  );
+
+  /// 시간 민감 배너 본문 — "다음 레슨 14:00 까지 30분" (Hyen 표준 H5).
+  /// 시각 정보를 등폭으로 읽히게 해 훑을 때 시간이 먼저 잡힌다.
+  static TextStyle get bannerMono => GoogleFonts.ibmPlexMono(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+    color: AppColors.ink,
+    height: 1.3,
   );
 
   /// 템포 표기 — "♩ = 92".

@@ -4,12 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/coach_mark/coach_mark_controller.dart';
 import '../../../../core/widgets/coach_mark/coach_mark_overlay.dart';
 import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
+import '../../../../core/widgets/notebook/notebook_bottom_nav.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/onboarding_facade.dart';
 import '../../../profile/profile_facade.dart' show questFirstShownProvider;
@@ -225,77 +224,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBottomNavigation() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.paper,
-        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, 'I', AppStrings.homeTabLabel),
-              _buildNavItem(
-                1,
-                'II',
-                AppStrings.scheduleTabTitle,
-                key: _scheduleNavKey,
-              ),
-              _buildNavItem(
-                2,
-                'III',
-                AppStrings.studentsTabLabel,
-                key: _studentsNavKey,
-              ),
-              _buildNavItem(
-                3,
-                'IV',
-                AppStrings.profileTabLabel,
-                key: _settingsNavKey,
-              ),
-            ],
-          ),
+    return NotebookBottomNav(
+      currentIndex: _currentIndex,
+      onTap: (index) => setState(() => _currentIndex = index),
+      items: [
+        const NotebookBottomNavItem(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home,
+          label: AppStrings.homeTabLabel,
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, String roman, String label, {Key? key}) {
-    final isSelected = _currentIndex == index;
-    final accentColor = isSelected
-        ? AppColors.paperAccent
-        : AppColors.inkTertiary;
-
-    return InkWell(
-      key: key,
-      onTap: () => setState(() => _currentIndex = index),
-      child: SizedBox(
-        width: 72,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              roman,
-              style: NotebookTypography.romanLarge.copyWith(
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: NotebookTypography.sectionLabelSmall.copyWith(
-                color: accentColor,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+        NotebookBottomNavItem(
+          icon: Icons.calendar_month_outlined,
+          activeIcon: Icons.calendar_month,
+          label: AppStrings.scheduleTabTitle,
+          itemKey: _scheduleNavKey,
         ),
-      ),
+        NotebookBottomNavItem(
+          icon: Icons.album_outlined,
+          activeIcon: Icons.album,
+          label: AppStrings.studentsTabLabel,
+          itemKey: _studentsNavKey,
+        ),
+        NotebookBottomNavItem(
+          icon: Icons.person_outline,
+          activeIcon: Icons.person,
+          label: AppStrings.profileTabLabel,
+          itemKey: _settingsNavKey,
+        ),
+      ],
     );
   }
 }
