@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../lessons/lessons_facade.dart' hide teacherAvailabilityProvider;
 import 'lesson_action_sheet.dart';
@@ -500,18 +501,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Context line (today only)
-          if (_isToday) ...[
-            Text(
-              _getContextLine(),
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.paperAccent,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
-          ],
+          if (_isToday) ...[_buildContextLine(), const SizedBox(height: 2)],
           // Stats line
           Text(
             '${_isToday ? "오늘" : ""} ${widget.lessons.length}레슨 · $timeStr',
@@ -522,8 +512,41 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     );
   }
 
-  String _getContextLine() {
-    if (widget.lessons.isEmpty) return '오늘은 레슨이 없습니다';
+  /// H5 — 지금 진행 중이거나 다가오는 레슨이 있으면 세피아 앰버로 채워 시간이
+  /// 먼저 잡히게 한다. 레슨이 없거나 다 끝난 날은 종이 그대로 둔다 — 채울 게
+  /// 없는 줄까지 강조하면 강조가 의미를 잃는다.
+  Widget _buildContextLine() {
+    final (text, imminent) = _contextLine();
+    if (!imminent) {
+      return Text(
+        text,
+        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.amberLight,
+        border: Border.all(color: AppColors.paperTrial),
+      ),
+      child: Text(
+        text,
+        style: NotebookTypography.bannerMono,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  /// 요약 줄 문구와 "지금 챙길 레슨이 있는가" 판정.
+  (String, bool) _contextLine() {
+    if (widget.lessons.isEmpty) return ('오늘은 레슨이 없습니다', false);
 
     final nowMinutes = _now.hour * 60 + _now.minute;
     final sortedLessons = List<Lesson>.from(widget.lessons)
@@ -535,7 +558,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final end = start + lesson.duration;
       if (start <= nowMinutes && end > nowMinutes) {
         final remaining = end - nowMinutes;
-        return '진행 중: ${lesson.studentName} · ${lesson.instrument} · $remaining분 남음';
+        return (
+          '진행 중: ${lesson.studentName} · ${lesson.instrument} · $remaining분 남음',
+          true,
+        );
       }
     }
 
@@ -545,14 +571,20 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       if (start > nowMinutes) {
         final until = start - nowMinutes;
         if (until <= 60) {
-          return '다음: ${lesson.studentName} · ${lesson.instrument} · $until분 후';
+          return (
+            '다음: ${lesson.studentName} · ${lesson.instrument} · $until분 후',
+            true,
+          );
         }
-        return '다음: ${lesson.studentName} · ${lesson.instrument} · ${lesson.startTime}';
+        return (
+          '다음: ${lesson.studentName} · ${lesson.instrument} · ${lesson.startTime}',
+          true,
+        );
       }
     }
 
     // All lessons done
-    return '오늘 레슨 완료';
+    return ('오늘 레슨 완료', false);
   }
 }
 
