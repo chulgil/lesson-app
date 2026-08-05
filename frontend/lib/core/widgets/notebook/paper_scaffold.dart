@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
+import 'paper_texture.dart';
 
 /// Notebook × Score 종이 스캐폴드.
 ///
-/// 크림색 종이 배경만 제공한다.
+/// 크림색 종이 배경 + 은은한 종이 결(grain)을 제공한다.
 /// 스펙: `docs/specs/design/notebook/README.md` §3
 ///
 /// 과거에는 왼쪽에 3px 붉은 여백선을 그렸으나, 모바일에서 베젤·라운드 코너에
@@ -24,6 +25,9 @@ class PaperScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(color: AppColors.paper, child: child);
+    return ColoredBox(
+      color: AppColors.paper,
+      child: PaperTexture(child: child),
+    );
   }
 }
