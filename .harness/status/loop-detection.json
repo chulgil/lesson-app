@@ -2477,10 +2477,10 @@
     },
     "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_hyen_ux_standard_0805.md": {
       "count": 1,
-      "first_seen": 1785918325,
-      "last_seen": 1785918325,
+      "first_seen": 1785919770,
+      "last_seen": 1785919770,
       "hashes": [
-        "11dc71a72a5b"
+        "c45f9aa38d2d"
       ]
     },
     "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/hyen-detail-followup/frontend/lib/core/widgets/notebook/paper_texture.dart": {
@@ -2510,5 +2510,5 @@
       ]
     }
   },
-  "updated_at": 1785918325
+  "updated_at": 1785919770
 }
