@@ -8,6 +8,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../domain/entities/cancellation_policy_hint.dart';
 import '../../domain/entities/lesson.dart';
 import 'lesson_confirmation_dialog.dart';
 
@@ -19,17 +20,29 @@ import 'lesson_confirmation_dialog.dart';
 class AttendanceConfirmationSheet extends StatefulWidget {
   final Lesson lesson;
 
-  const AttendanceConfirmationSheet({super.key, required this.lesson});
+  /// #1241 — deadline facts shown before the teacher picks a reason. The server
+  /// applies the same rule on save, so this only removes the surprise.
+  final CancellationPolicyHint? cancellationHint;
+
+  const AttendanceConfirmationSheet({
+    super.key,
+    required this.lesson,
+    this.cancellationHint,
+  });
 
   /// Show as a modal bottom sheet and return the result.
   static Future<LessonConfirmationResult?> show(
     BuildContext context, {
     required Lesson lesson,
+    CancellationPolicyHint? cancellationHint,
   }) {
     return showNotebookModalBottomSheet<LessonConfirmationResult>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => AttendanceConfirmationSheet(lesson: lesson),
+      builder: (_) => AttendanceConfirmationSheet(
+        lesson: lesson,
+        cancellationHint: cancellationHint,
+      ),
     );
   }
 
@@ -48,6 +61,37 @@ class _AttendanceConfirmationSheetState
   void dispose() {
     _noteController.dispose();
     super.dispose();
+  }
+
+  String? get _cancellationHintText {
+    final hint = widget.cancellationHint;
+    if (hint == null || !hint.enforced) return null;
+    return hint.isLateNow
+        ? AppStrings.cancelDeadlinePassedHint
+        : AppStrings.cancelDeadlineRemainingHint(hint.deadlineHours);
+  }
+
+  Widget _buildCancellationHint(String text) {
+    final isPassed = widget.cancellationHint?.isLateNow ?? false;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      color: isPassed ? AppColors.paperAccentSoft : AppColors.paperDark,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isPassed ? Icons.schedule : Icons.info_outline,
+            size: 16,
+            color: isPassed ? AppColors.paperAccent : AppColors.inkSecondary,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(text, style: AppTypography.caption),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -217,6 +261,11 @@ class _AttendanceConfirmationSheetState
           ],
         ),
         const SizedBox(height: AppSpacing.space4),
+
+        if (_cancellationHintText != null) ...[
+          _buildCancellationHint(_cancellationHintText!),
+          const SizedBox(height: AppSpacing.space3),
+        ],
 
         // Reason options
         ...LessonNonCompletionReason.values.map((reason) {

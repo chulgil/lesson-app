@@ -210,6 +210,21 @@ async def delete_lesson(
     await service.delete(lesson_id, current_user)
 
 
+@router.get(
+    "/{lesson_id}/cancellation-policy",
+    status_code=status.HTTP_200_OK,
+    summary="Cancellation deadline facts for the client hint",
+)
+async def get_lesson_cancellation_policy(
+    lesson_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> dict:
+    """#1241 — the same deadline the server judges by, so the client can warn first."""
+    service = LessonService(db)
+    return await service.cancellation_policy(lesson_id, current_user)
+
+
 @router.patch(
     "/{lesson_id}/status",
     response_model=LessonResponse,

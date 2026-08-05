@@ -1,3 +1,4 @@
+import '../entities/cancellation_policy_hint.dart';
 import '../entities/entities.dart';
 
 /// Repository interface for managing lesson data
@@ -34,6 +35,10 @@ abstract class LessonRepository {
     List<String>? keyPoints,
     String? practiceTips,
   });
+
+  /// #1241 — deadline facts for the pre-action hint. The server applies the
+  /// same rule when the status arrives, so this is advisory only.
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId);
 
   Future<void> deleteLesson(String id);
   Future<void> cancelLesson(String id);

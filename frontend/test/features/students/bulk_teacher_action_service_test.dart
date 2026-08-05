@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
+import 'package:lessonaza/features/lessons/domain/entities/cancellation_policy_hint.dart';
 import 'package:lessonaza/features/lessons/domain/repositories/lesson_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
@@ -96,6 +97,15 @@ class _FakeLessonRepository implements LessonRepository {
     updatedLessons.add(updated);
     return updated;
   }
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) async =>
+      const CancellationPolicyHint(
+        deadlineHours: 24,
+        deadlineAt: null,
+        isLateNow: false,
+        enforced: false,
+      );
 
   @override
   Future<void> deleteLesson(String id) async => _lessons.remove(id);

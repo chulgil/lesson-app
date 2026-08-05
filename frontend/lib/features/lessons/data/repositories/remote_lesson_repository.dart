@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/paginated_response.dart';
+import '../../domain/entities/cancellation_policy_hint.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/lesson_repository.dart';
 import 'lesson_update_payload.dart';
@@ -155,6 +156,14 @@ class RemoteLessonRepository implements LessonRepository {
       },
     );
     return Lesson.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) async {
+    final response = await _apiClient.get('/lessons/$lessonId/cancellation-policy');
+    return CancellationPolicyHint.fromJson(
+      response.data as Map<String, dynamic>,
+    );
   }
 
   @override

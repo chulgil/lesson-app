@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 
+import '../../domain/entities/cancellation_policy_hint.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/lesson_repository.dart';
 
@@ -929,6 +930,37 @@ class MockLessonRepository implements LessonRepository {
     );
     _lessons[index] = updated;
     return updated;
+  }
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    const hours = 24;
+    final index = _lessons.indexWhere((l) => l.id == lessonId);
+    if (index == -1) {
+      return const CancellationPolicyHint(
+        deadlineHours: hours,
+        deadlineAt: null,
+        isLateNow: false,
+        enforced: false,
+      );
+    }
+    final lesson = _lessons[index];
+    final parts = lesson.startTime.split(':');
+    final start = DateTime(
+      lesson.date.year,
+      lesson.date.month,
+      lesson.date.day,
+      int.tryParse(parts.first) ?? 0,
+      parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0,
+    );
+    final deadline = start.subtract(const Duration(hours: hours));
+    return CancellationPolicyHint(
+      deadlineHours: hours,
+      deadlineAt: deadline,
+      isLateNow: DateTime.now().isAfter(deadline),
+      enforced: true,
+    );
   }
 
   @override

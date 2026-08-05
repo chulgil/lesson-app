@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/auth/presentation/providers/user_role_provider.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
+import 'package:lessonaza/features/lessons/domain/entities/cancellation_policy_hint.dart';
 import 'package:lessonaza/features/lessons/domain/repositories/lesson_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
@@ -59,6 +60,15 @@ class _StubLessonRepository implements LessonRepository {
     List<String>? keyPoints,
     String? practiceTips,
   }) async => lesson;
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) async =>
+      const CancellationPolicyHint(
+        deadlineHours: 24,
+        deadlineAt: null,
+        isLateNow: false,
+        enforced: false,
+      );
 
   @override
   Future<void> deleteLesson(String id) async {}
