@@ -42,8 +42,16 @@ class _SpySubscriptionRepository extends MockSubscriptionRepository {
 /// updateLesson 을 no-op 으로 두어 in-memory 시드에 없는 테스트 레슨도
 /// "not found" 없이 완료되도록(양 경로 모두 lessonRepositoryProvider 사용).
 class _FakeLessonRepository extends MockLessonRepository {
+  final List<LessonStatus> statusTransitions = [];
+
   @override
   Future<Lesson> updateLesson(Lesson lesson) async => lesson;
+
+  @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    statusTransitions.add(status);
+    return lesson.copyWith(status: status);
+  }
 }
 
 class _FixedSelectedDate extends TeacherSelectedDate {
@@ -68,6 +76,10 @@ Subscription _activeSub() => Subscription(
 );
 
 void main() {
+  late _FakeLessonRepository lessonRepo;
+
+  setUp(() => lessonRepo = _FakeLessonRepository());
+
   setUpAll(() {
     Hive.init(Directory.systemTemp.createTempSync().path);
   });
@@ -99,7 +111,7 @@ void main() {
           teacherSelectedDateProvider.overrideWith(
             () => _FixedSelectedDate(day),
           ),
-          lessonRepositoryProvider.overrideWithValue(_FakeLessonRepository()),
+          lessonRepositoryProvider.overrideWithValue(lessonRepo),
           subscriptionRepositoryProvider.overrideWithValue(spy),
           activeStudentSubscriptionsProvider(
             _studentId,
@@ -140,11 +152,14 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(
+      lessonRepo.statusTransitions,
+      [LessonStatus.completed],
+      reason: '스와이프 완료는 상태 전이 엔드포인트를 정확히 1회 호출해야 한다',
+    );
+    expect(
       spy.addUsageCount,
-      1,
-      reason:
-          '수강권 레슨 완료는 출석 확인 플로우(confirmLessonCompleted)로 라우팅돼 '
-          '수강권 1회 차감(add_usage)이 발생해야 한다 (#767)',
+      0,
+      reason: '차감은 백엔드 상태 전이가 수행 — 클라이언트 중복 기록은 이중 차감 (#1237)',
     );
   });
 }

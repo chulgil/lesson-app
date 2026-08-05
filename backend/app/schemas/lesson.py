@@ -196,7 +196,15 @@ class LessonCreate(BaseModel):
 
 
 class LessonUpdate(BaseModel):
-    """Fields that can be updated on a lesson."""
+    """Fields that can be updated on a lesson.
+
+    ``extra='forbid'`` on purpose (#1238): status / feedback / key_points /
+    practice_tips have dedicated endpoints that carry side effects (deduction,
+    notifications), and silently dropping them here produced 200-OK writes that
+    never persisted. Sending an unsupported field is a client bug — fail loudly.
+    """
+
+    model_config = ConfigDict(extra="forbid")
 
     instrument: str | None = None
     date: _dt.date | None = None

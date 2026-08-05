@@ -73,6 +73,31 @@ class _FakeLessonRepository implements LessonRepository {
   }
 
   @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    final updated = lesson.copyWith(status: status);
+    _lessons[lesson.id] = updated;
+    updatedLessons.add(updated);
+    return updated;
+  }
+
+  @override
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) async {
+    final updated = lesson.copyWith(
+      feedback: feedback ?? lesson.feedback,
+      keyPoints: keyPoints ?? lesson.keyPoints,
+      practiceTips: practiceTips ?? lesson.practiceTips,
+    );
+    _lessons[lesson.id] = updated;
+    updatedLessons.add(updated);
+    return updated;
+  }
+
+  @override
   Future<void> deleteLesson(String id) async => _lessons.remove(id);
 
   @override

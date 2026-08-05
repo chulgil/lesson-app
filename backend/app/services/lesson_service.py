@@ -689,6 +689,11 @@ class LessonService:
             lesson.feedback = data.feedback
         if data.practice_tips is not None:
             lesson.practice_tips = data.practice_tips
+        # key_points was accepted by the schema but never written (#1236) — the
+        # note UI's "핵심 포인트" silently vanished. An explicitly sent empty
+        # list means "clear all", so only an omitted field leaves it untouched.
+        if "key_points" in data.model_fields_set:
+            lesson.key_points = data.key_points
 
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstNote")
 

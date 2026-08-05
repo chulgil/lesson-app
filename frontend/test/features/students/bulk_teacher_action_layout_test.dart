@@ -49,6 +49,18 @@ class _StubLessonRepository implements LessonRepository {
   Future<Lesson> updateLesson(Lesson lesson) async => lesson;
 
   @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async =>
+      lesson.copyWith(status: status);
+
+  @override
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) async => lesson;
+
+  @override
   Future<void> deleteLesson(String id) async {}
 
   @override

@@ -83,7 +83,7 @@ void showLessonActionSheet({
                       label: AppStrings.scheduleMarkComplete,
                       onTap: () {
                         Navigator.of(ctx).pop();
-                        _completeLesson(context, ref, lesson);
+                        completeLessonFromActionSheet(context, ref, lesson);
                       },
                     ),
                     // Manual lesson → edit
@@ -162,14 +162,17 @@ void showLessonActionSheet({
   );
 }
 
-Future<void> _completeLesson(
+/// #1237 — exported for the regression test: this is the grid/timeline entry
+/// point where the status transition used to be silently dropped.
+Future<void> completeLessonFromActionSheet(
   BuildContext context,
   WidgetRef ref,
   Lesson lesson,
 ) async {
   try {
-    final updated = lesson.copyWith(status: LessonStatus.completed);
-    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
+    await ref
+        .read(lessonsNotifierProvider.notifier)
+        .updateLessonStatus(lesson, LessonStatus.completed);
   } catch (e) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

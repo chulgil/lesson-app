@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/sync/application/mutation_queue_helper.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/lesson_repository.dart';
+import 'lesson_update_payload.dart';
 import 'remote_lesson_repository.dart';
 
 /// Decorator that wraps [RemoteLessonRepository] with offline **write-queue**
@@ -86,10 +87,63 @@ class SyncAwareLessonRepository implements LessonRepository {
           domain: 'lesson',
           httpMethod: 'PUT',
           path: '/lessons/${lesson.id}',
-          payload: lesson.toJson(),
+          // Whitelist payload — the queued body must match what the backend
+          // accepts (#1238), otherwise the replay 422s once connectivity is back.
+          payload: lessonScheduleUpdatePayload(lesson),
           clientUpdatedAt: DateTime.now().toUtc(),
         ),
     optimisticResult: () => lesson,
+  );
+
+  @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) =>
+      _queue.executeMutation(
+        remoteCall: () => _remote.updateLessonStatus(lesson, status),
+        queueCall:
+            (syncService, idempotencyKey) => syncService.queueMutation(
+              idempotencyKey: idempotencyKey,
+              domain: 'lesson',
+              httpMethod: 'PATCH',
+              path: '/lessons/${lesson.id}/status',
+              payload: {'status': status.name},
+              clientUpdatedAt: DateTime.now().toUtc(),
+            ),
+        // Server-side effects (deduction, notifications) land on replay; the
+        // offline value only flips the status so the list stops lying.
+        optimisticResult: () => lesson.copyWith(status: status),
+      );
+
+  @override
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) => _queue.executeMutation(
+    remoteCall: () => _remote.updateLessonFeedback(
+      lesson,
+      feedback: feedback,
+      keyPoints: keyPoints,
+      practiceTips: practiceTips,
+    ),
+    queueCall:
+        (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
+          domain: 'lesson',
+          httpMethod: 'PUT',
+          path: '/lessons/${lesson.id}/feedback',
+          payload: {
+            if (feedback != null) 'feedback': feedback,
+            if (keyPoints != null) 'key_points': keyPoints,
+            if (practiceTips != null) 'practice_tips': practiceTips,
+          },
+          clientUpdatedAt: DateTime.now().toUtc(),
+        ),
+    optimisticResult: () => lesson.copyWith(
+      feedback: feedback ?? lesson.feedback,
+      keyPoints: keyPoints ?? lesson.keyPoints,
+      practiceTips: practiceTips ?? lesson.practiceTips,
+    ),
   );
 
   @override

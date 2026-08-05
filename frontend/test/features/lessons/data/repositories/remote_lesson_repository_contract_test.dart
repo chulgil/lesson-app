@@ -14,6 +14,7 @@ import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
 void main() {
   late Map<String, dynamic>? capturedBody;
   late String? capturedPath;
+  late String? capturedMethod;
   late RemoteLessonRepository repo;
 
   Lesson testLesson({String? subscriptionId}) {
@@ -34,11 +35,13 @@ void main() {
   setUp(() {
     capturedBody = null;
     capturedPath = null;
+    capturedMethod = null;
     final dio = Dio(BaseOptions(baseUrl: 'https://contract.test/api/v1'));
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
           capturedPath = options.path;
+          capturedMethod = options.method;
           capturedBody = Map<String, dynamic>.from(options.data as Map);
           handler.resolve(
             Response(
@@ -80,4 +83,54 @@ void main() {
       expect(capturedBody!.containsKey('overflow_mode'), isFalse);
     },
   );
+
+  test('updateLesson sends ONLY the LessonUpdate whitelist (#1238)', () async {
+    await repo.updateLesson(
+      testLesson(subscriptionId: 'sub-1').copyWith(
+        feedback: '노트',
+        keyPoints: const ['보잉'],
+        practiceTips: '스케일',
+      ),
+    );
+
+    expect(capturedPath, '/lessons/lesson-1');
+    expect(capturedBody!.keys.toSet(), {
+      'instrument',
+      'date',
+      'start_time',
+      'duration',
+      'pieces',
+    });
+    // Sending these here used to 200-OK and silently drop them.
+    for (final dropped in ['status', 'feedback', 'key_points', 'practice_tips']) {
+      expect(capturedBody!.containsKey(dropped), isFalse, reason: dropped);
+    }
+  });
+
+  test('updateLessonStatus hits the dedicated PATCH endpoint (#1237)', () async {
+    await repo.updateLessonStatus(testLesson(), LessonStatus.completed);
+
+    expect(capturedMethod, 'PATCH');
+    expect(capturedPath, '/lessons/lesson-1/status');
+    expect(capturedBody, {'status': 'completed'});
+  });
+
+  test('updateLessonFeedback hits the feedback endpoint, omits untouched fields (#1236)',
+      () async {
+    await repo.updateLessonFeedback(
+      testLesson(),
+      feedback: '활 사용이 좋았어요',
+      keyPoints: const ['보잉', '음정'],
+    );
+
+    expect(capturedMethod, 'PUT');
+    expect(capturedPath, '/lessons/lesson-1/feedback');
+    expect(capturedBody!['feedback'], '활 사용이 좋았어요');
+    expect(capturedBody!['key_points'], ['보잉', '음정']);
+    expect(
+      capturedBody!.containsKey('practice_tips'),
+      isFalse,
+      reason: 'omitted argument must leave the field untouched server-side',
+    );
+  });
 }
