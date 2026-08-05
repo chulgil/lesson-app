@@ -133,13 +133,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
       final lesson = ref.read(lessonProvider(widget.lessonId)).valueOrNull;
       if (lesson != null) {
         final trimmed = _pendingFeedbackText!.trim();
-        final updatedLesson = lesson.copyWith(
-          feedback: trimmed.isEmpty ? null : trimmed,
-        );
         try {
           await ref
               .read(lessonsNotifierProvider.notifier)
-              .updateLesson(updatedLesson);
+              .updateLessonFeedback(lesson, feedback: trimmed);
         } catch (_) {
           // Silent fail on exit — data already in debounce
         }
@@ -509,11 +506,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
     final currentPoints = List<String>.from(lesson.keyPoints ?? []);
     currentPoints.add(content);
 
-    final updatedLesson = lesson.copyWith(keyPoints: currentPoints);
     try {
       await ref
           .read(lessonsNotifierProvider.notifier)
-          .updateLesson(updatedLesson);
+          .updateLessonFeedback(lesson, keyPoints: currentPoints);
 
       if (mounted) {
         ScaffoldMessenger.of(
@@ -538,13 +534,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
 
     currentPoints.removeAt(index);
 
-    final updatedLesson = lesson.copyWith(
-      keyPoints: currentPoints.isEmpty ? null : currentPoints,
-    );
     try {
       await ref
           .read(lessonsNotifierProvider.notifier)
-          .updateLesson(updatedLesson);
+          .updateLessonFeedback(lesson, keyPoints: currentPoints);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -562,13 +555,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
     _pendingFeedbackText = text;
     _feedbackDebounce = Timer(const Duration(milliseconds: 800), () async {
       final trimmed = text.trim();
-      final updatedLesson = lesson.copyWith(
-        feedback: trimmed.isEmpty ? null : trimmed,
-      );
       try {
         await ref
             .read(lessonsNotifierProvider.notifier)
-            .updateLesson(updatedLesson);
+            .updateLessonFeedback(lesson, feedback: trimmed);
         _pendingFeedbackText = null;
       } catch (e) {
         if (mounted) {
@@ -604,12 +594,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
   }
 
   Future<void> _setPracticeTip(Lesson lesson, String? content) async {
-    final updatedLesson = lesson.copyWith(
-      practiceTips: content?.isEmpty == true ? null : content,
-    );
     await ref
         .read(lessonsNotifierProvider.notifier)
-        .updateLesson(updatedLesson);
+        .updateLessonFeedback(lesson, practiceTips: content ?? '');
 
     if (mounted && content != null && content.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

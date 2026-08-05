@@ -100,6 +100,49 @@ class LessonsNotifier extends _$LessonsNotifier {
     }
   }
 
+  /// #1237 — status transitions go through the dedicated endpoint so the
+  /// server-side deduction and counterparty notifications actually run.
+  /// The old `updateLesson(copyWith(status:))` route was silently dropped.
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateLessonStatus(lesson, status);
+      state = await AsyncValue.guard(() => _repository.getLessons());
+      ref.invalidate(lessonsProvider);
+      ref.invalidate(lessonProvider(lesson.id));
+      return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// #1236 — lesson note writes go through the feedback endpoint; the entity
+  /// PUT never persisted them.
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateLessonFeedback(
+        lesson,
+        feedback: feedback,
+        keyPoints: keyPoints,
+        practiceTips: practiceTips,
+      );
+      state = await AsyncValue.guard(() => _repository.getLessons());
+      ref.invalidate(lessonsProvider);
+      ref.invalidate(lessonProvider(lesson.id));
+      return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   Future<void> deleteLesson(String id) async {
     state = const AsyncValue.loading();
     try {

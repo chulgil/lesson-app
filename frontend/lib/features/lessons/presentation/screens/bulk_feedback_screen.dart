@@ -500,8 +500,7 @@ color: AppColors.ink,
                 ? '$commonFeedback\n\n$perStudent'
                 : commonFeedback;
 
-        final updated = lesson.copyWith(feedback: fullFeedback);
-        await notifier.updateLesson(updated);
+        await notifier.updateLessonFeedback(lesson, feedback: fullFeedback);
       }
 
       if (mounted) {

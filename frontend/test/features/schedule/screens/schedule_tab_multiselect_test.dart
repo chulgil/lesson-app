@@ -35,8 +35,16 @@ class _SpySubscriptionRepository extends MockSubscriptionRepository {
 }
 
 class _FakeLessonRepository extends MockLessonRepository {
+  final List<LessonStatus> statusTransitions = [];
+
   @override
   Future<Lesson> updateLesson(Lesson lesson) async => lesson;
+
+  @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    statusTransitions.add(status);
+    return lesson.copyWith(status: status);
+  }
   @override
   Future<List<Lesson>> getLessons() async => const [];
 }
@@ -63,6 +71,10 @@ Subscription _activeSub() => Subscription(
 );
 
 void main() {
+  late _FakeLessonRepository lessonRepo;
+
+  setUp(() => lessonRepo = _FakeLessonRepository());
+
   setUpAll(() {
     Hive.init(Directory.systemTemp.createTempSync().path);
   });
@@ -91,7 +103,7 @@ void main() {
       overrides: [
         lessonsProvider.overrideWith((ref) async => dayLessons()),
         teacherSelectedDateProvider.overrideWith(() => _FixedSelectedDate(day)),
-        lessonRepositoryProvider.overrideWithValue(_FakeLessonRepository()),
+        lessonRepositoryProvider.overrideWithValue(lessonRepo),
         subscriptionRepositoryProvider.overrideWithValue(spy),
         activeStudentSubscriptionsProvider(
           _studentId,
@@ -141,7 +153,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(spy.addUsageCount, 2, reason: '선택한 2건이 각 1회씩 정확히 2회 차감돼야 한다');
+    expect(
+      lessonRepo.statusTransitions,
+      List.filled(2, LessonStatus.completed),
+      reason: '선택한 2건이 각 1회씩 정확히 2회 상태 전이돼야 한다',
+    );
+    expect(
+      spy.addUsageCount,
+      0,
+      reason: '차감은 백엔드 상태 전이가 수행 (#1237)',
+    );
     // 처리 후 선택 모드 종료(액션바 사라짐).
     expect(find.text(AppStrings.selectAllAction), findsNothing);
   });

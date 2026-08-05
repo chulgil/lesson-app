@@ -67,10 +67,9 @@ Future<void> markDayOff(
   if (confirmed != true || !context.mounted) return;
 
   try {
-    final updatedLesson = lesson.copyWith(
-      status: LessonStatus.cancelledByTeacher,
-    );
-    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    await ref
+        .read(lessonsNotifierProvider.notifier)
+        .updateLessonStatus(lesson, LessonStatus.cancelledByTeacher);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(AppStrings.attendanceDayOffSnack)),

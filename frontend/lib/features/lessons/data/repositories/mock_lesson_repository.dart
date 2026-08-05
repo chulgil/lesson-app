@@ -894,6 +894,44 @@ class MockLessonRepository implements LessonRepository {
   }
 
   @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _lessons.indexWhere((l) => l.id == lesson.id);
+    if (index == -1) {
+      throw Exception('Lesson not found');
+    }
+    final updated = _lessons[index].copyWith(
+      status: status,
+      updatedAt: DateTime.now(),
+    );
+    _lessons[index] = updated;
+    return updated;
+  }
+
+  @override
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _lessons.indexWhere((l) => l.id == lesson.id);
+    if (index == -1) {
+      throw Exception('Lesson not found');
+    }
+    final current = _lessons[index];
+    final updated = current.copyWith(
+      feedback: feedback ?? current.feedback,
+      keyPoints: keyPoints ?? current.keyPoints,
+      practiceTips: practiceTips ?? current.practiceTips,
+      updatedAt: DateTime.now(),
+    );
+    _lessons[index] = updated;
+    return updated;
+  }
+
+  @override
   Future<void> deleteLesson(String id) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _lessons.removeWhere((l) => l.id == id);

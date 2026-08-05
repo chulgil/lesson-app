@@ -73,8 +73,9 @@ Future<void> batchMarkDayOff(
   var success = 0;
   for (final lesson in lessons) {
     try {
-      await notifier.updateLesson(
-        lesson.copyWith(status: LessonStatus.cancelledByTeacher),
+      await notifier.updateLessonStatus(
+        lesson,
+        LessonStatus.cancelledByTeacher,
       );
       success++;
     } catch (_) {
