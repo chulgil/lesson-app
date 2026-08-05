@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../domain/entities/lesson.dart';
 import 'attendance_action_card.dart';
@@ -57,13 +58,20 @@ class AttendanceSection extends ConsumerWidget {
     }
 
     if (lesson.status != LessonStatus.scheduled) {
+      // #1240 — 되돌리기 진입점. 이게 없으면 완료 오탭이 영구 확정되고
+      // 차감된 회차를 앱 안에서 복구할 방법이 없다.
       return Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: AttendanceDeductionResultChip(
-            deducted: lesson.status.isDeducted,
-          ),
+        child: Row(
+          children: [
+            AttendanceDeductionResultChip(deducted: lesson.status.isDeducted),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: () => revertAttendance(context, ref, lesson),
+              icon: const Icon(Icons.undo, size: 16),
+              label: const Text(AppStrings.attendanceRevertAction),
+            ),
+          ],
         ),
       );
     }

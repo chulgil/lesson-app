@@ -27,6 +27,10 @@ from app.schemas.lesson import (
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 # #1167 — default body when a teacher grants no custom compensation message.
+# Statuses whose entry consumes one subscription session (#1240). Leaving any
+# of them for a non-deducting status gives the session back.
+_DEDUCTING_STATUSES = frozenset({"completed", "noShow", "cancelledByStudentLate"})
+
 _DEFAULT_COMPENSATION_MESSAGE = "지각 취소로 다음 레슨에 보너스 연습시간을 제공해 드립니다."
 
 
@@ -555,6 +559,9 @@ class LessonService:
         from app.models.request_event import RequestEvent, RequestEventType
 
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        # #1240 — captured before the overwrite so a deducting -> non-deducting
+        # transition can release the session the old status consumed.
+        previous_status = getattr(lesson.status, "value", lesson.status)
         try:
             lesson.status = LessonStatus(new_status)
         except ValueError:
@@ -616,7 +623,12 @@ class LessonService:
         # auto completion both deduct one session.
         if new_status == LessonStatus.completed.value:
             await self._deduct_if_completed(lesson)
-        elif new_status in (LessonStatus.noShow.value, LessonStatus.cancelledByStudentLate.value):
+        elif previous_status in _DEDUCTING_STATUSES and new_status not in _DEDUCTING_STATUSES:
+            # #1240 — the teacher is undoing a mis-tap (완료/노쇼 -> 예정·휴강).
+            # Deduction used to be increment-only, so the student lost a session
+            # permanently with no recovery path anywhere in the product.
+            await self._release_deduction(lesson)
+        if new_status in (LessonStatus.noShow.value, LessonStatus.cancelledByStudentLate.value):
             # LessonPolicy.no_show_deducts_lesson / late_cancel_deducts_lesson: the
             # cancellation/no-show itself is never blocked, but a configured penalty
             # deducts a session. No LessonPolicy row for the teacher -> no deduction
@@ -624,6 +636,23 @@ class LessonService:
             await self._deduct_if_policy_penalty(lesson, new_status)
 
         return LessonResponse.model_validate(lesson)
+
+    async def _release_deduction(self, lesson: Any) -> None:
+        """Give back the session this lesson consumed (#1240).
+
+        Only the rows this lesson created are removed, so sibling lessons on the
+        same subscription keep their deductions. ``first_lesson_consumed_at`` is
+        left alone on purpose — undoing a mis-tap must not re-open the payment
+        confirmation Undo that #426 deliberately closed.
+        """
+        if not lesson.subscription_id:
+            return
+        from app.services.subscription_service import SubscriptionService
+
+        await SubscriptionService(self.db).release_lesson_usage(
+            lesson_id=lesson.id,
+            subscription_id=lesson.subscription_id,
+        )
 
     async def _deduct_if_policy_penalty(self, lesson: Any, new_status: str) -> None:
         """Deduct one subscription session for a no-show/late-cancel penalty.

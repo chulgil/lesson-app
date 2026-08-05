@@ -9744,6 +9744,23 @@ class AppStrings {
   /// 처리 실패 스낵바.
   static const attendanceActionFailed = '처리에 실패했습니다. 다시 시도해주세요.';
 
+  /// 출결 처리 되돌리기 액션 (#1240).
+  static const attendanceRevertAction = '되돌리기';
+
+  /// 되돌리기 다이얼로그 제목.
+  static const attendanceRevertDialogTitle = '출결 처리 되돌리기';
+
+  /// 되돌리기 다이얼로그 본문 — 차감 복구 고지.
+  static const attendanceRevertDialogMessage =
+      '이 레슨을 예정 상태로 되돌리시겠습니까?\n차감된 수강권 1회가 복구됩니다.';
+
+  /// 되돌리기 다이얼로그 본문 — 차감이 없던 경우.
+  static const attendanceRevertDialogMessageNoDeduction =
+      '이 레슨을 예정 상태로 되돌리시겠습니까?';
+
+  /// 되돌리기 완료 스낵바.
+  static const attendanceRevertedSnack = '예정 상태로 되돌렸습니다';
+
   // 다중선택 일괄 처리 (#768 ①).
   /// 일괄 완료 확인 다이얼로그 제목.
   static const batchCompleteDialogTitle = '선택한 레슨 완료';
