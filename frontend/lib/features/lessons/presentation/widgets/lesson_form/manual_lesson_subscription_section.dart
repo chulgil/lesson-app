@@ -145,11 +145,14 @@ class _ResolvedBanner extends StatelessWidget {
                 if (showChange)
                   GestureDetector(
                     onTap: onChange,
+                    // H6 — 값 옆의 글자 액션이라 밑줄로 눌림을 표시한다.
                     child: Text(
                       AppStrings.manualLessonChangeSubscription,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.paperAccent,
                         fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.paperAccent,
                       ),
                     ),
                   ),

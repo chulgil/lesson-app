@@ -52,11 +52,14 @@ class TeacherMakeupCreditSection extends ConsumerWidget {
                   size: AppSpacing.iconXS,
                   color: AppColors.ink,
                 ),
+                // H6 — 텍스트가 affordance 를 지는 이동 액션이므로 밑줄.
                 label: Text(
                   AppStrings.viewAll,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.ink,
                     fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.ink,
                   ),
                 ),
                 style: TextButton.styleFrom(

@@ -378,11 +378,14 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
         const SizedBox(height: AppSpacing.space1),
         GestureDetector(
           onTap: widget.onIssueNewSubscription,
+          // H6 — 버튼 없이 글자만 눌리는 링크라 밑줄로 affordance 를 준다.
           child: Text(
             '${AppStrings.issueNewSubscription} →',
             style: AppTypography.caption.copyWith(
               color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+              decorationColor: AppColors.paperAccent,
             ),
           ),
         ),

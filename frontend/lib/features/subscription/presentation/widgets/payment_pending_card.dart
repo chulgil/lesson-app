@@ -37,9 +37,11 @@ class PaymentPendingCard extends ConsumerWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
         padding: const EdgeInsets.all(AppSpacing.space4),
+        // H4 — 처리하면 사라지는 일시적 알림. 종이 위에서 먼저 걸리도록
+        // 강조 채움 + 강조 테두리로 다른 상시 카드와 구분한다.
         decoration: BoxDecoration(
-          color: AppColors.paperDark,
-          border: Border.all(color: AppColors.inkQuaternary),
+          color: AppColors.paperAccentSoft,
+          border: Border.all(color: AppColors.paperAccent),
         ),
         child: Row(
           children: [
