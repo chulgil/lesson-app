@@ -240,8 +240,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           itemKey: _scheduleNavKey,
         ),
         NotebookBottomNavItem(
-          icon: Icons.album_outlined,
-          activeIcon: Icons.album,
+          icon: Icons.library_music_outlined,
+          activeIcon: Icons.library_music,
           label: AppStrings.studentsTabLabel,
           itemKey: _studentsNavKey,
         ),
