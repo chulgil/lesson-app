@@ -3309,6 +3309,9 @@ class AppStrings {
   /// 녹음을 시작할 수 없습니다 (cannot start recording)
   static const cannotStartRecording = '녹음을 시작할 수 없습니다';
 
+  /// 미리듣기 재생 실패 안내 (#1243).
+  static const cannotPlayRecording = '재생할 수 없는 파일입니다';
+
   /// 마이크 권한이 필요합니다 (microphone permission needed)
   static const micPermissionNeeded = '마이크 권한이 필요합니다';
 

@@ -305,7 +305,9 @@ class LessonBooking {
 
   /// Get selected option
   ScheduleOption? get selectedOption {
-    if (selectedOptionId == null || scheduleOptions == null) return null;
+    // isEmpty guard mirrors primaryOption — the orElse below does `.first`,
+    // which throws StateError on an empty (non-null) option list (#1243).
+    if (selectedOptionId == null || !hasScheduleOptions) return null;
     return scheduleOptions!.firstWhere(
       (opt) => opt.id == selectedOptionId,
       orElse: () => scheduleOptions!.first,

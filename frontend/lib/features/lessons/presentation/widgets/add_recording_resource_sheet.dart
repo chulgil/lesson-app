@@ -228,7 +228,13 @@ class _AddRecordingResourceSheetState
       await _player.setFilePath(_selectedFilePath!);
       await _player.play();
     } catch (_) {
-      // Ignore playback errors
+      // #1243 — silently swallowing this made the play button look broken
+      // (손상 파일·미지원 코덱·세션 점유). 형제 실패 경로와 동일하게 안내한다.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.cannotPlayRecording)),
+        );
+      }
     }
   }
 
