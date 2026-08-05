@@ -105,9 +105,12 @@ class LessonRequestSection extends ConsumerWidget {
                   ),
                   child: Text(
                     AppStrings.moreRequests(requests.length - 3),
+                    // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.ink,
                       fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.ink,
                     ),
                   ),
                 ),

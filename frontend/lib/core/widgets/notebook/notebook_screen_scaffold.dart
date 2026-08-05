@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
 import '../../theme/notebook_typography.dart';
+import 'paper_texture.dart';
 
 /// Notebook x Score default screen scaffold.
 ///
@@ -66,10 +67,15 @@ class NotebookScreenScaffold extends StatelessWidget {
             )
             : null);
 
+    // Paper grain only belongs on the paper background (Hyen H1); screens that
+    // override it (camera scanner, paperDark) keep their own surface.
+    final effectiveBody =
+        backgroundColor == AppColors.paper ? PaperTexture(child: body) : body;
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: effectiveAppBar,
-      body: body,
+      body: effectiveBody,
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
