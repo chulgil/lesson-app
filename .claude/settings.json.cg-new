@@ -1,0 +1,195 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "permissions": {
+        "allow": [
+            "Bash(git:*)",
+            "Bash(grep:*)",
+            "Bash(find:*)",
+            "Bash(ls:*)",
+            "Bash(tree:*)",
+            "Bash(wc:*)"
+        ]
+    },
+    "hooks": {
+        "SessionStart": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/session-start.py\"",
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/keyword-detector.py\"",
+                        "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/signal-capture.py\"",
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/bash-guard.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "[ ! -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\" ] || python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\"",
+                        "timeout": 3
+                    }
+                ]
+            },
+            {
+                "matcher": "AskUserQuestion",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "[ ! -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\" ] || python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\"",
+                        "timeout": 3
+                    }
+                ]
+            },
+            {
+                "matcher": "Edit|Write|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "[ ! -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\" ] || python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\"",
+                        "timeout": 3
+                    }
+                ]
+            },
+            {
+                "matcher": "mcp__.*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "[ ! -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\" ] || python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/unattended-guard.py\"",
+                        "timeout": 3
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/drift-monitor.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/loop-detection.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "[ ! -f \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/i18n-l10n-guard.py\" ] || python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/i18n-l10n-guard.py\"",
+                        "timeout": 3
+                    },
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/check-spec-claim.sh\"",
+                        "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/check-version-leftover.sh\"",
+                        "timeout": 5
+                    },
+                    {
+                        "type": "command",
+                        "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/check-lore-inline.sh\"",
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/stop-journal-reminder.py\"",
+                        "timeout": 3
+                    }
+                ]
+            }
+        ],
+        "PreCompact": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/precompact-snapshot.py\"",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/session-end-snapshot.py\"",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "SubagentStop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/subagent-stop-log.py\"",
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
+        "Notification": [
+            {
+                "matcher": "permission_prompt|idle_prompt|agent_needs_input|agent_completed",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/notification-relay.py\"",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "TaskCompleted": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/task-completed-journal.py\"",
+                        "timeout": 3
+                    }
+                ]
+            }
+        ]
+    }
+}

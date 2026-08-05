@@ -139,7 +139,7 @@ color: blue
 
 ## Related Skills
 
-- code-review, coding-standards, frontend-code-review
+- code-review, coding-standards, frontend-code-review(frontend 구성 설치 시)
 
 ## Memory Recording (Required)
 

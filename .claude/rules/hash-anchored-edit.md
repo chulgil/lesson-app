@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Hash-Anchored Edit — xxhash 기반 정밀 편집
 
 > autopus `auto hash` 패턴 흡수 (2026-04-23).

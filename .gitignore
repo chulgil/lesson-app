@@ -169,3 +169,7 @@ _bmad-output/
 
 # Compiled hook bytecode
 .claude/hooks/scripts/__pycache__/
+
+# cg 도구 로컬 스테이징 (머신 로컬 — 공유 금지, 보안 스캐너 가짜양성 원인)
+.cg/baseline-objects/
+.cg/patches/

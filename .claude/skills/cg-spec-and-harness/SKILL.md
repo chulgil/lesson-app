@@ -17,6 +17,7 @@ description: Phase 2 — 인터뷰를 공식 스펙으로 변환하고, 이 feat
 ## 출력
 
 - `.harness/spec/{YYYY-MM-DD}-{feature-slug}.md`
+- `.harness/evals/{feature-slug}.toml` — §2 성공 기준 중 기계 검증 가능한 항목의 회귀 eval
 - 필요 시 `harness/current.md` 업데이트 (예: 새 테스트 프레임워크 도입)
 
 ## 스펙 템플릿
@@ -69,6 +70,18 @@ description: Phase 2 — 인터뷰를 공식 스펙으로 변환하고, 이 feat
 ## 9. 범위 외
 - ...
 ```
+
+## 회귀 eval 내리기 (성공 기준 → 기계 검증 자산)
+
+스펙 확정 시 **§2 성공 기준 중 기계 검증 가능한 항목**(이진/숫자로 판정되는 것)을
+`.harness/evals/{feature-slug}.toml` 로 내립니다 — `_template.toml` 을 복사해
+`[[case]]` = `cmd`/`expect_exit`/`expect_contains` 로 작성. 수용 기준이 문서로
+끝나지 않고 `cg diagnose --gate eval` 로 **전체 기능 회귀를 재실행 가능한 자산**이
+되며, Phase 6 (cg-evaluation) Stage 1 의 입력이 됩니다.
+상세: [.harness/evals/README.md](../../../.harness/evals/README.md).
+
+- 기계 검증 불가능한 기준(예: "직관적인 UX")만 남는다면 §2 를 측정 가능하게 재작성
+- eval 케이스는 검증자산 — 이후 phase 에서 FAIL 을 통과시키려 완화·삭제 금지
 
 ## 품질 계약 체크
 

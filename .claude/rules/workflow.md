@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Workflow Rules
 
 > 이 규칙은 `CLAUDE.md` 가 참조하며, 워크플로우 기준으로 적용됩니다.

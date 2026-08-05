@@ -17,6 +17,7 @@ description: Phase 1 — 새 feature 에 대해 사용자를 인터뷰하여 요
 ## 출력
 
 - `.harness/interview/{YYYY-MM-DD}-{feature-slug}.md`
+- `.harness/spec/constitution.md` — 프로젝트 불변원칙 (생성 또는 갱신, 아래 §Constitution 추출)
 
 ## 인터뷰 템플릿
 
@@ -69,6 +70,31 @@ description: Phase 1 — 새 feature 에 대해 사용자를 인터뷰하여 요
 3. **추정 대신 확인**: "사용자가 이걸 원할 것 같다" → "확인해주세요: ..."
 4. 기술 용어가 등장하면 `mcp__context7__` 로 공식 문서 확인 (인터뷰에 신뢰도 기록)
 
+## Constitution 추출 — 프로젝트 불변원칙
+
+> spec-kit 의 Constitution Check 패턴 흡수: 인터뷰에서 드러난 **절대 제약**을
+> `.harness/spec/constitution.md` 로 성문화한다. cg-plan-check(Phase 4.5)가 이
+> 파일을 MUST 게이트로 사용해, 위반 계획을 실행 전에 차단한다.
+
+인터뷰 마무리 단계에서 답변 중 "항상 / 절대 / 금지" 급의 제약을 골라낸다:
+
+| 카테고리 | 예 |
+|---------|-----|
+| 보안 | "결제 토큰은 클라이언트에 저장 금지" |
+| 아키텍처 | "domain 은 presentation 을 의존하지 않는다" |
+| 데이터 | "회원 테이블 스키마 변경은 마이그레이션 필수" |
+| 범위 | "이번 분기는 iOS 만 지원" |
+
+작성 규칙:
+
+1. **MUST 5~9개 청킹** (Miller's Law, 7±2) — 이번 feature 한정 제약이 아니라
+   프로젝트 전체 불변원칙만. 10개째가 필요하면 기존 항목과 병합/일반화.
+2. 각 항목은 **검증 가능한 한 문장 + 근거** — "보안을 잘 지킨다" 같은 모호한
+   선언 금지. 포맷은 constitution.md 의 표(원칙/근거/검증 방법)를 따른다.
+3. constitution.md 가 이미 있으면 **갱신(개정)** — append 로 늘리지 않는다.
+   변경 diff 를 사용자에게 보여주고 **사람 확인 후** 반영.
+4. feature 한정 제약은 constitution 이 아니라 Phase 2 spec 의 제약 조건 섹션으로.
+
 ## Ambiguity Score (수치 게이트)
 
 > ouroboros 의 Socratic Clarity 패턴 흡수: 모호함을 **수치화** 해 Phase 2 진입 가능 여부를 결정.
@@ -105,4 +131,5 @@ Ambiguity Score: 0.15 / 1.0 [PASS]
 ## 완료 조건
 
 - **Ambiguity Score ≤ 0.20**
+- 새 불변원칙이 드러났으면 `.harness/spec/constitution.md` 생성/갱신 (사람 확인 완료)
 - 사용자 명시적 승인

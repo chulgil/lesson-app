@@ -46,11 +46,11 @@ cg companion doctor
 | knot (cg 평문 vault) | **영속** 지식 그물 | git 추적되는 `.md` 페이지 |
 | Understand-Anything | **일회성** 코드 그래프 | 세션 내 시각화·질의 |
 
-knot 은 의사결정·도메인 지식을 평문 md 로 **영속** 보존한다. Understand-Anything
-은 현재 코드 구조를 **일회성**으로 그래프화한다. 코드 구조 파악은 understand 로,
-보존 가치가 있는 결론은 knot note 로 옮겨 남긴다.
+knot 구성도 설치되어 있다면 — knot 은 의사결정·도메인 지식을 평문 md 로 **영속**
+보존한다. Understand-Anything 은 현재 코드 구조를 **일회성**으로 그래프화한다.
+코드 구조 파악은 understand 로, 보존 가치가 있는 결론은 knot note 로 옮겨 남긴다.
 
 ## 주의
 
 - cg 코어 기능(스펙·드리프트·mechanical 게이트)은 이 도구 없이도 전부 동작한다.
-- 그래프는 휘발성이므로, 재사용할 통찰은 반드시 knot 또는 spec 으로 옮길 것.
+- 그래프는 휘발성이므로, 재사용할 통찰은 반드시 spec 또는 (knot 구성 설치 시) knot 으로 옮길 것.

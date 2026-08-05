@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Security Guidelines
 
 ## Mandatory Security Checks

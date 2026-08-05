@@ -1,0 +1,97 @@
+{
+  "files": {
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/frontend/lib/features/schedule/domain/entities/group_class.dart": {
+      "count": 2,
+      "first_seen": 1785478387,
+      "last_seen": 1785478399,
+      "hashes": [
+        "652dd131f76d",
+        "88adc913b353"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/frontend/lib/features/schedule/presentation/extensions/no_show_policy_visuals.dart": {
+      "count": 1,
+      "first_seen": 1785478407,
+      "last_seen": 1785478407,
+      "hashes": [
+        "129d474db13b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1785478425,
+      "last_seen": 1785478425,
+      "hashes": [
+        "810bf82783b9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/frontend/lib/features/schedule/presentation/screens/group_class_detail_screen.dart": {
+      "count": 1,
+      "first_seen": 1785478427,
+      "last_seen": 1785478427,
+      "hashes": [
+        "18cadf778acc"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/app/models/subscription.py": {
+      "count": 3,
+      "first_seen": 1785478475,
+      "last_seen": 1785478497,
+      "hashes": [
+        "32aec2b63386",
+        "f18291622401",
+        "e78fd99d3ab9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/app/schemas/subscription.py": {
+      "count": 5,
+      "first_seen": 1785478583,
+      "last_seen": 1785478608,
+      "hashes": [
+        "42f04f219439",
+        "825066c52d2d",
+        "3d4512d4cee3",
+        "116c6a59f24e",
+        "ba72595352aa"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/app/services/subscription_service.py": {
+      "count": 5,
+      "first_seen": 1785478620,
+      "last_seen": 1785478816,
+      "hashes": [
+        "8c12fad76c7c",
+        "e1ffb64f0c7b",
+        "1601efc98aac",
+        "b8fd978b4d51",
+        "1601efc98aac"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/frontend/test/features/schedule/no_show_policy_test.dart": {
+      "count": 1,
+      "first_seen": 1785478632,
+      "last_seen": 1785478632,
+      "hashes": [
+        "330e1e21e2b6"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/alembic/versions/20260731_1000_subscription_applies_to.py": {
+      "count": 1,
+      "first_seen": 1785478676,
+      "last_seen": 1785478676,
+      "hashes": [
+        "a9a8ff9db02b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/tests/test_group_lesson_deduction.py": {
+      "count": 2,
+      "first_seen": 1785478723,
+      "last_seen": 1785478782,
+      "hashes": [
+        "a8eff6eb77d5",
+        "1c282d9a8f59"
+      ]
+    }
+  },
+  "updated_at": 1785478816
+}

@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Goal Fixation 가드 — 폭주 억제
 
 > LLM은 "문제 해결 = 코드 출력"이라는 프록시 목표에 과고착(Goal Fixation)한다.

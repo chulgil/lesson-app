@@ -48,7 +48,7 @@ v5의 `/verify` 단독 커맨드에서 v6의 `/handoff-verify` 통합 커맨드�
 
 - **직접 호출**: `/handoff-verify` (기본 루프, 최대 5회). 플래그로 동작 변경 —
   `--once`(단발), `--loop N`(N회), `--security`, `--coverage`, `--extract`, `--skip-handoff`.
-- **자동 호출**: `/commit-push-pr` 실행 전 (`--once` 사전 검증), `/orchestrate` 검증 단계 (루프 모드).
+- **자동 호출**: `/commit-push-pr` 실행 전 (`--once` 사전 검증), `/orchestrate` 검증 단계 (루프 모드 · multiagent 구성 설치 시).
 
 > 전체 트리거 표는 [reference.md](reference.md) 참조.
 

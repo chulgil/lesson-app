@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Doc Sync — Spec ↔ Code 동기화
 
 > 핵심 원칙: **코드 변경은 스펙 변경을 수반한다. 스펙 없이 머지 금지.**

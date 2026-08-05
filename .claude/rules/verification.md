@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Verification Before Completion
 
 > Extends [Golden Principle #10: Evidence-Based Completion](golden-principles.md#10-evidence-based-completion).

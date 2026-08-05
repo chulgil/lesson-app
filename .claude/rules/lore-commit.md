@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Lore Commit — 의사결정 지식을 git trailer에 기록
 
 > 목적: 커밋 메시지의 본문/제목이 아닌 **trailer 영역**에 구조화된 의사결정 정보를 남겨, 코드는 무엇(what)을, lore는 왜·무엇을 배제했는가(why / rejected)를 보관한다.

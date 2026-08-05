@@ -36,7 +36,7 @@ description: "사람이 잠든 동안 AI가 무인 자율 Loop 를 돌리는 야
 
 ### 3. 야간 무인 루프 (잠든 동안 — `CG_UNATTENDED=1`)
 
-격리 worktree 에서 `cg-ralph` 루프를 돌린다. 매 iteration:
+격리 worktree 에서 구현→검증 루프를 돌린다(ralph 구성도 설치되어 있다면 `cg-ralph` 루프 규약을 그대로 따른다). 매 iteration:
 
 ```
 1. 격리: 전용 worktree/브랜치 (main 직접 금지). 산출물은 로컬 draft 커밋만 (push 금지).
@@ -68,7 +68,7 @@ description: "사람이 잠든 동안 AI가 무인 자율 Loop 를 돌리는 야
 |---|---|
 | 모든 성공기준 통과 | 아침 리포트 + push/PR 후보 제시(머지는 사람) |
 | max_iterations/시간 초과 | 부분 진행을 draft 로 격리 + 미결큐에 잔여 기록 |
-| 연속 실패 N회 | 즉시 정지 + `cg-unstuck` 후보를 미결큐에 |
+| 연속 실패 N회 | 즉시 정지 + (ralph 구성 설치 시) `cg-unstuck` 후보를 미결큐에 |
 | 안전바닥 누적 | 모두 미결큐로, 사람 결정 대기 |
 
 ## 원칙

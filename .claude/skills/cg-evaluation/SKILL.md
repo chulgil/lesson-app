@@ -33,12 +33,30 @@ Stage 2  LLM Critics (각각 독립 Agent 호출)
 
 각 critic 은 코드 작성 세션과 분리된 컨텍스트에서 실행 — 자기확신 편향 제거.
 
+### Stage 1 — eval 게이트 (opt-in, 활성화 시 필수 포함)
+
+`.cg/mechanical.toml` 의 `eval` 게이트가 활성화되어 있으면 Stage 1 에서 함께 실행한다:
+`cg diagnose --gate eval` 이 `.harness/evals/*.toml` (feature 별 수용 기준, Phase 2 산출)을
+**전부** 재실행해 이번 변경이 옛 기능의 수용 기준을 깨지 않았는지 회귀 판정한다.
+케이스별 PASS/FAIL 결과는 rubric 평가의 **견고성** 점수 입력으로 사용한다 —
+수용 기준 회귀가 FAIL 인데 견고성 만점은 불가. FAIL 시 다른 Stage 1 게이트와
+동일하게 즉시 중단, Critic 스킵.
+
 ## 종합 판정
 
 | 결과 | 액션 |
 |------|------|
 | (Stage1 + 3-critic) 모두 PASS | Human Checkpoint 로 진행 |
 | 하나라도 FAIL | Phase 5 로 복귀. 실패 컨텍스트를 재시도 프롬프트에 포함. |
+
+### UNCERTAIN — 검증자의 정직한 기권
+
+critic 이 판정 수단이 없으면 PASS/FAIL 로 추측하지 말고 **UNCERTAIN(사유 필수)** 을 반환한다:
+
+- `unverifiable_runtime` — 실행해야만 확인 가능 → Critic 3(E2E) 또는 실기 게이트로 승격해 재검증
+- `insufficient_spec` — 스펙이 검증 가능하게 정의되지 않음 → cg-interview / Phase 2 spec 보강 후 재평가
+
+**관측된 부재는 UNCERTAIN 이 아니라 FAIL** (예: spec 성공 기준에 대응하는 테스트가 없음 — 관측된 결함이므로 FAIL). UNCERTAIN 이 남아 있는 동안 Human Checkpoint 로 자동 진행하지 않는다 — 위 처리 경로로 사유를 해소한 뒤 재평가한다.
 
 ## Human Checkpoint — 완료 선언 (필수)
 

@@ -14,7 +14,12 @@ from __future__ import annotations
 
 import shutil
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
+
+INSTINCT_REMINDER_FLOOR = 0.7
+INSTINCT_DECAY_PER_WEEK = 0.02
+INSTINCT_MAX_REMINDERS = 3
 
 
 def find_project_root(start: Path) -> Path | None:
@@ -58,15 +63,96 @@ def discover_context(root: Path) -> list[str]:
     return lines
 
 
+def _instinct_meta(text: str) -> dict[str, str]:
+    """Parse minimal ``key: value`` frontmatter from an instinct file."""
+    meta: dict[str, str] = {}
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return meta
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        key, sep, value = line.partition(":")
+        if sep:
+            meta[key.strip()] = value.strip()
+    return meta
+
+
+def _instinct_pattern(text: str) -> str:
+    """First content line of the observed-pattern section."""
+    lines = text.splitlines()
+    try:
+        start = lines.index("## 관찰된 패턴") + 1
+    except ValueError:
+        return ""
+    for line in lines[start:]:
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#"):
+            return stripped
+    return ""
+
+
+def _effective_confidence(meta: dict[str, str], now: datetime) -> float:
+    """Stored confidence minus weekly decay (0.02/week). May raise ValueError."""
+    confidence = float(meta.get("confidence", "0"))
+    try:
+        last_seen = datetime.fromisoformat(meta.get("last_seen", ""))
+    except ValueError:
+        return confidence
+    if last_seen.tzinfo is None:
+        last_seen = last_seen.replace(tzinfo=timezone.utc)
+    weeks = max(0, (now - last_seen).days // 7)
+    return max(0.0, confidence - INSTINCT_DECAY_PER_WEEK * weeks)
+
+
+def instinct_reminders(root: Path) -> list[str]:
+    """Push-style recall: cue-less (global) high-confidence instincts only.
+
+    Instincts with cues are recalled contextually via
+    ``cg instinct list --cue`` instead — no always-on injection.
+    """
+    directory = root / ".harness" / "instincts"
+    if not directory.is_dir():
+        return []
+    now = datetime.now(timezone.utc)
+    scored: list[tuple[float, str]] = []
+    for path in sorted(directory.glob("instinct-*.md")):
+        try:
+            text = path.read_text(encoding="utf-8")
+            meta = _instinct_meta(text)
+            effective = _effective_confidence(meta, now)
+        except (OSError, ValueError):
+            continue
+        if meta.get("status", "active") != "active" or meta.get("cues", ""):
+            continue
+        pattern = _instinct_pattern(text)
+        if effective >= INSTINCT_REMINDER_FLOOR and pattern:
+            scored.append((effective, pattern))
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return [
+        f"- ({effective:.2f}) {pattern}"
+        for effective, pattern in scored[:INSTINCT_MAX_REMINDERS]
+    ]
+
+
 def main() -> None:
     root = find_project_root(Path.cwd())
     if root is None:
         return
 
-    current = read_current(root)
     for line in discover_context(root):
         print(line, file=sys.stderr)
 
+    try:
+        reminders = instinct_reminders(root)
+    except Exception:  # hook must never break session start
+        reminders = []
+    if reminders:
+        print("[cg-harness] instinct reminders (confidence >= 0.7):", file=sys.stderr)
+        for line in reminders:
+            print(line, file=sys.stderr)
+
+    current = read_current(root)
     if current is None:
         return
 

@@ -32,7 +32,7 @@
 | 상황 | 동작 |
 |------|------|
 | `/commit-push-pr` 실행 전 | `--once` 모드로 사전 검증 |
-| `/orchestrate` 검증 단계 | 루프 모드로 자동 실행 |
+| `/orchestrate` 검증 단계 (multiagent 구성 설치 시) | 루프 모드로 자동 실행 |
 
 ---
 
@@ -147,7 +147,7 @@
 - 로직 오류 (비즈니스 로직 변경)
 - 아키텍처 변경이 필요한 타입 오류
 - 테스트 로직 자체의 오류
-- 보안 취약점 (security-pipeline이 처리)
+- 보안 취약점 (security 구성 설치 시 security-pipeline이 처리)
 
 ---
 
@@ -235,7 +235,7 @@
 
 ### security-pipeline 스킬
 
-`--security` 플래그 또는 effort:max 시 `security-pipeline` 스킬과 연동한다.
+security 구성도 설치되어 있다면, `--security` 플래그 또는 effort:max 시 `security-pipeline` 스킬과 연동한다.
 보안 검증 부분은 security-pipeline에 위임한다.
 
 ### /learn 커맨드

@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Reasoning Budget Policy
 
 Use a **reasoning sandwich**: spend more reasoning on planning and verification,

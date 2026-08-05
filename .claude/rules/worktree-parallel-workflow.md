@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Worktree Parallel Workflow — git worktree 병렬 개발 강제
 
 > 자동 적용: 모든 비자명 개발 작업은 별도 git worktree 에서 진행. main 직접 작업 금지.
@@ -64,7 +69,7 @@ git branch -a               # 다른 브랜치 작업 여부
 ## 병합 전 검증
 
 1. `/handoff-verify` 또는 `/verify-loop` 실행 (테스트 + 빌드 + 린트)
-2. 프론트 변경 시 [frontend-verify.md](frontend-verify.md) 의 스크린샷 회귀 1회
+2. frontend 구성이 설치된 프로젝트에서는 프론트 변경 시 [frontend-verify.md](frontend-verify.md) 의 스크린샷 회귀 1회
 3. PASS 시 main 으로 merge — PR 흐름 권장 (`gh pr create` → 리뷰 → merge)
 4. merge 후 정리: `ExitWorktree({action: "remove"})` 또는 `git worktree remove`
 

@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Flutter Architecture — 확장형 앱 계층 계약
 
 > 핵심 원칙: **business/domain 값은 순수하게 유지하고, 화면 표시·문자열·라우팅·플랫폼 의존은 바깥 계층에서 조립한다.**

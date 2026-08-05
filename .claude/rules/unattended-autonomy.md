@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Unattended Autonomy — 야간 무인 자율운영 결정정책
 
 > 출처: 하용호 "AI시대 나의 전문성을 재설계하는 법"(2026.6) Loop 사상 + 적대적 안전성 검증.
@@ -61,7 +66,7 @@
 
 - **격리**: 무인 루프는 전용 worktree/브랜치에서만 동작. `main` 직접 커밋·push·merge 금지. 산출물은 **로컬 draft 커밋**으로만 남긴다(push 안 함). → [worktree-parallel-workflow.md](worktree-parallel-workflow.md).
 - **독립 검증(검증 해킹 차단)**: 코드를 작성한 세션이 자기 산출물을 합격 판정하지 않는다. 분리된 fresh-context critic(`cg-evaluation`) + 기계 게이트(빌드/테스트/린트 exit code)만 신뢰. **테스트·어서션·커버리지를 약화시키는 변경 금지**(검증 해킹). → [rubric-evaluation.md](rubric-evaluation.md), [verification.md](verification.md).
-- **예산 서킷브레이커**: `max_iterations`·토큰 상한·벽시계 시간 상한·연속 실패 N회(기본 3) 중 하나라도 초과하면 즉시 정지하고 아침 큐에 사유를 남긴다. → [cg-ralph](../skills/cg-ralph/SKILL.md).
+- **예산 서킷브레이커**: `max_iterations`·토큰 상한·벽시계 시간 상한·연속 실패 N회(기본 3) 중 하나라도 초과하면 즉시 정지하고 아침 큐에 사유를 남긴다. → ralph 구성도 설치되어 있다면 [cg-ralph](../skills/cg-ralph/SKILL.md) 참조.
 - **멱등 재개**: 컨텍스트 소진/세션 종료는 부분상태 커밋 금지 — draft 로 격리하고 `cg-resume`+PreCompact/SessionEnd 스냅샷으로 재개. 재개 전 `git status` 정합성 검사.
 
 ## 아침 산출물 (사람이 깨어서 가장 먼저 보는 것)

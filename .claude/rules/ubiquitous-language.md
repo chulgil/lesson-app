@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Ubiquitous Language — 도메인 용어집 관리
 
 > 출처: Domain-Driven Design (Eric Evans) + Matt Pocock "Software Fundamentals" (2026.04)

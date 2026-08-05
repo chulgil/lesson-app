@@ -1,0 +1,2 @@
+{"ts": "2026-07-31T06:13:43.359011+00:00", "agent_type": "", "agent_id": "a0dfbc4001aab3b69", "summary": "그룹레슨 P1+P2 구현(Phase 5)을 worktree에서 진행 중입니다. J1 배선 정합과 J8 이모지 정리는 완료·검증됐고, 지금 J2 수강권 필드와 J7 노쇼 4값 에이전트가 실행 중이라 완료 보고를 검증한 뒤 J3로 넘어갑니다."}
+{"ts": "2026-07-31T06:22:36.005849+00:00", "agent_type": "j7-noshow", "agent_id": "aj7-noshow-a508de66470b4770", "summary": "**요약**: J7 완료 — FE `NoShowPolicy` 를 BE #239 SSOT 4값으로 정합. 커밋 `38dae244` (worktree `feat/group-lesson`, push 안 함).\n\n**변경 파일** (7개)\n- `/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/"}

@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Testing Requirements
 
 > 적용 범위: 테스트 파일 작업 시 (`**/*.test.*`, `**/*.spec.*`, `**/tests/**`, `**/__tests__/**`, `**/playwright/**`). `CLAUDE.md` 가 참조.

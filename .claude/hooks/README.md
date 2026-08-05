@@ -20,8 +20,13 @@
 | PreCompact | `scripts/precompact-snapshot.py` | 컴팩션 직전 working-set 스냅샷 → `.harness/status/handoff.md` |
 | SessionEnd | `scripts/session-end-snapshot.py` | 세션 종료 시 스냅샷 + journal 점검 |
 | SubagentStop | `scripts/subagent-stop-log.py` | 서브에이전트 완료 로그(`subagent-log.jsonl`) + 독립검증 넛지 |
+| Notification | `scripts/notification-relay.py` | 무인모드(`CG_UNATTENDED=1`)에서 주의 필요 알림을 `.harness/night/notify.sh` 로 아웃바운드 relay (night 모듈 없으면 no-op) |
+| TaskCompleted | `scripts/task-completed-journal.py` | 완료 task 1줄을 `.harness/journal/{날짜}.md` 에 append (계측 전용, 항상 exit 0) |
 
+> Notification 은 **block 불가**(side effect 전용) — matcher 는 `notification_type` 값으로 대상 유형을 한정한다.
+> TaskCompleted 는 **matcher 미지원**(항상 발화)이며 exit 2 로 완료를 반려(stderr 가 모델 피드백)할 수 있으나, 기본 배선은 계측 전용이라 항상 exit 0. 두 배선 모두 등록 SSOT 는 `.claude/settings.json` 이다.
 > `scripts/_snapshot.py` 는 훅이 아니라 PreCompact·SessionEnd 가 공유하는 헬퍼 모듈(settings.json 미등록).
+> `DirectoryAdded` (Claude Code 2.1.219+) 는 기본 와이어링에 넣지 않는다 — 옵트인 배선은 아래 §옵트인 참조.
 
 ## 스킬 자동 적용 2경로 (명령어 없이)
 
@@ -46,6 +51,51 @@
 1. `scripts/check-<이름>.sh` 작성 (`chmod +x`)
 2. `.claude/settings.json` 의 해당 이벤트 배열에 등록
 3. 정책 근거를 `.claude/rules/<이름>.md` 에 문서화 (훅은 감지, 룰은 정책)
+
+## 옵트인: DirectoryAdded 훅 (Claude Code 2.1.219+)
+
+세션 중 `/add-dir` (또는 SDK `register_repo_root`) 로 작업 디렉토리가 추가될 때 발화하는
+이벤트. 기본 와이어링에는 포함하지 않는다 — 다중 리포/모노리포 세션을 자주 쓰는 프로젝트만 옵트인.
+
+**용례**: 세션 중 추가된 디렉토리는 SessionStart 시점의 하네스 스캔(brownfield·knot)에 빠져
+있다. 이 훅으로 "새 디렉토리를 knot/스캔 대상에 편입하라"는 넛지를 주입해, 추가 디렉토리가
+하네스 사각지대가 되는 것을 막는다.
+
+와이어링 예시 (`.claude/settings.json` `hooks` 블록). 스크립트는 기본 제공하지 않는다 —
+필요 시 위 "새 훅 추가 절차"에 따라 생성:
+
+```json
+"DirectoryAdded": [
+  {
+    "hooks": [
+      {
+        "type": "command",
+        "command": "python3 .claude/hooks/scripts/directory-added-notice.py",
+        "timeout": 3
+      }
+    ]
+  }
+]
+```
+
+스크립트 예시 (advisory 원칙 — stderr 경고 + exit 0):
+
+```python
+#!/usr/bin/env python3
+"""DirectoryAdded: 새로 추가된 디렉토리를 knot/스캔 대상에 편입하도록 넛지."""
+import json
+import sys
+
+data = json.load(sys.stdin)
+added = data.get("directory") or data.get("path") or "?"
+print(
+    f"[hint] 디렉토리 추가 감지: {added}\n"
+    "  - cg-brownfield-scan 으로 새 디렉토리 스캔 검토\n"
+    "  - knot vault 대상이면 cg knot status 로 편입 확인",
+    file=sys.stderr,
+)
+sys.exit(0)
+```
 
 ## Git 훅 (별도)
 

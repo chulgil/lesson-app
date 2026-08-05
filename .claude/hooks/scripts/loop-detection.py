@@ -3,10 +3,15 @@
 
 Tracks repeated edits to the same file and warns the agent to step back instead
 of making small variations to the same broken approach.
+
+v2 (loop engineering 흡수): 내용 해시 기반 **진동(oscillation) 감지** 추가 —
+파일이 이전 상태로 되돌아가는 A→B→A 플립플롭은 "같은 두 접근 사이를 오가는 중"
+이라는 신호다. 반복 횟수 경고(양적)와 별개로 질적 신호를 잡는다.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import time
@@ -17,6 +22,7 @@ STATUS_DIR = Path(".harness/status")
 LOOP_FILE = STATUS_DIR / "loop-detection.json"
 THRESHOLD = 4
 WINDOW_SECONDS = 20 * 60
+HASH_HISTORY_CAP = 6  # 파일당 최근 내용 해시 보관 수 (진동 감지 창)
 
 
 def _extract_path(payload: dict[str, Any]) -> str | None:
@@ -49,6 +55,30 @@ def _load() -> dict[str, Any]:
     return data
 
 
+def _content_hash(path: str) -> str | None:
+    try:
+        return hashlib.sha1(Path(path).read_bytes()).hexdigest()[:12]
+    except OSError:
+        return None
+
+
+def _detect_oscillation(entry: dict[str, Any], current_hash: str) -> bool:
+    """직전이 아닌 과거 해시로의 회귀(A→B→A)만 진동으로 판정.
+
+    직전과 동일(A→A, no-op 재기록)은 진동이 아니므로 이력 갱신도 경고도 없다.
+    """
+    hashes = entry.get("hashes")
+    if not isinstance(hashes, list):
+        hashes = []
+    if hashes and hashes[-1] == current_hash:
+        entry["hashes"] = hashes
+        return False
+    oscillated = current_hash in hashes[:-1] if len(hashes) >= 2 else False
+    hashes.append(current_hash)
+    entry["hashes"] = hashes[-HASH_HISTORY_CAP:]
+    return oscillated
+
+
 def main() -> None:
     try:
         payload = json.loads(sys.stdin.read() or "{}")
@@ -73,9 +103,26 @@ def main() -> None:
 
     entry["count"] = int(entry.get("count", 0)) + 1
     entry["last_seen"] = now
+
+    current_hash = _content_hash(path)
+    oscillated = (
+        _detect_oscillation(entry, current_hash) if current_hash is not None else False
+    )
+
     files[path] = entry
     state["updated_at"] = now
-    LOOP_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    LOOP_FILE.write_text(
+        json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+    if oscillated:
+        print(
+            "[cg-harness] LoopDetectionMiddleware: 진동(oscillation) 감지 — "
+            f"{path} 가 이전 상태로 되돌아갔다(A→B→A). 두 접근 사이를 오가는 중이라는 "
+            "신호다. 같은 재시도 대신 에스컬레이션 사다리를 밟아라: 접근 전환(/cg-unstuck) "
+            "→ scope 축소 → 사용자에게 트레이드오프 질문."
+        )
+        return
 
     if int(entry["count"]) >= THRESHOLD:
         print(

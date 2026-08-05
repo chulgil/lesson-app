@@ -35,7 +35,7 @@ cg-harness 프로젝트를 처음 연 사용자에게:
    | `.harness/journal/{date}.md` | 매 커밋 = 한 줄 기록 |
    | `.harness/visuals/{feature}/` | 와이어프레임, 아키텍처 다이어그램 |
    | `.harness/status/` | drift.json, current.md (자동 생성) |
-   | `.cg/mechanical.toml` | build/test/lint 명령 (cg-ralph 가 사용) |
+   | `.cg/mechanical.toml` | build/test/lint 명령 (ralph 구성 설치 시 cg-ralph 가 사용) |
    | `.claude/skills/cg-*/` | 11개 스킬 (이 폴더의 SKILL.md 가 진실) |
 
 3. **다음 액션 1개만 추천**
@@ -45,8 +45,8 @@ cg-harness 프로젝트를 처음 연 사용자에게:
    - 신규 → `/cg-interview 의 새 기능 인터뷰 시작`
    - 인터뷰 완료 → `/cg-spec-and-harness 로 spec 작성`
    - spec 있음 → `/cg-decomposition 으로 AC Tree 구성`
-   - 코드 작성 중 → `/cg-execution-loop 또는 /cg-ralph`
-   - 막힘 → `/cg-unstuck` (5-persona)
+   - 코드 작성 중 → `/cg-execution-loop` — ralph 구성도 설치되어 있다면 `/cg-ralph`
+   - 막힘 → `/cg-unstuck` (5-persona, ralph 구성 설치 시)
    - 완료 검증 → `/cg-evaluation` (3-critic + Mechanical)
    - 길 잃음 → `/cg-status` (drift verdict)
 

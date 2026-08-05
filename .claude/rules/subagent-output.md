@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # 서브에이전트 결과 포맷
 
 > OpenHarness mailbox 패턴에서 도출.

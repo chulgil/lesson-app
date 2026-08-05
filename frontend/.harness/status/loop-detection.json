@@ -1,0 +1,103 @@
+{
+  "files": {
+    "/Users/r00360/Dev/mybrain/10 Projects/레슨앱/45-그룹레슨-기획-2026-07-30.md": {
+      "count": 2,
+      "first_seen": 1785473588,
+      "last_seen": 1785473627,
+      "hashes": [
+        "ff34471262e0",
+        "48050c887b3e"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_group_lesson_planning_0730.md": {
+      "count": 2,
+      "first_seen": 1785473639,
+      "last_seen": 1785473653,
+      "hashes": [
+        "3b4d55692885",
+        "8a539cb6607b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.harness/spec/2026-07-31-group-lesson.md": {
+      "count": 2,
+      "first_seen": 1785473778,
+      "last_seen": 1785474314,
+      "hashes": [
+        "bd2a2b888f52",
+        "43c759e0ff32"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.harness/evals/group-lesson.toml": {
+      "count": 1,
+      "first_seen": 1785473809,
+      "last_seen": 1785473809,
+      "hashes": [
+        "58c223739838"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.harness/knowledge/glossary.md": {
+      "count": 1,
+      "first_seen": 1785473859,
+      "last_seen": 1785473859,
+      "hashes": [
+        "8ce0fee40bfa"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/tests/test_group_class_crud.py": {
+      "count": 2,
+      "first_seen": 1785479414,
+      "last_seen": 1785479708,
+      "hashes": [
+        "6dfcf6b4c8b5",
+        "75fa6e83cfbd"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/app/schemas/schedule_ext.py": {
+      "count": 3,
+      "first_seen": 1785479504,
+      "last_seen": 1785479640,
+      "hashes": [
+        "819d5126a0df",
+        "b855eaa484b5",
+        "c90824dd6d87"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/app/services/schedule_ext_service.py": {
+      "count": 5,
+      "first_seen": 1785479552,
+      "last_seen": 1785479798,
+      "hashes": [
+        "7f197d58c876",
+        "86a3c3a6718d",
+        "1c282f50b477",
+        "dfa6a6125d53",
+        "1c282f50b477"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/app/api/v1/groups.py": {
+      "count": 1,
+      "first_seen": 1785479606,
+      "last_seen": 1785479606,
+      "hashes": [
+        "5d5135cee1f1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app-group-lesson/backend/alembic/versions/20260731_1000_subscription_applies_to.py": {
+      "count": 1,
+      "first_seen": 1785479755,
+      "last_seen": 1785479755,
+      "hashes": [
+        "e8c9f92b0c0e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/hyen-detail-followup/frontend/test/core/widgets/notebook/paper_texture_test.dart": {
+      "count": 1,
+      "first_seen": 1785916022,
+      "last_seen": 1785916022,
+      "hashes": [
+        "91b4142f8d22"
+      ]
+    }
+  },
+  "updated_at": 1785916022
+}

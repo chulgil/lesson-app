@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Adaptive Quality — 작업 난이도 기반 품질 모드
 
 > autopus `auto effort` / `--quality` 패턴 흡수 (2026-04-23).

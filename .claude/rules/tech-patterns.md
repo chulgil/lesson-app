@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Tech Patterns — 언어별 구현 패턴
 
 > 보편 원칙은 [golden-principles.md](golden-principles.md) 가 정본. 이 문서는 그 원칙의 **언어별 구현 방법**과 디렉토리/테스트 배치만 담는다 (중복 제거).

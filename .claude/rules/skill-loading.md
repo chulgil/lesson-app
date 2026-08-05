@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # 2단계 스킬 로딩 (oh-my-agent 패턴)
 
 > 60+ 스킬이 매 세션 로딩되면 초기 컨텍스트를 12만+ 토큰 소비한다.

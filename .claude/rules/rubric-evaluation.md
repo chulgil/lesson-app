@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Rubric 기반 평가 (Planner-Generator-Evaluator 패턴)
 
 > OpenHarness + Anthropic 하네스 실험에서 도출된 패턴.

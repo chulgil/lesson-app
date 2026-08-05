@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Simplicity Ladder — 코드를 쓰기 전에 사다리를 짚는다
 
 > 출처: ponytail (DietrichGebert, MIT) 의 "lazy senior dev" 사다리 패턴 흡수 (개념만 벤더 재작성).

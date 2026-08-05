@@ -19,7 +19,7 @@ description: "경량 3단 판정 (PASS/REVISE/FAIL) 으로 산출물 품질을 �
 | 패스 수 | 3-critic (code / test / e2e) | 단일 패스 |
 | 기준 | rubric 가중 평균 ≥ 7.5 | score ≥ 0.80 (PASS) |
 | 시간 | 수 분 | 수 초 |
-| 용례 | PR 머지 전 최종 검증 | cg-ralph 루프의 검증 단계 |
+| 용례 | PR 머지 전 최종 검증 | cg-ralph 루프의 검증 단계 (ralph 구성 설치 시) |
 
 ## Verdict 임계
 
@@ -27,7 +27,18 @@ description: "경량 3단 판정 (PASS/REVISE/FAIL) 으로 산출물 품질을 �
 |---|---|---|---|
 | ≥ 0.80 | **PASS** | done | 품질 기준 달성, 다음 단계 진행 |
 | 0.40-0.79 | **REVISE** | continue | 제안사항 반영 후 재실행 |
-| < 0.40 | **FAIL** | escalate | 근본적 문제, cg-unstuck 또는 cg-interview 로 |
+| < 0.40 | **FAIL** | escalate | 근본적 문제, cg-unstuck(ralph 구성 설치 시) 또는 cg-interview 로 |
+
+### UNCERTAIN — 검증자의 정직한 기권
+
+점수로 판정할 수단이 없으면 낮은 점수로 추측하지 말고 **UNCERTAIN(사유 필수)** 을 반환한다:
+
+| 사유 | 의미 | 처리 경로 |
+|---|---|---|
+| `unverifiable_runtime` | 실행해야만 확인 가능 (정적 검토로 판정 불가) | 실기/E2E 게이트로 승격 제안 (mechanical e2e; frontend 구성 설치 시 cg-ui-loop) |
+| `insufficient_spec` | 스펙이 검증 가능하게 정의되어 있지 않음 | cg-interview / spec 보강 제안 후 재평가 |
+
+**관측된 부재는 UNCERTAIN 이 아니라 FAIL** — "테스트가 없다", "에러 처리가 없다"처럼 산출물에서 직접 관측한 결함은 FAIL/REVISE 로 판정한다. UNCERTAIN 은 "판정할 수단이 없다"일 때만.
 
 ## 평가 차원 (5가지)
 
@@ -94,7 +105,7 @@ Loop Action: continue
 
 ## 반복 QA
 
-`cg-ralph` 와 결합해 사용할 때:
+`ralph` 구성도 설치되어 있다면, `cg-ralph` 와 결합해 사용할 때:
 
 1. 첫 호출에 `qa_session_id` 생성 (`qa-<uuid4_short>`)
 2. 각 반복의 verdict 를 `.harness/journal/{YYYY-MM-DD}.md` 에 누적

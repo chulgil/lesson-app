@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Issue 기반 작업 워크플로우
 
 > lesson-app 운영에서 흡수한 패턴. GitHub Issues (또는 동급 트래커) 를 작업 단위 SSOT 로 사용한다.

@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Domain Linter — AI 모델 무관 멱등성 강제
 
 > 하네스 엔지니어링 패턴: 어떤 AI 모델을 사용하더라도 같은 코드 구조가 나오도록 도메인 규칙을 강제한다.

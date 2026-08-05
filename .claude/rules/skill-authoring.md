@@ -1,3 +1,8 @@
+---
+origin_model: claude-fable-5
+review_by: 2026-10-26
+---
+
 # Skill Authoring — 스킬을 TDD 로 쓴다
 
 > 출처: superpowers `writing-skills` (MIT) 패턴 흡수.
