@@ -42,6 +42,19 @@ enum FifthWeekPolicy {
   optional, // Student choice
 }
 
+/// Scope of a subscription — which lesson format it can be spent on.
+///
+/// Mirrors the backend `subscription.applies_to` SSOT one-for-one. A null wire
+/// value means the row predates group lessons and therefore carries no scope
+/// restriction — read it through [Subscription.effectiveAppliesTo].
+enum SubscriptionAppliesTo {
+  oneToOne, // 1:1 lessons only
+
+  group, // Group classes only
+
+  universal, // Any lesson format
+}
+
 /// Payment method for subscription.
 enum SubscriptionPaymentMethod {
   cash,
@@ -171,6 +184,14 @@ class Subscription {
   /// Academy ID if ownership=academy. Null for teacher-issued subscriptions.
   final String? academyId;
 
+  /// Lesson format this ticket may be spent on. Null = no scope recorded
+  /// (legacy row) and is read as [SubscriptionAppliesTo.universal].
+  final SubscriptionAppliesTo? appliesTo;
+
+  /// Group class this ticket was issued for. Null with appliesTo=group means
+  /// "any group class" — it never falls back to a 1:1 class.
+  final String? groupClassId;
+
   Subscription({
     required this.id,
     required this.studentId,
@@ -212,6 +233,8 @@ class Subscription {
     this.overrideNotifyOwnerOnLateCancel,
     this.ownership,
     this.academyId,
+    this.appliesTo,
+    this.groupClassId,
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) =>
@@ -227,6 +250,16 @@ class Subscription {
     if (base == null) return null;
     return base + bonusCount;
   }
+
+  /// Scope with the null wire value resolved (BE `effective_applies_to`).
+  SubscriptionAppliesTo get effectiveAppliesTo =>
+      appliesTo ?? SubscriptionAppliesTo.universal;
+
+  /// True when this ticket belongs to a group class, either by an explicit
+  /// group scope or by naming a class. Display must not fall back to the 1:1
+  /// membership class name for these.
+  bool get isGroupScoped =>
+      appliesTo == SubscriptionAppliesTo.group || groupClassId != null;
 
   /// Base lessons without bonus (for display breakdown).
   int? get baseLessons =>
@@ -376,6 +409,8 @@ class Subscription {
     bool clearOverrideNotifyOwnerOnLateCancel = false,
     SubscriptionOwnership? ownership,
     String? academyId,
+    SubscriptionAppliesTo? appliesTo,
+    String? groupClassId,
   }) {
     return Subscription(
       id: id ?? this.id,
@@ -437,6 +472,8 @@ class Subscription {
                 this.overrideNotifyOwnerOnLateCancel,
       ownership: ownership ?? this.ownership,
       academyId: academyId ?? this.academyId,
+      appliesTo: appliesTo ?? this.appliesTo,
+      groupClassId: groupClassId ?? this.groupClassId,
     );
   }
 

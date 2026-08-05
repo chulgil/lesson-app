@@ -503,15 +503,14 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     try {
       final feedbackText = _feedbackController.text.trim();
       final tipText = _tipController.text.trim();
-      final updatedLesson = lesson.copyWith(
-        feedback: feedbackText.isEmpty ? null : feedbackText,
-        keyPoints: _keyPoints.isEmpty ? null : _keyPoints,
-        practiceTips: tipText.isEmpty ? null : tipText,
-      );
-
       await ref
           .read(lessonsNotifierProvider.notifier)
-          .updateLesson(updatedLesson);
+          .updateLessonFeedback(
+            lesson,
+            feedback: feedbackText,
+            keyPoints: _keyPoints,
+            practiceTips: tipText,
+          );
 
       if (mounted) {
         setState(() => _isSaving = false);

@@ -182,20 +182,6 @@ enum ExceptionType {
   additionalSlot, // Extra one-time slot
 }
 
-/// Extension for ExceptionType display names
-extension ExceptionTypeExtension on ExceptionType {
-  String get displayName {
-    switch (this) {
-      case ExceptionType.holiday:
-        return '휴무';
-      case ExceptionType.vacation:
-        return '휴가';
-      case ExceptionType.additionalSlot:
-        return '추가 오픈';
-    }
-  }
-}
-
 /// Time exception (holiday, vacation, or additional slot)
 @JsonSerializable()
 class TimeException {

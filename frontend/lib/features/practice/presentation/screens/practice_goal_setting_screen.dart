@@ -317,11 +317,11 @@ class _PracticeGoalSettingScreenState
             Row(
               children: [
                 if (_dailyTimeMinutes != null)
-                  _buildSummaryChip('⏱️ ${_formatMinutes(_dailyTimeMinutes!)}'),
+                  _buildSummaryChip(_formatMinutes(_dailyTimeMinutes!)),
                 if (_dailyTimeMinutes != null && _dailySectionCount != null)
                   const SizedBox(width: AppSpacing.space2),
                 if (_dailySectionCount != null)
-                  _buildSummaryChip('✅ $_dailySectionCount개 섹션'),
+                  _buildSummaryChip('$_dailySectionCount개 섹션'),
               ],
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -339,12 +339,12 @@ class _PracticeGoalSettingScreenState
               children: [
                 if (_weeklyTimeMinutes != null)
                   _buildSummaryChip(
-                    '⏱️ ${_formatMinutes(_weeklyTimeMinutes!)}',
+                    _formatMinutes(_weeklyTimeMinutes!),
                   ),
                 if (_weeklyTimeMinutes != null && _weeklyDayCount != null)
                   const SizedBox(width: AppSpacing.space2),
                 if (_weeklyDayCount != null)
-                  _buildSummaryChip('📅 $_weeklyDayCount일'),
+                  _buildSummaryChip('$_weeklyDayCount일'),
               ],
             ),
           ],

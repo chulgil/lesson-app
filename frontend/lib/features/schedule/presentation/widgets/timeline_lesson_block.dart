@@ -41,9 +41,24 @@ class TimelineLessonBlock extends StatelessWidget {
 
   double get blockHeight => (lesson.duration / 30.0) * kTimelineUnitHeight;
 
+  /// Statuses whose ink has "dried" — the block is done with.
+  /// Reads `displayStatus` (not raw `status`) so a past scheduled lesson fades
+  /// exactly as it does in the list view — the same lesson must not look
+  /// settled in one view and pending in another.
+  bool get _isFaded =>
+      lesson.displayStatus == LessonStatus.completed ||
+      lesson.displayStatus == LessonStatus.cancelled ||
+      lesson.displayStatus == LessonStatus.cancelledByStudentAdvance ||
+      lesson.displayStatus == LessonStatus.cancelledByTeacher ||
+      lesson.displayStatus == LessonStatus.cancelledMutual;
+
   @override
   Widget build(BuildContext context) {
     final baseColors = InstrumentColors.getColor(lesson.instrument);
+
+    // H7 — 끝난 블록은 글자만 물러나고, 좌측 상태 바와 배경은 그대로 둬서
+    // "채워진 게이지" 가 남는다 (디자이너 주석: 완료는 게이지 바처럼).
+    final mutedInk = _isFaded ? AppColors.inkQuaternary : null;
 
     // Color logic:
     // - Today view: full instrument colors (past lessons slightly faded)
@@ -113,7 +128,7 @@ class TimelineLessonBlock extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                child: _buildContent(colors),
+                child: _buildContent(colors, mutedInk),
               ),
             ),
             // Badges
@@ -129,7 +144,7 @@ class TimelineLessonBlock extends StatelessWidget {
   /// Consistent 2-line layout:
   /// Line 1: 이름  악기  시간분
   /// Line 2: 곡명 (if available)
-  Widget _buildContent(InstrumentColorPair colors) {
+  Widget _buildContent(InstrumentColorPair colors, Color? mutedInk) {
     final assignment =
         lesson.assignments?.isNotEmpty == true
             ? lesson.assignments!.first
@@ -147,7 +162,10 @@ class TimelineLessonBlock extends StatelessWidget {
         Text(
           '${NameUtils.givenName(lesson.studentName)}  ${lesson.instrument}  ${lesson.duration}분',
           style: (compact ? AppTypography.caption : AppTypography.bodySmall)
-              .copyWith(color: colors.accent, fontWeight: FontWeight.w600),
+              .copyWith(
+                color: mutedInk ?? colors.accent,
+                fontWeight: FontWeight.w600,
+              ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -157,7 +175,7 @@ class TimelineLessonBlock extends StatelessWidget {
           Text(
             assignment,
             style: AppTypography.captionSmall.copyWith(
-              color: colors.accent.withValues(alpha: 0.6),
+              color: mutedInk ?? colors.accent.withValues(alpha: 0.6),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

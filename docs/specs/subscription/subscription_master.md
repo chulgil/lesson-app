@@ -416,6 +416,7 @@ else → 이용중 (보라)
 - 체험레슨 완료 후 > "정규레슨 제안하기"
 - 레슨 요청 확인 > "수강권 제안하기"
 - 기존 "수강권 발급" 진입점 → 동일 화면으로 리다이렉트
+- 레슨 추가(AddLessonScreen) > 수강권 0개 배너 [정식 수강권 먼저 발급] — `returnTo=addLesson` 으로 즉시 발급 후 레슨 추가 화면 복귀 ([subscription_required_spec.md §2.6.3](subscription_required_spec.md), 2026-08-03)
 
 **Step 1**: 학생 선택 (또는 이미 선택됨)
 

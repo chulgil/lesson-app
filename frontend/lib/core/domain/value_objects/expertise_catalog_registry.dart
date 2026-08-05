@@ -22,6 +22,7 @@ class ExpertiseCatalogRegistry {
       '피아노',
       '플루트',
       '클라리넷',
+      '색소폰',
       '오보에',
       '바순',
       '호른',
@@ -29,15 +30,36 @@ class ExpertiseCatalogRegistry {
       '트롬본',
       '튜바',
       '타악기',
+      '드럼',
       '하프',
       '기타',
+      '베이스기타',
+      '우쿨렐레',
       '성악',
       '작곡/이론',
     ],
   );
 
+  /// Fitness (헬스 / GX) discipline catalog — the specialty tags (#979-B).
+  /// Pointed at by `DisciplineRegistry.fitness.expertiseCatalogId` ('specialties').
+  static const ExpertiseCatalog fitness = ExpertiseCatalog(
+    id: 'specialties',
+    items: <String>['웨이트', '필라테스', 'PT'],
+  );
+
+  /// Language (어학) discipline catalog — the subject tags (#1102). Pointed at by
+  /// `DisciplineRegistry.language.expertiseCatalogId` ('subjects').
+  static const ExpertiseCatalog language = ExpertiseCatalog(
+    id: 'subjects',
+    items: <String>['영어', '중국어', '일본어'],
+  );
+
   /// All registered catalogs, in registration order (music first).
-  static const List<ExpertiseCatalog> _registered = <ExpertiseCatalog>[music];
+  static const List<ExpertiseCatalog> _registered = <ExpertiseCatalog>[
+    music,
+    fitness,
+    language,
+  ];
 
   static List<ExpertiseCatalog> get all => _registered;
 

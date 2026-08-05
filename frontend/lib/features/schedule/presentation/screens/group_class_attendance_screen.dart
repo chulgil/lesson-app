@@ -5,15 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/entities/group_class_schedule.dart';
+import '../extensions/no_show_policy_visuals.dart';
 import '../providers/group_class_booking_providers.dart';
 
 /// Attendance screen for teachers to mark attendance
@@ -121,6 +124,19 @@ class _GroupClassAttendanceScreenState
     );
   }
 
+  /// Instrument color chip for the class icon tile. Falls back to the paper
+  /// accent chip when the class has no instrument tag.
+  InstrumentColorPair get _instrumentColors {
+    final instrument = widget.groupClass.instrument;
+    if (instrument == null || instrument.trim().isEmpty) {
+      return const InstrumentColorPair(
+        AppColors.paperAccentSoft,
+        AppColors.paperAccent,
+      );
+    }
+    return InstrumentColors.getColor(instrument);
+  }
+
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -134,9 +150,13 @@ class _GroupClassAttendanceScreenState
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
-            child: const Center(
-              child: Text('🎻', style: AppTypography.headingLarge),
+            decoration: BoxDecoration(color: _instrumentColors.background),
+            child: Center(
+              child: Icon(
+                Icons.music_note,
+                size: AppSpacing.iconMD,
+                color: _instrumentColors.accent,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -211,20 +231,9 @@ class _GroupClassAttendanceScreenState
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.people_outline, size: 64, color: AppColors.inkSecondary),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            AppStrings.noBookedStudents,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.people_outline,
+      title: AppStrings.noBookedStudents,
     );
   }
 
@@ -276,7 +285,7 @@ class _GroupClassAttendanceScreenState
                   decoration: BoxDecoration(
                     color:
                         isAttended
-                            ? AppColors.paperOk.withValues(alpha: 0.1)
+                            ? AppColors.paperOkSoft
                             : AppColors.paperAccentSoft,
                   ),
                   child: Center(
@@ -436,6 +445,17 @@ class _GroupClassAttendanceScreenState
                   ),
                   style: AppTypography.bodyMedium,
                 ),
+                // Absences are settled by the class no-show policy (BE SSOT
+                // #239) — spell out which of the 4 outcomes applies.
+                if (_attendanceState.length - _getAttendedCount() > 0) ...[
+                  const SizedBox(height: AppSpacing.space2),
+                  Text(
+                    widget.groupClass.noShowPolicy.description,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   AppStrings.finishClassConfirm,

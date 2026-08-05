@@ -140,7 +140,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.paperAccent.withValues(alpha: 0.1),
+                  color: AppColors.paperAccentSoft,
                 ),
                 child: const Icon(
                   Icons.event_busy,
@@ -179,7 +179,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
+          color: AppColors.paperAccentSoft,
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.3),
           ),
@@ -242,7 +242,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
+          color: AppColors.paperAccentSoft,
           border: Border.all(
             color: AppColors.paperAccent.withValues(alpha: 0.3),
           ),

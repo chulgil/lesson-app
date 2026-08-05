@@ -4,13 +4,17 @@ import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 
 void main() {
   // #962 멀티 Discipline Phase 0 — Discipline 값객체 + DisciplineRegistry SSOT.
-  // music 만 등록 = 현행 동작 변경 0. enum switch 금지, id 조회 패턴.
+  // music(0) + fitness(1) 등록(#979-B). enum switch 금지, id 조회 패턴.
   group('DisciplineRegistry', () {
-    test('music 가 0번 인스턴스로 등록되어 있다', () {
+    test('music(0) + fitness(1) + language(2) 이 등록 순서대로 있다 (#979-B/#1102)', () {
       expect(DisciplineRegistry.all, isNotEmpty);
       expect(DisciplineRegistry.all.first.id, 'music');
-      // music 만 등록 — 추가 분야는 데이터 등록만으로 확장(코드 변경 0).
-      expect(DisciplineRegistry.all.length, 1);
+      // Phase 4 (#979-B) fitness, Phase 5 (#1102) language — 데이터 등록만으로 추가.
+      expect(DisciplineRegistry.all.map((d) => d.id).toList(), [
+        'music',
+        'fitness',
+        'language',
+      ]);
     });
 
     test('byId 는 등록 분야를 반환하고 미등록은 null', () {
@@ -18,8 +22,30 @@ void main() {
       expect(music, isNotNull);
       expect(music!.expertiseCatalogId, 'instruments');
       expect(music.themeColorSeed, 0xFF9B1B12); // 음악 액션색(paperAccent)
-      expect(DisciplineRegistry.byId('fitness'), isNull);
+
+      final fitness = DisciplineRegistry.byId('fitness');
+      expect(fitness, isNotNull);
+      expect(fitness!.expertiseCatalogId, 'specialties'); // #979-B
+
+      final language = DisciplineRegistry.byId('language');
+      expect(language, isNotNull);
+      expect(language!.expertiseCatalogId, 'subjects'); // #1102
+
+      // 미등록/빈 id 는 null (호출처가 fallback 으로 degrade).
+      expect(DisciplineRegistry.byId('unknown_discipline'), isNull);
       expect(DisciplineRegistry.byId(''), isNull);
+    });
+
+    test('fitness 는 specialties 카탈로그를 가리킨다 (#979-B)', () {
+      expect(DisciplineRegistry.fitness.id, 'fitness');
+      expect(DisciplineRegistry.fitness.displayKey, 'discipline.fitness');
+      expect(DisciplineRegistry.fitness.expertiseCatalogId, 'specialties');
+    });
+
+    test('language 는 subjects 카탈로그를 가리킨다 (#1102)', () {
+      expect(DisciplineRegistry.language.id, 'language');
+      expect(DisciplineRegistry.language.displayKey, 'discipline.language');
+      expect(DisciplineRegistry.language.expertiseCatalogId, 'subjects');
     });
 
     test('fallback 은 music — null/legacy disciplineId 폴백', () {

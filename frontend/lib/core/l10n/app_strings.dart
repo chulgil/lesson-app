@@ -1309,6 +1309,21 @@ class AppStrings {
   /// Trial lesson detail bottom sheet
   static const trialLessonDetail = '체험레슨 상세';
   static const instrumentLabel = '악기';
+
+  /// 악기명 — 바이올린 (parent_home child-profile 키 SSOT, 향후 광역 dedup seed)
+  static const instrumentViolin = '바이올린';
+
+  /// 악기명 — 피아노
+  static const instrumentPiano = '피아노';
+
+  /// 악기명 — 첼로
+  static const instrumentCello = '첼로';
+
+  /// 악기명 — 비올라
+  static const instrumentViola = '비올라';
+
+  /// 악기명 — 플루트
+  static const instrumentFlute = '플루트';
   static const lessonDate = '날짜';
   static const lessonTime = '시간';
   static const statusLabel = '상태';
@@ -1653,23 +1668,8 @@ class AppStrings {
   /// 입금 알림을 보냈습니다
   static const paymentReminderSent = '입금 알림을 보냈습니다';
 
-  /// 입금 알림 발송에 실패했어요
-  static const paymentReminderSendFailed = '입금 알림 발송에 실패했어요';
-
-  /// 수강료 입금 안내
-  static const paymentReminderTitle = '수강료 입금 안내';
-
-  /// 수강료 %s원 입금 부탁드려요 (bodyFor 함수로 포맷)
-  static String paymentReminderBody({
-    required String teacherName,
-    required int amount,
-  }) {
-    final formatted = amount.toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-    return '$teacherName 선생님: 수강료 $formatted원 입금을 부탁드려요';
-  }
+  // #1212 미수금 리마인더 발송 문구(title/body/실패)는 FE 로컬 알림 제거와 함께
+  // 삭제됨. 재도입 시 BE Notification emit 쪽에서 문구를 정의한다.
 
   // ── Booking Cancel (예약 취소 화면) ─────────────────────────
   /// 예약 취소 (AppBar)
@@ -1851,6 +1851,130 @@ class AppStrings {
   /// 그룹 클래스 정보를 불러올 수 없습니다 (route extra 누락 placeholder)
   static const groupClassInfoUnavailable = '그룹 클래스 정보를 불러올 수 없습니다.';
 
+  // ── Group Class Form (그룹 클래스 생성·수정) ────────────────
+  /// 클래스 만들기 (생성 화면 제목)
+  static const groupClassFormCreateTitle = '클래스 만들기';
+
+  /// 클래스 수정 (수정 화면 제목)
+  static const groupClassFormEditTitle = '클래스 수정';
+
+  /// 클래스 이름 (필드 라벨)
+  static const groupClassFormNameLabel = '클래스 이름';
+
+  /// 클래스 이름 입력 힌트
+  static const groupClassFormNameHint = '예: 목요일 앙상블반';
+
+  /// 클래스 이름 미입력 검증 메시지
+  static const groupClassFormNameRequired = '클래스 이름을 입력해주세요';
+
+  /// 수업 소개 (선택 필드 라벨)
+  static const groupClassFormDescriptionLabel = '수업 소개 (선택)';
+
+  /// 수업 소개 입력 힌트
+  static const groupClassFormDescriptionHint = '어떤 수업인지 간단히 적어주세요';
+
+  /// 드롭인으로 열기 (폼 내 전환 스위치 — 별도 화면 분기 금지)
+  static const groupClassFormDropInToggleTitle = '드롭인으로 열기';
+
+  /// 드롭인 전환 부연
+  static const groupClassFormDropInToggleSubtitle = '매주 반복하지 않고 한 번만 여는 특강입니다';
+
+  /// 정원 (섹션·필드 라벨)
+  static const groupClassFormCapacityLabel = '정원';
+
+  /// $n명 (정원 값)
+  static String groupClassFormCapacityValue(int n) => '$n명';
+
+  /// 반복 요일 (필드 라벨)
+  static const groupClassFormRepeatDaysLabel = '반복 요일';
+
+  /// 반복 요일 미선택 검증 메시지
+  static const groupClassFormRepeatDaysRequired = '반복 요일을 하나 이상 선택해주세요';
+
+  /// 시작 시각 (필드 라벨)
+  static const groupClassFormStartTimeLabel = '시작 시각';
+
+  /// 수업 날짜 (드롭인 단일 일시 라벨)
+  static const groupClassFormDropInDateLabel = '수업 날짜';
+
+  /// 수업 시간 (진행 시간 라벨)
+  static const groupClassFormDurationLabel = '수업 시간';
+
+  /// 예약·노쇼 정책 (섹션)
+  static const groupClassFormSectionPolicy = '예약·노쇼 정책';
+
+  /// 노쇼 정책 (필드 라벨)
+  static const groupClassFormNoShowPolicyLabel = '노쇼 정책';
+
+  /// 예약 마감 (필드 라벨)
+  static const groupClassFormBookingDeadlineLabel = '예약 마감';
+
+  /// 취소 마감 (필드 라벨)
+  static const groupClassFormCancelDeadlineLabel = '취소 마감';
+
+  /// $hours시간 전 (마감 시각 값)
+  static String groupClassFormDeadlineHours(int hours) => '$hours시간 전';
+
+  /// 제한 없음 (마감 시각 0)
+  static const groupClassFormDeadlineNone = '제한 없음';
+
+  /// 회당 수강료 (선택 필드 라벨)
+  static const groupClassFormPriceLabel = '회당 수강료 (선택)';
+
+  /// 회당 수강료 입력 힌트
+  static const groupClassFormPriceHint = '예: 35000';
+
+  /// 클래스를 만들었습니다 (스낵바)
+  static const groupClassFormCreated = '클래스를 만들었습니다';
+
+  /// 클래스를 수정했습니다 (스낵바)
+  static const groupClassFormUpdated = '클래스를 수정했습니다';
+
+  /// 저장 실패 (스낵바)
+  static const groupClassFormSaveFailed = '저장하지 못했습니다. 다시 시도해주세요';
+
+  // ── Group Classes (교사 내 클래스 목록) ─────────────────────
+  /// 내 클래스 (목록 화면 제목)
+  static const groupClassesTitle = '내 클래스';
+
+  /// 클래스 없음 (빈 상태 제목)
+  static const groupClassesEmptyTitle = '아직 만든 클래스가 없습니다';
+
+  /// 빈 상태 부연
+  static const groupClassesEmptySubtitle = '여러 학생을 함께 지도하는 반이나 드롭인 특강을 만들어보세요';
+
+  /// 매주 $days · $time (반 반복 일정 요약)
+  static String groupClassesRepeatSummary(String days, String time) =>
+      '매주 $days · $time';
+
+  /// 정원 $max명 (목록 행 요약)
+  static String groupClassesCapacitySummary(int max) => '정원 $max명';
+
+  /// 내려둔 클래스 (비활성 배지)
+  static const groupClassesInactiveBadge = '내려둔 클래스';
+
+  /// 내리기 (스와이프 액션 라벨 — soft delete)
+  static const groupClassesDeactivateAction = '내리기';
+
+  /// 클래스를 내릴까요? (확인 다이얼로그 제목)
+  static const groupClassesDeactivateTitle = '클래스를 내릴까요?';
+
+  /// $name 내리기 확인 메시지 (예약·출석 이력 보존 명시)
+  static String groupClassesDeactivateMessage(String name) =>
+      '$name 은(는) 학생에게 더 이상 보이지 않습니다. 지난 예약·출석 기록은 그대로 남습니다.';
+
+  /// 클래스를 내렸습니다 (스낵바)
+  static const groupClassesDeactivated = '클래스를 내렸습니다';
+
+  /// 내리기 실패 (스낵바)
+  static const groupClassesDeactivateFailed = '클래스를 내리지 못했습니다. 다시 시도해주세요';
+
+  /// 그룹 수강권 (반 미지정 그룹 수강권의 표시 라벨 — 개인레슨 폴백 금지)
+  static const subscriptionGroupTicketLabel = '그룹 수강권';
+
+  /// 그룹 (수강권 카드 그룹 배지 라벨)
+  static const subscriptionGroupBadge = '그룹';
+
   /// 오류가 발생했습니다. 다시 시도해주세요.
   static const errorTryAgain = '오류가 발생했습니다. 다시 시도해주세요.';
 
@@ -1940,12 +2064,11 @@ class AppStrings {
   static String bookingPolicyText({
     required int bookingDeadlineHours,
     required int cancelDeadlineHours,
-    required bool deductOnNoShow,
+    required String noShowText,
   }) {
-    final noShow = deductOnNoShow ? '수강권 차감' : '수강권 미차감';
     return '• 예약 마감: 수업 $bookingDeadlineHours시간 전\n'
         '• 취소 마감: 수업 $cancelDeadlineHours시간 전\n'
-        '• 미참석 시: $noShow';
+        '• 미참석 시: $noShowText';
   }
 
   /// 대기 N번으로 등록되었습니다
@@ -2428,6 +2551,9 @@ class AppStrings {
   /// 레슨 노트 (lesson note history AppBar)
   static const lessonNotesTitle = '레슨 노트';
 
+  /// 지난 노트 (#1215 노트 편집기 위 이전 레슨 노트 참조 헤더)
+  static const previousLessonNotesTitle = '지난 노트';
+
   /// 노트 검색... (search hint)
   static const noteSearchHint = '노트 검색...';
 
@@ -2663,6 +2789,29 @@ class AppStrings {
   /// 스케줄 변경으로 이동 링크 텍스트
   static const goToScheduleChange = '스케줄 변경으로 이동 →';
 
+  // ── Awaiting Feedback Queue (선생님 피드백 대기 큐 — 껍데기감사 #415) ─
+  /// 피드백 대기 (screen title + home badge label)
+  static const awaitingFeedbackTitle = '피드백 대기';
+
+  /// {name} · N건 (student group header)
+  static String awaitingFeedbackStudentCount(String name, int count) =>
+      '$name · $count건';
+
+  /// N시간 전 완료 (completion relative-time suffix; time = '2시간 전')
+  static String awaitingFeedbackCompletedAgo(String relative) => '$relative 완료';
+
+  /// 리액션 보내기 (1-tap reaction button tooltip)
+  static const awaitingFeedbackReactTooltip = '리액션 보내기';
+
+  /// 모두 확인했어요 (empty state title)
+  static const awaitingFeedbackEmpty = '모두 확인했어요';
+
+  /// 대기 중인 피드백이 없습니다 (empty state subtitle)
+  static const awaitingFeedbackEmptySubtitle = '대기 중인 피드백이 없습니다';
+
+  /// 피드백 대기 N건 (home badge count label)
+  static String awaitingFeedbackBadge(int count) => '피드백 대기 $count건';
+
   // ── Quick Feedback (빠른 피드백 화면 30차) ─
 
   /// 피드백 (quick feedback screen title)
@@ -2682,6 +2831,12 @@ class AppStrings {
 
   /// 연습 팁 (section header)
   static const practiceTipsSection = '연습 팁';
+
+  /// 이번 주 집중 (#1106 — 피드백→연습 연결 카드 제목)
+  static const weeklyFocusTitle = '이번 주 집중';
+
+  /// 지금 연습하기 (#1106 — 집중 카드 CTA, 연습 허브로 이동)
+  static const weeklyFocusPracticeCta = '지금 연습하기';
 
   /// 저장하기 (save action button)
   static const saveAction = '저장하기';
@@ -2816,6 +2971,43 @@ class AppStrings {
       '이 레슨은 1회 체험 수강권으로 자동 연결됩니다.\n'
       '수강권을 발급하면 이후 레슨 횟수와 이동시간이\n'
       '자동으로 관리됩니다.';
+
+  /// S5 보조 버튼 — 체험 자동발급 대신 정식 수강권부터 발급 (spec §2.6.1)
+  static const manualLessonIssueFirstButton = '정식 수강권 먼저 발급';
+
+  /// S6 — 체험권 재사용 차단(trial_already_used) 안내 다이얼로그 (spec §2.6.5)
+  static const trialAlreadyUsedTitle = '체험 수강권을 이미 사용했어요';
+  static const trialAlreadyUsedMessage =
+      '이 학생은 무료 체험 수강권을 이미 사용했습니다.\n'
+      '정식 수강권을 발급하면 이 레슨부터 자동으로\n'
+      '연결·관리됩니다.';
+  static const issueSubscriptionAction = '수강권 발급하기';
+
+  /// S3 — 잔여 0 처리 방식 시트 (spec §2.6.2)
+  static const overflowSheetTitle = '처리 방식 선택';
+  static String overflowSheetSubtitle(String student, String subscription) =>
+      '$student · $subscription (0회 남음)';
+  static const overflowOptionMakeup = '보강 레슨';
+  static String overflowOptionMakeupDesc(int credits) =>
+      '보강 크레딧 $credits개 보유 · 1개를 사용합니다';
+  static const overflowOptionBonus = '보너스 레슨 (무료 추가)';
+  static const overflowOptionBonusDesc = '수강권에 +1회 무료 추가됩니다';
+  static const overflowOptionRenewal = '수강권 갱신 제안 보내기';
+  static const overflowOptionRenewalDesc = '갱신 후 이 시간으로 예약됩니다';
+  static const overflowOptionRenewalIssue = '수강권 갱신 발급';
+  static const overflowOptionRenewalIssueDesc = '발급 화면에서 입금 확인 후 바로 발급합니다';
+  static const overflowRenewalPreviewSnack = '갱신 대기 레슨으로 등록했습니다. 발급 화면으로 이동합니다';
+
+  /// 경로 4 (quick_add_lesson) — 학생 선택 시트 신규 학생 인라인 등록
+  static const lessonPickerAddStudentAction = '새 학생 등록';
+
+  /// §2.7 미가입 특칙 — 수강권 레슨도 선생님 단독 일정 수정 (챗 협상 생략)
+  static const scheduleEditDirectLabel = '일정 수정 (직접)';
+
+  /// S4 — 보강 크레딧 소비 토글 (spec §2.6.1, makeup_credit_spec §5.4)
+  static const makeupToggleLabel = '보강으로 처리';
+  static String makeupToggleCredits(int credits) => '보강 크레딧 $credits개 보유';
+  static const lessonMakeupBadge = '보강 크레딧 사용';
   static String activeSubscriptionBanner(int remaining, int total) =>
       '수강권 $remaining/$total회 남음 · 이 레슨은 1회차로 차감됩니다.';
 
@@ -3117,8 +3309,25 @@ class AppStrings {
   /// 녹음을 시작할 수 없습니다 (cannot start recording)
   static const cannotStartRecording = '녹음을 시작할 수 없습니다';
 
+  /// 미리듣기 재생 실패 안내 (#1243).
+  static const cannotPlayRecording = '재생할 수 없는 파일입니다';
+
+  /// 취소 마감 경과 안내 (#1241) — 서버가 지각 취소로 확정한다.
+  static const cancelDeadlinePassedHint = '취소 마감이 지났습니다 — 사전 취소를 선택해도 지각 취소로 처리됩니다';
+
+  /// 취소 마감 이전 안내 (#1241).
+  static String cancelDeadlineRemainingHint(int hours) =>
+      '레슨 $hours시간 전까지는 차감 없이 취소할 수 있습니다';
+
   /// 마이크 권한이 필요합니다 (microphone permission needed)
   static const micPermissionNeeded = '마이크 권한이 필요합니다';
+
+  /// 마이크 권한 영구거부 시 설정 유도 SnackBar (#1197)
+  static const micPermissionSettingsGuide =
+      '마이크 권한이 필요합니다. 설정에서 마이크 권한을 허용해주세요.';
+
+  /// SnackBar 액션 — OS 앱 설정 열기 (#1197)
+  static const openSettings = '설정 열기';
 
   // -- Add External Link Sheet --
 
@@ -3315,9 +3524,9 @@ class AppStrings {
   static String subscriptionExpiringTitle(int daysLeft) =>
       '수강권이 $daysLeft일 후 만료됩니다';
 
-  /// 수강권 만료 임박 본문 (남은 횟수 안내 + CTA)
-  static String subscriptionExpiringBody(int remaining) =>
-      '남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
+  /// 수강권 만료 임박 본문 (수강권 종류 + 남은 횟수 안내 + CTA)
+  static String subscriptionExpiringBody(String kind, int remaining) =>
+      '$kind · 남은 횟수 $remaining회 · 갱신 요청을 보내보세요';
 
   /// 수강권 확인 (액션 라벨)
   static const subscriptionViewAction = '수강권 확인';
@@ -3328,8 +3537,9 @@ class AppStrings {
   /// 수강권 1회 남음 (low lessons 알림 제목)
   static const subscriptionLastLessonTitle = '수강권이 마지막 1회 남았습니다';
 
-  /// 갱신 요청 안내 본문 (low lessons / expired 공용)
-  static const subscriptionRenewalRequestBody = '갱신 요청을 보내 레슨을 이어가세요';
+  /// 갱신 요청 안내 본문 (수강권 종류 + low lessons / expired 공용)
+  static String subscriptionRenewalRequestBody(String kind) =>
+      '$kind · 갱신 요청을 보내 레슨을 이어가세요';
 
   /// 갱신 요청 (액션 라벨)
   static const subscriptionRenewalAction = '갱신 요청';
@@ -3488,8 +3698,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -3921,6 +4131,9 @@ class AppStrings {
 
   /// 당일 취소 (24시간 이내)
   static const usageNoteLateCancellation = '당일 취소 (24시간 이내)';
+
+  /// 학생 결석 (사전 연락 없음)
+  static const usageNoteStudentAbsent = '학생 결석 (사전 연락 없음)';
 
   // SubscriptionSettings 디폴트 description
   /// 대량 구매 보너스
@@ -4919,6 +5132,10 @@ class AppStrings {
   /// #769: 발급 방식 차이 캡션 — 교사 즉시 발급.
   static const unifiedSubscriptionDirectIssueCaption = '교사가 즉시 발급';
 
+  /// 직접 발급 x 다중 템플릿 가드 — 발급 화면은 템플릿 1개만 받는다.
+  static const unifiedSubscriptionDirectIssueSingleTemplateOnly =
+      '바로 발급은 템플릿 1개만 선택할 수 있어요. 여러 개는 제안으로 보내주세요.';
+
   /// #769: 발급 방식 차이 캡션 — 학생 수락·입금 후 발급(제안).
   static const unifiedSubscriptionProposalCaption = '학생 수락·입금 후 발급';
 
@@ -5416,6 +5633,71 @@ class AppStrings {
 
   /// 학생 데이터가 없습니다 (빈 상태)
   static const analyticsNoStudentData = '학생 데이터가 없습니다';
+
+  // ── Analytics: 학생별 성장 / 요약 / 레퍼토리 (i18n §16 C5) ──────────────
+  /// 학생별 성장 탭 — 미니 통계 카드 라벨: 레슨 수
+  static const analyticsLessonCountLabel = '레슨 수';
+
+  /// 학생별 성장 탭 — 미니 통계 카드 라벨: 연속 연습
+  static const analyticsStreakLabel = '연속 연습';
+
+  /// 미니 통계 카드 값 — 레슨 횟수 ($n회)
+  static String analyticsLessonCountValueFormat(int n) => '$n회';
+
+  /// 미니 통계 카드 값 — 연속 연습 일수 ($n일)
+  static String analyticsStreakDaysFormat(int n) => '$n일';
+
+  /// 요약 탭 — 이동시간 카드 부제 (월 합산)
+  static const analyticsMonthlyTotal = '월 합산';
+
+  /// 요약 탭 — 학생별 연습 현황 섹션 제목
+  static const analyticsStudentPracticeStatus = '학생별 연습 현황';
+
+  /// 학생별 연습 현황 행 — 연습 달성률 ($pct%)
+  static String analyticsPracticePercentFormat(int pct) => '연습 $pct%';
+
+  /// 학생별 연습 현황 행 — 출석률 ($pct%)
+  static String analyticsAttendancePercentFormat(int pct) => '출석 $pct%';
+
+  /// 레퍼토리 진도 — 미분류 곡집 그룹 (기타)
+  static const analyticsRepertoireBookOther = '기타';
+
+  /// 레퍼토리 진도 상태 라벨 — 완료
+  static const analyticsRepertoireStatusCompleted = '완료';
+
+  /// 레퍼토리 진도 상태 라벨 — 진행중
+  static const analyticsRepertoireStatusInProgress = '진행중';
+
+  /// 레퍼토리 진도 상태 라벨 — 예정
+  static const analyticsRepertoireStatusPlanned = '예정';
+
+  // ── Analytics: 이탈 위험 학생 (Retention read-only surfacing — #1216) ────
+  /// 이탈 위험 학생 (월간요약 탭 섹션 헤더)
+  static const analyticsAtRiskSectionTitle = '이탈 위험 학생';
+
+  /// 이탈 위험 학생이 없습니다 (빈 상태 제목)
+  static const analyticsAtRiskEmptyTitle = '이탈 위험 학생이 없습니다';
+
+  /// 위험 높음 (RiskLevel.high 배지 라벨)
+  static const analyticsRiskLevelHigh = '위험 높음';
+
+  /// 위험 보통 (RiskLevel.medium 배지 라벨)
+  static const analyticsRiskLevelMedium = '위험 보통';
+
+  /// 위험 낮음 (RiskLevel.low 배지 라벨)
+  static const analyticsRiskLevelLow = '위험 낮음';
+
+  /// 만료일 없음 (daysUntilExpiry 가 null 인 경우 신호 텍스트)
+  static const analyticsAtRiskNoExpiry = '만료일 없음';
+
+  /// 레슨 기록 없음 (lastLessonDate 가 null 인 경우 신호 텍스트)
+  static const analyticsAtRiskNoLessonHistory = '레슨 기록 없음';
+
+  /// 연습량 N% 감소/증가 (practiceDropPercent 신호 포매터 — 음수=감소)
+  static String analyticsAtRiskPracticeDropFormat(double percent) {
+    final abs = percent.abs().toStringAsFixed(0);
+    return percent < 0 ? '연습량 $abs% 감소' : '연습량 $abs% 증가';
+  }
 
   // ── Edit Repertoire Screen (레퍼토리 편집 5-3b-26) ──────────────────────
   /// 레퍼토리 편집 (AppBar 타이틀)
@@ -6072,6 +6354,22 @@ class AppStrings {
   /// 정책: docs/specs/user/phone_verification_policy.md §2.
   static const questTitlePhoneVerification = '전화인증';
 
+  // ── OnboardingProgress required quest checklist (#602) ───────────────
+  // OnboardingQuest 표시 문자열 — 도메인 엔티티에서 이전. id → 라벨 매핑은
+  // features/onboarding/presentation/extensions/onboarding_quest_visuals.dart.
+  // 식별자: profile-created, first-student, first-lesson, first-note, phone-verified.
+  static const onboardingQuestProfileCreatedTitle = '프로필 생성';
+  static const onboardingQuestProfileCreatedDescription =
+      '선생님 프로필을 최소 정보로 완성합니다.';
+  static const onboardingQuestFirstStudentTitle = '첫 학생 추가';
+  static const onboardingQuestFirstStudentDescription = '첫 학생을 등록합니다.';
+  static const onboardingQuestFirstLessonTitle = '첫 레슨 등록';
+  static const onboardingQuestFirstLessonDescription = '첫 레슨 일정을 등록합니다.';
+  static const onboardingQuestFirstNoteTitle = '첫 레슨 노트 작성';
+  static const onboardingQuestFirstNoteDescription = '첫 레슨 피드백을 남깁니다.';
+  static const onboardingQuestPhoneVerifiedTitle = '전화번호 인증';
+  static const onboardingQuestPhoneVerifiedDescription = '전화번호 인증을 완료합니다.';
+
   // ── Bottom Navigation (홈 화면 하단 탭 5-3d-6) ─────────────────────────
   /// 홈 (bottom nav label, 로마숫자 I)
   static const homeTabLabel = '홈';
@@ -6266,11 +6564,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -6300,6 +6599,15 @@ class AppStrings {
 
   /// 만료/취소된 초대 — 비활성 섹션 헤더.
   static const inviteHistoryInactiveSection = '만료/취소된 초대';
+
+  /// 수락 — 초대 이력: 학생이 코드로 가입 완료(used) 섹션 헤더 (#1105).
+  static const inviteHistoryAcceptedSection = '수락';
+
+  /// 만료 — 초대 이력: 유효기간 경과(expired) 섹션 헤더 (#1105).
+  static const inviteHistoryExpiredSection = '만료';
+
+  /// 회수 — 초대 이력: 발급자가 취소(revoked) 섹션 헤더 (#1105).
+  static const inviteHistoryRevokedSection = '회수';
 
   /// 초대 취소 — 취소 다이얼로그 타이틀 + 카드 액션 버튼 라벨.
   static const inviteRevokeDialogTitle = '초대 취소';
@@ -6380,6 +6688,9 @@ class AppStrings {
   static const searchNoAcademiesFound = '검색된 학원이 없습니다';
   static const searchNoTeachersFound = '검색된 선생님이 없습니다';
   static const searchTrySuggestion = '다른 검색어나 필터를 시도해보세요';
+
+  /// 검색 0건 대체경로 CTA — 초대 코드로 직접 연결 (#1198)
+  static const searchConnectViaInviteCode = '초대 코드로 연결하기';
   static const searchPreviousTeacher = '이전에 레슨했어요';
   static const searchProfileLoadError = '프로필을 불러올 수 없습니다';
   static const searchProfileNotFound = '선생님 정보를 찾을 수 없습니다';
@@ -6445,6 +6756,112 @@ class AppStrings {
 
   // ── Invite / Connection ──
   static const inviteHowToConnect = '연결 방법 알아보기';
+
+  // ── My Connections / Invite Confirm (i18n §16 C5) ───────────────────
+  /// 잘못된 역할로 연결 시도 시 연결 실패 헤드라인
+  static const inviteCannotConnect = '연결할 수 없습니다';
+
+  /// 선생님이 선생님 코드를 입력한 경우 안내
+  static const inviteSelfCodeTeacher =
+      '선생님은 선생님의 초대 코드를 사용할 수 없습니다.\n학생의 초대 코드를 사용해주세요.';
+
+  /// 학생이 학생 코드를 입력한 경우 안내
+  static const inviteSelfCodeStudent =
+      '학생은 학생의 초대 코드를 사용할 수 없습니다.\n선생님의 초대 코드를 사용해주세요.';
+
+  /// 연결 확인 화면 제목 ($role = 상대 역할 라벨)
+  static String inviteConnectWithRoleFormat(String role) => '$role과 연결하기';
+
+  /// 연결 요청 확인 부제
+  static const inviteConnectRequestPrompt = '연결 요청을 보내시겠습니까?';
+
+  /// 이미 연결된 상대에게 재요청 시 헤드라인
+  static const inviteAlreadyConnected = '이미 연결되어 있습니다';
+
+  /// 이미 연결된 상대 안내 본문 ($role = 상대 역할 라벨)
+  static String inviteAlreadyConnectedBodyFormat(String role) =>
+      '해당 $role과 이미\n연결되어 있습니다.';
+
+  /// 연결 요청 전송 완료 헤드라인
+  static const inviteRequestSent = '연결 요청이 전송되었습니다!';
+
+  /// 연결 요청 전송 완료 본문 ($role = 상대 역할 라벨)
+  static String inviteRequestSentBodyFormat(String role) =>
+      '$role이 요청을 수락하면\n연결이 완료됩니다.';
+
+  /// 학생→선생님 연결 직후 체험레슨 예약 유도
+  static const inviteTrialBookingHint = '지금 바로 체험레슨을 예약할 수 있어요!';
+
+  /// 내 연결 목록 화면 제목 — 교사 측
+  static const inviteMyStudentsTitle = '내 학생';
+
+  /// 내 연결 목록 화면 제목 — 학생 측
+  static const inviteMyTeachersTitle = '내 선생님';
+
+  /// 연결 목록 로드 실패 (재시도 안내 포함)
+  static const inviteConnectionsLoadError = '연결 목록을 불러올 수 없습니다. 다시 시도해주세요.';
+
+  /// 연결 목록 로드 오류 설명
+  static const inviteConnectionsLoadErrorDescription =
+      '연결 목록을 불러오는 중 오류가 발생했습니다';
+
+  /// 빈 상태 — 연결된 학생 없음 (교사 측)
+  static const inviteNoConnectedStudents = '아직 연결된 학생이 없습니다';
+
+  /// 빈 상태 — 연결된 선생님 없음 (학생 측)
+  static const inviteNoConnectedTeachers = '아직 연결된 선생님이 없습니다';
+
+  /// 빈 상태 안내 — 교사 측 (초대 링크 공유)
+  static const inviteEmptyHintTeacher = '초대 링크를 공유하거나\n학생의 QR 코드를 스캔하세요.';
+
+  /// 빈 상태 안내 — 학생 측 (초대 코드 입력)
+  static const inviteEmptyHintStudent = '선생님의 초대 코드를 입력하거나\nQR 코드를 스캔하세요.';
+
+  /// 연결 방법 도움말 — 코드 입력 부제
+  static const inviteHelpCodeSubtitle = '선생님에게 받은 6자리 코드를 입력하세요';
+
+  /// 연결 방법 도움말 — QR 스캔 부제
+  static const inviteHelpScanSubtitle = '선생님의 QR 코드를 카메라로 스캔하세요';
+
+  /// 연결 방법 도움말 — 선생님 검색 부제
+  static const inviteHelpSearchSubtitle = '이름, 악기, 지역으로 선생님을 검색하세요';
+
+  /// 연결 카드 상태 배지 — 활성
+  static const inviteStatusConnected = '연결됨';
+
+  /// 연결 카드 상태 배지 — 해제
+  static const inviteStatusDisconnected = '해제됨';
+
+  /// 활성 연결 섹션 헤더 ($role = 학생/선생님)
+  static String inviteConnectedSectionFormat(String role) => '연결된 $role';
+
+  /// 이전(해제) 연결 섹션 헤더 ($role = 학생/선생님)
+  static String invitePreviousSectionFormat(String role) => '이전 $role';
+
+  /// 재연결 완료 SnackBar ($name = 상대 이름)
+  static String inviteReconnectedFormat(String name) => '$name님과 다시 연결되었습니다';
+
+  /// 연결 상세 — 연결일 ($date = 포맷된 날짜)
+  static String inviteConnectedDateFormat(String date) => '연결일: $date';
+
+  /// 연결 해제 확인 다이얼로그 본문 ($name = 상대 이름)
+  static String inviteDisconnectConfirmFormat(String name) =>
+      '$name님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.';
+
+  /// 연결 해제 완료 SnackBar ($name = 상대 이름)
+  static String inviteDisconnectedFormat(String name) => '$name님과의 연결이 해제되었습니다';
+
+  /// 연결 섹션 헤더 카운트 ($title = 섹션명, $count = 인원)
+  static String inviteSectionCountFormat(String title, int count) =>
+      '$title ($count명)';
+
+  /// 연결 카드 — 연결됨 + 경과 ($when = 상대 시각 표기)
+  static String inviteConnectedSinceFormat(String when) =>
+      '$inviteStatusConnected: $when';
+
+  /// 연결 카드 — 해제됨 + 경과 ($when = 상대 시각 표기)
+  static String inviteDisconnectedSinceFormat(String when) =>
+      '$inviteStatusDisconnected: $when';
   static const inviteConnectWithTeacher = '선생님과 연결하는 방법';
   static const inviteViewLessonSchedule = '레슨 일정 보기';
   static const inviteSendMessage = '메시지 보내기';
@@ -6470,6 +6887,13 @@ class AppStrings {
   static const onboardingCompleted = '완료';
   static const onboardingPhone = '휴대폰';
   static const onboardingProfile = '프로필';
+  // #1104 — Teacher onboarding step-progress header (역할→분야→프로필→가용시간)
+  // + role-select duration reassurance caption.
+  static const onboardingStepRole = '역할 선택';
+  static const onboardingStepDiscipline = '분야 선택';
+  static const onboardingStepProfile = '프로필';
+  static const onboardingStepAvailability = '첫 가용시간';
+  static const onboardingDurationCaption = '약 3분이면 끝나요';
   static const onboardingProfileSaveError = '프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.';
   static const onboardingProfileSaveFailure = '프로필 저장 실패. 다시 시도해주세요.';
   static const onboardingSelectFromGallery = '갤러리에서 선택';
@@ -6556,7 +6980,11 @@ class AppStrings {
       '아직 선생님이 없다면 가까운 선생님께 초대를 부탁해 주세요.\n'
       '본인 인증이 열리면 직접 가입도 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
-  static const authParentLoginNotReady = '학부모 로그인은 준비 중입니다.';
+
+  /// M6 (0702 감사) — 학부모도 Google 로그인 → 역할 선택으로 가입 가능.
+  /// '준비 중' 안내는 실제 가능한 경로를 숨겨 이탈을 유발했다.
+  static const authParentLoginNotReady =
+      '학부모도 Google 계정으로 시작한 뒤, 역할 선택에서 학부모를 선택해 주세요.';
   static const academyInviteAcceptFailed = '학원 초대 수락에 실패했습니다. 다시 시도해주세요.';
 
   /// 학원 초대 수락 성공 환영 메시지 (audit C3-F08)
@@ -6580,6 +7008,27 @@ class AppStrings {
   static const authDevTeacher = '선생님';
   static const authDevStudent = '학생';
   static const authDevParent = '학부모';
+
+  // ── Parent Invite Code (#601) ──
+  static const authParentInviteCodeDesc = '자녀의 선생님으로부터 받은\n초대 코드를 입력해주세요';
+  static const authInviteOrDivider = '또는';
+  static const authParentSkipTitle = '코드가 없어도 괜찮아요';
+  static const authParentSkipSubtitle = '나중에 프로필에서 자녀를 등록할 수 있습니다';
+
+  // ── Terms Agreement (#606) — 보기용 시트 타이틀/라벨 (본문은 위젯 const 유지) ──
+  static const authTermsOfServiceTitle = '서비스 이용약관';
+  static const authTermsSelectAll = '전체 동의';
+  static const authTermsView = '보기';
+
+  // ── Academy Invite Accept (#605) ──
+  static const academyInviteTitle = '학원 초대';
+  static const academyInviteRejectReasonTitle = '거절 사유를 선택해주세요';
+  static const academyInviteRejectReasonNotInterested = '관심 없음';
+  static const academyInviteRejectReasonAlreadyMember = '이미 다른 학원 소속';
+  static const academyInviteRejectReasonOther = '기타';
+  static const academyInviteOwnerPrefix = '대표: ';
+  static const academyInviteRolesTitle = '부여될 권한';
+  static const academyInvitePublicConsentLabel = '학원 공개 페이지에 내 프로필 노출 허용';
 
   // ── Age Gate (만 14세 미만 차단 안전망) ──
   // 정책: docs/specs/user/phone_verification_policy.md — 본인인증(PASS) 통합
@@ -6634,6 +7083,23 @@ class AppStrings {
   static const trophyCollectionMoreLabel = '더 보기';
   static String trophyCollectionCountLabel(int count) => '($count)';
 
+  // ── Journey Sticker Catalog (P3b Daily Satisfaction — doc 46 §5) ──
+  // 레퍼토리 기반 여정 스티커. 서버 computed 카탈로그(적립 테이블 없음, 로그
+  // 실시간 집계) — badge_collection_screen 의 획득한 뱃지 섹션과 별개 표시.
+  static const journeyStickerSectionTitle = '여정 스티커';
+  static const journeyStickerFamilyPractice = '연습';
+  static const journeyStickerFamilyJourney = '여정';
+  static const journeyStickerFamilyStreak = '꾸준함';
+  static const journeyStickerFamilyGrowth = '성장';
+  static String journeyStickerProgressHoursLabel(
+    int currentHours,
+    int targetHours,
+  ) => '$currentHours/${targetHours}h';
+  static String journeyStickerProgressDaysLabel(int current, int target) =>
+      '$current/$target일';
+  static String journeyStickerProgressCountLabel(int current, int target) =>
+      '$current/$target개';
+
   // ── Rest Recommendation (P2 Visual Growth — Job 8 / AC-7) ──
   static const restRecommendationSessionMessage = '잠깐 쉬는 게 어때요?';
   static const restRecommendationDailyMessage = '오늘은 충분히 했어요';
@@ -6642,8 +7108,31 @@ class AppStrings {
   // ── Growth Detail Screen (P2 Visual Growth — Job 9 / AC-6.4) ──
   static const growthDetailScreenTitle = '내 성장';
   static const growthDetailYearLabel = '1년 동안';
-  static const growthDetailSpotlightPlaceholder = '추천은 곧 추가됩니다';
-  static const growthDetailComparisonPlaceholder = '비교 보기는 곧 추가됩니다';
+
+  // ── Daily Practice Goal (P2 Daily Satisfaction — doc 46 §4) ──
+  // 잔디(성장 히트맵) 연동 오늘의 목표 카드. ESL 앱 관행처럼 "오늘 목표"만
+  // 다루고 밀린 목표를 누적 표시하지 않는다 (100% 상한).
+  static const dailyGoalCardTitle = '오늘의 연습 목표';
+  static const dailyGoalAchievedLabel = '오늘 목표 달성';
+  static const dailyGoalStartPrompt = '지금 연습을 시작해 볼까요';
+  static const dailyGoalAdjustSheetTitle = '오늘의 목표 조절';
+  static const dailyGoalAdjustSheetHint = '5분 단위로 조절할 수 있어요';
+  static String dailyGoalProgressLabel(int current, int goal) =>
+      '$current/$goal분';
+  static String dailyGoalRemainingLabel(int minutes) => '목표까지 $minutes분 남음';
+
+  // ── Daily Missions (P3a Daily Satisfaction — doc 46 §4④) ──
+  // ESL 스타일 "오늘의 미션" — 고정1(오늘의 연습 목표) + 로테이션2(메트로놈/
+  // 튜너/녹음 중 2개, KST 자정 리셋). StudentQuest 와 별개 — 서버 없이
+  // 로컬 관측 신호만으로 진행을 계산한다.
+  static const dailyMissionsCardTitle = '오늘의 미션';
+  static String dailyMissionsProgressLabel(int done, int total) =>
+      '$done/$total';
+  static const dailyMissionsAllDoneBonus = '미션 3개 모두 완료! 오늘도 최고예요';
+  static const dailyMissionPracticeTitle = '오늘의 연습 목표 채우기';
+  static const dailyMissionMetronomeTitle = '메트로놈과 함께 연습하기';
+  static const dailyMissionTunerTitle = '튜너로 음정 확인하기';
+  static const dailyMissionRecordingTitle = '연습 녹음 남기기';
 
   // ── Practice Badge (§2.7) ──
   static const practiceBadgeCollectionTitle = '뱃지 컬렉션';
@@ -6710,6 +7199,7 @@ class AppStrings {
   // ─── Student Home ───
   static const studentHomePracticeReminder = '연습 리마인더';
   static const studentHomePracticeReminderDesc = '설정한 시간에 연습 알림을 받습니다';
+  static const studentHomePracticeReminderOff = '꺼짐';
   static const studentHomeWeeklyPractice = '이번 주 연습';
   static const studentHomePracticeJournal = '연습 일지';
   static const studentHomeMySubscriptions = '내 수강권';
@@ -6922,6 +7412,13 @@ class AppStrings {
   static const parentHomeRegularLesson = '정규 레슨';
   static const parentHomeTodayPractice = '오늘의 연습';
   static const parentHomeFindTeacher = '선생님 찾기';
+  static const parentHomeRegisterMinorChild = '만 14세 미만 자녀 등록';
+  static const parentHomeConnectExistingStudent = '기존 학생 연결';
+  static const parentHomeLessonNotificationSubtitle = '일정 변경, 취소 알림';
+  static const parentHomePracticeNotificationSubtitle = '연습 완료, 스트릭 달성';
+  static const parentHomePaymentNotificationSubtitle = '입금 안내, 입금 확인 (필수)';
+  static const parentHomeSwitchChild = '자녀 전환';
+  static const parentHomeDeleteChildProfile = '자녀 프로필 삭제';
   static const parentHomeInviteCode = '초대코드 입력';
   static const parentHomeWeeklyPractice = '이번 주 연습';
   static const parentHomeConnect = '연결';
@@ -6955,6 +7452,118 @@ class AppStrings {
   static const parentHomePriorityMust = '필수';
   static const parentHomePriorityShould = '권장';
   static const parentHomePriorityCould = '선택';
+
+  // ── Parent Home Phase 2 (i18n §16 C5) ───────────────────────────────
+  /// 자녀 정보 수정 완료 SnackBar
+  static const parentHomeChildUpdated = '자녀 정보가 수정되었습니다';
+
+  /// 자녀 프로필 추가 완료 SnackBar
+  static const parentHomeChildAdded = '자녀 프로필이 추가되었습니다';
+
+  /// 자녀 폼 — 만 14세 미만 안내 배너
+  static const parentHomeUnder14Notice =
+      '만 14세 미만 자녀는 별도 계정 없이 학부모 계정에서 관리됩니다.';
+
+  /// 자녀 폼 — 프로필 색상 필드 라벨
+  static const parentHomeProfileColorLabel = '프로필 색상';
+
+  /// 자녀 폼 — 이름/별명 필드 라벨
+  static const parentHomeChildNameLabel = '이름/별명';
+
+  /// 자녀 폼 — 이름 필수 검증 메시지
+  static const parentHomeChildNameRequired = '이름을 입력해주세요';
+
+  /// 자녀 폼 — 이름 최소 길이 검증 메시지
+  static const parentHomeChildNameMinLength = '2글자 이상 입력해주세요';
+
+  /// 자녀 폼 — 출생년도 필드 라벨
+  static const parentHomeBirthYearLabel = '출생년도';
+
+  /// 자녀 폼 — 만 14세 이상 별도 계정 안내
+  static const parentHomeOver14Notice = '만 14세 이상은 별도 계정 등록이 가능합니다.';
+
+  /// 자녀 폼 — 수준 필드 라벨
+  static const parentHomeLevelLabel = '수준';
+
+  /// 자녀 폼 — 추가 버튼(신규)
+  static const parentHomeChildAdd = '자녀 추가';
+
+  /// 자녀 목록 빈 상태 부제
+  static const parentHomeChildrenEmptySubtitle =
+      '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요';
+
+  /// 자녀 카드 부제 — 선생님 미연결 fallback
+  static const parentHomeTeacherNotConnected = '선생님 미연결';
+
+  /// 자녀 추가 방법 선택 시트 제목
+  static const parentHomeChildAddMethodTitle = '자녀를 추가할 방법을 선택하세요';
+
+  /// 자녀 추가 방법 — 직접 추가 설명
+  static const parentHomeChildAddDirectDesc = '별도 계정 없이 학부모 계정에서 관리';
+
+  /// 자녀 추가 방법 — 초대 코드 연결 설명
+  static const parentHomeChildAddInviteDesc = '초대 코드로 만 14세 이상 학생 계정 연결';
+
+  /// 프로필 전환 — 자녀 프로필 섹션 라벨
+  static const parentHomeChildProfilesSectionLabel = '자녀 프로필';
+
+  /// 프로필 전환 — 미연결 자녀 배지
+  static const parentHomeUnconnectedBadge = '미연결';
+
+  /// 프로필 전환 — 연결 대기 중 부제
+  static const parentHomeConnectionPending = '연결 대기 중';
+
+  /// 프로필 전환 — 미연결 자녀 기능 안내 부제
+  static const parentHomePracticeMetronomeOnly = '연습/메트로놈만 가능';
+
+  /// 프로필 전환 시트 제목
+  static const parentHomeSwitchProfileTitle = '프로필 전환';
+
+  /// 프로필 전환 — 본인(학생 본인) 연습 부제
+  static const parentHomeOwnPractice = '본인 연습';
+
+  /// 프로필 헤더 — 아바타 이니셜 fallback(이름 없음)
+  static const parentHomeAvatarInitialFallback = '학';
+
+  /// 미연결 자녀 대시보드 — 선생님 연결 CTA
+  static const parentHomeConnectTeacherCta = '선생님과 연결하세요';
+
+  /// 미연결 자녀 대시보드 — 연결 시 혜택 안내
+  static const parentHomeConnectBenefits = '레퍼토리, 레슨 예약, 숙제 확인이 가능해집니다';
+
+  /// 나이 표기 ($age = 만 나이)
+  static String parentHomeAgeFormat(int age) => '만 $age세';
+
+  /// 출생년도 드롭다운 항목 ($year = 연도, $age = 만 나이)
+  static String parentHomeBirthYearAgeFormat(int year, int age) =>
+      '$year년 (${parentHomeAgeFormat(age)})';
+
+  /// 자녀 프로필 삭제 확인 본문 ($name = 자녀 이름)
+  static String parentHomeChildDeleteConfirmFormat(String name) =>
+      "'$name' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.";
+
+  /// 자녀 레슨 섹션 제목 ($name = 자녀 이름)
+  static String parentHomeChildLessonsTitleFormat(String name) => '$name의 레슨';
+
+  /// 일수 표기 ($n일)
+  static String parentHomeDaysFormat(int n) => '$n일';
+
+  /// 횟수 표기 ($n회)
+  static String parentHomeLessonCountFormat(int n) => '$n회';
+
+  /// 연습 일수 표기 ($n일 연습)
+  static String parentHomePracticedDaysFormat(int n) => '$n일 연습';
+
+  /// 프로필 전환 — 학생 프로필 라벨 ($name (학생))
+  static String parentHomeStudentProfileLabelFormat(String name) =>
+      '$name (학생)';
+
+  /// 프로필 전환 — 선생님 부제 ($name 선생님)
+  static String parentHomeTeacherSubtitleFormat(String name) => '$name 선생님';
+
+  /// 알림 활성 개수 ($enabled/$total개 알림 활성화)
+  static String parentHomeNotificationActiveFormat(int enabled, int total) =>
+      '$enabled/$total개 알림 활성화';
   static const parentHomeCompletedLabel = '완료됨';
   // ── Parent Lessons tab (실데이터) + 노트 접근동의 게이트 ──────
   static const parentHomeNoUpcomingLessons = '예정된 레슨이 없습니다';
@@ -7214,6 +7823,8 @@ class AppStrings {
   // -- Practice Notes --
   static const practiceNoteHint = '연습하면서 느낀 점을 기록하세요...';
   static const practiceNoteTitle = '연습노트';
+  static const practiceNoteEditTitle = '연습노트 수정';
+  static const practiceNoteAddTitle = '연습노트 추가';
   static const practiceNoteEmptyTitle = '연습노트가 없습니다';
   static const practiceNoteEmptySubtitle = '연습하면서 느낀 점을 기록해보세요';
   static const practiceNoteAddedSnack = '연습노트가 추가되었습니다';
@@ -7290,6 +7901,27 @@ class AppStrings {
   static const practiceRepertoireAddFailedRetry = '레퍼토리 추가에 실패했습니다. 다시 시도해주세요.';
   static const practiceSaveThenAddSection = '저장 후 섹션 추가하기';
   static const practiceRepertoireDeleteTitle = '레퍼토리 삭제';
+
+  // -- Repertoire/Section Add (#616 i18n) --
+  static const practiceSaveThenAddSectionHint = '레퍼토리 저장 후 섹션 추가 화면으로 이동합니다';
+  static const practiceSectionDuplicateError = '동일한 곡명과 범위의 섹션이 이미 존재합니다';
+  static const practiceSectionAddFailedRetry = '섹션 추가에 실패했습니다. 다시 시도해주세요.';
+  static const practiceSaveFailedRetry = '저장에 실패했습니다. 다시 시도해주세요.';
+  static const practiceStartMeasureLabel = '시작 마디';
+  static const practiceEndMeasureLabel = '끝 마디';
+  static const practiceStartLineLabel = '시작 줄';
+  static const practiceEndLineLabel = '끝 줄';
+  static const practicePieceNameLabel = '곡/연습곡 이름 *';
+  static const practicePieceNameSimpleLabel = '곡명 *';
+  static const practicePieceNameRequired = '곡 이름을 입력해주세요';
+  static const practiceMeasureRangeSelectHint = '연습할 마디 구간을 선택하세요';
+  static const practiceLineRangeSelectHint = '연습할 줄 구간을 선택하세요 (1~10줄)';
+  static const practiceSectionAliasLabel = '섹션 별칭 (선택)';
+  static String practiceSectionAliasHelper(String preview) =>
+      '비워두면 "$preview"로 표시됩니다';
+  static String practiceSectionNumberLabel(int number) => '섹션 $number';
+  static String practiceSectionPieceNameRequired(int number) =>
+      '섹션 $number의 곡명을 입력해주세요';
 
   // -- Smart Recording --
   static String practiceSmartTrimFront(String duration) => '앞 $duration 트림';
@@ -7449,6 +8081,7 @@ class AppStrings {
   static const profileBankAccountSaveError = '계좌 저장에 실패했어요. 잠시 후 다시 시도해주세요';
 
   static const profileBankAccountAddFormTitle = '계좌 추가';
+  static const profileBankAccountEditFormTitle = '계좌 수정';
   static const profileBankAccountBankNameLabel = '은행명 *';
   static const profileBankAccountHintBankSelect = '은행 선택';
   static const profileBankAccountHintBankName = '은행명 입력';
@@ -7551,6 +8184,9 @@ class AppStrings {
   // ── Cancellation Defaults Settings ──
   static const profileCancellationDefaultsTitle = '취소 정책 기본값';
 
+  /// 설정 저장 실패 SnackBar (#1184·#1194 — 설정 계열 공용)
+  static const settingsSaveFailed = '설정 저장에 실패했습니다. 다시 시도해주세요.';
+
   /// 취소 정책 기본값 화면 역할 안내 — #801. 변경권·노쇼는 취소/노쇼 정책 소관 명시.
   static const cancellationDefaultsRoleNote =
       '지각취소 시 보상·알림의 전역 기본값입니다. 변경 횟수·최소 취소 시간·노쇼·이월은 「취소/노쇼 정책」에서 설정합니다.';
@@ -7625,6 +8261,9 @@ class AppStrings {
   static const profileOutstandingEmpty = '미수금 항목이 없습니다';
   static const profileOutstandingListTitle = '미수금 목록';
   static const profileOutstandingSendReminder = '알림 보내기';
+  // #1212 학생에게 실제로 도달하는 발송 경로(BE)가 없어 버튼 비활성 + 준비중 표기.
+  static const profileOutstandingSendReminderPreparing =
+      '$profileOutstandingSendReminder ($authComingSoonBadge)';
   static const profileOutstandingConfirmPayment = '입금 확인';
   static const profileOutstandingPaymentConfirmed = '입금이 확인되었습니다';
   // #426 입금 확인 24h Undo
@@ -7771,6 +8410,12 @@ class AppStrings {
   static const studentBulkMessageTitleHint = '예) 5월 연휴 일정 안내';
   static const studentSubscriptionStatus = '수강권 현황';
   static const studentSubscriptionIssue = '발급';
+
+  /// 수강권 미등록 (학생 상세 경고 배너 제목)
+  static const studentSubscriptionMissingTitle = '수강권 미등록';
+
+  /// 학생에게 수강권을 발급해주세요 (학생 상세 경고 배너 설명)
+  static const studentSubscriptionMissingSubtitle = '학생에게 수강권을 발급해주세요';
   static const studentLessonNotes = '레슨 노트';
   static const studentWeeklyPractice = '이번 주 연습';
   static const studentPracticeLoadError = '연습 정보를 불러올 수 없습니다';
@@ -8133,6 +8778,22 @@ class AppStrings {
   static String syncFailedBanner(int count) => '$count건의 동기화가 실패했습니다';
   static const syncRetryAction = '재시도';
 
+  // ── Sync status UI (#1120) ──
+  static String syncStatusPending(int count) => '$count건 전송 대기 중';
+  static String syncStatusPendingOffline(int count) => '오프라인 · $count건 대기';
+  static String syncStatusSyncing(int count) => '$count건 동기화 중';
+  static String syncStatusFailed(int count) => '$count건 전송 실패';
+  static const syncQueueSheetTitle = '전송 실패 항목';
+  static const syncQueueEmpty = '전송 실패한 항목이 없습니다';
+  static const syncDeleteAction = '삭제';
+  static const syncEntryFailedDescription = '전송에 실패했습니다. 재시도하거나 삭제하세요.';
+  static const syncOrphanEntryDescription =
+      '앱이 종료되며 전송이 중단된 항목입니다. 재시도하면 서버로 다시 보냅니다.';
+  static const syncConflictEntryDescription = '서버의 최신 변경과 충돌해 반영되지 않았습니다.';
+
+  // ── Sync conflict rejection SnackBar (#1119) ──
+  static const syncConflictRejected = '서버의 최신 변경과 충돌해 반영되지 않았습니다';
+
   // ── Academy announcements ──
   static const announcementsTitle = '공지사항';
   static const announcementMarkAsRead = '읽음 처리';
@@ -8369,6 +9030,32 @@ class AppStrings {
 
   /// 공개 학생 요약 — 토큰 정보 부가 설명
   static const studentSummaryTokenLabel = '공유 링크';
+
+  // ── Public Child Growth Report (#1217) ────────────────────
+
+  /// 공개 성장 리포트 — 화면 제목
+  static const growthReportAppBarTitle = '성장 리포트';
+
+  /// 공개 성장 리포트 — 연속 연습일 지표 라벨
+  static const growthReportStreakLabel = '연속 연습';
+
+  /// 공개 성장 리포트 — 최근 30일 레슨 수 지표 라벨
+  static const growthReportRecentLessonsLabel = '최근 30일 레슨';
+
+  /// 공개 성장 리포트 — 토큰 정보 부가 설명 (studentSummaryTokenLabel 과 동일 의미, 화면 분리)
+  static const growthReportTokenLabel = '공유 링크';
+
+  /// 학생 상세 화면 더보기 시트 — 성장 리포트 공유 메뉴 항목
+  static const growthReportShareMenuLabel = '리포트 공유';
+
+  /// 학생 상세 화면 더보기 시트 — 성장 리포트 공유 메뉴 부가 설명
+  static const growthReportShareMenuHint = '무가입 학부모에게 보낼 읽기전용 링크';
+
+  /// 성장 리포트 공유 링크 복사 성공 토스트
+  static const growthReportShareCopied = '리포트 공유 링크가 복사되었습니다';
+
+  /// 성장 리포트 공유 링크 생성 실패 토스트 (lessonSummaryShareError 와 동일 문구, 화면 분리)
+  static const growthReportShareError = '공유 링크 생성에 실패했습니다. 다시 시도해주세요.';
 
   // ── Paywall (R4 #415) ────────────────────────────────────
   // spec/paywall_spec.md §6.3.
@@ -8637,9 +9324,10 @@ class AppStrings {
   static const vacationNotifyDialogTitle = '통보 완료';
 
   /// 휴가 등록 성공 확인 다이얼로그 본문 — 영향 학생 수 포함.
-  static String vacationNotifyDialogBody(int studentCount) => studentCount == 0
-      ? '해당 기간에 영향 받는 학생이 없어요.'
-      : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
+  static String vacationNotifyDialogBody(int studentCount) =>
+      studentCount == 0
+          ? '해당 기간에 영향 받는 학생이 없어요.'
+          : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
 
   /// 휴가 등록 성공 확인 다이얼로그 확인 버튼.
   static const vacationNotifyDialogConfirm = '확인';
@@ -8887,6 +9575,13 @@ class AppStrings {
   /// 회수 버튼.
   static const makeupCreditRevokeButton = '회수';
 
+  /// 보강 크레딧을 회수할까요? (회수 확인 다이얼로그 제목)
+  static const makeupCreditRevokeConfirmTitle = '보강 크레딧을 회수할까요?';
+
+  /// 학생의 보강 크레딧 1회를 회수해요. (회수 확인 다이얼로그 본문)
+  static const makeupCreditRevokeConfirmBody =
+      '학생의 보강 크레딧 1회를 회수해요. 회수 후에는 되돌릴 수 없어요.';
+
   /// 회수 성공 스낵바.
   static const makeupCreditRevokeSuccess = '보강 크레딧을 회수했어요.';
 
@@ -9059,6 +9754,23 @@ class AppStrings {
   /// 처리 실패 스낵바.
   static const attendanceActionFailed = '처리에 실패했습니다. 다시 시도해주세요.';
 
+  /// 출결 처리 되돌리기 액션 (#1240).
+  static const attendanceRevertAction = '되돌리기';
+
+  /// 되돌리기 다이얼로그 제목.
+  static const attendanceRevertDialogTitle = '출결 처리 되돌리기';
+
+  /// 되돌리기 다이얼로그 본문 — 차감 복구 고지.
+  static const attendanceRevertDialogMessage =
+      '이 레슨을 예정 상태로 되돌리시겠습니까?\n차감된 수강권 1회가 복구됩니다.';
+
+  /// 되돌리기 다이얼로그 본문 — 차감이 없던 경우.
+  static const attendanceRevertDialogMessageNoDeduction =
+      '이 레슨을 예정 상태로 되돌리시겠습니까?';
+
+  /// 되돌리기 완료 스낵바.
+  static const attendanceRevertedSnack = '예정 상태로 되돌렸습니다';
+
   // 다중선택 일괄 처리 (#768 ①).
   /// 일괄 완료 확인 다이얼로그 제목.
   static const batchCompleteDialogTitle = '선택한 레슨 완료';
@@ -9116,6 +9828,7 @@ class AppStrings {
 
   /// 휴강 상세 화면 AppBar.
   static const bulkClosureDetailTitle = '학원 휴강 안내';
+  static const bulkClosureNotFound = '휴강 정보를 찾을 수 없습니다';
 
   /// 학원 사유 / 강사 페이 보장 안내 (§5.2).
   static const bulkClosureAcademyReasonNote =
@@ -9479,6 +10192,9 @@ class AppStrings {
   /// 메인 홈 5묶음 메뉴 영역 섹션 헤더.
   static const categorySectionTitle = '설정';
 
+  /// 프로필 탭 통계·분석 섹션 헤더 (#1164 — 출석 현황 진입점).
+  static const profileAnalyticsSectionTitle = '통계·분석';
+
   /// 💰 수강권·정산 BottomSheet 제목.
   static const categorySheetSubscriptionBillingTitle = '수강권·정산';
 
@@ -9532,6 +10248,13 @@ class AppStrings {
   /// 학생 안내 메시지 섹션 보조 설명 (빈 입력 → 기본 메시지 fallback 안내).
   static const lessonStyleGuidanceHint =
       '예약 시 학생에게 보내는 안내입니다. 비우면 기본 메시지가 사용됩니다';
+
+  /// 레슨 방식 섹션 헤더 (대면/온라인/방문 다중선택).
+  static const lessonStyleLocationSection = '레슨 방식';
+
+  /// 레슨 방식 섹션 보조 설명 (수강권 등록 장소 선택지 연동 안내).
+  static const lessonStyleLocationHint =
+      '가능한 방식을 모두 선택하세요. 학생에게 표시되고, 수강권 등록 시 장소 선택지가 됩니다';
 
   // ── PriceTableScreen (W3 Task 3.3) ───────────────────────────────
   // spec §6.3 — 악기·레벨별 가격표 (LessonTimeSettingsScreen §6 에서 분리).
@@ -9930,6 +10653,14 @@ class AppStrings {
   /// 오프라인 배너 문구 (#868)
   static const offlineBannerMessage = '오프라인 — 저장된 데이터를 표시 중';
 
+  /// 오프라인 배너 — 캐시 서빙 시 데이터 신선도 표기 (D2, N14)
+  static String offlineBannerLastSync(String hhmm) =>
+      '오프라인 — $hhmm 동기화 데이터 표시 중';
+
+  /// 느린 네트워크 stale 배너 — 무선은 살아있으나 타임아웃으로 캐시 서빙 중 (G-06 / #1116)
+  static String slowNetworkBannerLastSync(String hhmm) =>
+      '연결이 느립니다 — $hhmm 동기화 데이터 표시 중';
+
   // ── Issue #920 i18n bundle ──
 
   // Role Select
@@ -9942,6 +10673,81 @@ class AppStrings {
   static const roleSelectParent = '학부모';
   static const roleSelectParentDesc = '자녀의 레슨과 연습을 확인';
   static const roleSelectConsentRequired = '필수 약관에 동의하면 역할을 선택할 수 있어요.';
+
+  // Discipline Select (#977) — 멀티 Discipline 가입 첫 단계.
+  static const disciplineSelectTitle = '분야 선택';
+  static const disciplineSelectSubtitle = '시작할 분야를 선택해 주세요.';
+
+  /// music 분야 표시명 (Discipline.displayKey 'discipline.music').
+  static const disciplineMusic = '음악';
+
+  /// fitness 분야 표시명 (Discipline.displayKey 'discipline.fitness') — #979-B.
+  static const disciplineFitness = '헬스';
+
+  /// language 분야 표시명 (Discipline.displayKey 'discipline.language') — #1102.
+  static const disciplineLanguage = '어학';
+
+  // Fitness practice tools (#979-B) — 스켈레톤 도구 탭 라벨 + 준비 중 안내.
+  static const practiceToolRepCounter = '세트 카운터';
+  static const practiceToolIntervalTimer = '인터벌 타이머';
+  static const practiceToolGuideMedia = '폼 영상';
+  static const practiceToolSkeletonSubtitle = '준비 중인 기능입니다';
+
+  // Language practice tools (#1102) — 스켈레톤 도구 탭 라벨 (subtitle 는 위 재사용).
+  static const practiceToolVocabBook = '단어장';
+  static const practiceToolDictation = '받아쓰기';
+  static const practiceToolPronunciation = '발음';
+  static const practiceToolConversation = '회화';
+
+  // ── Vocabulary tool (#1124) — 단어장 + 플래시카드 SRS ──
+  // 공용 CTA (C4: 같은 의미 = 단일 상수 — 패널·세트 화면 공용).
+  static const vocabReviewCta = '복습 시작';
+  static const vocabManageCta = '단어장 관리';
+  static const vocabNoDue = '복습할 카드가 없어요';
+  static String vocabDueWaiting(int n) => '$n개 복습 대기';
+  static String vocabSetCount(int n) => '단어장 $n개';
+  // Sets page
+  static const vocabSetsTitle = '단어장';
+  static const vocabSetsEmptyTitle = '아직 단어장이 없어요';
+  static const vocabSetsEmptySubtitle = '단어장을 만들어 단어를 모아보세요';
+  static const vocabCreateSetCta = '단어장 만들기';
+  static const vocabNewSetTitle = '새 단어장';
+  static const vocabRenameSetTitle = '단어장 이름 수정';
+  static const vocabSetNameHint = '단어장 이름';
+  static const vocabDeleteSetTitle = '단어장 삭제';
+  static String vocabDeleteSetMessage(String title, int cardCount) =>
+      "'$title' 단어장과 카드 $cardCount개가 함께 삭제됩니다.";
+  static String vocabCardCount(int n) => '단어 $n개';
+  static String vocabDueBadge(int n) => '복습 $n';
+  // Set page (cards)
+  static const vocabAddCardCta = '단어 추가';
+  static const vocabCardsEmptyTitle = '아직 단어가 없어요';
+  static const vocabCardsEmptySubtitle = '단어를 추가해 복습을 시작하세요';
+  static const vocabNewCardTitle = '새 단어';
+  static const vocabEditCardTitle = '단어 수정';
+  static const vocabCardFrontLabel = '단어';
+  static const vocabCardBackLabel = '뜻';
+  static const vocabCardExampleLabel = '예문 (선택)';
+  static const vocabCardMemoLabel = '메모 (선택)';
+  static const vocabCardFrontHint = '외울 단어나 표현';
+  static const vocabCardBackHint = '뜻을 입력하세요';
+  static const vocabCardRequiredError = '단어와 뜻을 모두 입력해주세요';
+  static const vocabDeleteCardTitle = '단어 삭제';
+  static const vocabDeleteCardMessage = '이 단어를 삭제할까요?';
+  // Review page
+  static const vocabReviewTitle = '복습';
+  static const vocabTapToReveal = '탭하여 뜻 보기';
+  static String vocabReviewProgress(int current, int total) =>
+      '$current / $total';
+  static const vocabGradeAgain = '다시';
+  static const vocabGradeHard = '어려움';
+  static const vocabGradeGood = '보통';
+  static const vocabGradeEasy = '쉬움';
+  static const vocabReviewDoneTitle = '복습 완료';
+  static String vocabReviewDoneMessage(int n) => '$n개 카드를 복습했어요';
+  static const vocabReviewEmptyTitle = '복습할 카드가 없어요';
+  static const vocabReviewEmptySubtitle = '지금 복습할 카드가 없어요. 내일 다시 만나요';
+  static const vocabReviewClose = '닫기';
 
   // Student Invite Code
   static const inviteCodeScreenDesc = '선생님으로부터 받은\n초대 코드를 입력해주세요';
@@ -9982,20 +10788,6 @@ class AppStrings {
   static const studentProfileSetupNameHint = '이름을 입력해주세요';
   static const studentProfileSetupInstrumentLabel = '악기';
   static const studentProfileSetupInstrumentHint = '악기를 선택해주세요';
-
-  // Common instrument list (SSOT — shared between teacher and student selectors)
-  static const List<String> instrumentList = [
-    '바이올린',
-    '피아노',
-    '첼로',
-    '플루트',
-    '클라리넷',
-    '비올라',
-    '기타',
-    '성악',
-    '드럼',
-    '작곡',
-  ];
 
   // Bank Account Edit
   static const bankAccountNoAccount = '등록된 계좌가 없습니다';
@@ -10068,7 +10860,12 @@ class AppStrings {
   // PracticeStartCard
   static String practiceStartHeader(String name) => '$name의 연습';
   static String practiceStartStreak(int days) => '$days일';
+
+  /// 스트릭 동결(freeze) 잔여 개수 배지 — 결석일 자동 보호 (스펙 §14.1/§14.2).
+  static String streakFreezeBadge(int remaining) => '동결 $remaining개';
   static const practiceStartButton = '연습 시작';
+  static String practiceStartContinuePiece(String pieceName) =>
+      '이어서: $pieceName';
   static String practiceStartYesterdayMinutes(int minutes) =>
       '어제 $minutes분 했어요';
 
@@ -10078,12 +10875,20 @@ class AppStrings {
   static const practiceCompleteUndoLabel = '탭하여 완료 취소';
   static const practiceCompleteHintLabel = '탭하여 이 섹션을 완료로 표시하세요';
 
+  // ScratchStampSheet — 연습 도장 스크래치 인터랙션 (P1, daily-satisfaction gamification)
+  static String practiceStampSheetTitle(int n) => '오늘 $n번째 연습!';
+  static const practiceStampSheetHint = '문질러서 도장을 채워보세요';
+  static const practiceStampSheetComplete = '완성!';
+  static const practiceStampQuickModeCheckbox = '다음부터 빠르게 체크';
+  static const practiceStampResetConfirmTitle = '도장 기록을 초기화할까요?';
+  static const practiceStampResetConfirmMessage = '오늘 채운 도장이 모두 지워집니다.';
+
   // CompletionToggle (N회 반복 mode)
   static String practiceRepeatAllDone(int done, int total) =>
       '오늘 연습 완료! ($done/$total회)';
   static String practiceRepeatTap(int done, int total) =>
       '탭하여 연습 기록 ($done/$total회)';
-  static const practiceRepeatReset = '탭하여 초기화';
+  static const practiceRepeatReset = '길게 눌러 초기화';
   static String practiceRepeatDailyCount(int total) => '하루 $total회 반복';
 
   // BadgeCollectionScreen
@@ -10122,4 +10927,188 @@ class AppStrings {
   static const gamificationOnboardingRecommendationLabel = '오늘 한 가지 추천해줄게:';
   static const gamificationOnboardingAccept = '좋아! 시작하기';
   static const gamificationOnboardingDecline = '내가 정할래';
+
+  // C1 empty-state consts (#634·#637)
+  static const practiceRecordingEmpty = '녹음이 없습니다';
+  static const practiceRecordingEmptyHint = '위의 마이크 버튼을 눌러 녹음을 시작하세요';
+  static const sectionPickerEmpty = '섹션이 없습니다';
+  static const sectionPickerEmptyHint = '먼저 레퍼토리와 섹션을 만들어주세요.';
+  static const repertoireArchiveEmpty = '아카이브된 레퍼토리가 없습니다';
+  static const studentPracticeTodayEmpty = '오늘 연습할 레퍼토리가 없습니다';
+  static const studentPracticeDateEmpty = '이 날짜에 연습 기록이 없습니다';
+  static const scheduleWeekEmpty = '이번 주는 레슨이 없습니다';
+  static const settingsBackupEmpty = '저장된 백업이 없습니다';
+  static const repertoireEmptyTitle = '등록된 곡이 없습니다';
+  static const repertoireEmptyHint = '곡을 추가하여 레퍼토리를 관리하세요';
+  static const sectionRecordingEmptyTitle = '아직 녹음이 없습니다';
+  static const sectionRecordingEmptyHint = '위의 녹음 버튼을 눌러 연습을 기록해보세요';
+
+  // C1 hybrid empty-state consts (#634 wave2)
+  static const studentHomeAppTeacherEmpty = '연결된 앱 선생님이 없습니다';
+  static const noSubscriptionsRegisteredHint = '선생님에게 수강권 발급을 요청하세요';
+  static const parentChildNotLinkedSuffix = '은(는) 아직 선생님과 연결되지 않았습니다';
+  static const parentChildNotLinkedDesc = '선생님 연결 후 수강권 정보가 표시됩니다';
+  static const instrumentManagementEmpty = '등록된 악기가 없습니다';
+
+  // N10: domain enum display labels moved out of domain layer (presentation/extensions).
+  // Relationship status (features/relationship)
+  static const relationshipStatusTrialBooked = '체험 예정';
+  static const relationshipStatusActive = '수강 중';
+  static const relationshipStatusExpired = '수강권 만료';
+  static const relationshipStatusPast = '이전 레슨';
+
+  // Schedule exception type (features/schedule)
+  static const exceptionTypeHoliday = '휴무';
+  static const exceptionTypeVacation = '휴가';
+  static const exceptionTypeAdditionalSlot = '추가 오픈';
+
+  // Practice sort labels (features/practice — shared by section/repertoire sort)
+  static const sortByCreatedDesc = '최신순';
+  static const sortByCreatedAsc = '오래된순';
+  static const sortByMeasureAsc = '마디순';
+  static const sortByLastPracticedDesc = '최근연습순';
+  static const sortByCustom = '사용자지정';
+
+  // ── 0702 감사 M11 — 인라인 한글 추출 (C5) ──
+
+  /// 오류: {e} (academy announcements load error)
+  static String announcementsLoadErrorWith(Object e) => '오류: $e';
+
+  /// 홈으로 이동 (academy invite expired CTA)
+  static const academyInviteExpiredGoHome = '홈으로 이동';
+
+  /// 학생 선택 (lesson form student picker sheet title)
+  static const lessonStudentPickerTitle = '학생 선택';
+
+  /// 메트로놈 박자 연습 (student tutorial metronome section title)
+  static const tutorialMetronomeSectionTitle = '메트로놈 박자 연습';
+
+  /// 재생 (student tutorial metronome play CTA)
+  static const tutorialMetronomePlay = '재생';
+
+  /// 재생중... ({remaining}) (student tutorial metronome countdown)
+  static String tutorialMetronomePlaying(int remaining) =>
+      '재생중... ($remaining)';
+
+  /// 메트로놈 박자를 익혔어요! (student tutorial metronome done)
+  static const tutorialMetronomeDone = '메트로놈 박자를 익혔어요!';
+
+  /// {instrument}이(가) 추가되었습니다 (instrument add success)
+  static String instrumentAddedWith(String instrument) =>
+      '$instrument이(가) 추가되었습니다';
+
+  /// 악기 추가에 실패했습니다 (instrument add failure)
+  static const instrumentAddFailed = '악기 추가에 실패했습니다';
+
+  /// 정지 (recording comparison stop CTA)
+  static const recordingComparisonStop = '정지';
+
+  /// 동시 재생 (recording comparison play-both CTA)
+  static const recordingComparisonPlayBoth = '동시 재생';
+
+  /// 녹음 재생 (repertoire recording play tooltip)
+  static const repertoireRecordingPlayTooltip = '녹음 재생';
+
+  // ── 0702 감사 M6 — 로그인 화면 문자열 (C5) ──
+
+  /// 함께 채워가는 레슨 노트. (login slogan)
+  static const authSlogan = '함께 채워가는 레슨 노트.';
+
+  /// Google 계정으로 시작 (login CTA)
+  static const authGoogleStart = 'Google 계정으로 시작';
+
+  /// Kakao로 시작 (login CTA, coming soon)
+  static const authKakaoStart = 'Kakao로 시작';
+
+  /// Apple 계정으로 시작 (login CTA, coming soon)
+  static const authAppleStart = 'Apple 계정으로 시작';
+
+  /// 학부모이신가요? (parent guide link)
+  static const authParentLoginLink = '학부모이신가요?';
+
+  // ── 0702 감사 N8 — 구독 협상 거절 (request_detail 3종 응답과 대칭) ──
+
+  /// 제안 거절 (reject confirm dialog title)
+  static const scheduleChangeRejectConfirmTitle = '제안 거절';
+
+  /// 거절 확인 본문 (reject confirm dialog body)
+  static const scheduleChangeRejectConfirmBody =
+      '이 일정 제안을 거절하시겠습니까? 상대방에게 알림이 전송됩니다.';
+
+  /// 첫 과제 내기 (home empty assignment CTA, #625)
+  static const weeklyAssignmentFirstCta = '첫 과제 내기';
+
+  // ── #1198 item4 — C5 하드코딩 한글 추출 ──
+
+  /// {name} (선생님) (teacher detail app bar title)
+  static String searchTeacherDetailTitle(String name) => '$name (선생님)';
+
+  /// {years}년 경력 (teacher detail — experience years)
+  static String searchCareerYears(int years) => '$years년 경력';
+
+  /// 시작 가이드 (getting started card title)
+  static const studentHomeGettingStartedTitle = '시작 가이드';
+
+  /// 아래 단계를 따라 레슨을 시작하세요 (getting started card subtitle)
+  static const studentHomeGettingStartedSubtitle = '아래 단계를 따라 레슨을 시작하세요';
+
+  /// 앱 선생님 (my teachers — app teacher section header)
+  static const studentHomeAppTeacherSection = '앱 선생님';
+
+  /// 앱을 통해 연결된 선생님 (my teachers — app teacher section hint)
+  static const studentHomeAppTeacherHint = '앱을 통해 연결된 선생님';
+
+  /// 마지막 레슨 (my teachers — last lesson stat label)
+  static const studentHomeMyTeacherLastLesson = '마지막 레슨';
+
+  /// 레슨 기간 (my teachers — lesson period stat label)
+  static const studentHomeMyTeacherLessonPeriod = '레슨 기간';
+
+  /// 직접 등록 (manual teacher — no instrument/phone fallback label)
+  static const studentHomeManualTeacherSelfRegistered = '직접 등록';
+
+  /// {name} 선생님을 삭제하시겠습니까? (manual teacher delete confirm — with name)
+  static String studentHomeDeleteTeacherConfirmName(String name) =>
+      '$name 선생님을 삭제하시겠습니까?';
+
+  /// {name} 선생님이 삭제되었습니다 (manual teacher deleted snackbar — with name)
+  static String studentHomeTeacherDeletedName(String name) =>
+      '$name 선생님이 삭제되었습니다';
+
+  /// 1개월 미만 (duration under one month)
+  static const durationUnderOneMonth = '1개월 미만';
+
+  /// {years}년 (duration in years)
+  static String yearCount(int years) => '$years년';
+
+  /// {years}년 {months}개월 (duration in years and months)
+  static String yearMonthCount(int years, int months) => '$years년 $months개월';
+
+  /// {count}개 복구 (startup recording recovery — recovered fragment)
+  static String studentHomeRecordingRecoveredCount(int count) => '$count개 복구';
+
+  /// {count}개 정리 (startup recording recovery — cleaned fragment)
+  static String studentHomeRecordingCleanedCount(int count) => '$count개 정리';
+
+  /// 녹음 파일: {parts} (전체 {total}개) (startup recording recovery summary)
+  static String studentHomeRecordingRecoverySummary(String parts, int total) =>
+      '녹음 파일: $parts (전체 $total개)';
+
+  /// 녹음 파일 {total}개 확인됨 (복구 불필요) (startup recording verified)
+  static String studentHomeRecordingVerified(int total) =>
+      '녹음 파일 $total개 확인됨 (복구 불필요)';
+
+  /// {title}이(가) 추가되었습니다 (repertoire piece added snackbar)
+  static String profileRepertoirePieceAdded(String title) =>
+      '$title이(가) 추가되었습니다';
+
+  /// {title}이(가) 삭제되었습니다 (repertoire piece deleted snackbar)
+  static String profileRepertoirePieceDeleted(String title) =>
+      '$title이(가) 삭제되었습니다';
+
+  /// {title}이(가) {studentName}에게 할당되었습니다 (repertoire piece assigned snackbar)
+  static String profileRepertoirePieceAssigned(
+    String title,
+    String studentName,
+  ) => '$title이(가) $studentName에게 할당되었습니다';
 }

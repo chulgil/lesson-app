@@ -1,32 +1,17 @@
-// TODO(#872): Backend endpoints for practice_journal are not yet implemented.
-// Assumed contract (to be confirmed with backend team):
+// Backend contract (implemented & mounted — backend/app/api/v1/practice_journal.py,
+// prefix /practice-journal; 0629 audit N4 path-drift fixed 2026-07-02):
 //
-//   GET  /practice-journal/ledger?child_profile_id=&year=&month=
-//        → PracticeLedger JSON (marks, seals, endorsements)
+//   GET  /practice-journal/ledger?child_profile_id=&year=&month=  → LedgerResponse
+//   POST /practice-journal/marks                → 200 PracticeMarkResponse (student-self)
+//   POST /practice-journal/seals                → 200 GuardianSealResponse (guardian;
+//        body guardian_user_id is accepted-but-IGNORED — server stamps auth user)
+//   POST /practice-journal/endorsements/self    → 201 EndorsementResponse (student-self)
+//   POST /practice-journal/endorsements/teacher → 201 EndorsementResponse (teacher;
+//        body author_user_id is accepted-but-IGNORED — server stamps auth user)
+//   GET  /practice-journal/volumes?child_profile_id=  → List<BoundVolumeResponse>
+//   POST /practice-journal/volumes              → 200 BoundVolumeResponse
+//        (idempotent — same (child, piece) returns the existing row)
 //
-//   POST /practice-journal/marks
-//        body: { child_profile_id, date: "YYYY-MM-DD", intensity: "short"|"full" }
-//        → 204 No Content (upsert semantics — server enforces full > short)
-//
-//   POST /practice-journal/seals
-//        body: { child_profile_id, week_start: "YYYY-MM-DD",
-//                guardian_user_id, cheer_note?: string }
-//        → 204 No Content (server enforces at-most-one per week)
-//
-//   POST /practice-journal/endorsements
-//        body: { child_profile_id, by: "self"|"teacher", date: "YYYY-MM-DD",
-//                author_user_id, assignment_ref?: string, note: string }
-//        → 204 No Content (server validates teacher requires assignment_ref)
-//
-//   GET  /practice-journal/volumes?child_profile_id=
-//        → List<BoundVolume> JSON (sorted by volume_no asc)
-//
-//   POST /practice-journal/volumes/bind
-//        body: { child_profile_id, piece_id, piece_name }
-//        → BoundVolume JSON (idempotent — returns existing if same piece_id)
-//
-// All routes require authenticated user; 401/403 propagated as
-// UnauthorizedException / ForbiddenException by ErrorInterceptor.
 
 import 'package:intl/intl.dart';
 
@@ -97,8 +82,12 @@ class RemotePracticeJournalRepository implements PracticeJournalRepository {
     if (!endorsement.isValid) {
       throw ArgumentError('Endorsement 무효: teacher=과제참조 필수 / self=참조 없음');
     }
+    // BE splits the route by author role (role-guarded dependencies).
+    final path = endorsement.by == EndorsedBy.teacher
+        ? '/practice-journal/endorsements/teacher'
+        : '/practice-journal/endorsements/self';
     await _apiClient.post(
-      '/practice-journal/endorsements',
+      path,
       data: {'child_profile_id': childProfileId, ...endorsement.toJson()},
     );
   }
@@ -122,7 +111,7 @@ class RemotePracticeJournalRepository implements PracticeJournalRepository {
     required String pieceName,
   }) async {
     final response = await _apiClient.post(
-      '/practice-journal/volumes/bind',
+      '/practice-journal/volumes',
       data: {
         'child_profile_id': childProfileId,
         'piece_id': pieceId,

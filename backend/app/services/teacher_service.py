@@ -179,6 +179,7 @@ class TeacherService:
         return TeacherPublicProfileResponse(
             id=teacher.id,
             name=user.name if user else "",
+            nickname=teacher.nickname,
             profile_image_url=user.profile_image_url if user else None,
             instruments=teacher.instruments or [],
             introduction=teacher.introduction,

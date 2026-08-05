@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/sync/sync_facade.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
@@ -16,9 +16,10 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../billing/billing_facade.dart';
-import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../notifications/notifications_facade.dart';
 import '../../../practice/domain/entities/practice_loop_stats.dart';
 import '../../../practice/practice_facade.dart';
+import '../../../practice/practice_ui_facade.dart';
 import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
 import 'assignment_summary_section.dart';
@@ -88,8 +89,9 @@ class DashboardTab extends ConsumerWidget {
 
                   const SizedBox(height: AppSpacing.space4),
 
-                  // ── Sync failure banner ────
-                  _buildSyncFailureBanner(ref),
+                  // #1120: sync failure surface is now the app-wide
+                  // SyncStatusBanner (all roles), so the teacher-only
+                  // banner here was removed to avoid a duplicate.
 
                   // ── 0순위: 선생님이 즉시 처리해야 하는 학생 연결 요청 ────
                   _buildPendingConnectionRequests(context, ref),
@@ -146,7 +148,7 @@ class DashboardTab extends ConsumerWidget {
                   const QuestBoardCard(),
 
                   // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
-                  _buildStatsRow(context, dashboard.lessonStats),
+                  _buildStatsRow(context, ref, dashboard.lessonStats),
 
                   const SizedBox(height: AppSpacing.space3),
 
@@ -163,6 +165,9 @@ class DashboardTab extends ConsumerWidget {
                   _buildEventsGroup(context, ref, dashboard.teacherId),
 
                   const SizedBox(height: AppSpacing.space6),
+
+                  // 피드백 대기 배지 (껍데기 감사 #415 / #1128) — 0건이면 숨김.
+                  const AwaitingFeedbackCard(),
 
                   const AssignmentSummarySection(),
 
@@ -198,6 +203,8 @@ class DashboardTab extends ConsumerWidget {
     final unreadCount = ref.watch(unreadNotificationCountProvider);
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
+      // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+      eyebrowStyle: NotebookTypography.wordmark,
       meta: _volumeIssueString(DateTime.now()),
       trailing: IconButton(
         onPressed: () => context.push(AppRoutes.notifications),
@@ -220,7 +227,6 @@ class DashboardTab extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.paperAccent,
-                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     AppStrings.unreadBadgeCount(unreadCount),
@@ -256,8 +262,9 @@ class DashboardTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // H3 — 날짜는 위 한 줄에서만. 제목·부제와 중복되지 않게 '레슨' 제거.
           Text(
-            '${now.month}월 ${now.day}일 레슨',
+            formatDateMDKorean(now),
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
@@ -267,7 +274,7 @@ class DashboardTab extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${now.month}月 ${now.day}日  ·  ${AppStrings.dashboardLessonCountFormat(lessonCount)}',
+            AppStrings.dashboardLessonCountFormat(lessonCount),
             style: NotebookTypography.mastheadDate,
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -286,6 +293,7 @@ class DashboardTab extends ConsumerWidget {
 
   Widget _buildStatsRow(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
     final monthCard = lessonStatsAsync.when(
@@ -295,7 +303,14 @@ class DashboardTab extends ConsumerWidget {
             value: AppStrings.usageCountShort(stats['completed'] ?? 0),
             color: AppColors.ink,
             icon: Icons.check_circle_outline,
-            onTap: () => context.push(AppRoutes.analytics),
+            // #749: same Pro paywall guard as the sibling "통계 더보기" link.
+            onTap: () => guardProFeatureNavigation(
+              context: context,
+              ref: ref,
+              required: TierRequirement.pro,
+              featureName: AppStrings.featureLockedMonthlyStats,
+              onPass: () => context.push(AppRoutes.analytics),
+            ),
           ),
       loading:
           () => StatCard(
@@ -394,12 +409,6 @@ class DashboardTab extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        // 로마숫자 카운트 — Notebook × Score 4대 시그니처 (Roman numerals)
-        Text(
-          lessonCount > 0 ? romanOf(lessonCount - 1) : '—',
-          style: NotebookTypography.roman,
-        ),
-        const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
             AppStrings.dashboardTodayLessonsSection,
@@ -416,9 +425,12 @@ class DashboardTab extends ConsumerWidget {
             ),
             child: Text(
               AppStrings.bulkFeedbackTitle,
+              // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.paperAccent,
               ),
             ),
           ),
@@ -559,73 +571,6 @@ class DashboardTab extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  /// Sync failure notification banner.
-  /// Watches syncServiceStatsStream and displays warning when failed > 0.
-  /// Uses angular Notebook × Score design (no rounded corners, inkQuaternary border).
-  Widget _buildSyncFailureBanner(WidgetRef ref) {
-    return ref
-        .watch(syncServiceStatsStreamProvider)
-        .when(
-          data: (stats) {
-            if (stats.failed == 0) {
-              return const SizedBox.shrink();
-            }
-
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.12),
-                border: Border.all(color: AppColors.inkQuaternary, width: 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.warning_outlined,
-                      color: AppColors.paperAccent,
-                      size: 18,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: Text(
-                        AppStrings.syncFailedBanner(stats.failed),
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.ink,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    TextButton(
-                      onPressed: () {
-                        ref.read(syncServiceProvider).retryFailedEntries();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        minimumSize: const Size(0, 28),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        AppStrings.syncRetryAction,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.paperAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-        );
   }
 }
 

@@ -18,13 +18,47 @@ class DisciplineRegistry {
     displayKey: 'discipline.music',
     themeColorSeed: 0xFF9B1B12,
     expertiseCatalogId: 'instruments',
+    productionReady: true,
+  );
+
+  /// Fitness (헬스 / GX) discipline — Phase 4 (#979-B). The second registered
+  /// vertical; adding it is pure data (this const + the append below), so the
+  /// music vertical stays pixel-identical. expertiseCatalog = specialties
+  /// (웨이트/필라테스/PT). themeColorSeed is provisional — no consumer reads it
+  /// yet, and the fitness brand palette is a later design decision.
+  static const Discipline fitness = Discipline(
+    id: 'fitness',
+    displayKey: 'discipline.fitness',
+    themeColorSeed: 0xFF2E7D32,
+    expertiseCatalogId: 'specialties',
+  );
+
+  /// Language (어학) discipline — Phase 5 (#1102). The third registered vertical;
+  /// like fitness, adding it is pure data (this const + the append below), so the
+  /// music vertical stays pixel-identical. expertiseCatalog = subjects
+  /// (영어/중국어/일본어). themeColorSeed is provisional — no consumer reads it yet.
+  static const Discipline language = Discipline(
+    id: 'language',
+    displayKey: 'discipline.language',
+    themeColorSeed: 0xFF1565C0,
+    expertiseCatalogId: 'subjects',
   );
 
   /// All registered disciplines, in registration order (music first).
-  /// Adding a vertical = append here (Phase 4+: fitness, language).
-  static const List<Discipline> _registered = <Discipline>[music];
+  /// Adding a vertical = append here.
+  static const List<Discipline> _registered = <Discipline>[
+    music,
+    fitness,
+    language,
+  ];
 
   static List<Discipline> get all => _registered;
+
+  /// Production-exposed subset (#1196) — verticals with a real home/tools.
+  /// Pure (no env dep, per flutter-architecture); env gating lives in the
+  /// presentation layer (see selectableDisciplines).
+  static List<Discipline> get productionReady =>
+      _registered.where((d) => d.productionReady).toList();
 
   /// Resolve a discipline by [id]; null if not registered.
   static Discipline? byId(String id) {

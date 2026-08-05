@@ -7,7 +7,7 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/lessons/domain/entities/lesson.dart';
 import 'package:lessonaza/features/lessons/presentation/providers/lesson_crud_provider.dart';
 import 'package:lessonaza/features/lessons/presentation/screens/edit_lesson_screen.dart';
-import 'package:lessonaza/features/students/presentation/providers/student_crud_provider.dart';
+import 'package:lessonaza/features/students/students_facade.dart';
 
 /// #766 후속 — 레슨 수정 화면 취소가 수강권 차감·정책 우회 회귀 가드.
 ///
@@ -32,13 +32,20 @@ Lesson _lesson({String? subscriptionId}) => Lesson(
   createdAt: DateTime(2026, 1, 1),
 );
 
-Future<void> _pumpEdit(WidgetTester tester, Lesson lesson) async {
+Future<void> _pumpEdit(
+  WidgetTester tester,
+  Lesson lesson, {
+  List<Student> students = const [],
+}) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         lessonProvider(_lessonId).overrideWith((ref) async => lesson),
         // profileColor 폴백(inkTertiary) 허용 — Student 없이도 렌더.
         studentProvider(_studentId).overrideWith((ref) async => null),
+        // §2.7 잠금 분기가 수강권 레슨에서 연결 여부를 조회 — 빈 목록이면
+        // connected 가정(기존 잠금 유지). 실 repo 초기화(타이머) 차단.
+        studentsProvider.overrideWith((ref) async => students),
       ],
       child: MaterialApp(
         theme: AppTheme.light,
@@ -85,5 +92,30 @@ void main() {
       reason: '수동 레슨은 기존대로 취소 버튼 유지(plain cancelLesson 정당)',
     );
     expect(archiveButton, findsOneWidget);
+  });
+
+  testWidgets('미가입 학생 수강권 레슨 — 필드 잠금 해제 + plain-cancel 가드 유지 (§2.7)', (
+    tester,
+  ) async {
+    final manualStudent = Student(
+      id: _studentId,
+      name: '수기 학생',
+      instrument: '바이올린',
+      level: StudentLevel.beginner,
+      status: StudentStatus.trial,
+      monthlyFee: 0,
+      createdAt: DateTime(2026, 1, 1),
+    );
+    await _pumpEdit(
+      tester,
+      _lesson(subscriptionId: 'sub_1'),
+      students: [manualStudent],
+    );
+
+    expect(tester.takeException(), isNull);
+    // 필드 잠금 해제: 잠금 안내 배너 미노출 (수동 레슨과 동일 전체 편집)
+    expect(find.text(AppStrings.subscriptionFieldLocked), findsNothing);
+    // #766 가드 유지: 수강권 귀속이면 미가입이어도 plain-cancel 버튼 미노출
+    expect(cancelButton, findsNothing);
   });
 }

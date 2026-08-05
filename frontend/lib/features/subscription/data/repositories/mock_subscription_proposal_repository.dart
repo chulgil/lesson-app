@@ -71,7 +71,7 @@ class MockSubscriptionProposalRepository
         studentId: 'student_2',
         templateId: 'template_t1_3', // 16회권
         message: '민호야, 수강권이 곧 끝나가네요!\n'
-            '16회권으로 연장하면 할인 적용해드릴게요 😊',
+            '16회권으로 연장하면 할인 적용해드릴게요',
         status: ProposalStatus.pending,
         createdAt: now.subtract(const Duration(days: 1)),
         expiresAt: now.add(const Duration(days: 6)),
@@ -89,7 +89,7 @@ class MockSubscriptionProposalRepository
         templateIds: ['template_t1_1', 'template_t1_2'],
         recommendedTemplateId: 'template_t1_2',
         message: '서연아, 다음 달부터 레슨 시작해볼까요?\n'
-            '선생님은 8회권 추천해요 ⭐',
+            '선생님은 8회권 추천해요',
         status: ProposalStatus.pending,
         createdAt: now.subtract(const Duration(hours: 5)),
         expiresAt: now.add(const Duration(days: 7)),
@@ -173,7 +173,7 @@ class MockSubscriptionProposalRepository
         teacherId: 'teacher_1',
         studentId: 'student_9',
         templateId: 'template_t1_2',
-        message: '지민아, 수강권이 만료되었네요!\n같은 조건으로 이어서 레슨하면 좋겠어요 😊',
+        message: '지민아, 수강권이 만료되었네요!\n같은 조건으로 이어서 레슨하면 좋겠어요',
         status: ProposalStatus.pending,
         createdAt: now.subtract(const Duration(days: 1)),
         expiresAt: now.add(const Duration(days: 6)),

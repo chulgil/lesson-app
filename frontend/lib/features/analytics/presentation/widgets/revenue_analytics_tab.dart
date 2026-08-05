@@ -12,6 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../providers/analytics_providers.dart';
+import 'analytics_error_view.dart';
 import 'revenue_pie_chart.dart';
 import 'simple_bar_chart.dart';
 
@@ -26,20 +27,8 @@ class RevenueAnalyticsTab extends ConsumerWidget {
 
     return analyticsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(AppStrings.cannotLoadData, style: AppTypography.bodyMedium),
-            const SizedBox(height: AppSpacing.space3),
-            OutlinedButton(
-              onPressed: () => ref.invalidate(revenueAnalyticsDataProvider(6)),
-              child: const Text(AppStrings.retry),
-            ),
-          ],
-        ),
+      error: (e, _) => AnalyticsErrorView(
+        onRetry: () => ref.invalidate(revenueAnalyticsDataProvider(6)),
       ),
       data: (analytics) => RefreshIndicator(
         onRefresh: () async => ref.invalidate(revenueAnalyticsDataProvider(6)),

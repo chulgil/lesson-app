@@ -8,29 +8,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 async def _ensure_group_class(
     db_session: AsyncSession, teacher_user_id: str = "test-user-id", class_id: str = "gc-1"
 ) -> str:
-    """Helper: 테스트용 LessonClass 를 직접 DB 에 삽입하고 ID 를 반환.
+    """Helper: 테스트용 GroupClass 를 직접 DB 에 삽입하고 ID 를 반환.
 
-    Group class ownership 검증이 추가된 이후, 테스트는 실제 LessonClass row 가 필요하다.
+    Group class ownership 검증이 추가된 이후, 테스트는 실제 GroupClass row 가 필요하다.
     teacher_user_id 의 Teacher.id 와 매핑하여 그 강사 소유 클래스로 만든다.
     """
     from sqlalchemy import select
 
-    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.schedule import GroupClass, GroupClassType
     from app.models.teacher import Teacher
 
     teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == teacher_user_id))
     if teacher_profile_id is None:
         teacher_profile_id = teacher_user_id
-    existing = await db_session.scalar(select(LessonClass).where(LessonClass.id == class_id))
+    existing = await db_session.scalar(select(GroupClass).where(GroupClass.id == class_id))
     if existing is not None:
         return class_id
-    lesson_class = LessonClass(
+    group_class = GroupClass(
         id=class_id,
         teacher_id=teacher_profile_id,
         name="Test Group Class",
-        type=LessonClassType.private,
+        type=GroupClassType.regular,
+        max_capacity=10,
+        duration_minutes=60,
+        booking_deadline_minutes=60,
+        cancel_deadline_minutes=1440,
+        is_active=True,
     )
-    db_session.add(lesson_class)
+    db_session.add(group_class)
     await db_session.flush()
     return class_id
 

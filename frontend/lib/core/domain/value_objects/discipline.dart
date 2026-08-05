@@ -24,11 +24,19 @@ class Discipline {
   /// fitness='specialties', language='subjects').
   final String expertiseCatalogId;
 
+  /// Whether this discipline is exposed in production sign-up selection
+  /// (#1196). Only production-ready verticals (real home/tools) are user-
+  /// facing on remote builds; others stay registered but dev/mock-only.
+  /// Exposure metadata — intentionally excluded from == / hashCode (identity
+  /// is the discipline, not its exposure state).
+  final bool productionReady;
+
   const Discipline({
     required this.id,
     required this.displayKey,
     required this.themeColorSeed,
     required this.expertiseCatalogId,
+    this.productionReady = false,
   });
 
   @override

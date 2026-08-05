@@ -28,6 +28,9 @@ SubscriptionTemplate _$SubscriptionTemplateFromJson(
           : DateTime.parse(json['updated_at'] as String),
       rescheduleAllowance: (json['reschedule_allowance'] as num?)?.toInt() ?? 2,
       isAutoProposalEnabled: json['is_auto_proposal_enabled'] as bool? ?? true,
+      appliesTo: $enumDecodeNullable(
+          _$SubscriptionAppliesToEnumMap, json['applies_to']),
+      groupClassId: json['group_class_id'] as String?,
     );
 
 Map<String, dynamic> _$SubscriptionTemplateToJson(
@@ -49,9 +52,17 @@ Map<String, dynamic> _$SubscriptionTemplateToJson(
       'updated_at': instance.updatedAt?.toIso8601String(),
       'reschedule_allowance': instance.rescheduleAllowance,
       'is_auto_proposal_enabled': instance.isAutoProposalEnabled,
+      'applies_to': _$SubscriptionAppliesToEnumMap[instance.appliesTo],
+      'group_class_id': instance.groupClassId,
     };
 
 const _$SubscriptionTemplateOwnerTypeEnumMap = {
   SubscriptionTemplateOwnerType.teacher: 'teacher',
   SubscriptionTemplateOwnerType.academy: 'academy',
+};
+
+const _$SubscriptionAppliesToEnumMap = {
+  SubscriptionAppliesTo.oneToOne: 'oneToOne',
+  SubscriptionAppliesTo.group: 'group',
+  SubscriptionAppliesTo.universal: 'universal',
 };

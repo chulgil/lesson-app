@@ -27,7 +27,10 @@ class SyncAdapterRegistry {
       'parent',
       'practice',
       'relationship',
-      'booking',
+      // G-01: availability 리포는 domain:'schedule' 로 큐잉한다(12곳).
+      // 이전 'booking' 은 큐잉 호출처가 없는 미사용 도메인 → 'schedule' 로
+      // 교정해 근무가능시간 쓰기 유실(재생 NO_ADAPTER)을 막는다.
+      'schedule',
       'search',
       'settings',
       'student-home',

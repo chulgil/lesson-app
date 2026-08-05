@@ -7,7 +7,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../onboarding/onboarding_facade.dart'
+    show currentTeacherProfileProvider;
 import '../../../students/students_facade.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
@@ -15,6 +18,7 @@ import '../extensions/lesson_policy_visuals.dart';
 import '../providers/lesson_policy_providers.dart';
 import '../providers/subscription_providers.dart';
 import '../screens/subscription_policy_override_screen.dart';
+import 'location_option_resolver.dart';
 import 'location_travel_selector.dart';
 
 /// Bottom sheet showing the applied policy for a subscription.
@@ -374,11 +378,14 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
         const SizedBox(height: AppSpacing.space1),
         GestureDetector(
           onTap: widget.onIssueNewSubscription,
+          // H6 — 버튼 없이 글자만 눌리는 링크라 밑줄로 affordance 를 준다.
           child: Text(
             '${AppStrings.issueNewSubscription} →',
             style: AppTypography.caption.copyWith(
               color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+              decorationColor: AppColors.paperAccent,
             ),
           ),
         ),
@@ -736,6 +743,11 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
             onTravelTimeChanged: (t) => setState(() => _travelTime = t),
             onLocationTypeChanged:
                 (type) => setState(() => _selectedLocationType = type),
+            // #1146 — gate location options by the teacher's lesson types.
+            allowedLocationTypes: allowedLocationTypes(
+              ref.watch(currentTeacherProfileProvider).valueOrNull?.lessonTypes,
+              isAcademy: false,
+            ),
           ),
           const SizedBox(height: AppSpacing.space4),
           SizedBox(
@@ -1070,13 +1082,9 @@ class _SheetFrame extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.space2),
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(color: AppColors.inkQuaternary),
-            ),
+          const Padding(
+            padding: EdgeInsets.only(top: AppSpacing.space2),
+            child: BottomSheetHandle(margin: EdgeInsets.zero),
           ),
           Flexible(
             child: SingleChildScrollView(

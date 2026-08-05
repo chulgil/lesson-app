@@ -23,7 +23,8 @@ class HomeQuickActionFab extends StatelessWidget {
       foregroundColor: AppColors.paper,
       shape: const CircleBorder(),
       onPressed: () => _showQuickActionSheet(context),
-      child: const Icon(Icons.add, size: 28),
+      // 44px FAB (Hyen 표준 H8) 에 맞춘 비례 아이콘.
+      child: const Icon(Icons.add, size: 22),
     );
   }
 
@@ -90,11 +91,9 @@ class _ActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Ink(
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.ink, width: 1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(

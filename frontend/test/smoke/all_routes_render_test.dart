@@ -78,6 +78,7 @@ const _teacherRoutes = <String>[
   AppRoutes.followFeed,
   AppRoutes.badgeCollection,
   AppRoutes.announcementHistory,
+  AppRoutes.awaitingFeedback,
   AppRoutes.myProfileCategory,
   AppRoutes.policyNotificationsCategory,
 ];
@@ -96,7 +97,6 @@ const _studentRoutes = <String>[
   AppRoutes.practiceStats,
   AppRoutes.practiceLoopStats,
   AppRoutes.repertoireHistory,
-  AppRoutes.tuner,
   AppRoutes.practiceGoalSettings,
   AppRoutes.invite,
   AppRoutes.inviteHistory,

@@ -252,19 +252,36 @@ DatePicker에서 **과거 7일**까지만 허용. 이유:
 
 ---
 
+## 경로 4: 학생 선택 시트 → [+ 새 학생 등록] (2026-08-03 신규)
+
+신규 학생의 체험 레슨을 잡는 경로. AddLessonScreen 학생 선택 시트 최상단에
+**[+ 새 학생 등록]** 항목을 추가한다.
+
+```
+스케줄 (+) → AddLessonScreen → 학생 선택 시트
+  └→ [+ 새 학생 등록] → add_student (직접 등록: 이름 + 연락처 최소 입력)
+       └→ 등록 완료 → 시트 복귀 + 방금 학생 자동 선택
+            └→ 체험 1회권 자동 발급 배너 → 날짜/시간 저장  (총 4~5탭)
+```
+
+- 이 경로에서는 등록 직후 "수강권을 발급하시겠습니까?" 다이얼로그 스킵.
+- 수강권 분기·발급 연속 플로우: [subscription_required_spec.md §2.6](../subscription/subscription_required_spec.md)
+
+---
+
 ## 구현 체크리스트
+
+> 2026-08-03 현행화 — origin/main 코드 실측. 체크된 항목은 심볼 확인 완료.
 
 - [ ] `home_screen.dart`: [레슨 추가] 버튼에 `date`, `hour` 파라미터 추가
 - [ ] `home_screen.dart`: 레슨 카드에 [↻] 반복 버튼 추가
-- [ ] `add_lesson_screen.dart`: `_mockStudents` 제거 → `studentsProvider` 사용
-- [ ] `add_lesson_screen.dart`: 학생 선택 시 자동 완성 로직 추가
-  - `Student.lessonDay` → 다음 해당 요일 날짜 계산
-  - `Student.lessonTime` → 시간 자동 입력
-  - `Student.lessonDuration` → 레슨 시간 칩 선택
+- [x] `add_lesson_screen.dart`: `_mockStudents` 제거 (참조 0건, 실 학생 데이터 사용)
+- [x] `add_lesson_screen.dart`: 학생 선택 시 자동 완성 로직 (`_autoFillFromStudent`)
 - [ ] `add_lesson_screen.dart`: 마지막 레슨 곡명 힌트 표시
-- [ ] `student_detail_screen.dart`: FAB에서 Student 패턴 데이터 전달
-- [ ] `calendar_tab.dart`: 기존 date/hour 전달 유지 (변경 없음)
+- [x] `student_detail_screen.dart`: FAB 에서 `studentId` 전달 (`?studentId=` 쿼리)
+- [x] 스케줄탭: `date`/`hour` 파라미터 전달 (`schedule_tab.dart` — 구 calendar_tab 은 schedule 로 통합됨)
 - [ ] 확인 다이얼로그 위젯 작성 (반복 레슨용)
+- [ ] 경로 4: 학생 선택 시트 [+ 새 학생 등록] (2026-08-03 추가)
 
 ---
 
@@ -274,3 +291,4 @@ DatePicker에서 **과거 7일**까지만 허용. 이유:
 |------|----------|
 | 2026-03-02 | 초안 작성 |
 | 2026-03-15 | 과거 레슨 기록 모드 추가 (경쟁앱 10개 분석 기반) |
+| 2026-08-03 | 경로 4(새 학생 인라인 등록) 추가 + 체크리스트 현행화 (구현 완료 4건 체크, calendar_tab → schedule_tab 통합 반영). 수강권 인텐트 분기는 subscription_required_spec §2.6 이 SSOT |

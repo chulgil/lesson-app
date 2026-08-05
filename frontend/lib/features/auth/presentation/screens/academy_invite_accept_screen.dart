@@ -26,7 +26,11 @@ class AcademyInviteAcceptScreen extends ConsumerStatefulWidget {
 }
 
 /// Predefined reject reasons (G9/W4 §3.7).
-const _kRejectReasons = <String>['관심 없음', '이미 다른 학원 소속', '기타'];
+const _kRejectReasons = <String>[
+  AppStrings.academyInviteRejectReasonNotInterested,
+  AppStrings.academyInviteRejectReasonAlreadyMember,
+  AppStrings.academyInviteRejectReasonOther,
+];
 
 class _AcademyInviteAcceptScreenState
     extends ConsumerState<AcademyInviteAcceptScreen> {
@@ -46,12 +50,11 @@ class _AcademyInviteAcceptScreenState
     // audit C3-F08: 수락 직후 학원명을 살린 환영 SnackBar 를 보여주기 위해
     // preview 캐시를 미리 읽어둔다 (성공 후엔 화면이 home 으로 떠나므로
     // preview provider 가 invalidate 될 수 있음).
-    final academyName =
-        ref
-            .read(academyInvitePreviewProvider(widget.token))
-            .valueOrNull
-            ?.academy
-            .name;
+    final academyName = ref
+        .read(academyInvitePreviewProvider(widget.token))
+        .valueOrNull
+        ?.academy
+        .name;
     try {
       final repository = ref.read(academyInviteRepositoryProvider);
       await repository.acceptInvite(
@@ -114,7 +117,10 @@ class _AcademyInviteAcceptScreenState
           children: [
             Padding(
               padding: EdgeInsets.all(AppSpacing.space3),
-              child: Text('거절 사유를 선택해주세요', style: AppTypography.bodyLarge),
+              child: Text(
+                AppStrings.academyInviteRejectReasonTitle,
+                style: AppTypography.bodyLarge,
+              ),
             ),
             for (final reason in _kRejectReasons)
               ListTile(
@@ -123,7 +129,7 @@ class _AcademyInviteAcceptScreenState
               ),
             const Divider(height: 1),
             ListTile(
-              title: const Text('취소'),
+              title: const Text(AppStrings.cancel),
               onTap: () => Navigator.of(sheetContext).pop(),
             ),
           ],
@@ -151,21 +157,16 @@ class _AcademyInviteAcceptScreenState
     final previewAsync = ref.watch(academyInvitePreviewProvider(widget.token));
 
     return previewAsync.when(
-      data:
-          (preview) => NotebookScreenScaffold(
-            body: PaperScaffold(child: _buildContent(preview)),
-          ),
-      loading:
-          () => const NotebookScreenScaffold(
-            body: PaperScaffold(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          ),
-      error:
-          (error, stack) => AcademyInviteExpiredScreen(
-            errorCode: _errorCodeFor(error),
-            errorMessage: error.toString(),
-          ),
+      data: (preview) => NotebookScreenScaffold(
+        body: PaperScaffold(child: _buildContent(preview)),
+      ),
+      loading: () => const NotebookScreenScaffold(
+        body: PaperScaffold(child: Center(child: CircularProgressIndicator())),
+      ),
+      error: (error, stack) => AcademyInviteExpiredScreen(
+        errorCode: _errorCodeFor(error),
+        errorMessage: error.toString(),
+      ),
     );
   }
 
@@ -179,7 +180,7 @@ class _AcademyInviteAcceptScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('학원 초대', style: AppTypography.bodyLarge),
+          Text(AppStrings.academyInviteTitle, style: AppTypography.bodyLarge),
           SizedBox(height: AppSpacing.space3),
           Container(
             padding: EdgeInsets.all(AppSpacing.space3),
@@ -192,7 +193,10 @@ class _AcademyInviteAcceptScreenState
                 if (academy.address != null)
                   Text(academy.address!, style: AppTypography.bodySmall),
                 SizedBox(height: AppSpacing.space2),
-                Text('대표: $ownerName', style: AppTypography.bodySmall),
+                Text(
+                  '${AppStrings.academyInviteOwnerPrefix}$ownerName',
+                  style: AppTypography.bodySmall,
+                ),
               ],
             ),
           ),
@@ -203,7 +207,10 @@ class _AcademyInviteAcceptScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('부여될 권한', style: AppTypography.bodyMedium),
+                Text(
+                  AppStrings.academyInviteRolesTitle,
+                  style: AppTypography.bodyMedium,
+                ),
                 SizedBox(height: AppSpacing.space2),
                 ...roles.map(
                   (r) => Text('- $r', style: AppTypography.bodySmall),
@@ -222,7 +229,7 @@ class _AcademyInviteAcceptScreenState
               ),
               Expanded(
                 child: Text(
-                  '학원 공개 페이지에 내 프로필 노출 허용',
+                  AppStrings.academyInvitePublicConsentLabel,
                   style: AppTypography.bodySmall,
                 ),
               ),
@@ -234,21 +241,20 @@ class _AcademyInviteAcceptScreenState
               Expanded(
                 child: OutlinedButton(
                   onPressed: _isAccepting ? null : _handleReject,
-                  child: const Text('거절'),
+                  child: const Text(AppStrings.rejectButton),
                 ),
               ),
               SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: ElevatedButton(
                   onPressed: _isAccepting ? null : _handleAccept,
-                  child:
-                      _isAccepting
-                          ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Text('수락'),
+                  child: _isAccepting
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(AppStrings.accept),
                 ),
               ),
             ],

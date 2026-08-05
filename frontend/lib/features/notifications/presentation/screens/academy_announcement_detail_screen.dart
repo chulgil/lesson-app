@@ -41,10 +41,13 @@ class AcademyAnnouncementDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 if (!announcement.isRead)
-                  ElevatedButton.icon(
+                  FilledButton.icon(
                     onPressed: () {
                       _markAsRead(ref);
                     },
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, AppSpacing.buttonHeight),
+                    ),
                     icon: const Icon(Icons.check),
                     label: Text(AppStrings.announcementMarkAsRead),
                   ),

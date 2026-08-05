@@ -11,6 +11,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.date_utils import to_date
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import LessonResponse
 from app.schemas.parent import (
@@ -533,9 +534,9 @@ class ParentService:
             ~blocked_visibility,
         )
         if date_from:
-            query = query.where(Lesson.date >= date_from)
+            query = query.where(Lesson.date >= to_date(date_from))
         if date_to:
-            query = query.where(Lesson.date <= date_to)
+            query = query.where(Lesson.date <= to_date(date_to))
 
         result = await self.db.scalars(query.order_by(Lesson.date.desc()))
         return [LessonResponse.model_validate(lesson) for lesson in result.all()]
@@ -981,6 +982,7 @@ class ParentService:
             select(ParentChildRelation.id).where(
                 ParentChildRelation.parent_id == parent.id,
                 ParentChildRelation.student_id == student_id,
+                ParentChildRelation.status == "active",
             )
         )
         return relation is not None

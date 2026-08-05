@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -386,6 +388,22 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.inkTertiary,
                         ),
+                      ),
+                      const SizedBox(height: AppSpacing.space6),
+                      // #1198 — 검색 0건 대체경로: 초대 코드로 직접 연결
+                      OutlinedButton(
+                        onPressed: () => context.go(AppRoutes.inviteCode),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.ink,
+                          side: const BorderSide(
+                            color: AppColors.ink,
+                            width: 1,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
+                        ),
+                        child: Text(AppStrings.searchConnectViaInviteCode),
                       ),
                     ],
                   ),

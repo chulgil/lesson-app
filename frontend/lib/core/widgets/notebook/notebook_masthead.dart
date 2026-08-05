@@ -23,8 +23,13 @@ class NotebookMasthead extends StatelessWidget {
   /// Masthead 상단 여백 — 독립 화면 (push, 자체 SafeArea).
   /// SafeArea top inset 바로 아래이므로 탭보다 넉넉하게.
   static const double mastheadTopPaddingScreen = 8.0;
+
   /// 좌측 로고/라벨 — 대문자 + letterSpacing 5.
   final String eyebrow;
+
+  /// [eyebrow] 스타일 override. 기본 [NotebookTypography.eyebrow].
+  /// 브랜드 워드마크를 뮤트할 때 [NotebookTypography.wordmark] 를 넘긴다.
+  final TextStyle? eyebrowStyle;
 
   /// 우측 메타 — VOL·NO·DATE.
   final String meta;
@@ -39,6 +44,7 @@ class NotebookMasthead extends StatelessWidget {
     super.key,
     required this.eyebrow,
     required this.meta,
+    this.eyebrowStyle,
     this.onMetaTap,
     this.trailing,
   });
@@ -57,7 +63,12 @@ class NotebookMasthead extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(child: Text(eyebrow, style: NotebookTypography.eyebrow)),
+          Expanded(
+            child: Text(
+              eyebrow,
+              style: eyebrowStyle ?? NotebookTypography.eyebrow,
+            ),
+          ),
           if (trailing != null)
             trailing!
           else

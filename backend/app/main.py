@@ -9,9 +9,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings, validate_runtime_configuration
 from app.core.exceptions import register_exception_handlers
 from app.core.i18n import LocaleMiddleware
+from app.core.idempotency import IdempotencyMiddleware  # noqa: F401  add_middleware 에서 사용
+from app.core.logging_config import configure_app_logging
 from app.core.security_headers import (
     SecurityHeadersMiddleware,  # noqa: F401  add_middleware 에서 사용 — ruff 가 데코레이터 인자 detect 못함.
 )
+
+# At import time so every uvicorn worker emits app.* INFO logs (#1180) —
+# uvicorn's log config only wires its own loggers and leaves root at WARNING.
+configure_app_logging()
 
 
 @asynccontextmanager
@@ -82,6 +88,51 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             hours=1,
         )
 
+        # 그룹 수업 리마인더 (P2-2). 전일은 저녁에 (다음날 일정을 확인하는 시간대),
+        # 당일은 아침에 보낸다.
+        from app.jobs.group_lesson_reminder_jobs import (
+            JOB_ID_DAY_BEFORE,
+            JOB_ID_DAY_OF,
+            run_group_lesson_reminder_day_before,
+            run_group_lesson_reminder_day_of,
+        )
+
+        register_daily_kst_job(
+            run_group_lesson_reminder_day_before,
+            job_id=JOB_ID_DAY_BEFORE,
+            hour=20,
+            minute=0,
+        )
+        register_daily_kst_job(
+            run_group_lesson_reminder_day_of,
+            job_id=JOB_ID_DAY_OF,
+            hour=8,
+            minute=0,
+        )
+
+        # Daily KST — pending lesson-request(14d) + subscription-proposal(7d)
+        # expiry. Previously endpoint-only (external cron) → in-process now so
+        # prod never leaves requests/proposals stuck pending (#1198).
+        from app.jobs.pending_expiry_jobs import (
+            JOB_ID_LESSON_REQUEST_EXPIRY,
+            JOB_ID_PROPOSAL_EXPIRY,
+            run_lesson_request_expiry_job,
+            run_proposal_expiry_job,
+        )
+
+        register_daily_kst_job(
+            run_lesson_request_expiry_job,
+            job_id=JOB_ID_LESSON_REQUEST_EXPIRY,
+            hour=0,
+            minute=10,
+        )
+        register_daily_kst_job(
+            run_proposal_expiry_job,
+            job_id=JOB_ID_PROPOSAL_EXPIRY,
+            hour=0,
+            minute=15,
+        )
+
         start_scheduler()
 
     yield
@@ -103,6 +154,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Idempotency middleware (#1117) — added FIRST so it is the INNERMOST user
+# middleware (closest to the router). A replayed/stored response therefore
+# still flows back out through CORS/security/locale and receives their headers.
+app.add_middleware(IdempotencyMiddleware)
+
 # CORS middleware — allow_methods / allow_headers 를 명시적으로 화이트리스트한다.
 # wildcard ``*`` 는 allow_credentials=True 와 결합하면 일부 브라우저에서 CORS spec 위반으로
 # 차단되거나, custom request header (예: ``X-Internal-API-Key``) 가 prefli ght 에서 누락된다.
@@ -116,6 +172,7 @@ app.add_middleware(
         "Accept-Language",
         "Authorization",
         "Content-Type",
+        "Idempotency-Key",
         "X-Internal-API-Key",
         "X-Requested-With",
         "X-Forwarded-For",

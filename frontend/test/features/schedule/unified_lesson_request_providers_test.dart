@@ -456,6 +456,74 @@ void main() {
       expect(updatedRequest!.status, UnifiedRequestStatus.subscriptionIssued);
     });
 
+    test('두 번째 호출은 수강권을 중복 발행하지 않는다 (idempotency — #D1)', () async {
+      // 입금확인 더블탭이 UI 가드를 통과해 issueSubscription 이 두 번 호출돼도,
+      // 이미 발행된 요청이면 두 번째 호출은 중복 subscription 을 만들지 않는다.
+      // fix(액션 idempotency 가드)를 되돌리면 subscription 이 2개 생겨 RED.
+      final requestRepository = MockUnifiedLessonRequestRepository();
+      final subscriptionRepository = MockSubscriptionRepository();
+      final cardRepository = MockScheduleConfirmationCardRepository();
+      final relationRepository = MockTeacherStudentRelationRepository();
+      final container = ProviderContainer(
+        overrides: [
+          unifiedLessonRequestRepositoryProvider.overrideWithValue(
+            requestRepository,
+          ),
+          subscriptionRepositoryProvider.overrideWithValue(
+            subscriptionRepository,
+          ),
+          scheduleConfirmationCardRepositoryProvider.overrideWith(
+            (ref) => cardRepository,
+          ),
+          teacherStudentRelationRepositoryProvider.overrideWith(
+            (ref) => relationRepository,
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final request = UnifiedLessonRequest(
+        id: 'issue-dup-001',
+        studentId: 'issue-dup-student-001',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.regular,
+        instrument: '피아노',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        preferredDay: 2,
+        preferredTime: '15:00',
+        preferredDuration: 50,
+        suggestedPrice: 180000,
+        status: UnifiedRequestStatus.paymentNotified,
+        createdAt: DateTime(2026, 5, 4),
+      );
+      await requestRepository.create(request);
+
+      final actions = UnifiedLessonRequestActions(container);
+      await actions.issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: true,
+      );
+      // 두 번째 호출 — idempotency 가드가 잡아야 한다.
+      await actions.issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: true,
+      );
+
+      final subscriptions = await subscriptionRepository.getByStudentId(
+        request.studentId,
+      );
+      expect(
+        subscriptions,
+        hasLength(1),
+        reason: '더블탭/재호출로 수강권이 2개 발행되면 안 된다 (#D1).',
+      );
+    });
+
     test('creates package subscription for package request', () async {
       final requestRepository = MockUnifiedLessonRequestRepository();
       final subscriptionRepository = MockSubscriptionRepository();

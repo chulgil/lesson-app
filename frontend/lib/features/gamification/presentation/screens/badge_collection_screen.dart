@@ -12,7 +12,9 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/gamification.dart';
 import '../providers/gamification_provider.dart';
+import '../providers/journey_sticker_provider.dart';
 import '../widgets/challenges_card.dart';
+import '../widgets/journey_sticker_section.dart';
 
 /// Badge collection and gamification detail screen.
 class BadgeCollectionScreen extends ConsumerWidget {
@@ -32,12 +34,12 @@ class BadgeCollectionScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) =>
             const Center(child: Text(AppStrings.gamificationDataLoadFailed)),
-        data: (data) => _buildContent(context, data),
+        data: (data) => _buildContent(context, ref, data),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, StudentGamification data) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, StudentGamification data) {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       children: [
@@ -59,6 +61,22 @@ class BadgeCollectionScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space3),
         _buildBadgeGrid(data.earnedBadges),
+
+        const SizedBox(height: AppSpacing.space5),
+
+        // Journey sticker catalog (P3b — computed, no accrual table)
+        Consumer(
+          builder: (context, ref, _) {
+            final catalogAsync = ref.watch(
+              journeyStickerCatalogProvider(studentId),
+            );
+            return catalogAsync.when(
+              data: (catalog) => JourneyStickerSection(catalog: catalog),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            );
+          },
+        ),
 
         const SizedBox(height: AppSpacing.space5),
 

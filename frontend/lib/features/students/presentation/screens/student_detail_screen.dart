@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -27,6 +28,7 @@ import '../../../../features/students/students_facade.dart'
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
+import '../../../share/share_facade.dart' show growthReportShareRepositoryProvider;
 import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 import '../../../lessons/lessons_facade.dart';
@@ -117,21 +119,7 @@ class StudentDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyMessage({required IconData icon, required String message}) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            message,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
+    return EmptyStateWidget(icon: icon, title: message);
   }
 }
 
@@ -292,6 +280,15 @@ class _StudentDetailContent extends ConsumerWidget {
                   _showInviteCodeDialog(context, student.name, ref);
                 },
               ),
+              _MoreOptionTile(
+                icon: Icons.ios_share,
+                title: AppStrings.growthReportShareMenuLabel,
+                hint: AppStrings.growthReportShareMenuHint,
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareGrowthReport(context, ref);
+                },
+              ),
               const _MoreSectionLabel(
                 title: AppStrings.studentStatusChangeSection,
               ),
@@ -405,6 +402,33 @@ class _StudentDetailContent extends ConsumerWidget {
           ),
         );
       }
+    }
+  }
+
+  /// #1217 — 무가입 자녀 성장 리포트 프리뷰 공유: 서버 토큰 생성 → 공유 URL
+  /// 클립보드 복사 + 토스트. 토큰 발급만 서버, 발급된 URL 은 그대로 복사
+  /// (랜딩=공개 성장 리포트 화면, 로그인 불필요).
+  Future<void> _shareGrowthReport(BuildContext context, WidgetRef ref) async {
+    try {
+      final share = await ref
+          .read(growthReportShareRepositoryProvider)
+          .createGrowthReportShare(student.id);
+      await Clipboard.setData(ClipboardData(text: share.url));
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.growthReportShareCopied),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.growthReportShareError),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -630,10 +654,14 @@ class _StudentMetaLine extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          student.instrument,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
+        Flexible(
+          child: Text(
+            student.instrument,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         Text(

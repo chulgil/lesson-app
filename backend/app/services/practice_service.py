@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -382,7 +382,6 @@ class PracticeService:
         offset: int,
         student_id: str | None = None,
         include_archived: bool = False,
-        date: str | None = None,
     ) -> PaginatedResponse[RepertoireResponse]:
         """List repertoires with filters."""
         from app.models.practice import PracticeRepertoire
@@ -855,64 +854,70 @@ class PracticeService:
     # ------------------------------------------------------------------
 
     async def get_streak(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
-        """Get current and longest streak."""
-        from app.models.practice import PracticeStreak
+        """Get current and longest streak, recomputed from practice logs (SSOT)."""
+        from app.services.streak_service import compute_streak
 
         sid = student_id or current_user.id
         await self._assert_can_read_student(sid, current_user)
-        streak = await self.db.scalar(
-            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+        summary = await compute_streak(self.db, sid)
+        return PracticeStreakResponse(
+            student_id=sid,
+            current_streak=summary.current,
+            longest_streak=summary.longest,
+            last_practice_date=summary.last_date,
         )
-        if streak is None:
-            return PracticeStreakResponse()
-        return PracticeStreakResponse.model_validate(streak)
 
     async def update_streak(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
-        """Ensure a streak row exists and return it."""
-        from app.models.practice import PracticeStreak
+        """Return the streak recomputed from logs (SSOT).
+
+        The legacy ``practice_streaks`` counter is removed (G3 PR-D); the streak
+        is always derived from ``practice_logs`` via ``compute_streak`` (spec §2),
+        so this is a pure read with no stored side effect.
+        """
+        from app.services.streak_service import compute_streak
 
         sid = student_id or current_user.id
         await self._assert_can_manage_student(sid, current_user)
-        streak = await self.db.scalar(
-            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+        summary = await compute_streak(self.db, sid)
+        return PracticeStreakResponse(
+            student_id=sid,
+            current_streak=summary.current,
+            longest_streak=summary.longest,
+            last_practice_date=summary.last_date,
         )
-        if streak is None:
-            streak = PracticeStreak(student_id=sid)
-            self.db.add(streak)
-            await self.db.flush()
-            await self.db.refresh(streak)
-        return PracticeStreakResponse.model_validate(streak)
 
     async def record_practice(self, student_id: str | None, current_user: Any) -> PracticeStreakResponse:
-        """Record today's practice and update the streak counters."""
-        from app.models.practice import PracticeStreak
+        """Record today's practice in the SSOT (``practice_logs``) and return the
+        recomputed streak.
+
+        The legacy ``practice_streaks`` counter is removed (G3 PR-D). Recording a
+        practice now writes a minimal, minutes-gated log for the KST day (when none
+        exists yet), so ``compute_streak`` — the single source of truth — reflects
+        it. Idempotent per day via the unique ``(student_id, date)`` index.
+        """
+        from app.models.practice_log import PracticeLog
+        from app.services.streak_service import compute_streak, to_kst_date
 
         sid = student_id or current_user.id
         await self._assert_can_manage_student(sid, current_user)
-        streak = await self.db.scalar(
-            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+
+        today = to_kst_date(datetime.now(UTC))
+        existing = await self.db.scalar(
+            select(PracticeLog).where(
+                PracticeLog.student_id == sid, PracticeLog.date == today
+            )
         )
-        if streak is None:
-            streak = PracticeStreak(student_id=sid)
-            self.db.add(streak)
-
-        today = date.today()
-        if streak.last_practice_date == today:
+        if existing is None:
+            self.db.add(PracticeLog(student_id=sid, date=today, total_minutes=1))
             await self.db.flush()
-            await self.db.refresh(streak)
-            return PracticeStreakResponse.model_validate(streak)
 
-        if streak.last_practice_date == today - timedelta(days=1):
-            streak.current_streak += 1
-        else:
-            streak.current_streak = 1
-
-        streak.longest_streak = max(streak.longest_streak, streak.current_streak)
-        streak.last_practice_date = today
-        streak.total_practice_days += 1
-        await self.db.flush()
-        await self.db.refresh(streak)
-        return PracticeStreakResponse.model_validate(streak)
+        summary = await compute_streak(self.db, sid)
+        return PracticeStreakResponse(
+            student_id=sid,
+            current_streak=summary.current,
+            longest_streak=summary.longest,
+            last_practice_date=summary.last_date,
+        )
 
     async def get_stats(
         self, student_id: str | None, year: int | None, month: int | None, current_user: Any
@@ -920,7 +925,8 @@ class PracticeService:
         """Get monthly practice statistics from DailyPracticeStatus."""
         from datetime import date as date_cls
 
-        from app.models.practice import DailyPracticeStatus, PracticeRepertoire, PracticeSection, PracticeStreak
+        from app.models.practice import DailyPracticeStatus, PracticeRepertoire, PracticeSection
+        from app.services.streak_service import compute_streak
 
         sid = student_id or current_user.id
         await self._assert_can_read_student(sid, current_user)
@@ -969,16 +975,14 @@ class PracticeService:
         )
         total_minutes = (total_minutes_result or 0) // 60
 
-        streak = await self.db.scalar(
-            select(PracticeStreak).where(PracticeStreak.student_id == sid)
-        )
+        summary = await compute_streak(self.db, sid)
 
         return PracticeStatsResponse(
             total_practice_minutes=total_minutes,
             total_practice_days=len(daily_map),
             completed_sections=completed_sections,
-            current_streak=streak.current_streak if streak else 0,
-            longest_streak=streak.longest_streak if streak else 0,
+            current_streak=summary.current,
+            longest_streak=summary.longest,
             daily_stats=daily_map,
         )
 

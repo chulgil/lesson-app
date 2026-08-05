@@ -162,23 +162,6 @@ class TeacherOnboardingNotifier extends _$TeacherOnboardingNotifier {
     }
   }
 
-  /// Complete tutorial step
-  void completeTutorialStep(TutorialStep step) {
-    final newProgress = state.tutorialProgress.markStepCompleted(step);
-    state = state.copyWith(tutorialProgress: newProgress);
-
-    if (newProgress.isCompleted) {
-      completeOnboarding();
-    }
-  }
-
-  /// Skip tutorial
-  void skipTutorial() {
-    final skipped = state.tutorialProgress.skip();
-    state = state.copyWith(tutorialProgress: skipped);
-    completeOnboarding();
-  }
-
   /// Complete onboarding
   void completeOnboarding() {
     state = state.copyWith(
@@ -494,41 +477,3 @@ class ProfileIntroduction extends _$ProfileIntroduction {
   set state(String value) => super.state = value;
 }
 
-/// Profile form validation
-@Riverpod(keepAlive: true)
-bool isProfileFormValid(Ref ref) {
-  final name = ref.watch(profileNameProvider);
-  final instruments = ref.watch(selectedInstrumentsProvider);
-  final introduction = ref.watch(profileIntroductionProvider);
-
-  return name.isNotEmpty && instruments.isNotEmpty && introduction.length >= 20;
-}
-
-/// Missing fields for profile
-@Riverpod(keepAlive: true)
-List<String> profileMissingFields(Ref ref) {
-  final fields = <String>[];
-  final name = ref.watch(profileNameProvider);
-  final instruments = ref.watch(selectedInstrumentsProvider);
-  final introduction = ref.watch(profileIntroductionProvider);
-
-  if (name.isEmpty) fields.add('이름');
-  if (instruments.isEmpty) fields.add('악기');
-  if (introduction.length < 20) fields.add('소개글 (20자 이상)');
-
-  return fields;
-}
-
-/// Build onboarding profile from form data
-@Riverpod(keepAlive: true)
-TeacherOnboardingProfile? onboardingProfileFromForm(Ref ref) {
-  final isValid = ref.watch(isProfileFormValidProvider);
-  if (!isValid) return null;
-
-  return TeacherOnboardingProfile(
-    name: ref.read(profileNameProvider),
-    profileImage: ref.read(profileImageProvider),
-    instruments: ref.read(selectedInstrumentsProvider),
-    introduction: ref.read(profileIntroductionProvider),
-  );
-}

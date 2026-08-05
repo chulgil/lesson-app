@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'subscription.dart';
+
 part 'subscription_template.g.dart';
 
 /// Owner type for subscription template.
@@ -69,6 +71,14 @@ class SubscriptionTemplate {
   /// false: 선생님이 직접 제안할 때만 사용 가능
   final bool isAutoProposalEnabled;
 
+  /// Lesson format tickets issued from this template may be spent on.
+  /// Null = no scope recorded, read as [SubscriptionAppliesTo.universal].
+  final SubscriptionAppliesTo? appliesTo;
+
+  /// Group class tickets from this template are issued for. Propagated to the
+  /// issued [Subscription] by the backend.
+  final String? groupClassId;
+
   SubscriptionTemplate({
     required this.id,
     required this.ownerId,
@@ -86,6 +96,8 @@ class SubscriptionTemplate {
     this.updatedAt,
     this.rescheduleAllowance = 2, // 기본값: 2회
     this.isAutoProposalEnabled = true, // 기본값: 자동 제안 활성화
+    this.appliesTo,
+    this.groupClassId,
   });
 
   factory SubscriptionTemplate.fromJson(Map<String, dynamic> json) =>
@@ -113,6 +125,8 @@ class SubscriptionTemplate {
     DateTime? updatedAt,
     int? rescheduleAllowance,
     bool? isAutoProposalEnabled,
+    SubscriptionAppliesTo? appliesTo,
+    String? groupClassId,
   }) {
     return SubscriptionTemplate(
       id: id ?? this.id,
@@ -133,6 +147,8 @@ class SubscriptionTemplate {
       rescheduleAllowance: rescheduleAllowance ?? this.rescheduleAllowance,
       isAutoProposalEnabled:
           isAutoProposalEnabled ?? this.isAutoProposalEnabled,
+      appliesTo: appliesTo ?? this.appliesTo,
+      groupClassId: groupClassId ?? this.groupClassId,
     );
   }
 

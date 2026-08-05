@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import datetime as _dt
+from email.utils import parsedate_to_datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Header, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.context_deps import require_teacher_context
@@ -126,6 +127,32 @@ async def get_practice_log_by_id(
     return result
 
 
+def _parse_if_unmodified_since(raw: str | None) -> _dt.datetime | None:
+    """Parse the ``If-Unmodified-Since`` precondition header (#1119, D4).
+
+    The app sends an ISO-8601 UTC value (sub-second precision); an HTTP-date
+    (RFC 7231) is also accepted. An unparseable value is ignored (treated as no
+    precondition — a parse bug must not block a legitimate write).
+    """
+    if not raw or not raw.strip():
+        return None
+    value = raw.strip()
+    iso = value[:-1] + "+00:00" if value.endswith("Z") else value
+    parsed: _dt.datetime | None = None
+    try:
+        parsed = _dt.datetime.fromisoformat(iso)
+    except ValueError:
+        try:
+            parsed = parsedate_to_datetime(value)
+        except (TypeError, ValueError):
+            return None
+    if parsed is None:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=_dt.UTC)
+    return parsed.astimezone(_dt.UTC)
+
+
 @router.put(
     "/{log_id}",
     response_model=PracticeLogResponse,
@@ -137,9 +164,15 @@ async def update_practice_log(
     body: PracticeLogUpdate,
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
+    if_unmodified_since: Annotated[str | None, Header(alias="If-Unmodified-Since")] = None,
 ) -> PracticeLogResponse:
     service = PracticeLogService(db)
-    result: PracticeLogResponse = await service.update_log(log_id, body.model_dump(exclude_none=True), current_user)
+    result: PracticeLogResponse = await service.update_log(
+        log_id,
+        body.model_dump(exclude_none=True),
+        current_user,
+        if_unmodified_since=_parse_if_unmodified_since(if_unmodified_since),
+    )
     return result
 
 

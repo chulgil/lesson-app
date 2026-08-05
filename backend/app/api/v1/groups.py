@@ -16,14 +16,114 @@ from app.schemas.schedule_ext import (
     GroupBookingActionRequest,
     GroupClassBookingCreate,
     GroupClassBookingResponse,
+    GroupClassCreate,
+    GroupClassResponse,
     GroupClassScheduleCreate,
     GroupClassScheduleResponse,
+    GroupClassUpdate,
     NoShowRecordCreate,
     NoShowRecordResponse,
 )
 from app.services.schedule_ext_service import ScheduleExtService
 
 router = APIRouter()
+
+
+# ---------------------------------------------------------------------------
+# Group Class definitions
+#
+# `/groups/classes` — 리터럴 경로가 `/{group_class_id}/schedules` 보다 먼저
+# 매칭되도록 파일 앞쪽에 선언한다.
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/classes",
+    response_model=GroupClassResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a group class",
+)
+async def create_group_class(
+    body: GroupClassCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> GroupClassResponse:
+    service = ScheduleExtService(db)
+    return await service.create_group_class(body.model_dump(), current_user)
+
+
+@router.get(
+    "/classes",
+    response_model=PaginatedResponse[GroupClassResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List group classes",
+)
+async def list_group_classes(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+    teacher_id: str | None = None,
+    include_inactive: str | None = None,
+) -> PaginatedResponse[GroupClassResponse]:
+    service = ScheduleExtService(db)
+    return await service.list_group_classes(
+        teacher_id=teacher_id,
+        include_inactive=include_inactive == "true",
+        current_user=current_user,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+    )
+
+
+@router.get(
+    "/classes/{group_class_id}",
+    response_model=GroupClassResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get a group class by ID",
+)
+async def get_group_class(
+    group_class_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> GroupClassResponse:
+    service = ScheduleExtService(db)
+    return await service.get_group_class(group_class_id)
+
+
+@router.patch(
+    "/classes/{group_class_id}",
+    response_model=GroupClassResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update a group class",
+)
+async def update_group_class(
+    group_class_id: str,
+    body: GroupClassUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> GroupClassResponse:
+    service = ScheduleExtService(db)
+    return await service.update_group_class(
+        group_class_id,
+        body.model_dump(exclude_unset=True),
+        current_user,
+    )
+
+
+@router.delete(
+    "/classes/{group_class_id}",
+    response_model=GroupClassResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Deactivate a group class",
+)
+async def deactivate_group_class(
+    group_class_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> GroupClassResponse:
+    service = ScheduleExtService(db)
+    return await service.deactivate_group_class(group_class_id, current_user)
 
 
 # ---------------------------------------------------------------------------

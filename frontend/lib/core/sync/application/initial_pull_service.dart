@@ -1,11 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-import '../../../features/lessons/data/local/lesson_cache_store.dart';
 import '../../../features/lessons/data/repositories/remote_lesson_repository.dart';
-import '../../../features/schedule/data/local/teacher_availability_cache_store.dart';
 import '../../../features/schedule/data/repositories/remote_teacher_availability_repository.dart';
-import '../../../features/students/data/local/student_cache_store.dart';
 import '../../../features/students/data/repositories/remote_student_repository.dart';
 import 'connectivity_service.dart';
 
@@ -14,11 +11,17 @@ import 'connectivity_service.dart';
 /// Key pattern: `<userId>:initialSyncDone` → `'1'`
 const _flagBoxName = 'initial_pull_flags_v1';
 
-/// Pulls server-side data into local caches on first login.
+/// Warms the HTTP response cache on first login (offline-launch backbone).
 ///
 /// Design decisions:
 /// - Covers lessons, students and schedule (availability) domains.
-/// - Repertoires domain has no remote CacheStore yet — tracked as TODO(#877).
+/// - Warming mechanism: each pull calls the SAME remote repository method the
+///   app's read path uses. The request goes through ApiClient →
+///   ResponseCacheInterceptor, which persists the response in
+///   ResponseCacheStore under the exact cache key (path + query params) the
+///   read path will later request. A subsequent offline launch is therefore
+///   served from the HTTP response cache — no per-domain cache store exists.
+/// - Repertoires domain has no remote endpoint warmed yet — tracked as TODO(#877).
 /// - Partial-failure isolation: each domain is pulled in its own try/catch so
 ///   one domain failing does NOT block the others or abort the whole pull.
 /// - user id scoped flag prevents re-pulling on logout → re-login.
@@ -28,26 +31,17 @@ const _flagBoxName = 'initial_pull_flags_v1';
 class InitialPullService {
   InitialPullService({
     required RemoteLessonRepository remoteLessons,
-    required LessonCacheStore lessonCache,
     required RemoteStudentRepository remoteStudents,
-    required StudentCacheStore studentCache,
     required RemoteTeacherAvailabilityRepository remoteAvailability,
-    required TeacherAvailabilityCacheStore availabilityCache,
     required ConnectivityService connectivity,
   }) : _remoteLessons = remoteLessons,
-       _lessonCache = lessonCache,
        _remoteStudents = remoteStudents,
-       _studentCache = studentCache,
        _remoteAvailability = remoteAvailability,
-       _availabilityCache = availabilityCache,
        _connectivity = connectivity;
 
   final RemoteLessonRepository _remoteLessons;
-  final LessonCacheStore _lessonCache;
   final RemoteStudentRepository _remoteStudents;
-  final StudentCacheStore _studentCache;
   final RemoteTeacherAvailabilityRepository _remoteAvailability;
-  final TeacherAvailabilityCacheStore _availabilityCache;
   final ConnectivityService _connectivity;
 
   /// Runs the initial pull for [userId] if not already completed.
@@ -93,13 +87,13 @@ class InitialPullService {
     }
   }
 
-  /// Pulls lessons into [LessonCacheStore]. Returns true on success.
+  /// Warms the lessons HTTP response cache (via ResponseCacheInterceptor).
+  /// Returns true on success.
   Future<bool> _pullLessons() async {
     try {
       debugPrint('[InitialPull] pulling lessons ...');
       final lessons = await _remoteLessons.getLessons();
-      await _lessonCache.putLessons(LessonCacheStore.keyAll(), lessons);
-      debugPrint('[InitialPull] seeded ${lessons.length} lessons');
+      debugPrint('[InitialPull] warmed ${lessons.length} lessons');
       return true;
     } catch (e) {
       debugPrint('[InitialPull] lessons pull failed (isolated): $e');
@@ -107,13 +101,13 @@ class InitialPullService {
     }
   }
 
-  /// Pulls students into [StudentCacheStore]. Returns true on success.
+  /// Warms the students HTTP response cache (via ResponseCacheInterceptor).
+  /// Returns true on success.
   Future<bool> _pullStudents() async {
     try {
       debugPrint('[InitialPull] pulling students ...');
       final students = await _remoteStudents.getStudents();
-      await _studentCache.putStudents(StudentCacheStore.keyAll(), students);
-      debugPrint('[InitialPull] seeded ${students.length} students');
+      debugPrint('[InitialPull] warmed ${students.length} students');
       return true;
     } catch (e) {
       debugPrint('[InitialPull] students pull failed (isolated): $e');
@@ -121,18 +115,15 @@ class InitialPullService {
     }
   }
 
-  /// Pulls teacher availability into [TeacherAvailabilityCacheStore].
+  /// Warms the teacher availability HTTP response cache (via
+  /// ResponseCacheInterceptor).
   /// Returns true on success (including 404 → no availability yet).
   Future<bool> _pullAvailability(String userId) async {
     try {
       debugPrint('[InitialPull] pulling availability for user=$userId ...');
       final availability = await _remoteAvailability.getAvailability(userId);
-      await _availabilityCache.putAvailability(
-        TeacherAvailabilityCacheStore.keyAvailability(userId),
-        availability,
-      );
       debugPrint(
-        '[InitialPull] seeded availability (null=${availability == null})',
+        '[InitialPull] warmed availability (null=${availability == null})',
       );
       return true;
     } catch (e) {

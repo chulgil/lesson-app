@@ -11,7 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
-import '../extensions/subscription_visuals.dart';
+import '../extensions/subscription_scope_visuals.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/subscription_card.dart';
 
@@ -166,7 +166,8 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.space3),
             child: SubscriptionCard(
               subscription: sub,
-              className: sub.typeLabel,
+              // 어느 수강권이 임박했는지 밝힌다 — 그룹은 클래스명/그룹 라벨 (P1-5).
+              className: sub.expiryKindLabel(),
               onTap:
                   () => context.push(
                     AppRoutes.subscriptionDetail.replaceFirst(':id', sub.id),

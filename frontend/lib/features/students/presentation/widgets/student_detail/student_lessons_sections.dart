@@ -40,7 +40,11 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
                   AppRoutes.studentNotes.replaceFirst(':id', studentId),
                 );
               },
-              child: const Text(AppStrings.studentViewAll),
+              // H6 — 텍스트만 있는 액션은 밑줄로 눌리는 것임을 알린다.
+              child: const Text(
+                AppStrings.studentViewAll,
+                style: TextStyle(decoration: TextDecoration.underline),
+              ),
             ),
           ],
         ),
@@ -124,7 +128,11 @@ class StudentRecentLessonsSection extends ConsumerWidget {
                   AppRoutes.studentNotes.replaceFirst(':id', studentId),
                 );
               },
-              child: const Text(AppStrings.studentViewAll),
+              // H6 — 텍스트만 있는 액션은 밑줄로 눌리는 것임을 알린다.
+              child: const Text(
+                AppStrings.studentViewAll,
+                style: TextStyle(decoration: TextDecoration.underline),
+              ),
             ),
           ],
         ),

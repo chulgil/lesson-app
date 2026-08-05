@@ -283,3 +283,170 @@ async def test_booking_with_use_credit_no_active_returns_422(
     )
 
     assert response.status_code == 422, response.text
+
+
+async def _seed_lessons_matching(
+    db_session: AsyncSession,
+    *,
+    subscription_id: str,
+    teacher_id: str,
+    student_id: str,
+    slots: list[tuple[date, str]],
+) -> None:
+    """#1203 — create Lesson rows (calendar SSOT) mirroring the seeded bookings."""
+    from app.models.lesson import Lesson, LessonSource, LessonStatus
+
+    for i, (day, start_time) in enumerate(slots):
+        db_session.add(
+            Lesson(
+                teacher_id=teacher_id,
+                student_id=student_id,
+                student_name="Student",
+                instrument="violin",
+                date=day,
+                start_time=start_time,
+                duration=60,
+                status=LessonStatus.scheduled,
+                subscription_id=subscription_id,
+                session_number=i + 1,
+                lesson_source=LessonSource.subscription_generated,
+            )
+        )
+    await db_session.flush()
+
+
+@pytest.mark.asyncio
+async def test_bulk_change_moves_matching_lessons(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """#1203 — bulk_change moves the Lesson rows (calendar SSOT), not only bookings."""
+    from sqlalchemy import select
+
+    from app.models.lesson import Lesson
+    from app.services.subscription_service import resolve_teacher_id
+
+    await _setup(create_test_user)
+    sub_id, _ = await _seed_subscription_and_bookings(db_session, "test-user-id", "test-student-id")
+    teacher_id = await resolve_teacher_id(db_session, "test-user-id")
+    base = date(2126, 7, 6)  # Monday
+    slots = [(base + timedelta(days=7 * i), "14:00") for i in range(3)]
+    await _seed_lessons_matching(
+        db_session,
+        subscription_id=sub_id,
+        teacher_id=teacher_id,
+        student_id="test-student-id",
+        slots=slots,
+    )
+    await db_session.commit()
+
+    response = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/bulk-change",
+        headers=auth_headers,
+        json={"new_day_of_week": 2, "new_time": "15:00"},  # Wednesday
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["rescheduled_count"] == 3
+
+    db_session.expire_all()
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.subscription_id == sub_id))).all()
+    assert len(lessons) == 3
+    for lesson in lessons:
+        assert lesson.date.weekday() == 2, "Lesson must move to Wednesday"
+        assert lesson.start_time == "15:00", "Lesson start_time must move"
+
+
+@pytest.mark.asyncio
+async def test_bulk_change_cancels_matching_lesson_on_conflict(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """#1203 — a bulk_change loss (seen_dates conflict) cancels the matching Lesson too."""
+    from sqlalchemy import select
+
+    from app.models.lesson import ClassMembership, Lesson, LessonClass, LessonSource, LessonStatus
+    from app.models.schedule import BookingStatus, LessonBooking
+    from app.models.subscription import Subscription
+    from app.services.subscription_service import resolve_teacher_id
+
+    await _setup(create_test_user)
+    teacher_id = await resolve_teacher_id(db_session, "test-user-id")
+    lc = LessonClass(teacher_id=teacher_id, name="Test")
+    db_session.add(lc)
+    await db_session.flush()
+    membership = ClassMembership(
+        lesson_class_id=lc.id,
+        student_id="test-student-id",
+        instrument="violin",
+        lesson_duration=60,
+    )
+    db_session.add(membership)
+    await db_session.flush()
+    sub = Subscription(
+        student_id="test-student-id",
+        membership_id=membership.id,
+        type="monthly",
+        lessons_per_month=4,
+        total_lessons=4,
+        start_date=date(2126, 7, 1),
+        end_date=date(2126, 7, 31),
+        amount=200000,
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    monday_date = date(2126, 7, 6)
+    tuesday_date = date(2126, 7, 7)
+    for d in (monday_date, tuesday_date):
+        db_session.add(
+            LessonBooking(
+                teacher_id=teacher_id,
+                student_id="test-student-id",
+                scheduled_date=d,
+                scheduled_time="14:00",
+                duration=60,
+                subscription_id=sub.id,
+                status=BookingStatus.confirmed,
+            )
+        )
+    for i, d in enumerate((monday_date, tuesday_date)):
+        db_session.add(
+            Lesson(
+                teacher_id=teacher_id,
+                student_id="test-student-id",
+                student_name="Student",
+                instrument="violin",
+                date=d,
+                start_time="14:00",
+                duration=60,
+                status=LessonStatus.scheduled,
+                subscription_id=sub.id,
+                session_number=i + 1,
+                lesson_source=LessonSource.subscription_generated,
+            )
+        )
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    response = await client.post(
+        f"/api/v1/subscriptions/{sub_id}/bulk-change",
+        headers=auth_headers,
+        json={"new_day_of_week": 2, "new_time": "15:00"},  # Wednesday
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["rescheduled_count"] == 1
+    assert body["lost_count"] == 1
+
+    db_session.expire_all()
+    lessons = (await db_session.scalars(select(Lesson).where(Lesson.subscription_id == sub_id))).all()
+    moved = [x for x in lessons if x.status == LessonStatus.scheduled]
+    cancelled = [x for x in lessons if x.status == LessonStatus.cancelled]
+    assert len(moved) == 1, "one Lesson moved"
+    assert moved[0].date.weekday() == 2 and moved[0].start_time == "15:00"
+    assert len(cancelled) == 1, "the lost lesson's Lesson row must be cancelled"
+    assert cancelled[0].date == tuesday_date, "the Tuesday lesson is the lost one"

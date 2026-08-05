@@ -7,11 +7,14 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../features/auth/auth_facade.dart'
+    show activeDisciplineProvider;
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../students/students_ui_facade.dart';
 import '../providers/student_home_profile_edit_provider.dart';
@@ -36,19 +39,6 @@ class _StudentProfileEditScreenState
   bool _isLoading = true;
   Student? _currentStudent;
 
-  final List<String> _instruments = [
-    '바이올린',
-    '비올라',
-    '첼로',
-    '피아노',
-    '플루트',
-    '클라리넷',
-    '기타',
-    '드럼',
-    '성악',
-    '기타 악기',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -69,10 +59,14 @@ class _StudentProfileEditScreenState
           _nameController.text = student.name;
           _emailController.text = student.email ?? '';
           _phoneController.text = student.phone ?? '';
+          final catalog =
+              ExpertiseCatalogRegistry.forDiscipline(
+                ref.read(activeDisciplineProvider),
+              ).items;
           _selectedInstrument =
-              _instruments.contains(student.instrument)
+              student.instrument.isNotEmpty
                   ? student.instrument
-                  : '바이올린';
+                  : (catalog.isNotEmpty ? catalog.first : '바이올린');
           _isLoading = false;
         });
       } else if (mounted) {
@@ -283,6 +277,17 @@ class _StudentProfileEditScreenState
   }
 
   Widget _buildInstrumentSelector() {
+    final catalog =
+        ExpertiseCatalogRegistry.forDiscipline(
+          ref.watch(activeDisciplineProvider),
+        ).items;
+    // #1072: preserve a saved value outside the current catalog (custom /
+    // legacy) as a selectable item so the dropdown never silently reverts
+    // it — fixes the 색소폰→바이올린 data loss on the auto-save exit.
+    final options =
+        catalog.contains(_selectedInstrument)
+            ? catalog
+            : <String>[_selectedInstrument, ...catalog];
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
       decoration: BoxDecoration(
@@ -296,7 +301,7 @@ class _StudentProfileEditScreenState
           icon: Icon(Icons.keyboard_arrow_down, color: AppColors.inkSecondary),
           style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
           items:
-              _instruments.map((instrument) {
+              options.map((instrument) {
                 return DropdownMenuItem(
                   value: instrument,
                   child: Text(instrument),

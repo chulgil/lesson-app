@@ -278,18 +278,23 @@ async def test_scenario_group_class_full_lifecycle(client: AsyncClient, auth_hea
     """Full group class lifecycle: schedule, fill, waitlist, cancel, promote, attend."""
     from sqlalchemy import select
 
-    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.schedule import GroupClass, GroupClassType
     from app.models.teacher import Teacher
 
     await create_test_user(user_id="test-user-id", role="teacher")
-    # Group class ownership 검증 — 실제 LessonClass row 가 필요하다.
+    # Group class ownership 검증 — 실제 GroupClass row 가 필요하다.
     teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == "test-user-id"))
     db_session.add(
-        LessonClass(
+        GroupClass(
             id="gc-ensemble",
             teacher_id=teacher_profile_id or "test-user-id",
             name="Test Ensemble",
-            type=LessonClassType.private,
+            type=GroupClassType.regular,
+            max_capacity=2,
+            duration_minutes=60,
+            booking_deadline_minutes=60,
+            cancel_deadline_minutes=1440,
+            is_active=True,
         )
     )
     await db_session.flush()

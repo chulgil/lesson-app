@@ -44,6 +44,22 @@ const _kMockAddresses = [
   _MockAddress(postalCode: '48058', address: '부산시 해운대구 센텀동로 99'),
 ];
 
+/// Opens the shared address-search bottom sheet (mock results until the Kakao
+/// Address API is wired) and returns the chosen address, or null if dismissed.
+/// Lets controller-based forms reuse the same search as [AddressSearchField].
+Future<AddressResult?> showAddressSearchSheet(BuildContext context) async {
+  final result = await showNotebookModalBottomSheet<_MockAddress>(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) => const _AddressSearchSheet(),
+  );
+  if (result == null) return null;
+  return AddressResult(
+    postalCode: result.postalCode,
+    address: result.address,
+  );
+}
+
 /// 공통 주소 검색 필드 — 심플한 단일 입력 UI.
 ///
 /// 내부적으로 [postalCode], [address], [addressDetail] 3필드로 분리 저장.

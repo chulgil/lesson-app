@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
-from typing import Any
+from typing import Any, NamedTuple
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.date_utils import to_date
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson import (
     LessonClassCreate,
@@ -24,6 +25,30 @@ from app.schemas.lesson import (
     MembershipUpdate,
 )
 from app.services.teacher_id_resolver import resolve_teacher_id
+
+# #1167 — default body when a teacher grants no custom compensation message.
+# Statuses whose entry consumes one subscription session (#1240). Leaving any
+# of them for a non-deducting status gives the session back.
+_DEDUCTING_STATUSES = frozenset({"completed", "noShow", "cancelledByStudentLate"})
+
+_DEFAULT_COMPENSATION_MESSAGE = "지각 취소로 다음 레슨에 보너스 연습시간을 제공해 드립니다."
+
+
+class _LateCancelCompensation(NamedTuple):
+    """Resolved compensation policy for a late student cancellation (#1167).
+
+    The policy is snapshotted on ``academy_subscriptions`` for academy-owned
+    subscriptions; otherwise the teacher-default values (matching the
+    ``CancellationDefaults`` FE entity defaults) apply. The per-teacher toggle
+    for non-academy teachers is stored client-side only, so the backend cannot
+    honour a non-academy teacher's toggle-off without a schema change.
+    """
+
+    enabled: bool
+    include_text: bool
+    message: str
+    notify_owner: bool
+    owner_user_id: str | None
 
 
 class LessonService:
@@ -57,11 +82,11 @@ class LessonService:
         if student_id:
             query = query.where(Lesson.student_id == student_id)
         if date:
-            query = query.where(Lesson.date == date)
+            query = query.where(Lesson.date == to_date(date))
         if date_from:
-            query = query.where(Lesson.date >= date_from)
+            query = query.where(Lesson.date >= to_date(date_from))
         if date_to:
-            query = query.where(Lesson.date <= date_to)
+            query = query.where(Lesson.date <= to_date(date_to))
         if status:
             query = query.where(Lesson.status == status)
 
@@ -93,13 +118,41 @@ class LessonService:
                     )
                 student_name = student.name
 
+        # 0702 audit M4: defense-in-depth against API-direct double booking.
+        # Same conflict semantics as the #301 recurring path (active lessons +
+        # bookings only); vacation/operating-hours stay FE-advisory so the
+        # teacher's manual create remains an intentional override.
+        from app.services.schedule_confirmation_service import ScheduleConfirmationService
+
+        has_conflict = await ScheduleConfirmationService(self.db).check_time_conflict(
+            teacher_id=tid,
+            scheduled_date=data.date,
+            scheduled_time=data.start_time or "00:00",
+            duration=data.duration,
+        )
+        if has_conflict:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Lesson time conflicts with an existing lesson or booking",
+            )
+
         subscription_id = data.subscription_id
         if subscription_id:
             await self._assert_subscription_matches_lesson(
                 subscription_id=subscription_id,
                 student_id=data.student_id,
             )
-        else:
+
+        is_preview = False
+        makeup_credit_id: str | None = None
+        if data.overflow_mode is not None:
+            subscription_id, is_preview, makeup_credit_id = await self._apply_overflow_mode(
+                mode=data.overflow_mode,
+                subscription_id=subscription_id,
+                student_id=data.student_id,
+                teacher_id=tid,
+            )
+        elif not subscription_id:
             # Auto-find or create subscription
             subscription_id = await self._find_or_create_subscription(
                 teacher_id=tid,
@@ -108,7 +161,10 @@ class LessonService:
             )
 
         session_number = data.session_number
-        if subscription_id:
+        # Preview lessons get their session number on renewal confirmation; credit
+        # lessons never get one — makeup sessions stay outside the regular count
+        # (makeup_credit_spec §2 "보강 회차는 정규 수강권에서 분리").
+        if subscription_id and not is_preview and makeup_credit_id is None:
             if session_number is None:
                 session_number = await self._next_subscription_session_number(subscription_id)
 
@@ -124,15 +180,32 @@ class LessonService:
             session_number=session_number,
             location_name=data.location_name,
             lesson_source=LessonSource.manual,
+            is_preview=is_preview,
         )
         self.db.add(lesson)
         await self.db.flush()
         await self.db.refresh(lesson)
+
+        if makeup_credit_id is not None:
+            # §5.3 side-effects: stamp used_at / used_lesson_id. The completion
+            # deduction path skips credit-funded lessons (see _deduct_if_completed).
+            from app.services.makeup_credit_service import MakeupCreditService
+
+            try:
+                await MakeupCreditService(self.db).use_credit(credit_id=makeup_credit_id, lesson_id=lesson.id)
+            except ValueError as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=str(exc),
+                ) from exc
+
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstLesson")
 
-        # Notify student about new lesson
-        if student and student.user_id:
-            from app.services.notification_service import NotificationService, NotificationPriority
+        # Notify student about new lesson. Preview lessons stay silent — the
+        # renewal proposal is the student-facing message for that flow.
+        if student and student.user_id and not is_preview:
+            from app.services.notification_service import NotificationPriority, NotificationService
+
             notification_service = NotificationService(self.db)
             await notification_service.create_and_send(
                 user_id=student.user_id,
@@ -159,15 +232,129 @@ class LessonService:
                 detail="subscription_id does not belong to student_id",
             )
 
-    async def _find_or_create_subscription(
-        self, *, teacher_id: str, student_id: str, lesson_date: date | None
-    ) -> str:
-        """Find active subscription for the student or create a trial one.
+    async def _apply_overflow_mode(
+        self, *, mode: str, subscription_id: str | None, student_id: str, teacher_id: str
+    ) -> tuple[str, bool, str | None]:
+        """Resolve the target subscription for an explicit overflow mode.
 
-        If the active subscription has no remaining lessons (used >= total),
-        auto-expand it as a bonus lesson (total_lessons += 1, bonus_count += 1).
+        subscription_required_spec §2.6.2 — called only when the FE sent
+        ``overflow_mode`` (S3 sheet / S4 toggle). The legacy silent path
+        (auto bonus in ``_find_or_create_subscription``) stays untouched.
+        Returns ``(subscription_id, is_preview, makeup_credit_id)`` —
+        ``makeup_credit_id`` is consumed by the caller after the lesson row
+        exists (``use_credit`` needs the lesson id).
         """
         from app.models.subscription import Subscription, SubscriptionStatus
+
+        async def _latest_active_subscription() -> Any:
+            return (
+                await self.db.execute(
+                    select(Subscription)
+                    .where(
+                        Subscription.student_id == student_id,
+                        Subscription.status == SubscriptionStatus.active,
+                    )
+                    .order_by(Subscription.created_at.desc())
+                    .limit(1)
+                )
+            ).scalar_one_or_none()
+
+        if mode == "makeup_credit":
+            # S4 — allowed regardless of remaining sessions (§5.4). FIFO credit,
+            # lesson attaches to the credit's source subscription first.
+            from app.services.makeup_credit_service import MakeupCreditService
+
+            credits = await MakeupCreditService(self.db).list_active_credits(
+                student_id=student_id,
+                teacher_id=teacher_id,
+                limit=1,
+            )
+            if not credits:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="No active makeup credit available",
+                )
+            credit = credits[0]
+
+            sub_id = subscription_id or credit.source_subscription_id
+            if sub_id is None:
+                latest = await _latest_active_subscription()
+                sub_id = latest.id if latest else None
+            if sub_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                    detail="overflow_mode requires a subscription to attach the lesson to",
+                )
+            return sub_id, False, credit.id
+
+        sub = (
+            await self.db.get(Subscription, subscription_id) if subscription_id else await _latest_active_subscription()
+        )
+        if sub is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="overflow_mode requires an active subscription",
+            )
+
+        from app.services.subscription_service import remaining_lessons
+
+        remaining = remaining_lessons(sub)
+        if remaining is None or remaining > 0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="overflow_mode requires an exhausted subscription",
+            )
+
+        if mode == "bonus":
+            # bonus_count only — total_lessons stays the paid base. Bumping both
+            # double-counted the bonus in remaining (= total + bonus - used).
+            sub.bonus_count = (sub.bonus_count or 0) + 1
+            if not sub.bonus_reason:
+                sub.bonus_reason = "teacher_goodwill"
+            await self.db.flush()
+            return sub.id, False, None
+
+        # renewal_pending: preview lesson only — no counter mutation.
+        return sub.id, True, None
+
+    async def _assert_trial_regeneration_allowed(self, student_id: str) -> None:
+        """§2.6.5 (D2) — an app-connected student gets exactly one auto trial.
+
+        A prior zero-amount trial subscription for this student means the free
+        pass was already used; the FE shows the issue-subscription CTA instead
+        (S6). Unconnected (manual) students are exempt (§2.7, D4) — lightweight
+        schedule-keeping stays possible without forcing a paid subscription.
+        Students are teacher-owned rows, so student_id already scopes the check.
+        """
+        from app.models.student import Student
+        from app.models.subscription import Subscription, SubscriptionType
+
+        prior_trial = await self.db.scalar(
+            select(Subscription.id)
+            .where(
+                Subscription.student_id == student_id,
+                Subscription.type == SubscriptionType.trial,
+                Subscription.amount == 0,
+            )
+            .limit(1)
+        )
+        if prior_trial is None:
+            return
+        student = await self.db.get(Student, student_id)
+        if student is not None and student.connected_at is not None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="trial_already_used",
+            )
+
+    async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
+        """Find active subscription for the student or create a trial one.
+
+        If the active subscription has no remaining lessons (bonus included),
+        auto-expand it as a bonus lesson (bonus_count += 1).
+        """
+        from app.models.subscription import Subscription, SubscriptionStatus
+        from app.services.subscription_service import remaining_lessons
 
         active_sub = (
             await self.db.execute(
@@ -182,15 +369,17 @@ class LessonService:
         ).scalar_one_or_none()
 
         if active_sub:
-            remaining = (active_sub.total_lessons or 0) - (active_sub.used_lessons or 0)
-            if remaining <= 0:
-                # Bonus lesson: expand subscription
-                active_sub.total_lessons = (active_sub.total_lessons or 0) + 1
+            remaining = remaining_lessons(active_sub)
+            if remaining is not None and remaining <= 0:
+                # Bonus lesson: bonus_count only — total_lessons stays the paid
+                # base (bumping both double-counted the bonus in remaining).
                 active_sub.bonus_count = (active_sub.bonus_count or 0) + 1
                 if not active_sub.bonus_reason:
                     active_sub.bonus_reason = "teacher_goodwill"
                 await self.db.flush()
             return active_sub.id
+
+        await self._assert_trial_regeneration_allowed(student_id)
 
         return await self._create_trial_subscription(
             teacher_id=teacher_id,
@@ -198,11 +387,9 @@ class LessonService:
             lesson_date=lesson_date,
         )
 
-    async def _create_trial_subscription(
-        self, *, teacher_id: str, student_id: str, lesson_date: date | None
-    ) -> str:
+    async def _create_trial_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
         """Create a 1-lesson trial subscription for auto-assignment."""
-        from app.models.subscription import Subscription, SubscriptionType, SubscriptionStatus
+        from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
 
         membership_id = await self._find_or_create_class_membership(teacher_id, student_id)
 
@@ -283,9 +470,7 @@ class LessonService:
         if max_session is not None:
             return int(max_session) + 1
 
-        existing_count = await self.db.scalar(
-            select(func.count()).where(Lesson.subscription_id == subscription_id)
-        )
+        existing_count = await self.db.scalar(select(func.count()).where(Lesson.subscription_id == subscription_id))
         return int(existing_count or 0) + 1
 
     async def get_by_id(self, lesson_id: str, current_user: Any) -> LessonResponse:
@@ -297,11 +482,28 @@ class LessonService:
         """Update a lesson."""
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
 
+        # Capture the schedule before mutation so a genuine reschedule can be
+        # distinguished from a no-op edit (#1131).
+        old_date = lesson.date
+        old_start_time = lesson.start_time
+
         update_data = data.model_dump(exclude_unset=True, exclude={"pieces"})
         for key, value in update_data.items():
             setattr(lesson, key, value)
         await self.db.flush()
         await self.db.refresh(lesson)
+
+        # Notify the counterparty only when the date or start time actually
+        # changed; same-value edits send nothing.
+        if lesson.date != old_date or lesson.start_time != old_start_time:
+            await self._notify_lesson_counterparty(
+                lesson,
+                current_user,
+                notification_type="lessonRescheduled",
+                title="레슨 일정이 변경되었습니다",
+                body=f"{old_date} {old_start_time} → {lesson.date} {lesson.start_time} 로 변경되었습니다",
+            )
+
         # NOTE: LessonUpdate has no ``status`` field — status transitions (and
         # thus completion deduction) only happen via ``update_status``.
         return LessonResponse.model_validate(lesson)
@@ -317,15 +519,37 @@ class LessonService:
         """
         if not lesson.subscription_id:
             return
+        # §2.6.2 — a preview lesson is not a real session until renewal
+        # confirmation promotes it; completing it early must never deduct.
+        # (Without this, a bonus expansion reviving the exhausted subscription
+        # opens a mis-deduction path.)
+        if getattr(lesson, "is_preview", False):
+            return
+        # makeup_credit_spec §5.3 — a credit-funded lesson already consumed a
+        # MakeupCredit; completing it must not touch the regular counter. The
+        # credit link (used_lesson_id) is the marker (§2.6.6 — no lesson-type enum).
+        from app.models.makeup_credit import MakeupCredit
+
+        credit_funded = await self.db.scalar(
+            select(MakeupCredit.id).where(MakeupCredit.used_lesson_id == lesson.id).limit(1)
+        )
+        if credit_funded:
+            return
         from app.services.subscription_service import SubscriptionService
 
-        await SubscriptionService(self.db).deduct_for_completed_lesson(
-            lesson.id, lesson.subscription_id
-        )
+        await SubscriptionService(self.db).deduct_for_completed_lesson(lesson.id, lesson.subscription_id)
 
     async def delete(self, lesson_id: str, current_user: Any) -> None:
-        """Delete a lesson."""
+        """Delete a lesson.
+
+        LessonPiece/LessonRecording have no FK on lesson_id (so no ON DELETE
+        CASCADE), so they're explicitly cleaned up here to avoid orphaned rows.
+        """
+        from app.models.lesson import LessonPiece, LessonRecording
+
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        await self.db.execute(delete(LessonPiece).where(LessonPiece.lesson_id == lesson_id))
+        await self.db.execute(delete(LessonRecording).where(LessonRecording.lesson_id == lesson_id))
         await self.db.delete(lesson)
         await self.db.flush()
 
@@ -335,6 +559,19 @@ class LessonService:
         from app.models.request_event import RequestEvent, RequestEventType
 
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        # #1240 — captured before the overwrite so a deducting -> non-deducting
+        # transition can release the session the old status consumed.
+        previous_status = getattr(lesson.status, "value", lesson.status)
+        try:
+            LessonStatus(new_status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Invalid lesson status: {new_status}",
+            )
+        # #1241 — the deadline is enforced here, not merely displayed: a client
+        # can pick who cancelled, but not whether it beat the clock.
+        new_status = await self._apply_cancel_deadline_verdict(lesson, new_status)
         try:
             lesson.status = LessonStatus(new_status)
         except ValueError:
@@ -369,16 +606,203 @@ class LessonService:
                     message=new_status,
                 )
             )
+            # #1167 — late student cancel: resolve compensation policy so the
+            # cancellation notice can echo the promise when the teacher opted in.
+            compensation = (
+                await self._resolve_late_cancel_compensation(lesson)
+                if new_status == LessonStatus.cancelledByStudentLate.value
+                else None
+            )
+            cancel_body = f"{lesson.date} {lesson.start_time} 레슨이 취소되었습니다"
+            if compensation is not None and compensation.enabled and compensation.include_text:
+                cancel_body = f"{cancel_body}\n{compensation.message}"
+            await self._notify_lesson_counterparty(
+                lesson,
+                current_user,
+                notification_type="lessonCancelled",
+                title="레슨이 취소되었습니다",
+                body=cancel_body,
+            )
+            if compensation is not None:
+                await self._send_late_cancel_compensation(lesson, compensation)
 
         await self.db.flush()
         await self.db.refresh(lesson)
 
         # Unified completion deduction (product-approved 2026-06-04): manual and
-        # auto completion both deduct one session. Idempotent; 휴강/취소 do not.
+        # auto completion both deduct one session.
         if new_status == LessonStatus.completed.value:
             await self._deduct_if_completed(lesson)
+        elif previous_status in _DEDUCTING_STATUSES and new_status not in _DEDUCTING_STATUSES:
+            # #1240 — the teacher is undoing a mis-tap (완료/노쇼 -> 예정·휴강).
+            # Deduction used to be increment-only, so the student lost a session
+            # permanently with no recovery path anywhere in the product.
+            await self._release_deduction(lesson)
+        if new_status in (LessonStatus.noShow.value, LessonStatus.cancelledByStudentLate.value):
+            # LessonPolicy.no_show_deducts_lesson / late_cancel_deducts_lesson: the
+            # cancellation/no-show itself is never blocked, but a configured penalty
+            # deducts a session. No LessonPolicy row for the teacher -> no deduction
+            # (safe default, no behavior change for teachers who never configured one).
+            await self._deduct_if_policy_penalty(lesson, new_status)
 
         return LessonResponse.model_validate(lesson)
+
+    async def _effective_cancel_deadline_hours(self, lesson: Any) -> int | None:
+        """Deadline in force for this lesson, or None when unconfigured.
+
+        Subscription override wins over the teacher default (§ cancel policy);
+        a teacher with no policy row keeps the legacy behaviour — the server
+        must not invent a penalty nobody configured.
+        """
+        from app.models.policy import LessonPolicy
+        from app.models.subscription import Subscription
+
+        if lesson.subscription_id:
+            sub = await self.db.get(Subscription, lesson.subscription_id)
+            override = getattr(sub, "override_cancel_deadline_hours", None) if sub else None
+            if override is not None:
+                return int(override)
+
+        if not lesson.teacher_id:
+            return None
+        policy = await self.db.scalar(
+            select(LessonPolicy).where(
+                LessonPolicy.teacher_id == lesson.teacher_id,
+                LessonPolicy.lesson_class_id.is_(None),
+            )
+        )
+        if policy is None:
+            return None
+        return int(policy.cancellation_deadline_hours)
+
+    async def _apply_cancel_deadline_verdict(self, lesson: Any, new_status: str) -> str:
+        """Return the status the deadline actually supports (#1241).
+
+        Only the advance/late student-cancel pair is rewritten — that split is a
+        pure timing question the server can settle from timestamps. No-show,
+        teacher cancel and mutual cancel describe *who and why*, so they stay
+        exactly as the teacher recorded them.
+        """
+        from app.services.cancellation_policy import (
+            ADVANCE_CANCEL_STATUS,
+            LATE_CANCEL_STATUS,
+            TIMING_DECIDED_STATUSES,
+            resolve_cancel_timing,
+        )
+
+        if new_status not in TIMING_DECIDED_STATUSES:
+            return new_status
+
+        deadline_hours = await self._effective_cancel_deadline_hours(lesson)
+        if deadline_hours is None:
+            return new_status
+
+        # Retroactive bookkeeping: once the lesson start has passed, "now" is no
+        # longer the moment the student gave notice (the teacher may be
+        # recording a cancellation from days ago). The server has no evidence
+        # then, so the teacher's record stands — a fabricated penalty would be
+        # worse than an unenforced one. Live decisions (before the start) are
+        # still judged by the server, which is what closes the bypass.
+        from app.services.cancellation_policy import KST, lesson_start_kst
+
+        start = lesson_start_kst(lesson.date, lesson.start_time)
+        if start is not None and datetime.now(UTC).astimezone(KST) > start:
+            return new_status
+
+        is_late = resolve_cancel_timing(
+            lesson_date=lesson.date,
+            start_time=lesson.start_time,
+            deadline_hours=deadline_hours,
+            at=datetime.now(UTC),
+        )
+        return LATE_CANCEL_STATUS if is_late else ADVANCE_CANCEL_STATUS
+
+    async def cancellation_policy(self, lesson_id: str, current_user: Any) -> dict[str, Any]:
+        """Deadline facts for the client hint — same numbers the server judges by."""
+        from app.services.cancellation_policy import (
+            DEFAULT_CANCEL_DEADLINE_HOURS,
+            cancel_deadline_at,
+            resolve_cancel_timing,
+        )
+        from app.models.subscription import Subscription
+
+        lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        configured = await self._effective_cancel_deadline_hours(lesson)
+        hours = DEFAULT_CANCEL_DEADLINE_HOURS if configured is None else configured
+
+        source = "default"
+        if configured is not None:
+            source = "policy"
+            if lesson.subscription_id:
+                sub = await self.db.get(Subscription, lesson.subscription_id)
+                if sub is not None and getattr(sub, "override_cancel_deadline_hours", None) is not None:
+                    source = "subscription"
+
+        deadline = cancel_deadline_at(lesson.date, lesson.start_time, hours)
+        return {
+            "deadline_hours": hours,
+            "deadline_at": deadline.isoformat() if deadline else None,
+            "is_late_now": resolve_cancel_timing(
+                lesson_date=lesson.date,
+                start_time=lesson.start_time,
+                deadline_hours=hours,
+                at=datetime.now(UTC),
+            ),
+            "enforced": configured is not None,
+            "source": source,
+        }
+
+    async def _release_deduction(self, lesson: Any) -> None:
+        """Give back the session this lesson consumed (#1240).
+
+        Only the rows this lesson created are removed, so sibling lessons on the
+        same subscription keep their deductions. ``first_lesson_consumed_at`` is
+        left alone on purpose — undoing a mis-tap must not re-open the payment
+        confirmation Undo that #426 deliberately closed.
+        """
+        if not lesson.subscription_id:
+            return
+        from app.services.subscription_service import SubscriptionService
+
+        await SubscriptionService(self.db).release_lesson_usage(
+            lesson_id=lesson.id,
+            subscription_id=lesson.subscription_id,
+        )
+
+    async def _deduct_if_policy_penalty(self, lesson: Any, new_status: str) -> None:
+        """Deduct one subscription session for a no-show/late-cancel penalty.
+
+        Reuses the same idempotent, user-agnostic deduction path as completion
+        (SubscriptionService.deduct_for_completed_lesson) — it locks the
+        subscription row and skips if a usage row already exists for this
+        lesson_id, so re-saving the same status never double-deducts.
+        """
+        from app.models.lesson import LessonStatus
+        from app.models.policy import LessonPolicy
+
+        if not lesson.subscription_id or not lesson.teacher_id:
+            return
+
+        policy = await self.db.scalar(
+            select(LessonPolicy).where(
+                LessonPolicy.teacher_id == lesson.teacher_id,
+                LessonPolicy.lesson_class_id.is_(None),
+            )
+        )
+        if policy is None:
+            return
+
+        penalty_enabled = (
+            policy.no_show_deducts_lesson
+            if new_status == LessonStatus.noShow.value
+            else policy.late_cancel_deducts_lesson
+        )
+        if not penalty_enabled:
+            return
+
+        from app.services.subscription_service import SubscriptionService
+
+        await SubscriptionService(self.db).deduct_for_completed_lesson(lesson.id, lesson.subscription_id)
 
     async def archive(self, lesson_id: str, current_user: Any) -> LessonResponse:
         """Archive a lesson from active lesson lists."""
@@ -398,9 +822,7 @@ class LessonService:
         await self.db.refresh(lesson)
         return LessonResponse.model_validate(lesson)
 
-    async def update_feedback(
-        self, lesson_id: str, data: LessonFeedbackUpdate, current_user: Any
-    ) -> LessonResponse:
+    async def update_feedback(self, lesson_id: str, data: LessonFeedbackUpdate, current_user: Any) -> LessonResponse:
         """Write or update feedback for a lesson."""
         from app.models.request_event import RequestEvent, RequestEventType
         from app.services.user_service import UserService
@@ -411,6 +833,11 @@ class LessonService:
             lesson.feedback = data.feedback
         if data.practice_tips is not None:
             lesson.practice_tips = data.practice_tips
+        # key_points was accepted by the schema but never written (#1236) — the
+        # note UI's "핵심 포인트" silently vanished. An explicitly sent empty
+        # list means "clear all", so only an omitted field leaves it untouched.
+        if "key_points" in data.model_fields_set:
+            lesson.key_points = data.key_points
 
         await UserService(self.db).complete_onboarding_quest(current_user, "teacher.firstNote")
 
@@ -431,7 +858,8 @@ class LessonService:
         # Notify student about new feedback
         if lesson.student_id:
             from app.models.student import Student
-            from app.services.notification_service import NotificationService, NotificationPriority
+            from app.services.notification_service import NotificationPriority, NotificationService
+
             student = await self.db.get(Student, lesson.student_id)
             if student and student.user_id:
                 notification_service = NotificationService(self.db)
@@ -459,6 +887,139 @@ class LessonService:
         if lesson.teacher_id != teacher_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lesson access denied")
         return lesson
+
+    async def _notify_lesson_counterparty(
+        self,
+        lesson: Any,
+        current_user: Any,
+        *,
+        notification_type: str,
+        title: str,
+        body: str,
+    ) -> None:
+        """Send a high-priority lesson event notification to the counterparty only.
+
+        The actor (``current_user``) is excluded: a teacher actor notifies the
+        student, and a student/parent actor notifies the teacher (#1131 §2.2).
+        Silently skips when the counterparty has no linked user account.
+        """
+        from app.models.student import Student
+        from app.models.teacher import Teacher
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        role = getattr(getattr(current_user, "role", None), "value", None) or "teacher"
+
+        recipient_user_id: str | None = None
+        if role == "teacher":
+            if lesson.student_id:
+                student = await self.db.get(Student, lesson.student_id)
+                recipient_user_id = student.user_id if student else None
+        else:
+            if lesson.teacher_id:
+                teacher = await self.db.get(Teacher, lesson.teacher_id)
+                recipient_user_id = teacher.user_id if teacher else None
+
+        if not recipient_user_id:
+            return
+
+        await NotificationService(self.db).create_and_send(
+            user_id=recipient_user_id,
+            notification_type=notification_type,
+            title=title,
+            body=body,
+            priority=NotificationPriority.high,
+            action_url=f"/lessons/{lesson.id}",
+        )
+
+    async def _resolve_late_cancel_compensation(self, lesson: Any) -> _LateCancelCompensation:
+        """Resolve the compensation policy for a late student cancellation (#1167).
+
+        Academy-owned subscriptions snapshot the policy on ``academy_subscriptions``;
+        for all other subscriptions the teacher's persisted ``cancellation_defaults``
+        row applies (#1178), falling back to the enabled defaults when the teacher
+        never saved the settings.
+        """
+        from app.models.academy import Academy
+        from app.models.academy_billing import AcademySubscription
+
+        academy_sub = None
+        if lesson.subscription_id:
+            academy_sub = await self.db.scalar(
+                select(AcademySubscription).where(AcademySubscription.subscription_id == lesson.subscription_id)
+            )
+        if academy_sub is None:
+            # #1178 — non-academy: use the teacher's persisted defaults when a
+            # row exists (cancellation_defaults.teacher_id == teachers.id);
+            # teachers who never saved the settings keep the enabled defaults.
+            from app.models.settings import CancellationDefaults
+
+            defaults = await self.db.scalar(
+                select(CancellationDefaults).where(CancellationDefaults.teacher_id == lesson.teacher_id)
+            )
+            if defaults is None:
+                return _LateCancelCompensation(
+                    enabled=True,
+                    include_text=True,
+                    message=_DEFAULT_COMPENSATION_MESSAGE,
+                    notify_owner=False,
+                    owner_user_id=None,
+                )
+            return _LateCancelCompensation(
+                enabled=defaults.student_compensation_extra_minutes_enabled,
+                include_text=defaults.include_extra_minutes_text_on_late_cancel,
+                message=defaults.student_compensation_extra_minutes_message or _DEFAULT_COMPENSATION_MESSAGE,
+                notify_owner=False,  # owner notification is an academy-only concern
+                owner_user_id=None,
+            )
+
+        owner_user_id = None
+        if academy_sub.notify_owner_on_late_cancel:
+            owner_user_id = await self.db.scalar(
+                select(Academy.owner_user_id).where(Academy.id == academy_sub.academy_id)
+            )
+        message = academy_sub.student_compensation_extra_minutes_message or _DEFAULT_COMPENSATION_MESSAGE
+        return _LateCancelCompensation(
+            enabled=bool(academy_sub.student_compensation_extra_minutes_enabled),
+            include_text=bool(academy_sub.include_extra_minutes_text_on_late_cancel),
+            message=message,
+            notify_owner=bool(academy_sub.notify_owner_on_late_cancel),
+            owner_user_id=owner_user_id,
+        )
+
+    async def _send_late_cancel_compensation(self, lesson: Any, compensation: _LateCancelCompensation) -> None:
+        """Notify the student (and academy owner) about late-cancel compensation (#1167).
+
+        Produces the ``compensationApplied`` student notification mandated by
+        notification_system.md §4 when compensation is enabled, and an oversight
+        notice to the academy owner when the academy subscription opted in.
+        """
+        from app.models.student import Student
+        from app.services.notification_service import NotificationPriority, NotificationService
+
+        svc = NotificationService(self.db)
+
+        if compensation.enabled and lesson.student_id:
+            student = await self.db.get(Student, lesson.student_id)
+            student_user_id = student.user_id if student else None
+            if student_user_id:
+                await svc.create_and_send(
+                    user_id=student_user_id,
+                    notification_type="compensationApplied",
+                    title="보너스 연습시간이 적립되었습니다",
+                    body=compensation.message,
+                    priority=NotificationPriority.normal,
+                    action_url=f"/lessons/{lesson.id}",
+                )
+
+        if compensation.notify_owner and compensation.owner_user_id:
+            await svc.create_and_send(
+                user_id=compensation.owner_user_id,
+                notification_type="lessonCancelled",
+                title="학생 지각 취소 알림",
+                body=f"{lesson.student_name} 학생이 {lesson.date} {lesson.start_time} 레슨을 지각 취소했습니다.",
+                priority=NotificationPriority.high,
+                action_url=f"/lessons/{lesson.id}",
+            )
 
     async def get_upcoming(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return upcoming lessons."""
@@ -534,9 +1095,7 @@ class LessonService:
         lc = await self._get_accessible_class(class_id, current_user)
         return LessonClassResponse.model_validate(lc)
 
-    async def update_class(
-        self, class_id: str, data: LessonClassUpdate, current_user: Any
-    ) -> LessonClassResponse:
+    async def update_class(self, class_id: str, data: LessonClassUpdate, current_user: Any) -> LessonClassResponse:
         """Update a lesson class."""
         lc = await self._get_accessible_class(class_id, current_user)
 
@@ -666,16 +1225,12 @@ class LessonService:
             ]
         return response
 
-    async def get_memberships_by_class(
-        self, class_id: str, current_user: Any
-    ) -> list[MembershipResponse]:
+    async def get_memberships_by_class(self, class_id: str, current_user: Any) -> list[MembershipResponse]:
         """List all memberships in a class."""
         from app.models.lesson import ClassMembership
 
         await self._get_accessible_class(class_id, current_user)
-        result = await self.db.scalars(
-            select(ClassMembership).where(ClassMembership.lesson_class_id == class_id)
-        )
+        result = await self.db.scalars(select(ClassMembership).where(ClassMembership.lesson_class_id == class_id))
         return [self._membership_response(m) for m in result.all()]
 
     async def get_memberships(
@@ -740,9 +1295,7 @@ class LessonService:
         await self._assert_membership_access(m, current_user)
         return self._membership_response(m)
 
-    async def add_membership(
-        self, class_id: str, data: MembershipCreate, current_user: Any
-    ) -> MembershipResponse:
+    async def add_membership(self, class_id: str, data: MembershipCreate, current_user: Any) -> MembershipResponse:
         """Add a student to a class."""
         from app.models.lesson import ClassMembership
 

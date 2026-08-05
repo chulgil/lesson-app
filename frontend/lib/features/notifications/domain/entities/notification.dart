@@ -36,6 +36,7 @@ enum NotificationType {
   // Management notifications (for teachers)
   newStudentRegistered,
   trialBookingRequest,
+  lessonRequestReceived, // #1207 — 학생이 레슨을 신청함 (교사 인박스)
   studentPracticeReport,
   reviewReceived,
 
@@ -176,6 +177,7 @@ extension NotificationTypeExtension on NotificationType {
       // Teacher-only notifications
       case NotificationType.newStudentRegistered:
       case NotificationType.trialBookingRequest:
+      case NotificationType.lessonRequestReceived:
       case NotificationType.studentPracticeReport:
       case NotificationType.reviewReceived:
       case NotificationType.paymentReceived:
@@ -409,51 +411,51 @@ const Map<NotificationType, NotificationTemplate> notificationTemplates = {
   // Connection notifications
   NotificationType.connectionRequestReceived: NotificationTemplate(
     type: NotificationType.connectionRequestReceived,
-    titleTemplate: '🔗 새 연결 요청',
+    titleTemplate: '새 연결 요청',
     bodyTemplate: '{{userName}}님이 연결을 요청했습니다',
     priority: NotificationPriority.high,
   ),
   NotificationType.connectionRequestAccepted: NotificationTemplate(
     type: NotificationType.connectionRequestAccepted,
-    titleTemplate: '✅ 연결 완료',
+    titleTemplate: '연결 완료',
     bodyTemplate: '{{userName}}님과 연결되었습니다! 지금 체험레슨을 예약해보세요.',
     priority: NotificationPriority.high,
   ),
   NotificationType.connectionEstablished: NotificationTemplate(
     type: NotificationType.connectionEstablished,
-    titleTemplate: '🎉 새 학생 연결',
+    titleTemplate: '새 학생 연결',
     bodyTemplate: '{{userName}}님과 연결되었습니다',
     priority: NotificationPriority.high,
   ),
   // Makeup lesson notifications
   NotificationType.makeupLessonCreated: NotificationTemplate(
     type: NotificationType.makeupLessonCreated,
-    titleTemplate: '🔄 보강 적립',
+    titleTemplate: '보강 적립',
     bodyTemplate: '보강 1회가 적립되었습니다 ({{reason}})',
     priority: NotificationPriority.normal,
   ),
   NotificationType.makeupLessonExpiring: NotificationTemplate(
     type: NotificationType.makeupLessonExpiring,
-    titleTemplate: '⏰ 보강 만료 임박',
+    titleTemplate: '보강 만료 임박',
     bodyTemplate: '보강 {{count}}회가 {{days}}일 후 만료됩니다',
     priority: NotificationPriority.high,
   ),
   // Schedule change notifications
   NotificationType.scheduleChangeRequested: NotificationTemplate(
     type: NotificationType.scheduleChangeRequested,
-    titleTemplate: '🔄 레슨 시간 변경 요청',
+    titleTemplate: '레슨 시간 변경 요청',
     bodyTemplate: '{{userName}}님이 {{change}} 변경을 요청했습니다',
     priority: NotificationPriority.high,
   ),
   NotificationType.scheduleChangeApproved: NotificationTemplate(
     type: NotificationType.scheduleChangeApproved,
-    titleTemplate: '✅ 시간 변경 승인',
+    titleTemplate: '시간 변경 승인',
     bodyTemplate: '레슨 시간이 {{newTime}}으로 변경되었습니다',
     priority: NotificationPriority.high,
   ),
   NotificationType.scheduleChangeAlternative: NotificationTemplate(
     type: NotificationType.scheduleChangeAlternative,
-    titleTemplate: '📅 다른 시간 제안',
+    titleTemplate: '다른 시간 제안',
     bodyTemplate: '{{userName}}님이 다른 시간을 제안했습니다',
     priority: NotificationPriority.normal,
   ),

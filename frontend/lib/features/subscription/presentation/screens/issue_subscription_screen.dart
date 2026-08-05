@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +16,9 @@ import '../../../../core/utils/price_input.dart';
 import '../../../analytics/analytics_facade.dart'
     show AnalyticsEvents, analyticsEventLoggerProvider;
 import '../../../auth/auth_facade.dart';
+import '../../../lessons/lessons_facade.dart' show lessonsNotifierProvider;
+import '../../../onboarding/onboarding_facade.dart'
+    show currentTeacherProfileProvider;
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/domain/entities/lesson_location.dart';
 import '../../../students/domain/entities/student_with_membership.dart';
@@ -33,6 +38,7 @@ import '../widgets/issue_form_membership_widgets.dart';
 import '../widgets/issue_form_sections.dart';
 import '../widgets/issue_form_summary_widgets.dart';
 import '../widgets/issue_form_type_options.dart';
+import '../widgets/location_option_resolver.dart';
 import '../widgets/location_travel_selector.dart';
 import '../widgets/proposal_draft_banner.dart';
 import 'issue_subscription_actions.dart';
@@ -52,6 +58,16 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   final String? lessonRequestId;
   final List<String> lessonRequestIds;
 
+  /// §2.6.3 발급 연속 플로우 — 'addLesson' 이면 발급 성공 시 정기 스케줄 등록
+  /// 리다이렉트를 건너뛰고 호출 화면(레슨 추가)으로 복귀한다.
+  final String? returnTo;
+
+  /// §2.6.3 known edge ① — the add-lesson renewal flow saved this preview
+  /// lesson, then pushReplacement'd here (the caller is gone). This screen
+  /// owns the preview until a subscription is issued: leaving without issuing
+  /// deletes it, since no proposal exists for the BE cancel hook to cover.
+  final String? previewLessonId;
+
   const IssueSubscriptionScreen({
     super.key,
     required this.studentIds,
@@ -60,6 +76,8 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
     this.renewFromSubscriptionId,
     this.lessonRequestId,
     this.lessonRequestIds = const [],
+    this.returnTo,
+    this.previewLessonId,
   });
 
   /// Whether this is a batch issuance (multiple students)
@@ -110,6 +128,10 @@ class _IssueSubscriptionScreenState
   /// In-flight guard: prevents double-tap from issuing twice.
   bool _submitting = false;
 
+  /// §2.6.3 edge ① — set once the issued subscription owns the preview
+  /// lesson's lifecycle (promotion/cancel), so the pop cleanup stands down.
+  bool _previewLessonHandled = false;
+
   final _amountController = TextEditingController();
   final _lessonsController = TextEditingController();
   final _validityController = TextEditingController();
@@ -129,6 +151,10 @@ class _IssueSubscriptionScreenState
   String? get lessonRequestId => widget.lessonRequestId;
   @override
   List<String> get lessonRequestIds => widget.lessonRequestIds;
+  @override
+  String? get returnTo => widget.returnTo;
+  @override
+  void markPreviewLessonHandled() => _previewLessonHandled = true;
   @override
   GlobalKey<FormState> get formKey => _formKey;
   @override
@@ -225,9 +251,7 @@ class _IssueSubscriptionScreenState
     final teacherId = ref.watch(currentUserIdProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
     return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
-        title: AppStrings.issueSelectStudentTitle,
-      ),
+      appBar: NotebookDetailAppBar(title: AppStrings.issueSelectStudentTitle),
       body: groupsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text(AppStrings.errorOccurred)),
@@ -253,9 +277,10 @@ class _IssueSubscriptionScreenState
               return ListTile(
                 title: Text(s.name, style: AppTypography.bodyLarge),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.pushReplacement(
-                  '${AppRoutes.issueSubscription}?studentId=${s.studentId}',
-                ),
+                onTap:
+                    () => context.pushReplacement(
+                      '${AppRoutes.issueSubscription}?studentId=${s.studentId}',
+                    ),
               );
             },
           );
@@ -308,51 +333,75 @@ class _IssueSubscriptionScreenState
       });
     }
 
-    return NotebookScreenScaffold(
-      appBar: NotebookDetailAppBar(
-        title:
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _cleanupOrphanPreviewLesson();
+      },
+      child: NotebookScreenScaffold(
+        appBar: NotebookDetailAppBar(
+          title:
+              widget.isBatchMode
+                  ? AppStrings.batchSubscriptionAppBarTitle(
+                    widget.studentIds.length,
+                  )
+                  : AppStrings.proposalTitle,
+        ),
+        body:
             widget.isBatchMode
-                ? AppStrings.batchSubscriptionAppBarTitle(
-                  widget.studentIds.length,
-                )
-                : AppStrings.proposalTitle,
-      ),
-      body:
-          widget.isBatchMode
-              ? _buildBatchForm()
-              : membershipsAsync.when(
-                data: (memberships) {
-                  if (memberships.isEmpty) {
-                    return const NoMembershipState();
-                  }
+                ? _buildBatchForm()
+                : membershipsAsync.when(
+                  data: (memberships) {
+                    if (memberships.isEmpty) {
+                      return const NoMembershipState();
+                    }
 
-                  // Auto-select first membership if none selected
-                  if (_selectedMembershipId == null && memberships.isNotEmpty) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      setState(() {
-                        _selectedMembershipId = memberships.first.id;
+                    // Auto-select first membership if none selected
+                    if (_selectedMembershipId == null &&
+                        memberships.isNotEmpty) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _selectedMembershipId = memberships.first.id;
+                        });
+                        _applyPolicyDefaults(memberships.first);
                       });
-                      _applyPolicyDefaults(memberships.first);
-                    });
-                  } else if (_selectedMembershipId != null &&
-                      _appliedPolicyMembershipId != _selectedMembershipId) {
-                    final selected = memberships.firstWhere(
-                      (m) => m.id == _selectedMembershipId,
-                      orElse: () => memberships.first,
-                    );
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _applyPolicyDefaults(selected);
-                    });
-                  }
+                    } else if (_selectedMembershipId != null &&
+                        _appliedPolicyMembershipId != _selectedMembershipId) {
+                      final selected = memberships.firstWhere(
+                        (m) => m.id == _selectedMembershipId,
+                        orElse: () => memberships.first,
+                      );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _applyPolicyDefaults(selected);
+                      });
+                    }
 
-                  return _buildForm(memberships);
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (error, _) =>
-                        SubscriptionErrorState(error: error.toString()),
-              ),
-      bottomNavigationBar: _buildBottomBar(),
+                    return _buildForm(memberships);
+                  },
+                  loading:
+                      () => const Center(child: CircularProgressIndicator()),
+                  error:
+                      (error, _) =>
+                          SubscriptionErrorState(error: error.toString()),
+                ),
+        bottomNavigationBar: _buildBottomBar(),
+      ),
+    );
+  }
+
+  /// §2.6.3 edge ① — the teacher left without issuing: the renewal intent is
+  /// dead, so the preview lesson saved by the add-lesson flow is deleted.
+  /// Fire-and-forget: the route is already popping, failures are swallowed
+  /// (the BE proposal hooks never cover the no-proposal path; a re-entered
+  /// renewal simply saves a fresh preview).
+  void _cleanupOrphanPreviewLesson() {
+    final id = widget.previewLessonId;
+    if (id == null || _previewLessonHandled) return;
+    _previewLessonHandled = true;
+    unawaited(
+      ref
+          .read(lessonsNotifierProvider.notifier)
+          .deleteLesson(id)
+          .catchError((_) {}),
     );
   }
 
@@ -532,6 +581,14 @@ class _IssueSubscriptionScreenState
               onTravelTimeChanged:
                   (minutes) => setState(() => _travelTimeMinutes = minutes),
               initialLocationType: _resolvePreferredLocationType(),
+              // #1146 — gate location options by the teacher's lesson types.
+              allowedLocationTypes: allowedLocationTypes(
+                ref
+                    .watch(currentTeacherProfileProvider)
+                    .valueOrNull
+                    ?.lessonTypes,
+                isAcademy: false,
+              ),
             ),
           ],
 
@@ -540,13 +597,14 @@ class _IssueSubscriptionScreenState
           // Subscription type selector
           SubscriptionTypeSelector(
             selectedType: _selectedType,
-            onChanged: (type) => setState(() {
-              _selectedType = type;
-              if (type != SubscriptionType.trial &&
-                  _paymentMode == IssuePaymentMode.free) {
-                _paymentMode = IssuePaymentMode.prepaid;
-              }
-            }),
+            onChanged:
+                (type) => setState(() {
+                  _selectedType = type;
+                  if (type != SubscriptionType.trial &&
+                      _paymentMode == IssuePaymentMode.free) {
+                    _paymentMode = IssuePaymentMode.prepaid;
+                  }
+                }),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -565,8 +623,8 @@ class _IssueSubscriptionScreenState
               totalLessons: _totalLessons,
               finalAmount: finalAmount,
               discountPercent: _discountPercent,
-              onAmountChanged: (value) =>
-                  setState(() => _originalAmount = value),
+              onAmountChanged:
+                  (value) => setState(() => _originalAmount = value),
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -625,14 +683,15 @@ class _IssueSubscriptionScreenState
           PaymentStatusSection(
             mode: _paymentMode,
             selectedPaymentMethod: _selectedPaymentMethod,
-            onModeChanged: (m) => setState(() {
-              _paymentMode = m;
-              if (m == IssuePaymentMode.free) {
-                _selectedType = SubscriptionType.trial;
-                _originalAmount = 0;
-                _amountController.clear();
-              }
-            }),
+            onModeChanged:
+                (m) => setState(() {
+                  _paymentMode = m;
+                  if (m == IssuePaymentMode.free) {
+                    _selectedType = SubscriptionType.trial;
+                    _originalAmount = 0;
+                    _amountController.clear();
+                  }
+                }),
             onPaymentMethodChanged:
                 (method) => setState(() => _selectedPaymentMethod = method),
           ),
@@ -676,13 +735,14 @@ class _IssueSubscriptionScreenState
 
           SubscriptionTypeSelector(
             selectedType: _selectedType,
-            onChanged: (type) => setState(() {
-              _selectedType = type;
-              if (type != SubscriptionType.trial &&
-                  _paymentMode == IssuePaymentMode.free) {
-                _paymentMode = IssuePaymentMode.prepaid;
-              }
-            }),
+            onChanged:
+                (type) => setState(() {
+                  _selectedType = type;
+                  if (type != SubscriptionType.trial &&
+                      _paymentMode == IssuePaymentMode.free) {
+                    _paymentMode = IssuePaymentMode.prepaid;
+                  }
+                }),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -699,8 +759,8 @@ class _IssueSubscriptionScreenState
               totalLessons: _totalLessons,
               finalAmount: finalAmount,
               discountPercent: _discountPercent,
-              onAmountChanged: (value) =>
-                  setState(() => _originalAmount = value),
+              onAmountChanged:
+                  (value) => setState(() => _originalAmount = value),
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -755,14 +815,15 @@ class _IssueSubscriptionScreenState
           PaymentStatusSection(
             mode: _paymentMode,
             selectedPaymentMethod: _selectedPaymentMethod,
-            onModeChanged: (m) => setState(() {
-              _paymentMode = m;
-              if (m == IssuePaymentMode.free) {
-                _selectedType = SubscriptionType.trial;
-                _originalAmount = 0;
-                _amountController.clear();
-              }
-            }),
+            onModeChanged:
+                (m) => setState(() {
+                  _paymentMode = m;
+                  if (m == IssuePaymentMode.free) {
+                    _selectedType = SubscriptionType.trial;
+                    _originalAmount = 0;
+                    _amountController.clear();
+                  }
+                }),
             onPaymentMethodChanged:
                 (method) => setState(() => _selectedPaymentMethod = method),
           ),
@@ -806,9 +867,11 @@ class _IssueSubscriptionScreenState
           children: [
             // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle
             // 로 통일 (§7.17).
-            Text(
-              AppStrings.rescheduleAllowanceTitle,
-              style: NotebookTypography.sectionTitle,
+            Flexible(
+              child: Text(
+                AppStrings.rescheduleAllowanceTitle,
+                style: NotebookTypography.sectionTitle,
+              ),
             ),
             if (policy != null) ...[
               const SizedBox(width: AppSpacing.space2),
@@ -842,7 +905,8 @@ class _IssueSubscriptionScreenState
           ),
         ],
         const SizedBox(height: AppSpacing.space3),
-        Row(
+        Wrap(
+          runSpacing: AppSpacing.space2,
           children: [
             for (final count in [0, 1, 2, 3, 5])
               Padding(
@@ -895,7 +959,8 @@ class _IssueSubscriptionScreenState
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
-          Row(
+          Wrap(
+            runSpacing: AppSpacing.space2,
             children: [
               for (final hours in [6, 12, 24, 48])
                 Padding(

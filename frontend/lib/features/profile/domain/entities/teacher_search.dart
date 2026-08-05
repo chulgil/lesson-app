@@ -133,6 +133,7 @@ class TeacherSearchResult {
 class TeacherPublicProfile {
   final String id;
   final String? name;
+  final String? nickname;
   final String? profileImage;
   final String? organizationId;
   final String? organizationName;
@@ -153,6 +154,10 @@ class TeacherPublicProfile {
   /// AcademyMember.publicPageConsent 와 1:1 매핑.
   final bool publicPageConsent;
 
+  /// 학생에게 표시되는 이름 (닉네임 우선, 없으면 본명). TeacherProfile.displayName 미러 (#1151).
+  String? get displayName =>
+      (nickname != null && nickname!.isNotEmpty) ? nickname : name;
+
   /// Check if this is an academy teacher
   bool get isAcademy => organizationId != null;
 
@@ -162,6 +167,7 @@ class TeacherPublicProfile {
   const TeacherPublicProfile({
     required this.id,
     this.name,
+    this.nickname,
     this.profileImage,
     this.organizationId,
     this.organizationName,
@@ -192,6 +198,9 @@ class TeacherPublicProfile {
           settings.nameVisibility == ProfileVisibility.public
               ? profile.name
               : null,
+      // 닉네임은 의도된 학생-facing 별칭 — 본명 visibility 로 게이팅하지 않는다
+      // (별칭 노출은 본명 유출이 아님). #1151
+      nickname: profile.nickname,
       profileImage:
           settings.photoVisibility == ProfileVisibility.public
               ? profile.profileImage

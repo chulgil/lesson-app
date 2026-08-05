@@ -10,8 +10,12 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart' as dfmt;
+import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../practice/practice_facade.dart';
+import '../../../students/students_facade.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../providers/analytics_providers.dart';
+import 'analytics_error_view.dart';
 import 'practice_weekly_line_chart.dart';
 import 'repertoire_progress_list.dart';
 
@@ -25,45 +29,64 @@ class StudentGrowthTab extends ConsumerStatefulWidget {
 }
 
 class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
-  static const _mockStudents = [
-    (id: 'student_1', name: '김민수'),
-    (id: 'student_2', name: '이서연'),
-    (id: 'student_3', name: '박지호'),
-    (id: 'student_4', name: '최예은'),
-    (id: 'student_5', name: '정하준'),
-  ];
-
-  String _selectedStudentId = 'student_1';
+  // #749: real teacher students (was hardcoded _mockStudents). null until the
+  // list resolves; defaults to the first student, which auto-selects the only
+  // student when the teacher has exactly one (mirrors subscription auto-select).
+  String? _selectedStudentId;
   AnalyticsPeriod _selectedPeriod = AnalyticsPeriod.threeMonths;
 
   @override
   Widget build(BuildContext context) {
-    final progressAsync = ref.watch(
-      studentProgressDataProvider(_selectedStudentId, _selectedPeriod),
-    );
+    final studentsAsync = ref.watch(studentsProvider);
 
-    return Column(
-      children: [
-        _buildSelectors(),
-        Expanded(
-          child: progressAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(
-              child: Text(
-                AppStrings.cannotLoadData,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-              ),
-            ),
-            data: (progress) => _buildContent(progress),
-          ),
-        ),
-      ],
+    return studentsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => AnalyticsErrorView(
+        onRetry: () => ref.invalidate(studentsProvider),
+      ),
+      data: (students) {
+        if (students.isEmpty) {
+          return const EmptyStateWidget(
+            icon: Icons.people_outline,
+            title: AppStrings.studentsEmptyTitle,
+            subtitle: AppStrings.studentsEmptySubtitle,
+          );
+        }
+
+        // Keep the current pick if it still exists, otherwise default to the
+        // first student (auto-selects the only student).
+        if (_selectedStudentId == null ||
+            !students.any((s) => s.id == _selectedStudentId)) {
+          _selectedStudentId = students.first.id;
+        }
+        final selectedId = _selectedStudentId!;
+
+        return Column(
+          children: [
+            _buildSelectors(students, selectedId),
+            Expanded(child: _buildProgress(selectedId)),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildSelectors() {
+  Widget _buildProgress(String studentId) {
+    final progressAsync = ref.watch(
+      studentProgressDataProvider(studentId, _selectedPeriod),
+    );
+    return progressAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => AnalyticsErrorView(
+        onRetry: () => ref.invalidate(
+          studentProgressDataProvider(studentId, _selectedPeriod),
+        ),
+      ),
+      data: (progress) => _buildContent(progress),
+    );
+  }
+
+  Widget _buildSelectors(List<Student> students, String selectedId) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
@@ -77,7 +100,7 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
       ),
       child: Row(
         children: [
-          Expanded(child: _buildStudentDropdown()),
+          Expanded(child: _buildStudentSelector(students, selectedId)),
           const SizedBox(width: AppSpacing.space3),
           _buildPeriodDropdown(),
         ],
@@ -85,10 +108,21 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
     );
   }
 
-  Widget _buildStudentDropdown() {
+  Widget _buildStudentSelector(List<Student> students, String selectedId) {
+    // Single student → static label (no redundant 1-item dropdown).
+    if (students.length == 1) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          students.first.name,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
+        ),
+      );
+    }
+
     return DropdownButtonHideUnderline(
       child: DropdownButton<String>(
-        value: _selectedStudentId,
+        value: selectedId,
         isDense: true,
         isExpanded: true,
         style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
@@ -96,7 +130,7 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
         onChanged: (v) {
           if (v != null) setState(() => _selectedStudentId = v);
         },
-        items: _mockStudents.map((s) {
+        items: students.map((s) {
           return DropdownMenuItem(
             value: s.id,
             child: Text(s.name),
@@ -134,7 +168,7 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(
-          studentProgressDataProvider(_selectedStudentId, _selectedPeriod),
+          studentProgressDataProvider(progress.studentId, _selectedPeriod),
         );
       },
       child: ListView(
@@ -158,6 +192,12 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
   Widget _buildSummaryCards(StudentProgressData progress) {
     final prPct = (progress.practiceAchievementRate * 100).toStringAsFixed(1);
     final arPct = (progress.attendanceRate * 100).toStringAsFixed(1);
+    // Streak comes from the single source of truth (practiceStreakProvider) via
+    // the practice facade. The cross-feature dependency goes through the facade.
+    // See docs/specs/practice/streak_ssot.md.
+    final streakDays = ref
+        .watch(practiceStreakProvider(progress.studentId))
+        .maybeWhen(data: (s) => s.currentStreak, orElse: () => 0);
 
     return Row(
       children: [
@@ -179,16 +219,16 @@ class _StudentGrowthTabState extends ConsumerState<StudentGrowthTab> {
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: _MiniStatCard(
-            label: '레슨 수',
-            value: '${progress.attendedLessons}회',
+            label: AppStrings.analyticsLessonCountLabel,
+            value: AppStrings.analyticsLessonCountValueFormat(progress.attendedLessons),
             color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: _MiniStatCard(
-            label: '연속 연습',
-            value: '${progress.practiceStreakDays}일',
+            label: AppStrings.analyticsStreakLabel,
+            value: AppStrings.analyticsStreakDaysFormat(streakDays),
             color: AppColors.amber,
           ),
         ),

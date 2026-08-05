@@ -25,6 +25,8 @@ TEACHER_NOTIFICATION_TYPES = frozenset(
     {
         "newStudentRegistered",
         "trialBookingRequest",
+        # #1207 — 학생이 레슨을 신청하면 교사 인박스에 도착 (전용 타입).
+        "lessonRequestReceived",
         "studentPracticeReport",
         "reviewReceived",
         "paymentReceived",
@@ -60,6 +62,12 @@ STUDENT_NOTIFICATION_TYPES = frozenset(
         "teacherNoshow",
         "compensationApplied",
         "lessonNoteShared",
+        # P2-2 — 그룹 수업 5종. 학생/학부모 인박스 대상 (교사는 출석부에서 직접 본다).
+        "groupBookingConfirmed",
+        "groupLessonReminderDayBefore",
+        "groupLessonReminderDayOf",
+        "groupDropInOpened",
+        "groupNoShowWarning",
     }
 )
 BOTH_ROLE_NOTIFICATION_TYPES = frozenset(
@@ -343,4 +351,4 @@ class NotificationService:
 
                 # Clean up invalid tokens
                 for token in failed_tokens:
-                    await token_service.unregister(token)
+                    await token_service.unregister(token, user_id)

@@ -9,12 +9,16 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/lessons_facade.dart';
+import '../../../gamification/gamification_facade.dart'
+    show effectiveStreakProvider;
 import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
@@ -201,11 +205,13 @@ class ParentDashboardTab extends ConsumerWidget {
   Widget _buildMasthead(BuildContext context, WidgetRef ref, String parentId) {
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
+      // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+      eyebrowStyle: NotebookTypography.wordmark,
       meta: 'VOL. ${DateTime.now().month} · NO. ${DateTime.now().day}',
       trailing: IconButton(
         onPressed: () => _showChildSelector(context, ref, parentId),
         icon: const Icon(Icons.swap_horiz, color: AppColors.ink, size: 22),
-        tooltip: '자녀 전환',
+        tooltip: AppStrings.parentHomeSwitchChild,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
       ),
@@ -226,10 +232,11 @@ class ParentDashboardTab extends ConsumerWidget {
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
-          Text('${profile.name}의 레슨', style: NotebookTypography.masthead),
+          Text(AppStrings.parentHomeChildLessonsTitleFormat(profile.name), style: NotebookTypography.masthead),
           const SizedBox(height: 6),
           Text(
-            '${now.month}月 ${now.day}日  ·  ${profile.instrumentLabel}',
+            // H3 — 한자식 날짜(8月 5日)를 한글 표기로 통일. 날짜는 이 줄에서 1회만.
+            '${formatDateMDKorean(now)}  ·  ${profile.instrumentLabel}',
             style: NotebookTypography.mastheadDate,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -275,64 +282,33 @@ class ParentDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context, String parentId) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.child_care_outlined,
-              size: 80,
-              color: AppColors.inkTertiary,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            // Notebook × Score: 빈 상태 헤드라인 (§7.89 3축) — Playfair sectionTitle.
-            Text(
-              AppStrings.parentHomeNoChildren,
-              style: NotebookTypography.sectionTitle,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.parentHomeNoChildrenDesc,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
-              },
-              icon: const Icon(Icons.add),
-              label: const Text(AppStrings.parentHomeAddChild),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                minimumSize: const Size(0, AppSpacing.buttonHeight),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space6,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            OutlinedButton.icon(
-              onPressed: () => context.push(AppRoutes.parentInviteCode),
-              icon: const Icon(Icons.qr_code, size: 18),
-              label: const Text(AppStrings.parentHomeInviteCode),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.paperAccent,
-                side: const BorderSide(color: AppColors.paperAccent),
-                minimumSize: const Size(0, AppSpacing.buttonHeight),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space6,
-                ),
-              ),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        EmptyStateWidget(
+          icon: Icons.child_care_outlined,
+          title: AppStrings.parentHomeNoChildren,
+          subtitle: AppStrings.parentHomeNoChildrenDesc,
+          actionLabel: AppStrings.parentHomeAddChild,
+          actionIcon: Icons.add,
+          onAction: () {
+            context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
+          },
         ),
-      ),
+        const SizedBox(height: AppSpacing.space3),
+        // #631 보조 CTA — 초대코드 입력 (EmptyStateWidget 1액션 제약으로 외부 유지).
+        OutlinedButton.icon(
+          onPressed: () => context.push(AppRoutes.parentInviteCode),
+          icon: const Icon(Icons.qr_code, size: 18),
+          label: const Text(AppStrings.parentHomeInviteCode),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.paperAccent,
+            side: const BorderSide(color: AppColors.paperAccent),
+            minimumSize: const Size(0, AppSpacing.buttonHeight),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space6),
+          ),
+        ),
+      ],
     );
   }
 
@@ -483,10 +459,14 @@ class ParentDashboardTab extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        profile.name,
-                        style: AppTypography.headingMedium.copyWith(
-                          color: AppColors.paper,
+                      Flexible(
+                        child: Text(
+                          profile.name,
+                          style: AppTypography.headingMedium.copyWith(
+                            color: AppColors.paper,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -500,7 +480,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           borderRadius: BorderRadius.zero,
                         ),
                         child: Text(
-                          '만 ${profile.age}세',
+                          AppStrings.parentHomeAgeFormat(profile.age),
                           style: AppTypography.caption.copyWith(
                             color: AppColors.paper,
                             fontWeight: FontWeight.w500,
@@ -549,10 +529,14 @@ class ParentDashboardTab extends ConsumerWidget {
                           color: AppColors.paper.withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: AppSpacing.space1),
-                        Text(
-                          profile.teacherName!,
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.paper.withValues(alpha: 0.7),
+                        Flexible(
+                          child: Text(
+                            profile.teacherName!,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.paper.withValues(alpha: 0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -624,7 +608,9 @@ class _QuickStatsSection extends ConsumerWidget {
 
     final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
     final weeklyItemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
-    final streakAsync = ref.watch(practiceStreakProvider(studentId));
+    // 표시 숫자는 학생 화면과 같은 SSOT — 학부모가 보는 자녀 스트릭이
+    // 학생 본인 화면과 달라지지 않게 (streak_ssot.md §7.1).
+    final streakAsync = ref.watch(effectiveStreakProvider(studentId));
 
     final weeklyLessonCount = lessonsAsync.maybeWhen(
       data: (lessons) {
@@ -657,7 +643,8 @@ class _QuickStatsSection extends ConsumerWidget {
     );
 
     final streakLabel = streakAsync.maybeWhen(
-      data: (streak) => '${streak.currentStreak}일',
+      data: (streak) =>
+          AppStrings.parentHomeDaysFormat(streak.effectiveCurrentStreak),
       orElse: () => null,
     );
 
@@ -667,7 +654,7 @@ class _QuickStatsSection extends ConsumerWidget {
           child: StatCard(
             icon: Icons.calendar_today,
             title: AppStrings.parentHomeWeeklyLesson,
-            value: weeklyLessonCount == null ? '-' : '$weeklyLessonCount회',
+            value: weeklyLessonCount == null ? '-' : AppStrings.parentHomeLessonCountFormat(weeklyLessonCount),
             color: AppColors.paperAccent,
           ),
         ),
@@ -744,7 +731,7 @@ class _UpcomingLessonSection extends ConsumerWidget {
               )
               .inDays;
           final teacherName = next.teacherName ?? profile.teacherName;
-          return ListTile(
+          final tile = ListTile(
             contentPadding: EdgeInsets.zero,
             leading: Container(
               width: 48,
@@ -799,6 +786,16 @@ class _UpcomingLessonSection extends ConsumerWidget {
               ),
             ),
           );
+          // H5 — 다음 레슨은 시간에 민감한 정보라 종이 위에서 먼저 잡혀야 한다.
+          // 세피아 앰버로 채우고 테두리를 둘러 다른 섹션과 구분한다.
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.amberLight,
+              border: Border.all(color: AppColors.paperTrial),
+            ),
+            child: tile,
+          );
         },
       ),
     );
@@ -823,6 +820,8 @@ class _PracticeStreakSection extends ConsumerWidget {
       );
     }
 
+    // 여기는 "어느 요일에 실제로 연습했는가" 를 그리므로 raw SSOT 를 쓴다 —
+    // 동결된 날은 연습한 날이 아니라 practiced 로 칠하면 안 된다 (§7).
     final streakAsync = ref.watch(practiceStreakProvider(studentId));
     final today = DateTime.now();
     final monday = DateTime(
@@ -868,7 +867,7 @@ class _PracticeStreakSection extends ConsumerWidget {
           title: AppStrings.parentHomeThisWeekPractice,
           icon: Icons.local_fire_department,
           trailing: Text(
-            '${practicedDays.length}일 연습',
+            AppStrings.parentHomePracticedDaysFormat(practicedDays.length),
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.paperOk,
               fontWeight: FontWeight.w600,
@@ -1068,7 +1067,7 @@ class _PaymentStatusSection extends ConsumerWidget {
                     style: AppTypography.bodyMedium,
                   ),
                   Text(
-                    '$totalRemaining회',
+                    AppStrings.parentHomeLessonCountFormat(totalRemaining),
                     style: AppTypography.headingSmall.copyWith(
                       color: AppColors.paperAccent,
                     ),

@@ -244,6 +244,14 @@ class UnifiedLessonRequest {
   final String?
   preferredLocationType; // "studentHome" | "academyRoom" | "teacherStudio" | "externalPlace" | "online"
 
+  // v6.0: Display names — populated by BE in remote mode; null in mock
+  // (name-map fallback resolves display). Additive, backward-compatible.
+  final String? studentName;
+
+  final String? teacherName;
+
+  final String? academyName;
+
   UnifiedLessonRequest({
     required this.id,
     required this.studentId,
@@ -269,6 +277,9 @@ class UnifiedLessonRequest {
     this.proposalId,
     this.academyId,
     this.preferredLocationType,
+    this.studentName,
+    this.teacherName,
+    this.academyName,
   });
 
   factory UnifiedLessonRequest.fromJson(Map<String, dynamic> json) =>
@@ -443,6 +454,9 @@ class UnifiedLessonRequest {
     String? proposalId,
     String? academyId,
     String? preferredLocationType,
+    String? studentName,
+    String? teacherName,
+    String? academyName,
   }) {
     return UnifiedLessonRequest(
       id: id ?? this.id,
@@ -470,6 +484,9 @@ class UnifiedLessonRequest {
       academyId: academyId ?? this.academyId,
       preferredLocationType:
           preferredLocationType ?? this.preferredLocationType,
+      studentName: studentName ?? this.studentName,
+      teacherName: teacherName ?? this.teacherName,
+      academyName: academyName ?? this.academyName,
     );
   }
 

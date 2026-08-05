@@ -917,7 +917,6 @@ class _HoldFilterChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: selected ? AppColors.ink : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppSpacing.space4),
           border: Border.all(
             color: selected ? AppColors.ink : AppColors.inkTertiary,
           ),

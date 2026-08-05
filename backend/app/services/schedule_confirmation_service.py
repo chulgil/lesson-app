@@ -47,7 +47,7 @@ class ScheduleConfirmationService:
                 days_ahead += 7
             next_date = base_date + timedelta(days=days_ahead)
 
-            conflict = await self._check_time_conflict(
+            conflict = await self.check_time_conflict(
                 teacher_id=current_user.id,
                 scheduled_date=next_date,
                 scheduled_time=data.proposed_time,
@@ -177,6 +177,9 @@ class ScheduleConfirmationService:
         # GAP-5: Create LessonBooking records when student confirms
         if data.action == "confirmed" and card.subscription_id:
             if not await self._subscription_has_confirmed_card(card):
+                # Serialize check_time_conflict + INSERT per teacher — closes the
+                # double-booking race between concurrent confirm requests.
+                await self._acquire_teacher_booking_lock(card.teacher_id)
                 await self._create_bookings_for_subscription(card)
 
         await self.db.flush()
@@ -205,6 +208,9 @@ class ScheduleConfirmationService:
 
         if data.status == "confirmed" and card.subscription_id:
             if not await self._subscription_has_confirmed_card(card):
+                # Serialize check_time_conflict + INSERT per teacher — same race as
+                # confirm_card (this endpoint reaches the same booking-creation path).
+                await self._acquire_teacher_booking_lock(card.teacher_id)
                 await self._create_bookings_for_subscription(card)
 
         await self.db.flush()
@@ -387,7 +393,7 @@ class ScheduleConfirmationService:
                 if days_ahead <= 0:
                     days_ahead += 7
                 scheduled_date = base_date + timedelta(days=days_ahead, weeks=week)
-                conflict = await self._check_time_conflict(
+                conflict = await self.check_time_conflict(
                     teacher_id=teacher_profile_id,
                     scheduled_date=scheduled_date,
                     scheduled_time=slot_time,
@@ -462,6 +468,10 @@ class ScheduleConfirmationService:
         from app.models.student import Student
         from app.models.subscription import Subscription
 
+        # Serialize check_time_conflict + INSERT per teacher — closes the
+        # double-booking race between concurrent standalone registrations.
+        await self._acquire_teacher_booking_lock(data.teacher_id)
+
         teacher_profile_id = await self._resolve_teacher_id_for_actor(data.teacher_id)
         student_id = data.student_id or current_user.id
 
@@ -517,14 +527,20 @@ class ScheduleConfirmationService:
             await self.db.refresh(booking)
         return created, count
 
-    async def _check_time_conflict(
+    async def check_time_conflict(
         self,
         teacher_id: str,
         scheduled_date: Any,
         scheduled_time: str,
         duration: int,
+        exclude_booking_id: str | None = None,
     ) -> bool:
-        """Check if teacher has an existing booking at this date/time."""
+        """Check if teacher has an existing booking at this date/time.
+
+        [exclude_booking_id] skips that booking row — used when re-validating
+        an existing booking's own slot (approve / change-request) so it does
+        not collide with itself.
+        """
         from app.models.lesson import Lesson
         from app.models.schedule import LessonBooking
 
@@ -542,6 +558,8 @@ class ScheduleConfirmationService:
         new_end = new_start + duration
 
         for booking in existing.all():
+            if exclude_booking_id is not None and booking.id == exclude_booking_id:
+                continue
             existing_start = self._time_to_minutes(booking.scheduled_time)
             existing_end = existing_start + (booking.duration or 60)
             if new_start < existing_end and new_end > existing_start:
@@ -579,6 +597,31 @@ class ScheduleConfirmationService:
         if profile_id is not None and profile_id not in teacher_ids:
             teacher_ids.append(profile_id)
         return teacher_ids
+
+    async def _acquire_teacher_booking_lock(self, teacher_id: str) -> None:
+        """Serialize check_time_conflict + booking INSERT per teacher.
+
+        Two concurrent confirm requests for the same teacher/slot can both pass
+        ``check_time_conflict`` before either commits, then both INSERT — a
+        double booking (esp. 선착순 즉시확정 slots). Acquire a Postgres
+        transaction-scoped advisory lock keyed on the teacher before the
+        conflict check runs, so a second concurrent caller blocks until the
+        first commits and then re-reads DB state that includes its booking.
+
+        No-op on non-Postgres dialects (SQLite in tests) — mirrors the dialect
+        guard in ``app.core.scheduler.try_advisory_lock``.
+        """
+        bind = self.db.bind
+        if bind is None or bind.dialect.name != "postgresql":
+            return
+
+        from sqlalchemy import text
+
+        from app.core.scheduler import advisory_lock_key
+
+        teacher_ids = await self._resolve_teacher_id_scope(teacher_id)
+        lock_key = advisory_lock_key(f"schedule-confirm-teacher:{min(teacher_ids)}")
+        await self.db.execute(text("SELECT pg_advisory_xact_lock(:key)").bindparams(key=lock_key))
 
     @staticmethod
     def _is_cancelled_lesson_status(status: Any) -> bool:

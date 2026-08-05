@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../gamification/gamification_facade.dart'
     show pointAwardNotifierProvider;
@@ -52,6 +53,7 @@ Future<List<PracticeItem>> practiceItemsByStudent(
   PracticeItemsByStudentRef ref,
   String studentId,
 ) async {
+  ref.autoRevalidate('/practice');
   final repository = ref.watch(practiceItemRepositoryProvider);
   return repository.getByStudentId(studentId);
 }
@@ -83,6 +85,7 @@ Future<List<PracticeItem>> incompletePracticeItems(
   IncompletePracticeItemsRef ref,
   String studentId,
 ) async {
+  ref.autoRevalidate('/practice');
   final repository = ref.watch(practiceItemRepositoryProvider);
   return repository.getIncompleteByStudentId(studentId);
 }
@@ -147,15 +150,17 @@ class PracticeItemsNotifier extends _$PracticeItemsNotifier {
     try {
       final newItem = await _repository.create(item);
 
-      // Auto-create section in student's practice repertoire
-      await _syncToStudentRepertoire(
-        studentId: studentId,
-        teacherId: teacherId,
-        practiceItemId: newItem.id,
-        title: title,
-        description: description,
-        resourceIds: resourceIds,
-      );
+      // #611·612 — sheet 가 만든 명시 섹션(마디범위 보유)에 과제 메타데이터
+      // (YouTube·리소스·교사·역참조)를 부착. 기본 레퍼토리 중복 생성(범위 소실) 제거.
+      if (sectionId != null) {
+        await _attachAssignmentToSection(
+          studentId: studentId,
+          sectionId: sectionId,
+          teacherId: teacherId,
+          practiceItemId: newItem.id,
+          resourceIds: resourceIds,
+        );
+      }
 
       state = await AsyncValue.guard(() => _repository.getByLessonId(lessonId));
       // Invalidate related providers
@@ -269,12 +274,13 @@ class PracticeItemsNotifier extends _$PracticeItemsNotifier {
   }
 
   /// Sync practice item to student's repertoire as a PracticeSection
-  Future<void> _syncToStudentRepertoire({
+  /// #611·612 — sheet 가 만든 명시 섹션(마디범위 보유)에 과제 메타데이터를 부착한다.
+  /// 기본('선생님 과제') 레퍼토리에 두 번째 full 섹션을 만들던 중복(범위 소실)을 대체.
+  Future<void> _attachAssignmentToSection({
     required String studentId,
+    required String sectionId,
     required String teacherId,
     required String practiceItemId,
-    required String title,
-    String? description,
     List<String> resourceIds = const [],
   }) async {
     try {
@@ -306,17 +312,19 @@ class PracticeItemsNotifier extends _$PracticeItemsNotifier {
         }
       }
 
-      await repertoireRepo.createSectionFromAssignment(
-        studentId: studentId,
-        pieceName: title,
-        sectionName: description,
-        youtubeUrl: youtubeUrl,
-        youtubeVideoId: youtubeVideoId,
-        youtubeStartSeconds: youtubeStartSeconds,
-        youtubeEndSeconds: youtubeEndSeconds,
-        teachingResourceIds: resourceIds,
-        assignedByTeacherId: teacherId,
-        practiceItemId: practiceItemId,
+      // 명시 섹션은 이미 마디범위를 보유. 과제 출처·YouTube·리소스만 보강한다.
+      final section = await repertoireRepo.getSection(sectionId);
+      if (section == null) return;
+      await repertoireRepo.updateSection(
+        section.copyWith(
+          youtubeUrl: youtubeUrl,
+          youtubeVideoId: youtubeVideoId,
+          youtubeStartSeconds: youtubeStartSeconds,
+          youtubeEndSeconds: youtubeEndSeconds,
+          teachingResourceIds: resourceIds,
+          assignedByTeacherId: teacherId,
+          practiceItemId: practiceItemId,
+        ),
       );
 
       // Invalidate repertoire providers to refresh student's practice tab
@@ -331,7 +339,7 @@ class PracticeItemsNotifier extends _$PracticeItemsNotifier {
           stack: st,
           library: 'practice_item_providers',
           context: ErrorDescription(
-            'Failed to sync assignment to student repertoire',
+            'Failed to attach assignment metadata to section',
           ),
         ),
       );

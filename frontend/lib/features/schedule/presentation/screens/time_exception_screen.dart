@@ -10,10 +10,12 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/teacher_availability.dart';
+import '../extensions/exception_type_visuals.dart';
 import '../providers/teacher_availability_providers.dart';
 
 /// Screen for managing time exceptions (holidays, vacations, additional slots)
@@ -219,27 +221,10 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.event_available, size: 64, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            AppStrings.noExceptionsSet,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            AppStrings.addExceptionHint,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.event_available,
+      title: AppStrings.noExceptionsSet,
+      subtitle: AppStrings.addExceptionHint,
     );
   }
 

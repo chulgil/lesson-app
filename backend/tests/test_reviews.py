@@ -159,3 +159,62 @@ async def test_review_rating_out_of_range(client: AsyncClient, student_auth_head
         json={"teacher_id": "t1", "rating": 6},
     )
     assert r6.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_review_is_verified_when_reviewer_completed_a_lesson(
+    client: AsyncClient, student_auth_headers, create_test_user, db_session
+):
+    """A review from a student who actually completed a lesson with the
+    teacher should be marked is_verified=True — the field existed on the
+    model/schema but was never set anywhere.
+    """
+    from datetime import date
+
+    from app.models.lesson import Lesson, LessonStatus
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="test-student-id", role="student", email="student-verified@test.com", name="Student")
+
+    db_session.add(
+        Lesson(
+            teacher_id="test-user-id-prof",
+            student_id="test-student-id",
+            student_name="Student",
+            instrument="violin",
+            date=date(2026, 5, 1),
+            start_time="10:00",
+            duration=60,
+            status=LessonStatus.completed,
+        )
+    )
+    await db_session.flush()
+    await db_session.commit()
+
+    response = await client.post(
+        "/api/v1/reviews/",
+        headers=student_auth_headers,
+        json={"teacher_id": "test-user-id", "rating": 5, "content": "실제로 배운 선생님"},
+    )
+    assert response.status_code == 201
+    assert response.json()["is_verified"] is True
+
+
+@pytest.mark.asyncio
+async def test_review_is_not_verified_without_a_completed_lesson(
+    client: AsyncClient, student_auth_headers, create_test_user
+):
+    """A review from someone who never had a lesson with the teacher must not
+    be marked verified."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-student-id", role="student", email="student-unverified@test.com", name="Student"
+    )
+
+    response = await client.post(
+        "/api/v1/reviews/",
+        headers=student_auth_headers,
+        json={"teacher_id": "test-user-id", "rating": 5, "content": "레슨 받아본 적 없음"},
+    )
+    assert response.status_code == 201
+    assert response.json()["is_verified"] is False

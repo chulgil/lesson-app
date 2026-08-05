@@ -1,7 +1,5 @@
 import '../../../lessons/domain/entities/entities.dart';
 import '../../../lessons/domain/repositories/lesson_repository.dart';
-import '../../../notifications/domain/entities/notification.dart';
-import '../../../notifications/domain/services/notification_service.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/domain/repositories/unified_lesson_request_repository.dart';
@@ -12,8 +10,8 @@ import '../entities/bulk_cancel_result.dart';
 /// §7.119 v2 Bulk Teacher Actions — 선택 모드에서 선생님이 여러 학생에게 동시 실행하는 운영 작업.
 ///
 /// 지원 유스케이스:
-/// - B1 휴강 공지: 특정 날짜의 레슨을 일괄 취소 + RequestEvent + 알림
-/// - B2 일괄 메시지: 학생들에게 공지 알림 + RequestEvent 브로드캐스트
+/// - B1 휴강 공지: 특정 날짜의 레슨을 일괄 취소 + RequestEvent
+/// - B2 일괄 메시지: 학생들에게 공지 RequestEvent 브로드캐스트
 ///
 /// v2 변경 (2026-05-07):
 /// - 회차(sessionNumber) 매핑 + 수강권 챗 이벤트(RequestEvent) 생성
@@ -21,21 +19,18 @@ import '../entities/bulk_cancel_result.dart';
 /// - 일괄 메시지 수신 조건 필터 (활성 수강권만 / 전체)
 class BulkTeacherActionService {
   final LessonRepository _lessonRepository;
-  final NotificationService _notificationService;
   final UnifiedLessonRequestRepository _requestRepository;
   final SubscriptionRepository _subscriptionRepository;
 
   BulkTeacherActionService({
     required LessonRepository lessonRepository,
-    required NotificationService notificationService,
     required UnifiedLessonRequestRepository requestRepository,
     required SubscriptionRepository subscriptionRepository,
   }) : _lessonRepository = lessonRepository,
-       _notificationService = notificationService,
        _requestRepository = requestRepository,
        _subscriptionRepository = subscriptionRepository;
 
-  /// 대상 날짜에 예정된 레슨을 일괄 취소하고 각 학생에게 알림을 보낸다.
+  /// 대상 날짜에 예정된 레슨을 일괄 취소하고 각 학생의 수강권 챗에 취소 이벤트를 남긴다.
   ///
   /// - 대상 날짜에 scheduled 상태 레슨이 없는 학생은 [BulkCancelResult.skippedStudentIds] 에 포함
   /// - 이미 취소 상태인 레슨은 건드리지 않는다 (중복 취소 방지)
@@ -56,7 +51,6 @@ class BulkTeacherActionService {
     required String teacherId,
     required List<String> studentIds,
     required DateTime targetDate,
-    required String notificationTitle,
     String? reason,
   }) async {
     final lessonsOnDate = await _lessonRepository.getLessonsByDate(targetDate);
@@ -92,17 +86,12 @@ class BulkTeacherActionService {
       cancelledCount++;
 
       // v2: 수강권 챗에 RequestEvent 생성 (회차 매핑)
+      // #1212 — 학생 통지는 이 챗 이벤트(BE) 가 SSOT.
+      // flutter_local_notifications 는 액터(교사) 기기 전용이라 상대 통지로 쓸 수
+      // 없어(기존엔 교사 기기에 오발) FE 로컬 알림 호출을 제거함.
       await _createCancelEvent(
         teacherId: teacherId,
         lesson: lesson,
-        reason: reason,
-      );
-
-      await _notifyCancellation(
-        studentId: entry.key,
-        teacherId: teacherId,
-        lesson: lesson,
-        title: notificationTitle,
         reason: reason,
       );
       notifiedCount++;
@@ -115,13 +104,12 @@ class BulkTeacherActionService {
     );
   }
 
-  /// 선생님 공지 메시지를 학생들에게 generalAnnouncement 알림으로 발송.
+  /// 선생님 공지 메시지를 학생들의 수강권 챗에 teacherAnnouncement 이벤트로 발송.
   ///
   /// [activeOnly] = true: 활성 수강권 보유 학생만 (기본)
   /// [activeOnly] = false: 선택된 전체 학생
   ///
-  /// 활성 수강권 보유 학생에게는 수강권 챗에도 RequestEvent 생성.
-  /// 반환: 실제로 알림을 받은 학생 수.
+  /// 반환: 공지를 전달한 학생 수.
   Future<int> broadcastMessage({
     required String teacherId,
     required List<String> studentIds,
@@ -132,28 +120,15 @@ class BulkTeacherActionService {
     if (studentIds.isEmpty) return 0;
 
     // 수신 대상 필터링
-    final targetIds =
-        activeOnly
-            ? await _filterActiveSubscriptionStudents(studentIds)
-            : studentIds;
+    final targetIds = activeOnly
+        ? await _filterActiveSubscriptionStudents(studentIds)
+        : studentIds;
 
-    final now = DateTime.now();
     var sent = 0;
     for (final studentId in targetIds) {
-      // 알림 생성
-      final notification = AppNotification(
-        id: 'bulk_msg_${now.millisecondsSinceEpoch}_$studentId',
-        userId: studentId,
-        type: NotificationType.generalAnnouncement,
-        priority: NotificationPriority.normal,
-        title: title,
-        body: body,
-        createdAt: now,
-        data: {'teacherId': teacherId, 'source': 'bulk_teacher_action'},
-      );
-      await _notificationService.showNotification(notification);
-
-      // v2: 활성 수강권이 있으면 챗에 RequestEvent 생성
+      // #1212 — 학생 통지는 챗 RequestEvent(BE) 가 SSOT.
+      // flutter_local_notifications 는 액터(교사) 기기 전용이라 상대 통지로 쓸 수
+      // 없어(기존엔 교사 기기에 오발) FE 로컬 알림 호출을 제거함.
       await _createAnnouncementEvent(
         teacherId: teacherId,
         studentId: studentId,
@@ -185,41 +160,6 @@ class BulkTeacherActionService {
       default:
         return false;
     }
-  }
-
-  Future<void> _notifyCancellation({
-    required String studentId,
-    required String teacherId,
-    required Lesson lesson,
-    required String title,
-    String? reason,
-  }) async {
-    final subscription = await _subscriptionForLesson(lesson);
-    final session = _sessionNumberFor(subscription);
-    final sessionPrefix = session != null ? '$session회차 ' : '';
-    final bodyBuffer = StringBuffer(
-      '$sessionPrefix${_formatDate(lesson.date)} ${lesson.startTime} 레슨이 취소되었습니다',
-    );
-    if (reason != null && reason.trim().isNotEmpty) {
-      bodyBuffer.write(' — ${reason.trim()}');
-    }
-
-    final notification = AppNotification(
-      id: 'bulk_cancel_${DateTime.now().millisecondsSinceEpoch}_$studentId',
-      userId: studentId,
-      type: NotificationType.lessonCancelled,
-      priority: NotificationPriority.high,
-      title: title,
-      body: bodyBuffer.toString(),
-      createdAt: DateTime.now(),
-      data: {
-        'teacherId': teacherId,
-        'lessonId': lesson.id,
-        'sessionNumber': session,
-        'source': 'bulk_teacher_action',
-      },
-    );
-    await _notificationService.showNotification(notification);
   }
 
   /// v2: 수강권 챗에 lessonCancelledByTeacher 이벤트 생성.
@@ -326,7 +266,4 @@ class BulkTeacherActionService {
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return matching.firstOrNull?.id;
   }
-
-  String _formatDate(DateTime date) =>
-      '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
 }

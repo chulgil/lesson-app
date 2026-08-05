@@ -3,6 +3,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -245,32 +246,10 @@ class _UnlinkedState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.link_off, size: 56, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.parentHomeNotLinked,
-              textAlign: TextAlign.center,
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.parentHomeNotLinkedDesc,
-              textAlign: TextAlign.center,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.link_off,
+      title: AppStrings.parentHomeNotLinked,
+      subtitle: AppStrings.parentHomeNotLinkedDesc,
     );
   }
 }
@@ -280,23 +259,11 @@ class _EmptyAssignments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.space6),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.assignment_outlined,
-            size: 56,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.parentHomeNoAssignment,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
+    return const SizedBox(
+      height: 160,
+      child: EmptyStateWidget(
+        icon: Icons.assignment_outlined,
+        title: AppStrings.parentHomeNoAssignment,
       ),
     );
   }
@@ -355,7 +322,7 @@ class _SectionHeader extends StatelessWidget {
             borderRadius: BorderRadius.zero,
           ),
           child: Text(
-            '$count개',
+            AppStrings.countItemsSuffix(count),
             style: AppTypography.caption.copyWith(
               color: color,
               fontWeight: FontWeight.bold,
@@ -527,11 +494,11 @@ color: AppColors.inkSecondary,
   String _getPriorityLabel() {
     switch (priority) {
       case AssignmentPriority.must:
-        return '필수';
+        return AppStrings.parentHomePriorityMust;
       case AssignmentPriority.should:
-        return '권장';
+        return AppStrings.parentHomePriorityShould;
       case AssignmentPriority.could:
-        return '선택';
+        return AppStrings.parentHomePriorityCould;
     }
   }
 

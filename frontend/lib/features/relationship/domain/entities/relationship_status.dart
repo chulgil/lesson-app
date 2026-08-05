@@ -18,20 +18,6 @@ enum RelationshipStatus {
 
 /// Extension methods for RelationshipStatus
 extension RelationshipStatusExtension on RelationshipStatus {
-  /// Display name in Korean
-  String get displayName {
-    switch (this) {
-      case RelationshipStatus.trialBooked:
-        return '체험 예정';
-      case RelationshipStatus.active:
-        return '수강 중';
-      case RelationshipStatus.expired:
-        return '수강권 만료';
-      case RelationshipStatus.past:
-        return '이전 레슨';
-    }
-  }
-
   /// Whether this status allows lesson booking
   bool get canBookLesson {
     return this == RelationshipStatus.active;

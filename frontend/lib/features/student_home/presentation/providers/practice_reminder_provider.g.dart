@@ -6,7 +6,7 @@ part of 'practice_reminder_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$practiceReminderHash() => r'2c446005b95578d08dfe79d1c62cad03127ee482';
+String _$practiceReminderHash() => r'4f4beac473b6ccf0cbcc10cde371a4d461515742';
 
 /// See also [PracticeReminder].
 @ProviderFor(PracticeReminder)

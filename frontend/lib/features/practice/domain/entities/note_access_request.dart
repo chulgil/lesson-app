@@ -104,8 +104,14 @@ class NoteAccessRequest {
   bool get isNotExpired => !isExpired;
 
   /// Remaining days of access (0 if expired)
+  ///
+  /// 캘린더 날짜 차이로 계산 (#D5) — Duration.inDays 는 24시간 미만을 0 으로
+  /// 버려, 내일 만료여도 "오늘까지" 로 하루 일찍 표시하던 버그가 있었다.
   int get remainingDays {
     if (isExpired) return 0;
-    return expiresAt.difference(DateTime.now()).inDays;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final expiryDate = DateTime(expiresAt.year, expiresAt.month, expiresAt.day);
+    return expiryDate.difference(today).inDays;
   }
 }

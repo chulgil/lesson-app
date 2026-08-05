@@ -358,6 +358,9 @@ class MyBookingsScreen extends ConsumerWidget {
     final canReschedule = remainingReschedules > 0;
     final isPast = booking.startDateTime.isBefore(DateTime.now());
     final leftColor = isPast ? AppColors.paperOk : AppColors.ink;
+    // H7 — 끝난 예약은 글자가 물러나고 좌측 상태 바(paperOk)만 남아 "채워진
+    // 게이지" 로 읽힌다. 다가올 예약이 먼저 눈에 들어오게 하는 것이 목적.
+    final mutedInk = isPast ? AppColors.inkQuaternary : null;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -386,7 +389,7 @@ class MyBookingsScreen extends ConsumerWidget {
                   style: GoogleFonts.ibmPlexMono(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isPast ? AppColors.inkSecondary : AppColors.ink,
+                    color: mutedInk ?? AppColors.ink,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -397,7 +400,7 @@ class MyBookingsScreen extends ConsumerWidget {
                     booking.formattedDate,
                     style: NotebookTypography.pieceTitle.copyWith(
                       fontSize: 15,
-                      color: isPast ? AppColors.inkSecondary : AppColors.ink,
+                      color: mutedInk ?? AppColors.ink,
                     ),
                   ),
                 ),
@@ -405,7 +408,7 @@ class MyBookingsScreen extends ConsumerWidget {
                   Text(
                     AppStrings.statusCompleted,
                     style: NotebookTypography.sectionLabel.copyWith(
-                      color: AppColors.paperOk,
+                      color: mutedInk ?? AppColors.paperOk,
                     ),
                   ),
               ],

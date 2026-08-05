@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +21,7 @@ import '../extensions/user_role_visuals.dart';
 import '../providers/auth_provider.dart';
 import '../../../home/home_ui_facade.dart' show AppUpdateBanner;
 import '../widgets/dev_login_section.dart';
+import '../widgets/terms_agreement_section.dart';
 import '../widgets/login_bottom_sheets.dart';
 
 const _googleServerClientId = String.fromEnvironment(
@@ -156,7 +159,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         // Italic serif slogan
         Text(
-          '선생님을 위한 레슨 노트.',
+          AppStrings.authSlogan,
           style: NotebookTypography.fine.copyWith(
             color: AppColors.inkSecondary,
             fontWeight: FontWeight.w400,
@@ -219,19 +222,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       children: [
         _NotebookAuthBtn(
-          label: 'Google 계정으로 시작',
+          label: AppStrings.authGoogleStart,
           primary: true,
           onTap: () => _handleGoogleLogin(context),
         ),
         const SizedBox(height: AppSpacing.space3),
         _NotebookAuthBtn(
-          label: 'Kakao로 시작',
+          label: AppStrings.authKakaoStart,
           onTap: null, // #118: 준비중 — NO-OP 제거
           comingSoonBadge: AppStrings.authComingSoonBadge,
         ),
         const SizedBox(height: AppSpacing.space3),
         _NotebookAuthBtn(
-          label: 'Apple 계정으로 시작',
+          label: AppStrings.authAppleStart,
           onTap: null, // #118: 준비중 — NO-OP 제거
           comingSoonBadge: AppStrings.authComingSoonBadge,
         ),
@@ -257,11 +260,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               vertical: AppSpacing.space2,
             ),
             child: Text(
-              '학부모이신가요?',
-              style: NotebookTypography.hand.copyWith(
-                color: AppColors.paperAccent,
+              AppStrings.authParentLoginLink,
+              // #1186 — match the screen's action texts (social button labels,
+              // Playfair serif); body sans stood out as a third typeface here.
+              style: NotebookTypography.buttonLabelSerif.copyWith(
+                color: AppColors.inkSecondary,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.paperAccent,
+                decorationColor: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -278,17 +283,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           color: AppColors.ink.withValues(alpha: 0.25),
           margin: const EdgeInsets.only(bottom: AppSpacing.space3),
         ),
-        Text(
-          'TERMS · PRIVACY · MMXXVI',
-          style: NotebookTypography.metaMono.copyWith(
-            color: AppColors.inkTertiary,
-            letterSpacing: 1.5,
-          ),
-          textAlign: TextAlign.center,
+        // Footer legal links — same read-only sheets as the signup flow
+        // (운영배포 게이트 감사 2026-07-12: 정적 텍스트였음).
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap:
+                  () => showTermsContentSheet(
+                    context,
+                    AppStrings.authTermsOfServiceTitle,
+                    termsOfServiceContent,
+                  ),
+              behavior: HitTestBehavior.opaque,
+              child: Text('TERMS', style: _footerLinkStyle),
+            ),
+            Text(' · ', style: _footerStyle),
+            GestureDetector(
+              onTap:
+                  () => showTermsContentSheet(
+                    context,
+                    AppStrings.authPrivacyPolicy,
+                    privacyPolicyContent,
+                  ),
+              behavior: HitTestBehavior.opaque,
+              child: Text('PRIVACY', style: _footerLinkStyle),
+            ),
+            Text(' · MMXXVI', style: _footerStyle),
+          ],
         ),
       ],
     );
   }
+
+  TextStyle get _footerStyle => NotebookTypography.metaMono.copyWith(
+    color: AppColors.inkTertiary,
+    letterSpacing: 1.5,
+  );
+
+  TextStyle get _footerLinkStyle => _footerStyle.copyWith(
+    decoration: TextDecoration.underline,
+    decorationColor: AppColors.inkTertiary,
+  );
 
   // ── Login handlers ────────────────────────────────────────────────
 
@@ -367,7 +403,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // account picker (Bug #726 fix).
       final googleSignIn = _getGoogleSignIn();
       await googleSignIn.signOut();
-      final account = await googleSignIn.signIn();
+      // #login: cap the OAuth wait. On macOS the flow opens the external
+      // default browser; if that browser fails to hand the custom-scheme
+      // redirect back (e.g. a stale/automation Chrome intercepting it), the
+      // callback never arrives. Time out instead of hanging forever with a
+      // stuck spinner so the button recovers and the user can retry.
+      final account = await googleSignIn.signIn().timeout(
+        const Duration(seconds: 90),
+        onTimeout: () => throw TimeoutException('Google sign-in timed out'),
+      );
       if (account == null) {
         if (mounted) setState(() => _isLoading = false);
         return;

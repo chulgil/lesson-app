@@ -129,6 +129,13 @@ class MakeupCreditBalance {
 신규 트랙:
 - `scheduledLessons` = `LessonBooking` 중 활성 상태 카운트 (재계산 가능)
 
+> **배선 현황 (2026-08-04 실측)**: `scheduledLessons` 트랙은 재계산 헬퍼
+> (`recalculate_scheduled_lessons` 등, bulkChange 훅 포인트)만 존재하고 라이브
+> 쓰기·읽기 경로가 없다 (API 응답/FE/가드 소비처 0 — 값은 항상 0). §3.3 불변식
+> 강제도 미구현. 소비처(§9 카드 등)가 생기는 시점에 booking 라이프사이클
+> (생성/취소/상태 전이)에 recalc 를 배선한다 — 그 전까지 증분(+=1) 방식 배선 금지
+> (재계산 SSOT 와 어긋나는 드리프트 발생).
+
 ### 3.3 일관성 불변식
 
 ```
@@ -228,8 +235,25 @@ scheduledLessons <= remainingLessons + usedLessons
 크레딧 사용 시:
 - `MakeupCredit.usedAt`, `usedLessonId` 기록
 - `Subscription.usedLessons` 미차감
-- `Subscription.scheduledLessons += 1`
+- `Subscription.scheduledLessons` 반영 — **booking 경유 경로만** 해당하며, 증분이
+  아니라 신규 booking 행이 §3.2 재계산에 잡히는 방식이다 (배선 현황은 §3.2 참조).
+  선생님 수동 레슨(POST /lessons, §5.4)은 booking 행이 없으므로 정의상 카운터 밖 —
+  J1 관찰 "scheduled_lessons 미증가"는 드리프트가 아니라 정합 (회귀 테스트
+  `test_manual_credit_lesson_leaves_scheduled_lessons_untouched` 로 고정).
 - `LessonBooking.creditUsed = true` 플래그
+
+### 5.4 선생님측 레슨 추가 시 소비 (2026-08-03)
+
+선생님이 레슨 추가(AddLessonScreen)에서 보강 크레딧 보유 학생을 선택하면
+수강권 배너에 크레딧 잔량을 노출하고 **"보강으로 처리" 토글**을 표시한다 (기본 OFF).
+
+- 토글 ON 저장 시: §5.3 과 동일 처리 (크레딧 차감, 정규 회차 미차감).
+- 레슨 귀속 우선순위 (2026-08-03 구현 정합 정정 — code critic 대조): **선생님이 명시
+  선택한 수강권 > 크레딧의 `sourceSubscriptionId` > 최신 활성 수강권**. 선생님의 명시
+  선택이 크레딧 출처보다 우선한다 (선택 UI 가 이미 열린 의도를 존중). 어느 쪽이든
+  크레딧 차감·정규 회차 미차감 회계는 동일.
+- 잔여 0 상태(S3)에서는 처리 방식 시트의 "보강 레슨" 항목이 이 토글을 대신한다.
+- 상태 분기 전체: [subscription_required_spec.md §2.6](subscription_required_spec.md) (S3/S4)
 
 ---
 

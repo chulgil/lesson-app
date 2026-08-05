@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../providers/bulk_teacher_action_providers.dart';
@@ -87,13 +88,7 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
             controller: scrollController,
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(color: AppColors.inkSecondary),
-                ),
-              ),
+              const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
               const SizedBox(height: AppSpacing.space4),
               Text(
                 AppStrings.studentBulkMessageTitle,

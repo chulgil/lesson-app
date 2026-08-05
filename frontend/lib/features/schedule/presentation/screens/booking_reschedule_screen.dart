@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -213,7 +214,7 @@ class _BookingRescheduleScreenState
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: AppColors.paperAccent.withValues(alpha: 0.1),
+          color: AppColors.paperAccentSoft,
         ),
         child: Row(
           children: [
@@ -245,7 +246,7 @@ class _BookingRescheduleScreenState
       decoration: BoxDecoration(
         color:
             isLastChance
-                ? AppColors.paperAccent.withValues(alpha: 0.1)
+                ? AppColors.paperAccentSoft
                 : AppColors.ink.withValues(alpha: 0.1),
       ),
       child: Row(
@@ -377,24 +378,9 @@ class _BookingRescheduleScreenState
     return nextDatesAsync.when(
       data: (dates) {
         if (dates.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.event_busy,
-                  size: 64,
-                  color: AppColors.inkTertiary,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                Text(
-                  AppStrings.noAvailableBookingTime,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
-            ),
+          return const EmptyStateWidget(
+            icon: Icons.event_busy,
+            title: AppStrings.noAvailableBookingTime,
           );
         }
 

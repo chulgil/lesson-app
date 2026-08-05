@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lessonaza/features/gamification/domain/entities/daily_practice.dart';
 import 'package:lessonaza/features/gamification/domain/entities/gamification.dart';
 import 'package:lessonaza/features/gamification/domain/entities/growth_heatmap.dart';
@@ -50,7 +53,6 @@ Future<void> _pump(
   required String studentId,
   GrowthHeatmap? heatmap,
   List<PracticeBadge> badges = const [],
-  bool isUnder14 = false,
 }) async {
   final stub = _StubGrowthHeatmapRepository(
     heatmap ?? GrowthHeatmap(studentId: studentId, days: const {}),
@@ -69,7 +71,6 @@ Future<void> _pump(
         home: Scaffold(
           body: StudentGrowthDetailScreen(
             studentId: studentId,
-            isUnder14: isUnder14,
           ),
         ),
       ),
@@ -79,6 +80,25 @@ Future<void> _pump(
 }
 
 void main() {
+  // doc 46 §4 (P2) — 화면이 dailyPracticeGoalProvider 를 watch 하면서 Hive box
+  // 를 연다. 미초기화 상태에서는 HiveError 가 try/catch 를 우회해 zone 레벨
+  // uncaught error 로 보고된다 (student_dashboard_layout_test.dart 와 동일 패턴).
+  late Directory tempDir;
+
+  setUpAll(() {
+    tempDir = Directory.systemTemp.createTempSync(
+      'student_growth_detail_screen_',
+    );
+    Hive.init(tempDir.path);
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    if (tempDir.existsSync()) {
+      tempDir.deleteSync(recursive: true);
+    }
+  });
+
   group('StudentGrowthDetailScreen — Job 9 Task 9.1 / AC-6.4', () {
     testWidgets('widget smoke test (HARD-GATE) — render exception 0', (
       tester,
@@ -128,65 +148,5 @@ void main() {
       );
     });
 
-    testWidgets('14세 이상 → 비교 보기 placeholder 노출', (tester) async {
-      await _pump(tester, studentId: 's1', isUnder14: false);
-      expect(
-        find.byKey(const ValueKey('comparison_placeholder')),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('14세 미만 → 비교 보기 placeholder hide (스펙 §9.1)', (tester) async {
-      await _pump(tester, studentId: 's1', isUnder14: true);
-      expect(
-        find.byKey(const ValueKey('comparison_placeholder')),
-        findsNothing,
-      );
-    });
-
-    testWidgets('Spotlight placeholder 노출 (P3 예정)', (tester) async {
-      await _pump(tester, studentId: 's1');
-      expect(
-        find.byKey(const ValueKey('spotlight_placeholder')),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets(
-      'NO-OP 버튼 0건 — placeholder 영역에 onTap: () {} / onPressed: null 패턴 0 (ux-rules)',
-      (tester) async {
-        await _pump(tester, studentId: 's1', isUnder14: false);
-
-        // GestureDetector.onTap 가 null 인 패턴만 허용 (정보 표시).
-        // NO-OP 빈 함수 () {} 는 금지.
-        final detectors = find.byType(GestureDetector);
-        for (final el in detectors.evaluate()) {
-          final widget = el.widget as GestureDetector;
-          // 본 화면에서 GestureDetector 가 placeholder 영역에 존재하면
-          // onTap 는 null (정보 표시) 또는 실제 라우팅 callback 이어야 함
-          if (widget.onTap != null) {
-            // 함수 본문이 빈 () {} 인지는 런타임 확인 불가 — 단, 본 테스트는
-            // GestureDetector 가 placeholder 안에 실수로 들어가지 않는지만
-            // 회귀 확인 (placeholder 자체에 GestureDetector 가 0개여야 함).
-          }
-        }
-
-        // placeholder 컨테이너 안에 직접 GestureDetector 가 없어야 함
-        final comparisonFinder = find.byKey(
-          const ValueKey('comparison_placeholder'),
-        );
-        expect(comparisonFinder, findsOneWidget);
-        // placeholder 의 children 안에서 GestureDetector 검색
-        final gestureInPlaceholder = find.descendant(
-          of: comparisonFinder,
-          matching: find.byType(GestureDetector),
-        );
-        expect(
-          gestureInPlaceholder,
-          findsNothing,
-          reason: 'placeholder 안에 GestureDetector 0개 (NO-OP 버튼 금지)',
-        );
-      },
-    );
   });
 }

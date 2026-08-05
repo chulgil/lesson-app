@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/gamification/domain/entities/growth_heatmap.dart';
+import 'package:lessonaza/features/gamification/domain/services/streak_with_freeze_calculator.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/effective_streak_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/growth_heatmap_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/widgets/practice_start_section.dart';
+import 'package:lessonaza/features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import 'package:lessonaza/features/students/domain/entities/student.dart';
 import 'package:lessonaza/features/students/presentation/providers/student_crud_provider.dart';
 
@@ -25,6 +28,19 @@ void main() {
         overrides: [
           studentProvider('s1').overrideWith((ref) async => mockStudent),
           growthHeatmapProvider('s1').overrideWith((ref) async => mockHeatmap),
+          effectiveStreakProvider('s1').overrideWith(
+            (ref) async => const StreakWithFreezeResult(
+              effectiveCurrentStreak: 3,
+              freezeShouldApply: false,
+              absenceDate: null,
+              streakBroken: false,
+              examModeDormant: false,
+              freezeBalance: 2,
+            ),
+          ),
+          studentRepertoiresProvider(
+            's1',
+          ).overrideWith((ref) async => const []),
         ],
         child: const MaterialApp(
           home: Scaffold(body: PracticeStartSection(studentId: 's1')),

@@ -83,58 +83,6 @@ class ChildProfile {
   /// Check if child can convert to own account (14 or older)
   bool get canConvertToAccount => age >= 14;
 
-  /// Get instrument display name
-  String get instrumentLabel {
-    switch (instrument.toLowerCase()) {
-      case 'violin':
-        return '바이올린';
-      case 'piano':
-        return '피아노';
-      case 'cello':
-        return '첼로';
-      case 'viola':
-        return '비올라';
-      case 'flute':
-        return '플루트';
-      default:
-        return instrument;
-    }
-  }
-
-  /// Get level display name
-  String get levelLabel {
-    switch (level.toLowerCase()) {
-      case 'beginner':
-        return '입문';
-      case 'elementary':
-        return '초급';
-      case 'intermediate':
-        return '중급';
-      case 'advanced':
-        return '고급';
-      default:
-        return level;
-    }
-  }
-
-  /// Get instrument icon
-  String get instrumentIconKey {
-    switch (instrument.toLowerCase()) {
-      case 'violin':
-        return 'musicNote';
-      case 'piano':
-        return 'piano';
-      case 'cello':
-        return 'musicNote';
-      case 'viola':
-        return 'musicNote';
-      case 'flute':
-        return 'musicNote';
-      default:
-        return 'musicNote';
-    }
-  }
-
   /// Copy with new values
   ChildProfile copyWith({
     String? id,

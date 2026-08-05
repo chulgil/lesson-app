@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription.dart';
 import '../extensions/subscription_visuals.dart';
 import '../utils/subscription_status_colors.dart';
+import 'subscription_badge.dart';
 import 'subscription_credit_widget.dart';
 
 /// Card widget displaying subscription information.
@@ -115,6 +116,10 @@ class SubscriptionCard extends StatelessWidget {
                     color: accentColor,
                   ),
                 ),
+                if (subscription.isGroupScoped) ...[
+                  const SizedBox(height: AppSpacing.space1),
+                  const GroupSubscriptionBadge(),
+                ],
                 if (personName != null)
                   Text(
                     personName!,
@@ -349,6 +354,10 @@ class SubscriptionCard extends StatelessWidget {
                               color: AppColors.inkSecondary,
                             ),
                           ),
+                        if (subscription.isGroupScoped) ...[
+                          const SizedBox(height: AppSpacing.space1),
+                          const GroupSubscriptionBadge(),
+                        ],
                       ],
                     ),
                   ),

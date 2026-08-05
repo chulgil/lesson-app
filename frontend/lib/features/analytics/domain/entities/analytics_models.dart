@@ -91,7 +91,6 @@ class StudentProgressData {
   final int totalLessons;
   final double practiceAchievementRate; // 0.0 ~ 1.0
   final int totalPracticeMinutes;
-  final int practiceStreakDays;
   final List<WeeklyPracticePoint> weeklyPractice;
   final List<AttendanceDay> attendanceCalendar;
   final List<RepertoirePiece> repertoire;
@@ -107,7 +106,6 @@ class StudentProgressData {
     required this.totalLessons,
     required this.practiceAchievementRate,
     required this.totalPracticeMinutes,
-    required this.practiceStreakDays,
     required this.weeklyPractice,
     required this.attendanceCalendar,
     required this.repertoire,
@@ -174,9 +172,15 @@ enum RiskLevel { high, medium, low }
 class AtRiskStudent {
   final String studentId;
   final String studentName;
-  final int daysUntilExpiry;
+
+  /// Null when the student has no live subscription (no expiry date exists).
+  final int? daysUntilExpiry;
+
+  /// Negative means practice volume declined.
   final double practiceDropPercent;
-  final DateTime lastLessonDate;
+
+  /// Null when the student has no lesson history yet.
+  final DateTime? lastLessonDate;
   final RiskLevel riskLevel;
 
   const AtRiskStudent({

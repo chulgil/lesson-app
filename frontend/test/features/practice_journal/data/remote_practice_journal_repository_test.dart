@@ -146,7 +146,30 @@ void main() {
 
         final body = requests.single.data as Map<String, dynamic>;
         expect(body['child_profile_id'], 'c1');
-        expect(requests.single.path, contains('/endorsements'));
+        // N4 contract: teacher endorsements hit the role-split route exactly.
+        expect(
+          requests.single.path,
+          '/practice-journal/endorsements/teacher',
+        );
+      });
+
+      test('POSTs self endorsement to the /self route (N4)', () async {
+        final requests = <RequestOptions>[];
+        final repo = _repoWith(
+          captured: requests,
+          responseData: null,
+          statusCode: 204,
+        );
+
+        final valid = Endorsement(
+          by: EndorsedBy.self,
+          date: DateTime.utc(2026, 6, 15),
+          authorUserId: 's1',
+          note: 'Done!',
+        );
+        await repo.addEndorsement('c1', valid);
+
+        expect(requests.single.path, '/practice-journal/endorsements/self');
       });
     });
 
@@ -211,6 +234,8 @@ void main() {
         expect(body['child_profile_id'], 'c1');
         expect(body['piece_id'], 'piece_1');
         expect(body['piece_name'], '바흐 미뉴에트');
+        // N4 contract: bind is POST /volumes (NOT /volumes/bind).
+        expect(requests.single.path, '/practice-journal/volumes');
       });
     });
   });

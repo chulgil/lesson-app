@@ -222,30 +222,6 @@ class PracticeReminderSheet extends ConsumerWidget {
                 }),
               ),
 
-              const SizedBox(height: AppSpacing.space6),
-
-              // Info banner
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.ink.withValues(alpha: 0.08),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, size: 16, color: AppColors.ink),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: Text(
-                        '푸시 알림은 준비 중입니다. 설정은 저장되며 기능 활성화 시 자동 적용됩니다.',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.ink,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               const SizedBox(height: AppSpacing.space4),
             ],
           ),

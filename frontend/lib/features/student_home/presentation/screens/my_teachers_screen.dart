@@ -10,9 +10,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
+import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
+import '../../../relationship/presentation/extensions/relationship_status_visuals.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
 import '../../../relationship/relationship_facade.dart';
 import '../../../search/search_facade.dart' show teacherProvider;
@@ -67,7 +71,7 @@ class MyTeachersScreen extends ConsumerWidget {
             // Notebook × Score: 카테고리 섹션 제목은 Playfair sectionTitle
             // (§7.17). '앱 선생님' 은 정적 그룹 헤더.
             Text(
-              '앱 선생님',
+              AppStrings.studentHomeAppTeacherSection,
               style: NotebookTypography.sectionTitle.copyWith(
                 color: AppColors.ink,
               ),
@@ -76,7 +80,7 @@ class MyTeachersScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
-          '앱을 통해 연결된 선생님',
+          AppStrings.studentHomeAppTeacherHint,
           style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -133,30 +137,16 @@ class MyTeachersScreen extends ConsumerWidget {
         color: AppColors.paperDark,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Column(
-        children: [
-          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            '연결된 앱 선생님이 없습니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            AppStrings.studentHomeSearchTeacherHint,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          FilledButton.icon(
-            onPressed: () => context.push(AppRoutes.teacherSearch),
-            icon: const Icon(Icons.search, size: 18),
-            label: const Text(AppStrings.studentHomeFindTeacher),
-          ),
-        ],
+      child: SizedBox(
+        height: 220,
+        child: EmptyStateWidget(
+          icon: Icons.school_outlined,
+          title: AppStrings.studentHomeAppTeacherEmpty,
+          subtitle: AppStrings.studentHomeSearchTeacherHint,
+          actionLabel: AppStrings.studentHomeFindTeacher,
+          actionIcon: Icons.search,
+          onAction: () => context.push(AppRoutes.teacherSearch),
+        ),
       ),
     );
   }
@@ -236,23 +226,15 @@ class MyTeachersScreen extends ConsumerWidget {
         color: AppColors.paperDark,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.person_add_outlined,
-            size: 40,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.studentHomeManualTeacherEmpty,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          _buildAddManualTeacherButton(context),
-        ],
+      child: SizedBox(
+        height: 200,
+        child: EmptyStateWidget(
+          icon: Icons.person_add_outlined,
+          title: AppStrings.studentHomeManualTeacherEmpty,
+          actionLabel: AppStrings.studentHomeManualTeacherRegister,
+          actionIcon: Icons.add,
+          onAction: () => context.push(AppRoutes.addManualTeacher),
+        ),
       ),
     );
   }
@@ -327,16 +309,20 @@ class _AppTeacherCard extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                teacherAsync.maybeWhen(
-                                  data: (t) =>
-                                      t?.name ??
-                                      AppStrings.myTeachersUnknownTeacher,
-                                  orElse: () =>
-                                      AppStrings.myTeachersUnknownTeacher,
-                                ),
-                                style: AppTypography.bodyLarge.copyWith(
-                                  fontWeight: FontWeight.w600,
+                              Flexible(
+                                child: Text(
+                                  teacherAsync.maybeWhen(
+                                    data: (t) =>
+                                        t?.displayName ??
+                                        AppStrings.myTeachersUnknownTeacher,
+                                    orElse: () =>
+                                        AppStrings.myTeachersUnknownTeacher,
+                                  ),
+                                  style: AppTypography.bodyLarge.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.space2),
@@ -371,20 +357,20 @@ class _AppTeacherCard extends ConsumerWidget {
                   children: [
                     _buildStat(
                       Icons.school_outlined,
-                      '총 레슨',
-                      '${relation.totalLessonCount}회',
+                      AppStrings.studentStatTotalLessons,
+                      '${relation.totalLessonCount}${AppStrings.lessonsUnit}',
                     ),
                     const SizedBox(width: AppSpacing.space6),
                     if (relation.lastLessonAt != null)
                       _buildStat(
                         Icons.calendar_today_outlined,
-                        '마지막 레슨',
-                        _formatRelativeDate(relation.lastLessonAt!),
+                        AppStrings.studentHomeMyTeacherLastLesson,
+                        formatRelativeDay(relation.lastLessonAt!),
                       ),
                     const SizedBox(width: AppSpacing.space6),
                     _buildStat(
                       Icons.access_time_outlined,
-                      '레슨 기간',
+                      AppStrings.studentHomeMyTeacherLessonPeriod,
                       _formatDuration(relation.createdAt),
                     ),
                   ],
@@ -445,24 +431,14 @@ class _AppTeacherCard extends ConsumerWidget {
     );
   }
 
-  String _formatRelativeDate(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays == 0) return '오늘';
-    if (diff.inDays == 1) return '어제';
-    if (diff.inDays < 7) return '${diff.inDays}일 전';
-    if (diff.inDays < 30) return '${diff.inDays ~/ 7}주 전';
-    if (diff.inDays < 365) return '${diff.inDays ~/ 30}개월 전';
-    return '${diff.inDays ~/ 365}년 전';
-  }
-
   String _formatDuration(DateTime startDate) {
     final months = DateTime.now().difference(startDate).inDays ~/ 30;
-    if (months < 1) return '1개월 미만';
-    if (months < 12) return '$months개월';
+    if (months < 1) return AppStrings.durationUnderOneMonth;
+    if (months < 12) return AppStrings.monthCount(months);
     final years = months ~/ 12;
     final remainingMonths = months % 12;
-    if (remainingMonths == 0) return '$years년';
-    return '$years년 $remainingMonths개월';
+    if (remainingMonths == 0) return AppStrings.yearCount(years);
+    return AppStrings.yearMonthCount(years, remainingMonths);
   }
 }
 
@@ -477,7 +453,7 @@ class _ManualTeacherCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+    final card = Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
@@ -562,7 +538,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                           if (teacher.instrument == null &&
                               teacher.phone == null)
                             Text(
-                              '직접 등록',
+                              AppStrings.studentHomeManualTeacherSelfRegistered,
                               style: AppTypography.bodySmall.copyWith(
                                 color: AppColors.inkTertiary,
                               ),
@@ -572,58 +548,30 @@ class _ManualTeacherCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-
-                // Edit/Delete menu
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      context.push(AppRoutes.addManualTeacher, extra: teacher);
-                    } else if (value == 'delete') {
-                      _confirmDelete(context, ref);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit_outlined, size: 18),
-                          SizedBox(width: AppSpacing.space2),
-                          Text(AppStrings.studentHomeEditAction),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.delete_outline,
-                            size: 18,
-                            color: AppColors.paperAccent,
-                          ),
-                          const SizedBox(width: AppSpacing.space2),
-                          Text(
-                            '삭제',
-                            style: TextStyle(color: AppColors.paperAccent),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: AppColors.inkTertiary,
-                    size: 20,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
               ],
             ),
           ),
         ),
       ),
+    );
+
+    // C6: 행 관리 액션(편집·삭제) = 우→좌 스와이프 (trailing 메뉴 대체).
+    return SwipeActionTile(
+      actions: [
+        SwipeAction(
+          label: AppStrings.studentHomeEditAction,
+          icon: Icons.edit_outlined,
+          onPressed: () =>
+              context.push(AppRoutes.addManualTeacher, extra: teacher),
+        ),
+        SwipeAction(
+          label: AppStrings.delete,
+          icon: Icons.delete_outline,
+          tone: SwipeActionTone.destructive,
+          onPressed: () => _confirmDelete(context, ref),
+        ),
+      ],
+      child: card,
     );
   }
 
@@ -631,7 +579,7 @@ class _ManualTeacherCard extends ConsumerWidget {
     showNotebookDialog(
       context: context,
       titleWidget: const Text(AppStrings.studentHomeDeleteTeacher),
-      content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
+      content: Text(AppStrings.studentHomeDeleteTeacherConfirmName(teacher.name)),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -647,7 +595,7 @@ class _ManualTeacherCard extends ConsumerWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${teacher.name} 선생님이 삭제되었습니다'),
+                    content: Text(AppStrings.studentHomeTeacherDeletedName(teacher.name)),
                     backgroundColor: AppColors.paperOk,
                   ),
                 );
@@ -666,7 +614,7 @@ class _ManualTeacherCard extends ConsumerWidget {
             }
           },
           child: Text(
-            '삭제',
+            AppStrings.delete,
             style: const TextStyle(color: AppColors.paperAccent),
           ),
         ),

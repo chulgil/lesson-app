@@ -312,15 +312,10 @@ class AnalyticsService:
             for i in range(period_days)
         ]
 
-        # Streak: count consecutive days with > 0 practice ending at today.
-        streak = 0
-        check = end
-        while check >= start:
-            if log_by_date.get(check, 0) > 0:
-                streak += 1
-                check -= _dt.timedelta(days=1)
-            else:
-                break
+        # Streak: authoritative full-history value (KST), window-independent (SSOT).
+        from app.services.streak_service import compute_streak
+
+        streak = (await compute_streak(self.db, student_id)).current
 
         # Achievement rate: fraction of days in period with any practice.
         days_with_practice = sum(1 for m in log_by_date.values() if m > 0)

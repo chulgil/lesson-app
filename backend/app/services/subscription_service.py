@@ -35,6 +35,25 @@ from app.services.subscription_access_service import SubscriptionAccessService
 from app.services.teacher_id_resolver import resolve_teacher_id
 
 
+def remaining_lessons(sub: Any) -> int | None:
+    """Remaining-session formula shared with the API/FE contract.
+
+    ``bonus_count`` is additive to the paid base (``total_lessons`` /
+    ``lessons_per_month``) — mirrors ``SubscriptionResponse.remaining_lessons``
+    and the DB constraint ``used_lessons <= total + bonus``. Every exhaustion
+    check must use this instead of ``total - used`` or bonuses get miscounted.
+    """
+    type_value = getattr(sub.type, "value", sub.type)
+    if type_value == "trial":
+        return 1 + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+    base = sub.total_lessons
+    if base is None and type_value == "monthly":
+        base = sub.lessons_per_month
+    if base is None:
+        return None
+    return base + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+
+
 class SubscriptionService:
     """Handle subscription lifecycle, templates, and proposals."""
 
@@ -189,6 +208,9 @@ class SubscriptionService:
             student_id=data.student_id,
             membership_id=membership_id,
             type=data.type or "monthly",
+            # P1-4 — omitted stays NULL (= universal), never coerced to oneToOne.
+            applies_to=data.applies_to,
+            group_class_id=data.group_class_id,
             total_lessons=data.total_lessons,
             used_lessons=data.used_lessons,
             amount=data.amount or 0,
@@ -216,6 +238,10 @@ class SubscriptionService:
         await self.db.flush()
         await self.db.refresh(sub)
 
+        # §2.6.2 — direct issuance (offline-student renewal path) promotes any
+        # pending preview lessons onto the new subscription.
+        await self._promote_preview_lessons(student_id=data.student_id, new_subscription_id=sub.id)
+
         # Notify student about new subscription
         from app.models.student import Student
 
@@ -236,6 +262,67 @@ class SubscriptionService:
             )
 
         return await self._subscription_response(sub)
+
+    async def _promote_preview_lessons(self, *, student_id: str, new_subscription_id: str) -> int:
+        """subscription_required_spec §2.6.2 — 갱신 발급 시 preview 레슨 정식 전환.
+
+        Re-attach the student's scheduled ``is_preview`` lessons to the newly
+        issued subscription, clear the flag, and assign session numbers so the
+        normal completion-deduction path applies from here on. Runs on both
+        issuance paths — direct ``create`` (offline-student renewal) and
+        ``confirm_proposal`` (renewal proposal deposit confirmation).
+        """
+        from app.models.lesson import Lesson, LessonStatus
+        from app.services.lesson_service import LessonService
+
+        previews = (
+            await self.db.scalars(
+                select(Lesson)
+                .where(
+                    Lesson.student_id == student_id,
+                    Lesson.is_preview.is_(True),
+                    Lesson.status == LessonStatus.scheduled,
+                )
+                .order_by(Lesson.date.asc(), Lesson.start_time.asc())
+            )
+        ).all()
+        if not previews:
+            return 0
+
+        lesson_service = LessonService(self.db)
+        for lesson in previews:
+            # Number first, then re-attach — autoflush would otherwise count the
+            # promoted row itself and skip a number. SSOT stays in LessonService;
+            # flushing inside the loop keeps consecutive previews consecutive.
+            next_number = await lesson_service._next_subscription_session_number(new_subscription_id)
+            lesson.subscription_id = new_subscription_id
+            lesson.is_preview = False
+            lesson.session_number = next_number
+            await self.db.flush()
+        return len(previews)
+
+    async def _cancel_preview_lessons(self, *, student_id: str) -> int:
+        """§2.6.2 — 갱신 제안 거절/취소/만료 시 preview 레슨 취소 (영구 잔존 방지).
+
+        ``is_preview`` stays True on the cancelled row — the marker that the
+        lesson never became a real session.
+        """
+        from app.models.lesson import Lesson, LessonStatus
+
+        previews = (
+            await self.db.scalars(
+                select(Lesson).where(
+                    Lesson.student_id == student_id,
+                    Lesson.is_preview.is_(True),
+                    Lesson.status == LessonStatus.scheduled,
+                )
+            )
+        ).all()
+        for lesson in previews:
+            lesson.status = LessonStatus.cancelled
+        if previews:
+            await self.db.flush()
+        return len(previews)
 
     async def get_by_id(self, subscription_id: str, current_user: Any) -> SubscriptionResponse:
         """Return a subscription by ID."""
@@ -380,6 +467,38 @@ class SubscriptionService:
             note="24시간 미확인 자동 완료 차감",
             deducted=True,
         )
+        await self.db.flush()
+        return True
+
+    async def release_lesson_usage(self, *, lesson_id: str, subscription_id: str) -> bool:
+        """Undo the deduction a lesson made (#1240).
+
+        The mirror of ``deduct_for_completed_lesson``: locks the subscription
+        row, removes the deducting usage rows tied to this lesson, and gives the
+        counter back (floored at 0 so a double release can never go negative).
+        Non-deducting history rows are left in place. Returns ``True`` when a
+        session was actually released.
+        """
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
+        if sub is None:
+            return False
+
+        rows = (
+            await self.db.scalars(
+                select(SubscriptionUsage).where(
+                    SubscriptionUsage.lesson_id == lesson_id,
+                    SubscriptionUsage.deducted.is_(True),
+                )
+            )
+        ).all()
+        if not rows:
+            return False
+
+        for row in rows:
+            await self.db.delete(row)
+        sub.used_lessons = max(0, (sub.used_lessons or 0) - len(rows))
         await self.db.flush()
         return True
 
@@ -556,6 +675,7 @@ class SubscriptionService:
         lost: list[LessonBooking] = []
         seen_dates: set[date] = set()
         for booking in targets:
+            old_date, old_time = booking.scheduled_date, booking.scheduled_time
             shift = (new_day_of_week - booking.scheduled_date.weekday()) % 7
             new_date = booking.scheduled_date + timedelta(days=shift)
             # 같은 새 일정에 이미 옮긴 booking 이 있거나 conflict — 손실 처리.
@@ -578,11 +698,28 @@ class SubscriptionService:
             if conflict is not None or new_date in seen_dates:
                 booking.status = BookingStatus.cancelled
                 lost.append(booking)
+                # #1203 — keep the calendar (Lesson SSOT) in sync with the lost booking.
+                await self._sync_lesson_to_booking_change(
+                    subscription_id=subscription_id,
+                    teacher_id=booking.teacher_id,
+                    old_date=old_date,
+                    old_time=old_time,
+                    cancel=True,
+                )
                 continue
             booking.scheduled_date = new_date
             booking.scheduled_time = new_time
             seen_dates.add(new_date)
             rescheduled += 1
+            # #1203 — move the matching Lesson (calendar SSOT) alongside the booking.
+            await self._sync_lesson_to_booking_change(
+                subscription_id=subscription_id,
+                teacher_id=booking.teacher_id,
+                old_date=old_date,
+                old_time=old_time,
+                new_date=new_date,
+                new_time=new_time,
+            )
 
         await self.db.flush()
 
@@ -608,6 +745,44 @@ class SubscriptionService:
             "credits_accrued": credits_accrued,
             "new_expires_at": sub_row.end_date if sub_row is not None else None,
         }
+
+    async def _sync_lesson_to_booking_change(
+        self,
+        *,
+        subscription_id: str,
+        teacher_id: str,
+        old_date: date,
+        old_time: str,
+        new_date: date | None = None,
+        new_time: str | None = None,
+        cancel: bool = False,
+    ) -> None:
+        """#1203 — keep the Lesson (calendar SSOT) in sync when bulk_change moves or
+        cancels a LessonBooking.
+
+        Lesson and LessonBooking are stored separately with no FK, so the calendar
+        (which reads Lesson) drifts unless the matching Lesson is updated too. Match
+        by (subscription_id, teacher_id, date, start_time); no-op if no Lesson row
+        matches (e.g. bookings without a generated Lesson).
+        """
+        from app.models.lesson import Lesson, LessonStatus
+
+        lesson = await self.db.scalar(
+            select(Lesson).where(
+                Lesson.subscription_id == subscription_id,
+                Lesson.teacher_id == teacher_id,
+                Lesson.date == old_date,
+                Lesson.start_time == old_time,
+                Lesson.status == LessonStatus.scheduled,
+            )
+        )
+        if lesson is None:
+            return
+        if cancel:
+            lesson.status = LessonStatus.cancelled
+        elif new_date is not None and new_time is not None:
+            lesson.date = new_date
+            lesson.start_time = new_time
 
     async def update_status(self, subscription_id: str, new_status: str, current_user: Any) -> SubscriptionResponse:
         """Update subscription status.
@@ -715,7 +890,7 @@ class SubscriptionService:
         self.db.add(usage)
 
         if usage.deducted:
-            sub = await self.db.get(Subscription, subscription_id)
+            sub = await self.db.scalar(select(Subscription).where(Subscription.id == subscription_id).with_for_update())
             if sub is not None:
                 self._apply_deduction_counter(sub)
 
@@ -1085,15 +1260,7 @@ class SubscriptionService:
         return response
 
     def _remaining_lessons(self, sub: Any) -> int | None:
-        type_value = getattr(sub.type, "value", sub.type)
-        if type_value == "trial":
-            return 1 + (sub.bonus_count or 0) - (sub.used_lessons or 0)
-        base = sub.total_lessons
-        if base is None and type_value == "monthly":
-            base = sub.lessons_per_month
-        if base is None:
-            return None
-        return base + (sub.bonus_count or 0) - (sub.used_lessons or 0)
+        return remaining_lessons(sub)
 
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any
@@ -1406,6 +1573,24 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return await self._subscription_response(sub)
 
+    async def _student_user_id(self, student_id: str) -> str | None:
+        """Resolve a proposal's student_id (Student row id or legacy user id) to a user id."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is not None:
+            return student.user_id
+        return student_id
+
+    async def _teacher_user_id(self, teacher_id: str) -> str | None:
+        """Resolve a proposal's teacher_id (Teacher row id or legacy user id) to a user id."""
+        from app.models.teacher import Teacher
+
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher is not None:
+            return teacher.user_id
+        return teacher_id
+
     async def _notify_deposit_received(
         self,
         subscription: Any,
@@ -1534,6 +1719,8 @@ class SubscriptionService:
             display_order=data.display_order,
             reschedule_allowance=data.reschedule_allowance,
             is_auto_proposal_enabled=data.is_auto_proposal_enabled,
+            applies_to=data.applies_to,
+            group_class_id=data.group_class_id,
         )
         self.db.add(template)
         await self.db.flush()
@@ -1769,6 +1956,21 @@ class SubscriptionService:
                 event_type="proposalSent",
             )
 
+        # #1193 — in-app row for the student; the alimtalk/FCM below are
+        # delivery channels only and never persisted for the notification list.
+        recipient = await self._student_user_id(proposal.student_id)
+        if recipient:
+            from app.services.notification_service import NotificationPriority, NotificationService
+
+            await NotificationService(self.db).create_and_send(
+                user_id=recipient,
+                notification_type="proposalReceived",
+                title="수강권 제안 도착",
+                body="선생님이 수강권을 제안했어요. 확인 후 진행해주세요.",
+                priority=NotificationPriority.high,
+                action_url=f"/subscriptions/{proposal.id}",
+            )
+
         # #423 — fire-and-forget alimtalk LNZ_INVOICE. Failure must not break proposal creation.
         try:
             await self._send_alimtalk_invoice(proposal)
@@ -1936,7 +2138,35 @@ class SubscriptionService:
         proposals = list(result.all())
         for proposal in proposals:
             proposal.status = ProposalStatus.expired
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         await self.db.flush()
+        return len(proposals)
+
+    async def expire_stale_proposals_systemwide(self) -> int:
+        """System-wide sweep: mark all past-expiry pending proposals expired.
+
+        Job-only (scheduler / system context). Unlike [expire_old_proposals]
+        there is no teacher_id filter — the #468 1d guard exists to stop a
+        *teacher* from expiring another teacher's proposals via the API; the
+        scheduler may sweep all teachers' stale proposals.
+        """
+        from app.models.subscription import ProposalStatus, SubscriptionProposal
+
+        now = datetime.now(UTC)
+        result = await self.db.scalars(
+            select(SubscriptionProposal).where(
+                SubscriptionProposal.status.in_([ProposalStatus.pending, ProposalStatus.paymentNotified]),
+                SubscriptionProposal.expires_at < now,
+            )
+        )
+        proposals = list(result.all())
+        for proposal in proposals:
+            proposal.status = ProposalStatus.expired
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
+        if proposals:
+            await self.db.flush()
         return len(proposals)
 
     async def respond_to_proposal(
@@ -1952,6 +2182,24 @@ class SubscriptionService:
             proposal.payment_notified_at = datetime.now(UTC)
             proposal.selected_template_id = data.selected_template_id
 
+            # #1193 — the teacher otherwise learns of the acceptance only by
+            # polling the home section (FE local notifications are actor-only).
+            recipient = await self._teacher_user_id(proposal.teacher_id)
+            if recipient:
+                from app.services.notification_service import (
+                    NotificationPriority,
+                    NotificationService,
+                )
+
+                await NotificationService(self.db).create_and_send(
+                    user_id=recipient,
+                    notification_type="proposalAccepted",
+                    title="수강권 제안 수락",
+                    body="학생이 수강권 제안을 수락하고 입금을 알렸어요. 입금 확인 후 발급해주세요.",
+                    priority=NotificationPriority.high,
+                    action_url=f"/subscriptions/{proposal.id}",
+                )
+
             # GAP-6: Sync LessonRequest status → paymentNotified
             if proposal.lesson_request_id:
                 await self._transition_request_status(proposal.lesson_request_id, "paymentNotified")
@@ -1965,8 +2213,12 @@ class SubscriptionService:
         elif data.action == "reject":
             proposal.status = ProposalStatus.rejected
             proposal.rejection_reason = data.rejection_reason
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         elif data.action == "cancel":
             proposal.status = ProposalStatus.cancelled
+            if proposal.is_renewal:
+                await self._cancel_preview_lessons(student_id=proposal.student_id)
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid action")
 
@@ -2062,6 +2314,10 @@ class SubscriptionService:
                 student_id=proposal.student_id,
                 membership_id=membership_id,
                 type=template.type if template else "monthly",
+                # P1-4 — the template carries the scope; a proposal without a
+                # template keeps NULL (= universal), matching pre-group rows.
+                applies_to=template.applies_to if template else None,
+                group_class_id=template.group_class_id if template else None,
                 total_lessons=template.lessons_count if template else None,
                 lessons_per_month=template.lessons_per_month if template else None,
                 amount=original_amount - discount_amount,
@@ -2102,6 +2358,14 @@ class SubscriptionService:
                 actor_id=proposal.teacher_id,
                 event_type="subscriptionIssued",
                 subscription_id=proposal.subscription_id,
+            )
+
+        # §2.6.2 — deposit confirmation promotes pending preview lessons onto
+        # the issued subscription (covers both the minted and hint-linked branches).
+        if proposal.subscription_id:
+            await self._promote_preview_lessons(
+                student_id=proposal.student_id,
+                new_subscription_id=proposal.subscription_id,
             )
 
         proposal.status = ProposalStatus.confirmed

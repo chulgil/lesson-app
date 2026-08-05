@@ -1,0 +1,71 @@
+name: Backend Tests
+
+# 백엔드 pytest 전체 스위트(~1460개)를 push/PR 게이트에 연결한다. 이전까지는
+# backend-migration-validation.yml 의 alembic 단일 테스트만 CI 를 돌아 나머지
+# 스위트(결제/구독/스케줄 등 도메인 로직)는 회귀 없이 그대로 머지될 수 있었다.
+#
+# Postgres 서비스 설정은 backend-migration-validation.yml 과 동일하게 재사용한다.
+# 대부분의 테스트는 conftest.py 의 db_engine fixture 가 테스트당 격리된 SQLite 를
+# 쓰지만, ALEMBIC_TEST_DATABASE_URL 을 설정해두면 PG 전용 게이트 테스트
+# (test_alembic_postgres_validation.py / test_date_filter_postgres.py 등, SQLite
+# create_all 이 숨기는 enum/날짜비교 버그를 잡는 테스트)도 skip 되지 않고 전체
+# 스위트 안에서 함께 실행된다.
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-tests.yml"
+
+concurrency:
+  group: backend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest-full-suite:
+    name: pytest (full suite, Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: lesson_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # PG-게이트 테스트(test_alembic_postgres_validation.py 등)를 skip 없이
+      # 실행하기 위한 DSN. 각 테스트 모듈이 자체적으로 alembic upgrade head /
+      # metadata.create_all 을 실행하므로 별도 마이그레이션 스텝은 불필요.
+      ALEMBIC_TEST_DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/lesson_test
+      TESTING: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies (incl. dev)
+        run: uv sync --frozen --extra dev
+
+      - name: Run full backend pytest suite
+        run: uv run pytest -q

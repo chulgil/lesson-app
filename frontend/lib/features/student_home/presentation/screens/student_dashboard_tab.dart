@@ -7,17 +7,17 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/home/home_ui_facade.dart';
+import '../../../gamification/gamification_facade.dart'
+    show effectiveStreakProvider;
 import '../../../gamification/gamification_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
-import '../../../practice/domain/entities/practice_log.dart';
-import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
 import '../../../students/students_facade.dart';
-import '../providers/student_home_practice_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
@@ -86,6 +86,13 @@ class StudentDashboardTab extends ConsumerWidget {
           // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
           const NoteAccessActiveBanner(),
 
+          // ── H4: 대응 필요 이벤트 그룹 (신청·제안·결제·일정확정 대기) ──
+          // 처리하면 사라지는 일시적 항목이라 콘텐츠 최상단에 둔다.
+          // 대기 항목이 없으면 스스로 숨으므로 평상시 레이아웃은 그대로.
+          _StudentEventsGroup(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // ── 1순위: 다음 레슨 (가장 궁금한 것) ──────────
           NextLessonCard(studentId: currentStudentId),
 
@@ -100,6 +107,16 @@ class StudentDashboardTab extends ConsumerWidget {
               );
             },
           ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ── Student gamification P2: 오늘의 연습 목표 + 잔디 연동 (doc 46 §4) ──
+          DailyGoalCard(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ── Student gamification P3a: 오늘의 미션(고정1+로테이션2, doc 46 §4④) ──
+          DailyMissionsCard(studentId: currentStudentId),
 
           const SizedBox(height: AppSpacing.space4),
 
@@ -146,11 +163,6 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
-          // ── 3순위: 이벤트 그룹 (대응 필요, 4개 배너 통합) ──
-          _StudentEventsGroup(studentId: currentStudentId),
-
-          const SizedBox(height: AppSpacing.space4),
-
           // ── 4순위: 학습 기록 그룹 (피드백 + 연습요약 + 체험) ──
           LearningRecordGroup(studentId: currentStudentId),
 
@@ -171,6 +183,8 @@ class StudentDashboardTab extends ConsumerWidget {
   Widget _buildMasthead(BuildContext context) {
     return NotebookMasthead(
       eyebrow: 'LESSONAZA',
+      // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+      eyebrowStyle: NotebookTypography.wordmark,
       meta: volNoLabel(DateTime.now()),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -222,8 +236,8 @@ class StudentDashboardTab extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${AppStrings.studentHomeMastheadHanjaDate(now.month, now.day)}'
-            '  ·  ${AppStrings.studentHomeGreeting}',
+            // H3 — 한자식 날짜(7月 27日)를 한글 표기로 통일. 날짜는 이 줄에서 1회만.
+            '${formatDateMDKorean(now)}  ·  ${AppStrings.studentHomeGreeting}',
             style: NotebookTypography.mastheadDate,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -303,14 +317,15 @@ class _StudentTimeBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final practiceLogsAsync = ref.watch(
-      studentHomePracticeLogsProvider(studentId),
-    );
-
-    // 학생은 streak 중심 메시지로 충분 — booking→Lesson 매핑 생략.
-    final streakDays = practiceLogsAsync.valueOrNull != null
-        ? _calculateStreak(practiceLogsAsync.value!)
-        : 0;
+    // Streak from the single source of truth (effectiveStreakProvider) — never
+    // recomputed here. Freeze bridges a covered gap so one missed day does not
+    // reset to 0. See docs/specs/practice/streak_ssot.md §1 Phase 3.
+    final streakDays = ref
+        .watch(effectiveStreakProvider(studentId))
+        .maybeWhen(
+          data: (streak) => streak.effectiveCurrentStreak,
+          orElse: () => 0,
+        );
 
     return TimeContextBanner(
       todayLessons: const <Lesson>[],
@@ -318,32 +333,6 @@ class _StudentTimeBanner extends ConsumerWidget {
       streakDays: streakDays,
     );
   }
-
-  /// 최근 연속 연습일 계산 (오늘부터 역순으로 연속된 연습일).
-  int _calculateStreak(List<PracticeLog> logs) {
-    if (logs.isEmpty) return 0;
-    final now = DateTime.now();
-    final practicedDates = <String>{};
-    for (final log in logs) {
-      if (log.totalMinutes > 0) {
-        practicedDates.add(_dateKey(log.date));
-      }
-    }
-    var streak = 0;
-    var checkDate = DateTime(now.year, now.month, now.day);
-    for (var i = 0; i < 100; i++) {
-      if (practicedDates.contains(_dateKey(checkDate))) {
-        streak++;
-        checkDate = checkDate.subtract(const Duration(days: 1));
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }
-
-  String _dateKey(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
 /// 학생용 이벤트 그룹.

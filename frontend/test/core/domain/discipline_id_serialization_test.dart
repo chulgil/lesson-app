@@ -112,8 +112,16 @@ void main() {
       expect(resolve('music'), DisciplineRegistry.music);
     });
 
+    test('등록된 fitness id → fitness (#979-B)', () {
+      expect(resolve('fitness'), DisciplineRegistry.fitness);
+    });
+
+    test('등록된 language id → language (#1102)', () {
+      expect(resolve('language'), DisciplineRegistry.language);
+    });
+
     test('미등록 id → music (fallback)', () {
-      expect(resolve('fitness'), DisciplineRegistry.music);
+      expect(resolve('unknown_discipline'), DisciplineRegistry.music);
     });
   });
 }

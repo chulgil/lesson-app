@@ -104,7 +104,7 @@ class _NoteAccessActiveBannerState
                     minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
                     side: BorderSide(
                       color: _isRevoking
-                          ? Colors.grey[400]!
+                          ? AppColors.inkQuaternary
                           : AppColors.bubbleSuccessText,
                     ),
                   ),
@@ -112,7 +112,7 @@ class _NoteAccessActiveBannerState
                     AppStrings.revokeButton,
                     style: AppTypography.button.copyWith(
                       color: _isRevoking
-                          ? Colors.grey[400]
+                          ? AppColors.inkQuaternary
                           : AppColors.bubbleSuccessText,
                     ),
                   ),

@@ -10,6 +10,7 @@ part 'teacher.g.dart';
 class Teacher {
   final String id;
   final String name;
+  final String? nickname; // 학생에게 표시되는 호칭 (null이면 name 사용, #1145)
   final String? profileImageUrl;
   final List<String> instruments;
   final String? bio;
@@ -26,6 +27,7 @@ class Teacher {
   const Teacher({
     required this.id,
     required this.name,
+    this.nickname,
     this.profileImageUrl,
     required this.instruments,
     this.bio,
@@ -52,10 +54,13 @@ class Teacher {
   /// Get formatted instruments string
   String get instrumentsText => instruments.join(', ');
 
+  /// 학생에게 표시되는 이름 (닉네임 우선, 없으면 본명)
+  String get displayName => nickname?.isNotEmpty == true ? nickname! : name;
+
   /// Get initials for avatar
   String get initials {
-    if (name.isEmpty) return '?';
-    return name[0];
+    if (displayName.isEmpty) return '?';
+    return displayName[0];
   }
 
   /// Get formatted trial fee
@@ -94,6 +99,7 @@ class Teacher {
   Teacher copyWith({
     String? id,
     String? name,
+    String? nickname,
     String? profileImageUrl,
     List<String>? instruments,
     String? bio,
@@ -110,6 +116,7 @@ class Teacher {
     return Teacher(
       id: id ?? this.id,
       name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       instruments: instruments ?? this.instruments,
       bio: bio ?? this.bio,

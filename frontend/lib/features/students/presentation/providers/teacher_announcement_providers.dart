@@ -42,6 +42,16 @@ Future<List<DateTime>> teacherDayOffs(
   );
 }
 
+/// 공지(휴강 포함) 쓰기 후 무효화해야 하는 읽기 provider 묶음 (A1).
+///
+/// 공지 리스트만 무효화하면 `teacherDayOffsProvider` 를 watch 하는 주간 그리드·
+/// 시간선택 달력·수강권 상세가 휴강일을 반영하지 못한 채 stale 로 남는다.
+/// `dynamic ref` — WidgetRef / Ref / ProviderContainer 모두 `invalidate` 를 갖는다.
+void invalidateAnnouncementViews(dynamic ref, String teacherId) {
+  ref.invalidate(teacherAnnouncementsProvider(teacherId));
+  ref.invalidate(teacherDayOffsProvider);
+}
+
 /// 선생님의 공지 목록.
 @riverpod
 Future<List<TeacherAnnouncement>> teacherAnnouncements(

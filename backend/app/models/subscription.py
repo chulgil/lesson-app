@@ -82,6 +82,21 @@ class ProposalPaymentStatus(str, enum.Enum):
     completed = "completed"
 
 
+class SubscriptionAppliesTo(str, enum.Enum):
+    """Lesson scope a subscription (or template) may be spent on.
+
+    spec `.harness/spec/2026-07-31-group-lesson.md` §2 P1-4 / §4.
+    The column is nullable and ``None`` means ``universal`` — every row issued
+    before group lessons existed keeps NULL and stays spendable everywhere.
+    Read it through ``Subscription.effective_applies_to`` so the NULL semantic
+    lives in one place.
+    """
+
+    oneToOne = "oneToOne"
+    group = "group"
+    universal = "universal"
+
+
 class Subscription(UUIDMixin, TimestampMixin, Base):
     """Lesson subscription / package."""
 
@@ -186,6 +201,32 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
 
+    # Group lesson scope (P1-4). Nullable on purpose — NULL is the pre-group
+    # world and reads back as ``universal``; no backfill, no default.
+    applies_to: Mapped[SubscriptionAppliesTo | None] = mapped_column(
+        Enum(
+            SubscriptionAppliesTo,
+            native_enum=True,
+            # Bind the camelCase *values*, not the member names. Identical today
+            # (name == value) but keeps the DB labels stable if a member is ever
+            # renamed — the drift that produced the /lessons 500 (#814).
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
+        nullable=True,
+    )
+    # Target class when a group subscription is issued for one specific class.
+    # NULL + applies_to=group means "any group class of this teacher".
+    group_class_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("group_classes.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    @property
+    def effective_applies_to(self) -> SubscriptionAppliesTo:
+        """Scope of this subscription, resolving the NULL = universal semantic."""
+        return self.applies_to or SubscriptionAppliesTo.universal
+
     __table_args__ = (
         CheckConstraint(
             "used_lessons >= 0 AND bonus_count >= 0 AND total_reschedule_allowance >= 0 "
@@ -265,6 +306,23 @@ class SubscriptionTemplate(UUIDMixin, TimestampMixin, Base):
     reschedule_allowance: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     is_auto_proposal_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # Group lesson scope (P1-4) — propagated onto the Subscription at issuance.
+    # Same NULL = universal semantic as ``Subscription.applies_to``.
+    applies_to: Mapped[SubscriptionAppliesTo | None] = mapped_column(
+        Enum(
+            SubscriptionAppliesTo,
+            native_enum=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
+        nullable=True,
+    )
+    # Optional class binding for a group template ("A반 8회권"). NULL keeps the
+    # template class-agnostic.
+    group_class_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("group_classes.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
     __table_args__ = (Index("idx_template_teacher", "teacher_id"),)
 

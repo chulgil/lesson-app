@@ -17,9 +17,13 @@ import 'package:lessonaza/features/subscription/domain/entities/subscription.dar
 import 'package:lessonaza/features/subscription/domain/entities/subscription_usage.dart';
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_providers.dart';
 
-/// #768 ① — 일괄 완료 차감 무결성: N건 완료 → 정확히 N회 차감(`addUsage`),
-/// 일괄 휴강 → 차감 0. 단일 완료(#767)와 같은 confirmLessonCompleted 경로를
-/// 레슨당 1회 호출하므로 이중/누락이 없어야 한다.
+/// #768 ① — 일괄 완료 차감 무결성: N건 완료 → 레슨당 정확히 1회 상태 전이,
+/// 일괄 휴강 → 차감 0.
+///
+/// #1237 이후 완료 차감의 주체는 백엔드(`PATCH /lessons/{id}/status`)다 —
+/// 클라이언트가 `addUsage` 를 함께 호출하면 이중 차감이 된다(멱등 가드 없음,
+/// backend `test_completion_plus_manual_usage_double_deducts` 로 고정). 따라서
+/// 이 테스트의 무결성 조건은 "상태 전이 N회 + addUsage 0회" 로 이동했다.
 
 const _studentId = 'stu_768a';
 const _teacherId = 'teacher_1';
@@ -34,8 +38,16 @@ class _SpySubscriptionRepository extends MockSubscriptionRepository {
 }
 
 class _FakeLessonRepository extends MockLessonRepository {
+  final List<LessonStatus> statusTransitions = [];
+
   @override
   Future<Lesson> updateLesson(Lesson lesson) async => lesson;
+
+  @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    statusTransitions.add(status);
+    return lesson.copyWith(status: status);
+  }
 
   // Instant fetch — the mock's getLessons() has a 300ms delay that would leave
   // a pending timer when LessonsNotifier refreshes after updateLesson.
@@ -81,10 +93,14 @@ void main() {
       ),
   ];
 
+  late _FakeLessonRepository lessonRepo;
+
+  setUp(() => lessonRepo = _FakeLessonRepository());
+
   Widget harness(_SpySubscriptionRepository spy, Widget child) {
     return ProviderScope(
       overrides: [
-        lessonRepositoryProvider.overrideWithValue(_FakeLessonRepository()),
+        lessonRepositoryProvider.overrideWithValue(lessonRepo),
         subscriptionRepositoryProvider.overrideWithValue(spy),
         activeStudentSubscriptionsProvider(
           _studentId,
@@ -97,7 +113,7 @@ void main() {
     );
   }
 
-  testWidgets('일괄 완료 3건 → 수강권 정확히 3회 차감(add_usage)', (tester) async {
+  testWidgets('일괄 완료 3건 → 상태 전이 정확히 3회, 클라이언트 차감 0회', (tester) async {
     final spy = _SpySubscriptionRepository();
     final lessons = subscriptionLessons(3);
 
@@ -131,9 +147,14 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(
+      lessonRepo.statusTransitions,
+      List.filled(3, LessonStatus.completed),
+      reason: '일괄 완료 N건은 레슨당 1회씩 정확히 N회 상태 전이 (이중/누락 금지)',
+    );
+    expect(
       spy.addUsageCount,
-      3,
-      reason: '일괄 완료 N건은 레슨당 1회씩 정확히 N회 차감돼야 한다 (이중/누락 금지)',
+      0,
+      reason: '차감은 백엔드 상태 전이가 수행한다 — 클라이언트가 또 하면 이중 차감',
     );
   });
 

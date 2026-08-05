@@ -147,22 +147,25 @@ class NextLessonCard extends ConsumerWidget {
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
               ),
+              // H5 — 카드 자체가 ink 채움(최상위 강조)이라 앰버 블록을 겹치지
+              // 않고, 시간에 가장 민감한 D-day 칩만 앰버로 띄운다.
               decoration: BoxDecoration(
-                color: AppColors.paper.withValues(alpha: 0.2),
+                color: AppColors.amberLight,
+                border: Border.all(color: AppColors.paperTrial),
               ),
               child: Column(
                 children: [
                   Text(
                     dDayText,
                     style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.paper,
+                      color: AppColors.ink,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
                     weekdayText,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.paper.withValues(alpha: 0.8),
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

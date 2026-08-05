@@ -28,6 +28,18 @@ String formatRelativeTime(DateTime dateTime) {
   return formatDateYMD(dateTime);
 }
 
+/// 과거 날짜를 일 단위 상대 표기로 (오늘 / 어제 / N일 전 / N주 전 / N개월 전 / N년 전).
+/// 분·시간 단위는 [formatRelativeTime] 참조.
+String formatRelativeDay(DateTime date) {
+  final diff = DateTime.now().difference(date);
+  if (diff.inDays == 0) return '오늘';
+  if (diff.inDays == 1) return '어제';
+  if (diff.inDays < 7) return '${diff.inDays}일 전';
+  if (diff.inDays < 30) return '${diff.inDays ~/ 7}주 전';
+  if (diff.inDays < 365) return '${diff.inDays ~/ 30}개월 전';
+  return '${diff.inDays ~/ 365}년 전';
+}
+
 /// Whether [createdAt] is older than [days] (default 5 for 7-day expiry urgency)
 bool isRequestUrgent(DateTime createdAt, {int days = 5}) {
   return DateTime.now().difference(createdAt).inDays >= days;

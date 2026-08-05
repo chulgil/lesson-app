@@ -79,17 +79,18 @@ class AcademyActivityTimelineItem extends StatelessWidget {
     return diff.inHours < 12;
   }
 
+  /// C8 — 활동 타입 색을 3색 의미 체계로 축소 (한 화면 3색 이하 원칙).
+  /// paperOk = 완료·확정(긍정 결과) / paperAccent = 변경·주의 / muted = 생성·정보.
+  /// (분류는 제안 기본값 — 제품 의미에 맞게 조정 가능.)
   Color _getActionTypeColor() {
     return switch (log.actionType) {
-      'lesson_created' => AppColors.profileBlue,
-      'subscription_issued' => AppColors.profileGreen,
-      'student_enrolled' => AppColors.profilePurple,
-      'lesson_completed' => AppColors.amber,
-      'payment_confirmed' => AppColors.profileGreen,
-      'schedule_changed' => AppColors.profileOrange,
-      'note_added' => AppColors.profileIndigo,
-      'lesson_request_accepted' => AppColors.profileTeal,
-      'makeup_recorded' => AppColors.profilePink,
+      'lesson_completed' ||
+      'payment_confirmed' ||
+      'subscription_issued' ||
+      'lesson_request_accepted' ||
+      'makeup_recorded' =>
+        AppColors.paperOk,
+      'schedule_changed' => AppColors.paperAccent,
       _ => AppColors.scheduleMutedAccent,
     };
   }

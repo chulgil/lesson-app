@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/lessons/domain/entities/entities.dart';
+import 'package:lessonaza/features/lessons/domain/entities/cancellation_policy_hint.dart';
 import 'package:lessonaza/features/lessons/domain/repositories/lesson_repository.dart';
-import 'package:lessonaza/features/notifications/domain/entities/notification.dart';
-import 'package:lessonaza/features/notifications/domain/services/notification_service.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/schedule/domain/repositories/unified_lesson_request_repository.dart';
@@ -33,24 +32,22 @@ class _FakeLessonRepository implements LessonRepository {
       _lessons.values.where((l) => l.studentId == studentId).toList();
 
   @override
-  Future<List<Lesson>> getLessonsByDate(DateTime date) async =>
-      _lessons.values
-          .where(
-            (l) =>
-                l.date.year == date.year &&
-                l.date.month == date.month &&
-                l.date.day == date.day,
-          )
-          .toList();
+  Future<List<Lesson>> getLessonsByDate(DateTime date) async => _lessons.values
+      .where(
+        (l) =>
+            l.date.year == date.year &&
+            l.date.month == date.month &&
+            l.date.day == date.day,
+      )
+      .toList();
 
   @override
   Future<List<Lesson>> getLessonsByDateRange(
     DateTime start,
     DateTime end,
-  ) async =>
-      _lessons.values
-          .where((l) => !l.date.isBefore(start) && !l.date.isAfter(end))
-          .toList();
+  ) async => _lessons.values
+      .where((l) => !l.date.isBefore(start) && !l.date.isAfter(end))
+      .toList();
 
   @override
   Future<List<Lesson>> getUpcomingLessons({int limit = 10}) async =>
@@ -64,7 +61,7 @@ class _FakeLessonRepository implements LessonRepository {
   Future<Lesson?> getLesson(String id) async => _lessons[id];
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
     _lessons[lesson.id] = lesson;
     return lesson;
   }
@@ -75,6 +72,40 @@ class _FakeLessonRepository implements LessonRepository {
     updatedLessons.add(lesson);
     return lesson;
   }
+
+  @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    final updated = lesson.copyWith(status: status);
+    _lessons[lesson.id] = updated;
+    updatedLessons.add(updated);
+    return updated;
+  }
+
+  @override
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) async {
+    final updated = lesson.copyWith(
+      feedback: feedback ?? lesson.feedback,
+      keyPoints: keyPoints ?? lesson.keyPoints,
+      practiceTips: practiceTips ?? lesson.practiceTips,
+    );
+    _lessons[lesson.id] = updated;
+    updatedLessons.add(updated);
+    return updated;
+  }
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) async =>
+      const CancellationPolicyHint(
+        deadlineHours: 24,
+        deadlineAt: null,
+        isLateNow: false,
+        enforced: false,
+      );
 
   @override
   Future<void> deleteLesson(String id) async => _lessons.remove(id);
@@ -93,36 +124,6 @@ class _FakeLessonRepository implements LessonRepository {
       _lessons[id] = existing.copyWith(status: LessonStatus.cancelledByTeacher);
     }
   }
-}
-
-class _FakeNotificationService implements NotificationService {
-  final List<AppNotification> shown = [];
-  final List<AppNotification> scheduled = [];
-
-  @override
-  Future<void> initialize() async {}
-
-  @override
-  Future<bool> requestPermission() async => true;
-
-  @override
-  Future<void> showNotification(AppNotification notification) async {
-    shown.add(notification);
-  }
-
-  @override
-  Future<void> scheduleNotification(AppNotification notification) async {
-    scheduled.add(notification);
-  }
-
-  @override
-  Future<void> cancelNotification(String id) async {}
-
-  @override
-  Future<void> cancelAllNotifications() async {}
-
-  @override
-  Stream<AppNotification> get onNotificationTapped => const Stream.empty();
 }
 
 class _FakeUnifiedLessonRequestRepository
@@ -321,6 +322,9 @@ Lesson _lesson({
     date: date,
     startTime: '14:00',
     status: status,
+    // _FakeSubscriptionRepository 가 돌려주는 수강권 id 와 일치시켜야
+    // _createCancelEvent 가 챗 이벤트를 만든다 (학생 통지의 실제 경로).
+    subscriptionId: 'SUB_$studentId',
     createdAt: DateTime(2026, 1, 1),
   );
 }
@@ -331,7 +335,7 @@ Lesson _lesson({
 
 void main() {
   group('BulkTeacherActionService.cancelLessonsOnDate', () {
-    test('대상 날짜에 레슨이 있는 학생만 취소 + 알림 발송', () async {
+    test('대상 날짜에 레슨이 있는 학생만 취소 + 챗 이벤트 생성', () async {
       final targetDate = DateTime(2026, 5, 1);
       final lessonRepo = _FakeLessonRepository([
         _lesson(id: 'L1', studentId: 'S1', date: targetDate),
@@ -342,12 +346,11 @@ void main() {
           date: DateTime(2026, 5, 2), // 다른 날짜
         ),
       ]);
-      final notificationService = _FakeNotificationService();
+      final requestRepo = _FakeUnifiedLessonRequestRepository();
 
       final service = BulkTeacherActionService(
         lessonRepository: lessonRepo,
-        notificationService: notificationService,
-        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        requestRepository: requestRepo,
         subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
@@ -355,7 +358,6 @@ void main() {
         teacherId: 'T1',
         studentIds: const ['S1', 'S2', 'S3'],
         targetDate: targetDate,
-        notificationTitle: '휴강 공지',
         reason: '선생님 개인 사정',
       );
 
@@ -372,14 +374,18 @@ void main() {
         expect(l.status.isDeducted, isFalse);
         expect(l.status.allowsReschedule, isTrue);
       }
-      expect(notificationService.shown.map((n) => n.type).toSet(), {
-        NotificationType.lessonCancelled,
+      // #1212 학생 통지는 수강권 챗 이벤트(BE)가 SSOT.
+      // FE 로컬 알림은 액터(교사) 기기 전용이라 상대 통지로 쓰지 않는다.
+      expect(requestRepo.addedEvents.map((e) => e.eventType).toSet(), {
+        RequestEventType.lessonCancelledByTeacher,
       });
-      expect(notificationService.shown.map((n) => n.userId).toSet(), {
-        'S1',
-        'S2',
+      expect(requestRepo.addedEvents.map((e) => e.requestId).toSet(), {
+        'R_S1',
+        'R_S2',
       });
-      expect(notificationService.shown.map((n) => n.title).toSet(), {'휴강 공지'});
+      expect(requestRepo.addedEvents.map((e) => e.message).toSet(), {
+        '선생님 개인 사정',
+      });
     });
 
     test('대상 날짜에 취소된 레슨은 건드리지 않음', () async {
@@ -394,7 +400,6 @@ void main() {
       ]);
       final service = BulkTeacherActionService(
         lessonRepository: lessonRepo,
-        notificationService: _FakeNotificationService(),
         requestRepository: _FakeUnifiedLessonRequestRepository(),
         subscriptionRepository: _FakeSubscriptionRepository(),
       );
@@ -403,7 +408,6 @@ void main() {
         teacherId: 'T1',
         studentIds: const ['S1'],
         targetDate: targetDate,
-        notificationTitle: '휴강 공지',
       );
 
       expect(result.cancelledLessonCount, 0);
@@ -427,7 +431,6 @@ void main() {
       ]);
       final service = BulkTeacherActionService(
         lessonRepository: lessonRepo,
-        notificationService: _FakeNotificationService(),
         requestRepository: _FakeUnifiedLessonRequestRepository(),
         subscriptionRepository: _FakeSubscriptionRepository(),
       );
@@ -442,12 +445,11 @@ void main() {
   });
 
   group('BulkTeacherActionService.broadcastMessage', () {
-    test('선택된 모든 학생에게 generalAnnouncement 알림 발송', () async {
-      final notificationService = _FakeNotificationService();
+    test('선택된 모든 학생 챗에 teacherAnnouncement 이벤트 생성', () async {
+      final requestRepo = _FakeUnifiedLessonRequestRepository();
       final service = BulkTeacherActionService(
         lessonRepository: _FakeLessonRepository(const []),
-        notificationService: notificationService,
-        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        requestRepository: requestRepo,
         subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
@@ -459,26 +461,25 @@ void main() {
       );
 
       expect(count, 3);
-      expect(notificationService.shown.map((n) => n.type).toSet(), {
-        NotificationType.generalAnnouncement,
+      // #1212 학생 통지는 수강권 챗 이벤트(BE)가 SSOT — FE 로컬 알림 없음.
+      expect(requestRepo.addedEvents.map((e) => e.eventType).toSet(), {
+        RequestEventType.teacherAnnouncement,
       });
-      expect(notificationService.shown.map((n) => n.userId).toSet(), {
-        'S1',
-        'S2',
-        'S3',
+      expect(requestRepo.addedEvents.map((e) => e.requestId).toSet(), {
+        'R_S1',
+        'R_S2',
+        'R_S3',
       });
-      for (final n in notificationService.shown) {
-        expect(n.title, '5월 일정 안내');
-        expect(n.body, '이번 주 금요일부터 연휴입니다.');
+      for (final e in requestRepo.addedEvents) {
+        expect(e.message, '5월 일정 안내\n이번 주 금요일부터 연휴입니다.');
       }
     });
 
-    test('빈 학생 목록 → 아무 알림도 발송하지 않고 0 반환', () async {
-      final notificationService = _FakeNotificationService();
+    test('빈 학생 목록 → 아무 이벤트도 만들지 않고 0 반환', () async {
+      final requestRepo = _FakeUnifiedLessonRequestRepository();
       final service = BulkTeacherActionService(
         lessonRepository: _FakeLessonRepository(const []),
-        notificationService: notificationService,
-        requestRepository: _FakeUnifiedLessonRequestRepository(),
+        requestRepository: requestRepo,
         subscriptionRepository: _FakeSubscriptionRepository(),
       );
 
@@ -490,7 +491,7 @@ void main() {
       );
 
       expect(count, 0);
-      expect(notificationService.shown, isEmpty);
+      expect(requestRepo.addedEvents, isEmpty);
     });
   });
 

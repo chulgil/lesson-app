@@ -6,9 +6,10 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../providers/student_home_booking_provider.dart';
+import '../providers/student_home_tab_request_provider.dart';
 import 'compact_trial_booking_card.dart';
 
 /// Trial bookings section for student dashboard
@@ -64,17 +65,18 @@ class TrialBookingsSection extends ConsumerWidget {
             if (trialBookings.length > 2)
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          AppStrings.studentHomeAllTrialInScheduleTab,
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                  child: Text('${trialBookings.length - 2}개 더보기'),
+                  // #749: take the user to the Lessons tab (index 1) where all
+                  // trial bookings live, instead of a no-op SnackBar.
+                  onPressed: () => ref
+                      .read(studentHomeTabRequestProvider.notifier)
+                      .state = 1,
+                  // H6 — 버튼처럼 눌리는 텍스트 액션은 밑줄로 affordance 를 준다.
+                  child: Text(
+                    '${trialBookings.length - 2}개 더보기',
+                    style: const TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -84,7 +86,8 @@ class TrialBookingsSection extends ConsumerWidget {
         height: 80,
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      // C7 — primary 섹션: 에러도 빈 상태로 graceful degrade (가시성 일치).
+      error: (_, __) => _buildEmptyState(context),
     );
   }
 
@@ -92,33 +95,23 @@ class TrialBookingsSection extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
+      // #636 — 빈 카드 배경을 subscription 빈 카드와 통일(paper).
       decoration: BoxDecoration(
-        color: AppColors.paperDark,
+        color: AppColors.paper,
         border: Border.all(
           color: AppColors.inkQuaternary,
           style: BorderStyle.solid,
         ),
       ),
-      child: Column(
-        children: [
-          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.studentHomeStartNewLesson,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          FilledButton.icon(
-            onPressed: () => context.push(AppRoutes.teacherSearch),
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text(AppStrings.studentHomeTrialBooking),
-            style: FilledButton.styleFrom(
-              minimumSize: Size(0, AppSpacing.buttonHeight),
-            ),
-          ),
-        ],
+      child: SizedBox(
+        height: 190,
+        child: EmptyStateWidget(
+          icon: Icons.school_outlined,
+          title: AppStrings.studentHomeStartNewLesson,
+          actionLabel: AppStrings.studentHomeTrialBooking,
+          actionIcon: Icons.add,
+          onAction: () => context.push(AppRoutes.teacherSearch),
+        ),
       ),
     );
   }

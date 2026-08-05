@@ -1007,18 +1007,23 @@ async def test_contract_group_bookings_frontend_shapes_and_body_actions(
     """RemoteGroupClassBookingRepository expects paginated /groups/bookings and body actions."""
     from sqlalchemy import select
 
-    from app.models.lesson import LessonClass, LessonClassType
+    from app.models.schedule import GroupClass, GroupClassType
     from app.models.teacher import Teacher
 
     await create_test_user(user_id="test-user-id", role="teacher")
-    # Group class ownership 검증 — 실제 LessonClass 가 있어야 schedule 생성 가능.
+    # Group class ownership 검증 — 실제 GroupClass 가 있어야 schedule 생성 가능.
     teacher_profile_id = await db_session.scalar(select(Teacher.id).where(Teacher.user_id == "test-user-id"))
     db_session.add(
-        LessonClass(
+        GroupClass(
             id="group-001",
             teacher_id=teacher_profile_id or "test-user-id",
             name="Test Group",
-            type=LessonClassType.private,
+            type=GroupClassType.regular,
+            max_capacity=1,
+            duration_minutes=60,
+            booking_deadline_minutes=60,
+            cancel_deadline_minutes=1440,
+            is_active=True,
         )
     )
     await db_session.flush()
@@ -1444,6 +1449,41 @@ async def test_contract_practice_streak_update_and_record(client, auth_headers, 
     assert data["current_streak"] == 1
     assert data["longest_streak"] == 1
     assert data["last_practice_date"] is not None
+
+
+@pytest.mark.asyncio
+async def test_record_practice_writes_ssot_so_get_agrees(client, auth_headers, create_test_user):
+    """G3 PR-D: record_practice writes the practice into the SSOT (``practice_logs``),
+    so GET /practice/streak (compute_streak) agrees with the recorded value.
+
+    The legacy ``practice_streaks`` counter is gone: previously record_practice wrote a
+    counter row (current_streak=1) but no log, so GET — which recomputes from logs —
+    returned 0 (the divergence bug). Now record writes a log, so both read 1.
+    """
+    await create_test_user(user_id="test-user-id", role="teacher")
+    sid = "student-ssot-1"
+
+    record_resp = await client.post(
+        f"/api/v1/practice/streak/record?student_id={sid}",
+        headers=auth_headers,
+    )
+    assert record_resp.status_code == 200
+    assert record_resp.json()["current_streak"] == 1
+
+    # GET recomputes from logs (SSOT) and must agree — no counter divergence.
+    get_resp = await client.get(
+        f"/api/v1/practice/streak?student_id={sid}",
+        headers=auth_headers,
+    )
+    assert get_resp.status_code == 200
+    assert get_resp.json()["current_streak"] == 1
+
+    # Idempotent per KST day — a second record does not double-count.
+    record2 = await client.post(
+        f"/api/v1/practice/streak/record?student_id={sid}",
+        headers=auth_headers,
+    )
+    assert record2.json()["current_streak"] == 1
 
 
 @pytest.mark.asyncio

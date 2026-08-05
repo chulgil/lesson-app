@@ -8,13 +8,16 @@
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
+import '../../../auth/auth_facade.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../extensions/practice_section_visuals.dart';
 import '../../../settings/settings_facade.dart';
@@ -201,36 +204,16 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.library_music_outlined,
-              size: 64,
-              color: AppColors.inkTertiary,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text(
-              '섹션이 없습니다',
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '먼저 레퍼토리와 섹션을 만들어주세요.',
-              textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.library_music_outlined,
+      title: AppStrings.sectionPickerEmpty,
+      subtitle: AppStrings.sectionPickerEmptyHint,
+      actionLabel: AppStrings.repertoireAdd,
+      actionIcon: Icons.add,
+      onAction: () {
+        final studentId = ref.read(currentUserIdProvider);
+        context.push('${AppRoutes.addRepertoire}?studentId=$studentId');
+      },
     );
   }
 

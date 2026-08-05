@@ -86,3 +86,50 @@ class PublicLessonSummaryResponse(BaseModel):
     student: PublicLessonSummaryStudent
     summary: PublicLessonSummaryBody
     generated_at: datetime
+
+
+class GrowthReportShareRequest(BaseModel):
+    """Request to issue a child growth-report share token (#1217)."""
+
+    expires_in_hours: int = Field(24, ge=1, le=24 * 30)
+
+
+class GrowthReportShareResponse(BaseModel):
+    """Response returned after issuing a growth-report share token (#1217)."""
+
+    token: str
+    url: str
+    app_deep_link: str
+    expires_at: datetime
+
+
+class PublicGrowthReportChild(BaseModel):
+    """Minimal, non-identifying child info for a public growth report.
+
+    Data minimality (#1217): given name only (no full legal name, no
+    contact info, no address) — this is minor data on a no-auth endpoint.
+    """
+
+    given_name: str = Field(..., description="Child given name only (surname stripped)")
+    instrument: str
+
+
+class PublicGrowthReportMetrics(BaseModel):
+    """Read-only growth metrics — no detailed lesson notes, no PII."""
+
+    practice_streak_days: int = Field(..., description="Current consecutive practice-day streak")
+    recent_lesson_count: int = Field(..., description="Completed lessons in the last 30 days")
+    progress_summary: str = Field(..., description="Short generated progress sentence")
+
+
+class PublicGrowthReportResponse(BaseModel):
+    """Token-gated, read-only public child growth report (#1217, minor-safe).
+
+    Excludes contact/address/payment fields and detailed lesson notes by
+    construction — see :class:`PublicGrowthReportChild` and
+    :class:`PublicGrowthReportMetrics`.
+    """
+
+    child: PublicGrowthReportChild
+    metrics: PublicGrowthReportMetrics
+    generated_at: datetime

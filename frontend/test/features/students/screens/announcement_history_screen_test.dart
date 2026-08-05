@@ -85,7 +85,7 @@ void main() {
   });
 
   testWidgets(
-    'AnnouncementHistoryScreen swipe reveals destructive [삭제] action',
+    'AnnouncementHistoryScreen swipe reveals [편집] + destructive [삭제] actions',
     (tester) async {
       final repo = _FakeAnnouncementRepository([fakeAnnouncement()]);
 
@@ -103,11 +103,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Drag the announcement card to reveal swipe action.
-      // 2026-06-12 방향 정책 — 관리(삭제) 액션은 우→좌 스와이프.
+      // Drag the announcement card to reveal swipe actions.
+      // 2026-06-12 방향 정책 — 관리(편집·삭제) 액션은 우→좌 스와이프.
       await tester.drag(find.text('6월 둘째 주 일정 안내드립니다.'), const Offset(-200, 0));
       await tester.pumpAndSettle();
 
+      expect(find.text(AppStrings.swipeActionEdit), findsOneWidget);
       expect(find.text(AppStrings.swipeActionDelete), findsOneWidget);
 
       expect(tester.takeException(), isNull);

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../../core/sync/revalidation_events_provider.dart';
 import '../../../../core/utils/time_format_utils.dart';
 import '../../data/repositories/mock_practice_stats_repository.dart';
 import '../../data/repositories/remote_practice_stats_repository.dart';
@@ -30,6 +31,7 @@ Future<PracticeStatsReport> weeklyReport(
   Ref ref,
   WeeklyReportParams params,
 ) async {
+  ref.autoRevalidate('/practice');
   final repository = ref.watch(practiceReportRepositoryProvider);
   return repository.getWeeklyReport(params.studentId, params.weekStart);
 }
@@ -43,6 +45,7 @@ Future<PracticeStatsReport> monthlyReport(
   Ref ref,
   MonthlyReportParams params,
 ) async {
+  ref.autoRevalidate('/practice');
   final repository = ref.watch(practiceReportRepositoryProvider);
   return repository.getMonthlyReport(
     params.studentId,

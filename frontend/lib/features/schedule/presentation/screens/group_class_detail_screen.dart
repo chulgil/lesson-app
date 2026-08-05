@@ -11,9 +11,11 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../extensions/group_class_booking_visuals.dart';
+import '../extensions/no_show_policy_visuals.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
+import '../../../../core/utils/instrument_colors.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/entities/group_class_schedule.dart';
@@ -152,11 +154,12 @@ class _GroupClassDetailScreenState
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
+            decoration: BoxDecoration(color: _instrumentColors.background),
             child: Center(
-              child: Text(
-                _getInstrumentEmoji(),
-                style: AppTypography.displayLarge,
+              child: Icon(
+                _getInstrumentIcon(),
+                size: AppSpacing.iconLG,
+                color: _instrumentColors.accent,
               ),
             ),
           ),
@@ -553,8 +556,7 @@ class _GroupClassDetailScreenState
                   widget.groupClass.bookingDeadlineMinutes ~/ 60,
               cancelDeadlineHours:
                   widget.groupClass.cancelDeadlineMinutes ~/ 60,
-              deductOnNoShow:
-                  widget.groupClass.noShowPolicy == NoShowPolicy.deduct,
+              noShowText: widget.groupClass.noShowPolicy.label,
             ),
             style: AppTypography.caption.copyWith(
               color: AppColors.inkSecondary,
@@ -565,22 +567,26 @@ class _GroupClassDetailScreenState
     );
   }
 
-  String _getInstrumentEmoji() {
+  /// Instrument color chip for the class icon tile. Falls back to the paper
+  /// accent chip when the class has no instrument tag.
+  InstrumentColorPair get _instrumentColors {
+    final instrument = widget.groupClass.instrument;
+    if (instrument == null || instrument.trim().isEmpty) {
+      return const InstrumentColorPair(
+        AppColors.paperAccentSoft,
+        AppColors.paperAccent,
+      );
+    }
+    return InstrumentColors.getColor(instrument);
+  }
+
+  IconData _getInstrumentIcon() {
     switch (widget.groupClass.instrument?.toLowerCase()) {
-      case 'violin':
-      case '바이올린':
-        return '🎻';
       case 'piano':
       case '피아노':
-        return '🎹';
-      case 'cello':
-      case '첼로':
-        return '🎻';
-      case 'guitar':
-      case '기타':
-        return '🎸';
+        return Icons.piano;
       default:
-        return '🎵';
+        return Icons.music_note;
     }
   }
 

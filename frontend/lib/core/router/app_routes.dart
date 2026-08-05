@@ -11,10 +11,14 @@ class AppRoutes {
   static const parentInviteCode = '/parent/invite-code';
   static const studentInviteCode = '/student/invite-code';
 
+  /// 분야(Discipline) 선택 — 멀티 Discipline 가입 첫 단계(#977).
+  /// 등록 분야가 1개(music)면 RoleSelect 게이트에서 auto-skip 되어 도달하지
+  /// 않는다. Phase 4 에서 2번째 분야 등록 시 활성화.
+  static const disciplineSelection = '/discipline-select';
+
   // Teacher onboarding routes
   static const teacherPhoneVerification = '/onboarding/phone-verification';
   static const teacherProfileSetup = '/onboarding/profile-setup';
-  static const teacherTutorial = '/onboarding/tutorial';
   // #422 — first availability quest (simple setup) per
   // docs/specs/onboarding/teacher_first_availability_setup.md
   static const teacherFirstAvailability = '/onboarding/first-availability';
@@ -77,7 +81,7 @@ class AppRoutes {
   // #512 — teacher-side per-student YouTube loop repeat stats.
   static const practiceLoopStats = '/practice/loop-stats';
   static const repertoireHistory = '/practice/history';
-  static const tuner = '/practice/tuner';
+  static const awaitingFeedback = '/practice/awaiting-feedback';
 
   // Profile routes
   static const profile = '/profile';
@@ -250,4 +254,7 @@ class AppRoutes {
 
   // Public sharing routes (R2 #318 — 토큰 기반 읽기 전용 요약)
   static const studentSummary = '/student/summary/:token';
+
+  // Public sharing routes (#1217 — 무가입 자녀 성장 리포트 프리뷰)
+  static const growthReport = '/growth-report/:token';
 }

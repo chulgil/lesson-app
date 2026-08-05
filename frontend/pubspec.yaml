@@ -55,6 +55,12 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   timezone: ^0.10.0
 
+  # Analytics (#1209 — 수익화 퍼널 계측)
+  firebase_analytics: ^11.6.0
+
+  # Crash Reporting (§6.6 launch-readiness — 기존 Firebase 인프라 재사용)
+  firebase_crashlytics: ^4.3.10
+
   # Utilities
   intl: ^0.20.2
   uuid: ^4.4.2
@@ -99,6 +105,7 @@ flutter:
     - assets/sounds/metronome/happy_kitten/
     - assets/sounds/metronome/stick/
     - assets/sounds/metronome/woodblock/
+    - assets/google_fonts/
 
   fonts:
     - family: Pretendard

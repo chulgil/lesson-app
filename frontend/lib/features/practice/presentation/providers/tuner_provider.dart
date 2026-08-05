@@ -9,6 +9,7 @@ import '../../../../core/audio/mock_tuner_engine.dart';
 import '../../../../core/audio/record_tuner_engine.dart';
 import '../../../../core/audio/tuner_engine.dart';
 import '../../../../core/audio/tuner_storage_service.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_display_note.dart';
 import '../../domain/entities/tuner_types.dart';
@@ -551,7 +552,7 @@ class Tuner extends _$Tuner {
       if (!hasPermission) {
         _wasListeningBeforePause = false;
         state = state.copyWith(
-          error: '마이크 권한이 필요합니다. 설정에서 마이크를 허용해주세요.',
+          error: AppStrings.micPermissionSettingsGuide,
           isListening: false,
           status: TuningStatus.idle,
         );

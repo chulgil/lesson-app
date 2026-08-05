@@ -2,8 +2,10 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/paginated_response.dart';
+import '../../domain/entities/cancellation_policy_hint.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/lesson_repository.dart';
+import 'lesson_update_payload.dart';
 
 /// Remote implementation of [LessonRepository] using FastAPI backend.
 class RemoteLessonRepository implements LessonRepository {
@@ -109,8 +111,14 @@ class RemoteLessonRepository implements LessonRepository {
   }
 
   @override
-  Future<Lesson> createLesson(Lesson lesson) async {
-    final response = await _apiClient.post('/lessons', data: lesson.toJson());
+  Future<Lesson> createLesson(Lesson lesson, {String? overflowMode}) async {
+    final response = await _apiClient.post(
+      '/lessons',
+      data: {
+        ...lesson.toJson(),
+        if (overflowMode != null) 'overflow_mode': overflowMode,
+      },
+    );
     return Lesson.fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -118,9 +126,44 @@ class RemoteLessonRepository implements LessonRepository {
   Future<Lesson> updateLesson(Lesson lesson) async {
     final response = await _apiClient.put(
       '/lessons/${lesson.id}',
-      data: lesson.toJson(),
+      data: lessonScheduleUpdatePayload(lesson),
     );
     return Lesson.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<Lesson> updateLessonStatus(Lesson lesson, LessonStatus status) async {
+    final response = await _apiClient.patch(
+      '/lessons/${lesson.id}/status',
+      data: {'status': status.name},
+    );
+    return Lesson.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<Lesson> updateLessonFeedback(
+    Lesson lesson, {
+    String? feedback,
+    List<String>? keyPoints,
+    String? practiceTips,
+  }) async {
+    final response = await _apiClient.put(
+      '/lessons/${lesson.id}/feedback',
+      data: {
+        if (feedback != null) 'feedback': feedback,
+        if (keyPoints != null) 'key_points': keyPoints,
+        if (practiceTips != null) 'practice_tips': practiceTips,
+      },
+    );
+    return Lesson.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<CancellationPolicyHint> getCancellationPolicy(String lessonId) async {
+    final response = await _apiClient.get('/lessons/$lessonId/cancellation-policy');
+    return CancellationPolicyHint.fromJson(
+      response.data as Map<String, dynamic>,
+    );
   }
 
   @override

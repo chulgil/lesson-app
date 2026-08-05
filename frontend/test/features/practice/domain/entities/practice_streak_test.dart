@@ -20,8 +20,8 @@ void main() {
         studentId: 'student_1',
         currentStreak: 3,
         updatedAt: now,
-      ).fireEmoji,
-      '✨',
+      ).streakLevel,
+      1,
     );
 
     expect(
@@ -40,8 +40,8 @@ void main() {
         studentId: 'student_1',
         currentStreak: 30,
         updatedAt: now,
-      ).fireEmoji,
-      '🔥🔥',
+      ).streakLevel,
+      3,
     );
   });
 }

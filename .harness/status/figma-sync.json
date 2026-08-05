@@ -1,0 +1,9 @@
+{
+    "file_key": "nnBjRUgvEOsn3DprvGhWEF",
+    "file_name": "Lessonaza Design System",
+    "direction": "code -> figma (one-way mirror)",
+    "synced_commit": "d9413a0a",
+    "synced_at": "2026-08-05",
+    "frames": 169,
+    "note": "이 커밋 기준으로 Figma 를 검수·갱신했다. 2026-08-05: Hyen UX 표준 반영 — color/paper #FFFDF8, paperNav·paperWordmark 변수 신설, 하단 네비 아이콘 12프레임, 교사 홈 리디자인. 이후의 frontend UI 변경은 Figma 에 미반영. 갱신 시 synced_commit/frames/synced_at 을 함께 올릴 것."
+}

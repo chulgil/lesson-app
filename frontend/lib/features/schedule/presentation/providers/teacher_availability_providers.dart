@@ -4,14 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
-import 'package:hive/hive.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
 import '../../../lessons/lessons_facade.dart';
 import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
-import '../../data/local/teacher_availability_cache_store.dart';
 import '../../data/repositories/mock_teacher_availability_repository.dart';
 import '../../data/repositories/remote_teacher_availability_repository.dart';
 import '../../data/repositories/sync_aware_teacher_availability_repository.dart';
@@ -20,7 +18,6 @@ import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
 import '../../domain/services/booking_lead_time_service.dart';
 import '../../domain/services/slot_recommendation_service.dart';
-import '../services/booking_notification_service.dart';
 
 part 'teacher_availability_providers.g.dart';
 
@@ -36,9 +33,6 @@ TeacherAvailabilityRepository teacherAvailabilityRepository(Ref ref) =>
       syncAware: (api, queue) => SyncAwareTeacherAvailabilityRepository(
         remote: RemoteTeacherAvailabilityRepository(api),
         queue: queue,
-        cache: TeacherAvailabilityCacheStore(
-          box: Hive.box<String>(TeacherAvailabilityCacheStore.boxName),
-        ),
       ),
     );
 
@@ -487,20 +481,10 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
       final cancelledSlot = await repository.cancelBooking(slotId);
       state = AsyncValue.data(cancelledSlot);
 
-      // Send cancellation notification if we have the necessary info
-      if (studentId != null && teacherName != null) {
-        final notification =
-            BookingNotificationService.createCancellationNotification(
-              userId: studentId,
-              teacherName: teacherName,
-              lessonDate: cancelledSlot.date,
-              startTime: cancelledSlot.startTime.toFlutterTimeOfDay(),
-              isTeacherInitiated: isTeacherInitiated,
-              reason: reason,
-            );
-        // TODO: Send notification via notification service
-        debugPrint('Cancellation notification created: ${notification.title}');
-      }
+      // #1191 — 취소 상대 통지는 BE Notification row 책임(전용 타입 부재로 emit
+      // 미구현 잔여, #1193). 기존 createCancellationNotification 은 상대 userId 로
+      // 로컬 알림을 만들었으나 flutter_local_notifications 는 액터 기기 전용이라
+      // debugPrint 로 drop 되던 오발 블록이라 제거함. 파라미터는 향후 BE emit 배선용.
 
       // Invalidate related providers to refresh data.
       // #528 — same rationale as bookSlotSimple: refresh the bookings list and
@@ -580,6 +564,11 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
       final repository = ref.read(teacherAvailabilityRepositoryProvider);
       final updated = await repository.addException(teacherId, exception);
       state = AsyncValue.data(updated);
+
+      // M1 (#1074) — TimeExceptionScreen 본문은 read-only
+      // teacherAvailabilityProvider 를 watch 하므로 여기서 invalidate 해야
+      // 추가가 목록에 반영된다 (updateLessonSettings 와 동일 패턴).
+      ref.invalidate(teacherAvailabilityProvider(teacherId));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -592,6 +581,9 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
       final repository = ref.read(teacherAvailabilityRepositoryProvider);
       final updated = await repository.removeException(teacherId, exceptionId);
       state = AsyncValue.data(updated);
+
+      // M1 (#1074) — addException 과 동일: read provider refetch.
+      ref.invalidate(teacherAvailabilityProvider(teacherId));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

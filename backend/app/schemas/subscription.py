@@ -25,6 +25,10 @@ class SubscriptionResponse(BaseModel):
     travel_time_minutes: int | None = None
     type: str | None = None
     status: str | None = None
+    # Group lesson scope (P1-4). ``None`` means universal — clients must not
+    # fall back to a 1:1 label. spec §4 표시 규칙.
+    applies_to: str | None = None
+    group_class_id: str | None = None
 
     total_lessons: int | None = None
     used_lessons: int = 0
@@ -105,6 +109,9 @@ class SubscriptionCreate(BaseModel):
     membership_id: str | None = None
     type: str | None = None
     status: str | None = None
+    # Group lesson scope (P1-4). Omitted -> NULL -> universal.
+    applies_to: str | None = None
+    group_class_id: str | None = None
     total_lessons: int | None = None
     used_lessons: int = 0
     amount: int | None = None
@@ -431,6 +438,9 @@ class SubscriptionTemplateResponse(BaseModel):
     reschedule_allowance: int = 2
     is_active: bool = True
     is_auto_proposal_enabled: bool = False
+    # Group lesson scope (P1-4) — copied onto the Subscription at issuance.
+    applies_to: str | None = None
+    group_class_id: str | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 
@@ -468,6 +478,9 @@ class SubscriptionTemplateCreate(BaseModel):
     display_order: int = 0
     reschedule_allowance: int = 2
     is_auto_proposal_enabled: bool = False
+    # Group lesson scope (P1-4). Omitted -> NULL -> universal.
+    applies_to: str | None = None
+    group_class_id: str | None = None
 
 
 class SubscriptionTemplateUpdate(BaseModel):
@@ -496,6 +509,9 @@ class SubscriptionTemplateUpdate(BaseModel):
     display_order: int | None = None
     reschedule_allowance: int | None = None
     is_auto_proposal_enabled: bool | None = None
+    # Group lesson scope (P1-4).
+    applies_to: str | None = None
+    group_class_id: str | None = None
 
 
 # ---------------------------------------------------------------------------

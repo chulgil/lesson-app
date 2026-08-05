@@ -46,13 +46,6 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           elevation: 0,
           title: const ProfileSwitcher(),
           centerTitle: false,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () => _showFindTeacherDialog(context),
-              tooltip: '선생님 찾기',
-            ),
-          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -189,14 +182,14 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                     // Notebook × Score: 연결 유도 카드 제목은 Playfair sectionTitle
                     // 로 통일 (§7.17).
                     Text(
-                      '선생님과 연결하세요',
+                      AppStrings.parentHomeConnectTeacherCta,
                       style: NotebookTypography.sectionTitle.copyWith(
                         color: AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '레퍼토리, 레슨 예약, 숙제 확인이 가능해집니다',
+                      AppStrings.parentHomeConnectBenefits,
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.inkSecondary,
                       ),
@@ -266,7 +259,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     // Get the current week dates
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: now.weekday - 1));
-    final weekDays = ['월', '화', '수', '목', '금', '토', '일'];
+    final weekDays = AppStrings.dayNamesShort;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -299,7 +292,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                 color: isToday
                     ? AppColors.paperAccent
                     : hasPractice
-                    ? AppColors.paperOk.withValues(alpha: 0.1)
+                    ? AppColors.paperOkSoft
                     : isPast
                     ? AppColors.paperDark
                     : Colors.transparent,

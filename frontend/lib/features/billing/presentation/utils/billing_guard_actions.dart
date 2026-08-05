@@ -11,14 +11,19 @@
 // 모든 결과는 SnackBar 로 안내하고, 성공 시 [appBillingSnapshotProvider] 를
 // invalidate 해 홈/대시보드 UI 가 최신 상태를 다시 fetch 하도록 한다.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/analytics/analytics_provider.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../students/students_facade.dart';
 import '../../billing_constants.dart';
 import '../../data/services/iap_service.dart';
 import '../../domain/entities/app_billing_snapshot.dart';
+import '../../domain/entities/billing_plan.dart';
+import '../../domain/entities/billing_status.dart';
 import '../../domain/services/billing_guard.dart';
 import '../providers/app_billing_provider.dart';
 import '../widgets/feature_locked_sheet.dart';
@@ -58,6 +63,16 @@ Future<void> guardAddStudentNavigation({
     onPass();
     return;
   }
+
+  // #1209 퍼널 1단계 — 한도 차단으로 paywall 이 열린 순간. fire-and-forget.
+  unawaited(
+    ref
+        .read(analyticsServiceProvider)
+        .logPaywallLimitReached(
+          plan: snapshot.plan.toWire(),
+          studentCount: studentCount,
+        ),
+  );
 
   await showFreeLimitSheet(
     context: context,
@@ -138,6 +153,11 @@ Future<void> handleBuyPro({
   final messenger = ScaffoldMessenger.of(context);
   final iap = ref.read(iapServiceProvider);
   final repo = ref.read(appBillingRepositoryProvider);
+  // #1209 — 구매 직전 상태를 캡처해야 trial→유료 전환과 직접 구매를 구분할 수
+  // 있다 (구매 후에는 snapshot 이 invalidate 되어 pro/active 로 바뀐다).
+  final fromTrial =
+      ref.read(appBillingSnapshotProvider).valueOrNull?.status ==
+      BillingStatus.trial;
 
   final available = await iap.isAvailable();
   if (!available) {
@@ -172,6 +192,17 @@ Future<void> handleBuyPro({
         // 동일 구매가 다음 부팅 시 stream 으로 재발생하지 않는다.
         await iap.completePurchase(purchase);
         ref.invalidate(appBillingSnapshotProvider);
+        if (result.granted) {
+          // #1209 퍼널 3단계 — 영수증 검증까지 통과해 plan 이 실제 활성화된 경우만.
+          unawaited(
+            ref
+                .read(analyticsServiceProvider)
+                .logSubscriptionUpgraded(
+                  plan: BillingPlan.pro.toWire(),
+                  fromTrial: fromTrial,
+                ),
+          );
+        }
         _showSnack(
           messenger,
           result.granted
@@ -279,6 +310,12 @@ Future<void> handleStartTrial({
     final result = await repo.startTrial();
     if (result.success) {
       ref.invalidate(appBillingSnapshotProvider);
+      // #1209 퍼널 2단계 — trial 은 별도 tier 가 아니라 (tier=pro, status=trial).
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logTrialStarted(plan: BillingPlan.pro.toWire()),
+      );
       _showSnack(messenger, AppStrings.paywallTrialStarted);
     } else if (result.message.contains('trial_already_used') ||
         result.message.contains('already')) {

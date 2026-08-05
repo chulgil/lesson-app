@@ -316,9 +316,20 @@ class _PriceCell extends ConsumerWidget {
       )..[level] = result;
     }
 
-    await ref
-        .read(teacherSettingsNotifierProvider.notifier)
-        .updatePriceTable(priceTable);
+    try {
+      await ref
+          .read(teacherSettingsNotifierProvider.notifier)
+          .updatePriceTable(priceTable);
+    } catch (_) {
+      // #1194 — notifier already rolled back; tell the user (수업료 = 매출).
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.settingsSaveFailed),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }
 

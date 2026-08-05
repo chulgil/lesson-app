@@ -35,7 +35,7 @@ class DevSectionHeader extends StatelessWidget {
 
 /// Dev account card for remote mode login
 class DevAccountCard extends StatelessWidget {
-  final String emoji;
+  final IconData icon;
   final String name;
   final String description;
   final Color color;
@@ -44,7 +44,7 @@ class DevAccountCard extends StatelessWidget {
 
   const DevAccountCard({
     super.key,
-    required this.emoji,
+    required this.icon,
     required this.name,
     required this.description,
     required this.color,
@@ -68,7 +68,7 @@ class DevAccountCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(emoji, style: AppTypography.headingMedium),
+            Icon(icon, color: color, size: 28),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Column(

@@ -1,7 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:hive/hive.dart';
+
 import '../../../network/api_client.dart';
+import '../../../network/cache/response_cache_policy.dart';
+import '../../../network/cache/response_cache_store.dart';
 import '../../application/connectivity_service.dart';
 import '../../application/sync_adapter_registry.dart';
 import '../../application/sync_service.dart';
@@ -31,6 +35,15 @@ SyncService syncService(SyncServiceRef ref) {
     connectivityService: ref.read(connectivityServiceProvider),
     adapterRegistry: ref.read(syncAdapterRegistryProvider),
     apiClient: ref.read(apiClientProvider),
+    invalidateCachedReads: (path) async {
+      // Same box/policy as the ResponseCacheInterceptor (apiClient wiring).
+      if (!Hive.isBoxOpen(ResponseCacheStore.boxName)) return;
+      final prefix = ResponseCachePolicy.active.matchingPrefix(path);
+      if (prefix == null) return;
+      await ResponseCacheStore(
+        box: Hive.box<String>(ResponseCacheStore.boxName),
+      ).removeByPathPrefix(prefix);
+    },
   );
 }
 

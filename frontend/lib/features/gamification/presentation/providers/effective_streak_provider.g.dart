@@ -6,7 +6,7 @@ part of 'effective_streak_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$effectiveStreakHash() => r'aa7591fa3abc92f5c4c0cfa5b63b8dfaa1278a3e';
+String _$effectiveStreakHash() => r'8e6b280694e5f8fb58b133e4a27025d2f90f6b63';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,8 +31,12 @@ class _SystemHash {
 
 /// 학생의 effective streak — raw [PracticeStreak] + [StreakFreeze] 종합 결과.
 ///
-/// 스펙 §6.5 / §14.2 / 플랜 Job 5 Task 5.1. side-effect 0 — 자동 freeze
-/// 적용 trigger 는 Task 5.1.b (recordPractice 진입 시).
+/// 스펙 §6.5 / §14.1 / §14.2. 표시용 SSOT — 학생 화면의 모든 스트릭 숫자는
+/// 이 provider 를 통한다 (`docs/specs/practice/streak_ssot.md` §1 Phase 3).
+///
+/// 읽기 시 두 가지 부수효과가 일어난다. 둘 다 멱등이라 재빌드에 안전하다.
+/// 1. §14.1 주간 발급 — `lastGrantedAt` 게이트 (주 1회만 +2)
+/// 2. §14.2 결석일 차감 — `usedAt` 게이트 (같은 날짜 재차감 X)
 ///
 /// Copied from [effectiveStreak].
 @ProviderFor(effectiveStreak)
@@ -40,23 +44,35 @@ const effectiveStreakProvider = EffectiveStreakFamily();
 
 /// 학생의 effective streak — raw [PracticeStreak] + [StreakFreeze] 종합 결과.
 ///
-/// 스펙 §6.5 / §14.2 / 플랜 Job 5 Task 5.1. side-effect 0 — 자동 freeze
-/// 적용 trigger 는 Task 5.1.b (recordPractice 진입 시).
+/// 스펙 §6.5 / §14.1 / §14.2. 표시용 SSOT — 학생 화면의 모든 스트릭 숫자는
+/// 이 provider 를 통한다 (`docs/specs/practice/streak_ssot.md` §1 Phase 3).
+///
+/// 읽기 시 두 가지 부수효과가 일어난다. 둘 다 멱등이라 재빌드에 안전하다.
+/// 1. §14.1 주간 발급 — `lastGrantedAt` 게이트 (주 1회만 +2)
+/// 2. §14.2 결석일 차감 — `usedAt` 게이트 (같은 날짜 재차감 X)
 ///
 /// Copied from [effectiveStreak].
 class EffectiveStreakFamily extends Family<AsyncValue<StreakWithFreezeResult>> {
   /// 학생의 effective streak — raw [PracticeStreak] + [StreakFreeze] 종합 결과.
   ///
-  /// 스펙 §6.5 / §14.2 / 플랜 Job 5 Task 5.1. side-effect 0 — 자동 freeze
-  /// 적용 trigger 는 Task 5.1.b (recordPractice 진입 시).
+  /// 스펙 §6.5 / §14.1 / §14.2. 표시용 SSOT — 학생 화면의 모든 스트릭 숫자는
+  /// 이 provider 를 통한다 (`docs/specs/practice/streak_ssot.md` §1 Phase 3).
+  ///
+  /// 읽기 시 두 가지 부수효과가 일어난다. 둘 다 멱등이라 재빌드에 안전하다.
+  /// 1. §14.1 주간 발급 — `lastGrantedAt` 게이트 (주 1회만 +2)
+  /// 2. §14.2 결석일 차감 — `usedAt` 게이트 (같은 날짜 재차감 X)
   ///
   /// Copied from [effectiveStreak].
   const EffectiveStreakFamily();
 
   /// 학생의 effective streak — raw [PracticeStreak] + [StreakFreeze] 종합 결과.
   ///
-  /// 스펙 §6.5 / §14.2 / 플랜 Job 5 Task 5.1. side-effect 0 — 자동 freeze
-  /// 적용 trigger 는 Task 5.1.b (recordPractice 진입 시).
+  /// 스펙 §6.5 / §14.1 / §14.2. 표시용 SSOT — 학생 화면의 모든 스트릭 숫자는
+  /// 이 provider 를 통한다 (`docs/specs/practice/streak_ssot.md` §1 Phase 3).
+  ///
+  /// 읽기 시 두 가지 부수효과가 일어난다. 둘 다 멱등이라 재빌드에 안전하다.
+  /// 1. §14.1 주간 발급 — `lastGrantedAt` 게이트 (주 1회만 +2)
+  /// 2. §14.2 결석일 차감 — `usedAt` 게이트 (같은 날짜 재차감 X)
   ///
   /// Copied from [effectiveStreak].
   EffectiveStreakProvider call(
@@ -93,16 +109,24 @@ class EffectiveStreakFamily extends Family<AsyncValue<StreakWithFreezeResult>> {
 
 /// 학생의 effective streak — raw [PracticeStreak] + [StreakFreeze] 종합 결과.
 ///
-/// 스펙 §6.5 / §14.2 / 플랜 Job 5 Task 5.1. side-effect 0 — 자동 freeze
-/// 적용 trigger 는 Task 5.1.b (recordPractice 진입 시).
+/// 스펙 §6.5 / §14.1 / §14.2. 표시용 SSOT — 학생 화면의 모든 스트릭 숫자는
+/// 이 provider 를 통한다 (`docs/specs/practice/streak_ssot.md` §1 Phase 3).
+///
+/// 읽기 시 두 가지 부수효과가 일어난다. 둘 다 멱등이라 재빌드에 안전하다.
+/// 1. §14.1 주간 발급 — `lastGrantedAt` 게이트 (주 1회만 +2)
+/// 2. §14.2 결석일 차감 — `usedAt` 게이트 (같은 날짜 재차감 X)
 ///
 /// Copied from [effectiveStreak].
 class EffectiveStreakProvider
     extends AutoDisposeFutureProvider<StreakWithFreezeResult> {
   /// 학생의 effective streak — raw [PracticeStreak] + [StreakFreeze] 종합 결과.
   ///
-  /// 스펙 §6.5 / §14.2 / 플랜 Job 5 Task 5.1. side-effect 0 — 자동 freeze
-  /// 적용 trigger 는 Task 5.1.b (recordPractice 진입 시).
+  /// 스펙 §6.5 / §14.1 / §14.2. 표시용 SSOT — 학생 화면의 모든 스트릭 숫자는
+  /// 이 provider 를 통한다 (`docs/specs/practice/streak_ssot.md` §1 Phase 3).
+  ///
+  /// 읽기 시 두 가지 부수효과가 일어난다. 둘 다 멱등이라 재빌드에 안전하다.
+  /// 1. §14.1 주간 발급 — `lastGrantedAt` 게이트 (주 1회만 +2)
+  /// 2. §14.2 결석일 차감 — `usedAt` 게이트 (같은 날짜 재차감 X)
   ///
   /// Copied from [effectiveStreak].
   EffectiveStreakProvider(

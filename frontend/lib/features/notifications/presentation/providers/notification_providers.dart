@@ -1,14 +1,10 @@
-import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../features/notifications/domain/entities/notification_settings.dart';
 import '../../../../features/notifications/domain/services/practice_reminder_scheduler.dart';
 import '../../../auth/auth_facade.dart';
 import '../../data/services/fcm_service.dart';
@@ -17,14 +13,13 @@ import '../../data/repositories/remote_notification_repository.dart';
 import '../../domain/entities/notification.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../domain/services/connection_notification_service.dart';
+import '../../domain/services/notification_delivery_gate.dart';
 import '../../domain/services/notification_scheduler_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
 
-part 'notification_providers.g.dart';
+import 'notification_preferences_provider.dart';
 
-const _notificationSettingsBoxName = 'notification_settings';
-const _studentSettingsKey = 'student_settings';
-const _teacherSettingsKey = 'teacher_settings';
+part 'notification_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 String notificationViewerRole(Ref ref) {
@@ -46,7 +41,14 @@ NotificationRepository? notificationApiRepository(Ref ref) {
 /// Provider for the notification service.
 @Riverpod(keepAlive: true)
 LocalNotificationService notificationService(Ref ref) {
-  final service = LocalNotificationService();
+  // #501: every delivery path (show/schedule, incl. FCM foreground and the
+  // scheduler/stub services that wrap this one) passes the preference gate.
+  final service = LocalNotificationService(
+    shouldDeliver: (notification) => shouldDeliverNotification(
+      ref.read(notificationPreferencesNotifierProvider),
+      notification,
+    ),
+  );
   ref.onDispose(() => service.dispose());
   return service;
 }
@@ -91,166 +93,6 @@ ConnectionNotificationService connectionNotificationService(Ref ref) {
 ProposalNotificationService proposalNotificationService(Ref ref) {
   final notificationService = ref.watch(notificationServiceProvider);
   return ProposalNotificationService(notificationService);
-}
-
-/// Provider for student notification settings (persisted to Hive)
-@riverpod
-class StudentNotificationSettingsNotifier
-    extends _$StudentNotificationSettingsNotifier {
-  @override
-  StudentNotificationSettings build() {
-    return _loadFromHive() ?? StudentNotificationSettings.defaultSettings;
-  }
-
-  StudentNotificationSettings? _loadFromHive() {
-    try {
-      final box = Hive.box(_notificationSettingsBoxName);
-      final jsonStr = box.get(_studentSettingsKey) as String?;
-      if (jsonStr == null) return null;
-      final json = jsonDecode(jsonStr) as Map<String, dynamic>;
-      return StudentNotificationSettings.fromJson(json);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<void> _saveToHive(StudentNotificationSettings settings) async {
-    try {
-      final box = Hive.box(_notificationSettingsBoxName);
-      await box.put(_studentSettingsKey, jsonEncode(settings.toJson()));
-    } catch (_) {
-      // Storage failure is non-blocking
-    }
-  }
-
-  void updateSettings(StudentNotificationSettings newSettings) {
-    state = newSettings;
-    _saveToHive(newSettings);
-  }
-
-  void toggleLessonReminder(bool enabled) {
-    state = state.copyWith(lessonReminderEnabled: enabled);
-    _saveToHive(state);
-  }
-
-  void togglePracticeReminder(bool enabled) {
-    state = state.copyWith(practiceReminderEnabled: enabled);
-    _saveToHive(state);
-  }
-
-  void toggleStreakWarning(bool enabled) {
-    state = state.copyWith(streakWarningEnabled: enabled);
-    _saveToHive(state);
-  }
-
-  void setPracticeReminderTime(int hour, int minute) {
-    state = state.copyWith(
-      practiceReminderTime: ClockTime(hour: hour, minute: minute),
-    );
-    _saveToHive(state);
-  }
-
-  void setStreakWarningTime(int hour, int minute) {
-    state = state.copyWith(
-      streakWarningTime: ClockTime(hour: hour, minute: minute),
-    );
-    _saveToHive(state);
-  }
-
-  void toggleDnd(bool enabled) {
-    state = state.copyWith(dndEnabled: enabled);
-    _saveToHive(state);
-  }
-
-  void setDndTimes({
-    int? startHour,
-    int? startMinute,
-    int? endHour,
-    int? endMinute,
-  }) {
-    state = state.copyWith(
-      dndStart: ClockTime(
-        hour: startHour ?? state.dndStart.hour,
-        minute: startMinute ?? state.dndStart.minute,
-      ),
-      dndEnd: ClockTime(
-        hour: endHour ?? state.dndEnd.hour,
-        minute: endMinute ?? state.dndEnd.minute,
-      ),
-    );
-    _saveToHive(state);
-  }
-}
-
-/// Provider for teacher notification settings (persisted to Hive)
-@riverpod
-class TeacherNotificationSettingsNotifier
-    extends _$TeacherNotificationSettingsNotifier {
-  @override
-  TeacherNotificationSettings build() {
-    return _loadFromHive() ?? TeacherNotificationSettings.defaultSettings;
-  }
-
-  TeacherNotificationSettings? _loadFromHive() {
-    try {
-      final box = Hive.box(_notificationSettingsBoxName);
-      final jsonStr = box.get(_teacherSettingsKey) as String?;
-      if (jsonStr == null) return null;
-      final json = jsonDecode(jsonStr) as Map<String, dynamic>;
-      return TeacherNotificationSettings.fromJson(json);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<void> _saveToHive(TeacherNotificationSettings settings) async {
-    try {
-      final box = Hive.box(_notificationSettingsBoxName);
-      await box.put(_teacherSettingsKey, jsonEncode(settings.toJson()));
-    } catch (_) {
-      // Storage failure is non-blocking
-    }
-  }
-
-  void updateSettings(TeacherNotificationSettings newSettings) {
-    state = newSettings;
-    _saveToHive(newSettings);
-  }
-
-  void toggleLessonReminder(bool enabled) {
-    state = state.copyWith(lessonReminderEnabled: enabled);
-    _saveToHive(state);
-  }
-
-  void toggleNewStudentAlert(bool enabled) {
-    state = state.copyWith(newStudentAlert: enabled);
-    _saveToHive(state);
-  }
-
-  void toggleTrialBookingAlert(bool enabled) {
-    state = state.copyWith(trialBookingAlert: enabled);
-    _saveToHive(state);
-  }
-
-  void togglePaymentReceivedAlert(bool enabled) {
-    state = state.copyWith(paymentReceivedAlert: enabled);
-    _saveToHive(state);
-  }
-
-  void toggleStudentPracticeReport(bool enabled) {
-    state = state.copyWith(studentPracticeReport: enabled);
-    _saveToHive(state);
-  }
-
-  void toggleReviewReceivedAlert(bool enabled) {
-    state = state.copyWith(reviewReceivedAlert: enabled);
-    _saveToHive(state);
-  }
-
-  void toggleDnd(bool enabled) {
-    state = state.copyWith(dndEnabled: enabled);
-    _saveToHive(state);
-  }
 }
 
 // ============================================================

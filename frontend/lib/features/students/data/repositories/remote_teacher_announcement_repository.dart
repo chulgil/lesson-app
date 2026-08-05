@@ -12,10 +12,9 @@ class RemoteTeacherAnnouncementRepository
   Future<TeacherAnnouncement> create(TeacherAnnouncement announcement) async {
     final response = await _apiClient.post(
       '/announcements',
-      data:
-          _toJson(announcement)
-            ..remove('id')
-            ..remove('created_at'),
+      data: _toJson(announcement)
+        ..remove('id')
+        ..remove('created_at'),
     );
     return _fromJson(response.data as Map<String, dynamic>);
   }
@@ -33,13 +32,21 @@ class RemoteTeacherAnnouncementRepository
   }
 
   @override
-  Future<TeacherAnnouncement> update(TeacherAnnouncement announcement) {
-    throw UnsupportedError('Teacher announcement update API is not available.');
+  Future<TeacherAnnouncement> update(TeacherAnnouncement announcement) async {
+    // Type is immutable server-side; only message + dates are sent.
+    final response = await _apiClient.put(
+      '/announcements/${announcement.id}',
+      data: {
+        'message': announcement.message,
+        'dates': announcement.dates.map(_dateOnly).toList(),
+      },
+    );
+    return _fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
-  Future<void> delete(String id) {
-    throw UnsupportedError('Teacher announcement delete API is not available.');
+  Future<void> delete(String id) async {
+    await _apiClient.delete('/announcements/$id');
   }
 
   @override
@@ -65,18 +72,14 @@ class RemoteTeacherAnnouncementRepository
       id: json['id'] as String,
       teacherId: json['teacher_id'] as String,
       type: _type(json['type'] as String?),
-      dates:
-          ((json['dates'] as List<dynamic>?) ?? [])
-              .map((date) => DateTime.parse(date as String))
-              .toList(),
+      dates: ((json['dates'] as List<dynamic>?) ?? [])
+          .map((date) => DateTime.parse(date as String))
+          .toList(),
       message: json['message'] as String? ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
-      affectedLessons:
-          ((json['affected_lessons'] as List<dynamic>?) ?? [])
-              .map(
-                (item) => _affectedLessonFromJson(item as Map<String, dynamic>),
-              )
-              .toList(),
+      affectedLessons: ((json['affected_lessons'] as List<dynamic>?) ?? [])
+          .map((item) => _affectedLessonFromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 

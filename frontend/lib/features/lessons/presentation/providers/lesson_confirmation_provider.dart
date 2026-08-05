@@ -43,19 +43,14 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
     try {
       final repository = ref.read(lessonRepositoryProvider);
 
-      // Update lesson status to completed
-      final updatedLesson = lesson.copyWith(
-        status: LessonStatus.completed,
-        updatedAt: DateTime.now(),
-      );
-
-      await repository.updateLesson(updatedLesson);
-
-      // Record subscription usage
-      await _recordSubscriptionUsage(
-        lesson: lesson,
-        usageType: UsageType.normal,
-        deducted: true,
+      // #1237 — the entity PUT never persisted `status`, so completion was a
+      // silent no-op while the client recorded a usage anyway. The status
+      // endpoint owns the transition AND the deduction (attributed to the
+      // lesson's own subscription), so the client must not record usage too —
+      // POST /usage has no idempotency guard and would deduct twice.
+      final updatedLesson = await repository.updateLessonStatus(
+        lesson,
+        LessonStatus.completed,
       );
 
       // Auto-record RequestEvent for chapter model integration
@@ -100,16 +95,10 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
       final isDeducted = reason.isDeducted;
       final needsReschedule = reason.allowsReschedule;
 
-      // Update lesson status
-      final updatedLesson = lesson.copyWith(
-        status: lessonStatus,
-        feedback: confirmationResult.note ?? lesson.feedback,
-        updatedAt: DateTime.now(),
-      );
-
-      await repository.updateLesson(updatedLesson);
-
-      // Record subscription usage if deducted
+      // Record the penalty usage BEFORE the transition: the backend's
+      // policy-based penalty deduction skips when a usage row already exists
+      // for this lesson, so this ordering keeps it exactly-once whether or not
+      // the teacher configured a LessonPolicy (#1237).
       if (isDeducted) {
         final usageType =
             reason == LessonNonCompletionReason.studentAbsent
@@ -121,6 +110,19 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
           usageType: usageType,
           deducted: true,
           note: confirmationResult.note,
+        );
+      }
+
+      var updatedLesson = await repository.updateLessonStatus(
+        lesson,
+        lessonStatus,
+      );
+
+      final note = confirmationResult.note;
+      if (note != null && note.isNotEmpty) {
+        updatedLesson = await repository.updateLessonFeedback(
+          updatedLesson,
+          feedback: note,
         );
       }
 

@@ -60,10 +60,20 @@ class SmsService:
             False 발송 실패 (네트워크/API 오류)
         """
         if settings.SMS_USE_MOCK:
-            logger.debug(
-                "SMS mock send OTP to %s (mock=True, code not logged)",
-                _mask_phone(phone_number),
-            )
+            if settings.SMS_MOCK_LOG_CODES:
+                # Beta/QA only (#1142): no real SMS is sent in mock mode, so expose the
+                # OTP in the server log for testers. Gated behind an opt-in flag; the
+                # real-send path below never logs the code regardless of any flag.
+                logger.info(
+                    "[MOCK SMS] OTP for %s: %s",
+                    _mask_phone(phone_number),
+                    code,
+                )
+            else:
+                logger.debug(
+                    "SMS mock send OTP to %s (mock=True, code not logged)",
+                    _mask_phone(phone_number),
+                )
             return True
 
         if not settings.SMS_API_KEY or not settings.SMS_API_SECRET or not settings.SMS_SENDER_NUMBER:
@@ -95,6 +105,29 @@ class SmsService:
                     "SMS send failed status=%d phone=%s",
                     response.status_code,
                     _mask_phone(phone_number),
+                )
+                return False
+            # Solapi send-many/detail returns HTTP 200 even when the individual
+            # message failed to register — per-message failures arrive in
+            # ``failedMessageList`` (#1179). Only errorCode/statusMessage are
+            # logged; never the raw entry (it contains the unmasked number).
+            try:
+                body = response.json()
+            except Exception:
+                logger.warning(
+                    "SMS send response body unparseable (status=%d) — trusting status, phone=%s",
+                    response.status_code,
+                    _mask_phone(phone_number),
+                )
+                return True
+            failed = (body or {}).get("failedMessageList") or []
+            if failed:
+                first = failed[0] if isinstance(failed[0], dict) else {}
+                logger.error(
+                    "SMS registration failed phone=%s error_code=%s status_message=%s",
+                    _mask_phone(phone_number),
+                    first.get("errorCode"),
+                    first.get("statusMessage"),
                 )
                 return False
             logger.info("SMS OTP sent phone=%s", _mask_phone(phone_number))

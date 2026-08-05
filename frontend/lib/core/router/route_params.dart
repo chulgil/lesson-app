@@ -12,7 +12,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/auth_facade.dart' show currentUserIdProvider;
+import '../../features/auth/auth_facade.dart'
+    show currentUserIdProvider, currentUserRoleProvider;
 
 /// 쿼리 `teacherId` 가 있으면 그 값, 없으면 현재 로그인 사용자 ID.
 ///
@@ -32,4 +33,18 @@ String teacherIdExtraOrCurrent(
   final fromExtra = extra?['teacherId'] as String?;
   if (fromExtra != null && fromExtra.isNotEmpty) return fromExtra;
   return ProviderScope.containerOf(context).read(currentUserIdProvider);
+}
+
+
+/// `extra` map 의 `viewerRole` 이 있으면 그 값, 없으면 현재 로그인 사용자 역할.
+///
+/// 하드코딩 'teacher'/'student' 폴백은 extra 유실(딥링크·상태복원) 시 반대
+/// 역할의 액션을 노출한다 — 식별자와 같은 원칙으로 현재 사용자에서 유도한다.
+String viewerRoleExtraOrCurrent(
+  BuildContext context,
+  Map<String, dynamic>? extra,
+) {
+  final fromExtra = extra?['viewerRole'] as String?;
+  if (fromExtra != null && fromExtra.isNotEmpty) return fromExtra;
+  return ProviderScope.containerOf(context).read(currentUserRoleProvider).name;
 }

@@ -71,6 +71,9 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
       ownership: $enumDecodeNullable(
           _$SubscriptionOwnershipEnumMap, json['ownership']),
       academyId: json['academy_id'] as String?,
+      appliesTo: $enumDecodeNullable(
+          _$SubscriptionAppliesToEnumMap, json['applies_to']),
+      groupClassId: json['group_class_id'] as String?,
     );
 
 Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
@@ -120,6 +123,8 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
           instance.overrideNotifyOwnerOnLateCancel,
       'ownership': _$SubscriptionOwnershipEnumMap[instance.ownership],
       'academy_id': instance.academyId,
+      'applies_to': _$SubscriptionAppliesToEnumMap[instance.appliesTo],
+      'group_class_id': instance.groupClassId,
     };
 
 const _$SubscriptionTypeEnumMap = {
@@ -157,4 +162,10 @@ const _$SubscriptionPaymentMethodEnumMap = {
 const _$SubscriptionOwnershipEnumMap = {
   SubscriptionOwnership.academy: 'academy',
   SubscriptionOwnership.teacher: 'teacher',
+};
+
+const _$SubscriptionAppliesToEnumMap = {
+  SubscriptionAppliesTo.oneToOne: 'oneToOne',
+  SubscriptionAppliesTo.group: 'group',
+  SubscriptionAppliesTo.universal: 'universal',
 };

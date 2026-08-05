@@ -200,6 +200,10 @@ class Lesson(UUIDMixin, TimestampMixin, Base):
     )
     location_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     location_address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Preview lesson beyond the subscription's remaining sessions — created by
+    # overflow_mode=renewal_pending, promoted to a real session on renewal
+    # payment confirmation (subscription_required_spec §2.6.2).
+    is_preview: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 

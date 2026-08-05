@@ -25,7 +25,19 @@ List<GoRoute> studentRoutes = [
   GoRoute(
     path: AppRoutes.addStudent,
     name: 'addStudent',
-    builder: (context, state) => const AddStudentScreen(),
+    builder:
+        (context, state) =>
+            AddStudentScreen(returnTo: state.uri.queryParameters['returnTo']),
+  ),
+
+  // Announcement History
+  // NOTE: must stay above studentDetail — go_router matches in declaration
+  // order, and '/students/:id' would otherwise capture 'announcement-history'
+  // as a studentId (see test/core/router/student_routes_shadow_test.dart).
+  GoRoute(
+    path: AppRoutes.announcementHistory,
+    name: 'announcementHistory',
+    builder: (context, state) => const AnnouncementHistoryScreen(),
   ),
 
   // Student Detail
@@ -68,13 +80,6 @@ List<GoRoute> studentRoutes = [
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return BadgeCollectionScreen(studentId: studentId);
     },
-  ),
-
-  // Announcement History
-  GoRoute(
-    path: AppRoutes.announcementHistory,
-    name: 'announcementHistory',
-    builder: (context, state) => const AnnouncementHistoryScreen(),
   ),
 
   // Student Growth Detail (P2 — Job 9)

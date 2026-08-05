@@ -19,7 +19,7 @@ void showParentLoginSheet(BuildContext context) {
     builder: (sheetContext) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Notebook × Score §7.113·§7.114: 이모지 가족(사람·오브젝트) → BoxShape.circle 예외.
+        // Notebook × Score §7.114: 원형 아바타 컨테이너 유지 (이모지 → 아이콘 대체).
         Container(
           width: 56,
           height: 56,
@@ -28,7 +28,11 @@ void showParentLoginSheet(BuildContext context) {
             shape: BoxShape.circle,
           ),
           child: const Center(
-            child: Text('👨‍👩‍👧', style: AppTypography.displayMedium),
+            child: Icon(
+              Icons.family_restroom,
+              size: AppSpacing.iconLG,
+              color: AppColors.ink,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.space2),

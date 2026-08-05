@@ -13,6 +13,8 @@ import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../domain/entities/teacher_stats.dart';
 import '../providers/analytics_providers.dart';
+import 'analytics_error_view.dart';
+import 'at_risk_students_section.dart';
 import 'monthly_trend_chart.dart';
 import 'practice_ranking_list.dart';
 
@@ -35,7 +37,7 @@ class AnalyticsSummaryTab extends ConsumerWidget {
 
     return statsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => _ErrorView(
+      error: (e, _) => AnalyticsErrorView(
         onRetry: () => ref.invalidate(teacherMonthlyStatsProvider(selectedMonth)),
       ),
       data: (stats) => RefreshIndicator(
@@ -47,6 +49,8 @@ class AnalyticsSummaryTab extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           children: [
             _buildStatCards(stats),
+            const SizedBox(height: AppSpacing.space5),
+            const AtRiskStudentsSection(),
             const SizedBox(height: AppSpacing.space5),
             MonthlyTrendChart(trendData: stats.lessonTrend),
             const SizedBox(height: AppSpacing.space5),
@@ -110,7 +114,7 @@ class AnalyticsSummaryTab extends ConsumerWidget {
               child: StatCard(
                 title: AppStrings.analyticsTravelTimeLabel,
                 value: travelM > 0 ? '${travelH}h ${travelM}m' : '${travelH}h',
-                subtitle: '월 합산',
+                subtitle: AppStrings.analyticsMonthlyTotal,
                 color: AppColors.inkTertiary,
                 icon: Icons.directions_car,
               ),
@@ -128,13 +132,19 @@ class AnalyticsSummaryTab extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '학생별 연습 현황',
+          AppStrings.analyticsStudentPracticeStatus,
           style: NotebookTypography.sectionTitle,
         ),
         const SizedBox(height: AppSpacing.space3),
         summaryListAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const SizedBox.shrink(),
+          // C7 — primary 하위리스트: 에러도 빈 상태와 동일 inline 텍스트로 표시 (가시성 일치).
+          error: (_, __) => Text(
+            AppStrings.cannotLoadData,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkTertiary,
+            ),
+          ),
           data: (list) => list.isEmpty
               ? Text(
                   AppStrings.analyticsNoStudentData,
@@ -217,7 +227,7 @@ class _StudentSummaryRow extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Text(
-                          '연습 $pr%',
+                          AppStrings.analyticsPracticePercentFormat(pr),
                           style: AppTypography.captionSmall.copyWith(
                             color: AppColors.paperOk,
                           ),
@@ -233,7 +243,7 @@ class _StudentSummaryRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '출석 $ar%',
+                    AppStrings.analyticsAttendancePercentFormat(ar),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -247,28 +257,6 @@ class _StudentSummaryRow extends StatelessWidget {
         ),
         Container(height: 1, color: AppColors.inkQuaternary),
       ],
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space3),
-          Text(AppStrings.cannotLoadData, style: AppTypography.bodyMedium),
-          const SizedBox(height: AppSpacing.space3),
-          OutlinedButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
-        ],
-      ),
     );
   }
 }

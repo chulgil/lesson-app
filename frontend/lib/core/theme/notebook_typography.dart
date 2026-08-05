@@ -55,6 +55,11 @@ class NotebookTypography {
     letterSpacing: 5,
   );
 
+  /// 브랜드 워드마크 — eyebrow 를 배경 톤으로 뮤트 (Hyen 표준 H2).
+  /// 로고가 본문 글자보다 먼저 읽히지 않도록 20% 잉크로 물러난다.
+  static TextStyle get wordmark =>
+      eyebrow.copyWith(color: AppColors.paperWordmark);
+
   /// VOL·NO·DATE 메타 — 매스트헤드 우측.
   /// 예: "VOL. IV · NO. 18 · APR MMXXVI"
   static TextStyle get metaMono => GoogleFonts.ibmPlexMono(
@@ -75,6 +80,10 @@ class NotebookTypography {
   /// 로마숫자 — 활성 상태 (현재 진행 중 레슨).
   static TextStyle get romanActive =>
       roman.copyWith(color: AppColors.paperAccent);
+
+  /// 로마숫자 — 큰 크기 (하단 네비게이션 마커 I~IV).
+  /// `roman` 과 값이 동일하고 fontSize 만 18. 색·굵기는 호출부에서 상태별로 덮어쓴다.
+  static TextStyle get romanLarge => roman.copyWith(fontSize: 18);
 
   /// 곡명·레슨 제목.
   static TextStyle get pieceTitle => GoogleFonts.playfairDisplay(
@@ -160,6 +169,10 @@ class NotebookTypography {
     letterSpacing: 1.0,
   );
 
+  /// 섹션 라벨 — 작은 크기 (하단 네비게이션 라벨, 카드 상태 라벨).
+  /// `sectionLabel` 과 값이 동일하고 fontSize 만 10. 색·굵기는 호출부에서 덮어쓴다.
+  static TextStyle get sectionLabelSmall => sectionLabel.copyWith(fontSize: 10);
+
   /// 손글씨 본문 — Gaegu.
   static TextStyle get hand => GoogleFonts.gaegu(
     fontSize: 16,
@@ -222,6 +235,15 @@ class NotebookTypography {
     color: AppColors.paperAccent,
     letterSpacing: 0.8,
     height: 1.2,
+  );
+
+  /// 시간 민감 배너 본문 — "다음 레슨 14:00 까지 30분" (Hyen 표준 H5).
+  /// 시각 정보를 등폭으로 읽히게 해 훑을 때 시간이 먼저 잡힌다.
+  static TextStyle get bannerMono => GoogleFonts.ibmPlexMono(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+    color: AppColors.ink,
+    height: 1.3,
   );
 
   /// 템포 표기 — "♩ = 92".

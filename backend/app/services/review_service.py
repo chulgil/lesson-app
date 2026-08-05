@@ -32,13 +32,9 @@ class ReviewService:
             TeacherReview.teacher_id == teacher_id,
             TeacherReview.is_active.is_(True),
         )
-        total = await self.db.scalar(
-            select(func.count()).select_from(query.subquery())
-        ) or 0
+        total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
 
-        result = await self.db.scalars(
-            query.order_by(TeacherReview.created_at.desc()).offset(offset).limit(size)
-        )
+        result = await self.db.scalars(query.order_by(TeacherReview.created_at.desc()).offset(offset).limit(size))
         return PaginatedResponse.create(items=list(result.all()), total=total, page=page, size=size)
 
     async def create_review(self, data: dict, current_user: Any) -> Any:
@@ -58,11 +54,30 @@ class ReviewService:
             tags=data.get("tags", []),
             visibility=data.get("visibility", "public"),
             is_anonymous=data.get("is_anonymous", False),
+            is_verified=await self._has_completed_lesson(data["teacher_id"], current_user.id),
         )
         self.db.add(review)
         await self.db.flush()
         await self.db.refresh(review)
         return review
+
+    async def _has_completed_lesson(self, teacher_id: str, student_id: str) -> bool:
+        """Whether student_id has a completed Lesson with teacher_id (verified-reviewer signal)."""
+        from app.models.lesson import Lesson, LessonStatus
+        from app.services.teacher_id_resolver import try_resolve_teacher_id
+
+        resolved_teacher_id = await try_resolve_teacher_id(self.db, teacher_id)
+        if resolved_teacher_id is None:
+            return False
+
+        completed_lesson_id = await self.db.scalar(
+            select(Lesson.id).where(
+                Lesson.teacher_id == resolved_teacher_id,
+                Lesson.student_id == student_id,
+                Lesson.status == LessonStatus.completed,
+            )
+        )
+        return completed_lesson_id is not None
 
     async def update_review(self, review_id: str, data: dict, current_user: Any) -> Any:
         """Update a review."""
@@ -101,29 +116,36 @@ class ReviewService:
             TeacherReview.is_active.is_(True),
         )
 
-        total = await self.db.scalar(
-            select(func.count()).select_from(base.subquery())
-        ) or 0
-        avg = await self.db.scalar(
-            select(func.avg(TeacherReview.rating)).where(
-                TeacherReview.teacher_id == teacher_id,
-                TeacherReview.is_active.is_(True),
+        total = await self.db.scalar(select(func.count()).select_from(base.subquery())) or 0
+        avg = (
+            await self.db.scalar(
+                select(func.avg(TeacherReview.rating)).where(
+                    TeacherReview.teacher_id == teacher_id,
+                    TeacherReview.is_active.is_(True),
+                )
             )
-        ) or 0.0
-        student_count = await self.db.scalar(
-            select(func.count()).where(
-                TeacherReview.teacher_id == teacher_id,
-                TeacherReview.is_active.is_(True),
-                TeacherReview.author_type == "student",
+            or 0.0
+        )
+        student_count = (
+            await self.db.scalar(
+                select(func.count()).where(
+                    TeacherReview.teacher_id == teacher_id,
+                    TeacherReview.is_active.is_(True),
+                    TeacherReview.author_type == "student",
+                )
             )
-        ) or 0
-        parent_count = await self.db.scalar(
-            select(func.count()).where(
-                TeacherReview.teacher_id == teacher_id,
-                TeacherReview.is_active.is_(True),
-                TeacherReview.author_type == "parent",
+            or 0
+        )
+        parent_count = (
+            await self.db.scalar(
+                select(func.count()).where(
+                    TeacherReview.teacher_id == teacher_id,
+                    TeacherReview.is_active.is_(True),
+                    TeacherReview.author_type == "parent",
+                )
             )
-        ) or 0
+            or 0
+        )
 
         return {
             "teacher_id": teacher_id,

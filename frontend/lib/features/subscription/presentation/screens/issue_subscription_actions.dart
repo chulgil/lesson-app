@@ -56,6 +56,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   String? get lessonRequestId;
   List<String> get lessonRequestIds;
 
+  /// §2.6.3 — 'addLesson' 이면 발급 성공 시 레슨 추가 화면으로 복귀 (스케줄
+  /// 확정은 호출 화면 몫이므로 정기 스케줄 등록 리다이렉트 생략).
+  String? get returnTo;
+
   GlobalKey<FormState> get formKey;
   SubscriptionType get selectedType;
   String? get selectedMembershipId;
@@ -81,6 +85,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
   /// #695 — template applied to the form (saved into the proposal draft).
   String? get appliedTemplateId;
+
+  /// §2.6.3 edge ① — called on successful issuance so the pop-time preview
+  /// lesson cleanup stands down (the subscription lifecycle owns it now).
+  void markPreviewLessonHandled();
 
   Future<void> issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
@@ -233,6 +241,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             );
       }
 
+      // Issuance fully succeeded — the preview lesson (renewal flow) now
+      // belongs to the subscription lifecycle; pop cleanup must stand down.
+      markPreviewLessonHandled();
+
       if (mounted) {
         final isPostpaid = !isFreeIssue && !isPaymentConfirmed;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -245,6 +257,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             backgroundColor: AppColors.paperAccent,
           ),
         );
+
+        // §2.6.3 returnTo=addLesson — the add-lesson form owns the schedule
+        // step; pop back with the issuance result so it re-resolves S1.
+        if (returnTo == 'addLesson') {
+          context.pop(true);
+          return;
+        }
 
         // Navigate to schedule registration for quick setup (Issue #59)
         if (teacherId != null) {
@@ -619,14 +638,18 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         }
       }
 
-      final skippedNames = skippedStudentIds.isEmpty
-          ? ''
-          : (await Future.wait(skippedStudentIds.map(flow.studentName)))
-                .join(', ');
-      final failedNames = failedStudentIds.isEmpty
-          ? ''
-          : (await Future.wait(failedStudentIds.map(flow.studentName)))
-                .join(', ');
+      final skippedNames =
+          skippedStudentIds.isEmpty
+              ? ''
+              : (await Future.wait(
+                skippedStudentIds.map(flow.studentName),
+              )).join(', ');
+      final failedNames =
+          failedStudentIds.isEmpty
+              ? ''
+              : (await Future.wait(
+                failedStudentIds.map(flow.studentName),
+              )).join(', ');
       if (mounted) {
         if (skippedStudentIds.isEmpty && failedStudentIds.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(

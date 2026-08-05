@@ -255,6 +255,20 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 그룹 수강권은 1:1 멤버십 수업명을 조회하지 않는다 — 조회 실패 시 "개인레슨"
+    // 으로 떨어지던 경로가 학부모 결제 탭의 오표시 원인이었다 (P1-5).
+    if (subscription.isGroupScoped) {
+      return SubscriptionCard(
+        compact: true,
+        subscription: subscription,
+        className: subscription.displayClassName(
+          fallback: AppStrings.individualLesson,
+        ),
+        instrument: membership.instrument,
+        personName: personName,
+        onTap: onTap,
+      );
+    }
     final lessonClassAsync = ref.watch(
       lessonClassProvider(membership.lessonClassId),
     );
@@ -263,7 +277,10 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
           (lessonClass) => SubscriptionCard(
             compact: true,
             subscription: subscription,
-            className: lessonClass?.name ?? '개인레슨',
+            className: subscription.displayClassName(
+              membershipClassName: lessonClass?.name,
+              fallback: AppStrings.individualLesson,
+            ),
             instrument: membership.instrument,
             personName: personName,
             onTap: onTap,
@@ -281,7 +298,7 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
           (_, __) => SubscriptionCard(
             compact: true,
             subscription: subscription,
-            className: '레슨',
+            className: AppStrings.lessonClassErrorFallback,
             instrument: membership.instrument,
             personName: personName,
             onTap: onTap,

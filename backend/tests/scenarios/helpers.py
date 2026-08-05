@@ -510,25 +510,30 @@ class TeacherActions:
         max_capacity: int,
         waitlist_capacity: int | None = None,
     ) -> str:
-        # Group class ownership 검증이 도입되어 LessonClass row 가 실제로 존재해야 한다.
+        # Group class ownership 검증이 도입되어 GroupClass row 가 실제로 존재해야 한다.
         # db_session 이 주어진 경우 (대부분의 fixture 가 전달) 헬퍼 안에서 자동 생성.
         if self.db_session is not None:
             from sqlalchemy import select
 
-            from app.models.lesson import LessonClass, LessonClassType
+            from app.models.schedule import GroupClass, GroupClassType
             from app.models.teacher import Teacher
 
-            existing = await self.db_session.scalar(select(LessonClass).where(LessonClass.id == group_class_id))
+            existing = await self.db_session.scalar(select(GroupClass).where(GroupClass.id == group_class_id))
             if existing is None:
                 teacher_profile_id = await self.db_session.scalar(
                     select(Teacher.id).where(Teacher.user_id == self.user_id)
                 )
                 self.db_session.add(
-                    LessonClass(
+                    GroupClass(
                         id=group_class_id,
                         teacher_id=teacher_profile_id or self.user_id,
                         name="Scenario Group Class",
-                        type=LessonClassType.private,
+                        type=GroupClassType.regular,
+                        max_capacity=max_capacity,
+                        duration_minutes=60,
+                        booking_deadline_minutes=60,
+                        cancel_deadline_minutes=1440,
+                        is_active=True,
                     )
                 )
                 await self.db_session.flush()

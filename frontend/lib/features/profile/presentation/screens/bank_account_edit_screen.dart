@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
@@ -43,31 +44,10 @@ class BankAccountEditScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.account_balance_outlined,
-            size: 64,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            AppStrings.bankAccountNoAccount,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            AppStrings.bankAccountAddPrompt,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.account_balance_outlined,
+      title: AppStrings.bankAccountNoAccount,
+      subtitle: AppStrings.bankAccountAddPrompt,
     );
   }
 
@@ -106,6 +86,8 @@ class BankAccountEditScreen extends ConsumerWidget {
         ...accounts.map(
           (account) => _BankAccountCard(
             account: account,
+            onEdit:
+                () => _showEditAccountSheet(context, ref, accounts, account),
             onSetDefault:
                 account.isDefault
                     ? null
@@ -215,15 +197,40 @@ class BankAccountEditScreen extends ConsumerWidget {
       await _saveAccounts(context, ref, updated);
     }
   }
+
+  Future<void> _showEditAccountSheet(
+    BuildContext context,
+    WidgetRef ref,
+    List<BankAccount> existingAccounts,
+    BankAccount target,
+  ) async {
+    final result = await showNotebookModalBottomSheet<BankAccount>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => _AddBankAccountSheet(account: target),
+    );
+
+    if (result != null) {
+      final updated =
+          existingAccounts
+              .map((a) => a.id == result.id ? result : a)
+              .toList();
+      if (!context.mounted) return;
+      await _saveAccounts(context, ref, updated);
+    }
+  }
 }
 
 class _BankAccountCard extends StatelessWidget {
   final BankAccount account;
+  final VoidCallback onEdit;
   final VoidCallback? onSetDefault;
   final VoidCallback? onDelete;
 
   const _BankAccountCard({
     required this.account,
+    required this.onEdit,
     this.onSetDefault,
     this.onDelete,
   });
@@ -298,35 +305,25 @@ class _BankAccountCard extends StatelessWidget {
                 color: AppColors.inkSecondary,
               ),
             ),
-            if (onSetDefault != null) ...[
-              const SizedBox(height: AppSpacing.space3),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: onSetDefault,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.paperAccent,
-                    side: BorderSide(color: AppColors.paperAccent),
-                  ),
-                  child: const Text(AppStrings.profileBankAccountSetDefault),
-                ),
-              ),
-            ],
           ],
         ),
       ),
     );
 
-    if (onDelete == null) return card;
-
     return SwipeActionTile(
       actions: [
         SwipeAction(
-          label: AppStrings.delete,
-          icon: Icons.delete_outline,
-          tone: SwipeActionTone.destructive,
-          onPressed: onDelete!,
+          label: AppStrings.swipeActionEdit,
+          icon: Icons.edit_outlined,
+          onPressed: onEdit,
         ),
+        if (onDelete != null)
+          SwipeAction(
+            label: AppStrings.delete,
+            icon: Icons.delete_outline,
+            tone: SwipeActionTone.destructive,
+            onPressed: onDelete!,
+          ),
       ],
       startActions: [
         if (onSetDefault != null)
@@ -345,7 +342,11 @@ class _BankAccountCard extends StatelessWidget {
 class _AddBankAccountSheet extends StatefulWidget {
   final bool isFirstAccount;
 
-  const _AddBankAccountSheet({this.isFirstAccount = false});
+  /// Edit target — when non-null, the sheet opens in edit mode with the
+  /// account's fields prefilled and saves via update instead of create.
+  final BankAccount? account;
+
+  const _AddBankAccountSheet({this.isFirstAccount = false, this.account});
 
   @override
   State<_AddBankAccountSheet> createState() => _AddBankAccountSheetState();
@@ -368,6 +369,18 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
   @override
   void initState() {
     super.initState();
+    final existing = widget.account;
+    if (existing != null) {
+      _bankNameController.text = existing.bankName;
+      _accountNumberController.text = existing.accountNumber;
+      _accountHolderController.text = existing.accountHolder;
+      // Editing an already-stored account — consent captured on creation.
+      _consentChecked = true;
+      _selectedDropdownValue =
+          AppStrings.bankNames.contains(existing.bankName)
+              ? existing.bankName
+              : AppStrings.bankAccountDirectInput;
+    }
     _bankNameController.addListener(_onBankNameChanged);
   }
 
@@ -459,14 +472,22 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
       return;
     }
 
-    final account = BankAccount(
-      id: 'ba_${DateTime.now().millisecondsSinceEpoch}',
-      bankName: _bankNameController.text.trim(),
-      accountNumber: _accountNumberController.text.trim(),
-      accountHolder: _accountHolderController.text.trim(),
-      isDefault: widget.isFirstAccount,
-      createdAt: DateTime.now(),
-    );
+    final existing = widget.account;
+    final account =
+        existing != null
+            ? existing.copyWith(
+              bankName: _bankNameController.text.trim(),
+              accountNumber: _accountNumberController.text.trim(),
+              accountHolder: _accountHolderController.text.trim(),
+            )
+            : BankAccount(
+              id: 'ba_${DateTime.now().millisecondsSinceEpoch}',
+              bankName: _bankNameController.text.trim(),
+              accountNumber: _accountNumberController.text.trim(),
+              accountHolder: _accountHolderController.text.trim(),
+              isDefault: widget.isFirstAccount,
+              createdAt: DateTime.now(),
+            );
     Navigator.pop(context, account);
   }
 
@@ -487,7 +508,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
           children: [
             // Notebook × Score: 폼 섹션 제목은 Playfair sectionTitle 로 통일 (§7.17).
             Text(
-              AppStrings.profileBankAccountAddFormTitle,
+              widget.account != null
+                  ? AppStrings.profileBankAccountEditFormTitle
+                  : AppStrings.profileBankAccountAddFormTitle,
               style: NotebookTypography.sectionTitle,
             ),
             const SizedBox(height: AppSpacing.space4),
@@ -692,7 +715,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _consentChecked ? _submit : null,
-                child: const Text(AppStrings.add),
+                child: Text(
+                  widget.account != null ? AppStrings.save : AppStrings.add,
+                ),
               ),
             ),
           ],

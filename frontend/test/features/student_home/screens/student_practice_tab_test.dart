@@ -113,6 +113,47 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // 회귀 가드 — 날짜 헤더 Row(날짜 + '오늘' 배지 + 섹션 수 + 정렬)가 375px
+    // 에서 60px 가로 overflow 를 내던 버그(Expanded+Flexible 로 수정). 오늘
+    // 날짜(배지 노출) + 빈 데이터가 최악 폭.
+    testWidgets('날짜 헤더 — 375px 가로 overflow 없음 (오늘·빈 데이터)', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(375, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            currentUserIdProvider.overrideWithValue('student-1'),
+            currentStudentProvider.overrideWith(
+              (ref) async => Student(
+                id: 'student-1',
+                name: '학생',
+                instrument: '바이올린',
+                createdAt: DateTime(2026),
+              ),
+            ),
+            goalStatusProvider(
+              'student-1',
+            ).overrideWith((_) async => fakeGoalStatus()),
+            studentRepertoiresProvider(
+              'student-1',
+            ).overrideWith((_) async => const <PracticeRepertoire>[]),
+            repertoiresForDateProvider(
+              RepertoiresForDateParams(
+                studentId: 'student-1',
+                date: DateTime.now(),
+              ),
+            ).overrideWith((_) async => const <PracticeRepertoire>[]),
+          ],
+          child: const MaterialApp(home: Scaffold(body: StudentPracticeTab())),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('header has 노트 추가 action button', (tester) async {
       // 440x900: 사전 존재(pre-existing) masthead 27px 오버플로 회피용.
       // 본 테스트의 검증 대상은 노트 섹션 와이어링 — 마스트헤드 폭은 별도 이슈.

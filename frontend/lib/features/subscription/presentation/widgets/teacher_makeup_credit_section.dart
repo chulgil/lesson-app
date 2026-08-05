@@ -16,7 +16,17 @@ import '../providers/makeup_credit_providers.dart';
 /// Lists issued credits and offers manual grant (§4.4) + revoke of unused ones.
 class TeacherMakeupCreditSection extends ConsumerWidget {
   final String studentId;
-  const TeacherMakeupCreditSection({super.key, required this.studentId});
+
+  /// When provided, renders a "전체보기" affordance in the header that
+  /// navigates to the full makeup-credit screen (#1165 진입점). Null in the
+  /// full screen itself (MakeupCreditScreen) where it would be redundant.
+  final VoidCallback? onViewAll;
+
+  const TeacherMakeupCreditSection({
+    super.key,
+    required this.studentId,
+    this.onViewAll,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,6 +44,32 @@ class TeacherMakeupCreditSection extends ConsumerWidget {
                 ),
               ),
             ),
+            if (onViewAll != null) ...[
+              TextButton.icon(
+                onPressed: onViewAll,
+                icon: const Icon(
+                  Icons.list,
+                  size: AppSpacing.iconXS,
+                  color: AppColors.ink,
+                ),
+                // H6 — 텍스트가 affordance 를 지는 이동 액션이므로 밑줄.
+                label: Text(
+                  AppStrings.viewAll,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.ink,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space1),
+            ],
             FilledButton(
               onPressed: () => _confirmGrant(context, ref),
               style: FilledButton.styleFrom(
@@ -112,6 +148,19 @@ class TeacherMakeupCreditSection extends ConsumerWidget {
     WidgetRef ref,
     MakeupCredit credit,
   ) async {
+    // R4 — destructive HARD-GATE: revoking must confirm first (grant does).
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => NotebookAlertDialog(
+        title: AppStrings.makeupCreditRevokeConfirmTitle,
+        content: const Text(AppStrings.makeupCreditRevokeConfirmBody),
+        confirmLabel: AppStrings.makeupCreditRevokeButton,
+        cancelLabel: AppStrings.cancel,
+        onConfirm: () => Navigator.pop(ctx, true),
+        onCancel: () => Navigator.pop(ctx, false),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     try {
       await ref

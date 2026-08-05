@@ -53,4 +53,11 @@ void main() {
     expect(find.text(AppStrings.roleSelectParent), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('#1104 소요시간 안내 캡션("약 3분이면 끝나요")을 표시한다', (tester) async {
+    await pumpRoleSelect(tester);
+
+    expect(find.text(AppStrings.onboardingDurationCaption), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

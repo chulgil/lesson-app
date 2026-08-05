@@ -64,7 +64,8 @@ class SyncAwarePracticeRepository implements PracticeRepository {
   Future<PracticeLog> createPracticeLog(PracticeLog log) =>
       _queue.executeMutation<PracticeLog>(
         remoteCall: () => _remote.createPracticeLog(log),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'practice',
           httpMethod: 'POST',
           path: '/practice-logs',
@@ -82,12 +83,20 @@ class SyncAwarePracticeRepository implements PracticeRepository {
 
   @override
   Future<PracticeLog> updatePracticeLog(PracticeLog log) =>
+      // #1119 (D4): practice is a Last-Write-Wins domain. `log.updatedAt` is
+      // the base version the client edited from — sent as the
+      // If-Unmodified-Since precondition on the direct send and stored as
+      // `clientUpdatedAt` on the queued replay, so the server rejects (412) a
+      // write it has since superseded. Null (never round-tripped) → applies.
       _queue.executeMutation<PracticeLog>(
-        remoteCall: () => _remote.updatePracticeLog(log),
-        queueCall: (syncService) => syncService.queueMutation(
+        remoteCall: () =>
+            _remote.updatePracticeLog(log, ifUnmodifiedSince: log.updatedAt),
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'practice',
           httpMethod: 'PUT',
           path: '/practice-logs/${log.id}',
+          clientUpdatedAt: log.updatedAt,
           payload: {
             'id': log.id,
             'student_id': log.studentId,
@@ -103,7 +112,8 @@ class SyncAwarePracticeRepository implements PracticeRepository {
   Future<void> deletePracticeLog(String id) =>
       _queue.executeVoidMutation(
         remoteCall: () => _remote.deletePracticeLog(id),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'practice',
           httpMethod: 'DELETE',
           path: '/practice-logs/$id',
@@ -124,7 +134,8 @@ class SyncAwarePracticeRepository implements PracticeRepository {
   Future<PracticeStreak> updateStreak(String studentId) =>
       _queue.executeMutation<PracticeStreak>(
         remoteCall: () => _remote.updateStreak(studentId),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'practice',
           httpMethod: 'PUT',
           path: '/practice/streak',
@@ -145,7 +156,8 @@ class SyncAwarePracticeRepository implements PracticeRepository {
   Future<PracticeStreak> recordPractice(String studentId) =>
       _queue.executeMutation<PracticeStreak>(
         remoteCall: () => _remote.recordPractice(studentId),
-        queueCall: (syncService) => syncService.queueMutation(
+        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
+          idempotencyKey: idempotencyKey,
           domain: 'practice',
           httpMethod: 'POST',
           path: '/practice/streak/record',

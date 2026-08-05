@@ -123,6 +123,8 @@ List<RouteBase> subscriptionRoutes = [
           renewFromSubscriptionId: renewFromSubscriptionId,
           lessonRequestId: lessonRequestId,
           lessonRequestIds: lessonRequestIds,
+          returnTo: state.uri.queryParameters['returnTo'],
+          previewLessonId: state.uri.queryParameters['previewLessonId'],
         ),
       );
     },
@@ -169,7 +171,7 @@ List<RouteBase> subscriptionRoutes = [
     builder: (context, state) {
       final id = state.pathParameters['id']!;
       final extra = state.extra as Map<String, dynamic>?;
-      final viewerRole = extra?['viewerRole'] as String? ?? 'student';
+      final viewerRole = viewerRoleExtraOrCurrent(context, extra);
       final initialSession = int.tryParse(
         state.uri.queryParameters['session'] ?? '',
       );

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -59,45 +60,10 @@ class InviteHistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.zero,
-              ),
-              child: Icon(
-                Icons.history,
-                size: 40,
-                color: AppColors.paperAccent,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            // Notebook × Score: 빈 상태 3축(§7.89) + 정적 명사 단일 헤드라인 → §7.17 승격.
-            Text(
-              AppStrings.inviteHistoryEmptyTitle,
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.inviteHistoryEmptyBody,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.history,
+      title: AppStrings.inviteHistoryEmptyTitle,
+      subtitle: AppStrings.inviteHistoryEmptyBody,
     );
   }
 
@@ -106,9 +72,20 @@ class InviteHistoryScreen extends ConsumerWidget {
     WidgetRef ref,
     List<Invite> invites,
   ) {
-    // Separate active and inactive invites
+    // Active invites keep their existing management affordances (copy/revoke).
     final activeInvites = invites.where((i) => i.isValid).toList();
-    final inactiveInvites = invites.where((i) => !i.isValid).toList();
+    // #1105 — inactive invites split into the three history categories so
+    // teachers can track whether a student joined (used), the invite lapsed
+    // (expired), or they pulled it back (revoked).
+    final usedInvites = invites
+        .where((i) => i.status == InviteStatus.used)
+        .toList();
+    final expiredInvites = invites
+        .where((i) => i.status == InviteStatus.expired)
+        .toList();
+    final revokedInvites = invites
+        .where((i) => i.status == InviteStatus.revoked)
+        .toList();
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -130,21 +107,62 @@ class InviteHistoryScreen extends ConsumerWidget {
             ),
           ),
         ],
-        if (activeInvites.isNotEmpty && inactiveInvites.isNotEmpty)
-          const SizedBox(height: AppSpacing.space4),
-        if (inactiveInvites.isNotEmpty) ...[
-          _buildSectionHeader(
-            AppStrings.inviteHistoryInactiveSection,
-            inactiveInvites.length,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          ...inactiveInvites.map(
-            (invite) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: _InviteCard(invite: invite, isInactive: true),
+        _buildHistoryGroup(
+          context,
+          ref,
+          title: AppStrings.inviteHistoryAcceptedSection,
+          invites: usedInvites,
+          showActive: activeInvites.isNotEmpty,
+        ),
+        _buildHistoryGroup(
+          context,
+          ref,
+          title: AppStrings.inviteHistoryExpiredSection,
+          invites: expiredInvites,
+          // Expired invites can be resurrected — reuse the resend flow.
+          onResend: (invite) => _handleResend(context, ref, invite),
+          showActive: activeInvites.isNotEmpty || usedInvites.isNotEmpty,
+        ),
+        _buildHistoryGroup(
+          context,
+          ref,
+          title: AppStrings.inviteHistoryRevokedSection,
+          invites: revokedInvites,
+          showActive: activeInvites.isNotEmpty ||
+              usedInvites.isNotEmpty ||
+              expiredInvites.isNotEmpty,
+        ),
+      ],
+    );
+  }
+
+  /// A single history subsection (수락/만료/회수). Renders nothing when empty so
+  /// the list only shows categories that actually have invites.
+  Widget _buildHistoryGroup(
+    BuildContext context,
+    WidgetRef ref, {
+    required String title,
+    required List<Invite> invites,
+    required bool showActive,
+    void Function(Invite invite)? onResend,
+  }) {
+    if (invites.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (showActive) const SizedBox(height: AppSpacing.space4),
+        _buildSectionHeader(title, invites.length),
+        const SizedBox(height: AppSpacing.space3),
+        ...invites.map(
+          (invite) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+            child: _InviteCard(
+              invite: invite,
+              isInactive: true,
+              onResend: onResend == null ? null : () => onResend(invite),
             ),
           ),
-        ],
+        ),
       ],
     );
   }
@@ -203,6 +221,33 @@ class InviteHistoryScreen extends ConsumerWidget {
     }
   }
 
+  /// Resend an expired invite via the invite repository resend endpoint
+  /// (extends expiry / resurrects), reusing the pending dashboard's messages.
+  /// #1105.
+  Future<void> _handleResend(
+    BuildContext context,
+    WidgetRef ref,
+    Invite invite,
+  ) async {
+    try {
+      await ref.read(inviteRepositoryProvider).resendInvite(invite.id);
+      ref.invalidate(myInvitesProvider);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.invitePendingResendSuccess)),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      final message = e.toString();
+      final friendly = message.contains('cooldown') || message.contains('10')
+          ? AppStrings.invitePendingResendCooldown
+          : AppStrings.invitePendingResendFailed;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(friendly)));
+    }
+  }
+
   void _copyCode(BuildContext context, String code) {
     Clipboard.setData(ClipboardData(text: code));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -219,12 +264,14 @@ class _InviteCard extends StatelessWidget {
   final bool isInactive;
   final VoidCallback? onRevoke;
   final VoidCallback? onCopyCode;
+  final VoidCallback? onResend;
 
   const _InviteCard({
     required this.invite,
     this.isInactive = false,
     this.onRevoke,
     this.onCopyCode,
+    this.onResend,
   });
 
   @override
@@ -349,6 +396,22 @@ class _InviteCard extends StatelessWidget {
                   side: BorderSide(color: AppColors.paperAccent),
                 ),
                 child: const Text(AppStrings.inviteRevokeDialogTitle),
+              ),
+            ),
+          ],
+          // #1105 — expired invites can be resent (resurrected). Reuses the
+          // pending dashboard's 재발송 CTA (FilledButton + paperAccent).
+          if (onResend != null) ...[
+            const SizedBox(height: AppSpacing.space3),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: onResend,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                  backgroundColor: AppColors.paperAccent,
+                ),
+                child: const Text(AppStrings.invitePendingResendLabel),
               ),
             ),
           ],

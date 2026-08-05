@@ -289,6 +289,22 @@ class AcademyService:
             )
         )
 
+    async def is_owner_at_academy(self, *, academy_id: str, user_id: str) -> bool:
+        """해당 학원에서 user 가 활성 owner 인지. also_register_as_teacher 로
+
+        같은 학원에 owner+teacher 겸직 행이 있을 수 있으므로(1인 학원 대표),
+        teacher 격리 여부를 판단하기 전에 owner 여부를 먼저 확인해야 한다.
+        """
+        member_id = await self.db.scalar(
+            select(AcademyMember.id).where(
+                AcademyMember.academy_id == academy_id,
+                AcademyMember.user_id == user_id,
+                AcademyMember.role == AcademyMemberRole.owner,
+                AcademyMember.access_revoked_at.is_(None),
+            )
+        )
+        return member_id is not None
+
     async def get_student(self, student_id: str) -> AcademyStudent:
         student = await self.db.get(AcademyStudent, student_id)
         if student is None:

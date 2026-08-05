@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/onboarding/presentation/screens/first_availability_setup_screen.dart';
+import 'package:lessonaza/core/widgets/onboarding_step_header.dart';
 import 'package:lessonaza/features/onboarding/presentation/widgets/first_availability_celebration_sheet.dart';
 
 void main() {
@@ -93,5 +94,25 @@ void main() {
       find.text(AppStrings.firstAvailabilityCelebrationAction),
       findsOneWidget,
     );
+  });
+
+  testWidgets('#1104 첫 가용시간 화면은 스텝 헤더에서 4/4 단계를 활성화한다', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const FirstAvailabilitySetupScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OnboardingStepHeader), findsOneWidget);
+    final header = tester.widget<OnboardingStepHeader>(
+      find.byType(OnboardingStepHeader),
+    );
+    expect(header.steps, OnboardingStepHeader.teacherSteps);
+    expect(header.currentStep, 4, reason: '첫 가용시간은 4단계 중 마지막');
+    expect(tester.takeException(), isNull);
   });
 }

@@ -628,4 +628,21 @@ Ch.3 레슨 진행 (3/10회)
 
 ---
 
-**확정: 2026-04-05. 구현 시작 가능.**
+## 8. 다음 회차 예약 진입점 배선 (2026-08-03)
+
+> 배경: 수강권 상세는 일정 **변경**(G-2/G-3)만 가능하고, 미정 회차를 **새로 잡는** 진입점이 없다.
+> `AppStrings.sessionBookingRequired`("N회차 예약 필요")는 정의만 있고 사용처 0건인 상태로
+> UI 설계 후 미배선되어 있었다. 본 절이 G-1/G-3 의 "예약 진입" 측면 해소안을 겸한다.
+> 기획: [lesson_add_intent_redesign.md §3.7](../../proposal/lesson_add_intent_redesign.md)
+
+| 뷰어 | 트리거 | CTA | 이동 |
+|---|---|---|---|
+| 선생님 | 미정 회차 존재 (`scheduledLessons < remaining`) | 회차 프로그레스바 아래 [N회차 예약하기] (`sessionBookingRequired` 재사용) | `AddLessonScreen?studentId=&subscriptionId=` 프리필 → 자동 귀속 저장 |
+| 학생 | 회차권/보강 크레딧 + 미정 회차 | 동일 CTA | 직접 예약 (`/schedule/booking/direct`) — 기존 화면 재사용 |
+
+- 정규권(주간 자동 생성)은 미정 회차가 없는 것이 정상이므로 CTA 비노출.
+- 신규 화면 없음 — 기존 AddLessonScreen(선생님) / LessonBookingScreen(학생) 재사용.
+
+---
+
+**확정: 2026-04-05. 구현 시작 가능.** (§8 은 2026-08-03 추가)

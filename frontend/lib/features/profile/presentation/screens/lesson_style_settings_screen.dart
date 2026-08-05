@@ -21,12 +21,34 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../../settings/settings_facade.dart';
+import '../../domain/entities/teacher_profile.dart';
 import '../../domain/entities/teacher_settings.dart';
+import '../extensions/lesson_type_option_visuals.dart';
+import '../providers/teacher_extended_profile_provider.dart';
 
 /// 수업방식 묶음 단일 화면 (W3 Task 3.2).
 ///
 /// spec §6.2 — 메인 홈 5묶음 카테고리 메뉴의 🎓 수업방식 카드 진입로.
 /// 3 항목을 한 화면에서 라디오 + TextField 로 결정한다.
+/// #1194 — awaits a settings save; the notifiers roll back on failure, so
+/// this only needs to tell the user the change did not land.
+Future<void> _saveSetting(
+  BuildContext context,
+  Future<void> Function() action,
+) async {
+  try {
+    await action();
+  } catch (_) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(AppStrings.settingsSaveFailed),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+}
+
 class LessonStyleSettingsScreen extends ConsumerWidget {
   const LessonStyleSettingsScreen({super.key});
 
@@ -41,17 +63,18 @@ class LessonStyleSettingsScreen extends ConsumerWidget {
       body: settingsAsync.when(
         data: (settings) => _LessonStyleSettingsContent(settings: settings),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            child: Text(
-              'Error: $e',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
+        error:
+            (e, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Text(
+                  'Error: $e',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -69,6 +92,8 @@ class _LessonStyleSettingsContent extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const _LessonTypeSection(),
+          const SizedBox(height: AppSpacing.space5),
           _DurationSection(current: settings.lessonDurationMinutes),
           const SizedBox(height: AppSpacing.space5),
           _MinBookingSection(current: settings.minBookingHours),
@@ -76,6 +101,86 @@ class _LessonStyleSettingsContent extends ConsumerWidget {
           _GuidanceSection(current: settings.bookingGuidanceMessage),
         ],
       ),
+    );
+  }
+}
+
+/// 레슨 방식 섹션 — 대면/온라인/방문 다중선택 (#1146).
+///
+/// 선생님이 켠 방식은 학생 프로필에 표시되고, 수강권 등록 시 장소 선택지를
+/// 제한한다(location_option_resolver). 0~3개 선택 허용(빈 값 = 미지정, 게이팅
+/// 안 함). `TeacherExtendedProfile` 을 read+write 하는 self-contained 섹션.
+class _LessonTypeSection extends ConsumerWidget {
+  const _LessonTypeSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(teacherExtendedProfileProvider);
+
+    return profileAsync.maybeWhen(
+      data: (profile) {
+        final selected = profile?.lessonTypes ?? const <LessonTypeOption>[];
+        return _SectionShell(
+          title: AppStrings.lessonStyleLocationSection,
+          hint: AppStrings.lessonStyleLocationHint,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Wrap(
+              spacing: AppSpacing.space2,
+              runSpacing: AppSpacing.space2,
+              children:
+                  LessonTypeOption.values.map((option) {
+                    final isSelected = selected.contains(option);
+                    return FilterChip(
+                      avatar: Icon(
+                        option.icon,
+                        size: 18,
+                        color:
+                            isSelected
+                                ? AppColors.paper
+                                : AppColors.inkSecondary,
+                      ),
+                      label: Text(option.label),
+                      selected: isSelected,
+                      showCheckmark: false,
+                      onSelected: (value) {
+                        final next =
+                            LessonTypeOption.values
+                                .where(
+                                  (o) =>
+                                      o == option
+                                          ? value
+                                          : selected.contains(o),
+                                )
+                                .toList();
+                        _saveSetting(
+                          context,
+                          () => ref
+                              .read(teacherExtendedProfileProvider.notifier)
+                              .updateLessonTypes(next),
+                        );
+                      },
+                      selectedColor: AppColors.paperAccent,
+                      backgroundColor: AppColors.paper,
+                      labelStyle: AppTypography.bodySmall.copyWith(
+                        color: isSelected ? AppColors.paper : AppColors.ink,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                      side: BorderSide(
+                        color:
+                            isSelected
+                                ? AppColors.paperAccent
+                                : AppColors.inkQuaternary,
+                      ),
+                      shape: const RoundedRectangleBorder(),
+                    );
+                  }).toList(),
+            ),
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 }
@@ -95,21 +200,25 @@ class _DurationSection extends ConsumerWidget {
       title: AppStrings.lessonStyleDurationSection,
       hint: AppStrings.lessonStyleDurationHint,
       child: Column(
-        children: _options
-            .map(
-              (minutes) => NotebookRadioListTile<int>(
-                value: minutes,
-                groupValue: current,
-                title: Text(AppStrings.lessonStyleMinutes(minutes)),
-                onChanged: (value) {
-                  if (value == null || value == current) return;
-                  ref
-                      .read(teacherSettingsNotifierProvider.notifier)
-                      .updateDefaultDuration(value);
-                },
-              ),
-            )
-            .toList(),
+        children:
+            _options
+                .map(
+                  (minutes) => NotebookRadioListTile<int>(
+                    value: minutes,
+                    groupValue: current,
+                    title: Text(AppStrings.lessonStyleMinutes(minutes)),
+                    onChanged: (value) {
+                      if (value == null || value == current) return;
+                      _saveSetting(
+                        context,
+                        () => ref
+                            .read(teacherSettingsNotifierProvider.notifier)
+                            .updateDefaultDuration(value),
+                      );
+                    },
+                  ),
+                )
+                .toList(),
       ),
     );
   }
@@ -131,21 +240,25 @@ class _MinBookingSection extends ConsumerWidget {
       title: AppStrings.lessonStyleBookingSection,
       hint: AppStrings.lessonStyleBookingHint,
       child: Column(
-        children: _options
-            .map(
-              (hours) => NotebookRadioListTile<int>(
-                value: hours,
-                groupValue: current,
-                title: Text(_formatHours(hours)),
-                onChanged: (value) {
-                  if (value == null || value == current) return;
-                  ref
-                      .read(teacherSettingsNotifierProvider.notifier)
-                      .updateMinBookingHours(value);
-                },
-              ),
-            )
-            .toList(),
+        children:
+            _options
+                .map(
+                  (hours) => NotebookRadioListTile<int>(
+                    value: hours,
+                    groupValue: current,
+                    title: Text(_formatHours(hours)),
+                    onChanged: (value) {
+                      if (value == null || value == current) return;
+                      _saveSetting(
+                        context,
+                        () => ref
+                            .read(teacherSettingsNotifierProvider.notifier)
+                            .updateMinBookingHours(value),
+                      );
+                    },
+                  ),
+                )
+                .toList(),
       ),
     );
   }
@@ -235,9 +348,12 @@ class _GuidanceMessageFieldState extends ConsumerState<_GuidanceMessageField> {
         counterText: '',
       ),
       onChanged: (value) {
-        ref
-            .read(teacherSettingsNotifierProvider.notifier)
-            .updateBookingGuidanceMessage(value);
+        _saveSetting(
+          context,
+          () => ref
+              .read(teacherSettingsNotifierProvider.notifier)
+              .updateBookingGuidanceMessage(value),
+        );
       },
     );
   }

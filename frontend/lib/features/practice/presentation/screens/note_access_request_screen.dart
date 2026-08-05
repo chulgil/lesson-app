@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/note_access_request.dart';
+import '../extensions/note_access_status_visuals.dart';
 import '../providers/note_access_provider.dart';
 
 /// Screen to display a note access consent request
@@ -179,36 +180,16 @@ class _NoteAccessRequestScreenState
   }
 
   Widget _buildStatusBadge(NoteAccessRequest request) {
-    final statusText = switch (request.status) {
-      NoteAccessStatus.consented => '동의됨',
-      NoteAccessStatus.rejected => '거절됨',
-      NoteAccessStatus.revoked => '회수됨',
-      NoteAccessStatus.requested => '요청 중',
-    };
-
-    final badgeColor = switch (request.status) {
-      NoteAccessStatus.consented => AppColors.bubbleSuccessBackground,
-      NoteAccessStatus.rejected => Colors.red[50],
-      NoteAccessStatus.revoked => AppColors.paperDark,
-      NoteAccessStatus.requested => AppColors.bubbleIdleBackground,
-    };
-
-    final textColor = switch (request.status) {
-      NoteAccessStatus.consented => AppColors.bubbleSuccessText,
-      NoteAccessStatus.rejected => Colors.red[700],
-      NoteAccessStatus.revoked => AppColors.inkSecondary,
-      NoteAccessStatus.requested => AppColors.bubbleIdleText,
-    };
-
+    final status = request.status;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(color: badgeColor),
+      decoration: BoxDecoration(color: status.badgeColor),
       child: Text(
-        statusText,
-        style: AppTypography.caption.copyWith(color: textColor),
+        status.label,
+        style: AppTypography.caption.copyWith(color: status.textColor),
         textAlign: TextAlign.center,
       ),
     );

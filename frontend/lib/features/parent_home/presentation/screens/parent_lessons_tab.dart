@@ -128,6 +128,8 @@ class _LessonsList extends StatelessWidget {
             // Notebook × Score: §1.2 #5 Masthead — tier-1 진입 시그니처.
             NotebookMasthead(
               eyebrow: 'LESSONAZA',
+              // H2 — 로고는 배경으로 물러나고 본문 글자가 먼저 읽히게 한다.
+              eyebrowStyle: NotebookTypography.wordmark,
               meta: 'VOL. ${now.month} · NO. ${now.day}',
             ),
             const SizedBox(height: AppSpacing.space4),
@@ -671,7 +673,10 @@ class _LessonCard extends StatelessWidget {
                         AppStrings.parentHomeRegularLesson,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: isPast ? AppColors.inkSecondary : AppColors.ink,
+                          // H7 — 지나간 레슨은 잉크가 바랜 것처럼 물러난다.
+                          color: isPast
+                              ? AppColors.inkQuaternary
+                              : AppColors.ink,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -684,7 +689,9 @@ class _LessonCard extends StatelessWidget {
                         ? timeLabel
                         : '$timeLabel • $teacherName',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkSecondary,
+                      color: isPast
+                          ? AppColors.inkQuaternary
+                          : AppColors.inkSecondary,
                     ),
                   ),
                 ],

@@ -46,12 +46,15 @@ def _lesson_end_kst(lesson: Lesson) -> datetime | None:
     return start + timedelta(minutes=lesson.duration or 0)
 
 
-# Statuses indicating absence
-_ABSENCE_STATUSES = {
+# Absence-pattern criterion (SSOT). Retention analytics (#1216) reuses these so the
+# "at-risk" definition and the teacher alert stay on one threshold.
+ABSENCE_STATUSES = {
     LessonStatus.studentAbsent,
     LessonStatus.noShow,
     LessonStatus.cancelledByStudentLate,
 }
+ABSENCE_PATTERN_WINDOW_DAYS = 14
+ABSENCE_PATTERN_MIN_COUNT = 2
 
 
 class AttendanceSchedulerService:
@@ -183,10 +186,10 @@ class AttendanceSchedulerService:
         Returns the number of alerts sent.
         """
         now = datetime.now(timezone.utc)
-        cutoff = now - timedelta(days=14)
+        cutoff = now - timedelta(days=ABSENCE_PATTERN_WINDOW_DAYS)
 
         # Find students with 2+ absences in last 14 days, grouped by teacher
-        absence_statuses = [s.value for s in _ABSENCE_STATUSES]
+        absence_statuses = [s.value for s in ABSENCE_STATUSES]
 
         query = (
             select(
@@ -201,7 +204,7 @@ class AttendanceSchedulerService:
                 )
             )
             .group_by(Lesson.teacher_id, Lesson.student_id)
-            .having(func.count(Lesson.id) >= 2)
+            .having(func.count(Lesson.id) >= ABSENCE_PATTERN_MIN_COUNT)
         )
 
         result = await self.db.execute(query)

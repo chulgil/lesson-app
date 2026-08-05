@@ -19,6 +19,17 @@ class StudentLessonCard extends StatelessWidget {
 
   const StudentLessonCard({super.key, required this.lesson});
 
+  /// H7 — 지나간(완료·취소) 레슨. 좌측 시간 블록과 휴강 배지는 유지하고
+  /// 나머지 잉크만 바래게 해 "채워진" 상태 표시가 남게 한다.
+  bool get _isDimmed {
+    final status = lesson.displayStatus;
+    return status == LessonStatus.completed ||
+        status == LessonStatus.cancelled ||
+        status == LessonStatus.cancelledByStudentAdvance ||
+        status == LessonStatus.cancelledByTeacher ||
+        status == LessonStatus.cancelledMutual;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Parse startTime (format: "HH:mm") to DateTime for display.
@@ -34,6 +45,7 @@ class StudentLessonCard extends StatelessWidget {
     );
     final daysUntil = lesson.daysFromNow;
     final isUpcoming = lesson.isUpcoming;
+    final mutedInk = _isDimmed ? AppColors.inkQuaternary : null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -97,11 +109,16 @@ class StudentLessonCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              lesson.teacherName ??
-                                  AppStrings.studentLessonDefaultTeacher,
-                              style: AppTypography.bodyLarge.copyWith(
-                                fontWeight: FontWeight.w600,
+                            Flexible(
+                              child: Text(
+                                lesson.teacherName ??
+                                    AppStrings.studentLessonDefaultTeacher,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: mutedInk,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: AppSpacing.space2),
@@ -116,7 +133,7 @@ class StudentLessonCard extends StatelessWidget {
                               child: Text(
                                 lesson.instrument,
                                 style: AppTypography.caption.copyWith(
-                                  color: AppColors.ink,
+                                  color: mutedInk ?? AppColors.ink,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -130,7 +147,7 @@ class StudentLessonCard extends StatelessWidget {
                               Icon(
                                 Icons.location_on_outlined,
                                 size: 14,
-                                color: AppColors.inkTertiary,
+                                color: mutedInk ?? AppColors.inkTertiary,
                               ),
                               const SizedBox(width: AppSpacing.space1),
                               Expanded(
@@ -151,7 +168,7 @@ class StudentLessonCard extends StatelessWidget {
                           Text(
                             lesson.pieces.first.displayName,
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.inkSecondary,
+                              color: mutedInk ?? AppColors.inkSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -206,7 +223,10 @@ class StudentLessonCard extends StatelessWidget {
                       ),
                     )
                   else
-                    Icon(Icons.chevron_right, color: AppColors.inkTertiary),
+                    Icon(
+                      Icons.chevron_right,
+                      color: mutedInk ?? AppColors.inkTertiary,
+                    ),
                 ],
               ),
             ),

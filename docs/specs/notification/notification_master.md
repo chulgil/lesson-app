@@ -56,7 +56,7 @@
 
 | 수신자 | 알림 타입 |
 |--------|----------|
-| **선생님 전용** | `newStudentRegistered`, `trialBookingRequest`, `studentPracticeReport`, `reviewReceived`, `paymentReceived`, `proposalAccepted`, `rescheduleAllowanceUsed`, `rescheduleAllowanceDepleted`, `generalAnnouncement`, `paymentReminderSentNotice`, `renewalReminderSentNotice` |
+| **선생님 전용** | `newStudentRegistered`, `trialBookingRequest`, `lessonRequestReceived`, `studentPracticeReport`, `reviewReceived`, `paymentReceived`, `proposalAccepted`, `rescheduleAllowanceUsed`, `rescheduleAllowanceDepleted`, `generalAnnouncement`, `paymentReminderSentNotice`, `renewalReminderSentNotice` |
 | **학생 전용** | `practiceReminder`, `practiceAssigned`, `streakWarning`, `streakMilestone`, `weeklyGoalAchieved`, `recordingFeedbackReceived`, `proposalReceived`, `proposalReminder24h/48h/72h`, `proposalExpired`, `paymentRequested`, `paymentReminder`, `paymentConfirmed`, `lessonsRunningLow`, `teacherNoshow`, `compensationApplied`, `lessonNoteShared` |
 | **상대방에게만** | `lessonCancelled`, `lessonRescheduled`, `scheduleChange*` — 요청자 본인은 이미 알고 있으므로 상대방에게만 |
 | **양쪽** | `lessonBooked`, `lessonReminder`, `lessonStarting`, `lessonCompleted`, `noshowWarning`, `noshowConfirmed`, `cancellationDeadline`, `connectionRequest*`, `connectionEstablished`, `connectionDisconnected`, `makeupLesson*`, `subscriptionExpiring*` |
@@ -121,6 +121,7 @@
 |------|---------|---------|------|
 | `newStudentRegistered` | normal | X | O |
 | `trialBookingRequest` | normal | X | O |
+| `lessonRequestReceived` | normal | X | O |
 | `studentPracticeReport` | low | X | **X** |
 | `reviewReceived` | normal | X | O |
 

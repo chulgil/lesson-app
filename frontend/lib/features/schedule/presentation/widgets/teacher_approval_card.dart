@@ -393,10 +393,14 @@ class TeacherApprovalListItem extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          booking.studentName,
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
+                        Flexible(
+                          child: Text(
+                            booking.studentName,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space2),

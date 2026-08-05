@@ -28,7 +28,9 @@ config.set_main_option("sqlalchemy.url", db_url)
 
 # Set up Python logging from alembic.ini
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # disable_existing_loggers=False: in-process alembic runs (tests) must not
+    # silently disable app loggers already created by imported modules (#1142 caplog).
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # SQLAlchemy MetaData for autogenerate support
 target_metadata = Base.metadata

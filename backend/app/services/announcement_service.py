@@ -16,6 +16,7 @@ from app.schemas.teacher_announcement import (
     TeacherAnnouncementCreate,
     TeacherAnnouncementDayOffsResponse,
     TeacherAnnouncementResponse,
+    TeacherAnnouncementUpdate,
 )
 from app.services.notification_service import NotificationService
 from app.services.teacher_id_resolver import resolve_teacher_id
@@ -169,6 +170,114 @@ class AnnouncementService:
             .distinct()
         )
         return TeacherAnnouncementDayOffsResponse(dates=list(rows))
+
+    async def update_announcement(
+        self,
+        announcement_id: str,
+        body: TeacherAnnouncementUpdate,
+        current_user: Any,
+    ) -> TeacherAnnouncementResponse:
+        """Update message (and dayOff dates); type is immutable, students are not re-notified."""
+        from app.models.teacher_announcement import TeacherAnnouncementDate, TeacherAnnouncementType
+
+        announcement = await self._load_owned_announcement(announcement_id, current_user)
+        is_day_off = announcement.type == TeacherAnnouncementType.day_off
+        normalized_dates = self._normalize_dates(body.dates)
+
+        # dates 검증은 기존 announcement 의 type 기준 (type 은 불변).
+        if is_day_off and not normalized_dates:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="dates required for dayOff type",
+            )
+        if not is_day_off and normalized_dates:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="dates must be empty for general type",
+            )
+
+        announcement.message = body.message
+
+        if is_day_off:
+            # 기존 날짜 행 전체 교체 (ORM cascade 미정의 → 수동 삭제 후 재삽입).
+            existing = await self.db.scalars(
+                select(TeacherAnnouncementDate).where(
+                    TeacherAnnouncementDate.teacher_announcement_id == announcement.id
+                )
+            )
+            for row in existing.all():
+                await self.db.delete(row)
+            await self.db.flush()
+            for announcement_date in normalized_dates:
+                self.db.add(
+                    TeacherAnnouncementDate(
+                        teacher_announcement_id=announcement.id,
+                        announcement_date=announcement_date,
+                    )
+                )
+
+        await self.db.flush()
+        await self.db.refresh(announcement)
+
+        dates: list[date] = []
+        affected_lessons: list[AffectedLesson] = []
+        if is_day_off:
+            dates = await self._announcement_dates(announcement.id)
+            affected_lessons = await self._collect_affected_lessons(
+                teacher_id=announcement.teacher_id,
+                dates=dates,
+                target_students=None,
+            )
+
+        return TeacherAnnouncementResponse(
+            id=announcement.id,
+            teacher_id=announcement.teacher_id,
+            type="dayOff" if is_day_off else "general",
+            dates=dates,
+            message=announcement.message,
+            created_at=announcement.created_at,
+            notified_count=announcement.notified_count,
+            affected_lessons=affected_lessons,
+        )
+
+    async def delete_announcement(self, announcement_id: str, current_user: Any) -> None:
+        """Delete an announcement and its day-off date rows (owner only).
+
+        Notification 모델은 announcement 를 참조하는 FK/컬럼이 없다 (JSON data.announcementId
+        메타데이터일 뿐). 참조 무결성 제약이 없으므로 dangling 도 없어, notification 은 삭제하지
+        않고 이력으로 보존한다.
+        """
+        from app.models.teacher_announcement import TeacherAnnouncementDate
+
+        announcement = await self._load_owned_announcement(announcement_id, current_user)
+
+        # 날짜 행을 먼저 지워 FK 위반을 피한다 (ORM cascade 미정의).
+        existing = await self.db.scalars(
+            select(TeacherAnnouncementDate).where(TeacherAnnouncementDate.teacher_announcement_id == announcement.id)
+        )
+        for row in existing.all():
+            await self.db.delete(row)
+
+        await self.db.delete(announcement)
+        await self.db.flush()
+
+    async def _load_owned_announcement(self, announcement_id: str, current_user: Any) -> Any:
+        """Load an announcement by id and assert the caller owns it (404/403)."""
+        from app.models.teacher_announcement import TeacherAnnouncement
+
+        announcement = await self.db.get(TeacherAnnouncement, announcement_id)
+        if announcement is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Announcement not found",
+            )
+        resolved_teacher_id = await resolve_teacher_id(self.db, current_user.id)
+        if announcement.teacher_id != resolved_teacher_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Teacher access denied",
+            )
+        return announcement
 
     async def _notify_active_students(
         self,

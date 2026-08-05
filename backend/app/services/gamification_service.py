@@ -52,11 +52,14 @@ class GamificationService:
         await self._assert_student_access(student_id, current_user)
 
         # Total points
-        total = await self.db.scalar(
-            select(func.coalesce(func.sum(GamificationPoint.points), 0)).where(
-                GamificationPoint.student_id == student_id
+        total = (
+            await self.db.scalar(
+                select(func.coalesce(func.sum(GamificationPoint.points), 0)).where(
+                    GamificationPoint.student_id == student_id
+                )
             )
-        ) or 0
+            or 0
+        )
 
         level, title, to_next, current_min, next_min = _compute_level(total)
 
@@ -117,10 +120,34 @@ class GamificationService:
         description: str,
         current_user: Any,
     ) -> Any:
-        """Award points to a student."""
+        """Award points to a student (idempotent within a short recency window).
+
+        Points have no natural unique key the way badges do — the same type/
+        amount is a legitimate repeat event over time (e.g. daily practice
+        bonus). So this guards only against an accidental double-submission
+        (double-tap / retry) of the exact same award, not against genuinely
+        repeated awards later on.
+        """
+        from datetime import UTC, datetime, timedelta
+
         from app.models.gamification import GamificationPoint
 
         await self._assert_student_access(student_id, current_user)
+
+        cutoff = datetime.now(UTC) - timedelta(seconds=5)
+        recent_duplicate = await self.db.scalar(
+            select(GamificationPoint)
+            .where(
+                GamificationPoint.student_id == student_id,
+                GamificationPoint.points == points,
+                GamificationPoint.type == point_type,
+                GamificationPoint.description == description,
+                GamificationPoint.earned_at >= cutoff,
+            )
+            .order_by(GamificationPoint.earned_at.desc())
+        )
+        if recent_duplicate is not None:
+            return recent_duplicate
 
         entry = GamificationPoint(
             student_id=student_id,

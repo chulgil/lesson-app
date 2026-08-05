@@ -7,6 +7,7 @@ import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -173,24 +174,9 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
     return nextDatesAsync.when(
       data: (dates) {
         if (dates.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.event_busy,
-                  size: 64,
-                  color: AppColors.inkTertiary,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                Text(
-                  AppStrings.noAvailableBookingTime,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
-            ),
+          return const EmptyStateWidget(
+            icon: Icons.event_busy,
+            title: AppStrings.noAvailableBookingTime,
           );
         }
         final suggestions =
@@ -291,6 +277,11 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
   }
 
   Future<void> _confirmAndBook() async {
+    // R3 (D2-class TOCTOU): engage the guard before ANY await, otherwise a
+    // double tap on a slow network stacks two confirm dialogs → duplicate
+    // bookings. Reset on every early return that keeps the screen alive.
+    if (_isBooking) return;
+    setState(() => _isBooking = true);
     final slot = _selectedSlot!;
     // #850 belt-and-suspenders — slots are already filtered by lead time in
     // the provider, but re-check here against a stale selection (screen left
@@ -310,7 +301,10 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
           backgroundColor: AppColors.paperAccent,
         ),
       );
-      setState(() => _selectedSlot = null);
+      setState(() {
+        _isBooking = false;
+        _selectedSlot = null;
+      });
       return;
     }
     if (!mounted) return;
@@ -329,9 +323,11 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
       confirmLabel: AppStrings.bookAction,
       onConfirm: () => Navigator.pop(context, true),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) {
+      if (mounted) setState(() => _isBooking = false);
+      return;
+    }
 
-    setState(() => _isBooking = true);
     try {
       final notifier = ref.read(slotBookingNotifierProvider.notifier);
       await notifier.bookSlot(

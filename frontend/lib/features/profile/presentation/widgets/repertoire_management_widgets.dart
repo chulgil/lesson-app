@@ -4,6 +4,7 @@ import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -132,27 +133,12 @@ class RepertoireEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.library_music, size: 64, color: AppColors.inkTertiary),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            hasFilters ? '검색 결과가 없습니다' : '등록된 곡이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            '곡을 추가하여 레퍼토리를 관리하세요',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          ),
-        ],
-      ),
+    return EmptyStateWidget(
+      icon: Icons.library_music,
+      title: hasFilters
+          ? AppStrings.searchNoResults
+          : AppStrings.repertoireEmptyTitle,
+      subtitle: AppStrings.repertoireEmptyHint,
     );
   }
 }
@@ -809,7 +795,7 @@ void showAssignToStudentDialog({
               final student = students[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.1),
+                  backgroundColor: AppColors.paperAccentSoft,
                   child: Text(
                     student.name[0],
                     style: TextStyle(color: AppColors.paperAccent),
