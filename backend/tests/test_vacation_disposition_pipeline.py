@@ -10,7 +10,7 @@ auto-extend behavior:
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
@@ -279,6 +279,16 @@ async def test_per_student_override_routes_each_student(
 # --------------------------------------------------------------------- Recovery
 
 
+# 취소 가드("이미 시작된 휴가")는 KST 오늘 기준이라 고정 날짜는 그 날이 지나면
+# 썩는다 — 복원 경로 테스트는 항상 미래 창을 쓴다.
+_KST_TZ = timezone(timedelta(hours=9))
+
+
+def _future_vacation_window(days: int = 5) -> tuple[date, date]:
+    start = datetime.now(_KST_TZ).date() + timedelta(days=1)
+    return start, start + timedelta(days=days - 1)
+
+
 @pytest.mark.asyncio
 async def test_recovery_restores_bookings_and_drops_credits(
     client: AsyncClient,
@@ -290,11 +300,12 @@ async def test_recovery_restores_bookings_and_drops_credits(
     teacher_id = f"{user.id}-prof"
     lc = await _seed_lesson_class(db_session, teacher_id)
     student_id, _ = await _seed_student(db_session, teacher_id, "복원")
+    vac_start, vac_end = _future_vacation_window()
     booking_id, _ = await _seed_booking(
         db_session,
         teacher_id,
         student_id,
-        date(2026, 8, 2),
+        vac_start + timedelta(days=1),
         lesson_class_id=lc,
         with_subscription=True,
     )
@@ -304,8 +315,8 @@ async def test_recovery_restores_bookings_and_drops_credits(
         "/api/v1/teacher/vacation",
         headers=_headers("t-rec"),
         json={
-            "start_date": "2026-08-01",
-            "end_date": "2026-08-05",
+            "start_date": vac_start.isoformat(),
+            "end_date": vac_end.isoformat(),
             "default_disposition": "makeupCredit",
         },
     )
