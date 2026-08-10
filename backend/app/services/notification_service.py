@@ -332,23 +332,34 @@ class NotificationService:
         self.db.add(notification)
         await self.db.flush()
 
-        # Send push notification if enabled
+        # Send push notification if enabled. Best-effort: a push-path failure
+        # (token lookup, FCM transport, token cleanup) must never abort the
+        # caller's business transaction — the in-app row above is the source
+        # of truth and ~30 core write paths call this without their own guard.
         if is_push:
-            token_service = DeviceTokenService(self.db)
-            tokens = await token_service.get_tokens_for_user(user_id)
+            try:
+                token_service = DeviceTokenService(self.db)
+                tokens = await token_service.get_tokens_for_user(user_id)
 
-            if tokens:
-                failed_tokens = await _fcm_service.send_to_user(
-                    tokens=tokens,
-                    title=title,
-                    body=body,
-                    notification_type=notification_type,
-                    priority=priority,
-                    data=data,
-                    action_url=action_url,
-                    action_label=action_label,
+                if tokens:
+                    failed_tokens = await _fcm_service.send_to_user(
+                        tokens=tokens,
+                        title=title,
+                        body=body,
+                        notification_type=notification_type,
+                        priority=priority,
+                        data=data,
+                        action_url=action_url,
+                        action_label=action_label,
+                    )
+
+                    # Clean up invalid tokens
+                    for token in failed_tokens:
+                        await token_service.unregister(token, user_id)
+            except Exception:  # noqa: BLE001 — push is best-effort by contract
+                logger.warning(
+                    "push send failed for user %s (type=%s) — in-app row kept",
+                    user_id,
+                    notification_type,
+                    exc_info=True,
                 )
-
-                # Clean up invalid tokens
-                for token in failed_tokens:
-                    await token_service.unregister(token, user_id)

@@ -425,6 +425,22 @@ class ScheduleService:
         from app.services.availability_service import AvailabilityService
 
         vacation_mode_blocked = any(AvailabilityService.is_slot_in_vacation(d, av) for av in availability_list)
+        if not vacation_mode_blocked:
+            # A registered VacationPeriod must block slots too — the vacation
+            # registration flow creates neither TeacherAvailability.vacation_mode
+            # nor a ScheduleException row, so without this read-side check
+            # students could book straight through a teacher's vacation.
+            from app.models.schedule import VacationPeriod
+
+            vacation_period_blocked = await self.db.scalar(
+                select(VacationPeriod.id).where(
+                    VacationPeriod.teacher_id.in_(teacher_id_scope),
+                    VacationPeriod.start_date <= d,
+                    VacationPeriod.end_date >= d,
+                    VacationPeriod.cancelled_at.is_(None),
+                )
+            )
+            vacation_mode_blocked = vacation_period_blocked is not None
 
         # Get time slots
         time_slots = await self.db.scalars(
@@ -1079,6 +1095,24 @@ class ScheduleService:
         update_data = data.model_dump(exclude_unset=True)
         update_data.pop("lesson_date", None)
         update_data.pop("start_time", None)
+
+        # Status transitions have dedicated endpoints (PATCH /approve, /cancel)
+        # with role checks and slot re-validation. PUT echoes the FE's full
+        # model, so an *unchanged* status is tolerated (and dropped so it does
+        # not mask change-intent detection below), but only the booking's
+        # teacher may change status here — otherwise a student could
+        # self-approve a pending booking straight to confirmed/completed.
+        requested_status = update_data.get("status")
+        if requested_status is not None:
+            if BookingStatus(requested_status) == booking.status:
+                update_data.pop("status")
+            elif current_user is not None:
+                teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+                if getattr(booking, "teacher_id", None) not in teacher_ids:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Only the teacher may change booking status",
+                    )
 
         # FE 호환 — 실제 date 또는 time 이 바뀌면 변경 의도. status=changeRequested 일관 처리.
         date_changed = "scheduled_date" in update_data and update_data["scheduled_date"] != booking.scheduled_date

@@ -308,7 +308,12 @@ class LessonRequestService:
         if subscription_id is None:
             return
 
-        today = dt.date.today()
+        # KST calendar date — server-local date.today() (UTC in deployment)
+        # lags a day behind between 00:00-09:00 KST, shifting which lessons a
+        # schedule change applies to.
+        from app.services.cancellation_policy import KST
+
+        today = datetime.now(UTC).astimezone(KST).date()
         lessons = list(
             (
                 await self.db.scalars(
@@ -404,6 +409,12 @@ class LessonRequestService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Cannot transition from terminal status '{request.status}'",
             )
+
+        # Idempotent reentry guard — re-submitting the current status (e.g. a
+        # double-tapped approve) must not re-emit RequestEvent rows and
+        # counterpart notifications.
+        if canonical_status == request.status:
+            return await self._to_response(request)
 
         # Approval / proposal / subscription-issuing transitions are teacher-only.
         # Students may only cancel/withdraw or progress their own payment side.

@@ -344,15 +344,22 @@ class AcademyBillingService:
                     "amount": invoice.total_amount,
                 }
             )
-        # 강사별 배분 계산 + AcademySettlement upsert.
-        default_share = float(
-            rule.teacher_distribution_config.get("default_share_pct", 0.6)
-            if rule.teacher_distribution_type == TeacherDistributionType.revenue_share
-            else 0.0
+        # 강사별 배분 계산 + AcademySettlement upsert. Decimal — float 곱셈은
+        # KRW 정수 금액에서 0.6*1_000_000 = 599999.999... 류 절사 오차를 만든다.
+        from decimal import ROUND_HALF_UP, Decimal
+
+        default_share = Decimal(
+            str(
+                rule.teacher_distribution_config.get("default_share_pct", 0.6)
+                if rule.teacher_distribution_type == TeacherDistributionType.revenue_share
+                else 0
+            )
         )
         count = 0
         for teacher_member_id, totals in teacher_totals.items():
-            calculated = int(totals["student_revenue"] * default_share)
+            calculated = int(
+                (Decimal(totals["student_revenue"]) * default_share).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+            )
             existing = await self.db.scalar(
                 select(AcademySettlement)
                 .where(AcademySettlement.academy_id == academy_id)

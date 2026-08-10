@@ -34,11 +34,17 @@ _buckets: dict[tuple[str, str], deque[float]] = defaultdict(deque)
 def _client_identifier(request: Request) -> str:
     """Return the rate-limit key for the request.
 
-    proxy 뒤 환경을 위해 X-Forwarded-For 의 첫 IP 우선, 그 다음 request.client.host.
+    X-Forwarded-For is client-forgeable: trusting it unconditionally lets every
+    request mint a fresh bucket, turning the limiter into a no-op. It is only
+    honored when RATE_LIMIT_TRUST_PROXY is enabled (deployment sits behind a
+    trusted reverse proxy), and then the *last* hop is used — the one appended
+    by our proxy — since the leading entries are client-controlled.
     """
+    from app.core.config import settings
+
     forwarded = request.headers.get("x-forwarded-for", "").strip()
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    if forwarded and getattr(settings, "RATE_LIMIT_TRUST_PROXY", False):
+        return forwarded.split(",")[-1].strip()
     if request.client is not None:
         return request.client.host
     return "unknown"

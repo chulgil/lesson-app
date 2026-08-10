@@ -78,6 +78,25 @@ async def _send_returns_for_period(session: AsyncSession, period: VacationPeriod
     students = (await session.scalars(select(Student).where(Student.id.in_(student_ids)))).all()
     service = build_alimtalk_service(session)
     notification_service = NotificationService(session)
+
+    # In-app/push dedupe by (user_id, vacation_period_id). The 7-day catch-up
+    # window re-matches the same period on every daily run; the alimtalk side
+    # has a vendor idempotency key, but without this marker check the in-app
+    # row and push were re-created each day — 7 duplicate pushes per return.
+    from app.models.notification import Notification
+
+    student_user_ids = [s.user_id for s in students if s.user_id]
+    already_notified: set[str] = set()
+    if student_user_ids:
+        rows = (
+            await session.execute(
+                select(Notification.user_id, Notification.data).where(
+                    Notification.type == "teacherVacationReturned",
+                    Notification.user_id.in_(student_user_ids),
+                )
+            )
+        ).all()
+        already_notified = {user_id for user_id, data in rows if (data or {}).get("vacation_period_id") == period.id}
     sent = 0
     for student in students:
         phone = student.parent_phone or student.phone or ""
@@ -93,11 +112,9 @@ async def _send_returns_for_period(session: AsyncSession, period: VacationPeriod
             )
             if log is not None and log.success:
                 sent += 1
-        # spec §6.3 — in-app companion. Each cron run re-creates a fresh
-        # Notification row; the alimtalk-side idempotency key prevents
-        # duplicate vendor sends but in-app delivery is by design a per-day
-        # rerun. Future work: dedupe by (user_id, vacation_period_id, type).
-        if student.user_id:
+        # spec §6.3 — in-app companion, deduped above by
+        # (user_id, vacation_period_id).
+        if student.user_id and student.user_id not in already_notified:
             try:
                 await notification_service.create_and_send(
                     user_id=student.user_id,

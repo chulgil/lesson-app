@@ -92,6 +92,11 @@ class Settings(BaseSettings):
     # ASGI lifespan deterministic and avoid leaking background event loops.
     TESTING: bool = False
 
+    # Rate limiter — trust X-Forwarded-For only behind a trusted reverse proxy
+    # (env: RATE_LIMIT_TRUST_PROXY=1). Default off: the header is client-forgeable,
+    # and trusting it lets every request mint a fresh rate-limit bucket.
+    RATE_LIMIT_TRUST_PROXY: bool = False
+
     # OpenAI (for AI lesson notes)
     OPENAI_API_KEY: str = ""
 
