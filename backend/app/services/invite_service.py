@@ -290,16 +290,22 @@ class InviteService:
 
         invite: Invite | None = None
 
-        # Validate invite code if provided
+        # Validate invite code if provided. Row-locked so the validate →
+        # use_count increment below is atomic — without the lock two
+        # concurrent requests could both pass _validate_invite_can_be_used
+        # and overshoot a single-use/max_uses invite (TOCTOU). No-op on the
+        # SQLite test dialect, same as the subscription_service pattern.
         if invite_code:
-            invite = await self.db.scalar(select(Invite).where(Invite.invite_code == invite_code.upper()))
+            invite = await self.db.scalar(
+                select(Invite).where(Invite.invite_code == invite_code.upper()).with_for_update()
+            )
             if invite is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Invalid invite code",
                 )
         elif invite_id:
-            invite = await self.db.get(Invite, invite_id)
+            invite = await self.db.scalar(select(Invite).where(Invite.id == invite_id).with_for_update())
             if invite is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,

@@ -120,8 +120,20 @@ class AcademyPaymentMatchingService:
         result = await self.db.scalars(stmt.order_by(AcademyBankTransaction.tx_at.desc()))
         return list(result.all()), total
 
-    async def get_transaction(self, tx_id: str) -> AcademyBankTransaction:
-        tx = await self.db.get(AcademyBankTransaction, tx_id)
+    async def get_transaction(self, tx_id: str, *, for_update: bool = False) -> AcademyBankTransaction:
+        """Fetch a bank transaction.
+
+        ``for_update`` row-locks the row so the state check → mutate sequences
+        (confirm/split/ignore/unmatch/suggest) cannot race a concurrent
+        double-tap into duplicate AcademyPayment rows. No-op on SQLite (tests),
+        same pattern as subscription_service.
+        """
+        if for_update:
+            tx = await self.db.scalar(
+                select(AcademyBankTransaction).where(AcademyBankTransaction.id == tx_id).with_for_update()
+            )
+        else:
+            tx = await self.db.get(AcademyBankTransaction, tx_id)
         if tx is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="bank transaction not found")
         return tx
@@ -152,7 +164,7 @@ class AcademyPaymentMatchingService:
         - invoice 취소됨 → 409
         - tx 가 이미 matched/ignored → 409
         """
-        tx = await self.get_transaction(tx_id)
+        tx = await self.get_transaction(tx_id, for_update=True)
         if tx.academy_id != academy_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="tx not in this academy")
         if tx.state in {AcademyBankTransactionState.matched, AcademyBankTransactionState.ignored}:
@@ -242,7 +254,7 @@ class AcademyPaymentMatchingService:
 
     async def ignore_transaction(self, *, academy_id: str, tx_id: str) -> AcademyBankTransaction:
         """학원장이 '이번 회기는 무시' → state='ignored', 다음 마감에서 자동 제외."""
-        tx = await self.get_transaction(tx_id)
+        tx = await self.get_transaction(tx_id, for_update=True)
         if tx.academy_id != academy_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="tx not in this academy")
         if tx.state == AcademyBankTransactionState.matched:
@@ -262,7 +274,7 @@ class AcademyPaymentMatchingService:
 
         Note: §7.6 의 "7일 이내" 시간 제약은 추후 라운드에서 추가 (현재는 항상 허용).
         """
-        tx = await self.get_transaction(tx_id)
+        tx = await self.get_transaction(tx_id, for_update=True)
         if tx.academy_id != academy_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="tx not in this academy")
         if tx.state != AcademyBankTransactionState.matched:
@@ -370,7 +382,7 @@ class AcademyPaymentMatchingService:
                 detail="duplicate invoice_id in splits",
             )
 
-        tx = await self.get_transaction(tx_id)
+        tx = await self.get_transaction(tx_id, for_update=True)
         if tx.academy_id != academy_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="tx not in this academy")
         if tx.state in {AcademyBankTransactionState.matched, AcademyBankTransactionState.ignored}:
@@ -482,7 +494,7 @@ class AcademyPaymentMatchingService:
 
         재호출 시 기존 pending suggestion 은 삭제 후 재계산 (decided 는 보존 — audit).
         """
-        tx = await self.get_transaction(tx_id)
+        tx = await self.get_transaction(tx_id, for_update=True)
         if tx.academy_id != academy_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="tx not in this academy")
         if tx.state in {
