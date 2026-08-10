@@ -7,7 +7,7 @@ import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
-import 'package:lessonaza/features/academy/data/repositories/mock_academy_inquiry_repository.dart';
+import '../providers/academy_inquiry_providers.dart';
 
 class AcademyInquiryDetailScreen extends ConsumerStatefulWidget {
   const AcademyInquiryDetailScreen({
@@ -50,12 +50,15 @@ class _AcademyInquiryDetailScreenState
 
     setState(() => _isReplying = true);
     try {
-      final repo = MockAcademyInquiryRepository();
+      // Shared repository — a locally constructed mock instance would drop
+      // the reply once this screen closes.
+      final repo = ref.read(academyInquiryRepositoryProvider);
       await repo.reply(_currentInquiry.id, _replyController.text);
       _replyController.clear();
 
       // Refresh inquiry
       final updated = await repo.getById(_currentInquiry.id);
+      ref.invalidate(academyInquiryListProvider(widget.academyId));
       setState(() => _currentInquiry = updated);
 
       if (mounted) {
@@ -101,7 +104,9 @@ class _AcademyInquiryDetailScreenState
                   // Replies
                   if (_currentInquiry.replies.isNotEmpty) ...[
                     Text(
-                      AppStrings.inquiryReplyCountLabel(_currentInquiry.replies.length),
+                      AppStrings.inquiryReplyCountLabel(
+                        _currentInquiry.replies.length,
+                      ),
                       style: AppTypography.headingSmall.copyWith(
                         color: AppColors.ink,
                       ),
@@ -136,13 +141,14 @@ class _AcademyInquiryDetailScreenState
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: _isReplying ? null : _submitReply,
-                    child: _isReplying
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(AppStrings.inquiryReplySend),
+                    child:
+                        _isReplying
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : Text(AppStrings.inquiryReplySend),
                   ),
                 ),
               ],
@@ -174,9 +180,7 @@ class _AcademyInquiryDetailScreenState
                     horizontal: AppSpacing.space2,
                     vertical: AppSpacing.space1,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccentSoft,
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                   child: Text(
                     inquiry.senderRole == InquirySenderRole.student
                         ? AppStrings.inquirySenderRoleStudent
@@ -226,7 +230,9 @@ class _AcademyInquiryDetailScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                reply.isFromAcademy ? AppStrings.inquiryReplyFromAcademy : AppStrings.inquiryReplyFromMe,
+                reply.isFromAcademy
+                    ? AppStrings.inquiryReplyFromAcademy
+                    : AppStrings.inquiryReplyFromMe,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.bold,

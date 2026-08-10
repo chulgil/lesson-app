@@ -13,21 +13,29 @@ part 'student_home_profile_provider.g.dart';
 
 @riverpod
 StudentHomeProfileState studentHomeProfile(StudentHomeProfileRef ref) {
-  final studentId = ref.watch(currentUserIdProvider);
-  final studentAsync = ref.watch(studentProvider(studentId));
-  final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
-  final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
-  final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
+  // Resolve the real Student.id (GET /students/me/profile). Passing the auth
+  // userId as a student id 404s on remote (mock matched by coincidence) —
+  // same fix as the sibling student_home tabs.
+  final studentAsync = ref.watch(currentStudentProvider);
+  final student = studentAsync.valueOrNull;
+  final studentId = student?.id;
+  final lessonsAsync =
+      studentId != null ? ref.watch(lessonsByStudentProvider(studentId)) : null;
+  final practiceLogsAsync =
+      studentId != null ? ref.watch(practiceLogsProvider(studentId)) : null;
+  final repertoiresAsync =
+      studentId != null
+          ? ref.watch(studentRepertoiresProvider(studentId))
+          : null;
   final connectionsAsync = ref.watch(myConnectionsProvider);
 
-  final student = studentAsync.valueOrNull;
   final completedLessonCount =
-      lessonsAsync.valueOrNull
+      lessonsAsync?.valueOrNull
           ?.where((lesson) => lesson.status == LessonStatus.completed)
           .length ??
       0;
   final totalPracticeMinutes =
-      practiceLogsAsync.valueOrNull?.fold<int>(
+      practiceLogsAsync?.valueOrNull?.fold<int>(
         0,
         (sum, log) => sum + log.totalMinutes,
       ) ??
@@ -36,7 +44,7 @@ StudentHomeProfileState studentHomeProfile(StudentHomeProfileRef ref) {
       student != null
           ? DateTime.now().difference(student.createdAt).inDays ~/ 30
           : 0;
-  final repertoireCount = repertoiresAsync.whenOrNull(
+  final repertoireCount = repertoiresAsync?.whenOrNull(
     data: (list) => list.where((repertoire) => !repertoire.isArchived).length,
   );
   final teacherSubtitle = connectionsAsync.whenOrNull(
@@ -49,14 +57,17 @@ StudentHomeProfileState studentHomeProfile(StudentHomeProfileRef ref) {
   );
 
   return StudentHomeProfileState(
-    studentId: studentId,
+    studentId: studentId ?? '',
     name: student?.name ?? '-',
     initial: student?.initial ?? '-',
     email: student?.email ?? '-',
     instrument: student?.instrument ?? '-',
-    lessonCountLabel: lessonsAsync.isLoading ? null : '$completedLessonCount회',
+    lessonCountLabel:
+        (lessonsAsync?.isLoading ?? true) ? null : '$completedLessonCount회',
     practiceTimeLabel:
-        practiceLogsAsync.isLoading ? null : '${totalPracticeMinutes ~/ 60}시간',
+        (practiceLogsAsync?.isLoading ?? true)
+            ? null
+            : '${totalPracticeMinutes ~/ 60}시간',
     lessonPeriodLabel:
         studentAsync.isLoading
             ? null

@@ -19,10 +19,7 @@ import '../widgets/year_heatmap_grid.dart';
 ///
 /// 스펙 §4.4 / 플랜 Job 9 Task 9.1 / AC-6.4. 1년 히트맵 + 트로피 모음.
 class StudentGrowthDetailScreen extends ConsumerWidget {
-  const StudentGrowthDetailScreen({
-    super.key,
-    required this.studentId,
-  });
+  const StudentGrowthDetailScreen({super.key, required this.studentId});
 
   final String studentId;
 
@@ -36,15 +33,15 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
         gamificationAsync.valueOrNull?.earnedBadges ?? const [];
     // doc 46 §4 (데일리 만족 루프 P2) — 오늘의 목표 대비 잔디 강도 + freeze 로
     // 지킨 날짜 표시. 값이 없으면 YearHeatmapGrid 는 기존 정적 5단계로 폴백.
-    final goalMinutes = ref
-        .watch(dailyPracticeGoalProvider(studentId))
-        .valueOrNull;
-    final frozenDates = ref
-        .watch(studentStreakFreezeProvider(studentId))
-        .valueOrNull
-        ?.usedAt
-        .map((d) => DateTime.utc(d.year, d.month, d.day))
-        .toSet();
+    final goalMinutes =
+        ref.watch(dailyPracticeGoalProvider(studentId)).valueOrNull;
+    final frozenDates =
+        ref
+            .watch(studentStreakFreezeProvider(studentId))
+            .valueOrNull
+            ?.usedAt
+            .map((d) => DateTime.utc(d.year, d.month, d.day))
+            .toSet();
 
     return NotebookScreenScaffold(
       appBarTitle: AppStrings.growthDetailScreenTitle,
@@ -63,7 +60,9 @@ class StudentGrowthDetailScreen extends ConsumerWidget {
               data:
                   (heatmap) => YearHeatmapGrid(
                     heatmap: heatmap,
-                    asOf: DateTime.now().toUtc(),
+                    // Cells are keyed by local calendar date tagged UTC —
+                    // asOf must match or the today column shifts at 00-09 KST.
+                    asOf: DateTime.now(),
                     goalMinutes: goalMinutes,
                     frozenDates: frozenDates,
                     onDayTap: (date) {

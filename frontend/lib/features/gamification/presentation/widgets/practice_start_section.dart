@@ -37,7 +37,9 @@ class PracticeStartSection extends ConsumerWidget {
 
     final name = studentAsync.value?.nickname ?? studentAsync.value?.name ?? '';
     final heatmap = heatmapAsync.value;
-    final now = DateTime.now().toUtc();
+    // Heatmap cells are keyed by the *local* calendar date tagged as UTC
+    // (PracticeRecordingService), so derive "today" from local time.
+    final now = DateTime.now();
     final today = DateTime.utc(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final yesterdayMinutes = heatmap?.days[yesterday]?.totalMinutes ?? 0;
@@ -60,9 +62,10 @@ class PracticeStartSection extends ConsumerWidget {
       onStartTap: () => _practice(context, ref),
       onMoreTap: () => _onMoreTap(context),
       continuePieceName: recentSection?.pieceName,
-      onContinueTap: recentSection == null
-          ? null
-          : () => _practice(context, ref, sectionId: recentSection.id),
+      onContinueTap:
+          recentSection == null
+              ? null
+              : () => _practice(context, ref, sectionId: recentSection.id),
     );
   }
 
@@ -113,13 +116,14 @@ class PracticeStartSection extends ConsumerWidget {
       context: context,
       barrierColor: Colors.transparent,
       barrierDismissible: false,
-      builder: (ctx) => PracticeCelebrationOverlay(
-        practiceMinutes: practiceMinutes,
-        streakDays: streakDays,
-        onDismiss: () {
-          if (ctx.mounted) Navigator.of(ctx).pop();
-        },
-      ),
+      builder:
+          (ctx) => PracticeCelebrationOverlay(
+            practiceMinutes: practiceMinutes,
+            streakDays: streakDays,
+            onDismiss: () {
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+          ),
     );
   }
 }

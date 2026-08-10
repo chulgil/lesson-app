@@ -79,6 +79,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       // keepAlive lessonsProvider(홈 대시보드)/lessonProvider(id)(상세) stale 방지 —
       // lesson_confirmation_provider 와 동일 패턴. weekLessons 는 notifier watch(#1141).
       ref.invalidate(lessonsProvider);
+      _invalidateDerived();
       return newLesson;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -93,6 +94,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       state = await AsyncValue.guard(() => _repository.getLessons());
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(lesson.id));
+      _invalidateDerived();
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -110,6 +112,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       state = await AsyncValue.guard(() => _repository.getLessons());
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(lesson.id));
+      _invalidateDerived();
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -136,6 +139,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       state = await AsyncValue.guard(() => _repository.getLessons());
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(lesson.id));
+      _invalidateDerived();
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -150,6 +154,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       state = await AsyncValue.guard(() => _repository.getLessons());
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(id));
+      _invalidateDerived();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -163,6 +168,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       state = await AsyncValue.guard(() => _repository.getLessons());
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(id));
+      _invalidateDerived();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -176,6 +182,7 @@ class LessonsNotifier extends _$LessonsNotifier {
       state = await AsyncValue.guard(() => _repository.getLessons());
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(id));
+      _invalidateDerived();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
@@ -185,5 +192,17 @@ class LessonsNotifier extends _$LessonsNotifier {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _repository.getLessons());
+  }
+
+  /// Derived keepAlive read providers that fetch lesson lists straight from
+  /// the repository. They have no watch-chain to this notifier, so every
+  /// mutation must invalidate them or their consumer screens (student lesson
+  /// sections, today/upcoming cards) keep showing pre-mutation data.
+  void _invalidateDerived() {
+    ref.invalidate(lessonsByStudentProvider);
+    ref.invalidate(lessonsByDateProvider);
+    ref.invalidate(upcomingLessonsProvider);
+    ref.invalidate(recentLessonsProvider);
+    ref.invalidate(todayLessonsProvider);
   }
 }

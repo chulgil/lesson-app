@@ -37,7 +37,9 @@ class _StubGrowthHeatmapRepository implements GrowthHeatmapRepository {
 }
 
 GrowthHeatmap _todayHeatmap(String studentId, DailyPractice today) {
-  final now = DateTime.now().toUtc();
+  // Heatmap cells are keyed by the *local* calendar date tagged as UTC —
+  // same derivation as _heatmapTodayKey in daily_missions_provider.dart.
+  final now = DateTime.now();
   final key = DateTime.utc(now.year, now.month, now.day);
   return GrowthHeatmap(studentId: studentId, days: {key: today});
 }

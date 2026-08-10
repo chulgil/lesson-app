@@ -157,6 +157,14 @@ class RecordingNotifier extends _$RecordingNotifier {
     _repertoireId = repertoireId;
     _studentId = studentId;
 
+    // The mic-input watchdog subscription outlives fast navigation: leaving
+    // the screen within the check window would otherwise leave it firing
+    // `state=` on a disposed notifier (StateError).
+    ref.onDispose(() {
+      _micInputCheckSubscription?.cancel();
+      _micInputCheckSubscription = null;
+    });
+
     // Setup player completion callback
     _player.onComplete = () {
       state = state.copyWith(
@@ -344,9 +352,9 @@ class RecordingNotifier extends _$RecordingNotifier {
         durationSeconds: durationSeconds,
         recordedAt: DateTime.now(),
         isRepresentative:
-            // #749: representative if none currently holds it (covers both the
-            // first recording and a list whose representative was deleted).
-            state.recordings.every((r) => !r.isRepresentative),
+        // #749: representative if none currently holds it (covers both the
+        // first recording and a list whose representative was deleted).
+        state.recordings.every((r) => !r.isRepresentative),
       );
 
       // Save to repository

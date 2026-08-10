@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
@@ -55,6 +56,17 @@ Future<List<ClassMembership>> activeStudentMemberships(
   return memberships.where((m) => m.isEnrolled).toList();
 }
 
+/// Sibling read providers over the same membership data. They have no
+/// watch-chain to the notifiers below, so every mutation must invalidate
+/// them or consumer screens (grouped student list, edit-student link check)
+/// keep showing pre-mutation memberships until the provider is recreated.
+void _invalidateMembershipReads(Ref ref) {
+  ref.invalidate(classMembershipsProvider);
+  ref.invalidate(studentMembershipsProvider);
+  ref.invalidate(activeStudentMembershipsProvider);
+  ref.invalidate(membershipProvider);
+}
+
 /// Notifier for managing ClassMembership CRUD operations.
 @riverpod
 class MembershipNotifier extends _$MembershipNotifier {
@@ -68,6 +80,7 @@ class MembershipNotifier extends _$MembershipNotifier {
     final repository = ref.read(membershipRepositoryProvider);
     final created = await repository.create(membership);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
     return created;
   }
 
@@ -75,6 +88,7 @@ class MembershipNotifier extends _$MembershipNotifier {
     final repository = ref.read(membershipRepositoryProvider);
     final updated = await repository.update(membership);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
     return updated;
   }
 
@@ -82,12 +96,14 @@ class MembershipNotifier extends _$MembershipNotifier {
     final repository = ref.read(membershipRepositoryProvider);
     await repository.updateStatus(id, status);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
   }
 
   Future<void> delete(String id) async {
     final repository = ref.read(membershipRepositoryProvider);
     await repository.delete(id);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
   }
 }
 
@@ -104,6 +120,7 @@ class StudentMembershipNotifier extends _$StudentMembershipNotifier {
     final repository = ref.read(membershipRepositoryProvider);
     final created = await repository.create(membership);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
     return created;
   }
 
@@ -111,6 +128,7 @@ class StudentMembershipNotifier extends _$StudentMembershipNotifier {
     final repository = ref.read(membershipRepositoryProvider);
     final updated = await repository.update(membership);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
     return updated;
   }
 
@@ -118,5 +136,6 @@ class StudentMembershipNotifier extends _$StudentMembershipNotifier {
     final repository = ref.read(membershipRepositoryProvider);
     await repository.updateStatus(id, status);
     ref.invalidateSelf();
+    _invalidateMembershipReads(ref);
   }
 }

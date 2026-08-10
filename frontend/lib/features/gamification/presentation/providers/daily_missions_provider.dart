@@ -19,13 +19,14 @@ part 'daily_missions_provider.g.dart';
 
 /// [growthHeatmapProvider]의 오늘 cell 을 찾는 key. [todayPracticeMinutesProvider]
 /// 와 정확히 동일한 파생식 — 이 provider 들이 서로 다른 "오늘"을 가리키면
-/// 같은 카드 안에서 미션 진행이 [DailyGoalCard] 진행과 어긋나 보인다. (참고:
-/// 이 key 는 실제로는 UTC 달력일이라 KST 자정과는 다르게 구르지만, 그 어긋남
-/// 은 P2 부터 있던 기존 동작 — 이 미션 기능의 범위가 아니다. 로테이션/
-/// 완료원장의 KST 자정 계약은 [DailyMissionRotation.kstCalendarDate] 가
-/// 별도로 담당한다.)
+/// 같은 카드 안에서 미션 진행이 [DailyGoalCard] 진행과 어긋나 보인다.
+/// Heatmap cells are keyed by the *local* calendar date tagged as UTC
+/// (PracticeRecordingService uses occurredAt's local y/m/d), so "today"
+/// derives from local time — the old toUtc() derivation pointed at
+/// yesterday's cell between 00:00-08:59 KST. 로테이션/완료원장의 KST 자정
+/// 계약은 [DailyMissionRotation.kstCalendarDate] 가 별도로 담당한다.
 DateTime _heatmapTodayKey() {
-  final now = DateTime.now().toUtc();
+  final now = DateTime.now();
   return DateTime.utc(now.year, now.month, now.day);
 }
 
