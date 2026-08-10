@@ -64,7 +64,11 @@ class DailyPracticeGoal extends _$DailyPracticeGoal {
 @riverpod
 Future<int> todayPracticeMinutes(Ref ref, String studentId) async {
   final heatmap = await ref.watch(growthHeatmapProvider(studentId).future);
-  final now = DateTime.now().toUtc();
+  // Heatmap cells are keyed by the *local* calendar date tagged as UTC
+  // (PracticeRecordingService uses occurredAt's local y/m/d), so "today"
+  // must derive from local time — the old toUtc() derivation pointed at
+  // yesterday's cell between 00:00-08:59 KST.
+  final now = DateTime.now();
   final todayKey = DateTime.utc(now.year, now.month, now.day);
   return heatmap.days[todayKey]?.totalMinutes ?? 0;
 }

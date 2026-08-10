@@ -24,7 +24,7 @@ class HiveGrowthHeatmapRepository implements GrowthHeatmapRepository {
     String studentId, {
     int yearsBack = 1,
   }) async {
-    final days = await _cache.loadYear(studentId, asOf: DateTime.now().toUtc());
+    final days = await _cache.loadYear(studentId, asOf: DateTime.now());
     return GrowthHeatmap(studentId: studentId, days: days);
   }
 
@@ -35,10 +35,7 @@ class HiveGrowthHeatmapRepository implements GrowthHeatmapRepository {
     DailyPractice evidence,
   ) async {
     final normDate = DateTime.utc(date.year, date.month, date.day);
-    final yearMap = await _cache.loadYear(
-      studentId,
-      asOf: DateTime.now().toUtc(),
-    );
+    final yearMap = await _cache.loadYear(studentId, asOf: DateTime.now());
     final existing = yearMap[normDate] ?? const DailyPractice();
     final merged = DailyPractice(
       metronomeMinutes: existing.metronomeMinutes + evidence.metronomeMinutes,
