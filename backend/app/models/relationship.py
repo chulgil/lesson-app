@@ -42,6 +42,9 @@ class TeacherStudentRelation(UUIDMixin, Base):
         nullable=False,
     )
     invite_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    # #1250 — invite codes are short-lived (7 days). NULL = legacy row before
+    # the expiry column existed (backfilled with a grace window in migration).
+    invite_code_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     status: Mapped[RelationStatus] = mapped_column(
         Enum(RelationStatus, native_enum=True),
         nullable=False,

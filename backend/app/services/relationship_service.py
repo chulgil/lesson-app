@@ -22,6 +22,8 @@ class RelationshipService:
 
     async def invite(self, student_id: str, method: str, current_user: Any) -> Any:
         """Create an invitation to connect with a student."""
+        from datetime import UTC, datetime, timedelta
+
         from app.models.relationship import RelationStatus, TeacherStudentRelation
 
         tid = await resolve_teacher_id(self.db, current_user.id)
@@ -31,6 +33,9 @@ class RelationshipService:
             teacher_id=tid,
             student_id=student_id,
             invite_code=invite_code,
+            # #1250 — codes are short-lived; an unexpiring code stays a live
+            # backdoor into the relation forever.
+            invite_code_expires_at=datetime.now(UTC) + timedelta(days=7),
             status=RelationStatus.trialBooked,
         )
         self.db.add(relation)
@@ -43,6 +48,8 @@ class RelationshipService:
 
     async def connect(self, invite_code: str, current_user: Any) -> Any:
         """Accept an invitation using an invite code."""
+        from datetime import UTC, datetime
+
         from app.models.relationship import TeacherStudentRelation
 
         relation = await self.db.scalar(
@@ -56,6 +63,18 @@ class RelationshipService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Invalid or expired invite code",
             )
+
+        # #1250 — expiry gate. NULL = legacy row (migration backfills prod).
+        expires_at = relation.invite_code_expires_at
+        if expires_at is not None:
+            if expires_at.tzinfo is None:
+                # SQLite strips tz info — naive means UTC by convention.
+                expires_at = expires_at.replace(tzinfo=UTC)
+            if expires_at < datetime.now(UTC):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Invalid or expired invite code",
+                )
 
         student_id = await resolve_student_id(self.db, current_user.id)
         if relation.student_id != student_id:
