@@ -220,8 +220,11 @@ class ParentService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent profile not found")
 
         # spec parent_system.md §3 — expired/not-found 구분: expired = 410 Gone, not-found = 404.
+        # Row-locked so the is_used check → set below is atomic; without it two
+        # concurrent submissions of the same code could both link (TOCTOU).
+        # No-op on the SQLite test dialect.
         invitation_any = await self.db.scalar(
-            select(ParentInvitation).where(ParentInvitation.invitation_code == invite_code)
+            select(ParentInvitation).where(ParentInvitation.invitation_code == invite_code).with_for_update()
         )
         now_utc = datetime.now(UTC)
 
@@ -257,6 +260,19 @@ class ParentService:
             )
         )
         if existing:
+            existing_status = getattr(existing.status, "value", existing.status)
+            if existing_status != "active":
+                # Re-linking after an unlink used to silently return the
+                # inactive row as "success" — the parent saw connected while
+                # the relation (and all child access) stayed inactive. A valid
+                # invite code re-proves consent, so reactivate it.
+                if invitation is not None and invitation.is_used:
+                    raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Invitation already used")
+                existing.status = ParentChildRelationStatus.active
+                if invitation is not None:
+                    invitation.is_used = True
+                await self.db.flush()
+                await self.db.refresh(existing)
             return self._relation_response(existing)
 
         if invitation is not None and invitation.is_used:
@@ -428,6 +444,20 @@ class ParentService:
         await self.db.refresh(relation)
         return await self._child_profile_response(student, relation)
 
+    @staticmethod
+    def _assert_relation_active(relation: Any) -> None:
+        """Teacher connect/disconnect requires an *active* parent link.
+
+        An unlinked (inactive) parent keeps read access to the profile, but
+        must not be able to hijack or sever the child's live teacher
+        connection.
+        """
+        if getattr(relation.status, "value", relation.status) != "active":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Parent link is not active",
+            )
+
     async def delete_child_profile(self, child_id: str, current_user: Any) -> None:
         """Soft-delete a child profile by marking the parent relation inactive."""
         from app.models.parent import ParentChildRelationStatus
@@ -449,6 +479,7 @@ class ParentService:
         from app.models.teacher import Teacher
 
         student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        self._assert_relation_active(relation)
         teacher = await self.db.get(Teacher, data.teacher_id)
         if teacher is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
@@ -490,6 +521,7 @@ class ParentService:
         from app.models.relationship import RelationStatus, TeacherStudentRelation
 
         student, relation = await self._get_child_profile_for_user(child_id, current_user)
+        self._assert_relation_active(relation)
         if student.teacher_id:
             teacher_relation = await self.db.scalar(
                 select(TeacherStudentRelation).where(
@@ -1004,7 +1036,13 @@ class ParentService:
         return relation
 
     async def _get_child_profile_for_user(self, child_id: str, current_user: Any) -> tuple[Any, Any]:
-        """Return Student and parent relation if the current user can access the child."""
+        """Return Student and parent relation if the current user can access the child.
+
+        The relation is returned regardless of status — a soft-deleted child
+        stays readable by its own parent (contract: detail returns 200 with
+        status "inactive"). State-changing teacher connect/disconnect must
+        additionally call :meth:`_assert_relation_active`.
+        """
         from app.models.parent import ParentChildRelation
         from app.models.student import Student
 
