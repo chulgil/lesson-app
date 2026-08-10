@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/notebook/notebook_alert_dialog.dart';
+import '../../../../subscription/subscription_facade.dart';
 import '../../../domain/entities/lesson.dart';
 import '../../providers/lesson_confirmation_provider.dart';
 import '../../providers/lesson_crud_provider.dart';
@@ -113,6 +114,10 @@ Future<void> revertAttendance(
     await ref
         .read(lessonsNotifierProvider.notifier)
         .updateLessonStatus(lesson, LessonStatus.scheduled);
+    // The backend restores the deducted session on this transition, so the
+    // remaining-count display must refresh too — same invalidation as the
+    // confirmAttendance path (lesson_confirmation_provider).
+    ref.invalidate(activeStudentSubscriptionsProvider(lesson.studentId));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(AppStrings.attendanceRevertedSnack)),
