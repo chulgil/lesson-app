@@ -27,8 +27,14 @@ class TeacherService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def _enrich_response(self, teacher: Any) -> TeacherResponse:
-        """Build TeacherResponse with user, education, career, certificates."""
+    async def _enrich_response(self, teacher: Any, *, sanitized: bool = False) -> TeacherResponse:
+        """Build TeacherResponse with user, education, career, certificates.
+
+        ``sanitized`` strips contact/consent PII from the embedded user —
+        search and detail are visible to any authenticated user, and the
+        in-app FE reads only name/profile_image_url from them. Owner paths
+        (/teachers/me, profile update) keep the full user payload.
+        """
         from app.models.teacher import TeacherCareer, TeacherCertificate, TeacherEducation
         from app.models.user import User
         from app.schemas.user import UserResponse
@@ -50,7 +56,13 @@ class TeacherService:
 
         response = TeacherResponse.model_validate(teacher)
         if user:
-            response.user = UserResponse.model_validate(user)
+            user_response = UserResponse.model_validate(user)
+            if sanitized:
+                user_response.email = None
+                user_response.phone = None
+                user_response.terms_accepted_at = None
+                user_response.marketing_consent_at = None
+            response.user = user_response
         response.education = [TeacherEducationResponse.model_validate(e) for e in education.all()]
         response.career = [TeacherCareerResponse.model_validate(c) for c in career.all()]
         response.certificates = [TeacherCertificateResponse.model_validate(c) for c in certificates.all()]
@@ -134,7 +146,7 @@ class TeacherService:
         total = await self.db.scalar(count_query) or 0
 
         result = await self.db.scalars(query.offset(offset).limit(size))
-        items = [await self._enrich_response(t) for t in result.all()]
+        items = [await self._enrich_response(t, sanitized=True) for t in result.all()]
 
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
@@ -145,7 +157,7 @@ class TeacherService:
         teacher = await self.db.get(Teacher, teacher_id)
         if teacher is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
-        return await self._enrich_response(teacher)
+        return await self._enrich_response(teacher, sanitized=True)
 
     async def get_by_user_id(self, user_id: str) -> TeacherResponse:
         """Return a teacher profile by the owning user ID."""
