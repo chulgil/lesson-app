@@ -39,17 +39,21 @@ JOB_ID_D7 = "payment_reminder_d7_final"
 _ACTIVE = (ProposalStatus.pending, ProposalStatus.paymentNotified)
 
 
-async def _send_student_alimtalk(session: AsyncSession, proposal: SubscriptionProposal, d_day: int) -> None:
-    """#423 — D+1/D+3/D+7 학생/학부모 측 알림톡 발송 (멱등성은 service 안에서)."""
+async def _send_student_alimtalk(session: AsyncSession, proposal: SubscriptionProposal, d_day: int) -> bool:
+    """#423 — D+1/D+3/D+7 학생/학부모 측 알림톡 발송 (멱등성은 service 안에서).
+
+    Returns True only when a send was actually performed — the runner uses it
+    to decide whether the reminder may be marked as delivered.
+    """
     from app.models.student import Student
     from app.services.alimtalk_service import build_alimtalk_service
 
     student = await session.get(Student, proposal.student_id)
     if student is None:
-        return
+        return False
     phone = student.parent_phone or student.phone or ""
     if not phone:
-        return
+        return False
     service = build_alimtalk_service(session)
     await service.send_payment_reminder(
         proposal_id=proposal.id,
@@ -63,6 +67,7 @@ async def _send_student_alimtalk(session: AsyncSession, proposal: SubscriptionPr
         # #423 — alimtalk fail → FCM push fallback to the linked user.
         fallback_user_id=student.user_id,
     )
+    return True
 
 
 async def _send_teacher_push(session: AsyncSession, proposal: SubscriptionProposal, notification_type: str) -> bool:
@@ -134,8 +139,9 @@ async def _run_payment_reminder(
                 logger.warning("payment reminder teacher push timeout proposal=%s", proposal.id)
                 ok = False
             # #423 — alimtalk to student/parent in parallel with the teacher push.
+            alimtalk_ok = False
             try:
-                await asyncio.wait_for(
+                alimtalk_ok = await asyncio.wait_for(
                     _send_student_alimtalk(s, proposal, n_days),
                     timeout=_EXTERNAL_CALL_TIMEOUT_SECONDS,
                 )
@@ -145,8 +151,13 @@ async def _run_payment_reminder(
                     n_days,
                     proposal.id,
                 )
-            setattr(proposal, reminder_field, now)
-            proposal.last_reminder_sent_at = now
+            # Mark delivered only when at least one channel actually went out.
+            # Marking on total failure made the NULL-guard idempotency skip the
+            # row forever — the failure vanished silently with no retry path.
+            # (alimtalk is idempotent service-side, so a retry cannot dupe it.)
+            if ok or alimtalk_ok:
+                setattr(proposal, reminder_field, now)
+                proposal.last_reminder_sent_at = now
             if ok:
                 sent += 1
         await s.commit()

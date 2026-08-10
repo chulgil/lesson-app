@@ -183,6 +183,29 @@ async def _send_push(
         )
 
 
+async def _has_approaching_notification(
+    session: AsyncSession,
+    *,
+    user_id: str,
+    request_id: str,
+) -> bool:
+    """True if the 60h approaching push was already sent for this request.
+
+    The Notification row that ``_send_push`` persists is the dedupe marker —
+    matched in Python because JSON containment operators differ between the
+    PG production and SQLite test dialects.
+    """
+    from app.models.notification import Notification
+
+    result = await session.scalars(
+        select(Notification.data).where(
+            Notification.user_id == user_id,
+            Notification.type == "scheduleChangeApproaching",
+        )
+    )
+    return any((row or {}).get("requestId") == request_id for row in result.all())
+
+
 async def _find_opponent_user_id(
     session: AsyncSession,
     *,
@@ -320,20 +343,24 @@ async def _run_schedule_change_expiry(
 
             # ── 60h 임박 알림 (요청자) ────────────────────────────────────────
             if proposed_at <= approaching_cutoff:
-                already_approaching = await _has_event(
+                # Dedupe on the previously-sent Notification row (this push's
+                # own marker). It used to key on the scheduleChangeReminder
+                # RequestEvent, which the 24h reminder always writes 36h
+                # earlier — so the approaching push could never fire. A new
+                # RequestEventType marker is not an option: deployed FE builds
+                # crash on unknown RequestEventType values ($enumDecode),
+                # while the FE notification-type parser falls back safely.
+                proposer_user_id = await _find_proposer_user_id(
                     s,
                     request_id=request_id,
-                    session_number=session_number,
-                    event_type=RequestEventType.scheduleChangeReminder,
+                    proposer_actor_type=proposer_actor_type,
                 )
-                # scheduleChangeReminder 이벤트가 이미 있으면 60h 임박 알림도 skip
-                # (리마인드 먼저 발송됐을 것이므로)
+                already_approaching = proposer_user_id is None or await _has_approaching_notification(
+                    s,
+                    user_id=proposer_user_id,
+                    request_id=request_id,
+                )
                 if not already_approaching:
-                    proposer_user_id = await _find_proposer_user_id(
-                        s,
-                        request_id=request_id,
-                        proposer_actor_type=proposer_actor_type,
-                    )
                     if proposer_user_id:
                         await _send_push(
                             s,
