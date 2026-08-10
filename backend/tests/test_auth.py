@@ -64,6 +64,55 @@ async def test_refresh_token_success(client: AsyncClient, create_test_user):
 
 
 @pytest.mark.asyncio
+async def test_refresh_token_rotates(client: AsyncClient, create_test_user):
+    """#1250 — refresh returns a NEW refresh token; the rotated one keeps working."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    old = create_refresh_token(data={"sub": "test-user-id"})
+
+    first = await client.post(
+        "/api/v1/auth/token/refresh",
+        json={"refresh_token": old},
+    )
+    assert first.status_code == 200
+    rotated = first.json()["refresh_token"]
+    assert rotated
+    assert rotated != old
+
+    second = await client.post(
+        "/api/v1/auth/token/refresh",
+        json={"refresh_token": rotated},
+    )
+    assert second.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_refresh_token_reuse_revokes_family(client: AsyncClient, create_test_user):
+    """#1250 — replaying a consumed refresh token is theft evidence: 401 and
+    the whole token family (including the legitimately rotated token) dies."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    old = create_refresh_token(data={"sub": "test-user-id"})
+
+    first = await client.post(
+        "/api/v1/auth/token/refresh",
+        json={"refresh_token": old},
+    )
+    assert first.status_code == 200
+    rotated = first.json()["refresh_token"]
+
+    replay = await client.post(
+        "/api/v1/auth/token/refresh",
+        json={"refresh_token": old},
+    )
+    assert replay.status_code == 401
+
+    after = await client.post(
+        "/api/v1/auth/token/refresh",
+        json={"refresh_token": rotated},
+    )
+    assert after.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_refresh_token_reflects_current_db_role(create_test_user, db_session):
     """Fix #4: refresh issues an access token with the user's CURRENT DB role,
     not the (possibly stale/elevated) role baked into the refresh token."""

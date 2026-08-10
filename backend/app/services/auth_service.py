@@ -161,8 +161,23 @@ class AuthService:
         )
 
     async def refresh_token(self, refresh_token: str) -> RefreshTokenResponse:
-        """Validate a refresh token and issue a new access token."""
-        from app.core.security import create_access_token, decode_refresh_token
+        """Validate a refresh token, rotate it, and issue a new token pair.
+
+        Rotation (#1250): the presented refresh token is single-use — its jti
+        is blacklisted here and a fresh refresh token is returned (the FE
+        interceptor already stores the rotated token). Presenting an
+        already-consumed token is reuse evidence — a replay from a stolen
+        copy, or a client that lost the rotation race — so the whole family
+        is revoked via ``tokens_revoked_at`` and the thief's live token dies
+        with it.
+        """
+        from datetime import timedelta
+
+        from app.core.security import (
+            create_access_token,
+            create_refresh_token,
+            decode_refresh_token,
+        )
 
         payload = decode_refresh_token(refresh_token)
         if payload is None:
@@ -171,20 +186,9 @@ class AuthService:
                 detail="Invalid or expired refresh token",
             )
 
-        # Check blacklist by jti
-        from app.models.user import TokenBlacklist
-
-        jti = payload.get("jti", "")
-        blacklisted = await self.db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == jti)) if jti else None
-        if blacklisted:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has been revoked",
-            )
-
         # Re-read the user's CURRENT role from DB instead of trusting the
         # (possibly stale/elevated) role claim in the refresh-token payload.
-        from app.models.user import User
+        from app.models.user import TokenBlacklist, User
 
         user = await self.db.get(User, payload["sub"])
         if user is None:
@@ -192,6 +196,31 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or expired refresh token",
             )
+
+        # Check blacklist by jti — a consumed (rotated) or logged-out token.
+        jti = payload.get("jti", "")
+        blacklisted = await self.db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == jti)) if jti else None
+        if blacklisted:
+            user.tokens_revoked_at = datetime.now(UTC)
+            await self.db.flush()
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+            )
+
+        # Family revocation epoch — refresh tokens issued before it are dead
+        # (mirrors the access-token check in get_current_user).
+        revoked_at = user.tokens_revoked_at
+        token_iat = payload.get("iat")
+        if revoked_at is not None and token_iat is not None:
+            iat_dt = datetime.fromtimestamp(token_iat, tz=UTC)
+            epoch_dt = revoked_at if revoked_at.tzinfo else revoked_at.replace(tzinfo=UTC)
+            if iat_dt < epoch_dt:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token has been revoked",
+                )
+
         current_role = getattr(user.role, "value", None)
 
         # AC-M2 §8.4: refresh 토큰 갱신 시에도 직전 active_context 복원.
@@ -202,9 +231,23 @@ class AuthService:
         if ctx["active_context"]:
             new_payload.update(ctx)
         access_token = create_access_token(data=new_payload)
+
+        # Rotate: consume the presented token, mint a successor. The blacklist
+        # row's expires_at matches the refresh TTL so a purge can reap it once
+        # the token would have died anyway.
+        if jti:
+            self.db.add(
+                TokenBlacklist(
+                    jti=jti,
+                    user_id=user.id,
+                    expires_at=datetime.now(UTC) + timedelta(days=30),
+                )
+            )
+            await self.db.flush()
+        new_refresh_token = create_refresh_token(data={"sub": user.id})
         return RefreshTokenResponse(
             access_token=access_token,
-            refresh_token=refresh_token,
+            refresh_token=new_refresh_token,
             token_type="bearer",
         )
 
