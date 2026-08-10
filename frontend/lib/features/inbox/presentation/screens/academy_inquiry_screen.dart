@@ -8,13 +8,7 @@ import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_detail_app_bar.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/academy/academy.dart';
-import 'package:lessonaza/features/academy/data/repositories/mock_academy_inquiry_repository.dart';
-
-final _inquiryListProvider =
-    FutureProvider.family<List<AcademyInquiry>, String>((ref, academyId) async {
-      final repo = MockAcademyInquiryRepository();
-      return repo.listByAcademy(academyId);
-    });
+import '../providers/academy_inquiry_providers.dart';
 
 class AcademyInquiryScreen extends ConsumerWidget {
   const AcademyInquiryScreen({required this.academyId, super.key});
@@ -23,7 +17,7 @@ class AcademyInquiryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inquiryAsync = ref.watch(_inquiryListProvider(academyId));
+    final inquiryAsync = ref.watch(academyInquiryListProvider(academyId));
 
     return NotebookScreenScaffold(
       // Icons.forum distinguishes 1:1 inquiry from personal notifications (bell).
@@ -60,7 +54,9 @@ class AcademyInquiryScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text(AppStrings.inquiryLoadErrorWith(error))),
+        error:
+            (error, stack) =>
+                Center(child: Text(AppStrings.inquiryLoadErrorWith(error))),
       ),
     );
   }

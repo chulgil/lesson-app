@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/inbox/presentation/widgets/academy_inquiry_form_widget.dart';
@@ -7,8 +8,12 @@ void main() {
   group('AcademyInquiryFormWidget', () {
     testWidgets('renders without crashing', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: AcademyInquiryFormWidget(academyId: 'acad_001')),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: AcademyInquiryFormWidget(academyId: 'acad_001'),
+            ),
+          ),
         ),
       );
 
@@ -19,8 +24,12 @@ void main() {
 
     testWidgets('displays all form fields', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: AcademyInquiryFormWidget(academyId: 'acad_001')),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: AcademyInquiryFormWidget(academyId: 'acad_001'),
+            ),
+          ),
         ),
       );
 
@@ -32,8 +41,12 @@ void main() {
 
     testWidgets('validates form fields', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: AcademyInquiryFormWidget(academyId: 'acad_001')),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: AcademyInquiryFormWidget(academyId: 'acad_001'),
+            ),
+          ),
         ),
       );
 

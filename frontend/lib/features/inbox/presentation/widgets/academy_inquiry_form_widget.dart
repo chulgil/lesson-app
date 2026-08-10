@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/theme/app_typography.dart';
 import 'package:lessonaza/features/academy/academy.dart';
-import 'package:lessonaza/features/academy/data/repositories/mock_academy_inquiry_repository.dart';
+import '../providers/academy_inquiry_providers.dart';
 
-class AcademyInquiryFormWidget extends StatefulWidget {
+class AcademyInquiryFormWidget extends ConsumerStatefulWidget {
   const AcademyInquiryFormWidget({
     required this.academyId,
     this.onSubmitSuccess,
@@ -17,11 +18,12 @@ class AcademyInquiryFormWidget extends StatefulWidget {
   final VoidCallback? onSubmitSuccess;
 
   @override
-  State<AcademyInquiryFormWidget> createState() =>
+  ConsumerState<AcademyInquiryFormWidget> createState() =>
       _AcademyInquiryFormWidgetState();
 }
 
-class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
+class _AcademyInquiryFormWidgetState
+    extends ConsumerState<AcademyInquiryFormWidget> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
@@ -52,13 +54,16 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
 
     setState(() => _isSubmitting = true);
     try {
-      final repo = MockAcademyInquiryRepository();
+      // Shared repository — a locally constructed mock instance would drop
+      // the inquiry, and the list screen would never see it.
+      final repo = ref.read(academyInquiryRepositoryProvider);
       await repo.create(
         academyId: widget.academyId,
         senderRole: _selectedRole,
         senderName: _nameController.text,
         body: _messageController.text,
       );
+      ref.invalidate(academyInquiryListProvider(widget.academyId));
 
       if (mounted) {
         _nameController.clear();
@@ -195,18 +200,19 @@ class _AcademyInquiryFormWidgetState extends State<AcademyInquiryFormWidget> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _isSubmitting ? null : _submitForm,
-              child: _isSubmitting
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.paper,
+              child:
+                  _isSubmitting
+                      ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.paper,
+                          ),
                         ),
-                      ),
-                    )
-                  : Text(AppStrings.inquiryFormSubmit),
+                      )
+                      : Text(AppStrings.inquiryFormSubmit),
             ),
           ),
         ],
