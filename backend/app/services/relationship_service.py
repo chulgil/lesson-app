@@ -144,7 +144,37 @@ class RelationshipService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Relationship not found",
             )
-        await self._assert_relationship_party(relation, current_user)
+        party = await self._relationship_party_role(relation, current_user)
+
+        # Field-level authorization — the endpoint used to accept every field
+        # from either party, letting a student self-grant privileged statuses
+        # or forge subscription/booking links. Same-value status echoes pass
+        # (FE PUTs the full model back); only privilege-escalating *changes*
+        # are teacher-only. Permission flags stay writable by both parties
+        # (CoachConnection contract: the teacher manages them).
+        privileged_statuses = {
+            RelationStatus.invitePending,
+            RelationStatus.pending,
+            RelationStatus.trialBooked,
+            RelationStatus.active,
+        }
+        current_status = getattr(relation.status, "value", relation.status)
+        if party != "teacher":
+            if (
+                new_status is not None
+                and new_status != current_status
+                and RelationStatus(new_status) in privileged_statuses
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Only the teacher may set this status",
+                )
+            if subscription_id or booking_id or last_lesson_day:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Only the teacher may update relationship metadata",
+                )
+
         if new_status is not None:
             relation.status = RelationStatus(new_status)
 
@@ -221,18 +251,22 @@ class RelationshipService:
 
     async def _assert_relationship_party(self, relation: Any, current_user: Any) -> None:
         """Require the caller to be the teacher or student party of the relation."""
+        await self._relationship_party_role(relation, current_user)
+
+    async def _relationship_party_role(self, relation: Any, current_user: Any) -> str:
+        """Return which side of the relation the caller is ("teacher"/"student")."""
         role = getattr(getattr(current_user, "role", None), "value", None)
 
         if role == "teacher":
             teacher_id = await resolve_teacher_id(self.db, current_user.id)
             if teacher_id == relation.teacher_id:
-                return
+                return "teacher"
         elif role == "student":
             from app.models.student import Student
 
             student_id = await self.db.scalar(select(Student.id).where(Student.user_id == current_user.id))
             if student_id is not None and student_id == relation.student_id:
-                return
+                return "student"
 
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
