@@ -244,7 +244,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             // Parent login is a mock test-scenario picker (no real OAuth wired).
             // In real mode it must not grant unauthenticated access to parentHome.
             if (ref.read(mockDataModeProvider)) {
-              showParentLoginSheet(context);
+              showParentLoginSheet(context, ref);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

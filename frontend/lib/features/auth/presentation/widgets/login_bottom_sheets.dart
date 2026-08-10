@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -8,93 +9,109 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
+import '../providers/auth_provider.dart';
 import 'parent_login_option.dart';
 import 'role_option_card.dart';
 
 /// Shows the parent login bottom sheet with social login options.
-void showParentLoginSheet(BuildContext context) {
+///
+/// Mock/dev-only test-scenario picker (the caller gates on
+/// [mockDataModeProvider]). Each option must establish parent auth state
+/// first — an unauthenticated `context.go` gets bounced back to /login by
+/// the router guard.
+void showParentLoginSheet(BuildContext context, WidgetRef ref) {
   showNotebookBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    builder: (sheetContext) => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Notebook × Score §7.114: 원형 아바타 컨테이너 유지 (이모지 → 아이콘 대체).
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: AppColors.ink.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.family_restroom,
-              size: AppSpacing.iconLG,
-              color: AppColors.ink,
+    builder:
+        (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Notebook × Score §7.114: 원형 아바타 컨테이너 유지 (이모지 → 아이콘 대체).
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.ink.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.family_restroom,
+                  size: AppSpacing.iconLG,
+                  color: AppColors.ink,
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
+            const SizedBox(height: AppSpacing.space2),
 
-        // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-        Text(
-          AppStrings.authParentLogin,
-          style: NotebookTypography.sectionTitle,
-        ),
-        const SizedBox(height: AppSpacing.space1),
-        Text(
-          '자녀의 레슨과 연습을 확인하세요',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
-          ),
-        ),
+            // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+            Text(
+              AppStrings.authParentLogin,
+              style: NotebookTypography.sectionTitle,
+            ),
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              '자녀의 레슨과 연습을 확인하세요',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
 
-        const SizedBox(height: AppSpacing.space3),
+            const SizedBox(height: AppSpacing.space3),
 
-        // Social login buttons for parent with test scenarios
-        ParentLoginOption(
-          icon: Icons.g_mobiledata_rounded,
-          label: 'Google로 계속하기',
-          description: '기존 학부모 (자녀 등록됨)',
-          backgroundColor: AppColors.googleBackground,
-          textColor: AppColors.ink,
-          borderColor: AppColors.inkQuaternary,
-          onPressed: () {
-            Navigator.pop(sheetContext);
-            context.go(AppRoutes.parentHome);
-          },
+            // Social login buttons for parent with test scenarios
+            ParentLoginOption(
+              icon: Icons.g_mobiledata_rounded,
+              label: 'Google로 계속하기',
+              description: '기존 학부모 (자녀 등록됨)',
+              backgroundColor: AppColors.googleBackground,
+              textColor: AppColors.ink,
+              borderColor: AppColors.inkQuaternary,
+              onPressed: () async {
+                Navigator.pop(sheetContext);
+                await ref
+                    .read(authNotifierProvider.notifier)
+                    .devLogin(email: 'parent@mock.dev', role: 'parent');
+                if (context.mounted) context.go(AppRoutes.parentHome);
+              },
+            ),
+            const SizedBox(height: AppSpacing.space2),
+
+            ParentLoginOption(
+              icon: Icons.chat_bubble_rounded,
+              label: AppStrings.authKakaoContinue,
+              description: '기존 학부모 (자녀 없음)',
+              backgroundColor: AppColors.kakaoBackground,
+              textColor: AppColors.ink,
+              onPressed: () async {
+                Navigator.pop(sheetContext);
+                await ref
+                    .read(authNotifierProvider.notifier)
+                    .devLogin(email: 'parent@mock.dev', role: 'parent');
+                if (context.mounted) context.go(AppRoutes.parentHome);
+              },
+            ),
+            const SizedBox(height: AppSpacing.space2),
+
+            ParentLoginOption(
+              icon: Icons.apple_rounded,
+              label: 'Apple로 계속하기',
+              description: '신규 가입 → 초대코드 입력',
+              backgroundColor: AppColors.appleBackground,
+              textColor: AppColors.paper,
+              onPressed: () async {
+                Navigator.pop(sheetContext);
+                await ref
+                    .read(authNotifierProvider.notifier)
+                    .devLogin(email: 'parent-new@mock.dev', role: 'parent');
+                if (context.mounted) context.go(AppRoutes.parentInviteCode);
+              },
+            ),
+
+            const SizedBox(height: AppSpacing.space3),
+          ],
         ),
-        const SizedBox(height: AppSpacing.space2),
-
-        ParentLoginOption(
-          icon: Icons.chat_bubble_rounded,
-          label: AppStrings.authKakaoContinue,
-          description: '기존 학부모 (자녀 없음)',
-          backgroundColor: AppColors.kakaoBackground,
-          textColor: AppColors.ink,
-          onPressed: () {
-            Navigator.pop(sheetContext);
-            context.go(AppRoutes.parentHome);
-          },
-        ),
-        const SizedBox(height: AppSpacing.space2),
-
-        ParentLoginOption(
-          icon: Icons.apple_rounded,
-          label: 'Apple로 계속하기',
-          description: '신규 가입 → 초대코드 입력',
-          backgroundColor: AppColors.appleBackground,
-          textColor: AppColors.paper,
-          onPressed: () {
-            Navigator.pop(sheetContext);
-            context.go(AppRoutes.parentInviteCode);
-          },
-        ),
-
-        const SizedBox(height: AppSpacing.space3),
-      ],
-    ),
   );
 }
 
@@ -106,51 +123,52 @@ void showRoleSelectSheet(
 }) {
   showNotebookBottomSheet<void>(
     context: context,
-    builder: (dialogContext) => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Notebook × Score §7.27: 바텀시트 제목 Playfair.
-        Text(
-          AppStrings.authSelectRole,
-          style: NotebookTypography.sectionTitle,
+    builder:
+        (dialogContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Notebook × Score §7.27: 바텀시트 제목 Playfair.
+            Text(
+              AppStrings.authSelectRole,
+              style: NotebookTypography.sectionTitle,
+            ),
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              '레슨 앱에서 어떤 역할로 사용하시나요?',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.space4),
+
+            // Teacher option
+            RoleOptionCard(
+              icon: Icons.school,
+              title: '선생님',
+              description: _getTeacherDescription(authProvider),
+              onTap: () {
+                Navigator.pop(dialogContext);
+                onRoleSelected('teacher');
+              },
+            ),
+
+            const SizedBox(height: AppSpacing.space3),
+
+            // Student option
+            RoleOptionCard(
+              icon: Icons.person,
+              title: '학생',
+              description: _getStudentDescription(authProvider),
+              onTap: () {
+                Navigator.pop(dialogContext);
+                onRoleSelected('student');
+              },
+            ),
+
+            const SizedBox(height: AppSpacing.space4),
+          ],
         ),
-        const SizedBox(height: AppSpacing.space1),
-        Text(
-          '레슨 앱에서 어떤 역할로 사용하시나요?',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.inkSecondary,
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.space4),
-
-        // Teacher option
-        RoleOptionCard(
-          icon: Icons.school,
-          title: '선생님',
-          description: _getTeacherDescription(authProvider),
-          onTap: () {
-            Navigator.pop(dialogContext);
-            onRoleSelected('teacher');
-          },
-        ),
-
-        const SizedBox(height: AppSpacing.space3),
-
-        // Student option
-        RoleOptionCard(
-          icon: Icons.person,
-          title: '학생',
-          description: _getStudentDescription(authProvider),
-          onTap: () {
-            Navigator.pop(dialogContext);
-            onRoleSelected('student');
-          },
-        ),
-
-        const SizedBox(height: AppSpacing.space4),
-      ],
-    ),
   );
 }
 
