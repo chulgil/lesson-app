@@ -548,6 +548,12 @@ class LessonService:
         from app.models.lesson import LessonPiece, LessonRecording
 
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
+        # Deleting a deducted lesson (completed/no-show/late-cancel) must give
+        # the consumed session back, same as the status-transition undo path
+        # (#1240). Without this the SubscriptionUsage rows were orphaned and
+        # the student permanently lost the session.
+        if getattr(lesson.status, "value", lesson.status) in _DEDUCTING_STATUSES:
+            await self._release_deduction(lesson)
         await self.db.execute(delete(LessonPiece).where(LessonPiece.lesson_id == lesson_id))
         await self.db.execute(delete(LessonRecording).where(LessonRecording.lesson_id == lesson_id))
         await self.db.delete(lesson)
@@ -719,12 +725,12 @@ class LessonService:
 
     async def cancellation_policy(self, lesson_id: str, current_user: Any) -> dict[str, Any]:
         """Deadline facts for the client hint — same numbers the server judges by."""
+        from app.models.subscription import Subscription
         from app.services.cancellation_policy import (
             DEFAULT_CANCEL_DEADLINE_HOURS,
             cancel_deadline_at,
             resolve_cancel_timing,
         )
-        from app.models.subscription import Subscription
 
         lesson = await self._get_accessible_lesson(lesson_id, current_user)
         configured = await self._effective_cancel_deadline_hours(lesson)
@@ -1024,8 +1030,12 @@ class LessonService:
     async def get_upcoming(self, current_user: Any, *, limit: int = 10) -> list[LessonResponse]:
         """Return upcoming lessons."""
         from app.models.lesson import Lesson
+        from app.services.cancellation_policy import KST
 
-        today = date.today()
+        # KST calendar date — server-local date.today() (UTC in deployment)
+        # lags a day behind between 00:00-09:00 KST, surfacing already-past
+        # lessons as "upcoming".
+        today = datetime.now(UTC).astimezone(KST).date()
         result = await self.db.scalars(
             select(Lesson)
             .where(Lesson.teacher_id == await resolve_teacher_id(self.db, current_user.id), Lesson.date >= today)
