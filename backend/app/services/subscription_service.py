@@ -514,7 +514,11 @@ class SubscriptionService:
         if sub is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
 
-        remaining = (sub.total_reschedule_allowance or 0) - (sub.used_reschedule_count or 0)
+        # Same formula as schedule_service._consume_reschedule_credit_or_raise:
+        # bonus credits (patch_reschedule_credits) count toward the allowance.
+        # Omitting them made teacher-granted bonus credits unusable here.
+        effective = (sub.total_reschedule_allowance or 0) + (sub.bonus_reschedule_count or 0)
+        remaining = effective - (sub.used_reschedule_count or 0)
         if remaining <= 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -2177,7 +2181,27 @@ class SubscriptionService:
 
         proposal = await self._get_proposal_for_user(proposal_id, current_user)
 
+        # Status guard — without it a terminal proposal (expired/rejected/
+        # cancelled/confirmed) could be revived to paymentNotified and later
+        # double-issued through confirm_proposal.
+        if proposal.status not in (ProposalStatus.pending, ProposalStatus.paymentNotified):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Proposal is {proposal.status} and cannot be modified",
+            )
+
         if data.action in ("notify_payment", "accept", "select_template"):
+            # A stale-but-not-yet-swept proposal must not be acceptable past
+            # its deadline (the expiry cron only flips status periodically).
+            expires_at = proposal.expires_at
+            if expires_at is not None and expires_at.tzinfo is None:
+                # SQLite strips tz info — naive means UTC by convention.
+                expires_at = expires_at.replace(tzinfo=UTC)
+            if expires_at is not None and expires_at < datetime.now(UTC):
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Proposal has expired",
+                )
             proposal.status = ProposalStatus.paymentNotified
             proposal.payment_notified_at = datetime.now(UTC)
             proposal.selected_template_id = data.selected_template_id
