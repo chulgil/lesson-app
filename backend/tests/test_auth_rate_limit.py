@@ -55,8 +55,11 @@ async def test_dev_login_rate_limit_kicks_in_after_window(client: AsyncClient, _
 
 
 @pytest.mark.asyncio
-async def test_rate_limit_uses_xff_when_present(client: AsyncClient, _enable_rate_limit):
-    """X-Forwarded-For 로 다른 IP 를 위장해도 카운트 분리 — proxy 환경 검증."""
+async def test_rate_limit_uses_xff_when_trusted_proxy(client: AsyncClient, _enable_rate_limit, monkeypatch):
+    """RATE_LIMIT_TRUST_PROXY=1 이면 XFF 로 클라이언트별 카운트 분리 — proxy 환경 검증."""
+    from app.core import config as core_config
+
+    monkeypatch.setattr(core_config.settings, "RATE_LIMIT_TRUST_PROXY", True)
     headers_a = {"X-Forwarded-For": "10.0.0.1"}
     headers_b = {"X-Forwarded-For": "10.0.0.2"}
 
@@ -84,6 +87,27 @@ async def test_rate_limit_uses_xff_when_present(client: AsyncClient, _enable_rat
         headers=headers_b,
     )
     assert response_b_fresh.status_code != 429
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_ignores_spoofed_xff_by_default(client: AsyncClient, _enable_rate_limit):
+    """기본(비신뢰) 모드에서는 XFF 위장으로 버킷을 갈아탈 수 없다 — 우회 회귀 방지.
+
+    RATE_LIMIT_TRUST_PROXY 기본값(False)에서는 요청마다 다른 XFF 를 보내도
+    소켓 주소 기준 단일 버킷으로 합산되어 한도 초과 시 429 가 나와야 한다.
+    """
+    last_status = None
+    for i in range(21):
+        response = await client.post(
+            "/api/v1/auth/token/refresh",
+            json={"refresh_token": f"spoof-{i}"},
+            headers={"X-Forwarded-For": f"10.9.{i}.{i}"},
+        )
+        last_status = response.status_code
+        if last_status == 429:
+            break
+
+    assert last_status == 429, f"spoofed XFF must not reset the bucket, got {last_status}"
 
 
 @pytest.mark.asyncio
