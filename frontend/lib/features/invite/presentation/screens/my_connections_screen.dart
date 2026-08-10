@@ -28,7 +28,10 @@ class MyConnectionsScreen extends ConsumerWidget {
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: userRole == InviteUserRole.teacher ? AppStrings.inviteMyStudentsTitle : AppStrings.inviteMyTeachersTitle,
+        title:
+            userRole == InviteUserRole.teacher
+                ? AppStrings.inviteMyStudentsTitle
+                : AppStrings.inviteMyTeachersTitle,
         actions: const [DetailAppBarAction.add],
         onAction: (action) {
           if (action == DetailAppBarAction.add) {
@@ -192,7 +195,10 @@ class MyConnectionsScreen extends ConsumerWidget {
     List<Connection> inactiveConnections,
     InviteUserRole userRole,
   ) {
-    final sectionLabel = userRole == InviteUserRole.teacher ? AppStrings.student : AppStrings.teacher;
+    final sectionLabel =
+        userRole == InviteUserRole.teacher
+            ? AppStrings.student
+            : AppStrings.teacher;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -287,9 +293,9 @@ class MyConnectionsScreen extends ConsumerWidget {
           ref.read(currentInviteUserRoleProvider) == InviteUserRole.teacher
               ? connection.studentName
               : connection.teacherName;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.inviteReconnectedFormat(name))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.inviteReconnectedFormat(name))),
+      );
     }
   }
 
@@ -327,14 +333,18 @@ class MyConnectionsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.space4),
                 Text(otherName, style: AppTypography.headingMedium),
                 Text(
-                  userRole == InviteUserRole.teacher ? AppStrings.student : AppStrings.teacher,
+                  userRole == InviteUserRole.teacher
+                      ? AppStrings.student
+                      : AppStrings.teacher,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
-                  AppStrings.inviteConnectedDateFormat(_formatDate(connection.connectedAt)),
+                  AppStrings.inviteConnectedDateFormat(
+                    _formatDate(connection.connectedAt),
+                  ),
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -350,16 +360,26 @@ class MyConnectionsScreen extends ConsumerWidget {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigate to schedule
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.message, color: AppColors.ink),
-                  title: const Text(AppStrings.inviteSendMessage),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigate to messages
+                    if (userRole == InviteUserRole.teacher) {
+                      // Teacher: the student detail screen carries this
+                      // connection's lesson schedule.
+                      context.push(
+                        AppRoutes.studentDetail.replaceFirst(
+                          ':id',
+                          connection.studentId,
+                        ),
+                      );
+                    } else {
+                      context.push(
+                        AppRoutes.myBookings,
+                        extra: {
+                          'studentId': connection.studentId,
+                          'studentName': connection.studentName,
+                          'teacherId': connection.teacherId,
+                          'teacherName': connection.teacherName,
+                        },
+                      );
+                    }
                   },
                 ),
                 ListTile(
@@ -400,9 +420,11 @@ class MyConnectionsScreen extends ConsumerWidget {
           .deactivateConnection(connection.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.inviteDisconnectedFormat(otherName))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.inviteDisconnectedFormat(otherName)),
+          ),
+        );
       }
     }
   }
@@ -440,9 +462,9 @@ class MyConnectionsScreen extends ConsumerWidget {
         .deactivateConnection(connection.id);
 
     if (success && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.inviteDisconnectedFormat(otherName))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.inviteDisconnectedFormat(otherName))),
+      );
     }
   }
 
@@ -626,8 +648,14 @@ class _ConnectionCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     isActive
-                        ? AppStrings.inviteConnectedSinceFormat(formatRelativeDay(connection.connectedAt))
-                        : AppStrings.inviteDisconnectedSinceFormat(formatRelativeDay(connection.deactivatedAt ?? connection.connectedAt)),
+                        ? AppStrings.inviteConnectedSinceFormat(
+                          formatRelativeDay(connection.connectedAt),
+                        )
+                        : AppStrings.inviteDisconnectedSinceFormat(
+                          formatRelativeDay(
+                            connection.deactivatedAt ?? connection.connectedAt,
+                          ),
+                        ),
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.inkSecondary,
                     ),
@@ -653,7 +681,6 @@ class _ConnectionCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _StatusBadge extends StatelessWidget {
@@ -676,7 +703,9 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.zero,
       ),
       child: Text(
-        isActive ? AppStrings.inviteStatusConnected : AppStrings.inviteStatusDisconnected,
+        isActive
+            ? AppStrings.inviteStatusConnected
+            : AppStrings.inviteStatusDisconnected,
         style: AppTypography.caption.copyWith(
           color: isActive ? AppColors.paperOk : AppColors.inkTertiary,
           fontWeight: FontWeight.w500,

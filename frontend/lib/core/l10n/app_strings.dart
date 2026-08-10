@@ -3313,7 +3313,8 @@ class AppStrings {
   static const cannotPlayRecording = '재생할 수 없는 파일입니다';
 
   /// 취소 마감 경과 안내 (#1241) — 서버가 지각 취소로 확정한다.
-  static const cancelDeadlinePassedHint = '취소 마감이 지났습니다 — 사전 취소를 선택해도 지각 취소로 처리됩니다';
+  static const cancelDeadlinePassedHint =
+      '취소 마감이 지났습니다 — 사전 취소를 선택해도 지각 취소로 처리됩니다';
 
   /// 취소 마감 이전 안내 (#1241).
   static String cancelDeadlineRemainingHint(int hours) =>
@@ -6864,7 +6865,6 @@ class AppStrings {
       '$inviteStatusDisconnected: $when';
   static const inviteConnectWithTeacher = '선생님과 연결하는 방법';
   static const inviteViewLessonSchedule = '레슨 일정 보기';
-  static const inviteSendMessage = '메시지 보내기';
   static const inviteDisconnect = '연결 해제';
   static const inviteReconnect = '다시 연결';
   static const inviteConnectionRequest = '연결 요청';
