@@ -88,8 +88,9 @@ void main() {
 
   group('read methods delegate to remote', () {
     test('getByStudentId', () async {
-      when(() => remote.getByStudentId('s1'))
-          .thenAnswer((_) async => [_testSubscription()]);
+      when(
+        () => remote.getByStudentId('s1'),
+      ).thenAnswer((_) async => [_testSubscription()]);
 
       final result = await repo.getByStudentId('s1');
       expect(result, hasLength(1));
@@ -105,8 +106,9 @@ void main() {
     });
 
     test('watchByStudentId delegates to remote', () {
-      when(() => remote.watchByStudentId('s1'))
-          .thenAnswer((_) => Stream.value([_testSubscription()]));
+      when(
+        () => remote.watchByStudentId('s1'),
+      ).thenAnswer((_) => Stream.value([_testSubscription()]));
 
       final stream = repo.watchByStudentId('s1');
       expect(stream, isA<Stream<List<Subscription>>>());
@@ -125,48 +127,31 @@ void main() {
       expect(result.id, equals('server-id'));
     });
 
-    test('offline: returns optimistic with tmp_ prefix', () async {
-      when(() => connectivity.isOnline).thenAnswer((_) async => false);
-      when(
-        () => syncService.queueMutation(
-          idempotencyKey: any(named: 'idempotencyKey'),
-          domain: any(named: 'domain'),
-          httpMethod: any(named: 'httpMethod'),
-          path: any(named: 'path'),
-          payload: any(named: 'payload'),
-        ),
-      ).thenAnswer((_) async => _fakeEntry());
+    test(
+      'NetworkException: rethrows — issuance is online-required (#1248)',
+      () async {
+        // A queued create used to fabricate a tmp_ id that downstream direct-
+        // HTTP steps (confirmPayment, orphan cleanup) ran against, leaving the
+        // replayed real subscription an orphan. The contract is now fail-fast.
+        when(
+          () => remote.create(any()),
+        ).thenThrow(const NetworkException(message: 'timeout'));
 
-      final result = await repo.create(_testSubscription());
-      expect(result.id, startsWith('tmp_'));
-      verify(
-        () => syncService.queueMutation(
-          idempotencyKey: any(named: 'idempotencyKey'),
-          domain: 'subscription',
-          httpMethod: 'POST',
-          path: '/subscriptions',
-          payload: any(named: 'payload'),
-        ),
-      ).called(1);
-    });
-
-    test('NetworkException: falls back to queue', () async {
-      when(() => connectivity.isOnline).thenAnswer((_) async => true);
-      when(() => remote.create(any()))
-          .thenThrow(const NetworkException(message: 'timeout'));
-      when(
-        () => syncService.queueMutation(
-          idempotencyKey: any(named: 'idempotencyKey'),
-          domain: any(named: 'domain'),
-          httpMethod: any(named: 'httpMethod'),
-          path: any(named: 'path'),
-          payload: any(named: 'payload'),
-        ),
-      ).thenAnswer((_) async => _fakeEntry());
-
-      final result = await repo.create(_testSubscription());
-      expect(result.id, startsWith('tmp_'));
-    });
+        await expectLater(
+          () async => repo.create(_testSubscription()),
+          throwsA(isA<NetworkException>()),
+        );
+        verifyNever(
+          () => syncService.queueMutation(
+            idempotencyKey: any(named: 'idempotencyKey'),
+            domain: any(named: 'domain'),
+            httpMethod: any(named: 'httpMethod'),
+            path: any(named: 'path'),
+            payload: any(named: 'payload'),
+          ),
+        );
+      },
+    );
   });
 
   group('update', () {
@@ -226,15 +211,17 @@ void main() {
         ),
       ).thenAnswer((_) async => sub);
 
-      final result =
-          await repo.useLesson('sub-1', lessonId: 'l1', instrument: 'violin');
+      final result = await repo.useLesson(
+        'sub-1',
+        lessonId: 'l1',
+        instrument: 'violin',
+      );
       expect(result.id, equals('sub-1'));
     });
 
     test('useReschedule delegates to remote', () async {
       final sub = _testSubscription();
-      when(() => remote.useReschedule('sub-1'))
-          .thenAnswer((_) async => sub);
+      when(() => remote.useReschedule('sub-1')).thenAnswer((_) async => sub);
 
       final result = await repo.useReschedule('sub-1');
       expect(result.id, equals('sub-1'));

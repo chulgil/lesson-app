@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 import '../../../../core/sync/application/mutation_queue_helper.dart';
 import '../../domain/entities/pending_payment.dart';
 import '../../domain/entities/subscription.dart';
@@ -76,30 +74,28 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<Subscription> create(Subscription subscription) =>
-      _queue.executeMutation<Subscription>(
-        remoteCall: () => _remote.create(subscription),
-        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-          idempotencyKey: idempotencyKey,
-          domain: 'subscription',
-          httpMethod: 'POST',
-          path: '/subscriptions',
-          payload: subscription.toJson(),
-        ),
-        optimisticResult: () =>
-            subscription.copyWith(id: 'tmp_${const Uuid().v4()}'),
-      );
+  // Issuance is online-required (#1248). Every create caller immediately
+  // chains direct-HTTP follow-ups (proposal confirmPayment, membership/
+  // relationship wiring, orphan cleanup) that need the real server id.
+  // Queueing an optimistic tmp_ id let those steps run against an id the
+  // server never learns about — after replay the real subscription stayed
+  // active+paymentConfirmed with no matching proposal (money-integrity
+  // orphan). Failing fast keeps the flow atomic: the teacher sees the
+  // error and retries online.
+  _remote.create(subscription);
 
   @override
   Future<Subscription> update(Subscription subscription) =>
       _queue.executeMutation<Subscription>(
         remoteCall: () => _remote.update(subscription),
-        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-          idempotencyKey: idempotencyKey,
-          domain: 'subscription',
-          httpMethod: 'PUT',
-          path: '/subscriptions/${subscription.id}',
-          payload: subscription.toJson(),
-        ),
+        queueCall:
+            (syncService, idempotencyKey) => syncService.queueMutation(
+              idempotencyKey: idempotencyKey,
+              domain: 'subscription',
+              httpMethod: 'PUT',
+              path: '/subscriptions/${subscription.id}',
+              payload: subscription.toJson(),
+            ),
         optimisticResult: () => subscription,
       );
 
@@ -110,30 +106,31 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
     String? teacherName,
     String? instrument,
   }) =>
-      // Online-only: requires current subscription state for optimistic result
-      _remote.useLesson(
-        id,
-        lessonId: lessonId,
-        teacherName: teacherName,
-        instrument: instrument,
-      );
+  // Online-only: requires current subscription state for optimistic result
+  _remote.useLesson(
+    id,
+    lessonId: lessonId,
+    teacherName: teacherName,
+    instrument: instrument,
+  );
 
   @override
   Future<Subscription> useReschedule(String id) =>
-      // Online-only: requires current subscription state for optimistic result
-      _remote.useReschedule(id);
+  // Online-only: requires current subscription state for optimistic result
+  _remote.useReschedule(id);
 
   @override
   Future<void> updateStatus(String id, SubscriptionStatus status) =>
       _queue.executeVoidMutation(
         remoteCall: () => _remote.updateStatus(id, status),
-        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-          idempotencyKey: idempotencyKey,
-          domain: 'subscription',
-          httpMethod: 'PATCH',
-          path: '/subscriptions/$id/status',
-          payload: {'status': status.name},
-        ),
+        queueCall:
+            (syncService, idempotencyKey) => syncService.queueMutation(
+              idempotencyKey: idempotencyKey,
+              domain: 'subscription',
+              httpMethod: 'PATCH',
+              path: '/subscriptions/$id/status',
+              payload: {'status': status.name},
+            ),
       );
 
   @override
@@ -141,13 +138,13 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
     String id, {
     SubscriptionPaymentMethod? paymentMethod,
   }) =>
-      // Online-only: payment operations require immediate server confirmation
-      _remote.confirmPayment(id, paymentMethod: paymentMethod);
+  // Online-only: payment operations require immediate server confirmation
+  _remote.confirmPayment(id, paymentMethod: paymentMethod);
 
   @override
   Future<Subscription> undoConfirmPayment(String id) =>
-      // Online-only: payment operations require immediate server confirmation
-      _remote.undoConfirmPayment(id);
+  // Online-only: payment operations require immediate server confirmation
+  _remote.undoConfirmPayment(id);
 
   // ═══════════════════════════════════════════════════════════════════
   // Payment-pending dashboard — #424 (online-only, no offline queue)
@@ -176,13 +173,14 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
   Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) =>
       _queue.executeMutation<SubscriptionUsage>(
         remoteCall: () => _remote.addUsage(usage),
-        queueCall: (syncService, idempotencyKey) => syncService.queueMutation(
-          idempotencyKey: idempotencyKey,
-          domain: 'subscription',
-          httpMethod: 'POST',
-          path: '/subscriptions/${usage.subscriptionId}/usage',
-          payload: usage.toJson(),
-        ),
+        queueCall:
+            (syncService, idempotencyKey) => syncService.queueMutation(
+              idempotencyKey: idempotencyKey,
+              domain: 'subscription',
+              httpMethod: 'POST',
+              path: '/subscriptions/${usage.subscriptionId}/usage',
+              payload: usage.toJson(),
+            ),
         optimisticResult: () => usage,
       );
 }
