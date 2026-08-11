@@ -30,6 +30,7 @@ import 'quest_board_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
 import 'next_mission_spotlight.dart';
+import 'pending_actions_summary.dart';
 import 'schedule_change_request_section.dart';
 import 'time_context_banner.dart';
 import 'urgent_alert_zone.dart';
@@ -92,6 +93,12 @@ class DashboardTab extends ConsumerWidget {
                   // #1120: sync failure surface is now the app-wide
                   // SyncStatusBanner (all roles), so the teacher-only
                   // banner here was removed to avoid a duplicate.
+
+                  // ── 최상위: 4개 "확인 필요" 표면(연결·예약승인·레슨요청·
+                  // 일정변경) 통합 카운터. 각 표면은 아래에 개별로 그대로 유지.
+                  PendingActionsSummary(teacherId: dashboard.teacherId),
+
+                  const SizedBox(height: AppSpacing.space4),
 
                   // ── 0순위: 선생님이 즉시 처리해야 하는 학생 연결 요청 ────
                   _buildPendingConnectionRequests(context, ref),
@@ -225,9 +232,7 @@ class DashboardTab extends ConsumerWidget {
                     horizontal: 4,
                     vertical: 1,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.paperAccent,
-                  ),
+                  decoration: BoxDecoration(color: AppColors.paperAccent),
                   child: Text(
                     AppStrings.unreadBadgeCount(unreadCount),
                     style: AppTypography.caption.copyWith(
@@ -304,13 +309,14 @@ class DashboardTab extends ConsumerWidget {
             color: AppColors.ink,
             icon: Icons.check_circle_outline,
             // #749: same Pro paywall guard as the sibling "통계 더보기" link.
-            onTap: () => guardProFeatureNavigation(
-              context: context,
-              ref: ref,
-              required: TierRequirement.pro,
-              featureName: AppStrings.featureLockedMonthlyStats,
-              onPass: () => context.push(AppRoutes.analytics),
-            ),
+            onTap:
+                () => guardProFeatureNavigation(
+                  context: context,
+                  ref: ref,
+                  required: TierRequirement.pro,
+                  featureName: AppStrings.featureLockedMonthlyStats,
+                  onPass: () => context.push(AppRoutes.analytics),
+                ),
           ),
       loading:
           () => StatCard(
