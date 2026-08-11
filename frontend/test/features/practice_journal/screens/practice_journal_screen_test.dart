@@ -17,9 +17,11 @@ import 'package:lessonaza/features/practice_journal/presentation/screens/practic
 class _SpyRepository implements PracticeJournalRepository {
   Endorsement? lastEndorsement;
   GuardianSeal? lastSeal;
+  PracticeLedger? ledgerOverride;
 
   @override
   Future<PracticeLedger> getLedger(String c, int year, int month) async =>
+      ledgerOverride ??
       PracticeLedger.empty(childProfileId: c, year: year, month: month);
 
   @override
@@ -150,6 +152,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('자가 검인'));
       await tester.pumpAndSettle();
+      // Self-endorse now opens an optional-note sheet before signing.
+      await tester.tap(find.byKey(const Key('self_endorse_sheet_sign_button')));
+      await tester.pumpAndSettle();
       expect(spy.lastEndorsement, isNotNull);
       expect(spy.lastEndorsement!.authorUserId, equals('real_42'));
       expect(spy.lastEndorsement!.authorUserId, isNot(equals('me')));
@@ -187,6 +192,80 @@ void main() {
       expect(spy.lastSeal, isNotNull);
       expect(spy.lastSeal!.guardianUserId, equals('real_42'));
       expect(spy.lastSeal!.guardianUserId, isNot(equals('me')));
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  // Self-endorse optional note sheet.
+  group('self endorse note sheet', () {
+    testWidgets('sheet renders without exception on 자가 검인 tap', (tester) async {
+      await tester.pumpWidget(_buildScreen(JournalRole.student));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('자가 검인'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('self_endorse_note_field')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'signing with empty note behaves like before (note stays empty)',
+      (tester) async {
+        final spy = _SpyRepository();
+        await tester.pumpWidget(_buildScreen(JournalRole.student, spy: spy));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('자가 검인'));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('self_endorse_sheet_sign_button')),
+        );
+        await tester.pumpAndSettle();
+        expect(spy.lastEndorsement, isNotNull);
+        expect(spy.lastEndorsement!.by, EndorsedBy.self);
+        expect(spy.lastEndorsement!.note, isEmpty);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('typed note is passed into the saved Endorsement', (
+      tester,
+    ) async {
+      final spy = _SpyRepository();
+      await tester.pumpWidget(_buildScreen(JournalRole.student, spy: spy));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('자가 검인'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('self_endorse_note_field')),
+        '오늘 스케일 30분 연습',
+      );
+      await tester.tap(find.byKey(const Key('self_endorse_sheet_sign_button')));
+      await tester.pumpAndSettle();
+      expect(spy.lastEndorsement, isNotNull);
+      expect(spy.lastEndorsement!.note, '오늘 스케일 30분 연습');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('recent self notes render read-only below the legend', (
+      tester,
+    ) async {
+      final spy =
+          _SpyRepository()
+            ..ledgerOverride = PracticeLedger(
+              childProfileId: 'child_1',
+              year: DateTime.now().year,
+              month: DateTime.now().month,
+              endorsements: [
+                Endorsement(
+                  by: EndorsedBy.self,
+                  date: DateTime.now(),
+                  authorUserId: 'real_42',
+                  note: '오늘 스케일 30분 연습',
+                ),
+              ],
+            );
+      await tester.pumpWidget(_buildScreen(JournalRole.student, spy: spy));
+      await tester.pumpAndSettle();
+      expect(find.text('오늘 스케일 30분 연습'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

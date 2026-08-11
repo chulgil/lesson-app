@@ -10442,6 +10442,12 @@ class AppStrings {
   /// 자가 검인(부모 미연결 학생의 한 줄 회고).
   static const journalSelfEndorse = '자가 검인';
 
+  /// 자가 검인 시트 — 선택 메모 입력 힌트.
+  static const journalSelfEndorseNoteHint = '오늘 연습 한 줄 (선택)';
+
+  /// 연습장 본문 — 자가 검인 메모 목록 섹션 제목.
+  static const journalSelfNotesTitle = '자가 메모';
+
   /// 부모 주간 응원·확인 도장.
   static const journalGuardianSeal = '확인 도장';
 
