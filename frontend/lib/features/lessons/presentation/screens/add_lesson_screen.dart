@@ -69,6 +69,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   int _reminderMinutes = 30;
   LessonLocation? _selectedLocation;
 
+  /// 세부 설정(장소·반복·리마인더) 접기/펼치기 제어 — 검증 에러 시 자동 펼침에 사용.
+  final _advancedSettingsController = ExpansibleController();
+
   @override
   void initState() {
     super.initState();
@@ -127,12 +130,51 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   void dispose() {
     _pieceController.dispose();
     _notesController.dispose();
+    _advancedSettingsController.dispose();
     super.dispose();
   }
 
   /// Whether the current date+time selection is in the past (record mode).
   bool get _isRecordMode =>
       !_isRecurring && isLessonDateTimeInPast(_selectedDate, _selectedTime);
+
+  /// Compact summary of 세부 설정(장소·반복·리마인더) shown in the collapsed
+  /// header so nothing feels hidden — built from existing state only.
+  String get _advancedSettingsSummary {
+    final parts = <String>[
+      _selectedLocation != null
+          ? AppStrings.lessonAdvancedSummaryLocation(_selectedLocation!.name)
+          : AppStrings.lessonAdvancedSummaryLocationUnset,
+    ];
+
+    if (!_isRecordMode) {
+      parts.add(
+        _isRecurring && _recurringDays.isNotEmpty
+            ? AppStrings.lessonAdvancedSummaryRecurringDays(_recurringDaysLabel)
+            : AppStrings.lessonAdvancedSummaryRecurringOff,
+      );
+      parts.add(
+        _enableReminder
+            ? AppStrings.lessonAdvancedSummaryReminderOn(_reminderMinutesLabel)
+            : AppStrings.lessonAdvancedSummaryReminderOff,
+      );
+    }
+
+    return parts.join(' · ');
+  }
+
+  String get _recurringDaysLabel => (_recurringDays.toList()..sort())
+      .map((i) => LessonRecurringSection.dayNames[i])
+      .join(',');
+
+  String get _reminderMinutesLabel {
+    final match = LessonReminderSection.reminderOptions.where(
+      (opt) => opt.$1 == _reminderMinutes,
+    );
+    return match.isNotEmpty
+        ? match.first.$2
+        : AppStrings.timeAgoMinutes(_reminderMinutes);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,47 +254,98 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Lesson location (selected from teacher's registered locations)
-              const LessonFormSectionTitle(AppStrings.lessonLocationLabel),
-              const SizedBox(height: AppSpacing.space3),
-              LessonLocationSection(
-                teacherId: ref.watch(currentTeacherIdProvider),
-                selectedLocationId: _selectedLocation?.id,
-                onSelected: (loc) {
-                  setState(() => _selectedLocation = loc);
-                },
-                onAutoPrefill: (loc) {
-                  if (_selectedLocation == null) {
-                    setState(() => _selectedLocation = loc);
-                  }
-                },
-              ),
+              // 세부 설정 — 장소·반복·리마인더 점진 공개. 기본값/자동 프리필은
+              // 접힌 상태에서도 동작해야 하므로 maintainState:true 로 children 을
+              // 항상 마운트한다 (Offstage 로만 감춤, 위젯 트리에서 제거 안 함).
+              Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  key: const Key('lessonAdvancedSettingsExpansionTile'),
+                  controller: _advancedSettingsController,
+                  initiallyExpanded: false,
+                  maintainState: true,
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  title: Text(
+                    AppStrings.lessonAdvancedSettingsLabel,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    _advancedSettingsSummary,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  children: [
+                    const SizedBox(height: AppSpacing.space3),
 
-              const SizedBox(height: AppSpacing.space6),
+                    // Lesson location (selected from teacher's registered locations)
+                    const LessonFormSectionTitle(
+                      AppStrings.lessonLocationLabel,
+                    ),
+                    const SizedBox(height: AppSpacing.space3),
+                    LessonLocationSection(
+                      teacherId: ref.watch(currentTeacherIdProvider),
+                      selectedLocationId: _selectedLocation?.id,
+                      onSelected: (loc) {
+                        setState(() => _selectedLocation = loc);
+                      },
+                      onAutoPrefill: (loc) {
+                        if (_selectedLocation == null) {
+                          setState(() => _selectedLocation = loc);
+                        }
+                      },
+                    ),
 
-              // Recurring lesson (hidden in record mode — past lessons can't recur)
-              if (!_isRecordMode)
-                LessonRecurringSection(
-                  isRecurring: _isRecurring,
-                  onRecurringChanged: (value) {
-                    setState(() {
-                      _isRecurring = value;
-                      if (!value) {
-                        _recurringDays.clear();
-                      }
-                    });
-                  },
-                  selectedDays: _recurringDays,
-                  onDayToggle: (index) {
-                    setState(() {
-                      if (_recurringDays.contains(index)) {
-                        _recurringDays.remove(index);
-                      } else {
-                        _recurringDays.add(index);
-                      }
-                    });
-                  },
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Recurring lesson (hidden in record mode — past lessons can't recur)
+                    if (!_isRecordMode) ...[
+                      LessonRecurringSection(
+                        isRecurring: _isRecurring,
+                        onRecurringChanged: (value) {
+                          setState(() {
+                            _isRecurring = value;
+                            if (!value) {
+                              _recurringDays.clear();
+                            }
+                          });
+                        },
+                        selectedDays: _recurringDays,
+                        onDayToggle: (index) {
+                          setState(() {
+                            if (_recurringDays.contains(index)) {
+                              _recurringDays.remove(index);
+                            } else {
+                              _recurringDays.add(index);
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.space6),
+                    ],
+
+                    // Reminder settings (hidden in record mode — past lessons don't need reminders)
+                    if (!_isRecordMode)
+                      LessonReminderSection(
+                        enableReminder: _enableReminder,
+                        onReminderChanged: (value) {
+                          setState(() => _enableReminder = value);
+                        },
+                        reminderMinutes: _reminderMinutes,
+                        onReminderTimeChanged: (value) {
+                          setState(() => _reminderMinutes = value);
+                        },
+                      ),
+
+                    const SizedBox(height: AppSpacing.space3),
+                  ],
                 ),
+              ),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -263,22 +356,6 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 pieceController: _pieceController,
                 notesController: _notesController,
               ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // Reminder settings (hidden in record mode — past lessons don't need reminders)
-              if (!_isRecordMode) ...[
-                LessonReminderSection(
-                  enableReminder: _enableReminder,
-                  onReminderChanged: (value) {
-                    setState(() => _enableReminder = value);
-                  },
-                  reminderMinutes: _reminderMinutes,
-                  onReminderTimeChanged: (value) {
-                    setState(() => _reminderMinutes = value);
-                  },
-                ),
-              ],
 
               const SizedBox(height: AppSpacing.space8),
 
@@ -584,6 +661,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     }
 
     if (_isRecurring && _recurringDays.isEmpty) {
+      // 반복 요일 선택은 세부 설정(접힘) 안에 있다 — 에러를 보여주려면 먼저 펼친다.
+      _advancedSettingsController.expand();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(AppStrings.selectRecurringDaysValidation),

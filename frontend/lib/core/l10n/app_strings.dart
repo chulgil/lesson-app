@@ -2966,6 +2966,27 @@ class AppStrings {
   /// 레슨 추가하기 (add lesson submit button)
   static const addLessonButton = '레슨 추가하기';
 
+  /// 세부 설정 (add lesson screen — collapsed 장소·반복·리마인더 group header)
+  static const lessonAdvancedSettingsLabel = '세부 설정';
+
+  /// 장소 {name} (advanced settings summary — location chosen)
+  static String lessonAdvancedSummaryLocation(String name) => '장소 $name';
+
+  /// 장소 미지정 (advanced settings summary — no location selected)
+  static const lessonAdvancedSummaryLocationUnset = '장소 미지정';
+
+  /// 반복 없음 (advanced settings summary — recurring off)
+  static const lessonAdvancedSummaryRecurringOff = '반복 없음';
+
+  /// 매주 {days} (advanced settings summary — recurring days, e.g. "매주 월,수")
+  static String lessonAdvancedSummaryRecurringDays(String days) => '매주 $days';
+
+  /// 리마인더 {label} (advanced settings summary — reminder enabled)
+  static String lessonAdvancedSummaryReminderOn(String label) => '리마인더 $label';
+
+  /// 리마인더 끔 (advanced settings summary — reminder disabled)
+  static const lessonAdvancedSummaryReminderOff = '리마인더 끔';
+
   /// 수강권 없는 학생 레슨 추가 시 안내 — 체험권 자동연결 (spec §2.4: 선생님은 수강권을 의식하지 않는다)
   static const noActiveSubscriptionBanner =
       '이 레슨은 1회 체험 수강권으로 자동 연결됩니다.\n'
