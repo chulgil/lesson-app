@@ -19,6 +19,7 @@ import '../../../features/practice/presentation/screens/practice_stats_screen.da
 import '../../../features/practice/presentation/screens/repertoire_history_screen.dart';
 import '../../../features/practice/presentation/screens/note_access_request_screen.dart';
 import '../../../features/practice/presentation/screens/awaiting_feedback_screen.dart';
+import '../../../features/practice/presentation/screens/recording_detail_screen.dart';
 import '../app_routes.dart';
 
 /// Practice routes
@@ -230,6 +231,17 @@ List<GoRoute> practiceRoutes = [
     builder: (context, state) {
       final requestId = state.pathParameters['requestId'] ?? '';
       return NoteAccessRequestScreen(requestId: requestId);
+    },
+  ),
+
+  // Recording Detail — student-facing playback + teacher feedback.
+  // Deep-link target for the recording feedback push notification.
+  GoRoute(
+    path: AppRoutes.recordingDetail,
+    name: 'recordingDetail',
+    builder: (context, state) {
+      final recordingId = state.pathParameters['recordingId'] ?? '';
+      return RecordingDetailScreen(recordingId: recordingId);
     },
   ),
 ];

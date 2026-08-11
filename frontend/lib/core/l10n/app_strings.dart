@@ -1664,6 +1664,17 @@ class AppStrings {
   /// 재생은 실제 녹음 파일이 연동되면 지원됩니다
   static const recordingPlaybackComingSoon = '재생은 실제 녹음 파일이 연동되면 지원됩니다';
 
+  // ── Recording Detail (학생 — 녹음 재생 + 선생님 피드백 열람) ─────────
+
+  /// 공유 녹음
+  static const recordingDetailTitle = '공유 녹음';
+
+  /// 선생님 피드백
+  static const recordingDetailFeedbackSectionTitle = '선생님 피드백';
+
+  /// 녹음을 찾을 수 없습니다
+  static const recordingDetailNotFound = '녹음을 찾을 수 없습니다';
+
   // ── Payment Reminder (미입금 알림) ─────────────────────────
   /// 입금 알림을 보냈습니다
   static const paymentReminderSent = '입금 알림을 보냈습니다';

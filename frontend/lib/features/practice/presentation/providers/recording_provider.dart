@@ -134,6 +134,16 @@ Future<bool> microphonePermission(Ref ref) async {
   return await recorder.hasPermission();
 }
 
+/// Look up a single recording by id, independent of repertoire/student
+/// context. Used by the deep-linked recording detail screen
+/// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+/// where only the recordingId is known.
+@riverpod
+Future<Recording?> recordingById(Ref ref, String recordingId) {
+  final repository = ref.watch(recordingRepositoryProvider);
+  return repository.getRecording(recordingId);
+}
+
 /// Main recording provider for a repertoire.
 @riverpod
 class RecordingNotifier extends _$RecordingNotifier {
