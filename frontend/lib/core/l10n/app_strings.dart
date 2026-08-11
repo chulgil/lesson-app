@@ -991,6 +991,13 @@ class AppStrings {
   static const teacherHomeConnectionRequestsSubtitle =
       '초대코드로 가입한 학생을 승인하면 학생 목록에 추가됩니다';
 
+  // ── Pending Actions Summary (Dashboard) ────────────────────
+  // 홈 대시보드 상단 통합 카운터 — 연결/예약승인/레슨요청/일정변경 4개 표면 합산.
+
+  static String pendingActionsSummaryTitle(int count) => '오늘 확인할 항목 $count건';
+  static const pendingActionsConnectionLabel = '연결';
+  static const pendingActionsBookingLabel = '예약 승인';
+
   // ── Subscription Card ─────────────────────────────────────
 
   /// 변경 횟수
