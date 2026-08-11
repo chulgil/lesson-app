@@ -45,6 +45,11 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   final void Function(RequestEvent event)? onCancellationAcknowledge;
   final VoidCallback? onCancelLesson;
 
+  /// When true, tints the bar background to signal "this is why you're
+  /// here" — used when navigating in directly from a schedule-change entry
+  /// point (e.g. home dashboard) rather than opening the screen at rest.
+  final bool highlightResponse;
+
   const SubscriptionBottomInputBar({
     super.key,
     required this.subscription,
@@ -61,6 +66,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     this.onCancellationFreeProcess,
     this.onCancellationAcknowledge,
     this.onCancelLesson,
+    this.highlightResponse = false,
   });
 
   @override
@@ -83,6 +89,12 @@ class SubscriptionBottomInputBar extends StatelessWidget {
         cancellationEvent.eventType ==
             RequestEventType.lessonCancellationConfirmed;
 
+    // An entry point (e.g. home dashboard) asked us to surface "this is why
+    // you're here" — only meaningful when the bar actually renders a
+    // response affordance, not the passive default state.
+    final isActionable = isCancellationConfirmed || isWaiting || canRespond;
+    final shouldHighlight = highlightResponse && isActionable;
+
     // Matches CurrentRequestBox.build() container exactly
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -92,7 +104,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
         MediaQuery.of(context).padding.bottom + AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.paper,
+        color: shouldHighlight ? AppColors.paperAccentSoft : AppColors.paper,
         border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Column(
@@ -456,9 +468,7 @@ class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
             ),
             child: Text(
               AppStrings.scheduleChangeAccept,
-              style: AppTypography.buttonSmall.copyWith(
-                color: AppColors.paper,
-              ),
+              style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
             ),
           ),
         ),

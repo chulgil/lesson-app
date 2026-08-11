@@ -62,8 +62,7 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
               child: Column(
                 children: [
                   for (int i = 0; i < displayRequests.length; i++) ...[
-                    if (i > 0)
-                      const ThinRule(),
+                    if (i > 0) const ThinRule(),
                     _ScheduleChangeListItem(
                       event: displayRequests[i],
                       studentName:
@@ -75,7 +74,10 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                           displayRequests[i].subscriptionId != null
                               ? () => context.push(
                                 _subscriptionDetailRoute(displayRequests[i]),
-                                extra: {'viewerRole': 'teacher'},
+                                extra: {
+                                  'viewerRole': 'teacher',
+                                  'highlightScheduleResponse': true,
+                                },
                               )
                               : null,
                     ),
@@ -331,9 +333,10 @@ class _ScheduleChangeListItem extends StatelessWidget {
     // Line 2: source · type · event description
     final line2Parts = <String>[];
     if (info != null) {
-      final source = info.isAcademy
-          ? (academyName ?? AppStrings.academy)
-          : AppStrings.individualLesson;
+      final source =
+          info.isAcademy
+              ? (academyName ?? AppStrings.academy)
+              : AppStrings.individualLesson;
       line2Parts.add(source);
       line2Parts.add(info.typeLabel);
     }
