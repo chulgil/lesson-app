@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/practice/domain/entities/metronome_settings.dart';
 import 'package:lessonaza/features/practice/presentation/providers/metronome_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/tuner_provider.dart';
@@ -152,7 +153,7 @@ void main() {
 
   for (final viewport in const [Size(1440, 900), Size(375, 667)]) {
     final label = '${viewport.width.toInt()}x${viewport.height.toInt()}';
-    testWidgets('renders 2 music tabs; settings toggles on tuner @ $label', (
+    testWidgets('renders 3 music tabs; settings toggles on tuner @ $label', (
       tester,
     ) async {
       tester.view.physicalSize = viewport;
@@ -162,11 +163,13 @@ void main() {
 
       await pumpModal(tester);
 
-      // Exactly 2 tabs, in music tool order.
+      // Exactly 3 tabs, in music tool order (metronome, tuner, 녹음 — #973 +
+      // 녹음 launch tab wired to the quick-record route).
       expect(find.text('메트로놈'), findsOneWidget);
       expect(find.text('튜너'), findsOneWidget);
+      expect(find.text(AppStrings.practiceRecordingTitle), findsOneWidget);
       final tabBar = tester.widget<TabBar>(find.byType(TabBar));
-      expect(tabBar.tabs.length, 2);
+      expect(tabBar.tabs.length, 3);
 
       // The modal threads its studentId into the metronome panel — the join the
       // refactor introduced (tool.panelBuilder(context, widget.studentId)).
