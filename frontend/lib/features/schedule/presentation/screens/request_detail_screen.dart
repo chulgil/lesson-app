@@ -7,11 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
-import '../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
@@ -30,6 +26,10 @@ import '../widgets/schedule_change_slot_bottom_sheet.dart';
 import '../widgets/schedule_change_type_bottom_sheet.dart';
 import '../widgets/current_request_box.dart';
 import '../widgets/proposal_bottom_sheet.dart';
+import '../widgets/request_detail/request_detail_app_bar.dart';
+import '../widgets/request_detail/request_detail_chapter_summaries.dart';
+import '../widgets/request_detail/request_detail_event_strip.dart';
+import '../widgets/request_detail/request_detail_more_menu_sheet.dart';
 import '../widgets/request_history_chat.dart';
 import 'suggest_alternative_screen.dart';
 
@@ -261,7 +261,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
         return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
-          appBar: _buildChatAppBar(context, request, opponentName, academyName),
+          appBar: buildRequestDetailAppBar(
+            request: request,
+            opponentName: opponentName,
+            academyName: academyName,
+            onTitleTap: () => showStudentProfileBottomSheet(
+              context: context,
+              studentId: request.studentId,
+              studentName: opponentName,
+              instrument: request.instrument,
+              student: ref
+                  .read(studentProvider(request.studentId))
+                  .valueOrNull,
+              message: request.message,
+              isTrialRequest: request.type == LessonRequestType.trial,
+            ),
+            onMoreTap: () => _showMoreMenu(context, request),
+          ),
           body: Column(
             children: [
               // Progress bar (fixed, below AppBar)
@@ -272,7 +288,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 child: ListView(
                   children: [
                     // Completed chapter summaries (collapsed)
-                    ..._buildChapterSummaries(request, events),
+                    ...buildRequestDetailChapterSummaries(
+                      request: request,
+                      events: events,
+                      viewerRole: viewerRole,
+                      requestPhaseEvents: _eventsForPhase(
+                        events,
+                        RequestPhase.request,
+                      ),
+                      expandedChapters: _expandedChapters,
+                      onToggleChapter: (phase) => setState(() {
+                        if (_expandedChapters.contains(phase)) {
+                          _expandedChapters.remove(phase);
+                        } else {
+                          _expandedChapters.add(phase);
+                        }
+                      }),
+                    ),
 
                     // Chat history (chronological, newest at bottom)
                     RequestHistoryChat(
@@ -302,7 +334,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
               ),
 
               // Event feedback strip (above action bar)
-              _buildEventStrip(),
+              RequestDetailEventStrip(
+                message: _eventMessage,
+                color: _eventColor,
+                icon: _eventIcon,
+                onDismiss: () => setState(() => _eventMessage = null),
+              ),
 
               // Bottom action bar (phase-aware)
               CurrentRequestBox(
@@ -356,76 +393,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     );
   }
 
-  /// Simple AppBar: "< 스케줄요청 박지호 (정규레슨)"
-  /// Tap name → bottom sheet profile
-  Widget _buildEventStrip() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      child: _eventMessage != null
-          ? Container(
-              key: ValueKey(_eventMessage),
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space2,
-              ),
-              color: _eventColor.withValues(alpha: 0.12),
-              child: Row(
-                children: [
-                  Icon(_eventIcon, size: 16, color: _eventColor),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      _eventMessage!,
-                      style: AppTypography.caption.copyWith(
-                        color: _eventColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => setState(() => _eventMessage = null),
-                    child: Icon(Icons.close, size: 14, color: _eventColor),
-                  ),
-                ],
-              ),
-            )
-          : const SizedBox.shrink(),
-    );
-  }
-
-  PreferredSizeWidget _buildChatAppBar(
-    BuildContext context,
-    UnifiedLessonRequest request,
-    String opponentName,
-    String? academyName,
-  ) {
-    final titleText = request.isAcademy && academyName != null
-        ? '$academyName $opponentName (${request.typeDisplayLabel})'
-        : '$opponentName (${request.typeDisplayLabel})';
-
-    return NotebookDetailAppBar(
-      titleWidget: GestureDetector(
-        onTap: () => showStudentProfileBottomSheet(
-          context: context,
-          studentId: request.studentId,
-          studentName: opponentName,
-          instrument: request.instrument,
-          student: ref.read(studentProvider(request.studentId)).valueOrNull,
-          message: request.message,
-          isTrialRequest: request.type == LessonRequestType.trial,
-        ),
-        child: Text(titleText, style: NotebookTypography.appBarTitle),
-      ),
-      actions: const [DetailAppBarAction.more],
-      onAction: (action) {
-        if (action == DetailAppBarAction.more) {
-          _showMoreMenu(context, request);
-        }
-      },
-    );
-  }
-
   void _showMoreMenu(BuildContext context, UnifiedLessonRequest request) {
     final events =
         ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
@@ -455,40 +422,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         ),
     ];
 
-    if (items.isEmpty) return;
-
-    showNotebookBottomSheet(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: AppSpacing.space2),
-            const BottomSheetHandle(margin: EdgeInsets.zero),
-            const SizedBox(height: AppSpacing.space3),
-            for (final (icon, label, onTap) in items)
-              ListTile(
-                leading: Icon(
-                  icon,
-                  color: label == AppStrings.cancelRequestAction
-                      ? AppColors.paperAccent
-                      : AppColors.ink,
-                ),
-                title: Text(
-                  label,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: label == AppStrings.cancelRequestAction
-                        ? AppColors.paperAccent
-                        : AppColors.ink,
-                  ),
-                ),
-                onTap: onTap,
-              ),
-            const SizedBox(height: AppSpacing.space2),
-          ],
-        ),
-      ),
-    );
+    showRequestDetailMoreMenu(context: context, items: items);
   }
 
   Future<void> _handleAccept(
@@ -1245,92 +1179,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   // ── Chapter Model Helpers ─────────────────────────────────
 
-  /// Build collapsed chapter summaries for completed phases.
-  List<Widget> _buildChapterSummaries(
-    UnifiedLessonRequest request,
-    List<RequestEvent> events,
-  ) {
-    final phase = request.currentPhase;
-    final chapters = <Widget>[];
-
-    // Phase 1: 레슨 신청 — show as collapsed if past Phase 1
-    if (phase != RequestPhase.request && phase != RequestPhase.terminal) {
-      final isExpanded = _expandedChapters.contains(RequestPhase.request);
-      chapters.add(
-        ChapterSummary(
-          icon: Icons.send,
-          title: AppStrings.chapterRequest,
-          completedDate: _phaseCompletedDate(request, RequestPhase.request),
-          summary: _phaseSummary(request, events, RequestPhase.request),
-          isExpanded: isExpanded,
-          onTap: () => setState(() {
-            if (isExpanded) {
-              _expandedChapters.remove(RequestPhase.request);
-            } else {
-              _expandedChapters.add(RequestPhase.request);
-            }
-          }),
-          child: isExpanded
-              ? RequestHistoryChat(
-                  events: _eventsForPhase(events, RequestPhase.request),
-                  request: request,
-                  shrinkWrap: true,
-                  showGuide: false,
-                  viewerId: viewerRole == 'teacher'
-                      ? request.teacherId
-                      : request.studentId,
-                  studentName: '',
-                )
-              : null,
-        ),
-      );
-    }
-
-    // Phase 2: 수강권 & 입금 — show if past Phase 2
-    if (_isPhaseCompleted(phase, RequestPhase.subscription)) {
-      final isExpanded = _expandedChapters.contains(RequestPhase.subscription);
-      chapters.add(
-        ChapterSummary(
-          icon: Icons.credit_card,
-          title: AppStrings.chapterSubscription,
-          completedDate: _phaseCompletedDate(
-            request,
-            RequestPhase.subscription,
-          ),
-          summary: _phaseSummary(request, events, RequestPhase.subscription),
-          isExpanded: isExpanded,
-          onTap: () => setState(() {
-            if (isExpanded) {
-              _expandedChapters.remove(RequestPhase.subscription);
-            } else {
-              _expandedChapters.add(RequestPhase.subscription);
-            }
-          }),
-        ),
-      );
-    }
-
-    // Phase 3: 레슨 진행 — show as active header if current
-    if (phase == RequestPhase.lessons || phase == RequestPhase.completed) {
-      final isActive = phase == RequestPhase.lessons;
-      chapters.add(
-        ChapterSummary(
-          icon: Icons.music_note,
-          title: AppStrings.chapterLessons,
-          isActive: isActive,
-          summary: isActive
-              ? null
-              : _phaseSummary(request, events, RequestPhase.lessons),
-          completedDate: isActive
-              ? null
-              : _phaseCompletedDate(request, RequestPhase.lessons),
-        ),
-      );
-    }
-
-    return chapters;
-  }
-
   /// Filter events belonging to the current active phase.
   List<RequestEvent> _eventsForCurrentPhase(
     UnifiedLessonRequest request,
@@ -1350,55 +1198,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   /// Check if an event belongs to a given phase.
   bool _eventBelongsToPhase(RequestEvent event, RequestPhase phase) {
     return requestDetailEventBelongsToPhase(event, phase);
-  }
-
-  /// Whether a phase is fully completed (current phase is past it).
-  bool _isPhaseCompleted(RequestPhase current, RequestPhase target) {
-    const order = [
-      RequestPhase.request,
-      RequestPhase.subscription,
-      RequestPhase.lessons,
-      RequestPhase.completed,
-    ];
-    final currentIdx = order.indexOf(current);
-    final targetIdx = order.indexOf(target);
-    if (currentIdx == -1 || targetIdx == -1) return false;
-    return currentIdx > targetIdx;
-  }
-
-  /// Get a display date for when a phase was completed.
-  String? _phaseCompletedDate(
-    UnifiedLessonRequest request,
-    RequestPhase phase,
-  ) {
-    if (phase == RequestPhase.request && request.confirmedAt != null) {
-      final d = request.confirmedAt!;
-      return '${d.month}/${d.day}';
-    }
-    return null;
-  }
-
-  /// Generate a one-line summary for a collapsed chapter.
-  String? _phaseSummary(
-    UnifiedLessonRequest request,
-    List<RequestEvent> events,
-    RequestPhase phase,
-  ) {
-    switch (phase) {
-      case RequestPhase.request:
-        return request.typeDisplayLabel;
-      case RequestPhase.subscription:
-        return AppStrings.subscription;
-      case RequestPhase.lessons:
-        final completedCount = events
-            .where((e) => e.eventType == RequestEventType.lessonCompleted)
-            .length;
-        if (completedCount > 0) return '$completedCount회 완료';
-        return null;
-      case RequestPhase.completed:
-      case RequestPhase.terminal:
-        return null;
-    }
   }
 
   Future<void> _handleCancel(
