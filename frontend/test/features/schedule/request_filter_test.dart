@@ -11,18 +11,42 @@ void main() {
     final today = DateTime(now.year, now.month, now.day);
 
     allRequests = [
-      _makeRequest('r1', status: UnifiedRequestStatus.pending,
-          createdAt: today, studentId: 's_김'),
-      _makeRequest('r2', status: UnifiedRequestStatus.negotiating,
-          createdAt: today.subtract(const Duration(days: 1)), studentId: 's_박'),
-      _makeRequest('r3', status: UnifiedRequestStatus.completed,
-          createdAt: today.subtract(const Duration(days: 5)), studentId: 's_이'),
-      _makeRequest('r4', status: UnifiedRequestStatus.cancelled,
-          createdAt: today.subtract(const Duration(days: 10)), studentId: 's_최'),
-      _makeRequest('r5', status: UnifiedRequestStatus.expired,
-          createdAt: today.subtract(const Duration(days: 35)), studentId: 's_정'),
-      _makeRequest('r6', status: UnifiedRequestStatus.pending,
-          createdAt: today.subtract(const Duration(days: 2)), studentId: 's_안'),
+      _makeRequest(
+        'r1',
+        status: UnifiedRequestStatus.pending,
+        createdAt: today,
+        studentId: 's_김',
+      ),
+      _makeRequest(
+        'r2',
+        status: UnifiedRequestStatus.negotiating,
+        createdAt: today.subtract(const Duration(days: 1)),
+        studentId: 's_박',
+      ),
+      _makeRequest(
+        'r3',
+        status: UnifiedRequestStatus.completed,
+        createdAt: today.subtract(const Duration(days: 5)),
+        studentId: 's_이',
+      ),
+      _makeRequest(
+        'r4',
+        status: UnifiedRequestStatus.cancelled,
+        createdAt: today.subtract(const Duration(days: 10)),
+        studentId: 's_최',
+      ),
+      _makeRequest(
+        'r5',
+        status: UnifiedRequestStatus.expired,
+        createdAt: today.subtract(const Duration(days: 35)),
+        studentId: 's_정',
+      ),
+      _makeRequest(
+        'r6',
+        status: UnifiedRequestStatus.pending,
+        createdAt: today.subtract(const Duration(days: 2)),
+        studentId: 's_안',
+      ),
     ];
   });
 
@@ -37,7 +61,10 @@ void main() {
       const filter = RequestFilter(status: UnifiedRequestStatus.pending);
       final result = filter.apply(allRequests);
       expect(result.length, 2);
-      expect(result.every((r) => r.status == UnifiedRequestStatus.pending), isTrue);
+      expect(
+        result.every((r) => r.status == UnifiedRequestStatus.pending),
+        isTrue,
+      );
     });
 
     test('filter by date range (1 week)', () {
@@ -57,6 +84,31 @@ void main() {
       // r5 is 35 days ago, excluded
       expect(result.length, 5);
     });
+
+    test(
+      'P1 — active (non-terminal) requests survive the date range regardless '
+      'of window, terminal requests outside the window stay excluded',
+      () {
+        final now = DateTime.now();
+        final oldActive = _makeRequest(
+          'r_old_active',
+          status: UnifiedRequestStatus.pending,
+          createdAt: now.subtract(const Duration(days: 40)),
+        );
+        final oldTerminal = _makeRequest(
+          'r_old_terminal',
+          status: UnifiedRequestStatus.cancelled,
+          createdAt: now.subtract(const Duration(days: 40)),
+        );
+        final oneWeekAgo = now.subtract(const Duration(days: 7));
+        final filter = RequestFilter(startDate: oneWeekAgo, endDate: now);
+
+        final result = filter.apply([oldActive, oldTerminal]);
+
+        expect(result.map((r) => r.id), contains('r_old_active'));
+        expect(result.map((r) => r.id), isNot(contains('r_old_terminal')));
+      },
+    );
 
     test('filter by specific day', () {
       final now = DateTime.now();

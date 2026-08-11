@@ -11,8 +11,12 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../schedule/schedule_facade.dart';
+import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
 import '../providers/student_home_booking_provider.dart';
 import '../providers/student_lessons_tab_state_provider.dart';
@@ -54,14 +58,15 @@ class StudentLessonsTab extends ConsumerWidget {
     final markedDates = schedule?.markerDates ?? <DateTime>{};
 
     // Filter lessons for selected date
-    final dayLessons = studentLessons
-        .where(
-          (l) =>
-              l.date.year == selectedDate.year &&
-              l.date.month == selectedDate.month &&
-              l.date.day == selectedDate.day,
-        )
-        .toList();
+    final dayLessons =
+        studentLessons
+            .where(
+              (l) =>
+                  l.date.year == selectedDate.year &&
+                  l.date.month == selectedDate.month &&
+                  l.date.day == selectedDate.day,
+            )
+            .toList();
 
     // Sort lessons
     switch (sortType) {
@@ -74,14 +79,15 @@ class StudentLessonsTab extends ConsumerWidget {
     }
 
     // Filter trial bookings for selected date
-    final dayTrialBookings = trialBookings
-        .where(
-          (b) =>
-              b.lessonDate.year == selectedDate.year &&
-              b.lessonDate.month == selectedDate.month &&
-              b.lessonDate.day == selectedDate.day,
-        )
-        .toList();
+    final dayTrialBookings =
+        trialBookings
+            .where(
+              (b) =>
+                  b.lessonDate.year == selectedDate.year &&
+                  b.lessonDate.month == selectedDate.month &&
+                  b.lessonDate.day == selectedDate.day,
+            )
+            .toList();
 
     final isLoading = scheduleAsync.isLoading;
     final totalCount = dayLessons.length + dayTrialBookings.length;
@@ -90,6 +96,10 @@ class StudentLessonsTab extends ConsumerWidget {
       children: [
         // Header: title + action button
         _buildHeader(context),
+
+        // Pending/in-negotiation lesson requests (moved from profile tab —
+        // was only reachable via 프로필 > 내 레슨 요청, HARD-GATE 중복 메뉴 금지).
+        _buildPendingRequestsSection(context, ref, currentStudentId),
 
         // Compact week strip (unified with teacher schedule)
         Padding(
@@ -152,6 +162,105 @@ class StudentLessonsTab extends ConsumerWidget {
     );
   }
 
+  /// Compact "진행 중인 신청" section — surfaces pending/in-negotiation
+  /// lesson requests at the top of the lessons tab so they never depend on
+  /// AllLessonRequestsScreen's date window to stay visible. Renders nothing
+  /// when there are none (no empty-state noise on top of the tab's own list).
+  Widget _buildPendingRequestsSection(
+    BuildContext context,
+    WidgetRef ref,
+    String currentStudentId,
+  ) {
+    final requestsAsync = ref.watch(
+      studentUnifiedRequestsProvider(currentStudentId),
+    );
+    final studentNames = ref.watch(studentNameMapProvider);
+    final teacherNames = ref.watch(teacherNameMapProvider);
+    final academyNames = ref.watch(academyNameMapProvider);
+
+    return requestsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (requests) {
+        final pending =
+            requests.where((r) => r.status.isActive).toList()
+              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        if (pending.isEmpty) return const SizedBox.shrink();
+
+        final displayRequests = pending.take(3).toList();
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space2,
+            AppSpacing.screenPadding,
+            AppSpacing.space3,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              NotebookSectionHeader(
+                label:
+                    '${AppStrings.studentHomePendingRequestsTitle} · ${pending.length}',
+                trailing: TextButton(
+                  onPressed:
+                      () => context.push(
+                        '${AppRoutes.myLessonRequests}?studentId=$currentStudentId',
+                      ),
+                  child: Text(
+                    AppStrings.studentViewAll,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space1),
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: AppColors.inkQuaternary),
+                    bottom: BorderSide(color: AppColors.inkQuaternary),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    for (int i = 0; i < displayRequests.length; i++) ...[
+                      if (i > 0) const ThinRule(),
+                      RequestListItem(
+                        request: displayRequests[i],
+                        studentName:
+                            displayRequests[i].studentName ??
+                            studentNames[currentStudentId] ??
+                            AppStrings.student,
+                        teacherName:
+                            displayRequests[i].teacherName ??
+                            teacherNames[displayRequests[i].teacherId],
+                        academyName:
+                            displayRequests[i].academyName ??
+                            academyNames[displayRequests[i].academyId],
+                        viewerRole: 'student',
+                        onTap:
+                            () => context.push(
+                              AppRoutes.requestDetail.replaceFirst(
+                                ':id',
+                                displayRequests[i].id,
+                              ),
+                              extra: {'viewerRole': 'student'},
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildDateHeader(
     WidgetRef ref,
     DateTime selectedDate,
@@ -206,23 +315,29 @@ class StudentLessonsTab extends ConsumerWidget {
       onSelected: (value) {
         ref.read(studentLessonSortTypeProvider.notifier).state = value;
       },
-      itemBuilder: (context) => LessonSortType.values
-          .map(
-            (type) => PopupMenuItem(
-              value: type,
-              child: Row(
-                children: [
-                  if (type == sortType)
-                    Icon(Icons.check, size: 16, color: AppColors.paperAccent)
-                  else
-                    const SizedBox(width: AppSpacing.space4),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(type.displayName),
-                ],
-              ),
-            ),
-          )
-          .toList(),
+      itemBuilder:
+          (context) =>
+              LessonSortType.values
+                  .map(
+                    (type) => PopupMenuItem(
+                      value: type,
+                      child: Row(
+                        children: [
+                          if (type == sortType)
+                            Icon(
+                              Icons.check,
+                              size: 16,
+                              color: AppColors.paperAccent,
+                            )
+                          else
+                            const SizedBox(width: AppSpacing.space4),
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(type.displayName),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

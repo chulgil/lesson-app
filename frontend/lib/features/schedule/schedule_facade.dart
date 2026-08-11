@@ -25,6 +25,7 @@ export 'presentation/providers/unified_lesson_request_providers.dart'
         unifiedRequestByIdProvider,
         studentNameMapProvider,
         studentTodayRequestsProvider,
+        studentUnifiedRequestsProvider,
         teacherNameMapProvider,
         teacherUnifiedRequestsProvider,
         todayRequestsProvider,

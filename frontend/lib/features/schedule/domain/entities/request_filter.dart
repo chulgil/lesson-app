@@ -89,10 +89,13 @@ class RequestFilter {
           }).toList();
     }
 
-    // Filter by date range
+    // Filter by date range — active (non-terminal) requests stay visible
+    // outside the window so a still-in-negotiation/in-progress request never
+    // silently disappears when a period preset (1주/1달/3개월) is applied.
     if (startDate != null && endDate != null) {
       result =
           result.where((r) {
+            if (r.status.isActive) return true;
             return !r.createdAt.isBefore(startDate!) &&
                 !r.createdAt.isAfter(endDate!);
           }).toList();

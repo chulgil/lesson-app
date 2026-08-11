@@ -148,9 +148,7 @@ class StudentProfileTab extends ConsumerWidget {
                   onTap: () => context.push(AppRoutes.profileEdit),
                   child: Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: AppColors.paperDark,
-                    ),
+                    decoration: const BoxDecoration(color: AppColors.paperDark),
                     child: const Icon(
                       Icons.camera_alt,
                       size: 16,
@@ -275,12 +273,9 @@ class StudentProfileTab extends ConsumerWidget {
             subtitle: profile.teacherSubtitle,
             onTap: () => context.push(AppRoutes.myTeachers),
           ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.assignment_outlined,
-            title: AppStrings.lessonRequestMenu,
-            onTap: () => context.push(AppRoutes.myLessonRequests),
-          ),
+          // #P1 — "내 레슨 요청" moved to the top of the 레슨 탭 (was a
+          // duplicate entry point; 진행 중인 신청 there also links to the
+          // same AllLessonRequestsScreen via AppRoutes.myLessonRequests).
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.library_music_outlined,
@@ -342,9 +337,10 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.alarm_outlined,
             title: AppStrings.studentHomePracticeReminder,
-            subtitle: reminderSettings.isEnabled
-                ? reminderSettings.formattedTime
-                : AppStrings.studentHomePracticeReminderOff,
+            subtitle:
+                reminderSettings.isEnabled
+                    ? reminderSettings.formattedTime
+                    : AppStrings.studentHomePracticeReminderOff,
             onTap: () => PracticeReminderSheet.show(context),
           ),
           _buildMenuDivider(),

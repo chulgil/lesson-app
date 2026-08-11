@@ -436,9 +436,6 @@ class AppStrings {
   /// 확인
   static const confirm = '확인';
 
-  /// 레슨 요청 (학생 프로필 메뉴)
-  static const lessonRequestMenu = '레슨 요청';
-
   // ── Filter Labels ─────────────────────────────────────────
 
   /// 시간순
@@ -7247,6 +7244,8 @@ class AppStrings {
   static const studentHomeLanguageKorean = '한국어';
   static const studentHomeMyTrialLessons = '내 체험레슨';
   static const studentHomeApply = '신청';
+  // #P1 — 레슨 탭 상단 진행 중 신청 섹션 (프로필 탭 "내 레슨 요청" 행 이동).
+  static const studentHomePendingRequestsTitle = '진행 중인 신청';
   static const studentHomeAllTrialInScheduleTab =
       '모든 체험 레슨은 스케줄 탭에서 확인할 수 있습니다';
   static const studentHomeTrialBooking = '체험레슨 신청';
