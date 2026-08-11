@@ -9,8 +9,12 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
+import '../../../gamification/gamification_facade.dart'
+    show growthHeatmapProvider, pointAwardNotifierProvider;
 import '../../domain/entities/smart_recording.dart';
 import '../../../../core/audio/audio_trimmer_service.dart';
+import '../providers/practice_recording_provider.dart'
+    show practiceSourceLoggersProvider;
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/smart_recording/smart_recording_indicator.dart';
 
@@ -255,6 +259,19 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       await ref
           .read(sectionCrudProvider.notifier)
           .incrementPractice(sectionId, repertoireId, actualDuration);
+
+      // 이 경로(곡 상세 녹음)는 recording_provider.dart 의 stopRecording() 과
+      // 달리 그동안 journal/heatmap/points 로 집계되지 않았다 — 동일하게
+      // 포인트 지급 + 잔디(heatmap) 녹음 카운트를 기록한다.
+      ref
+          .read(pointAwardNotifierProvider.notifier)
+          .awardRecordingSaved(studentId);
+      unawaited(
+        ref
+            .read(practiceSourceLoggersProvider)
+            .logRecording(studentId: studentId, occurredAt: DateTime.now()),
+      );
+      ref.invalidate(growthHeatmapProvider(studentId));
 
       ref.invalidate(sectionProvider(sectionId));
       ref.invalidate(studentRepertoiresProvider(studentId));
