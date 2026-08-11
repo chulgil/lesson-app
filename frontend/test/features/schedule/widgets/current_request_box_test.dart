@@ -81,6 +81,120 @@ void main() {
       },
     );
   });
+
+  group('CurrentRequestBox Phase 3 schedule change entry', () {
+    testWidgets(
+      'shows a schedule change button with no pending negotiation and '
+      'invokes onScheduleChange when tapped',
+      (tester) async {
+        var scheduleChangeTapped = false;
+
+        await tester.pumpWidget(
+          _wrap(
+            CurrentRequestBox(
+              request: _request(status: UnifiedRequestStatus.inProgress),
+              events: const [],
+              viewerRole: 'teacher',
+              opponentName: '이서현',
+              onScheduleChange: () => scheduleChangeTapped = true,
+            ),
+          ),
+        );
+
+        expect(find.text('일정 변경'), findsOneWidget);
+
+        await tester.tap(find.text('일정 변경'));
+        await tester.pump();
+
+        expect(scheduleChangeTapped, isTrue);
+      },
+    );
+
+    testWidgets(
+      'hides the schedule change button when onScheduleChange is not provided',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            CurrentRequestBox(
+              request: _request(status: UnifiedRequestStatus.inProgress),
+              events: const [],
+              viewerRole: 'teacher',
+              opponentName: '이서현',
+            ),
+          ),
+        );
+
+        expect(find.text('일정 변경'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'shows the response banner instead when a schedule change is pending',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            CurrentRequestBox(
+              request: _request(status: UnifiedRequestStatus.inProgress),
+              events: [
+                _event(
+                  actorType: ProposerRole.teacher,
+                  eventType: RequestEventType.scheduleChangeProposed,
+                ),
+              ],
+              viewerRole: 'student',
+              opponentName: '이서현',
+              onScheduleChange: () {},
+            ),
+          ),
+        );
+
+        expect(find.text('일정 변경 응답이 필요합니다'), findsOneWidget);
+        expect(find.text('일정 변경'), findsNothing);
+      },
+    );
+  });
+
+  group('CurrentRequestBox subscription proposal reject confirmation', () {
+    testWidgets(
+      'reject button shows a confirm dialog and does not fire until confirmed',
+      (tester) async {
+        var rejectFired = false;
+
+        await tester.pumpWidget(
+          _wrap(
+            CurrentRequestBox(
+              request: _request(status: UnifiedRequestStatus.proposalSent),
+              events: const [],
+              viewerRole: 'student',
+              opponentName: '김선생',
+              onRejectProposal: (_) => rejectFired = true,
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('거절'));
+        await tester.pumpAndSettle();
+
+        // Dialog is showing; the callback must not have fired yet.
+        expect(find.text('제안 거절'), findsOneWidget);
+        expect(rejectFired, isFalse);
+
+        // Cancel keeps the proposal alive.
+        await tester.tap(find.text('취소'));
+        await tester.pumpAndSettle();
+        expect(rejectFired, isFalse);
+
+        // Re-open and confirm this time — the dialog's confirm action is a
+        // TextButton, distinct from the background OutlinedButton reject CTA.
+        await tester.tap(find.text('거절'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(TextButton, '거절'));
+        await tester.pumpAndSettle();
+
+        expect(rejectFired, isTrue);
+      },
+    );
+  });
 }
 
 Widget _wrap(Widget child) {

@@ -11041,6 +11041,13 @@ class AppStrings {
   static const scheduleChangeRejectConfirmBody =
       '이 일정 제안을 거절하시겠습니까? 상대방에게 알림이 전송됩니다.';
 
+  /// 제안 거절 (subscription proposal reject confirm dialog title)
+  static const proposalRejectConfirmTitle = '제안 거절';
+
+  /// 거절 확인 본문 (subscription proposal reject confirm dialog body)
+  static const proposalRejectConfirmBody =
+      '이 수강권 제안을 거절하시겠습니까? 상대방에게 알림이 전송됩니다.';
+
   /// 첫 과제 내기 (home empty assignment CTA, #625)
   static const weeklyAssignmentFirstCta = '첫 과제 내기';
 

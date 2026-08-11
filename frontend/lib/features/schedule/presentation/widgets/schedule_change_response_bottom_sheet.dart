@@ -257,7 +257,21 @@ class _ScheduleChangeResponseBottomSheetState
     ));
   }
 
-  void _reject() {
+  /// Reject is destructive (ends the schedule change negotiation) — confirm
+  /// before closing the sheet with a reject result.
+  Future<void> _reject() async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.scheduleChangeRejectConfirmTitle,
+      message: AppStrings.scheduleChangeRejectConfirmBody,
+      confirmLabel: AppStrings.scheduleChangeReject,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed != true || !mounted) return;
+
     Navigator.pop<ScheduleChangeResponseResult>(context, (
       action: ScheduleChangeResponseAction.reject,
       message: _messageController.text.trim(),
