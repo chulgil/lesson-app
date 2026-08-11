@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart' show AppStrings;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
@@ -528,7 +529,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: _buildOutlinedButton(
                 label: AppStrings.eventReject,
                 icon: Icons.close,
-                onPressed: () => widget.onRejectProposal?.call(null),
+                onPressed: () => _confirmRejectProposal(context),
               ),
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -550,6 +551,23 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ),
       ],
     );
+  }
+
+  /// Reject is destructive (ends the payment proposal) — confirm before firing.
+  Future<void> _confirmRejectProposal(BuildContext context) async {
+    final confirmed = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.proposalRejectConfirmTitle,
+      message: AppStrings.proposalRejectConfirmBody,
+      confirmLabel: AppStrings.eventReject,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
+    if (confirmed == true) {
+      widget.onRejectProposal?.call(null);
+    }
   }
 
   Widget _buildTemplateRadio(SubscriptionTemplate template) {
@@ -614,10 +632,40 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (pendingScheduleChange != null) {
       return _buildScheduleChangeResponseBanner();
     }
-    // Subscription summary card + link to detail.
-    // Lesson management (attendance, schedule change) is handled in
-    // the subscription detail screen and calendar.
-    return _buildSubscriptionSummary();
+    // No pending negotiation: subscription summary + schedule change entry.
+    return _buildActiveLessonsActions();
+  }
+
+  /// Subscription summary card + schedule change entry point — shown in
+  /// Phase 3 when there is no pending schedule change negotiation.
+  Widget _buildActiveLessonsActions() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSubscriptionSummary(),
+        if (widget.onScheduleChange != null) ...[
+          const SizedBox(height: AppSpacing.space2),
+          SizedBox(
+            height: AppSpacing.buttonHeightSmall,
+            child: OutlinedButton.icon(
+              onPressed: widget.onScheduleChange,
+              icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+              label: Text(
+                AppStrings.scheduleChangeButton,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.inkQuaternary),
+                shape: RoundedRectangleBorder(),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 
   /// Returns the latest unresolved scheduleChangeProposed or
@@ -669,7 +717,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ),
         const SizedBox(width: AppSpacing.space2),
         TextButton(
-          onPressed: widget.onScheduleChangeResponse ?? widget.onViewSubscription,
+          onPressed:
+              widget.onScheduleChangeResponse ?? widget.onViewSubscription,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
             minimumSize: Size.zero,
