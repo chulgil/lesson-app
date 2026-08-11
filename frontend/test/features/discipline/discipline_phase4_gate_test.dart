@@ -187,11 +187,15 @@ void main() {
       expect(DisciplineRegistry.fallback, DisciplineRegistry.music);
     });
 
-    test('music 도구셋/카탈로그 불변 (22 악기, 메트로놈+튜너)', () {
+    test('music 도구셋/카탈로그 불변 (22 악기, 메트로놈+튜너+녹음)', () {
       expect(ExpertiseCatalogRegistry.music.items.length, 22);
+      // #973 앵커는 metronome+tuner 였다. 녹음 launch 탭(dead-code entry point
+      // 배선)이 music 자체의 신규 도구로 추가됐다 — fitness/language 유입이
+      // 아니므로 이 앵커의 취지(분야 간 누수 없음)와 무관, 목록만 갱신한다.
       expect(musicPracticeTools.map((t) => t.id).toList(), [
         PracticeToolIds.metronome,
         PracticeToolIds.tuner,
+        PracticeToolIds.recording,
       ]);
     });
   });

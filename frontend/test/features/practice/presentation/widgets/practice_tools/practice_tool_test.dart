@@ -1,31 +1,37 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/core/widgets/empty_state_widget.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/metronome_panel.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/music_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/tuner_panel.dart';
 
 /// #973 — the music practice-tool set that drives the practice tools modal.
 /// These assertions pin the data so the modal stays byte-identical to its
-/// previous hardcoded `[메트로놈, 튜너]` tabs.
+/// previous hardcoded `[메트로놈, 튜너]` tabs, plus the 녹음 launch tab added on
+/// top (dead-code entry point audit — recording had no reachable UI).
 void main() {
   group('musicPracticeTools (#973)', () {
-    test('is metronome then tuner, in tab order', () {
+    test('is metronome, tuner, recording, in tab order', () {
       expect(musicPracticeTools.map((t) => t.id).toList(), [
         PracticeToolIds.metronome,
         PracticeToolIds.tuner,
+        PracticeToolIds.recording,
       ]);
     });
 
-    test('tab labels are 메트로놈 / 튜너 (verbatim from the old modal)', () {
+    test('tab labels are 메트로놈 / 튜너 / 녹음', () {
       expect(musicPracticeTools.map((t) => t.displayLabel).toList(), [
         '메트로놈',
         '튜너',
+        AppStrings.practiceRecordingTitle,
       ]);
     });
 
     test('only the tuner exposes a settings affordance', () {
       expect(musicPracticeTools[0].onShowSettings, isNull);
       expect(musicPracticeTools[1].onShowSettings, isNotNull);
+      expect(musicPracticeTools[2].onShowSettings, isNull);
     });
 
     testWidgets('panelBuilder builds the right panel and threads studentId', (
@@ -57,5 +63,36 @@ void main() {
       expect(nullStudent.studentId, isNull);
       expect(nullStudent.sectionId, isNull);
     });
+
+    testWidgets(
+      'recording panel is a launch pad (EmptyStateWidget); action gated on studentId',
+      (tester) async {
+        late BuildContext ctx;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) {
+                ctx = context;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+
+        final withStudent =
+            musicPracticeTools[2].panelBuilder(ctx, 's1', null)
+                as EmptyStateWidget;
+        expect(withStudent.actionLabel, AppStrings.quickRecordButton);
+        expect(withStudent.onAction, isNotNull);
+
+        // No studentId (non-student entry point) → no way to resolve the
+        // quick-record target, so the action is hidden rather than crashing.
+        final withoutStudent =
+            musicPracticeTools[2].panelBuilder(ctx, null, null)
+                as EmptyStateWidget;
+        expect(withoutStudent.actionLabel, isNull);
+        expect(withoutStudent.onAction, isNull);
+      },
+    );
   });
 }
