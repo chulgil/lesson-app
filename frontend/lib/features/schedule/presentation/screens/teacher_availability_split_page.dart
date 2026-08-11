@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -90,10 +91,11 @@ class _SplitLayout extends ConsumerWidget {
     final isWide = width > TeacherAvailabilitySplitPage.mobileBreakpoint;
 
     // Read SSOT lesson duration from TeacherSettings.
-    final ssotDuration = ref
-        .watch(teacherSettingsNotifierProvider)
-        .valueOrNull
-        ?.lessonDurationMinutes;
+    final ssotDuration =
+        ref
+            .watch(teacherSettingsNotifierProvider)
+            .valueOrNull
+            ?.lessonDurationMinutes;
 
     final settings = _SettingsPanel(
       teacherId: teacherId,
@@ -267,31 +269,77 @@ class _WeeklySchedulePanel extends ConsumerWidget {
     int? preselectedDay,
     WeeklySchedule? existing,
   }) async {
-    final result = await showNotebookBottomSheet<WeeklySchedule>(
+    // self-surfaced 시트(자체 Container+SafeArea+SingleChildScrollView 보유)라
+    // showNotebookModalBottomSheet 사용 — showNotebookBottomSheet 는 자식에게
+    // unbounded 세로 제약을 줘 내부 스크롤이 무력화된다("다른 요일에도 적용"
+    // 섹션 추가로 콘텐츠가 늘어나며 실제로 overflow 재현됨. 참고: #754 동형).
+    final result = await showNotebookModalBottomSheet<List<WeeklySchedule>>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder:
           (context) => ScheduleEditBottomSheet(
             preselectedDay: preselectedDay,
             existingSchedule: existing,
           ),
     );
-    if (result == null) return;
+    if (result == null || result.isEmpty) return;
     final notifier = ref.read(
       teacherAvailabilityNotifierProvider(teacherId).notifier,
     );
-    if (existing != null && result.id == existing.id) {
-      await notifier.updateWeeklySchedule(result);
+
+    // result[0] is always the primary (edited/added) schedule — same save
+    // path as before the "다른 요일에도 적용" feature.
+    final primary = result.first;
+    if (existing != null && primary.id == existing.id) {
+      await notifier.updateWeeklySchedule(primary);
     } else {
-      await notifier.addWeeklySchedule(result);
+      await notifier.addWeeklySchedule(primary);
     }
     // 2026-06-12 — notifier 가 에러를 state 로만 들고 있으면 사용자는 아무
     // 피드백 없이 "적용 안 됨" 으로 인지한다 (silent fail). 실패 시 명시
     // SnackBar 를 띄우고 read provider invalidate 는 건너뛴다.
     if (!context.mounted) return;
     if (_notifyIfFailed(context, ref)) return;
+
+    // result[1..] are only present on the add flow ("다른 요일에도 적용" —
+    // 편집은 요일 선택이 잠겨 있어 항상 비어 있다). Skip a weekday whose
+    // existing schedules already overlap the new time range instead of
+    // aborting the whole batch, and report which days were skipped.
+    final skippedDayLabels = <String>[];
+    var appliedCount = 0;
+    for (final copy in result.skip(1)) {
+      final hasConflict = availability.weeklySchedules
+          .where((s) => s.dayOfWeek == copy.dayOfWeek)
+          .any((s) => weeklyScheduleTimesOverlap(s, copy));
+      if (hasConflict) {
+        skippedDayLabels.add(copy.dayName);
+        continue;
+      }
+      await notifier.addWeeklySchedule(copy);
+      if (!context.mounted) return;
+      if (_notifyIfFailed(context, ref)) return;
+      appliedCount++;
+    }
+
     ref.invalidate(teacherAvailabilityProvider(teacherId));
     ref.invalidate(teacherSettingsProvider);
+
+    if (result.length > 1) {
+      final skippedDays = skippedDayLabels.join(', ');
+      final message =
+          skippedDayLabels.isEmpty
+              ? AppStrings.weeklyScheduleAppliedToOtherDays(appliedCount)
+              : appliedCount == 0
+              ? AppStrings.weeklyScheduleApplyAllSkipped(skippedDays)
+              : AppStrings.weeklyScheduleAppliedWithSkipped(
+                appliedCount,
+                skippedDays,
+              );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
+    }
   }
 
   /// notifier 의 마지막 작업이 실패면 SnackBar 노출 후 true 반환.
@@ -597,9 +645,7 @@ class _LessonSettingsPanel extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ReadOnlyDurationRow(
-            teacherId: teacherId,
-          ),
+          _ReadOnlyDurationRow(teacherId: teacherId),
           const SizedBox(height: AppSpacing.space3),
           const ThinRule(),
           const SizedBox(height: AppSpacing.space3),
@@ -627,11 +673,12 @@ class _LessonSettingsPanel extends ConsumerWidget {
     required int breakTimeBetweenLessons,
   }) async {
     // SSOT: read lesson duration from TeacherSettings, not from availability.
-    final ssotDuration = ref
-        .read(teacherSettingsNotifierProvider)
-        .valueOrNull
-        ?.lessonDurationMinutes
-        ?? availability.slotDurationMinutes;
+    final ssotDuration =
+        ref
+            .read(teacherSettingsNotifierProvider)
+            .valueOrNull
+            ?.lessonDurationMinutes ??
+        availability.slotDurationMinutes;
     // slotStartInterval is the internal computed value: duration + break.
     final interval = ssotDuration + breakTimeBetweenLessons;
     await ref
@@ -980,4 +1027,21 @@ class _ReadOnlyDurationRow extends ConsumerWidget {
       ),
     );
   }
+}
+
+// ─── "다른 요일에도 적용" 겹침 판정 ─────────────────────────────────
+
+/// True when [a] and [b]'s `[startTime, endTime)` ranges overlap.
+///
+/// Half-open interval, consistent with the exception overlap check in
+/// [TimeException.containsDateTimeRange] — a touching boundary (one slot's
+/// end == the other's start) is NOT a conflict. Exposed at top level (same
+/// pattern as `hasSlotOverlap` in register_regular_lesson_screen.dart) so
+/// the interval logic is unit-testable without pumping a widget tree.
+bool weeklyScheduleTimesOverlap(WeeklySchedule a, WeeklySchedule b) {
+  final aStart = ClockTime.parse(a.startTime).inMinutes;
+  final aEnd = ClockTime.parse(a.endTime).inMinutes;
+  final bStart = ClockTime.parse(b.startTime).inMinutes;
+  final bEnd = ClockTime.parse(b.endTime).inMinutes;
+  return aStart < bEnd && bStart < aEnd;
 }

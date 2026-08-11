@@ -32,6 +32,11 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
   TimeOfDay _endTime = const TimeOfDay(hour: 18, minute: 0);
   bool _isActive = true;
 
+  /// "다른 요일에도 적용" — weekdays (besides [_selectedDay]) that get a
+  /// copy of the same time range on submit. Add-flow only: editing keeps
+  /// day selection locked, so this never surfaces (or gets used) then.
+  final Set<int> _selectedAdditionalDays = {};
+
   @override
   void initState() {
     super.initState();
@@ -102,27 +107,53 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                     return ChoiceChip(
                       label: Text(days[index]),
                       selected: isSelected,
-                      onSelected: isEditing
-                          ? null
-                          : (selected) {
-                              if (selected) {
-                                setState(() => _selectedDay = index);
-                              }
-                            },
+                      onSelected:
+                          isEditing
+                              ? null
+                              : (selected) {
+                                if (selected) {
+                                  setState(() {
+                                    _selectedDay = index;
+                                    // 새 주 요일이 "다른 요일" 선택에도 있었다면 중복이므로 제거.
+                                    _selectedAdditionalDays.remove(index);
+                                  });
+                                }
+                              },
                       selectedColor: AppColors.paperAccentSoft,
                       labelStyle: AppTypography.bodySmall.copyWith(
-                        color: isSelected
-                            ? AppColors.paperAccent
-                            : isWeekend
-                            ? AppColors.paperAccent
-                            : AppColors.inkSecondary,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
+                        color:
+                            isSelected
+                                ? AppColors.paperAccent
+                                : isWeekend
+                                ? AppColors.paperAccent
+                                : AppColors.inkSecondary,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     );
                   }),
                 ),
+
+                // "다른 요일에도 적용" — add-flow only (편집은 요일 고정).
+                if (!isEditing) ...[
+                  const SizedBox(height: AppSpacing.space5),
+                  Text(
+                    AppStrings.weeklyScheduleApplyOtherDaysLabel,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space2),
+                  Wrap(
+                    spacing: AppSpacing.space2,
+                    runSpacing: AppSpacing.space1,
+                    children: [
+                      for (int index = 0; index < 7; index++)
+                        if (index != _selectedDay)
+                          _buildAdditionalDayChip(index, days[index]),
+                    ],
+                  ),
+                ],
 
                 const SizedBox(height: AppSpacing.space5),
 
@@ -210,6 +241,28 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
     );
   }
 
+  Widget _buildAdditionalDayChip(int index, String label) {
+    final isSelected = _selectedAdditionalDays.contains(index);
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        setState(() {
+          if (selected) {
+            _selectedAdditionalDays.add(index);
+          } else {
+            _selectedAdditionalDays.remove(index);
+          }
+        });
+      },
+      selectedColor: AppColors.paperAccentSoft,
+      labelStyle: AppTypography.bodySmall.copyWith(
+        color: isSelected ? AppColors.paperAccent : AppColors.inkSecondary,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      ),
+    );
+  }
+
   Widget _buildTimePicker(String label, TimeOfDay time, bool isStart) {
     return InkWell(
       onTap: () => _selectTime(isStart),
@@ -287,15 +340,31 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
       return;
     }
 
+    final formattedStart = _formatTime(_startTime);
+    final formattedEnd = _formatTime(_endTime);
+
     final schedule = WeeklySchedule(
       id: widget.existingSchedule?.id ?? const Uuid().v4(),
       dayOfWeek: _selectedDay,
-      startTime: _formatTime(_startTime),
-      endTime: _formatTime(_endTime),
+      startTime: formattedStart,
+      endTime: formattedEnd,
       isActive: _isActive,
       createdAt: widget.existingSchedule?.createdAt ?? DateTime.now(),
     );
 
-    Navigator.of(context).pop(schedule);
+    // "다른 요일에도 적용" — one fresh WeeklySchedule per additional weekday,
+    // same time range. Empty on the edit flow (day selection locked there).
+    final copies = _selectedAdditionalDays.map(
+      (day) => WeeklySchedule(
+        id: const Uuid().v4(),
+        dayOfWeek: day,
+        startTime: formattedStart,
+        endTime: formattedEnd,
+        isActive: _isActive,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    Navigator.of(context).pop([schedule, ...copies]);
   }
 }

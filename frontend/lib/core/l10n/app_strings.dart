@@ -9510,6 +9510,23 @@ class AppStrings {
   /// 시간대 저장/삭제 실패 피드백 (2026-06-12 — silent fail 방지).
   static const weeklyScheduleSaveError = '시간대 저장에 실패했어요. 잠시 후 다시 시도해주세요';
 
+  /// "다른 요일에도 적용" — 시간대 추가 시트 내 다중 요일 선택 섹션 라벨 (신규 추가에서만 노출).
+  static const weeklyScheduleApplyOtherDaysLabel = '다른 요일에도 적용';
+
+  /// 다중 요일 적용 결과 — 선택한 요일 전체에 시간대가 추가됨 (성공 토스트).
+  static String weeklyScheduleAppliedToOtherDays(int count) =>
+      '$count개 요일에 같은 시간대를 추가했어요';
+
+  /// 다중 요일 적용 결과 — 일부 요일은 기존 시간대와 겹쳐 제외됨 (부분 성공 토스트).
+  static String weeklyScheduleAppliedWithSkipped(
+    int applied,
+    String skippedDays,
+  ) => '$applied개 요일에 시간대를 추가했어요 ($skippedDays요일은 기존 시간대와 겹쳐 제외)';
+
+  /// 다중 요일 적용 결과 — 선택한 요일 전부가 기존 시간대와 겹쳐 하나도 추가되지 않음.
+  static String weeklyScheduleApplyAllSkipped(String skippedDays) =>
+      '$skippedDays요일은 기존 시간대와 겹쳐 추가되지 않았어요';
+
   /// 수업 시간 설정 저장 실패 피드백 (#707 — silent fail 방지).
   static const lessonSettingsSaveError = '수업 시간 설정 저장에 실패했어요. 잠시 후 다시 시도해주세요';
 
