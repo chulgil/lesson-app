@@ -50,12 +50,19 @@ class SubscriptionDetailScreen extends ConsumerWidget {
   /// so the screen can auto-select the corresponding session.
   final String? focusLessonId;
 
+  /// When arriving from a schedule-change entry point (e.g. the home
+  /// dashboard's pending-request section), highlight the bottom response
+  /// bar so it reads as "this is why you're here" — parity with the
+  /// chat-thread flow's inline response affordance.
+  final bool highlightScheduleResponse;
+
   const SubscriptionDetailScreen({
     super.key,
     required this.subscriptionId,
     this.viewerRole = 'student',
     this.initialSelectedSession,
     this.focusLessonId,
+    this.highlightScheduleResponse = false,
   });
 
   @override
@@ -70,6 +77,7 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           viewerRole: viewerRole,
           initialSelectedSession: initialSelectedSession,
           focusLessonId: focusLessonId,
+          highlightScheduleResponse: highlightScheduleResponse,
         );
       },
       loading:
@@ -155,12 +163,14 @@ class _SubscriptionDetailBody extends ConsumerStatefulWidget {
   final String viewerRole;
   final int? initialSelectedSession;
   final String? focusLessonId;
+  final bool highlightScheduleResponse;
 
   const _SubscriptionDetailBody({
     required this.subscription,
     required this.viewerRole,
     this.initialSelectedSession,
     this.focusLessonId,
+    this.highlightScheduleResponse = false,
   });
 
   @override
@@ -495,6 +505,7 @@ class _SubscriptionDetailBodyState
             events: sessionEvents,
             opponentName: opponentName,
             selectedSession: _selectedSession,
+            highlightResponse: widget.highlightScheduleResponse,
             onScheduleChange: () => _handleScheduleChange(context),
             onAcceptScheduleChoice: _handleAcceptScheduleChoice,
             onRejectScheduleChoice:

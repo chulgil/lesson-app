@@ -176,11 +176,14 @@ List<RouteBase> subscriptionRoutes = [
         state.uri.queryParameters['session'] ?? '',
       );
       final focusLessonId = extra?['focusLessonId'] as String?;
+      final highlightScheduleResponse =
+          extra?['highlightScheduleResponse'] as bool? ?? false;
       return SubscriptionDetailScreen(
         subscriptionId: id,
         viewerRole: viewerRole,
         initialSelectedSession: initialSession,
         focusLessonId: focusLessonId,
+        highlightScheduleResponse: highlightScheduleResponse,
       );
     },
   ),
