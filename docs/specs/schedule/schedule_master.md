@@ -3,7 +3,7 @@
 > 구현 상태: ✅ 구현 완료
 > 최종 업데이트: 2026-03-12
 > 통합 문서: `teacher_availability_spec.md`, `schedule_confirmation_card_spec.md`
-> 관련 문서: [lesson_master.md](../lesson/lesson_master.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_master.md](../subscription/subscription_master.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md)
+> 관련 문서: [lesson_master.md](../lesson/lesson_master.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_master.md](../subscription/subscription_master.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md), [unified_lesson_request_spec.md](unified_lesson_request_spec.md)(통합 레슨 신청 Phase 1~4 라이프사이클 — §7의 구 LessonRequest 모델을 대체)
 
 ---
 

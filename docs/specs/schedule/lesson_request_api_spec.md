@@ -2,6 +2,7 @@
 
 > 작성일: 2026-03-29
 > Issue: #217
+> **범위 노트 (2026-08-11)**: 이 문서는 Phase 1(레슨 신청 → 시간 확정) 엔드포인트만 다룬다. Phase 2(수강권 발행)~Phase 4(종료/갱신) 전체 라이프사이클, 33개 `RequestEventType` 이벤트 카탈로그, 일정 변경 협상 서브플로우는 [`unified_lesson_request_spec.md`](unified_lesson_request_spec.md)를 참조.
 
 ## 엔드포인트 목록
 
