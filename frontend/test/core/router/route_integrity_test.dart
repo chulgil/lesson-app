@@ -89,6 +89,7 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.practiceStats,
     AppRoutes.practiceLoopStats,
     AppRoutes.awaitingFeedback,
+    AppRoutes.recordingDetail,
     AppRoutes.repertoireHistory,
     AppRoutes.profile,
     AppRoutes.instrumentManagement,
@@ -127,14 +128,11 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.followList,
     AppRoutes.followFeed,
     AppRoutes.selectTeacher,
-    AppRoutes.lessonTypeSelect,
     AppRoutes.pendingBookings,
-    AppRoutes.trialLessonRequest,
-    AppRoutes.regularLessonRequest,
     AppRoutes.registerRegularLesson,
-    AppRoutes.bookingList,
     AppRoutes.lessonBooking,
     AppRoutes.lessonDirectBooking,
+    // ignore: deprecated_member_use_from_same_package
     AppRoutes.lessonRequest, // INTENTIONALLY listed — currently NOT registered
     AppRoutes.lessonRequests,
     AppRoutes.myBookings,
@@ -144,7 +142,6 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.groupClassAttendance,
     AppRoutes.requestCompletion,
     AppRoutes.requestDetail,
-    AppRoutes.regularScheduleChange,
     AppRoutes.subscriptions,
     AppRoutes.subscriptionDetail,
     AppRoutes.expiringSubscriptions,
@@ -154,7 +151,6 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.teacherSubscriptions,
     AppRoutes.makeupCredits,
     AppRoutes.scheduleChangeRequests,
-    AppRoutes.proposalCreate,
     AppRoutes.proposalConfirm,
     AppRoutes.proposalSettings,
     AppRoutes.proposalDetail,
@@ -267,6 +263,7 @@ const _registeredTemplates = <String>{
   '/practice/loop-stats',
   '/practice/history',
   '/note-access/:requestId',
+  '/recordings/:recordingId',
   // profile_routes.dart
   '/profile/instruments',
   '/profile/repertoire',
@@ -445,6 +442,7 @@ Map<String, String> get _appRoutesMap {
     'practiceStats': AppRoutes.practiceStats,
     'practiceLoopStats': AppRoutes.practiceLoopStats,
     'awaitingFeedback': AppRoutes.awaitingFeedback,
+    'recordingDetail': AppRoutes.recordingDetail,
     'repertoireHistory': AppRoutes.repertoireHistory,
     'profile': AppRoutes.profile,
     'instrumentManagement': AppRoutes.instrumentManagement,
@@ -483,14 +481,11 @@ Map<String, String> get _appRoutesMap {
     'followList': AppRoutes.followList,
     'followFeed': AppRoutes.followFeed,
     'selectTeacher': AppRoutes.selectTeacher,
-    'lessonTypeSelect': AppRoutes.lessonTypeSelect,
     'pendingBookings': AppRoutes.pendingBookings,
-    'trialLessonRequest': AppRoutes.trialLessonRequest,
-    'regularLessonRequest': AppRoutes.regularLessonRequest,
     'registerRegularLesson': AppRoutes.registerRegularLesson,
-    'bookingList': AppRoutes.bookingList,
     'lessonBooking': AppRoutes.lessonBooking,
     'lessonDirectBooking': AppRoutes.lessonDirectBooking,
+    // ignore: deprecated_member_use_from_same_package
     'lessonRequest': AppRoutes.lessonRequest,
     'lessonRequests': AppRoutes.lessonRequests,
     'myBookings': AppRoutes.myBookings,
@@ -500,7 +495,6 @@ Map<String, String> get _appRoutesMap {
     'groupClassAttendance': AppRoutes.groupClassAttendance,
     'requestCompletion': AppRoutes.requestCompletion,
     'requestDetail': AppRoutes.requestDetail,
-    'regularScheduleChange': AppRoutes.regularScheduleChange,
     'subscriptions': AppRoutes.subscriptions,
     'subscriptionDetail': AppRoutes.subscriptionDetail,
     'expiringSubscriptions': AppRoutes.expiringSubscriptions,
@@ -510,7 +504,6 @@ Map<String, String> get _appRoutesMap {
     'teacherSubscriptions': AppRoutes.teacherSubscriptions,
     'makeupCredits': AppRoutes.makeupCredits,
     'scheduleChangeRequests': AppRoutes.scheduleChangeRequests,
-    'proposalCreate': AppRoutes.proposalCreate,
     'proposalConfirm': AppRoutes.proposalConfirm,
     'proposalSettings': AppRoutes.proposalSettings,
     'proposalDetail': AppRoutes.proposalDetail,
@@ -837,17 +830,22 @@ void main() {
       );
     });
 
-    test('unregistered /recordings/ path is detected as dead', () {
-      // /recordings/$id is a push notification actionUrl pointing to a route
-      // that has not been registered. Should fail (not in _registeredTemplates).
-      const bad = '/recordings/rec_abc123';
-      final result = _checkTarget(bad);
-      expect(
-        result.isFailure,
-        isTrue,
-        reason: '/recordings/ path has no registered GoRoute',
-      );
-    });
+    test(
+      '/recordings/:recordingId resolves — recording feedback deep link',
+      () {
+        // /recordings/$id is the push notification actionUrl for teacher
+        // feedback on a shared recording (recording_feedback_provider.dart
+        // _notifyStudent). Registered via AppRoutes.recordingDetail ->
+        // RecordingDetailScreen (practice_routes.dart).
+        const good = '/recordings/rec_abc123';
+        final result = _checkTarget(good);
+        expect(
+          result.isFailure,
+          isFalse,
+          reason: 'result.reason: ${result.reason}',
+        );
+      },
+    );
   });
 
   // -------------------------------------------------------------------------
@@ -985,6 +983,7 @@ void main() {
       // Spot-check a representative sample of critical routes.
       final checks = {
         'proposalDetail': AppRoutes.proposalDetail,
+        // ignore: deprecated_member_use_from_same_package
         'lessonRequest': AppRoutes.lessonRequest,
         'lessonRequests': AppRoutes.lessonRequests,
         'subscriptionDetail': AppRoutes.subscriptionDetail,

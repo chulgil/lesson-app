@@ -78,7 +78,7 @@ final microphonePermissionProvider = AutoDisposeFutureProvider<bool>.internal(
 );
 
 typedef MicrophonePermissionRef = AutoDisposeFutureProviderRef<bool>;
-String _$recordingNotifierHash() => r'0e33ba035efc1e3bc8cde63239e596de12f0003b';
+String _$recordingByIdHash() => r'6b1169ba768c9249dfe8e33f7ad8624e32b91b6b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -100,6 +100,164 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// Look up a single recording by id, independent of repertoire/student
+/// context. Used by the deep-linked recording detail screen
+/// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+/// where only the recordingId is known.
+///
+/// Copied from [recordingById].
+@ProviderFor(recordingById)
+const recordingByIdProvider = RecordingByIdFamily();
+
+/// Look up a single recording by id, independent of repertoire/student
+/// context. Used by the deep-linked recording detail screen
+/// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+/// where only the recordingId is known.
+///
+/// Copied from [recordingById].
+class RecordingByIdFamily extends Family<AsyncValue<Recording?>> {
+  /// Look up a single recording by id, independent of repertoire/student
+  /// context. Used by the deep-linked recording detail screen
+  /// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+  /// where only the recordingId is known.
+  ///
+  /// Copied from [recordingById].
+  const RecordingByIdFamily();
+
+  /// Look up a single recording by id, independent of repertoire/student
+  /// context. Used by the deep-linked recording detail screen
+  /// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+  /// where only the recordingId is known.
+  ///
+  /// Copied from [recordingById].
+  RecordingByIdProvider call(
+    String recordingId,
+  ) {
+    return RecordingByIdProvider(
+      recordingId,
+    );
+  }
+
+  @override
+  RecordingByIdProvider getProviderOverride(
+    covariant RecordingByIdProvider provider,
+  ) {
+    return call(
+      provider.recordingId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'recordingByIdProvider';
+}
+
+/// Look up a single recording by id, independent of repertoire/student
+/// context. Used by the deep-linked recording detail screen
+/// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+/// where only the recordingId is known.
+///
+/// Copied from [recordingById].
+class RecordingByIdProvider extends AutoDisposeFutureProvider<Recording?> {
+  /// Look up a single recording by id, independent of repertoire/student
+  /// context. Used by the deep-linked recording detail screen
+  /// (`/recordings/:recordingId`, e.g. from a feedback push notification)
+  /// where only the recordingId is known.
+  ///
+  /// Copied from [recordingById].
+  RecordingByIdProvider(
+    String recordingId,
+  ) : this._internal(
+          (ref) => recordingById(
+            ref as RecordingByIdRef,
+            recordingId,
+          ),
+          from: recordingByIdProvider,
+          name: r'recordingByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$recordingByIdHash,
+          dependencies: RecordingByIdFamily._dependencies,
+          allTransitiveDependencies:
+              RecordingByIdFamily._allTransitiveDependencies,
+          recordingId: recordingId,
+        );
+
+  RecordingByIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.recordingId,
+  }) : super.internal();
+
+  final String recordingId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Recording?> Function(RecordingByIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RecordingByIdProvider._internal(
+        (ref) => create(ref as RecordingByIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        recordingId: recordingId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Recording?> createElement() {
+    return _RecordingByIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RecordingByIdProvider && other.recordingId == recordingId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, recordingId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin RecordingByIdRef on AutoDisposeFutureProviderRef<Recording?> {
+  /// The parameter `recordingId` of this provider.
+  String get recordingId;
+}
+
+class _RecordingByIdProviderElement
+    extends AutoDisposeFutureProviderElement<Recording?> with RecordingByIdRef {
+  _RecordingByIdProviderElement(super.provider);
+
+  @override
+  String get recordingId => (origin as RecordingByIdProvider).recordingId;
+}
+
+String _$recordingNotifierHash() => r'04e817726538a1d578309f8c2b1dc4b19c61638f';
 
 abstract class _$RecordingNotifier
     extends BuildlessAutoDisposeNotifier<RecordingState> {

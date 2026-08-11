@@ -1265,7 +1265,8 @@ class RecordingComparison {
 - 이번 주 요약 (연습 일수, 총 시간, 공유 녹음 수)
 - 주간 연습 캘린더 (월~일 연습 여부 + 시간)
 - 공유된 녹음 목록 (탭하여 `TeacherFeedbackSheet` 오픈)
-- 피드백 입력 시 `/recordings/{recording_id}/feedback`에 저장하고 학생에게 `NotificationType.recordingFeedbackReceived` 로컬 알림 디스패치
+- 피드백 입력 시 `/recordings/{recording_id}/feedback`에 저장하고 학생에게 `NotificationType.recordingFeedbackReceived` 로컬 알림 디스패치 (`actionUrl: '/recordings/{recordingId}'`)
+- 알림 딥링크 대상 = `AppRoutes.recordingDetail` (`/recordings/:recordingId`) → `RecordingDetailScreen`(학생 뷰). `recordingByIdProvider(recordingId)`로 repertoire/student 컨텍스트 없이 녹음을 단독 조회하고, 재생(`RecordingPlayerSheet` 재사용) + `recordingFeedbackListProvider` 읽기 전용 피드백 스레드를 함께 표시
 
 재생 UI는 `SharedRecording` 전용 inline player가 필요 (별도 이슈).
 

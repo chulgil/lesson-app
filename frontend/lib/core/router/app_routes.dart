@@ -83,6 +83,10 @@ class AppRoutes {
   static const repertoireHistory = '/practice/history';
   static const awaitingFeedback = '/practice/awaiting-feedback';
 
+  /// 학생 — 녹음 상세(재생 + 선생님 피드백). 피드백 알림 딥링크 대상
+  /// (recording_feedback_provider.dart actionUrl: '/recordings/$recordingId').
+  static const recordingDetail = '/recordings/:recordingId';
+
   // Profile routes
   static const profile = '/profile';
   static const instrumentManagement = '/profile/instruments';
@@ -154,16 +158,17 @@ class AppRoutes {
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
-  static const lessonTypeSelect = '/schedule/lesson/type';
   static const pendingBookings = '/schedule/pending';
-  static const trialLessonRequest = '/schedule/trial/request';
-  static const regularLessonRequest = '/schedule/regular/request';
   static const registerRegularLesson = '/schedule/regular/register';
-  static const bookingList = '/schedule/bookings';
   static const lessonBooking = '/schedule/book-lesson';
 
   /// Student first-come direct slot booking (#580 student_direct_booking_spec).
   static const lessonDirectBooking = '/schedule/booking/direct';
+
+  /// 통합 레슨 신청(채팅형 UX) 이전의 단수형 잔재 — GoRoute 미등록.
+  /// 회귀 테스트 픽스처로만 유지 (route_integrity_test.dart 의 singular vs
+  /// plural dead-route 감지 케이스). 실제 이동은 [lessonRequests] 사용.
+  @Deprecated('never registered — kept as a route-integrity regression fixture')
   static const lessonRequest = '/schedule/lesson-request';
   static const lessonRequests = '/schedule/lesson-requests';
   static const myBookings = '/schedule/my-bookings';
@@ -173,7 +178,6 @@ class AppRoutes {
   static const groupClassAttendance = '/schedule/group-class/:id/attendance';
   static const requestCompletion = '/schedule/request-completion';
   static const requestDetail = '/schedule/request/:id';
-  static const regularScheduleChange = '/schedule/change-regular';
 
   // Subscription routes
   static const subscriptions = '/subscriptions';
@@ -187,7 +191,6 @@ class AppRoutes {
   static const scheduleChangeRequests = '/schedule-change-requests';
 
   // Proposal routes
-  static const proposalCreate = '/proposals/create';
   static const proposalConfirm = '/proposals/confirm';
   static const proposalSettings = '/proposals/settings';
   static const proposalDetail = '/proposals/:id';
