@@ -5,14 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
-import 'package:lessonaza/features/student_home/presentation/providers/student_home_profile_provider.dart';
-import 'package:lessonaza/features/student_home/presentation/screens/student_profile_tab.dart';
+import 'package:lessonaza/features/student_home/presentation/screens/student_settings_hub_screen.dart';
 import 'package:lessonaza/features/student_home/presentation/widgets/practice_reminder_sheet.dart';
 
 /// #1130 (껍데기 감사 #434): 연습 리마인더 진입점 복원 + '준비 중' 배너 제거.
 ///
 /// #1092 가 소유하는 영속(Hive `student:<uid>:practiceReminder`) + 주간
 /// OS 스케줄링은 그대로 두고, 진입점 노출과 배너 제거만 검증한다.
+///
+/// 설정 서브허브 분리(P1) 이후 진입점은 [StudentSettingsHubScreen] 으로
+/// 이동했다 — 프로필 탭에는 단일 "설정" 행만 남는다.
 void main() {
   late Directory tempDir;
 
@@ -27,29 +29,13 @@ void main() {
     await tempDir.delete(recursive: true);
   });
 
-  const fakeProfile = StudentHomeProfileState(
-    studentId: 'student-1',
-    name: '홍길동',
-    initial: '홍',
-    email: 'hong@example.com',
-    instrument: '바이올린',
-    lessonCountLabel: '12회',
-    practiceTimeLabel: '8시간',
-    lessonPeriodLabel: '3개월',
-    repertoireCount: 2,
-    teacherSubtitle: '김선생님',
-  );
-
-  Future<void> pumpTab(WidgetTester tester) async {
+  Future<void> pumpHub(WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(440, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          studentHomeProfileProvider.overrideWithValue(fakeProfile),
-        ],
-        child: const MaterialApp(home: Scaffold(body: StudentProfileTab())),
+      const ProviderScope(
+        child: MaterialApp(home: StudentSettingsHubScreen()),
       ),
     );
     await tester.pumpAndSettle();
@@ -69,8 +55,8 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('프로필 설정 메뉴에 연습 리마인더 진입점이 노출된다', (tester) async {
-    await pumpTab(tester);
+  testWidgets('설정 허브에 연습 리마인더 진입점이 노출된다', (tester) async {
+    await pumpHub(tester);
 
     expect(find.text(AppStrings.studentHomePracticeReminder), findsOneWidget);
     expect(find.byIcon(Icons.alarm_outlined), findsOneWidget);
@@ -78,7 +64,7 @@ void main() {
   });
 
   testWidgets('진입점 탭 시 연습 리마인더 시트가 열린다', (tester) async {
-    await pumpTab(tester);
+    await pumpHub(tester);
 
     // 진입점은 스크롤 하단에 위치 — 먼저 화면 안으로 스크롤.
     final entry = find.text(AppStrings.studentHomePracticeReminder);

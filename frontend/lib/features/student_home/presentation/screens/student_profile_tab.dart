@@ -14,10 +14,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../auth/auth_facade.dart';
-import '../providers/practice_reminder_provider.dart';
 import '../providers/student_home_profile_provider.dart';
-import '../widgets/language_select_sheet.dart';
-import '../widgets/practice_reminder_sheet.dart';
 
 /// Student profile tab with settings and account info
 class StudentProfileTab extends ConsumerWidget {
@@ -87,7 +84,7 @@ class StudentProfileTab extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: _buildSettingsSection(context, ref),
+            child: _buildSettingsSection(context),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -323,56 +320,16 @@ class StudentProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildSettingsSection(BuildContext context, WidgetRef ref) {
-    final reminderSettings = ref.watch(practiceReminderProvider);
+  Widget _buildSettingsSection(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Column(
-        children: [
-          _buildMenuItem(
-            icon: Icons.notifications_outlined,
-            title: AppStrings.studentHomeMenuNotificationSettings,
-            subtitle: AppStrings.studentHomeMenuNotificationSubtitle,
-            onTap: () => context.push(AppRoutes.notificationSettings),
-          ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.alarm_outlined,
-            title: AppStrings.studentHomePracticeReminder,
-            subtitle: reminderSettings.isEnabled
-                ? reminderSettings.formattedTime
-                : AppStrings.studentHomePracticeReminderOff,
-            onTap: () => PracticeReminderSheet.show(context),
-          ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.language_outlined,
-            title: AppStrings.studentHomeMenuLanguage,
-            subtitle: AppStrings.studentHomeMenuLanguageValue,
-            onTap: () => LanguageSelectSheet.show(context),
-          ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.backup_outlined,
-            title: AppStrings.studentHomeMenuRecordingBackup,
-            onTap: () => context.push(AppRoutes.backupSettings),
-          ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.help_outline,
-            title: AppStrings.studentHomeHelpTitle,
-            onTap: () => context.push(AppRoutes.help),
-          ),
-          _buildMenuDivider(),
-          _buildMenuItem(
-            icon: Icons.info_outline,
-            title: AppStrings.studentHomeAppInfoTitle,
-            onTap: () => context.push(AppRoutes.appInfo),
-          ),
-        ],
+      child: _buildMenuItem(
+        icon: Icons.settings_outlined,
+        title: AppStrings.studentHomeSettingsTitle,
+        onTap: () => context.push(AppRoutes.studentSettingsHub),
       ),
     );
   }

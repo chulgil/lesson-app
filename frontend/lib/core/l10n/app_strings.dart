@@ -7356,6 +7356,7 @@ class AppStrings {
   static const studentHomeMenuLanguage = '언어';
   static const studentHomeMenuLanguageValue = '한국어';
   static const studentHomeMenuRecordingBackup = '녹음 백업';
+  static const studentHomeSettingsTitle = '설정';
   static const studentHomeTeacherNameHint = '선생님 이름을 입력하세요';
   static const studentHomeLessonNoteHint = '레슨 관련 메모를 입력하세요';
   static const studentHomeSearchTeacherHint = '선생님을 검색하여 레슨을 시작해보세요';
