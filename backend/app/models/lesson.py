@@ -248,7 +248,13 @@ class LessonPiece(UUIDMixin, Base):
 
     __tablename__ = "lesson_pieces"
 
-    lesson_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    # #1250 — FK+CASCADE backs up the explicit pre-delete in
+    # lesson_service.delete at the schema level (orphan-row integrity).
+    lesson_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("lessons.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     composer: Mapped[str | None] = mapped_column(String(100), nullable=True)
     opus: Mapped[str | None] = mapped_column(String(50), nullable=True)
@@ -264,7 +270,12 @@ class LessonRecording(UUIDMixin, Base):
 
     __tablename__ = "lesson_recordings"
 
-    lesson_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    # #1250 — FK+CASCADE, same rationale as LessonPiece.
+    lesson_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("lessons.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     file_path: Mapped[str] = mapped_column(Text, nullable=False)
     file_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     duration: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

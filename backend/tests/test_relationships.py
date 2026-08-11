@@ -173,6 +173,72 @@ async def test_invite_student(client: AsyncClient, auth_headers, create_test_use
 
 
 @pytest.mark.asyncio
+async def test_invite_sets_code_expiry(client: AsyncClient, auth_headers, create_test_user, db_session):
+    """#1250 — a fresh invite carries a 7-day code expiry."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.relationship import TeacherStudentRelation
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+
+    response = await client.post(
+        "/api/v1/relationships/invite",
+        headers=auth_headers,
+        json={"student_id": "student-002", "method": "sms"},
+    )
+    assert response.status_code == 201
+
+    relation = await db_session.get(TeacherStudentRelation, response.json()["id"])
+    expires_at = relation.invite_code_expires_at
+    assert expires_at is not None
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=UTC)
+    remaining = expires_at - datetime.now(UTC)
+    assert timedelta(days=6) < remaining <= timedelta(days=7)
+
+
+@pytest.mark.asyncio
+async def test_connect_rejects_expired_invite_code(client: AsyncClient, create_test_user, db_session):
+    """#1250 — a stale invite code no longer activates the relation."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.core.security import create_access_token
+    from app.models.relationship import TeacherStudentRelation
+    from app.models.student import Student
+
+    await create_test_user(user_id="expiry-student-user", role="student", email="exp@test.com")
+    db_session.add(
+        Student(
+            id="student-expiry",
+            user_id="expiry-student-user",
+            teacher_id=None,
+            name="expiry",
+            instrument="violin",
+        )
+    )
+    await db_session.flush()
+    db_session.add(
+        TeacherStudentRelation(
+            id="relation-expired-code",
+            teacher_id="teacher-any",
+            student_id="student-expiry",
+            invite_code="EXPIRD",
+            status="trialBooked",
+            invite_code_expires_at=datetime.now(UTC) - timedelta(days=1),
+        )
+    )
+    await db_session.flush()
+
+    headers = {"Authorization": "Bearer " + create_access_token(data={"sub": "expiry-student-user", "role": "student"})}
+    response = await client.post(
+        "/api/v1/relationships/connect",
+        headers=headers,
+        json={"invite_code": "EXPIRD"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_update_relationship_practice_permissions(
     client: AsyncClient,
     auth_headers,
@@ -228,13 +294,9 @@ async def test_relationship_idor_blocks_non_party(
     # Owning teacher (test-user-id / test-user-id-prof)
     await create_test_user(user_id="test-user-id", role="teacher")
     # Owning student
-    await create_test_user(
-        user_id="student-user-id", role="student", email="s@test.com"
-    )
+    await create_test_user(user_id="student-user-id", role="student", email="s@test.com")
     # Unrelated teacher (third party)
-    await create_test_user(
-        user_id="outsider-user-id", role="teacher", email="outsider@test.com"
-    )
+    await create_test_user(user_id="outsider-user-id", role="teacher", email="outsider@test.com")
 
     db_session.add(
         Student(
@@ -258,18 +320,14 @@ async def test_relationship_idor_blocks_non_party(
     await db_session.flush()
 
     student_headers = {
-        "Authorization": "Bearer "
-        + create_access_token(data={"sub": "student-user-id", "role": "student"})
+        "Authorization": "Bearer " + create_access_token(data={"sub": "student-user-id", "role": "student"})
     }
     outsider_headers = {
-        "Authorization": "Bearer "
-        + create_access_token(data={"sub": "outsider-user-id", "role": "teacher"})
+        "Authorization": "Bearer " + create_access_token(data={"sub": "outsider-user-id", "role": "teacher"})
     }
 
     # Non-party (outsider teacher) is forbidden on GET
-    forbidden_get = await client.get(
-        "/api/v1/relationships/relation-idor", headers=outsider_headers
-    )
+    forbidden_get = await client.get("/api/v1/relationships/relation-idor", headers=outsider_headers)
     assert forbidden_get.status_code == 403
 
     # Non-party is forbidden on PATCH status
@@ -281,15 +339,11 @@ async def test_relationship_idor_blocks_non_party(
     assert forbidden_patch.status_code == 403
 
     # Owning teacher succeeds
-    teacher_get = await client.get(
-        "/api/v1/relationships/relation-idor", headers=auth_headers
-    )
+    teacher_get = await client.get("/api/v1/relationships/relation-idor", headers=auth_headers)
     assert teacher_get.status_code == 200
 
     # Owning student succeeds
-    student_get = await client.get(
-        "/api/v1/relationships/relation-idor", headers=student_headers
-    )
+    student_get = await client.get("/api/v1/relationships/relation-idor", headers=student_headers)
     assert student_get.status_code == 200
 
     student_patch = await client.patch(
