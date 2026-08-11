@@ -52,5 +52,15 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets('"내 레슨 요청" 메뉴 행이 제거됨 (P1: 레슨 탭 상단 섹션으로 이동, 중복 메뉴 금지)', (
+      tester,
+    ) async {
+      await pumpTab(tester);
+      // 대기중 신청 진입점이 레슨 탭으로 이동했으므로 프로필의 별도 항목은
+      // 제거된다 — 아이콘 재사용 없음(assignment_outlined 는 이 행 전용).
+      expect(find.byIcon(Icons.assignment_outlined), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
   });
 }
