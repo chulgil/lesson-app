@@ -4,6 +4,7 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/theme/app_colors.dart';
 import 'package:lessonaza/core/theme/app_spacing.dart';
 import 'package:lessonaza/core/theme/app_typography.dart';
+import 'package:lessonaza/core/widgets/notebook/notebook_bottom_sheet.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_glyph.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_screen_scaffold.dart';
 import 'package:lessonaza/features/practice_journal/domain/entities/endorsement.dart';
@@ -117,6 +118,7 @@ class _JournalBody extends StatelessWidget {
           JournalMonthGrid(ledger: ledger),
           const SizedBox(height: AppSpacing.space4),
           const _ActorLegend(),
+          _SelfNotesSection(endorsements: ledger.endorsements),
         ],
       ),
     );
@@ -275,22 +277,174 @@ class _BottomAction extends ConsumerWidget {
             ),
           );
         case JournalRole.student:
+          // Optional one-line note, zero added friction: empty field still
+          // signs with note:'' (unchanged behavior); sheet dismissed (null)
+          // cancels the whole write.
+          final note = await showNotebookModalBottomSheet<String>(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => const _SelfEndorseSheet(),
+          );
+          if (note == null) return;
           await repo.addEndorsement(
             childProfileId,
             Endorsement(
               by: EndorsedBy.self,
               date: today,
               authorUserId: userId,
-              note: '',
+              note: note,
             ),
           );
       }
       onSuccess();
     } catch (_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.errorTryAgain)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.errorTryAgain)));
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/// 자가 검인 시 선택적으로 남기는 한 줄 메모 입력 시트.
+///
+/// 필드를 비운 채 서명하면 기존과 동일하게 note:'' 로 저장된다(마찰 0).
+/// 시트를 닫으면(barrier tap 등) null 을 반환해 서명 자체를 취소한다.
+class _SelfEndorseSheet extends StatefulWidget {
+  const _SelfEndorseSheet();
+
+  @override
+  State<_SelfEndorseSheet> createState() => _SelfEndorseSheetState();
+}
+
+class _SelfEndorseSheetState extends State<_SelfEndorseSheet> {
+  static const noteFieldKey = Key('self_endorse_note_field');
+  static const signButtonKey = Key('self_endorse_sheet_sign_button');
+
+  final _noteController = TextEditingController();
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  void _sign() {
+    Navigator.of(context).pop(_noteController.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.space5),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              key: noteFieldKey,
+              controller: _noteController,
+              minLines: 1,
+              maxLines: 3,
+              textInputAction: TextInputAction.done,
+              decoration: const InputDecoration(
+                hintText: AppStrings.journalSelfEndorseNoteHint,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                key: signButtonKey,
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.paperAccent,
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
+                ),
+                onPressed: _sign,
+                child: const Text(AppStrings.journalSelfEndorse),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/// 자가 검인 메모 읽기 전용 목록 — [Endorsement.note] 가 이전엔 어디서도
+/// 표시되지 않았음(입력 UI 부재로 항상 빈 문자열) 을 보완.
+///
+/// 메모가 있는 self 검인만, 최신순으로 보여준다. 메모가 하나도 없으면 아무것도
+/// 렌더링하지 않는다(빈 상태 배너 불필요 — 목록 자체가 선택적 기능).
+class _SelfNotesSection extends StatelessWidget {
+  final List<Endorsement> endorsements;
+
+  const _SelfNotesSection({required this.endorsements});
+
+  @override
+  Widget build(BuildContext context) {
+    final notes =
+        endorsements
+            .where((e) => e.by == EndorsedBy.self && e.note.trim().isNotEmpty)
+            .toList()
+          ..sort((a, b) => b.date.compareTo(a.date));
+
+    if (notes.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: AppSpacing.space4),
+        Text(
+          AppStrings.journalSelfNotesTitle,
+          style: AppTypography.caption.copyWith(
+            color: AppColors.inkSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        for (final endorsement in notes) _SelfNoteRow(endorsement: endorsement),
+      ],
+    );
+  }
+}
+
+class _SelfNoteRow extends StatelessWidget {
+  final Endorsement endorsement;
+
+  const _SelfNoteRow({required this.endorsement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NotebookGlyph(
+            NotebookGlyph.dotFilled,
+            size: 12,
+            color: AppColors.ink,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              endorsement.note,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
