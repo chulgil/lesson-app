@@ -89,6 +89,7 @@ const _studentRoutes = <String>[
   AppRoutes.teacherSearch,
   AppRoutes.myTeachers,
   AppRoutes.addManualTeacher,
+  AppRoutes.studentSettingsHub,
   AppRoutes.subscriptions,
   AppRoutes.myBookings,
   AppRoutes.pendingBookings,

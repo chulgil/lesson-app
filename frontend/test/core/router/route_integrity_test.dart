@@ -116,6 +116,7 @@ Set<String> _buildAllRouteValues() {
     AppRoutes.cancellationDefaults,
     AppRoutes.myTeachers,
     AppRoutes.addManualTeacher,
+    AppRoutes.studentSettingsHub,
     AppRoutes.backupSettings,
     AppRoutes.allRecordings,
     AppRoutes.help,
@@ -312,6 +313,7 @@ const _registeredTemplates = <String>{
   // settings_routes.dart
   '/student/my-teachers',
   '/student/my-teachers/add',
+  '/student/settings',
   '/settings/backup',
   '/settings/recordings',
   '/settings/help',
@@ -469,6 +471,7 @@ Map<String, String> get _appRoutesMap {
     'cancellationDefaults': AppRoutes.cancellationDefaults,
     'myTeachers': AppRoutes.myTeachers,
     'addManualTeacher': AppRoutes.addManualTeacher,
+    'studentSettingsHub': AppRoutes.studentSettingsHub,
     'backupSettings': AppRoutes.backupSettings,
     'allRecordings': AppRoutes.allRecordings,
     'help': AppRoutes.help,

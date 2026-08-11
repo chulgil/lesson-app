@@ -141,6 +141,10 @@ class AppRoutes {
   static const myTeachers = '/student/my-teachers';
   static const addManualTeacher = '/student/my-teachers/add';
 
+  /// 학생 설정 서브허브 — 프로필 탭의 6개 설정 행(알림/리마인더/언어/백업/도움말/앱정보)을
+  /// 단일 진입점으로 묶은 화면.
+  static const studentSettingsHub = '/student/settings';
+
   // Settings routes
   static const backupSettings = '/settings/backup';
   static const allRecordings = '/settings/recordings';

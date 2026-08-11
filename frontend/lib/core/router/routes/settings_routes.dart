@@ -12,6 +12,7 @@ import '../../../features/student_home/presentation/screens/help_screen.dart';
 import '../../../features/student_home/presentation/screens/legal_document_screen.dart';
 import '../../../features/student_home/presentation/screens/add_manual_teacher_screen.dart';
 import '../../../features/student_home/presentation/screens/my_teachers_screen.dart';
+import '../../../features/student_home/presentation/screens/student_settings_hub_screen.dart';
 import '../../../features/student_home/domain/entities/manual_teacher.dart';
 import '../../../features/notifications/presentation/screens/notification_settings_screen.dart';
 import '../../../features/student_home/presentation/screens/student_profile_edit_screen.dart';
@@ -33,6 +34,12 @@ List<GoRoute> settingsRoutes = [
       final teacher = state.extra as ManualTeacher?;
       return AddManualTeacherScreen(existingTeacher: teacher);
     },
+  ),
+  // Student Settings Hub
+  GoRoute(
+    path: AppRoutes.studentSettingsHub,
+    name: 'studentSettingsHub',
+    builder: (context, state) => const StudentSettingsHubScreen(),
   ),
   // Backup Settings
   GoRoute(
