@@ -43,8 +43,24 @@ class _FirstAvailabilitySetupScreenState
   @override
   Widget build(BuildContext context) {
     return NotebookScreenScaffold(
-      appBar: const NotebookDetailAppBar(
+      appBar: NotebookDetailAppBar(
         title: AppStrings.firstAvailabilitySetupTitle,
+        // #P1-7 — 인라인 4단계 skip. 우측 상단 상시 노출("Prominent")로
+        // 스크롤 없이 접근 가능해야 한다. 홈 진입 후에는 NextMissionSpotlight/
+        // 퀘스트가 리마인더를 이어받는다 (docs/specs/onboarding/
+        // teacher_first_availability_setup.md §2 참조).
+        customActions: [
+          TextButton(
+            onPressed: () => _skip(context),
+            child: Text(
+              AppStrings.firstAvailabilitySkipAction,
+              style: NotebookTypography.sectionLabel.copyWith(
+                color: AppColors.inkSecondary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -225,6 +241,14 @@ class _FirstAvailabilitySetupScreenState
         child: const Text(AppStrings.firstAvailabilityAdvancedAction),
       ),
     );
+  }
+
+  // AppBar customAction — "나중에 설정". Onboarding is already marked complete
+  // by ProfileSetupScreen before this screen is reached (Design B, #P1-7), so
+  // no additional server call is needed here — this is a plain navigation,
+  // identical in shape to the "더 자세히 설정" link below.
+  void _skip(BuildContext context) {
+    context.go(AppRoutes.home);
   }
 
   void _toggleDay(int dayOfWeek) {

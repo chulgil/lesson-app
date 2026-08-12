@@ -39,7 +39,7 @@ v3 spec §1 자체에서 "레슨 시간/가용 시간 설정이 온보딩에 없
 | 블로커 퀘스트 | 가용시간 1개도 없으면 다른 퀘스트(학생 초대·레슨 등록) 잠금 |
 | 단일 화면 | 요일 다중선택 + 시작/종료시각 1쌍 + 적용 1탭. 풀 설정은 별도 화면에서 |
 | 합리적 기본값 | 레슨 1회 50분 / 쉬는 시간 10분 / 시작 간격 60분 (한국 음악 레슨 표준) |
-| 가입 흐름 내 강제 | 가입 흐름의 `first_availability_setup_screen` 에서 슬롯 1개 이상 등록 후에만 홈 진입 가능 (스킵 불가) |
+| 가입 흐름 내 인라인 4단계 (스킵 가능, 2026-08-12 개정) | 가입 흐름의 `first_availability_setup_screen` 이 프로필(3단계) 직후 4번째 단계로 진입. 우측 상단 "나중에 설정"으로 즉시 스킵 가능 — §3.4 참조 |
 | 점진적 공개 | 첫 등록 후에야 반복·예외·여러 블록 등 고급 옵션 노출 |
 
 ---
@@ -50,12 +50,12 @@ v3 spec §1 자체에서 "레슨 시간/가용 시간 설정이 온보딩에 없
 [온보딩 Phase A — 이름 + 악기 입력 완료]
     │
     ▼
-[가입 흐름 내 — first_availability_setup_screen 강제 진입 (스킵 불가)]
-  간소 가용시간 설정 화면
-  요일 다중선택 + 시작/종료시각 1쌍 + [적용]
-    │
-    ▼ WeeklySchedule.isActive = true 1+개 생성
-  셀레브레이션 시트 "첫 가용시간 등록 완료!"
+[가입 흐름 내 — first_availability_setup_screen 인라인 4단계 진입 (2026-08-12 개정)]
+  간소 가용시간 설정 화면 (OnboardingStepHeader 4/4)
+  요일 다중선택 + 시작/종료시각 1쌍 + [적용]   또는   AppBar "나중에 설정"
+    │                                              │
+    ▼ WeeklySchedule.isActive = true 1+개 생성       ▼ 슬롯 생성 없이 즉시
+  셀레브레이션 시트 "첫 가용시간 등록 완료!"              context.go(/home)
     │
     ▼
 [Step 2.5 — OnboardingCategoryPreviewScreen (W4, 2026-06-12)]
@@ -64,13 +64,14 @@ v3 spec §1 자체에서 "레슨 시간/가용 시간 설정이 온보딩에 없
   onboardingCategoryShownProvider (Hive) 영속 — 1회만 노출
     │
     ▼
-[홈 진입] — 가용시간 1개 이상 보장됨
+[홈 진입] — 가용시간 1개 이상 보장 또는 "나중에 설정"으로 스킵
   퀘스트 보드 표시
   · 필수 퀘스트: 첫 학생 초대 (가용시간 보장 후 활성)
   · 필수 퀘스트: 첫 레슨 등록 (가용시간 보장 후 활성)
+  · 스킵한 경우: NextMissionSpotlight(dashboard_tab.dart)/퀘스트 보드가 리마인더 역할
 ```
 
-가입 흐름 내 게이트가 슬롯 1개 이상을 강제하므로 홈 진입 시점에는 별도 인터스티셜 모달이 필요 없다. 가입 흐름 후 슬롯이 0개가 되는 경로(예: 모든 슬롯 비활성화)는 §4.1 폐기 노트 참조.
+2026-08-12 이전에는 `first_availability_setup_screen` 이 실제 가입 흐름에서 도달 불가능했다 (#430 이 프로필 저장 직후 `completeOnboarding()` + 홈 직행으로 변경하며, #422/#646 이 만든 라우터 phase 게이트를 우회). `OnboardingStepHeader.teacherSteps` 는 4단계를 표시했지만 실제로는 3단계에서 끝났다 (teacher-journey 감사 2026-08-11, P1-7). 본 개정은 `ProfileSetupScreen` 의 다음 화면을 홈에서 이 화면으로 바꾸는 인라인 네비게이션만으로 해결했다 — `completeOnboarding()` 호출 시점은 그대로이므로 라우터의 `AuthNeedsOnboarding` 리다이렉트 가드와 충돌하지 않는다 (§3.4).
 
 ### 3.3 Step 2.5 — 카테고리 미리보기 (2026-06-12 신규)
 
@@ -92,6 +93,16 @@ teacher-settings-redesign W4 머지 — 가입 직후 신규 5묶음 IA (`profil
 ### 3.2 풀 설정 이관 경로
 
 첫 등록 후 선생님이 "더 자세히 설정" 탭 시 기존 `teacher_availability_spec.md` 화면으로 이동. 본 스펙의 간소 UI 는 **최초 1회만 노출**.
+
+### 3.4 인라인 4단계 진입 + 스킵 (2026-08-12 개정)
+
+| 항목 | 내용 |
+|---|---|
+| 진입 | `ProfileSetupScreen._submit()` 성공 시 `context.go(AppRoutes.teacherFirstAvailability)` — 기존의 `context.go(AppRoutes.home)` 을 대체 |
+| completeOnboarding 시점 | 프로필 저장 직후(기존과 동일) — 이 화면 도달 시점엔 이미 `AuthAuthenticated` 상태이므로 라우터의 `AuthNeedsOnboarding` phase 게이트(`OnboardingPhase.firstAvailability`, #646)는 관여하지 않는다. 홈의 `NextMissionSpotlight` 가 `context.push(AppRoutes.teacherFirstAvailability)` 로 진입하는 기존 경로와 동일한 방식 |
+| 스킵 CTA | AppBar 우측 상단 "나중에 설정" (`AppStrings.firstAvailabilitySkipAction`) — 상시 노출, 스크롤 불필요. 탭 시 슬롯 생성 없이 `context.go(AppRoutes.home)` |
+| 스킵 후 리마인더 | 홈의 `NextMissionSpotlight`(`dashboard_tab.dart`) + 퀘스트 보드가 기존과 동일하게 안내를 이어받는다 |
+| 참고 | §2 "가입 흐름 내 강제(스킵 불가)" 원칙은 이 개정으로 완화되었다. 실제로는 #430 이후 이미 스킵 가능한 상태였고(도달 자체가 불가능했으므로), 본 개정은 그 실태를 인라인 UX 로 명시적으로 인정한 것 |
 
 ---
 
@@ -242,3 +253,4 @@ for (final day in selectedDays) {
 |---|---|---|
 | 1.0 | 2026-06-01 | 초안 — E2E 감사 #1 AB-C1 대응 (이슈 #422) |
 | 1.1 | 2026-06-10 | §2/§3/§4.1 인터스티셜 정책 폐기 → 가입 흐름 내 강제 게이트로 일원화 (감사 §4.3 B1). dead code 제거: `first_availability_interstitial.dart`, `showFirstAvailabilityInterstitial` export. |
+| 1.2 | 2026-08-12 | §2/§3/§3.4 — `first_availability_setup_screen` 을 `ProfileSetupScreen` 직후 인라인 4단계로 승격 + "나중에 설정" 스킵 CTA 추가 (teacher-journey 감사 2026-08-11, P1-7). #430 이후 이 화면이 실제 가입 흐름에서 도달 불가능했던 드리프트를 해소. §2 "스킵 불가" 원칙을 스킵 가능으로 완화. |

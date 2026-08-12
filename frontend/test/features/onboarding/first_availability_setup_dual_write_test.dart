@@ -86,8 +86,59 @@ void main() {
       // Five default weekday slots were sent.
       expect(spy.lastSlots, isNotNull);
       expect(spy.lastSlots!.length, 5);
+      // One slot is created per selected day — Mon(1)..Fri(5).
+      expect(
+        spy.lastSlots!.map((s) => s.dayOfWeek).toSet(),
+        {1, 2, 3, 4, 5},
+        reason: '선택된 요일 각각에 슬롯이 1개씩 생성되어야 한다',
+      );
       // No runtime crashes.
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('요일 선택을 바꾸면 변경된 요일 집합만큼만 슬롯이 생성된다 (#P1-7)', (tester) async {
+    final spy = _SpyOnboardingApi();
+
+    tester.view.physicalSize = const Size(1080, 1920);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          teacherAvailabilityApiProvider.overrideWithValue(spy),
+          teacherSettingsProvider.overrideWith(
+            (ref) async => _emptyTeacherSettings(),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const FirstAvailabilitySetupScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Default selection is Mon-Fri. Deselect Tue/Wed, select Sat →
+    // {Mon, Thu, Fri, Sat} = {1, 4, 5, 6}.
+    await tester.tap(find.text(AppStrings.firstAvailabilityDayTue));
+    await tester.tap(find.text(AppStrings.firstAvailabilityDayWed));
+    await tester.tap(find.text(AppStrings.firstAvailabilityDaySat));
+    await tester.pump();
+
+    await tester.tap(find.text(AppStrings.firstAvailabilityApplyAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(spy.callCount, 1);
+    expect(spy.lastSlots, isNotNull);
+    expect(
+      spy.lastSlots!.map((s) => s.dayOfWeek).toSet(),
+      {1, 4, 5, 6},
+      reason: '요일 선택을 바꾸면 그 집합대로만 슬롯이 생성되어야 한다',
+    );
+    expect(tester.takeException(), isNull);
+  });
 }
