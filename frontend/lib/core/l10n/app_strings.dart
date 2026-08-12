@@ -1627,6 +1627,11 @@ class AppStrings {
   /// N순위
   static String slotPriority(int n) => '$n순위';
 
+  /// N (compact digit-only priority label for narrow grid cells — the '순위'
+  /// meaning is conveyed by the adjacent selection-list legend, see
+  /// weekly_calendar_picker.dart._buildSelectionList()).
+  static String priorityCellLabel(int n) => '$n';
+
   /// N회차 → dateTime 확정
   static String sessionConfirmed(int n, String dateTime) =>
       '$n회차 → $dateTime 확정';

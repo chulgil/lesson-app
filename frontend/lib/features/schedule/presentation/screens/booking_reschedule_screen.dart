@@ -17,6 +17,7 @@ import '../../domain/entities/cancel_reason.dart';
 import '../../domain/services/cancellation_credit_policy.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_date_navigator.dart';
+import '../widgets/availability/availability_slot_chip_list.dart';
 import '../widgets/availability/empty_slots_suggestion.dart';
 
 /// Booking reschedule screen
@@ -83,7 +84,9 @@ class _BookingRescheduleScreenState
 
     return NotebookScreenScaffold(
       backgroundColor: AppColors.paper,
-      appBar: const NotebookDetailAppBar(title: AppStrings.bookingRescheduleTitle),
+      appBar: const NotebookDetailAppBar(
+        title: AppStrings.bookingRescheduleTitle,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -186,7 +189,11 @@ class _BookingRescheduleScreenState
         decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
         child: Row(
           children: [
-            const Icon(Icons.swap_horiz_rounded, color: AppColors.ink, size: 20),
+            const Icon(
+              Icons.swap_horiz_rounded,
+              color: AppColors.ink,
+              size: 20,
+            ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
@@ -213,9 +220,7 @@ class _BookingRescheduleScreenState
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.paperAccentSoft,
-        ),
+        decoration: BoxDecoration(color: AppColors.paperAccentSoft),
         child: Row(
           children: [
             const Icon(Icons.block, color: AppColors.paperAccent, size: 20),
@@ -300,69 +305,13 @@ class _BookingRescheduleScreenState
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
-          _buildSlotChips(availableSlots),
+          AvailabilitySlotChipList(
+            slots: availableSlots,
+            selectedId: _selectedSlot?.id,
+            onSelect: (s) => setState(() => _selectedSlot = s),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSlotChips(List<AvailabilitySlot> slots) {
-    return Wrap(
-      spacing: AppSpacing.space2,
-      runSpacing: AppSpacing.space2,
-      children:
-          slots.map((slot) {
-            final isSelected = _selectedSlot?.id == slot.id;
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedSlot = slot;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                constraints: const BoxConstraints(minWidth: 72, minHeight: 44),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space4,
-                  vertical: AppSpacing.space3,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.paperDark,
-                  border: Border.all(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.inkQuaternary,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (slot.isRecommended && !isSelected) ...[
-                      // #530 — recommended marker as a Material icon (UI-emoji
-                      // HARD-GATE: no ⭐ pictograph in UI text).
-                      const Icon(
-                        Icons.star_rounded,
-                        size: 16,
-                        color: AppColors.paperAccent,
-                      ),
-                      const SizedBox(width: AppSpacing.space1),
-                    ],
-                    Text(
-                      slot.formattedStartTime,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: isSelected ? AppColors.paper : AppColors.ink,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
     );
   }
 
@@ -410,19 +359,26 @@ class _BookingRescheduleScreenState
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+      error:
+          (_, __) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 

@@ -483,9 +483,13 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     return AppColors.paperAccent;
   }
 
+  // ux-rules HARD-GATE (UI emoji 금지): 원과 숫자 결합 유니코드(❶❷❸) 대신
+  // 텍스트 라벨을 사용한다. 셀 폭이 좁아 '순위' 접미사는 생략하고, 그 의미는
+  // 아래 _buildSelectionList() 의 범례 행("N순위: ...")이 전달한다
+  // (schedule_change_unification_spec.md §3.3).
   String _priorityLabel(int priority) {
-    const labels = ['', '❶', '❷', '❸'];
-    return labels[priority.clamp(0, 3)];
+    if (priority < 1 || priority > 3) return '';
+    return AppStrings.priorityCellLabel(priority);
   }
 
   Widget _buildSelectionList() {
