@@ -222,12 +222,17 @@ void main() {
     });
   });
 
-  group('Priority color mapping', () {
-    test('priority 1-3 returns distinct labels', () {
-      const labels = ['', '❶', '❷', '❸'];
-      expect(labels[1], '❶');
-      expect(labels[2], '❷');
-      expect(labels[3], '❸');
+  group('Priority cell label (§3.3 — no unicode pictograph)', () {
+    test('priority 1-3 returns plain digit labels, no ❶❷❸ pictographs', () {
+      const labels = ['', '1', '2', '3'];
+      expect(labels[1], '1');
+      expect(labels[2], '2');
+      expect(labels[3], '3');
+      for (final label in labels) {
+        expect(label.contains('❶'), isFalse);
+        expect(label.contains('❷'), isFalse);
+        expect(label.contains('❸'), isFalse);
+      }
     });
   });
 }

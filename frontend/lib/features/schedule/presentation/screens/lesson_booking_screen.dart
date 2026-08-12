@@ -14,6 +14,7 @@ import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_date_navigator.dart';
+import '../widgets/availability/availability_slot_chip_list.dart';
 import '../widgets/availability/empty_slots_suggestion.dart';
 
 /// Parameters for the student first-come direct booking screen.
@@ -95,14 +96,15 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
               child: slotsAsync.when(
                 data: _buildSlots,
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => Center(
-                  child: Text(
-                    AppStrings.cannotLoadData,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
+                error:
+                    (_, __) => Center(
+                      child: Text(
+                        AppStrings.cannotLoadData,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.inkSecondary,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
               ),
             ),
             if (_selectedSlot != null) _buildBottomBar(),
@@ -116,13 +118,9 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
     final available =
         slots
             .where((s) => s.status == AvailabilitySlotStatus.available)
-            .toList()
-          ..sort((a, b) => a.startTime.hour.compareTo(b.startTime.hour));
+            .toList();
 
     if (available.isEmpty) return _buildEmptyState();
-
-    final morning = available.where((s) => s.isMorning).toList();
-    final afternoon = available.where((s) => s.isAfternoon).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -136,25 +134,11 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          if (morning.isNotEmpty) ...[
-            _GroupLabel(AppStrings.timeAM),
-            const SizedBox(height: AppSpacing.space2),
-            _SlotChips(
-              slots: morning,
-              selectedId: _selectedSlot?.id,
-              onSelect: (s) => setState(() => _selectedSlot = s),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-          ],
-          if (afternoon.isNotEmpty) ...[
-            _GroupLabel(AppStrings.timePM),
-            const SizedBox(height: AppSpacing.space2),
-            _SlotChips(
-              slots: afternoon,
-              selectedId: _selectedSlot?.id,
-              onSelect: (s) => setState(() => _selectedSlot = s),
-            ),
-          ],
+          AvailabilitySlotChipList(
+            slots: available,
+            selectedId: _selectedSlot?.id,
+            onSelect: (s) => setState(() => _selectedSlot = s),
+          ),
         ],
       ),
     );
@@ -177,9 +161,13 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             title: AppStrings.noAvailableBookingTime,
           );
         }
-        final suggestions = dates
-            .map((date) => DateSuggestion(date: date, availableSlots: const []))
-            .toList();
+        final suggestions =
+            dates
+                .map(
+                  (date) =>
+                      DateSuggestion(date: date, availableSlots: const []),
+                )
+                .toList();
         return SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: EmptySlotsSuggestion(
@@ -195,14 +183,15 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => Center(
-        child: Text(
-          AppStrings.noAvailableBookingTime,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.inkSecondary,
+      error:
+          (_, __) => Center(
+            child: Text(
+              AppStrings.noAvailableBookingTime,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -244,22 +233,23 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
                   backgroundColor: AppColors.paperAccent,
                 ),
-                child: _isBooking
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.paper,
+                child:
+                    _isBooking
+                        ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.paper,
+                          ),
+                        )
+                        : Text(
+                          AppStrings.bookAction,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.paper,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      )
-                    : Text(
-                        AppStrings.bookAction,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.paper,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
               ),
             ),
           ],
@@ -373,72 +363,5 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         ),
       );
     }
-  }
-}
-
-class _GroupLabel extends StatelessWidget {
-  final String label;
-  const _GroupLabel(this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: AppTypography.caption.copyWith(
-        color: AppColors.inkTertiary,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-}
-
-class _SlotChips extends StatelessWidget {
-  final List<AvailabilitySlot> slots;
-  final String? selectedId;
-  final ValueChanged<AvailabilitySlot> onSelect;
-
-  const _SlotChips({
-    required this.slots,
-    required this.selectedId,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: AppSpacing.space2,
-      runSpacing: AppSpacing.space2,
-      children: slots.map((slot) {
-        final isSelected = selectedId == slot.id;
-        return GestureDetector(
-          onTap: () => onSelect(slot),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            constraints: const BoxConstraints(minWidth: 72, minHeight: 44),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space4,
-              vertical: AppSpacing.space3,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.paperAccent : AppColors.paperDark,
-              border: Border.all(
-                color: isSelected
-                    ? AppColors.paperAccent
-                    : AppColors.inkQuaternary,
-                width: isSelected ? 2 : 1,
-              ),
-            ),
-            // 시스템 데이터(시간) → 산세리프. Notebook §7.130 Gaegu 이항 룰.
-            child: Text(
-              slot.formattedStartTime,
-              style: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.paper : AppColors.ink,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
   }
 }
