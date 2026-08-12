@@ -17,6 +17,7 @@ import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/extensions/subscription_template_visuals.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../../domain/mappers/time_slot_mapper.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../extensions/cancel_reason_visuals.dart';
@@ -540,20 +541,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.id,
           request.teacherId,
           request.studentId,
-          slots:
-              result.slots
-                  .map(
-                    (s) => TimeSlotOption(
-                      id: s.id,
-                      dayOfWeek: s.dayOfWeek - 1,
-                      startTime:
-                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                      endTime:
-                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                      date: s.specificDate,
-                    ),
-                  )
-                  .toList(),
+          slots: result.slots.map((s) => s.toTimeSlotOption()).toList(),
           message: result.message,
         );
         if (context.mounted) {
@@ -670,20 +658,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.id,
           request.teacherId,
           request.studentId,
-          slots:
-              result.slots
-                  .map(
-                    (s) => TimeSlotOption(
-                      id: s.id,
-                      dayOfWeek: s.dayOfWeek - 1,
-                      startTime:
-                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                      endTime:
-                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                      date: s.specificDate,
-                    ),
-                  )
-                  .toList(),
+          slots: result.slots.map((s) => s.toTimeSlotOption()).toList(),
           message: result.message,
         );
         if (context.mounted) {
@@ -992,20 +967,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.teacherId,
         request.studentId,
         changeType: changeType,
-        suggestedSlots:
-            result.slots
-                .map(
-                  (s) => TimeSlotOption(
-                    id: s.id,
-                    // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
-                    dayOfWeek: s.dayOfWeek - 1,
-                    startTime:
-                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                    endTime:
-                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                  ),
-                )
-                .toList(),
+        suggestedSlots: result.slots.map((s) => s.toTimeSlotOption()).toList(),
         message: result.message.isEmpty ? null : result.message,
       );
       // #1191 — 상대 통지는 BE Notification row 가 SSOT (#1200: add_event 에서
@@ -1097,19 +1059,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.studentId,
             changeType: changeType,
             suggestedSlots:
-                result.counterSlots
-                    .map(
-                      (s) => TimeSlotOption(
-                        id: s.id,
-                        // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
-                        dayOfWeek: s.dayOfWeek - 1,
-                        startTime:
-                            '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                        endTime:
-                            '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                      ),
-                    )
-                    .toList(),
+                result.counterSlots.map((s) => s.toTimeSlotOption()).toList(),
             message: result.message.isEmpty ? null : result.message,
           );
           // #1191 — 상대 통지는 BE(#1200 scheduleChangeRequested→교사 emit). FE
