@@ -214,7 +214,7 @@ sub = Subscription(
 > #301 5주차 정책: `FifthWeekPolicy.skip`(기본값 = 5주차 자동 휴강)은 생성기가 count 기반
 > (정확히 `total_lessons` 회차만 생성)이라 **이미 구현된 동작**이다 — 5주차 추가 레슨을 만들지
 > 않는다. bonus/credit/deduct/optional 은 캘린더-월 인식이 필요한 별도 기능(미구현, 5주차
-> 보너스는 `accrue_fifth_week_bonus` makeup-credit 경로 참조).
+> 보너스는 makeup-credit 이 아니라 `Subscription.bonusCount` 조정 — makeup_credit_spec.md §7.1).
 >
 > #301 충돌 부분손실: `_generate_recurring_lessons` 는 교사 기존 예약과 겹치는 회차를 건너뛴다.
 > 조용한 손실을 막기 위해 생성 회차 < 요청 회차이면 `logger.warning` 으로 surface 한다(스킵

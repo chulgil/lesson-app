@@ -33,15 +33,19 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
     required String studentId,
     String? sourceSubscriptionId,
     String? reasonNote,
+    MakeupCreditReason reason = MakeupCreditReason.manualGrant,
+    String? lessonId,
   }) async {
     final response = await _apiClient.post(
       '/teachers/me/makeup-credits',
       data: {
         'student_id': studentId,
+        'reason': _reasonToWire(reason),
         if (sourceSubscriptionId != null)
           'source_subscription_id': sourceSubscriptionId,
         if (reasonNote != null && reasonNote.isNotEmpty)
           'reason_note': reasonNote,
+        if (lessonId != null) 'lesson_id': lessonId,
       },
     );
     return _fromJson(response.data as Map<String, dynamic>);
@@ -72,8 +76,8 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
 
   static List<MakeupCredit> _listFromResponse(dynamic data) {
     final map = data as Map<String, dynamic>;
-    final items =
-        (map['credits'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
+    final items = (map['credits'] as List<dynamic>? ?? [])
+        .cast<Map<String, dynamic>>();
     return items.map(_fromJson).toList(growable: false);
   }
 
@@ -86,10 +90,9 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
       reason: _reasonFromWire(json['reason'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       expiresAt: DateTime.parse(json['expires_at'] as String),
-      usedAt:
-          json['used_at'] != null
-              ? DateTime.parse(json['used_at'] as String)
-              : null,
+      usedAt: json['used_at'] != null
+          ? DateTime.parse(json['used_at'] as String)
+          : null,
       usedLessonId: json['used_lesson_id'] as String?,
       sourceEventId: json['source_event_id'] as String?,
     );
@@ -108,6 +111,21 @@ class RemoteMakeupCreditRepository implements MakeupCreditRepository {
       case 'manualGrant':
       default:
         return MakeupCreditReason.manualGrant;
+    }
+  }
+
+  static String _reasonToWire(MakeupCreditReason reason) {
+    switch (reason) {
+      case MakeupCreditReason.teacherVacation:
+        return 'teacherVacation';
+      case MakeupCreditReason.noShowExempt:
+        return 'noShowExempt';
+      case MakeupCreditReason.bulkChangeLoss:
+        return 'bulkChangeLoss';
+      case MakeupCreditReason.fifthWeekBonus:
+        return 'fifthWeekBonus';
+      case MakeupCreditReason.manualGrant:
+        return 'manualGrant';
     }
   }
 }

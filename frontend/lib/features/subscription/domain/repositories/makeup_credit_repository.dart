@@ -12,12 +12,16 @@ abstract class MakeupCreditRepository {
   /// GET /api/teachers/me/makeup-credits?student_id=...
   Future<List<MakeupCredit>> listTeacherCredits({required String studentId});
 
-  /// Teacher-side manual grant (spec §4.4 — safety net).
+  /// Teacher-side grant. Default [reason] is manual grant (spec §4.4 — safety
+  /// net). Pass [reason] = [MakeupCreditReason.noShowExempt] + [lessonId] for
+  /// the discretionary no-show exemption (spec §4.2).
   /// POST /api/teachers/me/makeup-credits
   Future<MakeupCredit> grantCredit({
     required String studentId,
     String? sourceSubscriptionId,
     String? reasonNote,
+    MakeupCreditReason reason = MakeupCreditReason.manualGrant,
+    String? lessonId,
   });
 
   /// Teacher-side revoke of an unused credit (mistaken grant cleanup).

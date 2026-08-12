@@ -115,10 +115,15 @@ class LessonConfirmationResult {
   final LessonNonCompletionReason? nonCompletionReason;
   final String? note;
 
+  /// 노쇼 표시 시 보강 크레딧을 함께 지급할지 (선생님 재량, 기본 OFF).
+  /// noShow 사유일 때만 의미 있음 — 다른 사유에서는 항상 false.
+  final bool grantMakeupCredit;
+
   const LessonConfirmationResult({
     required this.completed,
     this.nonCompletionReason,
     this.note,
+    this.grantMakeupCredit = false,
   });
 
   LessonStatus get lessonStatus {
@@ -158,6 +163,7 @@ class LessonConfirmationDialog extends StatefulWidget {
 class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
   bool _showReasonSelection = false;
   LessonNonCompletionReason? _selectedReason;
+  bool _grantMakeupCredit = false;
   final TextEditingController _noteController = TextEditingController();
 
   @override
@@ -299,97 +305,171 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
   Widget _buildReasonSelection() {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.space5),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header with back button
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _showReasonSelection = false;
-                    _selectedReason = null;
-                  });
-                },
-                icon: const Icon(Icons.arrow_back),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              // Notebook × Score §7.27: 다이얼로그 서브 헤더 Playfair.
-              Text(
-                AppStrings.nonCompletionReason,
-                style: NotebookTypography.sectionTitle,
-              ),
+      // 노쇼 보강 크레딧 체크박스(#no-show-credit)가 늘어나며 5개 사유 옵션 +
+      // 메모 입력까지 합친 총 높이가 작은 화면에서 세로 오버플로우를 낸다 —
+      // 스크롤 가능하게 감싸 잘림 없이 전체 콘텐츠에 도달할 수 있게 한다.
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header with back button
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _showReasonSelection = false;
+                      _selectedReason = null;
+                      _grantMakeupCredit = false;
+                    });
+                  },
+                  icon: const Icon(Icons.arrow_back),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                // Notebook × Score §7.27: 다이얼로그 서브 헤더 Playfair.
+                Text(
+                  AppStrings.nonCompletionReason,
+                  style: NotebookTypography.sectionTitle,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.space4),
+
+            // Reason options
+            ...LessonNonCompletionReason.values.map((reason) {
+              final isSelected = _selectedReason == reason;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+                child: _buildReasonOption(
+                  reason: reason,
+                  isSelected: isSelected,
+                  onTap: () {
+                    setState(() {
+                      _selectedReason = reason;
+                      if (reason != LessonNonCompletionReason.noShow) {
+                        _grantMakeupCredit = false;
+                      }
+                    });
+                  },
+                ),
+              );
+            }),
+
+            if (_selectedReason == LessonNonCompletionReason.noShow) ...[
+              const SizedBox(height: AppSpacing.space1),
+              _buildGrantMakeupCreditOption(),
             ],
-          ),
 
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space3),
 
-          // Reason options
-          ...LessonNonCompletionReason.values.map((reason) {
-            final isSelected = _selectedReason == reason;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: _buildReasonOption(
-                reason: reason,
-                isSelected: isSelected,
-                onTap: () {
-                  setState(() {
-                    _selectedReason = reason;
-                  });
-                },
+            // Note field
+            Text(
+              AppStrings.memoOptional,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.inkSecondary,
               ),
-            );
-          }),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          // Note field
-          Text(
-            AppStrings.memoOptional,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkSecondary,
             ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          TextField(
-            controller: _noteController,
-            maxLines: 2,
-            decoration: InputDecoration(
-              hintText: AppStrings.memoHint,
-              border: OutlineInputBorder(),
-              contentPadding: const EdgeInsets.all(AppSpacing.space3),
+            const SizedBox(height: AppSpacing.space2),
+            TextField(
+              controller: _noteController,
+              maxLines: 2,
+              decoration: InputDecoration(
+                hintText: AppStrings.memoHint,
+                border: OutlineInputBorder(),
+                contentPadding: const EdgeInsets.all(AppSpacing.space3),
+              ),
             ),
-          ),
 
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space4),
 
-          // Confirm button
-          ElevatedButton(
-            onPressed:
-                _selectedReason == null
-                    ? null
-                    : () {
-                      Navigator.of(context).pop(
-                        LessonConfirmationResult(
-                          completed: false,
-                          nonCompletionReason: _selectedReason,
-                          note:
-                              _noteController.text.isEmpty
-                                  ? null
-                                  : _noteController.text,
-                        ),
-                      );
-                    },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+            // Confirm button
+            ElevatedButton(
+              onPressed:
+                  _selectedReason == null
+                      ? null
+                      : () {
+                        Navigator.of(context).pop(
+                          LessonConfirmationResult(
+                            completed: false,
+                            nonCompletionReason: _selectedReason,
+                            note:
+                                _noteController.text.isEmpty
+                                    ? null
+                                    : _noteController.text,
+                            grantMakeupCredit:
+                                _selectedReason ==
+                                    LessonNonCompletionReason.noShow &&
+                                _grantMakeupCredit,
+                          ),
+                        );
+                      },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space3,
+                ),
+              ),
+              child: const Text(AppStrings.confirm),
             ),
-            child: const Text(AppStrings.confirm),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 노쇼 사유 선택 시에만 노출되는 보강 크레딧 지급 체크박스 (선생님 재량, 기본 OFF).
+  Widget _buildGrantMakeupCreditOption() {
+    return InkWell(
+      onTap: () => setState(() => _grantMakeupCredit = !_grantMakeupCredit),
+      borderRadius: BorderRadius.zero,
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color:
+                _grantMakeupCredit
+                    ? AppColors.paperOk
+                    : AppColors.inkQuaternary,
           ),
-        ],
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                value: _grantMakeupCredit,
+                onChanged:
+                    (checked) =>
+                        setState(() => _grantMakeupCredit = checked ?? false),
+                activeColor: AppColors.paperOk,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.lessonNoShowGrantMakeupCreditLabel,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    AppStrings.lessonNoShowGrantMakeupCreditDescription,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

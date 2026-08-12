@@ -29,6 +29,11 @@ from app.services.teacher_id_resolver import resolve_teacher_id
 student_router = APIRouter()
 teacher_router = APIRouter()
 
+# Reasons a teacher may trigger from the generic grant endpoint. The other
+# reasons (teacherVacation, bulkChangeLoss, fifthWeekBonus) are accrued by
+# their own system flows, not teacher discretion.
+_TEACHER_GRANTABLE_REASONS = {ModelReason.manualGrant, ModelReason.noShowExempt}
+
 
 # ----------------------------------------------------------------------
 # Student-side: /students/me/makeup-credits
@@ -84,16 +89,28 @@ async def list_teacher_credits_for_student(
     "",
     response_model=MakeupCreditResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Teacher manual grant of a makeup credit (§4.4 safety net)",
+    summary="Teacher grant of a makeup credit (manual §4.4, or no-show exempt §4.2)",
 )
 async def grant_makeup_credit(
     body: MakeupCreditGrantRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_teacher)],
 ) -> MakeupCreditResponse:
-    """Spec §4.4 — manual grant. Default 30-day expiry from service."""
+    """Spec §4.4 manual grant (default) or §4.2 discretionary no-show exemption.
+
+    §4.2 requires `lesson_id` — the lesson the teacher is waiving. Both are
+    teacher-initiated (as opposed to the system-driven vacation/bulk-change/
+    fifth-week-bonus accrual paths), so both are exposed here.
+    """
     teacher_id = await resolve_teacher_id(db, current_user.id)
     service = MakeupCreditService(db)
+    reason = ModelReason(body.reason.value)
+
+    if reason not in _TEACHER_GRANTABLE_REASONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"reason must be one of {sorted(r.value for r in _TEACHER_GRANTABLE_REASONS)}",
+        )
 
     # Issue #741: verify the target student belongs to this teacher. The DB
     # query lives in the service layer (routers must not query directly).
@@ -101,6 +118,19 @@ async def grant_makeup_credit(
         await service.assert_student_belongs_to_teacher(body.student_id, teacher_id)
     except PermissionError as exc:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+    if reason is ModelReason.noShowExempt:
+        if not body.lesson_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="lesson_id is required when reason=noShowExempt",
+            )
+        credit = await service.accrue_for_no_show_exempt(
+            student_id=body.student_id,
+            teacher_id=teacher_id,
+            lesson_id=body.lesson_id,
+        )
+        return MakeupCreditResponse.model_validate(credit)
 
     credit = await service.accrue(
         student_id=body.student_id,

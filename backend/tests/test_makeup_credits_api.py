@@ -102,6 +102,69 @@ async def test_teacher_grants_manual_credit(
     assert body["used_at"] is None
 
 
+async def test_teacher_grants_no_show_exempt_credit(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    """Spec §4.2 — discretionary no-show exemption via the grant endpoint."""
+    await create_test_user()
+    student_id = await _seed_student(db_session)
+    lesson_id = f"lesson-{uuid4()}"
+
+    response = await client.post(
+        "/api/v1/teachers/me/makeup-credits",
+        headers=_teacher_headers(),
+        json={
+            "student_id": student_id,
+            "reason": "noShowExempt",
+            "lesson_id": lesson_id,
+        },
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["student_id"] == student_id
+    assert body["teacher_id"] == TEACHER_PROFILE_ID
+    assert body["reason"] == "noShowExempt"
+    assert body["source_event_id"] == lesson_id
+
+
+async def test_teacher_grant_no_show_exempt_requires_lesson_id(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    await create_test_user()
+    student_id = await _seed_student(db_session)
+
+    response = await client.post(
+        "/api/v1/teachers/me/makeup-credits",
+        headers=_teacher_headers(),
+        json={"student_id": student_id, "reason": "noShowExempt"},
+    )
+
+    assert response.status_code == 400
+
+
+async def test_teacher_grant_rejects_system_only_reason(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    create_test_user,
+) -> None:
+    """teacherVacation/bulkChangeLoss/fifthWeekBonus are system-accrued only."""
+    await create_test_user()
+    student_id = await _seed_student(db_session)
+
+    response = await client.post(
+        "/api/v1/teachers/me/makeup-credits",
+        headers=_teacher_headers(),
+        json={"student_id": student_id, "reason": "teacherVacation"},
+    )
+
+    assert response.status_code == 400
+
+
 async def test_teacher_lists_only_own_issued_credits(
     client: AsyncClient,
     db_session: AsyncSession,

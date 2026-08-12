@@ -55,12 +55,16 @@ class MakeupCreditActions {
     required String studentId,
     String? sourceSubscriptionId,
     String? reasonNote,
+    MakeupCreditReason reason = MakeupCreditReason.manualGrant,
+    String? lessonId,
   }) async {
     final repo = _ref.read(makeupCreditRepositoryProvider);
     final credit = await repo.grantCredit(
       studentId: studentId,
       sourceSubscriptionId: sourceSubscriptionId,
       reasonNote: reasonNote,
+      reason: reason,
+      lessonId: lessonId,
     );
     _ref.invalidate(teacherMakeupCreditsProvider(studentId));
     _ref.invalidate(studentMakeupCreditsProvider);
