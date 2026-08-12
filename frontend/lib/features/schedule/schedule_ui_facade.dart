@@ -22,3 +22,5 @@ export 'presentation/widgets/schedule_change_type_bottom_sheet.dart'
     show showScheduleChangeTypeBottomSheet;
 export 'presentation/widgets/schedule_slot_choice_list.dart'
     show ScheduleSlotChoice, ScheduleSlotChoiceList;
+export 'presentation/widgets/schedule_change_action_bar.dart'
+    show ScheduleChangeResponseBar, ScheduleChangeWaitingBar;

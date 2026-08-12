@@ -17,6 +17,41 @@ typedef RejectScheduleChoice =
     void Function(RequestEvent event, String message);
 typedef ScheduleEventAction = void Function(RequestEvent event);
 
+/// Returns the latest unresolved schedule decision event for a session's
+/// event list — SSOT shared by [SubscriptionBottomInputBar] (Waiting/
+/// CanRespond rendering) and [SubscriptionDetailScreen] (A-2 canonical
+/// routing decision, schedule_change_unification_spec.md §4 M-3): a session
+/// has an active per-session negotiation exactly when this returns non-null.
+///
+/// The list is scanned newest-first: a terminal event resets to Default,
+/// while the first source event found drives the state. Note:
+/// [RequestEventType.scheduleChangeAccepted] stays a SOURCE — the acceptor
+/// keeps seeing Waiting + "결정 변경" (withdraw) until the thread moves on
+/// (spec §3.3 결정 변경 흐름).
+RequestEvent? latestSubscriptionScheduleDecisionEvent(
+  List<RequestEvent> events,
+) {
+  // Terminal events: once one appears after a proposal/counter, the thread
+  // is resolved and the bar reverts to Default. Shares the SSOT terminal set
+  // with the pending-badge provider so reject/expire agree across both (#543).
+  const terminalTypes = scheduleChangeNegotiationTerminalTypes;
+  const sourceTypes = {
+    RequestEventType.scheduleChanged,
+    RequestEventType.scheduleChangeProposed,
+    RequestEventType.scheduleChangeCountered,
+    RequestEventType.scheduleChangeAccepted,
+  };
+
+  final sorted =
+      events.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+  for (final event in sorted) {
+    if (terminalTypes.contains(event.eventType)) return null;
+    if (sourceTypes.contains(event.eventType)) return event;
+  }
+  return null;
+}
+
 /// Bottom input bar for the subscription detail screen.
 ///
 /// Four exclusive states based on schedule change / cancellation events:
@@ -75,7 +110,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final scheduleEvent = _latestScheduleDecisionEvent();
+    final scheduleEvent = latestSubscriptionScheduleDecisionEvent(events);
     final cancellationEvent = _latestCancellationEvent();
     final isWaiting = scheduleEvent != null && _isMyEvent(scheduleEvent);
     final canRespond =
@@ -121,18 +156,47 @@ class SubscriptionBottomInputBar extends StatelessWidget {
               onAcknowledge: onCancellationAcknowledge,
             ),
           ] else if (isWaiting) ...[
-            _WaitingDecisionBar(
-              event: scheduleEvent,
-              opponentName: opponentName,
-              onWithdraw: onWithdrawScheduleDecision,
+            ScheduleChangeWaitingBar(
+              opponentName: opponentName ?? AppStrings.opponent,
+              onWithdraw:
+                  onWithdrawScheduleDecision == null
+                      ? null
+                      : () => onWithdrawScheduleDecision!(scheduleEvent),
             ),
           ] else if (canRespond) ...[
-            _ScheduleChoiceBar(
-              event: scheduleEvent,
+            ScheduleChangeResponseBar(
+              choices:
+                  scheduleEvent.suggestedSlots
+                      .take(3)
+                      .toList()
+                      .asMap()
+                      .entries
+                      .map(
+                        (entry) => ScheduleSlotChoice(
+                          priority: entry.key + 1,
+                          label: entry.value.displayLabel,
+                        ),
+                      )
+                      .toList(),
               messageController: messageController,
-              onAccept: onAcceptScheduleChoice,
-              onReject: onRejectScheduleChoice,
-              onCompare: onCompareSchedule,
+              messageHint: AppStrings.subscriptionMessageHint,
+              messageMinLines: 1,
+              messageMaxLines: 3,
+              onAccept:
+                  (slotIndex, message) => onAcceptScheduleChoice?.call(
+                    scheduleEvent,
+                    slotIndex,
+                    message,
+                  ),
+              onReject:
+                  onRejectScheduleChoice == null
+                      ? null
+                      : (message) =>
+                          onRejectScheduleChoice!(scheduleEvent, message),
+              onCounterPropose:
+                  onCompareSchedule == null
+                      ? null
+                      : () => onCompareSchedule!(scheduleEvent),
             ),
           ] else ...[
             // Default: schedule change button only (no free-form messaging)
@@ -214,35 +278,6 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     );
   }
 
-  /// Returns the latest unresolved schedule decision event.
-  ///
-  /// The list is scanned newest-first: a terminal event resets the bar to
-  /// Default, while the first source event found drives the bar state.
-  /// Note: [RequestEventType.scheduleChangeAccepted] stays a SOURCE — the
-  /// acceptor keeps seeing Waiting + "결정 변경" (withdraw) until the thread
-  /// moves on (spec §3.3 결정 변경 흐름).
-  RequestEvent? _latestScheduleDecisionEvent() {
-    // Terminal events: once one appears after a proposal/counter, the thread
-    // is resolved and the bar reverts to Default. Shares the SSOT terminal set
-    // with the pending-badge provider so reject/expire agree across both (#543).
-    const terminalTypes = scheduleChangeNegotiationTerminalTypes;
-    const sourceTypes = {
-      RequestEventType.scheduleChanged,
-      RequestEventType.scheduleChangeProposed,
-      RequestEventType.scheduleChangeCountered,
-      RequestEventType.scheduleChangeAccepted,
-    };
-
-    final sorted =
-        events.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-    for (final event in sorted) {
-      if (terminalTypes.contains(event.eventType)) return null;
-      if (sourceTypes.contains(event.eventType)) return event;
-    }
-    return null;
-  }
-
   /// Latest cancellation-related event for the current session.
   RequestEvent? _latestCancellationEvent() {
     final candidates =
@@ -269,211 +304,6 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     final actorRole =
         event.actorType == ProposerRole.teacher ? 'teacher' : 'student';
     return actorRole == viewerRole;
-  }
-}
-
-class _WaitingDecisionBar extends StatelessWidget {
-  const _WaitingDecisionBar({
-    required this.event,
-    required this.opponentName,
-    required this.onWithdraw,
-  });
-
-  final RequestEvent event;
-  final String? opponentName;
-  final ScheduleEventAction? onWithdraw;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          AppStrings.waitingForResponse(opponentName ?? AppStrings.opponent),
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.inkSecondary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        SizedBox(
-          height: AppSpacing.buttonHeightSmall,
-          child: OutlinedButton(
-            onPressed: onWithdraw == null ? null : () => onWithdraw!(event),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.inkQuaternary),
-              shape: RoundedRectangleBorder(),
-            ),
-            child: Text(
-              AppStrings.withdrawApproval,
-              style: AppTypography.buttonSmall.copyWith(color: AppColors.ink),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ScheduleChoiceBar extends StatefulWidget {
-  const _ScheduleChoiceBar({
-    required this.event,
-    this.messageController,
-    required this.onAccept,
-    required this.onReject,
-    required this.onCompare,
-  });
-
-  final RequestEvent event;
-  final TextEditingController? messageController;
-  final AcceptScheduleChoice? onAccept;
-  final RejectScheduleChoice? onReject;
-  final ScheduleEventAction? onCompare;
-
-  @override
-  State<_ScheduleChoiceBar> createState() => _ScheduleChoiceBarState();
-}
-
-class _ScheduleChoiceBarState extends State<_ScheduleChoiceBar> {
-  int? _selectedSlotIndex;
-  late final TextEditingController _ownController;
-
-  TextEditingController get _messageController =>
-      widget.messageController ?? _ownController;
-
-  @override
-  void initState() {
-    super.initState();
-    _ownController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _ownController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final slots = widget.event.suggestedSlots.take(3).toList();
-    final choices =
-        slots
-            .asMap()
-            .entries
-            .map(
-              (entry) => ScheduleSlotChoice(
-                priority: entry.key + 1,
-                label: entry.value.displayLabel,
-              ),
-            )
-            .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ScheduleSlotChoiceList(
-          choices: choices,
-          selectedIndex: _selectedSlotIndex,
-          onSelected: (index) => setState(() => _selectedSlotIndex = index),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        TextField(
-          controller: _messageController,
-          minLines: 1,
-          maxLines: 3,
-          maxLength: 200,
-          style: AppTypography.bodySmall,
-          decoration: InputDecoration(
-            hintText: AppStrings.subscriptionMessageHint,
-            counterText: '',
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        // N8 (0702 감사) — request_detail 응답 3종(수락/거절/역제안)과 대칭.
-        Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: AppSpacing.buttonHeightSmall,
-                child: OutlinedButton(
-                  onPressed:
-                      widget.onReject == null
-                          ? null
-                          : () => widget.onReject!(
-                            widget.event,
-                            _messageController.text,
-                          ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.paperAccent),
-                    shape: RoundedRectangleBorder(),
-                  ),
-                  child: Text(
-                    AppStrings.scheduleChangeReject,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.paperAccent,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              flex: 2,
-              child: SizedBox(
-                height: AppSpacing.buttonHeightSmall,
-                child: OutlinedButton(
-                  onPressed:
-                      widget.onCompare == null
-                          ? null
-                          : () => widget.onCompare!(widget.event),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.inkQuaternary),
-                    shape: RoundedRectangleBorder(),
-                  ),
-                  child: Text(
-                    AppStrings.scheduleChangeCounter,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.ink,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        SizedBox(
-          width: double.infinity,
-          height: AppSpacing.buttonHeightSmall,
-          child: ElevatedButton(
-            onPressed:
-                _selectedSlotIndex == null || widget.onAccept == null
-                    ? null
-                    : () => widget.onAccept!(
-                      widget.event,
-                      _selectedSlotIndex!,
-                      _messageController.text,
-                    ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.paperAccent,
-              shape: RoundedRectangleBorder(),
-            ),
-            child: Text(
-              AppStrings.scheduleChangeAccept,
-              style: AppTypography.buttonSmall.copyWith(color: AppColors.paper),
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }
 
