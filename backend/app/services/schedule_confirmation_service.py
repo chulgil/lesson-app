@@ -508,7 +508,30 @@ class ScheduleConfirmationService:
                 count = sub.total_lessons
 
         base_date = data.scheduled_date if isinstance(data.scheduled_date, dt.date) else dt.date.today()
-        lesson_source = LessonSource.subscription_generated if data.subscription_id else LessonSource.manual
+
+        # subscription_required_spec §1/§2 — "lesson.subscriptionId != null, no
+        # exceptions". register_regular_lesson_screen never sends subscription_id,
+        # so without this resolve step the whole recurring batch was created with
+        # subscription_id=NULL (shadow lessons that never deduct on completion or
+        # restore on cancel). Resolve ONCE for the batch — not once per lesson —
+        # so a single subscription (the active one if present, otherwise one
+        # auto-created trial sized for the batch) backs all `count` lessons.
+        resolved_subscription_id = data.subscription_id
+        if not resolved_subscription_id:
+            from app.services.lesson_service import LessonService
+
+            resolved_subscription_id = await LessonService(self.db)._find_or_create_subscription(
+                teacher_id=teacher_profile_id,
+                student_id=student_id,
+                lesson_date=base_date,
+                lesson_count=count,
+            )
+
+        # A subscription (explicit or auto-resolved) now backs every batch, so
+        # the #426 cascade-cancel-on-deposit-undo path (LessonSource.
+        # subscription_generated) applies uniformly instead of only when the FE
+        # happened to send subscription_id.
+        lesson_source = LessonSource.subscription_generated
 
         created = await self._generate_recurring_lessons(
             teacher_profile_id=teacher_profile_id,
@@ -518,7 +541,7 @@ class ScheduleConfirmationService:
             count=count,
             instrument=data.instrument,
             lesson_type=data.lesson_type or "regular",
-            subscription_id=data.subscription_id,
+            subscription_id=resolved_subscription_id,
             base_date=base_date,
             lesson_source=lesson_source,
         )
