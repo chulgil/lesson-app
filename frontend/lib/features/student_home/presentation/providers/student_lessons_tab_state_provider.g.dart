@@ -26,9 +26,10 @@ final studentSelectedDateProvider =
 
 typedef _$StudentSelectedDate = Notifier<DateTime>;
 String _$studentLessonSortTypeHash() =>
-    r'5030b7fe8de7fb2fc34c65ca81298c092d73d8ef';
+    r'920f611c9afdf43d35e323a4e5e31aa1d904fb6e';
 
-/// State provider for student lesson sort type
+/// State provider for student lesson sort type. Persists the last selection
+/// per student so it survives app restarts.
 ///
 /// Copied from [StudentLessonSortType].
 @ProviderFor(StudentLessonSortType)

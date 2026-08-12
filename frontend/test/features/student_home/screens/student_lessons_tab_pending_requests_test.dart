@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
@@ -15,6 +18,12 @@ import 'package:lessonaza/features/students/students_facade.dart';
 /// 프로필 탭 뒤에 숨어 있던 문제(진입 경로 감사)를 고쳐, 레슨 탭 상단에
 /// "진행 중인 신청" 섹션을 노출한다.
 void main() {
+  setUpAll(() {
+    // StudentLessonSortType 가 build() 에서 Hive.openBox('settings') 를
+    // fire-and-forget 으로 호출하므로 init 없이는 HiveError 가 발생한다.
+    Hive.init(Directory.systemTemp.createTempSync().path);
+  });
+
   const studentId = 'student-1';
 
   final fakeStudent = Student(

@@ -7,7 +7,7 @@ part of 'schedule_view_mode_provider.dart';
 // **************************************************************************
 
 String _$scheduleViewModeNotifierHash() =>
-    r'e37aadd3912227b30617d529389fbbfc27692701';
+    r'cd03087edfa7be980db20d4f2b28be848356ca13';
 
 /// See also [ScheduleViewModeNotifier].
 @ProviderFor(ScheduleViewModeNotifier)

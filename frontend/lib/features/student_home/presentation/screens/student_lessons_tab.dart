@@ -58,15 +58,14 @@ class StudentLessonsTab extends ConsumerWidget {
     final markedDates = schedule?.markerDates ?? <DateTime>{};
 
     // Filter lessons for selected date
-    final dayLessons =
-        studentLessons
-            .where(
-              (l) =>
-                  l.date.year == selectedDate.year &&
-                  l.date.month == selectedDate.month &&
-                  l.date.day == selectedDate.day,
-            )
-            .toList();
+    final dayLessons = studentLessons
+        .where(
+          (l) =>
+              l.date.year == selectedDate.year &&
+              l.date.month == selectedDate.month &&
+              l.date.day == selectedDate.day,
+        )
+        .toList();
 
     // Sort lessons
     switch (sortType) {
@@ -79,15 +78,14 @@ class StudentLessonsTab extends ConsumerWidget {
     }
 
     // Filter trial bookings for selected date
-    final dayTrialBookings =
-        trialBookings
-            .where(
-              (b) =>
-                  b.lessonDate.year == selectedDate.year &&
-                  b.lessonDate.month == selectedDate.month &&
-                  b.lessonDate.day == selectedDate.day,
-            )
-            .toList();
+    final dayTrialBookings = trialBookings
+        .where(
+          (b) =>
+              b.lessonDate.year == selectedDate.year &&
+              b.lessonDate.month == selectedDate.month &&
+              b.lessonDate.day == selectedDate.day,
+        )
+        .toList();
 
     final isLoading = scheduleAsync.isLoading;
     final totalCount = dayLessons.length + dayTrialBookings.length;
@@ -182,9 +180,8 @@ class StudentLessonsTab extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
       data: (requests) {
-        final pending =
-            requests.where((r) => r.status.isActive).toList()
-              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final pending = requests.where((r) => r.status.isActive).toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
         if (pending.isEmpty) return const SizedBox.shrink();
 
         final displayRequests = pending.take(3).toList();
@@ -203,10 +200,9 @@ class StudentLessonsTab extends ConsumerWidget {
                 label:
                     '${AppStrings.studentHomePendingRequestsTitle} · ${pending.length}',
                 trailing: TextButton(
-                  onPressed:
-                      () => context.push(
-                        '${AppRoutes.myLessonRequests}?studentId=$currentStudentId',
-                      ),
+                  onPressed: () => context.push(
+                    '${AppRoutes.myLessonRequests}?studentId=$currentStudentId',
+                  ),
                   child: Text(
                     AppStrings.studentViewAll,
                     style: AppTypography.bodySmall.copyWith(
@@ -241,14 +237,13 @@ class StudentLessonsTab extends ConsumerWidget {
                             displayRequests[i].academyName ??
                             academyNames[displayRequests[i].academyId],
                         viewerRole: 'student',
-                        onTap:
-                            () => context.push(
-                              AppRoutes.requestDetail.replaceFirst(
-                                ':id',
-                                displayRequests[i].id,
-                              ),
-                              extra: {'viewerRole': 'student'},
-                            ),
+                        onTap: () => context.push(
+                          AppRoutes.requestDetail.replaceFirst(
+                            ':id',
+                            displayRequests[i].id,
+                          ),
+                          extra: {'viewerRole': 'student'},
+                        ),
                       ),
                     ],
                   ],
@@ -313,31 +308,25 @@ class StudentLessonsTab extends ConsumerWidget {
   Widget _buildSortDropdown(WidgetRef ref, LessonSortType sortType) {
     return PopupMenuButton<LessonSortType>(
       onSelected: (value) {
-        ref.read(studentLessonSortTypeProvider.notifier).state = value;
+        ref.read(studentLessonSortTypeProvider.notifier).setSortType(value);
       },
-      itemBuilder:
-          (context) =>
-              LessonSortType.values
-                  .map(
-                    (type) => PopupMenuItem(
-                      value: type,
-                      child: Row(
-                        children: [
-                          if (type == sortType)
-                            Icon(
-                              Icons.check,
-                              size: 16,
-                              color: AppColors.paperAccent,
-                            )
-                          else
-                            const SizedBox(width: AppSpacing.space4),
-                          const SizedBox(width: AppSpacing.space2),
-                          Text(type.displayName),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
+      itemBuilder: (context) => LessonSortType.values
+          .map(
+            (type) => PopupMenuItem(
+              value: type,
+              child: Row(
+                children: [
+                  if (type == sortType)
+                    Icon(Icons.check, size: 16, color: AppColors.paperAccent)
+                  else
+                    const SizedBox(width: AppSpacing.space4),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(type.displayName),
+                ],
+              ),
+            ),
+          )
+          .toList(),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
