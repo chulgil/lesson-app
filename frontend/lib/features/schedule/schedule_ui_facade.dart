@@ -14,6 +14,8 @@ export 'presentation/widgets/schedule_change_slot_bottom_sheet.dart'
         ScheduleChangeSlotParams,
         ScheduleChangeSlotResult,
         showScheduleChangeSlotBottomSheet;
+export 'presentation/widgets/suggest_alternative_bottom_sheet.dart'
+    show showSuggestAlternativeBottomSheet;
 export 'presentation/extensions/cancel_reason_visuals.dart'
     show CancelReasonVisuals;
 export 'presentation/widgets/cancel_lesson_bottom_sheet.dart'

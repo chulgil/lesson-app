@@ -10,9 +10,7 @@ import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
@@ -23,16 +21,14 @@ import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
 import '../widgets/alternative_time_grid.dart';
+import '../widgets/reject_message_bottom_sheet.dart';
 
 /// Result type for this screen.
 /// - slots not empty + acceptedSlotIndex == null → propose alternatives
 /// - slots empty + acceptedSlotIndex == null → reject
 /// - acceptedSlotIndex != null → accept student's preferred slot directly
-typedef SuggestAlternativeResult = ({
-  String message,
-  List<TimeSlot> slots,
-  int? acceptedSlotIndex,
-});
+typedef SuggestAlternativeResult =
+    ({String message, List<TimeSlot> slots, int? acceptedSlotIndex});
 
 /// Screen for suggesting alternative time slots via a weekly schedule grid.
 ///
@@ -163,11 +159,7 @@ class _SuggestAlternativeScreenState
     if (label == null) return const [];
     return [
       const SizedBox(width: AppSpacing.space1),
-      Icon(
-        Icons.warning_amber_rounded,
-        size: 16,
-        color: AppColors.paperAccent,
-      ),
+      Icon(Icons.warning_amber_rounded, size: 16, color: AppColors.paperAccent),
       const SizedBox(width: 2),
       Text(
         label,
@@ -206,9 +198,8 @@ class _SuggestAlternativeScreenState
   /// hours) for #526 window conflict checks. Read non-blocking — when the
   /// provider is still loading or errored we get null and the check is
   /// skipped rather than blocking the UI.
-  TeacherAvailability? _teacherAvailability() => ref
-      .watch(teacherAvailabilityProvider(_effectiveTeacherId))
-      .valueOrNull;
+  TeacherAvailability? _teacherAvailability() =>
+      ref.watch(teacherAvailabilityProvider(_effectiveTeacherId)).valueOrNull;
 
   @override
   Widget build(BuildContext context) {
@@ -239,21 +230,22 @@ class _SuggestAlternativeScreenState
           // Grid
           Expanded(
             child: weekLessonsAsync.when(
-              data: (lessons) => AlternativeTimeGrid(
-                weekStart: _weekStart,
-                lessons: lessons,
-                suggestedSlots: _suggestedSlots,
-                hideStudentNames: widget.isStudentView,
-                highlightedSlot: _selectedHighlight,
-                onEmptyCellTap: (cell) {
-                  if (!_isAcceptMode) {
-                    _addSlotFromGrid(cell.date, cell.hour, cell.minute);
-                  }
-                },
-              ),
+              data:
+                  (lessons) => AlternativeTimeGrid(
+                    weekStart: _weekStart,
+                    lessons: lessons,
+                    suggestedSlots: _suggestedSlots,
+                    hideStudentNames: widget.isStudentView,
+                    highlightedSlot: _selectedHighlight,
+                    onEmptyCellTap: (cell) {
+                      if (!_isAcceptMode) {
+                        _addSlotFromGrid(cell.date, cell.hour, cell.minute);
+                      }
+                    },
+                  ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) =>
-                  Center(child: Text('${AppStrings.loadFailed}: $e')),
+              error:
+                  (e, _) => Center(child: Text('${AppStrings.loadFailed}: $e')),
             ),
           ),
 
@@ -311,10 +303,10 @@ class _SuggestAlternativeScreenState
             final slot = entry.value;
             final isSelected = _selectedPreferredIndex == slot.priority;
             final conflict = _checkSlotConflict(
-      slot,
-      currentWeekLessons,
-      availability,
-    );
+              slot,
+              currentWeekLessons,
+              availability,
+            );
 
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space2),
@@ -344,13 +336,15 @@ class _SuggestAlternativeScreenState
                     vertical: AppSpacing.space2,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.paperOk.withValues(alpha: 0.08)
-                        : AppColors.paper,
+                    color:
+                        isSelected
+                            ? AppColors.paperOk.withValues(alpha: 0.08)
+                            : AppColors.paper,
                     border: Border.all(
-                      color: isSelected
-                          ? AppColors.paperOk
-                          : AppColors.inkQuaternary,
+                      color:
+                          isSelected
+                              ? AppColors.paperOk
+                              : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -360,24 +354,26 @@ class _SuggestAlternativeScreenState
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.paperOk
-                              : AppColors.ink.withValues(alpha: 0.12),
+                          color:
+                              isSelected
+                                  ? AppColors.paperOk
+                                  : AppColors.ink.withValues(alpha: 0.12),
                         ),
                         child: Center(
-                          child: isSelected
-                              ? const Icon(
-                                  Icons.check,
-                                  size: 14,
-                                  color: AppColors.paper,
-                                )
-                              : Text(
-                                  '${index + 1}',
-                                  style: AppTypography.caption.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.ink,
+                          child:
+                              isSelected
+                                  ? const Icon(
+                                    Icons.check,
+                                    size: 14,
+                                    color: AppColors.paper,
+                                  )
+                                  : Text(
+                                    '${index + 1}',
+                                    style: AppTypography.caption.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.ink,
+                                    ),
                                   ),
-                                ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -385,12 +381,12 @@ class _SuggestAlternativeScreenState
                         child: Text(
                           slot.displayLabel,
                           style: AppTypography.bodySmall.copyWith(
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                            color: isSelected
-                                ? AppColors.paperOk
-                                : AppColors.ink,
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                            color:
+                                isSelected ? AppColors.paperOk : AppColors.ink,
                           ),
                         ),
                       ),
@@ -434,9 +430,10 @@ class _SuggestAlternativeScreenState
               maxLength: 200,
               style: AppTypography.bodySmall,
               decoration: InputDecoration(
-                hintText: _isAcceptMode
-                    ? AppStrings.acceptMessageHint
-                    : AppStrings.messageHint,
+                hintText:
+                    _isAcceptMode
+                        ? AppStrings.acceptMessageHint
+                        : AppStrings.messageHint,
                 hintStyle: AppTypography.bodySmall.copyWith(
                   color: AppColors.inkTertiary,
                 ),
@@ -464,17 +461,17 @@ class _SuggestAlternativeScreenState
             // Action buttons
             _isAcceptMode
                 ? _buildAcceptButton(
-                    ref
-                            .watch(
-                              weekLessonsWithPreviewProvider((
-                                weekStart: _weekStart,
-                                teacherId: _effectiveTeacherId,
-                              )),
-                            )
-                            .valueOrNull ??
-                        [],
-                    _teacherAvailability(),
-                  )
+                  ref
+                          .watch(
+                            weekLessonsWithPreviewProvider((
+                              weekStart: _weekStart,
+                              teacherId: _effectiveTeacherId,
+                            )),
+                          )
+                          .valueOrNull ??
+                      [],
+                  _teacherAvailability(),
+                )
                 : _buildProposeButtons(),
           ],
         ),
@@ -584,13 +581,7 @@ class _SuggestAlternativeScreenState
 
   /// Show reject bottom sheet with message input.
   Future<void> _showRejectBottomSheet() async {
-    final result = await showNotebookBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      padding: EdgeInsets.zero,
-      showHandle: false,
-      builder: (context) => const _RejectBottomSheet(),
-    );
+    final result = await showRejectMessageBottomSheet(context);
 
     if (result != null && mounted) {
       Navigator.pop<SuggestAlternativeResult>(context, (
@@ -615,9 +606,10 @@ class _SuggestAlternativeScreenState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            onPressed: () => setState(() {
-              _weekStart = _weekStart.subtract(const Duration(days: 7));
-            }),
+            onPressed:
+                () => setState(() {
+                  _weekStart = _weekStart.subtract(const Duration(days: 7));
+                }),
             icon: const Icon(Icons.chevron_left),
             iconSize: 20,
           ),
@@ -628,9 +620,10 @@ class _SuggestAlternativeScreenState
             ),
           ),
           IconButton(
-            onPressed: () => setState(() {
-              _weekStart = _weekStart.add(const Duration(days: 7));
-            }),
+            onPressed:
+                () => setState(() {
+                  _weekStart = _weekStart.add(const Duration(days: 7));
+                }),
             icon: const Icon(Icons.chevron_right),
             iconSize: 20,
           ),
@@ -649,9 +642,8 @@ class _SuggestAlternativeScreenState
   ) {
     // ref.read (not _teacherAvailability()'s watch) — called from event
     // handlers (_addSlotFromGrid/_editSlot), not during build.
-    final availability = ref
-        .read(teacherAvailabilityProvider(_effectiveTeacherId))
-        .valueOrNull;
+    final availability =
+        ref.read(teacherAvailabilityProvider(_effectiveTeacherId)).valueOrNull;
     final window = ScheduleWindowConflictService.check(
       availability: availability,
       date: date,
@@ -703,7 +695,11 @@ class _SuggestAlternativeScreenState
 
     // #526 — block proposing a slot inside the teacher's vacation or outside
     // their operating hours.
-    final windowMessage = _windowConflictMessage(date, startMinutes, endMinutes);
+    final windowMessage = _windowConflictMessage(
+      date,
+      startMinutes,
+      endMinutes,
+    );
     if (windowMessage != null) {
       showErrorSnackBar(context, windowMessage);
       return;
@@ -716,10 +712,11 @@ class _SuggestAlternativeScreenState
           id: 'suggest_${DateTime.now().millisecondsSinceEpoch}',
           dayOfWeek: date.weekday,
           startTime: TimeOfDay(hour: hour, minute: minute).toClockTime(),
-          endTime: TimeOfDay(
-            hour: endMinutes ~/ 60,
-            minute: endMinutes % 60,
-          ).toClockTime(),
+          endTime:
+              TimeOfDay(
+                hour: endMinutes ~/ 60,
+                minute: endMinutes % 60,
+              ).toClockTime(),
           isActive: true,
           specificDate: date,
         ),
@@ -782,12 +779,13 @@ class _SuggestAlternativeScreenState
                       visualDensity: VisualDensity.compact,
                     ),
                     IconButton(
-                      onPressed: () => setState(() {
-                        _suggestedSlots = [
-                          ..._suggestedSlots.sublist(0, index),
-                          ..._suggestedSlots.sublist(index + 1),
-                        ];
-                      }),
+                      onPressed:
+                          () => setState(() {
+                            _suggestedSlots = [
+                              ..._suggestedSlots.sublist(0, index),
+                              ..._suggestedSlots.sublist(index + 1),
+                            ];
+                          }),
                       icon: const Icon(Icons.close, size: 18),
                       color: AppColors.paperAccent,
                       visualDensity: VisualDensity.compact,
@@ -874,10 +872,11 @@ class _SuggestAlternativeScreenState
           id: slot.id,
           dayOfWeek: newDate.weekday,
           startTime: newStartTime.toClockTime(),
-          endTime: TimeOfDay(
-            hour: endMinutes ~/ 60,
-            minute: endMinutes % 60,
-          ).toClockTime(),
+          endTime:
+              TimeOfDay(
+                hour: endMinutes ~/ 60,
+                minute: endMinutes % 60,
+              ).toClockTime(),
           isActive: true,
           specificDate: newDate,
         ),
@@ -907,116 +906,5 @@ class _SuggestAlternativeScreenState
       slots: _suggestedSlots,
       acceptedSlotIndex: null,
     ));
-  }
-}
-
-/// Bottom sheet for rejecting a lesson request with a message.
-class _RejectBottomSheet extends StatefulWidget {
-  const _RejectBottomSheet();
-
-  @override
-  State<_RejectBottomSheet> createState() => _RejectBottomSheetState();
-}
-
-class _RejectBottomSheetState extends State<_RejectBottomSheet> {
-  late TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: AppStrings.declineDefaultMessage);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(color: AppColors.paper),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.screenPadding,
-        AppSpacing.space3,
-        AppSpacing.screenPadding,
-        MediaQuery.of(context).viewInsets.bottom +
-            MediaQuery.of(context).padding.bottom +
-            AppSpacing.space4,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Drag handle
-          const Center(
-            child: BottomSheetHandle(width: 36, margin: EdgeInsets.zero),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          // Title
-          // Notebook × Score: BottomSheetHandle 선행 커스텀 바텀시트 헤더는
-          // Playfair appBarTitle 로 통일 (§7.27, 18/w700).
-          Text(
-            AppStrings.rejectBottomSheetTitle,
-            style: NotebookTypography.appBarTitle,
-          ),
-          const SizedBox(height: AppSpacing.space2),
-
-          // Guide text
-          Text(
-            AppStrings.rejectBottomSheetGuide,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          // Message input
-          TextField(
-            controller: _controller,
-            maxLines: 3,
-            maxLength: 200,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: AppStrings.messageHint,
-              counterText: '',
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space3,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          // Send button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                final message = _controller.text.trim();
-                if (message.isNotEmpty) {
-                  Navigator.pop(context, message);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(
-                  AppSpacing.buttonHeightSmall,
-                ),
-                backgroundColor: AppColors.paperAccent,
-                shape: RoundedRectangleBorder(),
-              ),
-              child: Text(
-                AppStrings.rejectSendAndClose,
-                style: AppTypography.buttonSmall.copyWith(
-                  color: AppColors.paper,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
