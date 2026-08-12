@@ -19,8 +19,7 @@ void main() {
       routes: [
         GoRoute(
           path: AppRoutes.login,
-          builder: (context, state) =>
-              const Scaffold(body: Text('login page')),
+          builder: (context, state) => const Scaffold(body: Text('login page')),
         ),
         GoRoute(
           path: AppRoutes.studentInviteCode,
@@ -28,8 +27,9 @@ void main() {
         ),
         GoRoute(
           path: AppRoutes.studentProfileSetup,
-          builder: (context, state) =>
-              const Scaffold(body: Text('profile setup page')),
+          builder:
+              (context, state) =>
+                  const Scaffold(body: Text('profile setup page')),
         ),
       ],
     );
@@ -49,6 +49,10 @@ void main() {
     await tester.pumpWidget(harness());
     await tester.pumpAndSettle();
 
+    // 6칸 초대코드 입력(+붙여넣기+확인 버튼) 통합 후 스킵 버튼이 기본 테스트
+    // 뷰포트 아래로 내려가므로 스크롤 후 탭.
+    await tester.ensureVisible(find.text('코드 없이 시작하기'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('코드 없이 시작하기'));
     await tester.pumpAndSettle();
 
@@ -66,6 +70,10 @@ void main() {
     await tester.pumpWidget(harness());
     await tester.pumpAndSettle();
 
+    // 6칸 초대코드 입력(+붙여넣기+확인 버튼) 통합 후 스킵 버튼이 기본 테스트
+    // 뷰포트 아래로 내려가므로 스크롤 후 탭.
+    await tester.ensureVisible(find.text('코드 없이 시작하기'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('코드 없이 시작하기'));
     await tester.pumpAndSettle();
 
@@ -78,12 +86,14 @@ void main() {
     expect(find.text(AppStrings.authAgeGateBlocked), findsOneWidget);
   });
 
-  testWidgets('confirming 만 14세 이상 proceeds to profile setup', (
-    tester,
-  ) async {
+  testWidgets('confirming 만 14세 이상 proceeds to profile setup', (tester) async {
     await tester.pumpWidget(harness());
     await tester.pumpAndSettle();
 
+    // 6칸 초대코드 입력(+붙여넣기+확인 버튼) 통합 후 스킵 버튼이 기본 테스트
+    // 뷰포트 아래로 내려가므로 스크롤 후 탭.
+    await tester.ensureVisible(find.text('코드 없이 시작하기'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('코드 없이 시작하기'));
     await tester.pumpAndSettle();
 

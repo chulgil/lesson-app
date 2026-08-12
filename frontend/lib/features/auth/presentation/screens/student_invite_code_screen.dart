@@ -4,15 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/network/api_client.dart';
-import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/auth_facade.dart';
-import '../../../../features/profile/profile_facade.dart';
+import '../../../../features/profile/domain/entities/invite.dart';
+import '../../../invite/invite_facade.dart';
 
 /// Student invite code input screen
 /// Students enter an invite code from the teacher to connect with their teacher
@@ -26,17 +25,7 @@ class StudentInviteCodeScreen extends ConsumerStatefulWidget {
 
 class _StudentInviteCodeScreenState
     extends ConsumerState<StudentInviteCodeScreen> {
-  final _codeController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
   bool _isSkipping = false; // #104: skip 경로 전용 가드 (제출 스피너와 분리)
-  String? _errorMessage;
-
-  @override
-  void dispose() {
-    _codeController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,96 +93,12 @@ class _StudentInviteCodeScreenState
 
                       const SizedBox(height: AppSpacing.space6),
 
-                      // Invite code input
-                      Form(
-                        key: _formKey,
-                        child: TextFormField(
-                          controller: _codeController,
-                          textAlign: TextAlign.center,
-                          style: AppTypography.headingMedium.copyWith(
-                            letterSpacing: 4,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: AppStrings.authInviteCodeHint,
-                            hintStyle: AppTypography.bodyLarge.copyWith(
-                              color: AppColors.inkTertiary,
-                            ),
-                            filled: true,
-                            fillColor: AppColors.paperDark,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.paperAccent,
-                                width: 2,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.paperAccent,
-                                width: 2,
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.space4,
-                              vertical: AppSpacing.space4,
-                            ),
-                          ),
-                          textCapitalization: TextCapitalization.characters,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return AppStrings.inviteCodeValidationEmpty;
-                            }
-                            return null;
-                          },
-                          onChanged: (_) {
-                            if (_errorMessage != null) {
-                              setState(() => _errorMessage = null);
-                            }
-                          },
-                        ),
-                      ),
-
-                      // Error message
-                      if (_errorMessage != null) ...[
-                        const SizedBox(height: AppSpacing.space2),
-                        Text(
-                          _errorMessage!,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.paperAccent,
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: AppSpacing.space4),
-
-                      // Submit button
-                      SizedBox(
-                        width: double.infinity,
-                        height: AppSpacing.buttonHeight,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleSubmitCode,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.paperAccent,
-                            // Notebook × Score §7.50: Vermillion CTA foreground = paper.
-                            foregroundColor: AppColors.paper,
-                            shape: RoundedRectangleBorder(),
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    // Notebook × Score §7.50: Vermillion CTA spinner = paper.
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppColors.paper,
-                                    ),
-                                  ),
-                                )
-                              : Text(AppStrings.inviteCodeSubmitButton, style: AppTypography.button),
-                        ),
+                      // 6-box invite code input — shared with the
+                      // post-onboarding invite flow (CodeInputScreen) so both
+                      // entry points look up the same way and confirm via the
+                      // same teacher-info step before creating a connection.
+                      InviteCodeDigitInput(
+                        onInviteResolved: _handleInviteResolved,
                       ),
 
                       const SizedBox(height: AppSpacing.space6),
@@ -231,9 +136,8 @@ class _StudentInviteCodeScreenState
                         width: double.infinity,
                         height: AppSpacing.buttonHeight,
                         child: OutlinedButton(
-                          onPressed: _isSkipping
-                              ? null
-                              : _handleStartWithoutCode,
+                          onPressed:
+                              _isSkipping ? null : _handleStartWithoutCode,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.inkSecondary,
                             side: BorderSide(color: AppColors.inkQuaternary),
@@ -303,62 +207,23 @@ class _StudentInviteCodeScreenState
     );
   }
 
-  Future<void> _handleSubmitCode() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final code = _codeController.text.trim().toUpperCase();
-
-      if (ref.read(mockDataModeProvider)) {
-        // Mock: accept any 6+ character code
-        await Future.delayed(const Duration(seconds: 1));
-        if (code.length < 6) {
-          setState(() => _errorMessage = AppStrings.inviteCodeInvalid);
-          return;
-        }
-      } else {
-        // Remote: send connection request via invite code
-        final apiClient = ref.read(apiClientProvider);
-        try {
-          await apiClient.post(
-            '/invites/connection-requests',
-            data: {
-              'target_id': '', // Will be resolved by invite_code on server
-              'method': 'inviteCode',
-              'invite_code': code,
-            },
-          );
-        } catch (e) {
-          setState(() => _errorMessage = AppStrings.inviteCodeInvalid);
-          return;
-        }
-      }
-
-      // #608 — remote 는 auth state 파생이 SSOT(user_role_provider.build).
-      // 이 수동 set 은 mock 모드(디버그 역할 전환) 전용 메커니즘으로만 유효.
-      ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
-      ref.invalidate(mySentRequestsProvider);
-      ref.invalidate(myConnectionsProvider);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(AppStrings.authTeacherConnectionRequested),
-            backgroundColor: AppColors.paperOk,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        context.go(AppRoutes.studentProfileSetup);
-      }
-    } catch (e) {
-      setState(() => _errorMessage = AppStrings.inviteCodeCheckError);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+  /// A valid invite code was resolved — establish the student role (mock
+  /// mode SSOT parity, see #608 above) before showing the teacher-info
+  /// confirm step, then push the shared [InviteConfirmScreen] directly so
+  /// the actual connection request is only created on explicit confirm.
+  void _handleInviteResolved(Invite invite) {
+    ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (_) => InviteConfirmScreen(
+              invite: invite,
+              // Onboarding isn't complete yet — routing to `homeRoute` would be
+              // redirected back to role-select by the auth guard. Land on
+              // profile setup instead (preserves the pre-unification behavior).
+              successRedirectRoute: AppRoutes.studentProfileSetup,
+            ),
+      ),
+    );
   }
 }
