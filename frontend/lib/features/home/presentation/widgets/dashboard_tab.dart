@@ -185,8 +185,8 @@ class DashboardTab extends ConsumerWidget {
 
                   const SizedBox(height: AppSpacing.space6),
 
-                  // ── Fine. 통계 링크 ──
-                  _buildAnalyticsLink(context, ref),
+                  // ── Fine. 종지부 ──
+                  _buildFineFooter(),
 
                   const SizedBox(height: AppSpacing.space8),
                 ],
@@ -308,7 +308,8 @@ class DashboardTab extends ConsumerWidget {
             value: AppStrings.usageCountShort(stats['completed'] ?? 0),
             color: AppColors.ink,
             icon: Icons.check_circle_outline,
-            // #749: same Pro paywall guard as the sibling "통계 더보기" link.
+            // #749: sole entry point to analytics — the duplicate "통계 더보기"
+            // footer link was removed (same destination + same Pro paywall guard).
             onTap:
                 () => guardProFeatureNavigation(
                   context: context,
@@ -537,44 +538,16 @@ class DashboardTab extends ConsumerWidget {
   }
 
   /// "Fine." 푸터 — 악보 마지막 종지부 인용.
-  /// Playfair Display italic "Fine." + 통계 더보기 링크.
   ///
-  /// #415 Phase A1 — 통계 리포트는 paywall_spec.md §7 의 Pro 전용 기능. 진입 전
-  /// guardProFeatureNavigation 으로 가드 → free 면 FeatureLockedSheet 노출.
-  Widget _buildAnalyticsLink(BuildContext context, WidgetRef ref) {
+  /// #749 (UI 복잡도 감사) — 통계 진입은 위 "이번 달" StatCard 하나로 통합.
+  /// 여기 있던 "통계 더보기" 링크는 동일 목적지(AppRoutes.analytics) +
+  /// 동일 Pro 가드의 중복 CTA였기 때문에 제거 (UX 규칙: 같은 행동 → 하나의 CTA).
+  Widget _buildFineFooter() {
     return Column(
       children: [
         const ThinRule(),
         const SizedBox(height: AppSpacing.space3),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text('Fine.', style: NotebookTypography.fine),
-            const Spacer(),
-            TextButton.icon(
-              onPressed:
-                  () => guardProFeatureNavigation(
-                    context: context,
-                    ref: ref,
-                    required: TierRequirement.pro,
-                    featureName: AppStrings.featureLockedMonthlyStats,
-                    onPass: () => context.push(AppRoutes.analytics),
-                  ),
-              icon: const Icon(Icons.bar_chart, size: 16, color: AppColors.ink),
-              label: Text(
-                AppStrings.dashboardAnalyticsMoreLink,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.ink,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-              ),
-            ),
-          ],
-        ),
+        Center(child: Text('Fine.', style: NotebookTypography.fine)),
       ],
     );
   }

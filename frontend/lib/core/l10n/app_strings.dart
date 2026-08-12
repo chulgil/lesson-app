@@ -6215,9 +6215,6 @@ class AppStrings {
   /// 레슨 더보기 — 5건 초과 시 노출 ("12개 레슨 더보기").
   static String dashboardMoreLessonsFormat(int count) => '$count개 레슨 더보기';
 
-  /// 통계 더보기 — Fine. 푸터 링크.
-  static const dashboardAnalyticsMoreLink = '통계 더보기';
-
   /// 오늘의 레슨 섹션 제목.
   static const dashboardTodayLessonsSection = '오늘의 레슨';
 
