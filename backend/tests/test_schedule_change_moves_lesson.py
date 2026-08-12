@@ -25,7 +25,7 @@ from app.models.schedule import (
     LessonBooking,
     LessonRequest,
 )
-from app.models.subscription import SubscriptionProposal
+from app.models.subscription import Subscription, SubscriptionProposal
 from app.schemas.request_event import RequestEventCreate, TimeSlotOptionSchema
 from app.services.lesson_request_service import LessonRequestService
 
@@ -72,6 +72,19 @@ async def _seed_request_and_subscription(db_session) -> None:
             teacher_id=TEACHER_USER_ID,
             student_id=STUDENT_PROFILE_ID,
             expires_at=dt.datetime.now(dt.UTC) + dt.timedelta(days=30),
+        )
+    )
+    # A real Subscription row — the bulk branch recalculates scheduled_lessons
+    # (D4), which requires the row to exist. FK enforcement is OFF in this
+    # suite, so membership_id can stay a bridge id without its own parent row.
+    db_session.add(
+        Subscription(
+            id=SUBSCRIPTION_ID,
+            student_id=STUDENT_PROFILE_ID,
+            membership_id="membership-bridge",
+            type="monthly",
+            total_lessons=8,
+            amount=200000,
         )
     )
 
@@ -207,6 +220,63 @@ async def test_bulk_accept_moves_all_future_lessons(db_session):
         expected = monday + dt.timedelta(weeks=i, days=3)
         assert lesson.start_time == "10:00", f"bulk accept must move lesson {i + 1} time"
         assert lesson.date == expected, f"bulk accept must move lesson {i + 1} date to its week's Thursday"
+
+
+@pytest.mark.asyncio
+async def test_bulk_accept_cancels_conflicting_lesson_and_accrues_credit(db_session):
+    """#3 통합 — bulk accept 의 개별 충돌은 더 이상 전체를 막지 않는다. 충돌하는
+    회차만 취소 + MakeupCredit(bulkChangeLoss) 적립, 나머지는 계속 이동한다
+    (subscription_service.bulk_change() 와 동일 정책). scheduled_lessons 도
+    재계산된다(D4)."""
+    from sqlalchemy import select as _select
+
+    from app.models.lesson import LessonStatus
+    from app.models.makeup_credit import MakeupCredit
+    from app.models.subscription import Subscription
+
+    monday = _next_monday(dt.date.today())
+    week0_target = monday + dt.timedelta(days=2)  # Wednesday week0 — stays free.
+    week1_monday = monday + dt.timedelta(weeks=1)
+    week1_target = week1_monday + dt.timedelta(days=2)  # Wednesday week1 — conflicts.
+
+    await _seed_request_and_subscription(db_session)
+    await _seed_lesson(db_session, lesson_id="les-1", date=monday, start_time="14:00", session_number=1)
+    await _seed_lesson(db_session, lesson_id="les-2", date=week1_monday, start_time="14:00", session_number=2)
+    # Another subscription already occupies week1's Wednesday 16:00 — only les-2 collides.
+    db_session.add(
+        LessonBooking(
+            teacher_id=TEACHER_USER_ID,
+            student_id="other-student",
+            lesson_type=BookingLessonType.regular,
+            scheduled_date=week1_target,
+            scheduled_time="16:00",
+            duration=60,
+            subscription_id="sub-other",
+            status=BookingStatus.confirmed,
+        )
+    )
+    await db_session.flush()
+
+    # Bulk change: Wednesday 16:00 (day_of_week 2).
+    await _propose_then_accept(db_session, change_type="bulkChange", new_day_of_week=2, new_time="16:00")
+
+    moved = await db_session.get(Lesson, "les-1")
+    assert moved.date == week0_target, "the non-conflicting lesson still moves"
+    assert moved.start_time == "16:00"
+
+    lost = await db_session.get(Lesson, "les-2")
+    assert lost.status == LessonStatus.cancelled, "only the conflicting lesson is cancelled, not the whole batch"
+
+    credits = (await db_session.scalars(_select(MakeupCredit).where(MakeupCredit.source_lesson_id == "les-2"))).all()
+    assert len(credits) == 1
+    assert credits[0].reason.value == "bulkChangeLoss"
+    assert credits[0].student_id == STUDENT_PROFILE_ID
+    assert credits[0].source_subscription_id == SUBSCRIPTION_ID
+
+    sub = await db_session.get(Subscription, SUBSCRIPTION_ID)
+    # Only les-1's rescheduled (still-confirmed) booking counts; les-2's mirrored
+    # booking is now cancelled.
+    assert sub.scheduled_lessons == 1
 
 
 @pytest.mark.asyncio

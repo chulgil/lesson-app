@@ -742,6 +742,11 @@ class SubscriptionService:
                 )
                 credits_accrued += 1
 
+        # D4 — scheduledLessons 트랙 재계산 (spec §3.2/§7 훅 포인트). reschedule 든
+        # loss(cancel) 든 활성 booking 집합이 바뀔 수 있으므로 targets 가 있었다면 호출.
+        if targets:
+            await MakeupCreditService(self.db).recalculate_scheduled_lessons(subscription_id)
+
         sub_row = await self.db.get(Subscription, subscription_id)
         return {
             "rescheduled_count": rescheduled,

@@ -82,6 +82,7 @@ async def test_bulk_change_moves_all_future_bookings(
 ):
     """spec §7 — 충돌이 없으면 모든 미래 booking 을 새 요일/시간으로 이동."""
     from app.models.schedule import LessonBooking
+    from app.models.subscription import Subscription
 
     await _setup(create_test_user)
     # Pin "today" to before the bookings via date manipulation — bookings 2126.
@@ -107,6 +108,9 @@ async def test_bulk_change_moves_all_future_bookings(
         assert row is not None
         assert row.scheduled_date.weekday() == 2
         assert row.scheduled_time == "15:00"
+    # D4 — scheduled_lessons 재계산: 손실 없이 전건 이동, 3건 유지.
+    sub = await db_session.get(Subscription, sub_id)
+    assert sub.scheduled_lessons == 3
 
 
 @pytest.mark.asyncio
@@ -192,6 +196,9 @@ async def test_bulk_change_accrues_credit_for_conflicting_slot(
     ).all()
     assert len(credits) == 1
     assert credits[0].reason.value == "bulkChangeLoss"
+    # D4 — scheduled_lessons 재계산: 1건만 재이동 후 confirmed 로 유지, 1건은 cancelled.
+    refreshed_sub = await db_session.get(Subscription, sub_id)
+    assert refreshed_sub.scheduled_lessons == 1
 
 
 @pytest.mark.asyncio

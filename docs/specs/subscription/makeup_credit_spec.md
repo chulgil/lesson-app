@@ -129,14 +129,16 @@ class MakeupCreditBalance {
 신규 트랙:
 - `scheduledLessons` = `LessonBooking` 중 활성 상태 카운트 (재계산 가능)
 
-> **배선 현황 (2026-08-04 실측, 2026-08-12 재확인)**: `scheduledLessons` 트랙은
-> 재계산 헬퍼(`recalculate_scheduled_lessons` 등, bulkChange 훅 포인트)만 존재하고
-> 라이브 쓰기·읽기 경로가 없다 (API 응답/FE/가드 소비처 0 — 값은 항상 0). §3.3
-> 불변식 강제도 미구현. 이번 라운드 수정 범위 밖 — §7.3 의 이중 일괄변경 시스템
-> 문제가 먼저 정리돼야 이 트랙의 유일한 훅 포인트(`bulk_change()`)가 실제로 호출될
-> 여지가 생긴다. 소비처(§9 카드 등)가 생기는 시점에 booking 라이프사이클
-> (생성/취소/상태 전이)에 recalc 를 배선한다 — 그 전까지 증분(+=1) 방식 배선 금지
-> (재계산 SSOT 와 어긋나는 드리프트 발생).
+> **배선 현황 (2026-08-04 실측, 2026-08-12 재확인, 2026-08-12 §7.3 통합 후 갱신)**:
+> §7.3 의 이중 일괄변경 시스템을 하나의 손실 정책으로 통합하면서
+> `recalculate_scheduled_lessons` 훅 포인트가 **두 호출부 모두에서 실제로 호출**된다
+> — `subscription_service.bulk_change()`(교사 직접 실행)와
+> `lesson_request_service._apply_bulk_schedule_change()`(제안-승인 확정, 실사용
+> 경로) 양쪽 다 이동/취소 처리 후 해당 subscription 의 `scheduledLessons` 를
+> 재계산한다. 다만 API 응답/FE/가드의 라이브 **소비처는 여전히 0**건 — 값은 정확히
+> 계산되지만 아직 아무도 읽지 않는다. §3.3 불변식 강제도 미구현. 소비처(§9 카드 등)가
+> 생기기 전까지는 증분(+=1) 방식 배선 금지(재계산 SSOT 와 어긋나는 드리프트 발생) —
+> 이미 배선된 두 호출부의 recalc 를 그대로 재사용할 것.
 
 ### 3.3 일관성 불변식
 
@@ -335,23 +337,42 @@ bulkChange(subscriptionId, newDayOfWeek, newTime)
 | 5주차 정책 bonus + 일괄변경 | `bonusCount` 정확 반영 |
 | 일괄변경 후 학생 측 크레딧 사용 가능 | 예약 화면에 크레딧 표시 |
 
-### 7.3 배선 현황 (2026-08-12 실측) — 이중 일괄변경 시스템 (미해결)
+### 7.3 배선 현황 (2026-08-12 통합 완료) — 이중 일괄변경 시스템
 
 > 감사(`audit-makeup-credit.md` #3, `audit-product-intent.md` §2-3)에서 확인된 구조
-> 이슈. 이번 라운드에서는 해결하지 않는다 — 아래는 실측 사실 기록.
+> 이슈. 오너 결정에 따라 이번 라운드에서 통합했다.
 
-`subscription_service.bulk_change()`(§7 상단 로직)와 그 크레딧 적립
-(`accrue_for_bulk_change_loss`)은 백엔드에 완전히 구현돼 있으나, **프론트엔드가 이
-엔드포인트를 호출하는 경로가 없다**(`POST /subscriptions/:id/bulk-change` 호출 0건).
-실제로 사용자가 쓰는 "일괄변경"은 `ScheduleChangeType.bulkChange` 제안-승인 흐름
-(`lesson_request_service.py`)이며, 이 경로는 `MakeupCreditService` 를 전혀 참조하지
-않는다 — 손실 회차가 발생해도 크레딧이 적립되지 않는다.
+`subscription_service.bulk_change()`(§7 상단 로직, 교사 직접 실행 — `POST
+/subscriptions/:id/bulk-change`, 학생 승인 불필요)와 실제 사용자가 쓰는
+`ScheduleChangeType.bulkChange` 제안-승인 흐름
+(`lesson_request_service._apply_schedule_change_to_lessons` →
+`_apply_bulk_schedule_change`)은 이제 **같은 손실 정책**을 공유한다: 개별 충돌은
+전체 배치를 막지 않고 그 회차만 취소(`cancelled`) + `MakeupCredit(reason=
+bulkChangeLoss)` 1건 적립, 나머지는 계속 이동한다. 처리 후 두 경로 모두
+`MakeupCreditService.recalculate_scheduled_lessons` 를 호출한다(§3.2, D4).
 
-즉 "일괄변경"이라는 이름의 코드 경로가 두 개 존재하며, 스펙 §1 이 원래 풀려던 문제
-(일괄변경 후 손실 회차 자동 보전)는 사용자가 실제로 쓰는 경로에서는 **여전히
-미해결**이다. 두 경로 중 하나로 통합할지(제안-승인 확정 시 `bulk_change()` 로직을
-재사용), 아니면 도달 불가능해진 `subscription_service.bulk_change()`/API 를 제거할지는
-별도 기획 결정이 필요하다 — 이 스펙 갱신에서는 판단하지 않는다.
+두 경로는 여전히 **코드 레벨에서는 분리**되어 있다 — 의도적 결정이다:
+
+- **대상 순회 축이 다르다.** `bulk_change()` 는 `LessonBooking` 을 순회하고
+  `Lesson`(캘린더)은 있으면 미러(#1203). 제안-승인 경로는 `Lesson`(캘린더 SSOT)을
+  순회하고 `LessonBooking` 은 있으면 미러(#1192) — booking 없이 존재하는 Lesson 도
+  항상 이동해야 하므로 이 축을 유지했다(#1192 가 이미 이 이유로 채택한 설계, "target_lesson_id
+  스키마 추가"를 거절하고 임박-레슨 추론을 택함). 두 축을 하나의 함수로 강제
+  통합하면 booking 없는 Lesson 이 조용히 안 움직이는 회귀가 생긴다.
+- **single 서브케이스는 정책을 바꾸지 않았다.** 승인 경로의 단건 변경은 여전히
+  충돌 시 409 로 안전 거절한다(#1192 원안 유지) — 일회성 재협상은 보상 장치가
+  필요 없다. 오직 **bulk** 서브케이스만 크레딧 보상 정책으로 전환했다.
+- 실제로 공유되는 것은 손실 보상의 **정책과 메커니즘**(`MakeupCreditService.
+  accrue_for_bulk_change_loss` + `recalculate_scheduled_lessons`)이지, 대상
+  순회 루프 자체가 아니다. #1203 커밋은 이미 "충돌정책 상이·서비스 경계 상이로
+  조기 공통헬퍼화는 결합만 증가"라고 기록했는데, 이번 통합도 그 전제(대상 선택은
+  분리 유지, 손실 정책만 통일)를 지키면서 "충돌정책이 실사용 경로에서 크레딧을
+  적립하지 않는다"는 실질적 갭만 해소했다.
+
+`POST /subscriptions/{id}/bulk-change` 라우트는 **유지**한다 — 여전히 FE 호출 0건
+이지만, 학생 승인 없이 교사가 즉시 강제로 이동시키는 별개의(협상 없는) 유스케이스를
+위한 진입점으로 스펙·테스트가 이미 완비돼 있다(§8.2, `test_subscription_bulk_change.py`).
+FE 연동 여부는 별도 기획 결정.
 
 ---
 
