@@ -22,7 +22,19 @@ import '../../../profile/profile_facade.dart';
 class InviteConfirmScreen extends ConsumerStatefulWidget {
   final Invite invite;
 
-  const InviteConfirmScreen({super.key, required this.invite});
+  /// Overrides the post-connection destination instead of deriving
+  /// `userRole.homeRoute`. Used by the onboarding invite-code flow so a
+  /// still-onboarding student lands on profile setup — `homeRoute` would be
+  /// redirected back to role-select by the auth guard mid-onboarding. When
+  /// set, the two-choice "book a lesson now" success offer is also
+  /// suppressed since the student hasn't finished onboarding yet.
+  final String? successRedirectRoute;
+
+  const InviteConfirmScreen({
+    super.key,
+    required this.invite,
+    this.successRedirectRoute,
+  });
 
   @override
   ConsumerState<InviteConfirmScreen> createState() =>
@@ -370,7 +382,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
 
   void _showAlreadyConnectedDialog(String targetRoleLabel) {
     final userRole = ref.read(currentUserRoleProvider);
-    final homeRoute = userRole.homeRoute;
+    final homeRoute = widget.successRedirectRoute ?? userRole.homeRoute;
 
     showNotebookDialog(
       context: context,
@@ -429,15 +441,22 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
   void _showSuccessDialog(String targetRoleLabel) {
     // Get home route based on current user role
     final userRole = ref.read(currentUserRoleProvider);
-    final homeRoute = userRole.homeRoute;
+    final homeRoute = widget.successRedirectRoute ?? userRole.homeRoute;
     final invite = widget.invite;
+
+    // successRedirectRoute means we're mid-onboarding (see the field doc) —
+    // suppress the optional "book a lesson now" / "go to student list"
+    // offers and always land on the single deterministic destination.
+    final isOnboarding = widget.successRedirectRoute != null;
 
     // Check if student connected to teacher - offer booking option
     final isStudentConnectingToTeacher =
+        !isOnboarding &&
         userRole == UserRole.student &&
         invite.creatorRole == InviteUserRole.teacher;
     // Check if teacher received student invite - offer going to student list
-    final isTeacherConnectingToStudent = userRole == UserRole.teacher;
+    final isTeacherConnectingToStudent =
+        !isOnboarding && userRole == UserRole.teacher;
 
     showNotebookDialog(
       context: context,
@@ -454,11 +473,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
               color: AppColors.paperOkSoft,
               borderRadius: BorderRadius.zero,
             ),
-            child: Icon(
-              Icons.check_circle,
-              size: 48,
-              color: AppColors.paperOk,
-            ),
+            child: Icon(Icons.check_circle, size: 48, color: AppColors.paperOk),
           ),
           const SizedBox(height: AppSpacing.space4),
           // Notebook × Score: 연결 성공 다이얼로그 헤드라인 Playfair sectionTitle (§7.89).
@@ -485,11 +500,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.lightbulb_outline,
-                    size: 20,
-                    color: AppColors.ink,
-                  ),
+                  Icon(Icons.lightbulb_outline, size: 20, color: AppColors.ink),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
@@ -529,16 +540,15 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     // Navigate to booking screen with teacher info
-                    final userProfile = ref.read(
-                      currentUserProfileProvider,
-                    );
+                    final userProfile = ref.read(currentUserProfileProvider);
                     context.push(
                       AppRoutes.lessonBooking,
                       extra: {
                         'teacherId': invite.creatorId,
                         'teacherName': invite.creatorName ?? AppStrings.teacher,
                         'instrument':
-                            AppStrings.instrumentFallback, // Will be selected in booking screen
+                            AppStrings
+                                .instrumentFallback, // Will be selected in booking screen
                         'studentId': userProfile.userId,
                         'studentName': userProfile.userName,
                         'isTrialLesson': true,

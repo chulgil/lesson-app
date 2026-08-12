@@ -99,6 +99,10 @@ void main() {
 
     final skip = find.text('코드 없이 시작하기');
     expect(skip, findsOneWidget);
+    // 6칸 초대코드 입력(+붙여넣기+확인 버튼) 통합 후 스킵 버튼이 기본 테스트
+    // 뷰포트(800x600) 아래로 내려가므로 스크롤 후 탭.
+    await tester.ensureVisible(skip);
+    await tester.pump();
 
     OutlinedButton skipButton() => tester.widget<OutlinedButton>(
       find.ancestor(of: skip, matching: find.byType(OutlinedButton)),

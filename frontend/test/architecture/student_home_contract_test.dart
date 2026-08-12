@@ -30,15 +30,35 @@ void main() {
   test(
     'student invite code submits a pending request, not a completed connection',
     () {
-      final source =
+      // #<int-invite-ui> — the onboarding invite-code screen now reuses the
+      // shared InviteConfirmScreen (the "unify onboarding + post-onboarding
+      // invite UI" rework), so the actual connection-request creation and its
+      // "pending, not connected" wording moved there. student_invite_code_screen
+      // only resolves the code and pushes the confirm step.
+      final onboardingSource =
           File(
             'lib/features/auth/presentation/screens/student_invite_code_screen.dart',
           ).readAsStringSync();
+      expect(onboardingSource, isNot(contains('authTeacherConnected')));
 
-      expect(source, contains('authTeacherConnectionRequested'));
-      expect(source, contains('ref.invalidate(mySentRequestsProvider)'));
-      expect(source, contains('ref.invalidate(myConnectionsProvider)'));
-      expect(source, isNot(contains('authTeacherConnected')));
+      final confirmSource =
+          File(
+            'lib/features/invite/presentation/screens/invite_confirm_screen.dart',
+          ).readAsStringSync();
+      expect(confirmSource, contains('AppStrings.inviteRequestSent'));
+      expect(confirmSource, isNot(contains('authTeacherConnected')));
+
+      final providerSource =
+          File(
+            'lib/features/profile/presentation/providers/invite_provider.dart',
+          ).readAsStringSync();
+      final requestConnectionBody = providerSource.substring(
+        providerSource.indexOf('Future<ConnectionRequest?> requestConnection'),
+      );
+      expect(
+        requestConnectionBody,
+        contains('ref.invalidate(mySentRequestsProvider)'),
+      );
     },
   );
 
