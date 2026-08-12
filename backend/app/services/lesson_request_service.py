@@ -273,17 +273,26 @@ class LessonRequestService:
         return event.proposed_day_of_week, event.proposed_time
 
     async def _apply_schedule_change_to_lessons(self, request: Any, event: Any) -> None:
-        """#1192 — move confirmed Lesson rows when a schedule change is accepted.
+        """#1192/§7 통합 — move confirmed Lesson rows when a schedule change is accepted.
 
         Without this, `add_event` only recorded a timeline event, so the weekly/
         daily calendar (Lesson SSOT) and conflict ledger (LessonBooking) kept the
         old time even after both parties agreed → no-show risk.
 
         - single: the next upcoming confirmed lesson shifts to the new weekday+time
-          within its own week (nearest future occurrence, no past dates).
+          within its own week (nearest future occurrence, no past dates). A
+          collision with another booking at the new slot aborts the accept (409)
+          before any row is mutated — safe reject, per the #1192 design (a one-off
+          slot renegotiation needs no compensation machinery).
         - bulk: every future confirmed lesson shifts to the new weekday+time.
-        - a collision with another booking at the new slot aborts the accept
-          (409) before any row is mutated — safe, per the #1192 design.
+          A collision no longer aborts the whole batch — the conflicting lesson
+          is cancelled and accrues 1 MakeupCredit(reason=bulkChangeLoss), the
+          rest keep moving. This mirrors `subscription_service.bulk_change()`'s
+          established §7/§8.2 policy (see `_apply_bulk_schedule_change` below).
+          Target selection stays Lesson-primary (not delegated wholesale to the
+          booking-primary `bulk_change()` engine) — a Lesson row without a
+          matching LessonBooking must still move; #1192 chose Lesson as the
+          reliable SSOT for exactly this reason.
         """
         import datetime as dt
 
@@ -345,8 +354,18 @@ class LessonRequestService:
             BookingStatus.changeRequested,
         ]
 
-        # Conflict-check every move first so a collision aborts atomically
-        # (reject the accept) before any row is mutated.
+        if is_bulk:
+            await self._apply_bulk_schedule_change(
+                event=event,
+                subscription_id=subscription_id,
+                new_time=new_time,
+                moves=moves,
+                active_booking_statuses=active_booking_statuses,
+            )
+            return
+
+        # single — conflict-check every move first so a collision aborts
+        # atomically (reject the accept) before any row is mutated.
         for lesson, new_date in moves:
             conflict = await self.db.scalar(
                 select(LessonBooking.id).where(
@@ -364,22 +383,118 @@ class LessonRequestService:
                 )
 
         for lesson, new_date in moves:
-            old_date, old_time = lesson.date, lesson.start_time
-            lesson.date = new_date
-            lesson.start_time = new_time
-            booking = await self.db.scalar(
-                select(LessonBooking).where(
-                    LessonBooking.subscription_id == subscription_id,
+            await self._move_lesson_and_matching_booking(
+                lesson=lesson,
+                new_date=new_date,
+                new_time=new_time,
+                subscription_id=subscription_id,
+                active_booking_statuses=active_booking_statuses,
+            )
+        await self.db.flush()
+
+    async def _apply_bulk_schedule_change(
+        self,
+        *,
+        event: Any,
+        subscription_id: str,
+        new_time: str,
+        moves: list[tuple[Any, Any]],
+        active_booking_statuses: list[Any],
+    ) -> None:
+        """makeup_credit_spec.md §7/§8.2 — bulk 충돌 정책. best-effort: 이동 가능한
+        건 이동, 충돌하는 건만 취소 + MakeupCredit(bulkChangeLoss) 적립. 정책은
+        `subscription_service.bulk_change()`(직접 실행 경로)와 동일 — 손실 회차
+        1건당 크레딧 1건, 처리 후 `scheduledLessons` 재계산(D4).
+        """
+        from app.models.schedule import LessonBooking
+        from app.services.makeup_credit_service import MakeupCreditService
+
+        makeup = MakeupCreditService(self.db)
+        credits_accrued = 0
+        for lesson, new_date in moves:
+            conflict = await self.db.scalar(
+                select(LessonBooking.id).where(
                     LessonBooking.teacher_id == lesson.teacher_id,
-                    LessonBooking.scheduled_date == old_date,
-                    LessonBooking.scheduled_time == old_time,
+                    LessonBooking.scheduled_date == new_date,
+                    LessonBooking.scheduled_time == new_time,
+                    LessonBooking.subscription_id != subscription_id,
                     LessonBooking.status.in_(active_booking_statuses),
                 )
             )
-            if booking is not None:
-                booking.scheduled_date = new_date
-                booking.scheduled_time = new_time
+            if conflict is not None:
+                await self._cancel_lesson_and_matching_booking(
+                    lesson=lesson,
+                    subscription_id=subscription_id,
+                    active_booking_statuses=active_booking_statuses,
+                )
+                await makeup.accrue_for_bulk_change_loss(
+                    student_id=lesson.student_id,
+                    teacher_id=lesson.teacher_id,
+                    subscription_id=subscription_id,
+                    schedule_change_id=event.id,
+                    lost_lesson_id=lesson.id,
+                )
+                credits_accrued += 1
+                continue
+            await self._move_lesson_and_matching_booking(
+                lesson=lesson,
+                new_date=new_date,
+                new_time=new_time,
+                subscription_id=subscription_id,
+                active_booking_statuses=active_booking_statuses,
+            )
         await self.db.flush()
+        await makeup.recalculate_scheduled_lessons(subscription_id)
+
+    async def _move_lesson_and_matching_booking(
+        self,
+        *,
+        lesson: Any,
+        new_date: Any,
+        new_time: str,
+        subscription_id: str,
+        active_booking_statuses: list[Any],
+    ) -> None:
+        from app.models.schedule import LessonBooking
+
+        old_date, old_time = lesson.date, lesson.start_time
+        lesson.date = new_date
+        lesson.start_time = new_time
+        booking = await self.db.scalar(
+            select(LessonBooking).where(
+                LessonBooking.subscription_id == subscription_id,
+                LessonBooking.teacher_id == lesson.teacher_id,
+                LessonBooking.scheduled_date == old_date,
+                LessonBooking.scheduled_time == old_time,
+                LessonBooking.status.in_(active_booking_statuses),
+            )
+        )
+        if booking is not None:
+            booking.scheduled_date = new_date
+            booking.scheduled_time = new_time
+
+    async def _cancel_lesson_and_matching_booking(
+        self,
+        *,
+        lesson: Any,
+        subscription_id: str,
+        active_booking_statuses: list[Any],
+    ) -> None:
+        from app.models.lesson import LessonStatus
+        from app.models.schedule import BookingStatus, LessonBooking
+
+        lesson.status = LessonStatus.cancelled
+        booking = await self.db.scalar(
+            select(LessonBooking).where(
+                LessonBooking.subscription_id == subscription_id,
+                LessonBooking.teacher_id == lesson.teacher_id,
+                LessonBooking.scheduled_date == lesson.date,
+                LessonBooking.scheduled_time == lesson.start_time,
+                LessonBooking.status.in_(active_booking_statuses),
+            )
+        )
+        if booking is not None:
+            booking.status = BookingStatus.cancelled
 
     async def update(self, request_id: str, data: LessonRequestUpdate, current_user: Any) -> LessonRequestResponse:
         """Update a lesson request."""
