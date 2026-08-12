@@ -239,9 +239,6 @@ void main() {
         'lib/features/schedule/presentation/screens/request_detail_screen.dart',
       ),
       File(
-        'lib/features/schedule/presentation/screens/suggest_alternative_screen.dart',
-      ),
-      File(
         'lib/features/schedule/presentation/screens/time_exception_screen.dart',
       ),
       File(

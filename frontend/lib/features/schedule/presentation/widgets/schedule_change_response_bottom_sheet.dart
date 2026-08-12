@@ -11,8 +11,8 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
-import '../screens/suggest_alternative_screen.dart';
 import 'schedule_slot_choice_list.dart';
+import 'suggest_alternative_bottom_sheet.dart';
 
 /// Action chosen in the schedule change response bottom sheet.
 enum ScheduleChangeResponseAction { accept, reject, counter }
@@ -281,18 +281,12 @@ class _ScheduleChangeResponseBottomSheetState
   }
 
   Future<void> _counterPropose() async {
-    final result =
-        await Navigator.push<({String message, List<TimeSlot> slots})>(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => SuggestAlternativeScreen(
-                  message: AppStrings.scheduleChangeCounter,
-                  durationMinutes: widget.durationMinutes,
-                  teacherId: widget.teacherId,
-                ),
-          ),
-        );
+    final result = await showSuggestAlternativeBottomSheet(
+      context,
+      message: AppStrings.scheduleChangeCounter,
+      durationMinutes: widget.durationMinutes,
+      teacherId: widget.teacherId,
+    );
 
     if (result != null && mounted) {
       Navigator.pop<ScheduleChangeResponseResult>(context, (

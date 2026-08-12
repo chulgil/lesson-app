@@ -634,16 +634,11 @@ class _SubscriptionDetailBodyState
     RequestEvent event,
   ) async {
     final teacherId = _getTeacherId();
-    final result = await Navigator.push<SuggestAlternativeResult>(
+    final result = await showSuggestAlternativeBottomSheet(
       context,
-      MaterialPageRoute(
-        builder:
-            (_) => SuggestAlternativeScreen(
-              message: '',
-              durationMinutes: 60,
-              teacherId: teacherId ?? '',
-            ),
-      ),
+      message: '',
+      durationMinutes: 60,
+      teacherId: teacherId ?? '',
     );
     if (result == null || !mounted) return;
 
@@ -694,16 +689,11 @@ class _SubscriptionDetailBodyState
     RequestEvent event,
   ) async {
     final teacherId = _getTeacherId();
-    final result = await Navigator.push<SuggestAlternativeResult>(
+    final result = await showSuggestAlternativeBottomSheet(
       context,
-      MaterialPageRoute(
-        builder:
-            (_) => SuggestAlternativeScreen(
-              message: '',
-              durationMinutes: 60,
-              teacherId: teacherId ?? '',
-            ),
-      ),
+      message: '',
+      durationMinutes: 60,
+      teacherId: teacherId ?? '',
     );
     if (result == null || !mounted) return;
 

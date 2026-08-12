@@ -8,7 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../screens/suggest_alternative_screen.dart';
+import 'suggest_alternative_bottom_sheet.dart';
 
 /// Result from the decline bottom sheet.
 typedef DeclineResult = ({String message, List<TimeSlot> suggestedSlots});
@@ -169,18 +169,12 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
             ? AppStrings.proposeDefaultMessage
             : currentText;
 
-    final result =
-        await Navigator.push<({String message, List<TimeSlot> slots})>(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => SuggestAlternativeScreen(
-                  message: message,
-                  durationMinutes: widget.durationMinutes,
-                  teacherId: widget.teacherId,
-                ),
-          ),
-        );
+    final result = await showSuggestAlternativeBottomSheet(
+      context,
+      message: message,
+      durationMinutes: widget.durationMinutes,
+      teacherId: widget.teacherId,
+    );
 
     if (result != null && mounted) {
       Navigator.pop<DeclineResult>(context, (
