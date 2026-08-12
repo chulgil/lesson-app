@@ -9628,6 +9628,16 @@ class AppStrings {
   /// 지급 실패 스낵바.
   static const makeupCreditGrantFailed = '보강 크레딧 지급에 실패했어요.';
 
+  /// 귀속 수강권 선택 시트 부제 — 여러 활성 수강권 중 귀속 대상 선택 안내.
+  static const makeupCreditGrantAttributionSubtitle =
+      '지급할 보강 크레딧을 어느 수강권에 귀속할지 선택하세요. 나중에 보강 레슨을 예약하면 이 수강권에서 차감돼요.';
+
+  /// "귀속 없음" 옵션 — 특정 수강권에 연결하지 않고 지급.
+  static const makeupCreditGrantNoAttributionOption = '귀속 없음';
+
+  /// 확인 다이얼로그의 귀속 안내 줄 (예: "귀속: 8회권" / "귀속: 귀속 없음").
+  static String makeupCreditGrantAttributionLine(String label) => '귀속: $label';
+
   /// 회수 버튼.
   static const makeupCreditRevokeButton = '회수';
 
