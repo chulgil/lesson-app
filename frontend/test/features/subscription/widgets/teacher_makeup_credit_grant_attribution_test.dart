@@ -27,12 +27,16 @@ class _SpyMakeupCreditRepository extends MockMakeupCreditRepository {
     required String studentId,
     String? sourceSubscriptionId,
     String? reasonNote,
+    MakeupCreditReason reason = MakeupCreditReason.manualGrant,
+    String? lessonId,
   }) async {
     grantedSourceSubscriptionIds.add(sourceSubscriptionId);
     return super.grantCredit(
       studentId: studentId,
       sourceSubscriptionId: sourceSubscriptionId,
       reasonNote: reasonNote,
+      reason: reason,
+      lessonId: lessonId,
     );
   }
 }
