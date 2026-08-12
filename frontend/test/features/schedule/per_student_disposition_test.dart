@@ -126,8 +126,11 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(vacationFormProvider.notifier);
-      notifier.setDraftStart(DateTime(2026, 8, 1));
-      notifier.setDraftEnd(DateTime(2026, 8, 5));
+      // Relative future dates — hardcoded past dates made hasValidDraft
+      // false once the calendar passed them (perpetual RED, same rot as #1247).
+      final start = DateTime.now().add(const Duration(days: 30));
+      notifier.setDraftStart(DateTime(start.year, start.month, start.day));
+      notifier.setDraftEnd(DateTime(start.year, start.month, start.day + 4));
       notifier.setStudentOverride('sA', VacationDisposition.makeupCredit);
 
       final period = await notifier.submit();
@@ -143,8 +146,11 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(vacationFormProvider.notifier);
-      notifier.setDraftStart(DateTime(2026, 8, 1));
-      notifier.setDraftEnd(DateTime(2026, 8, 5));
+      // Relative future dates — hardcoded past dates made hasValidDraft
+      // false once the calendar passed them (perpetual RED, same rot as #1247).
+      final start = DateTime.now().add(const Duration(days: 30));
+      notifier.setDraftStart(DateTime(start.year, start.month, start.day));
+      notifier.setDraftEnd(DateTime(start.year, start.month, start.day + 4));
 
       await notifier.submit();
       expect(repo.lastPerStudent, isNull);
@@ -169,16 +175,26 @@ void main() {
       );
       // Set date range so impact preview can be loaded.
       final notifier = container.read(vacationFormProvider.notifier);
-      notifier.setDraftStart(DateTime(2026, 8, 1));
-      notifier.setDraftEnd(DateTime(2026, 8, 5));
+      // Relative future dates — hardcoded past dates made hasValidDraft
+      // false once the calendar passed them (perpetual RED, same rot as #1247).
+      final start = DateTime.now().add(const Duration(days: 30));
+      notifier.setDraftStart(DateTime(start.year, start.month, start.day));
+      notifier.setDraftEnd(DateTime(start.year, start.month, start.day + 4));
       await notifier.loadImpact();
 
       // Apply an override before pumping again.
       notifier.setStudentOverride('sA', VacationDisposition.makeupCredit);
       await tester.pumpAndSettle();
 
-      // Impact section sits below the (taller) draft disposition section, so
-      // scroll it into view before asserting (#768 ② reorder).
+      // P2-3 progressive disclosure: the impact detail list is collapsed
+      // behind the summary badge — expand it before asserting on rows.
+      await tester.scrollUntilVisible(
+        find.byIcon(Icons.expand_more),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byIcon(Icons.expand_more));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.text('민수'),
         200,
