@@ -28,7 +28,6 @@
 - 빈 슬롯 시 다음 가용일 제안
 
 ### 제외 (후속)
-- 수강권 잔여횟수 차감의 BE 권위 처리 (현 FE는 표시 + `bookSlot` 호출)
 - 그룹 클래스 정원 예약 (1:1 = 정원 1 선착순만)
 - 게스트(비회원) 예약 — 본 화면은 로그인 학생 전용
 
@@ -100,8 +99,9 @@ LessonBookingParams {
 - 다음 가용일: `nextAvailableDatesProvider(teacherId, fromDate, limit)`
 
 ### 예약 실행
-`slotBookingNotifierProvider.bookSlot(slotId, studentId, studentName, teacherId, teacherName, slotDate, slotStartTime, slotEndTime, instrument, lessonType, fee)` → `LessonBooking` (즉시 확정).
+`slotBookingNotifierProvider.bookSlot(slotId, studentId, studentName, teacherId, teacherName, slotDate, slotStartTime, slotEndTime, instrument, lessonType, fee, subscriptionId)` → `LessonBooking` (즉시 확정).
 - **BE 구현 (2026-07-03, #1107)**: `POST /bookings` 가 `slot_id` 존재 시 `create_slot_booking` → `create_booking(auto_confirm=True)` 로 `LessonBooking.status=confirmed` 즉시 확정 (교사 approve 불필요). slot_id 없는 요청 경로는 pending 유지.
+- **수강권 연결 + 완료 시 차감 (구현됨, #580 Gap B/C)**: FE 는 `LessonBookingParams.subscriptionId`(§8 CTA 게이트에서 얻은 활성 수강권 id)를 `bookSlot` → `requestTrialLesson` → `BookingRepository.requestTrialLesson(subscriptionId:)` 로 끝까지 전달해 `LessonBooking.subscriptionId`(BE `subscription_id`)에 연결한다. BE `create_booking` 은 `subscription_id` 가 비어 있으면 `ScheduleService._find_active_subscription_id` 로 teacher-student 활성 수강권을 자동 연결한다(새 수강권은 만들지 않음 — 없으면 `subscription_id=null` 유지, 예약 자체는 실패하지 않음). 레슨 완료(`approve_booking(target_status=completed)`) 시 `booking.subscription_id` 가 있으면 `SubscriptionService.deduct_for_completed_lesson` 로 1회 차감(멱등 — 재완료해도 중복 차감 없음, `LessonService._deduct_if_completed` 와 동일 경로 재사용). 완료 후 취소 시 `release_lesson_usage` 로 차감을 되돌린다.
 - 에러는 `AsyncValue.error`로 삼켜지므로 `ref.read(slotBookingNotifierProvider).hasError` 확인 필수.
 
 ## 7. Notebook × 악보 디자인 적용

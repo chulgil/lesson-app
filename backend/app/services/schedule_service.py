@@ -858,6 +858,39 @@ class ScheduleService:
                     detail="해당 시간에 이미 예약이 있습니다",
                 )
 
+    async def _find_active_subscription_id(self, *, teacher_id: str, student_id: str) -> str | None:
+        """Auto-attach an already-active teacher-student subscription (#580 Gap B).
+
+        student_direct_booking_spec.md §6 — mirrors the "attach" branch of
+        ``LessonService._find_or_create_subscription`` but never creates a new
+        subscription: direct booking presupposes the student already holds one.
+        Returns ``None`` (never raises) when no active/expiringSoon subscription
+        with remaining sessions exists, so the booking still succeeds unlinked.
+        """
+        from app.models.lesson import ClassMembership, LessonClass
+        from app.models.subscription import Subscription, SubscriptionStatus
+        from app.services.subscription_service import remaining_lessons
+
+        candidates = (
+            await self.db.scalars(
+                select(Subscription)
+                .join(ClassMembership, ClassMembership.id == Subscription.membership_id)
+                .join(LessonClass, LessonClass.id == ClassMembership.lesson_class_id)
+                .where(
+                    LessonClass.teacher_id == teacher_id,
+                    Subscription.student_id == student_id,
+                    Subscription.status.in_([SubscriptionStatus.active, SubscriptionStatus.expiringSoon]),
+                )
+                .order_by(Subscription.created_at.desc())
+            )
+        ).all()
+
+        for sub in candidates:
+            remaining = remaining_lessons(sub)
+            if remaining is None or remaining > 0:
+                return sub.id
+        return None
+
     async def create_booking(
         self, data: BookingCreate, current_user: Any, *, auto_confirm: bool = False
     ) -> BookingResponse:
@@ -893,15 +926,26 @@ class ScheduleService:
             duration=data.duration,
         )
 
+        student_id = data.student_id or current_user.id
+        subscription_id = data.subscription_id
+        if subscription_id is None:
+            # student_direct_booking_spec.md §6 — FE 가 subscription_id 를 보내지
+            # 않으면(직접예약 CTA 게이트를 거치지 않은 경로 등) 활성 수강권을 자동
+            # 연결한다. 새 수강권은 만들지 않음 — 없으면 None 유지, 예약은 계속 진행.
+            subscription_id = await self._find_active_subscription_id(
+                teacher_id=data.teacher_id,
+                student_id=student_id,
+            )
+
         booking = LessonBooking(
             teacher_id=data.teacher_id,
-            student_id=data.student_id or current_user.id,
+            student_id=student_id,
             lesson_type=data.lesson_type,
             scheduled_date=data.scheduled_date,
             scheduled_time=data.scheduled_time,
             duration=data.duration,
             instrument=data.instrument,
-            subscription_id=data.subscription_id,
+            subscription_id=subscription_id,
             notes=data.notes,
             status=BookingStatus.confirmed if auto_confirm else BookingStatus.pending,
         )
@@ -1197,6 +1241,13 @@ class ScheduleService:
         if selected_option_id:
             prefix = f"[selected_option_id: {selected_option_id}]"
             booking.notes = f"{prefix}\n{booking.notes}" if booking.notes else prefix
+        if target_status == "completed" and booking.subscription_id:
+            # #580 Gap C — Lesson completion deducts via LessonService._deduct_if_completed;
+            # LessonBooking completion never did. Reuses the same idempotent,
+            # user-agnostic path (skips if a usage row already exists for this id).
+            from app.services.subscription_service import SubscriptionService
+
+            await SubscriptionService(self.db).deduct_for_completed_lesson(booking.id, booking.subscription_id)
         await self.db.flush()
         await self.db.refresh(booking)
         return await self._to_booking_response(booking)
@@ -1223,8 +1274,18 @@ class ScheduleService:
         if booking is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         await self._assert_booking_owner(booking, current_user)
+        was_completed = booking.status == BookingStatus.completed
         booking.status = BookingStatus.cancelled
         booking.notes = reason
+        if was_completed and booking.subscription_id:
+            # #580 Gap C symmetric release — mirrors LessonService._release_deduction
+            # (#1240): cancelling a completed, already-deducted booking must give
+            # the session back instead of leaving an orphaned deduction.
+            from app.services.subscription_service import SubscriptionService
+
+            await SubscriptionService(self.db).release_lesson_usage(
+                lesson_id=booking.id, subscription_id=booking.subscription_id
+            )
         await self.db.flush()
         await self.db.refresh(booking)
         await self._notify_booking_cancelled(booking, current_user)

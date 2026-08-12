@@ -89,6 +89,7 @@ class RemoteBookingRepository implements BookingRepository {
     required String teacherName,
     required TrialLessonRequest request,
     required int fee,
+    String? subscriptionId,
   }) async {
     final response = await _apiClient.post(
       '/bookings',
@@ -106,6 +107,7 @@ class RemoteBookingRepository implements BookingRepository {
         'start_time': _clockTimeToString(request.effectiveStartTime),
         'end_time': _clockTimeToString(request.effectiveEndTime),
         'fee': fee,
+        'subscription_id': subscriptionId,
       },
     );
     return _bookingFromJson(response.data as Map<String, dynamic>);
@@ -118,10 +120,9 @@ class RemoteBookingRepository implements BookingRepository {
   }) async {
     final response = await _apiClient.patch(
       '/bookings/$id/approve',
-      data:
-          selectedOptionId != null
-              ? {'selected_option_id': selectedOptionId}
-              : null,
+      data: selectedOptionId != null
+          ? {'selected_option_id': selectedOptionId}
+          : null,
     );
     return _bookingFromJson(response.data as Map<String, dynamic>);
   }
@@ -187,7 +188,8 @@ class RemoteBookingRepository implements BookingRepository {
         'fixed_time_slots': registration.fixedTimeSlots
             .map(
               (slot) => {
-                'day_of_week': slot.dayOfWeek - 1, // FE 1=Mon..7=Sun -> BE 0=Mon..6=Sun
+                'day_of_week':
+                    slot.dayOfWeek - 1, // FE 1=Mon..7=Sun -> BE 0=Mon..6=Sun
                 'start_time': slot.startTime.format24Hour(),
                 'duration_minutes': slot.durationMinutes,
               },
@@ -311,49 +313,40 @@ class RemoteBookingRepository implements BookingRepository {
       endTime: _clockTimeFromString(json['end_time'] as String? ?? '15:00'),
       durationMinutes: json['duration_minutes'] as int? ?? 60,
       fee: json['fee'] as int? ?? 0,
-      scheduleType:
-          json['schedule_type'] != null
-              ? ScheduleType.values.byName(json['schedule_type'] as String)
-              : null,
+      scheduleType: json['schedule_type'] != null
+          ? ScheduleType.values.byName(json['schedule_type'] as String)
+          : null,
       lessonsPerWeek: json['lessons_per_week'] as int?,
       recurringSkippedCount: json['recurring_skipped_count'] as int? ?? 0,
       studentPhone: json['student_phone'] as String?,
       studentEmail: json['student_email'] as String?,
-      lessonGoal:
-          json['lesson_goal'] != null
-              ? LessonGoal.values.byName(json['lesson_goal'] as String)
-              : null,
-      experienceLevel:
-          json['experience_level'] != null
-              ? ExperienceLevel.values.byName(
-                json['experience_level'] as String,
-              )
-              : null,
+      lessonGoal: json['lesson_goal'] != null
+          ? LessonGoal.values.byName(json['lesson_goal'] as String)
+          : null,
+      experienceLevel: json['experience_level'] != null
+          ? ExperienceLevel.values.byName(json['experience_level'] as String)
+          : null,
       studentMessage: json['student_message'] as String?,
       createdAt: DateTime.parse(
         json['created_at'] as String? ?? DateTime.now().toIso8601String(),
       ),
-      confirmedAt:
-          json['confirmed_at'] != null
-              ? DateTime.parse(json['confirmed_at'] as String)
-              : null,
-      completedAt:
-          json['completed_at'] != null
-              ? DateTime.parse(json['completed_at'] as String)
-              : null,
-      cancelledAt:
-          json['cancelled_at'] != null
-              ? DateTime.parse(json['cancelled_at'] as String)
-              : null,
+      confirmedAt: json['confirmed_at'] != null
+          ? DateTime.parse(json['confirmed_at'] as String)
+          : null,
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'] as String)
+          : null,
+      cancelledAt: json['cancelled_at'] != null
+          ? DateTime.parse(json['cancelled_at'] as String)
+          : null,
       unavailableMessage: json['unavailable_reason'] as String?,
-      unavailableAt:
-          json['unavailable_at'] != null
-              ? DateTime.parse(json['unavailable_at'] as String)
-              : null,
-      expiredAt:
-          json['expired_at'] != null
-              ? DateTime.parse(json['expired_at'] as String)
-              : null,
+      unavailableAt: json['unavailable_at'] != null
+          ? DateTime.parse(json['unavailable_at'] as String)
+          : null,
+      expiredAt: json['expired_at'] != null
+          ? DateTime.parse(json['expired_at'] as String)
+          : null,
+      subscriptionId: json['subscription_id'] as String?,
     );
   }
 
@@ -379,6 +372,7 @@ class RemoteBookingRepository implements BookingRepository {
       'lesson_goal': booking.lessonGoal?.name,
       'experience_level': booking.experienceLevel?.name,
       'student_message': booking.studentMessage,
+      'subscription_id': booking.subscriptionId,
     };
   }
 

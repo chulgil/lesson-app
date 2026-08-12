@@ -18,6 +18,7 @@ abstract class BookingRepository {
     required String teacherName,
     required TrialLessonRequest request,
     required int fee,
+    String? subscriptionId,
   });
   Future<LessonBooking> approveTrialLesson(
     String id, {
@@ -264,6 +265,7 @@ class MockBookingRepository implements BookingRepository {
     required String teacherName,
     required TrialLessonRequest request,
     required int fee,
+    String? subscriptionId,
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final booking = request.toBooking(
@@ -271,6 +273,7 @@ class MockBookingRepository implements BookingRepository {
       teacherId: teacherId,
       teacherName: teacherName,
       fee: fee,
+      subscriptionId: subscriptionId,
     );
     _bookings.add(booking);
     return booking;
@@ -478,18 +481,17 @@ class MockBookingRepository implements BookingRepository {
     final daySlot = allSlots.where((s) => s.dayOfWeek == date.weekday).toList();
 
     // Filter out already booked times
-    final bookedTimes =
-        _bookings
-            .where(
-              (b) =>
-                  b.teacherId == teacherId &&
-                  b.lessonDate.year == date.year &&
-                  b.lessonDate.month == date.month &&
-                  b.lessonDate.day == date.day &&
-                  b.status.isActive,
-            )
-            .map((b) => b.startTime)
-            .toList();
+    final bookedTimes = _bookings
+        .where(
+          (b) =>
+              b.teacherId == teacherId &&
+              b.lessonDate.year == date.year &&
+              b.lessonDate.month == date.month &&
+              b.lessonDate.day == date.day &&
+              b.status.isActive,
+        )
+        .map((b) => b.startTime)
+        .toList();
 
     // Generate 1-hour time slots
     final availableSlots = <TimeSlot>[];

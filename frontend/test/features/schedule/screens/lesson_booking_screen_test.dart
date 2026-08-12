@@ -6,7 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:lessonaza/core/booking/entities/lesson_booking.dart';
+import 'package:lessonaza/core/booking/repositories/booking_repository.dart';
 import 'package:lessonaza/core/domain/value_objects/clock_time.dart';
+import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/features/lessons/presentation/providers/booking_repository_provider.dart';
 import 'package:lessonaza/features/schedule/data/repositories/mock_teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/availability_slot.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
@@ -25,6 +29,59 @@ class _StubRepo extends MockTeacherAvailabilityRepository {
     DateTime date, {
     String? currentStudentId,
   }) async => slots;
+}
+
+/// #580 Gap B — real `MockTeacherAvailabilityRepository.bookSlot` parses the
+/// slot id as `<teacherId>-<date>-<time>`; the plain-id fixtures in this file
+/// (`_slot('a', 10)`) don't match that format, so tests that complete the
+/// full confirm flow need a stub that skips the parser.
+class _BookableStubRepo extends _StubRepo {
+  _BookableStubRepo(super.slots);
+
+  @override
+  Future<AvailabilitySlot> bookSlot(
+    String slotId,
+    String studentId,
+    String studentName,
+  ) async => slots.first.copyWith(status: AvailabilitySlotStatus.myBooking);
+}
+
+/// #580 Gap B — captures subscriptionId reaching the repository boundary via
+/// the real screen interaction (slot tap → confirm dialog → bookSlot).
+class _CapturingBookingRepo implements BookingRepository {
+  String? capturedSubscriptionId;
+
+  @override
+  Future<LessonBooking> requestTrialLesson({
+    required String teacherId,
+    required String teacherName,
+    required TrialLessonRequest request,
+    required int fee,
+    String? subscriptionId,
+  }) async {
+    capturedSubscriptionId = subscriptionId;
+    return LessonBooking(
+      id: 'booking_test',
+      teacherId: teacherId,
+      teacherName: teacherName,
+      studentId: request.studentId,
+      studentName: request.studentName,
+      lessonType: LessonType.trial,
+      status: BookingStatus.pending,
+      lessonDate: request.effectiveDate,
+      startTime: request.effectiveStartTime,
+      endTime: request.effectiveEndTime,
+      fee: fee,
+      subscriptionId: subscriptionId,
+      createdAt: DateTime(2026, 6, 10),
+    );
+  }
+
+  @override
+  Future<List<LessonBooking>> getAllBookings() async => const <LessonBooking>[];
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 AvailabilitySlot _slot(String id, int hour) => AvailabilitySlot(
@@ -157,5 +214,51 @@ void main() {
       find.byType(MakeupCreditUseSelector),
     );
     expect(selector.selected, BookingPaymentSource.makeupCredit);
+  });
+
+  // #580 Gap B — student_direct_booking_spec.md §6.
+  testWidgets('슬롯 선택 → 확인 → LessonBookingParams.subscriptionId 가 저장소까지 전달됨', (
+    tester,
+  ) async {
+    final bookingRepo = _CapturingBookingRepo();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          teacherAvailabilityRepositoryProvider.overrideWithValue(
+            _BookableStubRepo([_slot('a', 10)]),
+          ),
+          bookingRepositoryProvider.overrideWithValue(bookingRepo),
+        ],
+        child: const MaterialApp(
+          home: LessonBookingScreen(
+            params: LessonBookingParams(
+              teacherId: 't1',
+              teacherName: '김선생',
+              studentId: 's1',
+              studentName: '학생',
+              instrument: '바이올린',
+              subscriptionId: 'sub-active-1',
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('10:00'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.bookAction));
+    // Mirrors lesson_booking_double_tap_test.dart — the confirm dialog stays
+    // open without reaching a steady state, so pumpAndSettle() hangs here.
+    await tester.pump();
+    await tester.pump();
+
+    // Confirm dialog button (TextButton) — distinct from the bottom bar's
+    // FilledButton, both labelled AppStrings.bookAction.
+    await tester.tap(find.widgetWithText(TextButton, AppStrings.bookAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(bookingRepo.capturedSubscriptionId, 'sub-active-1');
   });
 }

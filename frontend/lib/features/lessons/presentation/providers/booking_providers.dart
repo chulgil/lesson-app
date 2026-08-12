@@ -146,6 +146,7 @@ class BookingsNotifier extends _$BookingsNotifier {
     required String teacherName,
     required TrialLessonRequest request,
     int fee = 30000, // Default trial fee
+    String? subscriptionId,
   }) async {
     state = const AsyncValue.loading();
     try {
@@ -154,6 +155,7 @@ class BookingsNotifier extends _$BookingsNotifier {
         teacherName: teacherName,
         request: request,
         fee: fee,
+        subscriptionId: subscriptionId,
       );
       final bookings = await _repository.getAllBookings();
       state = AsyncValue.data(bookings);

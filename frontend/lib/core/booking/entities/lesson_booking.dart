@@ -212,6 +212,9 @@ class LessonBooking {
   final String? requestId;
   // #301: standalone 주N회 등록 시 교사 기존 일정과 충돌해 건너뛴 회차 수 (응답 전용).
   final int recurringSkippedCount;
+  // student_direct_booking_spec.md §6 — 예약이 연결된 수강권. BE 가 없으면
+  // teacher-student 활성 수강권을 자동 연결(생성은 하지 않음). null 이면 정규권 외 예약.
+  final String? subscriptionId;
 
   const LessonBooking({
     required this.id,
@@ -251,6 +254,7 @@ class LessonBooking {
     this.selectedOptionId,
     this.requestId,
     this.recurringSkippedCount = 0,
+    this.subscriptionId,
   });
 
   /// Check if booking is trial lesson
@@ -377,6 +381,7 @@ class LessonBooking {
     List<ScheduleOption>? scheduleOptions,
     String? selectedOptionId,
     int? recurringSkippedCount,
+    String? subscriptionId,
   }) {
     return LessonBooking(
       id: id ?? this.id,
@@ -414,7 +419,9 @@ class LessonBooking {
       expiredAt: expiredAt ?? this.expiredAt,
       scheduleOptions: scheduleOptions ?? this.scheduleOptions,
       selectedOptionId: selectedOptionId ?? this.selectedOptionId,
-      recurringSkippedCount: recurringSkippedCount ?? this.recurringSkippedCount,
+      recurringSkippedCount:
+          recurringSkippedCount ?? this.recurringSkippedCount,
+      subscriptionId: subscriptionId ?? this.subscriptionId,
     );
   }
 
@@ -503,6 +510,7 @@ class TrialLessonRequest {
     required String teacherId,
     required String teacherName,
     required int fee,
+    String? subscriptionId,
   }) {
     return LessonBooking(
       id: id,
@@ -516,6 +524,7 @@ class TrialLessonRequest {
       startTime: effectiveStartTime,
       endTime: effectiveEndTime,
       fee: fee,
+      subscriptionId: subscriptionId,
       studentPhone: studentPhone,
       studentEmail: studentEmail,
       lessonGoal: goal,
