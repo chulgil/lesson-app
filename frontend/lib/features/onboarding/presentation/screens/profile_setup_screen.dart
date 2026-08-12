@@ -108,12 +108,20 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           .createFromOnboarding(ref.read(teacherOnboardingNotifierProvider));
 
       // #430: Phone verification moved to optional quest + E3 (subscription
-      // issuance) hard gate. SSO → terms → role → profile (B) → home direct.
+      // issuance) hard gate. SSO → terms → role → profile (B) → step 4
+      // (가용시간 빠른 설정) → home. #P1-7 (teacher-journey audit 2026-08-11):
+      // step 4 was built (`FirstAvailabilitySetupScreen`) but never reachable
+      // from this flow, so `OnboardingStepHeader.teacherSteps` promised 4
+      // steps while only 3 ever ran. completeOnboarding() still fires here
+      // (unchanged) — the new step is a plain in-flow navigation, not gated
+      // by the router's AuthNeedsOnboarding redirect, so it behaves exactly
+      // like the existing NextMissionSpotlight → teacherFirstAvailability
+      // push from home (dashboard_tab.dart).
       ref.read(teacherOnboardingNotifierProvider.notifier).completeOnboarding();
       await ref.read(authNotifierProvider.notifier).completeOnboarding();
 
       if (mounted) {
-        context.go(AppRoutes.home);
+        context.go(AppRoutes.teacherFirstAvailability);
       }
     } catch (e) {
       if (mounted) {

@@ -9737,6 +9737,10 @@ class AppStrings {
   /// 풀 설정 이관 버튼.
   static const firstAvailabilityAdvancedAction = '더 자세히 설정';
 
+  /// 가입 흐름 인라인 4단계 스킵 CTA (AppBar customAction) — 팀 감사 P1-7.
+  /// 홈의 NextMissionSpotlight/퀘스트가 미루기 후 리마인더 역할을 이어받는다.
+  static const firstAvailabilitySkipAction = '나중에 설정';
+
   /// 요일 미선택 검증 메시지.
   static const firstAvailabilityValidationDayMissing = '요일을 1개 이상 선택해주세요.';
 

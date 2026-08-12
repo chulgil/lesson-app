@@ -204,6 +204,22 @@ void main() {
     test('allows staying on a normal authenticated path', () {
       expect(resolveAuthRedirect(authed, '/teacher/home'), isNull);
     });
+
+    // #P1-7 (teacher-journey audit 2026-08-11) — ProfileSetupScreen now
+    // navigates to teacherFirstAvailability instead of home right after
+    // completeOnboarding() flips auth state to AuthAuthenticated. This must
+    // NOT be caught by the AuthAuthenticated splash/login/roleSelect bounce
+    // branch, otherwise the new inline step 4 would immediately redirect
+    // away before the teacher ever sees it.
+    test(
+      'authenticated teacher on teacherFirstAvailability is not redirected (#P1-7)',
+      () {
+        expect(
+          resolveAuthRedirect(authed, AppRoutes.teacherFirstAvailability),
+          isNull,
+        );
+      },
+    );
   });
 
   group('resolveAuthRedirect — loading', () {

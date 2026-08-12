@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lessonaza/core/auth/auth_state.dart';
 import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/core/router/app_routes.dart';
 import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:lessonaza/features/auth/auth_facade.dart';
@@ -198,6 +200,68 @@ void main() {
     );
     expect(header.steps, OnboardingStepHeader.teacherSteps);
     expect(header.currentStep, 3, reason: '프로필은 4단계 중 3번째');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('#P1-7 다음 버튼 탭 시 홈이 아닌 4단계(첫 가용시간 설정)로 이동한다', (tester) async {
+    final profileNotifier = _StubProfileNotifier();
+    final authNotifier = _StubAuthNotifier();
+
+    final router = GoRouter(
+      initialLocation: AppRoutes.teacherProfileSetup,
+      routes: [
+        GoRoute(
+          path: AppRoutes.teacherProfileSetup,
+          builder: (_, __) => const ProfileSetupScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.teacherFirstAvailability,
+          builder:
+              (_, __) =>
+                  const Scaffold(body: Center(child: Text('FIRST-AVAIL'))),
+        ),
+        GoRoute(
+          path: AppRoutes.home,
+          builder: (_, __) => const Scaffold(body: Center(child: Text('HOME'))),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          activeDisciplineProvider.overrideWith(
+            (ref) => DisciplineRegistry.music,
+          ),
+          currentTeacherProfileNotifierProvider.overrideWith(
+            () => profileNotifier,
+          ),
+          authNotifierProvider.overrideWith(() => authNotifier),
+        ],
+        child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).at(0), '김선생');
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(
+      find.byKey(ProfileSetupScreen.instrumentSelectorKey),
+    );
+    await tester.tap(find.byKey(ProfileSetupScreen.instrumentSelectorKey));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바이올린'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.widgetWithText(ElevatedButton, AppStrings.onboardingNext),
+    );
+    await tester.pumpAndSettle();
+
+    // 홈이 아니라 4단계(첫 가용시간)에 도착해야 한다 — 이 화면은 지금까지
+    // 실제 흐름에서 도달 불가능했다 (감사 P1-7).
+    expect(find.text('FIRST-AVAIL'), findsOneWidget);
+    expect(find.text('HOME'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
