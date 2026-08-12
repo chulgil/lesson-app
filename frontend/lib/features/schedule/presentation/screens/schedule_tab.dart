@@ -479,9 +479,7 @@ class ScheduleTab extends ConsumerWidget {
                 vertical: 2,
               ),
               // Notebook × Score: 각진 뱃지 (§7.113 매트릭스 — 컨테이너 bg zero)
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-              ),
+              decoration: BoxDecoration(color: AppColors.paperAccentSoft),
               // "오늘" = 시스템 자동 인디케이터 → Tier 4 Pretendard italic
               // (README §1.1 4계층, §7.127 Gaegu 회피).
               child: Text(
@@ -507,7 +505,7 @@ class ScheduleTab extends ConsumerWidget {
   Widget _buildSortDropdown(WidgetRef ref, LessonSortType sortType) {
     return PopupMenuButton<LessonSortType>(
       onSelected: (value) {
-        ref.read(teacherLessonSortTypeProvider.notifier).state = value;
+        ref.read(teacherLessonSortTypeProvider.notifier).setSortType(value);
       },
       itemBuilder: (context) => LessonSortType.values
           .map(
