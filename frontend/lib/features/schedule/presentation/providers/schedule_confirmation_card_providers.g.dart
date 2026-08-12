@@ -345,6 +345,190 @@ class _ScheduleConfirmationCardProviderElement
   String get cardId => (origin as ScheduleConfirmationCardProvider).cardId;
 }
 
+String _$lessonRequestIdBySubscriptionHash() =>
+    r'31028f2b4aacb22348e1f52f5fcb75a582da43d4';
+
+/// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+/// the [ScheduleConfirmationCard] reverse lookup (Option A).
+///
+/// Returns null when no card exists for the subscription (renewal proposals
+/// and teacher-direct proposals never set lessonRequestId) or when the
+/// lookup fails — callers should treat null as "no linked request thread"
+/// and fall back to subscription-based routing.
+///
+/// Copied from [lessonRequestIdBySubscription].
+@ProviderFor(lessonRequestIdBySubscription)
+const lessonRequestIdBySubscriptionProvider =
+    LessonRequestIdBySubscriptionFamily();
+
+/// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+/// the [ScheduleConfirmationCard] reverse lookup (Option A).
+///
+/// Returns null when no card exists for the subscription (renewal proposals
+/// and teacher-direct proposals never set lessonRequestId) or when the
+/// lookup fails — callers should treat null as "no linked request thread"
+/// and fall back to subscription-based routing.
+///
+/// Copied from [lessonRequestIdBySubscription].
+class LessonRequestIdBySubscriptionFamily extends Family<AsyncValue<String?>> {
+  /// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+  /// the [ScheduleConfirmationCard] reverse lookup (Option A).
+  ///
+  /// Returns null when no card exists for the subscription (renewal proposals
+  /// and teacher-direct proposals never set lessonRequestId) or when the
+  /// lookup fails — callers should treat null as "no linked request thread"
+  /// and fall back to subscription-based routing.
+  ///
+  /// Copied from [lessonRequestIdBySubscription].
+  const LessonRequestIdBySubscriptionFamily();
+
+  /// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+  /// the [ScheduleConfirmationCard] reverse lookup (Option A).
+  ///
+  /// Returns null when no card exists for the subscription (renewal proposals
+  /// and teacher-direct proposals never set lessonRequestId) or when the
+  /// lookup fails — callers should treat null as "no linked request thread"
+  /// and fall back to subscription-based routing.
+  ///
+  /// Copied from [lessonRequestIdBySubscription].
+  LessonRequestIdBySubscriptionProvider call(
+    String subscriptionId,
+  ) {
+    return LessonRequestIdBySubscriptionProvider(
+      subscriptionId,
+    );
+  }
+
+  @override
+  LessonRequestIdBySubscriptionProvider getProviderOverride(
+    covariant LessonRequestIdBySubscriptionProvider provider,
+  ) {
+    return call(
+      provider.subscriptionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'lessonRequestIdBySubscriptionProvider';
+}
+
+/// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+/// the [ScheduleConfirmationCard] reverse lookup (Option A).
+///
+/// Returns null when no card exists for the subscription (renewal proposals
+/// and teacher-direct proposals never set lessonRequestId) or when the
+/// lookup fails — callers should treat null as "no linked request thread"
+/// and fall back to subscription-based routing.
+///
+/// Copied from [lessonRequestIdBySubscription].
+class LessonRequestIdBySubscriptionProvider
+    extends AutoDisposeFutureProvider<String?> {
+  /// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+  /// the [ScheduleConfirmationCard] reverse lookup (Option A).
+  ///
+  /// Returns null when no card exists for the subscription (renewal proposals
+  /// and teacher-direct proposals never set lessonRequestId) or when the
+  /// lookup fails — callers should treat null as "no linked request thread"
+  /// and fall back to subscription-based routing.
+  ///
+  /// Copied from [lessonRequestIdBySubscription].
+  LessonRequestIdBySubscriptionProvider(
+    String subscriptionId,
+  ) : this._internal(
+          (ref) => lessonRequestIdBySubscription(
+            ref as LessonRequestIdBySubscriptionRef,
+            subscriptionId,
+          ),
+          from: lessonRequestIdBySubscriptionProvider,
+          name: r'lessonRequestIdBySubscriptionProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lessonRequestIdBySubscriptionHash,
+          dependencies: LessonRequestIdBySubscriptionFamily._dependencies,
+          allTransitiveDependencies:
+              LessonRequestIdBySubscriptionFamily._allTransitiveDependencies,
+          subscriptionId: subscriptionId,
+        );
+
+  LessonRequestIdBySubscriptionProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.subscriptionId,
+  }) : super.internal();
+
+  final String subscriptionId;
+
+  @override
+  Override overrideWith(
+    FutureOr<String?> Function(LessonRequestIdBySubscriptionRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: LessonRequestIdBySubscriptionProvider._internal(
+        (ref) => create(ref as LessonRequestIdBySubscriptionRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        subscriptionId: subscriptionId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<String?> createElement() {
+    return _LessonRequestIdBySubscriptionProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LessonRequestIdBySubscriptionProvider &&
+        other.subscriptionId == subscriptionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, subscriptionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin LessonRequestIdBySubscriptionRef
+    on AutoDisposeFutureProviderRef<String?> {
+  /// The parameter `subscriptionId` of this provider.
+  String get subscriptionId;
+}
+
+class _LessonRequestIdBySubscriptionProviderElement
+    extends AutoDisposeFutureProviderElement<String?>
+    with LessonRequestIdBySubscriptionRef {
+  _LessonRequestIdBySubscriptionProviderElement(super.provider);
+
+  @override
+  String get subscriptionId =>
+      (origin as LessonRequestIdBySubscriptionProvider).subscriptionId;
+}
+
 String _$scheduleConfirmationCardNotifierHash() =>
     r'acfa0549ad53b4aed6855d6cfb0af1301e792305';
 
