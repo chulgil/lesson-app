@@ -11119,6 +11119,12 @@ class AppStrings {
   static const proposalRejectConfirmBody =
       '이 수강권 제안을 거절하시겠습니까? 상대방에게 알림이 전송됩니다.';
 
+  /// 신청 거절 (직접예약 승인 UI 하우스 패턴 정렬 — booking reject confirm dialog title)
+  static const bookingRejectConfirmTitle = '신청 거절';
+
+  /// 거절 확인 본문 (booking reject confirm dialog body)
+  static const bookingRejectConfirmBody = '이 레슨 신청을 거절하시겠습니까? 학생에게 안내가 전달됩니다.';
+
   /// 첫 과제 내기 (home empty assignment CTA, #625)
   static const weeklyAssignmentFirstCta = '첫 과제 내기';
 

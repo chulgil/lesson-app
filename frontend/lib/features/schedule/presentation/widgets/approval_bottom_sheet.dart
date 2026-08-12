@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
+import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
@@ -300,15 +301,15 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
             child: OutlinedButton(
               onPressed: _isProcessing ? null : _handleReject,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.space3,
+                minimumSize: const Size.fromHeight(
+                  AppSpacing.buttonHeightSmall,
                 ),
                 side: BorderSide(color: AppColors.inkQuaternary),
                 shape: RoundedRectangleBorder(),
               ),
               child: Text(
                 AppStrings.rejectAction,
-                style: AppTypography.button.copyWith(
+                style: AppTypography.buttonSmall.copyWith(
                   color: AppColors.inkSecondary,
                 ),
               ),
@@ -319,8 +320,8 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
             child: FilledButton(
               onPressed: canApprove && !_isProcessing ? _handleApprove : null,
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.space3,
+                minimumSize: const Size.fromHeight(
+                  AppSpacing.buttonHeightSmall,
                 ),
                 backgroundColor: AppColors.paperAccent,
                 disabledBackgroundColor: AppColors.inkSecondary.withValues(
@@ -340,7 +341,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                       )
                       : Text(
                         AppStrings.approveAction,
-                        style: AppTypography.button.copyWith(
+                        style: AppTypography.buttonSmall.copyWith(
                           color: AppColors.paper,
                         ),
                       ),
@@ -395,6 +396,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
 
     if (result == null || !mounted) return;
 
+    final confirmed = await _confirmRejectBooking();
+    if (confirmed != true || !mounted) return;
+
     setState(() => _isProcessing = true);
 
     try {
@@ -432,6 +436,21 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
         setState(() => _isProcessing = false);
       }
     }
+  }
+
+  /// Reject is destructive (declines the booking request) — confirm before
+  /// firing, matching CurrentRequestBox's proposal/schedule-change reject gate.
+  Future<bool?> _confirmRejectBooking() {
+    return showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.bookingRejectConfirmTitle,
+      message: AppStrings.bookingRejectConfirmBody,
+      confirmLabel: AppStrings.eventReject,
+      cancelLabel: AppStrings.cancel,
+      isDestructive: true,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+    );
   }
 
   String _getTimeSinceRequest(LessonBooking booking) {
