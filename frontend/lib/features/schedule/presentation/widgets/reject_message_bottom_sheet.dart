@@ -12,9 +12,9 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 ///
 /// Returns the trimmed message, or null if dismissed without sending.
 ///
-/// Shared by [SuggestAlternativeScreen] and [showSuggestAlternativeBottomSheet]
-/// (its bottom-sheet counterpart) so the reject step stays identical across
-/// both presentations.
+/// Shared by every counter-propose / decline flow that nests this step
+/// under [showSuggestAlternativeBottomSheet] or a decline bottom sheet, so
+/// the reject step stays identical across callers.
 Future<String?> showRejectMessageBottomSheet(BuildContext context) {
   return showNotebookBottomSheet<String>(
     context: context,

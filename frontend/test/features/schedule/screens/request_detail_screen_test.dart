@@ -9,8 +9,6 @@ import 'package:lessonaza/features/schedule/presentation/providers/teacher_avail
 import 'package:lessonaza/features/schedule/presentation/providers/unified_lesson_request_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/week_lessons_provider.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/request_detail_screen.dart';
-import 'package:lessonaza/features/schedule/presentation/screens/suggest_alternative_screen.dart'
-    show SuggestAlternativeScreen;
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_template_providers.dart';
 
 // #P1 detail split — smoke test for the newly extracted app bar / event
@@ -140,8 +138,7 @@ void main() {
       );
     }
 
-    testWidgets('다른 시간 제안하기 opens a bottom sheet, not the full-screen '
-        'SuggestAlternativeScreen route', (tester) async {
+    testWidgets('다른 시간 제안하기 opens a bottom sheet', (tester) async {
       await tester.pumpWidget(buildMyTurnTestable());
       await tester.pumpAndSettle();
 
@@ -150,12 +147,133 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      // Bottom sheet content renders; the old full-screen route never does.
       // (The sheet's title text is the same string as the trigger button
       // below it, so assert on the sheet-only close icon instead.)
-      expect(find.byType(SuggestAlternativeScreen), findsNothing);
       expect(find.byIcon(Icons.close), findsOneWidget);
       expect(find.text(AppStrings.rejectAction), findsOneWidget);
+    });
+  });
+
+  group('withdraw (M-2 bottom-sheet migration)', () {
+    // Teacher already approved a slot → it's the student's turn, so
+    // CurrentRequestBox renders the theirTurn withdraw button wired to
+    // _handleWithdraw. status stays `approved` (still RequestPhase.request)
+    // so the phase-1 turn-state logic applies.
+    final approvedRequest = UnifiedLessonRequest(
+      id: 'request_1',
+      studentId: 'student_1',
+      teacherId: 'teacher_1',
+      instrument: '피아노',
+      goal: UnifiedLessonGoal.hobby,
+      experience: UnifiedExperienceLevel.beginner,
+      type: LessonRequestType.regular,
+      status: UnifiedRequestStatus.approved,
+      createdAt: DateTime(2026, 5, 4),
+    );
+
+    final events = [
+      RequestEvent(
+        id: 'evt_1',
+        requestId: approvedRequest.id,
+        actorType: ProposerRole.student,
+        actorId: approvedRequest.studentId,
+        eventType: RequestEventType.initialRequest,
+        createdAt: DateTime(2026, 5, 4),
+      ),
+      RequestEvent(
+        id: 'evt_2',
+        requestId: approvedRequest.id,
+        actorType: ProposerRole.teacher,
+        actorId: approvedRequest.teacherId,
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: DateTime(2026, 5, 5),
+      ),
+    ];
+
+    Widget buildTheirTurnTestable() {
+      final now = DateTime.now();
+      final weekStart = DateTime(
+        now.year,
+        now.month,
+        now.day - (now.weekday - 1),
+      );
+
+      return ProviderScope(
+        overrides: [
+          unifiedRequestByIdProvider(
+            approvedRequest.id,
+          ).overrideWith((ref) async => approvedRequest),
+          requestEventsProvider(
+            approvedRequest.id,
+          ).overrideWith((ref) async => events),
+          studentNameMapProvider.overrideWithValue(const {'student_1': '김민준'}),
+          teacherNameMapProvider.overrideWithValue(const {'teacher_1': '박선생'}),
+          academyNameMapProvider.overrideWithValue(const {}),
+          activeTeacherTemplatesProvider(
+            approvedRequest.teacherId,
+          ).overrideWith((ref) async => const []),
+          weekLessonsWithPreviewProvider((
+            weekStart: weekStart,
+            teacherId: approvedRequest.teacherId,
+          )).overrideWith((ref) async => const []),
+          teacherAvailabilityProvider(approvedRequest.teacherId).overrideWith(
+            (ref) async => TeacherAvailability(
+              id: approvedRequest.teacherId,
+              teacherId: approvedRequest.teacherId,
+              weeklySchedules: [
+                for (var d = 0; d < 7; d++)
+                  WeeklySchedule(
+                    id: 'ws-$d',
+                    dayOfWeek: d,
+                    startTime: '09:00',
+                    endTime: '21:00',
+                    createdAt: DateTime(2026, 1, 1),
+                  ),
+              ],
+              exceptions: const [],
+              createdAt: DateTime(2026, 1, 1),
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          home: RequestDetailScreen(
+            requestId: 'request_1',
+            viewerRole: 'teacher',
+          ),
+        ),
+      );
+    }
+
+    testWidgets('결정 변경 opens a bottom sheet, not a pushed full-screen '
+        'route', (tester) async {
+      await tester.pumpWidget(buildTheirTurnTestable());
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.withdrawApproval), findsOneWidget);
+      await tester.tap(find.text(AppStrings.withdrawApproval));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.text(AppStrings.rejectAction), findsOneWidget);
+    });
+
+    testWidgets('dismissing the sheet leaves the approval unchanged', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildTheirTurnTestable());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(AppStrings.withdrawApproval));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      // Sheet closed, withdraw button still there — no state change.
+      expect(find.text(AppStrings.withdrawApproval), findsOneWidget);
     });
   });
 }

@@ -32,7 +32,6 @@ import '../widgets/request_detail/request_detail_event_strip.dart';
 import '../widgets/request_detail/request_detail_more_menu_sheet.dart';
 import '../widgets/request_history_chat.dart';
 import '../widgets/suggest_alternative_bottom_sheet.dart';
-import 'suggest_alternative_screen.dart';
 
 List<RequestEvent> requestDetailVisibleEventsForCurrentPhase(
   UnifiedLessonRequest request,
@@ -598,18 +597,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
     // Go directly to schedule comparison (no withdraw event yet)
     if (!context.mounted) return;
-    final result = await Navigator.push<SuggestAlternativeResult>(
+    final result = await showSuggestAlternativeBottomSheet(
       context,
-      MaterialPageRoute(
-        builder:
-            (_) => SuggestAlternativeScreen(
-              message: '',
-              durationMinutes: request.preferredDuration,
-              teacherId: request.teacherId,
-              preferredSlots: request.preferredSlots,
-              isStudentView: viewerRole == 'student',
-            ),
-      ),
+      message: '',
+      durationMinutes: request.preferredDuration,
+      teacherId: request.teacherId,
+      preferredSlots: request.preferredSlots,
+      isStudentView: viewerRole == 'student',
     );
     if (result == null || !context.mounted) return;
 

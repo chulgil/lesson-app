@@ -16,8 +16,6 @@ import '../../domain/entities/teacher_availability.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
-import '../screens/suggest_alternative_screen.dart'
-    show SuggestAlternativeResult;
 import 'alternative_time_grid.dart';
 import 'reject_message_bottom_sheet.dart';
 import 'suggest_alternative/suggest_alternative_bottom_section.dart';
@@ -27,13 +25,20 @@ import 'suggest_alternative/suggest_alternative_preferred_slots_section.dart';
 import 'suggest_alternative/suggest_alternative_suggested_slots_list.dart';
 import 'suggest_alternative/suggest_alternative_week_nav.dart';
 
+/// Result type for the counter-propose / re-proposal flow.
+/// - slots not empty + acceptedSlotIndex == null → propose alternatives
+/// - slots empty + acceptedSlotIndex == null → reject
+/// - acceptedSlotIndex != null → accept the counterpart's preferred slot
+///   directly
+typedef SuggestAlternativeResult =
+    ({String message, List<TimeSlot> slots, int? acceptedSlotIndex});
+
 /// Shows the counter-propose / re-proposal bottom sheet.
 ///
-/// Bottom-sheet counterpart of [SuggestAlternativeScreen] (P1-4 first
-/// increment) — same weekly schedule grid, preferred-slot accept mode, and
-/// reject flow, presented as a self-surfaced sheet instead of a pushed
-/// full-screen route. Returns [SuggestAlternativeResult] or null if
-/// dismissed.
+/// Self-surfaced sheet with the weekly schedule grid, preferred-slot accept
+/// mode, and reject flow (M-2 — the former pushed full-screen route has
+/// been retired; this sheet is now the sole presentation). Returns
+/// [SuggestAlternativeResult] or null if dismissed.
 Future<SuggestAlternativeResult?> showSuggestAlternativeBottomSheet(
   BuildContext context, {
   required String message,
@@ -56,9 +61,9 @@ Future<SuggestAlternativeResult?> showSuggestAlternativeBottomSheet(
   );
 }
 
-/// Self-surfaced bottom sheet — same weekly grid + preferred-slot logic as
-/// [SuggestAlternativeScreen], reusing [AlternativeTimeGrid] and the shared
-/// [showRejectMessageBottomSheet] reject step.
+/// Self-surfaced bottom sheet — weekly grid + preferred-slot accept logic,
+/// reusing [AlternativeTimeGrid] and the shared [showRejectMessageBottomSheet]
+/// reject step.
 ///
 /// UI sections live in `widgets/suggest_alternative/` (P1-4 file-size
 /// split, golden-principles #5) — this class owns state and orchestration
@@ -282,7 +287,7 @@ class _SuggestAlternativeBottomSheetState
   }
 
   /// Show reject bottom sheet with message input — stacks on top of this
-  /// sheet, same as [SuggestAlternativeScreen]'s reject step.
+  /// sheet.
   Future<void> _showRejectBottomSheet() async {
     final result = await showRejectMessageBottomSheet(context);
 

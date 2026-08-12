@@ -1,8 +1,6 @@
 // Schedule feature public UI boundary.
 library;
 
-export 'presentation/screens/suggest_alternative_screen.dart'
-    show SuggestAlternativeResult, SuggestAlternativeScreen;
 export 'presentation/screens/unified_lesson_request_screen.dart'
     show UnifiedLessonRequestParams, UnifiedLessonRequestScreen;
 export 'presentation/screens/lesson_booking_screen.dart'
@@ -15,7 +13,7 @@ export 'presentation/widgets/schedule_change_slot_bottom_sheet.dart'
         ScheduleChangeSlotResult,
         showScheduleChangeSlotBottomSheet;
 export 'presentation/widgets/suggest_alternative_bottom_sheet.dart'
-    show showSuggestAlternativeBottomSheet;
+    show SuggestAlternativeResult, showSuggestAlternativeBottomSheet;
 export 'presentation/extensions/cancel_reason_visuals.dart'
     show CancelReasonVisuals;
 export 'presentation/widgets/cancel_lesson_bottom_sheet.dart'
