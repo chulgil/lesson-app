@@ -198,13 +198,23 @@ class VacationForm extends _$VacationForm {
 
   Future<void> loadImpact() async {
     if (!state.hasValidDraft) return;
+    final requestedStart = state.draftStart;
+    final requestedEnd = state.draftEnd;
     state = state.copyWith(isLoadingImpact: true, clearError: true);
     try {
       final impact = await _repository.previewImpact(
-        startDate: state.draftStart!,
-        endDate: state.draftEnd!,
+        startDate: requestedStart!,
+        endDate: requestedEnd!,
       );
-      state = state.copyWith(impact: impact, isLoadingImpact: false);
+      // The draft may have changed while this request was in flight (auto-load
+      // re-fires on every date change) — drop a stale response instead of
+      // overwriting the fresher (possibly still-loading) state.
+      final isStale =
+          state.draftStart != requestedStart || state.draftEnd != requestedEnd;
+      state = state.copyWith(
+        impact: isStale ? null : impact,
+        isLoadingImpact: false,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoadingImpact: false,
