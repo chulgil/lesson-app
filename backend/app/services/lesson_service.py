@@ -347,11 +347,22 @@ class LessonService:
                 detail="trial_already_used",
             )
 
-    async def _find_or_create_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
+    async def _find_or_create_subscription(
+        self, *, teacher_id: str, student_id: str, lesson_date: date | None, lesson_count: int = 1
+    ) -> str:
         """Find active subscription for the student or create a trial one.
 
         If the active subscription has no remaining lessons (bonus included),
-        auto-expand it as a bonus lesson (bonus_count += 1).
+        auto-expand it as a bonus lesson (bonus_count += ``lesson_count``).
+
+        ``lesson_count`` — how many lessons this single resolution call must
+        cover. Defaults to 1 for the per-lesson caller (``create``). A batch
+        caller (schedule_confirmation_service#301 recurring registration)
+        resolves once for the whole batch and passes the batch size so the
+        bonus top-up / auto-created trial can cover every lesson, not just the
+        first one to complete. Does not attempt to top up a partially-covered
+        active subscription (0 < remaining < lesson_count) — that mirrors the
+        pre-existing per-lesson granularity of this exhaustion check.
         """
         from app.models.subscription import Subscription, SubscriptionStatus
         from app.services.subscription_service import remaining_lessons
@@ -373,7 +384,7 @@ class LessonService:
             if remaining is not None and remaining <= 0:
                 # Bonus lesson: bonus_count only — total_lessons stays the paid
                 # base (bumping both double-counted the bonus in remaining).
-                active_sub.bonus_count = (active_sub.bonus_count or 0) + 1
+                active_sub.bonus_count = (active_sub.bonus_count or 0) + lesson_count
                 if not active_sub.bonus_reason:
                     active_sub.bonus_reason = "teacher_goodwill"
                 await self.db.flush()
@@ -385,10 +396,24 @@ class LessonService:
             teacher_id=teacher_id,
             student_id=student_id,
             lesson_date=lesson_date,
+            lesson_count=lesson_count,
         )
 
-    async def _create_trial_subscription(self, *, teacher_id: str, student_id: str, lesson_date: date | None) -> str:
-        """Create a 1-lesson trial subscription for auto-assignment."""
+    async def _create_trial_subscription(
+        self, *, teacher_id: str, student_id: str, lesson_date: date | None, lesson_count: int = 1
+    ) -> str:
+        """Create a 1-lesson trial subscription for auto-assignment.
+
+        ``lesson_count`` — number of lessons this trial must immediately cover
+        (schedule_confirmation_service#301 recurring batch registration passes
+        the batch size; the single-lesson caller leaves the default 1).
+        ``total_lessons`` stays fixed at 1 (subscription_required_spec §2.2) —
+        ``remaining_lessons()`` hardcodes the trial base to 1 regardless of
+        ``total_lessons``, so covering a larger batch has to go through
+        ``bonus_count`` instead (the same lever §2.3 already uses for bonus
+        lessons), or only the first lesson in the batch would deduct on
+        completion and the rest would silently skip (subscription "exhausted").
+        """
         from app.models.subscription import Subscription, SubscriptionStatus, SubscriptionType
 
         membership_id = await self._find_or_create_class_membership(teacher_id, student_id)
@@ -407,6 +432,7 @@ class LessonService:
             status=SubscriptionStatus.active,
             payment_confirmed=True,
             total_reschedule_allowance=0,
+            bonus_count=max(lesson_count - 1, 0),
         )
         self.db.add(sub)
         await self.db.flush()
