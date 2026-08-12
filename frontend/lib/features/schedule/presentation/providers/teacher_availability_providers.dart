@@ -364,6 +364,7 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
     LessonType lessonType = LessonType.oneTime,
     int fee = 50000,
     bool useCredit = false,
+    String? subscriptionId,
   }) async {
     debugPrint('[SlotBookingNotifier] bookSlot called');
     debugPrint('[SlotBookingNotifier] slotId: $slotId');
@@ -404,6 +405,7 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
         teacherName: teacherName,
         request: request,
         fee: fee,
+        subscriptionId: subscriptionId,
       );
       debugPrint(
         '[SlotBookingNotifier] Step 2 completed, booking id: ${booking.id}',

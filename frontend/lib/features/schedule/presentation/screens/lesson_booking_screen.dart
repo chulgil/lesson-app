@@ -94,17 +94,15 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             Expanded(
               child: slotsAsync.when(
                 data: _buildSlots,
-                loading:
-                    () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (_, __) => Center(
-                      child: Text(
-                        AppStrings.cannotLoadData,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => Center(
+                  child: Text(
+                    AppStrings.cannotLoadData,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
                     ),
+                  ),
+                ),
               ),
             ),
             if (_selectedSlot != null) _buildBottomBar(),
@@ -179,13 +177,9 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             title: AppStrings.noAvailableBookingTime,
           );
         }
-        final suggestions =
-            dates
-                .map(
-                  (date) =>
-                      DateSuggestion(date: date, availableSlots: const []),
-                )
-                .toList();
+        final suggestions = dates
+            .map((date) => DateSuggestion(date: date, availableSlots: const []))
+            .toList();
         return SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: EmptySlotsSuggestion(
@@ -201,15 +195,14 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error:
-          (_, __) => Center(
-            child: Text(
-              AppStrings.noAvailableBookingTime,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
+      error: (_, __) => Center(
+        child: Text(
+          AppStrings.noAvailableBookingTime,
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.inkSecondary,
           ),
+        ),
+      ),
     );
   }
 
@@ -251,23 +244,22 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
                   backgroundColor: AppColors.paperAccent,
                 ),
-                child:
-                    _isBooking
-                        ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.paper,
-                          ),
-                        )
-                        : Text(
-                          AppStrings.bookAction,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.paper,
-                            fontWeight: FontWeight.w600,
-                          ),
+                child: _isBooking
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.paper,
                         ),
+                      )
+                    : Text(
+                        AppStrings.bookAction,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.paper,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
             ),
           ],
@@ -342,6 +334,7 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         instrument: widget.params.instrument,
         lessonType: LessonType.oneTime,
         useCredit: _paymentSource == BookingPaymentSource.makeupCredit,
+        subscriptionId: widget.params.subscriptionId,
       );
       if (ref.read(slotBookingNotifierProvider).hasError) {
         throw Exception('slot booking failed');
@@ -415,41 +408,37 @@ class _SlotChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children:
-          slots.map((slot) {
-            final isSelected = selectedId == slot.id;
-            return GestureDetector(
-              onTap: () => onSelect(slot),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                constraints: const BoxConstraints(minWidth: 72, minHeight: 44),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space4,
-                  vertical: AppSpacing.space3,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.paperDark,
-                  border: Border.all(
-                    color:
-                        isSelected
-                            ? AppColors.paperAccent
-                            : AppColors.inkQuaternary,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                // 시스템 데이터(시간) → 산세리프. Notebook §7.130 Gaegu 이항 룰.
-                child: Text(
-                  slot.formattedStartTime,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: isSelected ? AppColors.paper : AppColors.ink,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                ),
+      children: slots.map((slot) {
+        final isSelected = selectedId == slot.id;
+        return GestureDetector(
+          onTap: () => onSelect(slot),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            constraints: const BoxConstraints(minWidth: 72, minHeight: 44),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space4,
+              vertical: AppSpacing.space3,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.paperAccent : AppColors.paperDark,
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.paperAccent
+                    : AppColors.inkQuaternary,
+                width: isSelected ? 2 : 1,
               ),
-            );
-          }).toList(),
+            ),
+            // 시스템 데이터(시간) → 산세리프. Notebook §7.130 Gaegu 이항 룰.
+            child: Text(
+              slot.formattedStartTime,
+              style: AppTypography.bodyMedium.copyWith(
+                color: isSelected ? AppColors.paper : AppColors.ink,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
