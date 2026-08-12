@@ -85,7 +85,7 @@ schedule / subscription / user / notification / lesson / invite / relationship /
 | 초대/관계 | `lesson/invite/invite_system_v2.md` | `lesson/invite/subscription_based_relationship.md` | `_archive/` |
 | 학생 설치 웹 랜딩/요약 공유 | `lesson/invite/student_install_web_landing_spec.md` | `lesson/invite/invite_system_v2.md`, `backend/backend_spec.md` | `_archive/`, FastAPI Jinja2 랜딩 직접 구현 |
 | 알림 | `notification/notification_master.md` | `notification/notification_system.md` | |
-| 스케줄/예약 | `schedule/schedule_master.md` | `schedule/unified_lesson_request_spec.md`(Phase 1~4 라이프사이클), `booking/unified_lesson_request_spec.md`(Phase 1 신청 폼 UX) | `_archive/` |
+| 스케줄/예약 | `schedule/schedule_master.md` | `schedule/unified_lesson_request_spec.md`(Phase 1~4 라이프사이클), `booking/unified_lesson_request_spec.md`(Phase 1 신청 폼 UX), `schedule/schedule_change_unification_spec.md`(검토 대기 — 일정변경 3계열 통합 제안) | `_archive/` |
 | 계측/분석 이벤트 | `analytics/event_instrumentation.md` (이벤트 정의·KPI 산식) | `analytics/event_tracking_spec.md` (수집 인프라) | `analytics/analytics_dashboard_spec.md` (인앱 학생 화면, 사내 지표 아님) |
 
 ---
