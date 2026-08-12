@@ -264,6 +264,22 @@ AddLessonScreen 학생 선택 시트 최상단에 **[+ 새 학생 등록]** 항�
 - BE 근거: 제안-수락 API(`POST /subscriptions-proposals/{id}/respond`)만 학생 계정을 전제 — 즉시 발급은 학생 계정 무관.
 - **정식 수강권 발급을 강제하지 않는다 (D4)** — 체험 1회권 자동 귀속 허용 유지 + 발급 유도 배너만.
 
+### 2.8 `POST /bookings` 경로의 수강권 귀속 (2026-08-12 배선)
+
+> §2.1~§2.7 은 `POST /lessons` 단일 엔드포인트만 다룬다. 레슨/예약이 생성되는 또
+> 다른 진입점인 `POST /bookings`(`fixed_time_slots` 정기 수기등록, 일반 슬롯 예약)
+> 는 감사(`audit-bypass-paths` 갭 A·B)에서 §1 불변식을 우회하는 경로로 확인됐다.
+> 이번 라운드에서 아래 두 경로를 수정했다.
+
+| 경로 | 이전 (감사 시점) | 수정 후 |
+|---|---|---|
+| 교사 정기레슨 수기등록 (`RegisterRegularLessonScreen` → `POST /bookings`, `fixed_time_slots`) | `subscription_id` 를 요청에 전혀 넣지 않고 BE 도 fallback 없이 `None` 을 그대로 저장 — 배치로 생성되는 레슨 전체가 `subscription_id=NULL` | `schedule_confirmation_service.create_standalone_regular_lessons` 가 배치 시작 시 **1회** `_find_or_create_subscription` 과 동일한 Plan B 폴백(활성 수강권이 있으면 귀속, 없으면 체험 1회권 자동 생성)을 호출해 얻은 `subscription_id` 를 배치 내 모든 레슨에 부여한다 |
+| 학생 직접예약 (`LessonBookingScreen`, #580) | `LessonBookingParams.subscriptionId` 필드는 존재하나 호출부(`bookSlot`)가 전달하지 않아 `LessonBooking.subscription_id` 가 항상 `NULL` | `bookSlot` 이 학생의 활성 수강권을 조회해 `subscription_id` 를 부착한다. 완료 처리(`ScheduleService.approve_booking(target_status='completed')`)에도 세션 차감 호출이 추가되어, `Lesson.update_status` 와 동일하게 `subscription_id` 가 있으면 완료 시 차감된다 |
+
+이 두 경로 외의 `LessonBooking` 완료 전반(일반 슬롯 예약 등)에 대한 차감 배선은
+이번 라운드 범위 밖이다 — 학생 직접예약 화면 자체의 갱신은
+`docs/specs/schedule/student_direct_booking_spec.md` §3 에서 별도로 다룬다.
+
 ## 3. 취소 분기 로직
 
 ### 3.1 현재 문제
@@ -407,3 +423,4 @@ if new_status == 'cancelled' and lesson.subscription_id:
 | 2026-06-15 | §2.5 추가 — 다수 활성 수강권 시 선택 UI(조건부, 2개+) + 멤버십 악기 상속 고정 + 0개 체험 자동생성 |
 | 2026-06-16 | §2.5 정정 — 악기는 BE `SubscriptionResponse.instrument`(membership 매핑, 빈문자열→null)로 제공. 직전 문구 "BE 스키마는 이미 제공"은 오류였음(실제 미제공). DB 마이그레이션 없음(코드 배포만) |
 | 2026-08-03 | §2.6 신설 — 레슨 추가 인텐트 분기 (S1~S6, 잔여 0 처리 시트, 발급 연속 플로우, 신규 학생 인라인 등록, 체험권 재생성 가드, 배지 간접 표현). §2.7 신설 — 미가입(수기) 학생 특칙 (즉시 발급만, 학생 확인 생략, D4·D5). 기획: `docs/proposal/lesson_add_intent_redesign.md` |
+| 2026-08-12 | §2.8 신설 — 수강권 정합성 감사 반영. `POST /bookings` 경로(정기레슨 수기등록 배치, 학생 직접예약) 의 §1 불변식 우회 갭을 수정: 수기등록 배치는 배치당 1회 Plan B 폴백으로 귀속, 직접예약은 활성 수강권 자동 부착 + booking 완료 시 차감 배선 추가 |

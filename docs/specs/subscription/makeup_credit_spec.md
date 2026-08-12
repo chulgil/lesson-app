@@ -129,10 +129,12 @@ class MakeupCreditBalance {
 신규 트랙:
 - `scheduledLessons` = `LessonBooking` 중 활성 상태 카운트 (재계산 가능)
 
-> **배선 현황 (2026-08-04 실측)**: `scheduledLessons` 트랙은 재계산 헬퍼
-> (`recalculate_scheduled_lessons` 등, bulkChange 훅 포인트)만 존재하고 라이브
-> 쓰기·읽기 경로가 없다 (API 응답/FE/가드 소비처 0 — 값은 항상 0). §3.3 불변식
-> 강제도 미구현. 소비처(§9 카드 등)가 생기는 시점에 booking 라이프사이클
+> **배선 현황 (2026-08-04 실측, 2026-08-12 재확인)**: `scheduledLessons` 트랙은
+> 재계산 헬퍼(`recalculate_scheduled_lessons` 등, bulkChange 훅 포인트)만 존재하고
+> 라이브 쓰기·읽기 경로가 없다 (API 응답/FE/가드 소비처 0 — 값은 항상 0). §3.3
+> 불변식 강제도 미구현. 이번 라운드 수정 범위 밖 — §7.3 의 이중 일괄변경 시스템
+> 문제가 먼저 정리돼야 이 트랙의 유일한 훅 포인트(`bulk_change()`)가 실제로 호출될
+> 여지가 생긴다. 소비처(§9 카드 등)가 생기는 시점에 booking 라이프사이클
 > (생성/취소/상태 전이)에 recalc 를 배선한다 — 그 전까지 증분(+=1) 방식 배선 금지
 > (재계산 SSOT 와 어긋나는 드리프트 발생).
 
@@ -172,6 +174,11 @@ scheduledLessons <= remainingLessons + usedLessons
 
 기존 `LessonStatus.studentAbsent` → 면제 시 `LessonStatus.cancelledMutual` 로 변경 + 크레딧 1건 적립.
 
+> **배선 완료 (2026-08-12)**: 레슨 노쇼 처리 흐름에 "면제(보강 크레딧 지급)" 옵션이
+> 추가되어 FE 가 `accrue_for_no_show_exempt` 를 호출하는 API 경로가 연결됐다. 기본값은
+> OFF다 — 선생님이 명시적으로 면제를 선택해야 크레딧이 적립되며, 노쇼 처리 자체가
+> 자동으로 크레딧을 지급하지 않는다(선생님 재량 원칙 유지).
+
 ### 4.3 (c) 정규 일괄변경 손실분
 
 `subscription_schedule_change_spec.md` 의 일괄변경 시:
@@ -196,6 +203,13 @@ scheduledLessons <= remainingLessons + usedLessons
 ### 4.4 (d) 수동 지급
 
 선생님이 학생 상세 → 보강 크레딧 → "수동 지급" 으로 직접 발급. 모든 케이스가 자동으로 처리되지 않을 때 안전망.
+
+> **수강권 귀속 선택 추가 (2026-08-12)**: 발급 화면에 학생의 활성 수강권 수에 따른
+> 귀속 선택이 추가됐다 — 1개면 `sourceSubscriptionId` 를 자동 첨부, 2개 이상이면
+> 선택 UI 를 노출, 0개이거나 선생님이 선택하지 않으면 `null` 로 유지된다. §3.1 의
+> `sourceSubscriptionId` nullable 원칙(회계상 크레딧은 특정 수강권에 종속되지 않는다는
+> 설계)은 그대로 유지된다 — 이 변경은 "귀속 근거를 남길 수 있는 선택지"를 추가한
+> 것이지, 크레딧을 수강권에 강제 귀속시키는 것이 아니다.
 
 ---
 
@@ -305,6 +319,13 @@ bulkChange(subscriptionId, newDayOfWeek, newTime)
 | 일괄변경 결과 5주차 제거 | `Subscription.bonusCount -= 1` (재계산 시 일관성 유지) |
 | 정책이 skip | bonusCount 변경 없음 |
 
+> **코드-스펙 정합 노트 (2026-08-12)**: 코드의 `MakeupCreditReason` enum 에는 §3.1
+> 4종 외에 5번째 값 `fifthWeekBonus` 가 존재했으나, 그 적립 메서드
+> (`accrue_fifth_week_bonus`)는 어디서도 호출되지 않는 죽은 코드였다 — 위 표의
+> `bonusCount` 직접 조정이 5주차 보너스의 유일한 정식 처리 방식이다. 2026-08-12
+> 이 죽은 호출 메서드를 제거했다. enum 값 자체는 과거 데이터 호환을 위해 유지하며,
+> 신규 적립 경로로는 사용하지 않는다.
+
 ### 7.2 검증 케이스 (테스트 필수)
 
 | 케이스 | 기대 |
@@ -313,6 +334,24 @@ bulkChange(subscriptionId, newDayOfWeek, newTime)
 | 일괄변경으로 손실 회차 N건 | `MakeupCredit 신규 N건 적립` |
 | 5주차 정책 bonus + 일괄변경 | `bonusCount` 정확 반영 |
 | 일괄변경 후 학생 측 크레딧 사용 가능 | 예약 화면에 크레딧 표시 |
+
+### 7.3 배선 현황 (2026-08-12 실측) — 이중 일괄변경 시스템 (미해결)
+
+> 감사(`audit-makeup-credit.md` #3, `audit-product-intent.md` §2-3)에서 확인된 구조
+> 이슈. 이번 라운드에서는 해결하지 않는다 — 아래는 실측 사실 기록.
+
+`subscription_service.bulk_change()`(§7 상단 로직)와 그 크레딧 적립
+(`accrue_for_bulk_change_loss`)은 백엔드에 완전히 구현돼 있으나, **프론트엔드가 이
+엔드포인트를 호출하는 경로가 없다**(`POST /subscriptions/:id/bulk-change` 호출 0건).
+실제로 사용자가 쓰는 "일괄변경"은 `ScheduleChangeType.bulkChange` 제안-승인 흐름
+(`lesson_request_service.py`)이며, 이 경로는 `MakeupCreditService` 를 전혀 참조하지
+않는다 — 손실 회차가 발생해도 크레딧이 적립되지 않는다.
+
+즉 "일괄변경"이라는 이름의 코드 경로가 두 개 존재하며, 스펙 §1 이 원래 풀려던 문제
+(일괄변경 후 손실 회차 자동 보전)는 사용자가 실제로 쓰는 경로에서는 **여전히
+미해결**이다. 두 경로 중 하나로 통합할지(제안-승인 확정 시 `bulk_change()` 로직을
+재사용), 아니면 도달 불가능해진 `subscription_service.bulk_change()`/API 를 제거할지는
+별도 기획 결정이 필요하다 — 이 스펙 갱신에서는 판단하지 않는다.
 
 ---
 
@@ -468,3 +507,4 @@ MakeupCredit 자체 헬퍼: `isUsed`, `isExpired(now)`, `isAvailable(now)`, `day
 | 버전 | 날짜 | 내용 |
 |---|---|---|
 | 1.0 | 2026-06-01 | 초안 — E2E 감사 #7 H-002 대응. Teachworks Make-up bank 패턴 차용. MakeupCredit 별도 엔티티 + Subscription.scheduledLessons 트랙 분리 + 일괄변경 재계산 로직 정의 |
+| 1.1 | 2026-08-12 | 수강권 정합성 감사 반영 — §4.2 노쇼 면제 배선 완료(기본 OFF), §4.4 수동 지급에 수강권 귀속 선택 추가, §7.1 fifthWeekBonus 죽은 메서드 제거 노트, §7.3 신설(일괄변경 이중 시스템 — 미해결, 별도 기획 결정 필요), §3.2 배선 현황 재확인 |
