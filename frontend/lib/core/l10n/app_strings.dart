@@ -714,6 +714,10 @@ class AppStrings {
   static const scheduleChangeResponseNeeded = '일정 변경 응답이 필요합니다';
   static const scheduleChangeResponseAction = '일정 변경 응답 필요 →';
 
+  // A-2 canonical routing (schedule_change_unification_spec §4 M-3) — 연계된
+  // 회차 협상은 요청 상세 스레드에서 이어간다.
+  static const scheduleChangeGoToThread = '요청 상세에서 이어가기';
+
   // ── Schedule Change Response — reject reason / accept memo (#544/#545) ──
   static const scheduleChangeResponseMessageHint = '사유나 메모를 남겨주세요 (선택)';
 
