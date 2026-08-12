@@ -46,8 +46,18 @@ class MakeupCreditListResponse(BaseModel):
 
 
 class MakeupCreditGrantRequest(BaseModel):
-    """Spec §8.1 POST body — teacher manual grant (§4.4 safety net)."""
+    """Spec §8.1 POST body — teacher grant.
+
+    Two reasons a teacher can trigger from this endpoint:
+    - manualGrant (default, §4.4 safety net)
+    - noShowExempt (§4.2 discretionary no-show exemption) — requires `lesson_id`
+    """
 
     student_id: str
     source_subscription_id: str | None = None
     reason_note: str | None = Field(default=None, max_length=500)
+    reason: MakeupCreditReason = MakeupCreditReason.manualGrant
+    lesson_id: str | None = Field(
+        default=None,
+        description="Required when reason=noShowExempt (spec §4.2 sourceEventId).",
+    )

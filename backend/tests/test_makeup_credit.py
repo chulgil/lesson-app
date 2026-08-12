@@ -170,26 +170,18 @@ async def test_accrue_for_bulk_change_loss_records_subscription_and_change_id(
 
 
 @pytest.mark.asyncio
-async def test_accrue_manual_and_fifth_week_bonus(db_session: AsyncSession) -> None:
-    """§4.4 manual + #432 brief 5주차 보너스 accrual paths."""
+async def test_accrue_manual(db_session: AsyncSession) -> None:
+    """§4.4 manual grant accrual path.
+
+    fifthWeekBonus is not accrued via MakeupCreditService — spec §7.1
+    prescribes a Subscription.bonusCount adjustment instead.
+    """
     teacher_id, student_id = await _make_pair(db_session)
-    sub_id = await _make_subscription(
-        db_session,
-        student_id=student_id,
-        teacher_id=teacher_id,
-    )
     service = MakeupCreditService(db_session)
 
     manual = await service.accrue_manual(student_id=student_id, teacher_id=teacher_id)
-    bonus = await service.accrue_fifth_week_bonus(
-        student_id=student_id,
-        teacher_id=teacher_id,
-        subscription_id=sub_id,
-    )
 
     assert manual.reason == MakeupCreditReason.manualGrant
-    assert bonus.reason == MakeupCreditReason.fifthWeekBonus
-    assert bonus.source_subscription_id == sub_id
 
 
 # ----------------------------------------------------------------------

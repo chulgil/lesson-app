@@ -3,8 +3,9 @@
 Spec: docs/specs/subscription/makeup_credit_spec.md
 
 Responsibilities:
-- Accrual (4 sources): teacherVacation / noShowExempt / bulkChangeLoss / manualGrant
-  (+ fifthWeekBonus per #432 brief).
+- Accrual (4 sources): teacherVacation / noShowExempt / bulkChangeLoss / manualGrant.
+  (fifthWeekBonus is spec'd as a Subscription.bonusCount adjustment — §7.1 —
+  not a MakeupCredit accrual; no service method here.)
 - Use (consume on a lesson booking).
 - Expire (mark expired credits or filter active).
 - scheduled_lessons recalculation for a subscription
@@ -178,21 +179,6 @@ class MakeupCreditService:
             teacher_id=teacher_id,
             reason=MakeupCreditReason.manualGrant,
             source_event_id=note_event_id,
-        )
-
-    async def accrue_fifth_week_bonus(
-        self,
-        *,
-        student_id: str,
-        teacher_id: str,
-        subscription_id: str,
-    ) -> MakeupCredit:
-        """Task brief #432 — 5주차 보너스 적립. 30d expiry."""
-        return await self.accrue(
-            student_id=student_id,
-            teacher_id=teacher_id,
-            reason=MakeupCreditReason.fifthWeekBonus,
-            source_subscription_id=subscription_id,
         )
 
     # ------------------------------------------------------------------

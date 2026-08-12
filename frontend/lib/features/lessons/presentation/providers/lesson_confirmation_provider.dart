@@ -100,10 +100,9 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
       // for this lesson, so this ordering keeps it exactly-once whether or not
       // the teacher configured a LessonPolicy (#1237).
       if (isDeducted) {
-        final usageType =
-            reason == LessonNonCompletionReason.studentAbsent
-                ? UsageType.studentAbsent
-                : UsageType.lateCancellation;
+        final usageType = reason == LessonNonCompletionReason.studentAbsent
+            ? UsageType.studentAbsent
+            : UsageType.lateCancellation;
 
         await _recordSubscriptionUsage(
           lesson: lesson,
@@ -117,6 +116,14 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
         lesson,
         lessonStatus,
       );
+
+      // Spec §4.2 — discretionary no-show exempt credit. Teacher opt-in only
+      // (checkbox default OFF in LessonConfirmationDialog, never automatic),
+      // fired only after the status transition above succeeds.
+      if (reason == LessonNonCompletionReason.noShow &&
+          confirmationResult.grantMakeupCredit) {
+        await _grantNoShowExemptCredit(lesson);
+      }
 
       final note = confirmationResult.note;
       if (note != null && note.isNotEmpty) {
@@ -250,6 +257,25 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
       // In production, this should be logged properly
     }
   }
+
+  /// Grant a discretionary makeup credit for a no-show (spec §4.2). Only
+  /// called when the teacher opted in via LessonConfirmationDialog's
+  /// checkbox — never automatic. A failure here must not undo the already
+  /// -recorded no-show status transition, so it's swallowed like the other
+  /// secondary side effects in this method.
+  Future<void> _grantNoShowExemptCredit(Lesson lesson) async {
+    try {
+      await ref
+          .read(makeupCreditActionsProvider)
+          .grant(
+            studentId: lesson.studentId,
+            reason: MakeupCreditReason.noShowExempt,
+            lessonId: lesson.id,
+          );
+    } catch (e) {
+      // Log error but don't fail the main operation
+    }
+  }
 }
 
 /// Check if lesson needs confirmation (past scheduled lesson without notes)
@@ -275,14 +301,13 @@ Future<List<Lesson>> lessonsNeedingConfirmation(Ref ref) async {
   final now = DateTime.now();
 
   return lessons.where((lesson) {
-      // Only scheduled lessons
-      if (lesson.status != LessonStatus.scheduled) return false;
+    // Only scheduled lessons
+    if (lesson.status != LessonStatus.scheduled) return false;
 
-      // Check if lesson time has passed
-      final lessonEndTime = _parseLessonEndTime(lesson);
-      return lessonEndTime.isBefore(now);
-    }).toList()
-    ..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
+    // Check if lesson time has passed
+    final lessonEndTime = _parseLessonEndTime(lesson);
+    return lessonEndTime.isBefore(now);
+  }).toList()..sort((a, b) => b.date.compareTo(a.date)); // Most recent first
 }
 
 /// Parse lesson end time from date and startTime

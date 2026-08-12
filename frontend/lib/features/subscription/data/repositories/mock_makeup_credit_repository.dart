@@ -61,6 +61,8 @@ class MockMakeupCreditRepository implements MakeupCreditRepository {
     required String studentId,
     String? sourceSubscriptionId,
     String? reasonNote,
+    MakeupCreditReason reason = MakeupCreditReason.manualGrant,
+    String? lessonId,
   }) async {
     final now = DateTime.now();
     final credit = MakeupCredit(
@@ -68,9 +70,10 @@ class MockMakeupCreditRepository implements MakeupCreditRepository {
       studentId: studentId,
       teacherId: 'mock-teacher',
       sourceSubscriptionId: sourceSubscriptionId,
-      reason: MakeupCreditReason.manualGrant,
+      reason: reason,
       createdAt: now,
       expiresAt: now.add(const Duration(days: 30)),
+      sourceEventId: lessonId,
     );
     _credits.add(credit);
     return credit;
