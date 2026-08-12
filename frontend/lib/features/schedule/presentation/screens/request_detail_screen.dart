@@ -31,6 +31,7 @@ import '../widgets/request_detail/request_detail_chapter_summaries.dart';
 import '../widgets/request_detail/request_detail_event_strip.dart';
 import '../widgets/request_detail/request_detail_more_menu_sheet.dart';
 import '../widgets/request_history_chat.dart';
+import '../widgets/suggest_alternative_bottom_sheet.dart';
 import 'suggest_alternative_screen.dart';
 
 List<RequestEvent> requestDetailVisibleEventsForCurrentPhase(
@@ -197,27 +198,29 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final academyNames = ref.watch(academyNameMapProvider);
 
     return requestAsync.when(
-      loading: () => NotebookScreenScaffold(
-        backgroundColor: AppColors.paper,
-        appBar: const NotebookDetailAppBar(
-          title: AppStrings.requestDetailTitle,
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => NotebookScreenScaffold(
-        backgroundColor: AppColors.paper,
-        appBar: const NotebookDetailAppBar(
-          title: AppStrings.requestDetailTitle,
-        ),
-        body: Center(
-          child: Text(
-            AppStrings.requestLoadError,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
+      loading:
+          () => NotebookScreenScaffold(
+            backgroundColor: AppColors.paper,
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.requestDetailTitle,
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (error, _) => NotebookScreenScaffold(
+            backgroundColor: AppColors.paper,
+            appBar: const NotebookDetailAppBar(
+              title: AppStrings.requestDetailTitle,
+            ),
+            body: Center(
+              child: Text(
+                AppStrings.requestLoadError,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
       data: (request) {
         if (request == null) {
           return NotebookScreenScaffold(
@@ -255,9 +258,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.teacherName ??
             teacherNames[request.teacherId] ??
             AppStrings.teacher;
-        final opponentName = viewerRole == 'teacher'
-            ? studentName
-            : AppStrings.teacherDisplayName(teacherName);
+        final opponentName =
+            viewerRole == 'teacher'
+                ? studentName
+                : AppStrings.teacherDisplayName(teacherName);
 
         return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
@@ -265,17 +269,17 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request: request,
             opponentName: opponentName,
             academyName: academyName,
-            onTitleTap: () => showStudentProfileBottomSheet(
-              context: context,
-              studentId: request.studentId,
-              studentName: opponentName,
-              instrument: request.instrument,
-              student: ref
-                  .read(studentProvider(request.studentId))
-                  .valueOrNull,
-              message: request.message,
-              isTrialRequest: request.type == LessonRequestType.trial,
-            ),
+            onTitleTap:
+                () => showStudentProfileBottomSheet(
+                  context: context,
+                  studentId: request.studentId,
+                  studentName: opponentName,
+                  instrument: request.instrument,
+                  student:
+                      ref.read(studentProvider(request.studentId)).valueOrNull,
+                  message: request.message,
+                  isTrialRequest: request.type == LessonRequestType.trial,
+                ),
             onMoreTap: () => _showMoreMenu(context, request),
           ),
           body: Column(
@@ -297,13 +301,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                         RequestPhase.request,
                       ),
                       expandedChapters: _expandedChapters,
-                      onToggleChapter: (phase) => setState(() {
-                        if (_expandedChapters.contains(phase)) {
-                          _expandedChapters.remove(phase);
-                        } else {
-                          _expandedChapters.add(phase);
-                        }
-                      }),
+                      onToggleChapter:
+                          (phase) => setState(() {
+                            if (_expandedChapters.contains(phase)) {
+                              _expandedChapters.remove(phase);
+                            } else {
+                              _expandedChapters.add(phase);
+                            }
+                          }),
                     ),
 
                     // Chat history (chronological, newest at bottom)
@@ -311,23 +316,27 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       events: _eventsForCurrentPhase(request, events),
                       request: request,
                       shrinkWrap: true,
-                      viewerId: viewerRole == 'teacher'
-                          ? request.teacherId
-                          : request.studentId,
+                      viewerId:
+                          viewerRole == 'teacher'
+                              ? request.teacherId
+                              : request.studentId,
                       viewerRole: viewerRole,
                       studentName: studentName,
                       proposalTemplates: proposalTemplates,
-                      onOpponentAvatarTap: () => showStudentProfileBottomSheet(
-                        context: context,
-                        studentId: request.studentId,
-                        studentName: opponentName,
-                        instrument: request.instrument,
-                        student: ref
-                            .read(studentProvider(request.studentId))
-                            .valueOrNull,
-                        message: request.message,
-                        isTrialRequest: request.type == LessonRequestType.trial,
-                      ),
+                      onOpponentAvatarTap:
+                          () => showStudentProfileBottomSheet(
+                            context: context,
+                            studentId: request.studentId,
+                            studentName: opponentName,
+                            instrument: request.instrument,
+                            student:
+                                ref
+                                    .read(studentProvider(request.studentId))
+                                    .valueOrNull,
+                            message: request.message,
+                            isTrialRequest:
+                                request.type == LessonRequestType.trial,
+                          ),
                     ),
                   ],
                 ),
@@ -349,40 +358,52 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 initialSelectedSlot: _preselectedSlot,
                 opponentName: opponentName,
                 // Phase 1
-                onAccept: (slotIndex, message) =>
-                    _handleAccept(context, ref, request, slotIndex, message),
-                onCounterPropose: () =>
-                    _handleCounterPropose(context, ref, request),
+                onAccept:
+                    (slotIndex, message) => _handleAccept(
+                      context,
+                      ref,
+                      request,
+                      slotIndex,
+                      message,
+                    ),
+                onCounterPropose:
+                    () => _handleCounterPropose(context, ref, request),
                 onCancel: () => _handleCancel(context, ref, request),
                 onWithdraw: () => _handleWithdraw(context, ref, request),
                 // Phase 2
-                onSendPaymentGuide: () =>
-                    _handleSendPaymentGuide(context, ref, request),
-                onIssuePostpaid: () =>
-                    _handleIssuePostpaid(context, ref, request),
+                onSendPaymentGuide:
+                    () => _handleSendPaymentGuide(context, ref, request),
+                onIssuePostpaid:
+                    () => _handleIssuePostpaid(context, ref, request),
                 onIssueFree: () => _handleIssueFree(context, ref, request),
-                onConfirmPayment: () =>
-                    _handleConfirmPayment(context, ref, request),
-                onVerifyPayment: () =>
-                    _handleVerifyPayment(context, ref, request),
-                onAcceptProposal: (templateId) =>
-                    _handleAcceptProposal(context, ref, request, templateId),
-                onRejectProposal: (reason) =>
-                    _handleRejectProposal(context, ref, request, reason),
+                onConfirmPayment:
+                    () => _handleConfirmPayment(context, ref, request),
+                onVerifyPayment:
+                    () => _handleVerifyPayment(context, ref, request),
+                onAcceptProposal:
+                    (templateId) => _handleAcceptProposal(
+                      context,
+                      ref,
+                      request,
+                      templateId,
+                    ),
+                onRejectProposal:
+                    (reason) =>
+                        _handleRejectProposal(context, ref, request, reason),
                 proposalTemplates: proposalTemplates,
                 // Phase 3
-                onLessonComplete: () =>
-                    _handleLessonComplete(context, ref, request),
-                onLessonCancel: () =>
-                    _handleLessonCancel(context, ref, request),
-                onScheduleChange: () =>
-                    _handleScheduleChange(context, ref, request),
-                onScheduleChangeResponse: () =>
-                    _handleScheduleChangeResponse(context, ref, request),
+                onLessonComplete:
+                    () => _handleLessonComplete(context, ref, request),
+                onLessonCancel:
+                    () => _handleLessonCancel(context, ref, request),
+                onScheduleChange:
+                    () => _handleScheduleChange(context, ref, request),
+                onScheduleChangeResponse:
+                    () => _handleScheduleChangeResponse(context, ref, request),
                 onAddNote: () => _handleAddNote(context, ref, request),
                 // Phase 3/4
-                onViewSubscription: () =>
-                    _handleViewSubscription(context, events),
+                onViewSubscription:
+                    () => _handleViewSubscription(context, events),
                 onProposeRenewal: () => _handleRenewal(context, ref, request),
                 onRequestRenewal: () => _handleRenewal(context, ref, request),
               ),
@@ -470,18 +491,16 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    // Navigate to schedule comparison screen with student's preferred slots
-    final result = await Navigator.push<SuggestAlternativeResult>(
+    // Open schedule comparison bottom sheet with student's preferred slots
+    // (P1-4 first increment — migrated from full-screen push to the house
+    // bottom-sheet pattern used by the rest of RequestDetailScreen's actions).
+    final result = await showSuggestAlternativeBottomSheet(
       context,
-      MaterialPageRoute(
-        builder: (_) => SuggestAlternativeScreen(
-          message: AppStrings.proposeDefaultMessage,
-          durationMinutes: request.preferredDuration,
-          teacherId: request.teacherId,
-          preferredSlots: request.preferredSlots,
-          isStudentView: viewerRole == 'student',
-        ),
-      ),
+      message: AppStrings.proposeDefaultMessage,
+      durationMinutes: request.preferredDuration,
+      teacherId: request.teacherId,
+      preferredSlots: request.preferredSlots,
+      isStudentView: viewerRole == 'student',
     );
     if (result == null || !context.mounted) return;
 
@@ -522,19 +541,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.id,
           request.teacherId,
           request.studentId,
-          slots: result.slots
-              .map(
-                (s) => TimeSlotOption(
-                  id: s.id,
-                  dayOfWeek: s.dayOfWeek - 1,
-                  startTime:
-                      '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                  endTime:
-                      '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                  date: s.specificDate,
-                ),
-              )
-              .toList(),
+          slots:
+              result.slots
+                  .map(
+                    (s) => TimeSlotOption(
+                      id: s.id,
+                      dayOfWeek: s.dayOfWeek - 1,
+                      startTime:
+                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                      endTime:
+                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                      date: s.specificDate,
+                    ),
+                  )
+                  .toList(),
           message: result.message,
         );
         if (context.mounted) {
@@ -581,22 +601,22 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final result = await Navigator.push<SuggestAlternativeResult>(
       context,
       MaterialPageRoute(
-        builder: (_) => SuggestAlternativeScreen(
-          message: '',
-          durationMinutes: request.preferredDuration,
-          teacherId: request.teacherId,
-          preferredSlots: request.preferredSlots,
-          isStudentView: viewerRole == 'student',
-        ),
+        builder:
+            (_) => SuggestAlternativeScreen(
+              message: '',
+              durationMinutes: request.preferredDuration,
+              teacherId: request.teacherId,
+              preferredSlots: request.preferredSlots,
+              isStudentView: viewerRole == 'student',
+            ),
       ),
     );
     if (result == null || !context.mounted) return;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
-      final actorRole = viewerRole == 'teacher'
-          ? ProposerRole.teacher
-          : ProposerRole.student;
+      final actorRole =
+          viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
 
       if (result.acceptedSlotIndex != null) {
         // Re-approve: check if slot changed
@@ -656,19 +676,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.id,
           request.teacherId,
           request.studentId,
-          slots: result.slots
-              .map(
-                (s) => TimeSlotOption(
-                  id: s.id,
-                  dayOfWeek: s.dayOfWeek - 1,
-                  startTime:
-                      '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                  endTime:
-                      '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                  date: s.specificDate,
-                ),
-              )
-              .toList(),
+          slots:
+              result.slots
+                  .map(
+                    (s) => TimeSlotOption(
+                      id: s.id,
+                      dayOfWeek: s.dayOfWeek - 1,
+                      startTime:
+                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                      endTime:
+                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                      date: s.specificDate,
+                    ),
+                  )
+                  .toList(),
           message: result.message,
         );
         if (context.mounted) {
@@ -706,9 +727,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           final templates = await ref.read(
             activeTeacherTemplatesProvider(request.teacherId).future,
           );
-          final selectedTemplates = templates
-              .where((t) => result.templateIds.contains(t.id))
-              .toList();
+          final selectedTemplates =
+              templates
+                  .where((t) => result.templateIds.contains(t.id))
+                  .toList();
 
           final templateSummary = selectedTemplates
               .map(
@@ -912,12 +934,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
@@ -941,12 +961,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     // Step 1: Choose change type
     final changeType = await showScheduleChangeTypeBottomSheet(context);
@@ -961,9 +979,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         teacherId: request.teacherId,
         studentId: request.studentId,
         durationMinutes: request.preferredDuration,
-        currentScheduleLabel: request.preferredSlots.isNotEmpty
-            ? request.preferredSlots.first.displayLabel
-            : '-',
+        currentScheduleLabel:
+            request.preferredSlots.isNotEmpty
+                ? request.preferredSlots.first.displayLabel
+                : '-',
         isBulkChange: changeType == ScheduleChangeType.bulkChange,
       ),
     );
@@ -979,19 +998,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.teacherId,
         request.studentId,
         changeType: changeType,
-        suggestedSlots: result.slots
-            .map(
-              (s) => TimeSlotOption(
-                id: s.id,
-                // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
-                dayOfWeek: s.dayOfWeek - 1,
-                startTime:
-                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                endTime:
-                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-              ),
-            )
-            .toList(),
+        suggestedSlots:
+            result.slots
+                .map(
+                  (s) => TimeSlotOption(
+                    id: s.id,
+                    // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
+                    dayOfWeek: s.dayOfWeek - 1,
+                    startTime:
+                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                    endTime:
+                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                  ),
+                )
+                .toList(),
         message: result.message.isEmpty ? null : result.message,
       );
       // #1191 — 상대 통지는 BE Notification row 가 SSOT (#1200: add_event 에서
@@ -1010,12 +1030,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
     // Find the pending proposal's slots and change type
     final events =
         ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
@@ -1084,19 +1102,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.teacherId,
             request.studentId,
             changeType: changeType,
-            suggestedSlots: result.counterSlots
-                .map(
-                  (s) => TimeSlotOption(
-                    id: s.id,
-                    // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
-                    dayOfWeek: s.dayOfWeek - 1,
-                    startTime:
-                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                    endTime:
-                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                  ),
-                )
-                .toList(),
+            suggestedSlots:
+                result.counterSlots
+                    .map(
+                      (s) => TimeSlotOption(
+                        id: s.id,
+                        // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
+                        dayOfWeek: s.dayOfWeek - 1,
+                        startTime:
+                            '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                        endTime:
+                            '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                      ),
+                    )
+                    .toList(),
             message: result.message.isEmpty ? null : result.message,
           );
           // #1191 — 상대 통지는 BE(#1200 scheduleChangeRequested→교사 emit). FE
@@ -1149,12 +1168,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);

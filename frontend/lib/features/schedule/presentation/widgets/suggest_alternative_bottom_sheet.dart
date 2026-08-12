@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
-import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/booking/presentation/extensions/lesson_booking_visual_extensions.dart';
+import '../../../../core/domain/value_objects/clock_time.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
@@ -20,32 +21,51 @@ import '../../domain/services/schedule_window_conflict_service.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
-import '../widgets/alternative_time_grid.dart';
-import '../widgets/reject_message_bottom_sheet.dart';
+import '../screens/suggest_alternative_screen.dart'
+    show SuggestAlternativeResult;
+import 'alternative_time_grid.dart';
+import 'reject_message_bottom_sheet.dart';
 
-/// Result type for this screen.
-/// - slots not empty + acceptedSlotIndex == null → propose alternatives
-/// - slots empty + acceptedSlotIndex == null → reject
-/// - acceptedSlotIndex != null → accept student's preferred slot directly
-typedef SuggestAlternativeResult =
-    ({String message, List<TimeSlot> slots, int? acceptedSlotIndex});
+/// Shows the counter-propose / re-proposal bottom sheet.
+///
+/// Bottom-sheet counterpart of [SuggestAlternativeScreen] (P1-4 first
+/// increment) — same weekly schedule grid, preferred-slot accept mode, and
+/// reject flow, presented as a self-surfaced sheet instead of a pushed
+/// full-screen route. Returns [SuggestAlternativeResult] or null if
+/// dismissed.
+Future<SuggestAlternativeResult?> showSuggestAlternativeBottomSheet(
+  BuildContext context, {
+  required String message,
+  required int durationMinutes,
+  String? teacherId,
+  bool isStudentView = false,
+  List<PreferredTimeSlot> preferredSlots = const [],
+}) {
+  return showNotebookModalBottomSheet<SuggestAlternativeResult>(
+    context: context,
+    isScrollControlled: true,
+    builder:
+        (_) => _SuggestAlternativeBottomSheet(
+          message: message,
+          durationMinutes: durationMinutes,
+          teacherId: teacherId,
+          isStudentView: isStudentView,
+          preferredSlots: preferredSlots,
+        ),
+  );
+}
 
-/// Screen for suggesting alternative time slots via a weekly schedule grid.
-///
-/// Shows the teacher's existing lessons and allows tapping empty cells
-/// to add suggested time slots (up to 3). Each slot can be edited or removed.
-///
-/// When [preferredSlots] are provided, shows the student's preferred times
-/// as selectable cards. Tapping one switches to "confirm" mode.
-class SuggestAlternativeScreen extends ConsumerStatefulWidget {
+/// Self-surfaced bottom sheet — same weekly grid + preferred-slot logic as
+/// [SuggestAlternativeScreen], reusing [AlternativeTimeGrid] and the shared
+/// [showRejectMessageBottomSheet] reject step.
+class _SuggestAlternativeBottomSheet extends ConsumerStatefulWidget {
   final String message;
   final int durationMinutes;
   final String? teacherId;
   final bool isStudentView;
   final List<PreferredTimeSlot> preferredSlots;
 
-  const SuggestAlternativeScreen({
-    super.key,
+  const _SuggestAlternativeBottomSheet({
     required this.message,
     required this.durationMinutes,
     this.teacherId,
@@ -54,12 +74,12 @@ class SuggestAlternativeScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SuggestAlternativeScreen> createState() =>
-      _SuggestAlternativeScreenState();
+  ConsumerState<_SuggestAlternativeBottomSheet> createState() =>
+      _SuggestAlternativeBottomSheetState();
 }
 
-class _SuggestAlternativeScreenState
-    extends ConsumerState<SuggestAlternativeScreen> {
+class _SuggestAlternativeBottomSheetState
+    extends ConsumerState<_SuggestAlternativeBottomSheet> {
   var _suggestedSlots = <TimeSlot>[];
   late DateTime _weekStart;
   late TextEditingController _messageController;
@@ -189,8 +209,6 @@ class _SuggestAlternativeScreenState
     );
   }
 
-  // 2026-06-12 — `?? 'teacher_1'` 데드코드 제거 (currentUserIdProvider 는
-  // 비-nullable String 이라 도달 불가였음).
   String get _effectiveTeacherId =>
       widget.teacherId ?? ref.read(currentUserIdProvider);
 
@@ -210,52 +228,88 @@ class _SuggestAlternativeScreenState
         teacherId: teacherId,
       )),
     );
+    final mq = MediaQuery.of(context);
 
-    return NotebookScreenScaffold(
-      backgroundColor: AppColors.paper,
-      resizeToAvoidBottomInset: true,
-      appBar: const NotebookDetailAppBar(title: AppStrings.counterPropose),
-      body: Column(
+    return Container(
+      // proposal_bottom_sheet / schedule_change_slot_bottom_sheet 패턴 —
+      // maxHeight 으로 sheet 상한 고정. FractionallySizedBox 금지 (scrim 삼킴).
+      constraints: BoxConstraints(maxHeight: mq.size.height * 0.92),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
+      padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            const Padding(
+              padding: EdgeInsets.only(top: AppSpacing.space3),
+              child: Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            _buildHeader(context),
+
+            // Student's preferred slots (if any)
+            if (widget.preferredSlots.isNotEmpty)
+              _buildPreferredSlotsSection(
+                weekLessonsAsync.valueOrNull ?? [],
+                _teacherAvailability(),
+              ),
+
+            // Week navigation
+            _buildWeekNav(),
+
+            // Grid
+            Flexible(
+              child: weekLessonsAsync.when(
+                data:
+                    (lessons) => AlternativeTimeGrid(
+                      weekStart: _weekStart,
+                      lessons: lessons,
+                      suggestedSlots: _suggestedSlots,
+                      hideStudentNames: widget.isStudentView,
+                      highlightedSlot: _selectedHighlight,
+                      onEmptyCellTap: (cell) {
+                        if (!_isAcceptMode) {
+                          _addSlotFromGrid(cell.date, cell.hour, cell.minute);
+                        }
+                      },
+                    ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error:
+                    (e, _) =>
+                        Center(child: Text('${AppStrings.loadFailed}: $e')),
+              ),
+            ),
+
+            // Suggested slots list (hidden in accept mode)
+            if (_suggestedSlots.isNotEmpty && !_isAcceptMode)
+              _buildSuggestedSlotsList(),
+
+            _buildBottomSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Row(
         children: [
-          // Student's preferred slots (if any)
-          if (widget.preferredSlots.isNotEmpty)
-            _buildPreferredSlotsSection(
-              weekLessonsAsync.valueOrNull ?? [],
-              _teacherAvailability(),
-            ),
-
-          // Week navigation
-          _buildWeekNav(),
-
-          // Grid
-          Expanded(
-            child: weekLessonsAsync.when(
-              data:
-                  (lessons) => AlternativeTimeGrid(
-                    weekStart: _weekStart,
-                    lessons: lessons,
-                    suggestedSlots: _suggestedSlots,
-                    hideStudentNames: widget.isStudentView,
-                    highlightedSlot: _selectedHighlight,
-                    onEmptyCellTap: (cell) {
-                      if (!_isAcceptMode) {
-                        _addSlotFromGrid(cell.date, cell.hour, cell.minute);
-                      }
-                    },
-                  ),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (e, _) => Center(child: Text('${AppStrings.loadFailed}: $e')),
-            ),
+          Text(
+            AppStrings.counterPropose,
+            style: NotebookTypography.sectionTitle,
           ),
-
-          // Suggested slots list (hidden in accept mode)
-          if (_suggestedSlots.isNotEmpty && !_isAcceptMode)
-            _buildSuggestedSlotsList(),
+          const Spacer(),
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.close),
+            iconSize: 20,
+          ),
         ],
       ),
-      // Bottom section as bottomNavigationBar — stays above keyboard
-      bottomNavigationBar: _buildBottomSection(),
     );
   }
 
@@ -404,77 +458,75 @@ class _SuggestAlternativeScreenState
   }
 
   /// Bottom section with message input and action buttons.
-  /// Rendered as [bottomNavigationBar] so it stays above the keyboard.
   Widget _buildBottomSection() {
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.screenPadding,
-          AppSpacing.space3,
-          AppSpacing.screenPadding,
-          AppSpacing.space4,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space3,
+        AppSpacing.screenPadding,
+        AppSpacing.space3,
+      ),
+      decoration: const BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border(
+          top: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
         ),
-        decoration: BoxDecoration(
-          color: AppColors.paper,
-          border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Message input (same style as chat input)
-            TextField(
-              controller: _messageController,
-              maxLines: _isAcceptMode ? 2 : 3,
-              minLines: 1,
-              maxLength: 200,
-              style: AppTypography.bodySmall,
-              decoration: InputDecoration(
-                hintText:
-                    _isAcceptMode
-                        ? AppStrings.acceptMessageHint
-                        : AppStrings.messageHint,
-                hintStyle: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkTertiary,
-                ),
-                counterText: '',
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: AppColors.inkQuaternary),
-                ),
-                enabledBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: AppColors.inkQuaternary),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: AppColors.ink),
-                ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Message input (same style as chat input)
+          TextField(
+            controller: _messageController,
+            maxLines: _isAcceptMode ? 2 : 3,
+            minLines: 1,
+            maxLength: 200,
+            style: AppTypography.bodySmall,
+            decoration: InputDecoration(
+              hintText:
+                  _isAcceptMode
+                      ? AppStrings.acceptMessageHint
+                      : AppStrings.messageHint,
+              hintStyle: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkTertiary,
+              ),
+              counterText: '',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: AppColors.ink),
               ),
             ),
-            const SizedBox(height: AppSpacing.space2),
+          ),
+          const SizedBox(height: AppSpacing.space2),
 
-            // Action buttons
-            _isAcceptMode
-                ? _buildAcceptButton(
-                  ref
-                          .watch(
-                            weekLessonsWithPreviewProvider((
-                              weekStart: _weekStart,
-                              teacherId: _effectiveTeacherId,
-                            )),
-                          )
-                          .valueOrNull ??
-                      [],
-                  _teacherAvailability(),
-                )
-                : _buildProposeButtons(),
-          ],
-        ),
+          // Action buttons
+          _isAcceptMode
+              ? _buildAcceptButton(
+                ref
+                        .watch(
+                          weekLessonsWithPreviewProvider((
+                            weekStart: _weekStart,
+                            teacherId: _effectiveTeacherId,
+                          )),
+                        )
+                        .valueOrNull ??
+                    [],
+                _teacherAvailability(),
+              )
+              : _buildProposeButtons(),
+        ],
       ),
     );
   }
@@ -579,7 +631,8 @@ class _SuggestAlternativeScreenState
     );
   }
 
-  /// Show reject bottom sheet with message input.
+  /// Show reject bottom sheet with message input — stacks on top of this
+  /// sheet, same as [SuggestAlternativeScreen]'s reject step.
   Future<void> _showRejectBottomSheet() async {
     final result = await showRejectMessageBottomSheet(context);
 

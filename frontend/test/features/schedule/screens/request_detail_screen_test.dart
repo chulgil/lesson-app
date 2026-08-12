@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
+import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
+import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/unified_lesson_request_providers.dart';
+import 'package:lessonaza/features/schedule/presentation/providers/week_lessons_provider.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/request_detail_screen.dart';
+import 'package:lessonaza/features/schedule/presentation/screens/suggest_alternative_screen.dart'
+    show SuggestAlternativeScreen;
 import 'package:lessonaza/features/subscription/presentation/providers/subscription_template_providers.dart';
 
 // #P1 detail split — smoke test for the newly extracted app bar / event
@@ -65,5 +71,91 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  group('counter-propose (P1-4 bottom-sheet migration)', () {
+    // Student made the initial request → it's the teacher (viewer)'s turn,
+    // so CurrentRequestBox renders the myTurn action row with the
+    // "다른 시간 제안하기" button wired to _handleCounterPropose.
+    final events = [
+      RequestEvent(
+        id: 'evt_1',
+        requestId: request.id,
+        actorType: ProposerRole.student,
+        actorId: request.studentId,
+        eventType: RequestEventType.initialRequest,
+        createdAt: DateTime(2026, 5, 4),
+      ),
+    ];
+
+    Widget buildMyTurnTestable() {
+      final now = DateTime.now();
+      final weekStart = DateTime(
+        now.year,
+        now.month,
+        now.day - (now.weekday - 1),
+      );
+
+      return ProviderScope(
+        overrides: [
+          unifiedRequestByIdProvider(
+            request.id,
+          ).overrideWith((ref) async => request),
+          requestEventsProvider(request.id).overrideWith((ref) async => events),
+          studentNameMapProvider.overrideWithValue(const {'student_1': '김민준'}),
+          teacherNameMapProvider.overrideWithValue(const {'teacher_1': '박선생'}),
+          academyNameMapProvider.overrideWithValue(const {}),
+          activeTeacherTemplatesProvider(
+            request.teacherId,
+          ).overrideWith((ref) async => const []),
+          weekLessonsWithPreviewProvider((
+            weekStart: weekStart,
+            teacherId: request.teacherId,
+          )).overrideWith((ref) async => const []),
+          teacherAvailabilityProvider(request.teacherId).overrideWith(
+            (ref) async => TeacherAvailability(
+              id: request.teacherId,
+              teacherId: request.teacherId,
+              weeklySchedules: [
+                for (var d = 0; d < 7; d++)
+                  WeeklySchedule(
+                    id: 'ws-$d',
+                    dayOfWeek: d,
+                    startTime: '09:00',
+                    endTime: '21:00',
+                    createdAt: DateTime(2026, 1, 1),
+                  ),
+              ],
+              exceptions: const [],
+              createdAt: DateTime(2026, 1, 1),
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          home: RequestDetailScreen(
+            requestId: 'request_1',
+            viewerRole: 'teacher',
+          ),
+        ),
+      );
+    }
+
+    testWidgets('다른 시간 제안하기 opens a bottom sheet, not the full-screen '
+        'SuggestAlternativeScreen route', (tester) async {
+      await tester.pumpWidget(buildMyTurnTestable());
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.scheduleChangeCounter), findsOneWidget);
+      await tester.tap(find.text(AppStrings.scheduleChangeCounter));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      // Bottom sheet content renders; the old full-screen route never does.
+      // (The sheet's title text is the same string as the trigger button
+      // below it, so assert on the sheet-only close icon instead.)
+      expect(find.byType(SuggestAlternativeScreen), findsNothing);
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.text(AppStrings.rejectAction), findsOneWidget);
+    });
   });
 }
