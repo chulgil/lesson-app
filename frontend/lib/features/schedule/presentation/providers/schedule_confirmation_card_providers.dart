@@ -38,6 +38,27 @@ Future<ScheduleConfirmationCard?> scheduleConfirmationCard(
   return repository.getCardById(cardId);
 }
 
+/// Resolve the originating [UnifiedLessonRequest] id for a subscription via
+/// the [ScheduleConfirmationCard] reverse lookup (Option A).
+///
+/// Returns null when no card exists for the subscription (renewal proposals
+/// and teacher-direct proposals never set lessonRequestId) or when the
+/// lookup fails — callers should treat null as "no linked request thread"
+/// and fall back to subscription-based routing.
+@riverpod
+Future<String?> lessonRequestIdBySubscription(
+  LessonRequestIdBySubscriptionRef ref,
+  String subscriptionId,
+) async {
+  final repository = ref.watch(scheduleConfirmationCardRepositoryProvider);
+  try {
+    final card = await repository.getCardBySubscriptionId(subscriptionId);
+    return card?.lessonRequestId;
+  } catch (_) {
+    return null;
+  }
+}
+
 /// Notifier for managing schedule confirmation card actions.
 @riverpod
 class ScheduleConfirmationCardNotifier

@@ -15,6 +15,7 @@ List<StudentLessonProgressItem> buildStudentLessonProgressItems({
   required List<Subscription> subscriptions,
   List<ScheduleConfirmationCard> scheduleCards = const [],
   List<RequestEvent> scheduleChangeEvents = const [],
+  Map<String, String> lessonRequestIdBySubscription = const {},
 }) {
   final items = <StudentLessonProgressItem>[
     ...requests.map(_requestItem),
@@ -23,7 +24,12 @@ List<StudentLessonProgressItem> buildStudentLessonProgressItems({
         !proposals.any((proposal) => proposal.id == renewalProposal.id))
       _renewalItem(renewalProposal),
     ...scheduleCards.map(_scheduleCardItem),
-    ..._scheduleChangeItems(scheduleChangeEvents, subscriptions, studentId),
+    ..._scheduleChangeItems(
+      scheduleChangeEvents,
+      subscriptions,
+      studentId,
+      lessonRequestIdBySubscription,
+    ),
     ..._recentSubscriptionReadyItems(subscriptions, scheduleCards),
   ];
 
@@ -157,6 +163,7 @@ Iterable<StudentLessonProgressItem> _scheduleChangeItems(
   List<RequestEvent> events,
   List<Subscription> subscriptions,
   String studentId,
+  Map<String, String> lessonRequestIdBySubscription,
 ) {
   final studentSubscriptionIds =
       subscriptions.map((subscription) => subscription.id).toSet();
@@ -169,7 +176,9 @@ Iterable<StudentLessonProgressItem> _scheduleChangeItems(
             (event.subscriptionId != null &&
                 studentSubscriptionIds.contains(event.subscriptionId)),
       )
-      .map(_scheduleChangeItem);
+      .map(
+        (event) => _scheduleChangeItem(event, lessonRequestIdBySubscription),
+      );
 }
 
 bool _isScheduleChangeProgressEvent(RequestEvent event) {
@@ -184,8 +193,19 @@ bool _isScheduleChangeProgressEvent(RequestEvent event) {
   };
 }
 
-StudentLessonProgressItem _scheduleChangeItem(RequestEvent event) {
+StudentLessonProgressItem _scheduleChangeItem(
+  RequestEvent event,
+  Map<String, String> lessonRequestIdBySubscription,
+) {
   final priority = _scheduleChangePriority(event);
+  final linkedRequestId =
+      event.subscriptionId == null
+          ? null
+          : lessonRequestIdBySubscription[event.subscriptionId];
+  final requestRoute =
+      linkedRequestId == null
+          ? null
+          : AppRoutes.requestDetail.replaceFirst(':id', linkedRequestId);
   final subscriptionRoute =
       event.subscriptionId == null
           ? null
@@ -206,7 +226,7 @@ StudentLessonProgressItem _scheduleChangeItem(RequestEvent event) {
     subtitle: _scheduleChangeSubtitle(event),
     statusLabel: _scheduleChangeStatusLabel(priority),
     createdAt: event.createdAt,
-    route: sessionRoute,
+    route: requestRoute ?? sessionRoute,
     routeExtra: _studentViewerExtra,
   );
 }

@@ -72,13 +72,8 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                       academyName: academyNames[displayRequests[i].actorId],
                       onTap:
                           displayRequests[i].subscriptionId != null
-                              ? () => context.push(
-                                _subscriptionDetailRoute(displayRequests[i]),
-                                extra: {
-                                  'viewerRole': 'teacher',
-                                  'highlightScheduleResponse': true,
-                                },
-                              )
+                              ? () =>
+                                  _handleTap(context, ref, displayRequests[i])
                               : null,
                     ),
                   ],
@@ -237,6 +232,37 @@ String _subscriptionDetailRoute(RequestEvent event) {
   );
   if (event.sessionNumber == null) return route;
   return '$route?session=${event.sessionNumber}';
+}
+
+/// Resolves the originating request thread before navigating.
+///
+/// If the subscription has a linked [ScheduleConfirmationCard] with a
+/// lessonRequestId (Option A reverse lookup), routes to the chat-style
+/// request detail thread. Otherwise falls back to the existing
+/// subscriptionDetail + highlightScheduleResponse intent (renewal /
+/// teacher-direct proposals never link back to a request).
+Future<void> _handleTap(
+  BuildContext context,
+  WidgetRef ref,
+  RequestEvent event,
+) async {
+  final lessonRequestId = await ref.read(
+    lessonRequestIdBySubscriptionProvider(event.subscriptionId!).future,
+  );
+  if (!context.mounted) return;
+
+  if (lessonRequestId != null) {
+    context.push(
+      AppRoutes.requestDetail.replaceFirst(':id', lessonRequestId),
+      extra: const {'viewerRole': 'teacher'},
+    );
+    return;
+  }
+
+  context.push(
+    _subscriptionDetailRoute(event),
+    extra: {'viewerRole': 'teacher', 'highlightScheduleResponse': true},
+  );
 }
 
 /// List item for schedule change requests — same layout as RequestListItem.

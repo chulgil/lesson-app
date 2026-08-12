@@ -17,6 +17,7 @@ export 'presentation/providers/group_class_providers.dart'
     show groupClassByIdProvider, teacherGroupClassesProvider;
 export 'presentation/providers/schedule_confirmation_card_providers.dart'
     show
+        lessonRequestIdBySubscriptionProvider,
         pendingScheduleConfirmationCardsProvider,
         scheduleConfirmationCardNotifierProvider;
 export 'presentation/providers/unified_lesson_request_providers.dart'
