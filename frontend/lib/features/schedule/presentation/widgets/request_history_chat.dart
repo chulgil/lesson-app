@@ -11,6 +11,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../../domain/mappers/time_slot_mapper.dart';
 import '../extensions/request_event_visuals.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import 'proposal_chat_card.dart';
@@ -591,19 +592,7 @@ class RequestHistoryChat extends StatelessWidget {
                       request!.studentId,
                       changeType: ScheduleChangeType.singleLesson,
                       suggestedSlots:
-                          result.slots
-                              .map(
-                                (s) => TimeSlotOption(
-                                  id: s.id,
-                                  // TimeSlot uses 1=Mon..7=Sun; TimeSlotOption uses 0=Mon..6=Sun
-                                  dayOfWeek: s.dayOfWeek - 1,
-                                  startTime:
-                                      '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                                  endTime:
-                                      '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                                ),
-                              )
-                              .toList(),
+                          result.slots.map((s) => s.toTimeSlotOption()).toList(),
                       message: result.message.isEmpty ? null : result.message,
                     );
                   } catch (_) {

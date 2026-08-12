@@ -18,6 +18,7 @@ import '../../../lessons/lessons_facade.dart';
 import '../../../schedule/schedule_facade.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/domain/mappers/time_slot_mapper.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../students/students_ui_facade.dart';
@@ -702,18 +703,7 @@ class _SubscriptionDetailBodyState
     if (result.slots.isEmpty) return;
 
     final suggestedSlots =
-        result.slots
-            .map(
-              (s) => TimeSlotOption(
-                id: s.id,
-                dayOfWeek: s.dayOfWeek,
-                startTime:
-                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                endTime:
-                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-              ),
-            )
-            .toList();
+        result.slots.map((s) => s.toTimeSlotOption()).toList();
 
     final counterEvent = RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
@@ -757,18 +747,7 @@ class _SubscriptionDetailBodyState
     if (result.slots.isEmpty) return;
 
     final suggestedSlots =
-        result.slots
-            .map(
-              (s) => TimeSlotOption(
-                id: s.id,
-                dayOfWeek: s.dayOfWeek,
-                startTime:
-                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                endTime:
-                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-              ),
-            )
-            .toList();
+        result.slots.map((s) => s.toTimeSlotOption()).toList();
 
     _recordScheduleChangeEvent(
       changeType: ScheduleChangeType.singleLesson,
@@ -803,18 +782,7 @@ class _SubscriptionDetailBodyState
 
     // Record schedule change event in chat (with slot data, same as RequestDetailScreen)
     final suggestedSlots =
-        result.slots
-            .map(
-              (s) => TimeSlotOption(
-                id: s.id,
-                dayOfWeek: s.dayOfWeek,
-                startTime:
-                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                endTime:
-                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-              ),
-            )
-            .toList();
+        result.slots.map((s) => s.toTimeSlotOption()).toList();
 
     _recordScheduleChangeEvent(
       changeType: changeType,
