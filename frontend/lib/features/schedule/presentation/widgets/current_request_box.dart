@@ -11,6 +11,7 @@ import '../../../subscription/presentation/extensions/subscription_template_visu
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
+import 'schedule_change_action_bar.dart';
 import 'schedule_slot_choice_list.dart';
 
 /// Current request action box — phase-aware actions.
@@ -94,14 +95,12 @@ class CurrentRequestBox extends StatefulWidget {
 class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   int? _selectedSlotIndex;
   String? _selectedTemplateId;
-  late TextEditingController _messageController;
 
   bool get _isTeacher => widget.viewerRole == 'teacher';
 
   @override
   void initState() {
     super.initState();
-    _messageController = TextEditingController();
     // Auto-select if only 1 slot
     final latestSlots = _latestSlotLabels;
     if (latestSlots.length == 1) {
@@ -116,12 +115,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         widget.initialSelectedSlot != oldWidget.initialSelectedSlot) {
       _selectedSlotIndex = widget.initialSelectedSlot;
     }
-  }
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    super.dispose();
   }
 
   /// Get display labels for the latest proposed slots (Phase 1 only).
@@ -221,153 +214,21 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             )
             .toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (slotChoices.isNotEmpty)
-          ScheduleSlotChoiceList(
-            choices: slotChoices,
-            selectedIndex: _selectedSlotIndex,
-            onSelected: (index) => setState(() => _selectedSlotIndex = index),
-          ),
-        const SizedBox(height: AppSpacing.space2),
-
-        // Message input
-        TextField(
-          controller: _messageController,
-          maxLines: 8,
-          minLines: 1,
-          maxLength: 200,
-          style: AppTypography.bodySmall,
-          decoration: InputDecoration(
-            hintText: AppStrings.messageHint,
-            hintStyle: AppTypography.bodySmall.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-            counterText: '',
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space2,
-            ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.inkQuaternary),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-
-        // Action buttons
-        Row(
-          children: [
-            // Counter-propose button
-            Expanded(
-              child: SizedBox(
-                height: AppSpacing.buttonHeightSmall,
-                child: OutlinedButton(
-                  onPressed: widget.onCounterPropose,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.inkQuaternary),
-                    shape: RoundedRectangleBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                    ),
-                  ),
-                  child: Text(
-                    AppStrings.scheduleChangeCounter,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            // Accept button
-            Expanded(
-              child: SizedBox(
-                height: AppSpacing.buttonHeightSmall,
-                child: ElevatedButton(
-                  onPressed:
-                      _selectedSlotIndex != null
-                          ? () {
-                            widget.onAccept?.call(
-                              _selectedSlotIndex!,
-                              _messageController.text.trim(),
-                            );
-                            _messageController.clear();
-                          }
-                          : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.paperAccent,
-                    disabledBackgroundColor: AppColors.scheduleMutedAccent,
-                    shape: RoundedRectangleBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                    ),
-                  ),
-                  child: Text(
-                    AppStrings.scheduleChangeAccept,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.paper,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
+    return ScheduleChangeResponseBar(
+      choices: slotChoices,
+      initialSelectedIndex: _selectedSlotIndex,
+      messageHint: AppStrings.messageHint,
+      onAccept:
+          (slotIndex, message) => widget.onAccept?.call(slotIndex, message),
+      onCounterPropose: widget.onCounterPropose,
     );
   }
 
   /// Their turn: waiting message + withdraw button
   Widget _buildTheirTurn() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Waiting message row
-        Row(
-          children: [
-            Icon(Icons.hourglass_top, color: AppColors.ink, size: 18),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: Text(
-                AppStrings.waitingForResponse(widget.opponentName),
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        // Withdraw button (full width)
-        SizedBox(
-          width: double.infinity,
-          height: 36,
-          child: OutlinedButton.icon(
-            onPressed: widget.onWithdraw,
-            icon: const Icon(Icons.undo, size: 16),
-            label: Text(
-              AppStrings.withdrawApproval,
-              style: AppTypography.buttonSmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.inkQuaternary),
-              shape: RoundedRectangleBorder(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space2,
-              ),
-            ),
-          ),
-        ),
-      ],
+    return ScheduleChangeWaitingBar(
+      opponentName: widget.opponentName,
+      onWithdraw: widget.onWithdraw,
     );
   }
 

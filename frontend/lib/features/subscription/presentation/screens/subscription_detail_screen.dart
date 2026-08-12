@@ -183,6 +183,11 @@ class _SubscriptionDetailBodyState
   late int _selectedSession;
   bool _sessionResolved = false;
 
+  /// A-2 canonical routing (schedule_change_unification_spec.md §4 M-3) —
+  /// guards the one-time auto-forward to RequestDetailScreen so returning
+  /// from there via back-navigation doesn't bounce the user forward again.
+  bool _forwardedToRequestDetail = false;
+
   // Event strip state — matches RequestDetailScreen pattern exactly
   String? _eventMessage;
   Color _eventColor = AppColors.paperOk;
@@ -391,6 +396,41 @@ class _SubscriptionDetailBodyState
                 .valueOrNull ??
             [];
 
+        // A-2 canonical routing (schedule_change_unification_spec.md §4 M-3,
+        // constraint: 라우팅은 lessonRequestId 역조회 성공 시에만). Ch.3 회차별
+        // 협상(Waiting/CanRespond) 은 linked request thread 가 있으면 그
+        // 스레드가 canonical — 여기서 in-place 로 협상하지 않는다. 무연계
+        // 수강권(갱신·교사 직접 제안)은 링크가 없어 A-1 위젯 경로를 그대로
+        // 유지한다(데드엔드 금지).
+        final hasActiveNegotiation =
+            latestSubscriptionScheduleDecisionEvent(sessionEvents) != null;
+        final linkedRequestId =
+            hasActiveNegotiation
+                ? ref
+                    .watch(
+                      lessonRequestIdBySubscriptionProvider(subscription.id),
+                    )
+                    .valueOrNull
+                : null;
+        final routeToRequestDetail =
+            hasActiveNegotiation && linkedRequestId != null;
+
+        // Arriving with the explicit "respond now" intent (P1-3): forward
+        // once automatically instead of waiting for a CTA tap. Guarded so a
+        // later back-navigation to this screen doesn't bounce forward again.
+        if (widget.highlightScheduleResponse &&
+            routeToRequestDetail &&
+            !_forwardedToRequestDetail) {
+          _forwardedToRequestDetail = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            context.pushReplacement(
+              AppRoutes.requestDetail.replaceFirst(':id', linkedRequestId),
+              extra: {'viewerRole': widget.viewerRole},
+            );
+          });
+        }
+
         return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
           appBar: AppBar(
@@ -499,28 +539,45 @@ class _SubscriptionDetailBodyState
               _buildEventStrip(),
             ],
           ),
-          bottomNavigationBar: SubscriptionBottomInputBar(
-            subscription: subscription,
-            viewerRole: widget.viewerRole,
-            events: sessionEvents,
-            opponentName: opponentName,
-            selectedSession: _selectedSession,
-            highlightResponse: widget.highlightScheduleResponse,
-            onScheduleChange: () => _handleScheduleChange(context),
-            onAcceptScheduleChoice: _handleAcceptScheduleChoice,
-            onRejectScheduleChoice:
-                (event, message) =>
-                    _handleRejectScheduleChoice(context, event, message),
-            onCompareSchedule:
-                (event) => _handleCompareSchedule(context, event),
-            onWithdrawScheduleDecision:
-                (event) => _handleWithdrawScheduleDecision(context, event),
-            onCancellationFreeProcess:
-                (event) => _handleCancellationFreeProcess(context, event),
-            onCancellationAcknowledge: _handleCancellationAcknowledge,
-            onCancelLesson:
-                _isTeacher ? null : () => _handleCancelLesson(context),
-          ),
+          bottomNavigationBar:
+              routeToRequestDetail
+                  ? _LinkedNegotiationBar(
+                    onTap:
+                        () => context.push(
+                          AppRoutes.requestDetail.replaceFirst(
+                            ':id',
+                            linkedRequestId,
+                          ),
+                          extra: {'viewerRole': widget.viewerRole},
+                        ),
+                  )
+                  : SubscriptionBottomInputBar(
+                    subscription: subscription,
+                    viewerRole: widget.viewerRole,
+                    events: sessionEvents,
+                    opponentName: opponentName,
+                    selectedSession: _selectedSession,
+                    highlightResponse: widget.highlightScheduleResponse,
+                    onScheduleChange: () => _handleScheduleChange(context),
+                    onAcceptScheduleChoice: _handleAcceptScheduleChoice,
+                    onRejectScheduleChoice:
+                        (event, message) => _handleRejectScheduleChoice(
+                          context,
+                          event,
+                          message,
+                        ),
+                    onCompareSchedule:
+                        (event) => _handleCompareSchedule(context, event),
+                    onWithdrawScheduleDecision:
+                        (event) =>
+                            _handleWithdrawScheduleDecision(context, event),
+                    onCancellationFreeProcess:
+                        (event) =>
+                            _handleCancellationFreeProcess(context, event),
+                    onCancellationAcknowledge: _handleCancellationAcknowledge,
+                    onCancelLesson:
+                        _isTeacher ? null : () => _handleCancelLesson(context),
+                  ),
         );
       },
       loading:
@@ -922,6 +979,70 @@ class _SubscriptionDetailBodyState
       lesson.date.day,
       hour,
       minute,
+    );
+  }
+}
+
+/// A-2 canonical routing (schedule_change_unification_spec.md §4 M-3) —
+/// shown instead of [SubscriptionBottomInputBar]'s Waiting/CanRespond UI
+/// once the session's negotiation is linked to a request thread
+/// (`lessonRequestIdBySubscriptionProvider` resolves non-null). Tapping
+/// routes to [RequestDetailScreen], which is canonical for the negotiation
+/// from here on — Ch.1/Ch.2 (수강권 정보·결제) stay owned by this screen.
+class _LinkedNegotiationBar extends StatelessWidget {
+  const _LinkedNegotiationBar({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.space3,
+        AppSpacing.space3,
+        AppSpacing.space3,
+        MediaQuery.of(context).padding.bottom + AppSpacing.space3,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.swap_horiz_rounded,
+            color: AppColors.paperAccent,
+            size: 18,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              AppStrings.scheduleChangeResponseNeeded,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          TextButton(
+            onPressed: onTap,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+              ),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              AppStrings.scheduleChangeGoToThread,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.paperAccent,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
