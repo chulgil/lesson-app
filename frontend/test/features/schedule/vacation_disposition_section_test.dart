@@ -7,6 +7,10 @@ import 'package:lessonaza/features/schedule/presentation/providers/vacation_prov
 import 'package:lessonaza/features/schedule/presentation/screens/teacher_vacation_mode_screen.dart';
 
 /// Disposition section smoke tests — H-001 spec §4.1 step 3.
+///
+/// The disposition section only renders once the impact preview has loaded
+/// (progressive disclosure — UI complexity audit rank 5), so every test sets
+/// a valid draft range first and lets the auto-load settle before asserting.
 class _StubRepo implements VacationRepository {
   @override
   Future<VacationImpactPreview> previewImpact({
@@ -55,40 +59,69 @@ class _StubRepo implements VacationRepository {
 }
 
 void main() {
+  // Future date so hasValidDraft (no past start) always holds.
+  final base = DateTime.now().add(const Duration(days: 10));
+
   group('Disposition section smoke — H-001 §4.1 step 3', () {
-    Widget wrap() => ProviderScope(
-      overrides: [
-        vacationRepositoryProvider.overrideWithValue(_StubRepo()),
-        vacationListProvider.overrideWith((_) async => <VacationPeriod>[]),
-      ],
-      child: const MaterialApp(home: TeacherVacationModeScreen()),
-    );
+    /// Pumps the screen, sets a valid draft range on the notifier (triggers
+    /// the impact auto-load), and settles — the disposition section only
+    /// appears once that impact preview has resolved.
+    Future<ProviderContainer> pumpWithValidDraft(WidgetTester tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          vacationRepositoryProvider.overrideWithValue(_StubRepo()),
+          vacationListProvider.overrideWith((_) async => <VacationPeriod>[]),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: TeacherVacationModeScreen()),
+        ),
+      );
+      final notifier = container.read(vacationFormProvider.notifier);
+      notifier.setDraftStart(base);
+      notifier.setDraftEnd(base.add(const Duration(days: 2)));
+      await tester.pumpAndSettle();
+      return container;
+    }
+
+    /// Scrolls the given text into view before asserting it renders — the
+    /// disposition section can sit below the fold once the (also auto-loaded)
+    /// impact section is stacked above it.
+    Future<void> expectVisible(WidgetTester tester, String text) async {
+      await tester.scrollUntilVisible(
+        find.text(text),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text(text), findsOneWidget);
+    }
 
     testWidgets('renders three options with the recommended badge', (
       tester,
     ) async {
-      await tester.pumpWidget(wrap());
-      await tester.pumpAndSettle();
+      await pumpWithValidDraft(tester);
       expect(tester.takeException(), isNull);
-      expect(find.text('어떻게 처리할까요?'), findsOneWidget);
-      expect(find.text('보강 크레딧 적립'), findsOneWidget);
-      expect(find.text('무료 처리'), findsOneWidget);
-      expect(find.text('다음 회차로 이월'), findsOneWidget);
-      expect(find.text('권장'), findsOneWidget);
+      await expectVisible(tester, '어떻게 처리할까요?');
+      await expectVisible(tester, '보강 크레딧 적립');
+      await expectVisible(tester, '무료 처리');
+      await expectVisible(tester, '다음 회차로 이월');
+      await expectVisible(tester, '권장');
     });
 
     // #784 — student-perspective hints visible
     testWidgets('student-perspective hints are rendered for each option', (
       tester,
     ) async {
-      await tester.pumpWidget(wrap());
-      await tester.pumpAndSettle();
+      await pumpWithValidDraft(tester);
       expect(tester.takeException(), isNull);
-      expect(find.text('보강 1회를 적립해 나중에 사용해요 (환불 아님)'), findsOneWidget);
-      expect(find.text('수강권 차감 없이 휴강 처리해요 (환불 아님)'), findsOneWidget);
-      expect(find.text('다음 회차로 밀리고, 수강권 유효기간이 자동 연장돼요'), findsOneWidget);
+      await expectVisible(tester, '보강 1회를 적립해 나중에 사용해요 (환불 아님)');
+      await expectVisible(tester, '수강권 차감 없이 휴강 처리해요 (환불 아님)');
+      await expectVisible(tester, '다음 회차로 밀리고, 수강권 유효기간이 자동 연장돼요');
       // Recommended badge explanation.
-      expect(find.text('학생에게 유연성이 가장 높은 방식이에요'), findsOneWidget);
+      await expectVisible(tester, '학생에게 유연성이 가장 높은 방식이에요');
     });
 
     // #784 — narrow 320px layout regression
@@ -98,27 +131,15 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(wrap());
-      await tester.pumpAndSettle();
+      await pumpWithValidDraft(tester);
+      // Scroll the disposition section into view so its narrow-width layout
+      // is actually built and laid out under the 320px constraint.
+      await expectVisible(tester, '어떻게 처리할까요?');
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('tapping an option updates the form state', (tester) async {
-      final container = ProviderContainer(
-        overrides: [
-          vacationRepositoryProvider.overrideWithValue(_StubRepo()),
-          vacationListProvider.overrideWith((_) async => <VacationPeriod>[]),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const MaterialApp(home: TeacherVacationModeScreen()),
-        ),
-      );
-      await tester.pumpAndSettle();
+      final container = await pumpWithValidDraft(tester);
       // Default disposition = rollForward.
       expect(
         container.read(vacationFormProvider).draftDisposition,
@@ -126,7 +147,11 @@ void main() {
       );
 
       // Tap the "보강 크레딧 적립" row.
-      await tester.ensureVisible(find.text('보강 크레딧 적립'));
+      await tester.scrollUntilVisible(
+        find.text('보강 크레딧 적립'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('보강 크레딧 적립'));
       await tester.pumpAndSettle();
@@ -136,7 +161,11 @@ void main() {
       );
 
       // Tap the "무료 처리" row.
-      await tester.ensureVisible(find.text('무료 처리'));
+      await tester.scrollUntilVisible(
+        find.text('무료 처리'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('무료 처리'));
       await tester.pumpAndSettle();

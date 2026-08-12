@@ -7,10 +7,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_alert_dialog.dart';
 import '../../../../core/widgets/notebook/notebook_banner.dart';
-import '../../../../core/widgets/notebook/notebook_bottom_sheet.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../domain/entities/vacation_period.dart';
 import '../providers/vacation_providers.dart';
+import '../widgets/vacation/vacation_impact_section.dart';
 
 /// Teacher vacation mode entry screen (#431, G3).
 ///
@@ -76,12 +76,19 @@ class TeacherVacationModeScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          SizedBox(height: AppSpacing.space3),
-          _DispositionSection(
-            selected: state.draftDisposition,
-            onChange: notifier.setDraftDisposition,
-            projectedExtensionDays: _projectedExtensionDays(state),
-          ),
+          SizedBox(height: AppSpacing.space4),
+          // 영향 미리보기 — 유효한 기간이 잡히면 자동으로 계산된다 (수동 새로고침 없음).
+          const VacationImpactSection(),
+          SizedBox(height: AppSpacing.space4),
+          // 처리 방식은 영향 미리보기가 준비된 뒤에야 의미가 있다 (점진적 공개).
+          if (state.impact != null) ...[
+            _DispositionSection(
+              selected: state.draftDisposition,
+              onChange: notifier.setDraftDisposition,
+              projectedExtensionDays: _projectedExtensionDays(state),
+            ),
+            SizedBox(height: AppSpacing.space1),
+          ],
           // 여러 기간을 묶으려면 '구간 추가' (다구간, #768 ②).
           _AddSegmentButton(
             state: state,
@@ -89,8 +96,6 @@ class TeacherVacationModeScreen extends ConsumerWidget {
           ),
           SizedBox(height: AppSpacing.space3),
           _ReasonField(value: state.reason, onChanged: notifier.setReason),
-          SizedBox(height: AppSpacing.space4),
-          _ImpactSection(state: state, onRefresh: notifier.loadImpact),
           SizedBox(height: AppSpacing.space5),
           _SubmitButton(state: state, onSubmit: () => _onSubmit(context, ref)),
         ],
@@ -263,228 +268,6 @@ class _ReasonFieldState extends State<_ReasonField> {
       onChanged: widget.onChanged,
     );
   }
-}
-
-class _ImpactSection extends StatelessWidget {
-  final VacationFormState state;
-  final Future<void> Function() onRefresh;
-
-  const _ImpactSection({required this.state, required this.onRefresh});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            const _SectionHeader(text: AppStrings.vacationImpactSection),
-            const Spacer(),
-            TextButton(
-              onPressed:
-                  state.hasValidDraft && !state.isLoadingImpact
-                      ? onRefresh
-                      : null,
-              child: const Text(AppStrings.vacationImpactRefresh),
-            ),
-          ],
-        ),
-        SizedBox(height: AppSpacing.space2),
-        if (state.isLoadingImpact)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Center(child: CircularProgressIndicator()),
-          )
-        else if (state.impact == null)
-          Text(
-            AppStrings.vacationRangeNeeded,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          )
-        else if (state.impact!.impactedLessonCount == 0)
-          Text(
-            AppStrings.vacationImpactEmpty,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkTertiary,
-            ),
-          )
-        else
-          _ImpactSummary(impact: state.impact!),
-      ],
-    );
-  }
-}
-
-class _ImpactSummary extends ConsumerWidget {
-  final VacationImpactPreview impact;
-  const _ImpactSummary({required this.impact});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final overrides = ref.watch(
-      vacationFormProvider.select((s) => s.perStudentOverrides),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          AppStrings.vacationImpactSummary(
-            lessonCount: impact.impactedLessonCount,
-            studentCount: impact.impactedStudentCount,
-          ),
-          style: AppTypography.bodyLarge.copyWith(color: AppColors.ink),
-        ),
-        SizedBox(height: AppSpacing.space1),
-        Text(
-          AppStrings.vacationPerStudentSheetHint,
-          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
-        ),
-        SizedBox(height: AppSpacing.space2),
-        for (final student in impact.impactedStudents.take(10))
-          _ImpactStudentRow(
-            student: student,
-            dispositionOverride: overrides[student.studentId],
-            onLongPress:
-                () => _openPerStudentSheet(
-                  context,
-                  ref,
-                  studentId: student.studentId,
-                  studentLabel: student.studentName ?? student.studentId,
-                ),
-          ),
-      ],
-    );
-  }
-}
-
-/// Schema-enum → user-facing label. Used by per-student row + sheet.
-String _dispositionLabel(VacationDisposition d) {
-  switch (d) {
-    case VacationDisposition.makeupCredit:
-      return AppStrings.vacationDispositionMakeupCreditLabel;
-    case VacationDisposition.freeCancel:
-      return AppStrings.vacationDispositionFreeCancelLabel;
-    case VacationDisposition.rollForward:
-      return AppStrings.vacationDispositionRollForwardLabel;
-  }
-}
-
-class _ImpactStudentRow extends StatelessWidget {
-  final VacationImpactedStudent student;
-  final VacationDisposition? dispositionOverride;
-  final VoidCallback onLongPress;
-  const _ImpactStudentRow({
-    required this.student,
-    required this.dispositionOverride,
-    required this.onLongPress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onLongPress: onLongPress,
-      onTap: onLongPress,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    student.studentName ?? student.studentId,
-                    style: AppTypography.bodyMedium,
-                  ),
-                  if (dispositionOverride != null) ...[
-                    SizedBox(height: 2),
-                    Text(
-                      AppStrings.vacationPerStudentOverrideLabel(
-                        _dispositionLabel(dispositionOverride!),
-                      ),
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.paperAccent,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            Text(
-              AppStrings.vacationImpactStudentCount(student.lessonCount),
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-Future<void> _openPerStudentSheet(
-  BuildContext context,
-  WidgetRef ref, {
-  required String studentId,
-  required String studentLabel,
-}) async {
-  final current = ref.read(vacationFormProvider).perStudentOverrides[studentId];
-  final selected = await showNotebookBottomSheet<VacationDisposition?>(
-    context: context,
-    builder: (sheetCtx) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.vacationPerStudentSheetTitle,
-            style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
-          ),
-          SizedBox(height: AppSpacing.space1),
-          Text(
-            studentLabel,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          SizedBox(height: AppSpacing.space3),
-          for (final option in VacationDisposition.values)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(_dispositionLabel(option)),
-              trailing:
-                  current == option
-                      ? const Icon(Icons.check, color: AppColors.paperAccent)
-                      : null,
-              onTap: () => Navigator.pop(sheetCtx, option),
-            ),
-          const Divider(height: 1),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text(AppStrings.vacationPerStudentUseDefault),
-            trailing:
-                current == null
-                    ? const Icon(Icons.check, color: AppColors.paperAccent)
-                    : null,
-            onTap: () => Navigator.pop(sheetCtx, null),
-          ),
-        ],
-      );
-    },
-  );
-
-  // If the user dismissed by tapping the scrim, selected is null *and* we
-  // were already at "no override". Treat dismiss as no-op via mounted check.
-  if (!context.mounted) return;
-  // showModalBottomSheet returns the popped value; null means user picked
-  // "기본값 사용". To distinguish dismiss vs explicit "기본값 사용", we always
-  // apply the popped value (Map<...> = null is safe).
-  ref
-      .read(vacationFormProvider.notifier)
-      .setStudentOverride(studentId, selected);
 }
 
 class _SubmitButton extends StatelessWidget {
@@ -923,7 +706,7 @@ class _AddedSegmentRow extends StatelessWidget {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  _dispositionLabel(segment.disposition),
+                  vacationDispositionLabel(segment.disposition),
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -998,7 +781,7 @@ Future<bool?> _showVacationSummary(
                           _shortDate(s.startDate),
                           _shortDate(s.endDate),
                         ),
-                        _dispositionLabel(s.disposition),
+                        vacationDispositionLabel(s.disposition),
                       ),
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.ink,
