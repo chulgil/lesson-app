@@ -269,11 +269,6 @@ class Student {
   LessonSlot? get primarySlot =>
       lessonSlots.isNotEmpty ? lessonSlots.first : null;
 
-  String? get lessonSchedule {
-    if (lessonSlots.isEmpty) return null;
-    return lessonSlots.map((s) => s.shortLabel).join(', ');
-  }
-
   /// Check if student has a registered address
   bool get hasAddress => postalCode != null && postalCode!.isNotEmpty;
 

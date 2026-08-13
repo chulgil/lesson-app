@@ -2000,6 +2000,25 @@ class AppStrings {
   /// 내리기 실패 (스낵바)
   static const groupClassesDeactivateFailed = '클래스를 내리지 못했습니다. 다시 시도해주세요';
 
+  /// 예약 확정 (개별 예약 상태 라벨)
+  static const groupClassBookingStatusConfirmed = '예약 확정';
+
+  /// 대기 $position번 (개별 예약 대기 상태 라벨)
+  static String groupClassBookingStatusWaitlist(int? position) =>
+      '대기 ${position ?? ''}번';
+
+  /// 자동 취소 (수업 시작 시 대기자 자동 취소된 예약 상태 라벨)
+  static const groupClassBookingStatusAutoCancelled = '자동 취소';
+
+  /// 취소됨 (그룹 클래스 예약·일정 공통 취소 상태 라벨)
+  static const groupClassStatusCancelled = '취소됨';
+
+  /// 마감 (그룹 클래스 일정 상태 라벨 — 더 이상 예약 불가)
+  static const groupClassScheduleStatusClosed = '마감';
+
+  /// 수업중 (그룹 클래스 일정 상태 라벨)
+  static const groupClassScheduleStatusInProgress = '수업중';
+
   /// 그룹 수강권 (반 미지정 그룹 수강권의 표시 라벨 — 개인레슨 폴백 금지)
   static const subscriptionGroupTicketLabel = '그룹 수강권';
 
@@ -3751,8 +3770,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-          ? '비워두면 기본 안내 문구가 사용됩니다.'
-          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+      ? '비워두면 기본 안내 문구가 사용됩니다.'
+      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -6614,12 +6633,11 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header =
-        hasIdentity
-            ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
-                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-            : '레슨앱에서 저와 함께해요!';
+    final header = hasIdentity
+        ? (instruments.isEmpty
+              ? '$senderName $role님이 레슨앱에 초대했어요!'
+              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+        : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -9375,10 +9393,9 @@ class AppStrings {
   static const vacationNotifyDialogTitle = '통보 완료';
 
   /// 휴가 등록 성공 확인 다이얼로그 본문 — 영향 학생 수 포함.
-  static String vacationNotifyDialogBody(int studentCount) =>
-      studentCount == 0
-          ? '해당 기간에 영향 받는 학생이 없어요.'
-          : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
+  static String vacationNotifyDialogBody(int studentCount) => studentCount == 0
+      ? '해당 기간에 영향 받는 학생이 없어요.'
+      : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
 
   /// 휴가 등록 성공 확인 다이얼로그 확인 버튼.
   static const vacationNotifyDialogConfirm = '확인';

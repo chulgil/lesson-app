@@ -130,42 +130,4 @@ class GroupClassSchedule {
 
   /// Check if class has ended
   bool get hasEnded => DateTime.now().isAfter(endTime);
-
-  /// Get capacity text (e.g., "4/6명")
-  String get capacityText => '$currentBookings/$maxCapacity명';
-
-  /// Get status display text
-  String get statusText {
-    switch (status) {
-      case ScheduleStatus.open:
-        if (isFull) return '만석';
-        if (availableSpots <= 2) return '마감임박';
-        return '예약가능';
-      case ScheduleStatus.full:
-        return '만석';
-      case ScheduleStatus.closed:
-        return '마감';
-      case ScheduleStatus.cancelled:
-        return '취소됨';
-      case ScheduleStatus.completed:
-        return '완료';
-      case ScheduleStatus.inProgress:
-        return '수업중';
-    }
-  }
-
-  /// Get formatted date text
-  String get dateText {
-    final weekdays = ['', '월', '화', '수', '목', '금', '토', '일'];
-    return '${startTime.month}/${startTime.day}(${weekdays[startTime.weekday]})';
-  }
-
-  /// Get formatted time text
-  String get timeText {
-    final startHour = startTime.hour.toString().padLeft(2, '0');
-    final startMin = startTime.minute.toString().padLeft(2, '0');
-    final endHour = endTime.hour.toString().padLeft(2, '0');
-    final endMin = endTime.minute.toString().padLeft(2, '0');
-    return '$startHour:$startMin ~ $endHour:$endMin';
-  }
 }

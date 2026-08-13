@@ -18,13 +18,6 @@ class StudentWithMembership {
   // Prefer membership data over student data
   String get instrument => membership?.instrument ?? student.instrument;
 
-  String? get lessonSchedule {
-    if (membership != null && membership!.lessonSlots.isNotEmpty) {
-      return membership!.scheduleDisplay;
-    }
-    return student.lessonSchedule;
-  }
-
   /// Whether student is connected via the app.
   bool get isAppConnected => student.isAppConnected;
 }

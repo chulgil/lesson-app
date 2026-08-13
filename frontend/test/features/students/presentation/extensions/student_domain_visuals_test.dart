@@ -144,5 +144,134 @@ void main() {
       expect(slot.displayLabel, '화요일 14:00~15:00');
       expect(slot.shortLabel, '화 14:00');
     });
+
+    test('dayLabel — 0=월 ~ 6=일', () {
+      const labels = ['월', '화', '수', '목', '금', '토', '일'];
+      for (var day = 0; day < labels.length; day++) {
+        final slot = LessonSlot(
+          dayOfWeek: day,
+          startTime: '10:00',
+          endTime: '11:00',
+        );
+        expect(slot.dayLabel, labels[day]);
+      }
+    });
+  });
+
+  group('StudentVisuals.lessonSchedule', () {
+    Student student({List<LessonSlot> lessonSlots = const []}) => Student(
+      id: 'student-1',
+      name: '민지',
+      instrument: '피아노',
+      level: StudentLevel.beginner,
+      status: StudentStatus.active,
+      practiceStatus: PracticeStatus.normal,
+      lessonSlots: lessonSlots,
+      profileColorKey: 'ink',
+      monthlyFee: 0,
+      createdAt: DateTime(2026),
+    );
+
+    test('빈 슬롯이면 null', () {
+      expect(student().lessonSchedule, isNull);
+    });
+
+    test('여러 슬롯은 쉼표로 join', () {
+      final withSlots = student(
+        lessonSlots: const [
+          LessonSlot(dayOfWeek: 1, startTime: '14:00', endTime: '15:00'),
+          LessonSlot(dayOfWeek: 3, startTime: '16:00', endTime: '17:00'),
+        ],
+      );
+      expect(withSlots.lessonSchedule, '화 14:00, 목 16:00');
+    });
+  });
+
+  group('ClassMembershipVisuals.scheduleDisplay', () {
+    ClassMembership membership({List<LessonSlot> lessonSlots = const []}) =>
+        ClassMembership(
+          id: 'membership-1',
+          lessonClassId: 'class-1',
+          studentId: 'student-1',
+          instrument: '피아노',
+          status: MembershipStatus.active,
+          monthlyFee: 0,
+          lessonsPerWeek: lessonSlots.length,
+          lessonSlots: lessonSlots,
+          lessonDuration: 60,
+          createdAt: DateTime(2026),
+        );
+
+    test('빈 슬롯이면 null', () {
+      expect(membership().scheduleDisplay, isNull);
+    });
+
+    test('여러 슬롯은 쉼표로 join', () {
+      final withSlots = membership(
+        lessonSlots: const [
+          LessonSlot(dayOfWeek: 1, startTime: '14:00', endTime: '15:00'),
+          LessonSlot(dayOfWeek: 3, startTime: '16:00', endTime: '17:00'),
+        ],
+      );
+      expect(withSlots.scheduleDisplay, '화 14:00, 목 16:00');
+    });
+  });
+
+  group('StudentWithMembershipVisuals.lessonSchedule', () {
+    test('membership 이 있고 슬롯이 있으면 membership 우선', () {
+      final swm = StudentWithMembership(
+        student: Student(
+          id: 'student-1',
+          name: '민지',
+          instrument: '피아노',
+          level: StudentLevel.beginner,
+          status: StudentStatus.active,
+          practiceStatus: PracticeStatus.normal,
+          lessonSlots: const [
+            LessonSlot(dayOfWeek: 5, startTime: '10:00', endTime: '11:00'),
+          ],
+          profileColorKey: 'ink',
+          monthlyFee: 0,
+          createdAt: DateTime(2026),
+        ),
+        membership: ClassMembership(
+          id: 'membership-1',
+          lessonClassId: 'class-1',
+          studentId: 'student-1',
+          instrument: '피아노',
+          status: MembershipStatus.active,
+          monthlyFee: 0,
+          lessonsPerWeek: 1,
+          lessonSlots: const [
+            LessonSlot(dayOfWeek: 1, startTime: '14:00', endTime: '15:00'),
+          ],
+          lessonDuration: 60,
+          createdAt: DateTime(2026),
+        ),
+      );
+
+      expect(swm.lessonSchedule, '화 14:00');
+    });
+
+    test('membership 슬롯이 없으면 student 슬롯으로 폴백', () {
+      final swm = StudentWithMembership(
+        student: Student(
+          id: 'student-1',
+          name: '민지',
+          instrument: '피아노',
+          level: StudentLevel.beginner,
+          status: StudentStatus.active,
+          practiceStatus: PracticeStatus.normal,
+          lessonSlots: const [
+            LessonSlot(dayOfWeek: 5, startTime: '10:00', endTime: '11:00'),
+          ],
+          profileColorKey: 'ink',
+          monthlyFee: 0,
+          createdAt: DateTime(2026),
+        ),
+      );
+
+      expect(swm.lessonSchedule, '토 10:00');
+    });
   });
 }

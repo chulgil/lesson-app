@@ -16,6 +16,7 @@ import '../../../students/students_facade.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/entities/group_class_schedule.dart';
+import '../extensions/group_class_visuals.dart';
 import '../extensions/no_show_policy_visuals.dart';
 import '../providers/group_class_booking_providers.dart';
 
@@ -61,14 +62,13 @@ class _GroupClassAttendanceScreenState
           if (_hasChanges)
             TextButton(
               onPressed: _isSaving ? null : _saveAttendance,
-              child:
-                  _isSaving
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Text(AppStrings.save),
+              child: _isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(AppStrings.save),
             ),
         ],
       ),
@@ -84,20 +84,18 @@ class _GroupClassAttendanceScreenState
           Expanded(
             child: bookingsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (_, __) =>
-                      Center(child: Text('${AppStrings.errorOccurred}.')),
+              error: (_, __) =>
+                  Center(child: Text('${AppStrings.errorOccurred}.')),
               data: (bookings) {
                 // Filter only confirmed bookings
-                final confirmedBookings =
-                    bookings
-                        .where(
-                          (b) =>
-                              b.status == GroupBookingStatus.confirmed ||
-                              b.status == GroupBookingStatus.attended ||
-                              b.status == GroupBookingStatus.noShow,
-                        )
-                        .toList();
+                final confirmedBookings = bookings
+                    .where(
+                      (b) =>
+                          b.status == GroupBookingStatus.confirmed ||
+                          b.status == GroupBookingStatus.attended ||
+                          b.status == GroupBookingStatus.noShow,
+                    )
+                    .toList();
 
                 // Initialize attendance state (default all to attended)
                 if (!_isInitialized) {
@@ -253,11 +251,10 @@ class _GroupClassAttendanceScreenState
     final studentAsync = ref.watch(studentProvider(booking.studentId));
 
     return studentAsync.when(
-      loading:
-          () => const ListTile(
-            leading: CircularProgressIndicator(),
-            title: Text(AppStrings.loadingText),
-          ),
+      loading: () => const ListTile(
+        leading: CircularProgressIndicator(),
+        title: Text(AppStrings.loadingText),
+      ),
       error: (e, _) => ListTile(title: Text('${AppStrings.errorOccurred}.')),
       data: (student) {
         final studentName = student?.name ?? AppStrings.unknownName;
@@ -270,8 +267,9 @@ class _GroupClassAttendanceScreenState
               vertical: AppSpacing.space3,
             ),
             decoration: BoxDecoration(
-              color:
-                  isAttended ? Colors.transparent : AppColors.paperAccentSoft,
+              color: isAttended
+                  ? Colors.transparent
+                  : AppColors.paperAccentSoft,
               border: const Border(
                 bottom: BorderSide(color: AppColors.inkQuaternary, width: 1),
               ),
@@ -283,18 +281,16 @@ class _GroupClassAttendanceScreenState
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color:
-                        isAttended
-                            ? AppColors.paperOkSoft
-                            : AppColors.paperAccentSoft,
+                    color: isAttended
+                        ? AppColors.paperOkSoft
+                        : AppColors.paperAccentSoft,
                   ),
                   child: Center(
                     child: Icon(
                       isAttended ? Icons.check : Icons.close,
-                      color:
-                          isAttended
-                              ? AppColors.paperOk
-                              : AppColors.paperAccent,
+                      color: isAttended
+                          ? AppColors.paperOk
+                          : AppColors.paperAccent,
                       size: 24,
                     ),
                   ),
@@ -310,12 +306,12 @@ class _GroupClassAttendanceScreenState
                         studentName,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w500,
-                          decoration:
-                              isAttended ? null : TextDecoration.lineThrough,
-                          color:
-                              isAttended
-                                  ? AppColors.ink
-                                  : AppColors.inkSecondary,
+                          decoration: isAttended
+                              ? null
+                              : TextDecoration.lineThrough,
+                          color: isAttended
+                              ? AppColors.ink
+                              : AppColors.inkSecondary,
                         ),
                       ),
                       if (!isAttended)
@@ -362,17 +358,16 @@ class _GroupClassAttendanceScreenState
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           ),
-          child:
-              _isSaving
-                  ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.paper,
-                    ),
-                  )
-                  : const Text(AppStrings.finishClass),
+          child: _isSaving
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.paper,
+                  ),
+                )
+              : const Text(AppStrings.finishClass),
         ),
       ),
     );
@@ -431,45 +426,44 @@ class _GroupClassAttendanceScreenState
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => NotebookAlertDialog(
-            title: AppStrings.finishClass,
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.attendanceSummary(
-                    _getAttendedCount(),
-                    _attendanceState.length - _getAttendedCount(),
-                  ),
-                  style: AppTypography.bodyMedium,
-                ),
-                // Absences are settled by the class no-show policy (BE SSOT
-                // #239) — spell out which of the 4 outcomes applies.
-                if (_attendanceState.length - _getAttendedCount() > 0) ...[
-                  const SizedBox(height: AppSpacing.space2),
-                  Text(
-                    widget.groupClass.noShowPolicy.description,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.space3),
-                Text(
-                  AppStrings.finishClassConfirm,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
+      builder: (context) => NotebookAlertDialog(
+        title: AppStrings.finishClass,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppStrings.attendanceSummary(
+                _getAttendedCount(),
+                _attendanceState.length - _getAttendedCount(),
+              ),
+              style: AppTypography.bodyMedium,
             ),
-            cancelLabel: AppStrings.cancel,
-            onCancel: () => Navigator.pop(context, false),
-            confirmLabel: AppStrings.finishClass,
-            onConfirm: () => Navigator.pop(context, true),
-          ),
+            // Absences are settled by the class no-show policy (BE SSOT
+            // #239) — spell out which of the 4 outcomes applies.
+            if (_attendanceState.length - _getAttendedCount() > 0) ...[
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                widget.groupClass.noShowPolicy.description,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              AppStrings.finishClassConfirm,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+          ],
+        ),
+        cancelLabel: AppStrings.cancel,
+        onCancel: () => Navigator.pop(context, false),
+        confirmLabel: AppStrings.finishClass,
+        onConfirm: () => Navigator.pop(context, true),
+      ),
     );
 
     if (confirmed != true) return;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -112,7 +111,7 @@ class LessonCard extends ConsumerWidget {
                 SizedBox(
                   width: 40,
                   child: Text(
-                    _getStatusLabel(),
+                    lesson.displayStatus.label,
                     style: NotebookTypography.sectionLabelSmall.copyWith(
                       color: mutedInk ?? lesson.displayStatus.color,
                     ),
@@ -131,25 +130,6 @@ class LessonCard extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _getStatusLabel() {
-    switch (lesson.displayStatus) {
-      case LessonStatus.scheduled:
-      case LessonStatus.reschedulePending:
-        return AppStrings.statusUpcoming;
-      case LessonStatus.completed:
-        return AppStrings.statusCompleted;
-      case LessonStatus.cancelled:
-      case LessonStatus.cancelledByStudentAdvance:
-      case LessonStatus.cancelledByTeacher:
-      case LessonStatus.cancelledMutual:
-        return AppStrings.statusCancelled;
-      case LessonStatus.noShow:
-      case LessonStatus.cancelledByStudentLate:
-      case LessonStatus.studentAbsent:
-        return AppStrings.statusAbsent;
-    }
   }
 
   /// Build context badge and subscription badge row.
