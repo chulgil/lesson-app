@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../domain/entities/entities.dart';
 import '../extensions/practice_section_visuals.dart';
@@ -238,25 +239,10 @@ class PracticeNoteListScreen extends ConsumerWidget {
   }
 
   Widget _buildError(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '오류가 발생했습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          TextButton(
-            onPressed: () => ref.invalidate(sectionNotesProvider(sectionId)),
-            child: const Text(AppStrings.retry),
-          ),
-        ],
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.errorOccurred,
+      actionLabel: AppStrings.retry,
+      onAction: () => ref.invalidate(sectionNotesProvider(sectionId)),
     );
   }
 

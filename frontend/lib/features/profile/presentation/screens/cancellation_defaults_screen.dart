@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_banner.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
@@ -91,28 +92,14 @@ class CancellationDefaultsScreen extends ConsumerWidget {
             ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (error, __) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  const Text(AppStrings.genericError),
-                  const SizedBox(height: AppSpacing.space4),
-                  FilledButton(
-                    onPressed: () {
-                      ref
-                          .read(cancellationDefaultsNotifierProvider.notifier)
-                          .refresh();
-                    },
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            (error, __) => ErrorStateWidget(
+              title: AppStrings.genericError,
+              actionLabel: AppStrings.retry,
+              onAction: () {
+                ref
+                    .read(cancellationDefaultsNotifierProvider.notifier)
+                    .refresh();
+              },
             ),
       ),
     );

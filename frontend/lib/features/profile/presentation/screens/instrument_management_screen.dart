@@ -5,6 +5,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -102,25 +103,10 @@ class _InstrumentManagementScreenState
         data: (profile) => _buildContent(profile?.instruments ?? const []),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (_, __) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  const Text(AppStrings.genericError),
-                  const SizedBox(height: AppSpacing.space4),
-                  FilledButton(
-                    onPressed:
-                        () => ref.invalidate(currentTeacherProfileProvider),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            (_, __) => ErrorStateWidget(
+              title: AppStrings.genericError,
+              actionLabel: AppStrings.retry,
+              onAction: () => ref.invalidate(currentTeacherProfileProvider),
             ),
       ),
     );

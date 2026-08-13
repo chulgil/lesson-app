@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/practice_facade.dart';
@@ -59,29 +60,11 @@ class PracticeRepertoireScreen extends ConsumerWidget {
                     : _buildRepertoireList(context, ref, repertoires),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    AppStrings.practiceErrorOccurred,
-                    style: AppTypography.bodyLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-                  TextButton(
-                    onPressed:
-                        () => ref.invalidate(
-                          studentRepertoiresProvider(studentId),
-                        ),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
+            (error, stack) => ErrorStateWidget(
+              title: AppStrings.practiceErrorOccurred,
+              actionLabel: AppStrings.retry,
+              onAction: () => ref.invalidate(
+                studentRepertoiresProvider(studentId),
               ),
             ),
       ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -124,25 +125,10 @@ class _WeeklyReportTab extends ConsumerWidget {
   }
 
   Widget _buildError(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            '통계를 불러올 수 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          TextButton(
-            onPressed: () => ref.invalidate(weeklyReportProvider),
-            child: const Text(AppStrings.retry),
-          ),
-        ],
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.cannotLoadData,
+      actionLabel: AppStrings.retry,
+      onAction: () => ref.invalidate(weeklyReportProvider),
     );
   }
 }
@@ -208,25 +194,10 @@ class _MonthlyReportTab extends ConsumerWidget {
   }
 
   Widget _buildError(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            '통계를 불러올 수 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          TextButton(
-            onPressed: () => ref.invalidate(monthlyReportProvider),
-            child: const Text(AppStrings.retry),
-          ),
-        ],
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.cannotLoadData,
+      actionLabel: AppStrings.retry,
+      onAction: () => ref.invalidate(monthlyReportProvider),
     );
   }
 }

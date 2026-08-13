@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../students/students_facade.dart';
 
@@ -258,35 +259,9 @@ class SubscriptionErrorState extends StatelessWidget {
       builder: (context, constraints) => SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.space6),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-                  Text(
-                    AppStrings.issueFormErrorTitle,
-                    style: NotebookTypography.sectionTitle,
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-                  Text(
-                    error,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+          child: ErrorStateWidget(
+            title: AppStrings.issueFormErrorTitle,
+            subtitle: error,
           ),
         ),
       ),

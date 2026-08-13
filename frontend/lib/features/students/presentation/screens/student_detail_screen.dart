@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -83,28 +84,11 @@ class StudentDetailScreen extends ConsumerWidget {
       error:
           (error, _) => _buildShellScaffold(
             context,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.paperAccent,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                Text(
-                  AppStrings.loadDataFailed,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space5),
-                OutlinedButton.icon(
-                  onPressed: () => ref.invalidate(studentProvider(studentId)),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text(AppStrings.retry),
-                ),
-              ],
+            child: ErrorStateWidget(
+              title: AppStrings.loadDataFailed,
+              actionLabel: AppStrings.retry,
+              actionIcon: Icons.refresh,
+              onAction: () => ref.invalidate(studentProvider(studentId)),
             ),
           ),
     );

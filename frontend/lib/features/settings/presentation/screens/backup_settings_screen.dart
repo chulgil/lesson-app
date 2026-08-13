@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../domain/entities/backup_state.dart';
@@ -30,28 +30,10 @@ class BackupSettingsScreen extends ConsumerWidget {
         data: (state) => _BackupContent(state: state),
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (_, __) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  const Text(
-                    AppStrings.genericError,
-                    style: TextStyle(color: AppColors.paperAccent),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  ElevatedButton(
-                    onPressed:
-                        () => ref.invalidate(backupStateNotifierProvider),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            (_, __) => ErrorStateWidget(
+              title: AppStrings.genericError,
+              actionLabel: AppStrings.retry,
+              onAction: () => ref.invalidate(backupStateNotifierProvider),
             ),
       ),
     );

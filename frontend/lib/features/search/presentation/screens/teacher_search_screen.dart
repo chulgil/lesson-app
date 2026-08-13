@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
@@ -184,29 +185,12 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           Expanded(
             child: searchResult.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.inkTertiary,
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    Text(
-                      AppStrings.searchErrorOccurred,
-                      style: AppTypography.bodyMedium,
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    ElevatedButton(
-                      onPressed: () => ref
-                          .read(teacherSearchResultsProvider.notifier)
-                          .refresh(),
-                      child: const Text(AppStrings.retry),
-                    ),
-                  ],
-                ),
+              error: (e, _) => ErrorStateWidget(
+                title: AppStrings.searchErrorOccurred,
+                actionLabel: AppStrings.retry,
+                onAction: () => ref
+                    .read(teacherSearchResultsProvider.notifier)
+                    .refresh(),
               ),
               data: (result) => _buildResults(result),
             ),
