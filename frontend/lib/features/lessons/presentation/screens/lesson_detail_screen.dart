@@ -9,8 +9,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/staff_divider.dart';
@@ -74,20 +74,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
   Widget _buildNotFoundScaffold() {
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(title: AppStrings.lessonRecordTitle),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.event_busy, size: 64, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              AppStrings.lessonNotFound,
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
+      body: ErrorStateWidget(
+        icon: Icons.event_busy,
+        title: AppStrings.lessonNotFound,
       ),
     );
   }
@@ -102,26 +91,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen> {
   Widget _buildErrorScaffold() {
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(title: AppStrings.lessonRecordTitle),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            OutlinedButton.icon(
-              onPressed: () => ref.invalidate(lessonProvider(widget.lessonId)),
-              icon: const Icon(Icons.refresh),
-              label: const Text(AppStrings.retry),
-            ),
-          ],
-        ),
+      body: ErrorStateWidget(
+        title: AppStrings.loadDataFailed,
+        actionLabel: AppStrings.retry,
+        actionIcon: Icons.refresh,
+        onAction: () => ref.invalidate(lessonProvider(widget.lessonId)),
       ),
     );
   }

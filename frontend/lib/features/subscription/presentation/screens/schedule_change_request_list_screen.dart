@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -257,24 +258,9 @@ class _ScheduleChangeRequestListScreenState
     required Map<String, String> studentNames,
   }) {
     if (requests.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.swap_horiz_rounded,
-              size: 48,
-              color: AppColors.inkTertiary,
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.noChangeRequests,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ],
-        ),
+      return EmptyStateWidget(
+        icon: Icons.swap_horiz_rounded,
+        title: AppStrings.noChangeRequests,
       );
     }
 

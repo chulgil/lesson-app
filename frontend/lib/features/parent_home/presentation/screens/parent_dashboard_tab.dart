@@ -1078,8 +1078,12 @@ class _PaymentStatusSection extends ConsumerWidget {
           ),
           // §3.2.4: paymentNotified 대기 제안 — 학부모 가시성
           proposalsAsync.when(
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            loading: () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (_, __) =>
+                const _SectionEmpty(message: AppStrings.errorOccurred),
             data: (proposals) {
               final waiting = proposals
                   .where((p) => p.status == ProposalStatus.paymentNotified)

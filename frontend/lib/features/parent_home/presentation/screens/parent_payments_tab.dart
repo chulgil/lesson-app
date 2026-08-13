@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -563,32 +564,10 @@ class _UnlinkedChildState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.link_off, size: 56, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              '${profile.name}은(는) 아직 선생님과 연결되지 않았습니다',
-              textAlign: TextAlign.center,
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '선생님 연결 후 수강권 정보가 표시됩니다',
-              textAlign: TextAlign.center,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.link_off,
+      title: '${profile.name}${AppStrings.parentChildNotLinkedSuffix}',
+      subtitle: AppStrings.parentChildNotLinkedDesc,
     );
   }
 }
