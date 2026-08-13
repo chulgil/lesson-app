@@ -116,6 +116,28 @@ C는 "내가 정하면 끝난다". 이 차이 자체는 사용자에게 숨길 �
 
 > **결정 필요**: C-1(정책 그대로, 중복만 제거 — 리스크 낮음) 또는 C-2(이력만 통합 — 추적성 향상, 설계 복잡도 소폭 증가). 이 스펙은 C-1을 기본값으로 추천한다 — "즉시 확정"이라는 제품 결정을 스펙이 임의로 뒤집지 않기 위해서다. C-2는 사용자 리서치(직접예약 이력 조회 니즈)가 확인되면 별도 스펙으로 승격.
 
+#### 2.3.1 후속 결정 — 보드 결정 4 (2026-08-13, 이슈 #1268)
+
+유저저니 보드(이슈 #1263)에서 "직접예약 재조정을 채팅형으로 통합"을 결정했다.
+이 결정은 위 C-1 채택을 **뒤집지 않는다** — C-1이 이미 경고한 대로 협상
+UI(상대 응답 대기)를 붙이는 것은 "즉시 확정"이라는 정책과 모순되므로, 통합의
+범위를 **진입 경험(엔트리 UX)** 으로 좁혀 해석한다.
+
+- `BookingRescheduleScreen`(풀스크린 push)을 제거하고 `BookingRescheduleSheet`
+  (바텀시트, `presentation/widgets/booking_reschedule_bottom_sheet.dart`)로
+  대체 — 계열 A/B가 이미 `showScheduleChangeTypeBottomSheet` /
+  `showScheduleChangeSlotBottomSheet`로 정착시킨 "일정 변경은 바텀시트"라는
+  진입 문법을 계열 C도 공유한다.
+- 슬롯 선택은 여전히 `AvailabilityDateNavigator` + `AvailabilitySlotChipList`
+  (교사가 선언한 `TeacherAvailability` + `minBookingHours` 리드타임을 반영)를
+  사용한다 — 계열 A/B의 `AlternativeTimeGrid`(`weekLessonsWithPreviewProvider`
+  기반, 가용성 미검증·"빈 셀은 전부 제안 가능")로 바꾸지 않는다. 협상 없는
+  즉시 확정 흐름에서 가용성 검증을 빼면 교사가 열어두지 않은 시간에도
+  학생이 바로 예약을 확정시킬 수 있게 되어 데이터 정합성이 깨진다.
+- `RequestEvent`/`UnifiedLessonRequest` 연계, 상대(교사) 응답 대기 단계는
+  추가하지 않는다 — C-1의 근거(§2.3, "즉시 확정이 강점인 흐름에 대기를 넣는
+  것은 퇴행") 그대로 유지.
+
 ---
 
 ## 3. 슬롯 선택 통일

@@ -503,7 +503,7 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
   // NOTE: A non-atomic rescheduleBooking() (cancel-old-then-book-new) used to
   // live here. It was removed (#483 Lore-rejected: that order can lose the
   // original booking if the new booking fails). Reschedule is now orchestrated
-  // by BookingRescheduleScreen._performReschedule (book-new-then-cancel-old
+  // by BookingRescheduleSheet._performReschedule (#1268, book-new-then-cancel-old
   // with rollback). No call sites remained.
 }
 

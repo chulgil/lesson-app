@@ -16,8 +16,8 @@ import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
+import '../widgets/booking_reschedule_bottom_sheet.dart';
 import 'booking_cancel_screen.dart';
-import 'booking_reschedule_screen.dart';
 import 'lesson_booking_screen.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../subscription/subscription_facade.dart'
@@ -466,26 +466,23 @@ class MyBookingsScreen extends ConsumerWidget {
   }
 
   void _navigateToReschedule(BuildContext context, AvailabilitySlot booking) {
-    Navigator.push(
+    // #1268 — unified with the chat-style schedule-change bottom sheets'
+    // presentation (bottom sheet, not a full-screen push). The direct-booking
+    // immediate-confirm policy itself is unchanged (schedule_change_unification_spec.md §2.3).
+    showBookingRescheduleBottomSheet(
       context,
-      MaterialPageRoute(
-        builder:
-            (context) => BookingRescheduleScreen(
-              teacherId: teacherId,
-              teacherName: teacherName,
-              studentId: studentId,
-              studentName: studentName,
-              currentBookingId: booking.id,
-              currentDate: booking.date,
-              currentStartTime: booking.startTime.toFlutterTimeOfDay(),
-              remainingReschedules: remainingReschedules,
-              totalReschedules: totalReschedules,
-              instrument: instrument,
-              subscriptionId:
-                  subscriptionId, // 🆕 For reschedule count deduction
-              cancelDeadlineHours: cancelDeadlineHours,
-            ),
-      ),
+      teacherId: teacherId,
+      teacherName: teacherName,
+      studentId: studentId,
+      studentName: studentName,
+      currentBookingId: booking.id,
+      currentDate: booking.date,
+      currentStartTime: booking.startTime.toFlutterTimeOfDay(),
+      remainingReschedules: remainingReschedules,
+      totalReschedules: totalReschedules,
+      instrument: instrument,
+      subscriptionId: subscriptionId,
+      cancelDeadlineHours: cancelDeadlineHours,
     );
   }
 

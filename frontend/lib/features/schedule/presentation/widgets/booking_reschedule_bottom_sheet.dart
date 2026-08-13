@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
-import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../../../notifications/notifications_facade.dart';
@@ -17,15 +18,65 @@ import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/cancel_reason.dart';
 import '../../domain/services/cancellation_credit_policy.dart';
 import '../providers/teacher_availability_providers.dart';
-import '../widgets/availability/availability_date_navigator.dart';
-import '../widgets/availability/availability_slot_chip_list.dart';
-import '../widgets/availability/empty_slots_suggestion.dart';
+import 'availability/availability_date_navigator.dart';
+import 'availability/availability_slot_chip_list.dart';
+import 'availability/empty_slots_suggestion.dart';
 
-/// Booking reschedule screen
+/// Shows the direct-booking reschedule flow as a Notebook-styled bottom sheet.
+///
+/// #1268 — unifies the entry presentation with the chat-style schedule-change
+/// bottom sheets (`showScheduleChangeTypeBottomSheet` /
+/// `showScheduleChangeSlotBottomSheet`). Per
+/// `docs/specs/schedule/schedule_change_unification_spec.md` §2.3 (C-1,
+/// reaffirmed by the 2026-08-13 board decision 4), the direct-booking policy
+/// itself stays immediate-confirm — only the presentation (full-screen push →
+/// bottom sheet) is unified, not the negotiation/RequestEvent model.
+Future<bool?> showBookingRescheduleBottomSheet(
+  BuildContext context, {
+  required String teacherId,
+  required String teacherName,
+  required String studentId,
+  required String studentName,
+  required String currentBookingId,
+  required DateTime currentDate,
+  required TimeOfDay currentStartTime,
+  required int remainingReschedules,
+  required int totalReschedules,
+  String? instrument,
+  String? subscriptionId,
+  int cancelDeadlineHours = 12,
+}) {
+  return showNotebookBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    padding: EdgeInsets.zero,
+    showHandle: false,
+    builder: (_) => BookingRescheduleSheet(
+      teacherId: teacherId,
+      teacherName: teacherName,
+      studentId: studentId,
+      studentName: studentName,
+      currentBookingId: currentBookingId,
+      currentDate: currentDate,
+      currentStartTime: currentStartTime,
+      remainingReschedules: remainingReschedules,
+      totalReschedules: totalReschedules,
+      instrument: instrument,
+      subscriptionId: subscriptionId,
+      cancelDeadlineHours: cancelDeadlineHours,
+    ),
+  );
+}
+
+/// Bottom sheet content for rescheduling a direct booking.
 ///
 /// Allows students to change their existing booking to a new time slot.
 /// Shows remaining reschedule count and warns when it's the last one.
-class BookingRescheduleScreen extends ConsumerStatefulWidget {
+///
+/// Public (not `_`-prefixed) so widget tests can pump it directly without
+/// driving the modal-route trigger — mirrors how the full-screen predecessor
+/// (`BookingRescheduleScreen`, removed by #1268) was tested.
+class BookingRescheduleSheet extends ConsumerStatefulWidget {
   final String teacherId;
   final String teacherName;
   final String studentId;
@@ -36,11 +87,11 @@ class BookingRescheduleScreen extends ConsumerStatefulWidget {
   final int remainingReschedules;
   final int totalReschedules;
   final String? instrument;
-  final String? subscriptionId; // 🆕 For reschedule count deduction
+  final String? subscriptionId; // For reschedule count deduction
   final int
   cancelDeadlineHours; // Free-change window (reschedule_credit_spec §3)
 
-  const BookingRescheduleScreen({
+  const BookingRescheduleSheet({
     super.key,
     required this.teacherId,
     required this.teacherName,
@@ -57,12 +108,12 @@ class BookingRescheduleScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<BookingRescheduleScreen> createState() =>
-      _BookingRescheduleScreenState();
+  ConsumerState<BookingRescheduleSheet> createState() =>
+      _BookingRescheduleSheetState();
 }
 
-class _BookingRescheduleScreenState
-    extends ConsumerState<BookingRescheduleScreen> {
+class _BookingRescheduleSheetState
+    extends ConsumerState<BookingRescheduleSheet> {
   late DateTime _selectedDate;
   AvailabilitySlot? _selectedSlot;
   bool _isLoading = false;
@@ -82,15 +133,26 @@ class _BookingRescheduleScreenState
         currentStudentId: widget.studentId,
       ),
     );
+    final mq = MediaQuery.of(context);
 
-    return NotebookScreenScaffold(
-      backgroundColor: AppColors.paper,
-      appBar: const NotebookDetailAppBar(
-        title: AppStrings.bookingRescheduleTitle,
-      ),
-      body: SafeArea(
+    // proposal_bottom_sheet / schedule_change_slot_bottom_sheet 패턴 —
+    // maxHeight 으로 sheet 상한 고정, 내부는 self-surfaced Container.
+    return Container(
+      constraints: BoxConstraints(maxHeight: mq.size.height * 0.92),
+      decoration: const BoxDecoration(color: AppColors.paperDark),
+      padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
+      child: SafeArea(
+        top: false,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
+            const Padding(
+              padding: EdgeInsets.only(top: AppSpacing.space3),
+              child: Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            _buildHeader(context),
+
             // Current booking info
             _buildCurrentBookingInfo(),
 
@@ -109,19 +171,18 @@ class _BookingRescheduleScreenState
             ),
 
             // Slot selection
-            Expanded(
+            Flexible(
               child: slotsAsync.when(
                 data: (slots) => _buildSlotSelection(slots),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (error, _) => Center(
-                      child: Text(
-                        AppStrings.cannotLoadData,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.inkSecondary,
-                        ),
-                      ),
+                error: (error, _) => Center(
+                  child: Text(
+                    AppStrings.cannotLoadData,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
                     ),
+                  ),
+                ),
               ),
             ),
 
@@ -133,9 +194,29 @@ class _BookingRescheduleScreenState
     );
   }
 
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Row(
+        children: [
+          Text(
+            AppStrings.bookingRescheduleTitle,
+            style: NotebookTypography.sectionTitle,
+          ),
+          const Spacer(),
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.close),
+            iconSize: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCurrentBookingInfo() {
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.space4),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
@@ -250,10 +331,7 @@ class _BookingRescheduleScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color:
-            isLastChance
-                ? AppColors.paperAccentSoft
-                : AppColors.inkSoft,
+        color: isLastChance ? AppColors.paperAccentSoft : AppColors.inkSoft,
       ),
       child: Row(
         children: [
@@ -266,13 +344,13 @@ class _BookingRescheduleScreenState
           Text(
             isLastChance
                 ? AppStrings.rescheduleLastChanceWithCount(
-                  widget.remainingReschedules,
-                  widget.totalReschedules,
-                )
+                    widget.remainingReschedules,
+                    widget.totalReschedules,
+                  )
                 : AppStrings.bookingRescheduleAvailable(
-                  widget.remainingReschedules,
-                  widget.totalReschedules,
-                ),
+                    widget.remainingReschedules,
+                    widget.totalReschedules,
+                  ),
             style: AppTypography.bodyMedium.copyWith(
               color: isLastChance ? AppColors.paperAccent : AppColors.ink,
               fontWeight: FontWeight.w600,
@@ -285,10 +363,9 @@ class _BookingRescheduleScreenState
 
   Widget _buildSlotSelection(List<AvailabilitySlot> slots) {
     // Filter out unavailable slots
-    final availableSlots =
-        slots
-            .where((s) => s.status == AvailabilitySlotStatus.available)
-            .toList();
+    final availableSlots = slots
+        .where((s) => s.status == AvailabilitySlotStatus.available)
+        .toList();
 
     if (availableSlots.isEmpty) {
       return _buildEmptyState();
@@ -335,15 +412,14 @@ class _BookingRescheduleScreenState
         }
 
         // Convert dates to DateSuggestion format
-        final suggestions =
-            dates
-                .map(
-                  (date) => DateSuggestion(
-                    date: date,
-                    availableSlots: const [], // Will be loaded when selected
-                  ),
-                )
-                .toList();
+        final suggestions = dates
+            .map(
+              (date) => DateSuggestion(
+                date: date,
+                availableSlots: const [], // Will be loaded when selected
+              ),
+            )
+            .toList();
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -360,9 +436,8 @@ class _BookingRescheduleScreenState
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error:
-          (_, __) =>
-              const ErrorStateWidget(title: AppStrings.loadDataFailed),
+      error: (_, __) =>
+          const ErrorStateWidget(title: AppStrings.loadDataFailed),
     );
   }
 
@@ -408,8 +483,9 @@ class _BookingRescheduleScreenState
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed:
-                  canReschedule && !_isLoading ? _handleReschedule : null,
+              onPressed: canReschedule && !_isLoading
+                  ? _handleReschedule
+                  : null,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.paperAccent,
                 padding: const EdgeInsets.symmetric(
@@ -417,25 +493,24 @@ class _BookingRescheduleScreenState
                 ),
                 shape: RoundedRectangleBorder(),
               ),
-              child:
-                  _isLoading
-                      ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.paper,
-                          ),
-                        ),
-                      )
-                      : Text(
-                        AppStrings.bookingRescheduleAction,
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.paper,
-                          fontWeight: FontWeight.w600,
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.paper,
                         ),
                       ),
+                    )
+                  : Text(
+                      AppStrings.bookingRescheduleAction,
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: AppColors.paper,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -468,7 +543,7 @@ class _BookingRescheduleScreenState
 
   Future<void> _handleReschedule() async {
     // Re-evaluate at tap time in case the lesson crossed the deadline while
-    // the screen was open.
+    // the sheet was open.
     final outcome = _computeOutcome();
     if (outcome.blocked) {
       if (mounted) {
@@ -627,7 +702,7 @@ class _BookingRescheduleScreenState
     return '${widget.currentDate.month}/${widget.currentDate.day}($weekday) $hour:$minute';
   }
 
-  /// 🆕 Send notification about reschedule allowance usage
+  /// Send notification about reschedule allowance usage
   Future<void> _sendRescheduleNotification(int remainingCount) async {
     final notificationService = ref.read(notificationServiceProvider);
 
