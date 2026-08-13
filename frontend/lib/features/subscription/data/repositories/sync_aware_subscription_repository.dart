@@ -100,21 +100,6 @@ class SyncAwareSubscriptionRepository implements SubscriptionRepository {
       );
 
   @override
-  Future<Subscription> useLesson(
-    String id, {
-    String? lessonId,
-    String? teacherName,
-    String? instrument,
-  }) =>
-  // Online-only: requires current subscription state for optimistic result
-  _remote.useLesson(
-    id,
-    lessonId: lessonId,
-    teacherName: teacherName,
-    instrument: instrument,
-  );
-
-  @override
   Future<Subscription> useReschedule(String id) =>
   // Online-only: requires current subscription state for optimistic result
   _remote.useReschedule(id);

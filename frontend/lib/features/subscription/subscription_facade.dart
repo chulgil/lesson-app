@@ -63,7 +63,6 @@
 ///   ref.read(subscriptionNotifierProvider(studentId).notifier)
 ///   - `.create(subscription)` — 수강권 생성
 ///   - `.updateSubscription(subscription)` — 수정
-///   - `.useLesson(id)` — 1회 사용
 ///   - `.useReschedule(id)` — 변경 1회 사용
 ///   - `.confirmPayment(id)` — 입금 확인
 ///   - `.pause(id)` / `.resume(id)` — 일시정지/재개
@@ -71,7 +70,6 @@
 /// ### MembershipSubscriptionNotifier (멤버십별)
 ///   ref.read(membershipSubscriptionNotifierProvider(membershipId).notifier)
 ///   - `.create(subscription)` — 수강권 생성
-///   - `.useLesson()` — 1회 사용
 ///   - `.useReschedule()` — 변경 1회 사용
 ///   - `.pause()` / `.resume()` — 일시정지/재개
 ///

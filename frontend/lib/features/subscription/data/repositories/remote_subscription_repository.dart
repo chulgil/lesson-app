@@ -62,24 +62,6 @@ class RemoteSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
-  Future<Subscription> useLesson(
-    String id, {
-    String? lessonId,
-    String? teacherName,
-    String? instrument,
-  }) async {
-    final response = await _apiClient.patch(
-      '/subscriptions/$id/use-lesson',
-      data: {
-        if (lessonId != null) 'lesson_id': lessonId,
-        if (teacherName != null) 'teacher_name': teacherName,
-        if (instrument != null) 'instrument': instrument,
-      },
-    );
-    return Subscription.fromJson(response.data as Map<String, dynamic>);
-  }
-
-  @override
   Future<Subscription> useReschedule(String id) async {
     final response = await _apiClient.patch(
       '/subscriptions/$id/use-reschedule',
