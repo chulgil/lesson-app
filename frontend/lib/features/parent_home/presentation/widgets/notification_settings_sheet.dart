@@ -204,7 +204,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
               decoration: BoxDecoration(
                 color:
                     item.isRequired
-                        ? AppColors.inkTertiary.withValues(alpha: 0.2)
+                        ? AppColors.inkBorder
                         : item.isRecommended
                         ? AppColors.paperOkSoft
                         : Colors.transparent,

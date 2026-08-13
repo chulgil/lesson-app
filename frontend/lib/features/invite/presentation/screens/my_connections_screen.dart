@@ -560,7 +560,7 @@ class _ConnectionCard extends StatelessWidget {
           color:
               isActive
                   ? AppColors.paper
-                  : AppColors.inkTertiary.withValues(alpha: 0.05),
+                  : AppColors.inkSoft,
           borderRadius: BorderRadius.zero,
           border: Border.all(color: AppColors.inkQuaternary),
         ),
@@ -572,7 +572,7 @@ class _ConnectionCard extends StatelessWidget {
               backgroundColor:
                   isActive
                       ? AppColors.paperAccentSoft
-                      : AppColors.inkTertiary.withValues(alpha: 0.1),
+                      : AppColors.inkSoft,
               backgroundImage:
                   profileImage != null ? NetworkImage(profileImage) : null,
               child:
@@ -665,7 +665,7 @@ class _StatusBadge extends StatelessWidget {
         color:
             isActive
                 ? AppColors.paperOkSoft
-                : AppColors.inkTertiary.withValues(alpha: 0.1),
+                : AppColors.inkSoft,
         borderRadius: BorderRadius.zero,
       ),
       child: Text(

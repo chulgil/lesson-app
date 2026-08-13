@@ -552,8 +552,8 @@ class _UnifiedLessonRequestScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+        color: AppColors.inkSoft,
+        border: Border.all(color: AppColors.inkBorder),
       ),
       child: Row(
         children: [

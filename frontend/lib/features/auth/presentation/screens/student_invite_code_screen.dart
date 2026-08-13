@@ -107,7 +107,7 @@ class _StudentInviteCodeScreenState
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.space4),
                         decoration: BoxDecoration(
-                          color: AppColors.ink.withValues(alpha: 0.1),
+                          color: AppColors.inkSoft,
                         ),
                         child: Row(
                           children: [

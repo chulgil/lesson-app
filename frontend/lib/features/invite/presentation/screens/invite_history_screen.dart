@@ -284,7 +284,7 @@ class _InviteCard extends StatelessWidget {
         border: Border.all(
           color:
               isInactive
-                  ? AppColors.inkQuaternary.withValues(alpha: 0.5)
+                  ? AppColors.inkStrong
                   : AppColors.inkQuaternary,
         ),
       ),

@@ -33,7 +33,7 @@ class TeacherSearchCard extends StatelessWidget {
         side:
             isPreviousTeacher
                 ? BorderSide(
-                  color: AppColors.ink.withValues(alpha: 0.5),
+                  color: AppColors.inkStrong,
                   width: 1.5,
                 )
                 : BorderSide.none,
@@ -132,7 +132,7 @@ class TeacherSearchCard extends StatelessWidget {
   Widget _buildPreviousTeacherBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

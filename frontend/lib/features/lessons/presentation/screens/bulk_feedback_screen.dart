@@ -120,7 +120,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           margin: const EdgeInsets.all(AppSpacing.screenPadding),
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.ink.withValues(alpha: 0.1),
+            color: AppColors.inkSoft,
           ),
           child: Row(
             children: [

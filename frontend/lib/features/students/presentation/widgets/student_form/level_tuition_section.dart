@@ -192,7 +192,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                 label: const Text(AppStrings.studentManageSubscription),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.ink,
-                  side: BorderSide(color: AppColors.ink.withValues(alpha: 0.4)),
+                  side: BorderSide(color: AppColors.inkMuted),
                 ),
               ),
             ),

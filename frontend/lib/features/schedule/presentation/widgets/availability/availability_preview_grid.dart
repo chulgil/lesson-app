@@ -215,7 +215,7 @@ class _PreviewCell extends StatelessWidget {
       return Container(
         height: 28,
         decoration: BoxDecoration(
-          color: AppColors.inkTertiary.withValues(alpha: 0.06),
+          color: AppColors.inkSoft,
         ),
         alignment: Alignment.center,
         child: Text(

@@ -338,7 +338,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
         label: Text(label, style: AppTypography.caption),
         deleteIcon: const Icon(Icons.close, size: 16),
         onDeleted: onRemove,
-        backgroundColor: AppColors.ink.withValues(alpha: 0.1),
+        backgroundColor: AppColors.inkSoft,
         deleteIconColor: AppColors.ink,
         side: BorderSide.none,
       ),

@@ -550,7 +550,7 @@ class PracticeTipsCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -178,7 +178,7 @@ class _FirstAvailabilitySetupScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.inkQuaternary.withValues(alpha: 0.3),
+        color: AppColors.inkBorderStrong,
         borderRadius: BorderRadius.zero,
       ),
       child: Column(

@@ -247,7 +247,7 @@ class _TemplateCard extends StatelessWidget {
         side: BorderSide(
           color: template.isActive
               ? AppColors.inkQuaternary
-              : AppColors.inkTertiary.withValues(alpha: 0.3),
+              : AppColors.inkBorderStrong,
         ),
       ),
       color: template.isActive ? AppColors.paper : AppColors.paperDark,
@@ -492,7 +492,7 @@ class _DetailChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: isActive
             ? AppColors.paperAccentSoft
-            : AppColors.inkTertiary.withValues(alpha: 0.1),
+            : AppColors.inkSoft,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

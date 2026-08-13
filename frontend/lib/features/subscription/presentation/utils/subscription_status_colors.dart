@@ -60,7 +60,7 @@ class SubscriptionStatusColors {
       return AppColors.paperAccent;
     }
     if (subscription.isExpired) {
-      return AppColors.inkTertiary.withValues(alpha: 0.3);
+      return AppColors.inkBorderStrong;
     }
     return AppColors.inkQuaternary;
   }

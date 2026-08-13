@@ -1179,8 +1179,8 @@ class _PaymentNotifiedProposalRow extends StatelessWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: AppColors.ink.withValues(alpha: 0.04),
-          border: Border.all(color: AppColors.ink.withValues(alpha: 0.12)),
+          color: AppColors.inkSoft,
+          border: Border.all(color: AppColors.inkSoft),
         ),
         child: Row(
           children: [

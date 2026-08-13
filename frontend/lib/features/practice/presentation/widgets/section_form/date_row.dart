@@ -81,7 +81,7 @@ class DateRow extends StatelessWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   backgroundColor:
-                      AppColors.inkTertiary.withValues(alpha: 0.2),
+                      AppColors.inkBorder,
                   shape: const CircleBorder(),
                 ),
                 child: Icon(

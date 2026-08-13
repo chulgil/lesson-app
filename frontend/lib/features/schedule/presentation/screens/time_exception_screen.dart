@@ -123,8 +123,8 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.08),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+        color: AppColors.inkSoft,
+        border: Border.all(color: AppColors.inkBorder),
       ),
       child: Row(
         children: [

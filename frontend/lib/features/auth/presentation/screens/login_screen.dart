@@ -187,7 +187,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Expanded(
               child: Container(
                 height: 1,
-                color: AppColors.ink.withValues(alpha: 0.2),
+                color: AppColors.inkBorder,
               ),
             ),
             Padding(
@@ -202,7 +202,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Expanded(
               child: Container(
                 height: 1,
-                color: AppColors.ink.withValues(alpha: 0.2),
+                color: AppColors.inkBorder,
               ),
             ),
           ],
@@ -280,7 +280,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       children: [
         Container(
           height: 1,
-          color: AppColors.ink.withValues(alpha: 0.25),
+          color: AppColors.inkBorderStrong,
           margin: const EdgeInsets.only(bottom: AppSpacing.space3),
         ),
         // Footer legal links — same read-only sheets as the signup flow

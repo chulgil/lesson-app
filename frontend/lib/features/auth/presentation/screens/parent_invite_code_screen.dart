@@ -66,7 +66,7 @@ class _ParentInviteCodeScreenState
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: AppColors.ink.withValues(alpha: 0.1),
+                          color: AppColors.inkSoft,
                         ),
                         child: Center(
                           child: Icon(

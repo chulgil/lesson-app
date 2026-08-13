@@ -62,7 +62,7 @@ class ScheduleOptionCard extends StatelessWidget {
         isSelected
             ? AppColors.paperAccentSoft
             : isDisabled
-            ? AppColors.inkSecondary.withValues(alpha: 0.05)
+            ? AppColors.inkSoft
             : AppColors.paperDark;
 
     return AnimatedContainer(
@@ -155,7 +155,7 @@ class ScheduleOptionCard extends StatelessWidget {
         color:
             isPrimary
                 ? AppColors.paperAccentSoft
-                : AppColors.inkSecondary.withValues(alpha: 0.1),
+                : AppColors.inkSoft,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

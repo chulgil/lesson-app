@@ -80,7 +80,7 @@ Color weeklyColumnBackground({
   required ColumnRestKind restKind,
 }) {
   if (restKind.isTeacherSetRest) {
-    return AppColors.ink.withValues(alpha: 0.10);
+    return AppColors.inkSoft;
   }
   return AppColors.scheduleColumnBackground;
 }

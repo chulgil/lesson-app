@@ -186,7 +186,7 @@ class _BookingRescheduleScreenState
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
-        decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+        decoration: BoxDecoration(color: AppColors.inkSoft),
         child: Row(
           children: [
             const Icon(
@@ -252,7 +252,7 @@ class _BookingRescheduleScreenState
         color:
             isLastChance
                 ? AppColors.paperAccentSoft
-                : AppColors.ink.withValues(alpha: 0.1),
+                : AppColors.inkSoft,
       ),
       child: Row(
         children: [

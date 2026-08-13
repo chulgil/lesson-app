@@ -157,7 +157,7 @@ class ProgressCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paperDark,
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.inkBorderStrong),
       ),
       child: Column(
         children: [
@@ -191,7 +191,7 @@ class ProgressCard extends StatelessWidget {
           ClipRRect(
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.ink.withValues(alpha: 0.2),
+              backgroundColor: AppColors.inkBorder,
               valueColor: const AlwaysStoppedAnimation(AppColors.ink),
             ),
           ),
@@ -413,7 +413,7 @@ class ActionButton extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       isDisabled
-                          ? AppColors.inkQuaternary.withValues(alpha: 0.2)
+                          ? AppColors.inkBorder
                           : AppColors.paperAccentSoft,
                 ),
                 child: Icon(

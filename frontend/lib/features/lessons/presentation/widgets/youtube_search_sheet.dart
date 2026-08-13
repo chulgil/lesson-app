@@ -450,7 +450,7 @@ class _ResultTile extends StatelessWidget {
                           horizontal: 4,
                           vertical: 1,
                         ),
-                        color: AppColors.ink.withValues(alpha: 0.75),
+                        color: AppColors.inkScrimStrong,
                         child: Text(
                           result.durationText!,
                           style: AppTypography.captionSmall.copyWith(

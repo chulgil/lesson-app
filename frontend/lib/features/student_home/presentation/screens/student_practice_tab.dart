@@ -921,7 +921,7 @@ class _SectionTile extends ConsumerWidget {
                     color:
                         section.isRepeat
                             ? AppColors.paperAccent
-                            : AppColors.inkSecondary.withValues(alpha: 0.5),
+                            : AppColors.inkStrong,
                     size: 20,
                   ),
                   tooltip: section.isRepeat ? '매일 반복' : '반복 안함',

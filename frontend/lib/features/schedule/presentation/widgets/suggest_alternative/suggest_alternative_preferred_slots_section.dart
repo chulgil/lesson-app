@@ -98,7 +98,7 @@ Widget buildSuggestAlternativePreferredSlotsSection({
                         color:
                             isSelected
                                 ? AppColors.paperOk
-                                : AppColors.ink.withValues(alpha: 0.12),
+                                : AppColors.inkSoft,
                       ),
                       child: Center(
                         child:

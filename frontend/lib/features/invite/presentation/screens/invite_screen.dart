@@ -373,7 +373,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           leading: Container(
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.ink.withValues(alpha: 0.1),
+              color: AppColors.inkSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.dialpad, color: AppColors.ink),

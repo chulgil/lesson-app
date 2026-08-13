@@ -534,8 +534,8 @@ class _TeacherDetailContent extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.ink.withValues(alpha: 0.1),
-            border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
+            color: AppColors.inkSoft,
+            border: Border.all(color: AppColors.inkBorderStrong),
           ),
           child: Row(
             children: [

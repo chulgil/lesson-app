@@ -464,7 +464,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         height: height,
         decoration: BoxDecoration(
           color:
-              isPast ? AppColors.inkQuaternary.withValues(alpha: 0.15) : null,
+              isPast ? AppColors.inkBorder : null,
           border: _cellBorder(
             includeTop: includeTopBoundary,
             includeLeft: includeLeftBoundary,

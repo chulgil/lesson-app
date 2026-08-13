@@ -210,7 +210,7 @@ class _GroupClassAttendanceScreenState
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space3,
       ),
-      color: AppColors.ink.withValues(alpha: 0.05),
+      color: AppColors.inkSoft,
       child: Row(
         children: [
           const Icon(Icons.lightbulb_outline, size: 18, color: AppColors.ink),

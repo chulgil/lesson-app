@@ -218,7 +218,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     if (outcome.beforeDeadline) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+        decoration: BoxDecoration(color: AppColors.inkSoft),
         child: Row(
           children: [
             const Icon(Icons.info_outline, color: AppColors.ink, size: 20),
@@ -290,7 +290,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Row(
         children: [
           const Icon(Icons.info_outline, color: AppColors.ink, size: 20),
@@ -326,7 +326,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   Widget _buildTeacherCancelInfo() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Row(
         children: [
           const Icon(Icons.info_outline, color: AppColors.ink, size: 20),

@@ -376,7 +376,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         horizontal: AppSpacing.space3,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.08)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Row(
         children: [
           Icon(Icons.lightbulb_outline, size: 16, color: AppColors.ink),

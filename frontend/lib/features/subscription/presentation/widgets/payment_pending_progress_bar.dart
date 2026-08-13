@@ -118,7 +118,7 @@ class _StepDot extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.ink.withValues(alpha: 0.2),
+                  color: AppColors.inkBorder,
                   width: 2,
                 ),
               ),
@@ -127,7 +127,7 @@ class _StepDot extends StatelessWidget {
               width: _dotSize,
               height: _dotSize,
               decoration: BoxDecoration(
-                color: AppColors.ink.withValues(alpha: 0.6),
+                color: AppColors.paperPencil,
                 shape: BoxShape.circle,
               ),
             ),
