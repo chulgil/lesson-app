@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
-import 'package:lessonaza/features/schedule/presentation/screens/request_detail_screen.dart';
+import 'package:lessonaza/features/schedule/presentation/utils/request_detail_phase_filter.dart';
 
 void main() {
   test('request detail resolves latest subscription route from events', () {

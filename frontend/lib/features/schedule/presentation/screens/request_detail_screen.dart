@@ -5,11 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
-import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../students/students_facade.dart';
 import '../../../students/students_ui_facade.dart';
@@ -21,6 +19,7 @@ import '../../domain/mappers/time_slot_mapper.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../extensions/cancel_reason_visuals.dart';
+import '../utils/request_detail_phase_filter.dart';
 import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
 import '../widgets/schedule_change_slot_bottom_sheet.dart';
@@ -31,84 +30,9 @@ import '../widgets/request_detail/request_detail_app_bar.dart';
 import '../widgets/request_detail/request_detail_chapter_summaries.dart';
 import '../widgets/request_detail/request_detail_event_strip.dart';
 import '../widgets/request_detail/request_detail_more_menu_sheet.dart';
+import '../widgets/request_detail/request_detail_status_scaffold.dart';
 import '../widgets/request_history_chat.dart';
 import '../widgets/suggest_alternative_bottom_sheet.dart';
-
-List<RequestEvent> requestDetailVisibleEventsForCurrentPhase(
-  UnifiedLessonRequest request,
-  List<RequestEvent> events,
-) {
-  final phase = request.currentPhase;
-  if (phase == RequestPhase.request || phase == RequestPhase.terminal) {
-    return events;
-  }
-  return events
-      .where((event) => requestDetailEventBelongsToPhase(event, phase))
-      .toList();
-}
-
-bool requestDetailEventBelongsToPhase(RequestEvent event, RequestPhase phase) {
-  return switch (phase) {
-    RequestPhase.request => _requestPhaseEventTypes.contains(event.eventType),
-    RequestPhase.subscription =>
-      _requestPhaseDecisionEventTypes.contains(event.eventType) ||
-          _subscriptionPhaseEventTypes.contains(event.eventType),
-    RequestPhase.lessons => _lessonPhaseEventTypes.contains(event.eventType),
-    RequestPhase.completed => _completedPhaseEventTypes.contains(
-      event.eventType,
-    ),
-    RequestPhase.terminal => true,
-  };
-}
-
-const _requestPhaseEventTypes = {
-  RequestEventType.initialRequest,
-  RequestEventType.approve,
-  RequestEventType.reject,
-  RequestEventType.proposeAlternative,
-  RequestEventType.counterPropose,
-  RequestEventType.acceptAlternative,
-  RequestEventType.withdrawApproval,
-  RequestEventType.cancel,
-  RequestEventType.expire,
-  RequestEventType.proposalSent,
-  RequestEventType.proposalAccepted,
-  RequestEventType.paymentNotified,
-};
-
-const _requestPhaseDecisionEventTypes = {
-  RequestEventType.approve,
-  RequestEventType.acceptAlternative,
-  RequestEventType.withdrawApproval,
-};
-
-const _subscriptionPhaseEventTypes = {
-  RequestEventType.paymentRequested,
-  RequestEventType.paymentConfirmed,
-  RequestEventType.subscriptionIssued,
-};
-
-const _lessonPhaseEventTypes = {
-  RequestEventType.lessonCompleted,
-  RequestEventType.lessonCancelled,
-  RequestEventType.scheduleChanged,
-  RequestEventType.lessonNoteAdded,
-};
-
-const _completedPhaseEventTypes = {
-  RequestEventType.subscriptionRenewed,
-  RequestEventType.subscriptionCompleted,
-  RequestEventType.completed,
-};
-
-String? requestDetailSubscriptionRoute(List<RequestEvent> events) {
-  final subscriptionEvents =
-      events.where((event) => event.subscriptionId != null).toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  if (subscriptionEvents.isEmpty) return null;
-  final subscriptionId = subscriptionEvents.first.subscriptionId!;
-  return AppRoutes.subscriptionDetail.replaceFirst(':id', subscriptionId);
-}
 
 /// Detail screen for a single lesson request — chat-style layout.
 ///
@@ -198,36 +122,22 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final academyNames = ref.watch(academyNameMapProvider);
 
     return requestAsync.when(
-      loading:
-          () => NotebookScreenScaffold(
-            backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(
-              title: AppStrings.requestDetailTitle,
-            ),
-            body: const Center(child: CircularProgressIndicator()),
-          ),
-      error:
-          (error, _) => NotebookScreenScaffold(
-            backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(
-              title: AppStrings.requestDetailTitle,
-            ),
-            body: Center(
-              child: Text(
-                AppStrings.requestLoadError,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
+      loading: () => const RequestDetailStatusScaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => RequestDetailStatusScaffold(
+        body: Center(
+          child: Text(
+            AppStrings.requestLoadError,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.inkSecondary,
             ),
           ),
+        ),
+      ),
       data: (request) {
         if (request == null) {
-          return NotebookScreenScaffold(
-            backgroundColor: AppColors.paper,
-            appBar: const NotebookDetailAppBar(
-              title: AppStrings.requestDetailTitle,
-            ),
+          return RequestDetailStatusScaffold(
             body: Center(
               child: Text(
                 AppStrings.requestNotFound,
@@ -258,10 +168,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.teacherName ??
             teacherNames[request.teacherId] ??
             AppStrings.teacher;
-        final opponentName =
-            viewerRole == 'teacher'
-                ? studentName
-                : AppStrings.teacherDisplayName(teacherName);
+        final opponentName = viewerRole == 'teacher'
+            ? studentName
+            : AppStrings.teacherDisplayName(teacherName);
 
         return NotebookScreenScaffold(
           backgroundColor: AppColors.paper,
@@ -269,17 +178,15 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request: request,
             opponentName: opponentName,
             academyName: academyName,
-            onTitleTap:
-                () => showStudentProfileBottomSheet(
-                  context: context,
-                  studentId: request.studentId,
-                  studentName: opponentName,
-                  instrument: request.instrument,
-                  student:
-                      ref.read(studentProvider(request.studentId)).valueOrNull,
-                  message: request.message,
-                  isTrialRequest: request.type == LessonRequestType.trial,
-                ),
+            onTitleTap: () => showStudentProfileBottomSheet(
+              context: context,
+              studentId: request.studentId,
+              studentName: opponentName,
+              instrument: request.instrument,
+              student: ref.read(studentProvider(request.studentId)).valueOrNull,
+              message: request.message,
+              isTrialRequest: request.type == LessonRequestType.trial,
+            ),
             onMoreTap: () => _showMoreMenu(context, request),
           ),
           body: Column(
@@ -301,14 +208,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                         RequestPhase.request,
                       ),
                       expandedChapters: _expandedChapters,
-                      onToggleChapter:
-                          (phase) => setState(() {
-                            if (_expandedChapters.contains(phase)) {
-                              _expandedChapters.remove(phase);
-                            } else {
-                              _expandedChapters.add(phase);
-                            }
-                          }),
+                      onToggleChapter: (phase) => setState(() {
+                        if (_expandedChapters.contains(phase)) {
+                          _expandedChapters.remove(phase);
+                        } else {
+                          _expandedChapters.add(phase);
+                        }
+                      }),
                     ),
 
                     // Chat history (chronological, newest at bottom)
@@ -316,27 +222,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       events: _eventsForCurrentPhase(request, events),
                       request: request,
                       shrinkWrap: true,
-                      viewerId:
-                          viewerRole == 'teacher'
-                              ? request.teacherId
-                              : request.studentId,
+                      viewerId: viewerRole == 'teacher'
+                          ? request.teacherId
+                          : request.studentId,
                       viewerRole: viewerRole,
                       studentName: studentName,
                       proposalTemplates: proposalTemplates,
-                      onOpponentAvatarTap:
-                          () => showStudentProfileBottomSheet(
-                            context: context,
-                            studentId: request.studentId,
-                            studentName: opponentName,
-                            instrument: request.instrument,
-                            student:
-                                ref
-                                    .read(studentProvider(request.studentId))
-                                    .valueOrNull,
-                            message: request.message,
-                            isTrialRequest:
-                                request.type == LessonRequestType.trial,
-                          ),
+                      onOpponentAvatarTap: () => showStudentProfileBottomSheet(
+                        context: context,
+                        studentId: request.studentId,
+                        studentName: opponentName,
+                        instrument: request.instrument,
+                        student: ref
+                            .read(studentProvider(request.studentId))
+                            .valueOrNull,
+                        message: request.message,
+                        isTrialRequest: request.type == LessonRequestType.trial,
+                      ),
                     ),
                   ],
                 ),
@@ -358,52 +260,40 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 initialSelectedSlot: _preselectedSlot,
                 opponentName: opponentName,
                 // Phase 1
-                onAccept:
-                    (slotIndex, message) => _handleAccept(
-                      context,
-                      ref,
-                      request,
-                      slotIndex,
-                      message,
-                    ),
-                onCounterPropose:
-                    () => _handleCounterPropose(context, ref, request),
+                onAccept: (slotIndex, message) =>
+                    _handleAccept(context, ref, request, slotIndex, message),
+                onCounterPropose: () =>
+                    _handleCounterPropose(context, ref, request),
                 onCancel: () => _handleCancel(context, ref, request),
                 onWithdraw: () => _handleWithdraw(context, ref, request),
                 // Phase 2
-                onSendPaymentGuide:
-                    () => _handleSendPaymentGuide(context, ref, request),
-                onIssuePostpaid:
-                    () => _handleIssuePostpaid(context, ref, request),
+                onSendPaymentGuide: () =>
+                    _handleSendPaymentGuide(context, ref, request),
+                onIssuePostpaid: () =>
+                    _handleIssuePostpaid(context, ref, request),
                 onIssueFree: () => _handleIssueFree(context, ref, request),
-                onConfirmPayment:
-                    () => _handleConfirmPayment(context, ref, request),
-                onVerifyPayment:
-                    () => _handleVerifyPayment(context, ref, request),
-                onAcceptProposal:
-                    (templateId) => _handleAcceptProposal(
-                      context,
-                      ref,
-                      request,
-                      templateId,
-                    ),
-                onRejectProposal:
-                    (reason) =>
-                        _handleRejectProposal(context, ref, request, reason),
+                onConfirmPayment: () =>
+                    _handleConfirmPayment(context, ref, request),
+                onVerifyPayment: () =>
+                    _handleVerifyPayment(context, ref, request),
+                onAcceptProposal: (templateId) =>
+                    _handleAcceptProposal(context, ref, request, templateId),
+                onRejectProposal: (reason) =>
+                    _handleRejectProposal(context, ref, request, reason),
                 proposalTemplates: proposalTemplates,
                 // Phase 3
-                onLessonComplete:
-                    () => _handleLessonComplete(context, ref, request),
-                onLessonCancel:
-                    () => _handleLessonCancel(context, ref, request),
-                onScheduleChange:
-                    () => _handleScheduleChange(context, ref, request),
-                onScheduleChangeResponse:
-                    () => _handleScheduleChangeResponse(context, ref, request),
+                onLessonComplete: () =>
+                    _handleLessonComplete(context, ref, request),
+                onLessonCancel: () =>
+                    _handleLessonCancel(context, ref, request),
+                onScheduleChange: () =>
+                    _handleScheduleChange(context, ref, request),
+                onScheduleChangeResponse: () =>
+                    _handleScheduleChangeResponse(context, ref, request),
                 onAddNote: () => _handleAddNote(context, ref, request),
                 // Phase 3/4
-                onViewSubscription:
-                    () => _handleViewSubscription(context, events),
+                onViewSubscription: () =>
+                    _handleViewSubscription(context, events),
                 onProposeRenewal: () => _handleRenewal(context, ref, request),
                 onRequestRenewal: () => _handleRenewal(context, ref, request),
               ),
@@ -597,8 +487,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
-      final actorRole =
-          viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+      final actorRole = viewerRole == 'teacher'
+          ? ProposerRole.teacher
+          : ProposerRole.student;
 
       if (result.acceptedSlotIndex != null) {
         // Re-approve: check if slot changed
@@ -696,10 +587,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           final templates = await ref.read(
             activeTeacherTemplatesProvider(request.teacherId).future,
           );
-          final selectedTemplates =
-              templates
-                  .where((t) => result.templateIds.contains(t.id))
-                  .toList();
+          final selectedTemplates = templates
+              .where((t) => result.templateIds.contains(t.id))
+              .toList();
 
           final templateSummary = selectedTemplates
               .map(
@@ -903,10 +793,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole =
-        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
-    final actorId =
-        viewerRole == 'teacher' ? request.teacherId : request.studentId;
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
@@ -930,10 +822,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole =
-        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
-    final actorId =
-        viewerRole == 'teacher' ? request.teacherId : request.studentId;
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
 
     // Step 1: Choose change type
     final changeType = await showScheduleChangeTypeBottomSheet(context);
@@ -948,10 +842,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         teacherId: request.teacherId,
         studentId: request.studentId,
         durationMinutes: request.preferredDuration,
-        currentScheduleLabel:
-            request.preferredSlots.isNotEmpty
-                ? request.preferredSlots.first.displayLabel
-                : '-',
+        currentScheduleLabel: request.preferredSlots.isNotEmpty
+            ? request.preferredSlots.first.displayLabel
+            : '-',
         isBulkChange: changeType == ScheduleChangeType.bulkChange,
       ),
     );
@@ -986,10 +879,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole =
-        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
-    final actorId =
-        viewerRole == 'teacher' ? request.teacherId : request.studentId;
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
     // Find the pending proposal's slots and change type
     final events =
         ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
@@ -1058,8 +953,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.teacherId,
             request.studentId,
             changeType: changeType,
-            suggestedSlots:
-                result.counterSlots.map((s) => s.toTimeSlotOption()).toList(),
+            suggestedSlots: result.counterSlots
+                .map((s) => s.toTimeSlotOption())
+                .toList(),
             message: result.message.isEmpty ? null : result.message,
           );
           // #1191 — 상대 통지는 BE(#1200 scheduleChangeRequested→교사 emit). FE
@@ -1112,10 +1008,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole =
-        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
-    final actorId =
-        viewerRole == 'teacher' ? request.teacherId : request.studentId;
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
