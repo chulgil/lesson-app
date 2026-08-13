@@ -469,18 +469,18 @@ class _TodayRecordingCountProviderElement
   String get studentId => (origin as TodayRecordingCountProvider).studentId;
 }
 
-String _$dailyMissionsHash() => r'7c3ab9c25b8abce34f25dce6e736bce08ca89e56';
+String _$dailyMissionsHash() => r'5a38697071f4789d5bdc22316d03e4109d1361ac';
 
 /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
 /// 조합한 최종 표시 데이터.
 ///
-/// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-/// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-/// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-/// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-/// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-/// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-/// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+/// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+/// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+/// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+/// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+/// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+/// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+/// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
 ///
 /// Copied from [dailyMissions].
 @ProviderFor(dailyMissions)
@@ -489,26 +489,26 @@ const dailyMissionsProvider = DailyMissionsFamily();
 /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
 /// 조합한 최종 표시 데이터.
 ///
-/// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-/// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-/// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-/// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-/// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-/// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-/// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+/// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+/// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+/// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+/// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+/// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+/// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+/// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
 ///
 /// Copied from [dailyMissions].
 class DailyMissionsFamily extends Family<List<DailyMission>> {
   /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
   /// 조합한 최종 표시 데이터.
   ///
-  /// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-  /// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-  /// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-  /// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-  /// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-  /// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-  /// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+  /// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+  /// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+  /// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+  /// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+  /// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+  /// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+  /// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
   ///
   /// Copied from [dailyMissions].
   const DailyMissionsFamily();
@@ -516,13 +516,13 @@ class DailyMissionsFamily extends Family<List<DailyMission>> {
   /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
   /// 조합한 최종 표시 데이터.
   ///
-  /// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-  /// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-  /// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-  /// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-  /// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-  /// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-  /// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+  /// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+  /// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+  /// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+  /// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+  /// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+  /// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+  /// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
   ///
   /// Copied from [dailyMissions].
   DailyMissionsProvider call(
@@ -560,26 +560,26 @@ class DailyMissionsFamily extends Family<List<DailyMission>> {
 /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
 /// 조합한 최종 표시 데이터.
 ///
-/// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-/// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-/// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-/// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-/// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-/// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-/// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+/// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+/// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+/// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+/// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+/// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+/// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+/// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
 ///
 /// Copied from [dailyMissions].
 class DailyMissionsProvider extends AutoDisposeProvider<List<DailyMission>> {
   /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
   /// 조합한 최종 표시 데이터.
   ///
-  /// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-  /// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-  /// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-  /// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-  /// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-  /// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-  /// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+  /// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+  /// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+  /// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+  /// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+  /// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+  /// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+  /// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
   ///
   /// Copied from [dailyMissions].
   DailyMissionsProvider(
@@ -680,10 +680,10 @@ abstract class _$DailyMissionLedger
 
 /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
 ///
-/// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-/// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-/// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-/// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+/// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+/// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+/// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+/// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
 /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
 ///
 /// box key = `student:<id>:missions:<dateKey>`, value = 완료된
@@ -697,10 +697,10 @@ const dailyMissionLedgerProvider = DailyMissionLedgerFamily();
 
 /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
 ///
-/// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-/// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-/// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-/// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+/// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+/// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+/// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+/// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
 /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
 ///
 /// box key = `student:<id>:missions:<dateKey>`, value = 완료된
@@ -713,10 +713,10 @@ class DailyMissionLedgerFamily
     extends Family<AsyncValue<Set<DailyMissionKind>>> {
   /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
   ///
-  /// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-  /// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-  /// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-  /// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+  /// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+  /// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+  /// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+  /// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
   /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
   ///
   /// box key = `student:<id>:missions:<dateKey>`, value = 완료된
@@ -729,10 +729,10 @@ class DailyMissionLedgerFamily
 
   /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
   ///
-  /// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-  /// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-  /// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-  /// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+  /// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+  /// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+  /// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+  /// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
   /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
   ///
   /// box key = `student:<id>:missions:<dateKey>`, value = 완료된
@@ -778,10 +778,10 @@ class DailyMissionLedgerFamily
 
 /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
 ///
-/// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-/// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-/// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-/// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+/// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+/// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+/// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+/// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
 /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
 ///
 /// box key = `student:<id>:missions:<dateKey>`, value = 완료된
@@ -794,10 +794,10 @@ class DailyMissionLedgerProvider extends AsyncNotifierProviderImpl<
     DailyMissionLedger, Set<DailyMissionKind>> {
   /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
   ///
-  /// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-  /// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-  /// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-  /// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+  /// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+  /// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+  /// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+  /// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
   /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
   ///
   /// box key = `student:<id>:missions:<dateKey>`, value = 완료된

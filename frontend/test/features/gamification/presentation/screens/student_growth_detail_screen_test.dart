@@ -68,11 +68,7 @@ Future<void> _pump(
         ).overrideWith((_) async => gamification),
       ],
       child: MaterialApp(
-        home: Scaffold(
-          body: StudentGrowthDetailScreen(
-            studentId: studentId,
-          ),
-        ),
+        home: Scaffold(body: StudentGrowthDetailScreen(studentId: studentId)),
       ),
     ),
   );
@@ -80,9 +76,11 @@ Future<void> _pump(
 }
 
 void main() {
-  // doc 46 §4 (P2) — 화면이 dailyPracticeGoalProvider 를 watch 하면서 Hive box
-  // 를 연다. 미초기화 상태에서는 HiveError 가 try/catch 를 우회해 zone 레벨
-  // uncaught error 로 보고된다 (student_dashboard_layout_test.dart 와 동일 패턴).
+  // doc 46 §4 (P2) — 화면이 studentStreakFreezeProvider 를 watch 하면서 Hive
+  // box 를 연다(#1269 이전엔 목표 provider 도 Hive 를 썼지만, 이제
+  // effectiveDailyGoalMinutesProvider 는 원격 PracticeGoal 기준이라 Hive 가
+  // 필요 없다). 미초기화 상태에서는 HiveError 가 try/catch 를 우회해 zone
+  // 레벨 uncaught error 로 보고된다 (student_dashboard_layout_test.dart 와 동일).
   late Directory tempDir;
 
   setUpAll(() {
@@ -147,6 +145,5 @@ void main() {
         findsOneWidget,
       );
     });
-
   });
 }

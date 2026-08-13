@@ -16,9 +16,9 @@ import '../../domain/services/daily_mission_rotation.dart';
 import '../extensions/daily_mission_visuals.dart';
 import '../providers/daily_missions_provider.dart';
 
-/// 오늘의 미션 카드 — 학생 대시보드, [DailyGoalCard] 인근에 배치한다.
+/// 오늘의 미션 카드 — 학생 대시보드, [GoalProgressSummaryCard] 인근에 배치한다.
 ///
-/// [DailyGoalCard]와의 관계: [DailyGoalCard]는 연습 "분(分)" 진행바만 보여
+/// [GoalProgressSummaryCard]와의 관계: 그 카드는 연습 "분(分)" 진행바만 보여
 /// 준다. 이 카드는 그 목표를 고정 코어 미션으로 포함하되, 메트로놈/튜너/
 /// 녹음 도구 사용을 매일 로테이션되는 2개의 추가 미션으로 얹어 다양성을
 /// 준다 — 서로 대체 관계가 아니라 보완 관계.
@@ -42,8 +42,8 @@ class _DailyMissionsCardState extends ConsumerState<DailyMissionsCard> {
   Widget build(BuildContext context) {
     // dailyMissionsProvider 는 동기 조합(각 의존 provider 를 valueOrNull ??
     // 기본값 으로 읽음) — 첫 프레임부터 항상 렌더 가능하고, 각 provider 가
-    // 실제로 resolve 되는 순간 자동으로 재계산된다 (DailyGoalCard 와 동일
-    // 패턴). AsyncValue.when 이 필요 없다.
+    // 실제로 resolve 되는 순간 자동으로 재계산된다 (GoalProgressSummaryCard
+    // 와 동일 패턴). AsyncValue.when 이 필요 없다.
     final missions = ref.watch(dailyMissionsProvider(widget.studentId));
     _scheduleLedgerLock(missions);
     return _buildCard(context, missions);

@@ -186,6 +186,174 @@ class _PracticeGoalProviderElement extends FutureProviderElement<PracticeGoal?>
   String get studentId => (origin as PracticeGoalProvider).studentId;
 }
 
+String _$effectiveDailyGoalMinutesHash() =>
+    r'25af37be2e02115628eda2d8c71e06ba8fc699a3';
+
+/// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+/// the single goal-target source for consumers outside the goal-setting UI
+/// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+/// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+/// onto this remote-persisted [PracticeGoal] field.
+///
+/// Copied from [effectiveDailyGoalMinutes].
+@ProviderFor(effectiveDailyGoalMinutes)
+const effectiveDailyGoalMinutesProvider = EffectiveDailyGoalMinutesFamily();
+
+/// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+/// the single goal-target source for consumers outside the goal-setting UI
+/// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+/// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+/// onto this remote-persisted [PracticeGoal] field.
+///
+/// Copied from [effectiveDailyGoalMinutes].
+class EffectiveDailyGoalMinutesFamily extends Family<AsyncValue<int>> {
+  /// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+  /// the single goal-target source for consumers outside the goal-setting UI
+  /// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+  /// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+  /// onto this remote-persisted [PracticeGoal] field.
+  ///
+  /// Copied from [effectiveDailyGoalMinutes].
+  const EffectiveDailyGoalMinutesFamily();
+
+  /// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+  /// the single goal-target source for consumers outside the goal-setting UI
+  /// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+  /// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+  /// onto this remote-persisted [PracticeGoal] field.
+  ///
+  /// Copied from [effectiveDailyGoalMinutes].
+  EffectiveDailyGoalMinutesProvider call(
+    String studentId,
+  ) {
+    return EffectiveDailyGoalMinutesProvider(
+      studentId,
+    );
+  }
+
+  @override
+  EffectiveDailyGoalMinutesProvider getProviderOverride(
+    covariant EffectiveDailyGoalMinutesProvider provider,
+  ) {
+    return call(
+      provider.studentId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'effectiveDailyGoalMinutesProvider';
+}
+
+/// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+/// the single goal-target source for consumers outside the goal-setting UI
+/// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+/// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+/// onto this remote-persisted [PracticeGoal] field.
+///
+/// Copied from [effectiveDailyGoalMinutes].
+class EffectiveDailyGoalMinutesProvider extends AutoDisposeFutureProvider<int> {
+  /// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+  /// the single goal-target source for consumers outside the goal-setting UI
+  /// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+  /// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+  /// onto this remote-persisted [PracticeGoal] field.
+  ///
+  /// Copied from [effectiveDailyGoalMinutes].
+  EffectiveDailyGoalMinutesProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => effectiveDailyGoalMinutes(
+            ref as EffectiveDailyGoalMinutesRef,
+            studentId,
+          ),
+          from: effectiveDailyGoalMinutesProvider,
+          name: r'effectiveDailyGoalMinutesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$effectiveDailyGoalMinutesHash,
+          dependencies: EffectiveDailyGoalMinutesFamily._dependencies,
+          allTransitiveDependencies:
+              EffectiveDailyGoalMinutesFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
+
+  EffectiveDailyGoalMinutesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<int> Function(EffectiveDailyGoalMinutesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: EffectiveDailyGoalMinutesProvider._internal(
+        (ref) => create(ref as EffectiveDailyGoalMinutesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<int> createElement() {
+    return _EffectiveDailyGoalMinutesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is EffectiveDailyGoalMinutesProvider &&
+        other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin EffectiveDailyGoalMinutesRef on AutoDisposeFutureProviderRef<int> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _EffectiveDailyGoalMinutesProviderElement
+    extends AutoDisposeFutureProviderElement<int>
+    with EffectiveDailyGoalMinutesRef {
+  _EffectiveDailyGoalMinutesProviderElement(super.provider);
+
+  @override
+  String get studentId =>
+      (origin as EffectiveDailyGoalMinutesProvider).studentId;
+}
+
 String _$todayProgressHash() => r'd4201f759e9eb697da327deab6b786d942a676d1';
 
 /// Today's progress

@@ -25,6 +25,11 @@ export 'presentation/providers/piece_crud_provider.dart'
         pieceSearchQueryProvider,
         studentRepertoireNotifierProvider;
 export 'presentation/providers/practice_crud_provider.dart';
+export 'presentation/providers/practice_goal_provider.dart'
+    show
+        defaultDailyGoalMinutes,
+        effectiveDailyGoalMinutesProvider,
+        practiceGoalProvider;
 export 'presentation/providers/practice_item_providers.dart';
 export 'presentation/providers/practice_loop_stats_provider.dart'
     show practiceLoopStatsSummaryProvider;

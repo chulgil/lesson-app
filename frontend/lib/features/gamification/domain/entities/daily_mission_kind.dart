@@ -3,7 +3,8 @@
 /// 순수 값 — 표시 라벨/아이콘은 `presentation/extensions` 에서 변환한다
 /// (flutter-architecture 계약: domain 에 표시 getter 금지).
 enum DailyMissionKind {
-  /// 고정 코어 — 오늘의 연습 목표(분) 달성. [DailyPracticeGoal]과 동일 목표값.
+  /// 고정 코어 — 오늘의 연습 목표(분) 달성. PracticeGoal.dailyTimeMinutes 와
+  /// 동일 목표값(effectiveDailyGoalMinutesProvider).
   practice15m,
 
   /// 로테이션 풀 — 메트로놈 연습 1분 이상.

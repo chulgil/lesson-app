@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'daily_practice_goal_provider.dart';
+part of 'today_practice_minutes_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
 String _$todayPracticeMinutesHash() =>
-    r'e15b41de4c8286d052dc77ed6983875c839e9da1';
+    r'1c4247a99b6909372613e7ef94461f60bd89ab63';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -191,190 +191,6 @@ class _TodayPracticeMinutesProviderElement
 
   @override
   String get studentId => (origin as TodayPracticeMinutesProvider).studentId;
-}
-
-String _$dailyPracticeGoalHash() => r'410772aa9ccbc85006e7f53502f6e4b63c045ed4';
-
-abstract class _$DailyPracticeGoal extends BuildlessAsyncNotifier<int> {
-  late final String studentId;
-
-  FutureOr<int> build(
-    String studentId,
-  );
-}
-
-/// 학생별 "오늘의 연습 목표"(분) — 로컬 전용 설정, 기본 15분.
-///
-/// [PracticeGoal](features/practice)의 다차원(일/주 × 시간/구간) 목표 CRUD와는
-/// 별개다. 이 provider 는 대시보드 상단의 가벼운 ESL 스타일 카드 전용 —
-/// 원격 저장 없이 기기 로컬에만 남으며, `GoalAchievementStorage` 와 동일하게
-/// lazy-open Hive box 패턴을 따른다 (박스 사전 오픈 불필요).
-///
-/// Copied from [DailyPracticeGoal].
-@ProviderFor(DailyPracticeGoal)
-const dailyPracticeGoalProvider = DailyPracticeGoalFamily();
-
-/// 학생별 "오늘의 연습 목표"(분) — 로컬 전용 설정, 기본 15분.
-///
-/// [PracticeGoal](features/practice)의 다차원(일/주 × 시간/구간) 목표 CRUD와는
-/// 별개다. 이 provider 는 대시보드 상단의 가벼운 ESL 스타일 카드 전용 —
-/// 원격 저장 없이 기기 로컬에만 남으며, `GoalAchievementStorage` 와 동일하게
-/// lazy-open Hive box 패턴을 따른다 (박스 사전 오픈 불필요).
-///
-/// Copied from [DailyPracticeGoal].
-class DailyPracticeGoalFamily extends Family<AsyncValue<int>> {
-  /// 학생별 "오늘의 연습 목표"(분) — 로컬 전용 설정, 기본 15분.
-  ///
-  /// [PracticeGoal](features/practice)의 다차원(일/주 × 시간/구간) 목표 CRUD와는
-  /// 별개다. 이 provider 는 대시보드 상단의 가벼운 ESL 스타일 카드 전용 —
-  /// 원격 저장 없이 기기 로컬에만 남으며, `GoalAchievementStorage` 와 동일하게
-  /// lazy-open Hive box 패턴을 따른다 (박스 사전 오픈 불필요).
-  ///
-  /// Copied from [DailyPracticeGoal].
-  const DailyPracticeGoalFamily();
-
-  /// 학생별 "오늘의 연습 목표"(분) — 로컬 전용 설정, 기본 15분.
-  ///
-  /// [PracticeGoal](features/practice)의 다차원(일/주 × 시간/구간) 목표 CRUD와는
-  /// 별개다. 이 provider 는 대시보드 상단의 가벼운 ESL 스타일 카드 전용 —
-  /// 원격 저장 없이 기기 로컬에만 남으며, `GoalAchievementStorage` 와 동일하게
-  /// lazy-open Hive box 패턴을 따른다 (박스 사전 오픈 불필요).
-  ///
-  /// Copied from [DailyPracticeGoal].
-  DailyPracticeGoalProvider call(
-    String studentId,
-  ) {
-    return DailyPracticeGoalProvider(
-      studentId,
-    );
-  }
-
-  @override
-  DailyPracticeGoalProvider getProviderOverride(
-    covariant DailyPracticeGoalProvider provider,
-  ) {
-    return call(
-      provider.studentId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'dailyPracticeGoalProvider';
-}
-
-/// 학생별 "오늘의 연습 목표"(분) — 로컬 전용 설정, 기본 15분.
-///
-/// [PracticeGoal](features/practice)의 다차원(일/주 × 시간/구간) 목표 CRUD와는
-/// 별개다. 이 provider 는 대시보드 상단의 가벼운 ESL 스타일 카드 전용 —
-/// 원격 저장 없이 기기 로컬에만 남으며, `GoalAchievementStorage` 와 동일하게
-/// lazy-open Hive box 패턴을 따른다 (박스 사전 오픈 불필요).
-///
-/// Copied from [DailyPracticeGoal].
-class DailyPracticeGoalProvider
-    extends AsyncNotifierProviderImpl<DailyPracticeGoal, int> {
-  /// 학생별 "오늘의 연습 목표"(분) — 로컬 전용 설정, 기본 15분.
-  ///
-  /// [PracticeGoal](features/practice)의 다차원(일/주 × 시간/구간) 목표 CRUD와는
-  /// 별개다. 이 provider 는 대시보드 상단의 가벼운 ESL 스타일 카드 전용 —
-  /// 원격 저장 없이 기기 로컬에만 남으며, `GoalAchievementStorage` 와 동일하게
-  /// lazy-open Hive box 패턴을 따른다 (박스 사전 오픈 불필요).
-  ///
-  /// Copied from [DailyPracticeGoal].
-  DailyPracticeGoalProvider(
-    String studentId,
-  ) : this._internal(
-          () => DailyPracticeGoal()..studentId = studentId,
-          from: dailyPracticeGoalProvider,
-          name: r'dailyPracticeGoalProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$dailyPracticeGoalHash,
-          dependencies: DailyPracticeGoalFamily._dependencies,
-          allTransitiveDependencies:
-              DailyPracticeGoalFamily._allTransitiveDependencies,
-          studentId: studentId,
-        );
-
-  DailyPracticeGoalProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.studentId,
-  }) : super.internal();
-
-  final String studentId;
-
-  @override
-  FutureOr<int> runNotifierBuild(
-    covariant DailyPracticeGoal notifier,
-  ) {
-    return notifier.build(
-      studentId,
-    );
-  }
-
-  @override
-  Override overrideWith(DailyPracticeGoal Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: DailyPracticeGoalProvider._internal(
-        () => create()..studentId = studentId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        studentId: studentId,
-      ),
-    );
-  }
-
-  @override
-  AsyncNotifierProviderElement<DailyPracticeGoal, int> createElement() {
-    return _DailyPracticeGoalProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is DailyPracticeGoalProvider && other.studentId == studentId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, studentId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-mixin DailyPracticeGoalRef on AsyncNotifierProviderRef<int> {
-  /// The parameter `studentId` of this provider.
-  String get studentId;
-}
-
-class _DailyPracticeGoalProviderElement
-    extends AsyncNotifierProviderElement<DailyPracticeGoal, int>
-    with DailyPracticeGoalRef {
-  _DailyPracticeGoalProviderElement(super.provider);
-
-  @override
-  String get studentId => (origin as DailyPracticeGoalProvider).studentId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
