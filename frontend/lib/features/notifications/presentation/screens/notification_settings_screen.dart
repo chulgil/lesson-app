@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/notification_preferences.dart';
 import '../providers/notification_preferences_provider.dart';
@@ -37,7 +38,12 @@ class NotificationSettingsScreen extends ConsumerWidget {
             onChanged: notifier.toggleMaster,
           ),
           const SizedBox(height: AppSpacing.space2),
-          _SectionHeader(AppStrings.notificationCategoryHeader),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+            child: NotebookSectionHeader(
+              label: AppStrings.notificationCategoryHeader,
+            ),
+          ),
           _CategoryTile(
             title: AppStrings.notificationLesson,
             subtitle: AppStrings.notificationLessonDesc,
@@ -101,13 +107,21 @@ class NotificationSettingsScreen extends ConsumerWidget {
           // Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
           if (isTeacher) ...[
             const SizedBox(height: AppSpacing.space2),
-            _SectionHeader(
-              AppStrings.notificationSettingsExpiryAutoSectionTeacher,
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: NotebookSectionHeader(
+                label: AppStrings.notificationSettingsExpiryAutoSectionTeacher,
+              ),
             ),
             _TeacherExpirySection(masterEnabled: prefs.masterEnabled),
           ],
           const SizedBox(height: AppSpacing.space2),
-          _SectionHeader(AppStrings.quietHoursTitle),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+            child: NotebookSectionHeader(label: AppStrings.quietHoursTitle),
+          ),
           _QuietHoursSection(
             startHour: prefs.quietStartHour,
             endHour: prefs.quietEndHour,
@@ -153,32 +167,6 @@ class _MasterToggleSection extends StatelessWidget {
           horizontal: AppSpacing.screenPadding,
           vertical: AppSpacing.space1,
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Section header
-// ---------------------------------------------------------------------------
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenPadding,
-        AppSpacing.space3,
-        AppSpacing.screenPadding,
-        AppSpacing.space2,
-      ),
-      child: Text(
-        title,
-        style: AppTypography.caption.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }

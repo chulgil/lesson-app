@@ -485,8 +485,9 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           AppStrings.inviteSectionCountFormat(title, count),
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
+          // Notebook × Score: 이 화면의 다른 섹션 타이틀(§L110)과 동일하게
+          // sectionTitle 로 통일 (§1258 헤더 토큰 정합).
+          style: NotebookTypography.sectionTitle.copyWith(
             color: AppColors.inkSecondary,
           ),
         ),
