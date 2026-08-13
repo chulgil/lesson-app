@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/router/app_routes.dart';
@@ -116,28 +117,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorState(BuildContext context, Object error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.paperAccent,
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.cannotLoadData,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return const ErrorStateWidget(title: AppStrings.cannotLoadData);
   }
 
   void _showAddTemplateDialog(BuildContext context, WidgetRef ref) {

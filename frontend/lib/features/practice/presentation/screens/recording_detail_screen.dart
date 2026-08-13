@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_screen_scaffold.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
@@ -186,36 +187,10 @@ class _ErrorView extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
         const SizedBox(height: 120),
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                size: 32,
-                color: AppColors.inkTertiary,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              Text(
-                AppStrings.loadDataFailed,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              OutlinedButton(
-                onPressed: onRetry,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.ink,
-                  side: const BorderSide(color: AppColors.ink, width: 1),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-                child: Text(AppStrings.retry),
-              ),
-            ],
-          ),
+        ErrorStateWidget(
+          title: AppStrings.loadDataFailed,
+          actionLabel: AppStrings.retry,
+          onAction: onRetry,
         ),
       ],
     );

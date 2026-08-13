@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/child_profile.dart';
@@ -38,27 +39,10 @@ class ChildProfilesScreen extends ConsumerWidget {
       body: profilesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.errorOccurred,
-                    style: AppTypography.bodyLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-                  TextButton(
-                    onPressed: () => ref.invalidate(childProfilesProvider(pid)),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            (error, stack) => ErrorStateWidget(
+              title: AppStrings.errorOccurred,
+              actionLabel: AppStrings.retry,
+              onAction: () => ref.invalidate(childProfilesProvider(pid)),
             ),
         data: (profiles) {
           if (profiles.isEmpty) {

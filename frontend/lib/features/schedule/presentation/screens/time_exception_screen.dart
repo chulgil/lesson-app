@@ -11,6 +11,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../auth/auth_facade.dart';
@@ -236,31 +237,10 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
   Widget _buildErrorState(Object error) {
     final teacherId = ref.read(currentUserIdProvider);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            size: 48,
-            color: AppColors.paperAccent,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.cannotLoadData,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          TextButton(
-            onPressed: () {
-              ref.invalidate(teacherAvailabilityProvider(teacherId));
-            },
-            child: const Text(AppStrings.retry),
-          ),
-        ],
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.cannotLoadData,
+      actionLabel: AppStrings.retry,
+      onAction: () => ref.invalidate(teacherAvailabilityProvider(teacherId)),
     );
   }
 

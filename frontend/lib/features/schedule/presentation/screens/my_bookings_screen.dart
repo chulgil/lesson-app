@@ -13,6 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import 'booking_cancel_screen.dart';
@@ -185,25 +186,8 @@ class MyBookingsScreen extends ConsumerWidget {
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error:
-                    (error, _) => Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            size: 48,
-                            color: AppColors.paperAccent,
-                          ),
-                          const SizedBox(height: AppSpacing.space3),
-                          Text(
-                            AppStrings.cannotLoadData,
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.inkSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    (error, _) =>
+                        const ErrorStateWidget(title: AppStrings.cannotLoadData),
               ),
             ),
           ],

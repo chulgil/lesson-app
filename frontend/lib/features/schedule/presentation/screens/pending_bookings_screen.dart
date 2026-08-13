@@ -5,8 +5,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/lessons_facade.dart';
@@ -55,29 +55,10 @@ class PendingBookingsScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.errorOccurred,
-                    style: AppTypography.bodyMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-                  TextButton(
-                    onPressed:
-                        () =>
-                            ref.invalidate(pendingBookingsProvider(teacherId)),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            (error, stack) => ErrorStateWidget(
+              title: AppStrings.errorOccurred,
+              actionLabel: AppStrings.retry,
+              onAction: () => ref.invalidate(pendingBookingsProvider(teacherId)),
             ),
       ),
     );

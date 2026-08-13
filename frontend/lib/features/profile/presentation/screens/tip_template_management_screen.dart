@@ -3,6 +3,7 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -124,36 +125,17 @@ class _TipTemplateManagementScreenState
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error:
-          (error, _) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: AppColors.paperAccent,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                Text(
-                  AppStrings.templateLoadFailed,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    if (category != null) {
-                      ref.invalidate(tipTemplatesByCategoryProvider(category));
-                    } else {
-                      ref.invalidate(tipTemplatesProvider);
-                    }
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text(AppStrings.retry),
-                ),
-              ],
-            ),
+          (error, _) => ErrorStateWidget(
+            title: AppStrings.templateLoadFailed,
+            actionLabel: AppStrings.retry,
+            actionIcon: Icons.refresh,
+            onAction: () {
+              if (category != null) {
+                ref.invalidate(tipTemplatesByCategoryProvider(category));
+              } else {
+                ref.invalidate(tipTemplatesProvider);
+              }
+            },
           ),
     );
   }

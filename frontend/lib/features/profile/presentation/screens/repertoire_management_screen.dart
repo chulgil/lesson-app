@@ -3,8 +3,8 @@ import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../practice/practice_facade.dart';
 import '../../../../features/practice/domain/entities/piece.dart';
@@ -61,25 +61,11 @@ class _RepertoireManagementScreenState
             child: piecesAsync.when(
               data: (pieces) => _buildPiecesList(pieces, searchQuery),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.paperAccent,
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    const Text(AppStrings.genericError),
-                    const SizedBox(height: AppSpacing.space4),
-                    FilledButton(
-                      onPressed: () =>
-                          ref.read(piecesNotifierProvider.notifier).refresh(),
-                      child: const Text(AppStrings.retry),
-                    ),
-                  ],
-                ),
+              error: (_, __) => ErrorStateWidget(
+                title: AppStrings.genericError,
+                actionLabel: AppStrings.retry,
+                onAction: () =>
+                    ref.read(piecesNotifierProvider.notifier).refresh(),
               ),
             ),
           ),

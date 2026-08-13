@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -271,19 +272,8 @@ class SubscriptionListScreen extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
-            ),
-          ],
-        ),
-      ),
+      error: (_, __) =>
+          const ErrorStateWidget(title: AppStrings.loadDataFailed),
     );
   }
 
@@ -384,31 +374,7 @@ class SubscriptionListScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorState(String error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space6),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-            const SizedBox(height: AppSpacing.space3),
-            // Notebook × Score: 에러 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text(
-              AppStrings.errorOccurred,
-              style: NotebookTypography.sectionTitle,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              error,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+    return ErrorStateWidget(title: AppStrings.errorOccurred, subtitle: error);
   }
 }
 

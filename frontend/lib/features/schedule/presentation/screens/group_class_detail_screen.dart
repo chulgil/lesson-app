@@ -7,6 +7,7 @@ import 'package:lessonaza/core/widgets/notebook/thin_rule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -107,25 +108,8 @@ class _GroupClassDetailScreenState
                 return confirmedCountAsync.when(
                   loading: () => const SizedBox.shrink(),
                   error:
-                      (_, __) => Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 48,
-                              color: AppColors.inkTertiary,
-                            ),
-                            const SizedBox(height: AppSpacing.space3),
-                            Text(
-                              AppStrings.loadDataFailed,
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.inkSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      (_, __) =>
+                          const ErrorStateWidget(title: AppStrings.loadDataFailed),
                   data: (confirmedCount) {
                     return _buildActionButtons(confirmedCount);
                   },

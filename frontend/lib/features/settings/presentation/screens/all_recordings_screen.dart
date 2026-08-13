@@ -24,6 +24,7 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../practice/domain/entities/practice_repertoire.dart';
@@ -68,30 +69,11 @@ class AllRecordingsScreen extends ConsumerWidget {
                       : _RecordingsList(recordings: recordings),
           loading: () => const Center(child: CircularProgressIndicator()),
           error:
-              (_, __) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.paperAccent,
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    const Text(
-                      AppStrings.genericError,
-                      style: TextStyle(color: AppColors.paperAccent),
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-                    ElevatedButton(
-                      onPressed:
-                          () => ref.invalidate(
-                            allRecordingsWithSectionInfoProvider,
-                          ),
-                      child: const Text(AppStrings.retry),
-                    ),
-                  ],
-                ),
+              (_, __) => ErrorStateWidget(
+                title: AppStrings.genericError,
+                actionLabel: AppStrings.retry,
+                onAction:
+                    () => ref.invalidate(allRecordingsWithSectionInfoProvider),
               ),
         ),
       ),

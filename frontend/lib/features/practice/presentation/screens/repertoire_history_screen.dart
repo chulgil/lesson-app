@@ -8,10 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../providers/repertoire_history_provider.dart';
@@ -69,26 +67,10 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: AppColors.paperAccent,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            AppStrings.errorOccurred,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          TextButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
-        ],
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.errorOccurred,
+      actionLabel: AppStrings.retry,
+      onAction: onRetry,
     );
   }
 }

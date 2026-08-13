@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/price_input.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
@@ -140,28 +141,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       error:
           (error, _) => NotebookScreenScaffold(
             appBar: NotebookDetailAppBar(title: AppStrings.studentEditTitle),
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.paperAccent,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    AppStrings.loadDataFailed,
-                    style: TextStyle(color: AppColors.paperAccent),
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  FilledButton(
-                    onPressed:
-                        () => ref.invalidate(studentProvider(widget.studentId)),
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            body: ErrorStateWidget(
+              title: AppStrings.loadDataFailed,
+              actionLabel: AppStrings.retry,
+              onAction: () => ref.invalidate(studentProvider(widget.studentId)),
             ),
           ),
       data: (student) {

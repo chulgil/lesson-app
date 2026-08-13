@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -179,23 +180,8 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error:
-                  (e, _) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: AppColors.paperAccent,
-                        ),
-                        const SizedBox(height: AppSpacing.space4),
-                        const Text(
-                          '오류가 발생했습니다.',
-                          style: TextStyle(color: AppColors.paperAccent),
-                        ),
-                      ],
-                    ),
-                  ),
+                  (e, _) =>
+                      const ErrorStateWidget(title: AppStrings.genericError),
             ),
           ),
         ],

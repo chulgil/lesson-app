@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
@@ -43,29 +44,10 @@ class TeacherDetailScreen extends ConsumerWidget {
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
-            (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppColors.inkSecondary,
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    AppStrings.searchProfileLoadError,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.inkSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  TextButton(
-                    onPressed: () => context.pop(),
-                    child: const Text(AppStrings.goBack),
-                  ),
-                ],
-              ),
+            (error, stack) => ErrorStateWidget(
+              title: AppStrings.searchProfileLoadError,
+              actionLabel: AppStrings.goBack,
+              onAction: () => context.pop(),
             ),
         data: (profile) {
           if (profile == null) {
