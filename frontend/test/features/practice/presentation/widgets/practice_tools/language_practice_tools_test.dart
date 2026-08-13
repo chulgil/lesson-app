@@ -6,24 +6,18 @@ import 'package:lessonaza/core/widgets/empty_state_widget.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/language_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/music_practice_tools.dart';
 
-/// #1102 / #1124 — language (어학) practice tools. 단어장 (vocabBook) is the first
-/// **real** tool (a word bank + SM-2 flashcard review launcher); the other three
-/// (받아쓰기/발음/회화) are still data-only skeletons rendering their identity. None
-/// collides with the music tool ids the modal gates on.
+/// #1102 — language (어학) practice tools. 받아쓰기/발음/회화 are all data-only
+/// skeletons rendering their identity (#1270 removed 단어장/vocabBook — the app
+/// is music-single-category for now; vocab returns via git history later).
+/// None collides with the music tool ids the modal gates on.
 void main() {
   // Skeleton panels render EmptyStateWidget (Playfair via google_fonts); keep
   // tests offline so the async font fetch never reaches the network (#980 fix).
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  // The three tools still awaiting their domain interview.
-  final skeletonTools = languagePracticeTools.where(
-    (t) => t.id != LanguagePracticeToolIds.vocabBook,
-  );
-
   group('languagePracticeTools', () {
-    test('registers 4 tools in order (vocab/dictation/pron/conv)', () {
+    test('registers 3 tools in order (dictation/pron/conv)', () {
       expect(languagePracticeTools.map((t) => t.id).toList(), [
-        LanguagePracticeToolIds.vocabBook,
         LanguagePracticeToolIds.dictation,
         LanguagePracticeToolIds.pronunciation,
         LanguagePracticeToolIds.conversation,
@@ -33,18 +27,14 @@ void main() {
     test('tab labels come from AppStrings', () {
       expect(
         languagePracticeTools[0].displayLabel,
-        AppStrings.practiceToolVocabBook,
-      );
-      expect(
-        languagePracticeTools[1].displayLabel,
         AppStrings.practiceToolDictation,
       );
       expect(
-        languagePracticeTools[2].displayLabel,
+        languagePracticeTools[1].displayLabel,
         AppStrings.practiceToolPronunciation,
       );
       expect(
-        languagePracticeTools[3].displayLabel,
+        languagePracticeTools[2].displayLabel,
         AppStrings.practiceToolConversation,
       );
     });
@@ -62,16 +52,6 @@ void main() {
       }
     });
 
-    test('단어장 is the one real language tool, not a skeleton (#1124)', () {
-      final vocab = languagePracticeTools.firstWhere(
-        (t) => t.id == LanguagePracticeToolIds.vocabBook,
-      );
-      expect(
-        vocab.panelBuilder(_StubContext(), null, null),
-        isNot(isA<EmptyStateWidget>()),
-      );
-    });
-
     test(
       'each skeleton panel title matches its own tool label (no copy-paste)',
       () {
@@ -83,7 +63,7 @@ void main() {
               AppStrings.practiceToolConversation,
         };
         final ctx = _StubContext();
-        for (final tool in skeletonTools) {
+        for (final tool in languagePracticeTools) {
           final panel = tool.panelBuilder(ctx, null, null) as EmptyStateWidget;
           expect(panel.title, expected[tool.id], reason: tool.id);
         }
@@ -94,7 +74,7 @@ void main() {
   testWidgets('each skeleton panel renders an EmptyStateWidget placeholder', (
     tester,
   ) async {
-    for (final tool in skeletonTools) {
+    for (final tool in languagePracticeTools) {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

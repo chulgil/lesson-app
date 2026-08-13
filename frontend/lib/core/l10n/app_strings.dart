@@ -10789,60 +10789,9 @@ class AppStrings {
   static const practiceToolSkeletonSubtitle = '준비 중인 기능입니다';
 
   // Language practice tools (#1102) — 스켈레톤 도구 탭 라벨 (subtitle 는 위 재사용).
-  static const practiceToolVocabBook = '단어장';
   static const practiceToolDictation = '받아쓰기';
   static const practiceToolPronunciation = '발음';
   static const practiceToolConversation = '회화';
-
-  // ── Vocabulary tool (#1124) — 단어장 + 플래시카드 SRS ──
-  // 공용 CTA (C4: 같은 의미 = 단일 상수 — 패널·세트 화면 공용).
-  static const vocabReviewCta = '복습 시작';
-  static const vocabManageCta = '단어장 관리';
-  static const vocabNoDue = '복습할 카드가 없어요';
-  static String vocabDueWaiting(int n) => '$n개 복습 대기';
-  static String vocabSetCount(int n) => '단어장 $n개';
-  // Sets page
-  static const vocabSetsTitle = '단어장';
-  static const vocabSetsEmptyTitle = '아직 단어장이 없어요';
-  static const vocabSetsEmptySubtitle = '단어장을 만들어 단어를 모아보세요';
-  static const vocabCreateSetCta = '단어장 만들기';
-  static const vocabNewSetTitle = '새 단어장';
-  static const vocabRenameSetTitle = '단어장 이름 수정';
-  static const vocabSetNameHint = '단어장 이름';
-  static const vocabDeleteSetTitle = '단어장 삭제';
-  static String vocabDeleteSetMessage(String title, int cardCount) =>
-      "'$title' 단어장과 카드 $cardCount개가 함께 삭제됩니다.";
-  static String vocabCardCount(int n) => '단어 $n개';
-  static String vocabDueBadge(int n) => '복습 $n';
-  // Set page (cards)
-  static const vocabAddCardCta = '단어 추가';
-  static const vocabCardsEmptyTitle = '아직 단어가 없어요';
-  static const vocabCardsEmptySubtitle = '단어를 추가해 복습을 시작하세요';
-  static const vocabNewCardTitle = '새 단어';
-  static const vocabEditCardTitle = '단어 수정';
-  static const vocabCardFrontLabel = '단어';
-  static const vocabCardBackLabel = '뜻';
-  static const vocabCardExampleLabel = '예문 (선택)';
-  static const vocabCardMemoLabel = '메모 (선택)';
-  static const vocabCardFrontHint = '외울 단어나 표현';
-  static const vocabCardBackHint = '뜻을 입력하세요';
-  static const vocabCardRequiredError = '단어와 뜻을 모두 입력해주세요';
-  static const vocabDeleteCardTitle = '단어 삭제';
-  static const vocabDeleteCardMessage = '이 단어를 삭제할까요?';
-  // Review page
-  static const vocabReviewTitle = '복습';
-  static const vocabTapToReveal = '탭하여 뜻 보기';
-  static String vocabReviewProgress(int current, int total) =>
-      '$current / $total';
-  static const vocabGradeAgain = '다시';
-  static const vocabGradeHard = '어려움';
-  static const vocabGradeGood = '보통';
-  static const vocabGradeEasy = '쉬움';
-  static const vocabReviewDoneTitle = '복습 완료';
-  static String vocabReviewDoneMessage(int n) => '$n개 카드를 복습했어요';
-  static const vocabReviewEmptyTitle = '복습할 카드가 없어요';
-  static const vocabReviewEmptySubtitle = '지금 복습할 카드가 없어요. 내일 다시 만나요';
-  static const vocabReviewClose = '닫기';
 
   // Student Invite Code
   static const inviteCodeScreenDesc = '선생님으로부터 받은\n초대 코드를 입력해주세요';
