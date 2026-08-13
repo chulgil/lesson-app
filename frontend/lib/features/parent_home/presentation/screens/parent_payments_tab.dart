@@ -577,30 +577,10 @@ class _NoSubscriptionsState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.space6),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.confirmation_number_outlined,
-            size: 56,
-            color: AppColors.inkTertiary,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          // Notebook × Score: 빈 상태 3축(§7.89) + 정적 명사 단일 헤드라인 → §7.17 승격.
-          Text(
-            '등록된 수강권이 없습니다',
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            '선생님에게 수강권 발급을 요청하세요',
-            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.confirmation_number_outlined,
+      title: AppStrings.noSubscriptionsRegisteredTitle,
+      subtitle: AppStrings.noSubscriptionsRegisteredHint,
     );
   }
 }
