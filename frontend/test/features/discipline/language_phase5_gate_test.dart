@@ -7,6 +7,7 @@
 //   B. C1~C8 일관성 (language 가 공통 계약 준수)
 //
 // #979-B/#980 fitness 게이트의 정확한 미러. 설계: 이슈 #1102.
+// #1270: 단어장(vocab)이 제거되어 language 도구 3종이 전부 skeleton 으로 복귀.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,9 +25,6 @@ import 'package:lessonaza/features/practice/presentation/providers/tuner_provide
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/language_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/music_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools_modal.dart';
-import 'package:lessonaza/features/vocabulary/domain/repositories/vocab_repository.dart';
-import 'package:lessonaza/features/vocabulary/presentation/providers/vocab_repository_provider.dart';
-import 'package:lessonaza/features/vocabulary/presentation/widgets/vocab_book_panel.dart';
 
 const _desktop = Size(1440, 900);
 const _mobile = Size(375, 812);
@@ -87,7 +85,7 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('연습 도구 모달 — language 스켈레톤 4탭·실 패널 렌더 크래시 없음 $label', (
+      testWidgets('연습 도구 모달 — language 스켈레톤 3탭 렌더 크래시 없음 $label', (
         tester,
       ) async {
         tester.view.physicalSize = vp;
@@ -100,11 +98,6 @@ void main() {
             overrides: [
               metronomeProvider.overrideWith(() => _NoopMetronome()),
               tunerProvider.overrideWith(() => _NoopTuner()),
-              // #1124: 단어장 패널은 실 store 를 읽는다 — 결정적 렌더를 위해 빈
-              // store 로 오버라이드(실 Hive I/O 는 fake-async 에서 완료 안 됨).
-              vocabRepositoryProvider.overrideWithValue(
-                _UnavailableVocabRepository(),
-              ),
             ],
             child: MaterialApp(
               theme: AppTheme.light,
@@ -116,15 +109,15 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // 4 탭 라벨(단어장/받아쓰기/발음/회화) 이 좁은 375 에서도 크래시 없이.
+        // 3 탭 라벨(받아쓰기/발음/회화) 이 좁은 375 에서도 크래시 없이.
         final tabBar = tester.widget<TabBar>(find.byType(TabBar));
-        expect(tabBar.tabs.length, 4);
-        // 활성 탭 = 단어장(#1124 첫 실 도구) → VocabBookPanel. 나머지 3개는 skeleton.
-        expect(find.byType(VocabBookPanel), findsOneWidget);
+        expect(tabBar.tabs.length, 3);
+        // 전 탭 skeleton (#1270 단어장 제거) → 활성 탭도 EmptyStateWidget.
+        expect(find.byType(EmptyStateWidget), findsOneWidget);
         expect(tester.takeException(), isNull);
 
         // TabBarView 는 활성 페이지만 lazy layout 하므로 각 탭을 구동해
-        // 탭 2·3·4 패널의 좁은-뷰포트 overflow 도 가드한다.
+        // 탭 2·3 패널의 좁은-뷰포트 overflow 도 가드한다.
         for (final tool in languagePracticeTools) {
           await tester.tap(find.text(tool.displayLabel).first);
           await tester.pumpAndSettle();
@@ -142,23 +135,17 @@ void main() {
   });
 
   group('#1102-B C1~C8 일관성 — language 가 공통 UX 계약(C1/C2/C5/C8)을 준수한다', () {
-    test('C1 — 준비 중 language 도구는 EmptyStateWidget; 단어장은 실 패널(#1124)', () {
+    test('C1 — 준비 중 language 도구는 EmptyStateWidget', () {
       final ctx = _StubContext();
       for (final tool in languagePracticeTools) {
         final panel = tool.panelBuilder(ctx, null, null);
-        if (tool.id == LanguagePracticeToolIds.vocabBook) {
-          // 첫 실 language 도구 — 준비 상태 SSOT(EmptyStateWidget)를 벗어난다.
-          expect(panel, isA<VocabBookPanel>(), reason: tool.id);
-        } else {
-          expect(panel, isA<EmptyStateWidget>(), reason: tool.id);
-        }
+        expect(panel, isA<EmptyStateWidget>(), reason: tool.id);
       }
     });
 
     test('C2 — language UI 문자열에 이모지/픽토그램 없음 (Material/NotebookGlyph만)', () {
       final strings = <String>[
         AppStrings.disciplineLanguage,
-        AppStrings.practiceToolVocabBook,
         AppStrings.practiceToolDictation,
         AppStrings.practiceToolPronunciation,
         AppStrings.practiceToolConversation,
@@ -172,7 +159,6 @@ void main() {
 
     test('C5 — language 도구 탭 라벨이 AppStrings 단일 상수', () {
       expect(languagePracticeTools.map((t) => t.displayLabel).toList(), [
-        AppStrings.practiceToolVocabBook,
         AppStrings.practiceToolDictation,
         AppStrings.practiceToolPronunciation,
         AppStrings.practiceToolConversation,
@@ -217,12 +203,4 @@ void main() {
 class _StubContext implements BuildContext {
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
-}
-
-/// A [VocabRepository] whose calls throw — the 단어장 panel then hits its error
-/// fallback ("nothing due") deterministically, with no real Hive I/O (#1124).
-class _UnavailableVocabRepository implements VocabRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw StateError('vocab store unavailable in gate test');
 }
