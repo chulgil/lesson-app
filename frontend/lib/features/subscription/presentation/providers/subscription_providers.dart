@@ -136,14 +136,6 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     return updated;
   }
 
-  Future<Subscription> useLesson(String id) async {
-    final repository = ref.read(subscriptionRepositoryProvider);
-    final updated = await repository.useLesson(id);
-    ref.invalidateSelf();
-    ref.invalidate(subscriptionProvider(id));
-    return updated;
-  }
-
   /// Use one reschedule allowance.
   /// Call this when student changes their booking.
   Future<Subscription> useReschedule(String id) async {
@@ -205,17 +197,6 @@ class MembershipSubscriptionNotifier extends _$MembershipSubscriptionNotifier {
     final created = await repository.create(subscription);
     ref.invalidateSelf();
     return created;
-  }
-
-  Future<Subscription> useLesson() async {
-    final subscription = await future;
-    if (subscription == null) {
-      throw Exception('No active subscription found');
-    }
-    final repository = ref.read(subscriptionRepositoryProvider);
-    final updated = await repository.useLesson(subscription.id);
-    ref.invalidateSelf();
-    return updated;
   }
 
   /// Use one reschedule allowance from the active subscription.

@@ -19,15 +19,6 @@ abstract class SubscriptionRepository {
   /// Update a subscription.
   Future<Subscription> update(Subscription subscription);
 
-  /// Use one lesson (increment usedLessons by 1).
-  /// Optionally provide lesson details for usage history.
-  Future<Subscription> useLesson(
-    String id, {
-    String? lessonId,
-    String? teacherName,
-    String? instrument,
-  });
-
   /// Use one reschedule allowance (increment usedRescheduleCount by 1).
   /// Returns the updated subscription.
   /// Throws if no reschedule allowance remaining.

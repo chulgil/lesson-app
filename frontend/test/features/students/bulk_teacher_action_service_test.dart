@@ -240,14 +240,6 @@ class _FakeSubscriptionRepository implements SubscriptionRepository {
   Future<Subscription> update(Subscription subscription) async => subscription;
 
   @override
-  Future<Subscription> useLesson(
-    String id, {
-    String? lessonId,
-    String? teacherName,
-    String? instrument,
-  }) => throw UnimplementedError();
-
-  @override
   Future<Subscription> useReschedule(String id) => throw UnimplementedError();
 
   @override

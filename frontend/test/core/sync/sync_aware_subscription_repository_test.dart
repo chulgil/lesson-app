@@ -200,25 +200,6 @@ void main() {
   });
 
   group('online-only methods', () {
-    test('useLesson delegates to remote', () async {
-      final sub = _testSubscription();
-      when(
-        () => remote.useLesson(
-          'sub-1',
-          lessonId: any(named: 'lessonId'),
-          teacherName: any(named: 'teacherName'),
-          instrument: any(named: 'instrument'),
-        ),
-      ).thenAnswer((_) async => sub);
-
-      final result = await repo.useLesson(
-        'sub-1',
-        lessonId: 'l1',
-        instrument: 'violin',
-      );
-      expect(result.id, equals('sub-1'));
-    });
-
     test('useReschedule delegates to remote', () async {
       final sub = _testSubscription();
       when(() => remote.useReschedule('sub-1')).thenAnswer((_) async => sub);
