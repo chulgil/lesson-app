@@ -11,7 +11,10 @@ enum LessonStatus {
   completed,
 
   // Cancellation states (detailed)
-  cancelled, // Generic cancelled (legacy compatibility)
+  // Intentional reason-less fallback, NOT legacy debris: no-deduction +
+  // reschedule-blocked semantic distinct from the 4 detailed variants.
+  // Actively written by cancelLesson() paths. Spec: enrollment_management_ux_spec.md 10.8
+  cancelled,
   cancelledByStudentAdvance, // Student cancelled 24h+ in advance (no deduction)
   cancelledByStudentLate, // Student cancelled within 24h (deducted)
   cancelledByTeacher, // Teacher cancelled (reschedule, no deduction)
