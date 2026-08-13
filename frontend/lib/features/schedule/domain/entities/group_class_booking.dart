@@ -118,23 +118,4 @@ class GroupClassBooking {
   bool get canCancel =>
       status == GroupBookingStatus.confirmed ||
       status == GroupBookingStatus.waitlist;
-
-  /// Get status display text
-  String get statusText {
-    switch (status) {
-      case GroupBookingStatus.confirmed:
-        return '예약 확정';
-      case GroupBookingStatus.waitlist:
-        return '대기 ${waitlistPosition ?? ''}번';
-      case GroupBookingStatus.attended:
-        return '출석';
-      case GroupBookingStatus.noShow:
-        return '미참석';
-      case GroupBookingStatus.cancelled:
-        return '취소됨';
-      case GroupBookingStatus.autoCancelled:
-        return '자동 취소';
-    }
-  }
-
 }

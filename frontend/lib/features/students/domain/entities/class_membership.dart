@@ -47,7 +47,8 @@ class ClassMembership {
   // Location & travel
   final String? lessonLocationId; // Default lesson location for this membership
 
-  final int travelTimeMinutes; // Teacher's travel time to this student (minutes)
+  final int
+  travelTimeMinutes; // Teacher's travel time to this student (minutes)
 
   // Meta
   final DateTime createdAt;
@@ -90,11 +91,6 @@ class ClassMembership {
 
   LessonSlot? get primarySlot =>
       lessonSlots.isNotEmpty ? lessonSlots.first : null;
-
-  String? get scheduleDisplay =>
-      lessonSlots.isNotEmpty
-          ? lessonSlots.map((s) => s.shortLabel).join(', ')
-          : null;
 
   ClassMembership copyWith({
     String? id,

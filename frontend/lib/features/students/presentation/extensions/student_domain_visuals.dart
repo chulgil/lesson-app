@@ -128,10 +128,9 @@ extension MembershipStatusVisuals on MembershipStatus {
 extension ClassMembershipVisuals on ClassMembership {
   String get statusLabel => status.label;
 
-  String? get scheduleDisplay =>
-      lessonSlots.isNotEmpty
-          ? lessonSlots.map((slot) => slot.shortLabel).join(', ')
-          : null;
+  String? get scheduleDisplay => lessonSlots.isNotEmpty
+      ? lessonSlots.map((slot) => slot.shortLabel).join(', ')
+      : null;
 }
 
 extension LessonClassVisuals on LessonClass {
@@ -196,14 +195,36 @@ extension LessonLocationVisuals on LessonLocation {
   }
 }
 
+const _lessonSlotDayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+
 extension LessonSlotVisuals on LessonSlot {
+  /// Short day label: "화"
+  String get dayLabel => _lessonSlotDayLabels[dayOfWeek.clamp(0, 6)];
+
+  /// Short display: "화 14:00"
+  String get shortLabel => '$dayLabel $startTime';
+
   String get displayLabel => '$dayLabel요일 $startTime~$endTime';
 }
 
 extension StudentVisuals on Student {
   Color get profileColor => _colorForKey(profileColorKey);
+
+  /// Comma-joined weekly lesson schedule (e.g., "화 14:00, 목 16:00").
+  String? get lessonSchedule {
+    if (lessonSlots.isEmpty) return null;
+    return lessonSlots.map((s) => s.shortLabel).join(', ');
+  }
 }
 
 extension StudentWithMembershipVisuals on StudentWithMembership {
   Color get profileColor => _colorForKey(profileColorKey);
+
+  /// Comma-joined weekly schedule — membership takes precedence over student.
+  String? get lessonSchedule {
+    if (membership != null && membership!.lessonSlots.isNotEmpty) {
+      return membership!.scheduleDisplay;
+    }
+    return student.lessonSchedule;
+  }
 }

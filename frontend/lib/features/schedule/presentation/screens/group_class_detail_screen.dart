@@ -11,6 +11,7 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../extensions/group_class_booking_visuals.dart';
+import '../extensions/group_class_visuals.dart';
 import '../extensions/no_show_policy_visuals.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
@@ -83,8 +84,8 @@ class _GroupClassDetailScreenState
               error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
               data: (confirmedCount) {
                 return waitlistCountAsync.when(
-                  loading:
-                      () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
                   data: (waitlistCount) {
                     return _buildCapacityStatus(confirmedCount, waitlistCount);
@@ -109,11 +110,17 @@ class _GroupClassDetailScreenState
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppColors.inkTertiary,
+                        ),
                         const SizedBox(height: AppSpacing.space3),
                         Text(
                           AppStrings.loadDataFailed,
-                          style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.inkSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -183,20 +190,18 @@ class _GroupClassDetailScreenState
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color:
-                  widget.groupClass.type == GroupClassType.regular
-                      ? AppColors.ink.withValues(alpha: 0.1)
-                      : AppColors.paperAccentSoft,
+              color: widget.groupClass.type == GroupClassType.regular
+                  ? AppColors.ink.withValues(alpha: 0.1)
+                  : AppColors.paperAccentSoft,
             ),
             child: Text(
               widget.groupClass.type == GroupClassType.regular
                   ? AppStrings.groupClassRegular
                   : AppStrings.groupClassDropin,
               style: AppTypography.caption.copyWith(
-                color:
-                    widget.groupClass.type == GroupClassType.regular
-                        ? AppColors.ink
-                        : AppColors.paperAccent,
+                color: widget.groupClass.type == GroupClassType.regular
+                    ? AppColors.ink
+                    : AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -240,8 +245,8 @@ class _GroupClassDetailScreenState
           ),
           if (widget.groupClass.pricePerSession != null) ...[
             const SizedBox(height: 12),
-          const ThinRule(),
-          const SizedBox(height: 12),
+            const ThinRule(),
+            const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.payments_outlined,
               label: AppStrings.infoLabelTuition,
@@ -285,19 +290,17 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color:
-            isFull
-                ? AppColors.paperAccentSoft
-                : isAlmostFull
-                ? AppColors.paperAccentSoft
-                : AppColors.paperOk.withValues(alpha: 0.05),
+        color: isFull
+            ? AppColors.paperAccentSoft
+            : isAlmostFull
+            ? AppColors.paperAccentSoft
+            : AppColors.paperOk.withValues(alpha: 0.05),
         border: Border.all(
-          color:
-              isFull
-                  ? AppColors.inkQuaternary
-                  : isAlmostFull
-                  ? AppColors.inkQuaternary
-                  : AppColors.paperOk.withValues(alpha: 0.3),
+          color: isFull
+              ? AppColors.inkQuaternary
+              : isAlmostFull
+              ? AppColors.inkQuaternary
+              : AppColors.paperOk.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -310,12 +313,11 @@ class _GroupClassDetailScreenState
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color:
-                      isFull
-                          ? AppColors.paperAccent
-                          : isAlmostFull
-                          ? AppColors.paperAccent
-                          : AppColors.paperOk,
+                  color: isFull
+                      ? AppColors.paperAccent
+                      : isAlmostFull
+                      ? AppColors.paperAccent
+                      : AppColors.paperOk,
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -327,12 +329,11 @@ class _GroupClassDetailScreenState
                     : AppStrings.capacityAvailable,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w700,
-                  color:
-                      isFull
-                          ? AppColors.paperAccent
-                          : isAlmostFull
-                          ? AppColors.paperAccent
-                          : AppColors.paperOk,
+                  color: isFull
+                      ? AppColors.paperAccent
+                      : isAlmostFull
+                      ? AppColors.paperAccent
+                      : AppColors.paperOk,
                 ),
               ),
             ],
@@ -372,8 +373,9 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color:
-            isWaitlist ? AppColors.paperAccentSoft : AppColors.paperAccentSoft,
+        color: isWaitlist
+            ? AppColors.paperAccentSoft
+            : AppColors.paperAccentSoft,
         border: Border.all(
           color: isWaitlist ? AppColors.inkQuaternary : AppColors.inkQuaternary,
         ),
@@ -384,17 +386,19 @@ class _GroupClassDetailScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(booking.status.statusIcon,
-                  size: AppSpacing.iconLG, color: AppColors.ink),
+              Icon(
+                booking.status.statusIcon,
+                size: AppSpacing.iconLG,
+                color: AppColors.ink,
+              ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 booking.statusText,
                 style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.w700,
-                  color:
-                      isWaitlist
-                          ? AppColors.paperAccent
-                          : AppColors.paperAccent,
+                  color: isWaitlist
+                      ? AppColors.paperAccent
+                      : AppColors.paperAccent,
                 ),
               ),
             ],
@@ -421,18 +425,17 @@ class _GroupClassDetailScreenState
                 foregroundColor: AppColors.paperAccent,
                 side: const BorderSide(color: AppColors.paperAccent),
               ),
-              child:
-                  _isProcessing
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text(
-                        isWaitlist
-                            ? AppStrings.waitlistCancelTitle
-                            : AppStrings.bookingCancelTitle,
-                      ),
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      isWaitlist
+                          ? AppStrings.waitlistCancelTitle
+                          : AppStrings.bookingCancelTitle,
+                    ),
             ),
           ),
         ],
@@ -472,22 +475,22 @@ class _GroupClassDetailScreenState
             onPressed: _isProcessing ? null : _createBooking,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              backgroundColor:
-                  isFull ? AppColors.paperAccent : AppColors.paperAccent,
+              backgroundColor: isFull
+                  ? AppColors.paperAccent
+                  : AppColors.paperAccent,
             ),
-            child:
-                _isProcessing
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.paper,
-                      ),
-                    )
-                    : Text(
-                      isFull ? AppStrings.joinWaitlist : AppStrings.bookAction,
+            child: _isProcessing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.paper,
                     ),
+                  )
+                : Text(
+                    isFull ? AppStrings.joinWaitlist : AppStrings.bookAction,
+                  ),
           ),
         ),
 
@@ -613,8 +616,9 @@ class _GroupClassDetailScreenState
                   ? AppStrings.waitlistRegistered(booking.waitlistPosition!)
                   : AppStrings.bookingCompleted,
             ),
-            backgroundColor:
-                isWaitlist ? AppColors.paperAccent : AppColors.paperOk,
+            backgroundColor: isWaitlist
+                ? AppColors.paperAccent
+                : AppColors.paperOk,
           ),
         );
       }
@@ -639,10 +643,9 @@ class _GroupClassDetailScreenState
   Future<void> _cancelBooking(GroupClassBooking booking) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title:
-          booking.isOnWaitlist
-              ? AppStrings.waitlistCancelTitle
-              : AppStrings.bookingCancelTitle,
+      title: booking.isOnWaitlist
+          ? AppStrings.waitlistCancelTitle
+          : AppStrings.bookingCancelTitle,
       content: Text(
         booking.isOnWaitlist
             ? AppStrings.cancelWaitlistConfirm
