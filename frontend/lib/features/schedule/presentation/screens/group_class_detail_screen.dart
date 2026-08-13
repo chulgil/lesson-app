@@ -84,8 +84,8 @@ class _GroupClassDetailScreenState
               error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
               data: (confirmedCount) {
                 return waitlistCountAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  loading:
+                      () => const Center(child: CircularProgressIndicator()),
                   error: (_, __) => const Text('${AppStrings.errorOccurred}.'),
                   data: (waitlistCount) {
                     return _buildCapacityStatus(confirmedCount, waitlistCount);
@@ -106,21 +106,24 @@ class _GroupClassDetailScreenState
                 }
                 return confirmedCountAsync.when(
                   loading: () => const SizedBox.shrink(),
-                  error: (_, __) => Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: AppColors.inkTertiary,
-                        ),
-                        const SizedBox(height: AppSpacing.space3),
-                        Text(
-                          AppStrings.loadDataFailed,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.inkSecondary,
-                          ),
+                  error:
+                      (_, __) => Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: AppColors.inkTertiary,
+                            ),
+                            const SizedBox(height: AppSpacing.space3),
+                            Text(
+                              AppStrings.loadDataFailed,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.inkSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                   data: (confirmedCount) {
@@ -188,18 +191,20 @@ class _GroupClassDetailScreenState
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: widget.groupClass.type == GroupClassType.regular
-                  ? AppColors.ink.withValues(alpha: 0.1)
-                  : AppColors.paperAccentSoft,
+              color:
+                  widget.groupClass.type == GroupClassType.regular
+                      ? AppColors.ink.withValues(alpha: 0.1)
+                      : AppColors.paperAccentSoft,
             ),
             child: Text(
               widget.groupClass.type == GroupClassType.regular
                   ? AppStrings.groupClassRegular
                   : AppStrings.groupClassDropin,
               style: AppTypography.caption.copyWith(
-                color: widget.groupClass.type == GroupClassType.regular
-                    ? AppColors.ink
-                    : AppColors.paperAccent,
+                color:
+                    widget.groupClass.type == GroupClassType.regular
+                        ? AppColors.ink
+                        : AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -288,17 +293,19 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: isFull
-            ? AppColors.paperAccentSoft
-            : isAlmostFull
-            ? AppColors.paperAccentSoft
-            : AppColors.paperOkSoft,
+        color:
+            isFull
+                ? AppColors.paperAccentSoft
+                : isAlmostFull
+                ? AppColors.paperAccentSoft
+                : AppColors.paperOkSoft,
         border: Border.all(
-          color: isFull
-              ? AppColors.inkQuaternary
-              : isAlmostFull
-              ? AppColors.inkQuaternary
-              : AppColors.paperOkSelected,
+          color:
+              isFull
+                  ? AppColors.inkQuaternary
+                  : isAlmostFull
+                  ? AppColors.inkQuaternary
+                  : AppColors.paperOkSelected,
         ),
       ),
       child: Column(
@@ -311,11 +318,12 @@ class _GroupClassDetailScreenState
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: isFull
-                      ? AppColors.paperAccent
-                      : isAlmostFull
-                      ? AppColors.paperAccent
-                      : AppColors.paperOk,
+                  color:
+                      isFull
+                          ? AppColors.paperAccent
+                          : isAlmostFull
+                          ? AppColors.paperAccent
+                          : AppColors.paperOk,
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -327,11 +335,12 @@ class _GroupClassDetailScreenState
                     : AppStrings.capacityAvailable,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isFull
-                      ? AppColors.paperAccent
-                      : isAlmostFull
-                      ? AppColors.paperAccent
-                      : AppColors.paperOk,
+                  color:
+                      isFull
+                          ? AppColors.paperAccent
+                          : isAlmostFull
+                          ? AppColors.paperAccent
+                          : AppColors.paperOk,
                 ),
               ),
             ],
@@ -371,9 +380,8 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: isWaitlist
-            ? AppColors.paperAccentSoft
-            : AppColors.paperAccentSoft,
+        color:
+            isWaitlist ? AppColors.paperAccentSoft : AppColors.paperAccentSoft,
         border: Border.all(
           color: isWaitlist ? AppColors.inkQuaternary : AppColors.inkQuaternary,
         ),
@@ -394,9 +402,10 @@ class _GroupClassDetailScreenState
                 booking.statusText,
                 style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isWaitlist
-                      ? AppColors.paperAccent
-                      : AppColors.paperAccent,
+                  color:
+                      isWaitlist
+                          ? AppColors.paperAccent
+                          : AppColors.paperAccent,
                 ),
               ),
             ],
@@ -423,17 +432,18 @@ class _GroupClassDetailScreenState
                 foregroundColor: AppColors.paperAccent,
                 side: const BorderSide(color: AppColors.paperAccent),
               ),
-              child: _isProcessing
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(
-                      isWaitlist
-                          ? AppStrings.waitlistCancelTitle
-                          : AppStrings.bookingCancelTitle,
-                    ),
+              child:
+                  _isProcessing
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text(
+                        isWaitlist
+                            ? AppStrings.waitlistCancelTitle
+                            : AppStrings.bookingCancelTitle,
+                      ),
             ),
           ),
         ],
@@ -473,22 +483,22 @@ class _GroupClassDetailScreenState
             onPressed: _isProcessing ? null : _createBooking,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              backgroundColor: isFull
-                  ? AppColors.paperAccent
-                  : AppColors.paperAccent,
+              backgroundColor:
+                  isFull ? AppColors.paperAccent : AppColors.paperAccent,
             ),
-            child: _isProcessing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.paper,
+            child:
+                _isProcessing
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.paper,
+                      ),
+                    )
+                    : Text(
+                      isFull ? AppStrings.joinWaitlist : AppStrings.bookAction,
                     ),
-                  )
-                : Text(
-                    isFull ? AppStrings.joinWaitlist : AppStrings.bookAction,
-                  ),
           ),
         ),
 
@@ -614,9 +624,8 @@ class _GroupClassDetailScreenState
                   ? AppStrings.waitlistRegistered(booking.waitlistPosition!)
                   : AppStrings.bookingCompleted,
             ),
-            backgroundColor: isWaitlist
-                ? AppColors.paperAccent
-                : AppColors.paperOk,
+            backgroundColor:
+                isWaitlist ? AppColors.paperAccent : AppColors.paperOk,
           ),
         );
       }
@@ -641,9 +650,10 @@ class _GroupClassDetailScreenState
   Future<void> _cancelBooking(GroupClassBooking booking) async {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
-      title: booking.isOnWaitlist
-          ? AppStrings.waitlistCancelTitle
-          : AppStrings.bookingCancelTitle,
+      title:
+          booking.isOnWaitlist
+              ? AppStrings.waitlistCancelTitle
+              : AppStrings.bookingCancelTitle,
       content: Text(
         booking.isOnWaitlist
             ? AppStrings.cancelWaitlistConfirm
