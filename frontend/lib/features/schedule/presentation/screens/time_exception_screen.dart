@@ -66,12 +66,18 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     // Separate upcoming and past
     final now = DateTime.now();
-    final upcoming = sortedExceptions
-        .where((e) => e.endDate.isAfter(now.subtract(const Duration(days: 1))))
-        .toList();
-    final past = sortedExceptions
-        .where((e) => e.endDate.isBefore(now.subtract(const Duration(days: 1))))
-        .toList();
+    final upcoming =
+        sortedExceptions
+            .where(
+              (e) => e.endDate.isAfter(now.subtract(const Duration(days: 1))),
+            )
+            .toList();
+    final past =
+        sortedExceptions
+            .where(
+              (e) => e.endDate.isBefore(now.subtract(const Duration(days: 1))),
+            )
+            .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -150,9 +156,8 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
   Widget _buildExceptionCard(TimeException exception, {bool isPast = false}) {
     final icon = _getExceptionIcon(exception.type);
-    final color = isPast
-        ? AppColors.inkTertiary
-        : _getExceptionColor(exception.type);
+    final color =
+        isPast ? AppColors.inkTertiary : _getExceptionColor(exception.type);
 
     // Swipe consistency (audit 2026-06-10 §2 원칙 1):
     // - 행 단위 destructive 액션은 SwipeActionTile 로 통일
@@ -204,19 +209,20 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-      child: isPast
-          ? card
-          : SwipeActionTile(
-              actions: [
-                SwipeAction(
-                  label: AppStrings.swipeActionDelete,
-                  icon: Icons.delete_outline,
-                  tone: SwipeActionTone.destructive,
-                  onPressed: () => _confirmDelete(exception),
-                ),
-              ],
-              child: card,
-            ),
+      child:
+          isPast
+              ? card
+              : SwipeActionTile(
+                actions: [
+                  SwipeAction(
+                    label: AppStrings.swipeActionDelete,
+                    icon: Icons.delete_outline,
+                    tone: SwipeActionTone.destructive,
+                    onPressed: () => _confirmDelete(exception),
+                  ),
+                ],
+                child: card,
+              ),
     );
   }
 
@@ -508,28 +514,31 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
   Widget _buildTypeSelector() {
     return Wrap(
       spacing: AppSpacing.space2,
-      children: ExceptionType.values
-          .where((t) => t != ExceptionType.additionalSlot)
-          .map((type) {
-            final isSelected = _selectedType == type;
-            return ChoiceChip(
-              label: Text(type.displayName),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() => _selectedType = type);
-                }
-              },
-              selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
-              labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected
-                    ? AppColors.paperAccent
-                    : AppColors.inkSecondary,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            );
-          })
-          .toList(),
+      children:
+          ExceptionType.values
+              .where((t) => t != ExceptionType.additionalSlot)
+              .map((type) {
+                final isSelected = _selectedType == type;
+                return ChoiceChip(
+                  label: Text(type.displayName),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() => _selectedType = type);
+                    }
+                  },
+                  selectedColor: AppColors.paperAccentSelected,
+                  labelStyle: AppTypography.bodySmall.copyWith(
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                );
+              })
+              .toList(),
     );
   }
 

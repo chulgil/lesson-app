@@ -122,9 +122,7 @@ class _GroupClassDetailScreenState
                             color: AppColors.inkSecondary,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
                   data: (confirmedCount) {
                     return _buildActionButtons(confirmedCount);
                   },
@@ -294,13 +292,13 @@ class _GroupClassDetailScreenState
             ? AppColors.paperAccentSoft
             : isAlmostFull
             ? AppColors.paperAccentSoft
-            : AppColors.paperOk.withValues(alpha: 0.05),
+            : AppColors.paperOkSoft,
         border: Border.all(
           color: isFull
               ? AppColors.inkQuaternary
               : isAlmostFull
               ? AppColors.inkQuaternary
-              : AppColors.paperOk.withValues(alpha: 0.3),
+              : AppColors.paperOkSelected,
         ),
       ),
       child: Column(

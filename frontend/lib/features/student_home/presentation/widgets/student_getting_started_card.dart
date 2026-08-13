@@ -115,12 +115,13 @@ class StudentGettingStartedCard extends ConsumerWidget {
             isCompleted: hasLessons,
             // #521 — 실 studentId 를 extra 로 전달. 누락 시 라우트가 빈 id 로
             // 폴백해 remote 에서 빈 예약/404 가 났다.
-            onTap: hasLessons
-                ? null
-                : () => context.push(
-                    AppRoutes.myBookings,
-                    extra: {'studentId': studentId},
-                  ),
+            onTap:
+                hasLessons
+                    ? null
+                    : () => context.push(
+                      AppRoutes.myBookings,
+                      extra: {'studentId': studentId},
+                    ),
           ),
         ],
       ),
@@ -157,14 +158,11 @@ class _StepItem extends StatelessWidget {
             vertical: AppSpacing.space3,
           ),
           decoration: BoxDecoration(
-            color:
-                isCompleted
-                    ? AppColors.paperOk.withValues(alpha: 0.08)
-                    : AppColors.paper,
+            color: isCompleted ? AppColors.paperOkSoft : AppColors.paper,
             border: Border.all(
               color:
                   isCompleted
-                      ? AppColors.paperOk.withValues(alpha: 0.3)
+                      ? AppColors.paperOkSelected
                       : AppColors.inkQuaternary,
             ),
           ),

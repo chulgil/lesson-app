@@ -78,7 +78,7 @@ class StudentPracticeSection extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color:
                                 isPracticed
-                                    ? AppColors.paperOk.withValues(alpha: 0.15)
+                                    ? AppColors.paperOkSoft
                                     : AppColors.paperDark,
                             borderRadius: BorderRadius.zero,
                             border:
@@ -89,13 +89,14 @@ class StudentPracticeSection extends ConsumerWidget {
                                     )
                                     : null,
                           ),
-                          child: isPracticed
-                              ? const Icon(
-                                  Icons.check,
-                                  size: 18,
-                                  color: AppColors.paperOk,
-                                )
-                              : const SizedBox.shrink(),
+                          child:
+                              isPracticed
+                                  ? const Icon(
+                                    Icons.check,
+                                    size: 18,
+                                    color: AppColors.paperOk,
+                                  )
+                                  : const SizedBox.shrink(),
                         ),
                       ],
                     );

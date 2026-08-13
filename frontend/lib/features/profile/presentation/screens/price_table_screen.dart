@@ -262,7 +262,7 @@ class _PriceCell extends ConsumerWidget {
           border: Border.all(
             color:
                 hasPrice
-                    ? AppColors.paperAccent.withValues(alpha: 0.3)
+                    ? AppColors.paperAccentSelected
                     : AppColors.inkQuaternary,
           ),
         ),

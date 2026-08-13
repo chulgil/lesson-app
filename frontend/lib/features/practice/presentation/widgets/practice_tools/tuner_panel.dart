@@ -125,10 +125,7 @@ class CurrentNoteDisplay extends ConsumerWidget {
     }
 
     // Green when perfect, primary color otherwise (80% opacity)
-    final noteColor =
-        isPerfect
-            ? AppColors.paperOk.withValues(alpha: 0.9)
-            : AppColors.paperAccent;
+    final noteColor = isPerfect ? AppColors.paperOk : AppColors.paperAccent;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

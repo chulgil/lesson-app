@@ -394,9 +394,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: AppColors.paperOk.withValues(alpha: 0.15),
+          color: AppColors.paperOkSoft,
           border: _cellBorder(
-            color: AppColors.paperOk.withValues(alpha: 0.45),
+            color: AppColors.paperOkSelected,
             includeTop: includeTopBoundary || isStart,
             includeLeft: includeLeftBoundary,
           ),

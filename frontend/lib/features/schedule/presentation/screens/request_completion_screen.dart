@@ -198,7 +198,7 @@ class RequestCompletionScreen extends StatelessWidget {
                   height: 36,
                   color:
                       isActive
-                          ? AppColors.paperAccent.withValues(alpha: 0.3)
+                          ? AppColors.paperAccentSelected
                           : AppColors.scheduleMutedAccent.withValues(
                             alpha: 0.3,
                           ),

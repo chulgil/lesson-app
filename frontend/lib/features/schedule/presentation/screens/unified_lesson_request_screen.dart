@@ -246,10 +246,8 @@ class _UnifiedLessonRequestScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.05),
-        border: Border.all(
-          color: AppColors.paperAccent.withValues(alpha: 0.15),
-        ),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccentSelected),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +339,7 @@ class _UnifiedLessonRequestScreenState
                     _selectedInstrument = selected ? instrument : null;
                   });
                 },
-                selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
+                selectedColor: AppColors.paperAccentSelected,
                 backgroundColor: AppColors.paper,
                 labelStyle: AppTypography.bodyMedium.copyWith(
                   color: isSelected ? AppColors.paperAccent : AppColors.ink,
@@ -458,32 +456,34 @@ class _UnifiedLessonRequestScreenState
       child: Wrap(
         spacing: AppSpacing.space2,
         runSpacing: AppSpacing.space2,
-        children: options.map((entry) {
-          final type = entry.key;
-          final label = entry.value;
-          final isSelected = _preferredLocationType == type;
-          return ChoiceChip(
-            label: Text(label),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                _preferredLocationType = selected ? type : null;
-              });
-            },
-            selectedColor: AppColors.paperAccent.withValues(alpha: 0.2),
-            backgroundColor: AppColors.paper,
-            labelStyle: AppTypography.bodyMedium.copyWith(
-              color: isSelected ? AppColors.paperAccent : AppColors.ink,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-            side: BorderSide(
-              color: isSelected
-                  ? AppColors.paperAccent
-                  : AppColors.inkQuaternary,
-            ),
-            shape: const RoundedRectangleBorder(),
-          );
-        }).toList(),
+        children:
+            options.map((entry) {
+              final type = entry.key;
+              final label = entry.value;
+              final isSelected = _preferredLocationType == type;
+              return ChoiceChip(
+                label: Text(label),
+                selected: isSelected,
+                onSelected: (selected) {
+                  setState(() {
+                    _preferredLocationType = selected ? type : null;
+                  });
+                },
+                selectedColor: AppColors.paperAccentSelected,
+                backgroundColor: AppColors.paper,
+                labelStyle: AppTypography.bodyMedium.copyWith(
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
+                ),
+                shape: const RoundedRectangleBorder(),
+              );
+            }).toList(),
       ),
     );
   }
@@ -679,7 +679,7 @@ class _UnifiedLessonRequestScreenState
           foregroundColor: AppColors.paper,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(),
-          disabledBackgroundColor: AppColors.paperAccent.withValues(alpha: 0.5),
+          disabledBackgroundColor: AppColors.paperAccentDisabled,
         ),
       ),
     );

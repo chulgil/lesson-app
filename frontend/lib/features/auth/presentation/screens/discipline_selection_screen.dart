@@ -127,10 +127,8 @@ class _DisciplineCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.paperAccent.withValues(alpha: 0.3),
-          ),
-          color: AppColors.paperAccent.withValues(alpha: 0.05),
+          border: Border.all(color: AppColors.paperAccentSelected),
+          color: AppColors.paperAccentSoft,
         ),
         child: Row(
           children: [

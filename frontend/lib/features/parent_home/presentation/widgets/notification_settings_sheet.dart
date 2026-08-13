@@ -93,7 +93,10 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
-                AppStrings.parentHomeNotificationActiveFormat(_settings.enabledCount, ParentNotificationSettings.totalConfigurable),
+                AppStrings.parentHomeNotificationActiveFormat(
+                  _settings.enabledCount,
+                  ParentNotificationSettings.totalConfigurable,
+                ),
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
@@ -203,7 +206,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                     item.isRequired
                         ? AppColors.inkTertiary.withValues(alpha: 0.2)
                         : item.isRecommended
-                        ? AppColors.paperOk.withValues(alpha: 0.15)
+                        ? AppColors.paperOkSoft
                         : Colors.transparent,
                 borderRadius: BorderRadius.zero,
               ),

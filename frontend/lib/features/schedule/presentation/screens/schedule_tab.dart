@@ -41,21 +41,20 @@ class ScheduleTab extends ConsumerWidget {
       ref.read(lessonSelectionProvider.notifier).clear();
     });
     final selectedIds = ref.watch(lessonSelectionProvider);
-    final body = viewMode == ScheduleViewMode.timeline
-        ? _buildPinnedLayout(context, ref, viewMode)
-        : _buildCollapsibleListLayout(context, ref, viewMode);
+    final body =
+        viewMode == ScheduleViewMode.timeline
+            ? _buildPinnedLayout(context, ref, viewMode)
+            : _buildCollapsibleListLayout(context, ref, viewMode);
     // 다중선택 액션바는 리스트 뷰 + 선택 항목이 있을 때만.
     final showSelectionBar =
         viewMode == ScheduleViewMode.list && selectedIds.isNotEmpty;
     return PaperScaffold(
-      child: showSelectionBar
-          ? Column(
-              children: [
-                Expanded(child: body),
-                const _SelectionActionBar(),
-              ],
-            )
-          : body,
+      child:
+          showSelectionBar
+              ? Column(
+                children: [Expanded(child: body), const _SelectionActionBar()],
+              )
+              : body,
     );
   }
 
@@ -73,23 +72,25 @@ class ScheduleTab extends ConsumerWidget {
 
     return lessonsAsync.when(
       data: (lessons) {
-        final dayLessons = lessons
-            .where(
-              (l) =>
-                  l.date.year == selectedDate.year &&
-                  l.date.month == selectedDate.month &&
-                  l.date.day == selectedDate.day,
-            )
-            .toList();
+        final dayLessons =
+            lessons
+                .where(
+                  (l) =>
+                      l.date.year == selectedDate.year &&
+                      l.date.month == selectedDate.month &&
+                      l.date.day == selectedDate.day,
+                )
+                .toList();
         switch (sortType) {
           case LessonSortType.timeAsc:
             dayLessons.sort((a, b) => a.startTime.compareTo(b.startTime));
           case LessonSortType.nameAsc:
             dayLessons.sort((a, b) => a.studentName.compareTo(b.studentName));
         }
-        final lessonDates = lessons
-            .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
-            .toSet();
+        final lessonDates =
+            lessons
+                .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
+                .toSet();
         return CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
@@ -118,9 +119,10 @@ class ScheduleTab extends ConsumerWidget {
                   onHorizontalDragEnd: (details) {
                     final velocity = details.primaryVelocity ?? 0;
                     if (velocity.abs() < 100) return;
-                    final newDate = velocity > 0
-                        ? selectedDate.subtract(const Duration(days: 7))
-                        : selectedDate.add(const Duration(days: 7));
+                    final newDate =
+                        velocity > 0
+                            ? selectedDate.subtract(const Duration(days: 7))
+                            : selectedDate.add(const Duration(days: 7));
                     ref.read(teacherSelectedDateProvider.notifier).state =
                         newDate;
                   },
@@ -139,59 +141,62 @@ class ScheduleTab extends ConsumerWidget {
                 ),
                 sliver: SliverList.builder(
                   itemCount: dayLessons.length,
-                  itemBuilder: (context, index) =>
-                      _SwipeableLessonCard(lesson: dayLessons[index]),
+                  itemBuilder:
+                      (context, index) =>
+                          _SwipeableLessonCard(lesson: dayLessons[index]),
                 ),
               ),
           ],
         );
       },
-      loading: () => CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader(context, ref)),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: StickyScheduleHeaderDelegate(
-              height: _stickyHeaderHeight,
-              child: _buildStickyHeaderContent(
-                context: context,
-                ref: ref,
-                selectedDate: selectedDate,
-                sortType: sortType,
-                lessonCount: 0,
-                markerDates: const <DateTime>{},
+      loading:
+          () => CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader(context, ref)),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: StickyScheduleHeaderDelegate(
+                  height: _stickyHeaderHeight,
+                  child: _buildStickyHeaderContent(
+                    context: context,
+                    ref: ref,
+                    selectedDate: selectedDate,
+                    sortType: sortType,
+                    lessonCount: 0,
+                    markerDates: const <DateTime>{},
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(child: CircularProgressIndicator()),
-          ),
-        ],
-      ),
-      error: (error, _) => CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader(context, ref)),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: StickyScheduleHeaderDelegate(
-              height: _stickyHeaderHeight,
-              child: _buildStickyHeaderContent(
-                context: context,
-                ref: ref,
-                selectedDate: selectedDate,
-                sortType: sortType,
-                lessonCount: 0,
-                markerDates: const <DateTime>{},
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator()),
               ),
-            ),
+            ],
           ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: _buildErrorState(ref, error),
+      error:
+          (error, _) => CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader(context, ref)),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: StickyScheduleHeaderDelegate(
+                  height: _stickyHeaderHeight,
+                  child: _buildStickyHeaderContent(
+                    context: context,
+                    ref: ref,
+                    selectedDate: selectedDate,
+                    sortType: sortType,
+                    lessonCount: 0,
+                    markerDates: const <DateTime>{},
+                  ),
+                ),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _buildErrorState(ref, error),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -222,30 +227,33 @@ class ScheduleTab extends ConsumerWidget {
             onHorizontalDragEnd: (details) {
               final velocity = details.primaryVelocity ?? 0;
               if (velocity.abs() < 100) return;
-              final delta = viewMode == ScheduleViewMode.timeline
-                  ? const Duration(days: 1)
-                  : const Duration(days: 7);
-              final newDate = velocity > 0
-                  ? selectedDate.subtract(delta)
-                  : selectedDate.add(delta);
+              final delta =
+                  viewMode == ScheduleViewMode.timeline
+                      ? const Duration(days: 1)
+                      : const Duration(days: 7);
+              final newDate =
+                  velocity > 0
+                      ? selectedDate.subtract(delta)
+                      : selectedDate.add(delta);
               ref.read(teacherSelectedDateProvider.notifier).state = newDate;
             },
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: viewMode == ScheduleViewMode.weeklyGrid
-                  ? ScheduleWeeklyGridView(
-                      key: const ValueKey(ScheduleViewMode.weeklyGrid),
-                      selectedDate: selectedDate,
-                    )
-                  : _buildViewContent(
-                      key: ValueKey(viewMode),
-                      lessonsAsync: lessonsAsync,
-                      selectedDate: selectedDate,
-                      sortType: sortType,
-                      viewMode: viewMode,
-                      ref: ref,
-                      context: context,
-                    ),
+              child:
+                  viewMode == ScheduleViewMode.weeklyGrid
+                      ? ScheduleWeeklyGridView(
+                        key: const ValueKey(ScheduleViewMode.weeklyGrid),
+                        selectedDate: selectedDate,
+                      )
+                      : _buildViewContent(
+                        key: ValueKey(viewMode),
+                        lessonsAsync: lessonsAsync,
+                        selectedDate: selectedDate,
+                        sortType: sortType,
+                        viewMode: viewMode,
+                        ref: ref,
+                        context: context,
+                      ),
             ),
           ),
         ),
@@ -305,14 +313,15 @@ class ScheduleTab extends ConsumerWidget {
     return lessonsAsync.when(
       data: (lessons) {
         // Filter lessons for selected date
-        final dayLessons = lessons
-            .where(
-              (l) =>
-                  l.date.year == selectedDate.year &&
-                  l.date.month == selectedDate.month &&
-                  l.date.day == selectedDate.day,
-            )
-            .toList();
+        final dayLessons =
+            lessons
+                .where(
+                  (l) =>
+                      l.date.year == selectedDate.year &&
+                      l.date.month == selectedDate.month &&
+                      l.date.day == selectedDate.day,
+                )
+                .toList();
 
         // Sort lessons
         switch (sortType) {
@@ -343,18 +352,20 @@ class ScheduleTab extends ConsumerWidget {
           ],
         );
       },
-      loading: () => Column(
-        children: [
-          _buildDateHeader(ref, selectedDate, 0, sortType),
-          const Expanded(child: Center(child: CircularProgressIndicator())),
-        ],
-      ),
-      error: (error, _) => Column(
-        children: [
-          _buildDateHeader(ref, selectedDate, 0, sortType),
-          Expanded(child: _buildErrorState(ref, error)),
-        ],
-      ),
+      loading:
+          () => Column(
+            children: [
+              _buildDateHeader(ref, selectedDate, 0, sortType),
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
+          ),
+      error:
+          (error, _) => Column(
+            children: [
+              _buildDateHeader(ref, selectedDate, 0, sortType),
+              Expanded(child: _buildErrorState(ref, error)),
+            ],
+          ),
     );
   }
 
@@ -410,17 +421,19 @@ class ScheduleTab extends ConsumerWidget {
   }) {
     return lessonsAsync.when(
       data: (lessons) {
-        final lessonDates = lessons
-            .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
-            .toSet();
-        final lessonCount = lessons
-            .where(
-              (l) =>
-                  l.date.year == selectedDate.year &&
-                  l.date.month == selectedDate.month &&
-                  l.date.day == selectedDate.day,
-            )
-            .length;
+        final lessonDates =
+            lessons
+                .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
+                .toSet();
+        final lessonCount =
+            lessons
+                .where(
+                  (l) =>
+                      l.date.year == selectedDate.year &&
+                      l.date.month == selectedDate.month &&
+                      l.date.day == selectedDate.day,
+                )
+                .length;
         return _buildStickyHeaderContent(
           context: context,
           ref: ref,
@@ -430,22 +443,24 @@ class ScheduleTab extends ConsumerWidget {
           markerDates: lessonDates,
         );
       },
-      loading: () => _buildStickyHeaderContent(
-        context: context,
-        ref: ref,
-        selectedDate: selectedDate,
-        sortType: sortType,
-        lessonCount: 0,
-        markerDates: const <DateTime>{},
-      ),
-      error: (_, __) => _buildStickyHeaderContent(
-        context: context,
-        ref: ref,
-        selectedDate: selectedDate,
-        sortType: sortType,
-        lessonCount: 0,
-        markerDates: const <DateTime>{},
-      ),
+      loading:
+          () => _buildStickyHeaderContent(
+            context: context,
+            ref: ref,
+            selectedDate: selectedDate,
+            sortType: sortType,
+            lessonCount: 0,
+            markerDates: const <DateTime>{},
+          ),
+      error:
+          (_, __) => _buildStickyHeaderContent(
+            context: context,
+            ref: ref,
+            selectedDate: selectedDate,
+            sortType: sortType,
+            lessonCount: 0,
+            markerDates: const <DateTime>{},
+          ),
     );
   }
 
@@ -507,23 +522,29 @@ class ScheduleTab extends ConsumerWidget {
       onSelected: (value) {
         ref.read(teacherLessonSortTypeProvider.notifier).setSortType(value);
       },
-      itemBuilder: (context) => LessonSortType.values
-          .map(
-            (type) => PopupMenuItem(
-              value: type,
-              child: Row(
-                children: [
-                  if (type == sortType)
-                    Icon(Icons.check, size: 16, color: AppColors.paperAccent)
-                  else
-                    const SizedBox(width: AppSpacing.space4),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(type.displayName),
-                ],
-              ),
-            ),
-          )
-          .toList(),
+      itemBuilder:
+          (context) =>
+              LessonSortType.values
+                  .map(
+                    (type) => PopupMenuItem(
+                      value: type,
+                      child: Row(
+                        children: [
+                          if (type == sortType)
+                            Icon(
+                              Icons.check,
+                              size: 16,
+                              color: AppColors.paperAccent,
+                            )
+                          else
+                            const SizedBox(width: AppSpacing.space4),
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(type.displayName),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -628,21 +649,23 @@ class _SwipeableLessonCard extends ConsumerWidget {
 
     final card = LessonCard(
       lesson: lesson,
-      onTap: selectionMode && isScheduled
-          ? () => selection.toggle(lesson.id)
-          : () => context.push(
-              AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
-            ),
+      onTap:
+          selectionMode && isScheduled
+              ? () => selection.toggle(lesson.id)
+              : () => context.push(
+                AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+              ),
     );
 
-    final content = isScheduled
-        ? _SelectableLessonRow(
-            isSelected: isSelected,
-            showIndicator: selectionMode,
-            onLongPress: () => selection.toggle(lesson.id),
-            child: card,
-          )
-        : card;
+    final content =
+        isScheduled
+            ? _SelectableLessonRow(
+              isSelected: isSelected,
+              showIndicator: selectionMode,
+              onLongPress: () => selection.toggle(lesson.id),
+              child: card,
+            )
+            : card;
 
     // 비예정이거나 선택 모드 → 스와이프 없음.
     if (!isScheduled || selectionMode) return content;
@@ -657,17 +680,18 @@ class _SwipeableLessonCard extends ConsumerWidget {
     // 취소(레슨 취소): 우→좌=관리/destructive → actions. 수강권 레슨은 취소 제거.
     return SwipeActionTile(
       key: ValueKey('lesson-swipe-${lesson.id}'),
-      actions: canSwipeCancel
-          ? [
-              SwipeAction(
-                // #766: 수강권 레슨은 취소 불가 → actions 비움.
-                label: AppStrings.actionLessonCancel,
-                icon: Icons.cancel,
-                tone: SwipeActionTone.destructive,
-                onPressed: () => _confirmCancel(context, ref),
-              ),
-            ]
-          : const [],
+      actions:
+          canSwipeCancel
+              ? [
+                SwipeAction(
+                  // #766: 수강권 레슨은 취소 불가 → actions 비움.
+                  label: AppStrings.actionLessonCancel,
+                  icon: Icons.cancel,
+                  tone: SwipeActionTone.destructive,
+                  onPressed: () => _confirmCancel(context, ref),
+                ),
+              ]
+              : const [],
       startActions: [
         SwipeAction(
           // #767: 완료=출석 확정 단일화 (confirmAttendance → 수강권 차감).
@@ -717,29 +741,31 @@ class _ViewModeToggle extends StatelessWidget {
       padding: const EdgeInsets.all(2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: ScheduleViewMode.values.map((mode) {
-          final isSelected = mode == currentMode;
-          return GestureDetector(
-            onTap: () => onChanged(mode),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space2,
-                vertical: AppSpacing.space2,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.paper : Colors.transparent,
-              ),
-              child: Icon(
-                _getIcon(mode),
-                size: 16,
-                color: isSelected
-                    ? AppColors.paperAccent
-                    : AppColors.inkTertiary,
-              ),
-            ),
-          );
-        }).toList(),
+        children:
+            ScheduleViewMode.values.map((mode) {
+              final isSelected = mode == currentMode;
+              return GestureDetector(
+                onTap: () => onChanged(mode),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                    vertical: AppSpacing.space2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.paper : Colors.transparent,
+                  ),
+                  child: Icon(
+                    _getIcon(mode),
+                    size: 16,
+                    color:
+                        isSelected
+                            ? AppColors.paperAccent
+                            : AppColors.inkTertiary,
+                  ),
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -780,9 +806,7 @@ class _SelectableLessonRow extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: Container(
-        color: isSelected
-            ? AppColors.paperAccent.withValues(alpha: 0.08)
-            : Colors.transparent,
+        color: isSelected ? AppColors.paperAccentSoft : Colors.transparent,
         child: Row(
           children: [
             if (showIndicator)
@@ -793,9 +817,10 @@ class _SelectableLessonRow extends StatelessWidget {
                       ? Icons.check_circle
                       : Icons.radio_button_unchecked,
                   size: 22,
-                  color: isSelected
-                      ? AppColors.paperAccent
-                      : AppColors.inkTertiary,
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkTertiary,
                 ),
               ),
             Expanded(child: child),
@@ -818,21 +843,22 @@ class _SelectionActionBar extends ConsumerWidget {
     final selection = ref.read(lessonSelectionProvider.notifier);
 
     final dayScheduled = lessonsAsync.maybeWhen(
-      data: (lessons) => lessons
-          .where(
-            (l) =>
-                l.date.year == selectedDate.year &&
-                l.date.month == selectedDate.month &&
-                l.date.day == selectedDate.day &&
-                (l.displayStatus == LessonStatus.scheduled ||
-                    l.displayStatus == LessonStatus.reschedulePending),
-          )
-          .toList(),
+      data:
+          (lessons) =>
+              lessons
+                  .where(
+                    (l) =>
+                        l.date.year == selectedDate.year &&
+                        l.date.month == selectedDate.month &&
+                        l.date.day == selectedDate.day &&
+                        (l.displayStatus == LessonStatus.scheduled ||
+                            l.displayStatus == LessonStatus.reschedulePending),
+                  )
+                  .toList(),
       orElse: () => <Lesson>[],
     );
-    final selectedLessons = dayScheduled
-        .where((l) => selectedIds.contains(l.id))
-        .toList();
+    final selectedLessons =
+        dayScheduled.where((l) => selectedIds.contains(l.id)).toList();
     final count = selectedLessons.length;
 
     return Container(
@@ -875,8 +901,10 @@ class _SelectionActionBar extends ConsumerWidget {
                       ),
                       const Spacer(),
                       TextButton(
-                        onPressed: () =>
-                            selection.selectAll(dayScheduled.map((l) => l.id)),
+                        onPressed:
+                            () => selection.selectAll(
+                              dayScheduled.map((l) => l.id),
+                            ),
                         child: const Text(AppStrings.selectAllAction),
                       ),
                     ],
@@ -886,14 +914,15 @@ class _SelectionActionBar extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: count == 0
-                              ? null
-                              : () => batchMarkDayOff(
-                                  context,
-                                  ref,
-                                  selectedLessons,
-                                  onDone: selection.clear,
-                                ),
+                          onPressed:
+                              count == 0
+                                  ? null
+                                  : () => batchMarkDayOff(
+                                    context,
+                                    ref,
+                                    selectedLessons,
+                                    onDone: selection.clear,
+                                  ),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(
                               0,
@@ -906,14 +935,15 @@ class _SelectionActionBar extends ConsumerWidget {
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: FilledButton(
-                          onPressed: count == 0
-                              ? null
-                              : () => batchConfirmAttendance(
-                                  context,
-                                  ref,
-                                  selectedLessons,
-                                  onDone: selection.clear,
-                                ),
+                          onPressed:
+                              count == 0
+                                  ? null
+                                  : () => batchConfirmAttendance(
+                                    context,
+                                    ref,
+                                    selectedLessons,
+                                    onDone: selection.clear,
+                                  ),
                           style: FilledButton.styleFrom(
                             minimumSize: const Size(
                               0,

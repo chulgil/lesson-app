@@ -41,10 +41,8 @@ Widget buildSuggestAlternativeSuggestedSlotsList({
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.paperAccent.withValues(alpha: 0.05),
-                border: Border.all(
-                  color: AppColors.paperAccent.withValues(alpha: 0.3),
-                ),
+                color: AppColors.paperAccentSoft,
+                border: Border.all(color: AppColors.paperAccentSelected),
               ),
               child: Row(
                 children: [

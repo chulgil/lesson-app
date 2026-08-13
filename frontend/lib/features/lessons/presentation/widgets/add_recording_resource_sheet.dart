@@ -269,9 +269,10 @@ class _AddRecordingResourceSheetState
           .createResource(
             type: TeachingResourceType.teacherRecording,
             title: _titleController.text.trim(),
-            description: _memoController.text.trim().isNotEmpty
-                ? _memoController.text.trim()
-                : null,
+            description:
+                _memoController.text.trim().isNotEmpty
+                    ? _memoController.text.trim()
+                    : null,
             // Mock: use local path. Real upload (Phase D) replaces this.
             audioUrl: _selectedFilePath,
             audioDurationSeconds: _durationSeconds,
@@ -408,16 +409,17 @@ class _AddRecordingResourceSheetState
                         AppSpacing.buttonHeight,
                       ),
                     ),
-                    child: _isSubmitting
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.paper,
-                            ),
-                          )
-                        : const Text(AppStrings.add),
+                    child:
+                        _isSubmitting
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.paper,
+                              ),
+                            )
+                            : const Text(AppStrings.add),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -515,7 +517,7 @@ class _RecordingIndicator extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperAccentSoft,
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccentSelected),
       ),
       child: Row(
         children: [

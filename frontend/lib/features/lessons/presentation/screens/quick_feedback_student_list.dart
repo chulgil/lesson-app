@@ -184,7 +184,7 @@ class _QuickFeedbackStudentListState
         leading: CircleAvatar(
           backgroundColor:
               isCompleted
-                  ? AppColors.paperOk.withValues(alpha: 0.2)
+                  ? AppColors.paperOkSelected
                   : AppColors.paperAccentSoft,
           child: Icon(
             isCompleted ? Icons.check_circle : Icons.schedule,

@@ -416,8 +416,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
           ..strokeWidth = 2
           ..strokeCap = StrokeCap.round;
 
-    final loopPaint =
-        Paint()..color = AppColors.paperAccent.withValues(alpha: 0.3);
+    final loopPaint = Paint()..color = AppColors.paperAccentSelected;
 
     final markerPaint =
         Paint()
@@ -695,7 +694,7 @@ class _MiniMapPainter extends CustomPainter {
           size.width * bProgress,
           size.height,
         ),
-        Paint()..color = AppColors.paperAccent.withValues(alpha: 0.3),
+        Paint()..color = AppColors.paperAccentSelected,
       );
     }
 

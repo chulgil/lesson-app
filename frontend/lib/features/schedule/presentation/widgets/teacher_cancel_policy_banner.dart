@@ -44,8 +44,8 @@ class TeacherCancelPolicyBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.08),
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        color: AppColors.paperAccentSoft,
+        border: Border.all(color: AppColors.paperAccentSelected),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

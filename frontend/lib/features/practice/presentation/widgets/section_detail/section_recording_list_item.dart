@@ -149,9 +149,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.inkSecondary.withValues(
-                              alpha: 0.2,
-                            ),
+                            color: AppColors.inkQuaternary,
                           ),
                           child: Text(
                             '${widget.recording.bpm} BPM',

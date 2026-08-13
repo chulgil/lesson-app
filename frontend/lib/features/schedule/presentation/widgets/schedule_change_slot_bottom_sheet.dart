@@ -197,9 +197,7 @@ class _ScheduleChangeSlotBottomSheetState
         vertical: AppSpacing.space1,
       ),
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.paperAccent.withValues(alpha: 0.08),
-      ),
+      decoration: BoxDecoration(color: AppColors.paperAccentSoft),
       child: Row(
         children: [
           Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),

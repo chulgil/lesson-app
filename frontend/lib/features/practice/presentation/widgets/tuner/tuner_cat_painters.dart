@@ -171,7 +171,7 @@ class HeartParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Vermillion tint matching cat face accent (Notebook × Score).
-    final baseColor = AppColors.paperAccent.withValues(alpha: 0.3);
+    final baseColor = AppColors.paperAccentSelected;
 
     for (final particle in particles) {
       final opacity = particle.opacity * 0.8; // Max 80% opacity
