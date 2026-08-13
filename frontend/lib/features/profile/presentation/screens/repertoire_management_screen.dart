@@ -71,7 +71,7 @@ class _RepertoireManagementScreenState
                       color: AppColors.paperAccent,
                     ),
                     const SizedBox(height: AppSpacing.space4),
-                    const Text(AppStrings.profileRepertoireError),
+                    const Text(AppStrings.genericError),
                     const SizedBox(height: AppSpacing.space4),
                     FilledButton(
                       onPressed: () =>

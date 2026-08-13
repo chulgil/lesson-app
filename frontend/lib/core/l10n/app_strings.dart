@@ -8286,7 +8286,6 @@ class AppStrings {
 
   // ── Repertoire Management ──
   static const profileRepertoireTitle = '레퍼토리 관리';
-  static const profileRepertoireError = '오류가 발생했습니다.';
   static const profileRepertoireAddPiece = '곡 추가';
   static const profileRepertoirePieceUpdated = '곡 정보가 수정되었습니다';
   static const profileRepertoireSearchHint = '곡 제목 또는 작곡가 검색';

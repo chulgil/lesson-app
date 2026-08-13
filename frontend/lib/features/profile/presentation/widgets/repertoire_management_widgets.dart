@@ -813,7 +813,7 @@ void showAssignToStudentDialog({
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Text(AppStrings.profileRepertoireError),
+      error: (_, __) => const Text(AppStrings.genericError),
     ),
     actions: [
       TextButton(
