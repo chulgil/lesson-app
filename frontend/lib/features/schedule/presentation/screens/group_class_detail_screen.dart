@@ -193,7 +193,7 @@ class _GroupClassDetailScreenState
             decoration: BoxDecoration(
               color:
                   widget.groupClass.type == GroupClassType.regular
-                      ? AppColors.ink.withValues(alpha: 0.1)
+                      ? AppColors.inkSoft
                       : AppColors.paperAccentSoft,
             ),
             child: Text(
@@ -545,7 +545,7 @@ class _GroupClassDetailScreenState
   Widget _buildPolicyInfo() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.05)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

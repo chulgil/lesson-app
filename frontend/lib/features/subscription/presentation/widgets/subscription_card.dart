@@ -233,7 +233,7 @@ class SubscriptionCard extends StatelessWidget {
                   color:
                       subscription.canReschedule
                           ? accentColor.withValues(alpha: 0.1)
-                          : AppColors.inkQuaternary.withValues(alpha: 0.5),
+                          : AppColors.inkStrong,
                 ),
                 child: Text(
                   '${AppStrings.rescheduleLabel} ${subscription.remainingReschedule}${AppStrings.countSuffix}',

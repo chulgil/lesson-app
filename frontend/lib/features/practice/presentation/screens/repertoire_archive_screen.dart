@@ -31,7 +31,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
             margin: const EdgeInsets.all(AppSpacing.space4),
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.ink.withValues(alpha: 0.1),
+              color: AppColors.inkSoft,
             ),
             child: Row(
               children: [

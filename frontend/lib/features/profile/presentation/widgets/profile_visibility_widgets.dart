@@ -324,7 +324,7 @@ class VisibilityInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(color: AppColors.ink.withValues(alpha: 0.1)),
+      decoration: BoxDecoration(color: AppColors.inkSoft),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -400,7 +400,7 @@ class PreviewSection extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.inkTertiary.withValues(alpha: 0.2),
+                    color: AppColors.inkBorder,
                   ),
                   child: Text(
                     '비공개',

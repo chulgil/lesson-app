@@ -32,7 +32,7 @@ void showParentLoginSheet(BuildContext context, WidgetRef ref) {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.ink.withValues(alpha: 0.1),
+                color: AppColors.inkSoft,
                 shape: BoxShape.circle,
               ),
               child: const Center(

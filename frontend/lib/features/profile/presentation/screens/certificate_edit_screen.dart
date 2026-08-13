@@ -420,7 +420,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.ink.withValues(alpha: 0.1),
+                color: AppColors.inkSoft,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

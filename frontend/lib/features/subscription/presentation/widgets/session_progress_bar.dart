@@ -113,7 +113,7 @@ class SessionProgressBar extends StatelessWidget {
     if (isCompleted) {
       color = AppColors.paperAccent;
     } else if (isEmpty) {
-      color = AppColors.inkQuaternary.withValues(alpha: 0.4);
+      color = AppColors.inkMuted;
     } else {
       color = AppColors.inkQuaternary;
     }

@@ -363,8 +363,8 @@ class BatchInfoBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.1),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
+        color: AppColors.inkSoft,
+        border: Border.all(color: AppColors.inkBorderStrong),
       ),
       child: Row(
         children: [
@@ -385,7 +385,7 @@ class BatchInfoBanner extends StatelessWidget {
                 Text(
                   AppStrings.issueFormBatchBannerBody,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.ink.withValues(alpha: 0.8),
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

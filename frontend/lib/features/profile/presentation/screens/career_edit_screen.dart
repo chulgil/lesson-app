@@ -390,7 +390,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
       ),
       disabledBorder: OutlineInputBorder(
         borderSide: BorderSide(
-          color: AppColors.inkQuaternary.withValues(alpha: 0.5),
+          color: AppColors.inkStrong,
         ),
       ),
     );

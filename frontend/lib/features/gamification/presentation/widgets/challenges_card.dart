@@ -129,7 +129,7 @@ class _ChallengeItem extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: challenge.period == ChallengePeriod.weekly
-                      ? AppColors.ink.withValues(alpha: 0.1)
+                      ? AppColors.inkSoft
                       : AppColors.paperAccentSoft,
                   borderRadius: BorderRadius.zero,
                 ),

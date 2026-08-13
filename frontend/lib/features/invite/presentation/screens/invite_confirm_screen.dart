@@ -396,7 +396,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.ink.withValues(alpha: 0.1),
+              color: AppColors.inkSoft,
               borderRadius: BorderRadius.zero,
             ),
             child: Icon(Icons.link, size: 48, color: AppColors.ink),
@@ -495,7 +495,7 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.ink.withValues(alpha: 0.1),
+                color: AppColors.inkSoft,
                 borderRadius: BorderRadius.zero,
               ),
               child: Row(

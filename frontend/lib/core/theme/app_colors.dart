@@ -143,6 +143,50 @@ class AppColors {
   static const scrimLight = Color(0x33000000); // black 20% scrim
   static const inkScrimStrong = Color(0xDE14161C); // 87% alpha, dark barrier
   static const paperPencil = Color(0x9914161C); // 60% alpha (손글씨)
+  // 인라인 잉크 틴트 SSOT (#1260, #1257 후속). withValues(alpha:) 는 alpha 만
+  // 덮어써 RGB 는 항상 ink 와 동일하므로, 어떤 ink* 상수에서 호출해도 결과는
+  // 같다 — 기준 base(ink/Secondary/Tertiary/Quaternary) 는 무관하고 최종
+  // alpha 값만 렌더링을 결정한다. 아래 5종은 alpha 값 기준으로 통합한 토큰.
+  // Color.from(alpha: exact) 사용 — hex byte 반올림(예: 0x1A=10.2%)이 아닌
+  // ink.withValues(alpha: 0.X) 와 완전히 동일한 double alpha 를 보존한다.
+  static const _inkR = 0x14 / 255;
+  static const _inkG = 0x16 / 255;
+  static const _inkB = 0x1C / 255;
+  // 카드·칩·배지의 옅은 배경 틴트 (10% alpha).
+  static const inkSoft = Color.from(
+    alpha: 0.1,
+    red: _inkR,
+    green: _inkG,
+    blue: _inkB,
+  );
+  // 기본 테두리·구분선 두께 (20% alpha).
+  static const inkBorder = Color.from(
+    alpha: 0.2,
+    red: _inkR,
+    green: _inkG,
+    blue: _inkB,
+  );
+  // 강조가 필요한 테두리 (30% alpha).
+  static const inkBorderStrong = Color.from(
+    alpha: 0.3,
+    red: _inkR,
+    green: _inkG,
+    blue: _inkB,
+  );
+  // 빈 상태 등 낮은 존재감의 마커 (40% alpha).
+  static const inkMuted = Color.from(
+    alpha: 0.4,
+    red: _inkR,
+    green: _inkG,
+    blue: _inkB,
+  );
+  // 비활성/미선택 상태 마커, 강조 테두리 (50% alpha).
+  static const inkStrong = Color.from(
+    alpha: 0.5,
+    red: _inkR,
+    green: _inkG,
+    blue: _inkB,
+  );
   @Deprecated(
     'docs/specs/design/notebook/README.md §3 사유로 제거된 토큰 (왼쪽 붉은 여백선). '
     '신규 사용 금지. 강조 색이 필요하면 paperAccent 를 사용.',

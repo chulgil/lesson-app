@@ -285,7 +285,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.ink.withValues(alpha: 0.1),
+                          color: AppColors.inkSoft,
                         ),
                         child: Text(
                           AppStrings.proposalDetailAutoSentBadge,

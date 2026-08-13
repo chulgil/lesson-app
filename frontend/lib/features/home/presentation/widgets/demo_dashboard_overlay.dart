@@ -34,7 +34,7 @@ class DemoDashboardOverlay extends ConsumerWidget {
           child: NotebookCard(
             color: AppColors.paper,
             shape: RoundedRectangleBorder(
-              side: BorderSide(color: AppColors.ink.withValues(alpha: 0.16)),
+              side: BorderSide(color: AppColors.inkBorder),
             ),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.space4),

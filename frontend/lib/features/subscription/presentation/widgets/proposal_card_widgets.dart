@@ -29,7 +29,7 @@ class ProposalStatusBanner extends StatelessWidget {
 
     switch (proposal.status) {
       case ProposalStatus.paymentNotified:
-        backgroundColor = AppColors.ink.withValues(alpha: 0.1);
+        backgroundColor = AppColors.inkSoft;
         textColor = AppColors.ink;
         icon = Icons.schedule;
         message = AppStrings.proposalPaymentPendingBannerBody;
@@ -47,13 +47,13 @@ class ProposalStatusBanner extends StatelessWidget {
         message = AppStrings.proposalBannerRejected;
         break;
       case ProposalStatus.expired:
-        backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.1);
+        backgroundColor = AppColors.inkSoft;
         textColor = AppColors.inkTertiary;
         icon = Icons.timer_off;
         message = AppStrings.proposalBannerExpired;
         break;
       case ProposalStatus.cancelled:
-        backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.1);
+        backgroundColor = AppColors.inkSoft;
         textColor = AppColors.inkTertiary;
         icon = Icons.block;
         message = AppStrings.proposalBannerCancelled;
@@ -650,8 +650,8 @@ class ProposalWaitingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.ink.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+        color: AppColors.inkSoft,
+        border: Border.all(color: AppColors.inkBorder),
       ),
       child: Column(
         children: [
