@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -82,55 +83,19 @@ class MyConnectionsScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty(BuildContext context, InviteUserRole userRole) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: AppColors.paperAccentSoft,
-                borderRadius: BorderRadius.zero,
-              ),
-              child: Icon(
-                Icons.people_outline,
-                size: 48,
-                color: AppColors.paperAccent,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            // Notebook × Score: 빈 상태 3축(§7.89) 통과 + §7.87-h 2원 유한집합 (teacher/parent·student).
-            Text(
-              userRole == InviteUserRole.teacher
-                  ? AppStrings.inviteNoConnectedStudents
-                  : AppStrings.inviteNoConnectedTeachers,
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              userRole == InviteUserRole.teacher
-                  ? AppStrings.inviteEmptyHintTeacher
-                  : AppStrings.inviteEmptyHintStudent,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            OutlinedButton.icon(
-              onPressed: () => _showHelpSheet(context),
-              icon: const Icon(Icons.help_outline),
-              label: const Text(AppStrings.inviteHowToConnect),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.people_outline,
+      title:
+          userRole == InviteUserRole.teacher
+              ? AppStrings.inviteNoConnectedStudents
+              : AppStrings.inviteNoConnectedTeachers,
+      subtitle:
+          userRole == InviteUserRole.teacher
+              ? AppStrings.inviteEmptyHintTeacher
+              : AppStrings.inviteEmptyHintStudent,
+      actionLabel: AppStrings.inviteHowToConnect,
+      actionIcon: Icons.help_outline,
+      onAction: () => _showHelpSheet(context),
     );
   }
 

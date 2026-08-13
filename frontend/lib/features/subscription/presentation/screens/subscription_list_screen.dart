@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -372,38 +373,13 @@ class SubscriptionListScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space6),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.school_outlined, size: 64, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space4),
-            // Notebook × Score: 빈 상태 헤드라인 3축 통과 (§7.89) — Playfair 승격.
-            Text(
-              AppStrings.noLessonsRegisteredTitle,
-              style: NotebookTypography.sectionTitle.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.noLessonsRegisteredBody,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkTertiary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            FilledButton.icon(
-              onPressed: () => context.push(AppRoutes.teacherSearch),
-              icon: const Icon(Icons.search),
-              label: const Text(AppStrings.teacherSearchButton),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.school_outlined,
+      title: AppStrings.noLessonsRegisteredTitle,
+      subtitle: AppStrings.noLessonsRegisteredBody,
+      actionLabel: AppStrings.teacherSearchButton,
+      actionIcon: Icons.search,
+      onAction: () => context.push(AppRoutes.teacherSearch),
     );
   }
 

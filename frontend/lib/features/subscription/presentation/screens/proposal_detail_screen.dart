@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -496,21 +497,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      error: (e, _) => ErrorStateWidget(title: AppStrings.loadDataFailed),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDetailsCard(template: template);
@@ -526,22 +513,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
 
     return templateAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => ErrorStateWidget(title: AppStrings.loadDataFailed),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return ProposalDiscountCard(proposal: proposal, template: template);
@@ -557,22 +530,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
 
     return templateAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (e, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => ErrorStateWidget(title: AppStrings.loadDataFailed),
       data: (template) {
         if (template == null) return const SizedBox.shrink();
         return _buildPaymentCard(proposal, template);
