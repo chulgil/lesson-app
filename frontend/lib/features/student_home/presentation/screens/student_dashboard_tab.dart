@@ -111,7 +111,9 @@ class StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // ── Student gamification P2: 오늘의 연습 목표 + 잔디 연동 (doc 46 §4) ──
-          DailyGoalCard(studentId: currentStudentId),
+          // #1269: PracticeGoal(원격) 기준 요약 — practice 탭 GoalProgressWidget 과
+          // 동일 목표 데이터를 공유한다.
+          GoalProgressSummaryCard(studentId: currentStudentId),
 
           const SizedBox(height: AppSpacing.space4),
 

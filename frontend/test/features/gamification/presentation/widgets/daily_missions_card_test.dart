@@ -1,8 +1,11 @@
 // DailyMissionsCard 위젯 테스트 — doc 46 §4④ (P3a 데일리 만족 루프).
 //
 // 0/부분/전부완료 3상태 스모크 테스트 (widget smoke test HARD-GATE).
-// [daily_goal_card_test.dart] 패턴 미러 — DailyPracticeGoal/DailyMissionLedger
-// 모두 lazy-open Hive box 를 쓰므로 real-Hive tempDir 초기화가 필요하다.
+// [DailyMissionLedger] 가 lazy-open Hive box 를 쓰므로 real-Hive tempDir
+// 초기화가 필요하다. #1269: practice15m 의 목표(15분 기본)는 이제
+// PracticeGoal(원격, mockDataModeProvider 기본값에서 MockPracticeGoalRepository)
+// 기준 — 미설정 시 defaultDailyGoalMinutes 로 폴백하므로 별도 override 없이도
+// 기존 기대값(기본 15분)이 유지된다.
 import 'dart:io';
 
 import 'package:flutter/material.dart';

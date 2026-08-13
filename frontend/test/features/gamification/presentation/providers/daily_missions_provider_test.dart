@@ -1,7 +1,10 @@
 // dailyMissionsProvider + DailyMissionLedger 멱등 완료 테스트 — doc 46 §4④ (P3a).
 //
-// [DailyGoalCard]/[DailyPracticeGoal] 와 동일하게 lazy-open Hive box 를 쓰므로
-// [daily_goal_card_test.dart] 와 같은 real-Hive tempDir 패턴을 따른다.
+// [DailyMissionLedger] 는 lazy-open Hive box 를 쓰므로 real-Hive tempDir
+// 패턴을 따른다. #1269: 목표 값은 device-local 이 아니라 practice 기능의
+// 원격 영속 PracticeGoal 기준(effectiveDailyGoalMinutesProvider) 이며,
+// mockDataModeProvider 기본값(USE_MOCK=true)에서는 MockPracticeGoalRepository
+// 가 목표 미설정 시 null → defaultDailyGoalMinutes(15) 로 폴백한다.
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +17,10 @@ import 'package:lessonaza/features/gamification/domain/entities/growth_heatmap.d
 import 'package:lessonaza/features/gamification/domain/repositories/growth_heatmap_repository.dart';
 import 'package:lessonaza/features/gamification/domain/services/daily_mission_rotation.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/daily_missions_provider.dart';
-import 'package:lessonaza/features/gamification/presentation/providers/daily_practice_goal_provider.dart';
 import 'package:lessonaza/features/gamification/presentation/providers/growth_heatmap_provider.dart';
+import 'package:lessonaza/features/gamification/presentation/providers/today_practice_minutes_provider.dart';
+import 'package:lessonaza/features/practice/domain/entities/entities.dart';
+import 'package:lessonaza/features/practice/presentation/providers/practice_goal_provider.dart';
 
 /// 메모리 stub — [daily_goal_card_test.dart] 패턴 미러.
 class _StubGrowthHeatmapRepository implements GrowthHeatmapRepository {
@@ -63,7 +68,7 @@ Future<List<DailyMission>> _settledMissions(
   );
   addTearDown(subscription.close);
 
-  await container.read(dailyPracticeGoalProvider(studentId).future);
+  await container.read(effectiveDailyGoalMinutesProvider(studentId).future);
   await container.read(todayPracticeMinutesProvider(studentId).future);
   await container.read(todayMetronomeMinutesProvider(studentId).future);
   await container.read(todayTunerMinutesProvider(studentId).future);
@@ -89,7 +94,7 @@ void main() {
 
   group('dailyMissionsProvider — 진행/목표 파생 (doc 46 §4④)', () {
     test(
-      'practice15m 은 dailyPracticeGoalProvider 목표 + heatmap 오늘 분을 반영',
+      'practice15m 은 effectiveDailyGoalMinutesProvider 목표 + heatmap 오늘 분을 반영',
       () async {
         final heatmap = _todayHeatmap(
           's1',
@@ -108,7 +113,7 @@ void main() {
         final practice = missions.firstWhere(
           (m) => m.kind == DailyMissionKind.practice15m,
         );
-        expect(practice.target, DailyPracticeGoal.defaultGoalMinutes);
+        expect(practice.target, defaultDailyGoalMinutes);
         expect(practice.progress, 7);
         expect(practice.completed, isFalse);
       },
@@ -202,8 +207,15 @@ void main() {
       // 목표를 30분으로 올리면 derived(15>=30)는 false 이지만, 원장 때문에
       // completed 는 유지되어야 한다 — 이미 채운 스탬프가 되돌아가지 않음.
       await container
-          .read(dailyPracticeGoalProvider('s_sticky').notifier)
-          .setGoal(30);
+          .read(practiceGoalCrudProvider.notifier)
+          .saveGoal(
+            PracticeGoal(
+              id: '',
+              studentId: 's_sticky',
+              dailyTimeMinutes: 30,
+              createdAt: DateTime.now(),
+            ),
+          );
       missions = await _settledMissions(container, 's_sticky');
       practice = missions.firstWhere(
         (m) => m.kind == DailyMissionKind.practice15m,

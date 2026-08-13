@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
@@ -23,6 +24,24 @@ PracticeGoalRepository practiceGoalRepository(PracticeGoalRepositoryRef ref) {
 Future<PracticeGoal?> practiceGoal(PracticeGoalRef ref, String studentId) {
   final repository = ref.watch(practiceGoalRepositoryProvider);
   return repository.getActiveGoal(studentId);
+}
+
+/// Fallback daily-time goal (minutes) used when the student has not set one.
+/// Mirrors the smallest preset in [GoalSettingChips]'s daily-time options
+/// (practice_goal_setting_screen.dart) so "no goal set" still behaves like a
+/// sensible default for consumers that need an unconditional target (daily
+/// missions, growth-heatmap intensity coloring) — #1269.
+const int defaultDailyGoalMinutes = 15;
+
+/// [PracticeGoal.dailyTimeMinutes] with [defaultDailyGoalMinutes] fallback —
+/// the single goal-target source for consumers outside the goal-setting UI
+/// itself (which distinguishes "unset" from "15 minutes" via the empty-state
+/// CTA). #1269: unifies the former device-local `DailyPracticeGoal` concept
+/// onto this remote-persisted [PracticeGoal] field.
+@riverpod
+Future<int> effectiveDailyGoalMinutes(Ref ref, String studentId) async {
+  final goal = await ref.watch(practiceGoalProvider(studentId).future);
+  return goal?.dailyTimeMinutes ?? defaultDailyGoalMinutes;
 }
 
 /// Today's progress

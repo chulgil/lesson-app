@@ -9,17 +9,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../practice/practice_facade.dart'
+    show defaultDailyGoalMinutes, effectiveDailyGoalMinutesProvider;
 import '../../domain/entities/daily_mission.dart';
 import '../../domain/entities/daily_mission_kind.dart';
 import '../../domain/services/daily_mission_rotation.dart';
-import 'daily_practice_goal_provider.dart';
 import 'growth_heatmap_provider.dart';
+import 'today_practice_minutes_provider.dart';
 
 part 'daily_missions_provider.g.dart';
 
 /// [growthHeatmapProvider]의 오늘 cell 을 찾는 key. [todayPracticeMinutesProvider]
 /// 와 정확히 동일한 파생식 — 이 provider 들이 서로 다른 "오늘"을 가리키면
-/// 같은 카드 안에서 미션 진행이 [DailyGoalCard] 진행과 어긋나 보인다.
+/// 같은 카드 안에서 미션 진행이 [GoalProgressSummaryCard] 진행과 어긋나 보인다.
 /// Heatmap cells are keyed by the *local* calendar date tagged as UTC
 /// (PracticeRecordingService uses occurredAt's local y/m/d), so "today"
 /// derives from local time — the old toUtc() derivation pointed at
@@ -56,10 +58,10 @@ Future<int> todayRecordingCount(Ref ref, String studentId) async {
 
 /// 데일리 미션 완료 원장 — 로컬 Hive, 멱등 (doc 46 §4④).
 ///
-/// 관측 신호(progress)가 흔들려도(예: [DailyPracticeGoal] 를 상향 조정)
-/// 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를 유지한다 —
-/// derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면 이미 채운
-/// 스탬프가 되돌아가는 회귀가 생긴다. [DailyGoalCard]/`daily_practice_goal_
+/// 관측 신호(progress)가 흔들려도(예: [PracticeGoal.dailyTimeMinutes] 를
+/// 상향 조정) 한 번 완료된 미션은 그날(KST) 안에서는 계속 완료 상태를
+/// 유지한다 — derived-only 라면 15/15 로 채운 뒤 목표를 30분으로 올리면
+/// 이미 채운 스탬프가 되돌아가는 회귀가 생긴다. `today_practice_minutes_
 /// provider.dart` 와 동일하게 lazy-open Hive box 패턴을 따른다.
 ///
 /// box key = `student:<id>:missions:<dateKey>`, value = 완료된
@@ -107,7 +109,7 @@ class DailyMissionLedger extends _$DailyMissionLedger {
       );
     } catch (_) {
       // 영속 실패는 조용히 무시 — 메모리 상태(state)는 이미 갱신되어 이번
-      // 세션에서는 유효하다 (DailyPracticeGoal 과 동일 best-effort).
+      // 세션에서는 유효하다 (다른 로컬 Hive provider 와 동일 best-effort).
     }
   }
 
@@ -118,13 +120,13 @@ class DailyMissionLedger extends _$DailyMissionLedger {
 /// 오늘의 미션 3종(고정1+로테이션2) — 로테이션 + 진행값 + 완료 원장을
 /// 조합한 최종 표시 데이터.
 ///
-/// [DailyGoalCard]/`daily_practice_goal_provider.dart` 와 동일하게 각 의존
-/// provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되 future 를
-/// await 하지 않음) — Hive 기반 provider(목표/원장)의 `.future` 를 그대로
-/// await 하면 위젯 테스트의 synthetic time 안에서 실제 파일 I/O 가 끝내
-/// resolve 되지 않아 화면이 영원히 loading 에 멈추는 문제가 있었다(회귀
-/// 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본목표)으로 그리고,
-/// 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
+/// [DailyMissionLedger]/`today_practice_minutes_provider.dart` 와 동일하게
+/// 각 의존 provider 를 `.valueOrNull ?? 기본값` 으로 읽는다(watch 는 하되
+/// future 를 await 하지 않음) — Hive 기반 provider(원장)나 원격 provider
+/// (목표)의 `.future` 를 그대로 await 하면 위젯 테스트의 synthetic time 안
+/// 에서 실제 I/O 가 끝내 resolve 되지 않아 화면이 영원히 loading 에 멈추는
+/// 문제가 있었다(회귀 확인됨). sync 조합이면 첫 프레임은 기본값(0진행/기본
+/// 목표)으로 그리고, 각 provider 가 실제로 resolve 되는 순간 자동 재계산된다.
 @riverpod
 List<DailyMission> dailyMissions(Ref ref, String studentId) {
   final now = DateTime.now();
@@ -132,8 +134,8 @@ List<DailyMission> dailyMissions(Ref ref, String studentId) {
   final kinds = DailyMissionRotation.missionsFor(studentId, now);
 
   final goal =
-      ref.watch(dailyPracticeGoalProvider(studentId)).valueOrNull ??
-      DailyPracticeGoal.defaultGoalMinutes;
+      ref.watch(effectiveDailyGoalMinutesProvider(studentId)).valueOrNull ??
+      defaultDailyGoalMinutes;
   final practiceMinutes =
       ref.watch(todayPracticeMinutesProvider(studentId)).valueOrNull ?? 0;
   final metronomeMinutes =
