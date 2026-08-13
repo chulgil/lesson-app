@@ -159,6 +159,7 @@ class MockAcademyVisibilityRepository implements AcademyVisibilityRepository {
                 academyId: academyId,
                 academyName: academy.name,
                 publicPageConsent: consent,
+                actorMemberId: member.id,
               ),
             );
           }

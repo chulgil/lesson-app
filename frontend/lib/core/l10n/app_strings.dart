@@ -8928,6 +8928,9 @@ class AppStrings {
   /// 학원 활동 타임라인 화면 제목
   static const academyActivityTimeline = '학원 활동 타임라인';
 
+  /// 학원별 소속 목록에서 활동 타임라인으로 진입하는 버튼/툴팁 라벨
+  static const academyActivityTimelineEntryLabel = '내 활동 보기';
+
   /// 활동 없음 메시지
   static const noActivityFound = '활동 기록이 없습니다';
 

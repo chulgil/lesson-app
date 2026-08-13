@@ -16,6 +16,7 @@ void main() {
             body: AcademyVisibilitySection(
               academies: const [],
               onToggle: (_, __) {},
+              onViewActivity: (_) {},
             ),
           ),
         ),
@@ -36,14 +37,17 @@ void main() {
                   academyId: 'acad_1',
                   academyName: 'OO음악학원',
                   consent: true,
+                  actorMemberId: 'member_1',
                 ),
                 AcademyVisibilityItem(
                   academyId: 'acad_2',
                   academyName: 'XX피아노학원',
                   consent: false,
+                  actorMemberId: 'member_2',
                 ),
               ],
               onToggle: (_, __) {},
+              onViewActivity: (_) {},
             ),
           ),
         ),
@@ -54,6 +58,38 @@ void main() {
       expect(find.text('OO음악학원'), findsOneWidget);
       expect(find.text('XX피아노학원'), findsOneWidget);
       expect(find.byType(Switch), findsNWidgets(2));
+    });
+
+    testWidgets('tapping the activity entry invokes onViewActivity with the '
+        "tapped academy's actorMemberId (#1264 orphan screen wiring)", (
+      tester,
+    ) async {
+      const item = AcademyVisibilityItem(
+        academyId: 'acad_1',
+        academyName: 'OO음악학원',
+        consent: true,
+        actorMemberId: 'member_1',
+      );
+      AcademyVisibilityItem? tapped;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AcademyVisibilitySection(
+              academies: const [item],
+              onToggle: (_, __) {},
+              onViewActivity: (academy) => tapped = academy,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.history));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(tapped, item);
+      expect(tapped?.actorMemberId, 'member_1');
     });
 
     testWidgets('toggling switch invokes onToggle with new value', (
@@ -70,9 +106,11 @@ void main() {
                   academyId: 'acad_1',
                   academyName: 'OO음악학원',
                   consent: false,
+                  actorMemberId: 'member_1',
                 ),
               ],
               onToggle: (id, value) => invocations.add((id, value)),
+              onViewActivity: (_) {},
             ),
           ),
         ),
@@ -95,9 +133,11 @@ void main() {
                   academyId: 'acad_1',
                   academyName: 'OO음악학원',
                   consent: true,
+                  actorMemberId: 'member_1',
                 ),
               ],
               onToggle: (_, __) {},
+              onViewActivity: (_) {},
               isLoading: true,
             ),
           ),

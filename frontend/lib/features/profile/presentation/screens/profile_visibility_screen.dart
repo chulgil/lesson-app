@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
@@ -268,6 +269,7 @@ class _ProfileVisibilityScreenState
                           academyId: a.academyId,
                           academyName: a.academyName,
                           consent: a.publicPageConsent,
+                          actorMemberId: a.actorMemberId,
                         ),
                       )
                       .toList(),
@@ -286,6 +288,14 @@ class _ProfileVisibilityScreenState
                 );
                 // Invalidate the academies list to refresh
                 ref.invalidate(teacherAcademiesProvider(profile.userId));
+              },
+              onViewActivity: (academy) {
+                final path = AppRoutes.academyActivityTimeline
+                    .replaceFirst(':academyId', academy.academyId)
+                    .replaceFirst(':actorMemberId', academy.actorMemberId);
+                context.push(
+                  '$path?actorName=${Uri.encodeComponent(profile.name)}',
+                );
               },
               isLoading: false,
             );
