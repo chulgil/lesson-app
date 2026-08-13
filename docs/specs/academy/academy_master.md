@@ -192,7 +192,7 @@
 - `AcademyActivityTimelineScreen` (`presentation/screens/academy_activity_timeline_screen.dart`)
   - 파라미터: `academyId`, `actorMemberId`, `actorName`
   - 활동 로그를 점-라인 타임라인으로 표시. 12시간 이내 항목은 "최근 변경" 강조. `actionType`별 색상/라벨 매핑(§3.2 참조). `NotebookScreenScaffold` + `AppStrings`/`AppColors`/`AppTypography` 사용.
-  - 라우트 미등록 (push 진입 가정). 현재 `app_routes.dart`에 전용 path 없음.
+  - 라우트 등록됨 (`academyActivityTimeline`, `/academy/:academyId/teachers/:actorMemberId/activity`, `academy_routes.dart`). 진입점: `ProfileVisibilityScreen`(profile feature)의 학원별 공개 페이지 노출 섹션에서 학원 행마다 "내 활동 보기" 버튼(#1264).
 
 ### 6.2 학원 관련 라우트 (다른 feature가 화면 보유)
 코드: `core/router/app_routes.dart`, `core/router/routes/`

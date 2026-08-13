@@ -22,21 +22,30 @@ class TeacherAcademyMembership {
   final String academyName;
   final bool publicPageConsent;
 
+  /// This teacher's per-academy member id (AcademyMember.id, e.g. "member_2").
+  /// Both mock and remote implementations already resolve this internally to
+  /// look up consent — exposed here so callers can address the academy
+  /// activity timeline route (`:actorMemberId`) without a second lookup.
+  final String actorMemberId;
+
   const TeacherAcademyMembership({
     required this.academyId,
     required this.academyName,
     required this.publicPageConsent,
+    required this.actorMemberId,
   });
 
   TeacherAcademyMembership copyWith({
     String? academyId,
     String? academyName,
     bool? publicPageConsent,
+    String? actorMemberId,
   }) {
     return TeacherAcademyMembership(
       academyId: academyId ?? this.academyId,
       academyName: academyName ?? this.academyName,
       publicPageConsent: publicPageConsent ?? this.publicPageConsent,
+      actorMemberId: actorMemberId ?? this.actorMemberId,
     );
   }
 
@@ -47,9 +56,13 @@ class TeacherAcademyMembership {
           runtimeType == other.runtimeType &&
           academyId == other.academyId &&
           academyName == other.academyName &&
-          publicPageConsent == other.publicPageConsent;
+          publicPageConsent == other.publicPageConsent &&
+          actorMemberId == other.actorMemberId;
 
   @override
   int get hashCode =>
-      academyId.hashCode ^ academyName.hashCode ^ publicPageConsent.hashCode;
+      academyId.hashCode ^
+      academyName.hashCode ^
+      publicPageConsent.hashCode ^
+      actorMemberId.hashCode;
 }

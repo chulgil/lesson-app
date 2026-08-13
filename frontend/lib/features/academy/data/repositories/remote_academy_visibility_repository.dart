@@ -61,6 +61,7 @@ class RemoteAcademyVisibilityRepository implements AcademyVisibilityRepository {
           academyId: academyId,
           academyName: academy['name'] as String,
           publicPageConsent: member.consent,
+          actorMemberId: member.memberId,
         ),
       );
     }

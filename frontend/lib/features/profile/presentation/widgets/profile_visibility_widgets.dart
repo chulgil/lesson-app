@@ -719,12 +719,14 @@ class ProfilePreviewContent extends StatelessWidget {
 class AcademyVisibilitySection extends StatefulWidget {
   final List<AcademyVisibilityItem> academies;
   final Function(String academyId, bool consent) onToggle;
+  final ValueChanged<AcademyVisibilityItem> onViewActivity;
   final bool isLoading;
 
   const AcademyVisibilitySection({
     super.key,
     required this.academies,
     required this.onToggle,
+    required this.onViewActivity,
     this.isLoading = false,
   });
 
@@ -824,7 +826,14 @@ class _AcademyVisibilitySectionState extends State<AcademyVisibilitySection> {
               ],
             ),
           ),
-          const SizedBox(width: AppSpacing.space3),
+          const SizedBox(width: AppSpacing.space1),
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: AppStrings.academyActivityTimelineEntryLabel,
+            color: AppColors.inkSecondary,
+            onPressed: () => widget.onViewActivity(academy),
+          ),
+          const SizedBox(width: AppSpacing.space1),
           Switch(
             value: value,
             onChanged:
@@ -844,21 +853,28 @@ class AcademyVisibilityItem {
   final String academyName;
   final bool consent;
 
+  /// This teacher's per-academy member id — used to enter the academy
+  /// activity timeline (`AppRoutes.academyActivityTimeline`).
+  final String actorMemberId;
+
   const AcademyVisibilityItem({
     required this.academyId,
     required this.academyName,
     required this.consent,
+    required this.actorMemberId,
   });
 
   AcademyVisibilityItem copyWith({
     String? academyId,
     String? academyName,
     bool? consent,
+    String? actorMemberId,
   }) {
     return AcademyVisibilityItem(
       academyId: academyId ?? this.academyId,
       academyName: academyName ?? this.academyName,
       consent: consent ?? this.consent,
+      actorMemberId: actorMemberId ?? this.actorMemberId,
     );
   }
 
@@ -869,9 +885,13 @@ class AcademyVisibilityItem {
           runtimeType == other.runtimeType &&
           academyId == other.academyId &&
           academyName == other.academyName &&
-          consent == other.consent;
+          consent == other.consent &&
+          actorMemberId == other.actorMemberId;
 
   @override
   int get hashCode =>
-      academyId.hashCode ^ academyName.hashCode ^ consent.hashCode;
+      academyId.hashCode ^
+      academyName.hashCode ^
+      consent.hashCode ^
+      actorMemberId.hashCode;
 }
