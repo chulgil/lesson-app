@@ -6,7 +6,7 @@ import 'package:lessonaza/features/schedule/data/repositories/mock_teacher_avail
 import 'package:lessonaza/features/schedule/domain/entities/availability_slot.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
 
-/// Regression (#bug2): BookingRescheduleScreen._performReschedule must be
+/// Regression (#bug2): BookingRescheduleSheet._performReschedule must be
 /// atomic — book the NEW slot first, only then cancel the OLD booking, and roll
 /// back the new booking if the cancel fails. A failure must never leave the
 /// student with zero reservations (lost booking).
@@ -64,8 +64,8 @@ class _RecordingRepo extends MockTeacherAvailabilityRepository {
   }
 }
 
-/// Replicates the screen's atomic reschedule sequence
-/// (BookingRescheduleScreen._performReschedule).
+/// Replicates the sheet's atomic reschedule sequence
+/// (BookingRescheduleSheet._performReschedule).
 Future<void> performAtomicReschedule(
   SlotBookingNotifier notifier,
   ProviderContainer container, {

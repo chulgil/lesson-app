@@ -6,7 +6,7 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/schedule/data/repositories/mock_teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/domain/entities/availability_slot.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/teacher_availability_providers.dart';
-import 'package:lessonaza/features/schedule/presentation/screens/booking_reschedule_screen.dart';
+import 'package:lessonaza/features/schedule/presentation/widgets/booking_reschedule_bottom_sheet.dart';
 
 /// 변경(reschedule)도 취소와 동일한 마감정책(reschedule_credit_spec §3,
 /// CancellationCreditPolicy = SSOT)을 따르는지.
@@ -17,6 +17,10 @@ import 'package:lessonaza/features/schedule/presentation/screens/booking_resched
 /// 항상 렌더되는 변경권 배지로 검증한다(액션 버튼은 슬롯 선택 후에만 표시).
 /// 타이밍 결정성: 레슨은 항상 now+2일. deadlineHours 로 마감 전/후를 뒤집는다
 /// (12h → deadline 미래=마감 전 / 100h → deadline 과거=마감 후). 벽시계 무관.
+///
+/// #1268 — 풀스크린 `BookingRescheduleScreen`을 바텀시트 `BookingRescheduleSheet`로
+/// 통합(schedule_change_unification_spec.md §2.3, 즉시확정 정책은 불변). 시트
+/// 콘텐츠 위젯은 public이라 모달 트리거 없이 직접 pump 가능.
 
 /// 슬롯을 지연 없이 1개 반환해 빈 상태(nextAvailableDates) 진입과 Timer 누출을 막는다.
 class _ImmediateRepo extends MockTeacherAvailabilityRepository {
@@ -55,7 +59,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
-          home: BookingRescheduleScreen(
+          home: BookingRescheduleSheet(
             teacherId: 't1',
             teacherName: '선생님',
             studentId: 's1',
