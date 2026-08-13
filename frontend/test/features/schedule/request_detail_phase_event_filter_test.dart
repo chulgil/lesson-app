@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
-import 'package:lessonaza/features/schedule/presentation/screens/request_detail_screen.dart';
+import 'package:lessonaza/features/schedule/presentation/utils/request_detail_phase_filter.dart';
 import 'package:lessonaza/features/schedule/presentation/widgets/request_history_chat.dart';
 
 void main() {
