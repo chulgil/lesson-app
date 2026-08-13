@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../domain/entities/tip_template.dart';
@@ -340,25 +341,8 @@ class _TipTemplateBottomSheetState
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error:
-          (error, _) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.paperAccent,
-                ),
-                const SizedBox(height: AppSpacing.space3),
-                Text(
-                  AppStrings.templateLoadFailed,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          (error, _) =>
+              const ErrorStateWidget(title: AppStrings.templateLoadFailed),
     );
   }
 

@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../providers/assignment_summary_provider.dart';
@@ -28,21 +29,10 @@ class AssignmentDashboardScreen extends ConsumerWidget {
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-              const SizedBox(height: AppSpacing.space3),
-              Text(AppStrings.cannotLoadData, style: AppTypography.bodyMedium),
-              const SizedBox(height: AppSpacing.space3),
-              OutlinedButton(
-                onPressed: () =>
-                    ref.invalidate(weeklyAssignmentSummaryProvider),
-                child: const Text(AppStrings.retry),
-              ),
-            ],
-          ),
+        error: (_, __) => ErrorStateWidget(
+          title: AppStrings.cannotLoadData,
+          actionLabel: AppStrings.retry,
+          onAction: () => ref.invalidate(weeklyAssignmentSummaryProvider),
         ),
         data: (summary) => _buildContent(context, summary),
       ),
