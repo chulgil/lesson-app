@@ -9,8 +9,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lessonaza/core/providers/repository_provider.dart';
+import 'package:lessonaza/features/lessons/lessons_facade.dart';
+import 'package:lessonaza/features/notifications/domain/entities/notification.dart';
+import 'package:lessonaza/features/notifications/domain/services/notification_service.dart';
+import 'package:lessonaza/features/students/data/repositories/mock_teacher_announcement_repository.dart';
 import 'package:lessonaza/features/students/domain/entities/teacher_announcement.dart';
 import 'package:lessonaza/features/students/presentation/providers/teacher_announcement_providers.dart';
+
+/// Silent no-op — the dayOff create path fires notifications; the real
+/// service would touch the platform plugin (absent in unit tests, causing a
+/// LateInitializationError flake depending on test order).
+class _SilentNotificationService implements NotificationService {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<void> showNotification(AppNotification notification) async {}
+
+  @override
+  Future<void> scheduleNotification(AppNotification notification) async {}
+
+  @override
+  Future<void> cancelNotification(String id) async {}
+
+  @override
+  Future<void> cancelAllNotifications() async {}
+
+  @override
+  Stream<AppNotification> get onNotificationTapped => const Stream.empty();
+}
 
 void main() {
   const teacherId = 'teacher_1';
@@ -18,7 +48,15 @@ void main() {
 
   test('공지 쓰기 무효화가 휴강일(dayOffs) 읽기 provider 도 재요청시킨다', () async {
     final container = ProviderContainer(
-      overrides: [mockDataModeProvider.overrideWithValue(true)],
+      overrides: [
+        mockDataModeProvider.overrideWithValue(true),
+        teacherAnnouncementRepositoryProvider.overrideWith(
+          (ref) => MockTeacherAnnouncementRepository(
+            lessonRepository: ref.watch(lessonRepositoryProvider),
+            notificationService: _SilentNotificationService(),
+          ),
+        ),
+      ],
     );
     addTearDown(container.dispose);
 
