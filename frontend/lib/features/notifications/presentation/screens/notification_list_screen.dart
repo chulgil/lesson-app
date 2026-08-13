@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
@@ -182,25 +183,7 @@ class _NotificationListScreenState
   }
 
   Widget _buildErrorState(Object error) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            size: 48,
-            color: AppColors.paperAccent,
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            AppStrings.notifLoadError,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
+    return const ErrorStateWidget(title: AppStrings.notifLoadError);
   }
 
   void _handleNotificationTap(AppNotification notification) {

@@ -8,6 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart' show ShareParams, SharePlus;
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -75,37 +76,11 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   }
 
   Widget _buildError() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              AppStrings.inviteCreateErrorTitle,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.inviteCreateErrorSubtitle,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            ElevatedButton(
-              onPressed: _createNewInvite,
-              child: const Text(AppStrings.retry),
-            ),
-          ],
-        ),
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.inviteCreateErrorTitle,
+      subtitle: AppStrings.inviteCreateErrorSubtitle,
+      actionLabel: AppStrings.retry,
+      onAction: _createNewInvite,
     );
   }
 

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/like_stamp.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/pencil_primitives.dart';
@@ -40,30 +41,13 @@ class PracticeItemsSection extends ConsumerWidget {
           child: CircularProgressIndicator(),
         ),
       ),
-      error: (error, _) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space6),
-          child: Column(
-            children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
-              const SizedBox(height: AppSpacing.space3),
-              Text(
-                AppStrings.loadDataFailed,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              TextButton.icon(
-                onPressed: () => ref
-                    .read(lessonWidgetPracticeItemActionsProvider(lessonId))
-                    .invalidateItems(),
-                icon: const Icon(Icons.refresh),
-                label: const Text(AppStrings.retry),
-              ),
-            ],
-          ),
-        ),
+      error: (error, _) => ErrorStateWidget(
+        title: AppStrings.loadDataFailed,
+        actionLabel: AppStrings.retry,
+        actionIcon: Icons.refresh,
+        onAction: () => ref
+            .read(lessonWidgetPracticeItemActionsProvider(lessonId))
+            .invalidateItems(),
       ),
     );
   }

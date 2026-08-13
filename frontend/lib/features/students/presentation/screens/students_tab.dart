@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/notebook_radio.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
@@ -704,29 +705,14 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   Widget _buildErrorState(Object error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            AppStrings.loadDataFailed,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.inkSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space6),
-          OutlinedButton.icon(
-            onPressed: () {
-              final teacherId = ref.read(currentUserIdProvider);
-              ref.invalidate(groupedStudentsProvider(teacherId));
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text(AppStrings.retry),
-          ),
-        ],
-      ),
+    return ErrorStateWidget(
+      title: AppStrings.loadDataFailed,
+      actionLabel: AppStrings.retry,
+      actionIcon: Icons.refresh,
+      onAction: () {
+        final teacherId = ref.read(currentUserIdProvider);
+        ref.invalidate(groupedStudentsProvider(teacherId));
+      },
     );
   }
 }
