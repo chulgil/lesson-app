@@ -28,7 +28,7 @@ class ExtendedProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
             (_, __) =>
-                const Center(child: Text(AppStrings.profileExtendedError)),
+                const Center(child: Text(AppStrings.genericError)),
         data: (profile) {
           if (profile == null) {
             return const Center(

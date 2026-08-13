@@ -716,7 +716,7 @@ class _UpcomingLessonSection extends ConsumerWidget {
           final next = _nextScheduledLesson(lessons);
           if (next == null) {
             return const _SectionEmpty(
-              message: AppStrings.parentHomeNoUpcomingLesson,
+              message: AppStrings.noUpcomingLessons,
             );
           }
           final dDay = DateTime(next.date.year, next.date.month, next.date.day)

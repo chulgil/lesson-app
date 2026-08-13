@@ -145,7 +145,7 @@ class _LessonsList extends StatelessWidget {
             const SizedBox(height: AppSpacing.space3),
             if (upcoming.isEmpty)
               const _LessonsEmptyRow(
-                message: AppStrings.parentHomeNoUpcomingLessons,
+                message: AppStrings.noUpcomingLessons,
               )
             else
               for (final lesson in upcoming) ...[

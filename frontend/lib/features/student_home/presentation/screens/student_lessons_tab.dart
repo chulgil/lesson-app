@@ -395,7 +395,7 @@ class StudentLessonsTab extends ConsumerWidget {
       height: 240,
       child: EmptyStateWidget(
         icon: Icons.event_available,
-        title: AppStrings.studentHomeNoUpcomingLesson,
+        title: AppStrings.noUpcomingLessons,
         subtitle: AppStrings.studentHomeBookNewLesson,
         actionLabel: AppStrings.studentHomeFindTeacher,
         actionIcon: Icons.search,

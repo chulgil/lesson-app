@@ -127,7 +127,7 @@ class _ProfileVisibilityScreenState
           loading: () => const Center(child: CircularProgressIndicator()),
           error:
               (_, __) => const Center(
-                child: Text(AppStrings.profileVisibilityErrorState),
+                child: Text(AppStrings.genericError),
               ),
           data: (profile) {
             if (profile == null) {
