@@ -88,7 +88,7 @@ class _RepertoireDetailScreenState
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
             (_, __) =>
-                const Center(child: Text(AppStrings.practiceErrorOccurredDot)),
+                const Center(child: Text(AppStrings.genericError)),
       ),
     );
   }

@@ -34,7 +34,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) =>
-            const Center(child: Text(AppStrings.profileOutstandingError)),
+            const Center(child: Text(AppStrings.genericError)),
       ),
     );
   }

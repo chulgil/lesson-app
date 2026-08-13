@@ -380,7 +380,7 @@ class _TipTemplateManagementScreenState
                       TextField(
                         controller: instrumentController,
                         decoration: const InputDecoration(
-                          labelText: '악기 (선택)',
+                          labelText: AppStrings.profileTipTemplateInstrumentLabel,
                           hintText: AppStrings.profileTipTemplateInstrumentHint,
                           border: OutlineInputBorder(),
                         ),
@@ -496,7 +496,7 @@ class _TipTemplateManagementScreenState
                       TextField(
                         controller: instrumentController,
                         decoration: const InputDecoration(
-                          labelText: '악기 (선택)',
+                          labelText: AppStrings.profileTipTemplateInstrumentLabel,
                           hintText: AppStrings.profileTipTemplateInstrumentHint,
                           border: OutlineInputBorder(),
                         ),

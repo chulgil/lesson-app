@@ -159,7 +159,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text(AppStrings.parentHomeNoUpcomingLesson), findsOneWidget);
+      expect(find.text(AppStrings.noUpcomingLessons), findsOneWidget);
       // 잔여 = 8 - 3 = 5회
       expect(find.textContaining('5회'), findsWidgets);
       expect(tester.takeException(), isNull);

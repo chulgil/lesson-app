@@ -1394,6 +1394,9 @@ class AppStrings {
   /// 오류가 발생했습니다
   static const errorOccurred = '오류가 발생했습니다';
 
+  /// 오류가 발생했습니다. (여러 에러 상태 화면 공용 — 마침표 포함)
+  static const genericError = '오류가 발생했습니다.';
+
   /// 레슨 정보를 찾을 수 없습니다
   static const lessonInfoNotFound = '레슨 정보를 찾을 수 없습니다';
 
@@ -5451,9 +5454,6 @@ class AppStrings {
   static const profileVisibilitySaveErrorSnackbar =
       '저장 중 오류가 발생했습니다. 다시 시도해주세요.';
 
-  /// 오류가 발생했습니다. (프로필 로딩 에러 상태)
-  static const profileVisibilityErrorState = '오류가 발생했습니다.';
-
   /// 프로필을 찾을 수 없습니다 (프로필 null 상태)
   static const profileVisibilityNullState = '프로필을 찾을 수 없습니다';
 
@@ -5825,9 +5825,6 @@ class AppStrings {
   /// 녹음 백업 (AppBar 타이틀)
   static const backupAppBarTitle = '녹음 백업';
 
-  /// 오류가 발생했습니다. (백업 로딩 에러 상태 — 마침표 포함)
-  static const backupErrorState = '오류가 발생했습니다.';
-
   // ── Backup Service Progress (백업/복원 진행 상태 5-3d-2) ───────────────
 
   /// 백업 준비 중... (createBackup 진입)
@@ -5920,9 +5917,6 @@ class AppStrings {
 
   /// 새로고침 (refresh IconButton tooltip — 다도메인 재사용 가능)
   static const refreshTooltip = '새로고침';
-
-  /// 오류가 발생했습니다. (per-domain error state — backup/profileVisibility 패턴)
-  static const allRecordingsErrorState = '오류가 발생했습니다.';
 
   /// 파일을 읽을 수 없습니다 (file path null SnackBar)
   static const allRecordingsFileReadError = '파일을 읽을 수 없습니다';
@@ -7275,7 +7269,6 @@ class AppStrings {
   static const studentHomePracticeGoalAchievement = '주간 달성률';
   static const studentHomeRecentFeedback = '최근 피드백';
   static const studentHomeFindTeacher = '선생님 찾기';
-  static const studentHomeNoUpcomingLesson = '예정된 레슨이 없습니다';
   static const studentHomeBookLessonSuggestion = '선생님을 찾아 레슨을 예약해보세요';
   static const studentHomeHelpTitle = '도움말';
   static const studentHomeFaqTitle = '자주 묻는 질문';
@@ -7493,7 +7486,6 @@ class AppStrings {
   // ── Parent Dashboard / Assignments (실데이터) ──────────────
   static const parentHomeNotLinked = '선생님과 연결되지 않았습니다';
   static const parentHomeNotLinkedDesc = '선생님 연결 후 레슨·연습 정보가 표시됩니다';
-  static const parentHomeNoUpcomingLesson = '예정된 레슨이 없습니다';
   static const parentHomeNoAssignment = '등록된 과제가 없습니다';
   static const parentHomeRemainingLesson = '수강권 잔여';
   static const parentHomeThisWeekPractice = '이번 주 연습';
@@ -7617,7 +7609,6 @@ class AppStrings {
       '$enabled/$total개 알림 활성화';
   static const parentHomeCompletedLabel = '완료됨';
   // ── Parent Lessons tab (실데이터) + 노트 접근동의 게이트 ──────
-  static const parentHomeNoUpcomingLessons = '예정된 레슨이 없습니다';
   static const parentHomeNoPastLessons = '지난 레슨이 없습니다';
   static const parentHomeLessonLoadError = '레슨 정보를 불러오지 못했습니다';
   static const parentHomeChildNotLinked = '아직 선생님과 연결되지 않았습니다';
@@ -7902,7 +7893,6 @@ class AppStrings {
   static const practiceSectionSearchHint = '레퍼토리 또는 섹션 검색...';
   static const practiceEdit = '편집';
   static const practiceMoveToArchive = '아카이브로 이동';
-  static const practiceErrorOccurredDot = '오류가 발생했습니다.';
   static const practiceStatsTitle = '연습 통계';
   static const practiceTotalCountLabel = '총 연습 횟수';
   static const practiceTotalRecordingLabel = '총 녹음';
@@ -8053,7 +8043,6 @@ class AppStrings {
 
   // ── Extended Profile (Credentials) ──
   static const profileExtendedTitle = '학력·경력·자격증';
-  static const profileExtendedError = '오류가 발생했습니다.';
   static const profileExtendedNotFound = '프로필을 찾을 수 없습니다';
   static const profileEducationEmpty = '학력 정보가 없습니다';
   static const profileEducationAdd = '학력 추가';
@@ -8143,7 +8132,6 @@ class AppStrings {
 
   // ── Instrument Management ──
   static const profileInstrumentTitle = '악기 관리';
-  static const profileInstrumentError = '오류가 발생했습니다.';
   static const profileInstrumentCurrentSection = '현재 가르치는 악기';
   static const profileInstrumentAddSection = '악기 추가';
   static const profileInstrumentHintCustom = '악기 이름 입력';
@@ -8208,7 +8196,6 @@ class AppStrings {
 
   // ── Lesson Time Settings ──
   static const profileLessonTimeTitle = '레슨 시간 설정';
-  static const profileLessonTimeError = '오류가 발생했습니다.';
   static const profileLessonTimeOptionsSection = '레슨 시간 옵션';
 
   /// 레슨 시간 사용 토글 박스 — 사용중
@@ -8308,7 +8295,6 @@ class AppStrings {
 
   // ── Outstanding Payments ──
   static const profileOutstandingTitle = '미수금 관리';
-  static const profileOutstandingError = '오류가 발생했습니다.';
   static const profileOutstandingEmpty = '미수금 항목이 없습니다';
   static const profileOutstandingListTitle = '미수금 목록';
   static const profileOutstandingSendReminder = '알림 보내기';
@@ -8367,6 +8353,7 @@ class AppStrings {
   static const profileTipTemplateAddDialogTitle = '새 템플릿 추가';
   static const profileTipTemplateContentHint = '템플릿 내용을 입력하세요';
   static const profileTipTemplateInstrumentHint = '예: 바이올린, 피아노';
+  static const profileTipTemplateInstrumentLabel = '악기 (선택)';
   static const profileTipTemplateContentRequired = '내용을 입력해주세요';
   static const profileTipTemplateAdded = '템플릿이 추가되었습니다';
   static const profileTipTemplateEditDialogTitle = '템플릿 수정';
@@ -8459,6 +8446,7 @@ class AppStrings {
   static const studentBulkMessageTitle = '일괄 메시지 보내기';
   static const studentBulkMessageBodyHint = '메시지 내용을 입력하세요';
   static const studentBulkMessageTitleHint = '예) 5월 연휴 일정 안내';
+  static const studentBulkMessageBodyLabel = '내용';
   static const studentSubscriptionStatus = '수강권 현황';
   static const studentSubscriptionIssue = '발급';
 
@@ -8481,7 +8469,6 @@ class AppStrings {
   static const studentDetailStatsPreparing = '상세 통계 기능은 준비 중입니다';
   static const studentDetailStatsButton = '상세 통계 보기';
   static const studentNoPhone = '전화번호 미등록';
-  static const studentUpcomingLessonsEmpty = '예정된 레슨이 없습니다';
   static const studentRecentLessonsEmpty = '완료된 레슨이 없습니다';
   static const formSectionBasicInfo = '기본 정보';
   static const formSectionGuardianInfo = '보호자 정보';

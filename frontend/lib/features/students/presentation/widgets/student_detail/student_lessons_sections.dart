@@ -64,7 +64,7 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
                     Icon(Icons.event_busy, color: AppColors.inkTertiary),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
-                      AppStrings.studentUpcomingLessonsEmpty,
+                      AppStrings.noUpcomingLessons,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.inkSecondary,
                       ),

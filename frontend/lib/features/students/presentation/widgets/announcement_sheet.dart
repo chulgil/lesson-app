@@ -250,7 +250,7 @@ class _AnnouncementSheetState extends ConsumerState<AnnouncementSheet> {
           maxLines: 4,
           maxLength: 200,
           decoration: InputDecoration(
-            labelText: '메시지',
+            labelText: AppStrings.messageLabel,
             hintText: AppStrings.announcementMessageHint,
             border: const OutlineInputBorder(),
             suffixIcon: _messageController.text.isNotEmpty

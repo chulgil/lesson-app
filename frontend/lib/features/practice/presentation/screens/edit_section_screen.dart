@@ -369,7 +369,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               TextFormField(
                 controller: _pieceNameController,
                 decoration: const InputDecoration(
-                  labelText: '곡/연습곡 이름 *',
+                  labelText: AppStrings.practicePieceNameLabel,
                   hintText: AppStrings.practicePieceNameHint,
                   prefixIcon: Icon(Icons.music_note),
                 ),
@@ -485,7 +485,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 TextFormField(
                   controller: _sectionNameController,
                   decoration: InputDecoration(
-                    labelText: '섹션 별칭 (선택)',
+                    labelText: AppStrings.practiceSectionAliasLabel,
                     hintText: AppStrings.practiceSectionAliasHint,
                     helperText: '비워두면 "${_getRangePreviewText()}"로 표시됩니다',
                     prefixIcon: const Icon(Icons.label_outline),

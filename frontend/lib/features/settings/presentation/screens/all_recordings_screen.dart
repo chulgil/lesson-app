@@ -79,7 +79,7 @@ class AllRecordingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.space4),
                     const Text(
-                      AppStrings.allRecordingsErrorState,
+                      AppStrings.genericError,
                       style: TextStyle(color: AppColors.paperAccent),
                     ),
                     const SizedBox(height: AppSpacing.space4),

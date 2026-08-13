@@ -68,7 +68,7 @@ class NextLessonCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  AppStrings.studentHomeNoUpcomingLesson,
+                  AppStrings.noUpcomingLessons,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.inkSecondary,
                   ),

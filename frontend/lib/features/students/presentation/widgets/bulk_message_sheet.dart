@@ -106,7 +106,7 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 controller: _titleController,
                 maxLength: 40,
                 decoration: const InputDecoration(
-                  labelText: '제목',
+                  labelText: AppStrings.titleLabel,
                   hintText: AppStrings.studentBulkMessageTitleHint,
                   border: OutlineInputBorder(),
                 ),
@@ -119,7 +119,7 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
                 maxLines: 5,
                 maxLength: 300,
                 decoration: const InputDecoration(
-                  labelText: '내용',
+                  labelText: AppStrings.studentBulkMessageBodyLabel,
                   hintText: AppStrings.studentBulkMessageBodyHint,
                   border: OutlineInputBorder(),
                 ),

@@ -112,7 +112,7 @@ class _InstrumentManagementScreenState
                     color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
-                  const Text(AppStrings.profileInstrumentError),
+                  const Text(AppStrings.genericError),
                   const SizedBox(height: AppSpacing.space4),
                   FilledButton(
                     onPressed:
