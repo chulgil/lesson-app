@@ -278,7 +278,7 @@ class _Marker extends StatelessWidget {
                 editable
                     ? [
                       BoxShadow(
-                        color: AppColors.paperAccent.withValues(alpha: 0.3),
+                        color: AppColors.paperAccentSelected,
                         blurRadius: 4,
                       ),
                     ]

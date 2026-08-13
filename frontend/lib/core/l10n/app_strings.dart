@@ -8291,6 +8291,7 @@ class AppStrings {
   static const profileRepertoireAssignStudent = '학생에게 할당';
   static const profileRepertoirePieceEditTitle = '곡 수정';
   static const profileRepertoirePieceAddTitle = '곡 추가';
+  static const profileRepertoirePieceTitleLabel = '곡 제목 *';
   static const profileRepertoireHintTitle = '예: 봄의 소리 왈츠';
   static const profileRepertoireHintComposer = '예: J. Strauss II';
   static const profileRepertoireHintOpus = '예: Op. 410';

@@ -150,8 +150,18 @@ class AppColors {
   static const paperMargin = Color(0xFFA83E3A);
   static const paperAccent = Color(0xFF9B1B12); // 핵심 액션 (회차권 — 빨간 펜 출석 체크)
   static const paperAccentSoft = Color(0x1F9B1B12); // 12% alpha
+  // 선택/활성 tint (칩 selectedColor, 강조 테두리, 캔버스 마커 등). 30% alpha.
+  static const paperAccentSelected = Color(0x4D9B1B12);
+  // 비활성 컨트롤 배경 (disabledBackgroundColor 등). 50% alpha.
+  static const paperAccentDisabled = Color(0x809B1B12);
+  // 상태 아이콘 tint — Soft/Selected보다 진하게. 70% alpha.
+  static const paperAccentStrong = Color(0xB39B1B12);
   static const paperOk = Color(0xFF3F5D2F); // 완료 / 정기권 (녹색 펜 — 안정·꾸준)
   static const paperOkSoft = Color(0x1F3F5D2F); // 12% alpha
+  // 선택/활성 tint (배지, 강조 테두리, 캔버스 마커 등). 30% alpha.
+  static const paperOkSelected = Color(0x4D3F5D2F);
+  // 상태 아이콘 tint — Soft/Selected보다 진하게. 70% alpha.
+  static const paperOkStrong = Color(0xB33F5D2F);
   static const paperTrial = Color(0xFFC4923A); // 체험레슨 (세피아 앰버 — 빈티지 잉크 톤)
   static const paperTrialSoft = Color(0x1FC4923A); // 12% alpha
   static const paperHighlight = Color(0xFFF7D755); // 형광펜

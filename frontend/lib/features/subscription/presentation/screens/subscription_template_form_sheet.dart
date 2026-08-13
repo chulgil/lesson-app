@@ -80,9 +80,10 @@ class _SubscriptionTemplateFormSheetState
       text: t != null ? formatPriceWithCommas(t.price) : '',
     );
     _regularPriceController = TextEditingController(
-      text: t?.regularPrice != null
-          ? formatPriceWithCommas(t!.regularPrice!)
-          : '',
+      text:
+          t?.regularPrice != null
+              ? formatPriceWithCommas(t!.regularPrice!)
+              : '',
     );
     _customLessonsController = TextEditingController();
     _customDurationController = TextEditingController();
@@ -159,9 +160,8 @@ class _SubscriptionTemplateFormSheetState
     final regular = parsePrice(_regularPriceController.text);
     final sale = parsePrice(_priceController.text);
     final hasDiscount = regular != null && sale != null && regular > sale;
-    final discountPct = hasDiscount
-        ? (((regular - sale) / regular) * 100).round()
-        : 0;
+    final discountPct =
+        hasDiscount ? (((regular - sale) / regular) * 100).round() : 0;
 
     return Container(
       decoration: const BoxDecoration(
@@ -382,26 +382,27 @@ class _SubscriptionTemplateFormSheetState
                       vertical: AppSpacing.space3,
                     ),
                   ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.paper,
+                  child:
+                      _isSaving
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.paper,
+                              ),
+                            ),
+                          )
+                          : Text(
+                            isEditing
+                                ? AppStrings.templateSaveEdit
+                                : AppStrings.templateSaveAdd,
+                            style: AppTypography.bodyLarge.copyWith(
+                              color: AppColors.paper,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        )
-                      : Text(
-                          isEditing
-                              ? AppStrings.templateSaveEdit
-                              : AppStrings.templateSaveAdd,
-                          style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.paper,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -417,13 +418,12 @@ class _SubscriptionTemplateFormSheetState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: _isAutoProposalEnabled
-            ? AppColors.paperOk.withValues(alpha: 0.05)
-            : AppColors.paper,
+        color: _isAutoProposalEnabled ? AppColors.paperOkSoft : AppColors.paper,
         border: Border.all(
-          color: _isAutoProposalEnabled
-              ? AppColors.paperOk.withValues(alpha: 0.3)
-              : AppColors.inkQuaternary,
+          color:
+              _isAutoProposalEnabled
+                  ? AppColors.paperOkSelected
+                  : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -457,18 +457,20 @@ class _SubscriptionTemplateFormSheetState
                       Icon(
                         Icons.flash_on,
                         size: 18,
-                        color: _isAutoProposalEnabled
-                            ? AppColors.paperOk
-                            : AppColors.inkTertiary,
+                        color:
+                            _isAutoProposalEnabled
+                                ? AppColors.paperOk
+                                : AppColors.inkTertiary,
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
                         AppStrings.templateAutoProposalCheckbox,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: _isAutoProposalEnabled
-                              ? AppColors.ink
-                              : AppColors.inkSecondary,
+                          color:
+                              _isAutoProposalEnabled
+                                  ? AppColors.ink
+                                  : AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -516,9 +518,10 @@ class _SubscriptionTemplateFormSheetState
         validityDays: _validityDays,
         price: sale,
         regularPrice: regularPrice,
-        description: _descriptionController.text.trim().isNotEmpty
-            ? _descriptionController.text.trim()
-            : null,
+        description:
+            _descriptionController.text.trim().isNotEmpty
+                ? _descriptionController.text.trim()
+                : null,
         isActive: widget.template?.isActive ?? true,
         displayOrder: widget.template?.displayOrder ?? 0,
         createdAt: widget.template?.createdAt ?? DateTime.now(),

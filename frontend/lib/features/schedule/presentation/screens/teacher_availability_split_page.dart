@@ -847,9 +847,7 @@ class _ExceptionsPanel extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space2,
                   ),
-                  side: BorderSide(
-                    color: AppColors.paperAccent.withValues(alpha: 0.3),
-                  ),
+                  side: BorderSide(color: AppColors.paperAccentSelected),
                   shape: const RoundedRectangleBorder(),
                 ),
               ),

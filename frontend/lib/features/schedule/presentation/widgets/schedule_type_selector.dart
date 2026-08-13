@@ -115,7 +115,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.paperOk.withValues(alpha: 0.15),
+                              color: AppColors.paperOkSoft,
                             ),
                             child: Text(
                               '권장',

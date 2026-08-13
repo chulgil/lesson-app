@@ -139,9 +139,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.paperAccentSoft,
-                ),
+                decoration: BoxDecoration(color: AppColors.paperAccentSoft),
                 child: const Icon(
                   Icons.event_busy,
                   color: AppColors.paperAccent,
@@ -180,9 +178,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperAccentSoft,
-          border: Border.all(
-            color: AppColors.paperAccent.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: AppColors.paperAccentSelected),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,9 +239,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.paperAccentSoft,
-          border: Border.all(
-            color: AppColors.paperAccent.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: AppColors.paperAccentSelected),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,10 +397,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            onPressed:
-                canCancel && !_isLoading
-                    ? () => _handleCancel()
-                    : null,
+            onPressed: canCancel && !_isLoading ? () => _handleCancel() : null,
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.paperAccent,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
@@ -500,9 +491,10 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   /// Cancellation credit outcome per spec (CancellationCreditPolicy = SSOT).
   CancellationCreditOutcome _computeOutcome() =>
       const CancellationCreditPolicy().compute(
-        reason: widget.isTeacherCancel
-            ? CancelReason.teacherCancel
-            : CancelReason.studentSchedule,
+        reason:
+            widget.isTeacherCancel
+                ? CancelReason.teacherCancel
+                : CancelReason.studentSchedule,
         lessonStart: _lessonStart(),
         now: DateTime.now(),
         deadlineHours: widget.cancelDeadlineHours,

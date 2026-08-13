@@ -80,10 +80,7 @@ Widget buildSuggestAlternativePreferredSlotsSection({
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected
-                          ? AppColors.paperOk.withValues(alpha: 0.08)
-                          : AppColors.paper,
+                  color: isSelected ? AppColors.paperOkSoft : AppColors.paper,
                   border: Border.all(
                     color:
                         isSelected

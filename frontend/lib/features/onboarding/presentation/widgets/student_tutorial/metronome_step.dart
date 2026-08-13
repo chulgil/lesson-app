@@ -168,7 +168,10 @@ class _MetronomeStepState extends State<MetronomeStep> {
                   ),
                   minimumSize: const Size(0, AppSpacing.buttonHeight),
                 ),
-                child: Text(AppStrings.tutorialMetronomePlay, style: AppTypography.button),
+                child: Text(
+                  AppStrings.tutorialMetronomePlay,
+                  style: AppTypography.button,
+                ),
               ),
             ),
 
@@ -179,7 +182,7 @@ class _MetronomeStepState extends State<MetronomeStep> {
               child: ElevatedButton(
                 onPressed: null, // Disabled during playback
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.paperAccent.withValues(alpha: 0.5),
+                  backgroundColor: AppColors.paperAccentDisabled,
                   foregroundColor: AppColors.paper,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero,

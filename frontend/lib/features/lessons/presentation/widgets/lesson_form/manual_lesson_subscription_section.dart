@@ -102,16 +102,15 @@ class _ResolvedBanner extends StatelessWidget {
       studentInstrument: studentInstrument,
     );
 
-    final message = hasSub
-        ? AppStrings.activeSubscriptionBanner(
-            subscription!.remainingLessons ?? 0,
-            subscription!.totalLessonsForDisplay ?? 0,
-          )
-        : AppStrings.noActiveSubscriptionBanner;
+    final message =
+        hasSub
+            ? AppStrings.activeSubscriptionBanner(
+              subscription!.remainingLessons ?? 0,
+              subscription!.totalLessonsForDisplay ?? 0,
+            )
+            : AppStrings.noActiveSubscriptionBanner;
     final icon = hasSub ? Icons.check_circle_outline : Icons.info_outline;
-    final bgColor = hasSub
-        ? AppColors.paperOk.withValues(alpha: 0.08)
-        : AppColors.paperDark;
+    final bgColor = hasSub ? AppColors.paperOkSoft : AppColors.paperDark;
     final iconColor = hasSub ? AppColors.paperOk : AppColors.ink;
 
     return Padding(
@@ -121,9 +120,7 @@ class _ResolvedBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           border: Border.all(
-            color: hasSub
-                ? AppColors.paperOk.withValues(alpha: 0.3)
-                : AppColors.inkQuaternary,
+            color: hasSub ? AppColors.paperOkSelected : AppColors.inkQuaternary,
           ),
         ),
         child: Column(
@@ -243,9 +240,10 @@ class _InstrumentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pair = InstrumentColors.getColor(instrument);
-    final label = inherited
-        ? AppStrings.manualLessonInstrumentInherited(instrument)
-        : AppStrings.manualLessonInstrumentFromStudent(instrument);
+    final label =
+        inherited
+            ? AppStrings.manualLessonInstrumentInherited(instrument)
+            : AppStrings.manualLessonInstrumentFromStudent(instrument);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,

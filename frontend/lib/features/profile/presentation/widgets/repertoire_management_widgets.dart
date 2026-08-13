@@ -14,19 +14,18 @@ import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/domain/entities/piece.dart';
 import 'piece_actions_bottom_sheet.dart';
 
-/// Get color for difficulty level
+/// Difficulty tier color — SSOT for the 5 difficulty labels, collapsed to
+/// 3 tiers (초급/초중급 · 중급/중상급 · 상급) to satisfy the "3색 이하" UX rule.
 Color getDifficultyColor(String? difficulty) {
   switch (difficulty) {
     case '초급':
-      return AppColors.paperOk;
     case '초중급':
-      return AppColors.profileGreen;
+      return AppColors.paperOk;
     case '중급':
-      return AppColors.amber;
     case '중상급':
       return AppColors.paperAccent;
     case '상급':
-      return AppColors.paperAccent;
+      return AppColors.inkSecondary;
     default:
       return AppColors.inkSecondary;
   }
@@ -135,9 +134,10 @@ class RepertoireEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyStateWidget(
       icon: Icons.library_music,
-      title: hasFilters
-          ? AppStrings.searchNoResults
-          : AppStrings.repertoireEmptyTitle,
+      title:
+          hasFilters
+              ? AppStrings.searchNoResults
+              : AppStrings.repertoireEmptyTitle,
       subtitle: AppStrings.repertoireEmptyHint,
     );
   }
@@ -377,7 +377,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: '곡 제목 *',
+                  labelText: AppStrings.profileRepertoirePieceTitleLabel,
                   hintText: AppStrings.profileRepertoireHintTitle,
                 ),
                 validator: (value) {
@@ -393,7 +393,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _composerController,
                 decoration: const InputDecoration(
-                  labelText: '작곡가',
+                  labelText: AppStrings.profileRepertoireComposerLabel,
                   hintText: AppStrings.profileRepertoireHintComposer,
                 ),
               ),
@@ -403,7 +403,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _opusController,
                 decoration: const InputDecoration(
-                  labelText: '작품번호',
+                  labelText: AppStrings.profileRepertoireOpusLabel,
                   hintText: AppStrings.profileRepertoireHintOpus,
                 ),
               ),
@@ -413,7 +413,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _movementController,
                 decoration: const InputDecoration(
-                  labelText: '악장',
+                  labelText: AppStrings.profileRepertoireMovementLabel,
                   hintText: AppStrings.profileRepertoireHintMovement,
                 ),
               ),
@@ -458,7 +458,7 @@ class _PieceDialogState extends State<PieceDialog> {
               TextFormField(
                 controller: _notesController,
                 decoration: const InputDecoration(
-                  labelText: '메모',
+                  labelText: AppStrings.memoLabel,
                   hintText: AppStrings.profileRepertoireHintNotes,
                 ),
                 maxLines: 3,

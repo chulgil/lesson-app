@@ -105,19 +105,26 @@ class _GroupClassDetailScreenState
                 }
                 return confirmedCountAsync.when(
                   loading: () => const SizedBox.shrink(),
-                  error: (_, __) => Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.error_outline, size: 48, color: AppColors.inkTertiary),
-                        const SizedBox(height: AppSpacing.space3),
-                        Text(
-                          AppStrings.loadDataFailed,
-                          style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
+                  error:
+                      (_, __) => Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: AppColors.inkTertiary,
+                            ),
+                            const SizedBox(height: AppSpacing.space3),
+                            Text(
+                              AppStrings.loadDataFailed,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.inkSecondary,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
                   data: (confirmedCount) {
                     return _buildActionButtons(confirmedCount);
                   },
@@ -240,8 +247,8 @@ class _GroupClassDetailScreenState
           ),
           if (widget.groupClass.pricePerSession != null) ...[
             const SizedBox(height: 12),
-          const ThinRule(),
-          const SizedBox(height: 12),
+            const ThinRule(),
+            const SizedBox(height: 12),
             _buildInfoRow(
               icon: Icons.payments_outlined,
               label: AppStrings.infoLabelTuition,
@@ -290,14 +297,14 @@ class _GroupClassDetailScreenState
                 ? AppColors.paperAccentSoft
                 : isAlmostFull
                 ? AppColors.paperAccentSoft
-                : AppColors.paperOk.withValues(alpha: 0.05),
+                : AppColors.paperOkSoft,
         border: Border.all(
           color:
               isFull
                   ? AppColors.inkQuaternary
                   : isAlmostFull
                   ? AppColors.inkQuaternary
-                  : AppColors.paperOk.withValues(alpha: 0.3),
+                  : AppColors.paperOkSelected,
         ),
       ),
       child: Column(
@@ -384,8 +391,11 @@ class _GroupClassDetailScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(booking.status.statusIcon,
-                  size: AppSpacing.iconLG, color: AppColors.ink),
+              Icon(
+                booking.status.statusIcon,
+                size: AppSpacing.iconLG,
+                color: AppColors.ink,
+              ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 booking.statusText,

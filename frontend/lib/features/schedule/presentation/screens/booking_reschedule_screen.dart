@@ -394,9 +394,7 @@ class _BookingRescheduleScreenState
           // New booking preview
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.paperAccent.withValues(alpha: 0.05),
-            ),
+            decoration: BoxDecoration(color: AppColors.paperAccentSoft),
             child: Row(
               children: [
                 const Icon(

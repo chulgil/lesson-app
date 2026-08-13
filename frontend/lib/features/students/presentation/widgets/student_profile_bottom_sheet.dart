@@ -110,7 +110,7 @@ void showStudentProfileBottomSheet({
                   decoration: BoxDecoration(
                     color:
                         isTrialRequest
-                            ? AppColors.paperAccent.withValues(alpha: 0.04)
+                            ? AppColors.paperAccentSoft
                             : AppColors.paperDark,
                     border:
                         isTrialRequest
@@ -172,10 +172,7 @@ void showStudentProfileBottomSheet({
                         AppStrings.parentPhoneLabel,
                         student.parentPhone!,
                       ),
-                    _profileInfoRow(
-                      AppStrings.levelLabel,
-                      student.level.label,
-                    ),
+                    _profileInfoRow(AppStrings.levelLabel, student.level.label),
                   ],
                 ),
               ),
@@ -220,14 +217,10 @@ Widget _profileInfoRow(String label, String value) {
           width: 80,
           child: Text(
             label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.inkTertiary,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ),
-        Expanded(
-          child: Text(value, style: AppTypography.bodySmall),
-        ),
+        Expanded(child: Text(value, style: AppTypography.bodySmall)),
       ],
     ),
   );

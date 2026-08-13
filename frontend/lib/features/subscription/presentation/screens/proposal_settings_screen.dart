@@ -113,13 +113,12 @@ class _ProposalSettingsScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: _autoProposalEnabled
-            ? AppColors.paperOkSoft
-            : AppColors.paper,
+        color: _autoProposalEnabled ? AppColors.paperOkSoft : AppColors.paper,
         border: Border.all(
-          color: _autoProposalEnabled
-              ? AppColors.paperOk.withValues(alpha: 0.3)
-              : AppColors.inkQuaternary,
+          color:
+              _autoProposalEnabled
+                  ? AppColors.paperOkSelected
+                  : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -239,150 +238,162 @@ class _ProposalSettingsScreenState
             }
 
             return Column(
-              children: templates.map((template) {
-                final isSelected =
-                    _selectedTemplateIds.isEmpty ||
-                    _selectedTemplateIds.contains(template.id);
-                final isRecommended = _recommendedTemplateId == template.id;
+              children:
+                  templates.map((template) {
+                    final isSelected =
+                        _selectedTemplateIds.isEmpty ||
+                        _selectedTemplateIds.contains(template.id);
+                    final isRecommended = _recommendedTemplateId == template.id;
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        if (_selectedTemplateIds.isEmpty) {
-                          // First selection: start with this template
-                          _selectedTemplateIds = {template.id};
-                        } else if (isSelected) {
-                          _selectedTemplateIds.remove(template.id);
-                          if (_recommendedTemplateId == template.id) {
-                            _recommendedTemplateId =
-                                _selectedTemplateIds.isNotEmpty
-                                ? _selectedTemplateIds.first
-                                : null;
-                          }
-                        } else {
-                          _selectedTemplateIds.add(template.id);
-                        }
-                        // Clear selection = use all
-                        if (_selectedTemplateIds.length == templates.length) {
-                          _selectedTemplateIds.clear();
-                          _recommendedTemplateId = null;
-                        }
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.space3),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.paperAccentSoft
-                            : AppColors.paper,
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.paperAccent
-                              : AppColors.inkQuaternary,
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Checkbox
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: isSelected
-                                    ? AppColors.paperAccent
-                                    : AppColors.inkQuaternary,
-                                width: 2,
-                              ),
-                              color: isSelected
-                                  ? AppColors.paperAccent
-                                  : Colors.transparent,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (_selectedTemplateIds.isEmpty) {
+                              // First selection: start with this template
+                              _selectedTemplateIds = {template.id};
+                            } else if (isSelected) {
+                              _selectedTemplateIds.remove(template.id);
+                              if (_recommendedTemplateId == template.id) {
+                                _recommendedTemplateId =
+                                    _selectedTemplateIds.isNotEmpty
+                                        ? _selectedTemplateIds.first
+                                        : null;
+                              }
+                            } else {
+                              _selectedTemplateIds.add(template.id);
+                            }
+                            // Clear selection = use all
+                            if (_selectedTemplateIds.length ==
+                                templates.length) {
+                              _selectedTemplateIds.clear();
+                              _recommendedTemplateId = null;
+                            }
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.space3),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? AppColors.paperAccentSoft
+                                    : AppColors.paper,
+                            border: Border.all(
+                              color:
+                                  isSelected
+                                      ? AppColors.paperAccent
+                                      : AppColors.inkQuaternary,
+                              width: isSelected ? 2 : 1,
                             ),
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 14,
-                                    color: AppColors.paper,
-                                  )
-                                : null,
                           ),
-                          const SizedBox(width: AppSpacing.space3),
+                          child: Row(
+                            children: [
+                              // Checkbox
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color:
+                                        isSelected
+                                            ? AppColors.paperAccent
+                                            : AppColors.inkQuaternary,
+                                    width: 2,
+                                  ),
+                                  color:
+                                      isSelected
+                                          ? AppColors.paperAccent
+                                          : Colors.transparent,
+                                ),
+                                child:
+                                    isSelected
+                                        ? const Icon(
+                                          Icons.check,
+                                          size: 14,
+                                          color: AppColors.paper,
+                                        )
+                                        : null,
+                              ),
+                              const SizedBox(width: AppSpacing.space3),
 
-                          // Template info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                              // Template info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          template.name,
+                                          style: AppTypography.bodyMedium
+                                              .copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                        if (isRecommended) ...[
+                                          const SizedBox(
+                                            width: AppSpacing.space1,
+                                          ),
+                                          Icon(
+                                            Icons.star,
+                                            size: 16,
+                                            color: AppColors.paperAccent,
+                                          ),
+                                        ],
+                                      ],
+                                    ),
                                     Text(
-                                      template.name,
-                                      style: AppTypography.bodyMedium.copyWith(
-                                        fontWeight: FontWeight.w600,
+                                      AppStrings.proposalSettingsTemplateInfoFormat(
+                                        template.totalLessons,
+                                        template.formattedPrice,
+                                      ),
+                                      style: AppTypography.caption.copyWith(
+                                        color: AppColors.inkSecondary,
                                       ),
                                     ),
-                                    if (isRecommended) ...[
-                                      const SizedBox(width: AppSpacing.space1),
-                                      Icon(
-                                        Icons.star,
-                                        size: 16,
-                                        color: AppColors.paperAccent,
-                                      ),
-                                    ],
                                   ],
                                 ),
-                                Text(
-                                  AppStrings.proposalSettingsTemplateInfoFormat(
-                                    template.totalLessons,
-                                    template.formattedPrice,
-                                  ),
-                                  style: AppTypography.caption.copyWith(
-                                    color: AppColors.inkSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Recommend button
-                          if (isSelected && _selectedTemplateIds.isNotEmpty)
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _recommendedTemplateId = template.id;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.space2,
-                                  vertical: AppSpacing.space1,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isRecommended
-                                      ? AppColors.paperAccent.withValues(
-                                          alpha: 0.2,
-                                        )
-                                      : AppColors.paperDark,
-                                ),
-                                child: Text(
-                                  AppStrings.templateRecommendedBadge,
-                                  style: AppTypography.captionSmall.copyWith(
-                                    color: isRecommended
-                                        ? AppColors.paperAccent
-                                        : AppColors.inkTertiary,
-                                  ),
-                                ),
                               ),
-                            ),
-                        ],
+
+                              // Recommend button
+                              if (isSelected && _selectedTemplateIds.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _recommendedTemplateId = template.id;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.space2,
+                                      vertical: AppSpacing.space1,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isRecommended
+                                              ? AppColors.paperAccent
+                                                  .withValues(alpha: 0.2)
+                                              : AppColors.paperDark,
+                                    ),
+                                    child: Text(
+                                      AppStrings.templateRecommendedBadge,
+                                      style: AppTypography.captionSmall
+                                          .copyWith(
+                                            color:
+                                                isRecommended
+                                                    ? AppColors.paperAccent
+                                                    : AppColors.inkTertiary,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
             );
           },
         ),
@@ -450,9 +461,13 @@ class _ProposalSettingsScreenState
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
-                      items: [0, 5, 10, 15, 20].map((v) {
-                        return DropdownMenuItem(value: v, child: Text('$v%'));
-                      }).toList(),
+                      items:
+                          [0, 5, 10, 15, 20].map((v) {
+                            return DropdownMenuItem(
+                              value: v,
+                              child: Text('$v%'),
+                            );
+                          }).toList(),
                       onChanged: (value) {
                         setState(() {
                           _discountPercent = value ?? 10;
@@ -483,14 +498,15 @@ class _ProposalSettingsScreenState
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
-                      items: [12, 24, 48, 72].map((v) {
-                        return DropdownMenuItem(
-                          value: v,
-                          child: Text(
-                            AppStrings.proposalSettingsHoursFormat(v),
-                          ),
-                        );
-                      }).toList(),
+                      items:
+                          [12, 24, 48, 72].map((v) {
+                            return DropdownMenuItem(
+                              value: v,
+                              child: Text(
+                                AppStrings.proposalSettingsHoursFormat(v),
+                              ),
+                            );
+                          }).toList(),
                       onChanged: (value) {
                         setState(() {
                           _discountHours = value ?? 24;
@@ -598,13 +614,14 @@ class _ProposalSettingsScreenState
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(),
         ),
-        child: _isSaving
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Text(AppStrings.save),
+        child:
+            _isSaving
+                ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                : const Text(AppStrings.save),
       ),
     );
   }

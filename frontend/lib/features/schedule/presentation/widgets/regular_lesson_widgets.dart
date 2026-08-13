@@ -385,9 +385,7 @@ class RegularLessonTimeSelector extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: AppColors.paperOkSoft,
-                border: Border.all(
-                  color: AppColors.paperOk.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: AppColors.paperOkSelected),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

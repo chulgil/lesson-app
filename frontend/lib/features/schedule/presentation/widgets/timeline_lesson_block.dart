@@ -193,9 +193,7 @@ class TimelineLessonBlock extends StatelessWidget {
         isCompleted ? Icons.check_circle : Icons.error_outline,
         size: 16,
         color:
-            isCompleted
-                ? AppColors.paperOk.withValues(alpha: 0.7)
-                : AppColors.paperAccent.withValues(alpha: 0.7),
+            isCompleted ? AppColors.paperOkStrong : AppColors.paperAccentStrong,
       ),
     );
   }

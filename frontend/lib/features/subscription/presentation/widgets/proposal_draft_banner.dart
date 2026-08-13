@@ -92,7 +92,7 @@ class _DraftBannerContent extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.paperAccentSoft,
-        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccentSelected),
       ),
       child: Row(
         children: [
