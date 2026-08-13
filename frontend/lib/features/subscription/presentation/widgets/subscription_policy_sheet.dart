@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -9,8 +8,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../onboarding/onboarding_facade.dart'
-    show currentTeacherProfileProvider;
 import '../../../students/students_facade.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
@@ -18,8 +15,10 @@ import '../extensions/lesson_policy_visuals.dart';
 import '../providers/lesson_policy_providers.dart';
 import '../providers/subscription_providers.dart';
 import '../screens/subscription_policy_override_screen.dart';
-import 'location_option_resolver.dart';
-import 'location_travel_selector.dart';
+import 'add_reschedule_sheet.dart';
+import 'change_location_sheet.dart';
+import 'edit_cancel_deadline_sheet.dart';
+import 'edit_travel_time_sheet.dart';
 
 /// Bottom sheet showing the applied policy for a subscription.
 ///
@@ -400,7 +399,7 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
       context: context,
       isScrollControlled: true,
       builder:
-          (ctx) => _AddRescheduleSheet(
+          (ctx) => AddRescheduleSheet(
             subscription: sub,
             onConfirm: (count) async {
               final updated = sub.copyWith(
@@ -420,7 +419,7 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
       context: context,
       isScrollControlled: true,
       builder:
-          (ctx) => _ChangeLocationSheet(
+          (ctx) => ChangeLocationSheet(
             membership: membership,
             preferredLocationType: widget.preferredLocationType,
             onSave: (locationId, travelTime) async {
@@ -442,7 +441,7 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
       context: context,
       isScrollControlled: true,
       builder:
-          (ctx) => _EditTravelTimeSheet(
+          (ctx) => EditTravelTimeSheet(
             currentMinutes: membership.travelTimeMinutes,
             onSave: (minutes) async {
               final updated = membership.copyWith(travelTimeMinutes: minutes);
@@ -457,7 +456,7 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
       context: context,
       isScrollControlled: true,
       builder:
-          (ctx) => _EditCancelDeadlineSheet(
+          (ctx) => EditCancelDeadlineSheet(
             currentHours: sub.effectiveCancelDeadlineHours,
             onSave: (hours) async {
               final updated = sub.copyWith(overrideCancelDeadlineHours: hours);
@@ -499,566 +498,6 @@ class _EditableSectionState extends ConsumerState<_EditableSection> {
 
   String _formatDate(DateTime date) =>
       '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
-}
-
-// ---------------------------------------------------------------------------
-// Add Reschedule Credits Sheet
-// ---------------------------------------------------------------------------
-
-class _AddRescheduleSheet extends StatefulWidget {
-  final Subscription subscription;
-  final Future<void> Function(int count) onConfirm;
-
-  const _AddRescheduleSheet({
-    required this.subscription,
-    required this.onConfirm,
-  });
-
-  @override
-  State<_AddRescheduleSheet> createState() => _AddRescheduleSheetState();
-}
-
-class _AddRescheduleSheetState extends State<_AddRescheduleSheet> {
-  int _count = 1;
-  final _reasonController = TextEditingController();
-  bool _saving = false;
-
-  @override
-  void dispose() {
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.space5,
-        right: AppSpacing.space5,
-        top: AppSpacing.space5,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacing.space5,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.addRescheduleCredit,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          // Count row
-          Row(
-            children: [
-              Text(
-                AppStrings.additionalCount,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.inkSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
-              _CounterButton(
-                value: _count,
-                min: 1,
-                max: 10,
-                onChanged: (v) => setState(() => _count = v),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space3),
-
-          // Reason field
-          TextField(
-            controller: _reasonController,
-            decoration: InputDecoration(
-              labelText: AppStrings.addReason,
-              hintText: AppStrings.scheduleChangeReasonHint,
-              border: OutlineInputBorder(borderRadius: BorderRadius.zero),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(
-                  color: AppColors.paperAccent,
-                  width: 1.5,
-                ),
-              ),
-            ),
-            style: AppTypography.bodyMedium,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                minimumSize: Size(0, AppSpacing.buttonHeight),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              onPressed:
-                  _saving
-                      ? null
-                      : () async {
-                        setState(() => _saving = true);
-                        try {
-                          await widget.onConfirm(_count);
-                          if (context.mounted) Navigator.of(context).pop();
-                        } finally {
-                          if (mounted) setState(() => _saving = false);
-                        }
-                      },
-              child:
-                  _saving
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text('$_count회 추가'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Change Location Sheet
-// ---------------------------------------------------------------------------
-
-class _ChangeLocationSheet extends ConsumerStatefulWidget {
-  final ClassMembership membership;
-  final Future<void> Function(String? locationId, int travelTime) onSave;
-
-  /// Student's preferred location type from their original lesson request.
-  /// When the teacher picks a different type, a confirmation dialog is shown.
-  final LocationType? preferredLocationType;
-
-  const _ChangeLocationSheet({
-    required this.membership,
-    required this.onSave,
-    this.preferredLocationType,
-  });
-
-  @override
-  ConsumerState<_ChangeLocationSheet> createState() =>
-      _ChangeLocationSheetState();
-}
-
-class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
-  late String? _locationId;
-  late int _travelTime;
-  LocationType? _selectedLocationType;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _locationId = widget.membership.lessonLocationId;
-    _travelTime = widget.membership.travelTimeMinutes;
-  }
-
-  /// Returns a human-readable label for [type].
-  String _locationTypeLabel(LocationType type) {
-    switch (type) {
-      case LocationType.studentHome:
-        return AppStrings.locationStudentHomeLabel;
-      case LocationType.externalPlace:
-        return AppStrings.locationExternalPlaceLabel;
-      case LocationType.teacherStudio:
-        return AppStrings.locationTeacherHomeLabel;
-      case LocationType.online:
-        return AppStrings.locationOnlineLabel;
-      case LocationType.academyRoom:
-        return AppStrings.academy;
-    }
-  }
-
-  Future<void> _handleSave() async {
-    final preferred = widget.preferredLocationType;
-
-    // Show warning dialog if the selected type differs from student's preference
-    if (preferred != null &&
-        _selectedLocationType != null &&
-        _selectedLocationType != preferred) {
-      final confirmed = await showNotebookDialog<bool>(
-        context: context,
-        title: AppStrings.locationChangeWarningTitle,
-        content: Text(
-          AppStrings.locationChangeWarningBody(
-            _locationTypeLabel(preferred),
-            _locationTypeLabel(_selectedLocationType!),
-          ),
-        ),
-        confirmLabel: AppStrings.changeTypeLabel,
-        cancelLabel: AppStrings.cancel,
-      );
-      if (confirmed != true) return;
-    }
-
-    setState(() => _saving = true);
-    try {
-      await widget.onSave(_locationId, _travelTime);
-      if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pop();
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.space5,
-        right: AppSpacing.space5,
-        top: AppSpacing.space5,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacing.space5,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.changeLocation,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          LocationTravelSelector(
-            membershipId: widget.membership.id,
-            studentId: widget.membership.studentId,
-            currentLocationId: _locationId,
-            currentTravelTime: _travelTime,
-            onLocationChanged: (id) => setState(() => _locationId = id),
-            onTravelTimeChanged: (t) => setState(() => _travelTime = t),
-            onLocationTypeChanged:
-                (type) => setState(() => _selectedLocationType = type),
-            // #1146 — gate location options by the teacher's lesson types.
-            allowedLocationTypes: allowedLocationTypes(
-              ref.watch(currentTeacherProfileProvider).valueOrNull?.lessonTypes,
-              isAcademy: false,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                minimumSize: Size(0, AppSpacing.buttonHeight),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              onPressed: _saving ? null : _handleSave,
-              child:
-                  _saving
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text(AppStrings.save),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Edit Travel Time Sheet
-// ---------------------------------------------------------------------------
-
-class _EditTravelTimeSheet extends StatefulWidget {
-  final int currentMinutes;
-  final Future<void> Function(int minutes) onSave;
-
-  const _EditTravelTimeSheet({
-    required this.currentMinutes,
-    required this.onSave,
-  });
-
-  @override
-  State<_EditTravelTimeSheet> createState() => _EditTravelTimeSheetState();
-}
-
-class _EditTravelTimeSheetState extends State<_EditTravelTimeSheet> {
-  late final TextEditingController _controller;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.currentMinutes.toString());
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.space5,
-        right: AppSpacing.space5,
-        top: AppSpacing.space5,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacing.space5,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.editTravelTime,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          TextField(
-            controller: _controller,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: InputDecoration(
-              suffixText: AppStrings.travelTimeMinutesSuffix,
-              border: OutlineInputBorder(borderRadius: BorderRadius.zero),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(
-                  color: AppColors.paperAccent,
-                  width: 1.5,
-                ),
-              ),
-            ),
-            style: AppTypography.bodyMedium,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                minimumSize: Size(0, AppSpacing.buttonHeight),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              onPressed:
-                  _saving
-                      ? null
-                      : () async {
-                        final minutes = int.tryParse(_controller.text) ?? 0;
-                        setState(() => _saving = true);
-                        try {
-                          await widget.onSave(minutes);
-                          if (context.mounted) Navigator.of(context).pop();
-                        } finally {
-                          if (mounted) setState(() => _saving = false);
-                        }
-                      },
-              child:
-                  _saving
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text(AppStrings.save),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Edit Cancel Deadline Sheet
-// ---------------------------------------------------------------------------
-
-class _EditCancelDeadlineSheet extends StatefulWidget {
-  final int currentHours;
-  final Future<void> Function(int hours) onSave;
-
-  const _EditCancelDeadlineSheet({
-    required this.currentHours,
-    required this.onSave,
-  });
-
-  @override
-  State<_EditCancelDeadlineSheet> createState() =>
-      _EditCancelDeadlineSheetState();
-}
-
-class _EditCancelDeadlineSheetState extends State<_EditCancelDeadlineSheet> {
-  static const _presets = [4, 12, 24, 48];
-  late int _selected;
-  late final TextEditingController _customController;
-  bool _isCustom = false;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.currentHours;
-    _isCustom = !_presets.contains(widget.currentHours);
-    _customController = TextEditingController(
-      text: _isCustom ? widget.currentHours.toString() : '',
-    );
-  }
-
-  @override
-  void dispose() {
-    _customController.dispose();
-    super.dispose();
-  }
-
-  int get _effectiveHours =>
-      _isCustom
-          ? (int.tryParse(_customController.text) ?? _selected)
-          : _selected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.space5,
-        right: AppSpacing.space5,
-        top: AppSpacing.space5,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacing.space5,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.editCancelDeadline,
-            style: NotebookTypography.sectionTitle.copyWith(
-              color: AppColors.paperAccent,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          // Preset chips
-          Wrap(
-            spacing: AppSpacing.space2,
-            children: [
-              ..._presets.map(
-                (h) => ChoiceChip(
-                  label: Text('$h시간'),
-                  selected: !_isCustom && _selected == h,
-                  onSelected: (_) {
-                    setState(() {
-                      _selected = h;
-                      _isCustom = false;
-                    });
-                  },
-                  selectedColor: AppColors.paperAccent,
-                  labelStyle: AppTypography.bodySmall.copyWith(
-                    color:
-                        (!_isCustom && _selected == h)
-                            ? AppColors.paper
-                            : AppColors.ink,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-              ),
-              ChoiceChip(
-                label: const Text(
-                  AppStrings.unifiedSubscriptionDirectInputToggle,
-                ),
-                selected: _isCustom,
-                onSelected: (_) => setState(() => _isCustom = true),
-                selectedColor: AppColors.paperAccent,
-                labelStyle: AppTypography.bodySmall.copyWith(
-                  color: _isCustom ? AppColors.paper : AppColors.ink,
-                ),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-            ],
-          ),
-
-          if (_isCustom) ...[
-            const SizedBox(height: AppSpacing.space3),
-            TextField(
-              controller: _customController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              autofocus: true,
-              decoration: InputDecoration(
-                suffixText: AppStrings.hourSuffix,
-                border: OutlineInputBorder(borderRadius: BorderRadius.zero),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(
-                    color: AppColors.paperAccent,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-              style: AppTypography.bodyMedium,
-            ),
-          ],
-
-          const SizedBox(height: AppSpacing.space4),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.paperAccent,
-                foregroundColor: AppColors.paper,
-                minimumSize: Size(0, AppSpacing.buttonHeight),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              onPressed:
-                  _saving
-                      ? null
-                      : () async {
-                        setState(() => _saving = true);
-                        try {
-                          await widget.onSave(_effectiveHours);
-                          if (context.mounted) Navigator.of(context).pop();
-                        } finally {
-                          if (mounted) setState(() => _saving = false);
-                        }
-                      },
-              child:
-                  _saving
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Text(AppStrings.save),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1244,58 +683,6 @@ class _NotEditableDivider extends StatelessWidget {
           ),
         ),
         Expanded(child: Container(height: 0.5, color: AppColors.inkQuaternary)),
-      ],
-    );
-  }
-}
-
-/// Simple +/- counter button for number inputs.
-class _CounterButton extends StatelessWidget {
-  final int value;
-  final int min;
-  final int max;
-  final ValueChanged<int> onChanged;
-
-  const _CounterButton({
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.remove),
-          onPressed: value > min ? () => onChanged(value - 1) : null,
-          iconSize: 20,
-          style: IconButton.styleFrom(
-            minimumSize: const Size(32, 32),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
-        SizedBox(
-          width: 32,
-          child: Text(
-            '$value',
-            textAlign: TextAlign.center,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: value < max ? () => onChanged(value + 1) : null,
-          iconSize: 20,
-          style: IconButton.styleFrom(
-            minimumSize: const Size(32, 32),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
       ],
     );
   }

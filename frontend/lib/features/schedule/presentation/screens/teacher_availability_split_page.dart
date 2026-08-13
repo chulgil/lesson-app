@@ -202,7 +202,9 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+          // Notebook × Score: 상단 "설정 패널" 타이틀(§L158)과 동일하게
+          // sectionTitle 로 통일 (§1258 헤더 토큰 정합).
+          style: NotebookTypography.sectionTitle,
         ),
         if (subtitle != null) ...[
           const SizedBox(height: 2),
