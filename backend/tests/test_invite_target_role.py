@@ -199,3 +199,113 @@ async def test_legacy_invite_without_target_role_unchanged(
         json={"target_id": "", "method": "inviteCode", "invite_code": invite["invite_code"]},
     )
     assert response.status_code == 201, response.text
+
+
+# ---------------------------------------------------------------------------
+# Accept guard — teacher-target invite referral (no connection)
+# ---------------------------------------------------------------------------
+
+
+async def _redeem_teacher_target_invite(client: AsyncClient, auth_headers, create_test_user) -> str:
+    """Teacher A issues a teacher-target invite, teacher B redeems it. Returns the request id."""
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(
+        user_id="test-other-teacher-id",
+        role="teacher",
+        email="other-teacher@test.com",
+        name="Other Teacher",
+    )
+    other_teacher_token = create_access_token(data={"sub": "test-other-teacher-id", "role": "teacher"})
+    other_teacher_headers = {"Authorization": f"Bearer {other_teacher_token}"}
+
+    invite = (
+        await client.post(
+            "/api/v1/invites/",
+            headers=auth_headers,
+            json={"target_role": "teacher"},
+        )
+    ).json()
+
+    redeem = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=other_teacher_headers,
+        json={"target_id": "", "method": "inviteCode", "invite_code": invite["invite_code"]},
+    )
+    assert redeem.status_code == 201, redeem.text
+    return redeem.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_teacher_target_referral_accept_rejected(client: AsyncClient, auth_headers, create_test_user):
+    """(a) Accepting a teacher-teacher referral request must be rejected with a 4xx.
+
+    Without this guard, accept would run the teacher/student split in
+    ``respond_to_request`` and attach the referring teacher to the roster as
+    a Student — a data corruption bug.
+    """
+    request_id = await _redeem_teacher_target_invite(client, auth_headers, create_test_user)
+
+    response = await client.patch(
+        f"/api/v1/invites/connection-requests/{request_id}/respond",
+        headers=auth_headers,
+        json={"action": "accept"},
+    )
+    assert 400 <= response.status_code < 500, response.text
+
+    # No Connection should have been created.
+    connections = await client.get("/api/v1/invites/connections", headers=auth_headers)
+    assert connections.json()["total"] == 0
+
+
+@pytest.mark.asyncio
+async def test_teacher_target_referral_reject_still_allowed(client: AsyncClient, auth_headers, create_test_user):
+    """(b) Reject remains a valid cleanup path for an unwanted referral request."""
+    request_id = await _redeem_teacher_target_invite(client, auth_headers, create_test_user)
+
+    response = await client.patch(
+        f"/api/v1/invites/connection-requests/{request_id}/respond",
+        headers=auth_headers,
+        json={"action": "reject", "rejection_reason": "Not interested"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "rejected"
+
+
+@pytest.mark.asyncio
+async def test_student_target_invite_accept_unaffected(
+    client: AsyncClient, auth_headers, student_auth_headers, create_test_user
+):
+    """(c) A student-target invite's connection request still accepts normally.
+
+    (Parent-target invites can't be exercised through this endpoint at all —
+    see the note in ``test_redeem_parent_target_invite_mismatched_by_teacher_rejected``
+    above — so there is nothing to assert for the parent side of (c).)
+    """
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="test-student-id", role="student", email="student@test.com", name="Student")
+
+    invite = (
+        await client.post(
+            "/api/v1/invites/",
+            headers=auth_headers,
+            json={"target_role": "student"},
+        )
+    ).json()
+
+    redeem = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=student_auth_headers,
+        json={"target_id": "", "method": "inviteCode", "invite_code": invite["invite_code"]},
+    )
+    assert redeem.status_code == 201, redeem.text
+
+    response = await client.patch(
+        f"/api/v1/invites/connection-requests/{redeem.json()['id']}/respond",
+        headers=auth_headers,
+        json={"action": "accept"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "accepted"
+
+    connections = await client.get("/api/v1/invites/connections", headers=auth_headers)
+    assert connections.json()["total"] == 1

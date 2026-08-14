@@ -515,6 +515,25 @@ class InviteService:
                 detail="Invite target role mismatch",
             )
 
+    def _validate_acceptable_connection_request(self, conn_req: Any) -> None:
+        """#1267 — reject accept when requester/target roles don't form a valid pair.
+
+        A teacher-target invite redeemed by a teacher produces a
+        ConnectionRequest with requester_role == target_role == teacher (no
+        student side). Accepting it would attach the other teacher to the
+        roster as a Student via ``_attach_student_to_teacher``. Per spec,
+        teacher-target invites are referral-only — the row stays pending as
+        the referral record; it must never be accepted. Reject (not cancel)
+        remains allowed as a cleanup path.
+        """
+        requester_role = getattr(conn_req.requester_role, "value", conn_req.requester_role)
+        target_role = getattr(conn_req.target_role, "value", conn_req.target_role)
+        if requester_role == target_role:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot accept a connection request between two users of the same role",
+            )
+
     async def get_pending_requests(self, *, user_id: str, page: int, size: int, offset: int) -> PaginatedResponse:
         """List pending connection requests for the user."""
         from app.models.invite import ConnectionRequest
@@ -580,6 +599,8 @@ class InviteService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Request is not pending",
             )
+        if action == "accept":
+            self._validate_acceptable_connection_request(conn_req)
 
         now = datetime.now(UTC)
         conn_req.responded_at = now
