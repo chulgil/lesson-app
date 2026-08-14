@@ -17,6 +17,9 @@ class InviteStatus(str, enum.Enum):
 class InviteUserRole(str, enum.Enum):
     teacher = "teacher"
     student = "student"
+    # #1275 — parent-target invites redeem through the same ConnectionRequest
+    # vehicle as student-target invites (see InviteService.respond_to_request).
+    parent = "parent"
 
 
 class InviteMethod(str, enum.Enum):

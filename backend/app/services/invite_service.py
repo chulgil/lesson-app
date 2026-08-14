@@ -533,6 +533,18 @@ class InviteService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot accept a connection request between two users of the same role",
             )
+        # #1275 — parent-target invites are teacher-issued (teacher creates
+        # the invite, a parent redeems it), so the only formalized parent
+        # pairing is parent<->teacher. A parent<->student pair has no
+        # ParentChildRelation semantics here (no specific child is bound at
+        # this generic-invite level) and would otherwise fall through to the
+        # teacher/student Connection branch and misattach one side.
+        roles = {requester_role, target_role}
+        if "parent" in roles and "teacher" not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A parent connection request must pair with a teacher",
+            )
 
     async def get_pending_requests(self, *, user_id: str, page: int, size: int, offset: int) -> PaginatedResponse:
         """List pending connection requests for the user."""
@@ -613,25 +625,41 @@ class InviteService:
 
         if action == "accept":
             conn_req.status = ConnectionRequestStatus.accepted
-            # Create connection
-            teacher_id = conn_req.requester_id if conn_req.requester_role.value == "teacher" else conn_req.target_id
-            student_id = conn_req.target_id if conn_req.requester_role.value == "teacher" else conn_req.requester_id
-            teacher_name = conn_req.requester_name if conn_req.requester_role.value == "teacher" else current_user.name
-            student_name = current_user.name if conn_req.requester_role.value == "teacher" else conn_req.requester_name
-            connection = Connection(
-                teacher_id=teacher_id,
-                teacher_name=teacher_name,
-                student_id=student_id,
-                student_name=student_name,
-                connection_request_id=request_id,
-            )
-            self.db.add(connection)
-            await self._attach_student_to_teacher(
-                teacher_user_id=teacher_id,
-                student_user_id=student_id,
-                student_name=student_name,
-                connected_at=now,
-            )
+            requester_role = conn_req.requester_role.value
+            target_role = conn_req.target_role.value
+            if "parent" in (requester_role, target_role):
+                # #1275 — parent-target invite redemption. The guard above
+                # already ensures the other side is "teacher"; a parent must
+                # never be attached to the roster as a Student.
+                parent_user_id = conn_req.requester_id if requester_role == "parent" else conn_req.target_id
+                parent_name = conn_req.requester_name if requester_role == "parent" else current_user.name
+                teacher_user_id = conn_req.target_id if requester_role == "parent" else conn_req.requester_id
+                await self._attach_parent_to_teacher(
+                    teacher_user_id=teacher_user_id,
+                    parent_user_id=parent_user_id,
+                    parent_name=parent_name,
+                    connected_at=now,
+                )
+            else:
+                # Create connection
+                teacher_id = conn_req.requester_id if requester_role == "teacher" else conn_req.target_id
+                student_id = conn_req.target_id if requester_role == "teacher" else conn_req.requester_id
+                teacher_name = conn_req.requester_name if requester_role == "teacher" else current_user.name
+                student_name = current_user.name if requester_role == "teacher" else conn_req.requester_name
+                connection = Connection(
+                    teacher_id=teacher_id,
+                    teacher_name=teacher_name,
+                    student_id=student_id,
+                    student_name=student_name,
+                    connection_request_id=request_id,
+                )
+                self.db.add(connection)
+                await self._attach_student_to_teacher(
+                    teacher_user_id=teacher_id,
+                    student_user_id=student_id,
+                    student_name=student_name,
+                    connected_at=now,
+                )
         else:
             conn_req.status = ConnectionRequestStatus.rejected
             conn_req.rejection_reason = rejection_reason
@@ -691,6 +719,47 @@ class InviteService:
         relation.disconnected_at = None
         relation.is_app_connected = True
         relation.app_connected_at = relation.app_connected_at or connected_at
+
+    async def _attach_parent_to_teacher(
+        self,
+        *,
+        teacher_user_id: str,
+        parent_user_id: str,
+        parent_name: str | None,
+        connected_at: datetime,
+    ) -> None:
+        """#1275 — attach an accepted parent-target connection request.
+
+        Mirrors ``_attach_student_to_teacher`` (find-or-create the profile,
+        then find-or-create the relationship row), but for the parent/teacher
+        pairing: the correct relationship for a parent accepted by a teacher
+        is ``ParentTeacherConnection``, not the teacher-student ``Connection``
+        — attaching a parent as a Student would corrupt the roster.
+        """
+        from app.models.parent import Parent, ParentStatus, ParentTeacherConnection
+        from app.services.teacher_id_resolver import resolve_teacher_id
+
+        teacher_id = await resolve_teacher_id(self.db, teacher_user_id)
+
+        parent = await self.db.scalar(select(Parent).where(Parent.user_id == parent_user_id))
+        if parent is None:
+            parent = Parent(
+                user_id=parent_user_id,
+                name=parent_name or "Parent",
+                status=ParentStatus.active,
+            )
+            self.db.add(parent)
+            await self.db.flush()
+
+        link = await self.db.scalar(
+            select(ParentTeacherConnection).where(
+                ParentTeacherConnection.parent_id == parent.id,
+                ParentTeacherConnection.teacher_id == teacher_id,
+            )
+        )
+        if link is None:
+            link = ParentTeacherConnection(parent_id=parent.id, teacher_id=teacher_id)
+            self.db.add(link)
 
     async def cancel_request(self, request_id: str, current_user: Any) -> Any:
         """Cancel a pending request by its requester."""

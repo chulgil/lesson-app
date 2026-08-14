@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import create_access_token
 
@@ -142,15 +144,7 @@ async def test_redeem_mismatched_target_role_rejected(client: AsyncClient, auth_
 async def test_redeem_parent_target_invite_mismatched_by_teacher_rejected(
     client: AsyncClient, auth_headers, create_test_user
 ):
-    """A parent-target invite still rejects a non-parent existing user.
-
-    NOTE: A *matching* parent redeemer cannot be exercised through this same
-    endpoint today — ``InviteUserRole`` (the native enum backing
-    ``ConnectionRequest.requester_role``/``target_role``) only defines
-    teacher/student, so parent users structurally cannot complete
-    ``create_connection_request`` yet. That gap predates this change and is
-    out of scope here; the role-mismatch check itself doesn't depend on it.
-    """
+    """A parent-target invite still rejects a non-parent existing user."""
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(
         user_id="test-other-teacher-id",
@@ -175,6 +169,101 @@ async def test_redeem_parent_target_invite_mismatched_by_teacher_rejected(
         json={"target_id": "", "method": "inviteCode", "invite_code": invite["invite_code"]},
     )
     assert 400 <= response.status_code < 500, response.text
+
+
+# ---------------------------------------------------------------------------
+# #1275 — parent-target invite full redemption (teacher issues, parent redeems)
+# ---------------------------------------------------------------------------
+
+
+def _parent_headers(user_id: str) -> dict[str, str]:
+    token = create_access_token(data={"sub": user_id, "role": "parent"})
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.mark.asyncio
+async def test_redeem_parent_target_invite_succeeds(client: AsyncClient, auth_headers, create_test_user):
+    """A parent whose role matches target_role="parent" can redeem via connection-requests.
+
+    #1275 — this used to fail with a Postgres enum write error (masked by
+    SQLite in earlier tests) because ``InviteUserRole`` had no "parent" member.
+    """
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="test-parent-id", role="parent", email="parent@test.com", name="Parent")
+
+    invite = (
+        await client.post(
+            "/api/v1/invites/",
+            headers=auth_headers,
+            json={"target_role": "parent"},
+        )
+    ).json()
+
+    response = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=_parent_headers("test-parent-id"),
+        json={"target_id": "", "method": "inviteCode", "invite_code": invite["invite_code"]},
+    )
+    assert response.status_code == 201, response.text
+    assert response.json()["requester_role"] == "parent"
+    assert response.json()["target_role"] == "teacher"
+
+
+@pytest.mark.asyncio
+async def test_accept_parent_target_request_creates_parent_teacher_connection(
+    client: AsyncClient, auth_headers, create_test_user, db_session: AsyncSession
+):
+    """Accepting a parent-target request must create ParentTeacherConnection.
+
+    #1275 — the generic teacher/student accept branch would otherwise
+    misattach the parent onto the roster as a fake Student via
+    ``_attach_student_to_teacher``. The correct relationship is
+    ``ParentTeacherConnection`` (mirrors how teacher-student acceptance
+    materializes ``TeacherStudentRelation``, adapted to parent semantics).
+    """
+    from app.models.parent import Parent, ParentTeacherConnection
+    from app.services.teacher_id_resolver import resolve_teacher_id
+
+    await create_test_user(user_id="test-user-id", role="teacher")
+    await create_test_user(user_id="test-parent-id", role="parent", email="parent@test.com", name="Parent")
+
+    invite = (
+        await client.post(
+            "/api/v1/invites/",
+            headers=auth_headers,
+            json={"target_role": "parent"},
+        )
+    ).json()
+
+    redeem = await client.post(
+        "/api/v1/invites/connection-requests",
+        headers=_parent_headers("test-parent-id"),
+        json={"target_id": "", "method": "inviteCode", "invite_code": invite["invite_code"]},
+    )
+    assert redeem.status_code == 201, redeem.text
+
+    response = await client.patch(
+        f"/api/v1/invites/connection-requests/{redeem.json()['id']}/respond",
+        headers=auth_headers,
+        json={"action": "accept"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "accepted"
+
+    # No fake Student/Connection should exist for the parent's user id.
+    connections = await client.get("/api/v1/invites/connections", headers=auth_headers)
+    assert connections.json()["total"] == 0
+
+    teacher_id = await resolve_teacher_id(db_session, "test-user-id")
+    parent = await db_session.scalar(select(Parent).where(Parent.user_id == "test-parent-id"))
+    assert parent is not None
+    link = await db_session.scalar(
+        select(ParentTeacherConnection).where(
+            ParentTeacherConnection.parent_id == parent.id,
+            ParentTeacherConnection.teacher_id == teacher_id,
+        )
+    )
+    assert link is not None
 
 
 # ---------------------------------------------------------------------------
@@ -277,9 +366,9 @@ async def test_student_target_invite_accept_unaffected(
 ):
     """(c) A student-target invite's connection request still accepts normally.
 
-    (Parent-target invites can't be exercised through this endpoint at all —
-    see the note in ``test_redeem_parent_target_invite_mismatched_by_teacher_rejected``
-    above — so there is nothing to assert for the parent side of (c).)
+    (The parent side of (c) is covered separately by
+    ``test_accept_parent_target_request_creates_parent_teacher_connection``
+    above, since it takes a different accept branch.)
     """
     await create_test_user(user_id="test-user-id", role="teacher")
     await create_test_user(user_id="test-student-id", role="student", email="student@test.com", name="Student")
