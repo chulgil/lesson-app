@@ -43,6 +43,7 @@ from app.api.v1 import (
     practice_loop_stats,
     profile_images,
     recordings,
+    refund_requests,
     relationships,
     request_events,
     reviews,
@@ -120,6 +121,7 @@ api_router.include_router(growth_reports.router, prefix="/growth-reports", tags=
 api_router.include_router(memberships.router, prefix="/memberships", tags=["memberships"])
 api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["subscriptions"])
 api_router.include_router(subscription_settings.router, prefix="/subscription-settings", tags=["subscription-settings"])
+api_router.include_router(refund_requests.router, prefix="/refund-requests", tags=["refund-requests"])
 api_router.include_router(lesson_policies.router, prefix="/lesson-policies", tags=["lesson-policies"])
 api_router.include_router(manual_teachers.router, prefix="/manual-teachers", tags=["manual-teachers"])
 api_router.include_router(practice.router, prefix="/practice", tags=["practice"])

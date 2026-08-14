@@ -38,6 +38,8 @@ class SubscriptionStatus(str, enum.Enum):
     paused = "paused"
     suspended = "suspended"  # 일시 정지 (운영 측 강제).
     cancelled = "cancelled"  # terminal — 환불·취소.
+    # terminal — 환불 요청 완료 처리(#1271). 잔여 회차 소멸.
+    refunded = "refunded"
 
 
 class BillingType(str, enum.Enum):

@@ -40,6 +40,8 @@ TEACHER_NOTIFICATION_TYPES = frozenset(
         "academyInviteDeclined",
         # Issue #633 — 학원 강사 초대 만료 임박 알림 (학원 owner, D-1).
         "academyInviteExpiringSoon",
+        # Issue #1271 — 학생이 수강권 환불을 요청하면 교사 인박스에 도착.
+        "refundRequested",
     }
 )
 STUDENT_NOTIFICATION_TYPES = frozenset(
@@ -68,6 +70,9 @@ STUDENT_NOTIFICATION_TYPES = frozenset(
         "groupLessonReminderDayOf",
         "groupDropInOpened",
         "groupNoShowWarning",
+        # Issue #1271 — 교사가 환불 요청을 완료/반려하면 학생 인박스에 도착.
+        "refundCompleted",
+        "refundRejected",
     }
 )
 BOTH_ROLE_NOTIFICATION_TYPES = frozenset(
