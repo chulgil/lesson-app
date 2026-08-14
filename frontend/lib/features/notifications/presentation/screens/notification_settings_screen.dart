@@ -10,6 +10,9 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../auth/auth_facade.dart';
 import '../../domain/entities/notification_preferences.dart';
+import '../../domain/entities/notification_type_group.dart';
+import '../../domain/services/notification_delivery_gate.dart';
+import '../extensions/notification_type_group_visuals.dart';
 import '../providers/notification_preferences_provider.dart';
 import '../providers/subscription_expiry_providers.dart';
 
@@ -49,8 +52,11 @@ class NotificationSettingsScreen extends ConsumerWidget {
             subtitle: AppStrings.notificationLessonDesc,
             enabled: prefs.lessonEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged:
-                (v) => notifier.toggleCategory(NotificationCategory.lesson, v),
+            onChanged: (v) =>
+                notifier.toggleCategory(NotificationCategory.lesson, v),
+            groups: NotificationCategory.lesson.groups,
+            groupOverrides: prefs.groupOverrides,
+            onGroupChanged: notifier.setGroupOverride,
           ),
           // Spec §2.2: lessonStarting/lessonCancelled bypass all toggles.
           const _BypassHint(AppStrings.notifCategoryLessonBypassHint),
@@ -59,49 +65,53 @@ class NotificationSettingsScreen extends ConsumerWidget {
             subtitle: AppStrings.notificationScheduleDesc,
             enabled: prefs.scheduleEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged:
-                (v) =>
-                    notifier.toggleCategory(NotificationCategory.schedule, v),
+            onChanged: (v) =>
+                notifier.toggleCategory(NotificationCategory.schedule, v),
+            groups: NotificationCategory.schedule.groups,
+            groupOverrides: prefs.groupOverrides,
+            onGroupChanged: notifier.setGroupOverride,
           ),
           _CategoryTile(
             title: AppStrings.notificationSubscription,
             subtitle: AppStrings.notificationSubscriptionDesc,
             enabled: prefs.subscriptionEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged:
-                (v) => notifier.toggleCategory(
-                  NotificationCategory.subscription,
-                  v,
-                ),
+            onChanged: (v) =>
+                notifier.toggleCategory(NotificationCategory.subscription, v),
+            groups: NotificationCategory.subscription.groups,
+            groupOverrides: prefs.groupOverrides,
+            onGroupChanged: notifier.setGroupOverride,
           ),
           _CategoryTile(
             title: AppStrings.notificationAnnouncement,
             subtitle: AppStrings.notificationAnnouncementDesc,
             enabled: prefs.announcementEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged:
-                (v) => notifier.toggleCategory(
-                  NotificationCategory.announcement,
-                  v,
-                ),
+            onChanged: (v) =>
+                notifier.toggleCategory(NotificationCategory.announcement, v),
+            groups: NotificationCategory.announcement.groups,
+            groupOverrides: prefs.groupOverrides,
+            onGroupChanged: notifier.setGroupOverride,
           ),
           _CategoryTile(
             title: AppStrings.notificationPractice,
             subtitle: AppStrings.notificationPracticeDesc,
             enabled: prefs.practiceEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged:
-                (v) =>
-                    notifier.toggleCategory(NotificationCategory.practice, v),
+            onChanged: (v) =>
+                notifier.toggleCategory(NotificationCategory.practice, v),
+            groups: NotificationCategory.practice.groups,
+            groupOverrides: prefs.groupOverrides,
+            onGroupChanged: notifier.setGroupOverride,
           ),
           _CategoryTile(
             title: AppStrings.notificationMarketing,
             subtitle: AppStrings.notificationMarketingDesc,
             enabled: prefs.marketingEnabled,
             masterEnabled: prefs.masterEnabled,
-            onChanged:
-                (v) =>
-                    notifier.toggleCategory(NotificationCategory.marketing, v),
+            onChanged: (v) =>
+                notifier.toggleCategory(NotificationCategory.marketing, v),
+            // marketing has no NotificationType members today — no groups.
           ),
           // Teacher-only: subscription expiry auto reminders (D-14/D-7/D-1/D-0)
           // Spec: docs/specs/student/enrollment_management_ux_spec.md §3.4
@@ -125,9 +135,8 @@ class NotificationSettingsScreen extends ConsumerWidget {
           _QuietHoursSection(
             startHour: prefs.quietStartHour,
             endHour: prefs.quietEndHour,
-            onChanged:
-                ({required int? startHour, required int? endHour}) => notifier
-                    .setQuietHours(startHour: startHour, endHour: endHour),
+            onChanged: ({required int? startHour, required int? endHour}) =>
+                notifier.setQuietHours(startHour: startHour, endHour: endHour),
           ),
           // Spec §2.2: urgent lesson notifications bypass quiet hours.
           const _BypassHint(AppStrings.notifQuietHoursBypassHint),
@@ -176,13 +185,16 @@ class _MasterToggleSection extends StatelessWidget {
 // Category toggle tile
 // ---------------------------------------------------------------------------
 
-class _CategoryTile extends StatelessWidget {
+class _CategoryTile extends StatefulWidget {
   const _CategoryTile({
     required this.title,
     required this.subtitle,
     required this.enabled,
     required this.masterEnabled,
     required this.onChanged,
+    this.groups = const [],
+    this.groupOverrides = const {},
+    this.onGroupChanged,
   });
 
   final String title;
@@ -191,26 +203,123 @@ class _CategoryTile extends StatelessWidget {
   final bool masterEnabled;
   final ValueChanged<bool> onChanged;
 
+  /// Type groups nested under this category. Empty = no expand affordance
+  /// (e.g. `marketing`, which currently has no NotificationType members).
+  final List<NotificationTypeGroup> groups;
+
+  /// Current per-group overrides — passed through from
+  /// [NotificationPreferences.groupOverrides] so a group with no explicit
+  /// entry renders as inherited-from-category (spec §3, #1272).
+  final Map<NotificationTypeGroup, bool> groupOverrides;
+
+  final void Function(NotificationTypeGroup group, bool enabled)?
+  onGroupChanged;
+
+  @override
+  State<_CategoryTile> createState() => _CategoryTileState();
+}
+
+class _CategoryTileState extends State<_CategoryTile> {
+  bool _expanded = false;
+
   @override
   Widget build(BuildContext context) {
-    final effectiveEnabled = masterEnabled && enabled;
+    final effectiveEnabled = widget.masterEnabled && widget.enabled;
+    final hasGroups = widget.groups.isNotEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          value: widget.enabled,
+          onChanged: widget.masterEnabled ? widget.onChanged : null,
+          activeThumbColor: AppColors.ink,
+          title: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.title,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: effectiveEnabled
+                        ? AppColors.ink
+                        : AppColors.inkTertiary,
+                  ),
+                ),
+              ),
+              if (hasGroups)
+                IconButton(
+                  icon: Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppColors.inkSecondary,
+                  ),
+                  tooltip: AppStrings.notifGroupExpandTooltip,
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                ),
+            ],
+          ),
+          subtitle: Text(
+            widget.subtitle,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkTertiary,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadding,
+          ),
+        ),
+        if (hasGroups && _expanded)
+          ...widget.groups.map(
+            (group) => _GroupTile(
+              group: group,
+              // Raw/inherited toggle position — mirrors _CategoryTile's own
+              // `value: enabled` pattern of always showing the stored state
+              // and only disabling interaction when the parent is off.
+              enabled: widget.groupOverrides[group] ?? true,
+              rowEnabled: effectiveEnabled,
+              onChanged: widget.onGroupChanged == null
+                  ? null
+                  : (v) => widget.onGroupChanged!(group, v),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Type group toggle row (nested under an expanded category)
+// ---------------------------------------------------------------------------
+
+class _GroupTile extends StatelessWidget {
+  const _GroupTile({
+    required this.group,
+    required this.enabled,
+    required this.rowEnabled,
+    required this.onChanged,
+  });
+
+  final NotificationTypeGroup group;
+  final bool enabled;
+  final bool rowEnabled;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
     return SwitchListTile(
       value: enabled,
-      onChanged: masterEnabled ? onChanged : null,
+      onChanged: rowEnabled ? onChanged : null,
       activeThumbColor: AppColors.ink,
       title: Text(
-        title,
-        style: AppTypography.bodyMedium.copyWith(
-          color: effectiveEnabled ? AppColors.ink : AppColors.inkTertiary,
+        group.label,
+        style: AppTypography.bodySmall.copyWith(
+          color: rowEnabled ? AppColors.inkSecondary : AppColors.inkTertiary,
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
+      contentPadding: const EdgeInsets.only(
+        left: AppSpacing.screenPadding + AppSpacing.space5,
+        right: AppSpacing.screenPadding,
       ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-      ),
+      dense: true,
     );
   }
 }
@@ -378,8 +487,8 @@ class _QuietHoursSection extends StatelessWidget {
                   child: _HourPickerButton(
                     label: AppStrings.quietHoursEndLabel,
                     hour: endHour!,
-                    onChanged:
-                        (h) => onChanged(startHour: startHour, endHour: h),
+                    onChanged: (h) =>
+                        onChanged(startHour: startHour, endHour: h),
                   ),
                 ),
               ],
@@ -444,11 +553,10 @@ class _HourPickerButton extends StatelessWidget {
       context: context,
       initialTime: TimeOfDay(hour: hour, minute: 0),
       initialEntryMode: TimePickerEntryMode.input,
-      builder:
-          (ctx, child) => MediaQuery(
-            data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
-            child: child!,
-          ),
+      builder: (ctx, child) => MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
     );
     if (picked != null) {
       onChanged(picked.hour);

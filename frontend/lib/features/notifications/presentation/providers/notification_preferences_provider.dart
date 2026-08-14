@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/notification_preferences.dart';
+import '../../domain/entities/notification_type_group.dart';
 
 part 'notification_preferences_provider.g.dart';
 
@@ -51,33 +52,39 @@ class NotificationPreferencesNotifier
   /// Toggle a specific category.
   void toggleCategory(NotificationCategory category, bool enabled) {
     state = switch (category) {
-      NotificationCategory.lesson =>
-        state.copyWith(lessonEnabled: enabled),
-      NotificationCategory.schedule =>
-        state.copyWith(scheduleEnabled: enabled),
-      NotificationCategory.subscription =>
-        state.copyWith(subscriptionEnabled: enabled),
-      NotificationCategory.announcement =>
-        state.copyWith(announcementEnabled: enabled),
-      NotificationCategory.practice =>
-        state.copyWith(practiceEnabled: enabled),
-      NotificationCategory.marketing =>
-        state.copyWith(marketingEnabled: enabled),
+      NotificationCategory.lesson => state.copyWith(lessonEnabled: enabled),
+      NotificationCategory.schedule => state.copyWith(scheduleEnabled: enabled),
+      NotificationCategory.subscription => state.copyWith(
+        subscriptionEnabled: enabled,
+      ),
+      NotificationCategory.announcement => state.copyWith(
+        announcementEnabled: enabled,
+      ),
+      NotificationCategory.practice => state.copyWith(practiceEnabled: enabled),
+      NotificationCategory.marketing => state.copyWith(
+        marketingEnabled: enabled,
+      ),
     };
     _saveToHive(state);
   }
 
   /// Set DND hours. Pass null for both to disable DND.
   void setQuietHours({required int? startHour, required int? endHour}) {
-    state = state.copyWith(
-      quietStartHour: startHour,
-      quietEndHour: endHour,
-    );
+    state = state.copyWith(quietStartHour: startHour, quietEndHour: endHour);
     _saveToHive(state);
   }
 
   /// Disable DND entirely.
   void clearQuietHours() {
     setQuietHours(startHour: null, endHour: null);
+  }
+
+  /// Set an explicit override for a single type group. The override
+  /// persists across category flips until the user flips it back.
+  void setGroupOverride(NotificationTypeGroup group, bool enabled) {
+    final updated = Map<NotificationTypeGroup, bool>.from(state.groupOverrides);
+    updated[group] = enabled;
+    state = state.copyWith(groupOverrides: updated);
+    _saveToHive(state);
   }
 }

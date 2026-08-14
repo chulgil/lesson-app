@@ -8780,6 +8780,57 @@ class AppStrings {
   /// 방해금지 시간대 DND 우회 안내 (spec §6.2)
   static const notifQuietHoursBypassHint = '레슨 시작, 취소 알림은 방해금지 시간에도 수신됩니다';
 
+  // ── Notification Settings — 타입 그룹 세부 제어 (#1272) ──────────────────
+  // 카테고리 펼침 시 노출되는 하위 그룹 토글 라벨.
+
+  /// 레슨 리마인더 그룹 (예약, 레슨 전 알림)
+  static const notifGroupLessonReminder = '레슨 리마인더';
+
+  /// 레슨 시작 그룹
+  static const notifGroupLessonStarting = '레슨 시작';
+
+  /// 취소·변경 그룹
+  static const notifGroupLessonCancelChange = '취소·변경';
+
+  /// 완료·노트 그룹
+  static const notifGroupLessonCompletedNote = '완료·노트';
+
+  /// 일정 변경 요청·승인 그룹
+  static const notifGroupScheduleChange = '일정 변경 요청·승인';
+
+  /// 보강·변경권 그룹
+  static const notifGroupMakeupAndAllowance = '보강·변경권';
+
+  /// 결제·입금 그룹
+  static const notifGroupPaymentPending = '결제·입금';
+
+  /// 만료 임박 그룹
+  static const notifGroupSubscriptionExpiry = '만료 임박';
+
+  /// 제안 리마인더 그룹
+  static const notifGroupProposalReminder = '제안 리마인더';
+
+  /// 연결 요청·수락 그룹
+  static const notifGroupConnectionRequest = '연결 요청·수락';
+
+  /// 연결 해제 그룹
+  static const notifGroupConnectionDisconnect = '연결 해제';
+
+  /// 공지·기타 그룹
+  static const notifGroupGeneralAnnouncement = '공지·기타';
+
+  /// 연습 리마인더 그룹
+  static const notifGroupPracticeReminder = '연습 리마인더';
+
+  /// 스트릭·목표 그룹
+  static const notifGroupStreakAndGoal = '스트릭·목표';
+
+  /// 녹음 피드백 그룹
+  static const notifGroupRecordingFeedback = '녹음 피드백';
+
+  /// 그룹 세부 설정 펼침 버튼 툴팁
+  static const notifGroupExpandTooltip = '세부 설정 펼치기';
+
   // ── App Rating Prompt (앱 평가 유도) ────────────────────────────────────
 
   // ── 마일스톤 축하 카드 (팝업 다이얼로그 폐기 → 인라인 카드) ──
