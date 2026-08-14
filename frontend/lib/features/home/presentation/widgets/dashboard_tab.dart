@@ -147,6 +147,10 @@ class DashboardTab extends ConsumerWidget {
                   const PaymentPendingCard(),
                   const SizedBox(height: AppSpacing.space3),
 
+                  // Refund-pending dashboard card — #1271. Hides when count=0.
+                  const RefundPendingCard(),
+                  const SizedBox(height: AppSpacing.space3),
+
                   // Invite-pending dashboard card — #5 D-G3 Phase 2. Hides when count=0.
                   const InvitePendingCard(),
                   const SizedBox(height: AppSpacing.space3),

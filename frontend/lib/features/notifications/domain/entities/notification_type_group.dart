@@ -20,6 +20,7 @@ enum NotificationTypeGroup {
   paymentPending,
   subscriptionExpiry,
   proposalReminder,
+  refundProgress,
 
   // announcement category
   connectionRequest,

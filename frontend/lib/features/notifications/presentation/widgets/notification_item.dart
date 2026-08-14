@@ -327,6 +327,12 @@ class NotificationItem extends StatelessWidget {
       case NotificationType.profileReminder3d:
       case NotificationType.profileReminder7d:
         return Icons.person_outline;
+
+      // Refund request (#1271)
+      case NotificationType.refundRequested:
+      case NotificationType.refundCompleted:
+      case NotificationType.refundRejected:
+        return Icons.account_balance_outlined;
     }
   }
 

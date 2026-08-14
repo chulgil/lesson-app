@@ -53,6 +53,9 @@ extension NotificationTypeCategory on NotificationType {
       case NotificationType.paymentPendingD1:
       case NotificationType.paymentPendingD3:
       case NotificationType.paymentPendingD7Final:
+      case NotificationType.refundRequested:
+      case NotificationType.refundCompleted:
+      case NotificationType.refundRejected:
         return NotificationCategory.subscription;
 
       case NotificationType.newStudentRegistered:
@@ -145,6 +148,10 @@ extension NotificationTypeGroupMapping on NotificationType {
       case NotificationType.proposalExpired:
       case NotificationType.renewalReminderSentNotice:
         return NotificationTypeGroup.proposalReminder;
+      case NotificationType.refundRequested:
+      case NotificationType.refundCompleted:
+      case NotificationType.refundRejected:
+        return NotificationTypeGroup.refundProgress;
 
       // announcement category
       case NotificationType.connectionRequestReceived:
@@ -196,6 +203,7 @@ extension NotificationTypeGroupCategory on NotificationTypeGroup {
       case NotificationTypeGroup.paymentPending:
       case NotificationTypeGroup.subscriptionExpiry:
       case NotificationTypeGroup.proposalReminder:
+      case NotificationTypeGroup.refundProgress:
         return NotificationCategory.subscription;
       case NotificationTypeGroup.connectionRequest:
       case NotificationTypeGroup.connectionDisconnect:

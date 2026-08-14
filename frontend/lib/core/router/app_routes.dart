@@ -192,6 +192,7 @@ class AppRoutes {
   static const subscriptionTemplates = '/subscriptions/templates';
   static const teacherSubscriptions = '/subscriptions/teacher';
   static const makeupCredits = '/subscriptions/makeup-credits';
+  static const refundPendingList = '/subscriptions/refund-pending';
   static const scheduleChangeRequests = '/schedule-change-requests';
 
   // Proposal routes

@@ -608,10 +608,20 @@
 | 적용 범위 | Applies To | `Subscription.appliesTo` | `applies_to` | 수강권 사용처 스코프: `oneToOne`/`group`/`universal` (null=universal 비파괴). 사용하지 않는 표현: 별도 그룹 수강권, 그룹 지갑 |
 | 반 공지 | Class Announcement | `TeacherAnnouncement` (scope=class) | `TeacherAnnouncement` | 반 전체 공지 — 기존 공지 엔티티에 대상 스코프 확장. 사용하지 않는 표현: ClassNote (신설 금지) |
 
+## 19. 환불 요청 (Refund Request) — #1271 (2026-08-14)
+
+| 한글 | 영문 | FE 클래스 | BE 클래스 | 설명 |
+|------|------|-----------|-----------|------|
+| 환불 요청 | Refund Request | `RefundRequest` | `RefundRequest` | 잔여 회차 있는 수강권의 외부 이체 환불 요청. 인앱 결제/PG 환불 아님(수기 이체) |
+| 환불 상태 | Refund Request Status | `RefundRequestStatus` | `RefundRequestStatus` | `requested` → `completed`｜`rejected` (종결형, 재오픈 없음) |
+| 예상 환불액 | Estimated Refund Amount | `estimateRefundAmount` (presentation/utils) | — | `LessonPolicy`(fullRefundDays/partialRefundRatio/halfwayRefundRatio) 기반 참고용 산정. 최종 금액은 선생님이 처리 시 직접 입력 |
+| 처리 금액 | Processed Amount | `RefundRequest.processedAmount` | `processed_amount` | 선생님이 완료 처리 시 입력한 실제 이체 금액 (참고용 예상액과 별개) |
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-08-14 | §19 환불 요청(Refund Request) 신설 — `RefundRequest`/`RefundRequestStatus` + 참고용 예상 환불액 산정(`estimateRefundAmount`, `LessonPolicy` 환불 필드 4종 재사용). 인앱 결제 없는 수기 외부이체 흐름. 이슈 #1271 |
 | 2026-08-03 | §2 "수기 레슨" · §6 "수기 학생" 등재/재정의 — 수기 = 수강권 미귀속이 아니라 (레슨) 선생님 직접 등록 + (학생) 미가입·학생 확인 생략. 데이터 경로는 수강권 귀속으로 단일. 근거: `subscription_required_spec.md` §2.6~2.7 + `docs/proposal/lesson_add_intent_redesign.md` (D5) |
 | 2026-07-31 | §18 그룹레슨 신설 — D1~D8 확정(옵시디언 45 §9) 반영. GroupClass 배선 정합·appliesTo·코호트/드롭인·반 공지 용어 등록 |
 | 2026-06-19 | 일괄 처리(Batch Action) 신설 — 스케줄 다중선택 일괄 완료/휴강(#768 ①). 리스트 long-press 진입 + 탭 토글 → 선택 N건 일괄 완료(레슨당 `confirmLessonCompleted` 1회씩 정확히 N회 차감)/휴강(차감 0). `LessonSelection` 선택 상태 + 하단 액션바. 기존 스와이프(단건 완료/취소) 불변. |

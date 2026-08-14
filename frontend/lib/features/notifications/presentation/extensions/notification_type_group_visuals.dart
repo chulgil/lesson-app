@@ -22,6 +22,8 @@ extension NotificationTypeGroupVisuals on NotificationTypeGroup {
       AppStrings.notifGroupSubscriptionExpiry,
     NotificationTypeGroup.proposalReminder =>
       AppStrings.notifGroupProposalReminder,
+    NotificationTypeGroup.refundProgress =>
+      AppStrings.notifGroupRefundProgress,
     NotificationTypeGroup.connectionRequest =>
       AppStrings.notifGroupConnectionRequest,
     NotificationTypeGroup.connectionDisconnect =>
