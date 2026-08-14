@@ -14,6 +14,7 @@ import '../../../features/subscription/presentation/screens/lesson_policy_screen
 import '../../../features/subscription/presentation/screens/makeup_credit_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
+import '../../../features/subscription/presentation/screens/refund_pending_list_screen.dart';
 import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/schedule_change_request_list_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_template_list_screen.dart';
@@ -137,6 +138,15 @@ List<RouteBase> subscriptionRoutes = [
       final studentId = state.uri.queryParameters['studentId'];
       return MakeupCreditScreen(studentId: studentId);
     },
+  ),
+  // Refund pending list route (#1271) must come before parameterized detail
+  // route. Teacher-only — mirrors the makeup credit / policy ordering above.
+  GoRoute(
+    path: AppRoutes.refundPendingList,
+    builder:
+        (context, state) => const _TeacherOnlySubscriptionRoute(
+          child: RefundPendingListScreen(),
+        ),
   ),
   // Policy route must come before detail route
   GoRoute(

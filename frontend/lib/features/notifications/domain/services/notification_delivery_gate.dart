@@ -52,6 +52,9 @@ extension NotificationTypeCategory on NotificationType {
       case NotificationType.paymentPendingD1:
       case NotificationType.paymentPendingD3:
       case NotificationType.paymentPendingD7Final:
+      case NotificationType.refundRequested:
+      case NotificationType.refundCompleted:
+      case NotificationType.refundRejected:
         return NotificationCategory.subscription;
 
       case NotificationType.newStudentRegistered:

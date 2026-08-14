@@ -71,6 +71,10 @@ enum NotificationType {
   // Reschedule allowance notifications
   rescheduleAllowanceUsed, // Student used reschedule allowance
   rescheduleAllowanceDepleted, // All reschedule allowances used
+  // Refund request notifications (#1271)
+  refundRequested, // Student submitted a refund request (teacher receives)
+  refundCompleted, // Teacher completed the refund (student receives)
+  refundRejected, // Teacher rejected the refund (student receives)
   // Bulk teacher actions (§7.119)
   generalAnnouncement, // Teacher broadcast message (non-urgent)
   // System auto-send notices (teacher sees "sent to student" notification)
@@ -124,6 +128,9 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.paymentPendingD7Final:
       case NotificationType.scheduleConfirmationRequired:
       case NotificationType.profileReminder7d: // Final reminder
+      case NotificationType.refundRequested:
+      case NotificationType.refundCompleted:
+      case NotificationType.refundRejected:
         return NotificationPriority.high;
 
       case NotificationType.streakMilestone:
@@ -187,6 +194,7 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.generalAnnouncement:
       case NotificationType.paymentReminderSentNotice:
       case NotificationType.renewalReminderSentNotice:
+      case NotificationType.refundRequested:
         return 'teacher';
 
       // Student-only notifications
@@ -211,6 +219,8 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.paymentPendingD1:
       case NotificationType.paymentPendingD3:
       case NotificationType.paymentPendingD7Final:
+      case NotificationType.refundCompleted:
+      case NotificationType.refundRejected:
         return 'student';
 
       // Teacher-only — profile reminder series

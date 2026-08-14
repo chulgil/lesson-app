@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,6 +15,7 @@ import '../../domain/services/connection_notification_service.dart';
 import '../../domain/services/notification_delivery_gate.dart';
 import '../../domain/services/notification_scheduler_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
+import '../../domain/services/refund_notification_service.dart';
 
 import 'notification_preferences_provider.dart';
 
@@ -44,10 +44,11 @@ LocalNotificationService notificationService(Ref ref) {
   // #501: every delivery path (show/schedule, incl. FCM foreground and the
   // scheduler/stub services that wrap this one) passes the preference gate.
   final service = LocalNotificationService(
-    shouldDeliver: (notification) => shouldDeliverNotification(
-      ref.read(notificationPreferencesNotifierProvider),
-      notification,
-    ),
+    shouldDeliver:
+        (notification) => shouldDeliverNotification(
+          ref.read(notificationPreferencesNotifierProvider),
+          notification,
+        ),
   );
   ref.onDispose(() => service.dispose());
   return service;
@@ -93,6 +94,13 @@ ConnectionNotificationService connectionNotificationService(Ref ref) {
 ProposalNotificationService proposalNotificationService(Ref ref) {
   final notificationService = ref.watch(notificationServiceProvider);
   return ProposalNotificationService(notificationService);
+}
+
+/// Provider for refund request notification service (#1271)
+@riverpod
+RefundNotificationService refundNotificationService(Ref ref) {
+  final notificationService = ref.watch(notificationServiceProvider);
+  return RefundNotificationService(notificationService);
 }
 
 // ============================================================

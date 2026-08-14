@@ -3773,8 +3773,8 @@ class AppStrings {
   /// 안내 문구 도움말 (기본값 메시지가 있을 때)
   static String policyCompensationMessageHelper(String? defaultMessage) =>
       defaultMessage == null || defaultMessage.isEmpty
-      ? '비워두면 기본 안내 문구가 사용됩니다.'
-      : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
+          ? '비워두면 기본 안내 문구가 사용됩니다.'
+          : '기본값: "$defaultMessage" — 본 수강권의 카톡 본문에 사용됩니다.';
 
   /// 안내 문구 placeholder
   static const policyCompensationMessageHint =
@@ -6655,11 +6655,12 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
-    final header = hasIdentity
-        ? (instruments.isEmpty
-              ? '$senderName $role님이 레슨앱에 초대했어요!'
-              : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
-        : '레슨앱에서 저와 함께해요!';
+    final header =
+        hasIdentity
+            ? (instruments.isEmpty
+                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
+            : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
         '초대 코드: $code\n'
@@ -8395,6 +8396,56 @@ class AppStrings {
   static const invitePendingResendFailed = '재발송에 실패했습니다.';
   static const invitePendingCodeLabel = '코드';
 
+  // ── #1271 수강권 환불 요청 ──
+  // 학생: 시트 폼
+  static const refundRequestCta = '환불 요청';
+  static const refundRequestSheetTitle = '환불 요청';
+  static const refundRequestBankLabel = '은행';
+  static const refundRequestAccountNumberLabel = '계좌번호';
+  static const refundRequestAccountHolderLabel = '예금주';
+  static const refundRequestReasonLabel = '사유 (선택)';
+  static const refundRequestReasonHint = '환불 사유를 입력해주세요 (선택)';
+  static const refundRequestEstimateLabel = '예상 환불액 (참고용)';
+  static const refundRequestEstimateNote = '실제 환불 금액은 선생님이 확인 후 결정합니다.';
+  static const refundRequestEstimateUnavailable = '예상 환불액을 계산할 수 없습니다.';
+  static const refundRequestSubmit = '요청하기';
+  static const refundRequestSuccess = '환불을 요청했습니다.';
+  static const refundRequestFailed = '환불 요청에 실패했습니다.';
+  static const refundRequestValidationBank = '은행을 선택하거나 입력해주세요.';
+  static const refundRequestValidationNumber = '계좌번호를 입력해주세요.';
+  static const refundRequestValidationHolder = '예금주를 입력해주세요.';
+  static const refundRequestDuplicateBlocked = '이미 진행 중인 환불 요청이 있습니다.';
+
+  // 상태 배지 (학생·선생님 공용)
+  static const refundStatusRequested = '환불 요청됨';
+  static const refundStatusCompleted = '환불 완료';
+  static const refundStatusRejected = '환불 반려';
+
+  // 선생님: 수강권 상세 상단 처리 박스
+  static const refundActionBoxTitle = '환불 요청';
+  static const refundActionBoxAccountCopyLabel = '계좌번호 복사';
+  static const refundActionBoxAccountCopied = '계좌번호를 복사했습니다.';
+  static const refundActionBoxAmountLabel = '환불 금액';
+  static const refundActionBoxAmountHint = '실제 이체한 금액을 입력하세요';
+  static const refundActionBoxAmountValidation = '금액을 입력해주세요.';
+  static const refundActionBoxComplete = '완료 처리';
+  static const refundActionBoxReject = '반려';
+  static const refundActionBoxCompleteConfirmTitle = '환불을 완료 처리할까요?';
+  static const refundActionBoxCompleteConfirmBody =
+      '완료 처리하면 수강권 잔여 회차가 소멸되고 학생에게 알림이 전송됩니다.';
+  static const refundActionBoxRejectTitle = '환불 반려';
+  static const refundActionBoxRejectReasonHint = '반려 사유를 입력해주세요';
+  static const refundActionBoxRejectReasonRequired = '반려 사유를 입력해주세요.';
+  static const refundActionBoxCompleteSuccess = '환불을 완료 처리했습니다.';
+  static const refundActionBoxCompleteFailed = '완료 처리에 실패했습니다.';
+  static const refundActionBoxRejectSuccess = '환불 요청을 반려했습니다.';
+  static const refundActionBoxRejectFailed = '반려에 실패했습니다.';
+
+  // 선생님: 환불 대기 대시보드
+  static const refundPendingCardTitle = '환불 대기';
+  static const refundPendingListTitle = '환불 대기';
+  static const refundPendingEmpty = '환불 대기 항목이 없습니다.';
+
   // ── Tip Template Management ──
   static const profileTipTemplateTitle = '템플릿 관리';
   static const profileTipTemplateAdd = '템플릿 추가';
@@ -9417,9 +9468,10 @@ class AppStrings {
   static const vacationNotifyDialogTitle = '통보 완료';
 
   /// 휴가 등록 성공 확인 다이얼로그 본문 — 영향 학생 수 포함.
-  static String vacationNotifyDialogBody(int studentCount) => studentCount == 0
-      ? '해당 기간에 영향 받는 학생이 없어요.'
-      : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
+  static String vacationNotifyDialogBody(int studentCount) =>
+      studentCount == 0
+          ? '해당 기간에 영향 받는 학생이 없어요.'
+          : '$studentCount명의 학생에게 휴가 일정이 통보되었어요.';
 
   /// 휴가 등록 성공 확인 다이얼로그 확인 버튼.
   static const vacationNotifyDialogConfirm = '확인';

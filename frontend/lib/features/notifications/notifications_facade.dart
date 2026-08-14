@@ -8,6 +8,7 @@ export 'presentation/providers/notification_providers.dart'
         notificationSchedulerServiceProvider,
         practiceReminderSchedulerProvider,
         proposalNotificationServiceProvider,
+        refundNotificationServiceProvider,
         unreadNotificationCountProvider;
 export 'domain/services/practice_reminder_scheduler.dart'
     show PracticeReminderScheduler;

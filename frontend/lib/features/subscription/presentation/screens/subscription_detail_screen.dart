@@ -29,6 +29,7 @@ import '../providers/subscription_providers.dart';
 import '../utils/expiry_streak_detector.dart';
 import '../widgets/expiry_streak_banner.dart';
 import '../widgets/next_session_booking_cta.dart';
+import '../widgets/refund_request_banner.dart';
 import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
 import '../widgets/subscription_bottom_input_bar.dart';
@@ -464,6 +465,13 @@ class _SubscriptionDetailBodyState
                       studentName: studentName,
                       teacherName: teacherName,
                     ),
+              ),
+
+              // #1271 — 환불 요청 표면 (학생: CTA/상태배지, 선생님: 처리 박스)
+              RefundRequestBanner(
+                subscription: subscription,
+                viewerRole: widget.viewerRole,
+                studentName: studentName,
               ),
 
               // §7.119 v2.2: 휴강 상단 배너 (선생님+학생 모두 표시)

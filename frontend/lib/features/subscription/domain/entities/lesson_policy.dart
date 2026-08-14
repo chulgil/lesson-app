@@ -45,10 +45,10 @@ class LessonPolicy {
   /// Carryover validity period in months
   final int carryoverPeriodMonths;
 
-  // ===== 환불 정책 — 보류 (2026-04-21) =====
-  // 앱 내 결제 기능 미구현으로 환불 UI를 연결하지 않는다.
-  // 스펙: docs/specs/subscription/lesson_policy_settings.md §4 "보류".
-  // 기존 원격/JSON 데이터 호환을 위해 필드 자체는 삭제하지 않는다.
+  // ===== 환불 정책 =====
+  // #1271 환불 요청 플로우에서 참고용 예상 환불액 산정에 사용 (외부 이체
+  // 수기 처리 — 인앱 결제/PG 자동 환불은 여전히 범위 외).
+  // 산식: features/subscription/presentation/utils/refund_estimate_calculator.dart
 
   final int fullRefundDays;
 

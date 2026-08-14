@@ -155,6 +155,26 @@ final proposalNotificationServiceProvider =
 
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
+String _$refundNotificationServiceHash() =>
+    r'025ca714b90cfabca85e5a8fd81273e25e47d42c';
+
+/// Provider for refund request notification service (#1271)
+///
+/// Copied from [refundNotificationService].
+@ProviderFor(refundNotificationService)
+final refundNotificationServiceProvider =
+    AutoDisposeProvider<RefundNotificationService>.internal(
+  refundNotificationService,
+  name: r'refundNotificationServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$refundNotificationServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef RefundNotificationServiceRef
+    = AutoDisposeProviderRef<RefundNotificationService>;
 String _$userNotificationsHash() => r'57b0962d3bf3e09a36e6724a2655a09f78a76b99';
 
 /// Provider for user's notifications list.
