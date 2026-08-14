@@ -45,6 +45,11 @@ class Invite(UUIDMixin, Base):
         Enum(InviteUserRole, native_enum=True),
         nullable=False,
     )
+    # #1267 — target role prebinding. Plain nullable string (not a native PG
+    # enum) so adding a 4th target role never needs an `ALTER TYPE ADD VALUE`
+    # migration; values validated in the Pydantic schema instead.
+    # None = legacy invite, no target role prebound.
+    target_role: Mapped[str | None] = mapped_column(String(20), nullable=True)
     invite_code: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     invite_url: Mapped[str] = mapped_column(Text, nullable=False)
     qr_code_data: Mapped[str] = mapped_column(Text, nullable=False)

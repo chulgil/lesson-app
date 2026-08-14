@@ -45,6 +45,7 @@ async def create_invite(
         max_uses=body.max_uses,
         note=body.note,
         expires_in_hours=body.expires_in_hours,
+        target_role=body.target_role,
         current_user=current_user,
     )
     return result
