@@ -47,6 +47,24 @@ void main() {
       const state = AuthNeedsRole(userId: 'u', name: 'n', email: 'e');
       expect(resolveAuthRedirect(state, AppRoutes.roleSelect), isNull);
     });
+
+    // #1267 — QR 스캔으로 온 신규 사용자는 역할을 고르기 전에 스캐너부터 열 수
+    // 있어야 한다 (RoleSelectScreen 을 거치지 않는 대상 역할 사전결정 흐름).
+    test('allows /invite/scan before a role is chosen (#1267)', () {
+      const state = AuthNeedsRole(userId: 'u', name: 'n', email: 'e');
+      expect(resolveAuthRedirect(state, AppRoutes.inviteScan), isNull);
+    });
+
+    test('still redirects other invite paths to roleSelect (#1267 scope)', () {
+      // Only the scanner itself is whitelisted pre-role; inviteConfirm still
+      // requires a role because AuthNeedsRole -> setRole() happens inside
+      // ScanInviteScreen before any navigation to inviteConfirm occurs.
+      const state = AuthNeedsRole(userId: 'u', name: 'n', email: 'e');
+      expect(
+        resolveAuthRedirect(state, AppRoutes.inviteConfirm),
+        AppRoutes.roleSelect,
+      );
+    });
   });
 
   group('resolveAuthRedirect — onboarding gate whitelist', () {

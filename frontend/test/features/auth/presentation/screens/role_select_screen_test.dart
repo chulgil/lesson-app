@@ -60,4 +60,35 @@ void main() {
     expect(find.text(AppStrings.onboardingDurationCaption), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  // #1267 — QR 스캔으로 온 신규 사용자는 역할 카드를 고르지 않고 바로 스캔으로
+  // 시작할 수 있다. 필수 약관 동의 전에는 다른 카드들처럼 비활성 상태다.
+  testWidgets('#1267 "QR 코드로 시작하기" 진입점이 있고, 약관 미동의 시 비활성이다', (tester) async {
+    await pumpRoleSelect(tester);
+
+    final scanEntry = find.widgetWithText(
+      TextButton,
+      AppStrings.roleSelectScanEntryLabel,
+    );
+    expect(scanEntry, findsOneWidget);
+    expect(tester.widget<TextButton>(scanEntry).onPressed, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('#1267 필수 약관에 동의하면 "QR 코드로 시작하기"가 활성화된다', (tester) async {
+    await pumpRoleSelect(tester);
+
+    // "전체 동의" tap satisfies both required terms in one go (mirrors
+    // TermsAgreementSection._toggleAll — no Material Checkbox, custom
+    // PencilBox affordance behind the label InkWell).
+    await tester.tap(find.text(AppStrings.authTermsSelectAll));
+    await tester.pumpAndSettle();
+
+    final scanEntry = find.widgetWithText(
+      TextButton,
+      AppStrings.roleSelectScanEntryLabel,
+    );
+    expect(tester.widget<TextButton>(scanEntry).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
 }

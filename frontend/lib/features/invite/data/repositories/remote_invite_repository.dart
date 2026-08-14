@@ -19,6 +19,7 @@ class RemoteInviteRepository implements InviteRepository {
     int? maxUses,
     Duration validity = const Duration(days: 7),
     String? note,
+    InviteTargetRole? targetRole,
   }) async {
     final response = await _apiClient.post(
       '/invites/',
@@ -27,6 +28,7 @@ class RemoteInviteRepository implements InviteRepository {
         if (maxUses != null) 'max_uses': maxUses,
         'expires_in_hours': validity.inHours,
         if (note != null) 'note': note,
+        if (targetRole != null) 'target_role': targetRole.wireValue,
       },
     );
     return _inviteFromJson(response.data as Map<String, dynamic>);
@@ -267,6 +269,7 @@ class RemoteInviteRepository implements InviteRepository {
       note: json['note'] as String?,
       expiresAt: DateTime.parse(json['expires_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
+      targetRole: InviteTargetRole.fromWire(json['target_role'] as String?),
     );
   }
 

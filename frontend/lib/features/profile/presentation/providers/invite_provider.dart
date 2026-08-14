@@ -76,6 +76,7 @@ class InviteCreator extends _$InviteCreator {
     int? maxUses,
     Duration validity = const Duration(days: 7),
     String? note,
+    InviteTargetRole? targetRole,
   }) async {
     state = const AsyncValue.loading();
 
@@ -91,6 +92,7 @@ class InviteCreator extends _$InviteCreator {
         maxUses: maxUses,
         validity: validity,
         note: note,
+        targetRole: targetRole,
       );
 
       state = AsyncValue.data(invite);

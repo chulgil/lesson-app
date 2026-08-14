@@ -115,7 +115,8 @@ class InviteHistoryScreen extends ConsumerWidget {
           ref,
           title: AppStrings.inviteHistoryRevokedSection,
           invites: revokedInvites,
-          showActive: activeInvites.isNotEmpty ||
+          showActive:
+              activeInvites.isNotEmpty ||
               usedInvites.isNotEmpty ||
               expiredInvites.isNotEmpty,
         ),
@@ -269,10 +270,7 @@ class _InviteCard extends StatelessWidget {
         color: isInactive ? AppColors.paperDark : AppColors.paper,
         borderRadius: BorderRadius.zero,
         border: Border.all(
-          color:
-              isInactive
-                  ? AppColors.inkStrong
-                  : AppColors.inkQuaternary,
+          color: isInactive ? AppColors.inkStrong : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -298,6 +296,27 @@ class _InviteCard extends StatelessWidget {
                   ),
                 ),
               ),
+              // #1267 — 대상 역할 배지 (레거시 초대는 targetRole=null → 미표시).
+              if (invite.targetRole != null) ...[
+                const SizedBox(width: AppSpacing.space2),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.inkSoft,
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  child: Text(
+                    invite.targetRole!.label,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
               const Spacer(),
               // Created date
               Text(

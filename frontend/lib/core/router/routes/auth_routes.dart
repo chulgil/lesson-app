@@ -65,25 +65,28 @@ List<GoRoute> authRoutes = [
   GoRoute(
     path: AppRoutes.parentInviteCode,
     name: 'parentInviteCode',
-    builder: (context, state) => const ParentInviteCodeScreen(),
+    // #1267 — 대상 역할 사전결정 QR 스캔이 넘기는 초대 코드(extra, String?).
+    // 신규 사용자는 이 코드로 수동 입력 없이 자동 제출된다.
+    builder: (context, state) =>
+        ParentInviteCodeScreen(initialCode: state.extra as String?),
   ),
 
   // Student Invite Code
   GoRoute(
     path: AppRoutes.studentInviteCode,
     name: 'studentInviteCode',
-    builder: (context, state) => const StudentInviteCodeScreen(),
+    builder: (context, state) =>
+        StudentInviteCodeScreen(initialCode: state.extra as String?),
   ),
 
   // Teacher Onboarding - Phone Verification
   GoRoute(
     path: AppRoutes.teacherPhoneVerification,
     name: 'teacherPhoneVerification',
-    builder:
-        (context, state) => PhoneVerificationScreen(
-          // #695 §5.5 — 'gate' when routed from the E3 gate modal; quest otherwise.
-          trigger: state.uri.queryParameters['trigger'] ?? 'quest',
-        ),
+    builder: (context, state) => PhoneVerificationScreen(
+      // #695 §5.5 — 'gate' when routed from the E3 gate modal; quest otherwise.
+      trigger: state.uri.queryParameters['trigger'] ?? 'quest',
+    ),
   ),
 
   // Teacher Onboarding - Profile Setup

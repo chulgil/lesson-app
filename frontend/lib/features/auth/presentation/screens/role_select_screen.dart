@@ -90,12 +90,11 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
-    final userName =
-        authState is AuthNeedsRole
-            ? authState.name
-            : authState is AuthNeedsOnboarding
-            ? authState.name
-            : '';
+    final userName = authState is AuthNeedsRole
+        ? authState.name
+        : authState is AuthNeedsOnboarding
+        ? authState.name
+        : '';
 
     return NotebookScreenScaffold(
       body: SafeArea(
@@ -183,6 +182,21 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
                 isEnabled: _canSelectRole,
                 isLoading: _isLoading,
                 onTap: () => _selectRole(UserRole.parent),
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // #1267 — 대상 역할이 지정된 QR 은 역할 카드를 고르지 않고 바로
+              // 스캔으로 시작할 수 있다. 스캔 결과가 새 역할을 확정하므로 같은
+              // 약관 동의 게이트를 공유한다.
+              Center(
+                child: TextButton.icon(
+                  onPressed: _canSelectRole
+                      ? () => context.push(AppRoutes.inviteScan)
+                      : null,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text(AppStrings.roleSelectScanEntryLabel),
+                ),
               ),
 
               if (!_terms.requiredAccepted) ...[

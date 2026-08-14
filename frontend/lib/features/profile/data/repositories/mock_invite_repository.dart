@@ -177,6 +177,7 @@ class MockInviteRepository implements InviteRepository {
     int? maxUses,
     Duration validity = const Duration(days: 7),
     String? note,
+    InviteTargetRole? targetRole,
   }) async {
     await Future.delayed(const Duration(milliseconds: 200));
 
@@ -196,6 +197,7 @@ class MockInviteRepository implements InviteRepository {
       isSingleUse: isSingleUse,
       maxUses: maxUses,
       note: note,
+      targetRole: targetRole,
     );
 
     _invites[id] = invite;

@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lessonaza/core/widgets/notebook/notebook_surfaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/auth/auth_state.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
@@ -11,7 +14,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
+import '../../../auth/auth_facade.dart';
 import '../../../profile/profile_facade.dart';
+import '../providers/invite_scan_routing.dart';
 
 /// QR code type
 enum _QrType { invite, academy }
@@ -56,10 +61,9 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
   @override
   Widget build(BuildContext context) {
     final userRole = ref.watch(currentInviteUserRoleProvider);
-    final targetRole =
-        userRole == InviteUserRole.teacher
-            ? AppStrings.student
-            : AppStrings.teacher;
+    final targetRole = userRole == InviteUserRole.teacher
+        ? AppStrings.student
+        : AppStrings.teacher;
 
     return NotebookScreenScaffold(
       backgroundColor: Colors.black,
@@ -213,22 +217,18 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
       height: 30,
       decoration: BoxDecoration(
         border: Border(
-          top:
-              isTop
-                  ? BorderSide(color: AppColors.paperAccent, width: 4)
-                  : BorderSide.none,
-          bottom:
-              !isTop
-                  ? BorderSide(color: AppColors.paperAccent, width: 4)
-                  : BorderSide.none,
-          left:
-              isLeft
-                  ? BorderSide(color: AppColors.paperAccent, width: 4)
-                  : BorderSide.none,
-          right:
-              !isLeft
-                  ? BorderSide(color: AppColors.paperAccent, width: 4)
-                  : BorderSide.none,
+          top: isTop
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
+              : BorderSide.none,
+          bottom: !isTop
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
+              : BorderSide.none,
+          left: isLeft
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
+              : BorderSide.none,
+          right: !isLeft
+              ? BorderSide(color: AppColors.paperAccent, width: 4)
+              : BorderSide.none,
         ),
       ),
     );
@@ -282,7 +282,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
             // Stop scanning before navigating (see academy branch).
             await _scannerController.stop();
             if (mounted) {
-              await context.push(AppRoutes.inviteConfirm, extra: invite);
+              await _routeResolvedInvite(invite);
             }
             if (mounted) await _scannerController.start();
           } else {
@@ -302,6 +302,61 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
         setState(() => _isProcessing = false);
       }
     }
+  }
+
+  /// #1267 — decides whether the resolved [invite] sends a brand-new scanner
+  /// straight into its target role's onboarding (skipping RoleSelectScreen
+  /// and manual code entry) or follows the normal confirm/mismatch flow.
+  /// Existing-account and legacy (no target role) invites always push
+  /// [AppRoutes.inviteConfirm] unchanged — [InviteConfirmScreen] itself
+  /// renders the mismatch-block content when applicable.
+  Future<void> _routeResolvedInvite(Invite invite) async {
+    final authState = ref.read(authNotifierProvider);
+    final isNewSession = authState is AuthNeedsRole;
+    final currentUserRole = switch (authState) {
+      AuthAuthenticated(:final role) => role,
+      AuthNeedsOnboarding(:final role) => role,
+      _ => null,
+    };
+
+    final decision = resolveInviteScanRoute(
+      targetRole: invite.targetRole,
+      isNewSession: isNewSession,
+      currentUserRole: currentUserRole,
+    );
+
+    switch (decision) {
+      case InviteScanNewUserOnboarding():
+        await _handleNewUserOnboarding(invite, decision);
+      case InviteScanConfirm():
+      case InviteScanRoleMismatch():
+        await context.push(AppRoutes.inviteConfirm, extra: invite);
+    }
+  }
+
+  Future<void> _handleNewUserOnboarding(
+    Invite invite,
+    InviteScanNewUserOnboarding decision,
+  ) async {
+    try {
+      await ref.read(authNotifierProvider.notifier).setRole(decision.role);
+    } catch (_) {
+      _showError(AppStrings.inviteScanProcessingError);
+      return;
+    }
+    if (!mounted) return;
+
+    if (!decision.createsConnectionRequest) {
+      // Teacher target — no connection request. The invite's creator/usedBy
+      // linkage IS the referral record; BE persists it once marked used.
+      unawaited(ref.read(inviteRepositoryProvider).useInvite(invite.id));
+      context.go(decision.onboardingRoute);
+      return;
+    }
+
+    // Student/parent onboarding screens accept the already-known code and
+    // auto-submit it — the scanner never re-types what the QR already gave.
+    context.go(decision.onboardingRoute, extra: invite.inviteCode);
   }
 
   _ParsedQr? _parseQrCode(String rawValue) {

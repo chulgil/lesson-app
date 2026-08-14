@@ -18,7 +18,11 @@ import '../../../profile/profile_facade.dart';
 /// Parent invite code input screen
 /// Parents enter an invite code from the teacher to connect with their child
 class ParentInviteCodeScreen extends ConsumerStatefulWidget {
-  const ParentInviteCodeScreen({super.key});
+  const ParentInviteCodeScreen({super.key, this.initialCode});
+
+  /// #1267 — QR 스캔으로 온 신규 사용자는 코드를 이미 알고 있으므로 수동 입력을
+  /// 건너뛴다: 필드를 채우고 자동 제출한다.
+  final String? initialCode;
 
   @override
   ConsumerState<ParentInviteCodeScreen> createState() =>
@@ -32,6 +36,18 @@ class _ParentInviteCodeScreenState
   bool _isLoading = false;
   bool _isSkipping = false; // #103: skip 경로 전용 가드 (제출 스피너와 분리)
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialCode;
+    if (initial != null && initial.isNotEmpty) {
+      _codeController.text = initial;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _handleSubmitCode();
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -65,9 +81,7 @@ class _ParentInviteCodeScreenState
                       Container(
                         width: 80,
                         height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.inkSoft,
-                        ),
+                        decoration: BoxDecoration(color: AppColors.inkSoft),
                         child: Center(
                           child: Icon(
                             Icons.family_restroom,

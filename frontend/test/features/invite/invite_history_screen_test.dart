@@ -47,9 +47,10 @@ Invite _invite({
     status: status,
     createdAt: now.subtract(const Duration(days: 3)),
     // expired invite's expiresAt is in the past; others in the future.
-    expiresAt: status == InviteStatus.expired
-        ? now.subtract(const Duration(days: 1))
-        : now.add(const Duration(days: 4)),
+    expiresAt:
+        status == InviteStatus.expired
+            ? now.subtract(const Duration(days: 1))
+            : now.add(const Duration(days: 4)),
     useCount: useCount,
   );
 }
@@ -134,6 +135,34 @@ void main() {
       await _pump(tester, invites: const []);
 
       expect(find.byType(EmptyStateWidget), findsOneWidget);
+    });
+
+    // #1267 — QR/코드 대상 역할 사전결정: 대상이 지정된 초대는 이력에도 배지가
+    // 붙고, 레거시 초대(targetRole=null)는 배지가 없다 (AC4 호환 회귀).
+    testWidgets('대상 역할이 있는 초대는 이력에 배지가 표시된다', (tester) async {
+      final withTarget = _invite(
+        id: 'i-used',
+        code: 'USED01',
+        status: InviteStatus.used,
+      ).copyWith(targetRole: InviteTargetRole.student);
+
+      await _pump(tester, invites: [withTarget]);
+
+      expect(find.text('학생용'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('레거시 초대(targetRole=null)는 배지가 없다', (tester) async {
+      await _pump(
+        tester,
+        invites: [
+          _invite(id: 'i-used', code: 'USED01', status: InviteStatus.used),
+        ],
+      );
+
+      expect(find.text('학생용'), findsNothing);
+      expect(find.text('선생님용'), findsNothing);
+      expect(find.text('학부모용'), findsNothing);
     });
   });
 }

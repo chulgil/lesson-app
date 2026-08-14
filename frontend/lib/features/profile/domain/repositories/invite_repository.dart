@@ -13,6 +13,7 @@ abstract class InviteRepository {
     int? maxUses,
     Duration validity = const Duration(days: 7),
     String? note,
+    InviteTargetRole? targetRole,
   });
 
   /// Get invite by ID
