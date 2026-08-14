@@ -22,3 +22,24 @@
 {"ts": "2026-08-05T04:23:37.176865+00:00", "type": "confirmation", "matched": "진행해", "snippet": "/goal https://www.figma.com/design/nnBjRUgvEOsn3DprvGhWEF/Lessonaza-Design-System?node-id=67-2&p=f&t=Mw5vCFtDSUGpNshz-0 에 실제 UX디자이너가 피드백을 준것이 있는데 이 기준을 표준으로 삼아 전체적으로 UIUX 변경이 필요합니다. 전체 UI반영해서 앱이 완료되면 ", "source": "user-prompt"}
 {"ts": "2026-08-05T07:39:20.759468+00:00", "type": "confirmation", "matched": "진행해", "snippet": "이어서 진행해주세요 모두 진행되어야함", "source": "user-prompt"}
 {"ts": "2026-08-05T07:49:26.366657+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요.", "source": "user-prompt"}
+{"ts": "2026-08-10T03:37:12.645755+00:00", "type": "confirmation", "matched": "진행해", "snippet": "백엔드도 마찬가지로 진행해주세요 .", "source": "user-prompt"}
+{"ts": "2026-08-10T04:35:47.979008+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-10T05:40:13.360366+00:00", "type": "confirmation", "matched": "진행해", "snippet": "남은것 순차적으로 진행해주세요.", "source": "user-prompt"}
+{"ts": "2026-08-11T02:11:37.621555+00:00", "type": "confirmation", "matched": "승인", "snippet": "머지 승인합니다.", "source": "user-prompt"}
+{"ts": "2026-08-11T06:14:56.189264+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속진행해주세요.", "source": "user-prompt"}
+{"ts": "2026-08-12T07:39:54.848330+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요.", "source": "user-prompt"}
+{"ts": "2026-08-13T01:33:48.547247+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-13T04:09:42.097727+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-13T05:46:27.371223+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요.", "source": "user-prompt"}
+{"ts": "2026-08-13T05:49:00.814261+00:00", "type": "correction", "matched": "수정해", "snippet": "이름을 적절하게 수정해주세요", "source": "user-prompt"}
+{"ts": "2026-08-13T08:44:42.797265+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-13T08:57:25.681405+00:00", "type": "rejection", "matched": "아니라", "snippet": "<agent-message from=\"impl-1270\">\n**요약**: 어학 단어장(vocabulary) 기능 전체 제거 완료. music-single-category 구성 복귀.\n**삭제 규모**: 45 files changed, 34 insertions(+), 3996 deletions(-). vocabulary feature dir(27 files)", "source": "user-prompt"}
+{"ts": "2026-08-13T09:13:58.144190+00:00", "type": "rejection", "matched": "롤백", "snippet": "<agent-message from=\"impl-1268\">\n**요약**: Level B-adapted 달성. `BookingRescheduleScreen`(풀스크린 push) 제거, `showBookingRescheduleBottomSheet`(신규)로 대체 — 계열 A/B가 쓰는 바텀시트 진입 문법과 시각적으로 통일. 승인/RequestEvent 협상은 ", "source": "user-prompt"}
+{"ts": "2026-08-14T01:12:07.950875+00:00", "type": "confirmation", "matched": "승인", "snippet": "계속진행해주세요 승인합니다.", "source": "user-prompt"}
+{"ts": "2026-08-14T01:22:01.480236+00:00", "type": "rejection", "matched": "되돌려", "snippet": "<agent-message from=\"impl-1274\">\n**요약**: MyBookingsScreen.build() 매 build 마다 DateTime.now() 를 그대로 availableSlotsForDateRangeProvider family 키(startDate/endDate)로 넘겨 microsecond 차로 매번 키가 달라져 캐시가 절대 히트 ", "source": "user-prompt"}
+{"ts": "2026-08-14T04:27:36.673973+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-14T04:37:35.362705+00:00", "type": "confirmation", "matched": "승인", "snippet": "두스펙모두 승인", "source": "user-prompt"}
+{"ts": "2026-08-14T06:09:06.522115+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-14T06:18:02.792495+00:00", "type": "confirmation", "matched": "진행해", "snippet": "남은이슈 진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-14T06:26:31.814096+00:00", "type": "confirmation", "matched": "진행해", "snippet": "계속 진행해주세요", "source": "user-prompt"}
+{"ts": "2026-08-14T06:44:36.110944+00:00", "type": "rejection", "matched": "revert", "snippet": "<agent-message from=\"impl-1276\">\n**요약**: Not a concurrency bug — `_acquire_teacher_booking_lock` (pg_advisory_xact_lock, added 81f9e032 2026-07-29) already correctly serializes check_time_conflict+INS", "source": "user-prompt"}

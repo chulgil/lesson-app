@@ -7,10 +7,10 @@
     },
     "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/MEMORY.md": {
       "count": 1,
-      "first_seen": 1785909663,
-      "last_seen": 1785909663,
+      "first_seen": 1786670885,
+      "last_seen": 1786670885,
       "hashes": [
-        "adc92baf8f7d"
+        "fffd653736c4"
       ]
     },
     "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_ux_flow_audit_749.md": {
@@ -2357,10 +2357,10 @@
     },
     "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/reference_main_preexisting_test_failures_0803.md": {
       "count": 1,
-      "first_seen": 1785723471,
-      "last_seen": 1785723471,
+      "first_seen": 1786523478,
+      "last_seen": 1786523478,
       "hashes": [
-        "7e2f8e201d4f"
+        "50da05c72dfe"
       ]
     },
     "/Users/r00360/Dev/personal/development/app/lesson-app/.harness/spec/decomposition-2026-08-03-lesson-add-intent.md": {
@@ -2508,7 +2508,2057 @@
       "hashes": [
         "83d965ddf29b"
       ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_flutter_audit_0810.md": {
+      "count": 1,
+      "first_seen": 1786414363,
+      "last_seen": 1786414363,
+      "hashes": [
+        "bcef8aa00fd5"
+      ]
+    },
+    "/private/tmp/claude-1001176004/-Users-r00360-Dev-personal-development-app-lesson-app/bad9a84e-aa35-442b-816b-d0c516c0e119/scratchpad/teacher-journey.md": {
+      "count": 1,
+      "first_seen": 1786418852,
+      "last_seen": 1786418852,
+      "hashes": [
+        "28d282cf85a6"
+      ]
+    },
+    "/private/tmp/claude-1001176004/-Users-r00360-Dev-personal-development-app-lesson-app/bad9a84e-aa35-442b-816b-d0c516c0e119/scratchpad/ui-complexity-audit.md": {
+      "count": 1,
+      "first_seen": 1786418900,
+      "last_seen": 1786418900,
+      "hashes": [
+        "861aca3f494a"
+      ]
+    },
+    "/private/tmp/claude-1001176004/-Users-r00360-Dev-personal-development-app-lesson-app/bad9a84e-aa35-442b-816b-d0c516c0e119/scratchpad/student-journey.md": {
+      "count": 1,
+      "first_seen": 1786419159,
+      "last_seen": 1786419159,
+      "hashes": [
+        "88e6443f31c2"
+      ]
+    },
+    "/Users/r00360/Dev/mybrain/10 Projects/레슨앱/51-유저저니-온보딩-스케줄-레슨일지-심층분석-2026-08-11.md": {
+      "count": 1,
+      "first_seen": 1786522741,
+      "last_seen": 1786522741,
+      "hashes": [
+        "97c7300bf996"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-schedule-guard/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786419589,
+      "last_seen": 1786419589,
+      "hashes": [
+        "1d83abfc96fc"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-schedule-guard/frontend/lib/features/schedule/presentation/widgets/current_request_box.dart": {
+      "count": 4,
+      "first_seen": 1786419595,
+      "last_seen": 1786419635,
+      "hashes": [
+        "cb54a06b96f9",
+        "a8f727d5cf59",
+        "019527718e73",
+        "69fd57bf1eaf"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-schedule-guard/frontend/lib/features/schedule/presentation/widgets/schedule_change_response_bottom_sheet.dart": {
+      "count": 3,
+      "first_seen": 1786419644,
+      "last_seen": 1786419686,
+      "hashes": [
+        "e57b8faecece",
+        "d7499cd5fcb6",
+        "fc6505bdb2de"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-journal-note/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786419705,
+      "last_seen": 1786419705,
+      "hashes": [
+        "ee3bf4d5e2d1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-availability-copy/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786419710,
+      "last_seen": 1786419710,
+      "hashes": [
+        "12823aa90cb9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-journal-note/frontend/lib/features/practice_journal/presentation/screens/practice_journal_screen.dart": {
+      "count": 4,
+      "first_seen": 1786419711,
+      "last_seen": 1786419751,
+      "hashes": [
+        "428890694988",
+        "4ccdc458ddf6",
+        "58202659dd88",
+        "3fbb3d8e6513"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-availability-copy/frontend/lib/features/schedule/presentation/widgets/schedule_edit_bottom_sheet.dart": {
+      "count": 4,
+      "first_seen": 1786419718,
+      "last_seen": 1786419757,
+      "hashes": [
+        "3c3ace93fd6f",
+        "9b320f24409c",
+        "b605d7a7829f",
+        "52edf470c340"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-schedule-guard/frontend/test/features/schedule/widgets/current_request_box_test.dart": {
+      "count": 2,
+      "first_seen": 1786419722,
+      "last_seen": 1786419753,
+      "hashes": [
+        "34404bdeaebe",
+        "db1ec130eb89"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-lesson-form/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786419744,
+      "last_seen": 1786419744,
+      "hashes": [
+        "aef6879d7eb0"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-lesson-form/frontend/lib/features/lessons/presentation/screens/add_lesson_screen.dart": {
+      "count": 5,
+      "first_seen": 1786419756,
+      "last_seen": 1786419851,
+      "hashes": [
+        "c284a5398ffb",
+        "136b650984fa",
+        "b2da14b67d65",
+        "62cce8e28112",
+        "40493f5ce19e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-feedback-route/frontend/lib/features/practice/presentation/providers/recording_provider.dart": {
+      "count": 1,
+      "first_seen": 1786419759,
+      "last_seen": 1786419759,
+      "hashes": [
+        "ca75bdfb818d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-journal-note/frontend/test/features/practice_journal/screens/practice_journal_screen_test.dart": {
+      "count": 3,
+      "first_seen": 1786419762,
+      "last_seen": 1786419792,
+      "hashes": [
+        "13491e60f83a",
+        "505bcaba1f55",
+        "88b04bdf957b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-feedback-route/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786419765,
+      "last_seen": 1786419765,
+      "hashes": [
+        "daba62356e76"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-feedback-route/frontend/lib/core/router/app_routes.dart": {
+      "count": 3,
+      "first_seen": 1786419772,
+      "last_seen": 1786419934,
+      "hashes": [
+        "6d3cc8cb8da2",
+        "389051f81372",
+        "962f16870e10"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-availability-copy/frontend/lib/features/schedule/presentation/screens/teacher_availability_split_page.dart": {
+      "count": 6,
+      "first_seen": 1786419777,
+      "last_seen": 1786420149,
+      "hashes": [
+        "1b9c24ee7378",
+        "7772e16a7db6",
+        "c65eacfd7d5e",
+        "14bc58a6ae9a",
+        "132209189800",
+        "e4ee4dcd387f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-schedule-guard/frontend/test/features/schedule/widgets/schedule_change_response_bottom_sheet_test.dart": {
+      "count": 1,
+      "first_seen": 1786419788,
+      "last_seen": 1786419788,
+      "hashes": [
+        "771c1c04ac62"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-feedback-route/frontend/lib/features/practice/presentation/screens/recording_detail_screen.dart": {
+      "count": 1,
+      "first_seen": 1786419827,
+      "last_seen": 1786419827,
+      "hashes": [
+        "539540bdf8b2"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-feedback-route/frontend/lib/core/router/routes/practice_routes.dart": {
+      "count": 2,
+      "first_seen": 1786419854,
+      "last_seen": 1786419861,
+      "hashes": [
+        "2a6bc75525c5",
+        "9fea8657de0e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-feedback-route/frontend/test/core/router/route_integrity_test.dart": {
+      "count": 9,
+      "first_seen": 1786419873,
+      "last_seen": 1786420008,
+      "hashes": [
+        "18a09d764b71",
+        "23b04f980d23",
+        "a7907231ba0f",
+        "b4d92d1e5626",
+        "0706efd04549",
+        "2b920861adc0"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-availability-copy/frontend/test/features/schedule/screens/teacher_availability_apply_other_days_test.dart": {
+      "count": 2,
+      "first_seen": 1786419921,
+      "last_seen": 1786420014,
+      "hashes": [
+        "c1bbabefee73",
+        "5ddc799edd7b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-availability-copy/frontend/test/features/schedule/screens/weekly_schedule_times_overlap_test.dart": {
+      "count": 1,
+      "first_seen": 1786419944,
+      "last_seen": 1786419944,
+      "hashes": [
+        "757c4aebfeca"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-recording-access/frontend/test/features/practice/presentation/screens/practice_recording_screen_test.dart": {
+      "count": 2,
+      "first_seen": 1786419957,
+      "last_seen": 1786419972,
+      "hashes": [
+        "f0bb3d057ec3",
+        "fdba8344b104"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-recording-access/frontend/lib/features/practice/presentation/widgets/practice_tools/music_practice_tools.dart": {
+      "count": 1,
+      "first_seen": 1786420015,
+      "last_seen": 1786420015,
+      "hashes": [
+        "4aaf00a2e453"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-recording-access/frontend/test/features/practice/presentation/widgets/practice_tools/practice_tool_test.dart": {
+      "count": 1,
+      "first_seen": 1786420039,
+      "last_seen": 1786420039,
+      "hashes": [
+        "4f0fe7b2f5a7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-recording-access/frontend/test/features/practice/presentation/widgets/practice_tools_modal_injection_test.dart": {
+      "count": 2,
+      "first_seen": 1786420048,
+      "last_seen": 1786420059,
+      "hashes": [
+        "5a5b5d6a6dae",
+        "9bc5dbbe41e1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/journey-recording-access/frontend/test/features/practice/presentation/widgets/practice_tools/music_practice_tools_recording_navigation_test.dart": {
+      "count": 3,
+      "first_seen": 1786420106,
+      "last_seen": 1786420177,
+      "hashes": [
+        "4b10eb204160",
+        "b732e2d543be",
+        "8a587f8cae66"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_journey_deep_dive_0811.md": {
+      "count": 1,
+      "first_seen": 1786522756,
+      "last_seen": 1786522756,
+      "hashes": [
+        "c8b49867cc65"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-spec-sync/docs/specs/subscription/makeup_credit_spec.md": {
+      "count": 6,
+      "first_seen": 1786496915,
+      "last_seen": 1786496970,
+      "hashes": [
+        "97b4352ccacd",
+        "e0e288361867",
+        "01a39b81b8ff",
+        "784506d257e8",
+        "31d819b3bc9b",
+        "3f596b9cf8ac"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-spec-sync/docs/specs/schedule/trial_lesson_status_spec.md": {
+      "count": 2,
+      "first_seen": 1786496980,
+      "last_seen": 1786496988,
+      "hashes": [
+        "06b56e6b3a15",
+        "daef664cbe8c"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-spec-sync/docs/specs/subscription/subscription_required_spec.md": {
+      "count": 2,
+      "first_seen": 1786497002,
+      "last_seen": 1786497015,
+      "hashes": [
+        "34a63340a9f1",
+        "3e717b32cd5d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/backend/app/schemas/makeup_credit.py": {
+      "count": 1,
+      "first_seen": 1786497043,
+      "last_seen": 1786497043,
+      "hashes": [
+        "8b67e28bc7a8"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/backend/app/api/v1/makeup_credits.py": {
+      "count": 2,
+      "first_seen": 1786497048,
+      "last_seen": 1786497062,
+      "hashes": [
+        "fa14af5b97d1",
+        "11eaf433eeac"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-grant-attribution/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786497063,
+      "last_seen": 1786497063,
+      "hashes": [
+        "594ca4239f9e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/backend/app/services/makeup_credit_service.py": {
+      "count": 2,
+      "first_seen": 1786497067,
+      "last_seen": 1786497074,
+      "hashes": [
+        "ad1742891a36",
+        "bf0e58422984"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-grant-attribution/frontend/lib/features/subscription/presentation/widgets/teacher_makeup_credit_section.dart": {
+      "count": 3,
+      "first_seen": 1786497072,
+      "last_seen": 1786497106,
+      "hashes": [
+        "f43203834225",
+        "8543406752db",
+        "1f2be4c64fa7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-regular-sublink/backend/app/services/lesson_service.py": {
+      "count": 2,
+      "first_seen": 1786497083,
+      "last_seen": 1786497096,
+      "hashes": [
+        "5051e478f653",
+        "99ec7fa007ba"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/backend/tests/test_makeup_credit.py": {
+      "count": 1,
+      "first_seen": 1786497089,
+      "last_seen": 1786497089,
+      "hashes": [
+        "e6e8ada4d4dd"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/backend/tests/test_makeup_credits_api.py": {
+      "count": 1,
+      "first_seen": 1786497099,
+      "last_seen": 1786497099,
+      "hashes": [
+        "df70c24d3acc"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-regular-sublink/backend/app/services/schedule_confirmation_service.py": {
+      "count": 1,
+      "first_seen": 1786497108,
+      "last_seen": 1786497108,
+      "hashes": [
+        "73a596e5b9cf"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-booking-sublink/frontend/lib/core/booking/entities/lesson_booking.dart": {
+      "count": 5,
+      "first_seen": 1786497110,
+      "last_seen": 1786497152,
+      "hashes": [
+        "2e4987d660c1",
+        "18ed5749b64a",
+        "bfd0cb1f2846",
+        "f25c61f98fb2",
+        "fb22a297c414"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-grant-attribution/frontend/test/features/subscription/widgets/teacher_makeup_credit_grant_attribution_test.dart": {
+      "count": 2,
+      "first_seen": 1786497136,
+      "last_seen": 1786497186,
+      "hashes": [
+        "e4e03bea6b9e",
+        "dda327bdd953"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/frontend/lib/features/subscription/domain/repositories/makeup_credit_repository.dart": {
+      "count": 1,
+      "first_seen": 1786497148,
+      "last_seen": 1786497148,
+      "hashes": [
+        "9ccd05a45ec7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/frontend/lib/features/subscription/data/repositories/remote_makeup_credit_repository.dart": {
+      "count": 2,
+      "first_seen": 1786497156,
+      "last_seen": 1786497165,
+      "hashes": [
+        "e9bc4b845dd3",
+        "40e74e00c37f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-booking-sublink/frontend/lib/core/booking/repositories/booking_repository.dart": {
+      "count": 2,
+      "first_seen": 1786497162,
+      "last_seen": 1786497173,
+      "hashes": [
+        "d0d6b77f174d",
+        "a0939d27c1b7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/frontend/lib/features/subscription/data/repositories/mock_makeup_credit_repository.dart": {
+      "count": 1,
+      "first_seen": 1786497172,
+      "last_seen": 1786497172,
+      "hashes": [
+        "4473a8299741"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-regular-sublink/backend/tests/test_regular_lesson_standalone_multislot.py": {
+      "count": 1,
+      "first_seen": 1786497180,
+      "last_seen": 1786497180,
+      "hashes": [
+        "1e215be6df29"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/frontend/lib/features/subscription/presentation/providers/makeup_credit_providers.dart": {
+      "count": 1,
+      "first_seen": 1786497181,
+      "last_seen": 1786497181,
+      "hashes": [
+        "dd76a5d8e84b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-booking-sublink/frontend/lib/features/schedule/data/repositories/remote_booking_repository.dart": {
+      "count": 3,
+      "first_seen": 1786497182,
+      "last_seen": 1786497196,
+      "hashes": [
+        "69ae6e50e6b6",
+        "d9cfa13472af",
+        "fd7aacf1c086"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786497188,
+      "last_seen": 1786497188,
+      "hashes": [
+        "451672791607"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-noshow-credit/frontend/lib/features/lessons/presentation/widgets/lesson_confirmation_dialog.dart": {
+      "count": 5,
+      "first_seen": 1786497199,
+      "last_seen": 1786497226,
+      "hashes": [
+        "d2e4b6fa278c",
+        "dc9d0b124ae2",
+        "a055adca825b",
+        "a0db5aca0795",
+        "73ad02589369"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-booking-sublink/frontend/lib/features/lessons/presentation/providers/booking_providers.dart": {
+      "count": 1,
+      "first_seen": 1786497202,
+      "last_seen": 1786497202,
+      "hashes": [
+        "9d913f6ef511"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-booking-sublink/frontend/lib/features/schedule/presentation/providers/teacher_availability_providers.dart": {
+      "count": 2,
+      "first_seen": 1786497207,
+      "last_seen": 1786497212,
+      "hashes": [
+        "8f6461cb2398",
+        "b633b2c43c41"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/sub-booking-sublink/frontend/lib/features/schedule/presentation/screens/lesson_booking_screen.dart": {
+      "count": 1,
+      "first_seen": 1786497217,
+      "last_seen": 1786497217,
+      "hashes": [
+        "3c7d7b8b7587"
+      ]
+    },
+    "/Users/r00360/Dev/mybrain/10 Projects/레슨앱/52-수강권-정합성-감사-2026-08-12.md": {
+      "count": 2,
+      "first_seen": 1786520138,
+      "last_seen": 1786520215,
+      "hashes": [
+        "8115d083bdc1",
+        "d1a8f3b7b6df"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_subscription_audit_0812.md": {
+      "count": 1,
+      "first_seen": 1786520117,
+      "last_seen": 1786520117,
+      "hashes": [
+        "5dcfd81aa96d"
+      ]
+    },
+    "/private/tmp/claude-1001176004/-Users-r00360-Dev-personal-development-app-lesson-app/bad9a84e-aa35-442b-816b-d0c516c0e119/scratchpad/probe-request-link.md": {
+      "count": 1,
+      "first_seen": 1786509093,
+      "last_seen": 1786509093,
+      "hashes": [
+        "2bdefb679603"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/lib/features/schedule/presentation/providers/schedule_confirmation_card_providers.dart": {
+      "count": 1,
+      "first_seen": 1786509400,
+      "last_seen": 1786509400,
+      "hashes": [
+        "7db4f8b64935"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/lib/features/schedule/schedule_facade.dart": {
+      "count": 1,
+      "first_seen": 1786509405,
+      "last_seen": 1786509405,
+      "hashes": [
+        "277e20bd7ac8"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/lib/features/home/presentation/widgets/schedule_change_request_section.dart": {
+      "count": 2,
+      "first_seen": 1786509497,
+      "last_seen": 1786509514,
+      "hashes": [
+        "f53640c76fb2",
+        "5860eb75a358"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/lib/features/student_home/presentation/mappers/student_lesson_progress_mapper.dart": {
+      "count": 3,
+      "first_seen": 1786509533,
+      "last_seen": 1786509552,
+      "hashes": [
+        "68bf08c196d6",
+        "8eeb0f9b9717",
+        "fbf1a760162f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/lib/features/student_home/presentation/providers/student_lesson_progress_provider.dart": {
+      "count": 2,
+      "first_seen": 1786509565,
+      "last_seen": 1786509620,
+      "hashes": [
+        "c79e9bd0a161",
+        "e4eb6eb266eb"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/test/features/home/schedule_change_request_section_routing_test.dart": {
+      "count": 3,
+      "first_seen": 1786509660,
+      "last_seen": 1786509696,
+      "hashes": [
+        "429de910c3d7",
+        "11ce18e9d3b2",
+        "b73ee9875b70"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/test/features/student_home/student_lesson_progress_mapper_test.dart": {
+      "count": 1,
+      "first_seen": 1786509777,
+      "last_seen": 1786509777,
+      "hashes": [
+        "45514696c5ea"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/link-impl/frontend/test/features/student_home/student_lesson_progress_provider_test.dart": {
+      "count": 2,
+      "first_seen": 1786509785,
+      "last_seen": 1786509798,
+      "hashes": [
+        "6b8ba525b5b3",
+        "fde5fe6be627"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/p14-reproposal-sheet/frontend/lib/features/schedule/presentation/widgets/reject_message_bottom_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786511486,
+      "last_seen": 1786511486,
+      "hashes": [
+        "6d59ba8390c3"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/p14-reproposal-sheet/frontend/lib/features/schedule/presentation/screens/suggest_alternative_screen.dart": {
+      "count": 4,
+      "first_seen": 1786511506,
+      "last_seen": 1786511553,
+      "hashes": [
+        "dc239460961a",
+        "b4f922137454",
+        "620cd24a3862",
+        "17a35f92062e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/frontend/lib/features/schedule/domain/mappers/time_slot_mapper.dart": {
+      "count": 1,
+      "first_seen": 1786518280,
+      "last_seen": 1786518280,
+      "hashes": [
+        "fb360e07543d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/frontend/lib/features/schedule/presentation/screens/request_detail_screen.dart": {
+      "count": 5,
+      "first_seen": 1786518296,
+      "last_seen": 1786518343,
+      "hashes": [
+        "84f1050187bb",
+        "0c9fc55b7df6",
+        "f768063d848f",
+        "ccbd4c4507dc",
+        "cfe7f94922c1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/lib/features/schedule/presentation/widgets/schedule_change_action_bar.dart": {
+      "count": 1,
+      "first_seen": 1786518309,
+      "last_seen": 1786518309,
+      "hashes": [
+        "b95dbc11250d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/lib/features/schedule/presentation/widgets/current_request_box.dart": {
+      "count": 3,
+      "first_seen": 1786518318,
+      "last_seen": 1786518386,
+      "hashes": [
+        "36f89877c3c3",
+        "a65087f8e5cf",
+        "55f5189f03a3"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/frontend/lib/features/schedule/presentation/widgets/request_history_chat.dart": {
+      "count": 2,
+      "first_seen": 1786518352,
+      "last_seen": 1786518359,
+      "hashes": [
+        "cc40970dfca0",
+        "813793b4300d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/frontend/lib/features/subscription/presentation/screens/subscription_detail_screen.dart": {
+      "count": 2,
+      "first_seen": 1786518372,
+      "last_seen": 1786518386,
+      "hashes": [
+        "ae00631066c1",
+        "c11b811c02f2"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/lib/features/schedule/schedule_ui_facade.dart": {
+      "count": 1,
+      "first_seen": 1786518405,
+      "last_seen": 1786518405,
+      "hashes": [
+        "c2ae1d55eb24"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/frontend/test/architecture/schedule_grid_mapper_contract_test.dart": {
+      "count": 1,
+      "first_seen": 1786518440,
+      "last_seen": 1786518440,
+      "hashes": [
+        "978a73f1b675"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/frontend/test/features/schedule/domain/mappers/time_slot_mapper_test.dart": {
+      "count": 1,
+      "first_seen": 1786518467,
+      "last_seen": 1786518467,
+      "hashes": [
+        "34f23075f556"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/lib/features/subscription/presentation/widgets/subscription_bottom_input_bar.dart": {
+      "count": 5,
+      "first_seen": 1786518504,
+      "last_seen": 1786518728,
+      "hashes": [
+        "c89b0d01461f",
+        "31f9a85f8411",
+        "2d49156d0c45",
+        "8308e948decb",
+        "c5076ad01a53"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/test/features/schedule/widgets/schedule_change_action_bar_test.dart": {
+      "count": 1,
+      "first_seen": 1786518596,
+      "last_seen": 1786518596,
+      "hashes": [
+        "82d8b0b5f969"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786518682,
+      "last_seen": 1786518682,
+      "hashes": [
+        "7b21bbe25448"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m4-grid-mapper/docs/specs/schedule/schedule_change_unification_spec.md": {
+      "count": 1,
+      "first_seen": 1786518743,
+      "last_seen": 1786518743,
+      "hashes": [
+        "c6715aec4322"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/lib/features/subscription/presentation/screens/subscription_detail_screen.dart": {
+      "count": 4,
+      "first_seen": 1786518768,
+      "last_seen": 1786518831,
+      "hashes": [
+        "fb66708342db",
+        "fef02e4176c7",
+        "f884f86c64d5",
+        "771257468bf9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/frontend/test/features/subscription/screens/subscription_detail_a2_routing_test.dart": {
+      "count": 5,
+      "first_seen": 1786518937,
+      "last_seen": 1786519072,
+      "hashes": [
+        "f729daf67322",
+        "e9629e0842fd",
+        "7129ca0fe802",
+        "e7c458670fd0",
+        "38cb8520ed95"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/m3-action-bar/docs/specs/schedule/schedule_change_unification_spec.md": {
+      "count": 2,
+      "first_seen": 1786519353,
+      "last_seen": 1786519364,
+      "hashes": [
+        "6e5fea7ffff8",
+        "0c72b6798dcb"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/subscription/presentation/screens/subscription_list_screen.dart": {
+      "count": 2,
+      "first_seen": 1786581496,
+      "last_seen": 1786581509,
+      "hashes": [
+        "c15f4c65090c",
+        "0e485b18146b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/invite/presentation/screens/my_connections_screen.dart": {
+      "count": 2,
+      "first_seen": 1786581514,
+      "last_seen": 1786581528,
+      "hashes": [
+        "d7c0ca6aa29a",
+        "f6d9ff1fd1ae"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/parent_home/presentation/screens/parent_payments_tab.dart": {
+      "count": 2,
+      "first_seen": 1786581536,
+      "last_seen": 1786581550,
+      "hashes": [
+        "025c4dd6f581",
+        "475503f0e88b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/subscription/presentation/screens/schedule_change_request_list_screen.dart": {
+      "count": 2,
+      "first_seen": 1786581554,
+      "last_seen": 1786581564,
+      "hashes": [
+        "85bb6fa48f97",
+        "2b483860674e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1256/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786581710,
+      "last_seen": 1786581710,
+      "hashes": [
+        "bb81b6d6b920"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/core/widgets/error_state_widget.dart": {
+      "count": 1,
+      "first_seen": 1786581743,
+      "last_seen": 1786581743,
+      "hashes": [
+        "1f54bbebe4fb"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/core/theme/app_colors.dart": {
+      "count": 1,
+      "first_seen": 1786581757,
+      "last_seen": 1786581757,
+      "hashes": [
+        "1e8cd1776f0f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/notifications/presentation/screens/notification_settings_screen.dart": {
+      "count": 5,
+      "first_seen": 1786581761,
+      "last_seen": 1786581792,
+      "hashes": [
+        "ad0bf019ce01",
+        "d3b262a491cf",
+        "c1c7ab705d11",
+        "85edcedc6efd",
+        "97a16787448a"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/test/core/widgets/error_state_widget_test.dart": {
+      "count": 1,
+      "first_seen": 1786581767,
+      "last_seen": 1786581767,
+      "hashes": [
+        "1598e6fe94b3"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/subscription/presentation/screens/subscription_detail_screen.dart": {
+      "count": 2,
+      "first_seen": 1786581773,
+      "last_seen": 1786581785,
+      "hashes": [
+        "f497eb75df1d",
+        "e08998384f6a"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/subscription/presentation/widgets/proposal_draft_banner.dart": {
+      "count": 1,
+      "first_seen": 1786581789,
+      "last_seen": 1786581789,
+      "hashes": [
+        "db7cad4d1a63"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/subscription/presentation/screens/subscription_policy_override_screen.dart": {
+      "count": 2,
+      "first_seen": 1786581793,
+      "last_seen": 1786581801,
+      "hashes": [
+        "2e3460a523ef",
+        "b81f8a06648f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/lessons/presentation/screens/lesson_detail_screen.dart": {
+      "count": 3,
+      "first_seen": 1786581795,
+      "last_seen": 1786581971,
+      "hashes": [
+        "301e0e4cc387",
+        "505804fd6e18",
+        "95ccebfb4063"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/schedule/presentation/widgets/timeline_lesson_block.dart": {
+      "count": 1,
+      "first_seen": 1786581806,
+      "last_seen": 1786581806,
+      "hashes": [
+        "b66de6694778"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/invite/presentation/screens/my_connections_screen.dart": {
+      "count": 1,
+      "first_seen": 1786581814,
+      "last_seen": 1786581814,
+      "hashes": [
+        "72b0c32eb89a"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/subscription/presentation/screens/subscription_template_form_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786581815,
+      "last_seen": 1786581815,
+      "hashes": [
+        "7e073de00dff"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/subscription/presentation/screens/proposal_detail_screen.dart": {
+      "count": 3,
+      "first_seen": 1786581816,
+      "last_seen": 1786581835,
+      "hashes": [
+        "6bc0931e9843",
+        "01e34a7f04fa",
+        "3ddf1968b383"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/schedule/presentation/screens/unified_lesson_request_screen.dart": {
+      "count": 1,
+      "first_seen": 1786581823,
+      "last_seen": 1786581823,
+      "hashes": [
+        "33849f670fd1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/schedule/presentation/screens/teacher_availability_split_page.dart": {
+      "count": 1,
+      "first_seen": 1786581829,
+      "last_seen": 1786581829,
+      "hashes": [
+        "54c3e331f7d6"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/schedule/presentation/screens/group_class_detail_screen.dart": {
+      "count": 1,
+      "first_seen": 1786581843,
+      "last_seen": 1786581843,
+      "hashes": [
+        "9444c5207907"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/subscription/presentation/screens/renewal_detail_screen.dart": {
+      "count": 3,
+      "first_seen": 1786581846,
+      "last_seen": 1786581872,
+      "hashes": [
+        "c07b97f49e4c",
+        "5d055b5e1699",
+        "f00e25c2fe08"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/schedule/presentation/screens/schedule_tab.dart": {
+      "count": 1,
+      "first_seen": 1786581849,
+      "last_seen": 1786581849,
+      "hashes": [
+        "1a7b19c62647"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/home/presentation/widgets/lesson_card.dart": {
+      "count": 7,
+      "first_seen": 1786581857,
+      "last_seen": 1786582346,
+      "hashes": [
+        "92f645f8cef4",
+        "3c8c40f56907",
+        "8173828a3247",
+        "b1efcaf6ac26",
+        "98b7b370792a",
+        "938d8a6623ca"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/test/features/home/presentation/widgets/lesson_card_test.dart": {
+      "count": 3,
+      "first_seen": 1786581882,
+      "last_seen": 1786582233,
+      "hashes": [
+        "2f85fd6d9de9",
+        "c380f8578cf0",
+        "038872c6c53c"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/schedule/domain/entities/group_class_booking.dart": {
+      "count": 1,
+      "first_seen": 1786581890,
+      "last_seen": 1786581890,
+      "hashes": [
+        "30fd2a6c7a90"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1254/frontend/lib/features/parent_home/presentation/screens/parent_dashboard_tab.dart": {
+      "count": 1,
+      "first_seen": 1786581898,
+      "last_seen": 1786581898,
+      "hashes": [
+        "dec050afeb5d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/schedule/domain/entities/group_class_schedule.dart": {
+      "count": 1,
+      "first_seen": 1786581899,
+      "last_seen": 1786581899,
+      "hashes": [
+        "b8ddf6bc3fc8"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786581912,
+      "last_seen": 1786581912,
+      "hashes": [
+        "4d6d656168b3"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786581912,
+      "last_seen": 1786581912,
+      "hashes": [
+        "da7abae3542b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/profile/presentation/widgets/repertoire_management_widgets.dart": {
+      "count": 6,
+      "first_seen": 1786581919,
+      "last_seen": 1786581948,
+      "hashes": [
+        "df2b029c6d8e",
+        "aab6727d4f25",
+        "c1a5e2deeaa2",
+        "7c8234dd7823",
+        "899ba5b5d0db",
+        "4821d8444f5f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/schedule/presentation/extensions/group_class_visuals.dart": {
+      "count": 1,
+      "first_seen": 1786581922,
+      "last_seen": 1786581922,
+      "hashes": [
+        "89ab1890ab90"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/schedule/presentation/screens/group_class_detail_screen.dart": {
+      "count": 1,
+      "first_seen": 1786581928,
+      "last_seen": 1786581928,
+      "hashes": [
+        "d87f611e1310"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/schedule/presentation/screens/group_class_attendance_screen.dart": {
+      "count": 1,
+      "first_seen": 1786581937,
+      "last_seen": 1786581937,
+      "hashes": [
+        "e2d68b93701e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/students/domain/entities/lesson_slot.dart": {
+      "count": 1,
+      "first_seen": 1786581957,
+      "last_seen": 1786581957,
+      "hashes": [
+        "7450593cb6da"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/students/presentation/extensions/student_domain_visuals.dart": {
+      "count": 1,
+      "first_seen": 1786581967,
+      "last_seen": 1786581967,
+      "hashes": [
+        "1a909d850dc7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/students/domain/entities/student.dart": {
+      "count": 1,
+      "first_seen": 1786581972,
+      "last_seen": 1786581972,
+      "hashes": [
+        "f2e141d80139"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/students/domain/entities/class_membership.dart": {
+      "count": 1,
+      "first_seen": 1786581980,
+      "last_seen": 1786581980,
+      "hashes": [
+        "94ffb6557f92"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1257/frontend/lib/features/practice/presentation/widgets/section_detail/section_recording_list_item.dart": {
+      "count": 1,
+      "first_seen": 1786581981,
+      "last_seen": 1786581981,
+      "hashes": [
+        "75d4f4783a87"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/lib/features/students/domain/entities/student_with_membership.dart": {
+      "count": 1,
+      "first_seen": 1786581986,
+      "last_seen": 1786581986,
+      "hashes": [
+        "06360f54e9c0"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/test/features/students/domain/entities/lesson_slot_test.dart": {
+      "count": 2,
+      "first_seen": 1786581999,
+      "last_seen": 1786582023,
+      "hashes": [
+        "73bc29fd9df9",
+        "46deaac66ff1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/subscription/presentation/widgets/add_reschedule_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786582019,
+      "last_seen": 1786582019,
+      "hashes": [
+        "740742bb37dd"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/subscription/presentation/widgets/change_location_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786582037,
+      "last_seen": 1786582037,
+      "hashes": [
+        "f0ce6c908b98"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1255/frontend/test/features/students/presentation/extensions/student_domain_visuals_test.dart": {
+      "count": 1,
+      "first_seen": 1786582042,
+      "last_seen": 1786582042,
+      "hashes": [
+        "62bb772ad46b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/subscription/presentation/widgets/edit_travel_time_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786582050,
+      "last_seen": 1786582050,
+      "hashes": [
+        "c5a63d140235"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/subscription/presentation/widgets/edit_cancel_deadline_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786582067,
+      "last_seen": 1786582067,
+      "hashes": [
+        "bf9747536875"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1258/frontend/lib/features/subscription/presentation/widgets/subscription_policy_sheet.dart": {
+      "count": 5,
+      "first_seen": 1786582079,
+      "last_seen": 1786582098,
+      "hashes": [
+        "99562bda0eea",
+        "df7123385d10",
+        "60a66615cf88",
+        "09a469987414",
+        "3053f3bbcd68"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/feedback_lore_trailer_format.md": {
+      "count": 1,
+      "first_seen": 1786584332,
+      "last_seen": 1786584332,
+      "hashes": [
+        "5faa21c2952d"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_consistency_audit_0813.md": {
+      "count": 1,
+      "first_seen": 1786598163,
+      "last_seen": 1786598163,
+      "hashes": [
+        "5a0615601703"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-i/frontend/lib/features/parent_home/presentation/screens/parent_assignments_tab.dart": {
+      "count": 1,
+      "first_seen": 1786596887,
+      "last_seen": 1786596887,
+      "hashes": [
+        "c69ee1d34ea7"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/reference_figjam_diagram_colon_truncation.md": {
+      "count": 1,
+      "first_seen": 1786689061,
+      "last_seen": 1786689061,
+      "hashes": [
+        "f2c265d05f7e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/lib/features/subscription/domain/repositories/subscription_repository.dart": {
+      "count": 1,
+      "first_seen": 1786607415,
+      "last_seen": 1786607415,
+      "hashes": [
+        "d93fb9e6e6e9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/lib/features/subscription/data/repositories/remote_subscription_repository.dart": {
+      "count": 1,
+      "first_seen": 1786607420,
+      "last_seen": 1786607420,
+      "hashes": [
+        "cce5cd81309f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/lib/features/subscription/data/repositories/sync_aware_subscription_repository.dart": {
+      "count": 1,
+      "first_seen": 1786607425,
+      "last_seen": 1786607425,
+      "hashes": [
+        "94a7c2be1004"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/lib/features/subscription/data/repositories/mock_subscription_repository.dart": {
+      "count": 1,
+      "first_seen": 1786607435,
+      "last_seen": 1786607435,
+      "hashes": [
+        "15287f30c850"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/lib/features/subscription/presentation/providers/subscription_providers.dart": {
+      "count": 2,
+      "first_seen": 1786607446,
+      "last_seen": 1786607451,
+      "hashes": [
+        "cd3e7d77f18c",
+        "979d95e7f03d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/lib/features/subscription/subscription_facade.dart": {
+      "count": 2,
+      "first_seen": 1786607456,
+      "last_seen": 1786607460,
+      "hashes": [
+        "ae46d6a9578b",
+        "146e10f26944"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/test/core/sync/sync_aware_subscription_repository_test.dart": {
+      "count": 1,
+      "first_seen": 1786607466,
+      "last_seen": 1786607466,
+      "hashes": [
+        "d5ddb28f7dc6"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1265/frontend/test/features/students/bulk_teacher_action_service_test.dart": {
+      "count": 2,
+      "first_seen": 1786607470,
+      "last_seen": 1786607597,
+      "hashes": [
+        "3b38b0bf35b4"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/project_journey_board_decisions_0813.md": {
+      "count": 1,
+      "first_seen": 1786689969,
+      "last_seen": 1786689969,
+      "hashes": [
+        "e3685acd66ac"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1270/frontend/lib/features/practice/presentation/widgets/practice_tools/language_practice_tools.dart": {
+      "count": 1,
+      "first_seen": 1786610897,
+      "last_seen": 1786610897,
+      "hashes": [
+        "12f7035940a4"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1270/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786610915,
+      "last_seen": 1786610915,
+      "hashes": [
+        "c454c0d659f5"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1270/frontend/test/features/practice/presentation/widgets/practice_tools/language_practice_tools_test.dart": {
+      "count": 1,
+      "first_seen": 1786610946,
+      "last_seen": 1786610946,
+      "hashes": [
+        "e109b09c604b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1270/frontend/test/features/discipline/language_phase5_gate_test.dart": {
+      "count": 1,
+      "first_seen": 1786611015,
+      "last_seen": 1786611015,
+      "hashes": [
+        "0bab01de4c74"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1268/frontend/lib/features/schedule/presentation/widgets/booking_reschedule_bottom_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786611274,
+      "last_seen": 1786611274,
+      "hashes": [
+        "72f47383b961"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1268/frontend/lib/features/schedule/presentation/screens/my_bookings_screen.dart": {
+      "count": 2,
+      "first_seen": 1786611285,
+      "last_seen": 1786611302,
+      "hashes": [
+        "99047dd6b3eb",
+        "6eb1324e0041"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1268/frontend/test/features/schedule/widgets/booking_reschedule_bottom_sheet_test.dart": {
+      "count": 1,
+      "first_seen": 1786611334,
+      "last_seen": 1786611334,
+      "hashes": [
+        "bc7ebf27c1f5"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1269/frontend/lib/features/practice/presentation/providers/practice_goal_provider.dart": {
+      "count": 1,
+      "first_seen": 1786611343,
+      "last_seen": 1786611343,
+      "hashes": [
+        "4c8bdb3ed4b2"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1268/frontend/test/features/schedule/booking_reschedule_atomicity_test.dart": {
+      "count": 2,
+      "first_seen": 1786611347,
+      "last_seen": 1786611352,
+      "hashes": [
+        "f798871e11b5",
+        "ac5cf18822ad"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1269/frontend/lib/features/practice/practice_facade.dart": {
+      "count": 1,
+      "first_seen": 1786611356,
+      "last_seen": 1786611356,
+      "hashes": [
+        "910b53ce741a"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1269/frontend/lib/features/gamification/presentation/providers/today_practice_minutes_provider.dart": {
+      "count": 1,
+      "first_seen": 1786611376,
+      "last_seen": 1786611376,
+      "hashes": [
+        "576159eeea48"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1268/docs/specs/schedule/schedule_change_unification_spec.md": {
+      "count": 1,
+      "first_seen": 1786611383,
+      "last_seen": 1786611383,
+      "hashes": [
+        "682762d5ee70"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1269/frontend/lib/features/gamification/presentation/providers/daily_missions_provider.dart": {
+      "count": 5,
+      "first_seen": 1786611385,
+      "last_seen": 1786611414,
+      "hashes": [
+        "07184480a606",
+        "3d6d37b60663",
+        "11f75be6df28",
+        "a9a2d810520b",
+        "0a68727096ef"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1269/frontend/lib/features/gamification/presentation/screens/student_growth_detail_screen.dart": {
+      "count": 2,
+      "first_seen": 1786611421,
+      "last_seen": 1786611431,
+      "hashes": [
+        "7a9782e3f8f7",
+        "dfe3cb7f21b6"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1269/frontend/lib/features/gamification/gamification_facade.dart": {
+      "count": 1,
+      "first_seen": 1786611451,
+      "last_seen": 1786611451,
+      "hashes": [
+        "43eabaaed4a9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1274/frontend/lib/features/schedule/presentation/screens/my_bookings_screen.dart": {
+      "count": 1,
+      "first_seen": 1786670152,
+      "last_seen": 1786670152,
+      "hashes": [
+        "c536d0be1160"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1267-be/backend/app/models/invite.py": {
+      "count": 1,
+      "first_seen": 1786670300,
+      "last_seen": 1786670300,
+      "hashes": [
+        "cb36a6774f79"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1267-be/backend/app/schemas/invite.py": {
+      "count": 1,
+      "first_seen": 1786670309,
+      "last_seen": 1786670309,
+      "hashes": [
+        "ff4fb56cc301"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1274/frontend/test/features/schedule/screens/my_bookings_screen_test.dart": {
+      "count": 1,
+      "first_seen": 1786670313,
+      "last_seen": 1786670313,
+      "hashes": [
+        "d53b1ec7d0eb"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1267-be/backend/app/services/invite_service.py": {
+      "count": 1,
+      "first_seen": 1786672224,
+      "last_seen": 1786672224,
+      "hashes": [
+        "bb3925e4885e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1267-be/backend/app/api/v1/invites.py": {
+      "count": 1,
+      "first_seen": 1786670366,
+      "last_seen": 1786670366,
+      "hashes": [
+        "78f1c75197f8"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1267-be/backend/alembic/versions/20260814_1000_add_invite_target_role.py": {
+      "count": 1,
+      "first_seen": 1786670374,
+      "last_seen": 1786670374,
+      "hashes": [
+        "083d386d609a"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1273/frontend/lib/features/gamification/presentation/providers/weekly_practice_minutes_provider.dart": {
+      "count": 1,
+      "first_seen": 1786670402,
+      "last_seen": 1786670402,
+      "hashes": [
+        "ebcc36ef6f17"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1273/frontend/lib/features/gamification/gamification_facade.dart": {
+      "count": 1,
+      "first_seen": 1786670410,
+      "last_seen": 1786670410,
+      "hashes": [
+        "b0966bed7448"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1273/frontend/lib/features/practice/presentation/providers/practice_goal_provider.dart": {
+      "count": 3,
+      "first_seen": 1786670416,
+      "last_seen": 1786670443,
+      "hashes": [
+        "6c76d771b015",
+        "5bdfda98913c",
+        "b2d5eab32429"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1267-be/backend/tests/test_invite_target_role.py": {
+      "count": 5,
+      "first_seen": 1786670419,
+      "last_seen": 1786670516,
+      "hashes": [
+        "a9c63bf83d97",
+        "bdacaf0bc18e",
+        "3d4bf09a695e",
+        "94ce0926b7a1",
+        "907209fd2f69"
+      ]
+    },
+    "/Users/r00360/.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/reference_ebook_qdrant_access.md": {
+      "count": 1,
+      "first_seen": 1786670880,
+      "last_seen": 1786670880,
+      "hashes": [
+        "afe76e49b721"
+      ]
+    },
+    "/Users/r00360/Dev/mcptools/ebook-qdrant-mcp/server.py": {
+      "count": 2,
+      "first_seen": 1786671107,
+      "last_seen": 1786671227,
+      "hashes": [
+        "f0ba6a2a3bed",
+        "282c5a06f494"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1275/backend/app/models/invite.py": {
+      "count": 1,
+      "first_seen": 1786682087,
+      "last_seen": 1786682087,
+      "hashes": [
+        "623142765c00"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1275/backend/alembic/versions/20260814_1100_add_parent_to_inviteuserrole.py": {
+      "count": 1,
+      "first_seen": 1786682095,
+      "last_seen": 1786682095,
+      "hashes": [
+        "e96b059ee3f7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1275/backend/app/services/invite_service.py": {
+      "count": 3,
+      "first_seen": 1786682108,
+      "last_seen": 1786682136,
+      "hashes": [
+        "79b01b326663",
+        "be04a6c6fdca",
+        "b62471cc1484"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1275/backend/tests/test_invite_target_role.py": {
+      "count": 4,
+      "first_seen": 1786682167,
+      "last_seen": 1786682226,
+      "hashes": [
+        "0995297a3b19",
+        "6ac15d5988a6",
+        "ac0fda38aeea",
+        "83184a7409c3"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/domain/entities/refund_request.dart": {
+      "count": 2,
+      "first_seen": 1786682680,
+      "last_seen": 1786682704,
+      "hashes": [
+        "daea72352f50",
+        "c9eaf4ccd000"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/features/notifications/domain/entities/notification_type_group.dart": {
+      "count": 1,
+      "first_seen": 1786682703,
+      "last_seen": 1786682703,
+      "hashes": [
+        "f0e162e4e355"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/features/notifications/domain/entities/notification_preferences.dart": {
+      "count": 4,
+      "first_seen": 1786682710,
+      "last_seen": 1786682765,
+      "hashes": [
+        "2e94d05f210a",
+        "82edbb5f140b",
+        "a33e71c41eaf",
+        "ddf8105a51a7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/domain/repositories/refund_request_repository.dart": {
+      "count": 1,
+      "first_seen": 1786682715,
+      "last_seen": 1786682715,
+      "hashes": [
+        "100fa6219fb9"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/core/utils/account_mask_utils.dart": {
+      "count": 1,
+      "first_seen": 1786682726,
+      "last_seen": 1786682726,
+      "hashes": [
+        "5de9ffa79aef"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/test/core/utils/account_mask_utils_test.dart": {
+      "count": 1,
+      "first_seen": 1786682737,
+      "last_seen": 1786682737,
+      "hashes": [
+        "ec92f027ea8d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/features/notifications/domain/services/notification_delivery_gate.dart": {
+      "count": 2,
+      "first_seen": 1786682771,
+      "last_seen": 1786682801,
+      "hashes": [
+        "b80485e32956",
+        "5b023f565eab"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/utils/refund_estimate_calculator.dart": {
+      "count": 1,
+      "first_seen": 1786682774,
+      "last_seen": 1786682774,
+      "hashes": [
+        "c192f33e9932"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/test/features/subscription/presentation/utils/refund_estimate_calculator_test.dart": {
+      "count": 1,
+      "first_seen": 1786682790,
+      "last_seen": 1786682790,
+      "hashes": [
+        "ab6a75ec5a1c"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/features/notifications/presentation/extensions/notification_type_group_visuals.dart": {
+      "count": 1,
+      "first_seen": 1786682812,
+      "last_seen": 1786682812,
+      "hashes": [
+        "c8fc0210e21e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/domain/entities/lesson_policy.dart": {
+      "count": 1,
+      "first_seen": 1786682812,
+      "last_seen": 1786682812,
+      "hashes": [
+        "eab1c680992d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 2,
+      "first_seen": 1786682830,
+      "last_seen": 1786682917,
+      "hashes": [
+        "200bec8ee366",
+        "1c3e0665017e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/features/notifications/presentation/providers/notification_preferences_provider.dart": {
+      "count": 2,
+      "first_seen": 1786682839,
+      "last_seen": 1786682847,
+      "hashes": [
+        "1738e976c2b2",
+        "00f99f42c358"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/data/repositories/mock_refund_request_repository.dart": {
+      "count": 1,
+      "first_seen": 1786682841,
+      "last_seen": 1786682841,
+      "hashes": [
+        "37b11bca8e45"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/models/refund_request.py": {
+      "count": 1,
+      "first_seen": 1786682850,
+      "last_seen": 1786682850,
+      "hashes": [
+        "2dd9767c9cfb"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/models/subscription.py": {
+      "count": 1,
+      "first_seen": 1786682856,
+      "last_seen": 1786682856,
+      "hashes": [
+        "ddc7f958ad05"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/lib/features/notifications/presentation/screens/notification_settings_screen.dart": {
+      "count": 3,
+      "first_seen": 1786682857,
+      "last_seen": 1786682905,
+      "hashes": [
+        "157976f241b4",
+        "e0eceddc5921",
+        "e2e6d5b4cdb3"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/models/__init__.py": {
+      "count": 1,
+      "first_seen": 1786682860,
+      "last_seen": 1786682860,
+      "hashes": [
+        "056971f07558"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/data/repositories/remote_refund_request_repository.dart": {
+      "count": 1,
+      "first_seen": 1786682863,
+      "last_seen": 1786682863,
+      "hashes": [
+        "bf48a56fd429"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/alembic/versions/20260814_1100_add_refund_requests.py": {
+      "count": 1,
+      "first_seen": 1786682874,
+      "last_seen": 1786682874,
+      "hashes": [
+        "9e9372aeda18"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/schemas/refund_request.py": {
+      "count": 1,
+      "first_seen": 1786682884,
+      "last_seen": 1786682884,
+      "hashes": [
+        "f1ff84d9fb0c"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/providers/refund_request_providers.dart": {
+      "count": 2,
+      "first_seen": 1786682909,
+      "last_seen": 1786683038,
+      "hashes": [
+        "ff820c370fde",
+        "2f369359ba15"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/notifications/domain/entities/notification.dart": {
+      "count": 4,
+      "first_seen": 1786682916,
+      "last_seen": 1786682937,
+      "hashes": [
+        "5d0fe7972eb6",
+        "8bab373fdffe",
+        "a0af7d40f77c",
+        "4894836a0c1a"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/services/refund_request_service.py": {
+      "count": 3,
+      "first_seen": 1786682921,
+      "last_seen": 1786683053,
+      "hashes": [
+        "19ef706f78b5",
+        "0818c5cb2077",
+        "793a19e17581"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/services/notification_service.py": {
+      "count": 2,
+      "first_seen": 1786682929,
+      "last_seen": 1786682935,
+      "hashes": [
+        "a435804b4be8",
+        "b04783bf4376"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/api/v1/refund_requests.py": {
+      "count": 1,
+      "first_seen": 1786682946,
+      "last_seen": 1786682946,
+      "hashes": [
+        "bf8326dc8c34"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/app/api/v1/__init__.py": {
+      "count": 2,
+      "first_seen": 1786682952,
+      "last_seen": 1786682959,
+      "hashes": [
+        "93d8e94cc687",
+        "1073ad40a8af"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/notifications/presentation/widgets/notification_item.dart": {
+      "count": 1,
+      "first_seen": 1786682983,
+      "last_seen": 1786682983,
+      "hashes": [
+        "1fea6445aae4"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/test/features/notifications/domain/notification_delivery_gate_test.dart": {
+      "count": 2,
+      "first_seen": 1786682986,
+      "last_seen": 1786683012,
+      "hashes": [
+        "d5d791d09868",
+        "b03aac4b63e8"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/notifications/domain/services/notification_delivery_gate.dart": {
+      "count": 1,
+      "first_seen": 1786682988,
+      "last_seen": 1786682988,
+      "hashes": [
+        "19634fa3ccf7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-be/backend/tests/test_refund_request.py": {
+      "count": 2,
+      "first_seen": 1786682997,
+      "last_seen": 1786683008,
+      "hashes": [
+        "568b1d96ddb7",
+        "2f2b843b316d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/notifications/domain/services/refund_notification_service.dart": {
+      "count": 1,
+      "first_seen": 1786682998,
+      "last_seen": 1786682998,
+      "hashes": [
+        "8c8ce4fd7703"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/notifications/presentation/providers/notification_providers.dart": {
+      "count": 2,
+      "first_seen": 1786683020,
+      "last_seen": 1786683027,
+      "hashes": [
+        "e7b3b13fedc9",
+        "f45f76348aec"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/test/features/notifications/domain/notification_preferences_test.dart": {
+      "count": 1,
+      "first_seen": 1786683029,
+      "last_seen": 1786683029,
+      "hashes": [
+        "127da32619e7"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1272/frontend/test/features/notifications/notification_settings_screen_test.dart": {
+      "count": 4,
+      "first_seen": 1786683040,
+      "last_seen": 1786683128,
+      "hashes": [
+        "a65f4eb4c14c",
+        "8590b0ac0e75",
+        "e7da3069d3c7",
+        "48b922829a42"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/notifications/notifications_facade.dart": {
+      "count": 1,
+      "first_seen": 1786683048,
+      "last_seen": 1786683048,
+      "hashes": [
+        "9d25ee4672c0"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/extensions/refund_request_visuals.dart": {
+      "count": 1,
+      "first_seen": 1786683228,
+      "last_seen": 1786683228,
+      "hashes": [
+        "ea4985bc043b"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/core/l10n/app_strings.dart": {
+      "count": 1,
+      "first_seen": 1786683244,
+      "last_seen": 1786683244,
+      "hashes": [
+        "d6c7cb825ff6"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/widgets/refund_request_sheet.dart": {
+      "count": 1,
+      "first_seen": 1786683289,
+      "last_seen": 1786683289,
+      "hashes": [
+        "9fa4ece9eb31"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/widgets/refund_status_badge.dart": {
+      "count": 1,
+      "first_seen": 1786683297,
+      "last_seen": 1786683297,
+      "hashes": [
+        "d3b9e4a61c30"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/widgets/refund_reject_reason_dialog.dart": {
+      "count": 1,
+      "first_seen": 1786683364,
+      "last_seen": 1786683364,
+      "hashes": [
+        "19577d6b43dc"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/widgets/refund_action_box.dart": {
+      "count": 1,
+      "first_seen": 1786683399,
+      "last_seen": 1786683399,
+      "hashes": [
+        "9944814dec25"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/widgets/refund_request_banner.dart": {
+      "count": 1,
+      "first_seen": 1786683419,
+      "last_seen": 1786683419,
+      "hashes": [
+        "328ec2d3711d"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/screens/subscription_detail_screen.dart": {
+      "count": 2,
+      "first_seen": 1786683426,
+      "last_seen": 1786683432,
+      "hashes": [
+        "4a3e916f7259",
+        "3346bf03f131"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/screens/refund_pending_list_screen.dart": {
+      "count": 3,
+      "first_seen": 1786683521,
+      "last_seen": 1786683658,
+      "hashes": [
+        "792cf4efdc23",
+        "f9127f20fff5",
+        "7f0af8e88b22"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/presentation/widgets/refund_pending_card.dart": {
+      "count": 1,
+      "first_seen": 1786683549,
+      "last_seen": 1786683549,
+      "hashes": [
+        "b52afea3a914"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/core/router/app_routes.dart": {
+      "count": 1,
+      "first_seen": 1786683557,
+      "last_seen": 1786683557,
+      "hashes": [
+        "e8466160edd2"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/core/router/routes/subscription_routes.dart": {
+      "count": 2,
+      "first_seen": 1786683570,
+      "last_seen": 1786683579,
+      "hashes": [
+        "3c127a927f40",
+        "e1212a3ef59f"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/subscription_ui_facade.dart": {
+      "count": 1,
+      "first_seen": 1786683588,
+      "last_seen": 1786683588,
+      "hashes": [
+        "7e675cc0024e"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/home/presentation/widgets/dashboard_tab.dart": {
+      "count": 1,
+      "first_seen": 1786683593,
+      "last_seen": 1786683593,
+      "hashes": [
+        "39fce3e11178"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/lib/features/subscription/subscription_facade.dart": {
+      "count": 3,
+      "first_seen": 1786683599,
+      "last_seen": 1786683609,
+      "hashes": [
+        "d031341a7b9c",
+        "192fc9eaba3c",
+        "e865c6441fc1"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/.harness/knowledge/glossary.md": {
+      "count": 1,
+      "first_seen": 1786684755,
+      "last_seen": 1786684755,
+      "hashes": [
+        "4a772fb5cb61"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/docs/specs/glossary.md": {
+      "count": 1,
+      "first_seen": 1786684776,
+      "last_seen": 1786684776,
+      "hashes": [
+        "e49954a8c832"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1271-fe/frontend/test/core/router/route_integrity_test.dart": {
+      "count": 2,
+      "first_seen": 1786685385,
+      "last_seen": 1786685404,
+      "hashes": [
+        "f647066b011d",
+        "40e0ac976037"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1276/backend/tests/test_schedule_confirmation_concurrency_postgres.py": {
+      "count": 1,
+      "first_seen": 1786688581,
+      "last_seen": 1786688581,
+      "hashes": [
+        "4104533935da"
+      ]
+    },
+    "/Users/r00360/Dev/personal/development/app/lesson-app/.claude/worktrees/wt-1276/backend/app/services/schedule_confirmation_service.py": {
+      "count": 2,
+      "first_seen": 1786688678,
+      "last_seen": 1786688715,
+      "hashes": [
+        "4d9eadddab46",
+        "73a596e5b9cf"
+      ]
     }
   },
-  "updated_at": 1785919770
+  "updated_at": 1786689969
 }
