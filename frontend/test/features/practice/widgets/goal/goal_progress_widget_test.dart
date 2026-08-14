@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/features/gamification/gamification_facade.dart'
+    show todayPracticeMinutesProvider, weeklyPracticeMinutesProvider;
 import 'package:lessonaza/features/practice/domain/entities/entities.dart';
 import 'package:lessonaza/features/practice/presentation/providers/goal_achievement_storage_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/practice_goal_provider.dart';
@@ -145,6 +147,67 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets(
+      '#1273 회귀 — 진행바가 practice-logs(스트릭 전용) 근접-0 대신 히트맵 파생 분을 반영한다',
+      (tester) async {
+        final goal = PracticeGoal(
+          id: 'g1',
+          studentId: 's1',
+          dailyTimeMinutes: 30,
+          weeklyTimeMinutes: 180,
+          isActive: true,
+          createdAt: DateTime(2026, 6, 1),
+        );
+        final now = DateTime.now();
+        final weekStart = now.subtract(Duration(days: now.weekday - 1));
+        final normalizedWeekStart = DateTime(
+          weekStart.year,
+          weekStart.month,
+          weekStart.day,
+        );
+
+        await tester.pumpWidget(
+          wrap(const GoalProgressWidget(studentId: 's1'), [
+            practiceGoalProvider('s1').overrideWith((_) async => goal),
+            // practice-logs 파이프라인은 스트릭 전용으로 남는다(#1273 결정) —
+            // 실사용에서 항상 관측되던 1분 minimal streak log 를 그대로
+            // 재현해, goalStatusProvider 가 이 값을 더 이상 시간 진행값으로
+            // 쓰지 않음을 검증한다.
+            todayProgressProvider('s1').overrideWith(
+              (_) async => DailyPracticeProgress(
+                date: now,
+                practiceTimeSeconds: 60,
+                completedSectionCount: 0,
+              ),
+            ),
+            weeklyProgressProvider('s1').overrideWith(
+              (_) async => WeeklyPracticeProgress(
+                weekStart: normalizedWeekStart,
+                totalTimeSeconds: 60,
+                practiceDayCount: 0,
+                dailyProgress: const [],
+              ),
+            ),
+            // 히트맵 파생 소스 — 실제 누적 연습 분 (#1269 과 동일 소스).
+            todayPracticeMinutesProvider('s1').overrideWith((_) async => 20),
+            weeklyPracticeMinutesProvider('s1').overrideWith((_) async => 90),
+            goalAchievementStorageProvider(
+              's1',
+            ).overrideWith(_FakeGoalAchievementStorage.new),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        // 20분/90분(1시간 30분) — 히트맵 파생 값. practice-logs 파이프라인의
+        // 1분/1분 근접-0 값이 아니어야 한다.
+        expect(find.text('20분 / 30분'), findsOneWidget);
+        expect(find.text('1시간 30분 / 3시간'), findsOneWidget);
+        expect(find.textContaining('1분 / 30분'), findsNothing);
+        expect(find.textContaining('1분 / 3시간'), findsNothing);
+      },
+    );
   });
 }
 
