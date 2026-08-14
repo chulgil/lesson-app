@@ -1,3 +1,5 @@
+import 'notification_type_group.dart';
+
 /// Per-category notification toggle preferences.
 ///
 /// Stores the user's fine-grained push notification settings
@@ -30,6 +32,14 @@ class NotificationPreferences {
   /// Do-Not-Disturb end hour (0–23). Null = DND disabled.
   final int? quietEndHour;
 
+  /// Per-[NotificationTypeGroup] override, nested under a category.
+  ///
+  /// Absent key = inherit the parent category's toggle value (no migration
+  /// needed for existing users — an empty map is identical to pre-#1272
+  /// behavior). Present key = explicit override that persists across
+  /// category flips.
+  final Map<NotificationTypeGroup, bool> groupOverrides;
+
   const NotificationPreferences({
     this.masterEnabled = true,
     this.lessonEnabled = true,
@@ -40,6 +50,7 @@ class NotificationPreferences {
     this.marketingEnabled = false,
     this.quietStartHour,
     this.quietEndHour,
+    this.groupOverrides = const {},
   });
 
   /// Default preferences for a new user.
@@ -55,6 +66,7 @@ class NotificationPreferences {
     bool? marketingEnabled,
     Object? quietStartHour = _absent,
     Object? quietEndHour = _absent,
+    Map<NotificationTypeGroup, bool>? groupOverrides,
   }) {
     return NotificationPreferences(
       masterEnabled: masterEnabled ?? this.masterEnabled,
@@ -70,6 +82,7 @@ class NotificationPreferences {
       quietEndHour: identical(quietEndHour, _absent)
           ? this.quietEndHour
           : quietEndHour as int?,
+      groupOverrides: groupOverrides ?? this.groupOverrides,
     );
   }
 
@@ -107,16 +120,19 @@ class NotificationPreferences {
   }
 
   Map<String, dynamic> toJson() => {
-        'masterEnabled': masterEnabled,
-        'lessonEnabled': lessonEnabled,
-        'scheduleEnabled': scheduleEnabled,
-        'subscriptionEnabled': subscriptionEnabled,
-        'announcementEnabled': announcementEnabled,
-        'practiceEnabled': practiceEnabled,
-        'marketingEnabled': marketingEnabled,
-        'quietStartHour': quietStartHour,
-        'quietEndHour': quietEndHour,
-      };
+    'masterEnabled': masterEnabled,
+    'lessonEnabled': lessonEnabled,
+    'scheduleEnabled': scheduleEnabled,
+    'subscriptionEnabled': subscriptionEnabled,
+    'announcementEnabled': announcementEnabled,
+    'practiceEnabled': practiceEnabled,
+    'marketingEnabled': marketingEnabled,
+    'quietStartHour': quietStartHour,
+    'quietEndHour': quietEndHour,
+    'groupOverrides': groupOverrides.map(
+      (group, enabled) => MapEntry(group.name, enabled),
+    ),
+  };
 
   factory NotificationPreferences.fromJson(Map<String, dynamic> json) {
     return NotificationPreferences(
@@ -129,7 +145,29 @@ class NotificationPreferences {
       marketingEnabled: (json['marketingEnabled'] as bool?) ?? false,
       quietStartHour: json['quietStartHour'] as int?,
       quietEndHour: json['quietEndHour'] as int?,
+      groupOverrides: _groupOverridesFromJson(json['groupOverrides']),
     );
+  }
+
+  /// Tolerant decode: missing key (pre-#1272 persisted JSON) yields an empty
+  /// map (full inheritance); unknown group names are dropped rather than
+  /// throwing, so a future group rename/removal can't corrupt old data.
+  static Map<NotificationTypeGroup, bool> _groupOverridesFromJson(Object? raw) {
+    if (raw is! Map) return const {};
+    final result = <NotificationTypeGroup, bool>{};
+    for (final entry in raw.entries) {
+      NotificationTypeGroup? group;
+      for (final candidate in NotificationTypeGroup.values) {
+        if (candidate.name == entry.key) {
+          group = candidate;
+          break;
+        }
+      }
+      if (group == null) continue;
+      final enabled = entry.value;
+      if (enabled is bool) result[group] = enabled;
+    }
+    return result;
   }
 
   @override
@@ -144,20 +182,34 @@ class NotificationPreferences {
           practiceEnabled == other.practiceEnabled &&
           marketingEnabled == other.marketingEnabled &&
           quietStartHour == other.quietStartHour &&
-          quietEndHour == other.quietEndHour;
+          quietEndHour == other.quietEndHour &&
+          _groupOverridesEqual(groupOverrides, other.groupOverrides);
 
   @override
   int get hashCode => Object.hash(
-        masterEnabled,
-        lessonEnabled,
-        scheduleEnabled,
-        subscriptionEnabled,
-        announcementEnabled,
-        practiceEnabled,
-        marketingEnabled,
-        quietStartHour,
-        quietEndHour,
-      );
+    masterEnabled,
+    lessonEnabled,
+    scheduleEnabled,
+    subscriptionEnabled,
+    announcementEnabled,
+    practiceEnabled,
+    marketingEnabled,
+    quietStartHour,
+    quietEndHour,
+    groupOverrides.length,
+  );
+
+  static bool _groupOverridesEqual(
+    Map<NotificationTypeGroup, bool> a,
+    Map<NotificationTypeGroup, bool> b,
+  ) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (final entry in a.entries) {
+      if (b[entry.key] != entry.value) return false;
+    }
+    return true;
+  }
 }
 
 /// Notification categories shown to the user.
