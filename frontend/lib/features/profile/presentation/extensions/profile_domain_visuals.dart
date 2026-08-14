@@ -112,6 +112,44 @@ extension InviteUserRoleVisuals on InviteUserRole {
   }
 }
 
+extension InviteTargetRoleVisuals on InviteTargetRole {
+  /// Card title in the creation selector, and the badge text shown on the
+  /// generated invite/QR view and invite history rows.
+  String get label {
+    switch (this) {
+      case InviteTargetRole.teacher:
+        return AppStrings.inviteTargetRoleTeacherLabel;
+      case InviteTargetRole.student:
+        return AppStrings.inviteTargetRoleStudentLabel;
+      case InviteTargetRole.parent:
+        return AppStrings.inviteTargetRoleParentLabel;
+    }
+  }
+
+  /// Card description in the creation selector only.
+  String get description {
+    switch (this) {
+      case InviteTargetRole.teacher:
+        return AppStrings.inviteTargetRoleTeacherDesc;
+      case InviteTargetRole.student:
+        return AppStrings.inviteTargetRoleStudentDesc;
+      case InviteTargetRole.parent:
+        return AppStrings.inviteTargetRoleParentDesc;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case InviteTargetRole.teacher:
+        return Icons.school_rounded;
+      case InviteTargetRole.student:
+        return Icons.music_note_rounded;
+      case InviteTargetRole.parent:
+        return Icons.family_restroom_rounded;
+    }
+  }
+}
+
 extension InviteVisuals on Invite {
   String get formattedExpiry {
     final remaining = timeRemaining;

@@ -6542,6 +6542,34 @@ class AppStrings {
   /// 잠시 후 다시 시도해주세요 — error 본문.
   static const inviteCreateErrorSubtitle = '잠시 후 다시 시도해주세요';
 
+  // ── Invite Target Role (#1267 — 대상 역할 사전결정) ──────────────────────
+  /// 초대 생성 전 대상 선택 화면 제목.
+  static const inviteTargetRoleSelectorTitle = '누구를 위한 초대인가요?';
+
+  /// 초대 생성 전 대상 선택 화면 부제.
+  static const inviteTargetRoleSelectorSubtitle = '대상을 고르면 QR과 초대 코드가 만들어져요';
+
+  /// 선생님용(추천) 대상 카드 라벨 — 초대 이력/QR 화면 배지에도 사용.
+  static const inviteTargetRoleTeacherLabel = '선생님용';
+
+  /// 선생님용 카드 설명 — 연결 없이 추천 기록만 남는다는 의도 전달.
+  static const inviteTargetRoleTeacherDesc = '다른 선생님에게 레슨아자를 추천해요';
+
+  /// 학생용 대상 카드 라벨 — 배지에도 사용.
+  static const inviteTargetRoleStudentLabel = '학생용';
+
+  /// 학생용 카드 설명.
+  static const inviteTargetRoleStudentDesc = '학생을 초대해서 레슨을 시작해요';
+
+  /// 학부모용 대상 카드 라벨 — 배지에도 사용.
+  static const inviteTargetRoleParentLabel = '학부모용';
+
+  /// 학부모용 카드 설명.
+  static const inviteTargetRoleParentDesc = '자녀 계정으로 학부모를 초대해요';
+
+  /// 생성된 초대 화면에서 대상을 바꿔 다시 만들 때 쓰는 버튼.
+  static const inviteTargetRoleChangeButton = '다른 대상으로 다시 만들기';
+
   /// $targetRole에게 QR 코드를 보여주거나 링크를 공유해주세요 — 헤더 안내.
   static String inviteShareGuideFormat(String targetRole) =>
       '$targetRole에게 QR 코드를 보여주거나 링크를 공유해주세요';
@@ -6830,6 +6858,13 @@ class AppStrings {
   /// 학생이 학생 코드를 입력한 경우 안내
   static const inviteSelfCodeStudent =
       '학생은 학생의 초대 코드를 사용할 수 없습니다.\n선생님의 초대 코드를 사용해주세요.';
+
+  /// #1267 — 대상 역할이 지정된 초대를 다른 역할 계정이 스캔한 경우 헤드라인.
+  static const inviteTargetRoleMismatchTitle = '다른 역할 전용 초대예요';
+
+  /// #1267 — 대상 역할 불일치 안내 본문 ($expectedRole = 대상 역할 라벨).
+  static String inviteTargetRoleMismatchBodyFormat(String expectedRole) =>
+      '이 초대는 $expectedRole 전용이에요.\n$expectedRole 계정으로 다시 스캔해주세요.';
 
   /// 연결 확인 화면 제목 ($role = 상대 역할 라벨)
   static String inviteConnectWithRoleFormat(String role) => '$role과 연결하기';
@@ -10767,6 +10802,10 @@ class AppStrings {
   static const roleSelectParent = '학부모';
   static const roleSelectParentDesc = '자녀의 레슨과 연습을 확인';
   static const roleSelectConsentRequired = '필수 약관에 동의하면 역할을 선택할 수 있어요.';
+
+  /// #1267 — 대상 역할이 지정된 QR 초대는 역할 카드를 고르지 않고 바로 스캔으로
+  /// 시작할 수 있다는 진입점 버튼 라벨.
+  static const roleSelectScanEntryLabel = 'QR 코드로 시작하기';
 
   // Discipline Select (#977) — 멀티 Discipline 가입 첫 단계.
   static const disciplineSelectTitle = '분야 선택';

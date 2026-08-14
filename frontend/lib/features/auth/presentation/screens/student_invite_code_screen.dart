@@ -16,7 +16,11 @@ import '../../../invite/invite_facade.dart';
 /// Student invite code input screen
 /// Students enter an invite code from the teacher to connect with their teacher
 class StudentInviteCodeScreen extends ConsumerStatefulWidget {
-  const StudentInviteCodeScreen({super.key});
+  const StudentInviteCodeScreen({super.key, this.initialCode});
+
+  /// #1267 — QR 스캔으로 온 신규 사용자는 코드를 이미 알고 있으므로 수동 입력을
+  /// 건너뛴다 (CodeInputScreen 의 deep-link initialCode 패턴과 동일).
+  final String? initialCode;
 
   @override
   ConsumerState<StudentInviteCodeScreen> createState() =>
@@ -98,6 +102,7 @@ class _StudentInviteCodeScreenState
                       // entry points look up the same way and confirm via the
                       // same teacher-info step before creating a connection.
                       InviteCodeDigitInput(
+                        initialCode: widget.initialCode,
                         onInviteResolved: _handleInviteResolved,
                       ),
 
@@ -106,9 +111,7 @@ class _StudentInviteCodeScreenState
                       // Info box
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.space4),
-                        decoration: BoxDecoration(
-                          color: AppColors.inkSoft,
-                        ),
+                        decoration: BoxDecoration(color: AppColors.inkSoft),
                         child: Row(
                           children: [
                             Icon(
@@ -136,8 +139,9 @@ class _StudentInviteCodeScreenState
                         width: double.infinity,
                         height: AppSpacing.buttonHeight,
                         child: OutlinedButton(
-                          onPressed:
-                              _isSkipping ? null : _handleStartWithoutCode,
+                          onPressed: _isSkipping
+                              ? null
+                              : _handleStartWithoutCode,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.inkSecondary,
                             side: BorderSide(color: AppColors.inkQuaternary),
@@ -215,14 +219,13 @@ class _StudentInviteCodeScreenState
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder:
-            (_) => InviteConfirmScreen(
-              invite: invite,
-              // Onboarding isn't complete yet — routing to `homeRoute` would be
-              // redirected back to role-select by the auth guard. Land on
-              // profile setup instead (preserves the pre-unification behavior).
-              successRedirectRoute: AppRoutes.studentProfileSetup,
-            ),
+        builder: (_) => InviteConfirmScreen(
+          invite: invite,
+          // Onboarding isn't complete yet — routing to `homeRoute` would be
+          // redirected back to role-select by the auth guard. Land on
+          // profile setup instead (preserves the pre-unification behavior).
+          successRedirectRoute: AppRoutes.studentProfileSetup,
+        ),
       ),
     );
   }

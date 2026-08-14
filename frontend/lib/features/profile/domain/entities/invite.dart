@@ -37,6 +37,33 @@ enum InviteUserRole {
   }
 }
 
+/// Target role an invite is pre-bound to at creation time (#1267 — QR/코드
+/// 대상 역할 사전결정).
+///
+/// Distinct from [InviteUserRole]: that is who *created* the invite, this is
+/// who the invite is *for*. Nullable on [Invite] for backward compatibility
+/// — invites created before this field existed have no target and keep the
+/// legacy self-code-only validation behavior.
+enum InviteTargetRole {
+  teacher,
+  student,
+  parent;
+
+  /// Wire value used by the backend `target_role` field.
+  String get wireValue => name;
+
+  /// Parses the backend `target_role` field. Returns null for both "field
+  /// absent" (legacy invite) and "unrecognized value" (defensive — treat an
+  /// unknown future value as untargeted rather than crashing).
+  static InviteTargetRole? fromWire(String? value) {
+    if (value == null) return null;
+    for (final role in InviteTargetRole.values) {
+      if (role.name == value) return role;
+    }
+    return null;
+  }
+}
+
 /// Invite model - can be created by teacher or student
 class Invite {
   final String id;
@@ -53,6 +80,7 @@ class Invite {
   final int? maxUses; // Maximum number of uses (null = unlimited)
   final int useCount; // Current use count
   final String? note; // Optional note/label for the invite
+  final InviteTargetRole? targetRole; // #1267 — 대상 역할 사전결정, null=레거시
 
   const Invite({
     required this.id,
@@ -69,6 +97,7 @@ class Invite {
     this.maxUses,
     this.useCount = 0,
     this.note,
+    this.targetRole,
   });
 
   /// Check if invite is currently valid
@@ -102,6 +131,7 @@ class Invite {
     int? maxUses,
     int? useCount,
     String? note,
+    InviteTargetRole? targetRole,
   }) {
     return Invite(
       id: id ?? this.id,
@@ -118,6 +148,7 @@ class Invite {
       maxUses: maxUses ?? this.maxUses,
       useCount: useCount ?? this.useCount,
       note: note ?? this.note,
+      targetRole: targetRole ?? this.targetRole,
     );
   }
 

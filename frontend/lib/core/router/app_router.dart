@@ -86,6 +86,12 @@ String? resolveAuthRedirect(
   // New OAuth signup: terms agreement is collected inline inside
   // RoleSelectScreen (phone_verification_policy.md §2.3).
   if (authState is AuthNeedsRole && !isRoleSelect) {
+    // #1267 — target-role QR scan must reach the scanner before a role is
+    // chosen, otherwise RoleSelectScreen always appears first and the
+    // "skip role-select" acceptance criterion breaks. Once the scan resolves
+    // a target-role invite, ScanInviteScreen calls setRole() itself and the
+    // AuthNeedsOnboarding gate below takes over routing.
+    if (currentPath == AppRoutes.inviteScan) return null;
     return AppRoutes.roleSelect;
   }
 

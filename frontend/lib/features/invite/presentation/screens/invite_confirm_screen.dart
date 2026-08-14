@@ -17,6 +17,7 @@ import '../../../auth/auth_facade.dart';
 import '../../../parent_home/parent_home_facade.dart';
 import '../../../profile/presentation/extensions/profile_domain_visuals.dart';
 import '../../../profile/profile_facade.dart';
+import '../extensions/invite_target_role_routing.dart';
 
 /// Screen for confirming connection request from an invite
 class InviteConfirmScreen extends ConsumerStatefulWidget {
@@ -55,7 +56,18 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
   Widget build(BuildContext context) {
     final currentUserRole = ref.watch(currentInviteUserRoleProvider);
     final inviteCreatorRole = widget.invite.creatorRole;
-    final isValidConnection = currentUserRole != inviteCreatorRole;
+
+    // #1267 — 대상 역할이 지정된 초대는 스캔한 계정의 실제 역할(교사/학생/학부모)
+    // 이 대상과 일치해야 한다. currentInviteUserRoleProvider 는 학부모를
+    // student 로 접어버려 학부모의 학생용 QR 대리 스캔을 못 걸러내므로, 전체
+    // 3종 UserRole 을 별도로 비교한다.
+    final actualUserRole = ref.watch(currentUserRoleProvider);
+    final targetRole = widget.invite.targetRole;
+    final targetMismatch =
+        targetRole != null && actualUserRole != targetRole.asUserRole;
+
+    final isValidConnection =
+        !targetMismatch && currentUserRole != inviteCreatorRole;
 
     return NotebookScreenScaffold(
       appBar: const NotebookDetailAppBar(
@@ -64,16 +76,32 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child:
-              isValidConnection
-                  ? _buildValidContent(inviteCreatorRole)
-                  : _buildInvalidContent(currentUserRole),
+          child: isValidConnection
+              ? _buildValidContent(inviteCreatorRole)
+              : _buildInvalidContent(
+                  currentUserRole,
+                  mismatchTargetRole: targetMismatch ? targetRole : null,
+                ),
         ),
       ),
     );
   }
 
-  Widget _buildInvalidContent(InviteUserRole currentUserRole) {
+  Widget _buildInvalidContent(
+    InviteUserRole currentUserRole, {
+    InviteTargetRole? mismatchTargetRole,
+  }) {
+    final String body;
+    if (mismatchTargetRole != null) {
+      body = AppStrings.inviteTargetRoleMismatchBodyFormat(
+        mismatchTargetRole.label,
+      );
+    } else {
+      body = currentUserRole == InviteUserRole.teacher
+          ? AppStrings.inviteSelfCodeTeacher
+          : AppStrings.inviteSelfCodeStudent;
+    }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -94,15 +122,15 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
           const SizedBox(height: AppSpacing.space6),
           // Notebook × Score: 연결 실패 상태 헤드라인 Playfair sectionTitle (§7.89).
           Text(
-            AppStrings.inviteCannotConnect,
+            mismatchTargetRole != null
+                ? AppStrings.inviteTargetRoleMismatchTitle
+                : AppStrings.inviteCannotConnect,
             style: NotebookTypography.sectionTitle,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            currentUserRole == InviteUserRole.teacher
-                ? AppStrings.inviteSelfCodeTeacher
-                : AppStrings.inviteSelfCodeStudent,
+            body,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.inkSecondary,
             ),
@@ -262,17 +290,16 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                 ),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
-              child:
-                  _isLoading
-                      ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.paper,
-                        ),
-                      )
-                      : const Text(AppStrings.inviteSendConnectionRequest),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.paper,
+                      ),
+                    )
+                  : const Text(AppStrings.inviteSendConnectionRequest),
             ),
           ),
 
@@ -334,10 +361,9 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             targetRole: creatorRole,
             method: InviteMethod.inviteCode,
             inviteId: invite.id,
-            message:
-                _messageController.text.isEmpty
-                    ? null
-                    : _messageController.text,
+            message: _messageController.text.isEmpty
+                ? null
+                : _messageController.text,
           );
 
       if (mounted) {
@@ -546,9 +572,8 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                       extra: {
                         'teacherId': invite.creatorId,
                         'teacherName': invite.creatorName ?? AppStrings.teacher,
-                        'instrument':
-                            AppStrings
-                                .instrumentFallback, // Will be selected in booking screen
+                        'instrument': AppStrings
+                            .instrumentFallback, // Will be selected in booking screen
                         'studentId': userProfile.userId,
                         'studentName': userProfile.userName,
                         'isTrialLesson': true,

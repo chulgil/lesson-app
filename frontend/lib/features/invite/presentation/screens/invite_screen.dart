@@ -18,6 +18,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../profile/presentation/extensions/profile_domain_visuals.dart';
 import '../../../profile/profile_facade.dart';
+import '../widgets/invite_target_role_selector.dart';
 
 /// Screen for creating and sharing invites
 class InviteScreen extends ConsumerStatefulWidget {
@@ -28,19 +29,23 @@ class InviteScreen extends ConsumerStatefulWidget {
 }
 
 class _InviteScreenState extends ConsumerState<InviteScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Create a new invite when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _createNewInvite();
-    });
-  }
+  // #1267 — 대상 역할을 먼저 고른 뒤에만 초대를 생성한다 (기존: 화면 진입 시
+  // 자동 생성). null 이면 InviteTargetRoleSelector 를 보여준다.
+  InviteTargetRole? _selectedTargetRole;
 
-  Future<void> _createNewInvite() async {
+  Future<void> _createNewInvite(InviteTargetRole targetRole) async {
+    setState(() => _selectedTargetRole = targetRole);
     await ref
         .read(inviteCreatorProvider.notifier)
-        .createInvite(validity: const Duration(days: 7));
+        .createInvite(
+          validity: const Duration(days: 7),
+          targetRole: targetRole,
+        );
+  }
+
+  void _changeTarget() {
+    ref.read(inviteCreatorProvider.notifier).reset();
+    setState(() => _selectedTargetRole = null);
   }
 
   @override
@@ -50,10 +55,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title:
-            userRole == InviteUserRole.teacher
-                ? AppStrings.inviteScreenTitleTeacher
-                : AppStrings.inviteScreenTitleStudent,
+        title: userRole == InviteUserRole.teacher
+            ? AppStrings.inviteScreenTitleTeacher
+            : AppStrings.inviteScreenTitleStudent,
         leading: DetailAppBarLeading.close,
         actions: const [DetailAppBarAction.history],
         onAction: (action) {
@@ -62,16 +66,21 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           }
         },
       ),
-      body: inviteState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _buildError(),
-        data: (invite) {
-          if (invite == null) {
-            return _buildError();
-          }
-          return _buildContent(invite, userRole);
-        },
-      ),
+      body: _selectedTargetRole == null
+          ? SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+              child: InviteTargetRoleSelector(onSelect: _createNewInvite),
+            )
+          : inviteState.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => _buildError(),
+              data: (invite) {
+                if (invite == null) {
+                  return _buildError();
+                }
+                return _buildContent(invite, userRole);
+              },
+            ),
     );
   }
 
@@ -80,15 +89,14 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       title: AppStrings.inviteCreateErrorTitle,
       subtitle: AppStrings.inviteCreateErrorSubtitle,
       actionLabel: AppStrings.retry,
-      onAction: _createNewInvite,
+      onAction: () => _createNewInvite(_selectedTargetRole!),
     );
   }
 
   Widget _buildContent(Invite invite, InviteUserRole userRole) {
-    final targetRole =
-        userRole == InviteUserRole.teacher
-            ? AppStrings.student
-            : AppStrings.teacher;
+    final targetRole = userRole == InviteUserRole.teacher
+        ? AppStrings.student
+        : AppStrings.teacher;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -118,6 +126,11 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ),
           ),
 
+          if (invite.targetRole != null) ...[
+            const SizedBox(height: AppSpacing.space3),
+            _buildTargetRoleBadgeRow(invite.targetRole!),
+          ],
+
           const SizedBox(height: AppSpacing.space6),
 
           // QR Code
@@ -144,6 +157,49 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           _buildAlternativeOptions(),
         ],
       ),
+    );
+  }
+
+  /// #1267 — 대상 역할 배지 + 대상 변경(재생성) 진입점.
+  Widget _buildTargetRoleBadgeRow(InviteTargetRole targetRole) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space3,
+            vertical: AppSpacing.space1,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.paperAccent.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.zero,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(targetRole.icon, size: 14, color: AppColors.paperAccent),
+              const SizedBox(width: AppSpacing.space1),
+              Text(
+                targetRole.label,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.paperAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        TextButton(
+          onPressed: _changeTarget,
+          child: Text(
+            AppStrings.inviteTargetRoleChangeButton,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -399,10 +455,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
   void _shareLink(Invite invite) {
     final userRole = ref.read(currentInviteUserRoleProvider);
-    final roleText =
-        userRole == InviteUserRole.teacher
-            ? AppStrings.teacher
-            : AppStrings.student;
+    final roleText = userRole == InviteUserRole.teacher
+        ? AppStrings.teacher
+        : AppStrings.student;
 
     String? senderName;
     List<String> instruments = const [];
