@@ -137,6 +137,19 @@ async def test_concurrent_standalone_registration_does_not_double_book():
         student_a = str(uuid.uuid4())
         student_b = str(uuid.uuid4())
 
+        # create_standalone_regular_lessons auto-resolves a subscription per
+        # batch (c57ff2d1, #301 shadow-lesson fix) — that INSERTs a
+        # Subscription row whose student_id FK requires a real Student row.
+        # Production always has one (a teacher must add a student profile
+        # before booking lessons for them); this concurrency harness fabricates
+        # bare uuid4 ids, so it must create the rows itself.
+        from app.models.student import Student
+
+        async with session_maker() as setup_session:
+            setup_session.add(Student(id=student_a, name="Race Student A"))
+            setup_session.add(Student(id=student_b, name="Race Student B"))
+            await setup_session.commit()
+
         today = dt.date.today()
         day_of_week = today.weekday()
         start_time = "14:00"
