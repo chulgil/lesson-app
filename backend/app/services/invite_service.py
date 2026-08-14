@@ -36,6 +36,7 @@ class InviteService:
         max_uses: int | None = None,
         note: str | None = None,
         expires_in_hours: int = 48,
+        target_role: str | None = None,
         current_user: Any,
     ) -> Any:
         """Create a new invite code."""
@@ -49,6 +50,7 @@ class InviteService:
             creator_id=current_user.id,
             creator_name=current_user.name,
             creator_role=current_user.role,
+            target_role=target_role,
             invite_code=code,
             invite_url=invite_url,
             qr_code_data=qr_data,
@@ -108,6 +110,7 @@ class InviteService:
             creator_id=invite.creator_id,
             creator_name=invite.creator_name,
             creator_role=getattr(invite.creator_role, "value", invite.creator_role),
+            target_role=invite.target_role,
             invite_code=invite.invite_code,
             invite_url="",
             qr_code_data="",
@@ -314,6 +317,7 @@ class InviteService:
 
         if invite is not None:
             self._validate_invite_can_be_used(invite)
+            self._validate_invite_target_role(invite, current_user)
             invite_id = invite.id
             target_id = invite.creator_id
 
@@ -496,6 +500,40 @@ class InviteService:
                 detail="Invite usage limit reached",
             )
 
+    def _validate_invite_target_role(self, invite: Any, current_user: Any) -> None:
+        """#1267 — reject redemption by an existing user whose role doesn't match target_role.
+
+        Legacy invites (``target_role`` is ``None``) skip this check — unchanged behavior.
+        """
+        target_role = invite.target_role
+        if target_role is None:
+            return
+        current_role = getattr(current_user.role, "value", current_user.role)
+        if current_role != target_role:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invite target role mismatch",
+            )
+
+    def _validate_acceptable_connection_request(self, conn_req: Any) -> None:
+        """#1267 — reject accept when requester/target roles don't form a valid pair.
+
+        A teacher-target invite redeemed by a teacher produces a
+        ConnectionRequest with requester_role == target_role == teacher (no
+        student side). Accepting it would attach the other teacher to the
+        roster as a Student via ``_attach_student_to_teacher``. Per spec,
+        teacher-target invites are referral-only — the row stays pending as
+        the referral record; it must never be accepted. Reject (not cancel)
+        remains allowed as a cleanup path.
+        """
+        requester_role = getattr(conn_req.requester_role, "value", conn_req.requester_role)
+        target_role = getattr(conn_req.target_role, "value", conn_req.target_role)
+        if requester_role == target_role:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot accept a connection request between two users of the same role",
+            )
+
     async def get_pending_requests(self, *, user_id: str, page: int, size: int, offset: int) -> PaginatedResponse:
         """List pending connection requests for the user."""
         from app.models.invite import ConnectionRequest
@@ -561,6 +599,8 @@ class InviteService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Request is not pending",
             )
+        if action == "accept":
+            self._validate_acceptable_connection_request(conn_req)
 
         now = datetime.now(UTC)
         conn_req.responded_at = now

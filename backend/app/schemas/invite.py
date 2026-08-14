@@ -2,11 +2,14 @@
 
 import datetime as _dt
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 # ---------------------------------------------------------------------------
 # Invite
 # ---------------------------------------------------------------------------
+
+# #1267 — target role prebinding. Kept in sync with app.models.user.UserRole.
+VALID_INVITE_TARGET_ROLES = {"teacher", "student", "parent"}
 
 
 class InviteCreate(BaseModel):
@@ -16,6 +19,14 @@ class InviteCreate(BaseModel):
     max_uses: int | None = None
     note: str | None = None
     expires_in_hours: int = 48
+    target_role: str | None = None
+
+    @field_validator("target_role")
+    @classmethod
+    def _validate_target_role(cls, value: str | None) -> str | None:
+        if value is not None and value not in VALID_INVITE_TARGET_ROLES:
+            raise ValueError(f"target_role must be one of {sorted(VALID_INVITE_TARGET_ROLES)}")
+        return value
 
 
 class InviteResponse(BaseModel):
@@ -27,6 +38,7 @@ class InviteResponse(BaseModel):
     creator_id: str
     creator_name: str | None = None
     creator_role: str
+    target_role: str | None = None
     invite_code: str
     invite_url: str
     qr_code_data: str
@@ -70,6 +82,7 @@ class PublicInviteLandingResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Connection Request
 # ---------------------------------------------------------------------------
+
 
 class ConnectionRequestCreate(BaseModel):
     """Create a connection request."""
@@ -115,6 +128,7 @@ class ConnectionRequestRespondRequest(BaseModel):
 # ---------------------------------------------------------------------------
 # Connection
 # ---------------------------------------------------------------------------
+
 
 class ConnectionResponse(BaseModel):
     """Established connection."""
