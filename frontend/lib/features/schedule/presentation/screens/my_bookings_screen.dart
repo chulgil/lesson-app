@@ -54,8 +54,13 @@ class MyBookingsRoute extends ConsumerWidget {
 
     // teacherId 가 없으면 정확한 수강권을 특정할 수 없어 변경권 0 (버튼 비활성).
     if (teacherId.isEmpty) {
-      return _screen(resolvedStudentId, remaining: 0, total: 0, subId: null,
-          deadlineHours: 12);
+      return _screen(
+        resolvedStudentId,
+        remaining: 0,
+        total: 0,
+        subId: null,
+        deadlineHours: 12,
+      );
     }
 
     final subAsync = ref.watch(
@@ -77,9 +82,13 @@ class MyBookingsRoute extends ConsumerWidget {
         backgroundColor: AppColors.paper,
         body: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, _) =>
-          _screen(resolvedStudentId, remaining: 0, total: 0, subId: null,
-          deadlineHours: 12),
+      error: (_, _) => _screen(
+        resolvedStudentId,
+        remaining: 0,
+        total: 0,
+        subId: null,
+        deadlineHours: 12,
+      ),
     );
   }
 
@@ -135,14 +144,20 @@ class MyBookingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get upcoming bookings (next 60 days)
+    // Get upcoming bookings (next 60 days). Truncated to day granularity so
+    // the provider family key stays stable across rebuilds within the same
+    // day — DateTime.now() carries live microseconds that differ on every
+    // build, which broke family-key equality and looped the loading state
+    // (#1274). The backend already only reads the date part (see
+    // RemoteTeacherAvailabilityRepository.getAvailableSlotsForDateRange).
     final now = DateTime.now();
-    final endDate = now.add(const Duration(days: 60));
+    final today = DateTime(now.year, now.month, now.day);
+    final endDate = today.add(const Duration(days: 60));
 
     final slotsAsync = ref.watch(
       availableSlotsForDateRangeProvider(
         teacherId: teacherId,
-        startDate: now,
+        startDate: today,
         endDate: endDate,
         currentStudentId: studentId,
       ),
@@ -171,12 +186,11 @@ class MyBookingsScreen extends ConsumerWidget {
             Expanded(
               child: slotsAsync.when(
                 data: (slots) {
-                  final myBookings =
-                      slots
-                          .where(
-                            (s) => s.status == AvailabilitySlotStatus.myBooking,
-                          )
-                          .toList();
+                  final myBookings = slots
+                      .where(
+                        (s) => s.status == AvailabilitySlotStatus.myBooking,
+                      )
+                      .toList();
 
                   if (myBookings.isEmpty) {
                     return _buildEmptyState(context);
@@ -185,9 +199,8 @@ class MyBookingsScreen extends ConsumerWidget {
                   return _buildBookingList(context, ref, myBookings);
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (error, _) =>
-                        const ErrorStateWidget(title: AppStrings.cannotLoadData),
+                error: (error, _) =>
+                    const ErrorStateWidget(title: AppStrings.cannotLoadData),
               ),
             ),
           ],
@@ -227,16 +240,15 @@ class MyBookingsScreen extends ConsumerWidget {
                     Icon(
                       canReschedule
                           ? (isLastChance
-                              ? Icons.warning_amber
-                              : Icons.swap_horiz_rounded)
+                                ? Icons.warning_amber
+                                : Icons.swap_horiz_rounded)
                           : Icons.block,
                       size: 14,
-                      color:
-                          canReschedule
-                              ? (isLastChance
-                                  ? AppColors.paperAccent
-                                  : AppColors.ink)
-                              : AppColors.paperAccent,
+                      color: canReschedule
+                          ? (isLastChance
+                                ? AppColors.paperAccent
+                                : AppColors.ink)
+                          : AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
@@ -245,14 +257,14 @@ class MyBookingsScreen extends ConsumerWidget {
                         totalReschedules,
                       ),
                       style: AppTypography.bodySmall.copyWith(
-                        color:
-                            canReschedule
-                                ? (isLastChance
-                                    ? AppColors.paperAccent
-                                    : AppColors.inkSecondary)
-                                : AppColors.paperAccent,
-                        fontWeight:
-                            isLastChance ? FontWeight.w600 : FontWeight.normal,
+                        color: canReschedule
+                            ? (isLastChance
+                                  ? AppColors.paperAccent
+                                  : AppColors.inkSecondary)
+                            : AppColors.paperAccent,
+                        fontWeight: isLastChance
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -404,19 +416,17 @@ class MyBookingsScreen extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed:
-                          canReschedule
-                              ? () => _navigateToReschedule(context, booking)
-                              : null,
+                      onPressed: canReschedule
+                          ? () => _navigateToReschedule(context, booking)
+                          : null,
                       icon: const Icon(Icons.swap_horiz_rounded, size: 18),
                       label: const Text(AppStrings.rescheduleShort),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.paperAccent,
                         side: BorderSide(
-                          color:
-                              canReschedule
-                                  ? AppColors.paperAccent
-                                  : AppColors.inkQuaternary,
+                          color: canReschedule
+                              ? AppColors.paperAccent
+                              : AppColors.inkQuaternary,
                         ),
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.space2,
@@ -427,19 +437,17 @@ class MyBookingsScreen extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed:
-                          canReschedule
-                              ? () => _navigateToCancel(context, booking)
-                              : null,
+                      onPressed: canReschedule
+                          ? () => _navigateToCancel(context, booking)
+                          : null,
                       icon: const Icon(Icons.close, size: 18),
                       label: const Text(AppStrings.cancel),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.paperAccent,
                         side: BorderSide(
-                          color:
-                              canReschedule
-                                  ? AppColors.paperAccent
-                                  : AppColors.inkQuaternary,
+                          color: canReschedule
+                              ? AppColors.paperAccent
+                              : AppColors.inkQuaternary,
                         ),
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.space2,
@@ -490,20 +498,19 @@ class MyBookingsScreen extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => BookingCancelScreen(
-              bookingId: booking.id,
-              teacherName: teacherName,
-              teacherId: teacherId,
-              bookingDate: booking.date,
-              startTime: booking.startTime.toFlutterTimeOfDay(),
-              remainingReschedules: remainingReschedules,
-              totalReschedules: totalReschedules,
-              instrument: instrument,
-              subscriptionId: subscriptionId,
-              studentId: studentId,
-              cancelDeadlineHours: cancelDeadlineHours,
-            ),
+        builder: (context) => BookingCancelScreen(
+          bookingId: booking.id,
+          teacherName: teacherName,
+          teacherId: teacherId,
+          bookingDate: booking.date,
+          startTime: booking.startTime.toFlutterTimeOfDay(),
+          remainingReschedules: remainingReschedules,
+          totalReschedules: totalReschedules,
+          instrument: instrument,
+          subscriptionId: subscriptionId,
+          studentId: studentId,
+          cancelDeadlineHours: cancelDeadlineHours,
+        ),
       ),
     );
   }
