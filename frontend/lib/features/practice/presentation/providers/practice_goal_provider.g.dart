@@ -356,22 +356,54 @@ class _EffectiveDailyGoalMinutesProviderElement
 
 String _$todayProgressHash() => r'd4201f759e9eb697da327deab6b786d942a676d1';
 
-/// Today's progress
+/// Today's progress from the practice-logs pipeline.
+///
+/// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+/// only writes a 1-minute minimal log for streak purposes, so
+/// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+/// practice duration. [goalStatusProvider] therefore only consumes this for
+/// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+/// overrides the time value with the heatmap-derived
+/// `todayPracticeMinutesProvider`.
 ///
 /// Copied from [todayProgress].
 @ProviderFor(todayProgress)
 const todayProgressProvider = TodayProgressFamily();
 
-/// Today's progress
+/// Today's progress from the practice-logs pipeline.
+///
+/// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+/// only writes a 1-minute minimal log for streak purposes, so
+/// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+/// practice duration. [goalStatusProvider] therefore only consumes this for
+/// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+/// overrides the time value with the heatmap-derived
+/// `todayPracticeMinutesProvider`.
 ///
 /// Copied from [todayProgress].
 class TodayProgressFamily extends Family<AsyncValue<DailyPracticeProgress>> {
-  /// Today's progress
+  /// Today's progress from the practice-logs pipeline.
+  ///
+  /// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+  /// only writes a 1-minute minimal log for streak purposes, so
+  /// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+  /// practice duration. [goalStatusProvider] therefore only consumes this for
+  /// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+  /// overrides the time value with the heatmap-derived
+  /// `todayPracticeMinutesProvider`.
   ///
   /// Copied from [todayProgress].
   const TodayProgressFamily();
 
-  /// Today's progress
+  /// Today's progress from the practice-logs pipeline.
+  ///
+  /// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+  /// only writes a 1-minute minimal log for streak purposes, so
+  /// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+  /// practice duration. [goalStatusProvider] therefore only consumes this for
+  /// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+  /// overrides the time value with the heatmap-derived
+  /// `todayPracticeMinutesProvider`.
   ///
   /// Copied from [todayProgress].
   TodayProgressProvider call(
@@ -406,11 +438,27 @@ class TodayProgressFamily extends Family<AsyncValue<DailyPracticeProgress>> {
   String? get name => r'todayProgressProvider';
 }
 
-/// Today's progress
+/// Today's progress from the practice-logs pipeline.
+///
+/// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+/// only writes a 1-minute minimal log for streak purposes, so
+/// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+/// practice duration. [goalStatusProvider] therefore only consumes this for
+/// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+/// overrides the time value with the heatmap-derived
+/// `todayPracticeMinutesProvider`.
 ///
 /// Copied from [todayProgress].
 class TodayProgressProvider extends FutureProvider<DailyPracticeProgress> {
-  /// Today's progress
+  /// Today's progress from the practice-logs pipeline.
+  ///
+  /// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+  /// only writes a 1-minute minimal log for streak purposes, so
+  /// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+  /// practice duration. [goalStatusProvider] therefore only consumes this for
+  /// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+  /// overrides the time value with the heatmap-derived
+  /// `todayPracticeMinutesProvider`.
   ///
   /// Copied from [todayProgress].
   TodayProgressProvider(
@@ -496,22 +544,38 @@ class _TodayProgressProviderElement
 
 String _$weeklyProgressHash() => r'341cab3d6ac6c84749e72a27080fb78d9e4d6b7e';
 
-/// This week's progress
+/// This week's progress from the practice-logs pipeline.
+///
+/// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+/// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+/// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
 ///
 /// Copied from [weeklyProgress].
 @ProviderFor(weeklyProgress)
 const weeklyProgressProvider = WeeklyProgressFamily();
 
-/// This week's progress
+/// This week's progress from the practice-logs pipeline.
+///
+/// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+/// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+/// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
 ///
 /// Copied from [weeklyProgress].
 class WeeklyProgressFamily extends Family<AsyncValue<WeeklyPracticeProgress>> {
-  /// This week's progress
+  /// This week's progress from the practice-logs pipeline.
+  ///
+  /// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+  /// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+  /// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
   ///
   /// Copied from [weeklyProgress].
   const WeeklyProgressFamily();
 
-  /// This week's progress
+  /// This week's progress from the practice-logs pipeline.
+  ///
+  /// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+  /// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+  /// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
   ///
   /// Copied from [weeklyProgress].
   WeeklyProgressProvider call(
@@ -546,11 +610,19 @@ class WeeklyProgressFamily extends Family<AsyncValue<WeeklyPracticeProgress>> {
   String? get name => r'weeklyProgressProvider';
 }
 
-/// This week's progress
+/// This week's progress from the practice-logs pipeline.
+///
+/// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+/// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+/// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
 ///
 /// Copied from [weeklyProgress].
 class WeeklyProgressProvider extends FutureProvider<WeeklyPracticeProgress> {
-  /// This week's progress
+  /// This week's progress from the practice-logs pipeline.
+  ///
+  /// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+  /// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+  /// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
   ///
   /// Copied from [weeklyProgress].
   WeeklyProgressProvider(
@@ -636,24 +708,52 @@ class _WeeklyProgressProviderElement
   String get studentId => (origin as WeeklyProgressProvider).studentId;
 }
 
-String _$goalStatusHash() => r'a41f55414a84e10d0d01a6914e65ca72782ae210';
+String _$goalStatusHash() => r'0026ec46670570ca2b35154f469c46203e028a3a';
 
-/// Combined goal status provider for widgets
+/// Combined goal status provider for widgets.
+///
+/// #1273: daily/weekly *time* progress is unified onto the same
+/// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+/// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+/// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+/// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+/// which have no heatmap equivalent.
 ///
 /// Copied from [goalStatus].
 @ProviderFor(goalStatus)
 const goalStatusProvider = GoalStatusFamily();
 
-/// Combined goal status provider for widgets
+/// Combined goal status provider for widgets.
+///
+/// #1273: daily/weekly *time* progress is unified onto the same
+/// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+/// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+/// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+/// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+/// which have no heatmap equivalent.
 ///
 /// Copied from [goalStatus].
 class GoalStatusFamily extends Family<AsyncValue<GoalStatus>> {
-  /// Combined goal status provider for widgets
+  /// Combined goal status provider for widgets.
+  ///
+  /// #1273: daily/weekly *time* progress is unified onto the same
+  /// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+  /// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+  /// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+  /// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+  /// which have no heatmap equivalent.
   ///
   /// Copied from [goalStatus].
   const GoalStatusFamily();
 
-  /// Combined goal status provider for widgets
+  /// Combined goal status provider for widgets.
+  ///
+  /// #1273: daily/weekly *time* progress is unified onto the same
+  /// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+  /// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+  /// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+  /// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+  /// which have no heatmap equivalent.
   ///
   /// Copied from [goalStatus].
   GoalStatusProvider call(
@@ -688,11 +788,25 @@ class GoalStatusFamily extends Family<AsyncValue<GoalStatus>> {
   String? get name => r'goalStatusProvider';
 }
 
-/// Combined goal status provider for widgets
+/// Combined goal status provider for widgets.
+///
+/// #1273: daily/weekly *time* progress is unified onto the same
+/// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+/// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+/// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+/// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+/// which have no heatmap equivalent.
 ///
 /// Copied from [goalStatus].
 class GoalStatusProvider extends FutureProvider<GoalStatus> {
-  /// Combined goal status provider for widgets
+  /// Combined goal status provider for widgets.
+  ///
+  /// #1273: daily/weekly *time* progress is unified onto the same
+  /// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+  /// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+  /// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+  /// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+  /// which have no heatmap equivalent.
   ///
   /// Copied from [goalStatus].
   GoalStatusProvider(

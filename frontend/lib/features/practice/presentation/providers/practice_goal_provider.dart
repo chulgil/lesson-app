@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../gamification/gamification_facade.dart'
+    show todayPracticeMinutesProvider, weeklyPracticeMinutesProvider;
 import '../../data/repositories/mock_practice_goal_repository.dart';
 import '../../data/repositories/remote_practice_goal_repository.dart';
 import '../../domain/entities/entities.dart';
@@ -44,7 +46,15 @@ Future<int> effectiveDailyGoalMinutes(Ref ref, String studentId) async {
   return goal?.dailyTimeMinutes ?? defaultDailyGoalMinutes;
 }
 
-/// Today's progress
+/// Today's progress from the practice-logs pipeline.
+///
+/// #1273: the practice-logs pipeline (`PracticeService.record_practice`)
+/// only writes a 1-minute minimal log for streak purposes, so
+/// [DailyPracticeProgress.practiceTimeSeconds] here never accumulates real
+/// practice duration. [goalStatusProvider] therefore only consumes this for
+/// [DailyPracticeProgress.completedSectionCount] (no heatmap equivalent) and
+/// overrides the time value with the heatmap-derived
+/// `todayPracticeMinutesProvider`.
 @Riverpod(keepAlive: true)
 Future<DailyPracticeProgress> todayProgress(
   TodayProgressRef ref,
@@ -54,7 +64,11 @@ Future<DailyPracticeProgress> todayProgress(
   return repository.getDailyProgress(studentId, DateTime.now());
 }
 
-/// This week's progress
+/// This week's progress from the practice-logs pipeline.
+///
+/// #1273: same caveat as [todayProgress] — [goalStatusProvider] only
+/// consumes this for [WeeklyPracticeProgress.practiceDayCount] and overrides
+/// the time value with the heatmap-derived `weeklyPracticeMinutesProvider`.
 @Riverpod(keepAlive: true)
 Future<WeeklyPracticeProgress> weeklyProgress(
   WeeklyProgressRef ref,
@@ -118,7 +132,14 @@ class PracticeGoalCrud extends _$PracticeGoalCrud {
 
 typedef PracticeGoalCrudNotifier = PracticeGoalCrud;
 
-/// Combined goal status provider for widgets
+/// Combined goal status provider for widgets.
+///
+/// #1273: daily/weekly *time* progress is unified onto the same
+/// heatmap-derived source as `GoalProgressSummaryCard` (#1269,
+/// `todayPracticeMinutesProvider` / `weeklyPracticeMinutesProvider`) — the
+/// practice-logs pipeline (`todayProgress`/`weeklyProgress` above) stays
+/// streak-only and only supplies `completedSectionCount`/`practiceDayCount`,
+/// which have no heatmap equivalent.
 @Riverpod(keepAlive: true)
 Future<GoalStatus> goalStatus(GoalStatusRef ref, String studentId) async {
   final goal = await ref.watch(practiceGoalProvider(studentId).future);
@@ -128,11 +149,26 @@ Future<GoalStatus> goalStatus(GoalStatusRef ref, String studentId) async {
   final weeklyProgress = await ref.watch(
     weeklyProgressProvider(studentId).future,
   );
+  final heatmapTodayMinutes = await ref.watch(
+    todayPracticeMinutesProvider(studentId).future,
+  );
+  final heatmapWeeklyMinutes = await ref.watch(
+    weeklyPracticeMinutesProvider(studentId).future,
+  );
 
   return GoalStatus(
     goal: goal,
-    todayProgress: todayProgress,
-    weeklyProgress: weeklyProgress,
+    todayProgress: DailyPracticeProgress(
+      date: todayProgress.date,
+      practiceTimeSeconds: heatmapTodayMinutes * 60,
+      completedSectionCount: todayProgress.completedSectionCount,
+    ),
+    weeklyProgress: WeeklyPracticeProgress(
+      weekStart: weeklyProgress.weekStart,
+      totalTimeSeconds: heatmapWeeklyMinutes * 60,
+      practiceDayCount: weeklyProgress.practiceDayCount,
+      dailyProgress: weeklyProgress.dailyProgress,
+    ),
   );
 }
 

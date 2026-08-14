@@ -18,6 +18,10 @@ export 'presentation/providers/growth_heatmap_provider.dart'
 // 의 effectiveDailyGoalMinutesProvider 참조.
 export 'presentation/providers/today_practice_minutes_provider.dart'
     show todayPracticeMinutesProvider;
+// #1273 — 이번 주 연습 분 파생 (today 버전과 동일 heatmap 소스). practice
+// 탭 GoalProgressWidget 의 weekly 진행값이 이 provider 를 소비한다.
+export 'presentation/providers/weekly_practice_minutes_provider.dart'
+    show weeklyPracticeMinutesProvider;
 export 'presentation/providers/student_quest_provider.dart'
     show studentQuestRepositoryProvider;
 // 학생 P3a — 오늘의 미션(고정1+로테이션2, doc 46 §4④).
