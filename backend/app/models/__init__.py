@@ -122,6 +122,7 @@ from app.models.schedule import (  # noqa: F401
 )
 from app.models.schedule_ext import (  # noqa: F401
     GroupClassBooking,
+    GroupClassMember,
     GroupClassSchedule,
     LessonScheduleChange,
     NoShowRecord,

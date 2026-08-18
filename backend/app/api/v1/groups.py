@@ -17,6 +17,8 @@ from app.schemas.schedule_ext import (
     GroupClassBookingCreate,
     GroupClassBookingResponse,
     GroupClassCreate,
+    GroupClassMemberAssignRequest,
+    GroupClassMemberResponse,
     GroupClassResponse,
     GroupClassScheduleCreate,
     GroupClassScheduleResponse,
@@ -64,16 +66,72 @@ async def list_group_classes(
     pagination: Annotated[dict, Depends(get_pagination)],
     teacher_id: str | None = None,
     include_inactive: str | None = None,
+    student_id: str | None = None,
 ) -> PaginatedResponse[GroupClassResponse]:
     service = ScheduleExtService(db)
     return await service.list_group_classes(
         teacher_id=teacher_id,
+        student_id=student_id,
         include_inactive=include_inactive == "true",
         current_user=current_user,
         page=pagination["page"],
         size=pagination["size"],
         offset=pagination["offset"],
     )
+
+
+@router.get(
+    "/classes/{group_class_id}/members",
+    response_model=list[GroupClassMemberResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List cohort members of a group class",
+)
+async def list_group_class_members(
+    group_class_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> list[GroupClassMemberResponse]:
+    service = ScheduleExtService(db)
+    result: list[GroupClassMemberResponse] = await service.list_group_class_members(group_class_id, current_user)
+    return result
+
+
+@router.post(
+    "/classes/{group_class_id}/members",
+    response_model=GroupClassMemberResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Assign a student to a cohort (capacity checked)",
+)
+async def assign_group_class_member(
+    group_class_id: str,
+    body: GroupClassMemberAssignRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> GroupClassMemberResponse:
+    service = ScheduleExtService(db)
+    result: GroupClassMemberResponse = await service.assign_group_class_member(
+        group_class_id, body.student_id, current_user
+    )
+    return result
+
+
+@router.delete(
+    "/classes/{group_class_id}/members/{student_id}",
+    response_model=GroupClassMemberResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Remove a student from a cohort",
+)
+async def remove_group_class_member(
+    group_class_id: str,
+    student_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> GroupClassMemberResponse:
+    service = ScheduleExtService(db)
+    result: GroupClassMemberResponse = await service.remove_group_class_member(
+        group_class_id, student_id, current_user
+    )
+    return result
 
 
 @router.get(
