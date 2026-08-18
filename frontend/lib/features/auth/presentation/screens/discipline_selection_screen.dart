@@ -17,12 +17,12 @@ import '../providers/active_discipline_provider.dart';
 import '../../../../core/widgets/onboarding_step_header.dart';
 
 /// Discipline selection — the first sign-up step of the multi-discipline
-/// platform (#977). The user picks a coaching discipline (music and fitness
-/// today; later language) before role onboarding.
+/// platform (#977). The user picks a coaching discipline before role onboarding.
 ///
-/// Live since #979-B registered fitness: with >1 registered discipline
-/// RoleSelectScreen's gate routes here (music + fitness cards), and the user's
-/// pick is persisted before role onboarding.
+/// Dormant since #1278 (음악 단일 포커스): only music is registered, so
+/// RoleSelectScreen's `>1 discipline` gate skips straight to role onboarding.
+/// The screen is kept for deep-link safety and for the next registered
+/// discipline; it renders the music card and persists the pick as before.
 ///
 /// [role] (via GoRouter `extra`) is the role chosen on RoleSelectScreen; after a
 /// discipline is picked we continue to that role's onboarding. A null role

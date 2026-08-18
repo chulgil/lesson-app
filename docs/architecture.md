@@ -4,7 +4,7 @@
 
 ## 개요
 
-> **전방동기화 (Discipline 전환, 2026-06-26)**: 현재 20 도메인은 음악 전용 전제(Discipline 0). 멀티 Discipline 3계층(무관 코어 / 추상 슬롯 / 분야 구현) + Registry 추상화는 `36-멀티카테고리-Discipline-플랫폼-설계`(옵시디언) 설계 단계이며 **미구현**. 신규 도메인/추상 추가 시 `docs/SPEC_ROUTING.md` §0 + 36- Phase 매핑 확인 후 진행. 아래 디렉토리 매핑·도메인 건강도 표는 현행 음악 기준 유지.
+> **음악 단일 포커스 (2026-08-18 확정 — 옵시디언 55)**: 20 도메인은 음악 전제가 **최종 상태**다. 멀티 Discipline(헬스/필라테스/어학) 방향은 폐기 — fitness·language 등록 카테고리 코드는 제거됐고, `Discipline` 값객체·`disciplineId` wire 필드만 데이터 호환용으로 music 단독 휴면 유지(신규 카테고리 등록 금지). 상세: `docs/SPEC_ROUTING.md` §0.
 
 레슨 앱은 **Clean Architecture** 원칙과 **Feature-based 구조**를 결합한 Flutter 앱입니다.
 

@@ -6,15 +6,17 @@
 
 > **[명명 — Discipline 전환]** 신규 "분야"(vertical) 개념은 **`Discipline`**(아래 §0 정의), 기존 **`카테고리/Category`(§14 선생님 설정 5묶음)는 `SettingGroup` 개념**이다. 신규 코드/스펙에서 `카테고리`를 분야 의미로 쓰지 말 것. (Discipline 도입: #962, music 0번. Category→SettingGroup 코드 리네이밍은 후속 — 현재 `CategoryCard`/`OnboardingCategoryPreviewScreen` 클래스명 유지.)
 
-## 0. 분야 (Discipline) — 멀티카테고리 SSOT
+## 0. 분야 (Discipline) — 음악 단일 확정 (휴면 추상화)
+
+> **2026-08-18 사용자 확정 (옵시디언 55)**: 멀티카테고리 방향 폐기 — 레슨아자는 음악 단일 카테고리 앱. fitness·language 등록은 코드에서 제거됨.
 
 | 용어 | 영문/심볼 | 정의 | 사용하지 않는 표현 |
 |------|-----------|------|-------------------|
-| 분야 | `Discipline` (`core/domain/value_objects/discipline.dart`) | 코칭 vertical(음악/헬스/필라테스/어학). id·displayKey·themeColorSeed·expertiseCatalogId 의 값 객체. **현재 music 1개만 등록**(Discipline 0). 추가 = `DisciplineRegistry` 데이터 등록(코드 변경 0) | 카테고리(=SettingGroup), 장르, 종목(=specialty) |
-| 분야 레지스트리 | `DisciplineRegistry` | 등록 분야 SSOT. id 조회(`byId`), enum switch 금지. `fallback`=music(null/legacy `disciplineId` 폴백) | — |
-| 전문분야 | `specialty` / `expertiseTags` | 분야 내 세부 종목(음악=악기, 헬스=웨이트/필라테스/PT, 어학=과목). `Discipline.expertiseCatalogId` 가 카탈로그 지정 | 악기(음악 한정 별칭) |
+| 분야 | `Discipline` (`core/domain/value_objects/discipline.dart`) | **music 단독 등록**의 휴면 값 객체 — `disciplineId` wire/저장 데이터 호환용으로만 유지. **신규 분야 등록 금지** | 카테고리(=SettingGroup), 장르, 종목(=specialty) |
+| 분야 레지스트리 | `DisciplineRegistry` | 등록 분야 SSOT (music 1개). `fallback`=music(null/legacy `disciplineId` 폴백) | — |
+| 전문분야 | `specialty` / `expertiseTags` | 분야 내 세부 종목 = **악기** (음악 단일). `Discipline.expertiseCatalogId` 가 카탈로그 지정 | — |
 
-> 설계 SSOT: 옵시디언 `36-멀티카테고리-Discipline-플랫폼-설계`. 일반화 진행: #962~#980(Phase 0~4). 본 §0 외 용어 일반화(RangeSpec/RepeatTarget/StringOverlay 등)는 해당 Phase 이슈가 doc-sync 로 추가.
+> 구 설계(옵시디언 36, 이슈 #962~#980)는 역사 문서 — 재착수 시에만 참조.
 
 ## 원칙
 

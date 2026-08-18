@@ -1880,7 +1880,7 @@ class AppStrings {
   static const groupClassRegular = '정규 클래스';
 
   /// 드롭인 클래스 (배지)
-  static const groupClassDropin = '드롭인 클래스';
+  static const groupClassDropin = '특강';
 
   /// 그룹 클래스 정보를 불러올 수 없습니다 (route extra 누락 placeholder)
   static const groupClassInfoUnavailable = '그룹 클래스 정보를 불러올 수 없습니다.';
@@ -1908,7 +1908,7 @@ class AppStrings {
   static const groupClassFormDescriptionHint = '어떤 수업인지 간단히 적어주세요';
 
   /// 드롭인으로 열기 (폼 내 전환 스위치 — 별도 화면 분기 금지)
-  static const groupClassFormDropInToggleTitle = '드롭인으로 열기';
+  static const groupClassFormDropInToggleTitle = '특강으로 열기';
 
   /// 드롭인 전환 부연
   static const groupClassFormDropInToggleSubtitle = '매주 반복하지 않고 한 번만 여는 특강입니다';
@@ -1975,7 +1975,7 @@ class AppStrings {
   static const groupClassesEmptyTitle = '아직 만든 클래스가 없습니다';
 
   /// 빈 상태 부연
-  static const groupClassesEmptySubtitle = '여러 학생을 함께 지도하는 반이나 드롭인 특강을 만들어보세요';
+  static const groupClassesEmptySubtitle = '여러 학생을 함께 지도하는 반이나 특강을 만들어보세요';
 
   /// 매주 $days · $time (반 반복 일정 요약)
   static String groupClassesRepeatSummary(String days, String time) =>
@@ -10917,23 +10917,6 @@ class AppStrings {
 
   /// music 분야 표시명 (Discipline.displayKey 'discipline.music').
   static const disciplineMusic = '음악';
-
-  /// fitness 분야 표시명 (Discipline.displayKey 'discipline.fitness') — #979-B.
-  static const disciplineFitness = '헬스';
-
-  /// language 분야 표시명 (Discipline.displayKey 'discipline.language') — #1102.
-  static const disciplineLanguage = '어학';
-
-  // Fitness practice tools (#979-B) — 스켈레톤 도구 탭 라벨 + 준비 중 안내.
-  static const practiceToolRepCounter = '세트 카운터';
-  static const practiceToolIntervalTimer = '인터벌 타이머';
-  static const practiceToolGuideMedia = '폼 영상';
-  static const practiceToolSkeletonSubtitle = '준비 중인 기능입니다';
-
-  // Language practice tools (#1102) — 스켈레톤 도구 탭 라벨 (subtitle 는 위 재사용).
-  static const practiceToolDictation = '받아쓰기';
-  static const practiceToolPronunciation = '발음';
-  static const practiceToolConversation = '회화';
 
   // Student Invite Code
   static const inviteCodeScreenDesc = '선생님으로부터 받은\n초대 코드를 입력해주세요';

@@ -19,13 +19,15 @@ import 'package:lessonaza/features/parent_home/presentation/screens/child_profil
 /// 구조라, music 은 기존 5-키 큐레이션을 유지(byte-identical)하고 non-music 분야만
 /// `ExpertiseCatalogRegistry.forDiscipline` 라벨을 노출한다. 저장값이 활성
 /// 카탈로그 밖이면 items 에 prepend 해 DropdownButton value 계약을 지킨다(#1098 미러).
-/// Resolves to fitness only after a microtask, reproducing the cold-start
-/// where activeDisciplineProvider first emits the music fallback (storage
-/// AsyncLoading) then the real discipline — the path a synchronous
-/// activeDisciplineProvider override masks (adversarial-review gap).
-class _AsyncFitnessStorage extends SelectedDisciplineStorage {
+///
+/// #1278 (음악 단일 포커스): 등록 분야가 music 뿐이므로 non-music 경로는 미등록
+/// 분야로 구동한다 — 카탈로그가 music 으로 degrade 하되 키=라벨 분기는 유지된다.
+/// Resolves late, reproducing the cold-start where activeDisciplineProvider
+/// first emits the music fallback (storage AsyncLoading) then the resolved
+/// discipline — the path a synchronous override masks (adversarial-review gap).
+class _AsyncLegacyStorage extends SelectedDisciplineStorage {
   @override
-  Future<String?> build() async => 'fitness';
+  Future<String?> build() async => 'fitness'; // #1278 로 제거된 legacy 저장값
 }
 
 void main() {
@@ -34,8 +36,16 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   const musicOnlyLabel = '바이올린'; // music 카탈로그 전용
-  const fitnessTag = '필라테스'; // fitness specialty 전용
+  const unregisteredTag = '필라테스'; // 등록 카탈로그에 없는 태그 (#1278)
   const musicKey = 'violin'; // child_profile 이 저장하는 영문 키
+
+  /// 미등록 분야 — 카탈로그는 music 으로 degrade 하지만 non-music 분기를 탄다.
+  const unregisteredDiscipline = Discipline(
+    id: 'unregistered',
+    displayKey: 'discipline.unregistered',
+    themeColorSeed: 0xFF000000,
+    expertiseCatalogId: 'specialties',
+  );
 
   ChildProfile childWith(String instrument) => ChildProfile(
     id: 'c1',
@@ -97,13 +107,15 @@ void main() {
       expect(opts.map((o) => o.$1).toList(), kChildInstrumentKeys);
       expect(opts.first.$1, musicKey);
       expect(opts.map((o) => o.$2), contains(musicOnlyLabel));
-      expect(opts.map((o) => o.$2), isNot(contains(fitnessTag)));
+      expect(opts.map((o) => o.$2), isNot(contains(unregisteredTag)));
     });
 
-    test('fitness: specialty 라벨을 키=라벨로', () {
-      final opts = childInstrumentOptionsFor(DisciplineRegistry.fitness);
-      expect(opts.map((o) => o.$1), contains(fitnessTag));
-      expect(opts.map((o) => o.$2), contains(fitnessTag));
+    test('미등록 분야: 카탈로그를 키=라벨로 (music degrade) — #1278', () {
+      final opts = childInstrumentOptionsFor(unregisteredDiscipline);
+      // 카탈로그는 music 으로 degrade 하되, non-music 분기라 영문 키가 아니라
+      // 카탈로그 라벨 자체가 키가 된다.
+      expect(opts.map((o) => o.$1), contains(musicOnlyLabel));
+      expect(opts.map((o) => o.$1), isNot(contains(unregisteredTag)));
       // 키=라벨 (영문 키 아님)
       for (final o in opts) {
         expect(o.$1, o.$2);
@@ -121,45 +133,45 @@ void main() {
       expect(d.value, musicKey);
       final values = d.items!.map((e) => e.value).toList();
       expect(values, containsAll(kChildInstrumentKeys));
-      expect(values, isNot(contains(fitnessTag)));
+      expect(values, isNot(contains(unregisteredTag)));
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('fitness 신규: 기본값=첫 specialty, 필라테스 노출 + violin 부재', (
+    testWidgets('미등록 분야 신규: 기본값=카탈로그 첫 항목, violin 키 부재 — #1278', (
       tester,
     ) async {
-      await pump(tester, DisciplineRegistry.fitness);
+      await pump(tester, unregisteredDiscipline);
       final d = instrumentDropdown(tester);
       final values = d.items!.map((e) => e.value).toList();
-      expect(values, contains(fitnessTag));
+      expect(values, contains(musicOnlyLabel));
       expect(values, isNot(contains(musicKey)));
-      expect(d.value, '웨이트'); // 활성 분야(fitness) 첫 옵션 — 구체 단언
+      expect(d.value, musicOnlyLabel); // degrade 한 카탈로그의 첫 옵션 — 구체 단언
       expect(tester.takeException(), isNull);
     });
 
     testWidgets(
-      'value-preservation: music 자녀(violin)를 fitness 활성 중 편집해도 violin 보존',
+      'value-preservation: violin 자녀를 미등록 분야 활성 중 편집해도 violin 보존',
       (tester) async {
         await pump(
           tester,
-          DisciplineRegistry.fitness,
+          unregisteredDiscipline,
           existing: childWith(musicKey),
         );
         final d = instrumentDropdown(tester);
         expect(d.value, musicKey); // revert/assert 없이 보존
         final values = d.items!.map((e) => e.value).toList();
         expect(values, contains(musicKey)); // prepend
-        expect(values, contains(fitnessTag)); // + fitness 옵션
+        expect(values, contains(musicOnlyLabel)); // + 카탈로그 옵션
         expect(tester.takeException(), isNull);
       },
     );
 
     testWidgets(
-      'cold-start: 스토리지가 fitness로 늦게 resolve 되면 신규 기본값이 violin이 아니라 웨이트',
+      'cold-start: legacy fitness 저장값이 늦게 resolve 돼도 music 기본값(violin) 유지 — #1278',
       (tester) async {
         // No synchronous activeDisciplineProvider override — let the async
-        // storage resolve after a frame so initState sees the music fallback
-        // and build must re-derive the default once fitness resolves.
+        // storage resolve after a frame. #1278 이후 legacy 'fitness' 저장값은
+        // music 으로 degrade 하므로, 재파생 후에도 기본값은 violin 이어야 한다.
         tester.view.physicalSize = const Size(375, 812);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -168,7 +180,7 @@ void main() {
           ProviderScope(
             overrides: [
               selectedDisciplineStorageProvider.overrideWith(
-                () => _AsyncFitnessStorage(),
+                () => _AsyncLegacyStorage(),
               ),
             ],
             child: MaterialApp(
@@ -180,12 +192,11 @@ void main() {
         await tester.pumpAndSettle();
 
         final d = instrumentDropdown(tester);
-        expect(d.value, isNot(musicKey)); // music 폴백 누출 방지
-        expect(d.value, '웨이트'); // 해소된 fitness 첫 옵션
+        expect(d.value, musicKey); // legacy id → music degrade → violin 기본값
         expect(
           d.items!.map((e) => e.value),
-          isNot(contains(musicKey)),
-        ); // violin 미prepend
+          containsAll(kChildInstrumentKeys),
+        ); // music 5-키 큐레이션
         expect(tester.takeException(), isNull);
       },
     );

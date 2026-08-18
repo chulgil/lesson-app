@@ -1,6 +1,4 @@
 import '../../../../../core/domain/value_objects/discipline_registry.dart';
-import 'fitness_practice_tools.dart';
-import 'language_practice_tools.dart';
 import 'music_practice_tools.dart';
 import 'practice_tool.dart';
 
@@ -16,12 +14,10 @@ import 'practice_tool.dart';
 class PracticeToolRegistry {
   const PracticeToolRegistry._();
 
-  /// Music (discipline 0): metronome + tuner. Fitness (#979-B) registers its
-  /// own skeleton tool list here as one map entry (see below).
+  /// Music (discipline 0): metronome + tuner. A future discipline registers its
+  /// own tool list here as one map entry.
   static final Map<String, List<PracticeTool>> _byId = {
     DisciplineRegistry.music.id: musicPracticeTools,
-    DisciplineRegistry.fitness.id: fitnessPracticeTools,
-    DisciplineRegistry.language.id: languagePracticeTools,
   };
 
   /// The tools registered for [disciplineId]; null if none registered.
@@ -32,6 +28,6 @@ class PracticeToolRegistry {
   static List<PracticeTool> forDiscipline(String disciplineId) =>
       _byId[disciplineId] ?? musicPracticeTools;
 
-  /// All registered discipline ids (music, fitness, language).
+  /// All registered discipline ids (music).
   static Iterable<String> get registeredDisciplineIds => _byId.keys;
 }

@@ -19,23 +19,30 @@ import 'package:lessonaza/features/students/domain/entities/student.dart';
 ///  - StudentProfileEditScreen (dropdown; also fixes the 색소폰→바이올린 revert)
 ///  - the shared InstrumentSelector chips (exercised via AddManualTeacherScreen)
 ///
-/// Music stays byte-identical to the 22-item instrument catalog; fitness
-/// surfaces 웨이트/필라테스/PT. The edit-screen dropdown additionally preserves a
-/// saved value outside the active catalog (custom/legacy) instead of silently
-/// reverting it — the auto-save-on-exit data-loss fix.
+/// Music stays byte-identical to the 22-item instrument catalog. The
+/// edit-screen dropdown additionally preserves a saved value outside the active
+/// catalog (custom/legacy) instead of silently reverting it — the
+/// auto-save-on-exit data-loss fix.
 ///
-/// RED before the swap: an active fitness discipline still lists music
-/// instruments, so `필라테스` is absent and `첼로` present; and the edit dropdown
-/// reverts `색소폰` (not in the old 10-list) to `바이올린`.
+/// #1278 (음악 단일 포커스): music 이 유일한 등록 분야이므로 미등록 분야는
+/// music 카탈로그로 degrade 한다 — 조회가 레지스트리 경유임을 고정한다.
 void main() {
   // #980: keep Playfair (google_fonts) offline so Notebook surfaces render in
   // widget tests without a late network fetch dangling past teardown.
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  // A music instrument that is NOT a fitness specialty — the discriminator.
+  // A music instrument — present whenever the music catalog is the source.
   const musicOnlyTag = '첼로';
-  // A fitness specialty that is NOT a music instrument.
-  const fitnessTag = '필라테스';
+  // A tag outside every registered catalog — must never surface (#1278).
+  const unregisteredTag = '필라테스';
+
+  /// 미등록 분야 — 카탈로그 조회는 music 으로 degrade 해야 한다.
+  const unregisteredDiscipline = Discipline(
+    id: 'unregistered',
+    displayKey: 'discipline.unregistered',
+    themeColorSeed: 0xFF000000,
+    expertiseCatalogId: 'specialties',
+  );
   // In the 22-item catalog but NOT the old hardcoded 10-list — the revert repro.
   const outOf10Music = '색소폰';
   // Outside every registered catalog — custom / legacy value preservation.
@@ -76,19 +83,19 @@ void main() {
       );
 
       expect(find.text(musicOnlyTag), findsOneWidget);
-      expect(find.text(fitnessTag), findsNothing);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('fitness: specialty(필라테스) 노출 + 악기(첼로) 부재', (tester) async {
+    testWidgets('미등록 분야: music 카탈로그로 degrade (첼로 노출) — #1278', (tester) async {
       await pump(
         tester,
         const AddManualTeacherScreen(),
-        activeDiscipline(DisciplineRegistry.fitness),
+        activeDiscipline(unregisteredDiscipline),
       );
 
-      expect(find.text(fitnessTag), findsOneWidget);
-      expect(find.text(musicOnlyTag), findsNothing);
+      expect(find.text(musicOnlyTag), findsOneWidget);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
@@ -133,7 +140,7 @@ void main() {
       final values = d.items!.map((e) => e.value).toList();
       expect(values, contains(outOf10Music));
       expect(values, contains('바이올린')); // 22-카탈로그 노출
-      expect(values, isNot(contains(fitnessTag))); // music 카탈로그
+      expect(values, isNot(contains(unregisteredTag))); // music 카탈로그
       expect(tester.takeException(), isNull);
     });
 
@@ -150,20 +157,20 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('fitness: 저장된 specialty(필라테스) 값 표시 + specialty 카탈로그', (
+    testWidgets('미등록 분야: 카탈로그 밖 저장값 보존 + music 카탈로그로 degrade — #1278', (
       tester,
     ) async {
       await pump(
         tester,
         const StudentProfileEditScreen(),
-        overridesFor(DisciplineRegistry.fitness, studentWith(fitnessTag)),
+        overridesFor(unregisteredDiscipline, studentWith(unregisteredTag)),
       );
 
       final d = dropdown(tester);
-      expect(d.value, fitnessTag);
+      expect(d.value, unregisteredTag); // 저장값 보존 (revert 없음)
       final values = d.items!.map((e) => e.value).toList();
-      expect(values, contains(fitnessTag));
-      expect(values, isNot(contains(musicOnlyTag))); // 악기 부재
+      expect(values, contains(unregisteredTag)); // prepend
+      expect(values, contains(musicOnlyTag)); // + degrade 한 music 카탈로그
       expect(tester.takeException(), isNull);
     });
   });
