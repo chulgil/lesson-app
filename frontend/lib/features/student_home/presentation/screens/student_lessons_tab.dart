@@ -20,6 +20,7 @@ import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_facade.dart';
 import '../providers/student_home_booking_provider.dart';
 import '../providers/student_lessons_tab_state_provider.dart';
+import '../widgets/student_group_class_card.dart';
 import '../widgets/student_lesson_card.dart';
 import '../widgets/trial_booking_card.dart';
 import '../../../../core/widgets/compact_week_strip.dart';
@@ -87,8 +88,25 @@ class StudentLessonsTab extends ConsumerWidget {
         )
         .toList();
 
+    // Enrolled cohort classes meeting on the selected day. Derived from the
+    // repeat rule (1=Mon..7=Sun, same basis as DateTime.weekday); drop-ins carry
+    // no repeat rule so they surface through their booking, not here.
+    final dayGroupClasses = ref
+            .watch(studentGroupClassesProvider(currentStudentId))
+            .valueOrNull
+            ?.where(
+              (c) =>
+                  c.type == GroupClassType.regular &&
+                  (c.repeatDaysOfWeek ?? const <int>[]).contains(
+                    selectedDate.weekday,
+                  ),
+            )
+            .toList() ??
+        const <GroupClass>[];
+
     final isLoading = scheduleAsync.isLoading;
-    final totalCount = dayLessons.length + dayTrialBookings.length;
+    final totalCount =
+        dayLessons.length + dayTrialBookings.length + dayGroupClasses.length;
 
     return Column(
       children: [
@@ -129,6 +147,9 @@ class StudentLessonsTab extends ConsumerWidget {
             context,
             dayLessons,
             dayTrialBookings,
+            dayGroupClasses,
+            currentStudentId,
+            selectedDate,
             isLoading,
           ),
         ),
@@ -351,9 +372,15 @@ class StudentLessonsTab extends ConsumerWidget {
     BuildContext context,
     List<Lesson> dayLessons,
     List<LessonBooking> dayTrialBookings,
+    List<GroupClass> dayGroupClasses,
+    String currentStudentId,
+    DateTime selectedDate,
     bool isLoading,
   ) {
-    final hasContent = dayLessons.isNotEmpty || dayTrialBookings.isNotEmpty;
+    final hasContent =
+        dayLessons.isNotEmpty ||
+        dayTrialBookings.isNotEmpty ||
+        dayGroupClasses.isNotEmpty;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -381,6 +408,15 @@ class StudentLessonsTab extends ConsumerWidget {
         if (dayLessons.isNotEmpty) ...[
           ...dayLessons.map((lesson) => StudentLessonCard(lesson: lesson)),
         ],
+
+        // Enrolled cohort classes meeting today
+        ...dayGroupClasses.map(
+          (groupClass) => StudentGroupClassCard(
+            groupClass: groupClass,
+            studentId: currentStudentId,
+            date: selectedDate,
+          ),
+        ),
 
         // Empty state
         if (!hasContent && !isLoading) _buildEmptyState(context),

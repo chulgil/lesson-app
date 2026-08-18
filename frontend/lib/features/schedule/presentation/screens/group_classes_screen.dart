@@ -6,8 +6,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -17,8 +19,8 @@ import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../domain/entities/group_class.dart';
+import '../../domain/entities/group_class_schedule.dart';
 import '../providers/group_class_providers.dart';
-import 'group_class_form_screen.dart';
 
 /// The teacher's group classes — 반 and 드롭인 in one list.
 class GroupClassesScreen extends ConsumerWidget {
@@ -30,8 +32,8 @@ class GroupClassesScreen extends ConsumerWidget {
 
   final String teacherId;
 
-  /// Opens the class detail screen. That screen needs a concrete session, which
-  /// this list does not hold — J12 resolves it when wiring the route.
+  /// Opens a class. The attendance screen needs a concrete session, which this
+  /// list does not hold, so [GroupClassesRoute] resolves one before pushing.
   final void Function(GroupClass groupClass) onOpenClass;
 
   @override
@@ -99,16 +101,9 @@ class GroupClassesScreen extends ConsumerWidget {
   }
 
   void _openForm(BuildContext context, {GroupClass? groupClass}) {
-    // Same-feature sibling screen; J12 may swap this for a named route once the
-    // form path is registered.
-    Navigator.of(context).push(
-      MaterialPageRoute<GroupClass>(
-        builder:
-            (_) => GroupClassFormScreen(
-              teacherId: teacherId,
-              groupClass: groupClass,
-            ),
-      ),
+    context.push(
+      AppRoutes.groupClassForm,
+      extra: {'teacherId': teacherId, 'groupClass': groupClass},
     );
   }
 
@@ -149,6 +144,74 @@ class GroupClassesScreen extends ConsumerWidget {
         ),
       );
     }
+  }
+}
+
+/// Route host for [AppRoutes.groupClasses].
+///
+/// A class row carries no session, but the attendance screen needs one, so the
+/// tap resolves the class's sessions first and opens the next upcoming one.
+class GroupClassesRoute extends ConsumerWidget {
+  const GroupClassesRoute({super.key, required this.teacherId});
+
+  final String teacherId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GroupClassesScreen(
+      teacherId: teacherId,
+      onOpenClass: (groupClass) => _openAttendance(context, ref, groupClass),
+    );
+  }
+
+  /// Teachers land on attendance, not the student booking detail — the detail
+  /// screen is the student's booking surface and needs their student id.
+  Future<void> _openAttendance(
+    BuildContext context,
+    WidgetRef ref,
+    GroupClass groupClass,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final List<GroupClassSchedule> schedules;
+    try {
+      schedules = await ref.read(
+        groupClassSchedulesProvider(groupClass.id).future,
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.groupClassInfoUnavailable),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    if (schedules.isEmpty) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.groupClassesNoSessionYet),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // Next upcoming session, or the most recent one once the class has run its
+    // course — a finished class still opens instead of dead-ending on the tap.
+    final now = DateTime.now();
+    final schedule = schedules.firstWhere(
+      (s) => s.startTime.isAfter(now),
+      orElse: () => schedules.last,
+    );
+    if (!context.mounted) return;
+    context.push(
+      AppRoutes.groupClassAttendance.replaceFirst(':id', schedule.id),
+      extra: {
+        'scheduleId': schedule.id,
+        'schedule': schedule,
+        'groupClass': groupClass,
+      },
+    );
   }
 }
 

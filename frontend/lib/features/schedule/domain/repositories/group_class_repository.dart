@@ -17,8 +17,20 @@ abstract class GroupClassRepository {
     bool includeInactive = false,
   });
 
+  /// Active classes the student is enrolled in (cohort roster).
+  ///
+  /// Roster membership only — this is not a discovery feed, so a class the
+  /// student could join but has not been assigned to never shows up here.
+  Future<List<GroupClass>> getClassesForStudent(String studentId);
+
   /// A single class by ID, or null when it no longer exists.
   Future<GroupClass?> getClassById(String classId);
+
+  /// Sessions opened for a class, earliest first.
+  ///
+  /// Screens that only hold a class (list rows, agenda rows) resolve a concrete
+  /// session through this before pushing the detail/attendance screens.
+  Future<List<GroupClassSchedule>> getSchedulesForClass(String classId);
 
   /// Create a class. For a regular class the backend also lays down the
   /// recurring sessions derived from the repeat settings.

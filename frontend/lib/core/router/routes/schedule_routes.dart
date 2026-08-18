@@ -11,6 +11,8 @@ import '../../../features/schedule/domain/entities/group_class.dart';
 import '../../../features/schedule/domain/entities/group_class_schedule.dart';
 import '../../../features/schedule/presentation/screens/group_class_attendance_screen.dart';
 import '../../../features/schedule/presentation/screens/group_class_detail_screen.dart';
+import '../../../features/schedule/presentation/screens/group_class_form_screen.dart';
+import '../../../features/schedule/presentation/screens/group_classes_screen.dart';
 import '../../../features/search/presentation/screens/teacher_search_screen.dart';
 import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/request_completion_screen.dart';
@@ -251,6 +253,30 @@ List<GoRoute> scheduleRoutes = [
   // ============================================================
   // Group Class routes
   // ============================================================
+
+  // Teacher's own class list (J12 진입점 — 교사 홈 카드의 목적지).
+  GoRoute(
+    path: AppRoutes.groupClasses,
+    name: 'groupClasses',
+    builder: (context, state) {
+      return GroupClassesRoute(
+        teacherId: teacherIdParamOrCurrent(context, state),
+      );
+    },
+  ),
+
+  // Group class create / edit form. extra['groupClass'] populated = edit.
+  GoRoute(
+    path: AppRoutes.groupClassForm,
+    name: 'groupClassForm',
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>?;
+      return GroupClassFormScreen(
+        teacherId: teacherIdExtraOrCurrent(context, extra),
+        groupClass: extra?['groupClass'] as GroupClass?,
+      );
+    },
+  ),
 
   // Group Class Detail (student view - booking/waitlist)
   GoRoute(

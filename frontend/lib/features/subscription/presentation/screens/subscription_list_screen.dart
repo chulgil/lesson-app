@@ -13,6 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/makeup_credit_providers.dart';
@@ -307,10 +308,17 @@ class SubscriptionListScreen extends ConsumerWidget {
         .watch(lessonClassProvider(membership.lessonClassId))
         .whenData((lessonClass) => lessonClass?.name);
 
+    // J12 branch (1) — a group ticket prints its class name; while it resolves
+    // the card falls back to the "그룹 수강권" label, never to "개인레슨".
+    final groupClassId = subscription.groupClassId;
+
     return SubscriptionMembershipCard(
       subscription: subscription,
       classNameAsync: classNameAsync,
       instrument: membership.instrument,
+      groupClassName: groupClassId == null
+          ? null
+          : ref.watch(groupClassByIdProvider(groupClassId)).valueOrNull?.name,
       onTap: onTap,
     );
   }

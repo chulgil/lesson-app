@@ -204,6 +204,167 @@ class _TeacherGroupClassesProviderElement
   String get teacherId => (origin as TeacherGroupClassesProvider).teacherId;
 }
 
+String _$studentGroupClassesHash() =>
+    r'0cc46ecd306072de77e4cf953081b13e12245c1a';
+
+/// Active classes a student is enrolled in (cohort roster).
+///
+/// Feeds the student agenda: only classes the student was assigned to, never
+/// classes they could browse — discovery lives on the teacher detail screen.
+///
+/// Copied from [studentGroupClasses].
+@ProviderFor(studentGroupClasses)
+const studentGroupClassesProvider = StudentGroupClassesFamily();
+
+/// Active classes a student is enrolled in (cohort roster).
+///
+/// Feeds the student agenda: only classes the student was assigned to, never
+/// classes they could browse — discovery lives on the teacher detail screen.
+///
+/// Copied from [studentGroupClasses].
+class StudentGroupClassesFamily extends Family<AsyncValue<List<GroupClass>>> {
+  /// Active classes a student is enrolled in (cohort roster).
+  ///
+  /// Feeds the student agenda: only classes the student was assigned to, never
+  /// classes they could browse — discovery lives on the teacher detail screen.
+  ///
+  /// Copied from [studentGroupClasses].
+  const StudentGroupClassesFamily();
+
+  /// Active classes a student is enrolled in (cohort roster).
+  ///
+  /// Feeds the student agenda: only classes the student was assigned to, never
+  /// classes they could browse — discovery lives on the teacher detail screen.
+  ///
+  /// Copied from [studentGroupClasses].
+  StudentGroupClassesProvider call(
+    String studentId,
+  ) {
+    return StudentGroupClassesProvider(
+      studentId,
+    );
+  }
+
+  @override
+  StudentGroupClassesProvider getProviderOverride(
+    covariant StudentGroupClassesProvider provider,
+  ) {
+    return call(
+      provider.studentId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'studentGroupClassesProvider';
+}
+
+/// Active classes a student is enrolled in (cohort roster).
+///
+/// Feeds the student agenda: only classes the student was assigned to, never
+/// classes they could browse — discovery lives on the teacher detail screen.
+///
+/// Copied from [studentGroupClasses].
+class StudentGroupClassesProvider
+    extends AutoDisposeFutureProvider<List<GroupClass>> {
+  /// Active classes a student is enrolled in (cohort roster).
+  ///
+  /// Feeds the student agenda: only classes the student was assigned to, never
+  /// classes they could browse — discovery lives on the teacher detail screen.
+  ///
+  /// Copied from [studentGroupClasses].
+  StudentGroupClassesProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentGroupClasses(
+            ref as StudentGroupClassesRef,
+            studentId,
+          ),
+          from: studentGroupClassesProvider,
+          name: r'studentGroupClassesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentGroupClassesHash,
+          dependencies: StudentGroupClassesFamily._dependencies,
+          allTransitiveDependencies:
+              StudentGroupClassesFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
+
+  StudentGroupClassesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<GroupClass>> Function(StudentGroupClassesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: StudentGroupClassesProvider._internal(
+        (ref) => create(ref as StudentGroupClassesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<GroupClass>> createElement() {
+    return _StudentGroupClassesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StudentGroupClassesProvider && other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin StudentGroupClassesRef on AutoDisposeFutureProviderRef<List<GroupClass>> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _StudentGroupClassesProviderElement
+    extends AutoDisposeFutureProviderElement<List<GroupClass>>
+    with StudentGroupClassesRef {
+  _StudentGroupClassesProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as StudentGroupClassesProvider).studentId;
+}
+
 String _$groupClassByIdHash() => r'8a6905c5d6cbd7fac1e6eddbb7f1c224307303a1';
 
 /// A single class — used by the edit form and by screens that only hold an ID.
@@ -343,6 +504,170 @@ class _GroupClassByIdProviderElement
 
   @override
   String get classId => (origin as GroupClassByIdProvider).classId;
+}
+
+String _$groupClassSchedulesHash() =>
+    r'4608786183092dc9feb3d948837c4234705fae65';
+
+/// Sessions opened for a class, earliest first.
+///
+/// List and agenda rows hold a class but the detail/attendance screens need a
+/// concrete session, so the row tap resolves one through this provider.
+///
+/// Copied from [groupClassSchedules].
+@ProviderFor(groupClassSchedules)
+const groupClassSchedulesProvider = GroupClassSchedulesFamily();
+
+/// Sessions opened for a class, earliest first.
+///
+/// List and agenda rows hold a class but the detail/attendance screens need a
+/// concrete session, so the row tap resolves one through this provider.
+///
+/// Copied from [groupClassSchedules].
+class GroupClassSchedulesFamily
+    extends Family<AsyncValue<List<GroupClassSchedule>>> {
+  /// Sessions opened for a class, earliest first.
+  ///
+  /// List and agenda rows hold a class but the detail/attendance screens need a
+  /// concrete session, so the row tap resolves one through this provider.
+  ///
+  /// Copied from [groupClassSchedules].
+  const GroupClassSchedulesFamily();
+
+  /// Sessions opened for a class, earliest first.
+  ///
+  /// List and agenda rows hold a class but the detail/attendance screens need a
+  /// concrete session, so the row tap resolves one through this provider.
+  ///
+  /// Copied from [groupClassSchedules].
+  GroupClassSchedulesProvider call(
+    String classId,
+  ) {
+    return GroupClassSchedulesProvider(
+      classId,
+    );
+  }
+
+  @override
+  GroupClassSchedulesProvider getProviderOverride(
+    covariant GroupClassSchedulesProvider provider,
+  ) {
+    return call(
+      provider.classId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupClassSchedulesProvider';
+}
+
+/// Sessions opened for a class, earliest first.
+///
+/// List and agenda rows hold a class but the detail/attendance screens need a
+/// concrete session, so the row tap resolves one through this provider.
+///
+/// Copied from [groupClassSchedules].
+class GroupClassSchedulesProvider
+    extends AutoDisposeFutureProvider<List<GroupClassSchedule>> {
+  /// Sessions opened for a class, earliest first.
+  ///
+  /// List and agenda rows hold a class but the detail/attendance screens need a
+  /// concrete session, so the row tap resolves one through this provider.
+  ///
+  /// Copied from [groupClassSchedules].
+  GroupClassSchedulesProvider(
+    String classId,
+  ) : this._internal(
+          (ref) => groupClassSchedules(
+            ref as GroupClassSchedulesRef,
+            classId,
+          ),
+          from: groupClassSchedulesProvider,
+          name: r'groupClassSchedulesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupClassSchedulesHash,
+          dependencies: GroupClassSchedulesFamily._dependencies,
+          allTransitiveDependencies:
+              GroupClassSchedulesFamily._allTransitiveDependencies,
+          classId: classId,
+        );
+
+  GroupClassSchedulesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.classId,
+  }) : super.internal();
+
+  final String classId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<GroupClassSchedule>> Function(GroupClassSchedulesRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupClassSchedulesProvider._internal(
+        (ref) => create(ref as GroupClassSchedulesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        classId: classId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<GroupClassSchedule>> createElement() {
+    return _GroupClassSchedulesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupClassSchedulesProvider && other.classId == classId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, classId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GroupClassSchedulesRef
+    on AutoDisposeFutureProviderRef<List<GroupClassSchedule>> {
+  /// The parameter `classId` of this provider.
+  String get classId;
+}
+
+class _GroupClassSchedulesProviderElement
+    extends AutoDisposeFutureProviderElement<List<GroupClassSchedule>>
+    with GroupClassSchedulesRef {
+  _GroupClassSchedulesProviderElement(super.provider);
+
+  @override
+  String get classId => (origin as GroupClassSchedulesProvider).classId;
 }
 
 String _$groupClassFormNotifierHash() =>

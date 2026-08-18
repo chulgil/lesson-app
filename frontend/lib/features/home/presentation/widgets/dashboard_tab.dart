@@ -184,6 +184,11 @@ class DashboardTab extends ConsumerWidget {
 
                   const SizedBox(height: AppSpacing.space6),
 
+                  // ── 내 클래스 진입점 (J12) — 반·특강 목록 ──
+                  const _GroupClassesEntryCard(),
+
+                  const SizedBox(height: AppSpacing.space3),
+
                   // ── Loop Stats Entry (#512) — 영상 반복 통계 진입점 ──
                   _LoopStatsEntryCard(),
 
@@ -553,6 +558,54 @@ class DashboardTab extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space3),
         Center(child: Text('Fine.', style: NotebookTypography.fine)),
       ],
+    );
+  }
+}
+
+/// Entry-point card linking to the teacher's own group classes (반 · 특강).
+///
+/// Always visible: hiding it when the teacher owns no classes would leave the
+/// create form unreachable, which is the orphan this entry point removes (J12).
+// ignore: widget-smoke-test — static dashboard card composed of existing primitives
+class _GroupClassesEntryCard extends StatelessWidget {
+  const _GroupClassesEntryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => context.push(AppRoutes.groupClasses),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.groupClassesTitle,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  Text(
+                    AppStrings.groupClassesEntrySubtitle,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.inkTertiary),
+          ],
+        ),
+      ),
     );
   }
 }
