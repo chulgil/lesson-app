@@ -160,6 +160,27 @@ class GroupClassBooking(UUIDMixin, TimestampMixin, Base):
     )
 
 
+class GroupClassMember(UUIDMixin, TimestampMixin, Base):
+    """Fixed roster row of a cohort (regular) group class — J4 (spec §2 P2-4).
+
+    Teacher-assigned membership; capacity is validated against
+    ``GroupClass.max_capacity`` at assignment time. Plain String(36) refs,
+    matching ``GroupClassBooking``.
+    """
+
+    __tablename__ = "group_class_members"
+
+    group_class_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    student_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    # Teacher user id that performed the assignment (audit).
+    added_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+    __table_args__ = (
+        Index("uk_gcm_class_student", "group_class_id", "student_id", unique=True),
+        Index("idx_gcm_student", "student_id"),
+    )
+
+
 class NoShowRecord(UUIDMixin, Base):
     """Record of a student no-show with applied policy."""
 

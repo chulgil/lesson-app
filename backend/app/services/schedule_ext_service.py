@@ -173,6 +173,101 @@ class ScheduleExtService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not the owning teacher")
         return group_class
 
+    async def _assert_student_scope(self, student_id: str, current_user: Any) -> None:
+        """student_id 필터 조회 권한 — 학생 본인 또는 그 학생의 교사만."""
+        from app.models.student import Student
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        if student.user_id == current_user.id or student.id == current_user.id:
+            return
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if student.teacher_id in teacher_ids:
+            return
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    # -----------------------------------------------------------------------
+    # Cohort Members (J4 — spec §2 P2-4)
+    # -----------------------------------------------------------------------
+
+    async def list_group_class_members(self, group_class_id: str, current_user: Any) -> list[Any]:
+        from app.models.schedule_ext import GroupClassMember
+        from app.models.student import Student
+        from app.schemas.schedule_ext import GroupClassMemberResponse
+
+        await self._assert_group_class_teacher(group_class_id, current_user)
+        rows = await self.db.execute(
+            select(GroupClassMember, Student.name)
+            .join(Student, Student.id == GroupClassMember.student_id)
+            .where(GroupClassMember.group_class_id == group_class_id)
+            .order_by(GroupClassMember.created_at.asc())
+        )
+        return [
+            GroupClassMemberResponse.model_validate(member).model_copy(update={"student_name": name})
+            for member, name in rows.all()
+        ]
+
+    async def assign_group_class_member(self, group_class_id: str, student_id: str, current_user: Any) -> Any:
+        """교사 배정 — 자기 학생만, 정원 초과 400, 중복 409 (스펙 P2-4)."""
+        from app.models.schedule_ext import GroupClassMember
+        from app.models.student import Student
+        from app.schemas.schedule_ext import GroupClassMemberResponse
+
+        group_class = await self._assert_group_class_teacher(group_class_id, current_user)
+        student = await self.db.get(Student, student_id)
+        teacher_ids = await self._resolve_teacher_id_scope(current_user.id)
+        if student is None or student.teacher_id not in teacher_ids:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your student")
+
+        existing = await self.db.scalar(
+            select(GroupClassMember.id).where(
+                GroupClassMember.group_class_id == group_class_id,
+                GroupClassMember.student_id == student_id,
+            )
+        )
+        if existing is not None:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="이미 배정된 학생입니다.")
+
+        member_count = (
+            await self.db.scalar(
+                select(func.count())
+                .select_from(GroupClassMember)
+                .where(GroupClassMember.group_class_id == group_class_id)
+            )
+            or 0
+        )
+        if member_count >= group_class.max_capacity:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="정원이 가득 차 배정할 수 없습니다.")
+
+        member = GroupClassMember(
+            group_class_id=group_class_id,
+            student_id=student_id,
+            added_by=current_user.id,
+        )
+        self.db.add(member)
+        await self.db.flush()
+        await self.db.refresh(member)
+        return GroupClassMemberResponse.model_validate(member).model_copy(update={"student_name": student.name})
+
+    async def remove_group_class_member(self, group_class_id: str, student_id: str, current_user: Any) -> Any:
+        from app.models.schedule_ext import GroupClassMember
+        from app.schemas.schedule_ext import GroupClassMemberResponse
+
+        await self._assert_group_class_teacher(group_class_id, current_user)
+        member = await self.db.scalar(
+            select(GroupClassMember).where(
+                GroupClassMember.group_class_id == group_class_id,
+                GroupClassMember.student_id == student_id,
+            )
+        )
+        if member is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Member not found")
+        removed = GroupClassMemberResponse.model_validate(member)
+        await self.db.delete(member)
+        await self.db.flush()
+        return removed
+
     async def _assert_schedule_teacher(self, schedule_id: str, current_user: Any) -> Any:
         """GroupClassSchedule → GroupClass → teacher_id 검증. schedule row 반환."""
         from app.models.schedule_ext import GroupClassSchedule
@@ -278,8 +373,28 @@ class ScheduleExtService:
         page: int,
         size: int,
         offset: int,
+        student_id: str | None = None,
     ) -> PaginatedResponse:
         from app.models.schedule import GroupClass
+
+        if student_id is not None:
+            # J12 학생 아젠다 데이터원 — 로스터에 등록된 반만. 본인(또는 그 학생의
+            # 교사)만 조회 가능. 비활성 클래스는 아젠다에 나오지 않는다.
+            from app.models.schedule_ext import GroupClassMember
+
+            await self._assert_student_scope(student_id, current_user)
+            query = (
+                select(GroupClass)
+                .join(GroupClassMember, GroupClassMember.group_class_id == GroupClass.id)
+                .where(
+                    GroupClassMember.student_id == student_id,
+                    GroupClass.is_active.is_(True),
+                )
+            )
+            total = await self.db.scalar(select(func.count()).select_from(query.subquery())) or 0
+            rows = await self.db.scalars(query.order_by(GroupClass.created_at.desc()).offset(offset).limit(size))
+            items = [self._to_class_response(row) for row in rows.all()]
+            return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
         owner_ids = await self._resolve_teacher_id_scope(current_user.id)
         target_ids = [teacher_id] if teacher_id else owner_ids

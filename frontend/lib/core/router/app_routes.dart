@@ -180,6 +180,12 @@ class AppRoutes {
   static const teacherVacationMode = '/schedule/vacation';
   static const groupClassDetail = '/schedule/group-class/:id';
   static const groupClassAttendance = '/schedule/group-class/:id/attendance';
+
+  /// 교사 — 내 클래스 목록 (반·특강). 교사 홈 진입점의 목적지 (J12, P1-2).
+  static const groupClasses = '/schedule/group-classes';
+
+  /// 교사 — 클래스 생성·수정 폼. 수정은 `extra['groupClass']` 로 전달한다.
+  static const groupClassForm = '/schedule/group-classes/form';
   static const requestCompletion = '/schedule/request-completion';
   static const requestDetail = '/schedule/request/:id';
 

@@ -41,6 +41,9 @@ const _teacherRoutes = <String>[
   AppRoutes.teacherVacationMode,
   AppRoutes.scheduleChangeRequests,
   AppRoutes.pendingBookings,
+  // J12 진입점 — 내 클래스 목록 + 생성 폼 (폼은 extra 없이 = 생성 모드).
+  AppRoutes.groupClasses,
+  AppRoutes.groupClassForm,
   AppRoutes.subscriptions,
   AppRoutes.teacherSubscriptions,
   AppRoutes.expiringSubscriptions,

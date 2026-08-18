@@ -35,10 +35,34 @@ class RemoteGroupClassRepository implements GroupClassRepository {
   }
 
   @override
+  Future<List<GroupClass>> getClassesForStudent(String studentId) async {
+    final response = await _apiClient.get(
+      '/groups/classes',
+      queryParameters: {'student_id': studentId},
+    );
+    final paginated = PaginatedResponse.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => GroupClass.fromJson(json),
+    );
+    return paginated.items;
+  }
+
+  @override
   Future<GroupClass?> getClassById(String classId) async {
     final response = await _apiClient.get('/groups/classes/$classId');
     if (response.data == null) return null;
     return GroupClass.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<List<GroupClassSchedule>> getSchedulesForClass(String classId) async {
+    final response = await _apiClient.get('/groups/$classId/schedules');
+    final paginated = PaginatedResponse.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => GroupClassSchedule.fromJson(json),
+    );
+    return paginated.items.toList()
+      ..sort((a, b) => a.startTime.compareTo(b.startTime));
   }
 
   @override

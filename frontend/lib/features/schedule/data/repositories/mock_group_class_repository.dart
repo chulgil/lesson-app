@@ -27,6 +27,10 @@ class MockGroupClassRepository implements GroupClassRepository {
   final Map<String, GroupClass> _classes = {};
   final Map<String, GroupClassSchedule> _schedules = {};
 
+  /// Cohort roster: student id -> class ids they are enrolled in. The backend
+  /// keeps this in `group_class_members`; the mock holds it in memory.
+  final Map<String, Set<String>> _roster = {};
+
   void _seed() {
     final now = DateTime.now();
     final ensemble = GroupClass(
@@ -57,6 +61,23 @@ class MockGroupClassRepository implements GroupClassRepository {
     );
     _classes[ensemble.id] = ensemble;
     _classes[masterclass.id] = masterclass;
+    _roster['student_1'] = {ensemble.id};
+
+    // One upcoming session per class so the list rows have something concrete
+    // to open. The backend expands regular repeat rules server-side.
+    for (final groupClass in [ensemble, masterclass]) {
+      final startTime = now.add(const Duration(days: 3));
+      final schedule = GroupClassSchedule(
+        id: 'schedule_${groupClass.id}',
+        groupClassId: groupClass.id,
+        startTime: startTime,
+        endTime: startTime.add(Duration(minutes: groupClass.durationMinutes)),
+        maxCapacity: groupClass.maxCapacity,
+        waitlistCapacity: groupClass.waitlistCapacity,
+        createdAt: now,
+      );
+      _schedules[schedule.id] = schedule;
+    }
   }
 
   @override
@@ -71,9 +92,34 @@ class MockGroupClassRepository implements GroupClassRepository {
   }
 
   @override
+  Future<List<GroupClass>> getClassesForStudent(String studentId) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    final enrolled = _roster[studentId] ?? const <String>{};
+    return enrolled
+        .map((id) => _classes[id])
+        .nonNulls
+        .where((c) => c.isActive)
+        .toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  @override
   Future<GroupClass?> getClassById(String classId) async {
     await Future.delayed(const Duration(milliseconds: 50));
     return _classes[classId];
+  }
+
+  @override
+  Future<List<GroupClassSchedule>> getSchedulesForClass(String classId) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    return schedulesFor(classId)
+      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+  }
+
+  /// Enrol a student in a class — test seam for the agenda row, mirroring
+  /// `POST /groups/classes/{id}/members`.
+  void enrol({required String studentId, required String classId}) {
+    _roster.putIfAbsent(studentId, () => <String>{}).add(classId);
   }
 
   @override

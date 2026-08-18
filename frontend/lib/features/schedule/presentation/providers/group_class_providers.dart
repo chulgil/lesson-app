@@ -9,6 +9,7 @@ import '../../data/repositories/mock_group_class_repository.dart';
 import '../../data/repositories/remote_group_class_repository.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_draft.dart';
+import '../../domain/entities/group_class_schedule.dart';
 import '../../domain/repositories/group_class_repository.dart';
 
 part 'group_class_providers.g.dart';
@@ -43,6 +44,19 @@ Future<List<GroupClass>> teacherGroupClasses(
   return repository.getClassesForTeacher(teacherId, includeInactive: true);
 }
 
+/// Active classes a student is enrolled in (cohort roster).
+///
+/// Feeds the student agenda: only classes the student was assigned to, never
+/// classes they could browse — discovery lives on the teacher detail screen.
+@riverpod
+Future<List<GroupClass>> studentGroupClasses(
+  StudentGroupClassesRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(groupClassRepositoryProvider);
+  return repository.getClassesForStudent(studentId);
+}
+
 /// A single class — used by the edit form and by screens that only hold an ID.
 @riverpod
 Future<GroupClass?> groupClassById(
@@ -51,6 +65,19 @@ Future<GroupClass?> groupClassById(
 ) async {
   final repository = ref.watch(groupClassRepositoryProvider);
   return repository.getClassById(classId);
+}
+
+/// Sessions opened for a class, earliest first.
+///
+/// List and agenda rows hold a class but the detail/attendance screens need a
+/// concrete session, so the row tap resolves one through this provider.
+@riverpod
+Future<List<GroupClassSchedule>> groupClassSchedules(
+  GroupClassSchedulesRef ref,
+  String classId,
+) async {
+  final repository = ref.watch(groupClassRepositoryProvider);
+  return repository.getSchedulesForClass(classId);
 }
 
 // ============================================================

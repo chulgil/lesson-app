@@ -2003,6 +2003,19 @@ class AppStrings {
   /// 내리기 실패 (스낵바)
   static const groupClassesDeactivateFailed = '클래스를 내리지 못했습니다. 다시 시도해주세요';
 
+  /// 교사 홈 진입점 카드 부연 (제목은 groupClassesTitle 재사용)
+  static const groupClassesEntrySubtitle = '반과 특강을 만들고 출석을 확인합니다';
+
+  /// 회차 미개설 (행을 눌렀는데 열린 회차가 없을 때 — 스낵바)
+  static const groupClassesNoSessionYet = '아직 열린 회차가 없습니다';
+
+  /// 개설 클래스 (교사 상세 — 학생이 반·특강을 발견하는 표면)
+  static const groupClassesTeacherDetailTitle = '개설 클래스';
+
+  /// $time · $minutes분 (학생 아젠다 반 행 요약)
+  static String groupClassAgendaSummary(String time, int minutes) =>
+      '$time · $minutes분';
+
   /// 예약 확정 (개별 예약 상태 라벨)
   static const groupClassBookingStatusConfirmed = '예약 확정';
 

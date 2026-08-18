@@ -206,6 +206,20 @@ class GroupClassBookingResponse(BaseModel):
     updated_at: _dt.datetime | None = None
 
 
+class GroupClassMemberAssignRequest(BaseModel):
+    student_id: str
+
+
+class GroupClassMemberResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    group_class_id: str
+    student_id: str
+    student_name: str | None = None
+    created_at: _dt.datetime
+
+
 class AttendanceMarkRequest(BaseModel):
     attended: bool = True
 

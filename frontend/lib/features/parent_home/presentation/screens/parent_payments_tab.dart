@@ -13,6 +13,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
+import '../../../schedule/schedule_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/subscription_ui_facade.dart';
@@ -244,10 +245,20 @@ class _MembershipSubscriptionCard extends ConsumerWidget {
     // 그룹 수강권은 1:1 멤버십 수업명을 조회하지 않는다 — 조회 실패 시 "개인레슨"
     // 으로 떨어지던 경로가 학부모 결제 탭의 오표시 원인이었다 (P1-5).
     if (subscription.isGroupScoped) {
+      // J12 branch ① — resolve the real class name; until it loads the card
+      // shows the "그룹 수강권" label, never the 1:1 fallback.
+      final groupClassId = subscription.groupClassId;
       return SubscriptionCard(
         compact: true,
         subscription: subscription,
         className: subscription.displayClassName(
+          groupClassName:
+              groupClassId == null
+                  ? null
+                  : ref
+                      .watch(groupClassByIdProvider(groupClassId))
+                      .valueOrNull
+                      ?.name,
           fallback: AppStrings.individualLesson,
         ),
         instrument: membership.instrument,

@@ -13,6 +13,7 @@ import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
+import '../../../../features/schedule/schedule_facade.dart';
 import '../../../../features/schedule/schedule_ui_facade.dart';
 import '../../../profile/domain/entities/invite.dart';
 import '../../../profile/presentation/extensions/lesson_type_option_visuals.dart';
@@ -192,6 +193,11 @@ class _TeacherDetailContent extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
+
+                // 개설 클래스 — 학생이 반·특강을 발견하는 표면 (D3: 탐색 전용
+                // 탭을 만들지 않고 기존 교사 상세에 붙인다). 개설 클래스가
+                // 없으면 섹션 자체를 숨긴다 (공개 프로필에 빈 상태 노이즈 금지).
+                _buildGroupClassesSection(ref),
 
                 // Introduction
                 _buildSection(
@@ -630,6 +636,84 @@ class _TeacherDetailContent extends ConsumerWidget {
               ),
             );
           }).toList(),
+    );
+  }
+
+  /// Active group classes this teacher runs — the discovery surface for 반·특강.
+  Widget _buildGroupClassesSection(WidgetRef ref) {
+    final classes =
+        ref
+            .watch(teacherGroupClassesProvider(profile.id))
+            .valueOrNull
+            ?.where((c) => c.isActive)
+            .toList() ??
+        const <GroupClass>[];
+    if (classes.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSection(
+          icon: Icons.groups_outlined,
+          title: AppStrings.groupClassesTeacherDetailTitle,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: classes.map(_buildGroupClassRow).toList(),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space4),
+      ],
+    );
+  }
+
+  Widget _buildGroupClassRow(GroupClass groupClass) {
+    final schedule = groupClass.scheduleText;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space2,
+                  vertical: AppSpacing.space1,
+                ),
+                decoration: const BoxDecoration(
+                  color: AppColors.paperAccentSoft,
+                ),
+                child: Text(
+                  groupClass.type == GroupClassType.regular
+                      ? AppStrings.groupClassRegular
+                      : AppStrings.groupClassDropin,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: Text(
+                  groupClass.name,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          if (schedule.isNotEmpty)
+            Text(
+              schedule,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
