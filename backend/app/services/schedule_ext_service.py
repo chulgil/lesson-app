@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -782,12 +782,112 @@ class ScheduleExtService:
         return results
 
     async def deduct_subscription(self, booking_id: str, current_user: Any) -> Any:
-        """Mark a booking's subscription as deducted — booking 소유 강사만."""
-        booking = await self._assert_booking_actor(booking_id, current_user)
+        """Deduct one session for an attended group booking — booking 소유 강사만.
+
+        J5a (spec §2 P1-3): real deduction through the subscription SSOT
+        (``SubscriptionService.add_usage`` — row lock + counter) instead of the
+        old flag-only marking. ``subscription_deducted`` doubles as the
+        idempotency marker and is re-checked under a booking row lock, so
+        re-confirmation and concurrent calls never double-deduct.
+        """
+        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+        from app.services.subscription_service import SubscriptionService
+
+        await self._assert_booking_actor(booking_id, current_user)
+        booking = await self.db.scalar(
+            select(GroupClassBooking).where(GroupClassBooking.id == booking_id).with_for_update()
+        )
+        if booking.subscription_deducted:
+            return booking
+
+        schedule = await self.db.get(GroupClassSchedule, booking.schedule_id)
+        group_class = await self._get_group_class(schedule.group_class_id) if schedule else None
+        if group_class is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group class not found")
+
+        subscription = await self._resolve_deduction_subscription(booking, group_class)
+        await SubscriptionService(self.db).add_usage(
+            subscription.id,
+            {"note": group_class.name},
+            current_user,
+        )
+        booking.subscription_id = subscription.id
         booking.subscription_deducted = True
         await self.db.flush()
         await self.db.refresh(booking)
         return booking
+
+    async def _resolve_deduction_subscription(self, booking: Any, group_class: Any) -> Any:
+        """Pick the subscription a group attendance consumes (spec P1-3 selection rule).
+
+        A booking-pinned subscription wins. Otherwise, among the student's
+        payment-confirmed subscriptions with remaining sessions under this
+        class's teacher: ``appliesTo=group`` (this class, then any-group)
+        before ``universal``, earlier ``end_date`` first. ``oneToOne``-scoped
+        subscriptions are never spendable on a group session (P1-4 → 4xx).
+        """
+        from app.models.lesson import ClassMembership, LessonClass
+        from app.models.subscription import Subscription, SubscriptionAppliesTo
+
+        def _spendable(sub: Any) -> bool:
+            if not sub.payment_confirmed:
+                return False
+            if sub.total_lessons is None:
+                return True
+            return (sub.total_lessons - (sub.used_lessons or 0)) > 0
+
+        if booking.subscription_id:
+            sub = await self.db.get(Subscription, booking.subscription_id)
+            if sub is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+            if sub.effective_applies_to is SubscriptionAppliesTo.oneToOne:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="1:1 전용 수강권은 그룹 수업에 사용할 수 없습니다.",
+                )
+            if not _spendable(sub):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="지정된 수강권에 차감할 잔여 횟수가 없습니다.",
+                )
+            return sub
+
+        result = await self.db.scalars(
+            select(Subscription)
+            .join(ClassMembership, Subscription.membership_id == ClassMembership.id)
+            .join(LessonClass, ClassMembership.lesson_class_id == LessonClass.id)
+            .where(
+                Subscription.student_id == booking.student_id,
+                LessonClass.teacher_id == group_class.teacher_id,
+            )
+        )
+        candidates = list(result.all())
+
+        def _scope_rank(sub: Any) -> int | None:
+            """0=this class, 1=any-group, 2=universal, None=not spendable here."""
+            scope = sub.effective_applies_to
+            if scope is SubscriptionAppliesTo.group:
+                if sub.group_class_id is None:
+                    return 1
+                return 0 if sub.group_class_id == group_class.id else None
+            if scope is SubscriptionAppliesTo.universal:
+                return 2
+            return None
+
+        eligible = [(rank, sub) for sub in candidates if (rank := _scope_rank(sub)) is not None and _spendable(sub)]
+        if not eligible:
+            if any(sub.effective_applies_to is SubscriptionAppliesTo.oneToOne for sub in candidates):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="1:1 전용 수강권은 그룹 수업에 사용할 수 없습니다.",
+                )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="차감할 수 있는 수강권이 없습니다.",
+            )
+
+        eligible.sort(key=lambda pair: (pair[0], pair[1].end_date or date.max))
+        return eligible[0][1]
 
     # -----------------------------------------------------------------------
     # No-Show Records
