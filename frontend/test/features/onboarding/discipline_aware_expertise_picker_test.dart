@@ -23,20 +23,29 @@ import 'package:lessonaza/features/settings/settings_facade.dart'
 /// The onboarding + expertise-management pickers must list the ACTIVE
 /// discipline's expertise catalog (`ExpertiseCatalogRegistry.forDiscipline`),
 /// not a hardcoded music instrument list. Music stays byte-identical (the music
-/// catalog == `InstrumentList.all`); fitness surfaces 웨이트/필라테스/PT.
+/// catalog == `InstrumentList.all`).
 ///
-/// RED before the swap: with an active fitness discipline the pickers still
-/// list music instruments, so `필라테스` is absent and `첼로` is present. The
-/// music cases are byte-identity anchors — they pass before AND after the swap.
+/// #1278 (음악 단일 포커스): music 이 유일한 등록 분야이므로 미등록 분야는
+/// music 카탈로그로 degrade 한다. 각 그룹의 두 번째 케이스가 그 폴백 계약을
+/// 고정한다 — 카탈로그 조회가 분야 하드코딩이 아니라 레지스트리 경유임을 보장.
 void main() {
   // #980: keep Playfair (google_fonts) offline so Notebook surfaces render in
   // widget tests without a late network fetch dangling past teardown.
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  // A music instrument that is NOT a fitness specialty — the discriminator.
+  // A music instrument — present whenever the music catalog is the source.
   const musicOnlyTag = '첼로';
-  // A fitness specialty that is NOT a music instrument.
-  const fitnessTag = '필라테스';
+  // A tag that belongs to no registered catalog — must never surface (#1278).
+  const unregisteredTag = '필라테스';
+
+  /// An unregistered discipline (its catalog id resolves to nothing) — the
+  /// picker must degrade to the music catalog rather than render empty.
+  const unregisteredDiscipline = Discipline(
+    id: 'unregistered',
+    displayKey: 'discipline.unregistered',
+    themeColorSeed: 0xFF000000,
+    expertiseCatalogId: 'specialties',
+  );
 
   List<Override> activeDiscipline(Discipline d) => [
     activeDisciplineProvider.overrideWith((ref) => d),
@@ -83,20 +92,20 @@ void main() {
       await openSheet(tester);
 
       expect(find.text(musicOnlyTag), findsOneWidget);
-      expect(find.text(fitnessTag), findsNothing);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('fitness: specialty(필라테스) 노출 + 악기(첼로) 부재', (tester) async {
+    testWidgets('미등록 분야: music 카탈로그로 degrade (첼로 노출) — #1278', (tester) async {
       await pump(
         tester,
         const ProfileSetupScreen(),
-        activeDiscipline(DisciplineRegistry.fitness),
+        activeDiscipline(unregisteredDiscipline),
       );
       await openSheet(tester);
 
-      expect(find.text(fitnessTag), findsOneWidget);
-      expect(find.text(musicOnlyTag), findsNothing);
+      expect(find.text(musicOnlyTag), findsOneWidget);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
@@ -116,20 +125,20 @@ void main() {
       await openSheet(tester);
 
       expect(find.text(musicOnlyTag), findsOneWidget);
-      expect(find.text(fitnessTag), findsNothing);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('fitness: specialty(필라테스) 노출 + 악기(첼로) 부재', (tester) async {
+    testWidgets('미등록 분야: music 카탈로그로 degrade (첼로 노출) — #1278', (tester) async {
       await pump(
         tester,
         const StudentProfileSetupScreen(),
-        activeDiscipline(DisciplineRegistry.fitness),
+        activeDiscipline(unregisteredDiscipline),
       );
       await openSheet(tester);
 
-      expect(find.text(fitnessTag), findsOneWidget);
-      expect(find.text(musicOnlyTag), findsNothing);
+      expect(find.text(musicOnlyTag), findsOneWidget);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
@@ -175,22 +184,22 @@ void main() {
       await openAddSheet(tester);
 
       expect(find.text(musicOnlyTag), findsOneWidget);
-      expect(find.text(fitnessTag), findsNothing);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('fitness: 추가 시트에 specialty(필라테스) 노출 + 악기(첼로) 부재', (
+    testWidgets('미등록 분야: 추가 시트가 music 카탈로그로 degrade (첼로 노출) — #1278', (
       tester,
     ) async {
       await pump(
         tester,
         const InstrumentManagementScreen(),
-        overridesFor(DisciplineRegistry.fitness),
+        overridesFor(unregisteredDiscipline),
       );
       await openAddSheet(tester);
 
-      expect(find.text(fitnessTag), findsOneWidget);
-      expect(find.text(musicOnlyTag), findsNothing);
+      expect(find.text(musicOnlyTag), findsOneWidget);
+      expect(find.text(unregisteredTag), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });

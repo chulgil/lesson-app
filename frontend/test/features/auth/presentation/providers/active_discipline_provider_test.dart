@@ -8,8 +8,8 @@ import 'package:lessonaza/features/auth/auth_facade.dart';
 import 'package:lessonaza/features/auth/presentation/providers/active_discipline_provider.dart';
 
 /// #979-A — persisted discipline selection + derived active discipline.
-/// #979-B registers fitness, so [activeDiscipline] resolves the persisted id
-/// (music or fitness), falling back to music for null / legacy / unknown ids.
+/// #1278 (음악 단일 포커스) leaves music as the only registered discipline, so
+/// [activeDiscipline] falls back to music for null / legacy / unknown ids.
 void main() {
   late Directory tempDir;
 
@@ -79,28 +79,21 @@ void main() {
       expect(container.read(activeDisciplineProvider), DisciplineRegistry.music);
     });
 
-    test('resolves the persisted fitness discipline (#979-B)', () async {
-      final container = containerFor('user_a');
-      await container
-          .read(selectedDisciplineStorageProvider.notifier)
-          .select('fitness');
-      await container.read(selectedDisciplineStorageProvider.future);
-      expect(
-        container.read(activeDisciplineProvider),
-        DisciplineRegistry.fitness,
-      );
-    });
-
-    test('resolves the persisted language discipline (#1102)', () async {
-      final container = containerFor('user_a');
-      await container
-          .read(selectedDisciplineStorageProvider.notifier)
-          .select('language');
-      await container.read(selectedDisciplineStorageProvider.future);
-      expect(
-        container.read(activeDisciplineProvider),
-        DisciplineRegistry.language,
-      );
+    test('legacy fitness/language 저장값은 music 으로 degrade (#1278)', () async {
+      // 음악 단일 포커스 전환 전에 이 기기에 남은 선택값이 있어도 앱은 깨지지
+      // 않고 music 으로 안전 degrade 한다 (비파괴 마이그레이션).
+      for (final legacyId in const ['fitness', 'language']) {
+        final container = containerFor('user_a');
+        await container
+            .read(selectedDisciplineStorageProvider.notifier)
+            .select(legacyId);
+        await container.read(selectedDisciplineStorageProvider.future);
+        expect(
+          container.read(activeDisciplineProvider),
+          DisciplineRegistry.music,
+          reason: legacyId,
+        );
+      }
     });
 
     test('falls back to music for an unregistered persisted id', () async {

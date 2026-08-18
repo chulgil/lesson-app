@@ -5,7 +5,6 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/practice/domain/entities/metronome_settings.dart';
 import 'package:lessonaza/features/practice/presentation/providers/metronome_provider.dart';
 import 'package:lessonaza/features/practice/presentation/providers/tuner_provider.dart';
-import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/fitness_practice_tools.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/metronome_panel.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools/practice_tool.dart';
 import 'package:lessonaza/features/practice/presentation/widgets/practice_tools_modal.dart';
@@ -259,21 +258,19 @@ void main() {
   );
 
   testWidgets(
-    'fitness tool set: 3 tabs (real ids), warms neither metronome nor tuner (#979-B gates)',
+    'non-music tool set: 3 tabs, warms neither metronome nor tuner (#979-B gates)',
     (tester) async {
-      // The real fitness tool ids/labels/count drive the modal gate logic —
-      // _metronomeIndex and _tunerIndex both resolve to -1. Panels are stubbed
-      // so the render stays free of the EmptyStateWidget google_fonts fetch
-      // (the real skeleton panels are covered by fitness_practice_tools_test).
+      // A tool set carrying neither the `metronome` nor the `tuner` id drives the
+      // modal gate logic — _metronomeIndex and _tunerIndex both resolve to -1.
       // Throwing stubs prove the modal reads neither provider across init, tab
       // switch, lifecycle and teardown (red-green: drop the metronome gate and
       // the init microtask warmUp throws; drop the tuner gate and the tab
       // switch / lifecycle / deactivate throws).
       final tools = [
-        for (final tool in fitnessPracticeTools)
+        for (final id in const ['tool_a', 'tool_b', 'tool_c'])
           PracticeTool(
-            id: tool.id,
-            displayLabel: tool.displayLabel,
+            id: id,
+            displayLabel: id,
             panelBuilder: (_, __, ___) => const SizedBox(),
           ),
       ];
@@ -292,14 +289,14 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
 
-      // Three fitness tabs, in tool order; no settings affordance (skeletons).
+      // Three tabs, in tool order; no settings affordance (non-metronome set).
       final tabBar = tester.widget<TabBar>(find.byType(TabBar));
       expect(tabBar.tabs.length, 3);
-      expect(find.text(fitnessPracticeTools[0].displayLabel), findsOneWidget);
+      expect(find.text(tools[0].displayLabel), findsOneWidget);
       expect(find.byIcon(Icons.settings_outlined), findsNothing);
 
       // Switching tabs fires _onTabChanged, which must skip the absent tuner.
-      await tester.tap(find.text(fitnessPracticeTools[1].displayLabel));
+      await tester.tap(find.text(tools[1].displayLabel));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
 

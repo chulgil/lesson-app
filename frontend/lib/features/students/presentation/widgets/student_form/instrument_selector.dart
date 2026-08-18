@@ -12,7 +12,7 @@ class InstrumentSelector extends StatelessWidget {
   /// The expertise catalog to choose from. Callers pass the active discipline's
   /// catalog (`ExpertiseCatalogRegistry.forDiscipline(activeDiscipline).items`),
   /// not a hardcoded music list (#1072). Music resolves byte-identically to the
-  /// 22-item instrument catalog; fitness surfaces 웨이트/필라테스/PT.
+  /// 22-item instrument catalog; unregistered disciplines degrade to it (#1278).
   final List<String> instruments;
 
   const InstrumentSelector({

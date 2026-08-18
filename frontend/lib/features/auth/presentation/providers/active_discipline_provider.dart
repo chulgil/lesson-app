@@ -13,10 +13,11 @@ const _boxName = 'selected_discipline';
 /// Persists the coaching discipline the user chose at sign-up (#979-A, Phase 4).
 ///
 /// User-scoped (mirrors `OnboardingProgressStorage`): the Hive key carries the
-/// current user id, so choices never cross-contaminate between accounts. Live
-/// since #979-B registered fitness: the selection screen is shown at sign-up
-/// and this stores the pick. Before a pick (or for legacy sessions) [build]
-/// returns null and [activeDiscipline] falls back to music.
+/// current user id, so choices never cross-contaminate between accounts.
+/// Dormant since #1278 (음악 단일 포커스): with one registered discipline the
+/// selection screen is skipped at sign-up, so nothing is normally stored.
+/// Before a pick (or for legacy sessions) [build] returns null and
+/// [activeDiscipline] falls back to music.
 @Riverpod(keepAlive: true)
 class SelectedDisciplineStorage extends _$SelectedDisciplineStorage {
   @override
@@ -41,8 +42,8 @@ class SelectedDisciplineStorage extends _$SelectedDisciplineStorage {
 ///
 /// Resolves the persisted [SelectedDisciplineStorage] id through
 /// [DisciplineRegistry], falling back to music for null / legacy / unknown ids
-/// (including while the async storage is still loading). Resolves to music or
-/// fitness today (#979-B); it is the seam the practice tools modal reads to
+/// (including while the async storage is still loading). Resolves to music
+/// today (#1278); it is the seam the practice tools modal reads to
 /// pick a discipline's tool set.
 @riverpod
 Discipline activeDiscipline(ActiveDisciplineRef ref) {

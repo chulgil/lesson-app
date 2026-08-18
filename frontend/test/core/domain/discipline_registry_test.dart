@@ -4,17 +4,12 @@ import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 
 void main() {
   // #962 멀티 Discipline Phase 0 — Discipline 값객체 + DisciplineRegistry SSOT.
-  // music(0) + fitness(1) 등록(#979-B). enum switch 금지, id 조회 패턴.
+  // #1278 음악 단일 포커스: music(0) 만 등록. enum switch 금지, id 조회 패턴은 유지
+  // (미래 분야는 데이터 등록만으로 추가 가능).
   group('DisciplineRegistry', () {
-    test('music(0) + fitness(1) + language(2) 이 등록 순서대로 있다 (#979-B/#1102)', () {
-      expect(DisciplineRegistry.all, isNotEmpty);
+    test('music(0) 만 등록되어 있다 (#1278 음악 단일 포커스)', () {
+      expect(DisciplineRegistry.all.map((d) => d.id).toList(), ['music']);
       expect(DisciplineRegistry.all.first.id, 'music');
-      // Phase 4 (#979-B) fitness, Phase 5 (#1102) language — 데이터 등록만으로 추가.
-      expect(DisciplineRegistry.all.map((d) => d.id).toList(), [
-        'music',
-        'fitness',
-        'language',
-      ]);
     });
 
     test('byId 는 등록 분야를 반환하고 미등록은 null', () {
@@ -23,29 +18,13 @@ void main() {
       expect(music!.expertiseCatalogId, 'instruments');
       expect(music.themeColorSeed, 0xFF9B1B12); // 음악 액션색(paperAccent)
 
-      final fitness = DisciplineRegistry.byId('fitness');
-      expect(fitness, isNotNull);
-      expect(fitness!.expertiseCatalogId, 'specialties'); // #979-B
-
-      final language = DisciplineRegistry.byId('language');
-      expect(language, isNotNull);
-      expect(language!.expertiseCatalogId, 'subjects'); // #1102
+      // #1278 로 제거된 분야는 더 이상 등록되지 않는다.
+      expect(DisciplineRegistry.byId('fitness'), isNull);
+      expect(DisciplineRegistry.byId('language'), isNull);
 
       // 미등록/빈 id 는 null (호출처가 fallback 으로 degrade).
       expect(DisciplineRegistry.byId('unknown_discipline'), isNull);
       expect(DisciplineRegistry.byId(''), isNull);
-    });
-
-    test('fitness 는 specialties 카탈로그를 가리킨다 (#979-B)', () {
-      expect(DisciplineRegistry.fitness.id, 'fitness');
-      expect(DisciplineRegistry.fitness.displayKey, 'discipline.fitness');
-      expect(DisciplineRegistry.fitness.expertiseCatalogId, 'specialties');
-    });
-
-    test('language 는 subjects 카탈로그를 가리킨다 (#1102)', () {
-      expect(DisciplineRegistry.language.id, 'language');
-      expect(DisciplineRegistry.language.displayKey, 'discipline.language');
-      expect(DisciplineRegistry.language.expertiseCatalogId, 'subjects');
     });
 
     test('fallback 은 music — null/legacy disciplineId 폴백', () {

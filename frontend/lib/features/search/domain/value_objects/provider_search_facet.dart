@@ -1,4 +1,3 @@
-import '../../../../core/domain/value_objects/expertise_catalog_registry.dart';
 import '../repositories/teacher_search_repository.dart';
 
 // Discipline-keyed teacher-search facet registry for the multi-Discipline platform
@@ -6,9 +5,9 @@ import '../repositories/teacher_search_repository.dart';
 //
 // Pure domain — references only the [TeacherSearchRepository] interface (no Riverpod
 // Ref, no presentation). Names how each discipline's search facet (the dynamic
-// filter dimension — music: instruments, fitness: 종목, language: 과목) resolves its
-// available values from the repository. Music is discipline 0; a future Discipline
-// (Phase 4) registers its own facet here without touching the search providers.
+// filter dimension — music: instruments) resolves its available values from the
+// repository. Music is the only registered discipline; a future Discipline
+// registers its own facet here without touching the search providers.
 
 /// Resolves the available values for one search facet from the [repo].
 typedef ProviderSearchFacetResolver =
@@ -25,18 +24,14 @@ class ProviderSearchFacetRegistry {
 
   /// Music (discipline 0): the `instruments` facet resolves to the repository's
   /// teacher-scan instruments list — byte-identical to the pre-#976
-  /// `availableInstruments` provider. Language/fitness (#1108) register catalog-
-  /// backed facets: their skeleton verticals have no teachers to scan yet, so the
-  /// chips surface the discipline's subjects/종목 directly from the catalog SSOT.
+  /// `availableInstruments` provider.
   static final Map<String, ProviderSearchFacetResolver> _byId = {
     'instruments': (repo) => repo.getAvailableInstruments(),
-    'subjects': (repo) async => ExpertiseCatalogRegistry.language.items,
-    'specialties': (repo) async => ExpertiseCatalogRegistry.fitness.items,
   };
 
   /// Resolve a facet by [facetId]; null if no discipline registers it.
   static ProviderSearchFacetResolver? byId(String facetId) => _byId[facetId];
 
-  /// All registered facet ids (instruments, subjects, specialties).
+  /// All registered facet ids (instruments).
   static Iterable<String> get registeredFacetIds => _byId.keys;
 }

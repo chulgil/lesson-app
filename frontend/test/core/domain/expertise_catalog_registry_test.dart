@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/domain/value_objects/discipline.dart';
 import 'package:lessonaza/core/domain/value_objects/discipline_registry.dart';
 import 'package:lessonaza/core/domain/value_objects/expertise_catalog_registry.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
@@ -22,32 +23,22 @@ void main() {
         ExpertiseCatalogRegistry.byId('instruments'),
         same(ExpertiseCatalogRegistry.music),
       );
-      expect(
-        ExpertiseCatalogRegistry.byId('specialties'),
-        same(ExpertiseCatalogRegistry.fitness),
-      );
-      expect(
-        ExpertiseCatalogRegistry.byId('subjects'),
-        same(ExpertiseCatalogRegistry.language),
-      );
+      // #1278 로 제거된 분야의 카탈로그는 더 이상 등록되지 않는다.
+      expect(ExpertiseCatalogRegistry.byId('specialties'), isNull);
+      expect(ExpertiseCatalogRegistry.byId('subjects'), isNull);
       expect(ExpertiseCatalogRegistry.byId('unknown'), isNull);
     });
 
-    test('fitness 카탈로그 = id specialties, 3종 (웨이트/필라테스/PT) (#979-B)', () {
-      expect(ExpertiseCatalogRegistry.fitness.id, 'specialties');
-      expect(ExpertiseCatalogRegistry.fitness.items, ['웨이트', '필라테스', 'PT']);
-      expect(
-        ExpertiseCatalogRegistry.forDiscipline(DisciplineRegistry.fitness),
-        same(ExpertiseCatalogRegistry.fitness),
+    test('미등록 분야는 music 카탈로그로 degrade (#1278)', () {
+      const unregistered = Discipline(
+        id: 'unregistered',
+        displayKey: 'discipline.unregistered',
+        themeColorSeed: 0xFF000000,
+        expertiseCatalogId: 'specialties',
       );
-    });
-
-    test('language 카탈로그 = id subjects, 3종 (영어/중국어/일본어) (#1102)', () {
-      expect(ExpertiseCatalogRegistry.language.id, 'subjects');
-      expect(ExpertiseCatalogRegistry.language.items, ['영어', '중국어', '일본어']);
       expect(
-        ExpertiseCatalogRegistry.forDiscipline(DisciplineRegistry.language),
-        same(ExpertiseCatalogRegistry.language),
+        ExpertiseCatalogRegistry.forDiscipline(unregistered),
+        same(ExpertiseCatalogRegistry.music),
       );
     });
 

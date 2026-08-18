@@ -1,10 +1,10 @@
-// #980 — RoleSelect → DisciplineSelection 라우팅이 live 임을 behavioral 로 고정.
+// #1278 — RoleSelect 가 분야 선택을 건너뛰고 역할 온보딩으로 직행함을 고정.
 //
-// #977 이 심은 게이트(role_select_screen.dart `_goToOnboarding`: all.length>1 →
-// 분야 선택 화면)는 #979-B 가 fitness 를 등록해 length==2 가 되면서 live 됐다.
-// #979-B 는 length·화면 단언까지만 커버했고, RoleSelect 를 실제로 mount·탭 해
-// 분야 선택 화면으로 이동하는 경로는 미검증이었다(리뷰 defer ②). 이 테스트가
-// 그 now-live 경로를 실 위젯 흐름으로 가드한다.
+// #977 이 심은 게이트(role_select_screen.dart `_goToOnboarding`:
+// selectableDisciplines().length>1 → 분야 선택 화면)는 #979-B/#1102 가 fitness·
+// language 를 등록하는 동안 live 였다. 음악 단일 포커스(#1278)로 등록 분야가
+// music 하나가 되면서 게이트가 다시 닫혔다 — 고를 것이 하나뿐인 화면을 사용자에게
+// 보여주지 않는다. 이 테스트가 그 라우팅을 실 위젯 흐름으로 가드한다.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,7 +40,9 @@ void main() {
   // navigating away unmounts it, so keep tests offline (no dangling font fetch).
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  testWidgets('#980 게이트 live: 약관 동의 → 역할 탭 → 분야 선택 화면으로 라우팅', (tester) async {
+  testWidgets('#1278 게이트 dormant: 약관 동의 → 역할 탭 → 분야 선택 건너뛰고 역할 온보딩', (
+    tester,
+  ) async {
     final router = GoRouter(
       initialLocation: AppRoutes.roleSelect,
       routes: [
@@ -54,8 +56,8 @@ void main() {
               (_, __) =>
                   const Scaffold(body: Text('discipline-select-reached')),
         ),
-        // Fallback: if the gate were wrong (length==1 path), it would land on a
-        // role onboarding route instead — make that observably different.
+        // If the gate were wrong (length>1 path), it would land on the
+        // discipline picker instead — make that observably different.
         GoRoute(
           path: AppRoutes.teacherProfileSetup,
           builder:
@@ -82,12 +84,12 @@ void main() {
     // this settled state before tapping (guards a cold-start nav flake).
     expect(find.text(AppStrings.roleSelectConsentRequired), findsNothing);
 
-    // Tap the teacher role → _goToOnboarding → all.length>1 → discipline select.
+    // Tap the teacher role → _goToOnboarding → length==1 → role onboarding.
     await tester.tap(find.text(AppStrings.roleSelectTeacher));
     await tester.pumpAndSettle();
 
-    expect(find.text('discipline-select-reached'), findsOneWidget);
-    expect(find.text('teacher-onboarding-reached'), findsNothing);
+    expect(find.text('teacher-onboarding-reached'), findsOneWidget);
+    expect(find.text('discipline-select-reached'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
