@@ -33,8 +33,8 @@
   - **담당 job**: J12
   - **관련 테스트**: `frontend/test/routing/all_routes_render_test.dart` (기존 게이트 확장)
 
-  ### AC-5 [실차감] add_usage 단일 경로 + 노쇼 4값 분기 (pending)
-  - **만족 조건**: 출석 확정→잔여 감소 + 멱등 + 선택 규칙(group→universal·만료임박 우선) + flag-only 제거 + **노쇼 4값 분기(deductCredit/halfCredit/noDeduction/reschedule→MakeupCredit) 기존 1:1 SSOT 시맨틱 재사용**
+  ### AC-5 [실차감] add_usage 단일 경로 + 노쇼 정책 집행 (passed — J5a PR #1281 + J5b)
+  - **만족 조건**: 출석 확정→잔여 감소 + 멱등 + 선택 규칙(group→universal·만료임박 우선) + flag-only 제거 + **노쇼 집행 2축 정렬(2026-08-18 개정, 옵시디언 54): deductCredit=차감 / reschedule=차감+MakeupCredit 적립(쌍 회계) / noDeduction=무차감 / halfCredit=폐기(신규 400, 레거시 무차감)** + 결과 문구 알림(배치 경로 포함)
   - **담당 job**: J5a(차감 코어), J5b(노쇼 4분기)
   - **관련 테스트**: `backend/tests/test_group_lesson_deduction.py` (노쇼 4분기 케이스 포함)
 

@@ -175,9 +175,15 @@ async def test_issue_group_template(
 _DEDUCT = "/api/v1/groups/bookings/{}/deduct"
 
 
-async def _make_group_attendance(db_session: AsyncSession, create_test_user) -> dict:
-    """teacher(test-user-id) + student(test-student-id) + 반 회차 + 출석 booking."""
-    from app.models.schedule import GroupClass, GroupClassType
+async def _make_group_attendance(
+    db_session: AsyncSession,
+    create_test_user,
+    *,
+    booking_status: str = "attended",
+    no_show_policy: str | None = None,
+) -> dict:
+    """teacher(test-user-id) + student(test-student-id) + 반 회차 + booking."""
+    from app.models.schedule import GroupClass, GroupClassType, NoShowPolicy
     from app.models.schedule_ext import (
         GroupBookingStatus,
         GroupClassBooking,
@@ -201,6 +207,8 @@ async def _make_group_attendance(db_session: AsyncSession, create_test_user) -> 
         type=GroupClassType.regular,
         max_capacity=6,
     )
+    if no_show_policy is not None:
+        group_class.no_show_policy = NoShowPolicy(no_show_policy)
     db_session.add(group_class)
     await db_session.flush()
 
@@ -218,8 +226,8 @@ async def _make_group_attendance(db_session: AsyncSession, create_test_user) -> 
     booking = GroupClassBooking(
         schedule_id=schedule.id,
         student_id="test-student-id",
-        status=GroupBookingStatus.attended,
-        attended_at=now,
+        status=GroupBookingStatus(booking_status),
+        attended_at=now if booking_status == "attended" else None,
     )
     db_session.add(booking)
     await db_session.flush()
@@ -492,3 +500,331 @@ async def test_no_eligible_subscription_rejected(
     assert (await db_session.get(Subscription, unconfirmed_id)).used_lessons == 0
     booking = await db_session.get(GroupClassBooking, ctx["booking_id"])
     assert booking.subscription_deducted is False
+
+
+# ---------------------------------------------------------------------------
+# J5b 노쇼 정책 집행 — 업계 2축([차감]x[보강권]) 정렬 (옵시디언 54, 2026-08-18)
+# ---------------------------------------------------------------------------
+
+_BATCH = "/api/v1/groups/bookings/batch-attendance"
+_ATTENDANCE = "/api/v1/groups/bookings/{}/attendance"
+_CLASSES_URL = "/api/v1/groups/classes"
+
+
+async def _no_show_records(db_session: AsyncSession, booking_id: str) -> list:
+    from sqlalchemy import select
+
+    from app.models.schedule_ext import NoShowRecord
+
+    rows = await db_session.scalars(select(NoShowRecord).where(NoShowRecord.lesson_id == booking_id))
+    return list(rows.all())
+
+
+async def _no_show_notifications(db_session: AsyncSession) -> list:
+    from sqlalchemy import select
+
+    from app.models.notification import Notification
+
+    rows = await db_session.scalars(select(Notification).where(Notification.type == "groupNoShowWarning"))
+    return list(rows.all())
+
+
+async def _makeup_credits(db_session: AsyncSession, student_id: str = "test-student-id") -> list:
+    from sqlalchemy import select
+
+    from app.models.makeup_credit import MakeupCredit
+
+    rows = await db_session.scalars(select(MakeupCredit).where(MakeupCredit.student_id == student_id))
+    return list(rows.all())
+
+
+@pytest.mark.asyncio
+async def test_no_show_deduct_credit_policy(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """deductCredit: 노쇼 처리 → 1회 차감 + NoShowRecord + 결과 문구 알림."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="confirmed", no_show_policy="deductCredit"
+    )
+    sub = _make_subscription(
+        membership_id=ctx["membership_id"],
+        applies_to=SubscriptionAppliesTo.group,
+        group_class_id=ctx["class_id"],
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    response = await client.post(
+        _BATCH,
+        headers=auth_headers,
+        json={"bookings": [{"booking_id": ctx["booking_id"], "attended": False}]},
+    )
+    assert response.status_code == 200, response.text
+
+    db_session.expire_all()
+    refreshed = await db_session.get(Subscription, sub_id)
+    assert refreshed.used_lessons == 1, "노쇼 차감 정책이면 실제 잔여가 줄어야 한다"
+    usages = await _usage_rows(db_session, sub_id)
+    assert len(usages) == 1
+    assert usages[0].type.value == "noShow"
+    records = await _no_show_records(db_session, ctx["booking_id"])
+    assert len(records) == 1
+    assert records[0].deducted_credits == 1
+    assert records[0].applied_policy.value == "deductCredit"
+    notifications = await _no_show_notifications(db_session)
+    assert notifications, "배치 경로에서도 노쇼 알림이 발송돼야 한다"
+    assert "차감" in notifications[0].body, "조용한 차감 금지 — 결과 문구 필수"
+
+
+@pytest.mark.asyncio
+async def test_no_show_reschedule_policy_deducts_and_accrues(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """reschedule: 1회 차감 + 보강권(noShowExempt) 1회 적립 — 쌍 회계."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="confirmed", no_show_policy="reschedule"
+    )
+    sub = _make_subscription(
+        membership_id=ctx["membership_id"],
+        applies_to=SubscriptionAppliesTo.group,
+        group_class_id=ctx["class_id"],
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    response = await client.post(
+        _BATCH,
+        headers=auth_headers,
+        json={"bookings": [{"booking_id": ctx["booking_id"], "attended": False}]},
+    )
+    assert response.status_code == 200, response.text
+
+    db_session.expire_all()
+    assert (await db_session.get(Subscription, sub_id)).used_lessons == 1
+    credits = await _makeup_credits(db_session)
+    assert len(credits) == 1
+    assert credits[0].reason.value == "noShowExempt"
+    records = await _no_show_records(db_session, ctx["booking_id"])
+    assert records[0].deducted_credits == 1
+    notifications = await _no_show_notifications(db_session)
+    assert any("보강" in n.body for n in notifications), "보강권 적립을 알림에 명시"
+
+
+@pytest.mark.asyncio
+async def test_no_show_no_deduction_policy(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """noDeduction: 무차감 + 기록 + '차감 없이' 문구. 단건 경로로 검증."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="confirmed", no_show_policy="noDeduction"
+    )
+    sub = _make_subscription(
+        membership_id=ctx["membership_id"],
+        applies_to=SubscriptionAppliesTo.group,
+        group_class_id=ctx["class_id"],
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    response = await client.patch(
+        _ATTENDANCE.format(ctx["booking_id"]),
+        headers=auth_headers,
+        json={"attended": False},
+    )
+    assert response.status_code == 200, response.text
+
+    db_session.expire_all()
+    assert (await db_session.get(Subscription, sub_id)).used_lessons == 0
+    records = await _no_show_records(db_session, ctx["booking_id"])
+    assert len(records) == 1
+    assert records[0].deducted_credits == 0
+    notifications = await _no_show_notifications(db_session)
+    assert any("차감 없이" in n.body for n in notifications)
+
+
+@pytest.mark.asyncio
+async def test_no_show_half_credit_legacy_no_deduction(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """폐기된 halfCredit 레거시 행: 조용한 차감 금지 — 무차감 처리 + 기록."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="confirmed", no_show_policy="halfCredit"
+    )
+    sub = _make_subscription(
+        membership_id=ctx["membership_id"],
+        applies_to=SubscriptionAppliesTo.group,
+        group_class_id=ctx["class_id"],
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    response = await client.post(
+        _BATCH,
+        headers=auth_headers,
+        json={"bookings": [{"booking_id": ctx["booking_id"], "attended": False}]},
+    )
+    assert response.status_code == 200, response.text
+
+    db_session.expire_all()
+    assert (await db_session.get(Subscription, sub_id)).used_lessons == 0
+    records = await _no_show_records(db_session, ctx["booking_id"])
+    assert len(records) == 1
+    assert records[0].deducted_credits == 0
+    assert records[0].applied_policy.value == "halfCredit"
+
+
+@pytest.mark.asyncio
+async def test_no_show_idempotent_on_remark(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """노쇼 재처리는 멱등 — 차감·기록·알림 1회만."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="confirmed", no_show_policy="deductCredit"
+    )
+    sub = _make_subscription(
+        membership_id=ctx["membership_id"],
+        applies_to=SubscriptionAppliesTo.group,
+        group_class_id=ctx["class_id"],
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    payload = {"bookings": [{"booking_id": ctx["booking_id"], "attended": False}]}
+    first = await client.post(_BATCH, headers=auth_headers, json=payload)
+    second = await client.post(_BATCH, headers=auth_headers, json=payload)
+    assert first.status_code == 200, first.text
+    assert second.status_code == 200, second.text
+
+    db_session.expire_all()
+    assert (await db_session.get(Subscription, sub_id)).used_lessons == 1
+    assert len(await _usage_rows(db_session, sub_id)) == 1
+    assert len(await _no_show_records(db_session, ctx["booking_id"])) == 1
+    per_user_counts: dict[str, int] = {}
+    for n in await _no_show_notifications(db_session):
+        per_user_counts[n.user_id] = per_user_counts.get(n.user_id, 0) + 1
+    assert all(count == 1 for count in per_user_counts.values()), "재처리가 알림을 중복 발송하면 안 된다"
+
+
+@pytest.mark.asyncio
+async def test_no_show_without_subscription_still_marks(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """수강권이 없어도 노쇼 마킹은 성공 — 기록만 남기고 출석부를 막지 않는다."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="confirmed", no_show_policy="deductCredit"
+    )
+    await db_session.commit()
+
+    response = await client.post(
+        _BATCH,
+        headers=auth_headers,
+        json={"bookings": [{"booking_id": ctx["booking_id"], "attended": False}]},
+    )
+    assert response.status_code == 200, response.text
+
+    db_session.expire_all()
+    records = await _no_show_records(db_session, ctx["booking_id"])
+    assert len(records) == 1
+    assert records[0].deducted_credits == 0
+    assert len(await _makeup_credits(db_session)) == 0
+
+
+@pytest.mark.asyncio
+async def test_no_show_after_attended_deduction_no_double(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """출석 차감 후 노쇼로 정정해도 이중 차감 없음 — 마커 공유."""
+    ctx = await _make_group_attendance(
+        db_session, create_test_user, booking_status="attended", no_show_policy="deductCredit"
+    )
+    sub = _make_subscription(
+        membership_id=ctx["membership_id"],
+        applies_to=SubscriptionAppliesTo.group,
+        group_class_id=ctx["class_id"],
+    )
+    db_session.add(sub)
+    await db_session.flush()
+    sub_id = sub.id
+    await db_session.commit()
+
+    deducted = await client.patch(_DEDUCT.format(ctx["booking_id"]), headers=auth_headers)
+    assert deducted.status_code == 200, deducted.text
+    response = await client.post(
+        _BATCH,
+        headers=auth_headers,
+        json={"bookings": [{"booking_id": ctx["booking_id"], "attended": False}]},
+    )
+    assert response.status_code == 200, response.text
+
+    db_session.expire_all()
+    assert (await db_session.get(Subscription, sub_id)).used_lessons == 1, "출석 차감 1회만"
+    records = await _no_show_records(db_session, ctx["booking_id"])
+    assert len(records) == 1
+    assert records[0].deducted_credits == 0
+
+
+@pytest.mark.asyncio
+async def test_half_credit_rejected_on_create_and_update(
+    client: AsyncClient,
+    auth_headers,
+    create_test_user,
+    db_session: AsyncSession,
+):
+    """폐기 정책: 신규 클래스 생성·수정에서 halfCredit 은 400."""
+    await create_test_user(user_id="test-user-id", role="teacher", name="홍선생")
+    await db_session.commit()
+
+    payload = {
+        "name": "앙상블반",
+        "type": "regular",
+        "max_capacity": 6,
+        "duration_minutes": 60,
+        "no_show_policy": "halfCredit",
+        "repeat_days_of_week": [1],
+        "repeat_time_of_day": "18:00",
+    }
+    created = await client.post(_CLASSES_URL, headers=auth_headers, json=payload)
+    assert created.status_code == 400, created.text
+
+    payload["no_show_policy"] = "deductCredit"
+    ok = await client.post(_CLASSES_URL, headers=auth_headers, json=payload)
+    assert ok.status_code in (200, 201), ok.text
+    class_id = ok.json()["id"]
+
+    updated = await client.patch(
+        f"{_CLASSES_URL}/{class_id}",
+        headers=auth_headers,
+        json={"no_show_policy": "halfCredit"},
+    )
+    assert updated.status_code == 400, updated.text
