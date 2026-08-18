@@ -219,11 +219,13 @@ class GroupNotificationService:
     # 5. 노쇼 경고
     # ------------------------------------------------------------------
 
-    async def notify_no_show_warning(self, *, booking: Any, schedule: Any, group_class: Any) -> int:
+    async def notify_no_show_warning(
+        self, *, booking: Any, schedule: Any, group_class: Any, outcome: str | None = None
+    ) -> int:
         """노쇼 처리를 학생 + 연결된 학부모에게 알린다. 발송 건수 반환.
 
-        정책별 차감 결과는 J5b(노쇼 4값 분기) 소관이라 문구에 넣지 않는다 — 여기서는
-        "결석 처리되었다" 는 사실만 통지한다.
+        ``outcome`` 은 J5b 정책 집행 결과 문구 — 조용한 차감 금지 원칙(3중 고지,
+        옵시디언 54)에 따라 차감/보강권 결과를 body 에 함께 싣는다.
         """
         recipients: list[str] = []
         student_user_id = await resolve_student_user_id(self.db, booking.student_id)
@@ -231,12 +233,15 @@ class GroupNotificationService:
             recipients.append(student_user_id)
         recipients.extend(uid for uid in await self._guardian_user_ids(booking.student_id) if uid not in recipients)
 
+        body = f"{group_class.name} {_when(schedule)} 수업이 결석(노쇼)으로 처리되었어요."
+        if outcome:
+            body = f"{body} {outcome}"
         for user_id in recipients:
             await self._emit(
                 user_id=user_id,
                 notification_type=TYPE_NO_SHOW_WARNING,
                 title="결석으로 처리되었어요",
-                body=f"{group_class.name} {_when(schedule)} 수업이 결석(노쇼)으로 처리되었어요.",
+                body=body,
                 priority=NotificationPriority.urgent,
                 data={"groupClassId": group_class.id, "scheduleId": schedule.id, "bookingId": booking.id},
             )

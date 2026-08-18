@@ -18,6 +18,7 @@ import 'package:lessonaza/features/schedule/data/repositories/mock_group_class_r
 import 'package:lessonaza/features/schedule/domain/entities/group_class.dart';
 import 'package:lessonaza/features/schedule/presentation/providers/group_class_providers.dart';
 import 'package:lessonaza/features/schedule/presentation/screens/group_class_form_screen.dart';
+import 'package:lessonaza/features/schedule/presentation/widgets/group_class_form_fields.dart';
 
 const _kTeacherId = 'teacher_1';
 const _kOpenLabel = 'open-form';
@@ -212,6 +213,31 @@ void main() {
 
       expect(find.text(AppStrings.groupClassFormEditTitle), findsOneWidget);
       expect(find.text('금요일 챔버반'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('no-show policy chips do not offer retired halfCredit', (
+      tester,
+    ) async {
+      // halfCredit retired 2026-08-18 (Obsidian 54) — selectable set is the
+      // market-aligned trio: deduct / deduct+makeup / no deduction.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: GroupClassNoShowPolicyChips(
+              selectedPolicy: NoShowPolicy.deductCredit,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.noShowPolicyDeductCredit), findsOneWidget);
+      expect(find.text(AppStrings.noShowPolicyNoDeduction), findsOneWidget);
+      expect(find.text(AppStrings.noShowPolicyReschedule), findsOneWidget);
+      expect(find.text(AppStrings.noShowPolicyHalfCredit), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
