@@ -77,15 +77,14 @@ class GroupClassInstrumentChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children:
-          instruments.map((instrument) {
-            final isSelected = selectedInstrument == instrument;
-            return GroupClassFormChip(
-              label: instrument,
-              selected: isSelected,
-              onSelected: () => onChanged(isSelected ? null : instrument),
-            );
-          }).toList(),
+      children: instruments.map((instrument) {
+        final isSelected = selectedInstrument == instrument;
+        return GroupClassFormChip(
+          label: instrument,
+          selected: isSelected,
+          onSelected: () => onChanged(isSelected ? null : instrument),
+        );
+      }).toList(),
     );
   }
 }
@@ -137,14 +136,13 @@ class GroupClassCapacityChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children:
-          presets.map((capacity) {
-            return GroupClassFormChip(
-              label: AppStrings.groupClassFormCapacityValue(capacity),
-              selected: selectedCapacity == capacity,
-              onSelected: () => onChanged(capacity),
-            );
-          }).toList(),
+      children: presets.map((capacity) {
+        return GroupClassFormChip(
+          label: AppStrings.groupClassFormCapacityValue(capacity),
+          selected: selectedCapacity == capacity,
+          onSelected: () => onChanged(capacity),
+        );
+      }).toList(),
     );
   }
 }
@@ -169,13 +167,19 @@ class GroupClassNoShowPolicyChips extends StatelessWidget {
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
           children:
-              NoShowPolicy.values.map((policy) {
-                return GroupClassFormChip(
-                  label: policy.label,
-                  selected: selectedPolicy == policy,
-                  onSelected: () => onChanged(policy),
-                );
-              }).toList(),
+              // halfCredit retired 2026-08-18 (Obsidian 54) — no market precedent
+              // and the integer session ledger cannot execute 0.5. The enum value
+              // stays for legacy rows; it is just no longer selectable.
+              NoShowPolicy.values
+                  .where((policy) => policy != NoShowPolicy.halfCredit)
+                  .map((policy) {
+                    return GroupClassFormChip(
+                      label: policy.label,
+                      selected: selectedPolicy == policy,
+                      onSelected: () => onChanged(policy),
+                    );
+                  })
+                  .toList(),
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
@@ -207,17 +211,15 @@ class GroupClassDeadlineChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children:
-          presetHours.map((hours) {
-            return GroupClassFormChip(
-              label:
-                  hours == 0
-                      ? AppStrings.groupClassFormDeadlineNone
-                      : AppStrings.groupClassFormDeadlineHours(hours),
-              selected: selectedMinutes == hours * 60,
-              onSelected: () => onChanged(hours * 60),
-            );
-          }).toList(),
+      children: presetHours.map((hours) {
+        return GroupClassFormChip(
+          label: hours == 0
+              ? AppStrings.groupClassFormDeadlineNone
+              : AppStrings.groupClassFormDeadlineHours(hours),
+          selected: selectedMinutes == hours * 60,
+          onSelected: () => onChanged(hours * 60),
+        );
+      }).toList(),
     );
   }
 }

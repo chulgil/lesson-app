@@ -256,6 +256,7 @@ class ScheduleExtService:
         from app.models.schedule import GroupClass
 
         payload = dict(data)
+        self._reject_retired_no_show_policy(payload)
         start_date = payload.pop("start_date", None)
         group_class = GroupClass(
             teacher_id=await self._resolve_teacher_profile_id(current_user.id),
@@ -301,7 +302,22 @@ class ScheduleExtService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group class not found")
         return self._to_class_response(group_class)
 
+    @staticmethod
+    def _reject_retired_no_show_policy(data: dict) -> None:
+        """halfCredit 폐기 (2026-08-18, Obsidian 54).
+
+        0.5-credit deduction exists nowhere in the market and the ledger is
+        integer-only, so the value never became executable. The enum member
+        stays for wire/legacy-row compat; only new selections are blocked.
+        """
+        if data.get("no_show_policy") == "halfCredit":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="halfCredit 정책은 지원이 종료되었습니다. 차감·차감+보강권·무차감 중 선택해 주세요.",
+            )
+
     async def update_group_class(self, group_class_id: str, data: dict, current_user: Any) -> GroupClassResponse:
+        self._reject_retired_no_show_policy(data)
         group_class = await self._assert_group_class_teacher(group_class_id, current_user)
         columns = _class_columns(data)
         recurrence_changed = any(key in columns for key in ("repeat_days", "repeat_time", "duration_minutes", "type"))
@@ -614,21 +630,88 @@ class ScheduleExtService:
             booking.attended_at = datetime.now(UTC)
         await self.db.flush()
         await self.db.refresh(booking)
-        # P2-2 — 노쇼는 학생 본인이 모르는 채 차감될 수 있어 학부모까지 통지한다.
-        # 정책별 차감 결과 문구는 J5b(노쇼 4값 분기) 소관.
         if not attended:
-            from app.models.schedule_ext import GroupClassSchedule
-            from app.services.group_notification_service import GroupNotificationService
-
-            schedule = await self.db.get(GroupClassSchedule, booking.schedule_id)
-            group_class = await self._get_group_class(schedule.group_class_id) if schedule else None
-            if schedule is not None and group_class is not None:
-                await GroupNotificationService(self.db).notify_no_show_warning(
-                    booking=booking,
-                    schedule=schedule,
-                    group_class=group_class,
-                )
+            await self._process_no_show(booking, current_user)
         return booking
+
+    async def _process_no_show(self, booking: Any, current_user: Any) -> None:
+        """Apply the class no-show policy for a booking marked noShow (J5b).
+
+        Market-aligned two-axis execution (Obsidian 54): ``deductCredit``
+        deducts one session; ``reschedule`` deducts one session AND accrues a
+        makeup credit — the pair keeps the ledger neutral, so no credit is
+        granted when nothing was deducted. ``noDeduction`` and retired
+        ``halfCredit`` rows deduct nothing. The ``NoShowRecord`` keyed by
+        booking id is the idempotency anchor (re-marking never double-deducts
+        or re-notifies), and the ``subscription_deducted`` marker is shared
+        with the attendance deduction so an attended-then-corrected booking is
+        never charged twice. Marking must never fail because the student lacks
+        a spendable subscription — the record is still written.
+        """
+        from app.models.schedule import NoShowPolicy
+        from app.models.schedule_ext import GroupClassSchedule, NoShowRecord
+        from app.services.group_notification_service import GroupNotificationService
+        from app.services.makeup_credit_service import MakeupCreditService
+        from app.services.subscription_service import SubscriptionService
+
+        existing = await self.db.scalar(select(NoShowRecord.id).where(NoShowRecord.lesson_id == booking.id))
+        if existing is not None:
+            return
+
+        schedule = await self.db.get(GroupClassSchedule, booking.schedule_id)
+        group_class = await self._get_group_class(schedule.group_class_id) if schedule else None
+        if schedule is None or group_class is None:
+            return
+
+        policy = group_class.no_show_policy
+        deducted = 0
+        if policy in (NoShowPolicy.deductCredit, NoShowPolicy.reschedule) and not booking.subscription_deducted:
+            try:
+                subscription = await self._resolve_deduction_subscription(booking, group_class)
+            except HTTPException:
+                subscription = None
+            if subscription is not None:
+                await SubscriptionService(self.db).add_usage(
+                    subscription.id,
+                    {"type": "noShow", "note": group_class.name},
+                    current_user,
+                )
+                booking.subscription_id = subscription.id
+                booking.subscription_deducted = True
+                deducted = 1
+
+        if policy is NoShowPolicy.reschedule and deducted:
+            await MakeupCreditService(self.db).accrue_for_no_show_exempt(
+                student_id=booking.student_id,
+                teacher_id=group_class.teacher_id,
+                lesson_id=booking.id,
+            )
+
+        self.db.add(
+            NoShowRecord(
+                lesson_id=booking.id,
+                student_id=booking.student_id,
+                teacher_id=group_class.teacher_id,
+                lesson_date=schedule.start_time.date(),
+                applied_policy=policy,
+                deducted_credits=deducted,
+                processed_by=current_user.id,
+            )
+        )
+        await self.db.flush()
+
+        if policy is NoShowPolicy.reschedule and deducted:
+            outcome = "정책에 따라 수강권 1회가 차감되고 보강권 1회가 적립되었어요 (30일 내 사용)."
+        elif deducted:
+            outcome = "정책에 따라 수강권 1회가 차감되었어요."
+        else:
+            outcome = "수강권 차감 없이 처리되었어요."
+        await GroupNotificationService(self.db).notify_no_show_warning(
+            booking=booking,
+            schedule=schedule,
+            group_class=group_class,
+            outcome=outcome,
+        )
 
     async def get_bookings_for_schedule(self, schedule_id: str, current_user: Any) -> list[Any]:
         from app.models.schedule_ext import GroupClassBooking
@@ -779,6 +862,10 @@ class ScheduleExtService:
         await self.db.flush()
         for b in results:
             await self.db.refresh(b)
+        # J5b — FE 주경로(수업 종료)는 배치라서 노쇼 정책·알림이 여기서도 돌아야 한다.
+        for b in results:
+            if b.status == GroupBookingStatus.noShow:
+                await self._process_no_show(b, current_user)
         return results
 
     async def deduct_subscription(self, booking_id: str, current_user: Any) -> Any:

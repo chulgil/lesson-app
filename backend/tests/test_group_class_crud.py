@@ -60,7 +60,8 @@ def _regular_payload(**overrides) -> dict:
         "max_capacity": 6,
         "waitlist_capacity": 2,
         "duration_minutes": 60,
-        "no_show_policy": "halfCredit",
+        # halfCredit 은 2026-08-18 폐기 (Obsidian 54) — 생성 payload 는 지원 값만.
+        "no_show_policy": "deductCredit",
         "repeat_days_of_week": [1, 3],  # 1=월 … 7=일 (FE 계약)
         "repeat_time_of_day": "18:00",
         "instrument": "violin",
@@ -109,7 +110,7 @@ async def test_create_group_class_returns_fe_contract_keys(client: AsyncClient, 
     assert body["name"] == "앙상블반"
     assert body["type"] == "regular"
     assert body["max_capacity"] == 6
-    assert body["no_show_policy"] == "halfCredit"
+    assert body["no_show_policy"] == "deductCredit"
     assert body["repeat_days_of_week"] == [1, 3]
     assert body["repeat_time_of_day"] == "18:00"
     assert body["is_active"] is True
@@ -185,7 +186,7 @@ async def test_update_group_class_patches_only_supplied_fields(
     assert body["name"] == "앙상블 A반"
     assert body["max_capacity"] == 8
     # 건드리지 않은 필드는 보존.
-    assert body["no_show_policy"] == "halfCredit"
+    assert body["no_show_policy"] == "deductCredit"
     assert body["repeat_time_of_day"] == "18:00"
 
 
