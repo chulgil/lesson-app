@@ -28,6 +28,16 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('#1287 UXC-4a 로그인 화면은 앱 용도를 1문장으로 알려준다', (
+    WidgetTester tester,
+  ) async {
+    await _pumpLogin(tester);
+
+    // 슬로건은 장식이라 "무슨 앱인지" 를 말하지 않는다. 가입 전 유일한 WHAT 문장.
+    expect(find.text(AppStrings.authValueProposition), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('학부모 링크는 소셜 버튼 라벨과 동일한 폰트를 사용한다', (WidgetTester tester) async {
     await _pumpLogin(tester);
 

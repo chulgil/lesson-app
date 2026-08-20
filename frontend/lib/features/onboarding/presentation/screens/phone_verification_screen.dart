@@ -225,8 +225,15 @@ class _PhoneVerificationScreenState
   }
 
   void _handleBack() {
-    // Navigate back to profile setup
-    GoRouter.of(context).go(AppRoutes.teacherProfileSetup);
+    // Both production entries start from home — the quest row pushes, the E3
+    // gate modal go()s. Sending everyone to the onboarding profile form instead
+    // reopened a step they had already finished, with no way back out.
+    final router = GoRouter.of(context);
+    if (router.canPop()) {
+      router.pop();
+      return;
+    }
+    router.go(AppRoutes.home);
   }
 
   @override
@@ -253,13 +260,17 @@ class _PhoneVerificationScreenState
 
                 // Notebook × Score: 스텝 타이틀 Playfair sectionTitle (§7.87-h).
                 Text(
-                  _codeSent ? AppStrings.phoneVerifyStepTitleCode : AppStrings.phoneVerifyStepTitlePhone,
+                  _codeSent
+                      ? AppStrings.phoneVerifyStepTitleCode
+                      : AppStrings.phoneVerifyStepTitlePhone,
                   style: NotebookTypography.sectionTitle,
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   _codeSent
-                      ? AppStrings.phoneVerifyStepDescCode(_phoneController.text)
+                      ? AppStrings.phoneVerifyStepDescCode(
+                        _phoneController.text,
+                      )
                       : AppStrings.phoneVerifyStepDescPhone,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.inkSecondary,
@@ -308,7 +319,9 @@ class _PhoneVerificationScreenState
                               ),
                             )
                             : Text(
-                              _codeSent ? AppStrings.phoneVerifyButtonVerify : AppStrings.phoneVerifyButtonSend,
+                              _codeSent
+                                  ? AppStrings.phoneVerifyButtonVerify
+                                  : AppStrings.phoneVerifyButtonSend,
                               style: AppTypography.button,
                             ),
                   ),

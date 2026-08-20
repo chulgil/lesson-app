@@ -1,9 +1,10 @@
 // W4 Task 4.4 — NextMissionSpotlight (메인 첫 진입 1회 안내).
 // spec §9.1 Step 3 — 가입 후 DashboardTab 첫 진입 시 spotlight 1회.
 //
-// 영속: `questFirstShownProvider` 재사용 (architect P1 #4 — 두 spotlight
-// 시스템 공존 방지). value == null → 첫 진입 → spotlight 노출.
-// [시작]/[나중에] 양쪽 모두 markShown() 호출하여 두 번째 진입부터 숨김.
+// 영속: `nextMissionSpotlightDismissedProvider` (UXC-2). 과거에는
+// `questFirstShownProvider` 의 타임스탬프를 재사용했으나, home 진입 즉시
+// (post-frame) 기록되는 그 값이 곧 노출 조건이라 spotlight 가 플래시하거나
+// 아예 뜨지 않았다. 소거는 사용자가 [시작]/[나중에] 를 탭할 때만 일어난다.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,8 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../profile/profile_facade.dart' show questFirstShownProvider;
+import '../../../profile/profile_facade.dart'
+    show nextMissionSpotlightDismissedProvider;
 
 /// 메인 첫 진입 1회 spotlight overlay.
 ///
@@ -26,19 +28,23 @@ class NextMissionSpotlight extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final firstShownAsync = ref.watch(questFirstShownProvider);
+    final dismissedAsync = ref.watch(nextMissionSpotlightDismissedProvider);
 
-    return firstShownAsync.when(
-      data: (value) {
-        // value != null → 이전에 markShown 호출된 적 있음 → 노출 안 함.
-        if (value != null) return const SizedBox.shrink();
+    return dismissedAsync.when(
+      data: (dismissed) {
+        // 사용자가 [시작]/[나중에] 를 탭한 적이 있으면 다시 띄우지 않는다.
+        if (dismissed) return const SizedBox.shrink();
         return _SpotlightOverlay(
           onStart: () async {
-            await ref.read(questFirstShownProvider.notifier).markShown();
+            await ref
+                .read(nextMissionSpotlightDismissedProvider.notifier)
+                .markDismissed();
             onStart?.call();
           },
           onLater: () async {
-            await ref.read(questFirstShownProvider.notifier).markShown();
+            await ref
+                .read(nextMissionSpotlightDismissedProvider.notifier)
+                .markDismissed();
           },
         );
       },

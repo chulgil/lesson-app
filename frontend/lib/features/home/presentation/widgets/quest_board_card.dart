@@ -21,6 +21,13 @@ import 'quest_celebration_card.dart';
 /// 가입 직후 첫 도착 시 자동 완료된 카드를 표시하는 시간 (§8.2).
 const _kFirstArrivalRevealDuration = Duration(seconds: 2);
 
+/// 접힌 상태에서 노출할 최대 quest 행 수 (UXC-6 점진 공개).
+const _kCollapsedRowLimit = 4;
+
+/// '접기' 는 앱 전역에서 하나의 문구를 쓴다 — 기존 상수를 재사용한다
+/// (C4: 같은 의미의 신규 동의어 상수 금지).
+const _kCollapseLabel = AppStrings.urgentAlertCollapse;
+
 /// Quest 분류 그룹 — §13 퀘스트 시스템 (3-group).
 enum QuestGroup {
   /// Q1~Q5 — 학생에게 보일 정보 준비 (가용시간/사진/소개/레슨비/계좌).
@@ -53,6 +60,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
   /// 가입 직후 첫 도착 윈도우 안이면 true — 2초 후 false 로 전환.
   bool _revealCompleted = false;
   Timer? _revealTimer;
+
+  /// UXC-6 — 사용자가 [더보기] 를 눌러 전체 퀘스트를 펼쳤는지.
+  bool _expanded = false;
 
   /// §B4 자동 완료 카드 애니메이션 (감사 §4.6).
   /// ScaleTransition(0.9 → 1.0, 300ms) + sustain 1s + FadeOut(500ms).
@@ -189,6 +199,35 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
                 .toList(),
     };
 
+    // UXC-6 점진 공개 — 접힌 상태에서는 "지금 할 그룹" 하나만, 그 안에서도
+    // 최대 _kCollapsedRowLimit 행만 노출한다. 신규 선생님 첫 홈에 12행이
+    // 한꺼번에 쏟아지던 것을 줄인다 (Hick's Law). 나머지는 [더보기] 로.
+    QuestGroup? currentGroup;
+    for (final g in QuestGroup.values) {
+      if (byGroupVisible[g]!.isNotEmpty) {
+        currentGroup = g;
+        break;
+      }
+    }
+    final byGroupDisplayed = <QuestGroup, List<_Quest>>{
+      for (final g in QuestGroup.values)
+        g:
+            _expanded
+                ? byGroupVisible[g]!
+                : g == currentGroup
+                ? byGroupVisible[g]!.take(_kCollapsedRowLimit).toList()
+                : const <_Quest>[],
+    };
+    final visibleRowCount = byGroupVisible.values.fold<int>(
+      0,
+      (sum, list) => sum + list.length,
+    );
+    final displayedRowCount = byGroupDisplayed.values.fold<int>(
+      0,
+      (sum, list) => sum + list.length,
+    );
+    final hasHiddenRows = displayedRowCount < visibleRowCount;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
       child: AnimatedSize(
@@ -219,10 +258,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
             ),
             const SizedBox(height: AppSpacing.space3),
             for (final group in QuestGroup.values) ...[
-              if (byGroupVisible[group]!.isNotEmpty) ...[
+              if (byGroupDisplayed[group]!.isNotEmpty) ...[
                 _QuestGroupSection(
                   group: group,
-                  quests: byGroupVisible[group]!,
+                  quests: byGroupDisplayed[group]!,
                   totalInGroup: byGroupAll[group]!.length,
                   completedInGroup:
                       byGroupAll[group]!.where((q) => q.isCompleted).length,
@@ -234,7 +273,32 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
                   const SizedBox(height: AppSpacing.space3),
               ],
             ],
+            if (hasHiddenRows || _expanded) _buildDisclosureToggle(),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// UXC-6 — 남은 퀘스트를 펼치거나 다시 접는 토글.
+  Widget _buildDisclosureToggle() {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.space2),
+      child: TextButton(
+        onPressed: () => setState(() => _expanded = !_expanded),
+        // 테마 minimumSize 가 Size(infinity, h) 라 Column 의 loose 제약에서
+        // 크래시한다 — 컴팩트 배치에는 항상 override (tech-patterns).
+        style: TextButton.styleFrom(
+          minimumSize: const Size(0, AppSpacing.buttonHeight),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+          foregroundColor: AppColors.ink,
+        ),
+        child: Text(
+          _expanded ? _kCollapseLabel : AppStrings.showMore,
+          style: NotebookTypography.roman.copyWith(
+            fontSize: 12,
+            color: AppColors.inkSecondary,
+          ),
         ),
       ),
     );
@@ -276,6 +340,7 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         title: AppStrings.questTitleSlots,
         reward: AppStrings.questRewardSlots,
         isCompleted: hasSlots,
+        glossHint: AppStrings.questGlossAvailability,
         // §5.1 — Q1 진입 라우트 변경: teacherFirstAvailability → teacherAvailability (split_page).
         onTap: () => context.push(AppRoutes.teacherAvailability),
       ),
@@ -329,6 +394,8 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         title: AppStrings.questTitleStudent,
         reward: AppStrings.questRewardConnection,
         isCompleted: hasStudents,
+        // UXC-3 — 죽은 코치마크 step 2 의 설명을 그대로 이식.
+        glossHint: AppStrings.coachMarkFirstStudentInviteDescription,
         onTap: () => context.push(AppRoutes.invite),
       ),
       _Quest(
@@ -338,6 +405,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardSubscription,
         isCompleted: hasSubscription,
         isLocked: !hasStudents,
+        // UXC-7 — '수강권' 첫 노출 지점. 온보딩 카테고리 미리보기와 같은
+        // 문장을 재사용한다 (C4: 동일 의미 = 단일 상수).
+        glossHint: AppStrings.onboardingCategorySubscriptionGloss,
         onTap:
             hasStudents
                 ? () => context.push(AppRoutes.issueSubscription)
@@ -350,6 +420,8 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardFirstLesson,
         isCompleted: hasCompletedLesson,
         isLocked: !hasStudents,
+        // UXC-3 — 죽은 코치마크 step 3 의 설명을 그대로 이식.
+        glossHint: AppStrings.coachMarkFirstLessonRegisterDescription,
         onTap:
             hasStudents ? () => context.push(AppRoutes.lessons) : onLockedTap(),
       ),
@@ -410,6 +482,11 @@ class _Quest {
   /// 예: Q3 "최소 20자", Q4 "최소 1개 가격", Q10 "1건 등록".
   final String? thresholdHint;
 
+  /// 용어 풀이 1행 (UXC-7) — '가용시간'·'수강권' 처럼 비테크 선생님이
+  /// 기능명을 목표로 번역하지 못하는 용어의 첫 노출 지점에만 붙인다.
+  /// 죽은 코치마크의 "왜 필요한지" 카피도 여기로 이식했다 (UXC-3).
+  final String? glossHint;
+
   const _Quest({
     required this.id,
     required this.group,
@@ -419,6 +496,7 @@ class _Quest {
     required this.onTap,
     this.isLocked = false,
     this.thresholdHint,
+    this.glossHint,
   });
 }
 
@@ -656,6 +734,23 @@ class _QuestItem extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                  ],
+                  // UXC-7 용어 풀이 — 행당 1줄. lock/완료 상태에서는 lock hint
+                  // 또는 취소선이 우선이라 표시하지 않는다.
+                  if (quest.glossHint != null &&
+                      !quest.isCompleted &&
+                      !quest.isLocked) ...[
+                    const SizedBox(height: 2),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(
+                        quest.glossHint!,
+                        style: NotebookTypography.roman.copyWith(
+                          fontSize: 11,
+                          color: AppColors.inkTertiary,
+                        ),
+                      ),
                     ),
                   ],
                   // §9 임계값 hint — 조건이 boolean 이 아닌 quest 만 (Q3/Q4/Q10).

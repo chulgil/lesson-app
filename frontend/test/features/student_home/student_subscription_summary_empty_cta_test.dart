@@ -9,7 +9,7 @@ import 'package:lessonaza/features/student_home/presentation/widgets/student_sub
 
 void main() {
   testWidgets(
-    '#621 empty subscription CTA routes student to selectTeacher, not teacher lessonRequests',
+    'UXC-10 empty subscription CTA routes student to teacherSearch, not teacher lessonRequests',
     (tester) async {
       const studentId = 'student_1';
       String? landed;
@@ -23,10 +23,10 @@ void main() {
             ),
           ),
           GoRoute(
-            path: AppRoutes.selectTeacher,
+            path: AppRoutes.teacherSearch,
             builder: (context, state) {
-              landed = 'selectTeacher';
-              return const Scaffold(body: Text('select teacher'));
+              landed = 'teacherSearch';
+              return const Scaffold(body: Text('teacher search'));
             },
           ),
           GoRoute(
@@ -61,8 +61,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(landed, 'selectTeacher');
-      expect(find.text('select teacher'), findsOneWidget);
+      expect(landed, 'teacherSearch');
+      expect(find.text('teacher search'), findsOneWidget);
     },
   );
 }

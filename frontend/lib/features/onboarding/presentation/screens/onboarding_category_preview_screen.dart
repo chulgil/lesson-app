@@ -4,8 +4,8 @@
 // 흐름:
 //   Step 1 ProfileSetup → Step 2 FirstAvailability → Step 2.5 (이 화면) → Step 3 Dashboard
 //
-// 영속: `onboardingCategoryShownProvider` Hive flag — [시작하기]/[건너뛰기]
-// 어느 쪽이든 markShown() 호출 + 메인 진입.
+// 영속: `onboardingCategoryShownProvider` Hive flag — [시작하기] 가 markShown()
+// 호출 + 메인 진입.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -85,6 +85,16 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space5),
               _CategoryGrid(items: _categories),
               const SizedBox(height: AppSpacing.space4),
+              // '수강권' first appears on the tile above and is the one term a
+              // new teacher cannot infer from the word itself.
+              Text(
+                AppStrings.onboardingCategorySubscriptionGloss,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.space3),
               Text(
                 subtitle ?? AppStrings.onboardingCategoryPreviewSubtitle,
                 style: AppTypography.bodyMedium.copyWith(
@@ -93,26 +103,14 @@ class OnboardingCategoryPreviewScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.space5),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _proceed(context, ref),
-                      child: const Text(
-                        AppStrings.onboardingCategoryPreviewSkip,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space3),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () => _proceed(context, ref),
-                      child: const Text(
-                        AppStrings.onboardingCategoryPreviewStart,
-                      ),
-                    ),
-                  ),
-                ],
+              // Single CTA — [건너뛰기] and [시작하기] both ran _proceed, so the
+              // choice was cosmetic (ux-rules: same action = one CTA).
+              FilledButton(
+                onPressed: () => _proceed(context, ref),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
+                ),
+                child: const Text(AppStrings.onboardingCategoryPreviewStart),
               ),
             ],
           ),

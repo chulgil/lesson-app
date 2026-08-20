@@ -1,6 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../auth/auth_facade.dart';
+
 part 'quest_first_shown_provider.g.dart';
 
 const _kBoxName = 'quest_state';
@@ -50,5 +52,40 @@ class QuestFirstShown extends _$QuestFirstShown {
     if (value == null) return false;
     return (now ?? DateTime.now()).difference(value) <=
         kQuestFirstArrivalWindow;
+  }
+}
+
+/// NextMissionSpotlight 소거 여부를 영속화하는 provider (UXC-2).
+///
+/// [QuestFirstShown] 의 타임스탬프와 분리된 별개의 플래그다. 첫 도착 기록은
+/// home 진입 즉시(post-frame) 남고 QuestBoardCard 의 5분 윈도우가 그 값을
+/// 쓰기 때문에, spotlight 노출 조건까지 같은 값에 묶어 두면 기록되는 순간
+/// spotlight 가 사라진다 (플래시 또는 미노출). 이 플래그는 사용자가
+/// [시작]/[나중에] 를 실제로 탭했을 때만 true 가 된다.
+@riverpod
+class NextMissionSpotlightDismissed extends _$NextMissionSpotlightDismissed {
+  Box<dynamic>? _box;
+
+  Future<Box<dynamic>> _openBox() async {
+    return _box ??= await Hive.openBox(_kBoxName);
+  }
+
+  /// 사용자별 키 — 같은 기기에서 계정을 바꾸면 spotlight 가 다시 노출된다.
+  String _key(String userId) => 'teacher:$userId:nextMissionSpotlightDismissed';
+
+  @override
+  Future<bool> build() async {
+    final userId = ref.watch(currentUserIdProvider);
+    final box = await _openBox();
+    return box.get(_key(userId), defaultValue: false) as bool? ?? false;
+  }
+
+  /// spotlight 소거 — [시작]/[나중에] 탭 시 1회 호출.
+  Future<void> markDismissed() async {
+    final userId = ref.read(currentUserIdProvider);
+    final box = await _openBox();
+    await box.put(_key(userId), true);
+    ref.invalidateSelf();
+    await future;
   }
 }

@@ -96,6 +96,25 @@ void main() {
     );
   });
 
+  testWidgets('#1287 UXC-4b 가용시간 화면 본문에 왜 필요한지가 보인다', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const FirstAvailabilitySetupScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // '가용시간' 은 도메인 용어다. WHY 가 죽은 코치마크 카피에만 있으면 안 된다.
+    expect(
+      find.text(AppStrings.firstAvailabilityInterstitialDescription),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('#1104 첫 가용시간 화면은 스텝 헤더에서 4/4 단계를 활성화한다', (tester) async {
     await tester.pumpWidget(
       ProviderScope(

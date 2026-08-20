@@ -17,7 +17,9 @@ import '../../../gamification/gamification_ui_facade.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../practice_journal/practice_journal.dart';
+import '../../../profile/profile_facade.dart';
 import '../../../students/students_facade.dart';
+import '../providers/student_home_booking_provider.dart';
 import '../widgets/dashboard/next_lesson_card.dart';
 import '../widgets/learning_record_group.dart';
 import '../widgets/student_getting_started_card.dart';
@@ -42,6 +44,21 @@ class StudentDashboardTab extends ConsumerWidget {
           data: (student) {
             final currentStudentId = student.id;
 
+            // UXC-9 — 선생님 연결도 레슨도 아직 없는 신규 학생에게는 시작
+            // 체크리스트를 최상단으로 올리고, 채울 데이터가 없어 빈 껍데기로만
+            // 뜨는 게이미피케이션 섹션(목표·미션·배지)을 감춘다.
+            //
+            // 판정은 "비어 있음을 확인했을 때"만 성립시킨다. 로딩/에러로 아직
+            // 모르는 동안 신규로 단정하면 기존 학생 화면에서 섹션이 사라졌다
+            // 다시 나타나며 순서가 흔들린다.
+            final connections = ref.watch(myConnectionsProvider).valueOrNull;
+            final hasAnyBooking = ref
+                .watch(studentHomeHasAnyBookingProvider(currentStudentId))
+                .valueOrNull;
+            final isNewStudent =
+                (connections != null && connections.isEmpty) &&
+                hasAnyBooking == false;
+
             // O7: StudentQuest 0개 시 자동 onboarding (Job 6 Task 6.2).
             //
             // 2026-06-12 회귀 수정 — trigger 는 반드시 스크롤 **밖** (tab 전체 wrap).
@@ -51,7 +68,12 @@ class StudentDashboardTab extends ConsumerWidget {
             // TeacherMigrationOverlayGate 와 동일한 게이트 패턴.
             return StudentGamificationOnboardingTrigger(
               studentId: currentStudentId,
-              child: _buildDashboardBody(context, now, currentStudentId),
+              child: _buildDashboardBody(
+                context,
+                now,
+                currentStudentId,
+                isNewStudent: isNewStudent,
+              ),
             );
           },
         );
@@ -60,8 +82,9 @@ class StudentDashboardTab extends ConsumerWidget {
   Widget _buildDashboardBody(
     BuildContext context,
     DateTime now,
-    String currentStudentId,
-  ) {
+    String currentStudentId, {
+    required bool isNewStudent,
+  }) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenPadding,
@@ -82,6 +105,14 @@ class StudentDashboardTab extends ConsumerWidget {
 
           // ── 0순위: 시간대 인식 배너 (student_home_master.md §2.2) ──
           _StudentTimeBanner(studentId: currentStudentId),
+
+          // ── UXC-9: 신규 학생 최우선 — 시작 체크리스트 ──
+          // 연결 전에는 아래 14번째 자리가 아니라 배너 바로 밑에서 첫 행동을
+          // 안내한다. 연결된 학생에게는 기존 자리(학습 기록 위)로 되돌아간다.
+          if (isNewStudent) ...[
+            const SizedBox(height: AppSpacing.space4),
+            StudentGettingStartedCard(studentId: currentStudentId),
+          ],
 
           // ── G21/#402: 노트 일시 접근 동의 활성 배너 (조건부) ──
           const NoteAccessActiveBanner(),
@@ -113,14 +144,18 @@ class StudentDashboardTab extends ConsumerWidget {
           // ── Student gamification P2: 오늘의 연습 목표 + 잔디 연동 (doc 46 §4) ──
           // #1269: PracticeGoal(원격) 기준 요약 — practice 탭 GoalProgressWidget 과
           // 동일 목표 데이터를 공유한다.
-          GoalProgressSummaryCard(studentId: currentStudentId),
+          // UXC-9: 둘 다 데이터가 없어도 카드를 그리므로(목표=빈 상태 카드,
+          // 미션=자체 숨김 없음) 신규 학생 화면에서는 감춘다.
+          if (!isNewStudent) ...[
+            GoalProgressSummaryCard(studentId: currentStudentId),
 
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space4),
 
-          // ── Student gamification P3a: 오늘의 미션(고정1+로테이션2, doc 46 §4④) ──
-          DailyMissionsCard(studentId: currentStudentId),
+            // ── Student gamification P3a: 오늘의 미션(고정1+로테이션2, doc 46 §4④) ──
+            DailyMissionsCard(studentId: currentStudentId),
 
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space4),
+          ],
 
           // ── Student gamification P1: [연습 시작] 단일 진입점 (스펙 §4.1) ──
           PracticeStartSection(studentId: currentStudentId),
@@ -146,14 +181,17 @@ class StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Gamification header (선생님 quest / badge — P1 무변)
-          GamificationHeader(
-            studentId: currentStudentId,
-            onTap: () => context.push(
-              '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
+          // UXC-9: 활동 전에는 Lv.1 · 0P 껍데기라 신규 학생에게는 감춘다.
+          if (!isNewStudent) ...[
+            GamificationHeader(
+              studentId: currentStudentId,
+              onTap: () => context.push(
+                '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
+              ),
             ),
-          ),
 
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space4),
+          ],
 
           // ── 이번 주 과제 (미완료 항목 최대 3개 미리보기) ──
           WeeklyAssignmentsSection(studentId: currentStudentId),
@@ -161,9 +199,12 @@ class StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Getting started guide (조건부 자동 숨김)
-          StudentGettingStartedCard(studentId: currentStudentId),
+          // UXC-9: 신규 학생일 때는 위로 승격되므로 여기서는 그리지 않는다.
+          if (!isNewStudent) ...[
+            StudentGettingStartedCard(studentId: currentStudentId),
 
-          const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space4),
+          ],
 
           // ── 4순위: 학습 기록 그룹 (피드백 + 연습요약 + 체험) ──
           LearningRecordGroup(studentId: currentStudentId),

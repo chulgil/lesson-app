@@ -24,7 +24,7 @@ class NextLessonCard extends ConsumerWidget {
 
     return bookingAsync.when(
       loading: () => _buildLoadingState(),
-      error: (_, __) => _buildEmptyState(context),
+      error: (_, __) => _buildErrorState(),
       data: (booking) {
         if (booking == null) {
           return _buildEmptyState(context);
@@ -52,38 +52,62 @@ class NextLessonCard extends ConsumerWidget {
     );
   }
 
+  /// Empty state is a live entry point, not a dead label: the copy tells the
+  /// student to find a teacher, so tapping it must actually go there
+  /// (UXC-10 canonical route).
   Widget _buildEmptyState(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.teacherSearch),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          border: Border.all(color: AppColors.inkQuaternary),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.event_available, color: AppColors.inkTertiary, size: 32),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.noUpcomingLessons,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.inkSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    AppStrings.studentHomeBookLessonSuggestion,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.ink, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// A failed load is not "no lessons" (C7). Matches the sibling dashboard
+  /// card's error presentation (StudentSubscriptionSummary._buildErrorState).
+  Widget _buildErrorState() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.paper,
         border: Border.all(color: AppColors.inkQuaternary),
       ),
-      child: Row(
-        children: [
-          Icon(Icons.event_available, color: AppColors.inkTertiary, size: 32),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.noUpcomingLessons,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.inkSecondary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppStrings.studentHomeBookLessonSuggestion,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.inkTertiary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: Text(
+        AppStrings.dashboardLessonsLoadError,
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }

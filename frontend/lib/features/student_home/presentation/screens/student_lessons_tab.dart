@@ -169,7 +169,7 @@ class StudentLessonsTab extends ConsumerWidget {
             eyebrow: 'LESSON',
             meta: volNoLabel(now),
             trailing: IconButton(
-              onPressed: () => context.push(AppRoutes.selectTeacher),
+              onPressed: () => context.push(AppRoutes.teacherSearch),
               icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
               tooltip: AppStrings.studentHomeBookAction,
               padding: EdgeInsets.zero,

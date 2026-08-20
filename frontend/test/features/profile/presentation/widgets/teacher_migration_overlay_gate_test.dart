@@ -132,12 +132,11 @@ void main() {
     // category_new_badge_provider_test (markAllIntroduced 케이스) + onboarding W4 의
     // onboarding_category_shown_provider 가 검증한다. Gate test 는 wiring contract 만.
 
-    testWidgets('overlay [시작하기] / [건너뛰기] 두 버튼 모두 onProceed 콜백을 가진다', (
-      tester,
-    ) async {
+    testWidgets('overlay 단일 CTA [시작하기] 가 onProceed 콜백을 가진다', (tester) async {
       // tap chain 자체는 OnboardingCategoryPreviewScreen 의 W4 회귀 테스트가 담당.
-      // 여기서는 두 버튼이 정확히 onProceed 를 호출하도록 wiring 되어 있는지만
+      // 여기서는 CTA 가 정확히 onProceed 를 호출하도록 wiring 되어 있는지만
       // contract 차원에서 보장한다 (gate 가 콜백 주입했음을 확인).
+      // #1287 UXC-5 — [건너뛰기] 는 [시작하기] 와 동작이 같아 제거됐다.
       await setupTallViewport(tester);
       await tester.pumpWidget(
         buildHarness(
@@ -151,10 +150,7 @@ void main() {
         find.text(AppStrings.onboardingCategoryPreviewStart),
         findsOneWidget,
       );
-      expect(
-        find.text(AppStrings.onboardingCategoryPreviewSkip),
-        findsOneWidget,
-      );
+      expect(find.text(AppStrings.onboardingCategoryPreviewSkip), findsNothing);
 
       final overlay = tester.widget<OnboardingCategoryPreviewScreen>(
         find.byType(OnboardingCategoryPreviewScreen),

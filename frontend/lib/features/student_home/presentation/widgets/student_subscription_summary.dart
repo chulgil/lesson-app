@@ -117,7 +117,8 @@ class StudentSubscriptionSummary extends ConsumerWidget {
           actionLabel: AppStrings.subscriptionEmptyRequestLessonCta,
           // #621 — 학생 빈 수강권 "레슨 신청" 은 교사 전용 lessonRequests 가
           // 아니라 학생 진입점인 선생님 선택(레슨 신청 funnel)으로 라우팅한다.
-          onAction: () => context.push(AppRoutes.selectTeacher),
+          // UXC-10 — 미연결 학생의 '선생님 찾기' 는 teacherSearch 로 단일화.
+          onAction: () => context.push(AppRoutes.teacherSearch),
         ),
       ),
     );

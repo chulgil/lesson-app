@@ -167,6 +167,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // What the app does. The slogan above is decorative, so without this
+        // line a first-time visitor reaches the login buttons without ever
+        // being told what they are signing in to.
+        Text(
+          AppStrings.authValueProposition,
+          style: NotebookTypography.handMedium.copyWith(
+            color: AppColors.inkSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: AppSpacing.space5),
 
         // Handwritten sub-note
@@ -184,12 +196,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       children: [
         Row(
           children: [
-            Expanded(
-              child: Container(
-                height: 1,
-                color: AppColors.inkBorder,
-              ),
-            ),
+            Expanded(child: Container(height: 1, color: AppColors.inkBorder)),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space3,
@@ -199,12 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 style: NotebookTypography.sectionLabel,
               ),
             ),
-            Expanded(
-              child: Container(
-                height: 1,
-                color: AppColors.inkBorder,
-              ),
-            ),
+            Expanded(child: Container(height: 1, color: AppColors.inkBorder)),
           ],
         ),
         const SizedBox(height: AppSpacing.space4),

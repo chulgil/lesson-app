@@ -73,6 +73,16 @@ class _FirstAvailabilitySetupScreenState
                 steps: OnboardingStepHeader.teacherSteps,
                 currentStep: 4,
               ),
+              const SizedBox(height: AppSpacing.space4),
+              // Why this screen exists. "가용시간" is our word, not the
+              // teacher's — the same sentence the interstitial uses to send
+              // people here, so arriving from either entry reads the same.
+              Text(
+                AppStrings.firstAvailabilityInterstitialDescription,
+                style: NotebookTypography.handMedium.copyWith(
+                  color: AppColors.inkSecondary,
+                ),
+              ),
               const SizedBox(height: AppSpacing.space6),
               _buildDaysSection(),
               const SizedBox(height: AppSpacing.space6),
@@ -338,7 +348,7 @@ class _FirstAvailabilitySetupScreenState
       await showFirstAvailabilityCelebrationSheet(context);
       if (!mounted) return;
       // W4 Task 4.3 — Step 2.5 카테고리 미리보기 (spec §9.1).
-      // 미리보기 [시작하기]/[건너뛰기] 양쪽 모두 markShown → /home.
+      // 미리보기 [시작하기] 가 markShown → /home.
       context.go(AppRoutes.onboardingCategoryPreview);
     } catch (_) {
       if (!mounted) return;

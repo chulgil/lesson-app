@@ -31,7 +31,9 @@ void main() {
       expect(find.text(AppStrings.studentSignupBlockedHelper), findsOneWidget);
     });
 
-    testWidgets('renders both CTAs (parent + invite code)', (tester) async {
+    testWidgets('renders all three CTAs (parent + invite code + no code)', (
+      tester,
+    ) async {
       await pumpScreen(tester);
       await tester.pumpAndSettle();
 
@@ -49,6 +51,28 @@ void main() {
         ),
         findsOneWidget,
       );
+      // UXC-13 — 코드 없는 학생이 초대코드 화면을 거치지 않고 바로 체험을
+      // 시작할 수 있어야 한다. 초대코드 화면의 건너뛰기와 같은 문구를 쓴다.
+      expect(
+        find.widgetWithText(TextButton, AppStrings.inviteCodeSkipButton),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('no-code CTA opens the age gate before starting', (
+      tester,
+    ) async {
+      await pumpScreen(tester);
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.widgetWithText(TextButton, AppStrings.inviteCodeSkipButton),
+      );
+      await tester.pumpAndSettle();
+
+      // 만 14세 게이트는 초대코드 화면의 건너뛰기와 동일하게 유지된다.
+      expect(find.text(AppStrings.authAgeGateTitle), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders inside a narrow viewport without overflow', (
