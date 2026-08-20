@@ -522,11 +522,7 @@ class StudentProfileTab extends ConsumerWidget {
           onPressed: () {
             SharePlus.instance.share(
               ShareParams(
-                text:
-                    '[레슨앱] 학부모 초대\n\n'
-                    '학생의 학부모님을 초대합니다.\n\n'
-                    '초대 코드: $inviteCode\n${AppStrings.inviteParentShareValidity}\n\n'
-                    '앱을 설치하고 위 코드를 입력해주세요.',
+                text: AppStrings.inviteParentShareMessageFormat(inviteCode),
               ),
             );
           },

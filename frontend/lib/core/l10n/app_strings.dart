@@ -6726,6 +6726,9 @@ class AppStrings {
   ///
   /// 선생님 케이스에서 [senderName] 과 [instruments] 가 비어있지 않으면
   /// "악기 선생님 OOO" 형태의 헤더를 추가해 카톡 미리보기에서 신뢰도를 높인다.
+  ///
+  /// UXB-3 (#1289): 받은 사람이 이 메시지 하나만 읽고 가입까지 끝낼 수 있도록
+  /// 앱 한 줄 소개 + 시작 3단계(설치 -> 코드 입력 -> 연결)를 함께 싣는다.
   static String inviteShareMessageFormat(
     String code,
     String url,
@@ -6742,8 +6745,13 @@ class AppStrings {
             : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';
     return '$header\n\n'
-        '초대 코드: $code\n'
-        '또는 링크: $url\n\n'
+        '$inviteStartGuideValueLine\n\n'
+        '$inviteStartGuideStepsTitle\n'
+        '1. 아래 링크를 눌러 앱을 설치하세요.\n'
+        '   $url\n'
+        '2. 앱에서 초대 코드를 입력하세요.\n'
+        '   초대 코드: $code\n'
+        '3. $role과 연결되면 바로 시작할 수 있어요.\n\n'
         '$inviteStudentShareValidity\n\n'
         '$signature';
   }
@@ -11388,4 +11396,115 @@ class AppStrings {
   /// 죽은 코치마크(`coachMarkTimeDescription`) 에만 있던 "왜 필요한지" 를
   /// 사용자가 실제로 읽는 위치로 옮긴 문장이다 (UXC-3).
   static const questGlossAvailability = '가용시간은 학생이 레슨을 신청할 수 있는 나의 열린 시간이에요';
+
+  // UX backlog UXB-1 (#1289)
+
+  /// 예시 학생 이름 — 이름 자체가 라벨이다. 목록·카드·피커 어디에 나타나도
+  /// 실제 학생으로 오인되지 않아야 하므로 이름에 성격을 박아 둔다.
+  static const starterSampleStudentName = '예시 학생 (지워도 돼요)';
+
+  /// 예시 학생 메모 — 상세 화면에서 성격을 한 번 더 확인시킨다.
+  static const starterSampleStudentNotes =
+      '앱을 둘러보려고 만든 예시 데이터예요. 언제든 지워도 괜찮아요.';
+
+  /// 예시 지난 레슨의 레슨 노트 본문.
+  static const starterSampleLessonFeedback =
+      '레슨을 마치면 이렇게 노트를 남겨요. 학생은 이 노트를 앱에서 그대로 읽어요.';
+
+  static const starterSampleLessonKeyPointFirst = '활 쓰는 속도를 일정하게';
+
+  static const starterSampleLessonKeyPointSecond = '3번째 마디 음정 확인';
+
+  /// 예시 레슨 노트의 연습 과제.
+  static const starterSampleLessonPracticeTips = '느린 템포로 다섯 번 반복한 뒤 원래 속도로 한 번';
+
+  /// 예시 연습 기록 메모.
+  static const starterSamplePracticeNotes = '학생이 남긴 연습 기록은 이렇게 보여요.';
+
+  /// 빈 명단 아래 보조 제안 설명 1줄.
+  static const starterSampleOfferHint = '아직 학생이 없다면 예시로 화면을 채워볼 수 있어요';
+
+  /// 빈 명단 아래 보조 제안 버튼.
+  static const starterSampleOfferLabel = '예시 데이터로 둘러보기';
+
+  /// 생성 진행 중 버튼 라벨.
+  static const starterSampleCreating = '예시 데이터를 만드는 중';
+
+  static const starterSampleCreated = '예시 학생과 지난 레슨, 연습 기록을 만들었어요';
+
+  static const starterSampleCreateFailed = '예시 데이터를 만들지 못했어요. 잠시 후 다시 시도해 주세요';
+
+  /// 생성 실패 + 되돌리기까지 실패 — 남은 예시 학생을 직접 지우도록 안내한다.
+  static const starterSampleCreateFailedResidue =
+      '예시 데이터를 만들다 실패했어요. 명단에 남은 예시 학생이 있으면 직접 지워주세요';
+
+  /// 정리 배너 본문 — 실제 학생이 생긴 뒤에만 노출된다.
+  static const starterSampleCleanupTitle = '둘러보기용 예시 데이터가 남아 있어요';
+
+  static const starterSampleCleanupLabel = '예시 데이터 정리';
+
+  static const starterSampleCleanupConfirmTitle = '예시 데이터를 지울까요?';
+
+  static const starterSampleCleanupConfirmMessage =
+      '예시 학생과 함께 만든 지난 레슨, 연습 기록이 모두 삭제돼요. 직접 등록한 학생은 그대로 남아요.';
+
+  static const starterSampleCleanupDone = '예시 데이터를 정리했어요';
+
+  static const starterSampleCleanupFailed =
+      '예시 데이터를 정리하지 못했어요. 잠시 후 다시 시도해 주세요';
+
+  // UX backlog UXB-3 (#1289)
+
+  /// 초대 공유 메시지 도입부 — 앱을 한 번도 본 적 없는 사람이 읽는 첫 문장.
+  /// 가치 문구 자체는 [authValueProposition] 단일 상수를 재사용한다 (C4).
+  static const inviteStartGuideValueLine = '레슨앱에서 $authValueProposition.';
+
+  /// 시작하는 방법 — 공유 메시지 안 시작 3단계 목록의 제목.
+  static const inviteStartGuideStepsTitle = '시작하는 방법';
+
+  /// [레슨앱] 학부모 초대 — 학부모 공유 메시지 첫 줄.
+  static const inviteParentShareHeader = '[레슨앱] 학부모 초대';
+
+  /// 학부모가 앱에서 무엇을 볼 수 있는지 1줄 — 공통 가치 문구 뒤에 붙는다.
+  static const inviteParentStartGuideValueLine =
+      '학부모님은 자녀의 레슨 일정과 연습 기록을 확인할 수 있어요.';
+
+  /// 학부모 초대 시작 안내 공유 메시지 — 받은 학부모가 이 메시지만 읽고
+  /// 가입까지 끝낼 수 있도록 앱 소개 + 시작 3단계 + 코드를 함께 싣는다.
+  ///
+  /// 학부모 초대는 딥링크 없이 6자 코드만 발급되므로(전화 기반 ParentInvitation)
+  /// 1단계에 링크 대신 설치 안내를 둔다. [studentName] 이 있으면 누구의 학부모를
+  /// 초대하는지 밝히고(선생님 발신), 없으면 학생 본인이 보내는 경우다.
+  static String inviteParentShareMessageFormat(
+    String code, {
+    String? studentName,
+  }) {
+    final intro = studentName != null && studentName.isNotEmpty
+        ? '$studentName 학생의 학부모님을 초대합니다.'
+        : '학생의 학부모님을 초대합니다.';
+    return '$inviteParentShareHeader\n\n'
+        '$intro\n\n'
+        '$inviteStartGuideValueLine\n'
+        '$inviteParentStartGuideValueLine\n\n'
+        '$inviteStartGuideStepsTitle\n'
+        '1. 레슨앱을 설치하고 실행하세요.\n'
+        '2. 앱에서 초대 코드를 입력하세요.\n'
+        '   초대 코드: $code\n'
+        '3. 자녀 계정과 연결되면 바로 확인할 수 있어요.\n\n'
+        '$inviteParentShareValidity';
+  }
+
+  // UX backlog UXB-2 (#1289) — 초대 딥링크 role-skip
+  //
+  // 6자리 초대 코드는 항상 학생 연결이므로 역할 선택을 건너뛴다. 그 사실을
+  // 화면에서 한 줄로 밝히고, 실제로 선생님/학부모인 사용자를 위한 탈출구를 둔다.
+
+  /// 코드를 들고 학생 초대코드 화면으로 직행했을 때 상단 배너.
+  static const inviteDeepLinkStudentBanner = '초대를 받으셨네요 — 학생으로 시작합니다';
+
+  /// 배너 옆 보조 링크 — 역할 선택 화면으로 돌아간다.
+  static const inviteDeepLinkRoleSwitch = '선생님·학부모로 시작하기';
+
+  /// 역할 확정(setRole) 실패 시 안내. 코드는 그대로 두고 재시도할 수 있다.
+  static const inviteDeepLinkRoleSetFailed = '역할을 설정하지 못했습니다. 잠시 후 다시 시도해 주세요.';
 }

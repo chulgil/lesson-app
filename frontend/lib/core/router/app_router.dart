@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../auth/auth_state.dart';
+import '../deep_link/pending_invite_code_provider.dart';
 import '../widgets/notebook/notebook_surfaces.dart';
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/extensions/user_role_visuals.dart';
@@ -66,10 +67,17 @@ enum OnboardingPhase { profileA, firstAvailability, complete }
 /// completed onboarding lands on the correct step instead of always bouncing
 /// to `roleSelect`. The phase is computed once per redirect from Riverpod at
 /// the [GoRouter.redirect] closure; tests can pass it explicitly.
+///
+/// [pendingInviteCode] (UXB-2 #1289) is the code carried by an invite deep
+/// link that has not been consumed yet. It only affects the [AuthNeedsRole]
+/// gate: a 6-digit code always means a student connection, so the role
+/// question (and the student signup-blocked screen behind it) is skipped.
+/// Null — the no-deep-link default — leaves every branch unchanged.
 String? resolveAuthRedirect(
   AuthState authState,
   String currentPath, {
   OnboardingPhase teacherPhase = OnboardingPhase.complete,
+  String? pendingInviteCode,
 }) {
   final isPublic =
       _publicPaths.contains(currentPath) ||
@@ -92,6 +100,17 @@ String? resolveAuthRedirect(
     // a target-role invite, ScanInviteScreen calls setRole() itself and the
     // AuthNeedsOnboarding gate below takes over routing.
     if (currentPath == AppRoutes.inviteScan) return null;
+
+    // UXB-2 #1289 — 초대 딥링크를 들고 온 역할 미확정 사용자는 코드가 곧
+    // "학생으로 연결" 을 뜻하므로 roleSelect·studentSignupBlocked 두 화면을
+    // 건너뛰고 학생 초대코드 화면으로 직행한다. 역할이 실제로 다른 사용자는
+    // 그 화면의 보조 링크로 roleSelect 에 갈 수 있다 (거기서 코드를 비운다).
+    if (pendingInviteCode != null) {
+      return currentPath == AppRoutes.studentInviteCode
+          ? null
+          : AppRoutes.studentInviteCode;
+    }
+
     return AppRoutes.roleSelect;
   }
 
@@ -220,11 +239,13 @@ class AppRouter {
       initialLocation: AppRoutes.splash,
       debugLogDiagnostics: true,
       refreshListenable: refreshListenable,
-      redirect: (context, state) => resolveAuthRedirect(
-        ref.read(authNotifierProvider),
-        state.matchedLocation,
-        teacherPhase: resolveTeacherOnboardingPhase(ref),
-      ),
+      redirect:
+          (context, state) => resolveAuthRedirect(
+            ref.read(authNotifierProvider),
+            state.matchedLocation,
+            teacherPhase: resolveTeacherOnboardingPhase(ref),
+            pendingInviteCode: ref.read(pendingInviteCodeProvider),
+          ),
       routes: [
         // Combine all domain-specific routes
         ...authRoutes,
@@ -243,9 +264,10 @@ class AppRouter {
         ...subscriptionRoutes,
         ...academyRoutes,
       ],
-      errorBuilder: (context, state) => NotebookScreenScaffold(
-        body: Center(child: Text('Page not found: ${state.uri}')),
-      ),
+      errorBuilder:
+          (context, state) => NotebookScreenScaffold(
+            body: Center(child: Text('Page not found: ${state.uri}')),
+          ),
     );
   }
 }

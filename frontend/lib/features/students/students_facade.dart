@@ -17,9 +17,14 @@ export 'presentation/providers/student_crud_provider.dart'
         StudentsNotifier,
         currentStudentIdProvider,
         currentStudentProvider,
+        filteredStudentsProvider,
         studentProvider,
         studentsNotifierProvider,
         studentsProvider;
+// UXB-1 — the starter sample writes students through the repository contract,
+// so it has to reproduce the invalidation StudentsNotifier normally performs.
+export 'presentation/providers/student_repository_provider.dart'
+    show studentRepositoryProvider;
 export 'presentation/providers/student_image_provider.dart'
     show
         studentBackgroundImageNotifierProvider,

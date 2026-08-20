@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import 'core/auth/auth_state.dart';
 import 'core/deep_link/deep_link_handler.dart';
+import 'core/deep_link/pending_invite_code_provider.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/l10n/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
@@ -169,7 +170,17 @@ class _LessonazaAppState extends ConsumerState<LessonazaApp>
     // R2 #318 — lessonapp:// 딥링크 → GoRouter 연결 (1회만 시작).
     // Uses the single router instance so navigation targets the live router.
     if (_deepLinkHandler == null) {
-      _deepLinkHandler = DeepLinkHandler(navigate: routerConfig.go);
+      _deepLinkHandler = DeepLinkHandler(
+        navigate: (path) {
+          // UXB-2 #1289 — 초대 코드를 먼저 기록해야 go() 직후의 redirect 가
+          // 역할 미확정 사용자를 학생 초대코드 화면으로 보낼 수 있다.
+          final code = pendingInviteCodeFromPath(path);
+          if (code != null) {
+            ref.read(pendingInviteCodeProvider.notifier).state = code;
+          }
+          routerConfig.go(path);
+        },
+      );
       unawaited(_deepLinkHandler!.start());
     }
 
