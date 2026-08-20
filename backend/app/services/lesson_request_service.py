@@ -96,6 +96,21 @@ class LessonRequestService:
             preferred_day = preferred_day if preferred_day is not None else primary_slot.get("day_of_week")
             preferred_time = preferred_time or primary_slot.get("start_time")
 
+        # J15b — 같은 학생 x 같은 반의 활성(비종결) 신청 중복 차단.
+        if data.group_class_id:
+            duplicate = await self.db.scalar(
+                select(LessonRequest.id).where(
+                    LessonRequest.student_id == current_user.id,
+                    LessonRequest.group_class_id == data.group_class_id,
+                    LessonRequest.status.notin_(TERMINAL_STATUSES),
+                )
+            )
+            if duplicate is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="이미 이 반에 대기 중인 신청이 있습니다.",
+                )
+
         # Auto-match price from teacher's price table
         suggested_price = await self._match_price(data.teacher_id, data.instrument, data.experience_level)
 
@@ -112,6 +127,7 @@ class LessonRequestService:
             preferred_time=preferred_time,
             preferred_duration=data.preferred_duration,
             preferred_slots=preferred_slots,
+            group_class_id=data.group_class_id,
             # spec §18 — 학생 신청 시 희망 장소 (수강권 발급 디폴트 전달용).
             preferred_location_type=data.preferred_location_type,
             is_returning_student=data.is_returning_student,

@@ -27,7 +27,8 @@
 - [ ] **P2-1 마감 집행**: `booking/cancel_deadline_minutes` BE 검증 (마감 후 예약/취소 → 4xx + 정책 메시지), FE 표시 유지
 - [ ] **P2-2 알림 6종 BE emit**: 예약확정 · 리마인더(전일·당일) · 드롭인 오픈 · 노쇼 경고 · 반 공지 발행 (대기승급·자동취소는 기존). FE 로컬 오발화 금지(#1191). pytest 로 5전이 emit 검증(#1207 패턴)
 - [ ] **P2-3 노쇼 정합**: FE `NoShowPolicy` 2값 → BE SSOT 4값(deductCredit/halfCredit/noDeduction/reschedule) 통일
-- [ ] **P2-4 코호트 멤버 관리**: 교사 직접 배정 + 학생 신청→챗형 승인(기존 lesson_request 재사용 — D4). 정원 초과 시 배정 차단
+- [ ] **P2-4 코호트 멤버 관리**: 교사 직접 배정(J4 API + J15a 로스터 UI) + 학생 신청→챗형 승인(기존 lesson_request 재사용 — D4). 정원 초과 시 배정 차단
+  - **챗형 승인 배선 (2026-08-20 설계 확정 — 안 A)**: `lesson_requests` 에 nullable `group_class_id` 컬럼만 추가(신규 RequestEventType·request_type 값 금지 — FE `$enumDecode` 크래시 계약). 학생이 교사 상세 개설 클래스 섹션에서 반 지정 신청 → 기존 챗 승인 → 교사가 그룹 템플릿 제안(승인 UI 는 request.group_class_id 매칭 템플릿 우선 노출 — 1:1 템플릿 오제안 무음누락 방지) → `confirm_proposal` 이 수강권 발급 직후 `sub.group_class_id` 존재 시 멤버 배정 훅 실행. **정원 검증은 승인(confirm) 시점 집행**(신청 다수→확정 소수) — 초과 시 400 으로 confirm 차단, 이미 멤버면 멱등 스킵. 같은 학생×같은 반 활성 신청 중복 409
 - [ ] **P2-5 반 공지**: `TeacherAnnouncement` 에 대상 스코프(전체/특정 클래스) 확장 — ClassNote 신설 금지(D5). 개인 피드백은 기존 1:1 노트 경로
 - [ ] **P2-6 예약 확인 다이얼로그**: 드롭인 즉시예약 전 확인(차감될 수강권 + 마감·노쇼 정책 명시), 정책 박스를 액션 버튼 위로(D4 조건)
 

@@ -279,6 +279,10 @@ class LessonRequest(UUIDMixin, Base):
     preferred_time: Mapped[str | None] = mapped_column(String(5), nullable=True)  # HH:MM
     preferred_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)  # minutes
     preferred_slots: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # J15b (spec P2-4) — cohort enrollment request pins the target class. Plain
+    # nullable column: new RequestEventType/request_type values are forbidden
+    # (deployed FE $enumDecode crash contract), a column decodes safely.
+    group_class_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     # spec unified_lesson_request_spec.md §18 (2026-05-07) — 학생 신청 시 희망 장소 전달.
     # studentHome / academyRoom / teacherStudio / externalPlace / online — 자유 string 으로 저장.
     preferred_location_type: Mapped[str | None] = mapped_column(String(30), nullable=True)

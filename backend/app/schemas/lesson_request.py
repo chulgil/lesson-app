@@ -17,6 +17,11 @@ class LessonRequestCreate(BaseModel):
         default=None,
         validation_alias=AliasChoices("request_type", "type"),
     )
+    # J15b — 코호트(반) 지정 신청. 반 등록은 챗형 승인으로 이어진다.
+    group_class_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("group_class_id", "groupClassId"),
+    )
     instrument: str | None = Field(default=None, max_length=50)
     goal: Literal["hobby", "exam", "major", "other"] | None = None
     experience_level: Literal["beginner", "intermediate", "advanced"] | None = Field(
@@ -87,6 +92,7 @@ class LessonRequestResponse(BaseModel):
     # Unified fields
     request_type: str | None = None
     type: str | None = None
+    group_class_id: str | None = None
     instrument: str | None = None
     goal: str | None = None
     experience_level: str | None = None
