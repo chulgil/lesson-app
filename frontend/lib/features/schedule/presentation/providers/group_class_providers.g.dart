@@ -670,6 +670,169 @@ class _GroupClassSchedulesProviderElement
   String get classId => (origin as GroupClassSchedulesProvider).classId;
 }
 
+String _$groupClassMembersHash() => r'15c3d7482583a88d8a01ad79d3f6d9d655802d47';
+
+/// Cohort roster of a class, oldest assignment first.
+///
+/// Only regular classes have one — a drop-in class is booked per session, so
+/// its roster is always empty.
+///
+/// Copied from [groupClassMembers].
+@ProviderFor(groupClassMembers)
+const groupClassMembersProvider = GroupClassMembersFamily();
+
+/// Cohort roster of a class, oldest assignment first.
+///
+/// Only regular classes have one — a drop-in class is booked per session, so
+/// its roster is always empty.
+///
+/// Copied from [groupClassMembers].
+class GroupClassMembersFamily
+    extends Family<AsyncValue<List<GroupClassMember>>> {
+  /// Cohort roster of a class, oldest assignment first.
+  ///
+  /// Only regular classes have one — a drop-in class is booked per session, so
+  /// its roster is always empty.
+  ///
+  /// Copied from [groupClassMembers].
+  const GroupClassMembersFamily();
+
+  /// Cohort roster of a class, oldest assignment first.
+  ///
+  /// Only regular classes have one — a drop-in class is booked per session, so
+  /// its roster is always empty.
+  ///
+  /// Copied from [groupClassMembers].
+  GroupClassMembersProvider call(
+    String classId,
+  ) {
+    return GroupClassMembersProvider(
+      classId,
+    );
+  }
+
+  @override
+  GroupClassMembersProvider getProviderOverride(
+    covariant GroupClassMembersProvider provider,
+  ) {
+    return call(
+      provider.classId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupClassMembersProvider';
+}
+
+/// Cohort roster of a class, oldest assignment first.
+///
+/// Only regular classes have one — a drop-in class is booked per session, so
+/// its roster is always empty.
+///
+/// Copied from [groupClassMembers].
+class GroupClassMembersProvider
+    extends AutoDisposeFutureProvider<List<GroupClassMember>> {
+  /// Cohort roster of a class, oldest assignment first.
+  ///
+  /// Only regular classes have one — a drop-in class is booked per session, so
+  /// its roster is always empty.
+  ///
+  /// Copied from [groupClassMembers].
+  GroupClassMembersProvider(
+    String classId,
+  ) : this._internal(
+          (ref) => groupClassMembers(
+            ref as GroupClassMembersRef,
+            classId,
+          ),
+          from: groupClassMembersProvider,
+          name: r'groupClassMembersProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupClassMembersHash,
+          dependencies: GroupClassMembersFamily._dependencies,
+          allTransitiveDependencies:
+              GroupClassMembersFamily._allTransitiveDependencies,
+          classId: classId,
+        );
+
+  GroupClassMembersProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.classId,
+  }) : super.internal();
+
+  final String classId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<GroupClassMember>> Function(GroupClassMembersRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupClassMembersProvider._internal(
+        (ref) => create(ref as GroupClassMembersRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        classId: classId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<GroupClassMember>> createElement() {
+    return _GroupClassMembersProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupClassMembersProvider && other.classId == classId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, classId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GroupClassMembersRef
+    on AutoDisposeFutureProviderRef<List<GroupClassMember>> {
+  /// The parameter `classId` of this provider.
+  String get classId;
+}
+
+class _GroupClassMembersProviderElement
+    extends AutoDisposeFutureProviderElement<List<GroupClassMember>>
+    with GroupClassMembersRef {
+  _GroupClassMembersProviderElement(super.provider);
+
+  @override
+  String get classId => (origin as GroupClassMembersProvider).classId;
+}
+
 String _$groupClassFormNotifierHash() =>
     r'55f8a156b472d779fd59d0d558cef8c2576ea3d6';
 
@@ -690,5 +853,25 @@ final groupClassFormNotifierProvider = AutoDisposeNotifierProvider<
 );
 
 typedef _$GroupClassFormNotifier = AutoDisposeNotifier<AsyncValue<GroupClass?>>;
+String _$groupClassMemberNotifierHash() =>
+    r'87831ce515291ecbee476047afbd67ac3bcd0f08';
+
+/// Write path for the cohort roster. Kept apart from [groupClassMembers] so a
+/// successful assign/remove always invalidates the read explicitly.
+///
+/// Copied from [GroupClassMemberNotifier].
+@ProviderFor(GroupClassMemberNotifier)
+final groupClassMemberNotifierProvider = AutoDisposeNotifierProvider<
+    GroupClassMemberNotifier, AsyncValue<void>>.internal(
+  GroupClassMemberNotifier.new,
+  name: r'groupClassMemberNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$groupClassMemberNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$GroupClassMemberNotifier = AutoDisposeNotifier<AsyncValue<void>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

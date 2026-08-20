@@ -9,6 +9,7 @@ import '../../data/repositories/mock_group_class_repository.dart';
 import '../../data/repositories/remote_group_class_repository.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_draft.dart';
+import '../../domain/entities/group_class_member.dart';
 import '../../domain/entities/group_class_schedule.dart';
 import '../../domain/repositories/group_class_repository.dart';
 
@@ -78,6 +79,19 @@ Future<List<GroupClassSchedule>> groupClassSchedules(
 ) async {
   final repository = ref.watch(groupClassRepositoryProvider);
   return repository.getSchedulesForClass(classId);
+}
+
+/// Cohort roster of a class, oldest assignment first.
+///
+/// Only regular classes have one — a drop-in class is booked per session, so
+/// its roster is always empty.
+@riverpod
+Future<List<GroupClassMember>> groupClassMembers(
+  GroupClassMembersRef ref,
+  String classId,
+) async {
+  final repository = ref.watch(groupClassRepositoryProvider);
+  return repository.listMembers(classId);
 }
 
 // ============================================================
@@ -152,5 +166,54 @@ class GroupClassFormNotifier extends _$GroupClassFormNotifier {
   void _invalidateReads({required String teacherId, required String classId}) {
     ref.invalidate(teacherGroupClassesProvider(teacherId));
     ref.invalidate(groupClassByIdProvider(classId));
+  }
+}
+
+/// Write path for the cohort roster. Kept apart from [groupClassMembers] so a
+/// successful assign/remove always invalidates the read explicitly.
+@riverpod
+class GroupClassMemberNotifier extends _$GroupClassMemberNotifier {
+  @override
+  AsyncValue<void> build() => const AsyncValue.data(null);
+
+  /// Put a student on the roster. Throws when the backend rejects it — the
+  /// caller shows the server's reason (full roster, duplicate, other teacher).
+  Future<void> assign({
+    required String classId,
+    required String studentId,
+  }) async {
+    await _mutate(
+      classId: classId,
+      action: (repository) =>
+          repository.assignMember(classId: classId, studentId: studentId),
+    );
+  }
+
+  /// Take a student off the roster.
+  Future<void> remove({
+    required String classId,
+    required String studentId,
+  }) async {
+    await _mutate(
+      classId: classId,
+      action: (repository) =>
+          repository.removeMember(classId: classId, studentId: studentId),
+    );
+  }
+
+  Future<void> _mutate({
+    required String classId,
+    required Future<void> Function(GroupClassRepository) action,
+  }) async {
+    state = const AsyncValue.loading();
+
+    try {
+      await action(ref.read(groupClassRepositoryProvider));
+      state = const AsyncValue.data(null);
+      ref.invalidate(groupClassMembersProvider(classId));
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 }

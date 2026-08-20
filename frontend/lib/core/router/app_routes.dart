@@ -181,6 +181,9 @@ class AppRoutes {
   static const groupClassDetail = '/schedule/group-class/:id';
   static const groupClassAttendance = '/schedule/group-class/:id/attendance';
 
+  /// 교사 — 반 코호트 로스터 관리 (배정·내보내기). `:id` = group class id.
+  static const groupClassMembers = '/schedule/group-class/:id/members';
+
   /// 교사 — 내 클래스 목록 (반·특강). 교사 홈 진입점의 목적지 (J12, P1-2).
   static const groupClasses = '/schedule/group-classes';
 

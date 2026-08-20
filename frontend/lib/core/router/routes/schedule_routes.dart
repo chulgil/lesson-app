@@ -12,6 +12,7 @@ import '../../../features/schedule/domain/entities/group_class_schedule.dart';
 import '../../../features/schedule/presentation/screens/group_class_attendance_screen.dart';
 import '../../../features/schedule/presentation/screens/group_class_detail_screen.dart';
 import '../../../features/schedule/presentation/screens/group_class_form_screen.dart';
+import '../../../features/schedule/presentation/screens/group_class_members_screen.dart';
 import '../../../features/schedule/presentation/screens/group_classes_screen.dart';
 import '../../../features/search/presentation/screens/teacher_search_screen.dart';
 import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
@@ -314,6 +315,16 @@ List<GoRoute> scheduleRoutes = [
         schedule: extra['schedule'] as GroupClassSchedule,
         groupClass: extra['groupClass'] as GroupClass,
       );
+    },
+  ),
+
+  // Cohort roster management (teacher view). Resolves the class from the path
+  // param, so a deep link works without extra.
+  GoRoute(
+    path: AppRoutes.groupClassMembers,
+    name: 'groupClassMembers',
+    builder: (context, state) {
+      return GroupClassMembersScreen(classId: state.pathParameters['id']!);
     },
   ),
 ];

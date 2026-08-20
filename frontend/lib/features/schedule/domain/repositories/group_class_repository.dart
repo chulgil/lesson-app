@@ -4,6 +4,7 @@
 
 import '../entities/group_class.dart';
 import '../entities/group_class_draft.dart';
+import '../entities/group_class_member.dart';
 import '../entities/group_class_schedule.dart';
 
 /// Repository for group class definitions (반 / 드롭인).
@@ -50,5 +51,24 @@ abstract class GroupClassRepository {
     required String groupClassId,
     required DateTime startTime,
     required DateTime endTime,
+  });
+
+  /// Cohort roster of a class, oldest assignment first.
+  Future<List<GroupClassMember>> listMembers(String classId);
+
+  /// Put one of the teacher's own students on the roster.
+  ///
+  /// Rejected when the roster already holds [GroupClass.maxCapacity] students,
+  /// when the student is already on it, or when they belong to another teacher.
+  Future<GroupClassMember> assignMember({
+    required String classId,
+    required String studentId,
+  });
+
+  /// Take a student off the roster. Attendance history keeps pointing at the
+  /// class, so past sessions stay intact.
+  Future<void> removeMember({
+    required String classId,
+    required String studentId,
   });
 }

@@ -2,6 +2,7 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/paginated_response.dart';
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_draft.dart';
+import '../../domain/entities/group_class_member.dart';
 import '../../domain/entities/group_class_schedule.dart';
 import '../../domain/repositories/group_class_repository.dart';
 
@@ -106,6 +107,37 @@ class RemoteGroupClassRepository implements GroupClassRepository {
       },
     );
     return GroupClassSchedule.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// The roster endpoints return a bare list, not the paginated envelope the
+  /// class endpoints use.
+  @override
+  Future<List<GroupClassMember>> listMembers(String classId) async {
+    final response = await _apiClient.get('/groups/classes/$classId/members');
+    final items = response.data as List<dynamic>;
+    return items
+        .map((json) => GroupClassMember.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<GroupClassMember> assignMember({
+    required String classId,
+    required String studentId,
+  }) async {
+    final response = await _apiClient.post(
+      '/groups/classes/$classId/members',
+      data: {'student_id': studentId},
+    );
+    return GroupClassMember.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> removeMember({
+    required String classId,
+    required String studentId,
+  }) async {
+    await _apiClient.delete('/groups/classes/$classId/members/$studentId');
   }
 
   /// Capacity is not sent per session — the class owns it (P1-0 SSOT).
