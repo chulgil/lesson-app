@@ -197,7 +197,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                 // 개설 클래스 — 학생이 반·특강을 발견하는 표면 (D3: 탐색 전용
                 // 탭을 만들지 않고 기존 교사 상세에 붙인다). 개설 클래스가
                 // 없으면 섹션 자체를 숨긴다 (공개 프로필에 빈 상태 노이즈 금지).
-                _buildGroupClassesSection(ref),
+                _buildGroupClassesSection(context, ref),
 
                 // Introduction
                 _buildSection(
@@ -640,7 +640,7 @@ class _TeacherDetailContent extends ConsumerWidget {
   }
 
   /// Active group classes this teacher runs — the discovery surface for 반·특강.
-  Widget _buildGroupClassesSection(WidgetRef ref) {
+  Widget _buildGroupClassesSection(BuildContext context, WidgetRef ref) {
     final classes =
         ref
             .watch(teacherGroupClassesProvider(profile.id))
@@ -658,7 +658,8 @@ class _TeacherDetailContent extends ConsumerWidget {
           title: AppStrings.groupClassesTeacherDetailTitle,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: classes.map(_buildGroupClassRow).toList(),
+            children:
+                classes.map((c) => _buildGroupClassRow(context, c)).toList(),
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
@@ -666,8 +667,11 @@ class _TeacherDetailContent extends ConsumerWidget {
     );
   }
 
-  Widget _buildGroupClassRow(GroupClass groupClass) {
+  /// A single open class. Only a 반(regular) carries the 신청 CTA — a 특강
+  /// (dropIn) has no fixed roster, so it keeps the per-session booking path.
+  Widget _buildGroupClassRow(BuildContext context, GroupClass groupClass) {
     final schedule = groupClass.scheduleText;
+    final isRegular = groupClass.type == GroupClassType.regular;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: Column(
@@ -684,7 +688,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                   color: AppColors.paperAccentSoft,
                 ),
                 child: Text(
-                  groupClass.type == GroupClassType.regular
+                  isRegular
                       ? AppStrings.groupClassRegular
                       : AppStrings.groupClassDropin,
                   style: AppTypography.caption.copyWith(
@@ -703,6 +707,23 @@ class _TeacherDetailContent extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (isRegular) ...[
+                const SizedBox(width: AppSpacing.space2),
+                OutlinedButton(
+                  onPressed: () => _pushGroupClassRequest(context, groupClass),
+                  style: OutlinedButton.styleFrom(
+                    // 테마 minimumSize 는 Size(∞, h) — Row 안에서는 폭을 풀어야 한다.
+                    minimumSize: const Size(0, AppSpacing.buttonHeightSmall),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space3,
+                    ),
+                    foregroundColor: AppColors.paperAccent,
+                    side: const BorderSide(color: AppColors.paperAccent),
+                    shape: const RoundedRectangleBorder(),
+                  ),
+                  child: const Text(AppStrings.groupClassEnrollAction),
+                ),
+              ],
             ],
           ),
           if (schedule.isNotEmpty)
@@ -713,6 +734,21 @@ class _TeacherDetailContent extends ConsumerWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// Enter the existing unified request flow pinned to [groupClass]. The
+  /// enrollment itself happens on the teacher's confirm, so this only carries
+  /// which 반 the student is applying to.
+  void _pushGroupClassRequest(BuildContext context, GroupClass groupClass) {
+    context.push(
+      AppRoutes.lessonBooking,
+      extra: UnifiedLessonRequestParams(
+        teacherId: profile.id,
+        teacherName: profile.displayName ?? '',
+        teacherInstruments: profile.instruments,
+        groupClassId: groupClass.id,
       ),
     );
   }

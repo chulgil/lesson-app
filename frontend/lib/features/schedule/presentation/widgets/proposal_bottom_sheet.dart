@@ -37,23 +37,31 @@ class ProposalResult {
 ///
 /// Combines payment method selection, template selection, and bank account
 /// into a single flow. Bank account is only shown for prepaid method.
+///
+/// [groupClassId] is the 반 the request was pinned to (J15b). Templates tied to
+/// that class sort to the top and carry a group badge; every other template
+/// stays selectable, since which one to issue is the teacher's call.
 Future<ProposalResult?> showProposalBottomSheet(
   BuildContext context, {
   required String teacherId,
+  String? groupClassId,
 }) {
   return showNotebookBottomSheet<ProposalResult>(
     context: context,
     isScrollControlled: true,
     padding: EdgeInsets.zero,
     showHandle: false,
-    builder: (context) => _ProposalSheet(teacherId: teacherId),
+    builder:
+        (context) =>
+            _ProposalSheet(teacherId: teacherId, groupClassId: groupClassId),
   );
 }
 
 class _ProposalSheet extends ConsumerStatefulWidget {
   final String teacherId;
+  final String? groupClassId;
 
-  const _ProposalSheet({required this.teacherId});
+  const _ProposalSheet({required this.teacherId, this.groupClassId});
 
   @override
   ConsumerState<_ProposalSheet> createState() => _ProposalSheetState();
@@ -312,14 +320,16 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         }
 
         final atMax = _selectedIds.length >= kMaxTemplateSelections;
+        final ordered = _orderByGroupClass(templates);
 
         return Column(
           children: [
-            for (final template in templates) ...[
+            for (final template in ordered) ...[
               SelectableTemplateCard(
                 template: template,
                 isSelected: _selectedIds.contains(template.id),
                 isDisabled: atMax && !_selectedIds.contains(template.id),
+                isGroupClassMatch: _matchesGroupClass(template),
                 onTap: () => _toggleTemplate(template.id),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -328,6 +338,22 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         );
       },
     );
+  }
+
+  bool _matchesGroupClass(SubscriptionTemplate template) {
+    final classId = widget.groupClassId;
+    return classId != null && template.groupClassId == classId;
+  }
+
+  /// Matching templates first, original order preserved within each group.
+  List<SubscriptionTemplate> _orderByGroupClass(
+    List<SubscriptionTemplate> templates,
+  ) {
+    if (widget.groupClassId == null) return templates;
+    return [
+      ...templates.where(_matchesGroupClass),
+      ...templates.where((t) => !_matchesGroupClass(t)),
+    ];
   }
 
   // ── Bank Account Selector ──────────────────────────────────

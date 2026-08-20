@@ -88,6 +88,18 @@ class GroupClassesScreen extends ConsumerWidget {
                         () => _confirmDeactivate(context, ref, groupClass),
                   ),
                 ],
+                // Roster management is the third action, so it goes
+                // left-to-right as a convenience. Drop-ins have no fixed roster
+                // — they are booked per session — so it is absent for them.
+                startActions: [
+                  if (groupClass.type == GroupClassType.regular)
+                    SwipeAction(
+                      label: AppStrings.groupClassMembersEntryAction,
+                      icon: Icons.group_outlined,
+                      tone: SwipeActionTone.convenience,
+                      onPressed: () => _openMembers(context, groupClass),
+                    ),
+                ],
                 child: GroupClassRow(
                   groupClass: groupClass,
                   onTap: () => onOpenClass(groupClass),
@@ -104,6 +116,12 @@ class GroupClassesScreen extends ConsumerWidget {
     context.push(
       AppRoutes.groupClassForm,
       extra: {'teacherId': teacherId, 'groupClass': groupClass},
+    );
+  }
+
+  void _openMembers(BuildContext context, GroupClass groupClass) {
+    context.push(
+      AppRoutes.groupClassMembers.replaceFirst(':id', groupClass.id),
     );
   }
 

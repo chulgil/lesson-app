@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/group_class.dart';
 import '../../domain/entities/group_class_draft.dart';
+import '../../domain/entities/group_class_member.dart';
 import '../../domain/entities/group_class_schedule.dart';
 import '../../domain/repositories/group_class_repository.dart';
 
@@ -14,6 +15,7 @@ import '../../domain/repositories/group_class_repository.dart';
 class MockGroupClassRepository implements GroupClassRepository {
   MockGroupClassRepository({
     this.ownerTeacherId = 'teacher_1',
+    this.studentNames = const {},
     bool seed = true,
   }) {
     if (seed) _seed();
@@ -23,13 +25,18 @@ class MockGroupClassRepository implements GroupClassRepository {
   /// derive it from the authenticated teacher.
   final String ownerTeacherId;
 
+  /// Student id -> display name. The backend joins the student row to stamp
+  /// `student_name` on roster responses; the mock has no student table, so
+  /// callers that care about the name supply it here.
+  final Map<String, String> studentNames;
+
   final _uuid = const Uuid();
   final Map<String, GroupClass> _classes = {};
   final Map<String, GroupClassSchedule> _schedules = {};
 
-  /// Cohort roster: student id -> class ids they are enrolled in. The backend
-  /// keeps this in `group_class_members`; the mock holds it in memory.
-  final Map<String, Set<String>> _roster = {};
+  /// Cohort roster rows keyed by member id. The backend keeps these in
+  /// `group_class_members`; the mock holds them in memory.
+  final Map<String, GroupClassMember> _members = {};
 
   void _seed() {
     final now = DateTime.now();
@@ -61,7 +68,7 @@ class MockGroupClassRepository implements GroupClassRepository {
     );
     _classes[ensemble.id] = ensemble;
     _classes[masterclass.id] = masterclass;
-    _roster['student_1'] = {ensemble.id};
+    _assign(classId: ensemble.id, studentId: 'student_1');
 
     // One upcoming session per class so the list rows have something concrete
     // to open. The backend expands regular repeat rules server-side.
@@ -94,7 +101,10 @@ class MockGroupClassRepository implements GroupClassRepository {
   @override
   Future<List<GroupClass>> getClassesForStudent(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    final enrolled = _roster[studentId] ?? const <String>{};
+    final enrolled = _members.values
+        .where((m) => m.studentId == studentId)
+        .map((m) => m.groupClassId)
+        .toSet();
     return enrolled
         .map((id) => _classes[id])
         .nonNulls
@@ -116,10 +126,69 @@ class MockGroupClassRepository implements GroupClassRepository {
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
   }
 
-  /// Enrol a student in a class — test seam for the agenda row, mirroring
-  /// `POST /groups/classes/{id}/members`.
+  /// Enrol a student in a class — synchronous seam for tests that need a
+  /// seeded roster, mirroring `POST /groups/classes/{id}/members`.
   void enrol({required String studentId, required String classId}) {
-    _roster.putIfAbsent(studentId, () => <String>{}).add(classId);
+    _assign(classId: classId, studentId: studentId);
+  }
+
+  @override
+  Future<List<GroupClassMember>> listMembers(String classId) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    return _membersOf(classId)
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  }
+
+  @override
+  Future<GroupClassMember> assignMember({
+    required String classId,
+    required String studentId,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    return _assign(classId: classId, studentId: studentId);
+  }
+
+  @override
+  Future<void> removeMember({
+    required String classId,
+    required String studentId,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    _members.removeWhere(
+      (_, member) =>
+          member.groupClassId == classId && member.studentId == studentId,
+    );
+  }
+
+  List<GroupClassMember> _membersOf(String classId) =>
+      _members.values.where((m) => m.groupClassId == classId).toList();
+
+  /// Mirrors the backend guards: unknown class, duplicate assignment and
+  /// over-capacity all reject rather than silently growing the roster.
+  GroupClassMember _assign({
+    required String classId,
+    required String studentId,
+  }) {
+    final groupClass = _classes[classId];
+    if (groupClass == null) {
+      throw StateError('Group class not found: $classId');
+    }
+    final current = _membersOf(classId);
+    if (current.any((m) => m.studentId == studentId)) {
+      throw StateError('Student already assigned: $studentId');
+    }
+    if (current.length >= groupClass.maxCapacity) {
+      throw StateError('Group class is full: $classId');
+    }
+    final member = GroupClassMember(
+      id: _uuid.v4(),
+      groupClassId: classId,
+      studentId: studentId,
+      studentName: studentNames[studentId],
+      createdAt: DateTime.now(),
+    );
+    _members[member.id] = member;
+    return member;
   }
 
   @override

@@ -25,6 +25,10 @@ class SelectableTemplateCard extends StatelessWidget {
   final bool isDisabled;
   final VoidCallback? onTap;
 
+  /// J15b — this template belongs to the 반 the request was pinned to. Badged
+  /// so a 1:1 template is not proposed to a cohort applicant by accident.
+  final bool isGroupClassMatch;
+
   const SelectableTemplateCard({
     super.key,
     required this.template,
@@ -32,6 +36,7 @@ class SelectableTemplateCard extends StatelessWidget {
     this.isRecommended = false,
     this.isDisabled = false,
     this.onTap,
+    this.isGroupClassMatch = false,
   });
 
   @override
@@ -75,6 +80,25 @@ class SelectableTemplateCard extends StatelessWidget {
                       ),
                       child: Text(
                         AppStrings.templateRecommendedBadgeStar,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.paperAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                  ],
+                  if (isGroupClassMatch) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: AppColors.paperAccentSoft,
+                      ),
+                      child: Text(
+                        AppStrings.templateGroupClassBadge,
                         style: AppTypography.caption.copyWith(
                           color: AppColors.paperAccent,
                           fontWeight: FontWeight.w600,

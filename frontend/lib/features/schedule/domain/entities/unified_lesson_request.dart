@@ -197,6 +197,11 @@ class UnifiedLessonRequest {
 
   final UnifiedExperienceLevel experience;
 
+  /// J15b — the cohort (반) this request enrolls into, when the student applied
+  /// from a teacher's open-class section. Null for ordinary 1:1 requests; the
+  /// roster assignment happens when the teacher confirms a group proposal.
+  final String? groupClassId;
+
   final String? message;
 
   // Time negotiation
@@ -260,6 +265,7 @@ class UnifiedLessonRequest {
     required this.instrument,
     required this.goal,
     required this.experience,
+    this.groupClassId,
     this.message,
     this.preferredDay,
     this.preferredTime,
@@ -437,6 +443,7 @@ class UnifiedLessonRequest {
     String? instrument,
     UnifiedLessonGoal? goal,
     UnifiedExperienceLevel? experience,
+    String? groupClassId,
     String? message,
     int? preferredDay,
     String? preferredTime,
@@ -466,6 +473,7 @@ class UnifiedLessonRequest {
       instrument: instrument ?? this.instrument,
       goal: goal ?? this.goal,
       experience: experience ?? this.experience,
+      groupClassId: groupClassId ?? this.groupClassId,
       message: message ?? this.message,
       preferredDay: preferredDay ?? this.preferredDay,
       preferredTime: preferredTime ?? this.preferredTime,

@@ -2255,6 +2255,24 @@ class SubscriptionService:
         await self.db.refresh(proposal)
         return SubscriptionProposalResponse.model_validate(proposal)
 
+    async def _assign_cohort_member_for_group_subscription(
+        self, group_class_id: str, student_id: str, current_user: Any
+    ) -> None:
+        """Enroll the student on the cohort roster when confirm issues a group pass.
+
+        Idempotent — an existing membership (teacher pre-assigned via J4 UI)
+        turns the 409 into a skip so re-confirmation never fails. Every other
+        error (capacity 400, ownership 403) propagates and aborts the confirm.
+        """
+        from app.services.schedule_ext_service import ScheduleExtService
+
+        try:
+            await ScheduleExtService(self.db).assign_group_class_member(group_class_id, student_id, current_user)
+        except HTTPException as exc:
+            if exc.status_code == status.HTTP_409_CONFLICT:
+                return
+            raise
+
     async def confirm_proposal(
         self,
         proposal_id: str,
@@ -2359,6 +2377,15 @@ class SubscriptionService:
                 discount_amount=discount_amount if discount_amount > 0 else None,
                 discount_reason=discount_reason,
             )
+            # J15b (spec P2-4 챗형 승인) — a class-pinned group template enrolls
+            # the roster. Runs BEFORE issuing so capacity is enforced at confirm
+            # time (신청 다수 -> 확정 소수): a full class raises 400 and nothing
+            # (no membership, no subscription) is created.
+            if template is not None and template.group_class_id:
+                await self._assign_cohort_member_for_group_subscription(
+                    template.group_class_id, proposal.student_id, current_user
+                )
+
             self.db.add(sub)
             await self.db.flush()
             proposal.subscription_id = sub.id

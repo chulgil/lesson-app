@@ -99,6 +99,7 @@ async def test_issue_group_template(
 ):
     """그룹 전용 템플릿으로 발급 → Subscription 에 스코프·대상 반이 전파된다."""
     from app.models.schedule import GroupClass, GroupClassType
+    from app.models.student import Student
     from app.models.subscription import (
         ProposalPaymentStatus,
         ProposalStatus,
@@ -115,6 +116,10 @@ async def test_issue_group_template(
         email="student@test.com",
     )
     teacher_id = await resolve_teacher_id(db_session, "test-user-id")
+    # J15b — confirm 은 그룹 템플릿이면 로스터 배정까지 수행하므로 교사 소속
+    # Student 프로필이 실플로우처럼 존재해야 한다.
+    db_session.add(Student(id="test-student-id", user_id="test-student-id", teacher_id=teacher_id, name="학생"))
+    await db_session.flush()
 
     group_class = GroupClass(
         teacher_id=teacher_id,

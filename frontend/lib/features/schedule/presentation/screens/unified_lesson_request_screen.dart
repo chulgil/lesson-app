@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/network/api_exceptions.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -16,6 +17,7 @@ import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/settings/settings_facade.dart';
 import '../../../../features/students/domain/entities/lesson_location.dart';
 import '../extensions/unified_lesson_request_visuals.dart';
+import '../providers/group_class_providers.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/weekly_calendar_picker.dart';
 import 'request_completion_screen.dart';
@@ -30,6 +32,11 @@ class UnifiedLessonRequestParams {
   final int? previousDay;
   final String? previousTime;
 
+  /// J15b — set when the student applied to a specific 반 from the teacher's
+  /// open-class section. The request carries it so the teacher's confirm can
+  /// enroll the roster.
+  final String? groupClassId;
+
   const UnifiedLessonRequestParams({
     required this.teacherId,
     required this.teacherName,
@@ -38,6 +45,7 @@ class UnifiedLessonRequestParams {
     this.previousInstrument,
     this.previousDay,
     this.previousTime,
+    this.groupClassId,
   });
 }
 
@@ -106,6 +114,10 @@ class _UnifiedLessonRequestScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildTeacherHeader(),
+              if (widget.params.groupClassId != null) ...[
+                const SizedBox(height: AppSpacing.space4),
+                _buildGroupClassContext(widget.params.groupClassId!),
+              ],
               if (widget.params.isReturningStudent) ...[
                 const SizedBox(height: AppSpacing.space4),
                 _buildReturningBanner(),
@@ -204,6 +216,48 @@ class _UnifiedLessonRequestScreenState
   }
 
   // -- Returning student banner --
+
+  /// Read-only reminder of which 반 this request is pinned to. The name comes
+  /// from the class itself so a deep link carrying only the id still shows it.
+  Widget _buildGroupClassContext(String groupClassId) {
+    final name =
+        ref.watch(groupClassByIdProvider(groupClassId)).valueOrNull?.name;
+    if (name == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space4,
+        vertical: AppSpacing.space3,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paperDark,
+        border: Border.all(color: AppColors.inkQuaternary),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.groups_outlined, size: 20, color: AppColors.ink),
+          const SizedBox(width: AppSpacing.space2),
+          Text(
+            AppStrings.groupClassRequestContextLabel,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              name,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.ink,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildReturningBanner() {
     return Container(
@@ -722,6 +776,7 @@ class _UnifiedLessonRequestScreenState
         instrument: _selectedInstrument!,
         goal: _selectedGoal,
         experience: _selectedExperience,
+        groupClassId: widget.params.groupClassId,
         message:
             _messageController.text.trim().isEmpty
                 ? null
@@ -750,6 +805,20 @@ class _UnifiedLessonRequestScreenState
             lessonType: _selectedType,
             preferredSlots: _preferredSlots,
             duration: 60,
+          ),
+        );
+      }
+    } on ApiException catch (e) {
+      // 409 = 같은 반에 이미 활성 신청이 있음. 재시도 안내는 오답이라 분리한다.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.statusCode == 409
+                  ? AppStrings.groupClassRequestDuplicate
+                  : AppStrings.requestSubmitFailedRetry,
+            ),
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
