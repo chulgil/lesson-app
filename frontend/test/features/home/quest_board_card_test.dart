@@ -154,6 +154,32 @@ Future<void> _pump(WidgetTester tester, List<Override> overrides) async {
   await tester.pumpAndSettle();
 }
 
+/// UXC-6 — [더보기] 를 눌러 접힌 퀘스트를 모두 펼친다.
+Future<void> _expandBoard(WidgetTester tester) async {
+  await tester.ensureVisible(find.text(AppStrings.showMore));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(AppStrings.showMore));
+  await tester.pumpAndSettle();
+}
+
+/// 신규 선생님 — 아무 퀘스트도 완료하지 않은 상태 (학생 0명).
+List<Override> _nothingDone() => [
+  hasAvailableSlotsProvider.overrideWithValue(false),
+  hasProfileImageProvider.overrideWithValue(false),
+  hasIntroductionProvider.overrideWithValue(false),
+  hasInstrumentsProvider.overrideWithValue(false),
+  hasPriceTableProvider.overrideWithValue(false),
+  hasBankAccountProvider.overrideWithValue(false),
+  hasIssuedSubscriptionProvider.overrideWithValue(false),
+  hasWrittenLessonNoteProvider.overrideWithValue(false),
+  hasAssignedPracticeProvider.overrideWithValue(false),
+  homeHasCompletedLessonProvider.overrideWithValue(false),
+  homeTeacherPhoneVerifiedProvider.overrideWithValue(false),
+  homeStudentsProvider.overrideWith((ref) async => <Student>[]),
+  questFirstShownProvider.overrideWith(_FakeQuestFirstShown.new),
+  questCelebrationProvider.overrideWith(_DismissedCelebration.new),
+];
+
 void main() {
   test(
     'gauge reaches 100 with all 10 mandatory quests done (phone unverified)',
@@ -197,15 +223,18 @@ void main() {
 
   // ── §13 3-group + lock 매트릭스 신규 케이스 (Job 4) ──
 
-  testWidgets('3-group 헤더가 모두 표시됨 — profile / operation / bonus', (
+  testWidgets('3-group 헤더가 모두 표시됨 — profile / operation / bonus (펼친 뒤)', (
     tester,
   ) async {
     final overrides = _allMandatoryDone(phoneVerified: false);
-    // 각 그룹마다 1개씩 미완료 → 모든 그룹 헤더가 표시되어야 함.
+    // 각 그룹마다 1개씩 미완료 → 펼치면 모든 그룹 헤더가 표시되어야 함.
     overrides[0] = hasAvailableSlotsProvider.overrideWithValue(false); // Q1
     overrides[6] = hasIssuedSubscriptionProvider.overrideWithValue(false); // Q7
 
     await _pump(tester, overrides);
+
+    // UXC-6 — 접힌 상태에서는 "지금 할 그룹" 하나만 보인다.
+    await _expandBoard(tester);
 
     expect(tester.takeException(), isNull);
     expect(find.text(AppStrings.questGroupProfileLabel), findsOneWidget);
@@ -213,11 +242,12 @@ void main() {
     expect(find.text(AppStrings.questGroupBonusLabel), findsOneWidget);
   });
 
-  testWidgets('선택 보너스 그룹에 [선택] 태그 표시', (tester) async {
+  testWidgets('선택 보너스 그룹에 [선택] 태그 표시 (펼친 뒤)', (tester) async {
     final overrides = _allMandatoryDone(phoneVerified: false);
     overrides[0] = hasAvailableSlotsProvider.overrideWithValue(false);
 
     await _pump(tester, overrides);
+    await _expandBoard(tester);
 
     expect(tester.takeException(), isNull);
     expect(find.text(AppStrings.questGroupBonusOptionalTag), findsOneWidget);
@@ -451,9 +481,7 @@ void main() {
 
   // ── UX #4 한글화 + 전체완료 collapse smoke tests ──
 
-  testWidgets('UX#4: 미완료 상태 — 준비 체크리스트 타이틀 표시 (320px 좁은 폭)', (
-    tester,
-  ) async {
+  testWidgets('UX#4: 미완료 상태 — 준비 체크리스트 타이틀 표시 (320px 좁은 폭)', (tester) async {
     await tester.binding.setSurfaceSize(const Size(320, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -466,9 +494,7 @@ void main() {
     expect(find.text(AppStrings.questBoardTitle), findsOneWidget);
   });
 
-  testWidgets('UX#4: 전체완료 + dismiss → 카드 완전 hide (320px 좁은 폭)', (
-    tester,
-  ) async {
+  testWidgets('UX#4: 전체완료 + dismiss → 카드 완전 hide (320px 좁은 폭)', (tester) async {
     await tester.binding.setSurfaceSize(const Size(320, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -479,26 +505,136 @@ void main() {
     expect(find.text(AppStrings.questBoardTitle), findsNothing);
   });
 
-  testWidgets('UX#4: 전체완료 + 졸업 카드 pending → collapse(QuestCelebrationCard) 표시 (320px)', (
-    tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(320, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'UX#4: 전체완료 + 졸업 카드 pending → collapse(QuestCelebrationCard) 표시 (320px)',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    final overrides = _allMandatoryDone(phoneVerified: false);
-    overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
-      _PendingCelebration.new,
+      final overrides = _allMandatoryDone(phoneVerified: false);
+      overrides[overrides.length - 1] = questCelebrationProvider.overrideWith(
+        _PendingCelebration.new,
+      );
+
+      await _pump(tester, overrides);
+
+      expect(tester.takeException(), isNull);
+      // 보드 타이틀 숨겨짐 (카드가 졸업 카드로 교체됨).
+      expect(find.text(AppStrings.questBoardTitle), findsNothing);
+      // 졸업 카드 표시.
+      expect(find.text(AppStrings.questCelebrationTitle), findsOneWidget);
+    },
+  );
+
+  // ── UXC-6 점진 공개 (2026-08-20) ──
+  //
+  // 신규 선생님 첫 홈에 퀘스트 12행이 한꺼번에 쏟아지던 것을 "지금 할 그룹"
+  // 하나 + 최대 4행으로 줄이고, 나머지는 [더보기] 뒤로 미뤘다.
+
+  testWidgets('접힌 상태 — 현재 그룹만, 최대 4행까지만 노출', (tester) async {
+    await _pump(tester, _nothingDone());
+
+    expect(tester.takeException(), isNull);
+    // 현재 그룹 = profile. 앞 4행만.
+    expect(find.text(AppStrings.questTitleSlots), findsOneWidget); // Q1
+    expect(find.text(AppStrings.questTitlePhoto), findsOneWidget); // Q2
+    expect(find.text(AppStrings.questTitleIntro), findsOneWidget); // Q3
+    // 5번째부터는 접힘 (Q4 레슨비).
+    expect(find.text(AppStrings.questTitlePrice), findsNothing);
+    // 다른 그룹은 통째로 접힘.
+    expect(find.text(AppStrings.questGroupOperationLabel), findsNothing);
+    expect(find.text(AppStrings.questTitleStudent), findsNothing);
+    expect(find.text(AppStrings.questGroupBonusLabel), findsNothing);
+    // 남은 퀘스트로 가는 통로는 남아 있다.
+    expect(find.text(AppStrings.showMore), findsOneWidget);
+  });
+
+  testWidgets('[더보기] → 전체 노출, [접기] → 다시 현재 그룹만', (tester) async {
+    await _pump(tester, _nothingDone());
+    await _expandBoard(tester);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questTitlePrice), findsOneWidget); // Q4
+    expect(find.text(AppStrings.questGroupOperationLabel), findsOneWidget);
+    expect(find.text(AppStrings.questTitleStudent), findsOneWidget); // Q6
+    expect(find.text(AppStrings.questGroupBonusLabel), findsOneWidget);
+
+    // 다시 접기 — 영구 확장이 아니다.
+    await tester.ensureVisible(find.text(AppStrings.urgentAlertCollapse));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.urgentAlertCollapse));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questTitlePrice), findsNothing);
+    expect(find.text(AppStrings.questGroupOperationLabel), findsNothing);
+    expect(find.text(AppStrings.showMore), findsOneWidget);
+  });
+
+  testWidgets('숨길 행이 없으면 [더보기] 를 띄우지 않는다', (tester) async {
+    // Q1 하나만 미완료 → 접어도 펼쳐도 같은 화면.
+    final overrides = _allMandatoryDone(phoneVerified: true);
+    overrides[0] = hasAvailableSlotsProvider.overrideWithValue(false);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questTitleSlots), findsOneWidget);
+    expect(find.text(AppStrings.showMore), findsNothing);
+    expect(find.text(AppStrings.urgentAlertCollapse), findsNothing);
+  });
+
+  // ── UXC-7 용어 풀이 + UXC-3 코치마크 카피 이식 ──
+
+  testWidgets('Q1 행에 "가용시간" 용어 풀이 1줄 노출', (tester) async {
+    await _pump(tester, _nothingDone());
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.questGlossAvailability), findsOneWidget);
+  });
+
+  testWidgets('Q6 행에 죽은 코치마크의 "첫 학생 초대" 설명이 이식됨 (UXC-3)', (tester) async {
+    await _pump(tester, _nothingDone());
+    await _expandBoard(tester);
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.text(AppStrings.coachMarkFirstStudentInviteDescription),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Q7 잠금 해제 시 "수강권" 용어 풀이 노출', (tester) async {
+    // 학생이 있어 Q7 이 열린 상태 — profile 그룹은 모두 완료라 operation 이
+    // 현재 그룹이 된다.
+    final overrides = _allMandatoryDone(phoneVerified: true);
+    overrides[6] = hasIssuedSubscriptionProvider.overrideWithValue(false);
+
+    await _pump(tester, overrides);
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.text(AppStrings.onboardingCategorySubscriptionGloss),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Q7 잠금 상태 — 용어 풀이 대신 lock hint 만 (행당 힌트 1개)', (tester) async {
+    final overrides = _allMandatoryDone(phoneVerified: true);
+    overrides[6] = hasIssuedSubscriptionProvider.overrideWithValue(false);
+    overrides[11] = homeStudentsProvider.overrideWith(
+      (ref) async => <Student>[],
     );
 
     await _pump(tester, overrides);
 
     expect(tester.takeException(), isNull);
-    // 보드 타이틀 숨겨짐 (카드가 졸업 카드로 교체됨).
-    expect(find.text(AppStrings.questBoardTitle), findsNothing);
-    // 졸업 카드 표시.
-    expect(find.text(AppStrings.questCelebrationTitle), findsOneWidget);
+    expect(
+      find.text(AppStrings.onboardingCategorySubscriptionGloss),
+      findsNothing,
+    );
+    expect(find.text(AppStrings.questLockedStudentRequiredHint), findsWidgets);
   });
-
 }
 
 /// 가입 직후 첫 도착 윈도우 simulation — markShown 된 상태로 시작.

@@ -22,6 +22,7 @@ import '../../../practice/practice_facade.dart';
 import '../../../practice/practice_ui_facade.dart';
 import '../../../profile/profile_facade.dart';
 import '../providers/home_dashboard_provider.dart';
+import '../providers/home_lesson_summary_provider.dart';
 import 'assignment_summary_section.dart';
 import 'demo_dashboard_overlay.dart';
 import '../../../profile/profile_ui_facade.dart';
@@ -44,6 +45,15 @@ class DashboardTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboard = ref.watch(homeDashboardProvider);
+
+    // UXC-6 점진 공개 — 학생도 레슨도 없는 첫 홈에서는 통계 카드(= Pro 분석
+    // 화면의 유일한 진입점)를 숨긴다. 0으로만 채워진 카드와 유료 잠금은 아직
+    // 아무것도 못 해본 선생님에게 노이즈다. 학생이나 레슨이 하나라도 생기면
+    // 다시 나타난다 (영구 제거 아님).
+    final hasStudents =
+        ref.watch(homeStudentsProvider).valueOrNull?.isNotEmpty ?? false;
+    final hasAnyLessons = dashboard.lessons.valueOrNull?.isNotEmpty ?? false;
+    final hasTeachingData = hasStudents || hasAnyLessons;
 
     // Get today's lessons
     final now = DateTime.now();
@@ -159,9 +169,10 @@ class DashboardTab extends ConsumerWidget {
                   const QuestBoardCard(),
 
                   // ── 통계: 오늘 N회 / 이번달 N회 ─────────────────
-                  _buildStatsRow(context, ref, dashboard.lessonStats),
-
-                  const SizedBox(height: AppSpacing.space3),
+                  if (hasTeachingData) ...[
+                    _buildStatsRow(context, ref, dashboard.lessonStats),
+                    const SizedBox(height: AppSpacing.space3),
+                  ],
 
                   // ── 긴급 알림 존 (미수금 등 — 통계 바로 아래) ────
                   UrgentAlertZone(

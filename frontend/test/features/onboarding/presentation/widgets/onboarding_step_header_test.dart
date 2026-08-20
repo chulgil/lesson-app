@@ -81,6 +81,46 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('#1287 UXC-1 도달할 수 없는 분야 단계는 빼고 번호를 다시 매긴다', (tester) async {
+    // 등록된 discipline 이 music 하나뿐이면 RoleSelectScreen 이 분야 화면을
+    // 건너뛴다. 4단계를 그리면 프로필이 "3/4" 로 읽혀 실제 여정과 어긋난다.
+    await pumpHeader(
+      tester,
+      steps: OnboardingStepHeader.teacherSteps,
+      currentStep: 3, // 프로필 — 4단계 리스트 기준
+    );
+
+    expect(find.text(AppStrings.onboardingStepDiscipline), findsNothing);
+    expect(find.text(AppStrings.onboardingStepRole), findsOneWidget);
+    expect(find.text(AppStrings.onboardingStepProfile), findsOneWidget);
+    expect(find.text(AppStrings.onboardingStepAvailability), findsOneWidget);
+    // 3단계로 줄었으므로 '4' 번은 없고, 프로필이 2번이 된다.
+    expect(find.text('4'), findsNothing);
+
+    final profileBadge = tester.widget<Container>(
+      find.ancestor(of: find.text('2'), matching: find.byType(Container)).first,
+    );
+    expect(
+      (profileBadge.decoration as BoxDecoration).color,
+      AppColors.paperAccent,
+      reason: '프로필은 3단계 여정의 2번째로 활성화돼야 한다',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('#1287 현재 서 있는 단계는 건너뛰기 대상이어도 감추지 않는다', (tester) async {
+    // 분야 화면에 deep-link 로 도달한 경우 — 본인 위치를 숨기면 안 된다.
+    await pumpHeader(
+      tester,
+      steps: OnboardingStepHeader.teacherSteps,
+      currentStep: 2, // 분야
+    );
+
+    expect(find.text(AppStrings.onboardingStepDiscipline), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   test('teacherSteps 는 역할→분야→프로필→가용시간 4단계 SSOT 다', () {
     expect(OnboardingStepHeader.teacherSteps, const [
       AppStrings.onboardingStepRole,

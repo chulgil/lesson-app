@@ -91,7 +91,7 @@ class StudentGettingStartedCard extends ConsumerWidget {
             onTap:
                 hasConnections || hasPendingConnectionRequest
                     ? null
-                    : () => context.push(AppRoutes.selectTeacher),
+                    : () => context.push(AppRoutes.teacherSearch),
           ),
 
           const SizedBox(height: AppSpacing.space2),

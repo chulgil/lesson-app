@@ -313,6 +313,8 @@ https://lessonaza.app/t/{teacher-slug}
 
 ## 5. 코치마크 시스템 설계
 
+> **폐기 (2026-08-20, #1287 UXC-3)**: 홈 화면의 3-step 코치마크 배선은 프로덕션 경로에서 `start()` 호출 0회의 죽은 코드로 확인되어 제거됨. 설명 카피는 QuestBoardCard 퀘스트 행 부제(풀 방식 컨텍스트 도움말)로 이식. `core/widgets/coach_mark/` 라이브러리는 향후 재사용을 위해 보존. 근거: NN/g push vs pull — 시퀀스형 코치마크는 읽히지 않음.
+
 ### 5.1 컴포넌트
 
 ```dart
@@ -456,6 +458,7 @@ class CoachMarkState {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-08-20 | UX Clarity #1287 — §5 코치마크 홈 배선 폐기(데드코드, 카피는 퀘스트 행 부제로 이식), 퀘스트보드 현재 그룹만 노출(+더 보기), 데이터 0 상태 통계 카드 숨김, NextMissionSpotlight dismiss 플래그 분리(첫 도착 타임스탬프와 별도), 로그인 가치제안 1줄·가용시간 WHY 부제·수강권/가용시간 용어 풀이 추가, 카테고리 프리뷰 단일 CTA, 단계 헤더 실제 여정 정합. 작업 스펙: `.harness/spec/2026-08-20-ux-clarity-onboarding.md` |
 | 2026-06-10 | §3.3 보강 인용 갱신 — 인터스티셜 모달 정책 폐기, 가입 흐름 강제 게이트로 일원화. FirstAvailabilityInterstitial dead code 제거. (감사 §4.3 B1) |
 | 2026-06-03 | 코드 반영 — OnboardingQuest/OnboardingProgress 엔티티, provider/저장, Phase B 화면 및 첫 가용시간 위젯 추가 |
 | 2026-05-31 | v3 초안 — 게임형 튜토리얼 + 프로필 보상 시스템 설계 |

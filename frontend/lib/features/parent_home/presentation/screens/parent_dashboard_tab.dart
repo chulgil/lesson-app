@@ -74,21 +74,23 @@ class ParentDashboardTab extends ConsumerWidget {
 
             final linkedStudentId = profile.linkedStudentId;
 
+            // UXC-12: 선생님 미연결 자녀는 섹션마다 같은 안내를 반복하는 대신
+            // 행동 가능한 연결 카드 하나만 보여준다.
+            if (linkedStudentId == null) {
+              return _buildUnlinkedState(context, ref, parentId, profile);
+            }
+
             return RefreshIndicator(
               onRefresh: () async {
                 ref.invalidate(childProfilesProvider(parentId));
-                if (linkedStudentId != null) {
-                  ref.invalidate(lessonsByStudentProvider(linkedStudentId));
-                  ref.invalidate(practiceStreakProvider(linkedStudentId));
-                  ref.invalidate(weeklyPracticeItemsProvider(linkedStudentId));
-                  ref.invalidate(
-                    practiceItemsByStudentProvider(linkedStudentId),
-                  );
-                  ref.invalidate(studentSubscriptionsProvider(linkedStudentId));
-                  ref.invalidate(
-                    activeStudentMembershipsProvider(linkedStudentId),
-                  );
-                }
+                ref.invalidate(lessonsByStudentProvider(linkedStudentId));
+                ref.invalidate(practiceStreakProvider(linkedStudentId));
+                ref.invalidate(weeklyPracticeItemsProvider(linkedStudentId));
+                ref.invalidate(practiceItemsByStudentProvider(linkedStudentId));
+                ref.invalidate(studentSubscriptionsProvider(linkedStudentId));
+                ref.invalidate(
+                  activeStudentMembershipsProvider(linkedStudentId),
+                );
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -125,7 +127,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _QuickStatsSection(profile: profile),
+                      child: _QuickStatsSection(studentId: linkedStudentId),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -135,7 +137,10 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _UpcomingLessonSection(profile: profile),
+                      child: _UpcomingLessonSection(
+                        profile: profile,
+                        studentId: linkedStudentId,
+                      ),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -145,7 +150,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _PracticeStreakSection(profile: profile),
+                      child: _PracticeStreakSection(studentId: linkedStudentId),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -165,7 +170,9 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _RecentAssignmentsSection(profile: profile),
+                      child: _RecentAssignmentsSection(
+                        studentId: linkedStudentId,
+                      ),
                     ),
 
                     const SizedBox(height: AppSpacing.space6),
@@ -175,7 +182,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.screenPadding,
                       ),
-                      child: _PaymentStatusSection(profile: profile),
+                      child: _PaymentStatusSection(studentId: linkedStudentId),
                     ),
 
                     const SizedBox(height: AppSpacing.space5),
@@ -232,7 +239,10 @@ class ParentDashboardTab extends ConsumerWidget {
             style: NotebookTypography.mastheadLabel,
           ),
           const SizedBox(height: 4),
-          Text(AppStrings.parentHomeChildLessonsTitleFormat(profile.name), style: NotebookTypography.masthead),
+          Text(
+            AppStrings.parentHomeChildLessonsTitleFormat(profile.name),
+            style: NotebookTypography.masthead,
+          ),
           const SizedBox(height: 6),
           Text(
             // H3 — 한자식 날짜(8月 5日)를 한글 표기로 통일. 날짜는 이 줄에서 1회만.
@@ -309,6 +319,67 @@ class ParentDashboardTab extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// 선생님 미연결 자녀 화면 — UXC-12.
+  ///
+  /// 예전에는 통계·다음레슨·연습·과제·수강권 5개 섹션이 각각 같은 "미연결"
+  /// 문구만 반복해서 행동할 곳이 없었다. 자녀 정체성(매스트헤드·히어로 카드)만
+  /// 남기고 연결 CTA 카드 하나로 합친다.
+  Widget _buildUnlinkedState(
+    BuildContext context,
+    WidgetRef ref,
+    String parentId,
+    ChildProfile profile,
+  ) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(childProfilesProvider(parentId));
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: _buildMasthead(context, ref, parentId),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: _buildProgrammeTitle(context, profile),
+            ),
+            _buildChildHeader(context, profile),
+            const SizedBox(height: AppSpacing.space8),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: EmptyStateWidget(
+                icon: Icons.link_off,
+                title: AppStrings.parentHomeNotLinked,
+                subtitle: AppStrings.parentHomeNotLinkedDesc,
+                actionLabel: AppStrings.parentHomeInviteCode,
+                actionIcon: Icons.qr_code,
+                onAction: () => context.push(AppRoutes.parentInviteCode),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space8),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: _buildFineFooter(context),
+            ),
+            const SizedBox(height: AppSpacing.space6),
+          ],
+        ),
+      ),
     );
   }
 
@@ -595,17 +666,12 @@ class _SectionEmpty extends StatelessWidget {
 
 /// 빠른 통계 — 이번주 레슨 / 과제 완료 / 연습 스트릭 (실데이터).
 class _QuickStatsSection extends ConsumerWidget {
-  const _QuickStatsSection({required this.profile});
+  const _QuickStatsSection({required this.studentId});
 
-  final ChildProfile profile;
+  final String studentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentId = profile.linkedStudentId;
-    if (studentId == null) {
-      return const _SectionEmpty(message: AppStrings.parentHomeNotLinked);
-    }
-
     final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
     final weeklyItemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
     // 표시 숫자는 학생 화면과 같은 SSOT — 학부모가 보는 자녀 스트릭이
@@ -654,7 +720,9 @@ class _QuickStatsSection extends ConsumerWidget {
           child: StatCard(
             icon: Icons.calendar_today,
             title: AppStrings.parentHomeWeeklyLesson,
-            value: weeklyLessonCount == null ? '-' : AppStrings.parentHomeLessonCountFormat(weeklyLessonCount),
+            value: weeklyLessonCount == null
+                ? '-'
+                : AppStrings.parentHomeLessonCountFormat(weeklyLessonCount),
             color: AppColors.paperAccent,
           ),
         ),
@@ -683,22 +751,16 @@ class _QuickStatsSection extends ConsumerWidget {
 
 /// 다음 레슨 — 가장 가까운 미래 scheduled 레슨 (실데이터).
 class _UpcomingLessonSection extends ConsumerWidget {
-  const _UpcomingLessonSection({required this.profile});
+  const _UpcomingLessonSection({
+    required this.profile,
+    required this.studentId,
+  });
 
   final ChildProfile profile;
+  final String studentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentId = profile.linkedStudentId;
-    if (studentId == null) {
-      return SectionCard(
-        romanIndex: 0,
-        title: AppStrings.parentHomeNextLesson,
-        icon: Icons.event,
-        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
-      );
-    }
-
     final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
 
     return SectionCard(
@@ -715,9 +777,7 @@ class _UpcomingLessonSection extends ConsumerWidget {
         data: (lessons) {
           final next = _nextScheduledLesson(lessons);
           if (next == null) {
-            return const _SectionEmpty(
-              message: AppStrings.noUpcomingLessons,
-            );
+            return const _SectionEmpty(message: AppStrings.noUpcomingLessons);
           }
           final dDay = DateTime(next.date.year, next.date.month, next.date.day)
               .difference(
@@ -804,22 +864,12 @@ class _UpcomingLessonSection extends ConsumerWidget {
 
 /// 이번 주 연습 — practiceStreak 기반 (실데이터).
 class _PracticeStreakSection extends ConsumerWidget {
-  const _PracticeStreakSection({required this.profile});
+  const _PracticeStreakSection({required this.studentId});
 
-  final ChildProfile profile;
+  final String studentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentId = profile.linkedStudentId;
-    if (studentId == null) {
-      return SectionCard(
-        romanIndex: 1,
-        title: AppStrings.parentHomeThisWeekPractice,
-        icon: Icons.local_fire_department,
-        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
-      );
-    }
-
     // 여기는 "어느 요일에 실제로 연습했는가" 를 그리므로 raw SSOT 를 쓴다 —
     // 동결된 날은 연습한 날이 아니라 practiced 로 칠하면 안 된다 (§7).
     final streakAsync = ref.watch(practiceStreakProvider(studentId));
@@ -936,22 +986,12 @@ class _PracticeStreakSection extends ConsumerWidget {
 
 /// 과제 현황 — 이번 주 연습 항목 (실데이터).
 class _RecentAssignmentsSection extends ConsumerWidget {
-  const _RecentAssignmentsSection({required this.profile});
+  const _RecentAssignmentsSection({required this.studentId});
 
-  final ChildProfile profile;
+  final String studentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentId = profile.linkedStudentId;
-    if (studentId == null) {
-      return SectionCard(
-        romanIndex: 2,
-        title: AppStrings.parentHomeAssignmentStatus,
-        icon: Icons.assignment,
-        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
-      );
-    }
-
     final itemsAsync = ref.watch(weeklyPracticeItemsProvider(studentId));
 
     return SectionCard(
@@ -1011,22 +1051,12 @@ class _RecentAssignmentsSection extends ConsumerWidget {
 
 /// 수강권 잔여 — 활성 수강권 잔여 회차 (실데이터).
 class _PaymentStatusSection extends ConsumerWidget {
-  const _PaymentStatusSection({required this.profile});
+  const _PaymentStatusSection({required this.studentId});
 
-  final ChildProfile profile;
+  final String studentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final studentId = profile.linkedStudentId;
-    if (studentId == null) {
-      return SectionCard(
-        romanIndex: 3,
-        title: AppStrings.parentHomeRemainingLesson,
-        icon: Icons.confirmation_number_outlined,
-        child: const _SectionEmpty(message: AppStrings.parentHomeNotLinked),
-      );
-    }
-
     final subscriptionsAsync = ref.watch(
       studentSubscriptionsProvider(studentId),
     );

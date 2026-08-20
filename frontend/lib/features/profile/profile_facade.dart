@@ -10,4 +10,8 @@ export 'presentation/providers/teacher_extended_profile_provider.dart'
 export 'presentation/providers/quest_celebration_provider.dart'
     show QuestCelebrationState, questCelebrationProvider;
 export 'presentation/providers/quest_first_shown_provider.dart'
-    show QuestFirstShown, questFirstShownProvider;
+    show
+        NextMissionSpotlightDismissed,
+        QuestFirstShown,
+        nextMissionSpotlightDismissedProvider,
+        questFirstShownProvider;

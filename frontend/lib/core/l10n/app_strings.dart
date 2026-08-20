@@ -7143,7 +7143,7 @@ class AppStrings {
   /// 학생 직접 가입 차단 화면 본문.
   static const studentSignupBlockedBody =
       '본인 인증 도입 전까지 학생 직접 가입은 잠시 닫혀 있어요.\n'
-      '아래 두 가지 방법으로 시작할 수 있어요.';
+      '아래 세 가지 방법으로 시작할 수 있어요.';
 
   /// CTA — 학부모 가입으로 이동.
   static const studentSignupBlockedParentCta = '부모님 계정으로 시작하기';
@@ -7153,7 +7153,7 @@ class AppStrings {
 
   /// 안내 — 다음 액션 분기 (만 14세 이상 + 선생님 미보유 케이스).
   static const studentSignupBlockedHelper =
-      '아직 선생님이 없다면 가까운 선생님께 초대를 부탁해 주세요.\n'
+      '아직 선생님이 없어도 혼자 연습부터 시작할 수 있어요.\n'
       '본인 인증이 열리면 직접 가입도 가능해질 예정이에요.';
   static const authKakaoNotReady = '카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.';
 
@@ -11099,7 +11099,7 @@ class AppStrings {
   static const profileSetupBackDialogConfirm = '나가기';
   static const profileSetupBackDialogCancel = '계속 작성';
   // #112 Student role invite badge
-  static const roleSelectStudentInviteBadge = '초대 필요';
+  static const roleSelectStudentInviteBadge = '초대코드 선택사항';
   // #118 Social login coming soon badge
   static const authComingSoonBadge = '준비중';
 
@@ -11371,4 +11371,21 @@ class AppStrings {
     String title,
     String studentName,
   ) => '$title이(가) $studentName에게 할당되었습니다';
+
+  // UX Clarity slice A (#1287)
+
+  /// 로그인 화면 가치제안 1줄 — 처음 방문한 사람이 "무슨 앱인지" 를 읽는 유일한 문장.
+  /// `authSlogan`(장식 슬로건) 과 달리 앱이 실제로 해주는 일을 말한다.
+  static const authValueProposition = '레슨 일정과 수강권, 연습 기록을 한 권의 노트로 관리해요';
+
+  /// 카테고리 미리보기 — '수강권' 첫 노출 지점의 용어 풀이 1줄.
+  static const onboardingCategorySubscriptionGloss =
+      '수강권은 레슨 횟수를 묶어 파는 이용권이에요. 레슨을 마치면 회차가 자동으로 차감돼요';
+
+  // UX Clarity slice B (#1287)
+
+  /// 퀘스트 보드 — '가용시간' 첫 노출 지점의 용어 풀이 1줄 (UXC-7).
+  /// 죽은 코치마크(`coachMarkTimeDescription`) 에만 있던 "왜 필요한지" 를
+  /// 사용자가 실제로 읽는 위치로 옮긴 문장이다 (UXC-3).
+  static const questGlossAvailability = '가용시간은 학생이 레슨을 신청할 수 있는 나의 열린 시간이에요';
 }

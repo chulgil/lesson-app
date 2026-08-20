@@ -37,6 +37,40 @@ class StudentSignupBlockedScreen extends ConsumerWidget {
     context.go(AppRoutes.studentInviteCode);
   }
 
+  /// UXC-13 — 코드 없이 체험 시작.
+  ///
+  /// 초대코드 화면의 [건너뛰기] 와 완전히 같은 동작(만 14세 자가확인 →
+  /// 학생 역할 → 프로필 설정)을 여기서 바로 노출해 한 화면을 줄인다.
+  /// 이 화면이 "가입이 닫혀 있다" 고만 말하고 정작 코드 없는 경로는
+  /// 다음 화면에 숨겨 두던 모순을 없앤다.
+  Future<void> _startWithoutCode(BuildContext context, WidgetRef ref) async {
+    // 만 14세 미만 차단 안전망 (phone_verification_policy.md §2.2) — PASS
+    // 통합 전까지의 자가신고 게이트. 초대코드 화면과 동일하게 유지한다.
+    final isOverFourteen = await showNotebookDialog<bool>(
+      context: context,
+      title: AppStrings.authAgeGateTitle,
+      message: AppStrings.authAgeGateBody,
+      confirmLabel: AppStrings.authAgeGateConfirm,
+      cancelLabel: AppStrings.authAgeGateCancel,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () {
+        Navigator.of(context).pop(false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(AppStrings.authAgeGateBlocked),
+            backgroundColor: AppColors.paperAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+    );
+    if (isOverFourteen != true) return;
+    if (!context.mounted) return;
+    // #608 — remote 는 auth state 파생이 SSOT. 이 수동 set 은 mock 모드 전용.
+    ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+    context.go(AppRoutes.studentProfileSetup);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return NotebookScreenScaffold(
@@ -126,6 +160,24 @@ class StudentSignupBlockedScreen extends ConsumerWidget {
                   AppStrings.studentSignupBlockedInviteCta,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.paperAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.space2),
+
+              TextButton(
+                onPressed: () => _startWithoutCode(context, ref),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.inkSecondary,
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
+                  shape: const RoundedRectangleBorder(),
+                ),
+                child: Text(
+                  AppStrings.inviteCodeSkipButton,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.inkSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

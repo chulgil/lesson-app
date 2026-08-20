@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/router/app_routes.dart';
-import '../../../../core/widgets/coach_mark/coach_mark_controller.dart';
-import '../../../../core/widgets/coach_mark/coach_mark_overlay.dart';
-import '../../../../core/widgets/coach_mark/coach_mark_scope.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/notebook/notebook_bottom_nav.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../onboarding/onboarding_facade.dart';
 import '../../../profile/profile_facade.dart' show questFirstShownProvider;
 import '../../../profile/profile_ui_facade.dart';
-import '../../../settings/settings_facade.dart';
 import '../../../schedule/schedule_ui_facade.dart';
 import '../../../students/students_ui_facade.dart';
 import '../providers/home_lesson_summary_provider.dart';
-import '../providers/teacher_profile_completion_provider.dart';
 import '../widgets/dashboard_tab.dart';
 import '../widgets/home_quick_action_fab.dart';
 
@@ -33,68 +26,16 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
-  final _settingsNavKey = GlobalKey();
-  final _studentsNavKey = GlobalKey();
-  // Phase B step 3 target — 레슨 탭 (감사 §4.4 B2).
-  final _scheduleNavKey = GlobalKey();
-
-  late final CoachMarkController _coachMarkController;
-
-  bool _wasCoachMarkActive = false;
-
   @override
   void initState() {
     super.initState();
-    // Phase B 3-step 코치마크 시퀀스 (감사 §4.4 B2) —
-    // SSOT: docs/specs/onboarding/teacher_onboarding_v3_spec.md §3.3.
-    //   1) lesson_time_settings → 설정 탭 → 가용시간 등록
-    //   2) first_student_invite → 학생 탭 → 첫 학생 초대
-    //   3) first_lesson_register → 레슨 탭 → 첫 레슨 등록
-    // 시퀀스 종료 후 QuestBoardCard 가 다음 진입점을 안내한다.
-    _coachMarkController = CoachMarkController(
-      steps: [
-        CoachMarkStep(
-          id: 'lesson_time_settings',
-          targetKey: _settingsNavKey,
-          title: AppStrings.coachMarkTimeTitle,
-          description: AppStrings.coachMarkTimeDescription,
-          actionLabel: AppStrings.coachMarkTimeAction,
-          position: CoachMarkPosition.above,
-          onAction: () => setState(() => _currentIndex = 3),
-        ),
-        CoachMarkStep(
-          id: 'first_student_invite',
-          targetKey: _studentsNavKey,
-          title: AppStrings.coachMarkFirstStudentInviteTitle,
-          description: AppStrings.coachMarkFirstStudentInviteDescription,
-          actionLabel: AppStrings.coachMarkFirstStudentInviteAction,
-          position: CoachMarkPosition.above,
-          onAction: () {
-            setState(() => _currentIndex = 2);
-            // Deep wiring (#652): 학생 탭 전환 후 초대 화면까지 안내.
-            context.push(AppRoutes.invite);
-          },
-        ),
-        CoachMarkStep(
-          id: 'first_lesson_register',
-          targetKey: _scheduleNavKey,
-          title: AppStrings.coachMarkFirstLessonRegisterTitle,
-          description: AppStrings.coachMarkFirstLessonRegisterDescription,
-          actionLabel: AppStrings.coachMarkFirstLessonRegisterAction,
-          position: CoachMarkPosition.above,
-          onAction: () {
-            setState(() => _currentIndex = 1);
-            // Deep wiring (#652): 레슨 탭 전환 후 레슨 추가 화면까지 안내.
-            context.push(AppRoutes.addLesson);
-          },
-        ),
-      ],
-    );
-
-    _coachMarkController.addListener(_onCoachMarkChanged);
-
+    // UXC-3 (2026-08-20): Phase B 3-step 코치마크 시퀀스 제거.
+    // `CoachMarkController.start()` 가 프로덕션 경로에서 한 번도 호출되지
+    // 않아 컨트롤러·리스너·타깃 키가 전부 죽은 배선이었다. 시퀀스가 담고
+    // 있던 "왜 필요한지" 카피는 QuestBoardCard 의 퀘스트 행 부제로 옮겼다
+    // (사용자가 실제로 읽는 위치). core/widgets/coach_mark 라이브러리는
+    // 향후 재사용을 위해 보존한다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _maybeStartCoachMark();
       _markQuestFirstShown();
     });
   }
@@ -115,65 +56,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.read(questFirstShownProvider.notifier).markShown();
   }
 
-  void _onCoachMarkChanged() {
-    if (_wasCoachMarkActive && !_coachMarkController.isActive) {
-      ref
-          .read(onboardingProgressStorageProvider.notifier)
-          .markCoachMarkCompleted();
-    }
-    _wasCoachMarkActive = _coachMarkController.isActive;
-  }
-
-  // Subscription used to wait for the onboarding-progress storage (Hive) to
-  // finish loading before deciding whether to start the coach mark. On the
-  // first frame the provider is still AsyncLoading, so valueOrNull is null and
-  // a single sync read would skip the coach mark entirely. (#7)
-  ProviderSubscription<AsyncValue<OnboardingProgressStorageState>>?
-  _coachMarkLoadSub;
-
-  void _maybeStartCoachMark() {
-    final storageAsync = ref.read(onboardingProgressStorageProvider);
-    if (!storageAsync.hasValue) {
-      // Storage not loaded yet — re-check once a value arrives, then clean up.
-      _coachMarkLoadSub?.close();
-      _coachMarkLoadSub = ref.listenManual(onboardingProgressStorageProvider, (
-        previous,
-        next,
-      ) {
-        if (next.hasValue && mounted) {
-          _coachMarkLoadSub?.close();
-          _coachMarkLoadSub = null;
-          _maybeStartCoachMark();
-        }
-      });
-      return;
-    }
-    final storage = storageAsync.valueOrNull;
-    if (storage == null || storage.coachMarkCompleted) return;
-
-    // The blocking first-availability interstitial is the single source of
-    // "set lesson time" guidance. The lesson-time coach mark duplicated it and
-    // re-prompted "레슨 시간을 설정하세요" even after the teacher had already set
-    // it (the interstitial sets slots, then the rebuilt home re-ran this and
-    // started the coach mark). Once slots exist the action is done → mark the
-    // coach mark complete; before slots exist the interstitial handles it, so
-    // we never auto-start the coach mark.
-    final settingsAsync = ref.read(teacherSettingsProvider);
-    if (settingsAsync.hasValue && ref.read(hasAvailableSlotsProvider)) {
-      ref
-          .read(onboardingProgressStorageProvider.notifier)
-          .markCoachMarkCompleted();
-    }
-  }
-
-  @override
-  void dispose() {
-    _coachMarkLoadSub?.close();
-    _coachMarkController.removeListener(_onCoachMarkChanged);
-    _coachMarkController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     // §B3 Q6 (첫 학생 초대) 완료 직후 잠금 해제 축하 시트 1회 표시.
@@ -188,19 +70,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return DebugWrapper(
       child: NotebookScreenScaffold(
         body: SafeArea(
-          child: CoachMarkScope(
-            controller: _coachMarkController,
-            child: IndexedStack(
-              index: _currentIndex,
-              children: [
-                DashboardTab(
-                  onViewAllLessons: () => setState(() => _currentIndex = 1),
-                ),
-                const ScheduleTab(),
-                const StudentsTab(),
-                const ProfileTab(),
-              ],
-            ),
+          child: IndexedStack(
+            index: _currentIndex,
+            children: [
+              DashboardTab(
+                onViewAllLessons: () => setState(() => _currentIndex = 1),
+              ),
+              const ScheduleTab(),
+              const StudentsTab(),
+              const ProfileTab(),
+            ],
           ),
         ),
         floatingActionButton: const HomeQuickActionFab(),
@@ -227,8 +106,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return NotebookBottomNav(
       currentIndex: _currentIndex,
       onTap: (index) => setState(() => _currentIndex = index),
-      items: [
-        const NotebookBottomNavItem(
+      items: const [
+        NotebookBottomNavItem(
           icon: Icons.home_outlined,
           activeIcon: Icons.home,
           label: AppStrings.homeTabLabel,
@@ -237,19 +116,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           icon: Icons.calendar_month_outlined,
           activeIcon: Icons.calendar_month,
           label: AppStrings.scheduleTabTitle,
-          itemKey: _scheduleNavKey,
         ),
         NotebookBottomNavItem(
           icon: Icons.library_music_outlined,
           activeIcon: Icons.library_music,
           label: AppStrings.studentsTabLabel,
-          itemKey: _studentsNavKey,
         ),
         NotebookBottomNavItem(
           icon: Icons.person_outline,
           activeIcon: Icons.person,
           label: AppStrings.profileTabLabel,
-          itemKey: _settingsNavKey,
         ),
       ],
     );

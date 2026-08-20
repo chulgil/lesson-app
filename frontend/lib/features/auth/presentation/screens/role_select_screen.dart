@@ -227,7 +227,7 @@ class _RoleCard extends StatelessWidget {
   final bool isEnabled;
   final bool isLoading;
   final VoidCallback onTap;
-  final String? badge; // #112: optional pre-badge (e.g. "초대 필요")
+  final String? badge; // #112: optional pre-badge (e.g. "초대코드 선택사항")
 
   const _RoleCard({
     required this.icon,

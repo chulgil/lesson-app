@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../domain/value_objects/discipline_registry.dart';
 import '../l10n/app_strings.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -14,7 +15,8 @@ import '../theme/app_typography.dart';
 /// tokens, no shadow.
 ///
 /// This widget is discipline/role agnostic — it renders whatever [steps] and
-/// [currentStep] it is given. Callers decide whether to show it (e.g. the shared
+/// [currentStep] it is given, minus any step the signup flow cannot reach (see
+/// [_isUnreachable]). Callers decide whether to show it (e.g. the shared
 /// discipline-selection screen only mounts it for the teacher flow).
 class OnboardingStepHeader extends StatelessWidget {
   /// SSOT for the teacher signup step labels, in order. [currentStep] is 1-based
@@ -38,18 +40,41 @@ class OnboardingStepHeader extends StatelessWidget {
     required this.currentStep,
   });
 
+  /// Whether [label] names a step the signup flow never actually runs.
+  ///
+  /// 분야 selection only runs when more than one discipline is selectable. With
+  /// music alone registered (#1278) RoleSelectScreen routes 역할 → 프로필
+  /// directly, so drawing 분야 promised a screen nobody reaches and pushed every
+  /// later number one too high — 프로필 read "3/4" on a three-step journey.
+  /// Registering a second discipline brings the step back on its own.
+  static bool _isUnreachable(String label) =>
+      label == AppStrings.onboardingStepDiscipline &&
+      DisciplineRegistry.all.length <= 1;
+
   @override
   Widget build(BuildContext context) {
-    final children = <Widget>[];
+    // Renumber against the steps that survive so call sites keep passing their
+    // literal position in [steps]. The active step is never dropped: a deep
+    // link that lands on a skipped screen still shows the user where they are.
+    final visible = <String>[];
+    var activeIndex = 0;
     for (var i = 0; i < steps.length; i++) {
+      final isActive = i + 1 == currentStep;
+      if (!isActive && _isUnreachable(steps[i])) continue;
+      if (isActive) activeIndex = visible.length + 1;
+      visible.add(steps[i]);
+    }
+
+    final children = <Widget>[];
+    for (var i = 0; i < visible.length; i++) {
       if (i > 0) {
-        children.add(_ProgressDivider(isActive: i < currentStep));
+        children.add(_ProgressDivider(isActive: i < activeIndex));
       }
       children.add(
         _ProgressStep(
           step: i + 1,
-          label: steps[i],
-          isActive: i + 1 == currentStep,
+          label: visible[i],
+          isActive: i + 1 == activeIndex,
         ),
       );
     }

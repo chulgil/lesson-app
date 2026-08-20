@@ -1,4 +1,6 @@
-// #930 / #112 — Student role card must display "초대 필요" pre-badge.
+// #930 / #112 — Student role card must display the invite pre-badge.
+// UXC-13: 문구는 "초대 필요" → "초대코드 선택사항" 으로 완화됐고, 배지의
+// 존재 자체는 유지된다 (검증은 리터럴이 아니라 상수 기준).
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,13 +32,13 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('#112 학생 역할 카드에 "초대 필요" 배지가 표시된다', (tester) async {
+  testWidgets('#112 학생 역할 카드에 초대코드 배지가 표시된다', (tester) async {
     await pumpRoleSelect(tester);
 
     expect(
       find.text(AppStrings.roleSelectStudentInviteBadge),
       findsOneWidget,
-      reason: '학생 카드에만 초대 필요 배지가 있어야 함',
+      reason: '학생 카드에만 초대코드 배지가 있어야 함',
     );
     expect(tester.takeException(), isNull);
   });

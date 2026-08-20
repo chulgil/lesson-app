@@ -127,6 +127,20 @@ List<Override> _emptyOverrides() => [
   childProfilesProvider('parent-1').overrideWith((_) async => const []),
 ];
 
+/// 자녀 프로필은 있으나 선생님과 연결되지 않은 상태 (UXC-12).
+/// 레슨·연습·수강권 프로바이더는 의도적으로 override 하지 않는다 — 해당
+/// 섹션이 아예 렌더되지 않아야 하므로, 읽히면 테스트가 실패한다.
+List<Override> _unlinkedOverrides() {
+  final profile = _profile(linkedStudentId: null);
+  return [
+    currentUserIdProvider.overrideWithValue('parent-1'),
+    childProfilesProvider('parent-1').overrideWith((_) async => [profile]),
+    selectedChildProfileProvider.overrideWith(
+      () => _FakeSelectedChildProfile(profile),
+    ),
+  ];
+}
+
 void main() {
   group('ParentDashboardTab — 자녀 실데이터 연결 (#585)', () {
     testWidgets('연결된 자녀 대시보드가 예외 없이 렌더된다', (tester) async {
@@ -164,30 +178,55 @@ void main() {
       expect(find.textContaining('5회'), findsWidgets);
       expect(tester.takeException(), isNull);
     });
+  });
 
-    testWidgets('미연결 자녀는 섹션마다 미연결 안내를 렌더한다', (tester) async {
+  // UXC-12: 미연결 자녀는 섹션마다 같은 안내를 반복하는 대신 연결 CTA 카드 1개.
+  group('ParentDashboardTab 미연결 자녀 (UXC-12)', () {
+    testWidgets('연결 안내 카드 1개만 노출되고 죽은 섹션 자리표시자는 사라진다', (tester) async {
       await tester.binding.setSurfaceSize(const Size(440, 1400));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      final profile = _profile(linkedStudentId: null);
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            currentUserIdProvider.overrideWithValue('parent-1'),
-            childProfilesProvider(
-              'parent-1',
-            ).overrideWith((_) async => [profile]),
-            selectedChildProfileProvider.overrideWith(
-              () => _FakeSelectedChildProfile(profile),
-            ),
-          ],
-          child: const MaterialApp(home: Scaffold(body: ParentDashboardTab())),
+          overrides: _unlinkedOverrides(),
+          child: MaterialApp.router(routerConfig: _emptyStateRouter()),
         ),
       );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
 
-      expect(find.text(AppStrings.parentHomeNotLinked), findsWidgets);
+      // 안내는 정확히 1곳 — 예전에는 5개 섹션이 같은 문구를 반복했다.
+      expect(find.text(AppStrings.parentHomeNotLinked), findsOneWidget);
+      expect(find.text(AppStrings.parentHomeNotLinkedDesc), findsOneWidget);
+      // 행동 가능한 연결 CTA 1개.
+      expect(find.text(AppStrings.parentHomeInviteCode), findsOneWidget);
+
+      // 데이터가 없는 섹션 헤더는 렌더되지 않는다.
+      expect(find.text(AppStrings.parentHomeNextLesson), findsNothing);
+      expect(find.text(AppStrings.parentHomeThisWeekPractice), findsNothing);
+      expect(find.text(AppStrings.parentHomeAssignmentStatus), findsNothing);
+      expect(find.text(AppStrings.parentHomeRemainingLesson), findsNothing);
+
+      // 자녀 정체성(이름)은 유지된다.
+      expect(find.text('지우'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('연결 CTA 탭 → parentInviteCode 라우트로 이동', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(440, 1400));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _unlinkedOverrides(),
+          child: MaterialApp.router(routerConfig: _emptyStateRouter()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(AppStrings.parentHomeInviteCode));
+      await tester.pumpAndSettle();
+
+      expect(find.text('invite-code-sentinel'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
