@@ -2066,6 +2066,15 @@ class AppStrings {
   /// 이름을 확인할 수 없는 로스터 행 (서버 이름 없음 + 담당 학생 목록에도 없음)
   static const groupClassMembersUnknownStudent = '이름 미확인 학생';
 
+  /// 신청 (교사 상세 개설 클래스 — 반 행에서 챗형 신청 흐름 진입)
+  static const groupClassEnrollAction = '신청';
+
+  /// 신청할 반 (레슨 신청 화면 — 어떤 반에 신청하는지 알려주는 읽기 전용 맥락)
+  static const groupClassRequestContextLabel = '신청할 반';
+
+  /// 같은 반에 이미 대기 중인 신청이 있을 때 (BE 409)
+  static const groupClassRequestDuplicate = '이미 이 반에 대기 중인 신청이 있습니다';
+
   /// $time · $minutes분 (학생 아젠다 반 행 요약)
   static String groupClassAgendaSummary(String time, int minutes) =>
       '$time · $minutes분';
@@ -3761,6 +3770,9 @@ class AppStrings {
 
   /// ⭐ 추천 (selectable template card 배지 — 별 포함)
   static const templateRecommendedBadgeStar = '추천';
+
+  /// 그룹 (수강권 템플릿 배지 — 신청한 반과 연결된 그룹 전용 템플릿)
+  static const templateGroupClassBadge = '그룹';
 
   /// N회 · M분 · 유효기간 (selectable template card 요약 라인)
   static String templateSummaryLine({

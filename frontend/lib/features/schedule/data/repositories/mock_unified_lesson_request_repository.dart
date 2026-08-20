@@ -1,3 +1,4 @@
+import '../../../../core/network/api_exceptions.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
@@ -1547,6 +1548,23 @@ class MockUnifiedLessonRequestRepository
   @override
   Future<UnifiedLessonRequest> create(UnifiedLessonRequest request) async {
     await Future.delayed(const Duration(milliseconds: 100));
+    // J15b — 같은 학생 x 같은 반의 활성 신청 중복 차단 (BE 409 와 동일 계약).
+    final groupClassId = request.groupClassId;
+    if (groupClassId != null) {
+      final duplicate = _requests.values.any(
+        (r) =>
+            r.studentId == request.studentId &&
+            r.groupClassId == groupClassId &&
+            !r.isTerminal,
+      );
+      if (duplicate) {
+        // 사용자 문구는 화면이 statusCode 로 고른다 (data 계층은 l10n 비의존).
+        throw const ApiException(
+          message: 'duplicate active request for group class',
+          statusCode: 409,
+        );
+      }
+    }
     _requests[request.id] = request;
     return request;
   }

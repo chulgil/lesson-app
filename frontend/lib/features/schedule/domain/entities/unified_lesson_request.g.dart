@@ -93,6 +93,7 @@ UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
       goal: $enumDecode(_$UnifiedLessonGoalEnumMap, json['goal']),
       experience:
           $enumDecode(_$UnifiedExperienceLevelEnumMap, json['experience']),
+      groupClassId: json['group_class_id'] as String?,
       message: json['message'] as String?,
       preferredDay: (json['preferred_day'] as num?)?.toInt(),
       preferredTime: json['preferred_time'] as String?,
@@ -138,6 +139,7 @@ Map<String, dynamic> _$UnifiedLessonRequestToJson(
       'instrument': instance.instrument,
       'goal': _$UnifiedLessonGoalEnumMap[instance.goal]!,
       'experience': _$UnifiedExperienceLevelEnumMap[instance.experience]!,
+      'group_class_id': instance.groupClassId,
       'message': instance.message,
       'preferred_day': instance.preferredDay,
       'preferred_time': instance.preferredTime,

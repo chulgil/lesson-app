@@ -575,6 +575,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final result = await showProposalBottomSheet(
       context,
       teacherId: request.teacherId,
+      groupClassId: request.groupClassId,
     );
     if (result == null || !context.mounted) return;
 

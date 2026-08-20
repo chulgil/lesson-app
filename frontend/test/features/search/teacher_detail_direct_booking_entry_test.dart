@@ -105,6 +105,10 @@ void main() {
     expect(cta, findsOneWidget, reason: '수강권 보유 학생에게는 직접 예약 CTA 가 보여야 한다');
     expect(find.text(AppStrings.searchLessonApply), findsNothing);
 
+    // 개설 클래스 섹션이 자라면 CTA 가 접힘 아래로 내려간다 — 실제 화면은
+    // 스크롤되므로 탭 전에 노출시킨다.
+    await tester.ensureVisible(cta);
+    await tester.pumpAndSettle();
     await tester.tap(cta);
     await tester.pumpAndSettle();
 
@@ -126,6 +130,10 @@ void main() {
     expect(cta, findsOneWidget);
     expect(find.text(AppStrings.bookAction), findsNothing);
 
+    // 개설 클래스 섹션이 자라면 CTA 가 접힘 아래로 내려간다 — 실제 화면은
+    // 스크롤되므로 탭 전에 노출시킨다.
+    await tester.ensureVisible(cta);
+    await tester.pumpAndSettle();
     await tester.tap(cta);
     await tester.pumpAndSettle();
 
