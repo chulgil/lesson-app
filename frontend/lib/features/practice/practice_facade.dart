@@ -44,6 +44,10 @@ export 'presentation/providers/practice_overview_provider.dart'
 export 'presentation/providers/practice_repertoire_crud_provider.dart';
 export 'presentation/providers/practice_repertoire_repository_provider.dart'
     show practiceRepertoireRepositoryProvider;
+// UXB-1 — the starter sample writes a practice log through the repository
+// contract from the onboarding application service.
+export 'presentation/providers/practice_repository_provider.dart'
+    show practiceRepositoryProvider;
 export 'presentation/providers/practice_streak_provider.dart'
     show
         currentUserStreakProvider,

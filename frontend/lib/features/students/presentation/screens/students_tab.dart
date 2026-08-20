@@ -17,6 +17,8 @@ import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../billing/billing_facade.dart' show guardAddStudentNavigation;
+import '../../../onboarding/onboarding_facade.dart'
+    show StarterSampleCleanupBanner, StarterSampleOffer;
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/roster_summary.dart';
 import '../extensions/student_domain_visuals.dart';
@@ -87,6 +89,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                     selectedCategory: _selectedTriageCategory,
                   ),
                 ),
+              // UXB-1 — 실제 학생이 생긴 뒤에만 스스로 나타나는 예시 데이터 정리 CTA.
+              if (!_isSelectionMode)
+                const SliverToBoxAdapter(child: StarterSampleCleanupBanner()),
               SliverToBoxAdapter(child: _buildSearchBar()),
               const SliverToBoxAdapter(
                 child: SizedBox(height: AppSpacing.space2),
@@ -98,16 +103,19 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 child: SizedBox(height: AppSpacing.space2),
               ),
               groupedAsync.when(
-                data: (groups) =>
-                    _buildGroupedStudentSliver(groups, summaryAsync.value),
-                loading: () => const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (error, stack) => SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _buildErrorState(error),
-                ),
+                data:
+                    (groups) =>
+                        _buildGroupedStudentSliver(groups, summaryAsync.value),
+                loading:
+                    () => const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                error:
+                    (error, stack) => SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _buildErrorState(error),
+                    ),
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
@@ -135,25 +143,26 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return groups
         .map((group) {
-          final filtered = group.students.where((swm) {
-            switch (_currentFilter) {
-              case StudentFilter.all:
-                return true;
-              case StudentFilter.good:
-                return swm.practiceStatus == PracticeStatus.good;
-              case StudentFilter.normal:
-                return swm.practiceStatus == PracticeStatus.normal;
-              case StudentFilter.poor:
-                return swm.practiceStatus == PracticeStatus.poor;
-              case StudentFilter.paused:
-                return swm.practiceStatus == PracticeStatus.paused;
-              case StudentFilter.expiring:
-              case StudentFilter.unpaid:
-              case StudentFilter.trial:
-              case StudentFilter.archive:
-                return enrollmentIds?.contains(swm.studentId) ?? false;
-            }
-          }).toList();
+          final filtered =
+              group.students.where((swm) {
+                switch (_currentFilter) {
+                  case StudentFilter.all:
+                    return true;
+                  case StudentFilter.good:
+                    return swm.practiceStatus == PracticeStatus.good;
+                  case StudentFilter.normal:
+                    return swm.practiceStatus == PracticeStatus.normal;
+                  case StudentFilter.poor:
+                    return swm.practiceStatus == PracticeStatus.poor;
+                  case StudentFilter.paused:
+                    return swm.practiceStatus == PracticeStatus.paused;
+                  case StudentFilter.expiring:
+                  case StudentFilter.unpaid:
+                  case StudentFilter.trial:
+                  case StudentFilter.archive:
+                    return enrollmentIds?.contains(swm.studentId) ?? false;
+                }
+              }).toList();
           return StudentGroup(
             lessonClass: group.lessonClass,
             students: filtered,
@@ -328,11 +337,12 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                 const SizedBox(width: AppSpacing.space1),
                 // + 학생 추가
                 IconButton(
-                  onPressed: () => guardAddStudentNavigation(
-                    context: context,
-                    ref: ref,
-                    onPass: () => context.push(AppRoutes.addStudentMethod),
-                  ),
+                  onPressed:
+                      () => guardAddStudentNavigation(
+                        context: context,
+                        ref: ref,
+                        onPass: () => context.push(AppRoutes.addStudentMethod),
+                      ),
                   icon: const Icon(Icons.add, color: AppColors.ink, size: 22),
                   tooltip: AppStrings.studentAddLabel,
                   padding: EdgeInsets.zero,
@@ -389,15 +399,16 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             color: AppColors.inkTertiary,
           ),
           prefixIcon: const Icon(Icons.search, color: AppColors.inkTertiary),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    ref.read(studentSearchQueryProvider.notifier).clear();
-                  },
-                  icon: const Icon(Icons.clear, size: 20),
-                )
-              : null,
+          suffixIcon:
+              _searchController.text.isNotEmpty
+                  ? IconButton(
+                    onPressed: () {
+                      _searchController.clear();
+                      ref.read(studentSearchQueryProvider.notifier).clear();
+                    },
+                    icon: const Icon(Icons.clear, size: 20),
+                  )
+                  : null,
           filled: true,
           fillColor: AppColors.paperDark,
           border: const OutlineInputBorder(borderSide: BorderSide.none),
@@ -414,51 +425,53 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   Future<void> _showPracticeFilterSheet() async {
     final selected = await showNotebookModalBottomSheet<StudentFilter>(
       context: context,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.paper,
-          borderRadius: BorderRadius.zero,
-        ),
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
-                // (§7.27). '필터' 는 정적 명사 헤더 — 연습/수강 상태 통합.
-                Text(
-                  AppStrings.studentFilterTitle,
-                  style: NotebookTypography.appBarTitle,
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: AppColors.paper,
+              borderRadius: BorderRadius.zero,
+            ),
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
+                    // (§7.27). '필터' 는 정적 명사 헤더 — 연습/수강 상태 통합.
+                    Text(
+                      AppStrings.studentFilterTitle,
+                      style: NotebookTypography.appBarTitle,
+                    ),
+                    const SizedBox(height: AppSpacing.space3),
+                    ...StudentFilter.values.map((filter) {
+                      final isSelected = _currentFilter == filter;
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: NotebookRadio<StudentFilter>(
+                          value: filter,
+                          groupValue: isSelected ? filter : null,
+                          onChanged: (_) => Navigator.of(context).pop(filter),
+                        ),
+                        title: Text(
+                          filter.label,
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                          ),
+                        ),
+                        onTap: () => Navigator.of(context).pop(filter),
+                      );
+                    }),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.space3),
-                ...StudentFilter.values.map((filter) {
-                  final isSelected = _currentFilter == filter;
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: NotebookRadio<StudentFilter>(
-                      value: filter,
-                      groupValue: isSelected ? filter : null,
-                      onChanged: (_) => Navigator.of(context).pop(filter),
-                    ),
-                    title: Text(
-                      filter.label,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                      ),
-                    ),
-                    onTap: () => Navigator.of(context).pop(filter),
-                  );
-                }),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
     );
 
     if (selected != null) {
@@ -496,9 +509,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             icon: Icon(
               Icons.tune,
               size: 20,
-              color: hasActiveFilter
-                  ? AppColors.paperAccent
-                  : AppColors.inkSecondary,
+              color:
+                  hasActiveFilter
+                      ? AppColors.paperAccent
+                      : AppColors.inkSecondary,
             ),
             onPressed: _showPracticeFilterSheet,
             tooltip: AppStrings.studentFilterTitle,
@@ -523,41 +537,42 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   void _showSortOptions() {
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
-              // (§7.27). '정렬 기준' 은 정적 명사 헤더.
-              child: Text(
-                AppStrings.studentSortTitle,
-                style: NotebookTypography.appBarTitle,
-              ),
-            ),
-            ...StudentSortOption.values.map((option) {
-              final isSelected = _sortOption == option;
-              return ListTile(
-                leading: NotebookRadio<StudentSortOption>(
-                  value: option,
-                  groupValue: isSelected ? option : null,
-                  onChanged: (_) {
-                    setState(() => _sortOption = option);
-                    Navigator.pop(context);
-                  },
+      builder:
+          (context) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.space4),
+                  // Notebook × Score: 모달 시트 타이틀은 Playfair appBarTitle
+                  // (§7.27). '정렬 기준' 은 정적 명사 헤더.
+                  child: Text(
+                    AppStrings.studentSortTitle,
+                    style: NotebookTypography.appBarTitle,
+                  ),
                 ),
-                title: Text(option.label),
-                onTap: () {
-                  setState(() => _sortOption = option);
-                  Navigator.pop(context);
-                },
-              );
-            }),
-            const SizedBox(height: AppSpacing.space2),
-          ],
-        ),
-      ),
+                ...StudentSortOption.values.map((option) {
+                  final isSelected = _sortOption == option;
+                  return ListTile(
+                    leading: NotebookRadio<StudentSortOption>(
+                      value: option,
+                      groupValue: isSelected ? option : null,
+                      onChanged: (_) {
+                        setState(() => _sortOption = option);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    title: Text(option.label),
+                    onTap: () {
+                      setState(() => _sortOption = option);
+                      Navigator.pop(context);
+                    },
+                  );
+                }),
+                const SizedBox(height: AppSpacing.space2),
+              ],
+            ),
+          ),
     );
   }
 
@@ -629,17 +644,27 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   Widget _buildEmptyState() {
     final query = ref.watch(studentSearchQueryProvider);
 
-    return EmptyStateWidget(
+    final emptyState = EmptyStateWidget(
       icon: Icons.people_outline,
-      title: query.isNotEmpty
-          ? AppStrings.studentsSearchEmptyTitle
-          : AppStrings.studentsEmptyTitle,
+      title:
+          query.isNotEmpty
+              ? AppStrings.studentsSearchEmptyTitle
+              : AppStrings.studentsEmptyTitle,
       subtitle: query.isEmpty ? AppStrings.studentsEmptySubtitle : null,
       actionLabel: query.isEmpty ? AppStrings.studentAddLabel : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
-      onAction: query.isEmpty
-          ? () => context.push(AppRoutes.addStudentMethod)
-          : null,
+      onAction:
+          query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,
+    );
+
+    // 검색 결과 없음과 명단 자체가 빈 것은 다르다 — 둘러보기 제안은 후자에서만
+    // 노출한다 (UXB-1).
+    if (query.isNotEmpty) return emptyState;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [emptyState, const StarterSampleOffer()],
     );
   }
 
@@ -853,20 +878,22 @@ class _StudentCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected
-            ? AppColors.paperAccentSoft
-            : Theme.of(context).colorScheme.surface,
+        color:
+            isSelected
+                ? AppColors.paperAccentSoft
+                : Theme.of(context).colorScheme.surface,
         border: isSelected ? Border.all(color: AppColors.paperAccent) : null,
       ),
       child: InkWell(
-        onTap: isSelectionMode
-            ? () => onSelectionChanged(!isSelected)
-            : () {
-                context.push(
-                  AppRoutes.studentDetail.replaceFirst(':id', swm.studentId),
-                  extra: {'membershipId': swm.membership?.id},
-                );
-              },
+        onTap:
+            isSelectionMode
+                ? () => onSelectionChanged(!isSelected)
+                : () {
+                  context.push(
+                    AppRoutes.studentDetail.replaceFirst(':id', swm.studentId),
+                    extra: {'membershipId': swm.membership?.id},
+                  );
+                },
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,
@@ -960,9 +987,10 @@ class _StudentCard extends ConsumerWidget {
                 Icon(
                   swm.isAppConnected ? Icons.link : Icons.edit_note,
                   size: 14,
-                  color: swm.isAppConnected
-                      ? AppColors.paperOk
-                      : AppColors.inkTertiary,
+                  color:
+                      swm.isAppConnected
+                          ? AppColors.paperOk
+                          : AppColors.inkTertiary,
                 ),
               ],
             ),
@@ -1006,9 +1034,10 @@ class _StudentCard extends ConsumerWidget {
           return SizedBox(
             width: 56,
             child: GestureDetector(
-              onTap: () => context.push(
-                '${AppRoutes.issueSubscription}?studentId=$studentId',
-              ),
+              onTap:
+                  () => context.push(
+                    '${AppRoutes.issueSubscription}?studentId=$studentId',
+                  ),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
@@ -1060,13 +1089,14 @@ class _EnrollmentExtras extends ConsumerWidget {
       data: (subs) {
         if (subs.isEmpty) return const SizedBox.shrink();
 
-        final active = subs
-            .where(
-              (s) =>
-                  s.status == SubscriptionStatus.active ||
-                  s.status == SubscriptionStatus.expiringSoon,
-            )
-            .toList();
+        final active =
+            subs
+                .where(
+                  (s) =>
+                      s.status == SubscriptionStatus.active ||
+                      s.status == SubscriptionStatus.expiringSoon,
+                )
+                .toList();
         final isArchive = active.isEmpty;
 
         if (isArchive) {
@@ -1086,21 +1116,26 @@ class _EnrollmentExtras extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.space2),
-        child: Row(
-          children: [
-            Icon(Icons.error_outline, size: 16, color: AppColors.inkTertiary),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              AppStrings.loadDataFailed,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.inkSecondary,
-              ),
+      error:
+          (_, __) => Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space2),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: AppColors.inkTertiary,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  AppStrings.loadDataFailed,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.inkSecondary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -1111,13 +1146,13 @@ class _EnrollmentExtras extends ConsumerWidget {
   ) {
     final total = sub.totalLessonsForDisplay;
     final used = sub.usedLessons;
-    final progress = (total != null && total > 0)
-        ? (used / total).clamp(0.0, 1.0)
-        : 0.0;
+    final progress =
+        (total != null && total > 0) ? (used / total).clamp(0.0, 1.0) : 0.0;
     final daysLeft = sub.daysUntilExpiration;
-    final barColor = progress >= 0.8 || (daysLeft != null && daysLeft <= 7)
-        ? AppColors.paperAccent
-        : AppColors.inkSecondary;
+    final barColor =
+        progress >= 0.8 || (daysLeft != null && daysLeft <= 7)
+            ? AppColors.paperAccent
+            : AppColors.inkSecondary;
 
     // 진행 bar만 표시 (D-day, 레슨추가는 상세 화면에서 확인)
     if (total == null || total <= 0) return const SizedBox.shrink();
@@ -1151,9 +1186,10 @@ class _EnrollmentExtras extends ConsumerWidget {
     WidgetRef ref,
     Subscription? latest,
   ) {
-    final expiredDateText = latest?.endDate != null
-        ? '${latest!.endDate!.year}-${latest.endDate!.month.toString().padLeft(2, '0')}-${latest.endDate!.day.toString().padLeft(2, '0')} 만료'
-        : AppStrings.subscriptionExpiredLabel;
+    final expiredDateText =
+        latest?.endDate != null
+            ? '${latest!.endDate!.year}-${latest.endDate!.month.toString().padLeft(2, '0')}-${latest.endDate!.day.toString().padLeft(2, '0')} 만료'
+            : AppStrings.subscriptionExpiredLabel;
     return Text(
       expiredDateText,
       style: AppTypography.captionSmall.copyWith(color: AppColors.inkTertiary),
@@ -1161,8 +1197,9 @@ class _EnrollmentExtras extends ConsumerWidget {
   }
 
   Subscription? _latestByEndDate(List<Subscription> subs) {
-    final withDates = subs.where((s) => s.endDate != null).toList()
-      ..sort((a, b) => b.endDate!.compareTo(a.endDate!));
+    final withDates =
+        subs.where((s) => s.endDate != null).toList()
+          ..sort((a, b) => b.endDate!.compareTo(a.endDate!));
     return withDates.isEmpty ? null : withDates.first;
   }
 }

@@ -458,6 +458,7 @@ class CoachMarkState {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-08-20 | UX 백로그 #1289 — (1) 스타터 샘플 데이터: 학생 0명 교사 옵트인 1탭으로 예시 학생+완료 레슨(노트)+연습 기록 생성, 실제 학생 등록 후 1탭 정리 (`features/onboarding/domain/services/starter_sample_data_service.dart`, 진입점 students_tab 빈 상태). (2) 초대 딥링크 role-skip: 6자 코드 보유+역할 미확정 시 roleSelect·차단 화면 스킵→학생 초대코드 화면 직행(보조 링크로 역할 변경 가능). (3) 초대 공유 메시지를 시작 안내(소개 1줄+3단계+코드+링크)로 강화, 학부모 공유 문구 AppStrings 정합. 작업 스펙: `.harness/spec/2026-08-20-ux-clarity-backlog.md` |
 | 2026-08-20 | UX Clarity #1287 — §5 코치마크 홈 배선 폐기(데드코드, 카피는 퀘스트 행 부제로 이식), 퀘스트보드 현재 그룹만 노출(+더 보기), 데이터 0 상태 통계 카드 숨김, NextMissionSpotlight dismiss 플래그 분리(첫 도착 타임스탬프와 별도), 로그인 가치제안 1줄·가용시간 WHY 부제·수강권/가용시간 용어 풀이 추가, 카테고리 프리뷰 단일 CTA, 단계 헤더 실제 여정 정합. 작업 스펙: `.harness/spec/2026-08-20-ux-clarity-onboarding.md` |
 | 2026-06-10 | §3.3 보강 인용 갱신 — 인터스티셜 모달 정책 폐기, 가입 흐름 강제 게이트로 일원화. FirstAvailabilityInterstitial dead code 제거. (감사 §4.3 B1) |
 | 2026-06-03 | 코드 반영 — OnboardingQuest/OnboardingProgress 엔티티, provider/저장, Phase B 화면 및 첫 가용시간 위젯 추가 |
