@@ -7,12 +7,14 @@ import '../../../../core/presentation/extensions/clock_time_ui_extensions.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
+import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../lessons/lessons_facade.dart';
 import '../../../search/search_facade.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../data/repositories/mock_teacher_availability_repository.dart';
 import '../../data/repositories/remote_teacher_availability_repository.dart';
 import '../../data/repositories/sync_aware_teacher_availability_repository.dart';
+import '../../data/services/teacher_availability_onboarding_api.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
@@ -34,6 +36,25 @@ TeacherAvailabilityRepository teacherAvailabilityRepository(Ref ref) =>
         remote: RemoteTeacherAvailabilityRepository(api),
         queue: queue,
       ),
+    );
+
+// ============================================================
+// Onboarding dual-write API — data-mode gated (#1293).
+// ============================================================
+
+/// Singleton so tests can override with a fake. Mock mode persists through
+/// [teacherAvailabilityRepositoryProvider] instead of issuing real HTTP
+/// (previously the provider always hit the BE endpoint, so mock-mode saves
+/// failed with a connection error).
+@Riverpod(keepAlive: true)
+TeacherAvailabilityApi teacherAvailabilityApi(Ref ref) =>
+    createRepository<TeacherAvailabilityApi>(
+      ref: ref,
+      mock: () => LocalTeacherAvailabilityApi(
+        repository: ref.read(teacherAvailabilityRepositoryProvider),
+        teacherIdResolver: () => ref.read(currentUserIdProvider),
+      ),
+      remote: (apiClient) => RemoteTeacherAvailabilityApi(apiClient),
     );
 
 // ============================================================

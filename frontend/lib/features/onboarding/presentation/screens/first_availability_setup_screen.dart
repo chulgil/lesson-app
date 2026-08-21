@@ -11,7 +11,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
-import '../../../schedule/data/services/teacher_availability_onboarding_api.dart';
+import '../../../schedule/schedule_facade.dart'
+    show teacherAvailabilityApiProvider;
 import '../../../settings/settings_facade.dart';
 import '../widgets/first_availability_celebration_sheet.dart';
 import '../../../../core/widgets/onboarding_step_header.dart';

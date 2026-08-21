@@ -10,13 +10,18 @@
 //
 // Reader unification (Job 3) lives in a follow-up PR; this layer only
 // owns the dual-write call.
-
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+//
+// #1293 — the save path is data-mode gated: mock mode persists through the
+// (mock-gated) availability repository instead of issuing real HTTP. The
+// provider that picks an implementation lives in
+// `presentation/providers/teacher_availability_providers.dart` so this data
+// layer stays free of presentation imports.
 
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/network/api_client.dart';
-
-part 'teacher_availability_onboarding_api.g.dart';
+import '../../domain/entities/teacher_availability.dart';
+import '../../domain/mappers/time_slot_mapper.dart';
+import '../../domain/repositories/teacher_availability_repository.dart';
 
 /// Result returned by the BE dual-write endpoint — counts only.
 class OnboardingDualWriteResult {
@@ -36,11 +41,16 @@ class OnboardingDualWriteResult {
   }
 }
 
+/// Onboarding availability save contract — implemented per data mode.
+abstract class TeacherAvailabilityApi {
+  Future<OnboardingDualWriteResult> postOnboarding(List<TimeSlot> slots);
+}
+
 /// Thin HTTP wrapper around the onboarding dual-write endpoint.
-class TeacherAvailabilityApi {
+class RemoteTeacherAvailabilityApi implements TeacherAvailabilityApi {
   final ApiClient _apiClient;
 
-  TeacherAvailabilityApi(this._apiClient);
+  RemoteTeacherAvailabilityApi(this._apiClient);
 
   /// Calls `POST /teacher/availability/onboarding` with the supplied
   /// availability slots. BE owns the dual-write to `TeacherAvailability`
@@ -49,17 +59,19 @@ class TeacherAvailabilityApi {
   ///
   /// BE expects `day_of_week` in 0..6 (Mon=0, Sun=6); domain entity uses
   /// 1..7 (Mon=1, Sun=7), so we shift by -1 here.
+  @override
   Future<OnboardingDualWriteResult> postOnboarding(List<TimeSlot> slots) async {
     final body = {
-      'slots': slots
-          .map(
-            (s) => {
-              'day_of_week': s.dayOfWeek - 1,
-              'start_time': s.startTime.toString(),
-              'end_time': s.endTime.toString(),
-            },
-          )
-          .toList(),
+      'slots':
+          slots
+              .map(
+                (s) => {
+                  'day_of_week': s.dayOfWeek - 1,
+                  'start_time': s.startTime.toString(),
+                  'end_time': s.endTime.toString(),
+                },
+              )
+              .toList(),
     };
 
     final response = await _apiClient.post(
@@ -78,9 +90,52 @@ class TeacherAvailabilityApi {
   }
 }
 
-/// Singleton provider so tests can override with a fake.
-@Riverpod(keepAlive: true)
-TeacherAvailabilityApi teacherAvailabilityApi(TeacherAvailabilityApiRef ref) {
-  final apiClient = ref.read(apiClientProvider);
-  return TeacherAvailabilityApi(apiClient);
+/// Mock-mode implementation (#1293): persists through the availability
+/// repository (mock-gated upstream) so the onboarding gate and read-side
+/// providers see the new slots — and never touches HTTP.
+///
+/// The legacy `TeacherSettings.available_slots` mirror is intentionally not
+/// written here: mock repositories are in-memory demo data and the mirror is
+/// being phased out (reader unification, #607 Job 3).
+class LocalTeacherAvailabilityApi implements TeacherAvailabilityApi {
+  final TeacherAvailabilityRepository _repository;
+  final String Function() _teacherIdResolver;
+
+  LocalTeacherAvailabilityApi({
+    required TeacherAvailabilityRepository repository,
+    required String Function() teacherIdResolver,
+  }) : _repository = repository,
+       _teacherIdResolver = teacherIdResolver;
+
+  @override
+  Future<OnboardingDualWriteResult> postOnboarding(List<TimeSlot> slots) async {
+    final teacherId = _teacherIdResolver();
+    final existing = await _repository.getAvailability(teacherId);
+    final base =
+        existing ??
+        TeacherAvailability(
+          id: 'availability-$teacherId',
+          teacherId: teacherId,
+          weeklySchedules: const [],
+          createdAt: DateTime.now(),
+        );
+
+    final now = DateTime.now();
+    final added = [
+      for (final slot in slots)
+        slot.toWeeklySchedule(
+          id: 'onboarding-${now.millisecondsSinceEpoch}-${slot.dayOfWeek}',
+          createdAt: now,
+        ),
+    ];
+
+    await _repository.saveAvailability(
+      base.copyWith(weeklySchedules: [...base.weeklySchedules, ...added]),
+    );
+
+    return OnboardingDualWriteResult(
+      scheduleSlotCount: slots.length,
+      settingsSlotCount: slots.length,
+    );
+  }
 }
