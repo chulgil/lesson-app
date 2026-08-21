@@ -10,6 +10,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../domain/entities/backup_state.dart';
 import '../../data/services/backup_service.dart';
+import '../../../../core/domain/entities/backup_stage.dart';
+import '../../../../core/presentation/extensions/backup_stage_labels.dart';
 
 part 'backup_provider.g.dart';
 
@@ -47,7 +49,7 @@ class BackupStateNotifier extends _$BackupStateNotifier {
 
     try {
       final backupFile = await _service.createBackup(
-        onProgress: (progress, status) {
+        onProgress: (progress, stage, {current, total}) {
           final currentState = state.value ?? const BackupState();
           state = AsyncValue.data(currentState.copyWith(progress: progress));
         },
@@ -102,14 +104,19 @@ class BackupStateNotifier extends _$BackupStateNotifier {
 
     final filePath = result.files.first.path;
     if (filePath == null) {
-      return RestoreResult.failure('파일 경로를 가져올 수 없습니다.');
+      return RestoreResult.failure(
+        const BackupFailure(BackupFailureKind.invalidFile),
+      );
     }
 
     // Validate file extension
     final expectedExtension = '.${BackupService.backupExtension}';
     if (!filePath.toLowerCase().endsWith(expectedExtension.toLowerCase())) {
       return RestoreResult.failure(
-        '올바른 백업 파일이 아닙니다.\n$expectedExtension 확장자 파일을 선택해주세요.',
+        BackupFailure(
+          BackupFailureKind.wrongExtension,
+          detail: expectedExtension,
+        ),
       );
     }
 
@@ -128,7 +135,7 @@ class BackupStateNotifier extends _$BackupStateNotifier {
     try {
       final result = await _service.restoreFromBackup(
         backupFile,
-        onProgress: (progress, status) {
+        onProgress: (progress, stage, {current, total}) {
           final currentState = state.value ?? const BackupState();
           state = AsyncValue.data(currentState.copyWith(progress: progress));
         },
@@ -140,7 +147,7 @@ class BackupStateNotifier extends _$BackupStateNotifier {
         newState.copyWith(
           isRestoring: false,
           progress: null,
-          lastError: result.success ? null : result.errorMessage,
+          lastError: result.success ? null : result.failure?.message,
         ),
       );
 
@@ -154,7 +161,9 @@ class BackupStateNotifier extends _$BackupStateNotifier {
           lastError: e.toString(),
         ),
       );
-      return RestoreResult.failure(e.toString());
+      return RestoreResult.failure(
+        BackupFailure(BackupFailureKind.unknown, detail: e.toString()),
+      );
     }
   }
 

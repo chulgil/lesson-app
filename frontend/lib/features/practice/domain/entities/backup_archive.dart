@@ -4,10 +4,13 @@
 // version, metadata, and the recording entries inside the archive.
 // Pure domain — no Flutter or platform imports.
 
+import '../../../../core/domain/entities/backup_stage.dart';
+
 /// Magic header written to `metadata.json` to identify our archive format.
 ///
 /// Used at restore time as a first-pass integrity gate before doing any
 /// file I/O against Hive boxes or the recordings directory.
+
 const String backupArchiveMagic = 'lessonbackup';
 
 /// Backup archive format version.
@@ -151,17 +154,18 @@ class BackupRestoreResult {
   /// Hive entries inserted across all boxes.
   final int restoredBoxEntries;
 
-  /// Human-readable error message when [success] is `false`.
-  final String? errorMessage;
+  /// Typed failure payload when [success] is `false` — presentation maps it
+  /// to user copy (backup_stage_labels.dart).
+  final BackupFailure? failure;
 
   const BackupRestoreResult({
     required this.success,
     this.restoredRecordings = 0,
     this.skippedRecordings = 0,
     this.restoredBoxEntries = 0,
-    this.errorMessage,
+    this.failure,
   });
 
-  factory BackupRestoreResult.failure(String message) =>
-      BackupRestoreResult(success: false, errorMessage: message);
+  factory BackupRestoreResult.failure(BackupFailure failure) =>
+      BackupRestoreResult(success: false, failure: failure);
 }
