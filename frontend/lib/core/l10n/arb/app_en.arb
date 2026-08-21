@@ -170,5 +170,34 @@
         "type": "int"
       }
     }
+  },
+  "backupWrongExtensionMessage": "Not a valid backup file.\nPlease choose a {extension} file.",
+  "@backupWrongExtensionMessage": {
+    "description": "Restore rejection when the picked file lacks the backup extension.",
+    "placeholders": {
+      "extension": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPathUnavailableMessage": "Couldn't access the file path.",
+  "@backupPathUnavailableMessage": {
+    "description": "Restore rejection when the file picker returned no usable path."
+  },
+  "selectorValidityDaysInputHint": "Enter validity (days)",
+  "@selectorValidityDaysInputHint": {
+    "description": "Hint for the validity custom input in days mode."
+  },
+  "selectorValidityMonthsInputHint": "Enter months",
+  "@selectorValidityMonthsInputHint": {
+    "description": "Hint for the validity custom input in months mode."
+  },
+  "practiceMeasureRangeGuide": "Select the measure range to practice",
+  "@practiceMeasureRangeGuide": {
+    "description": "Guide under the measure-range section title in the section form."
+  },
+  "practiceLineRangeGuide": "Select the line range to practice (lines 1–10)",
+  "@practiceLineRangeGuide": {
+    "description": "Guide under the line-range section title in the section form."
   }
 }

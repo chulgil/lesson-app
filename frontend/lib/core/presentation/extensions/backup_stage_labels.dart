@@ -7,6 +7,7 @@
 
 import '../../domain/entities/backup_stage.dart';
 import '../../l10n/app_strings.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 extension BackupStageLabels on BackupStage {
   /// User-facing progress copy for this stage.
@@ -64,10 +65,32 @@ extension BackupFailureLabels on BackupFailure {
       case BackupFailureKind.wrongExtension:
         return '${AppStrings.backupInvalidFile}'
             '${detail == null ? '' : ' ($detail)'}';
+      case BackupFailureKind.pathUnavailable:
+        // Context-free fallback — the full copy lives in [resolveMessage].
+        return AppStrings.backupInvalidFile;
       case BackupFailureKind.encodeFailed:
         return AppStrings.backupEncodeFailure;
       case BackupFailureKind.unknown:
         return AppStrings.restoreErrorFormat(detail ?? '');
+    }
+  }
+
+  /// Locale-aware message — preferred whenever a BuildContext is available.
+  ///
+  /// [message] is the context-free fallback (providers hold no context and
+  /// keep the AppStrings-based copy); this variant restores the original,
+  /// more actionable copy for the picker-stage failures (리뷰 0821).
+  String resolveMessage(AppLocalizations l10n) {
+    switch (kind) {
+      case BackupFailureKind.wrongExtension:
+        return l10n.backupWrongExtensionMessage(detail ?? '');
+      case BackupFailureKind.pathUnavailable:
+        return l10n.backupPathUnavailableMessage;
+      case BackupFailureKind.invalidFile:
+      case BackupFailureKind.unsupportedVersion:
+      case BackupFailureKind.encodeFailed:
+      case BackupFailureKind.unknown:
+        return message;
     }
   }
 }

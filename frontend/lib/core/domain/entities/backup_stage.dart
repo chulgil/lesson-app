@@ -38,6 +38,9 @@ enum BackupFailureKind {
   /// [BackupFailure.detail] carries the expected extension.
   wrongExtension,
 
+  /// File picker returned no usable path (unrelated to file validity).
+  pathUnavailable,
+
   /// ZIP encoding produced no bytes.
   encodeFailed,
 

@@ -105,7 +105,7 @@ class BackupStateNotifier extends _$BackupStateNotifier {
     final filePath = result.files.first.path;
     if (filePath == null) {
       return RestoreResult.failure(
-        const BackupFailure(BackupFailureKind.invalidFile),
+        const BackupFailure(BackupFailureKind.pathUnavailable),
       );
     }
 

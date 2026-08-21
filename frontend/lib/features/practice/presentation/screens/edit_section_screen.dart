@@ -434,7 +434,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '연습할 마디 구간을 선택하세요',
+                  AppLocalizations.of(context).practiceMeasureRangeGuide,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),
@@ -459,7 +459,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  '연습할 줄 구간을 선택하세요 (1~10줄)',
+                  AppLocalizations.of(context).practiceLineRangeGuide,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.inkSecondary,
                   ),

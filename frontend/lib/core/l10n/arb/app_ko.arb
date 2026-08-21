@@ -170,5 +170,34 @@
         "type": "int"
       }
     }
+  },
+  "backupWrongExtensionMessage": "올바른 백업 파일이 아닙니다.\n{extension} 확장자 파일을 선택해주세요.",
+  "@backupWrongExtensionMessage": {
+    "description": "Restore rejection when the picked file lacks the backup extension.",
+    "placeholders": {
+      "extension": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPathUnavailableMessage": "파일 경로를 가져올 수 없습니다.",
+  "@backupPathUnavailableMessage": {
+    "description": "Restore rejection when the file picker returned no usable path."
+  },
+  "selectorValidityDaysInputHint": "유효기간 입력",
+  "@selectorValidityDaysInputHint": {
+    "description": "Hint for the validity custom input in days mode."
+  },
+  "selectorValidityMonthsInputHint": "개월 입력",
+  "@selectorValidityMonthsInputHint": {
+    "description": "Hint for the validity custom input in months mode."
+  },
+  "practiceMeasureRangeGuide": "연습할 마디 구간을 선택하세요",
+  "@practiceMeasureRangeGuide": {
+    "description": "Guide under the measure-range section title in the section form."
+  },
+  "practiceLineRangeGuide": "연습할 줄 구간을 선택하세요 (1~10줄)",
+  "@practiceLineRangeGuide": {
+    "description": "Guide under the line-range section title in the section form."
   }
 }
