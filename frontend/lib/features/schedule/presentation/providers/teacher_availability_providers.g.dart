@@ -7,7 +7,7 @@ part of 'teacher_availability_providers.dart';
 // **************************************************************************
 
 String _$teacherAvailabilityRepositoryHash() =>
-    r'53a041fa349e50fcca4064871ffb8d09d28c4cf7';
+    r'55aa2910d5357033a821b013e8c0540bc28989c7';
 
 /// See also [teacherAvailabilityRepository].
 @ProviderFor(teacherAvailabilityRepository)
@@ -24,6 +24,28 @@ final teacherAvailabilityRepositoryProvider =
 
 typedef TeacherAvailabilityRepositoryRef
     = ProviderRef<TeacherAvailabilityRepository>;
+String _$teacherAvailabilityApiHash() =>
+    r'355443fea83a1590c71d1939aeda911e483eee2c';
+
+/// Singleton so tests can override with a fake. Mock mode persists through
+/// [teacherAvailabilityRepositoryProvider] instead of issuing real HTTP
+/// (previously the provider always hit the BE endpoint, so mock-mode saves
+/// failed with a connection error).
+///
+/// Copied from [teacherAvailabilityApi].
+@ProviderFor(teacherAvailabilityApi)
+final teacherAvailabilityApiProvider =
+    Provider<TeacherAvailabilityApi>.internal(
+  teacherAvailabilityApi,
+  name: r'teacherAvailabilityApiProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherAvailabilityApiHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef TeacherAvailabilityApiRef = ProviderRef<TeacherAvailabilityApi>;
 String _$teacherAvailabilityHash() =>
     r'c8a488ca035b8e9370023cd62fd2868e23592120';
 
@@ -1755,7 +1777,7 @@ final selectedDateProvider =
 
 typedef _$SelectedDate = AutoDisposeNotifier<DateTime>;
 String _$slotBookingNotifierHash() =>
-    r'e086e574292d2a020a5bb0878079182bb709b010';
+    r'0f3b15c221a17201756b9208d992f853c14409a2';
 
 /// See also [SlotBookingNotifier].
 @ProviderFor(SlotBookingNotifier)
@@ -1773,7 +1795,7 @@ final slotBookingNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SlotBookingNotifier
     = AutoDisposeNotifier<AsyncValue<AvailabilitySlot?>>;
 String _$teacherAvailabilityNotifierHash() =>
-    r'8956f53c167f5649dd774c8368d38df317925070';
+    r'a376930e23abf631b3853af1ba30622ed5afba4a';
 
 abstract class _$TeacherAvailabilityNotifier
     extends BuildlessAutoDisposeNotifier<AsyncValue<TeacherAvailability?>> {

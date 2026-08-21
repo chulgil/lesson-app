@@ -16,6 +16,8 @@ import 'package:lessonaza/core/l10n/app_strings.dart';
 import 'package:lessonaza/features/onboarding/presentation/screens/first_availability_setup_screen.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/schedule/data/services/teacher_availability_onboarding_api.dart';
+import 'package:lessonaza/features/schedule/schedule_facade.dart'
+    show teacherAvailabilityApiProvider;
 import 'package:lessonaza/features/settings/settings_facade.dart';
 
 class _SpyOnboardingApi implements TeacherAvailabilityApi {

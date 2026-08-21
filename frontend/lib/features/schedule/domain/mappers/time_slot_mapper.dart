@@ -1,5 +1,6 @@
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/domain/value_objects/clock_time.dart';
+import '../entities/teacher_availability.dart';
 import '../entities/unified_lesson_request.dart';
 
 /// Single mapper owning the `dayOfWeek` indexing shift between the grid's
@@ -36,6 +37,22 @@ extension TimeSlotMapperX on TimeSlot {
       dayOfWeek: dayOfWeek - 1,
       startTime: startTime.format24Hour(),
       endTime: endTime.format24Hour(),
+    );
+  }
+
+  /// [TimeSlot] (1-indexed) -> [WeeklySchedule] (0-indexed) — the shape the
+  /// availability SSOT stores; used by the onboarding save's mock-mode
+  /// persistence (#1293).
+  WeeklySchedule toWeeklySchedule({
+    required String id,
+    required DateTime createdAt,
+  }) {
+    return WeeklySchedule(
+      id: id,
+      dayOfWeek: dayOfWeek - 1,
+      startTime: startTime.format24Hour(),
+      endTime: endTime.format24Hour(),
+      createdAt: createdAt,
     );
   }
 }
