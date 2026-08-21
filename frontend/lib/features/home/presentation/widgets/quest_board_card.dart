@@ -64,6 +64,11 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
   /// UXC-6 — 사용자가 [더보기] 를 눌러 전체 퀘스트를 펼쳤는지.
   bool _expanded = false;
 
+  /// 보드 전체 접힘 상태 — 기본은 접힘(헤더+진행률만), 헤더 탭으로 펼친다.
+  /// 가입 직후 첫 도착(리빌 윈도우)에는 자동 펼침 — 접힌 채로는 자동완료
+  /// 리빌·온보딩 안내가 보이지 않기 때문.
+  bool _boardExpanded = false;
+
   /// §B4 자동 완료 카드 애니메이션 (감사 §4.6).
   /// ScaleTransition(0.9 → 1.0, 300ms) + sustain 1s + FadeOut(500ms).
   late final AnimationController _revealScaleController;
@@ -98,7 +103,10 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
       final value = await ref.read(questFirstShownProvider.future);
       if (!mounted) return;
       if (QuestFirstShown.isWithin(value)) {
-        setState(() => _revealCompleted = true);
+        setState(() {
+          _revealCompleted = true;
+          _boardExpanded = true;
+        });
         // §B4 사운드 1회 + scale-up.
         unawaited(SystemSound.play(SystemSoundType.click));
         _revealScaleController.forward(from: 0);
@@ -193,10 +201,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
     };
     final byGroupVisible = <QuestGroup, List<_Quest>>{
       for (final g in QuestGroup.values)
-        g:
-            byGroupAll[g]!
-                .where((q) => _revealCompleted || !q.isCompleted)
-                .toList(),
+        g: byGroupAll[g]!
+            .where((q) => _revealCompleted || !q.isCompleted)
+            .toList(),
     };
 
     // UXC-6 점진 공개 — 접힌 상태에서는 "지금 할 그룹" 하나만, 그 안에서도
@@ -211,12 +218,11 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
     }
     final byGroupDisplayed = <QuestGroup, List<_Quest>>{
       for (final g in QuestGroup.values)
-        g:
-            _expanded
-                ? byGroupVisible[g]!
-                : g == currentGroup
-                ? byGroupVisible[g]!.take(_kCollapsedRowLimit).toList()
-                : const <_Quest>[],
+        g: _expanded
+            ? byGroupVisible[g]!
+            : g == currentGroup
+            ? byGroupVisible[g]!.take(_kCollapsedRowLimit).toList()
+            : const <_Quest>[],
     };
     final visibleRowCount = byGroupVisible.values.fold<int>(
       0,
@@ -237,43 +243,56 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Expanded(
-                  child: NotebookSectionHeader(
-                    label: AppStrings.questBoardTitle,
+            // 헤더 탭 = 보드 접기/펼치기 토글 (기본 접힘).
+            InkWell(
+              onTap: () => setState(() => _boardExpanded = !_boardExpanded),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Expanded(
+                    child: NotebookSectionHeader(
+                      label: AppStrings.questBoardTitle,
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                _ProgressGauge(percent: percent),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              AppStrings.questBoardIntro,
-              style: NotebookTypography.handMedium.copyWith(
-                color: AppColors.inkSecondary,
+                  const SizedBox(width: AppSpacing.space3),
+                  _ProgressGauge(percent: percent),
+                  const SizedBox(width: AppSpacing.space2),
+                  Icon(
+                    _boardExpanded ? Icons.expand_less : Icons.expand_more,
+                    size: 20,
+                    color: AppColors.inkSecondary,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: AppSpacing.space3),
-            for (final group in QuestGroup.values) ...[
-              if (byGroupDisplayed[group]!.isNotEmpty) ...[
-                _QuestGroupSection(
-                  group: group,
-                  quests: byGroupDisplayed[group]!,
-                  totalInGroup: byGroupAll[group]!.length,
-                  completedInGroup:
-                      byGroupAll[group]!.where((q) => q.isCompleted).length,
-                  // §B4 자동 reveal 윈도우 안의 완료 카드에만 애니메이션 적용.
-                  revealScale: _revealCompleted ? _revealScale : null,
-                  revealFade: _revealCompleted ? _revealFade : null,
+            if (_boardExpanded) ...[
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                AppStrings.questBoardIntro,
+                style: NotebookTypography.handMedium.copyWith(
+                  color: AppColors.inkSecondary,
                 ),
-                if (group != QuestGroup.bonus)
-                  const SizedBox(height: AppSpacing.space3),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+              for (final group in QuestGroup.values) ...[
+                if (byGroupDisplayed[group]!.isNotEmpty) ...[
+                  _QuestGroupSection(
+                    group: group,
+                    quests: byGroupDisplayed[group]!,
+                    totalInGroup: byGroupAll[group]!.length,
+                    completedInGroup: byGroupAll[group]!
+                        .where((q) => q.isCompleted)
+                        .length,
+                    // §B4 자동 reveal 윈도우 안의 완료 카드에만 애니메이션 적용.
+                    revealScale: _revealCompleted ? _revealScale : null,
+                    revealFade: _revealCompleted ? _revealFade : null,
+                  ),
+                  if (group != QuestGroup.bonus)
+                    const SizedBox(height: AppSpacing.space3),
+                ],
               ],
+              if (hasHiddenRows || _expanded) _buildDisclosureToggle(),
             ],
-            if (hasHiddenRows || _expanded) _buildDisclosureToggle(),
           ],
         ),
       ),
@@ -408,10 +427,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         // UXC-7 — '수강권' 첫 노출 지점. 온보딩 카테고리 미리보기와 같은
         // 문장을 재사용한다 (C4: 동일 의미 = 단일 상수).
         glossHint: AppStrings.onboardingCategorySubscriptionGloss,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.issueSubscription)
-                : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.issueSubscription)
+            : onLockedTap(),
       ),
       _Quest(
         id: 'q8',
@@ -422,8 +440,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         isLocked: !hasStudents,
         // UXC-3 — 죽은 코치마크 step 3 의 설명을 그대로 이식.
         glossHint: AppStrings.coachMarkFirstLessonRegisterDescription,
-        onTap:
-            hasStudents ? () => context.push(AppRoutes.lessons) : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.lessons)
+            : onLockedTap(),
       ),
       _Quest(
         id: 'q9',
@@ -432,10 +451,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         reward: AppStrings.questRewardLessonNote,
         isCompleted: hasLessonNote,
         isLocked: !hasStudents,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.quickFeedbackList)
-                : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.quickFeedbackList)
+            : onLockedTap(),
       ),
       _Quest(
         id: 'q10',
@@ -445,10 +463,9 @@ class _QuestBoardCardState extends ConsumerState<QuestBoardCard>
         isCompleted: hasPracticeAssigned,
         isLocked: !hasStudents,
         thresholdHint: AppStrings.questThresholdPracticeHint,
-        onTap:
-            hasStudents
-                ? () => context.push(AppRoutes.assignmentDashboard)
-                : onLockedTap(),
+        onTap: hasStudents
+            ? () => context.push(AppRoutes.assignmentDashboard)
+            : onLockedTap(),
       ),
       // ── ✨ 선택 보너스 그룹 (Q11) ──
       _Quest(
@@ -658,12 +675,11 @@ class _QuestItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = quest.onTap != null;
-    final accentColor =
-        quest.isCompleted
-            ? AppColors.paperOk
-            : isEnabled
-            ? AppColors.ink
-            : AppColors.inkTertiary;
+    final accentColor = quest.isCompleted
+        ? AppColors.paperOk
+        : isEnabled
+        ? AppColors.ink
+        : AppColors.inkTertiary;
 
     final content = InkWell(
       onTap: quest.onTap,
@@ -674,26 +690,25 @@ class _QuestItem extends StatelessWidget {
           children: [
             SizedBox(
               width: 28,
-              child:
-                  quest.isCompleted
-                      ? const Padding(
-                        padding: EdgeInsets.only(top: 2),
-                        child: NotebookGlyph(
-                          NotebookGlyph.check,
-                          size: 16,
-                          color: AppColors.paperOk,
-                        ),
-                      )
-                      : quest.isLocked
-                      ? Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(
-                          Icons.lock_outline,
-                          size: 14,
-                          color: accentColor,
-                        ),
-                      )
-                      : const SizedBox.shrink(),
+              child: quest.isCompleted
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 2),
+                      child: NotebookGlyph(
+                        NotebookGlyph.check,
+                        size: 16,
+                        color: AppColors.paperOk,
+                      ),
+                    )
+                  : quest.isLocked
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Icon(
+                        Icons.lock_outline,
+                        size: 14,
+                        color: accentColor,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -704,12 +719,12 @@ class _QuestItem extends StatelessWidget {
                     quest.title,
                     style: NotebookTypography.pieceTitle.copyWith(
                       fontSize: 15,
-                      color:
-                          quest.isCompleted
-                              ? AppColors.inkTertiary
-                              : AppColors.ink,
-                      decoration:
-                          quest.isCompleted ? TextDecoration.lineThrough : null,
+                      color: quest.isCompleted
+                          ? AppColors.inkTertiary
+                          : AppColors.ink,
+                      decoration: quest.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                   if (quest.reward != null && !quest.isCompleted) ...[
@@ -812,11 +827,10 @@ class _DottedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = 1
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
 
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final path = Path()..addRect(rect);
