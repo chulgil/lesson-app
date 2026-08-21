@@ -12,6 +12,7 @@ import '../../../features/notifications/presentation/screens/academy_announcemen
 import '../../../features/notifications/presentation/screens/academy_announcements_screen.dart';
 import '../../../features/notifications/presentation/screens/notification_list_screen.dart';
 import '../app_routes.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Notification routes
 List<GoRoute> notificationRoutes = [
@@ -38,8 +39,12 @@ List<GoRoute> notificationRoutes = [
     builder: (context, state) {
       final announcement = state.extra;
       if (announcement is! AcademyAnnouncement) {
-        return const NotebookScreenScaffold(
-          body: Center(child: Text('공지사항을 불러올 수 없습니다.')),
+        return NotebookScreenScaffold(
+          body: Center(
+            child: Text(
+              AppLocalizations.of(context).notificationAnnouncementLoadError,
+            ),
+          ),
         );
       }
       return AcademyAnnouncementDetailScreen(announcement: announcement);
@@ -64,8 +69,12 @@ List<GoRoute> notificationRoutes = [
       final academyId = state.pathParameters['academyId'] ?? '';
       final inquiry = state.extra;
       if (inquiry is! AcademyInquiry) {
-        return const NotebookScreenScaffold(
-          body: Center(child: Text('문의를 불러올 수 없습니다.')),
+        return NotebookScreenScaffold(
+          body: Center(
+            child: Text(
+              AppLocalizations.of(context).notificationInquiryLoadError,
+            ),
+          ),
         );
       }
       return AcademyInquiryDetailScreen(inquiry: inquiry, academyId: academyId);

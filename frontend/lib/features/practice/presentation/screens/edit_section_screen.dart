@@ -12,6 +12,7 @@ import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../../features/practice/practice_facade.dart';
 import '../widgets/section_form/add_section_widgets.dart';
 import '../widgets/section_form/range_picker_sheet.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Screen for editing an existing practice section
 class EditSectionScreen extends ConsumerStatefulWidget {
@@ -98,9 +99,10 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         _startLine = section.startLine ?? 1;
         _endLine = section.endLine ?? 2;
         _repeatCount = section.repeatCount;
-        _targetPracticeMinutes = section.targetPracticeSeconds != null
-            ? (section.targetPracticeSeconds! / 60).round()
-            : null;
+        _targetPracticeMinutes =
+            section.targetPracticeSeconds != null
+                ? (section.targetPracticeSeconds! / 60).round()
+                : null;
         _isInitialized = true;
       });
     } catch (e) {
@@ -154,25 +156,26 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
       final updatedSection = _originalSection!.copyWith(
         pieceName: _pieceNameController.text.trim(),
         rangeType: _rangeType,
-        startMeasure: _rangeType == SectionRangeType.measure
-            ? _startMeasure
-            : 1,
+        startMeasure:
+            _rangeType == SectionRangeType.measure ? _startMeasure : 1,
         endMeasure: _rangeType == SectionRangeType.measure ? _endMeasure : 1,
         startLine: _rangeType == SectionRangeType.line ? _startLine : null,
         endLine: _rangeType == SectionRangeType.line ? _endLine : null,
         clearStartLine: _rangeType != SectionRangeType.line,
         clearEndLine: _rangeType != SectionRangeType.line,
-        sectionName: _sectionNameController.text.trim().isEmpty
-            ? null
-            : _sectionNameController.text.trim(),
+        sectionName:
+            _sectionNameController.text.trim().isEmpty
+                ? null
+                : _sectionNameController.text.trim(),
         isRepeat: true, // 섹션은 레퍼토리 기간 동안 매일 반복
         repeatCount: _repeatCount,
         clearRepeatCount: _repeatCount == null,
         clearStartDate: true, // 섹션 날짜는 레퍼토리에서 상속
         clearEndDate: true,
-        targetPracticeSeconds: _targetPracticeMinutes != null
-            ? _targetPracticeMinutes! * 60
-            : null,
+        targetPracticeSeconds:
+            _targetPracticeMinutes != null
+                ? _targetPracticeMinutes! * 60
+                : null,
         clearTargetPracticeSeconds: _targetPracticeMinutes == null,
         updatedAt: DateTime.now(),
       );
@@ -217,24 +220,25 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 마디' : '끝 마디',
-        unit: '마디',
-        initialValue: initialValue,
-        maxValue: 100,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              _startMeasure = value;
-              if (_endMeasure < _startMeasure) {
-                _endMeasure = _startMeasure;
-              }
-            } else {
-              _endMeasure = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 마디' : '끝 마디',
+            unit: '마디',
+            initialValue: initialValue,
+            maxValue: 100,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  _startMeasure = value;
+                  if (_endMeasure < _startMeasure) {
+                    _endMeasure = _startMeasure;
+                  }
+                } else {
+                  _endMeasure = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -243,24 +247,25 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showNotebookModalBottomSheet<void>(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 줄' : '끝 줄',
-        unit: '줄',
-        initialValue: initialValue,
-        maxValue: 10,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              _startLine = value;
-              if (_endLine < _startLine) {
-                _endLine = _startLine;
-              }
-            } else {
-              _endLine = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 줄' : '끝 줄',
+            unit: '줄',
+            initialValue: initialValue,
+            maxValue: 10,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  _startLine = value;
+                  if (_endLine < _startLine) {
+                    _endLine = _startLine;
+                  }
+                } else {
+                  _endLine = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -487,7 +492,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   decoration: InputDecoration(
                     labelText: AppStrings.practiceSectionAliasLabel,
                     hintText: AppStrings.practiceSectionAliasHint,
-                    helperText: '비워두면 "${_getRangePreviewText()}"로 표시됩니다',
+                    helperText: AppLocalizations.of(
+                      context,
+                    ).editSectionNameHelper(_getRangePreviewText()),
                     prefixIcon: const Icon(Icons.label_outline),
                   ),
                   textInputAction: TextInputAction.done,
@@ -511,8 +518,8 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // ========================================
               TargetTimeSection(
                 targetMinutes: _targetPracticeMinutes,
-                onChanged: (value) =>
-                    setState(() => _targetPracticeMinutes = value),
+                onChanged:
+                    (value) => setState(() => _targetPracticeMinutes = value),
               ),
 
               const SizedBox(height: AppSpacing.space8),
@@ -522,16 +529,17 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.paper,
-                          ),
-                        )
-                      : const Text(AppStrings.practiceSaveChanges),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.paper,
+                            ),
+                          )
+                          : const Text(AppStrings.practiceSaveChanges),
                 ),
               ),
 

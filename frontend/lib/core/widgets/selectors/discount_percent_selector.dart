@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Common widget for selecting discount percentage with preset chips and custom input.
 ///
@@ -99,7 +100,7 @@ class DiscountPercentSelector extends StatelessWidget {
             }),
             // Custom input chip
             ChoiceChip(
-              label: const Text('직접 입력'),
+              label: Text(AppLocalizations.of(context).selectorDirectInput),
               selected: isCustom,
               onSelected: (selected) {
                 if (selected) {
@@ -132,7 +133,8 @@ class DiscountPercentSelector extends StatelessWidget {
                 _MaxValueInputFormatter(100),
               ],
               decoration: InputDecoration(
-                hintText: '할인율',
+                hintText:
+                    AppLocalizations.of(context).selectorDiscountPercentHint,
                 suffixText: '%',
                 filled: true,
                 fillColor: AppColors.paper,

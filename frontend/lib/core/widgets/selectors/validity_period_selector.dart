@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Common widget for selecting validity period with preset chips and custom input.
 ///
@@ -98,18 +99,20 @@ class ValidityPeriodSelector extends StatelessWidget {
                 selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.ink,
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
             }),
             // Custom input chip
             ChoiceChip(
-              label: const Text('직접 입력'),
+              label: Text(AppLocalizations.of(context).selectorDirectInput),
               selected: isCustom,
               onSelected: (selected) {
                 if (selected) {
@@ -120,7 +123,8 @@ class ValidityPeriodSelector extends StatelessWidget {
               selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
               checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: isCustom ? AppColors.paperAccent : AppColors.inkQuaternary,
+                color:
+                    isCustom ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: isCustom ? AppColors.paperAccent : AppColors.ink,
@@ -139,9 +143,8 @@ class ValidityPeriodSelector extends StatelessWidget {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
-                hintText: inputUnit == ValidityInputUnit.days
-                    ? '유효기간 입력'
-                    : '개월 입력',
+                hintText:
+                    inputUnit == ValidityInputUnit.days ? '유효기간 입력' : '개월 입력',
                 suffixText: inputUnit == ValidityInputUnit.days ? '일' : '개월',
                 filled: true,
                 fillColor: AppColors.paper,
@@ -165,9 +168,10 @@ class ValidityPeriodSelector extends StatelessWidget {
               onChanged: (value) {
                 final input = int.tryParse(value) ?? 0;
                 if (input > 0) {
-                  final days = inputUnit == ValidityInputUnit.months
-                      ? input * 30
-                      : input;
+                  final days =
+                      inputUnit == ValidityInputUnit.months
+                          ? input * 30
+                          : input;
                   onPeriodChanged(days, true);
                 }
               },

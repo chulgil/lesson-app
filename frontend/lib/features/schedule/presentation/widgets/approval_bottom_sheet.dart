@@ -13,6 +13,7 @@ import '../../../../core/booking/presentation/extensions/lesson_booking_visual_e
 import '../../../lessons/lessons_facade.dart';
 import 'schedule_option_card.dart';
 import 'decline_bottom_sheet.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Bottom sheet for booking approval with multi-option support.
 class ApprovalBottomSheet extends ConsumerStatefulWidget {
@@ -368,7 +369,11 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       widget.onApproved();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${widget.booking.studentName}님의 레슨이 승인되었습니다'),
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).lessonApprovedMessage(widget.booking.studentName),
+          ),
           backgroundColor: AppColors.paperOk,
         ),
       );

@@ -26,6 +26,7 @@ import '../../../../features/students/students_facade.dart'
         studentsNotifierProvider;
 import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_form_widgets.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Screen for editing an existing student
 class EditStudentScreen extends ConsumerStatefulWidget {
@@ -227,9 +228,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     const SizedBox(height: AppSpacing.space3),
                     InstrumentSelector(
                       selectedInstrument: _selectedInstrument,
-                      instruments: ExpertiseCatalogRegistry.forDiscipline(
-                        ref.watch(activeDisciplineProvider),
-                      ).items,
+                      instruments:
+                          ExpertiseCatalogRegistry.forDiscipline(
+                            ref.watch(activeDisciplineProvider),
+                          ).items,
                       onChanged: (value) {
                         setState(() {
                           _selectedInstrument = value;
@@ -592,7 +594,11 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${_nameController.text} 학생 정보가 수정되었습니다'),
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).studentInfoUpdatedMessage(_nameController.text),
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.paperOk,
         ),

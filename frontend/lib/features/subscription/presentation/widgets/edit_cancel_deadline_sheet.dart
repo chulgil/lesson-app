@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Bottom sheet for editing a subscription's cancel deadline (hours).
 class EditCancelDeadlineSheet extends StatefulWidget {
@@ -78,7 +79,7 @@ class _EditCancelDeadlineSheetState extends State<EditCancelDeadlineSheet> {
             children: [
               ..._presets.map(
                 (h) => ChoiceChip(
-                  label: Text('$h시간'),
+                  label: Text(AppLocalizations.of(context).hoursOptionLabel(h)),
                   selected: !_isCustom && _selected == h,
                   onSelected: (_) {
                     setState(() {

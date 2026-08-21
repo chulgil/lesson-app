@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Common widget for selecting bonus lesson count with preset chips and custom input.
 ///
@@ -99,7 +100,7 @@ class BonusCountSelector extends StatelessWidget {
             }),
             // Custom input chip
             ChoiceChip(
-              label: const Text('직접 입력'),
+              label: Text(AppLocalizations.of(context).selectorDirectInput),
               selected: isCustom,
               onSelected: (selected) {
                 if (selected) {
@@ -129,7 +130,7 @@ class BonusCountSelector extends StatelessWidget {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
-                hintText: '횟수',
+                hintText: AppLocalizations.of(context).selectorCountHint,
                 suffixText: '회',
                 filled: true,
                 fillColor: AppColors.paper,

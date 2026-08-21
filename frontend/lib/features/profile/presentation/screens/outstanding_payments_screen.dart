@@ -11,6 +11,7 @@ import '../../../../core/utils/currency_utils.dart';
 import '../../../auth/auth_facade.dart';
 import '../../../students/students_facade.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Tuition deposit status screen.
 class OutstandingPaymentsScreen extends ConsumerWidget {
@@ -33,8 +34,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           return _buildContent(context, ref, unpaidList, teacherId);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) =>
-            const Center(child: Text(AppStrings.genericError)),
+        error: (_, __) => const Center(child: Text(AppStrings.genericError)),
       ),
     );
   }
@@ -166,9 +166,10 @@ class _UnpaidCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.paper,
           border: Border.all(
-            color: daysOverdue > 0
-                ? AppColors.paperAccent
-                : AppColors.inkQuaternary,
+            color:
+                daysOverdue > 0
+                    ? AppColors.paperAccent
+                    : AppColors.inkQuaternary,
           ),
         ),
         child: Padding(
@@ -314,7 +315,11 @@ class _UnpaidCard extends ConsumerWidget {
     showNotebookDialog(
       context: context,
       title: AppStrings.profileOutstandingConfirmPayment,
-      content: Text('${formatWonWithComma(subscription.amount)} 입금을 확인하시겠습니까?'),
+      content: Text(
+        AppLocalizations.of(
+          context,
+        ).paymentConfirmBody(formatWonWithComma(subscription.amount)),
+      ),
       confirmLabel: AppStrings.confirm,
       cancelLabel: AppStrings.cancel,
       onConfirm: () async {
@@ -364,11 +369,12 @@ class _UnpaidCard extends ConsumerWidget {
       if (!context.mounted) return;
       // Server returns 409 for window-expired / first-lesson-consumed; map to friendly text.
       final message = e.toString();
-      final friendly = message.contains('24')
-          ? AppStrings.paymentUndoWindowExpired
-          : message.contains('lesson') || message.contains('차감')
-          ? AppStrings.paymentUndoBlockedByLesson
-          : AppStrings.paymentUndoFailedSnackbar;
+      final friendly =
+          message.contains('24')
+              ? AppStrings.paymentUndoWindowExpired
+              : message.contains('lesson') || message.contains('차감')
+              ? AppStrings.paymentUndoBlockedByLesson
+              : AppStrings.paymentUndoFailedSnackbar;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(friendly)));

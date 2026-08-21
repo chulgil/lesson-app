@@ -27,5 +27,148 @@
   "navPayments": "Payments",
   "@navPayments": {
     "description": "Bottom navigation label for the payments tab."
+  },
+  "academyClosureLoadError": "Couldn't load the closure information.",
+  "@academyClosureLoadError": {
+    "description": "Route-level fallback when a closure/makeup route is opened without valid data."
+  },
+  "notificationAnnouncementLoadError": "Couldn't load the announcement.",
+  "@notificationAnnouncementLoadError": {
+    "description": "Route-level fallback when an announcement route is opened without valid data."
+  },
+  "notificationInquiryLoadError": "Couldn't load the inquiry.",
+  "@notificationInquiryLoadError": {
+    "description": "Route-level fallback when an inquiry route is opened without valid data."
+  },
+  "coachMarkSkip": "Skip",
+  "@coachMarkSkip": {
+    "description": "Skip button on the coach-mark overlay."
+  },
+  "selectorDirectInput": "Enter manually",
+  "@selectorDirectInput": {
+    "description": "Custom-input chip label shared by count/discount/duration/validity selectors."
+  },
+  "selectorCountHint": "Count",
+  "@selectorCountHint": {
+    "description": "Hint for the bonus-count custom input field."
+  },
+  "selectorDiscountPercentHint": "Discount %",
+  "@selectorDiscountPercentHint": {
+    "description": "Hint for the discount-percent custom input field."
+  },
+  "selectorCountInputHint": "Enter a count",
+  "@selectorCountInputHint": {
+    "description": "Hint for the lesson-count custom input field."
+  },
+  "selectorDurationInputHint": "Enter minutes",
+  "@selectorDurationInputHint": {
+    "description": "Hint for the lesson-duration custom input field (minutes)."
+  },
+  "tunerShowComboSubtitle": "Show a combo streak on consecutive perfects",
+  "@tunerShowComboSubtitle": {
+    "description": "Tuner settings toggle subtitle — show combo streak."
+  },
+  "tunerVibrationSubtitle": "Vibrate on perfect tuning",
+  "@tunerVibrationSubtitle": {
+    "description": "Tuner settings toggle subtitle — vibrate on perfect."
+  },
+  "followCancelConfirmBody": "Unfollow {name}?",
+  "@followCancelConfirmBody": {
+    "description": "Unfollow confirmation dialog body.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "instrumentDeletedMessage": "{name} has been removed",
+  "@instrumentDeletedMessage": {
+    "description": "Snackbar after deleting an instrument from the teacher profile.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentConfirmBody": "Confirm the deposit of {amount}?",
+  "@paymentConfirmBody": {
+    "description": "Outstanding-payment confirmation dialog body; amount is pre-formatted with currency.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "repertoireDeleteConfirmBody": "Delete {title}?",
+  "@repertoireDeleteConfirmBody": {
+    "description": "Repertoire piece delete confirmation dialog body.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonApprovedMessage": "{studentName}'s lesson has been approved",
+  "@lessonApprovedMessage": {
+    "description": "Snackbar after approving a lesson booking.",
+    "placeholders": {
+      "studentName": {
+        "type": "String"
+      }
+    }
+  },
+  "studentInfoUpdatedMessage": "{name}'s student info has been updated",
+  "@studentInfoUpdatedMessage": {
+    "description": "Snackbar after editing a student's info.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "parentInviteIntroBody": "Invite {studentName}'s parent",
+  "@parentInviteIntroBody": {
+    "description": "Parent-invite dialog intro on the student detail screen.",
+    "placeholders": {
+      "studentName": {
+        "type": "String"
+      }
+    }
+  },
+  "bulkMessageSentMessage": "Message sent to {count} recipients",
+  "@bulkMessageSentMessage": {
+    "description": "Snackbar after sending a bulk message.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rescheduleAddCountButton": "Add {count} sessions",
+  "@rescheduleAddCountButton": {
+    "description": "Submit button on the add-reschedule-credit sheet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "editSectionNameHelper": "Shown as \"{preview}\" when left blank",
+  "@editSectionNameHelper": {
+    "description": "Helper under the section-name field; preview is the derived range text.",
+    "placeholders": {
+      "preview": {
+        "type": "String"
+      }
+    }
+  },
+  "hoursOptionLabel": "{hours}h",
+  "@hoursOptionLabel": {
+    "description": "Hour-preset chip label (e.g. cancel deadline).",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../domain/entities/subscription.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Bottom sheet for granting bonus reschedule credits to a subscription.
 class AddRescheduleSheet extends StatefulWidget {
@@ -124,7 +125,11 @@ class _AddRescheduleSheetState extends State<AddRescheduleSheet> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                      : Text('$_count회 추가'),
+                      : Text(
+                        AppLocalizations.of(
+                          context,
+                        ).rescheduleAddCountButton(_count),
+                      ),
             ),
           ),
         ],

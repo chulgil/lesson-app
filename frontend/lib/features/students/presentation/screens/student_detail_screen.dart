@@ -29,10 +29,12 @@ import '../../../../features/students/students_facade.dart'
 import '../../../auth/auth_facade.dart' show currentUserIdProvider;
 import '../../../parent_home/parent_home_facade.dart'
     show InvitationSource, ParentInvitation, invitationsNotifierProvider;
-import '../../../share/share_facade.dart' show growthReportShareRepositoryProvider;
+import '../../../share/share_facade.dart'
+    show growthReportShareRepositoryProvider;
 import '../extensions/student_domain_visuals.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 import '../../../lessons/lessons_facade.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Student detail screen — Notebook × Score 레이아웃.
 ///
@@ -215,9 +217,7 @@ class _StudentDetailContent extends ConsumerWidget {
           (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const _MoreSectionLabel(
-                title: AppStrings.managementSectionTitle,
-              ),
+              const _MoreSectionLabel(title: AppStrings.managementSectionTitle),
               _MoreOptionTile(
                 icon: Icons.edit_outlined,
                 title: AppStrings.studentEditInfoTitle,
@@ -343,7 +343,9 @@ class _StudentDetailContent extends ConsumerWidget {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text(AppStrings.studentArchiveFailed),
+                            content: const Text(
+                              AppStrings.studentArchiveFailed,
+                            ),
                             backgroundColor: AppColors.paperAccent,
                           ),
                         );
@@ -488,7 +490,10 @@ class _StudentDetailContent extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$studentName 학생의 학부모를 초대합니다', style: AppTypography.bodyMedium),
+          Text(
+            AppLocalizations.of(context).parentInviteIntroBody(studentName),
+            style: AppTypography.bodyMedium,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Container(
             padding: const EdgeInsets.symmetric(
@@ -781,8 +786,7 @@ class _MoreOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isDestructive ? AppColors.paperAccent : AppColors.ink;
+    final color = isDestructive ? AppColors.paperAccent : AppColors.ink;
     return ListTile(
       leading: Icon(icon, color: color, size: 22),
       title: Text(title, style: AppTypography.bodyLarge.copyWith(color: color)),
