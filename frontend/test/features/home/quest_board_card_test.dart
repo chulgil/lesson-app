@@ -152,6 +152,15 @@ Future<void> _pump(WidgetTester tester, List<Override> overrides) async {
     ),
   );
   await tester.pumpAndSettle();
+  // 보드는 기본 접힘 — 내용을 검증하는 기존 테스트들을 위해 헤더를 탭해
+  // 펼친다. 보드 미표시(celebration/graduated)나 리빌 윈도우 자동 펼침
+  // 케이스는 그대로 둔다.
+  final header = find.text(AppStrings.questBoardTitle);
+  if (header.evaluate().isNotEmpty &&
+      find.text(AppStrings.questBoardIntro).evaluate().isEmpty) {
+    await tester.tap(header);
+    await tester.pumpAndSettle();
+  }
 }
 
 /// UXC-6 — [더보기] 를 눌러 접힌 퀘스트를 모두 펼친다.
@@ -634,6 +643,46 @@ void main() {
       findsNothing,
     );
     expect(find.text(AppStrings.questLockedStudentRequiredHint), findsWidgets);
+  });
+
+  group('보드 접힘 기본값 — 헤더 탭 토글 (0821)', () {
+    Future<void> pumpCollapsed(WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: _nothingDone(),
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: const Scaffold(
+              body: SingleChildScrollView(child: QuestBoardCard()),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('기본은 접힘 — 헤더·진행률만 보이고 퀘스트 행은 숨김', (tester) async {
+      await pumpCollapsed(tester);
+
+      expect(find.text(AppStrings.questBoardTitle), findsOneWidget);
+      expect(find.byIcon(Icons.expand_more), findsOneWidget);
+      expect(find.text(AppStrings.questBoardIntro), findsNothing);
+      expect(find.text(AppStrings.questTitleSlots), findsNothing);
+    });
+
+    testWidgets('헤더 탭 → 펼침, 다시 탭 → 접힘', (tester) async {
+      await pumpCollapsed(tester);
+
+      await tester.tap(find.text(AppStrings.questBoardTitle));
+      await tester.pumpAndSettle();
+      expect(find.text(AppStrings.questBoardIntro), findsOneWidget);
+      expect(find.text(AppStrings.questTitleSlots), findsOneWidget);
+      expect(find.byIcon(Icons.expand_less), findsOneWidget);
+
+      await tester.tap(find.text(AppStrings.questBoardTitle));
+      await tester.pumpAndSettle();
+      expect(find.text(AppStrings.questBoardIntro), findsNothing);
+    });
   });
 }
 
