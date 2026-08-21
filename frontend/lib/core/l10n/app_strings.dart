@@ -9994,7 +9994,7 @@ class AppStrings {
   static const firstAvailabilityCelebrationNext = '다음 단계: 첫 학생 초대하기';
 
   /// 셀레브레이션 닫기 버튼.
-  static const firstAvailabilityCelebrationAction = '다음 퀘스트으로';
+  static const firstAvailabilityCelebrationAction = '다음 퀘스트로';
 
   /// 잠금 안내 — quest_board 에서 가용시간 0개일 때 다른 퀘스트 비활성 상태.
   static const firstAvailabilityLockedHint = '가용시간 설정 후 진행 가능';
