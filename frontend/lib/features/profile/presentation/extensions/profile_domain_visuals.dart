@@ -126,6 +126,19 @@ extension InviteTargetRoleVisuals on InviteTargetRole {
     }
   }
 
+  /// Bare role noun for guide sentences ("학생에게 …" / "학부모에게 …") —
+  /// distinct from [label] which is the badge/card form ("학생용").
+  String get guideNoun {
+    switch (this) {
+      case InviteTargetRole.teacher:
+        return AppStrings.teacher;
+      case InviteTargetRole.student:
+        return AppStrings.student;
+      case InviteTargetRole.parent:
+        return AppStrings.parent;
+    }
+  }
+
   /// Card description in the creation selector only.
   String get description {
     switch (this) {

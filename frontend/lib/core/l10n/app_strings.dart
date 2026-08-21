@@ -263,6 +263,9 @@ class AppStrings {
   /// 학생 (역할명)
   static const student = '학생';
 
+  /// 학부모 — generic role noun (guide sentences 등).
+  static const parent = '학부모';
+
   /// 개인 (학원 아님)
   static const individual = '개인';
 
@@ -6606,11 +6609,8 @@ class AppStrings {
   static String hoursRemainingFormat(int hours) => '$hours시간 남음';
 
   // ── Invite Screen (초대 생성 화면 5-3d-12) ──────────────────────────────
-  /// 학생 초대하기 — AppBar 타이틀 (선생님 시점).
-  static const inviteScreenTitleTeacher = '학생 초대하기';
-
-  /// 선생님 연결하기 — AppBar 타이틀 (학생 시점).
-  static const inviteScreenTitleStudent = '선생님 연결하기';
+  /// 초대하기 — 대상 중립 화면 타이틀 (#1294, 3-대상 셀렉터와 정합).
+  static const inviteScreenTitle = '초대하기';
 
   /// 초대 내역 — history IconButton 툴팁.
   static const inviteHistoryTooltip = '초대 내역';
@@ -9994,7 +9994,7 @@ class AppStrings {
   static const firstAvailabilityCelebrationNext = '다음 단계: 첫 학생 초대하기';
 
   /// 셀레브레이션 닫기 버튼.
-  static const firstAvailabilityCelebrationAction = '다음 퀘스트으로';
+  static const firstAvailabilityCelebrationAction = '다음 퀘스트로';
 
   /// 잠금 안내 — quest_board 에서 가용시간 0개일 때 다른 퀘스트 비활성 상태.
   static const firstAvailabilityLockedHint = '가용시간 설정 후 진행 가능';

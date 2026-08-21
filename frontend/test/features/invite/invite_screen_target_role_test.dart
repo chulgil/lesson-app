@@ -17,6 +17,7 @@ import 'package:lessonaza/features/profile/presentation/providers/invite_provide
 /// mirrors invite_history_screen_test.dart's spy pattern.
 class _SpyInviteRepository implements InviteRepository {
   final List<InviteTargetRole?> createdTargetRoles = [];
+  final List<Duration> createdValidities = [];
   int createCallCount = 0;
 
   @override
@@ -31,6 +32,7 @@ class _SpyInviteRepository implements InviteRepository {
   }) async {
     createCallCount++;
     createdTargetRoles.add(targetRole);
+    createdValidities.add(validity);
     return Invite(
       id: 'invite-created-$createCallCount',
       creatorId: creatorId,
@@ -122,6 +124,48 @@ void main() {
         find.text(AppStrings.inviteTargetRoleSelectorTitle),
         findsOneWidget,
       );
+    });
+  });
+
+  group('InviteScreen — 학부모 초대 유효기간·가이드 (#1294)', () {
+    testWidgets('학부모용 카드는 24시간 유효 초대를 생성한다', (tester) async {
+      final spy = await _pump(tester);
+
+      await tester.tap(find.text(AppStrings.inviteTargetRoleParentLabel));
+      await tester.pumpAndSettle();
+
+      expect(spy.createdValidities.single, const Duration(hours: 24));
+    });
+
+    testWidgets('학생용 카드는 7일 유효 초대를 생성한다', (tester) async {
+      final spy = await _pump(tester);
+
+      await tester.tap(find.text(AppStrings.inviteTargetRoleStudentLabel));
+      await tester.pumpAndSettle();
+
+      expect(spy.createdValidities.single, const Duration(days: 7));
+    });
+
+    testWidgets('학부모용 초대 화면 가이드가 학부모 대상 문구를 보여준다', (tester) async {
+      await _pump(tester);
+
+      await tester.tap(find.text(AppStrings.inviteTargetRoleParentLabel));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(AppStrings.inviteShareGuideFormat(AppStrings.parent)),
+        findsOneWidget,
+      );
+      expect(
+        find.text(AppStrings.inviteShareGuideFormat(AppStrings.student)),
+        findsNothing,
+      );
+    });
+
+    testWidgets('앱바 타이틀은 대상 중립 "초대하기" 를 사용한다', (tester) async {
+      await _pump(tester);
+
+      expect(find.text(AppStrings.inviteScreenTitle), findsOneWidget);
     });
   });
 }
