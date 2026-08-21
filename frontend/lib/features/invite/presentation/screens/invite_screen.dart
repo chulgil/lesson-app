@@ -38,7 +38,11 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     await ref
         .read(inviteCreatorProvider.notifier)
         .createInvite(
-          validity: const Duration(days: 7),
+          // #1294 — 학부모 초대는 24시간 유효 (학부모 초대 코드 24시간 규칙 및
+          // 공유 메시지 안내 문구와 정합). 그 외 대상은 7일 유지.
+          validity: targetRole == InviteTargetRole.parent
+              ? const Duration(hours: 24)
+              : const Duration(days: 7),
           targetRole: targetRole,
         );
   }
@@ -55,9 +59,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
     return NotebookScreenScaffold(
       appBar: NotebookDetailAppBar(
-        title: userRole == InviteUserRole.teacher
-            ? AppStrings.inviteScreenTitleTeacher
-            : AppStrings.inviteScreenTitleStudent,
+        // #1294 — 셀렉터가 3개 대상을 모두 초대하므로 대상 중립 타이틀 사용.
+        title: AppStrings.inviteScreenTitle,
         leading: DetailAppBarLeading.close,
         actions: const [DetailAppBarAction.history],
         onAction: (action) {
@@ -94,9 +97,13 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   }
 
   Widget _buildContent(Invite invite, InviteUserRole userRole) {
-    final targetRole = userRole == InviteUserRole.teacher
-        ? AppStrings.student
-        : AppStrings.teacher;
+    // #1294 — 가이드 문구는 초대의 대상 역할을 따른다. targetRole 이 없는
+    // 레거시 초대만 기존 상대-역할 추정으로 폴백.
+    final targetRole =
+        invite.targetRole?.guideNoun ??
+        (userRole == InviteUserRole.teacher
+            ? AppStrings.student
+            : AppStrings.teacher);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
