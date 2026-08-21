@@ -19,7 +19,6 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,6 +29,7 @@ from app.core.scheduler import (  # noqa: F401  release 는 finally 블록에서
     release_advisory_lock,
     try_advisory_lock,
 )
+from app.core.timezones import KST as _KST
 from app.services.group_notification_service import (
     TYPE_REMINDER_DAY_BEFORE,
     TYPE_REMINDER_DAY_OF,
@@ -41,8 +41,6 @@ logger = logging.getLogger(__name__)
 
 JOB_ID_DAY_BEFORE = "group_lesson_reminder_day_before"
 JOB_ID_DAY_OF = "group_lesson_reminder_day_of"
-
-_KST = ZoneInfo("Asia/Seoul")
 
 # SQL 범위 가드의 여유폭. 저장 dialect 에 따라 start_time 이 naive(KST)/aware(UTC) 로
 # 오갈 수 있어 최대 9시간이 어긋난다 — 하루 여유를 둬 후보를 놓치지 않게 한다.

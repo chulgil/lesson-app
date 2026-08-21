@@ -21,10 +21,12 @@ from apscheduler.triggers.interval import (
 )
 from sqlalchemy import text
 
+from app.core.timezones import DEFAULT_TIMEZONE_NAME
+
 logger = logging.getLogger(__name__)
 
 # KST timezone — patch_plans/C §1 Lore-constraint: KST 자정 기준 D-day 산정
-SCHEDULER_TIMEZONE = "Asia/Seoul"
+SCHEDULER_TIMEZONE = DEFAULT_TIMEZONE_NAME
 
 _scheduler: AsyncIOScheduler | None = None
 

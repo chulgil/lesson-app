@@ -16,17 +16,16 @@ Spec: docs/specs/schedule/teacher_vacation_mode.md.
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
-from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+# KST 자정 기준 — UTC↔KST 경계 hazard (spec §7.2 취소 가능 판정)
+from app.core.timezones import KST as _KST
+
 # Recovery window — spec §7.2
 RECOVERY_WINDOW_HOURS = 24
-
-# KST 자정 기준 — UTC↔KST 경계 hazard (spec §7.2 취소 가능 판정)
-_KST = ZoneInfo("Asia/Seoul")
 
 from app.models.schedule import (
     BookingStatus,

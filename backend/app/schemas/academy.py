@@ -11,6 +11,8 @@ import enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.core.timezones import DEFAULT_TIMEZONE_NAME
+
 
 class AcademyMemberRole(str, enum.Enum):
     owner = "owner"
@@ -51,7 +53,7 @@ class AcademyCreate(BaseModel):
     phone: str | None = Field(default=None, max_length=30)
     address: str | None = Field(default=None, max_length=500)
     description: str | None = None
-    timezone: str = "Asia/Seoul"
+    timezone: str = DEFAULT_TIMEZONE_NAME
     locale: str = "ko"
     # 1탭 onboarding — 학원장 본인이 겸직 강사로도 등록 (소규모 음악학원 흔한 패턴).
     also_register_as_teacher: bool = False

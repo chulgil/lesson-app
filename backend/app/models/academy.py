@@ -32,6 +32,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.timezones import DEFAULT_TIMEZONE_NAME
 from app.models.base import Base, TimestampMixin, UUIDMixin
 
 # ruff: noqa: N815
@@ -89,7 +90,7 @@ class Academy(UUIDMixin, TimestampMixin, Base):
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Timezone / locale (UI 기본값 + 외부 API 호출 기준).
-    timezone: Mapped[str] = mapped_column(String(50), nullable=False, default="Asia/Seoul")
+    timezone: Mapped[str] = mapped_column(String(50), nullable=False, default=DEFAULT_TIMEZONE_NAME)
     locale: Mapped[str] = mapped_column(String(10), nullable=False, default="ko")
 
     __table_args__ = (

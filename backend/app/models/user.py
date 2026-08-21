@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, Enum, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.timezones import DEFAULT_TIMEZONE_NAME
 from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
@@ -66,7 +67,7 @@ class User(UUIDMixin, TimestampMixin, Base):
     # i18n / localization
     locale: Mapped[str] = mapped_column(String(10), nullable=False, default="ko")
     country: Mapped[str] = mapped_column(String(2), nullable=False, default="KR")
-    timezone: Mapped[str] = mapped_column(String(50), nullable=False, default="Asia/Seoul")
+    timezone: Mapped[str] = mapped_column(String(50), nullable=False, default=DEFAULT_TIMEZONE_NAME)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="KRW")
 
     __table_args__ = (

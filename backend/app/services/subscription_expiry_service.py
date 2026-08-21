@@ -11,18 +11,16 @@ from __future__ import annotations
 import logging
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
-from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+# Plan C §1 Lore-constraint: KST 자정 기준 D-day 산정
+from app.core.timezones import KST as _KST
 from app.models.lesson import ClassMembership, LessonClass
 from app.models.subscription import Subscription, SubscriptionStatus
 
 logger = logging.getLogger(__name__)
-
-# Plan C §1 Lore-constraint: KST 자정 기준 D-day 산정
-_KST = ZoneInfo("Asia/Seoul")
 
 # Plan C §3.4 — 4 milestones (학생/학부모/선생님 알림 트리거)
 NOTIFY_MILESTONES = (14, 7, 1, 0)

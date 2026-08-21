@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,6 +34,7 @@ from app.core.alimtalk_client import (
     MockAlimTalkClient,
 )
 from app.core.config import settings
+from app.core.timezones import KST
 from app.models.alimtalk_log import AlimTalkLog, AlimTalkTemplate
 
 logger = logging.getLogger(__name__)
@@ -143,7 +144,6 @@ def build_alimtalk_service(db: AsyncSession) -> AlimTalkService:
     )
 
 
-KST = timezone(timedelta(hours=9))
 SEND_WINDOW_START_HOUR = 8
 SEND_WINDOW_END_HOUR = 20
 # Templates that may send outside the normal window (e.g. final-notice cron at 09:00
