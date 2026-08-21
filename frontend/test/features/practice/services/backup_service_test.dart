@@ -13,6 +13,7 @@ import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/features/practice/data/services/file_backup_service.dart';
 import 'package:lessonaza/features/practice/domain/entities/backup_archive.dart';
+import 'package:lessonaza/core/domain/entities/backup_stage.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -59,7 +60,9 @@ void main() {
       );
 
       final progressEvents = <double>[];
-      await service.create(onProgress: (p, _) => progressEvents.add(p));
+      await service.create(
+        onProgress: (p, _, {current, total}) => progressEvents.add(p),
+      );
 
       expect(progressEvents.first, 0.0);
       expect(progressEvents.last, 1.0);
@@ -134,7 +137,7 @@ void main() {
       final result = await service.restore(tampered);
 
       expect(result.success, isFalse);
-      expect(result.errorMessage, isNotNull);
+      expect(result.failure, isNotNull);
     });
 
     test('rejects archive with incompatible major version', () async {
@@ -159,7 +162,8 @@ void main() {
       final result = await service.restore(tampered);
 
       expect(result.success, isFalse);
-      expect(result.errorMessage, contains('99.0'));
+      expect(result.failure?.kind, BackupFailureKind.unsupportedVersion);
+      expect(result.failure?.detail, '99.0');
     });
 
     test('rejects archive whose file no longer exists', () async {

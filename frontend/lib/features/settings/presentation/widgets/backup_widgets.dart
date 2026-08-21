@@ -21,6 +21,8 @@ import '../providers/backup_provider.dart';
 import '../providers/orphan_recording_provider.dart';
 import '../screens/all_recordings_screen.dart';
 import 'backup_item_actions_bottom_sheet.dart';
+import '../../../../core/domain/entities/backup_stage.dart';
+import '../../../../core/presentation/extensions/backup_stage_labels.dart';
 
 /// Status card showing backup summary information.
 class StatusCard extends StatelessWidget {
@@ -371,7 +373,11 @@ class ActionsSection extends ConsumerWidget {
                 '건너뛴 녹음: ${result.skippedRecordings}개\n'
                 '복원된 데이터: ${result.restoredBoxEntries}개',
               )
-              : Text(result.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
+              : Text(
+                (result.failure ??
+                        const BackupFailure(BackupFailureKind.unknown))
+                    .message,
+              ),
       confirmLabel: AppStrings.confirm,
       onConfirm: () => Navigator.pop(context),
     );
@@ -639,7 +645,11 @@ class BackupItem extends ConsumerWidget {
                 '건너뛴 녹음: ${result.skippedRecordings}개\n'
                 '복원된 데이터: ${result.restoredBoxEntries}개',
               )
-              : Text(result.errorMessage ?? '알 수 없는 오류가 발생했습니다.'),
+              : Text(
+                (result.failure ??
+                        const BackupFailure(BackupFailureKind.unknown))
+                    .message,
+              ),
       confirmLabel: AppStrings.confirm,
       onConfirm: () => Navigator.pop(context),
     );

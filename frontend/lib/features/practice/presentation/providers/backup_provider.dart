@@ -9,6 +9,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/services/file_backup_service.dart';
+import '../../../../core/presentation/extensions/backup_stage_labels.dart';
 import '../../domain/entities/backup_archive.dart';
 import '../../domain/services/backup_service.dart';
 
@@ -82,8 +83,12 @@ class BackupController extends _$BackupController {
     try {
       final service = ref.read(backupServiceProvider);
       final archive = await service.create(
-        onProgress: (p, s) {
-          state = BackupProgress(progress: p, status: s, isRunning: p < 1.0);
+        onProgress: (p, s, {current, total}) {
+          state = BackupProgress(
+            progress: p,
+            status: s.label(current: current, total: total),
+            isRunning: p < 1.0,
+          );
         },
       );
       state = BackupProgress.idle;
@@ -102,8 +107,12 @@ class BackupController extends _$BackupController {
       final service = ref.read(backupServiceProvider);
       final result = await service.restore(
         archive,
-        onProgress: (p, s) {
-          state = BackupProgress(progress: p, status: s, isRunning: p < 1.0);
+        onProgress: (p, s, {current, total}) {
+          state = BackupProgress(
+            progress: p,
+            status: s.label(current: current, total: total),
+            isRunning: p < 1.0,
+          );
         },
       );
       state = BackupProgress.idle;

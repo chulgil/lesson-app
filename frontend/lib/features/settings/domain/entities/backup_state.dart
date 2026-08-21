@@ -2,6 +2,8 @@
 //
 // Part of the data backup feature (Issue #15).
 
+import '../../../../core/domain/entities/backup_stage.dart';
+
 /// State of the backup system.
 class BackupState {
   final int recordingCount;
@@ -79,15 +81,15 @@ class BackupMetadata {
   });
 
   Map<String, dynamic> toJson() => {
-        'appVersion': appVersion,
-        'backupVersion': backupVersion,
-        'createdAt': createdAt.toIso8601String(),
-        'recordingCount': recordingCount,
-        'totalSizeBytes': totalSizeBytes,
-        'deviceModel': deviceModel,
-        'osVersion': osVersion,
-        'boxCounts': boxCounts,
-      };
+    'appVersion': appVersion,
+    'backupVersion': backupVersion,
+    'createdAt': createdAt.toIso8601String(),
+    'recordingCount': recordingCount,
+    'totalSizeBytes': totalSizeBytes,
+    'deviceModel': deviceModel,
+    'osVersion': osVersion,
+    'boxCounts': boxCounts,
+  };
 
   factory BackupMetadata.fromJson(Map<String, dynamic> json) {
     return BackupMetadata(
@@ -109,18 +111,19 @@ class RestoreResult {
   final int restoredRecordings;
   final int skippedRecordings;
   final int restoredBoxEntries;
-  final String? errorMessage;
+
+  /// Typed failure payload when [success] is `false` — presentation maps it
+  /// to user copy (backup_stage_labels.dart).
+  final BackupFailure? failure;
 
   const RestoreResult({
     required this.success,
     this.restoredRecordings = 0,
     this.skippedRecordings = 0,
     this.restoredBoxEntries = 0,
-    this.errorMessage,
+    this.failure,
   });
 
-  factory RestoreResult.failure(String message) => RestoreResult(
-        success: false,
-        errorMessage: message,
-      );
+  factory RestoreResult.failure(BackupFailure failure) =>
+      RestoreResult(success: false, failure: failure);
 }

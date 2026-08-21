@@ -11,7 +11,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/config/environment.dart';
-import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/domain/entities/backup_stage.dart';
 import '../../domain/entities/backup_state.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 
@@ -24,9 +24,15 @@ class BackupService {
   ///
   /// Returns the path to the created backup file.
   Future<File> createBackup({
-    void Function(double progress, String status)? onProgress,
+    void Function(
+      double progress,
+      BackupStage stage, {
+      int? current,
+      int? total,
+    })?
+    onProgress,
   }) async {
-    onProgress?.call(0.0, AppStrings.backupPreparing);
+    onProgress?.call(0.0, BackupStage.preparing);
 
     final archive = Archive();
     final docsDir = await getApplicationDocumentsDirectory();
@@ -45,7 +51,7 @@ class BackupService {
       }
     }
 
-    onProgress?.call(0.1, AppStrings.backupMetadataCreating);
+    onProgress?.call(0.1, BackupStage.creatingMetadata);
 
     // Create metadata
     final metadata = await _createMetadata(
@@ -61,7 +67,7 @@ class BackupService {
       ),
     );
 
-    onProgress?.call(0.2, AppStrings.backupHiveExporting);
+    onProgress?.call(0.2, BackupStage.exportingHive);
 
     // Export Hive boxes
     final hiveSnapshot = await _exportHiveBoxes();
@@ -70,7 +76,7 @@ class BackupService {
       ArchiveFile('hive_snapshot.json', hiveJson.length, utf8.encode(hiveJson)),
     );
 
-    onProgress?.call(0.3, AppStrings.backupRecordingsAdding);
+    onProgress?.call(0.3, BackupStage.addingRecordings);
 
     // Add recording files
     for (var i = 0; i < recordingFiles.length; i++) {
@@ -84,14 +90,13 @@ class BackupService {
       final progress = 0.3 + (0.6 * (i + 1) / recordingFiles.length);
       onProgress?.call(
         progress,
-        AppStrings.backupRecordingsAddingProgressFormat(
-          i + 1,
-          recordingFiles.length,
-        ),
+        BackupStage.addingRecordings,
+        current: i + 1,
+        total: recordingFiles.length,
       );
     }
 
-    onProgress?.call(0.9, AppStrings.backupZipCompressing);
+    onProgress?.call(0.9, BackupStage.compressing);
 
     // Encode to ZIP
     final zipBytes = ZipEncoder().encode(archive);
@@ -117,7 +122,7 @@ class BackupService {
     // Save last backup date
     await _saveLastBackupDate(DateTime.now());
 
-    onProgress?.call(1.0, AppStrings.backupComplete);
+    onProgress?.call(1.0, BackupStage.backupCompleted);
 
     return backupFile;
   }
@@ -125,10 +130,16 @@ class BackupService {
   /// Restore from a backup file.
   Future<RestoreResult> restoreFromBackup(
     File backupFile, {
-    void Function(double progress, String status)? onProgress,
+    void Function(
+      double progress,
+      BackupStage stage, {
+      int? current,
+      int? total,
+    })?
+    onProgress,
   }) async {
     try {
-      onProgress?.call(0.0, AppStrings.backupFileReading);
+      onProgress?.call(0.0, BackupStage.readingFile);
 
       final bytes = await backupFile.readAsBytes();
       final archive = ZipDecoder().decodeBytes(bytes);
@@ -152,19 +163,24 @@ class BackupService {
       }
 
       if (metadata == null) {
-        return RestoreResult.failure(AppStrings.backupInvalidFile);
+        return RestoreResult.failure(
+          const BackupFailure(BackupFailureKind.invalidFile),
+        );
       }
 
-      onProgress?.call(0.1, AppStrings.backupVersionChecking);
+      onProgress?.call(0.1, BackupStage.checkingVersion);
 
       // Check backup version compatibility
       if (!_isVersionCompatible(metadata.backupVersion)) {
         return RestoreResult.failure(
-          AppStrings.backupUnsupportedVersionFormat(metadata.backupVersion),
+          BackupFailure(
+            BackupFailureKind.unsupportedVersion,
+            detail: metadata.backupVersion,
+          ),
         );
       }
 
-      onProgress?.call(0.2, AppStrings.backupHiveRestoring);
+      onProgress?.call(0.2, BackupStage.restoringHive);
 
       // Restore Hive data first
       if (hiveSnapshotFile != null) {
@@ -174,7 +190,7 @@ class BackupService {
         restoredBoxEntries = await _restoreHiveBoxes(hiveJson, docsDir.path);
       }
 
-      onProgress?.call(0.4, AppStrings.backupRecordingsRestoring);
+      onProgress?.call(0.4, BackupStage.restoringRecordings);
 
       // Restore recording files
       final recordingFiles = archive.where(
@@ -202,14 +218,13 @@ class BackupService {
         final progress = 0.4 + (0.5 * processedFiles / totalFiles);
         onProgress?.call(
           progress,
-          AppStrings.backupRecordingsRestoringProgressFormat(
-            processedFiles,
-            totalFiles,
-          ),
+          BackupStage.restoringRecordings,
+          current: processedFiles,
+          total: totalFiles,
         );
       }
 
-      onProgress?.call(1.0, AppStrings.restoreComplete);
+      onProgress?.call(1.0, BackupStage.restoreCompleted);
 
       return RestoreResult(
         success: true,
@@ -218,7 +233,9 @@ class BackupService {
         restoredBoxEntries: restoredBoxEntries,
       );
     } catch (e) {
-      return RestoreResult.failure(AppStrings.restoreErrorFormat(e));
+      return RestoreResult.failure(
+        BackupFailure(BackupFailureKind.unknown, detail: e.toString()),
+      );
     }
   }
 

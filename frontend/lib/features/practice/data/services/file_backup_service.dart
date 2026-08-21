@@ -14,7 +14,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/config/environment.dart';
-import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/domain/entities/backup_stage.dart';
 import '../../domain/entities/backup_archive.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../../domain/services/backup_service.dart';
@@ -45,7 +45,7 @@ class FileBackupService implements BackupService {
 
   @override
   Future<BackupArchive> create({BackupProgressCallback? onProgress}) async {
-    onProgress?.call(0.0, AppStrings.backupPreparing);
+    onProgress?.call(0.0, BackupStage.preparing);
 
     final docsDir = await _documentsDirectory();
     final recordingsDir = Directory('${docsDir.path}/recordings');
@@ -61,7 +61,7 @@ class FileBackupService implements BackupService {
       }
     }
 
-    onProgress?.call(0.1, AppStrings.backupMetadataCreating);
+    onProgress?.call(0.1, BackupStage.creatingMetadata);
 
     final metadata = BackupArchiveMetadata(
       magic: backupArchiveMagic,
@@ -80,7 +80,7 @@ class FileBackupService implements BackupService {
       ArchiveFile(metadataFileName, metadataBytes.length, metadataBytes),
     );
 
-    onProgress?.call(0.2, AppStrings.backupHiveExporting);
+    onProgress?.call(0.2, BackupStage.exportingHive);
 
     final hiveSnapshot = await _exportHiveBoxes();
     final hiveBytes = utf8.encode(jsonEncode(hiveSnapshot));
@@ -88,7 +88,7 @@ class FileBackupService implements BackupService {
       ArchiveFile(hiveSnapshotFileName, hiveBytes.length, hiveBytes),
     );
 
-    onProgress?.call(0.3, AppStrings.backupRecordingsAdding);
+    onProgress?.call(0.3, BackupStage.addingRecordings);
 
     final manifest = <BackupRecordingEntry>[];
     for (var i = 0; i < recordingFiles.length; i++) {
@@ -107,18 +107,19 @@ class FileBackupService implements BackupService {
       final progress = 0.3 + (0.6 * (i + 1) / recordingFiles.length);
       onProgress?.call(
         progress,
-        AppStrings.backupRecordingsAddingProgressFormat(
-          i + 1,
-          recordingFiles.length,
-        ),
+        BackupStage.addingRecordings,
+        current: i + 1,
+        total: recordingFiles.length,
       );
     }
 
-    onProgress?.call(0.9, AppStrings.backupZipCompressing);
+    onProgress?.call(0.9, BackupStage.compressing);
 
     final zipBytes = ZipEncoder().encode(archive);
     if (zipBytes == null) {
-      throw Exception(AppStrings.backupEncodeFailure);
+      throw const BackupException(
+        BackupFailure(BackupFailureKind.encodeFailed),
+      );
     }
 
     final backupDir = Directory('${docsDir.path}/backups');
@@ -134,7 +135,7 @@ class FileBackupService implements BackupService {
     );
     await backupFile.writeAsBytes(zipBytes);
 
-    onProgress?.call(1.0, AppStrings.backupComplete);
+    onProgress?.call(1.0, BackupStage.backupCompleted);
 
     return BackupArchive(
       filePath: backupFile.path,
@@ -147,7 +148,7 @@ class FileBackupService implements BackupService {
   Future<BackupArchive> open(String filePath) async {
     final file = File(filePath);
     if (!await file.exists()) {
-      throw Exception(AppStrings.backupInvalidFile);
+      throw const BackupException(BackupFailure(BackupFailureKind.invalidFile));
     }
 
     final bytes = await file.readAsBytes();
@@ -170,7 +171,7 @@ class FileBackupService implements BackupService {
     }
 
     if (metadata == null) {
-      throw Exception(AppStrings.backupInvalidFile);
+      throw const BackupException(BackupFailure(BackupFailureKind.invalidFile));
     }
 
     return BackupArchive(
@@ -185,16 +186,19 @@ class FileBackupService implements BackupService {
     BackupArchive archive, {
     BackupProgressCallback? onProgress,
   }) async {
-    onProgress?.call(0.0, AppStrings.backupFileReading);
+    onProgress?.call(0.0, BackupStage.readingFile);
 
     // Hard gate — magic + major version must match before touching state.
     if (archive.metadata.magic != backupArchiveMagic) {
-      return BackupRestoreResult.failure(AppStrings.backupInvalidFile);
+      return BackupRestoreResult.failure(
+        const BackupFailure(BackupFailureKind.invalidFile),
+      );
     }
     if (!BackupArchive.isVersionCompatible(archive.metadata.backupVersion)) {
       return BackupRestoreResult.failure(
-        AppStrings.backupUnsupportedVersionFormat(
-          archive.metadata.backupVersion,
+        BackupFailure(
+          BackupFailureKind.unsupportedVersion,
+          detail: archive.metadata.backupVersion,
         ),
       );
     }
@@ -202,13 +206,15 @@ class FileBackupService implements BackupService {
     try {
       final file = File(archive.filePath);
       if (!await file.exists()) {
-        return BackupRestoreResult.failure(AppStrings.backupInvalidFile);
+        return BackupRestoreResult.failure(
+          const BackupFailure(BackupFailureKind.invalidFile),
+        );
       }
       final bytes = await file.readAsBytes();
       final zipArchive = ZipDecoder().decodeBytes(bytes);
       final docsDir = await _documentsDirectory();
 
-      onProgress?.call(0.1, AppStrings.backupVersionChecking);
+      onProgress?.call(0.1, BackupStage.checkingVersion);
 
       // Re-validate metadata from disk in case the [BackupArchive] passed
       // in was tampered with after [open]. Defence in depth.
@@ -228,10 +234,12 @@ class FileBackupService implements BackupService {
       if (diskMetadata == null ||
           diskMetadata.magic != backupArchiveMagic ||
           !BackupArchive.isVersionCompatible(diskMetadata.backupVersion)) {
-        return BackupRestoreResult.failure(AppStrings.backupInvalidFile);
+        return BackupRestoreResult.failure(
+          const BackupFailure(BackupFailureKind.invalidFile),
+        );
       }
 
-      onProgress?.call(0.2, AppStrings.backupHiveRestoring);
+      onProgress?.call(0.2, BackupStage.restoringHive);
 
       int restoredBoxEntries = 0;
       if (hiveSnapshotFile != null) {
@@ -241,11 +249,12 @@ class FileBackupService implements BackupService {
         restoredBoxEntries = await _restoreHiveBoxes(hiveJson);
       }
 
-      onProgress?.call(0.4, AppStrings.backupRecordingsRestoring);
+      onProgress?.call(0.4, BackupStage.restoringRecordings);
 
-      final recordingEntries = zipArchive
-          .where((f) => f.isFile && f.name.startsWith(recordingsPrefix))
-          .toList();
+      final recordingEntries =
+          zipArchive
+              .where((f) => f.isFile && f.name.startsWith(recordingsPrefix))
+              .toList();
 
       int restoredRecordings = 0;
       int skippedRecordings = 0;
@@ -267,11 +276,13 @@ class FileBackupService implements BackupService {
         final progress = 0.4 + (0.5 * (i + 1) / (total == 0 ? 1 : total));
         onProgress?.call(
           progress,
-          AppStrings.backupRecordingsRestoringProgressFormat(i + 1, total),
+          BackupStage.restoringRecordings,
+          current: i + 1,
+          total: total,
         );
       }
 
-      onProgress?.call(1.0, AppStrings.restoreComplete);
+      onProgress?.call(1.0, BackupStage.restoreCompleted);
 
       return BackupRestoreResult(
         success: true,
@@ -280,7 +291,9 @@ class FileBackupService implements BackupService {
         restoredBoxEntries: restoredBoxEntries,
       );
     } catch (e) {
-      return BackupRestoreResult.failure(AppStrings.restoreErrorFormat(e));
+      return BackupRestoreResult.failure(
+        BackupFailure(BackupFailureKind.unknown, detail: e.toString()),
+      );
     }
   }
 
@@ -291,9 +304,8 @@ class FileBackupService implements BackupService {
 
     if (Hive.isBoxOpen('practice_recordings')) {
       final box = Hive.box<PracticeRecording>('practice_recordings');
-      export['practice_recordings'] = box.values
-          .map(_practiceRecordingToJson)
-          .toList();
+      export['practice_recordings'] =
+          box.values.map(_practiceRecordingToJson).toList();
     }
 
     if (Hive.isBoxOpen('practice_repertoires')) {
