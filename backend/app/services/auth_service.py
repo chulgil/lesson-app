@@ -11,6 +11,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.timezones import DEFAULT_TIMEZONE_NAME
 from app.schemas.auth import DevLoginRequest, OAuthRequest, RefreshTokenResponse, TokenResponse
 from app.schemas.user import UserResponse
 
@@ -562,7 +563,7 @@ class AuthService:
             profile_image_url=provider_user.get("profile_image_url"),
             locale=request.locale or "ko",
             country=request.country or "KR",
-            timezone=request.timezone or "Asia/Seoul",
+            timezone=request.timezone or DEFAULT_TIMEZONE_NAME,
         )
         self.db.add(user)
         await self.db.flush()

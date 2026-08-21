@@ -67,7 +67,7 @@ flutter analyze                                              # 분석
 | 색상 | `AppColors`만 사용 (하드코딩 금지) |
 | Provider | `@riverpod` 어노테이션, `features/[domain]/` 아래만 |
 | 위젯 크기 | 500줄 이상 → 별도 파일 분리 |
-| UI 텍스트 | `AppStrings` 상수 사용 (하드코딩 금지, 다국어 대비) |
+| UI 텍스트 | 하드코딩 금지. **신규 문자열 = ARB**(`app_ko.arb`+`app_en.arb`)+`AppLocalizations` — `AppStrings` 신규 상수 금지(라체트 게이트, 글로벌 확장 단계 0). 기존 `AppStrings` 상수는 이관 전까지 사용 유지 |
 | UI 아이콘 | UI 텍스트에 이모지/유니코드 픽토그램 금지 (🎵⭐📋⚠️ℹ️✅ 등) → Material `Icons.*` 벡터 아이콘만. 예외: NotebookGlyph(시그니처 영역). 훅: `check-ui-emoji.sh`, 룰: `.claude/rules/ux-rules.md` |
 | 스와이프 액션 (4원칙) | 1) 우→좌=관리 (편집·삭제, 최대 2개) / 2) 좌→우=기타·편의 (`convenience` 녹색, 3번째 액션부터, 과다 시 BottomSheet) / 3) 모든 destructive=확인 다이얼로그 / 4) 방향 의미 전 화면 공통. 스펙: `docs/_components/swipe_action.md`, 룰: `.claude/rules/ux-rules.md` |
 

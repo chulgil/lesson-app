@@ -13,9 +13,9 @@ Only the *timing* classification is server-owned. Who cancelled and why
 from __future__ import annotations
 
 from datetime import date as _date
-from datetime import datetime, time, timedelta, timezone
+from datetime import datetime, time, timedelta
 
-KST = timezone(timedelta(hours=9))
+from app.core.timezones import KST
 
 DEFAULT_CANCEL_DEADLINE_HOURS = 24
 

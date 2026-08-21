@@ -4,17 +4,15 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
-from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+# repeat_time_of_day 는 KST 벽시계다 (#469 의 lesson date+"HH:MM" 해석과 동일).
+from app.core.timezones import KST as _KST
 from app.schemas.common import PaginatedResponse
 from app.schemas.schedule_ext import GroupClassResponse
-
-# repeat_time_of_day 는 KST 벽시계다 (#469 의 lesson date+"HH:MM" 해석과 동일).
-_KST = ZoneInfo("Asia/Seoul")
 
 # 반 회차를 몇 주치 미리 깔아둘지. #301 정규레슨 반복 생성이 슬롯당 4주(한 달)를
 # 만드는 것과 같은 horizon 을 쓴다. 클래스를 수정할 때마다 다시 채워지는 rolling window.

@@ -10,14 +10,14 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # KST is a fixed UTC+9 offset (no DST), so a static timezone is sufficient.
-KST = timezone(timedelta(hours=9))
+from app.core.timezones import KST
 
 
 @dataclass(frozen=True)

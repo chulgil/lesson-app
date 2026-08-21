@@ -10,22 +10,18 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, time, timedelta, timezone
-from zoneinfo import ZoneInfo
 
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+# #469: lesson date + "HH:MM" start_time are stored in KST wall-clock terms —
+# lesson end instants are computed in KST and compared against KST-now.
+from app.core.timezones import KST as _KST
 from app.models.lesson import Lesson, LessonStatus
 from app.models.notification import NotificationPriority
 from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
-
-# #469: lesson date + "HH:MM" start_time are stored in KST wall-clock terms.
-# Compute the lesson end instant in KST and compare against KST-now so the
-# 30-min / 24-hour thresholds respect the actual start_time (the previous
-# ``Lesson.date < threshold.date()`` ignored start_time and the UTC/KST offset).
-_KST = ZoneInfo("Asia/Seoul")
 
 # Statuses indicating unconfirmed lesson
 _UNCONFIRMED_STATUS = LessonStatus.scheduled

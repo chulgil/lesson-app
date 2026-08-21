@@ -24,18 +24,16 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 from typing import Any
-from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+# 저장된 회차 시각은 KST 벽시계다 (schedule_ext_service 와 같은 규약).
+from app.core.timezones import KST as _KST
 from app.models.notification import NotificationPriority
 from app.services.notification_recipient import resolve_student_user_id
 
 logger = logging.getLogger(__name__)
-
-# 저장된 회차 시각은 KST 벽시계다 (schedule_ext_service 와 같은 규약).
-_KST = ZoneInfo("Asia/Seoul")
 
 TYPE_BOOKING_CONFIRMED = "groupBookingConfirmed"
 TYPE_REMINDER_DAY_BEFORE = "groupLessonReminderDayBefore"

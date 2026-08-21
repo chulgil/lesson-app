@@ -13,7 +13,7 @@ on subsequent days is safe — already-sent rows short-circuit.
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import select
@@ -25,13 +25,12 @@ from app.core.scheduler import (  # noqa: F401  release 는 finally 블록에서
     release_advisory_lock,
     try_advisory_lock,
 )
+from app.core.timezones import KST as _KST
 from app.models.schedule import LessonBooking, VacationPeriod
 
 logger = logging.getLogger(__name__)
 
 JOB_ID = "vacation_return_announcement"
-
-_KST = timezone(timedelta(hours=9))
 
 
 async def _send_returns_for_period(session: AsyncSession, period: VacationPeriod) -> int:
