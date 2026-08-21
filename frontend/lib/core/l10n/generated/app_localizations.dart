@@ -271,6 +271,42 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{hours}시간'**
   String hoursOptionLabel(int hours);
+
+  /// Restore rejection when the picked file lacks the backup extension.
+  ///
+  /// In ko, this message translates to:
+  /// **'올바른 백업 파일이 아닙니다.\n{extension} 확장자 파일을 선택해주세요.'**
+  String backupWrongExtensionMessage(String extension);
+
+  /// Restore rejection when the file picker returned no usable path.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 경로를 가져올 수 없습니다.'**
+  String get backupPathUnavailableMessage;
+
+  /// Hint for the validity custom input in days mode.
+  ///
+  /// In ko, this message translates to:
+  /// **'유효기간 입력'**
+  String get selectorValidityDaysInputHint;
+
+  /// Hint for the validity custom input in months mode.
+  ///
+  /// In ko, this message translates to:
+  /// **'개월 입력'**
+  String get selectorValidityMonthsInputHint;
+
+  /// Guide under the measure-range section title in the section form.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습할 마디 구간을 선택하세요'**
+  String get practiceMeasureRangeGuide;
+
+  /// Guide under the line-range section title in the section form.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습할 줄 구간을 선택하세요 (1~10줄)'**
+  String get practiceLineRangeGuide;
 }
 
 class _AppLocalizationsDelegate

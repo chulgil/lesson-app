@@ -122,9 +122,11 @@ class LocalTeacherAvailabilityApi implements TeacherAvailabilityApi {
 
     final now = DateTime.now();
     final added = [
-      for (final slot in slots)
+      // Index suffix keeps ids unique when the submitted list carries the
+      // same dayOfWeek more than once (re-submission merges existing slots).
+      for (final (i, slot) in slots.indexed)
         slot.toWeeklySchedule(
-          id: 'onboarding-${now.millisecondsSinceEpoch}-${slot.dayOfWeek}',
+          id: 'onboarding-${now.millisecondsSinceEpoch}-${slot.dayOfWeek}-$i',
           createdAt: now,
         ),
     ];

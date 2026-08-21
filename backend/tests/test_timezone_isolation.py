@@ -22,9 +22,9 @@ SEAM = APP_DIR / "core" / "timezones.py"
 # Inline definitions this guard forbids outside the seam module. The
 # ``timedelta(hours=9)`` form is the legacy fixed-offset spelling of KST.
 INLINE_PATTERNS = (
-    re.compile(r'ZoneInfo\(\s*"Asia/Seoul"'),
+    re.compile(r"ZoneInfo\(\s*['\"]Asia/Seoul['\"]"),
     re.compile(r"timezone\(\s*timedelta\(\s*hours\s*=\s*9\b"),
-    re.compile(r'"Asia/Seoul"'),
+    re.compile(r"['\"]Asia/Seoul['\"]"),
 )
 
 

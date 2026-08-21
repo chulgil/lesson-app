@@ -124,7 +124,16 @@ done
 
 - 실측 위반 29건(생산 21파일) 박멸: ARB 신규 22키(ko/en 병기) + 기존 AppStrings 포매터 재사용 2건(`practiceCountTimes`·`usageCountShort`)
 - 디버그 전용 2파일(`debug_role_switcher`·`recording_diagnostic_screen`) 은 §2.2 규칙으로 예외 등록
-- 잔여(후속 이슈): data 계층의 AppStrings 의존 2건(backup 서비스 onProgress) — BackupStage enum 분리 리디자인 필요. `suffixText: '회'` 류 미검출 접미사는 단계 2 에서 이관
+- data 계층의 AppStrings 의존 2건(backup 서비스 onProgress) — #1299 에서 BackupStage/BackupFailure 값 기반으로 해소
+
+### 2.5 리뷰 0821 정정 — 멀티라인 잔존과 라체트 봉인
+
+초기 게이트는 "같은 줄" 정규식이라 dart-format 이 줄바꿈한 멀티라인 호출을 놓쳤다.
+전문(full-content) 스캔으로 강화한 결과 **멀티라인 형태 잔존 253건 실측** — 이는
+단계 1 스코프(단일행 검출분) 밖의 기존 부채로, 게이트를 baseline 라체트로 전환해
+봉인했다 (`hardcodedKoreanBaseline = 253`, 증가=FAIL·감소=라체트 조임). 253건과
+`suffixText: '회'` 류 접미사, 커스텀 위젯 named param(`title:`·`unit:` 등)의 한글은
+**단계 2 이관 대상**이다.
 
 ---
 

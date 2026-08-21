@@ -116,4 +116,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String hoursOptionLabel(int hours) {
     return '$hours시간';
   }
+
+  @override
+  String backupWrongExtensionMessage(String extension) {
+    return '올바른 백업 파일이 아닙니다.\n$extension 확장자 파일을 선택해주세요.';
+  }
+
+  @override
+  String get backupPathUnavailableMessage => '파일 경로를 가져올 수 없습니다.';
+
+  @override
+  String get selectorValidityDaysInputHint => '유효기간 입력';
+
+  @override
+  String get selectorValidityMonthsInputHint => '개월 입력';
+
+  @override
+  String get practiceMeasureRangeGuide => '연습할 마디 구간을 선택하세요';
+
+  @override
+  String get practiceLineRangeGuide => '연습할 줄 구간을 선택하세요 (1~10줄)';
 }

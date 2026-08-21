@@ -12,7 +12,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_detail_app_bar.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../schedule/schedule_facade.dart'
-    show teacherAvailabilityApiProvider;
+    show teacherAvailabilityApiProvider, teacherAvailabilityProvider;
 import '../../../settings/settings_facade.dart';
 import '../widgets/first_availability_celebration_sheet.dart';
 import '../../../../core/widgets/onboarding_step_header.dart';
@@ -344,6 +344,9 @@ class _FirstAvailabilitySetupScreenState
       // the FE-side replaceAvailableSlots path which only touched the
       // legacy mirror. Reader unification (Job 3) is a follow-up PR.
       await ref.read(teacherAvailabilityApiProvider).postOnboarding(newSlots);
+      // 리뷰 0821 — 저장 후 availability snapshot 을 갱신하지 않으면 온보딩
+      // 게이트가 stale 값을 읽는다 (형제 뮤테이션들과 같은 invalidate 패턴).
+      ref.invalidate(teacherAvailabilityProvider);
       if (!mounted) return;
       // Celebration sheet — modal sheet, no skip.
       await showFirstAvailabilityCelebrationSheet(context);

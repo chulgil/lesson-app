@@ -87,6 +87,24 @@ void main() {
       expect(result.settingsSlotCount, 2);
     });
 
+    test('같은 요일 슬롯이 여러 개여도 id 가 충돌하지 않는다 (리뷰 0821)', () async {
+      final repo = _FakeAvailabilityRepository();
+      final api = LocalTeacherAvailabilityApi(
+        repository: repo,
+        teacherIdResolver: () => 'teacher_1',
+      );
+
+      // 재제출 시나리오: 기존 슬롯과 신규 선택이 같은 요일로 겹친다.
+      await api.postOnboarding([_slot(1), _slot(1), _slot(3)]);
+
+      final ids = repo.lastSaved!.weeklySchedules.map((s) => s.id).toList();
+      expect(
+        ids.toSet().length,
+        ids.length,
+        reason: 'ids must be unique: $ids',
+      );
+    });
+
     test('availability 가 없으면 teacherId 앵커로 새로 만들어 저장한다', () async {
       final repo = _FakeAvailabilityRepository();
       final api = LocalTeacherAvailabilityApi(

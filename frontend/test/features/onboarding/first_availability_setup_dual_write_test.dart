@@ -21,8 +21,13 @@ import 'package:lessonaza/core/theme/app_theme.dart';
 import 'package:lessonaza/features/onboarding/presentation/screens/first_availability_setup_screen.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/schedule/data/services/teacher_availability_onboarding_api.dart';
+import 'package:lessonaza/features/schedule/domain/entities/teacher_availability.dart';
+import 'package:lessonaza/features/schedule/domain/repositories/teacher_availability_repository.dart';
 import 'package:lessonaza/features/schedule/schedule_facade.dart'
-    show teacherAvailabilityApiProvider;
+    show
+        teacherAvailabilityApiProvider,
+        teacherAvailabilityProvider,
+        teacherAvailabilityRepositoryProvider;
 import 'package:lessonaza/features/settings/settings_facade.dart';
 
 class _SpyOnboardingApi implements TeacherAvailabilityApi {
@@ -143,4 +148,77 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  // 리뷰 0821 — mock 경로에서 저장 후 availability snapshot 이 stale 하면
+  // 온보딩 게이트가 루프를 돌 수 있다. 제출이 teacherAvailabilityProvider 를
+  // invalidate 해 재조회를 유발하는지 검증한다.
+  testWidgets('제출 후 teacherAvailabilityProvider 를 invalidate 해 재조회한다', (
+    tester,
+  ) async {
+    final spy = _SpyOnboardingApi();
+    final countingRepo = _CountingAvailabilityRepository();
+
+    tester.view.physicalSize = const Size(1080, 1920);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          teacherAvailabilityApiProvider.overrideWithValue(spy),
+          teacherAvailabilityRepositoryProvider.overrideWithValue(countingRepo),
+          teacherSettingsProvider.overrideWith(
+            (ref) async => _emptyTeacherSettings(),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const Stack(
+            children: [FirstAvailabilitySetupScreen(), _AvailabilityProbe()],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final before = countingRepo.getAvailabilityCalls;
+    expect(before, greaterThan(0), reason: 'probe must warm the provider');
+
+    await tester.tap(find.text(AppStrings.firstAvailabilityApplyAction));
+    // celebration sheet 애니메이션이 계속 돌아 pumpAndSettle 은 타임아웃 —
+    // 기존 테스트와 같은 고정 pump 로 대체.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(spy.callCount, 1);
+    expect(
+      countingRepo.getAvailabilityCalls,
+      greaterThan(before),
+      reason: '제출 후 invalidate 로 availability 재조회가 일어나야 한다',
+    );
+  });
+}
+
+class _CountingAvailabilityRepository implements TeacherAvailabilityRepository {
+  int getAvailabilityCalls = 0;
+
+  @override
+  Future<TeacherAvailability?> getAvailability(String teacherId) async {
+    getAvailabilityCalls++;
+    return null;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Keeps teacherAvailabilityProvider alive so invalidate triggers a re-fetch.
+class _AvailabilityProbe extends ConsumerWidget {
+  const _AvailabilityProbe();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(teacherAvailabilityProvider('teacher-1'));
+    return const SizedBox.shrink();
+  }
 }

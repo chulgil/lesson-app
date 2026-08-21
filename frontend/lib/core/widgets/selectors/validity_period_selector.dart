@@ -144,7 +144,13 @@ class ValidityPeriodSelector extends StatelessWidget {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
                 hintText:
-                    inputUnit == ValidityInputUnit.days ? '유효기간 입력' : '개월 입력',
+                    inputUnit == ValidityInputUnit.days
+                        ? AppLocalizations.of(
+                          context,
+                        ).selectorValidityDaysInputHint
+                        : AppLocalizations.of(
+                          context,
+                        ).selectorValidityMonthsInputHint,
                 suffixText: inputUnit == ValidityInputUnit.days ? '일' : '개월',
                 filled: true,
                 fillColor: AppColors.paper,

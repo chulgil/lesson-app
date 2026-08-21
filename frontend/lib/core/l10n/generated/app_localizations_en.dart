@@ -119,4 +119,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String hoursOptionLabel(int hours) {
     return '${hours}h';
   }
+
+  @override
+  String backupWrongExtensionMessage(String extension) {
+    return 'Not a valid backup file.\nPlease choose a $extension file.';
+  }
+
+  @override
+  String get backupPathUnavailableMessage => 'Couldn\'t access the file path.';
+
+  @override
+  String get selectorValidityDaysInputHint => 'Enter validity (days)';
+
+  @override
+  String get selectorValidityMonthsInputHint => 'Enter months';
+
+  @override
+  String get practiceMeasureRangeGuide =>
+      'Select the measure range to practice';
+
+  @override
+  String get practiceLineRangeGuide =>
+      'Select the line range to practice (lines 1–10)';
 }

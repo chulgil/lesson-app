@@ -22,6 +22,7 @@ import '../providers/orphan_recording_provider.dart';
 import '../screens/all_recordings_screen.dart';
 import 'backup_item_actions_bottom_sheet.dart';
 import '../../../../core/domain/entities/backup_stage.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 import '../../../../core/presentation/extensions/backup_stage_labels.dart';
 
 /// Status card showing backup summary information.
@@ -376,7 +377,7 @@ class ActionsSection extends ConsumerWidget {
               : Text(
                 (result.failure ??
                         const BackupFailure(BackupFailureKind.unknown))
-                    .message,
+                    .resolveMessage(AppLocalizations.of(context)),
               ),
       confirmLabel: AppStrings.confirm,
       onConfirm: () => Navigator.pop(context),
@@ -648,7 +649,7 @@ class BackupItem extends ConsumerWidget {
               : Text(
                 (result.failure ??
                         const BackupFailure(BackupFailureKind.unknown))
-                    .message,
+                    .resolveMessage(AppLocalizations.of(context)),
               ),
       confirmLabel: AppStrings.confirm,
       onConfirm: () => Navigator.pop(context),
