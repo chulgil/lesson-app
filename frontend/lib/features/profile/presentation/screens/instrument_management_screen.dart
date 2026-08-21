@@ -15,6 +15,7 @@ import '../../../../core/theme/notebook_typography.dart';
 import '../../../../features/auth/auth_facade.dart';
 import '../../../onboarding/onboarding_facade.dart';
 import '../../../settings/settings_facade.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Screen for managing teacher's instruments.
 ///
@@ -366,14 +367,14 @@ class _InstrumentManagementScreenState
           );
       if (!mounted) return;
       Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.instrumentAddedWith(instrument))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.instrumentAddedWith(instrument))),
+      );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.instrumentAddFailed)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.instrumentAddFailed)),
+      );
     }
   }
 
@@ -394,14 +395,14 @@ class _InstrumentManagementScreenState
       _customInstrumentController.clear();
       if (!mounted) return;
       Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.instrumentAddedWith(instrument))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.instrumentAddedWith(instrument))),
+      );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.instrumentAddFailed)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.instrumentAddFailed)),
+      );
     }
   }
 
@@ -435,9 +436,13 @@ class _InstrumentManagementScreenState
           ),
         );
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('$instrument이(가) 삭제되었습니다')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).instrumentDeletedMessage(instrument),
+          ),
+        ),
+      );
     }
   }
 }

@@ -17,6 +17,7 @@ import '../../domain/entities/follow.dart';
 import '../../domain/entities/follow_target_type.dart';
 import '../providers/follow_providers.dart';
 import '../widgets/follow_card.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Follow list screen with filter tabs.
 class FollowListScreen extends ConsumerWidget {
@@ -35,7 +36,11 @@ class FollowListScreen extends ConsumerWidget {
             labelColor: AppColors.paperAccent,
             unselectedLabelColor: AppColors.inkSecondary,
             indicatorColor: AppColors.paperAccent,
-            tabs: [Tab(text: AppStrings.followTabAll), Tab(text: AppStrings.teacher), Tab(text: AppStrings.followTabAcademy)],
+            tabs: [
+              Tab(text: AppStrings.followTabAll),
+              Tab(text: AppStrings.teacher),
+              Tab(text: AppStrings.followTabAcademy),
+            ],
           ),
         ),
         body: TabBarView(
@@ -82,9 +87,10 @@ class _FollowTab extends ConsumerWidget {
             subtitle: AppStrings.followEmptySubtitle,
             actionLabel: isAcademyTab ? null : AppStrings.teacherSearchButton,
             actionIcon: isAcademyTab ? null : Icons.search,
-            onAction: isAcademyTab
-                ? null
-                : () => context.push(AppRoutes.teacherSearch),
+            onAction:
+                isAcademyTab
+                    ? null
+                    : () => context.push(AppRoutes.teacherSearch),
           );
         }
 
@@ -114,7 +120,11 @@ class _FollowTab extends ConsumerWidget {
     final confirmed = await showNotebookDialog<bool>(
       context: context,
       title: AppStrings.followCancelTitle,
-      content: Text('${follow.followingName ?? follow.followingId}의 팔로우를 취소하시겠습니까?'),
+      content: Text(
+        AppLocalizations.of(
+          context,
+        ).followCancelConfirmBody(follow.followingName ?? follow.followingId),
+      ),
       confirmLabel: AppStrings.followCancelConfirmLabel,
       cancelLabel: AppStrings.cancel,
       isDestructive: true,

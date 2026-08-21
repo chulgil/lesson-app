@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/app_strings.dart';
 
 /// Common widget for selecting lesson count with preset chips and custom input.
 ///
@@ -76,7 +78,7 @@ class LessonCountSelector extends StatelessWidget {
             ...presets.map((count) {
               final isSelected = !isCustom && selectedCount == count;
               return ChoiceChip(
-                label: Text('$count회'),
+                label: Text(AppStrings.usageCountShort(count)),
                 selected: isSelected,
                 onSelected: (selected) {
                   if (selected) {
@@ -87,18 +89,20 @@ class LessonCountSelector extends StatelessWidget {
                 selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color:
-                      isSelected ? AppColors.paperAccent : AppColors.ink,
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
             }),
             // Custom input chip
             ChoiceChip(
-              label: const Text('직접 입력'),
+              label: Text(AppLocalizations.of(context).selectorDirectInput),
               selected: isCustom,
               onSelected: (selected) {
                 if (selected) {
@@ -109,7 +113,8 @@ class LessonCountSelector extends StatelessWidget {
               selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
               checkmarkColor: AppColors.paperAccent,
               side: BorderSide(
-                color: isCustom ? AppColors.paperAccent : AppColors.inkQuaternary,
+                color:
+                    isCustom ? AppColors.paperAccent : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color: isCustom ? AppColors.paperAccent : AppColors.ink,
@@ -128,7 +133,7 @@ class LessonCountSelector extends StatelessWidget {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
-                hintText: '횟수 입력',
+                hintText: AppLocalizations.of(context).selectorCountInputHint,
                 suffixText: '회',
                 filled: true,
                 fillColor: AppColors.paper,

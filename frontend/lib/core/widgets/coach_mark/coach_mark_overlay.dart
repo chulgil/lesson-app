@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Position of the speech-bubble relative to the highlighted target.
 enum CoachMarkPosition { above, below }
@@ -348,7 +349,7 @@ class _BalloonCard extends StatelessWidget {
                       horizontal: AppSpacing.space2,
                     ),
                   ),
-                  child: const Text('건너뛰기'),
+                  child: Text(AppLocalizations.of(context).coachMarkSkip),
                 )
               else
                 const SizedBox.shrink(),

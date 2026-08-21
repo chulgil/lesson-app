@@ -39,6 +39,13 @@ ALLOWED_PATH_PARTS = {
     "generated",
 }
 
+# i18n_migration_spec.md §2.2 — 디버그 전용 화면은 이관 제외 (개발자 전용 문자열).
+# test/architecture/hardcoded_korean_guard_test.dart 의 예외 목록과 동기 유지.
+DEBUG_ONLY_FILES = {
+    Path("lib/core/widgets/debug_role_switcher.dart"),
+    Path("lib/core/widgets/recording_diagnostic_screen.dart"),
+}
+
 
 def find_project_root(start: Path) -> Path | None:
     for parent in [start, *start.parents]:
@@ -61,6 +68,8 @@ def is_flutter_project(root: Path) -> bool:
 def should_skip(path: Path, root: Path) -> bool:
     rel = path.relative_to(root)
     if path.name.endswith(".g.dart") or path.name.endswith(".freezed.dart"):
+        return True
+    if rel in DEBUG_ONLY_FILES:
         return True
     if any(part in ALLOWED_PATH_PARTS for part in rel.parts):
         return True

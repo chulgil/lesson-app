@@ -106,20 +106,25 @@ done
 
 이 케이스가 가장 회피 쉬움 — 키만 바꾸면 끝. 단계 1 작업 시 우선 처리.
 
-### 2.2 정리 규칙
+### 2.2 정리 규칙 (2026-08-21 단계 0 도입 후 개정)
 
 | 종류 | 이관 대상 |
 |------|----------|
-| 재사용 가능한 UI 문구 | `app_strings.dart` 신규 상수 추가 |
-| 1회성 알림/snackbar 메시지 | `app_strings.dart` (모든 사용자 표시 문구는 SSOT) |
-| 데이터(샘플 데이터 `local_app_release_repository.dart` 등) | seed/asset로 분리 또는 AppStrings 처리 |
-| 디버그/로그 문자열 | AppStrings 제외 (개발자 전용) |
+| UI 문구 (재사용·1회성 모두) | **ARB 키(app_ko+app_en) + AppLocalizations** — 단계 0 라체트가 AppStrings 신규 상수를 차단. 동일 의미의 **기존 AppStrings 상수/포매터가 있으면 재사용** (C4) |
+| 데이터(샘플 데이터 `local_app_release_repository.dart` 등) | seed/asset로 분리 |
+| 디버그/로그 문자열 | 이관 제외 (개발자 전용) — 예외 목록: `hardcoded_korean_guard_test.dart`·`i18n-l10n-guard.py` 의 DEBUG_ONLY_FILES |
 
 ### 2.3 검수
 
 - `flutter analyze` 통과
-- 위 grep 0건
+- **기계 게이트**: `test/architecture/hardcoded_korean_guard_test.dart` 0건 (2026-08-21 도입 — 검출 범위 lib 전체, features 한정이던 §2.1 grep 을 대체·강화)
 - 변경 없는 화면 회귀: `flutter test` + 스크린샷 회귀 (Playwright/golden)
+
+### 2.4 단계 1 실행 기록 (2026-08-21)
+
+- 실측 위반 29건(생산 21파일) 박멸: ARB 신규 22키(ko/en 병기) + 기존 AppStrings 포매터 재사용 2건(`practiceCountTimes`·`usageCountShort`)
+- 디버그 전용 2파일(`debug_role_switcher`·`recording_diagnostic_screen`) 은 §2.2 규칙으로 예외 등록
+- 잔여(후속 이슈): data 계층의 AppStrings 의존 2건(backup 서비스 onProgress) — BackupStage enum 분리 리디자인 필요. `suffixText: '회'` 류 미검출 접미사는 단계 2 에서 이관
 
 ---
 

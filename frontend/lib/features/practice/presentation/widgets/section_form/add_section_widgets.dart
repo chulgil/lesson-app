@@ -213,7 +213,7 @@ class RepeatCountSection extends StatelessWidget {
               9,
               (index) => DropdownMenuItem(
                 value: index + 2,
-                child: Text('${index + 2}회'),
+                child: Text(AppStrings.practiceCountTimes(index + 2)),
               ),
             ),
           ],
@@ -409,13 +409,14 @@ class PieceSuggestionChips extends StatelessWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space1,
-      children: suggestions.take(maxItems).map((name) {
-        return ActionChip(
-          label: Text(name, style: AppTypography.bodySmall),
-          onPressed: () => onSelected(name),
-          visualDensity: VisualDensity.compact,
-        );
-      }).toList(),
+      children:
+          suggestions.take(maxItems).map((name) {
+            return ActionChip(
+              label: Text(name, style: AppTypography.bodySmall),
+              onPressed: () => onSelected(name),
+              visualDensity: VisualDensity.compact,
+            );
+          }).toList(),
     );
   }
 }

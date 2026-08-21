@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
+import 'package:lessonaza/core/l10n/generated/app_localizations.dart';
 import 'package:lessonaza/features/profile/domain/entities/teacher_settings.dart';
 import 'package:lessonaza/features/settings/settings_facade.dart';
 import 'package:lessonaza/features/subscription/presentation/screens/subscription_template_form_sheet.dart';
@@ -41,6 +42,9 @@ Future<void> _pumpSheet(
         ),
       ],
       child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ko'),
         home: Scaffold(
           body: SubscriptionTemplateFormSheet(
             teacherId: 'teacher-1',

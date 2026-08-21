@@ -15,6 +15,7 @@ import '../../../features/academy/presentation/screens/academy_activity_timeline
 import '../../../features/academy/presentation/screens/bulk_closure_detail_screen.dart';
 import '../../../features/schedule/presentation/screens/makeup_lesson_input_screen.dart';
 import '../app_routes.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Academy routes (G15 일괄 휴강 + 활동 타임라인).
 ///
@@ -31,8 +32,10 @@ List<GoRoute> academyRoutes = [
       final teacherMemberId =
           (state.uri.queryParameters['teacherMemberId'] ?? '').trim();
       if (closureId.isEmpty) {
-        return const NotebookScreenScaffold(
-          body: Center(child: Text('휴강 정보를 불러올 수 없습니다.')),
+        return NotebookScreenScaffold(
+          body: Center(
+            child: Text(AppLocalizations.of(context).academyClosureLoadError),
+          ),
         );
       }
       return BulkClosureDetailScreen(
@@ -52,8 +55,10 @@ List<GoRoute> academyRoutes = [
       // 수행하며, router 빌더가 ProviderScope 를 통해 호출한다 (placeholder 금지).
       final extra = state.extra;
       if (extra is! MakeupRouteExtra) {
-        return const NotebookScreenScaffold(
-          body: Center(child: Text('휴강 정보를 불러올 수 없습니다.')),
+        return NotebookScreenScaffold(
+          body: Center(
+            child: Text(AppLocalizations.of(context).academyClosureLoadError),
+          ),
         );
       }
       final container = ProviderScope.containerOf(context);

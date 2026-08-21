@@ -10,6 +10,7 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/notebook/notebook_surfaces.dart';
 import '../../../auth/auth_facade.dart';
 import '../providers/bulk_teacher_action_providers.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// §7.119 B2 일괄 메시지 바텀시트.
 ///
@@ -64,9 +65,13 @@ class _BulkMessageSheetState extends ConsumerState<BulkMessageSheet> {
     );
     if (!mounted) return;
     setState(() => _submitting = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$count명에게 메시지를 보냈습니다')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context).bulkMessageSentMessage(count),
+        ),
+      ),
+    );
     Navigator.of(context).pop(true);
   }
 

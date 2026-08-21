@@ -13,6 +13,7 @@ import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../extensions/practice_display_extensions.dart';
 import '../../providers/tuner_provider.dart';
+import '../../../../../core/l10n/generated/app_localizations.dart';
 
 /// Bottom sheet for tuner settings.
 class TunerSettingsSheet extends ConsumerWidget {
@@ -567,7 +568,7 @@ class _ToggleSection extends StatelessWidget {
       children: [
         SwitchListTile(
           title: const Text(AppStrings.tunerShowComboTitle),
-          subtitle: const Text('Perfect 연속 달성 시 콤보 표시'),
+          subtitle: Text(AppLocalizations.of(context).tunerShowComboSubtitle),
           value: showCombo,
           onChanged: (_) => onShowComboChanged(),
           activeThumbColor: AppColors.paperAccent,
@@ -575,7 +576,7 @@ class _ToggleSection extends StatelessWidget {
         ),
         SwitchListTile(
           title: const Text(AppStrings.tunerVibrationFeedbackTitle),
-          subtitle: const Text('Perfect 튜닝 시 진동'),
+          subtitle: Text(AppLocalizations.of(context).tunerVibrationSubtitle),
           value: vibrationFeedback,
           onChanged: (_) => onVibrationChanged(),
           activeThumbColor: AppColors.paperAccent,

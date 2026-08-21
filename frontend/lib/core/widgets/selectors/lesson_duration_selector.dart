@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Common widget for selecting lesson duration with preset chips and optional custom input.
 ///
@@ -98,12 +99,13 @@ class LessonDurationSelector extends StatelessWidget {
                 selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isSelected
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color: isSelected
-                      ? AppColors.paperAccent
-                      : AppColors.ink,
+                  color: isSelected ? AppColors.paperAccent : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
@@ -111,7 +113,7 @@ class LessonDurationSelector extends StatelessWidget {
             // Custom input chip
             if (allowCustomInput)
               ChoiceChip(
-                label: const Text('직접 입력'),
+                label: Text(AppLocalizations.of(context).selectorDirectInput),
                 selected: isCustom,
                 onSelected: (selected) {
                   if (selected) {
@@ -122,11 +124,13 @@ class LessonDurationSelector extends StatelessWidget {
                 selectedColor: AppColors.paperAccent.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.paperAccent,
                 side: BorderSide(
-                  color: isCustom ? AppColors.paperAccent : AppColors.inkQuaternary,
+                  color:
+                      isCustom
+                          ? AppColors.paperAccent
+                          : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color:
-                      isCustom ? AppColors.paperAccent : AppColors.ink,
+                  color: isCustom ? AppColors.paperAccent : AppColors.ink,
                   fontWeight: isCustom ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -142,7 +146,8 @@ class LessonDurationSelector extends StatelessWidget {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
-                hintText: '시간 입력',
+                hintText:
+                    AppLocalizations.of(context).selectorDurationInputHint,
                 suffixText: '분',
                 filled: true,
                 fillColor: AppColors.paper,

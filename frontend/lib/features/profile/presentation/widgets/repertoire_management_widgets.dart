@@ -13,6 +13,7 @@ import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/swipe_action_tile.dart';
 import '../../../../features/practice/domain/entities/piece.dart';
 import 'piece_actions_bottom_sheet.dart';
+import '../../../../core/l10n/generated/app_localizations.dart';
 
 /// Difficulty tier color — SSOT for the 5 difficulty labels, collapsed to
 /// 3 tiers (초급/초중급 · 중급/중상급 · 상급) to satisfy the "3색 이하" UX rule.
@@ -759,7 +760,9 @@ void showDeletePieceConfirmation({
   showNotebookDialog(
     context: context,
     title: AppStrings.profileRepertoirePieceDeleteTitle,
-    content: Text('${piece.title}을(를) 삭제하시겠습니까?'),
+    content: Text(
+      AppLocalizations.of(context).repertoireDeleteConfirmBody(piece.title),
+    ),
     confirmLabel: AppStrings.delete,
     cancelLabel: AppStrings.cancel,
     isDestructive: true,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/core/l10n/generated/app_localizations.dart';
 import 'package:lessonaza/core/widgets/coach_mark/coach_mark_controller.dart';
 import 'package:lessonaza/core/widgets/coach_mark/coach_mark_overlay.dart';
 import 'package:lessonaza/core/widgets/coach_mark/coach_mark_scope.dart';
@@ -15,6 +16,9 @@ Future<void> pumpOverlay(WidgetTester tester) async {
 // Material widgets (buttons, TextTheme, etc.) and MediaQuery are available.
 Widget _wrap(Widget child) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('ko'),
     home: MediaQuery(
       data: const MediaQueryData(size: Size(390, 844)),
       child: Scaffold(body: SizedBox(width: 390, height: 844, child: child)),
@@ -246,6 +250,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ko'),
           home: Scaffold(
             body: CoachMarkScope(
               controller: controller,
@@ -297,6 +304,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ko'),
           home: Scaffold(
             body: CoachMarkScope(
               controller: controller,
