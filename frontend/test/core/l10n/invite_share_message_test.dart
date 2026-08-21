@@ -146,6 +146,32 @@ void main() {
     });
   });
 
+  group('inviteShareMessageFormat — 이중 존칭 방지 (#1290)', () {
+    test('악기 없이 이름만 있어도 "선생님님" 이 나오지 않는다', () {
+      final text = AppStrings.inviteShareMessageFormat(
+        '123456',
+        'https://lesson.app/i/123456',
+        AppStrings.teacher,
+        senderName: '김선생',
+      );
+
+      expect(text.contains('선생님님'), isFalse);
+      expect(text, contains('김선생 선생님이 레슨앱에 초대했어요'));
+    });
+
+    test('악기가 있는 헤더도 "선생님님" 이 나오지 않는다', () {
+      final text = AppStrings.inviteShareMessageFormat(
+        '123456',
+        'https://lesson.app/i/123456',
+        AppStrings.teacher,
+        senderName: '김선생',
+        instruments: const ['바이올린'],
+      );
+
+      expect(text.contains('선생님님'), isFalse);
+    });
+  });
+
   group('inviteParentShareMessageFormat — 학부모 시작 안내 (UXB-3)', () {
     test('학생 이름이 있으면 누구의 학부모인지 밝힌다', () {
       final text = AppStrings.inviteParentShareMessageFormat(

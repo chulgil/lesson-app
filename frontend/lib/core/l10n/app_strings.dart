@@ -6737,10 +6737,13 @@ class AppStrings {
     List<String> instruments = const [],
   }) {
     final hasIdentity = senderName != null && senderName.isNotEmpty;
+    // #1290 — '선생님' 처럼 role 이 이미 '님' 으로 끝나면 조사만 붙인다
+    // ("김선생 선생님님이" 이중 존칭 방지).
+    final roleSubject = role.endsWith('님') ? '$role이' : '$role님이';
     final header =
         hasIdentity
             ? (instruments.isEmpty
-                ? '$senderName $role님이 레슨앱에 초대했어요!'
+                ? '$senderName $roleSubject 레슨앱에 초대했어요!'
                 : '${instruments.join(', ')} $role $senderName 님이 레슨앱에 초대했어요!')
             : '레슨앱에서 저와 함께해요!';
     final signature = hasIdentity ? '- $senderName $role 드림' : '- $role 드림';

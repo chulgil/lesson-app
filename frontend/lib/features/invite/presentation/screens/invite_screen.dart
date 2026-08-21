@@ -471,10 +471,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
     SharePlus.instance.share(
       ShareParams(
-        text: AppStrings.inviteShareMessageFormat(
-          invite.inviteCode,
-          invite.inviteUrl,
-          roleText,
+        text: buildInviteShareText(
+          invite,
+          roleText: roleText,
           senderName: senderName,
           instruments: instruments,
         ),
@@ -488,4 +487,29 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     // In the future, can integrate Kakao SDK for native sharing
     _shareLink(invite);
   }
+}
+
+
+/// Builds the invite share message for [invite] (#1290).
+///
+/// Parent-targeted invites use the dedicated parent template — they are
+/// redeemed with the 6-digit code only, so the generic deep-link message
+/// would mislead. Everything else (student/teacher/legacy null) keeps the
+/// generic template.
+String buildInviteShareText(
+  Invite invite, {
+  required String roleText,
+  String? senderName,
+  List<String> instruments = const [],
+}) {
+  if (invite.targetRole == InviteTargetRole.parent) {
+    return AppStrings.inviteParentShareMessageFormat(invite.inviteCode);
+  }
+  return AppStrings.inviteShareMessageFormat(
+    invite.inviteCode,
+    invite.inviteUrl,
+    roleText,
+    senderName: senderName,
+    instruments: instruments,
+  );
 }
