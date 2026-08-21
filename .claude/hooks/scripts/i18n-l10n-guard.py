@@ -14,6 +14,7 @@ PostToolUse 단계에서 production Dart 파일의 직접 한글 UI 문자열을
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -184,11 +185,35 @@ def find_cross_feature_provider_imports(root: Path) -> list[tuple[Path, int, str
     return violations
 
 
+def edited_file_from_stdin() -> Path | None:
+    """PostToolUse payload 의 tool_input.file_path (없으면 None — 전체 스캔만)."""
+    if sys.stdin.isatty():
+        return None
+    try:
+        payload = json.load(sys.stdin)
+    except (json.JSONDecodeError, OSError, ValueError):
+        return None
+    file_path = (payload.get("tool_input") or {}).get("file_path")
+    return Path(file_path) if file_path else None
+
+
 def main() -> None:
+    edited = edited_file_from_stdin()
     root = find_project_root(Path.cwd())
     if root is None or not is_flutter_project(root):
         print("Success")
         return
+
+    # 글로벌 확장 단계 0 (신규 문자열 = ARB) — app_strings.dart 편집 시 리마인더.
+    # advisory 전용 (stderr, 차단 없음). 기계 강제는 라체트 테스트가 담당:
+    # test/architecture/app_strings_ratchet_test.dart
+    if edited is not None and edited.name == "app_strings.dart":
+        print(
+            "[i18n] app_strings.dart 편집 감지 — 신규 사용자-facing 문자열은 "
+            "ARB(app_ko.arb + app_en.arb) + AppLocalizations 로 추가하세요. "
+            "AppStrings 멤버 증가는 app_strings_ratchet_test 가 차단합니다.",
+            file=sys.stderr,
+        )
 
     text_violations = find_violations(root)
     layer_violations = find_layer_violations(root)

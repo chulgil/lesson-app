@@ -44,10 +44,27 @@ frontend/lib/core/l10n/
 
 | 단계 | 목표 | 마일스톤 |
 |------|------|---------|
+| **0. 신규 유입 차단** | 신규 문자열은 ARB+AppLocalizations 로만 추가 — AppStrings 라체트 게이트 | **도입 완료 (2026-08-21)** |
 | **1. 하드코딩 박멸** | `title:`, `subtitle:`, `label:`, `hint:` 잔재를 AppStrings 또는 AppLocalizations로 흡수 | M2 |
 | **2. ARB 이관** | AppStrings 2,311개 → `app_ko.arb` 키 + AppLocalizations 사용 | M2~M3 |
 | **3. 영어 번역** | `app_en.arb` 전체 키 영문 번역 | Year 2 |
 | **4. 일본어 추가** | `app_ja.arb` 신규 + locale 분기 UI | Year 2+ |
+
+---
+
+## 1.5 단계 0 — 신규 유입 차단 게이트 (도입 완료, 2026-08-21)
+
+글로벌 확장 전략(옵시디언 56번)의 "지금 당장 할 일": 이관(단계 1~2)이 끝나기 전에도
+**부채가 더 늘지 않게** 신규 문자열의 진입점을 ARB 로 고정한다.
+
+- **정책**: 신규 사용자-facing 문자열 = `app_ko.arb` 키(+ `app_en.arb` 병기) + `AppLocalizations`.
+  `AppStrings` 신규 상수 추가 금지. 기존 상수는 이관 전까지 사용 유지.
+- **기계 강제**: `test/architecture/app_strings_ratchet_test.dart` — `AppStrings` 멤버 수를
+  baseline(도입 시점 실측 4,646 = static const 4,108 + static String 538) 이하로 잠근다.
+  이관으로 실측이 줄면 baseline 을 하향해 래칫을 조인다.
+- **편집 시 리마인더**: `.claude/hooks/scripts/i18n-l10n-guard.py` 가 `app_strings.dart`
+  편집 시 stderr advisory 를 낸다 (차단은 라체트 테스트 담당).
+- **규칙**: `.claude/rules/i18n-l10n.md` §신규 문자열 = ARB 필수.
 
 ---
 
